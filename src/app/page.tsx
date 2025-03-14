@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ToolCard from '@/components/ToolCard';
+import Link from 'next/link';
 
 export default function Home() {
   const tools = [
@@ -17,12 +18,35 @@ export default function Home() {
         <i className="fas fa-tools mr-2 text-blue-500"></i>Welcome to ToolHubX
       </h1>
       <p className="text-gray-300 text-center mb-8 max-w-2xl mx-auto">
-        Free tools with HMRC-compliant calculations to simplify your tax and financial planning. Results are estimates—consult a professional for official filings.
+        Free, HMRC-compliant tax calculators to simplify your financial planning. Results are estimates—consult a professional for official filings.
       </p>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-12">
         {tools.map((tool) => (
           <ToolCard key={tool.slug} {...tool} />
         ))}
+      </div>
+      <div className="text-center bg-gray-900 rounded-lg shadow-md mx-auto max-w-[700px] h-[300px] p-6 lg:p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-100">Latest Tax Tips</h2>
+        <div className="flex flex-col gap-4 items-center h-[calc(100%-2.5rem)] justify-center">
+          <Link
+            href="/blog/how-to-estimate-limited-company-taxes"
+            className="block w-full max-w-md px-4 py-3 text-blue-500 hover:text-blue-400 bg-gray-800 rounded-md hover:bg-gray-700 transition duration-150 text-base font-medium"
+          >
+            How to Estimate Your Limited Company Taxes in 5 Minutes
+          </Link>
+          <Link
+            href="/blog/self-employed-taxes-3-step-guide"
+            className="block w-full max-w-md px-4 py-3 text-blue-500 hover:text-blue-400 bg-gray-800 rounded-md hover:bg-gray-700 transition duration-150 text-base font-medium"
+          >
+            Self-Employed Taxes: A 3-Step Guide
+          </Link>
+          <Link
+            href="/blog/understanding-uk-personal-taxes"
+            className="block w-full max-w-md px-4 py-3 text-blue-500 hover:text-blue-400 bg-gray-800 rounded-md hover:bg-gray-700 transition duration-150 text-base font-medium"
+          >
+            Understanding Your UK Personal Taxes in Minutes
+          </Link>
+        </div>
       </div>
     </div>
   );
