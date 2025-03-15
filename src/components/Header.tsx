@@ -9,19 +9,12 @@ export default function Header() {
         <Link href="/" className="text-xl font-bold md:text-2xl text-white flex items-center">
           <i className="fas fa-tools mr-2 text-yellow-300"></i>ToolHubX
         </Link>
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+        {/* Commented out ad space and BMC link until AdSense approval */}
+        {/* <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="bg-gray-700 p-2 rounded-lg text-white text-sm shadow-md">
             <p><i className="fas fa-ad mr-2"></i>Support ToolHubX!</p>
           </div>
-          <a
-            href="https://www.buymeacoffee.com/toolhubx.uk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-yellow-300 hover:text-yellow-400 flex items-center transition duration-150"
-          >
-            <i className="fas fa-coffee mr-2" aria-hidden="true"></i>Buy Me a Coffee
-          </a>
-        </div>
+        </div> */}
       </div>
     </header>
   );
