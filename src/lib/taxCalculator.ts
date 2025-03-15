@@ -83,7 +83,7 @@ function calculateAllowance(
     isMarried: boolean,
     partnerIncome: number
 ): { allowance: number; marriageAllowance: number } {
-    const baseAllowance = TAX_YEARS[taxYear].allowance; // Changed from let to const (Line 86)
+    const baseAllowance = TAX_YEARS[taxYear].allowance;
     const taxCodeValue = taxCode.trim().toUpperCase() || '1257L';
 
     let allowance = baseAllowance;
@@ -107,7 +107,12 @@ function calculateAllowance(
     let marriageAllowance = 0;
     if (isMarried && partnerIncome <= 12570 && income >= 12571 && income <= 50270) {
         marriageAllowance = 252;
-        allowance += 1260; // Higher earner gets the transferred allowance
+        allowance += 1260;
+    } else if (taxCodeValue.endsWith('M')) {
+        allowance += 1260;
+        marriageAllowance = 252;
+    } else if (taxCodeValue.endsWith('N')) {
+        allowance -= 1260;
     }
 
     if (income > 100000) {
@@ -129,7 +134,6 @@ function calculateIncomeTax(
     const taxBreakdown: { band: string; amount: number; rate: number }[] = [];
     const taxCodeValue = taxCode.trim().toUpperCase();
     const bands = isScotland ? TAX_YEARS[taxYear].scotlandBands : TAX_YEARS[taxYear].ukBands;
-    const target = taxCodeValue === '0T' ? income : taxable;
 
     if (taxCodeValue === 'BR') {
         tax = income * 0.2;
@@ -144,7 +148,7 @@ function calculateIncomeTax(
         tax = 0;
         taxBreakdown.push({ band: 'No Tax', amount: 0, rate: 0 });
     } else {
-        let remaining = target;
+        let remaining = taxable;
         for (let i = 0; i < bands.length; i++) {
             if (remaining <= 0) break;
             const bandLimit = i === 0 ? bands[i].limit : bands[i].limit - bands[i - 1].limit;
@@ -163,10 +167,10 @@ function calculateIncomeTax(
     return { tax, taxBreakdown };
 }
 
-function calculateNI(income: number, taxYear: TaxYear): number {
+function calculateNI(income: number, taxYear: TaxYear): number { // Fixed: Use income, not taxable
     const niThreshold = TAX_YEARS[taxYear].niThreshold;
     const niUpper = TAX_YEARS[taxYear].niUpper;
-    const niTaxable = Math.max(income - niThreshold, 0);
+    const niTaxable = Math.max(income - niThreshold, 0); // NI on full income above threshold
 
     if (niTaxable <= niUpper - niThreshold) {
         return niTaxable * 0.08;
@@ -175,20 +179,27 @@ function calculateNI(income: number, taxYear: TaxYear): number {
     }
 }
 
-function calculateStudentLoan(income: number, studentLoan: string): number {
-    switch (studentLoan) {
-        case 'plan1':
-            return Math.max(income - 22015, 0) * 0.09;
-        case 'plan2':
-            return Math.max(income - 27295, 0) * 0.09;
-        case 'plan4':
-            return Math.max(income - 27660, 0) * 0.09;
-        case 'postgraduate':
-            return Math.max(income - 21000, 0) * 0.06;
-        case 'none':
-        default:
-            return 0;
+function calculateStudentLoan(income: number, studentLoans: string[]): number {
+    let totalStudentLoan = 0;
+    for (const loanType of studentLoans) {
+        switch (loanType) {
+            case 'plan1':
+                totalStudentLoan += Math.max(income - 22015, 0) * 0.09;
+                break;
+            case 'plan2':
+                totalStudentLoan += Math.max(income - 27295, 0) * 0.09;
+                break;
+            case 'plan4':
+                totalStudentLoan += Math.max(income - 27660, 0) * 0.09;
+                break;
+            case 'postgraduate':
+                totalStudentLoan += Math.max(income - 21000, 0) * 0.06;
+                break;
+            default:
+                break;
+        }
     }
+    return totalStudentLoan;
 }
 
 function calculateTaxForYear(
@@ -211,7 +222,7 @@ export function calculateTax(
     taxCode: string,
     pension: number,
     isPensionPercent: boolean,
-    studentLoan: string,
+    studentLoans: string[],
     isScotland: boolean,
     taxYear: TaxYear,
     isOverPensionAge: boolean,
@@ -232,7 +243,7 @@ export function calculateTax(
         taxYear,
         isScotland,
         isBlind,
-        isMarried,
+        isMarried && income - pensionContrib <= 50270,
         partnerSalary
     );
 
@@ -240,8 +251,8 @@ export function calculateTax(
     const taxable = Math.max(taxableBeforeDeductions - allowancesDeductions, 0);
 
     const { tax, taxBreakdown } = calculateIncomeTax(taxable, taxCode, income, taxYear, isScotland);
-    const ni = noNI || isOverPensionAge ? 0 : calculateNI(income, taxYear);
-    const student = calculateStudentLoan(income, studentLoan);
+    const ni = noNI || isOverPensionAge ? 0 : calculateNI(income, taxYear); // Fixed: NI on income
+    const student = calculateStudentLoan(income, studentLoans);
 
     const employerNI = Math.max(income - TAX_YEARS[taxYear].niThreshold, 0) * 0.138;
     const hmrcPensionRelief = pensionContrib * (taxBreakdown[taxBreakdown.length - 1]?.rate || 0);

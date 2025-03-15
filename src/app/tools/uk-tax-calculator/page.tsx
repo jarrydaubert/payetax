@@ -6,16 +6,18 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import ExcelJS from 'exceljs';
 import Link from 'next/link';
 
-// Input Form Component
+// Input Form Component (trimmed outputPeriod)
 const InputForm = ({
   taxYear,
   setTaxYear,
   allowancesDeductions,
   setAllowancesDeductions,
-  studentLoan,
-  setStudentLoan,
+  studentLoans,
+  setStudentLoans,
   isMarried,
   setIsMarried,
+  hoursPerWeek,
+  setHoursPerWeek,
   onCalculate,
   onReset,
 }: {
@@ -23,10 +25,12 @@ const InputForm = ({
   setTaxYear: React.Dispatch<React.SetStateAction<string>>;
   allowancesDeductions: string;
   setAllowancesDeductions: React.Dispatch<React.SetStateAction<string>>;
-  studentLoan: string;
-  setStudentLoan: React.Dispatch<React.SetStateAction<string>>;
+  studentLoans: string[];
+  setStudentLoans: React.Dispatch<React.SetStateAction<string[]>>;
   isMarried: boolean;
   setIsMarried: React.Dispatch<React.SetStateAction<boolean>>;
+  hoursPerWeek: string;
+  setHoursPerWeek: React.Dispatch<React.SetStateAction<string>>;
   onCalculate: (result: TaxResult | null, error: string) => void;
   onReset: () => void;
 }) => {
@@ -34,26 +38,38 @@ const InputForm = ({
   const [taxCode, setTaxCode] = useState<string>('1257L');
   const [pension, setPension] = useState<string>('0');
   const [isPensionPercent, setIsPensionPercent] = useState<boolean>(true);
-  const [region, setRegion] = useState<string>('england');
   const [isOverPensionAge, setIsOverPensionAge] = useState<boolean>(false);
   const [partnerSalary, setPartnerSalary] = useState<string>('0');
   const [isBlind, setIsBlind] = useState<boolean>(false);
   const [noNI, setNoNI] = useState<boolean>(false);
-  const [period, setPeriod] = useState<Period>('1');
-  const [hoursPerWeek, setHoursPerWeek] = useState<string>('37.5');
+  const [inputPeriod, setInputPeriod] = useState<Period>('1');
 
   const formatNumber = (value: string): string => {
     const num = parseFloat(value.replace(/,/g, '')) || 0;
-    return num.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return num.toLocaleString('en-GB', {
+      minimumFractionDigits: value.includes('.') ? 2 : 0,
+      maximumFractionDigits: 2,
+    });
   };
 
   const handleNumberInput = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const cleaned = value.replace(/[^0-9.]/g, '');
-    setter(cleaned ? formatNumber(cleaned) : '0');
+    if (cleaned.split('.').length > 2) return;
+    setter(cleaned ? cleaned : '0');
   };
 
   const handleFocus = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
     if (value === '0') setter('');
+  };
+
+  const handleBlur = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    setter(value === '' ? '0' : formatNumber(value));
+  };
+
+  const handleStudentLoanChange = (loanType: string) => {
+    setStudentLoans((prev) =>
+      prev.includes(loanType) ? prev.filter((loan) => loan !== loanType) : [...prev, loanType]
+    );
   };
 
   const calculate = useCallback(() => {
@@ -67,7 +83,7 @@ const InputForm = ({
 
     if (pensionNum < 0) return { error: 'Pension contribution cannot be negative.' };
     if (isPensionPercent && pensionNum > 100) return { error: 'Pension percentage cannot exceed 100%.' };
-    if (hoursNum <= 0 && period === '1950') return { error: 'Hours per week must be positive.' };
+    if (hoursNum <= 0 && inputPeriod === '1950') return { error: 'Hours per week must be positive.' };
     if (allowancesNum < 0) return { error: 'Allowances/Deductions cannot be negative.' };
 
     const taxResult = calculateTax(
@@ -75,20 +91,20 @@ const InputForm = ({
       taxCode,
       pensionNum,
       isPensionPercent,
-      studentLoan,
-      region === 'scotland',
+      studentLoans,
+      taxCode.startsWith('S'),
       taxYear as '2024' | '2025',
       isOverPensionAge,
-      isMarried,
+      isMarried && !taxCode.endsWith('M') && !taxCode.endsWith('N'),
       partnerNum,
       isBlind,
       noNI,
-      period,
+      inputPeriod,
       hoursNum,
       allowancesNum
     );
     return { result: taxResult };
-  }, [gross, taxCode, pension, isPensionPercent, studentLoan, region, taxYear, isOverPensionAge, isMarried, partnerSalary, isBlind, noNI, period, hoursPerWeek, allowancesDeductions]);
+  }, [gross, taxCode, pension, isPensionPercent, studentLoans, taxYear, isOverPensionAge, isMarried, partnerSalary, isBlind, noNI, inputPeriod, hoursPerWeek, allowancesDeductions]);
 
   useEffect(() => {
     if (gross !== '0') {
@@ -98,22 +114,21 @@ const InputForm = ({
       }, 500);
       return () => clearTimeout(timeout);
     }
-  }, [gross, taxCode, pension, isPensionPercent, studentLoan, region, taxYear, isOverPensionAge, isMarried, partnerSalary, isBlind, noNI, period, hoursPerWeek, allowancesDeductions, calculate, onCalculate]);
+  }, [gross, taxCode, pension, isPensionPercent, studentLoans, taxYear, isOverPensionAge, isMarried, partnerSalary, isBlind, noNI, inputPeriod, hoursPerWeek, allowancesDeductions, calculate, onCalculate]);
 
   const handleResetLocal = () => {
     setGross('0');
     setTaxCode('1257L');
     setPension('0');
     setIsPensionPercent(true);
-    setStudentLoan('none');
-    setRegion('england');
+    setStudentLoans([]);
     setTaxYear('2025');
     setIsOverPensionAge(false);
     setIsMarried(false);
     setPartnerSalary('0');
     setIsBlind(false);
     setNoNI(false);
-    setPeriod('1');
+    setInputPeriod('1');
     setHoursPerWeek('37.5');
     setAllowancesDeductions('0');
     onReset();
@@ -139,23 +154,6 @@ const InputForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-100">
-            <i className="fas fa-map-marker-alt mr-2 text-blue-500"></i>Tax Region 
-            <span className="ml-2 text-xs text-gray-500">Scotland has unique rates; others use UK rates (HMRC).</span>
-          </label>
-          <select
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-            aria-label="Select tax region"
-          >
-            <option value="england">England</option>
-            <option value="wales">Wales</option>
-            <option value="northernireland">Northern Ireland</option>
-            <option value="scotland">Scotland</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-100">
             <i className="fas fa-pound-sign mr-2 text-blue-500"></i>Gross Salary (£) 
             <span className="ml-2 text-xs text-gray-500">Your total pay before tax (per HMRC payslip).</span>
           </label>
@@ -164,7 +162,7 @@ const InputForm = ({
             value={gross}
             onChange={(e) => handleNumberInput(e.target.value, setGross)}
             onFocus={() => handleFocus(gross, setGross)}
-            onBlur={() => setGross(gross === '' ? '0' : gross)}
+            onBlur={() => handleBlur(gross, setGross)}
             className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
             placeholder="e.g., 30,000"
             aria-label="Enter gross salary"
@@ -196,9 +194,9 @@ const InputForm = ({
               value={pension}
               onChange={(e) => handleNumberInput(e.target.value, setPension)}
               onFocus={() => handleFocus(pension, setPension)}
-              onBlur={() => setPension(pension === '' ? '0' : pension)}
+              onBlur={() => handleBlur(pension, setPension)}
               className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              placeholder={isPensionPercent ? "e.g., 5" : "e.g., 1,000"}
+              placeholder={isPensionPercent ? "e.g., 8.4" : "e.g., 1,000"}
               aria-label="Enter pension contribution"
             />
             <select
@@ -214,32 +212,37 @@ const InputForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-100">
-            <i className="fas fa-graduation-cap mr-2 text-blue-500"></i>Student Loan Plan 
-            <span className="ml-2 text-xs text-gray-500">Repayments above thresholds (e.g., £27,295 for Plan 2, HMRC).</span>
+            <i className="fas fa-graduation-cap mr-2 text-blue-500"></i>Student Loan Plans 
+            <span className="ml-2 text-xs text-gray-500">Select all that apply; repayments above thresholds (HMRC).</span>
           </label>
-          <select
-            value={studentLoan}
-            onChange={(e) => setStudentLoan(e.target.value)}
-            className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-            aria-label="Select student loan plan"
-          >
-            <option value="none">None</option>
-            <option value="plan1">Plan 1</option>
-            <option value="plan2">Plan 2</option>
-            <option value="plan4">Plan 4</option>
-            <option value="postgraduate">Postgraduate</option>
-          </select>
+          <div className="flex flex-col gap-2">
+            {['plan1', 'plan2', 'plan4', 'postgraduate'].map((loanType) => (
+              <label key={loanType} className="flex items-center gap-2 text-sm text-gray-100">
+                <input
+                  type="checkbox"
+                  checked={studentLoans.includes(loanType)}
+                  onChange={() => handleStudentLoanChange(loanType)}
+                  className="h-4 w-4 text-blue-600 bg-gray-700 border-gray-600 rounded"
+                  aria-label={`Select ${loanType} student loan`}
+                />
+                {loanType === 'plan1' && 'Plan 1 (Pre-2012)'}
+                {loanType === 'plan2' && 'Plan 2 (2012-2023)'}
+                {loanType === 'plan4' && 'Plan 4 (Scotland)'}
+                {loanType === 'postgraduate' && 'Postgraduate'}
+              </label>
+            ))}
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-100">
-            <i className="fas fa-clock mr-2 text-blue-500"></i>Period 
-            <span className="ml-2 text-xs text-gray-500">How often you’re paid (HMRC standard).</span>
+            <i className="fas fa-clock mr-2 text-blue-500"></i>Input Period 
+            <span className="ml-2 text-xs text-gray-500">How often you\'re paid (HMRC standard).</span>
           </label>
           <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value as Period)}
+            value={inputPeriod}
+            onChange={(e) => setInputPeriod(e.target.value as Period)}
             className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-            aria-label="Select pay period"
+            aria-label="Select input pay period"
           >
             <option value="1">Yearly</option>
             <option value="12">Monthly</option>
@@ -247,21 +250,21 @@ const InputForm = ({
             <option value="26">Fortnightly</option>
             <option value="52">Weekly</option>
             <option value="260">Daily</option>
-            <option value="1950">Hourly (Full-Time)</option>
+            <option value="1950">Hourly</option>
           </select>
         </div>
-        {period === '1950' && (
+        {inputPeriod === '1950' && (
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-100">
               <i className="fas fa-hourglass-half mr-2 text-blue-500"></i>Hours per Week 
-              <span className="ml-2 text-xs text-gray-500">Used for hourly pay; 37.5 is full-time (HMRC).</span>
+              <span className="ml-2 text-xs text-gray-500">Adjust for part-time or full-time hourly pay.</span>
             </label>
             <input
               type="text"
               value={hoursPerWeek}
               onChange={(e) => handleNumberInput(e.target.value, setHoursPerWeek)}
               onFocus={() => handleFocus(hoursPerWeek, setHoursPerWeek)}
-              onBlur={() => setHoursPerWeek(hoursPerWeek === '' ? '37.5' : hoursPerWeek)}
+              onBlur={() => handleBlur(hoursPerWeek, setHoursPerWeek)}
               className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
               placeholder="e.g., 37.5"
               aria-label="Enter hours per week"
@@ -278,7 +281,7 @@ const InputForm = ({
             value={allowancesDeductions}
             onChange={(e) => handleNumberInput(e.target.value, setAllowancesDeductions)}
             onFocus={() => handleFocus(allowancesDeductions, setAllowancesDeductions)}
-            onBlur={() => setAllowancesDeductions(allowancesDeductions === '' ? '0' : allowancesDeductions)}
+            onBlur={() => handleBlur(allowancesDeductions, setAllowancesDeductions)}
             className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
             placeholder="e.g., 500"
             aria-label="Enter allowances or deductions"
@@ -344,7 +347,7 @@ const InputForm = ({
       {isMarried && (
         <div className="mb-6">
           <label className="block text-sm font-medium mb-1 text-gray-100">
-            <i className="fas fa-user-friends mr-2 text-blue-500"></i>Partner&apos;s Gross Wage (£) 
+            <i className="fas fa-user-friends mr-2 text-blue-500"></i>Partner\'s Gross Wage (£) 
             <span className="ml-2 text-xs text-gray-500">Used for Marriage Allowance if below £12,570 (HMRC).</span>
           </label>
           <input
@@ -352,10 +355,10 @@ const InputForm = ({
             value={partnerSalary}
             onChange={(e) => handleNumberInput(e.target.value, setPartnerSalary)}
             onFocus={() => handleFocus(partnerSalary, setPartnerSalary)}
-            onBlur={() => setPartnerSalary(partnerSalary === '' ? '0' : partnerSalary)}
+            onBlur={() => handleBlur(partnerSalary, setPartnerSalary)}
             className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
             placeholder="e.g., 20,000"
-            aria-label="Enter partner's gross wage"
+            aria-label="Enter partner\'s gross wage"
           />
         </div>
       )}
@@ -383,139 +386,200 @@ const InputForm = ({
   );
 };
 
-// Results Table Component
+// Results Table Component (multi-period version)
 const ResultsTable = ({
   result,
-  studentLoan,
+  studentLoans,
   isMarried,
   allowancesDeductions,
+  hoursPerWeek,
 }: {
   result: TaxResult | null;
-  studentLoan: string;
+  studentLoans: string[];
   isMarried: boolean;
   allowancesDeductions: string;
+  hoursPerWeek: string;
 }) => {
+  const [visiblePeriods, setVisiblePeriods] = useState<string[]>(['Yearly', 'Monthly', 'Weekly', 'Daily']);
+
   if (!result) return null;
+
+  const periodOptions: Record<string, number> = {
+    'Yearly': 1,
+    'Monthly': 12,
+    '4-Weekly': 13,
+    'Fortnightly': 26,
+    'Weekly': 52,
+    'Daily': 260,
+    'Hourly': 1950 * (parseFloat(hoursPerWeek || '37.5') / 37.5),
+  };
+
+  const handlePeriodToggle = (period: string) => {
+    setVisiblePeriods((prev) =>
+      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+    );
+  };
 
   return (
     <div className="p-4 bg-gray-800 rounded overflow-x-auto">
       <h2 className="text-lg font-semibold mb-4 text-gray-100 md:text-xl sticky top-0 bg-gray-800 z-10">
         <i className="fas fa-table mr-2 text-blue-500"></i>Your Payslip Summary
       </h2>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {Object.keys(periodOptions).map((period) => (
+          <label key={period} className="flex items-center gap-1 text-sm text-gray-100">
+            <input
+              type="checkbox"
+              checked={visiblePeriods.includes(period)}
+              onChange={() => handlePeriodToggle(period)}
+              className="h-4 w-4 text-blue-600 bg-gray-700 border-gray-600 rounded"
+            />
+            {period}
+          </label>
+        ))}
+      </div>
       <table className="w-full text-sm text-gray-100 border border-gray-600">
         <thead>
           <tr className="bg-gray-700 border-b border-gray-600 sticky top-8 z-10">
             <th className="p-2 text-left border-r border-gray-600">Category</th>
             <th className="p-2 text-right border-r border-gray-600">%</th>
-            <th className="p-2 text-right border-r border-gray-600">Yearly (£)</th>
-            <th className="p-2 text-right border-r border-gray-600">Monthly (£)</th>
-            <th className="p-2 text-right">Weekly (£)</th>
+            {visiblePeriods.map((period) => (
+              <th key={period} className="p-2 text-right border-r border-gray-600">{period} (£)</th>
+            ))}
           </tr>
         </thead>
         <tbody>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-money-bill-wave mr-2"></i>Gross Pay</td>
             <td className="p-2 text-right border-r border-gray-600">100%</td>
-            <td className="p-2 text-right border-r border-gray-600">{result.gross.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600">{(result.gross / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right">{(result.gross / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right border-r border-gray-600">
+                {(result.gross / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-shield-alt mr-2"></i>Tax-Free Allowance</td>
-            <td className="p-2 text-right border-r border-gray-600">{((result.allowance / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600">{result.allowance.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600">{(result.allowance / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right">{(result.allowance / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600">{((result.allowance / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right border-r border-gray-600">
+                {(result.allowance / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-balance-scale mr-2"></i>Total Taxable</td>
-            <td className="p-2 text-right border-r border-gray-600">{((result.taxable / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600">{result.taxable.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600">{(result.taxable / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right">{(result.taxable / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600">{((result.taxable / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right border-r border-gray-600">
+                {(result.taxable / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-hand-holding-usd mr-2"></i>Total Tax Due</td>
-            <td className="p-2 text-right border-r border-gray-600 text-red-400">{((result.tax / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-red-400">{result.tax.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-red-400">{(result.tax / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-red-400">{(result.tax / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-red-400">{((result.tax / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-red-400 border-r border-gray-600">
+                {(result.tax / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           {result.taxBreakdown.map((band, index) => (
             <tr key={index} className="border-b border-gray-600">
               <td className="p-2 pl-4 border-r border-gray-600"><i className="fas fa-percentage mr-2"></i>{band.band} Rate</td>
-              <td className="p-2 text-right border-r border-gray-600 text-red-400">{((band.amount / result.gross) * 100).toFixed(0)}%</td>
-              <td className="p-2 text-right border-r border-gray-600 text-red-400">{band.amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="p-2 text-right border-r border-gray-600 text-red-400">{(band.amount / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="p-2 text-right text-red-400">{(band.amount / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className="p-2 text-right border-r border-gray-600 text-red-400">{((band.amount / result.gross) * 100).toFixed(1)}%</td>
+              {visiblePeriods.map((period) => (
+                <td key={period} className="p-2 text-right text-red-400 border-r border-gray-600">
+                  {(band.amount / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </td>
+              ))}
             </tr>
           ))}
-          {studentLoan !== 'none' && (
+          {studentLoans.length > 0 && (
             <tr className="border-b border-gray-600">
-              <td className="p-2 border-r border-gray-600"><i className="fas fa-graduation-cap mr-2"></i>Student Loan</td>
-              <td className="p-2 text-right border-r border-gray-600 text-orange-400">{((result.student / result.gross) * 100).toFixed(0)}%</td>
-              <td className="p-2 text-right border-r border-gray-600 text-orange-400">{result.student.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="p-2 text-right border-r border-gray-600 text-orange-400">{(result.student / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-orange-400">{(result.student / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className="p-2 border-r border-gray-600"><i className="fas fa-graduation-cap mr-2"></i>Student Loan{studentLoans.length > 1 ? 's' : ''}</td>
+              <td className="p-2 text-right border-r border-gray-600 text-orange-400">{((result.student / result.gross) * 100).toFixed(1)}%</td>
+              {visiblePeriods.map((period) => (
+                <td key={period} className="p-2 text-right text-orange-400 border-r border-gray-600">
+                  {(result.student / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </td>
+              ))}
             </tr>
           )}
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-id-card mr-2"></i>National Insurance</td>
-            <td className="p-2 text-right border-r border-gray-600 text-yellow-400">{((result.ni / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-yellow-400">{result.ni.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-yellow-400">{(result.ni / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-yellow-400">{(result.ni / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-yellow-400">{((result.ni / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-yellow-400 border-r border-gray-600">
+                {(result.ni / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-piggy-bank mr-2"></i>Pension [You]</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{((result.pension / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{result.pension.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{(result.pension / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-purple-400">{(result.pension / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{((result.pension / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-purple-400 border-r border-gray-600">
+                {(result.pension / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-hand-holding-heart mr-2"></i>Pension [HMRC Relief]</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{((result.hmrcPensionRelief / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{result.hmrcPensionRelief.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{(result.hmrcPensionRelief / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-purple-400">{(result.hmrcPensionRelief / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-purple-400">{((result.hmrcPensionRelief / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-purple-400 border-r border-gray-600">
+                {(result.hmrcPensionRelief / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           {isMarried && result.marriageAllowance !== 0 && (
             <tr className="border-b border-gray-600">
               <td className="p-2 border-r border-gray-600"><i className="fas fa-ring mr-2"></i>Marriage Allowance</td>
-              <td className="p-2 text-right border-r border-gray-600 text-green-400">{((result.marriageAllowance / result.gross) * 100).toFixed(0)}%</td>
-              <td className="p-2 text-right border-r border-gray-600 text-green-400">{result.marriageAllowance.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="p-2 text-right border-r border-gray-600 text-green-400">{(result.marriageAllowance / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="p-2 text-right text-green-400">{(result.marriageAllowance / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className="p-2 text-right border-r border-gray-600 text-green-400">{((result.marriageAllowance / result.gross) * 100).toFixed(1)}%</td>
+              {visiblePeriods.map((period) => (
+                <td key={period} className="p-2 text-right text-green-400 border-r border-gray-600">
+                  {(result.marriageAllowance / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </td>
+              ))}
             </tr>
           )}
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-hand-holding-usd mr-2"></i>Allowances/Deductions</td>
-            <td className="p-2 text-right border-r border-gray-600 text-teal-400">{((parseFloat(allowancesDeductions.replace(/,/g, '')) / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-teal-400">{allowancesDeductions}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-teal-400">{(parseFloat(allowancesDeductions.replace(/,/g, '')) / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-teal-400">{(parseFloat(allowancesDeductions.replace(/,/g, '')) / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-teal-400">{((parseFloat(allowancesDeductions.replace(/,/g, '')) / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-teal-400 border-r border-gray-600">
+                {(parseFloat(allowancesDeductions.replace(/,/g, '')) / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600 font-bold"><i className="fas fa-wallet mr-2"></i>Net Pay</td>
-            <td className="p-2 text-right border-r border-gray-600 text-green-400 font-bold">{((result.net / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-green-400 font-bold">{result.net.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-green-400 font-bold">{(result.net / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-green-400 font-bold">{(result.net / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-green-400 font-bold">{((result.net / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-green-400 font-bold border-r border-gray-600">
+                {(result.net / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600"><i className="fas fa-building mr-2"></i>Employers NI</td>
-            <td className="p-2 text-right border-r border-gray-600 text-gray-400">{((result.employerNI / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-gray-400">{result.employerNI.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-gray-400">{(result.employerNI / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-gray-400">{(result.employerNI / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-gray-400">{((result.employerNI / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-gray-400 border-r border-gray-600">
+                {(result.employerNI / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
           <tr className="border-b border-gray-600">
             <td className="p-2 border-r border-gray-600 font-semibold"><i className="fas fa-exchange-alt mr-2"></i>Net Change from Previous Year</td>
-            <td className="p-2 text-right border-r border-gray-600 text-blue-400 font-semibold">{((result.netChange / result.gross) * 100).toFixed(0)}%</td>
-            <td className="p-2 text-right border-r border-gray-600 text-blue-400 font-semibold">{result.netChange.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right border-r border-gray-600 text-blue-400 font-semibold">{(result.netChange / 12).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td className="p-2 text-right text-blue-400 font-semibold">{(result.netChange / 52).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td className="p-2 text-right border-r border-gray-600 text-blue-400 font-semibold">{((result.netChange / result.gross) * 100).toFixed(1)}%</td>
+            {visiblePeriods.map((period) => (
+              <td key={period} className="p-2 text-right text-blue-400 font-semibold border-r border-gray-600">
+                {(result.netChange / periodOptions[period]).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
@@ -523,24 +587,37 @@ const ResultsTable = ({
   );
 };
 
-// Chart Display Component
+// Chart Display Component (unchanged, still uses outputPeriod)
 const ChartDisplay = ({
   result,
-  studentLoan,
+  studentLoans,
+  outputPeriod,
+  hoursPerWeek,
 }: {
   result: TaxResult | null;
-  studentLoan: string;
+  studentLoans: string[];
+  outputPeriod: Period;
+  hoursPerWeek: string;
 }) => {
-  const [chartPeriod, setChartPeriod] = useState<'yearly' | 'monthly' | 'weekly'>('yearly');
+  const periodFactors: Record<Period, number> = {
+    '1': 1,
+    '12': 12,
+    '13': 13,
+    '26': 26,
+    '52': 52,
+    '260': 260,
+    '1950': 1950 * (parseFloat(hoursPerWeek || '37.5') / 37.5),
+  };
+
+  const divisor = periodFactors[outputPeriod] || 1;
 
   const getChartData = () => {
     if (!result) return [];
-    const divisor = chartPeriod === 'yearly' ? 1 : chartPeriod === 'monthly' ? 12 : 52;
     return [
       { name: 'Tax', value: result.tax / divisor, fill: '#f87171' },
       { name: 'NI', value: result.ni / divisor, fill: '#facc15' },
       { name: 'Pension', value: result.pension / divisor, fill: '#a78bfa' },
-      { name: 'Student Loan', value: studentLoan !== 'none' ? result.student / divisor : 0, fill: '#fb923c' },
+      { name: `Student Loan${studentLoans.length > 1 ? 's' : ''}`, value: studentLoans.length > 0 ? result.student / divisor : 0, fill: '#fb923c' },
       { name: 'Net Pay', value: result.net / divisor, fill: '#4ade80' },
     ].filter(item => item.value > 0);
   };
@@ -553,16 +630,6 @@ const ChartDisplay = ({
         <h2 className="text-lg font-semibold text-gray-100 md:text-xl">
           <i className="fas fa-chart-pie mr-2 text-blue-500"></i>Breakdown
         </h2>
-        <select
-          value={chartPeriod}
-          onChange={(e) => setChartPeriod(e.target.value as 'yearly' | 'monthly' | 'weekly')}
-          className="p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-          aria-label="Select chart period"
-        >
-          <option value="yearly">Yearly</option>
-          <option value="monthly">Monthly</option>
-          <option value="weekly">Weekly</option>
-        </select>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
@@ -578,7 +645,7 @@ const ChartDisplay = ({
             <Cell key="Tax" fill="#f87171" />
             <Cell key="NI" fill="#facc15" />
             <Cell key="Pension" fill="#a78bfa" />
-            <Cell key="Student Loan" fill="#fb923c" />
+            <Cell key="Student Loans" fill="#fb923c" />
             <Cell key="Net Pay" fill="#4ade80" />
           </Pie>
           <Tooltip formatter={(value) => `£${value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
@@ -588,18 +655,40 @@ const ChartDisplay = ({
   );
 };
 
-// Export Button Component
+// Export Button Component (unchanged, still uses outputPeriod)
 const ExportButton = ({
   result,
   allowancesDeductions,
-  studentLoan,
+  studentLoans,
   isMarried,
+  outputPeriod,
+  hoursPerWeek,
 }: {
   result: TaxResult | null;
   allowancesDeductions: string;
-  studentLoan: string;
+  studentLoans: string[];
   isMarried: boolean;
+  outputPeriod: Period;
+  hoursPerWeek: string;
 }) => {
+  const periodFactors: Record<Period, number> = {
+    '1': 1,
+    '12': 12,
+    '13': 13,
+    '26': 26,
+    '52': 52,
+    '260': 260,
+    '1950': 1950 * (parseFloat(hoursPerWeek || '37.5') / 37.5),
+  };
+
+  const divisor = periodFactors[outputPeriod] || 1;
+  const periodLabel = outputPeriod === '12' ? 'Monthly' : 
+                     outputPeriod === '26' ? 'Fortnightly' : 
+                     outputPeriod === '52' ? 'Weekly' : 
+                     outputPeriod === '260' ? 'Daily' : 
+                     outputPeriod === '1950' ? 'Hourly' : 
+                     outputPeriod === '13' ? '4-Weekly' : 'Yearly';
+
   const exportToExcel = async () => {
     if (!result) return;
     const workbook = new ExcelJS.Workbook();
@@ -609,32 +698,30 @@ const ExportButton = ({
       { header: 'Category', key: 'category', width: 25 },
       { header: '%', key: 'percent', width: 10 },
       { header: 'Yearly (£)', key: 'yearly', width: 15 },
-      { header: 'Monthly (£)', key: 'monthly', width: 15 },
-      { header: 'Weekly (£)', key: 'weekly', width: 15 },
+      { header: `${periodLabel} (£)`, key: 'period', width: 15 },
     ];
 
     worksheet.addRows([
-      ['Gross Pay', `${((result.gross / result.gross) * 100).toFixed(0)}%`, result.gross, result.gross / 12, result.gross / 52],
-      ['Tax-Free Allowance', `${((result.allowance / result.gross) * 100).toFixed(0)}%`, result.allowance, result.allowance / 12, result.allowance / 52],
-      ['Total Taxable', `${((result.taxable / result.gross) * 100).toFixed(0)}%`, result.taxable, result.taxable / 12, result.taxable / 52],
-      ['Total Tax Due', `${((result.tax / result.gross) * 100).toFixed(0)}%`, result.tax, result.tax / 12, result.tax / 52],
-      ...result.taxBreakdown.map(band => [band.band + ' Rate', `${((band.amount / result.gross) * 100).toFixed(0)}%`, band.amount, band.amount / 12, band.amount / 52]),
-      ...(studentLoan !== 'none' ? [['Student Loan', `${((result.student / result.gross) * 100).toFixed(0)}%`, result.student, result.student / 12, result.student / 52]] : []),
-      ['National Insurance', `${((result.ni / result.gross) * 100).toFixed(0)}%`, result.ni, result.ni / 12, result.ni / 52],
-      ['Pension [You]', `${((result.pension / result.gross) * 100).toFixed(0)}%`, result.pension, result.pension / 12, result.pension / 52],
-      ['Pension [HMRC Relief]', `${((result.hmrcPensionRelief / result.gross) * 100).toFixed(0)}%`, result.hmrcPensionRelief, result.hmrcPensionRelief / 12, result.hmrcPensionRelief / 52],
-      ...(isMarried && result.marriageAllowance !== 0 ? [['Marriage Allowance', `${((result.marriageAllowance / result.gross) * 100).toFixed(0)}%`, result.marriageAllowance, result.marriageAllowance / 12, result.marriageAllowance / 52]] : []),
-      ['Allowances/Deductions', `${((parseFloat(allowancesDeductions.replace(/,/g, '')) / result.gross) * 100).toFixed(0)}%`, parseFloat(allowancesDeductions.replace(/,/g, '')), parseFloat(allowancesDeductions.replace(/,/g, '')) / 12, parseFloat(allowancesDeductions.replace(/,/g, '')) / 52],
-      ['Net Pay', `${((result.net / result.gross) * 100).toFixed(0)}%`, result.net, result.net / 12, result.net / 52],
-      ['Employers NI', `${((result.employerNI / result.gross) * 100).toFixed(0)}%`, result.employerNI, result.employerNI / 12, result.employerNI / 52],
-      ['Net Change from Previous Year', `${((result.netChange / result.gross) * 100).toFixed(0)}%`, result.netChange, result.netChange / 12, result.netChange / 52],
+      ['Gross Pay', `${((result.gross / result.gross) * 100).toFixed(1)}%`, result.gross, result.gross / divisor],
+      ['Tax-Free Allowance', `${((result.allowance / result.gross) * 100).toFixed(1)}%`, result.allowance, result.allowance / divisor],
+      ['Total Taxable', `${((result.taxable / result.gross) * 100).toFixed(1)}%`, result.taxable, result.taxable / divisor],
+      ['Total Tax Due', `${((result.tax / result.gross) * 100).toFixed(1)}%`, result.tax, result.tax / divisor],
+      ...result.taxBreakdown.map(band => [band.band + ' Rate', `${((band.amount / result.gross) * 100).toFixed(1)}%`, band.amount, band.amount / divisor]),
+      ...(studentLoans.length > 0 ? [['Student Loan' + (studentLoans.length > 1 ? 's' : ''), `${((result.student / result.gross) * 100).toFixed(1)}%`, result.student, result.student / divisor]] : []),
+      ['National Insurance', `${((result.ni / result.gross) * 100).toFixed(1)}%`, result.ni, result.ni / divisor],
+      ['Pension [You]', `${((result.pension / result.gross) * 100).toFixed(1)}%`, result.pension, result.pension / divisor],
+      ['Pension [HMRC Relief]', `${((result.hmrcPensionRelief / result.gross) * 100).toFixed(1)}%`, result.hmrcPensionRelief, result.hmrcPensionRelief / divisor],
+      ...(isMarried && result.marriageAllowance !== 0 ? [['Marriage Allowance', `${((result.marriageAllowance / result.gross) * 100).toFixed(1)}%`, result.marriageAllowance, result.marriageAllowance / divisor]] : []),
+      ['Allowances/Deductions', `${((parseFloat(allowancesDeductions.replace(/,/g, '')) / result.gross) * 100).toFixed(1)}%`, parseFloat(allowancesDeductions.replace(/,/g, '')), parseFloat(allowancesDeductions.replace(/,/g, '')) / divisor],
+      ['Net Pay', `${((result.net / result.gross) * 100).toFixed(1)}%`, result.net, result.net / divisor],
+      ['Employers NI', `${((result.employerNI / result.gross) * 100).toFixed(1)}%`, result.employerNI, result.employerNI / divisor],
+      ['Net Change from Previous Year', `${((result.netChange / result.gross) * 100).toFixed(1)}%`, result.netChange, result.netChange / divisor],
     ]);
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber > 1) {
         row.getCell(3).numFmt = '#,##0.00';
         row.getCell(4).numFmt = '#,##0.00';
-        row.getCell(5).numFmt = '#,##0.00';
       }
     });
 
@@ -659,7 +746,7 @@ const ExportButton = ({
   ) : null;
 };
 
-// Glossary Component
+// Glossary Component (unchanged)
 const Glossary = () => (
   <div className="mt-6 p-4 bg-gray-800 rounded">
     <h2 className="text-lg font-semibold mb-4 text-gray-100 md:text-xl">
@@ -670,7 +757,7 @@ const Glossary = () => (
       <li><strong><i className="fas fa-shield-alt mr-2"></i>Tax-Free Allowance</strong>: Amount you can earn before paying income tax (£12,570 in 2024/25).</li>
       <li><strong><i className="fas fa-balance-scale mr-2"></i>Total Taxable</strong>: Income subject to tax after allowances and deductions.</li>
       <li><strong><i className="fas fa-id-card mr-2"></i>National Insurance (NI)</strong>: Contributions for state benefits, e.g., pension, NHS.</li>
-      <li><strong><i className="fas fa-graduation-cap mr-2"></i>Student Loan</strong>: Repayments deducted based on income thresholds.</li>
+      <li><strong><i className="fas fa-graduation-cap mr-2"></i>Student Loans</strong>: Repayments deducted based on income thresholds.</li>
       <li><strong><i className="fas fa-piggy-bank mr-2"></i>Pension [You]</strong>: Your contribution to a pension scheme.</li>
       <li><strong><i className="fas fa-hand-holding-heart mr-2"></i>Pension [HMRC Relief]</strong>: Tax relief added by HMRC to your pension.</li>
       <li><strong><i className="fas fa-ring mr-2"></i>Marriage Allowance</strong>: Tax break (£252/year) if one partner earns below £12,570.</li>
@@ -685,14 +772,15 @@ const Glossary = () => (
   </div>
 );
 
-// Main Page Component
+// Main Page Component (updated, no outputPeriod)
 export default function UKTaxCalculator() {
   const [result, setResult] = useState<TaxResult | null>(null);
   const [error, setError] = useState<string>('');
   const [taxYear, setTaxYear] = useState<string>('2025');
   const [allowancesDeductions, setAllowancesDeductions] = useState<string>('0');
-  const [studentLoan, setStudentLoan] = useState<string>('none');
+  const [studentLoans, setStudentLoans] = useState<string[]>([]);
   const [isMarried, setIsMarried] = useState<boolean>(false);
+  const [hoursPerWeek, setHoursPerWeek] = useState<string>('37.5');
 
   const handleCalculate = useCallback((newResult: TaxResult | null, newError: string) => {
     setResult(newResult);
@@ -705,7 +793,7 @@ export default function UKTaxCalculator() {
   }, []);
 
   return (
-    <div className="container relative">
+    <div className="container relative" suppressHydrationWarning>
       <div className="fixed bottom-0 left-0 right-0 bg-gray-800 text-gray-100 p-2 text-center z-10">
         <i className="fas fa-cookie-bite mr-2"></i>We use cookies to improve your experience. 
         <a href="/privacy" className="text-blue-500 hover:underline">Learn More</a> |{' '}
@@ -714,11 +802,7 @@ export default function UKTaxCalculator() {
         </button>
       </div>
 
-      <div className="mb-4 bg-gray-700 p-4 rounded text-center text-gray-100">
-        <p><i className="fas fa-ad mr-2"></i>Ad Space - Support ToolHubX!</p>
-      </div>
-
-      <h1 className="text-2xl font-bold mb-4 md:text-3xl">
+      <h1 className="text-2xl font-bold mb-4 md:text-3xl" suppressHydrationWarning>
         <i className="fas fa-calculator mr-2 text-blue-500"></i>UK Tax Calculator
       </h1>
       <p className="mb-4 text-gray-400 text-sm md:text-base">
@@ -730,10 +814,12 @@ export default function UKTaxCalculator() {
         setTaxYear={setTaxYear}
         allowancesDeductions={allowancesDeductions}
         setAllowancesDeductions={setAllowancesDeductions}
-        studentLoan={studentLoan}
-        setStudentLoan={setStudentLoan}
+        studentLoans={studentLoans}
+        setStudentLoans={setStudentLoans}
         isMarried={isMarried}
         setIsMarried={setIsMarried}
+        hoursPerWeek={hoursPerWeek}
+        setHoursPerWeek={setHoursPerWeek}
         onCalculate={handleCalculate}
         onReset={handleReset}
       />
@@ -742,30 +828,31 @@ export default function UKTaxCalculator() {
         <div className="mt-6">
           <ResultsTable
             result={result}
-            studentLoan={studentLoan}
+            studentLoans={studentLoans}
             isMarried={isMarried}
             allowancesDeductions={allowancesDeductions}
+            hoursPerWeek={hoursPerWeek}
           />
           <ChartDisplay
             result={result}
-            studentLoan={studentLoan}
+            studentLoans={studentLoans}
+            outputPeriod={'1'} // Temporary until refactored
+            hoursPerWeek={hoursPerWeek}
           />
           <div className="flex justify-center mt-4">
             <ExportButton
               result={result}
               allowancesDeductions={allowancesDeductions}
-              studentLoan={studentLoan}
+              studentLoans={studentLoans}
               isMarried={isMarried}
+              outputPeriod={'1'} // Temporary until refactored
+              hoursPerWeek={hoursPerWeek}
             />
           </div>
         </div>
       )}
 
       <Glossary />
-
-      <div className="mt-4 bg-gray-700 p-4 rounded text-center text-gray-100">
-        <p><i className="fas fa-ad mr-2"></i>Ad Space - Keep ToolHubX Free!</p>
-      </div>
     </div>
   );
 }
