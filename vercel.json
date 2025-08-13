@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.toolhubx.uk"
+        }
+      ],
+      "destination": "https://toolhubx.uk/:path*",
+      "permanent": true
+    }
+  ]
+}

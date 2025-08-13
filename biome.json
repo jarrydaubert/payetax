@@ -1,0 +1,103 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn",
+        "noConstantCondition": "error",
+        "noUnusedImports": "error",
+        "noUndeclaredVariables": "error",
+        "useValidForDirection": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["log", "warn", "error", "info"]
+          }
+        },
+        "noArrayIndexKey": "warn",
+        "noDoubleEquals": "error",
+        "noImplicitAnyLet": "error",
+        "noMisleadingCharacterClass": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "warn",
+        "useTemplate": "error",
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "shorthand"
+          }
+        },
+        "useShorthandAssign": "error",
+        "useConst": "error",
+        "useExponentiationOperator": "error"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "error",
+        "useButtonType": "error",
+        "noLabelWithoutControl": "error",
+        "useAltText": "error",
+        "noAccessKey": "error",
+        "useValidAnchor": "error",
+        "useAriaPropsForRole": "error"
+      },
+      "complexity": {
+        "noForEach": "warn",
+        "useLiteralKeys": "error",
+        "noUselessFragments": "error",
+        "noUselessRename": "error"
+      },
+      "performance": {
+        "noDelete": "error",
+        "noAccumulatingSpread": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "error"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "formatWithErrors": true,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "quoteProperties": "asNeeded"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "files": {
+    "includes": ["/*.ts", "/.tsx", "**/.js", "/*.jsx", "/*.json"],
+    "ignoreUnknown": false
+  }
+}

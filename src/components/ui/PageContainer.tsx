@@ -1,0 +1,90 @@
+/**
+ * src/components/ui/PageContainer.tsx
+ *
+ * A standardized page container with consistent styling and layout
+ * Used across about, privacy, and feedback pages to maintain design consistency
+ */
+
+'use client';
+
+import type React from 'react';
+import { cn } from '@/lib/utils';
+
+/**
+ * Props for the PageContainer component
+ */
+interface PageContainerProps {
+  /** Page content */
+  children: React.ReactNode;
+  /** Optional additional CSS classes */
+  className?: string;
+  /** Maximum width variant for the container */
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '5xl' | '6xl' | '7xl';
+  /** Whether to use glass styling (default: true) */
+  glass?: boolean;
+  /** ID for targeting with CSS or accessibility */
+  id?: string;
+}
+
+/**
+ * Standard page container with consistent styling
+ * Used across about, privacy, and feedback pages to maintain design consistency
+ *
+ * @param props Component props
+ * @returns Standardized page container component
+ */
+const PageContainer: React.FC<PageContainerProps> = ({
+  children,
+  className,
+  maxWidth = '5xl',
+  glass = true,
+  id,
+}) => {
+  /**
+   * Maps the maxWidth prop to the corresponding Tailwind class
+   * @returns Tailwind max-width class
+   */
+  const getMaxWidthClass = (): string => {
+    switch (maxWidth) {
+      case 'sm':
+        return 'max-w-sm';
+      case 'md':
+        return 'max-w-md';
+      case 'lg':
+        return 'max-w-lg';
+      case 'xl':
+        return 'max-w-xl';
+      case '2xl':
+        return 'max-w-2xl';
+      case '4xl':
+        return 'max-w-4xl';
+      case '5xl':
+        return 'max-w-5xl';
+      case '6xl':
+        return 'max-w-6xl';
+      case '7xl':
+        return 'max-w-7xl';
+      default:
+        return 'max-w-5xl';
+    }
+  };
+
+  return (
+    <div
+      id={id}
+      className={cn('container mx-auto px-4 sm:px-6 py-8 sm:py-12', getMaxWidthClass(), className)}
+    >
+      {glass ? (
+        <section className="glass-card relative overflow-hidden">
+          {/* Decorative gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 -z-10" />
+          <div className="glass-card-inner">{children}</div>
+        </section>
+      ) : (
+        children
+      )}
+    </div>
+  );
+};
+
+export default PageContainer;

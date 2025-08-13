@@ -1,0 +1,101 @@
+// src/components/ui/PageHeader.tsx
+/**
+ * Standard page header component with consistent styling
+ *
+ * Provides a consistent header layout for pages including title,
+ * description, back link, and optional action buttons.
+ *
+ * @module components/ui/PageHeader
+ */
+
+'use client';
+
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import type React from 'react';
+import { cn } from '@/lib/utils';
+
+/**
+ * Props for the PageHeader component
+ */
+interface PageHeaderProps {
+  /** Page title displayed as the main heading */
+  title: string;
+  /** Optional page description displayed below the title */
+  description?: string;
+  /** Optional back link URL */
+  backLink?: string;
+  /** Optional back link text (defaults to "Back to Calculator") */
+  backLinkText?: string;
+  /** Optional actions to display in the header */
+  actions?: React.ReactNode;
+  /** Optional additional CSS classes */
+  className?: string;
+  /** Whether to use gradient styling for the title */
+  gradientTitle?: boolean;
+  /** ID for the header for accessibility purposes */
+  id?: string;
+}
+
+/**
+ * Standard page header with consistent styling
+ * Used across about, privacy, feedback and other pages
+ *
+ * @param props Component properties
+ * @returns PageHeader component
+ */
+const PageHeader: React.FC<PageHeaderProps> = ({
+  title,
+  description,
+  backLink,
+  backLinkText = 'Back to Calculator',
+  actions,
+  className,
+  gradientTitle = true,
+  id,
+}): React.ReactElement => {
+  return (
+    <header className={cn('mb-8', className)} id={id}>
+      {/* Back link with arrow icon if provided */}
+      {backLink && (
+        <Link
+          href={backLink}
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-6 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+          aria-label={`Return to ${backLinkText}`}
+        >
+          <ArrowLeft
+            className="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1"
+            aria-hidden="true"
+          />
+          <span className="border-b border-transparent group-hover:border-current">
+            {backLinkText}
+          </span>
+        </Link>
+      )}
+
+      {/* Title and actions row */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1
+          className={cn(
+            'text-3xl font-bold',
+            gradientTitle ? 'gradient-text' : 'text-gray-900 dark:text-white'
+          )}
+        >
+          {title}
+        </h1>
+        {actions && (
+          <div className="flex items-center space-x-3" role="toolbar" aria-label="Page actions">
+            {actions}
+          </div>
+        )}
+      </div>
+
+      {/* Optional description */}
+      {description && (
+        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-3xl">{description}</p>
+      )}
+    </header>
+  );
+};
+
+export default PageHeader;
