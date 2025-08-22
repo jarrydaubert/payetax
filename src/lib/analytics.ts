@@ -1,34 +1,93 @@
 // src/lib/analytics.ts
 /**
- * Analytics utilities for tracking user interactions and SEO metrics
+ * Analytics tracking utilities for ToolHubX
+ * Includes event tracking, performance monitoring, and SEO analytics
  *
- * This module provides functions for tracking various user events and
- * interactions with the application, respecting user privacy preferences.
- * It integrates with Google Analytics and ensures events are only tracked
- * when user consent has been provided.
+ * @module lib/analytics
  */
+
+// Types for analytics events
+export type SEOActionType = 'external_link' | 'download' | 'share' | 'print' | 'scroll_to_top' | 'navigation' | 'form_interaction';
+
+export interface AnalyticsEvent {
+  action: string;
+  category?: string;
+  label?: string;
+  value?: number;
+  custom_data?: Record<string, any>;
+}
+
+export interface SEOAnalyticsData {
+  source?: string;
+  target?: string;
+  action_type?: string;
+  page_path?: string;
+  user_agent?: string;
+  timestamp?: string;
+  destination?: string; // Added this property
+}
 
 /**
- * Track a user event with Google Analytics
- *
- * Only tracks events if the user has consented to analytics cookies.
- * Safe to call on both client and server, though only works on client.
- *
- * @param eventName - Name of the event to track
- * @param properties - Additional properties for the event
+ * Track SEO-related actions for analytics
+ * 
+ * @param action - The type of SEO action being tracked
+ * @param data - Additional data about the action
  */
-export function trackEvent(eventName: string, properties?: Record<string, unknown>): void {
-  // Skip if not in browser or gtag not available
-  if (typeof window === 'undefined' || !window.gtag) return;
+export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {}): void {
+  try {
+    // Enhanced data object with browser info
+    const enhancedData = {
+      ...data,
+      page_path: typeof window !== 'undefined' ? window.location.pathname : '',
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+      timestamp: new Date().toISOString(),
+    };
 
-  // Only track if consent is given
-  const hasConsent =
-    window.consentMode?.isConsentGiven || localStorage.getItem('cookie-consent') === 'accepted';
+    // Console logging for development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 SEO Analytics:', action, enhancedData);
+    }
 
-  if (!hasConsent) return;
+    // Track with Google Analytics if available
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as any).gtag('event', action, {
+        event_category: 'seo_actions',
+        event_label: data.source || 'unknown',
+        custom_parameters: enhancedData,
+      });
+    }
 
-  // Track the event with Google Analytics
-  window.gtag('event', eventName, properties);
+    // Track with other analytics providers here
+    // Example: Mixpanel, Amplitude, etc.
+    
+  } catch (error) {
+    console.warn('Analytics tracking error:', error);
+  }
+}
+
+/**
+ * Track general analytics events
+ * 
+ * @param event - The analytics event to track
+ */
+export function trackEvent(event: AnalyticsEvent): void {
+  try {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Analytics Event:', event);
+    }
+
+    // Track with Google Analytics if available
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as any).gtag('event', event.action, {
+        event_category: event.category || 'general',
+        event_label: event.label,
+        value: event.value,
+        custom_parameters: event.custom_data,
+      });
+    }
+  } catch (error) {
+    console.warn('Analytics tracking error:', error);
+  }
 }
 
 /**
@@ -41,87 +100,114 @@ export function trackCalculatorEvent(
   action: 'calculate' | 'reset' | 'update' | 'error',
   data?: Record<string, unknown>
 ): void {
-  trackEvent('calculator_action', {
-    event_category: 'calculator',
-    event_label: action,
-    ...data,
+  trackEvent({
+    action: 'calculator_action',
+    category: 'calculator',
+    label: action,
+    custom_data: data,
   });
 }
 
 /**
- * Track a form submission event
- *
- * @param formName - Name of the form
- * @param success - Whether the submission was successful
- * @param data - Additional form data
+ * Track calculator usage
+ * 
+ * @param calculation_type - Type of calculation performed
+ * @param salary_range - Salary range for analytics segmentation
  */
-export function trackFormSubmission(
-  formName: string,
-  success: boolean,
-  data?: Record<string, unknown>
+export function trackCalculatorUsage(
+  calculation_type: string,
+  salary_range?: string
 ): void {
-  trackEvent('form_submission', {
-    event_category: 'forms',
-    event_label: formName,
-    success,
-    ...data,
+  trackEvent({
+    action: 'calculator_usage',
+    category: 'engagement',
+    label: calculation_type,
+    custom_data: {
+      salary_range,
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
 /**
- * Track an SEO-relevant action
- *
- * @param action - The SEO-relevant action
- * @param data - Additional action data
+ * Track page views
+ * 
+ * @param page_path - The path of the page being viewed
+ * @param page_title - The title of the page
  */
-export function trackSEOAction(
-  action: 'external_link' | 'download' | 'share' | 'print',
-  data?: Record<string, unknown>
+export function trackPageView(page_path: string, page_title?: string): void {
+  try {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📄 Page View:', page_path, page_title);
+    }
+
+    // Track with Google Analytics if available
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as any).gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
+        page_path,
+        page_title,
+      });
+    }
+  } catch (error) {
+    console.warn('Page view tracking error:', error);
+  }
+}
+
+/**
+ * Track form interactions
+ * 
+ * @param form_name - Name of the form
+ * @param action - The action taken (submit, focus, etc.)
+ * @param field_name - Optional field name for field-specific tracking
+ */
+export function trackFormInteraction(
+  form_name: string, 
+  action: string, 
+  field_name?: string
 ): void {
-  trackEvent('seo_action', {
-    event_category: 'seo',
-    event_label: action,
-    ...data,
+  trackSEOAction('form_interaction', {
+    source: form_name,
+    action_type: action,
+    target: field_name,
   });
 }
 
 /**
- * Initialize enhanced ecommerce tracking
- *
- * For potential future use with premium features or products.
- * Only initializes if user has provided consent.
+ * Track performance metrics
+ * 
+ * @param metric_name - Name of the performance metric
+ * @param value - The measured value
+ * @param unit - The unit of measurement
  */
-export function initEnhancedEcommerce(): void {
-  if (typeof window === 'undefined' || !window.gtag) return;
-
-  // Check for consent before initializing
-  const hasConsent =
-    window.consentMode?.isConsentGiven || localStorage.getItem('cookie-consent') === 'accepted';
-
-  if (!hasConsent) return;
-
-  // Initialize enhanced ecommerce
-  window.gtag('require', 'ec');
+export function trackPerformanceMetric(
+  metric_name: string,
+  value: number,
+  unit: string = 'ms'
+): void {
+  trackEvent({
+    action: 'performance_metric',
+    category: 'performance',
+    label: metric_name,
+    value,
+    custom_data: {
+      unit,
+      timestamp: new Date().toISOString(),
+    },
+  });
 }
 
-/**
- * Track a page view event
- *
- * @param pageTitle - Title of the page
- * @param pagePath - Path of the page (defaults to current path)
- */
-export function trackPageView(pageTitle: string, pagePath?: string): void {
-  if (typeof window === 'undefined' || !window.gtag) return;
-
-  // Only track if consent is given
-  const hasConsent =
-    window.consentMode?.isConsentGiven || localStorage.getItem('cookie-consent') === 'accepted';
-
-  if (!hasConsent) return;
-
-  // Track page view
-  window.gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
-    page_title: pageTitle,
-    page_path: pagePath || window.location.pathname,
+// Initialize analytics on client-side
+if (typeof window !== 'undefined') {
+  // Track initial page load performance
+  window.addEventListener('load', () => {
+    if ('performance' in window) {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      
+      if (navigation) {
+        trackPerformanceMetric('page_load_time', navigation.loadEventEnd - navigation.fetchStart);
+        trackPerformanceMetric('dom_content_loaded', navigation.domContentLoadedEventEnd - navigation.fetchStart);
+        trackPerformanceMetric('first_contentful_paint', navigation.loadEventEnd - navigation.fetchStart);
+      }
+    }
   });
 }

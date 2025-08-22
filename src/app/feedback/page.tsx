@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function FeedbackPage() {
   return (
     <Suspense
-      fallback={<div className="h-60 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />}
+      fallback={<div className="h-60 glass animate-pulse rounded-lg" />}
     >
       <FeedbackPageClient />
     </Suspense>

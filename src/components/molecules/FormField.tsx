@@ -1,5 +1,4 @@
 // src/components/molecules/FormField.tsx
-// A reusable form field wrapper combining labels, hints and inputs with modern styling
 
 import { AlertCircle, Info } from 'lucide-react';
 import type React from 'react';
@@ -7,30 +6,17 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
-  /** Unique identifier for the form field */
   id: string;
-  /** Label text for the form field */
   label: string;
-  /** Optional helper text displayed below the label */
   description?: string;
-  /** Whether the field is required */
   required?: boolean;
-  /** Whether to display the required indicator */
   showRequired?: boolean;
-  /** Error message to display */
   error?: string;
-  /** Additional CSS classes */
   className?: string;
-  /** Form field content (usually an input element) */
   children: React.ReactNode;
-  /** Optional tooltip content */
   tooltip?: string;
 }
 
-/**
- * FormField component that wraps inputs with labels, descriptions, and error handling
- * Provides consistent styling and behavior for form elements
- */
 const FormField: React.FC<FormFieldProps> = ({
   id,
   label,
@@ -46,7 +32,7 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div className={cn('mb-5', className)}>
-      {/* Label with optional required indicator and tooltip */}
+      {/* Label with required indicator and tooltip */}
       <div className="flex justify-between items-baseline mb-1.5">
         <label
           htmlFor={id}
@@ -81,10 +67,10 @@ const FormField: React.FC<FormFieldProps> = ({
         </label>
       </div>
 
-      {/* Description text above the input */}
+      {/* Description text */}
       {description && !error && <p className="mb-1.5 text-xs text-foreground/70">{description}</p>}
 
-      {/* Main input element with error styling if needed */}
+      {/* Input wrapper with error styling */}
       <div
         className={cn(
           error ? 'ring-1 ring-destructive/50' : '',
@@ -94,7 +80,7 @@ const FormField: React.FC<FormFieldProps> = ({
         {children}
       </div>
 
-      {/* Error message with icon */}
+      {/* Error message */}
       {error && (
         <p className="mt-2 text-xs text-destructive flex items-center animate-fade-in">
           <AlertCircle size={12} className="mr-1 flex-shrink-0" />

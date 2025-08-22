@@ -1,17 +1,11 @@
 // src/app/blog/page.tsx
-/**
- * Blog index page with local MDX blog system
- * Displays featured posts, post grid, and categories
- */
 
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
 
-/**
- * Generate metadata for the blog index page
- */
 export const metadata: Metadata = {
   title: 'UK Tax Insights & Updates | ToolHubX Blog',
   description:
@@ -36,9 +30,6 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Format date in a human-readable format
- */
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en-GB', {
@@ -48,16 +39,12 @@ function formatDate(dateString: string): string {
   }).format(date);
 }
 
-/**
- * Blog page component
- */
 export default async function BlogPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  // Parse page number from search params
   const currentPage = params.page
     ? Number.parseInt(Array.isArray(params.page) ? params.page[0] : params.page, 10)
     : 1;
@@ -67,7 +54,6 @@ export default async function BlogPage({
       : params.category
     : undefined;
 
-  // Fetch blog data
   const [posts, featuredPost, categories] = await Promise.all([
     getBlogPosts({
       page: currentPage,
@@ -78,232 +64,192 @@ export default async function BlogPage({
     getBlogCategories(),
   ]);
 
-  // Get proper total count
   const totalCount = await getBlogPostsCount(selectedCategory);
   const totalPages = Math.ceil(totalCount / 12);
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Page Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">UK Tax Insights & Updates</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Expert guidance, practical advice, and the latest updates on UK taxation. Stay informed
-          with our comprehensive articles on PAYE, self-assessment, tax codes, and more.
-        </p>
-      </div>
-
-      {/* Featured Post */}
-      {featuredPost && !selectedCategory && currentPage === 1 && (
-        <div className="mb-16 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 md:p-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {featuredPost.image && (
-              <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                <Image
-                  src={featuredPost.image}
-                  alt={featuredPost.imageAlt || featuredPost.title}
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+    <div className="pt-20"> {/* Add top padding to clear fixed navbar */}
+      <div className="container mx-auto px-4 py-12">
+        {/* Header with back button */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Calculator
+          </Link>
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              UK Tax Insights & Updates
+            </h1>
+            <p className="text-lg text-white max-w-3xl mx-auto">
+              Expert guidance, practical advice, and the latest updates on UK taxation.
+            </p>
+            {selectedCategory && (
+              <div className="mt-4">
+                <span className="text-small text-white/90">Showing posts in: </span>
+                <span className="text-primary font-medium">
+                  {categories.find(cat => cat.slug === selectedCategory)?.name || selectedCategory}
+                </span>
               </div>
             )}
-            <div>
-              <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium mb-4">
-                Featured
-              </span>
-              <h2 className="text-3xl font-bold mb-4">
-                <Link
-                  href={`/blog/${featuredPost.slug}`}
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                >
-                  {featuredPost.title}
-                </Link>
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{featuredPost.excerpt}</p>
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-6">
-                <span>{formatDate(featuredPost.publishedAt)}</span>
-                <span className="mx-2">•</span>
-                <span>{featuredPost.readTime}</span>
-                {featuredPost.author && (
-                  <>
-                    <span className="mx-2">•</span>
-                    <span>By {featuredPost.author}</span>
-                  </>
-                )}
-              </div>
+          </div>
+        </div>
+
+        {/* Categories Filter */}
+        {categories.length > 0 && (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-3 justify-center">
               <Link
-                href={`/blog/${featuredPost.slug}`}
-                className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                href="/blog"
+                className={`px-4 py-2 rounded-full text-small font-medium transition-all duration-200 ${
+                  !selectedCategory
+                    ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                    : 'glass text-white/90 hover:glass-strong hover:scale-105'
+                }`}
               >
-                Read Article
-                <svg
-                  className="ml-2 w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                All Posts
+                <span className="ml-1 text-caption opacity-75">
+                  ({totalCount})
+                </span>
               </Link>
+              {categories.map((category) => (
+                <Link
+                  key={category.slug}
+                  href={`/blog?category=${category.slug}`}
+                  className={`px-4 py-2 rounded-full text-small font-medium transition-all duration-200 ${
+                    selectedCategory === category.slug
+                      ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                      : 'glass text-white/90 hover:glass-strong hover:scale-105'
+                  }`}
+                >
+                  {category.name}
+                  <span className="ml-1 text-caption opacity-75">
+                    ({category.count || 0})
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Categories */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Categories</h2>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/blog"
-            className={`px-4 py-2 rounded-full font-medium transition-colors ${
-              !selectedCategory
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
-          >
-            All Posts
-          </Link>
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/blog?category=${category.slug}`}
-              className={`px-4 py-2 rounded-full font-medium transition-colors ${
-                selectedCategory === category.slug
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              {category.name} {category.count ? `(${category.count})` : ''}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Blog Posts Grid */}
-      {posts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {posts.map((post) => (
-            <article
-              key={post.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
-            >
-              {post.image && (
-                <Link href={`/blog/${post.slug}`} className="block relative h-48 overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt={post.imageAlt || post.title}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </Link>
-              )}
-              <div className="p-6">
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
-                  <span className="font-medium text-blue-600 dark:text-blue-400">
-                    {post.categoryData?.name || post.category}
-                  </span>
-                  <span>{formatDate(post.publishedAt)}</span>
-                </div>
-                <h3 className="text-xl font-bold mb-3">
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  >
-                    {post.title}
-                  </Link>
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{post.readTime}</span>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm inline-flex items-center"
-                  >
-                    Read more
-                    <svg
-                      className="ml-1 w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
+        {/* Featured Post */}
+        {featuredPost && !selectedCategory && currentPage === 1 && (
+          <Link href={`/blog/${featuredPost.slug}`} className="block mb-12">
+            <div className="glass-card border border-foreground/10 hover:shadow-2xl hover:border-primary/30 transition-all duration-500 group">
+              <div className="glass-card-inner p-8">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="px-3 py-1 text-caption font-semibold text-white bg-gradient-to-r from-primary to-accent rounded-full uppercase tracking-wide">
+                        Featured
+                      </span>
+                      <span className="text-small text-white/90">
+                        {formatDate(featuredPost.publishedAt)}
+                      </span>
+                    </div>
+                    <h2 className="text-3xl font-bold mb-4 text-white leading-tight group-hover:text-primary transition-colors">
+                      {featuredPost.title}
+                    </h2>
+                    <p className="text-white/90 mb-6 text-lg leading-relaxed">{featuredPost.excerpt}</p>
+                    <div className="inline-flex items-center text-primary hover:text-primary/80 font-medium text-lg group transition-colors">
+                      <span>Read Article</span>
+                      <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                  </div>
+                  {featuredPost.image && (
+                    <div className="relative h-80 rounded-xl overflow-hidden shadow-lg">
+                      <Image
+                        src={featuredPost.image}
+                        alt={featuredPost.imageAlt || featuredPost.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                    </svg>
-                  </Link>
+                    </div>
+                  )}
                 </div>
               </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-16">
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {selectedCategory
-              ? 'No articles found in this category.'
-              : 'No articles found. Check back soon!'}
-          </p>
-        </div>
-      )}
+            </div>
+          </Link>
+        )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <nav className="flex justify-center items-center space-x-2" aria-label="Pagination">
-          {currentPage > 1 && (
-            <Link
-              href={`/blog?page=${currentPage - 1}${
-                selectedCategory ? `&category=${selectedCategory}` : ''
-              }`}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            >
-              Previous
-            </Link>
-          )}
+        {/* Posts Grid */}
+        {posts.length > 0 ? (
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {posts.map((post: any) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="block">
+                  <article className="glass-card group hover:shadow-2xl hover:border-primary/20 transition-all duration-500 border border-foreground/10 h-full">
+                    <div className="glass-card-inner p-6 h-full flex flex-col">
+                      {post.image && (
+                        <div className="relative h-48 mb-6 rounded-lg overflow-hidden">
+                          <Image
+                            src={post.image}
+                            alt={post.imageAlt || post.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="px-3 py-1 text-caption text-primary bg-primary/10 rounded-full font-medium">
+                          {post.category}
+                        </span>
+                        <span className="text-caption text-white/90">
+                          {formatDate(post.publishedAt)}
+                        </span>
+                        {post.readTime && (
+                          <span className="text-caption text-white/90">• {post.readTime}</span>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-bold mb-3 text-white leading-tight group-hover:text-primary transition-colors flex-grow">
+                        {post.title}
+                      </h3>
+                      <p className="text-white mb-4 leading-relaxed text-small line-clamp-3">{post.excerpt}</p>
+                      <div className="inline-flex items-center text-primary hover:text-primary/80 font-medium group mt-auto">
+                        <span>Read More</span>
+                        <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
 
-          <div className="flex space-x-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Link
-                key={page}
-                href={`/blog?page=${page}${
-                  selectedCategory ? `&category=${selectedCategory}` : ''
-                }`}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  page === currentPage
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                {page}
-              </Link>
-            ))}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2">
+                {currentPage > 1 && (
+                  <Link
+                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                    className="px-4 py-2 glass text-white/90 rounded-lg hover:glass-strong transition-colors"
+                  >
+                    Previous
+                  </Link>
+                )}
+                
+                <span className="px-4 py-2 text-white/90">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                {currentPage < totalPages && (
+                  <Link
+                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                    className="px-4 py-2 glass text-white/90 rounded-lg hover:glass-strong transition-colors"
+                  >
+                    Next
+                  </Link>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-white/90">No blog posts found.</p>
           </div>
-
-          {currentPage < totalPages && (
-            <Link
-              href={`/blog?page=${currentPage + 1}${
-                selectedCategory ? `&category=${selectedCategory}` : ''
-              }`}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            >
-              Next
-            </Link>
-          )}
-        </nav>
-      )}
+        )}
+      </div>
     </div>
   );
 }

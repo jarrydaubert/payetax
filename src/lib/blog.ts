@@ -2,6 +2,7 @@
 /**
  * Blog library for managing local MDX blog posts
  * Replaces Strapi API integration with file-based blog system
+ * FIXED: js-yaml v4 compatibility
  */
 
 import fs from 'node:fs';
@@ -60,22 +61,50 @@ async function getAllMDXFiles(): Promise<string[]> {
 }
 
 /**
- * Read and parse a single MDX file
+ * Read and parse a single MDX file with improved error handling
  */
 async function readMDXFile(filename: string): Promise<BlogPost | null> {
   try {
     const filePath = path.join(getBlogContentPath(), filename);
     const fileContent = await fs.promises.readFile(filePath, 'utf-8');
 
-    // Parse frontmatter and content
-    const { data, content } = matter(fileContent);
+    // Parse frontmatter and content with js-yaml v4 compatibility
+    const { data, content } = matter(fileContent, {
+      // Configure gray-matter to use js-yaml v4 safely
+      engines: {
+        yaml: {
+          parse: (str: string) => {
+            try {
+              // Use yaml.load instead of yaml.safeLoad for js-yaml v4
+              const yaml = require('js-yaml');
+              return yaml.load(str);
+            } catch (error) {
+              console.error(`YAML parse error in ${filename}:`, error);
+              return {};
+            }
+          }
+        }
+      }
+    });
 
-    // Validate frontmatter
-    const frontmatter = data as BlogPostFrontmatter;
+    // Validate frontmatter - must have required fields
+    if (!data || typeof data !== 'object') {
+      console.warn(`Invalid frontmatter in ${filename}: not an object`);
+      return null;
+    }
 
-    // Basic validation
-    if (!frontmatter.title || !frontmatter.slug || !frontmatter.excerpt || !frontmatter.publishedAt || !frontmatter.category) {
-      console.warn(`Invalid frontmatter in ${filename}:`, frontmatter);
+    const frontmatter = data as Partial<BlogPostFrontmatter>;
+
+    // Check for required fields
+    if (!frontmatter.title || !frontmatter.slug || !frontmatter.excerpt || 
+        !frontmatter.publishedAt || !frontmatter.category) {
+      console.warn(`Invalid frontmatter in ${filename}: missing required fields`, {
+        title: !!frontmatter.title,
+        slug: !!frontmatter.slug,
+        excerpt: !!frontmatter.excerpt,
+        publishedAt: !!frontmatter.publishedAt,
+        category: !!frontmatter.category,
+      });
       return null;
     }
 
@@ -119,29 +148,29 @@ async function readMDXFile(filename: string): Promise<BlogPost | null> {
 }
 
 /**
- * Sort posts by various criteria
+ * Sort posts based on the specified criteria
  */
 function sortPosts(posts: BlogPost[], sortBy: BlogSortOption = 'date-desc'): BlogPost[] {
   return [...posts].sort((a, b) => {
     switch (sortBy) {
-      case 'date-asc':
-        return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
       case 'date-desc':
         return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      case 'date-asc':
+        return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
       case 'title-asc':
         return a.title.localeCompare(b.title);
       case 'title-desc':
         return b.title.localeCompare(a.title);
       default:
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        return 0;
     }
   });
 }
 
 /**
- * Filter posts based on options
+ * Filter posts based on provided options
  */
-function filterPosts(posts: BlogPost[], options: BlogPaginationOptions = {}): BlogPost[] {
+function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPost[] {
   let filtered = [...posts];
 
   // Filter by category
@@ -151,12 +180,14 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions = {}): Bl
 
   // Filter by tag
   if (options.tag) {
-    filtered = filtered.filter((post) => post.tags?.includes(options.tag as string));
+    filtered = filtered.filter((post) => 
+      post.tags?.some((tag) => tag.toLowerCase() === options.tag?.toLowerCase())
+    );
   }
 
-  // Filter by featured
-  if (options.featured) {
-    filtered = filtered.filter((post) => post.featured);
+  // Filter by featured status
+  if (options.featured !== undefined) {
+    filtered = filtered.filter((post) => post.featured === options.featured);
   }
 
   // Filter by search query
@@ -304,49 +335,54 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
  */
 export async function getRelatedPosts(
   postId: string,
-  categorySlug?: string
+  categorySlug?: string,
+  count: number = BLOG_CONFIG.relatedPostsCount
 ): Promise<RelatedPost[]> {
   try {
-    const posts = await getBlogPosts({
-      category: categorySlug,
-      pageSize: 50, // Get more posts to filter from
-    });
-
-    // Filter out the current post and limit results
-    const relatedPosts = posts
-      .filter((post) => post.id !== postId)
-      .slice(0, BLOG_CONFIG.relatedPostsCount)
-      .map((post) => ({
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-      }));
-
-    return relatedPosts;
+    const allPosts = await getBlogPosts();
+    
+    // Filter out the current post
+    const otherPosts = allPosts.filter((post) => post.id !== postId);
+    
+    // Prefer posts from the same category
+    let relatedPosts = categorySlug 
+      ? otherPosts.filter((post) => post.category === categorySlug)
+      : otherPosts;
+    
+    // If not enough posts in the same category, add posts from other categories
+    if (relatedPosts.length < count) {
+      const remainingPosts = otherPosts.filter((post) => post.category !== categorySlug);
+      relatedPosts = [...relatedPosts, ...remainingPosts];
+    }
+    
+    // Take only the required count and map to RelatedPost format
+    return relatedPosts.slice(0, count).map((post) => ({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      publishedAt: post.publishedAt,
+      readTime: post.readTime,
+      category: post.category,
+    }));
   } catch (error) {
-    console.error('Error getting related posts:', error);
+    console.error(`Error getting related posts for ${postId}:`, error);
     return [];
   }
 }
 
 /**
- * Get all blog categories with post counts
+ * Get all available blog categories with post counts
  */
 export async function getBlogCategories(): Promise<BlogCategory[]> {
   try {
-    const files = await getAllMDXFiles();
-    const posts = await Promise.all(files.map((file) => readMDXFile(file)));
-    const validPosts = posts.filter((post): post is BlogPost => post !== null);
-
+    const allPosts = await getBlogPosts();
+    
     // Count posts per category
-    const categoryCounts: Record<string, number> = {};
-    for (const post of validPosts) {
-      categoryCounts[post.category] = (categoryCounts[post.category] || 0) + 1;
-    }
-
+    const categoryCounts = allPosts.reduce((counts, post) => {
+      counts[post.category] = (counts[post.category] || 0) + 1;
+      return counts;
+    }, {} as Record<string, number>);
+    
     // Return categories with counts
     return BLOG_CONFIG.categories.map((category) => ({
       ...category,
@@ -354,52 +390,6 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
     }));
   } catch (error) {
     console.error('Error getting blog categories:', error);
-    return BLOG_CONFIG.categories.map((category) => ({
-      ...category,
-      count: 0,
-    }));
+    return BLOG_CONFIG.categories;
   }
-}
-
-/**
- * Search blog posts
- */
-export async function searchBlogPosts(query: string): Promise<BlogPost[]> {
-  if (!query || query.trim().length < 2) {
-    return [];
-  }
-
-  return getBlogPosts({
-    searchQuery: query.trim(),
-    pageSize: 20,
-  });
-}
-
-/**
- * Get recent posts for RSS or sitemap
- */
-export async function getRecentPosts(limit = 10): Promise<BlogPost[]> {
-  return getBlogPosts({
-    pageSize: limit,
-  });
-}
-
-/**
- * Validate blog post data
- */
-export function validateBlogPost(post: unknown): post is BlogPostFrontmatter {
-  return (
-    typeof post === 'object' &&
-    post !== null &&
-    'title' in post &&
-    'slug' in post &&
-    'excerpt' in post &&
-    'publishedAt' in post &&
-    'category' in post &&
-    typeof (post as BlogPostFrontmatter).title === 'string' &&
-    typeof (post as BlogPostFrontmatter).slug === 'string' &&
-    typeof (post as BlogPostFrontmatter).excerpt === 'string' &&
-    typeof (post as BlogPostFrontmatter).publishedAt === 'string' &&
-    typeof (post as BlogPostFrontmatter).category === 'string'
-  );
 }

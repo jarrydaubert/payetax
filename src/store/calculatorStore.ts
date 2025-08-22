@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import * as Sentry from '@sentry/nextjs';
 import {
   DEFAULT_TAX_CODE,
   type NICategory,
@@ -84,6 +85,7 @@ interface CalculatorState {
   calculate: () => void;
   calculatePreviousYear: () => void;
   reset: () => void;
+  init: () => void;
 }
 
 // Get current tax year
@@ -107,16 +109,20 @@ const defaultTaxYear = getCurrentTaxYear();
 // Initialize with current year's rates
 const currentYearRates = TAX_RATES[defaultTaxYear];
 
+// UK minimum wage (April 2024 - March 2025): £11.44 per hour
+// Full-time annual: £11.44 × 37.5 hours × 52 weeks = £22,308
+const MINIMUM_WAGE_ANNUAL = 22308;
+
 // Default inputs
 const defaultInput: CalculatorInput = {
-  salary: 0,
+  salary: MINIMUM_WAGE_ANNUAL,
   payPeriod: PERIODS.ANNUALLY,
   taxYear: defaultTaxYear,
-  taxCode: DEFAULT_TAX_CODE,
+  taxCode: '', // Empty by default - use standard allowance
   isScottish: false,
   pensionContribution: 0,
   pensionContributionType: 'percentage',
-  studentLoanPlans: ['none'],
+  studentLoanPlans: [],
   niCategory: 'A',
   hoursPerWeek: 40,
   additionalAllowances: [],
@@ -140,6 +146,18 @@ export const useCalculatorStore = create<CalculatorState>()(
         niRates: currentYearRates.nationalInsurance.employee.A,
         results: null,
         previousYearResults: null,
+
+        // Initialize with example calculation on first load
+        // This is called after store creation to show £0 example
+        init: () => {
+          const { calculate } = get();
+          try {
+            calculate();
+          } catch (error) {
+            // Silently handle initialization errors
+            console.warn('Failed to initialize example calculation:', error);
+          }
+        },
 
         // Input actions
         setSalary: (salary) => set((state) => ({ input: { ...state.input, salary } })),
@@ -175,9 +193,66 @@ export const useCalculatorStore = create<CalculatorState>()(
 
         // Calculation actions
         calculate: () => {
-          const { input } = get();
-          const results = calculateTax(input);
-          set({ results });
+          try {
+            const { input } = get();
+            
+            // Allow calculations with £0 salary for demonstration purposes
+            if (input.salary < 0) {
+              throw new Error('Salary cannot be negative');
+            }
+            
+            // Add Sentry context for tax calculation
+            Sentry.addBreadcrumb({
+              category: 'tax-calculation',
+              message: 'Starting tax calculation',
+              level: 'info',
+              data: {
+                salary: input.salary,
+                taxYear: input.taxYear,
+                payPeriod: input.payPeriod,
+                isScottish: input.isScottish,
+                hasStudentLoan: input.studentLoanPlans.length > 0 && !input.studentLoanPlans.includes('none'),
+                hasPension: input.pensionContribution > 0,
+              },
+            });
+            
+            const results = calculateTax(input);
+            set({ results });
+            
+            // Log successful calculation
+            Sentry.addBreadcrumb({
+              category: 'tax-calculation',
+              message: 'Tax calculation completed successfully',
+              level: 'info',
+              data: {
+                netPay: results.netPay.annually,
+                incomeTax: results.incomeTax.annually,
+                nationalInsurance: results.nationalInsurance.annually,
+              },
+            });
+            
+          } catch (error) {
+            // Capture calculation errors with context
+            Sentry.withScope((scope) => {
+              const { input } = get();
+              scope.setTag('feature', 'tax-calculation');
+              scope.setLevel('error');
+              scope.setContext('calculationInput', {
+                salary: input.salary,
+                taxYear: input.taxYear,
+                payPeriod: input.payPeriod,
+                taxCode: input.taxCode,
+                isScottish: input.isScottish,
+                pensionContribution: input.pensionContribution,
+                studentLoanPlans: input.studentLoanPlans,
+              });
+              Sentry.captureException(error);
+            });
+            
+            // Reset results on error
+            set({ results: null });
+            throw error; // Re-throw to let UI handle it
+          }
         },
         calculatePreviousYear: () => {
           const { input } = get();

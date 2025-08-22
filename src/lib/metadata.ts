@@ -13,11 +13,11 @@ import type { Metadata, Viewport } from 'next';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolhubx.uk';
 
 // Default metadata values
-const DEFAULT_TITLE = 'UK PAYE Tax Calculator';
+const DEFAULT_TITLE = 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay';
 const DEFAULT_DESCRIPTION =
-  'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.';
+  'Free UK PAYE tax calculator with official HMRC rates 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.';
 const DEFAULT_KEYWORDS =
-  'UK tax calculator, PAYE calculator, income tax, national insurance, take home pay, salary calculator, tax calculator UK, 2024-2025 tax';
+  'UK tax calculator 2025, PAYE calculator, salary calculator, HMRC rates 2025, National Insurance calculator, take-home pay calculator, UK income tax, tax code calculator, free tax calculator UK';
 const DEFAULT_OG_IMAGE = '/images/og-image.png';
 
 /**

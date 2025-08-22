@@ -112,7 +112,7 @@ export default async function CategoryPage({
       </Script>
 
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumbs" className="mb-8 text-sm text-gray-500 dark:text-gray-400">
+      <nav aria-label="Breadcrumbs" className="mb-8 text-small text-white/90">
         <ol className="flex items-center space-x-2">
           <li>
             <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400">
@@ -132,8 +132,8 @@ export default async function CategoryPage({
 
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">{category.name} Insights</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+        <h1 className="text-title md:text-display font-bold mb-4">{category.name} Insights</h1>
+        <p className="text-large text-white/80 max-w-3xl mx-auto">
           Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
           guidance, and practical advice.
         </p>
@@ -141,7 +141,7 @@ export default async function CategoryPage({
 
       {/* Categories */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6">Categories</h2>
+        <h2 className="text-subheading font-bold mb-6">Categories</h2>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/blog"
@@ -186,7 +186,7 @@ export default async function CategoryPage({
                   </Link>
                 )}
                 <div className="p-6">
-                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center justify-between text-small text-white/90 mb-3">
                     <span className="font-medium text-blue-600 dark:text-blue-400">
                       {post.categoryData?.name || post.category}
                     </span>
@@ -200,16 +200,16 @@ export default async function CategoryPage({
                       {post.title}
                     </Link>
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                  <p className="text-white mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-small text-white/90">
                       {post.readTime}
                     </span>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm inline-flex items-center"
+                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-small inline-flex items-center"
                     >
                       Read more
                       <svg
@@ -234,7 +234,7 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-large text-white/80">
               No articles found in this category. Check back soon!
             </p>
           </div>
@@ -279,7 +279,7 @@ export default async function CategoryPage({
       )}
 
       {/* CTA */}
-      <div className="bg-gray-50 dark:bg-gray-900 mt-12 p-6 rounded-lg">
+      <div className="glass mt-12 p-6 rounded-lg">
         <h2 className="text-xl font-bold mb-3">Calculate Your UK Tax Now</h2>
         <p className="mb-4">
           Use our free PAYE tax calculator to determine your take-home pay and plan your finances

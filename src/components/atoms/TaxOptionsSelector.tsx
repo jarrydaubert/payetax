@@ -2,7 +2,7 @@
 // Component for selecting additional tax options with modern styling and accessibility
 
 import type React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useId } from 'react';
 import type { NICategory } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import NumberInput from './NumberInput';
@@ -56,8 +56,9 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
   // State for managing section expansion
   const [expanded, setExpanded] = useState(true);
 
-  // Generate unique IDs for accessibility
-  const groupId = id || `tax-options-${Math.random().toString(36).substring(2, 9)}`;
+  // Generate unique IDs for accessibility using React's useId hook
+  const uniqueId = useId();
+  const groupId = id || `tax-options-${uniqueId}`;
   const optionPrefix = `${groupId}-option`;
   const partnerIncomeId = `${groupId}-partner-income`;
   const expandButtonId = `${groupId}-expand`;
@@ -177,7 +178,9 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
                   'h-4 w-4 rounded border transition-colors duration-200',
                   // Better visibility in both light and dark modes
                   'border-gray-400 dark:border-glass',
-                  isPensionAge ? 'bg-primary border-primary' : 'bg-white/90 dark:bg-glass-deep'
+                  isPensionAge
+                    ? 'bg-primary border-primary'
+                    : 'bg-white/90 dark:bg-glass-deep'
                 )}
                 aria-hidden="true"
               >
@@ -214,7 +217,7 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
             </div>
           </div>
 
-          {/* Marriage Allowance Option */}
+          {/* Marriage/Civil Partnership Option */}
           <div className="flex items-start">
             <div className="relative flex items-center h-5 mt-0.5">
               <input
@@ -228,9 +231,10 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
               <div
                 className={cn(
                   'h-4 w-4 rounded border transition-colors duration-200',
-                  // Better visibility in both light and dark modes
                   'border-gray-400 dark:border-glass',
-                  isMarried ? 'bg-primary border-primary' : 'bg-white/90 dark:bg-glass-deep'
+                  isMarried
+                    ? 'bg-primary border-primary'
+                    : 'bg-white/90 dark:bg-glass-deep'
                 )}
                 aria-hidden="true"
               >
@@ -267,42 +271,6 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
             </div>
           </div>
 
-          {/* Partner's income - only show if married option is selected */}
-          {isMarried && (
-            <div className="ml-7 mt-1 p-3 bg-glass-deep backdrop-blur-glass-sm rounded-lg relative overflow-hidden animate-fade-in">
-              {/* Left accent border */}
-              <div
-                className="absolute inset-y-0 left-0 w-1 bg-primary/20 rounded-l-md"
-                aria-hidden="true"
-              />
-              <div className="pl-2">
-                <label
-                  htmlFor={partnerIncomeId}
-                  className="block text-sm font-medium text-foreground mb-1.5"
-                >
-                  Partner&apos;s Annual Income
-                </label>
-                <div className="max-w-xs">
-                  <NumberInput
-                    id={partnerIncomeId}
-                    value={partnerIncome}
-                    onChange={onPartnerIncomeChange}
-                    prefix="£"
-                    aria-describedby={`${partnerIncomeId}-description`}
-                  />
-                  <p
-                    id={`${partnerIncomeId}-description`}
-                    className="mt-2 text-xs text-foreground/70 bg-glass p-2 rounded"
-                  >
-                    Required to determine if you qualify for Marriage Allowance. Lower earner must
-                    have income below £12,570, higher earner must be a basic rate taxpayer (income
-                    between £12,571 and £50,270).
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Blind Person's Allowance Option */}
           <div className="flex items-start">
             <div className="relative flex items-center h-5 mt-0.5">
@@ -317,9 +285,10 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
               <div
                 className={cn(
                   'h-4 w-4 rounded border transition-colors duration-200',
-                  // Better visibility in both light and dark modes
                   'border-gray-400 dark:border-glass',
-                  isBlind ? 'bg-primary border-primary' : 'bg-white/90 dark:bg-glass-deep'
+                  isBlind
+                    ? 'bg-primary border-primary'
+                    : 'bg-white/90 dark:bg-glass-deep'
                 )}
                 aria-hidden="true"
               >
@@ -345,7 +314,7 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
                 htmlFor={`${optionPrefix}-blind`}
                 className="font-medium text-foreground cursor-pointer"
               >
-                Blind Person&apos;s Allowance
+                {"Blind Person's Allowance"}
               </label>
               <p
                 id={`${optionPrefix}-blind-description`}
@@ -370,7 +339,6 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
               <div
                 className={cn(
                   'h-4 w-4 rounded border transition-colors duration-200',
-                  // Better visibility in both light and dark modes
                   'border-gray-400 dark:border-glass',
                   noNationalInsurance
                     ? 'bg-primary border-primary'
@@ -410,6 +378,29 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
               </p>
             </div>
           </div>
+
+          {/* Partner Income Input - only visible when married */}
+          {isMarried && (
+            <div className="border-t border-glass pt-3">
+              <NumberInput
+                id={partnerIncomeId}
+                value={partnerIncome}
+                onChange={onPartnerIncomeChange}
+                prefix="£"
+                clearOnFocus
+                className="w-full"
+                placeholder="0"
+                aria-label="Partner's annual income"
+                aria-describedby={`${partnerIncomeId}-description`}
+              />
+              <p
+                id={`${partnerIncomeId}-description`}
+                className="text-foreground/70 text-xs mt-1"
+              >
+                Partner's annual income (for marriage allowance calculations)
+              </p>
+            </div>
+          )}
         </fieldset>
       </div>
     </div>

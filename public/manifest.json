@@ -1,36 +1,88 @@
 {
-  "name": "ToolHubX - Free UK Tax Calculator",
+  "name": "ToolHubX - Free UK PAYE Tax Calculator",
   "short_name": "ToolHubX",
-  "description": "Built by a UK veteran, ToolHubX.uk offers a free, HMRC-compliant tax calculator for 2025/26.",
-  "start_url": "/",
+  "description": "Free UK PAYE tax calculator with official HMRC rates 2025-2026. Calculate income tax, National Insurance, and take-home pay instantly.",
+  "start_url": "/?utm_source=pwa",
   "display": "standalone",
-  "background_color": "#1f2937",
-  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "background_color": "#0f0b1a",
+  "theme_color": "#6366f1",
+  "scope": "/",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
       "src": "/favicon-16x16.png",
       "sizes": "16x16",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/favicon-32x32.png",
       "sizes": "32x32",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calculate Tax",
+      "short_name": "Calculator",
+      "description": "Calculate your PAYE tax and take-home pay",
+      "url": "/?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Blog",
+      "short_name": "Blog",
+      "description": "UK tax guides and tips",
+      "url": "/blog?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/pwa-screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ToolHubX Tax Calculator on Desktop"
+    },
+    {
+      "src": "/images/pwa-screenshot-narrow.png",
+      "sizes": "640x1280",
+      "type": "image/png", 
+      "form_factor": "narrow",
+      "label": "ToolHubX Tax Calculator on Mobile"
     }
   ]
 }
