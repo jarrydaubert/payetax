@@ -28,10 +28,10 @@ describe('Tax Calculator', () => {
       const result = calculateTax(input);
 
       expect(result.grossSalary.annually).toBe(30000);
-      expect(result.incomeTax.annually).toBeGreaterThan(3000);
-      expect(result.incomeTax.annually).toBeLessThan(4000);
-      expect(result.nationalInsurance.annually).toBeGreaterThan(2000);
+      expect(result.incomeTax.annually).toBeCloseTo(3486, 0); // £17,430 × 20%
+      expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 0); // (£30k - £12,570) × 8%
       expect(result.netPay.annually).toBeLessThan(30000);
+      expect(result.netPay.annually).toBeGreaterThan(24000);
     });
 
     it('calculates tax for higher rate salary correctly', () => {
@@ -39,9 +39,10 @@ describe('Tax Calculator', () => {
       const result = calculateTax(input);
 
       expect(result.grossSalary.annually).toBe(60000);
-      expect(result.incomeTax.annually).toBeGreaterThan(10000);
-      expect(result.nationalInsurance.annually).toBeGreaterThan(5000);
+      expect(result.incomeTax.annually).toBeCloseTo(11432, 50); // £7,540 + £3,892
+      expect(result.nationalInsurance.annually).toBeCloseTo(3210.6, 1); // NI: £37,700 × 8% + £9,730 × 2%
       expect(result.netPay.annually).toBeLessThan(60000);
+      expect(result.netPay.annually).toBeGreaterThan(40000);
     });
 
     it('handles zero income correctly', () => {
@@ -59,8 +60,8 @@ describe('Tax Calculator', () => {
       const result = calculateTax(input);
 
       expect(result.grossSalary.annually).toBe(10000);
-      expect(result.incomeTax.annually).toBe(0);
-      expect(result.nationalInsurance.annually).toBe(0);
+      expect(result.incomeTax.annually).toBe(0); // Below personal allowance
+      expect(result.nationalInsurance.annually).toBe(0); // Below NI threshold
       expect(result.netPay.annually).toBe(10000);
     });
   });
@@ -135,24 +136,37 @@ describe('Tax Calculator', () => {
   });
 
   describe('Pay Period Calculations', () => {
-    const testSalary = 36000;
+    const testAnnualSalary = 36000;
 
     it('calculates monthly amounts correctly', () => {
-      const input = createBasicInput(testSalary, { payPeriod: 'monthly' });
+      // Annual salary of £36,000 should give monthly amounts of £3,000
+      const input = createBasicInput(testAnnualSalary, { payPeriod: 'annually' });
       const result = calculateTax(input);
 
-      expect(result.grossSalary.monthly).toBeCloseTo(3000, 0);
-      expect(result.grossSalary.annually).toBe(testSalary);
+      expect(result.grossSalary.monthly).toBeCloseTo(3000, 0); // £36,000 / 12 = £3,000
+      expect(result.grossSalary.annually).toBe(testAnnualSalary);
       expect(result.netPay.monthly).toBeLessThan(result.grossSalary.monthly);
     });
 
     it('calculates weekly amounts correctly', () => {
-      const input = createBasicInput(testSalary, { payPeriod: 'weekly' });
+      // Annual salary of £36,000 should give weekly amounts of ~£692
+      const input = createBasicInput(testAnnualSalary, { payPeriod: 'annually' });
       const result = calculateTax(input);
 
-      expect(result.grossSalary.weekly).toBeCloseTo(692.31, 0);
-      expect(result.grossSalary.annually).toBe(testSalary);
+      expect(result.grossSalary.weekly).toBeCloseTo(692.31, 0); // £36,000 / 52 = £692.31
+      expect(result.grossSalary.annually).toBe(testAnnualSalary);
       expect(result.netPay.weekly).toBeLessThan(result.grossSalary.weekly);
+    });
+
+    it('handles monthly input salary correctly', () => {
+      // If someone enters £3,000 monthly, that should convert to £36,000 annually
+      const monthlySalary = 3000;
+      const input = createBasicInput(monthlySalary, { payPeriod: 'monthly' });
+      const result = calculateTax(input);
+
+      expect(result.grossSalary.monthly).toBeCloseTo(3000, 0);
+      expect(result.grossSalary.annually).toBeCloseTo(36000, 0); // 3000 × 12
+      expect(result.netPay.monthly).toBeLessThan(result.grossSalary.monthly);
     });
   });
 
