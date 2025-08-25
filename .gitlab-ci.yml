@@ -12,7 +12,7 @@ cache:
     - node_modules/
     - .npm/
 
-# Test stage - Run linting and type checking
+# Test stage - Run linting, type checking, and unit tests
 test:
   stage: test
   image: node:18-alpine
@@ -20,6 +20,7 @@ test:
     - npm ci --cache .npm --prefer-offline
   script:
     - npm run lint
+    - npm test # Run unit tests
     - npm run build # This includes TypeScript type checking
   only:
     - merge_requests

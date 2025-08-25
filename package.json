@@ -21,6 +21,7 @@
     "full-audit": "npm run fix-all && rm -rf .next && concurrently \"npm run dev\" \"sleep 10 && npm run lighthouse-check\"",
     "update-deps": "npx npm-check-updates --doctor -u && npm install",
     "security-audit": "npm audit --audit-level=high",
+    "clean-reports": "rm -rf coverage/ playwright-report/ test-results/ lighthouse-report.json logs/ *.tsbuildinfo .next/analyze/ || true",
     "prepare": "husky install || true"
   },
   "dependencies": {

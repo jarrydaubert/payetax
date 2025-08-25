@@ -8,38 +8,38 @@ jest.mock('@/lib/taxCalculator', () => ({
     grossSalary: {
       annually: 50000,
       monthly: 4166.67,
-      weekly: 961.54
+      weekly: 961.54,
     },
     incomeTax: {
       annually: 7486,
       monthly: 623.83,
-      weekly: 143.96
+      weekly: 143.96,
     },
     nationalInsurance: {
       annually: 4464,
       monthly: 372,
-      weekly: 85.85
+      weekly: 85.85,
     },
     studentLoan: {
       annually: 0,
       monthly: 0,
-      weekly: 0
+      weekly: 0,
     },
     pensionContribution: {
       annually: 0,
       monthly: 0,
-      weekly: 0
+      weekly: 0,
     },
     totalDeductions: {
       annually: 11950,
       monthly: 995.83,
-      weekly: 229.81
+      weekly: 229.81,
     },
     netPay: {
       annually: 38050,
       monthly: 3170.83,
-      weekly: 731.73
-    }
+      weekly: 731.73,
+    },
   }),
 }));
 

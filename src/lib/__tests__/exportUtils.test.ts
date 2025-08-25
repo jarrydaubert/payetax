@@ -1,8 +1,8 @@
 // src/lib/__tests__/exportUtils.test.ts
 
-import { generateCSV, downloadCSV } from '../exportUtils';
-import type { TaxCalculationResults } from '../taxCalculator';
 import type { ExportData } from '../exportUtils';
+import { downloadCSV, generateCSV } from '../exportUtils';
+import type { TaxCalculationResults } from '../taxCalculator';
 
 // Mock browser APIs
 Object.defineProperty(document, 'createElement', {
@@ -54,7 +54,7 @@ describe('Export Utils', () => {
       fortnightly: 288.31,
       weekly: 144.15,
       daily: 28.83,
-      hourly: 3.60,
+      hourly: 3.6,
     },
     nationalInsurance: {
       annually: 2994.4,
@@ -97,9 +97,7 @@ describe('Export Utils', () => {
       {
         name: 'Basic rate',
         rate: 20,
-        threshold: 37700,
-        taxableAmount: 37430,
-        taxAmount: 7486,
+        amount: 37430,
       },
     ],
     additionalAllowances: undefined,
@@ -250,7 +248,7 @@ describe('Export Utils', () => {
     it('sets correct filename', () => {
       const csv = generateCSV(mockExportData);
       expect(csv).toBeTruthy();
-      
+
       // Test that function executes without errors
       expect(() => downloadCSV(csv, 'tax-calculation.csv')).not.toThrow();
     });
@@ -274,7 +272,7 @@ describe('Export Utils', () => {
   describe('Integration Tests', () => {
     it('generates and downloads CSV successfully', () => {
       const csv = generateCSV(mockExportData);
-      
+
       expect(csv).toBeTruthy();
       expect(() => downloadCSV(csv, 'tax-calculation.csv')).not.toThrow();
     });
@@ -298,7 +296,7 @@ describe('Export Utils', () => {
           fortnightly: 96.15,
           weekly: 48.08,
           daily: 9.62,
-          hourly: 1.20,
+          hourly: 1.2,
         },
       };
 
