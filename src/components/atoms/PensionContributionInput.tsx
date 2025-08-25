@@ -2,7 +2,7 @@
 // Modern component for entering pension contributions with improved usability and accessibility
 
 import type React from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import NumberInput from './NumberInput';
 
@@ -41,11 +41,13 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
   const [focusedOption, setFocusedOption] = useState<string | null>(null);
 
   // Generate unique IDs for accessibility
-  const groupId = id || `pension-contribution-${Math.random().toString(36).substring(2, 9)}`;
-  const percentageId = `${groupId}-percentage`;
-  const amountId = `${groupId}-amount`;
-  const inputId = `${groupId}-input`;
-  const descriptionId = `${groupId}-description`;
+  const generatedId = useId();
+  const _groupId = id || generatedId;
+  const percentageId = useId();
+  const amountId = useId();
+  const inputId = useId();
+  const descriptionId = useId();
+  const labelId = useId();
 
   // Handle input change - optimized with useCallback
   const handleValueChange = useCallback(
@@ -76,31 +78,31 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
   }, []);
 
   return (
-    <div className={cn('space-y-2', className)} aria-labelledby={`${groupId}-label`}>
+    <fieldset className={cn('space-y-2', className)} aria-labelledby={labelId}>
       {/* Type selection radios with semantic HTML */}
-      <fieldset className="flex space-x-5" aria-label="Contribution type" disabled={disabled}>
-        <legend className="sr-only">Contribution Type</legend>
+      <fieldset className='flex space-x-5' aria-label='Contribution type' disabled={disabled}>
+        <legend className='sr-only'>Contribution Type</legend>
 
-        <div className="flex items-center">
-          <div className="relative">
+        <div className='flex items-center'>
+          <div className='relative'>
             <input
               id={percentageId}
-              type="radio"
+              type='radio'
               checked={type === 'percentage'}
               onChange={() => handleTypeChange('percentage')}
               onFocus={() => handleRadioFocus(percentageId)}
               onBlur={handleRadioBlur}
               className={cn(
-                'w-4 h-4 text-primary border-border focus:ring-primary',
-                'opacity-0 absolute inset-0 z-10 cursor-pointer'
+                'h-4 w-4 border-border text-primary focus:ring-primary',
+                'absolute inset-0 z-10 cursor-pointer opacity-0'
               )}
-              aria-labelledby="percentage-label"
+              aria-labelledby='percentage-label'
               disabled={disabled}
             />
             {/* Custom styled radio */}
             <div
               className={cn(
-                'w-4 h-4 rounded-full border transition-colors duration-200',
+                'h-4 w-4 rounded-full border transition-colors duration-200',
                 'border-gray-400 dark:border-glass',
                 type === 'percentage'
                   ? 'border-primary'
@@ -108,46 +110,46 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
                     ? 'border-primary/50'
                     : ''
               )}
-              aria-hidden="true"
+              aria-hidden='true'
             >
               {type === 'percentage' && (
-                <div className="w-2 h-2 mx-auto mt-0.5 rounded-full bg-primary" />
+                <div className='mx-auto mt-0.5 h-2 w-2 rounded-full bg-primary' />
               )}
             </div>
           </div>
           <label
-            id="percentage-label"
+            id={labelId}
             htmlFor={percentageId}
             className={cn(
-              'ml-2 block text-sm font-medium cursor-pointer',
+              'ml-2 block cursor-pointer font-medium text-sm',
               type === 'percentage' ? 'text-foreground' : 'text-foreground/80',
-              disabled && 'opacity-70 cursor-not-allowed'
+              disabled && 'cursor-not-allowed opacity-70'
             )}
           >
             Percentage
           </label>
         </div>
 
-        <div className="flex items-center">
-          <div className="relative">
+        <div className='flex items-center'>
+          <div className='relative'>
             <input
               id={amountId}
-              type="radio"
+              type='radio'
               checked={type === 'amount'}
               onChange={() => handleTypeChange('amount')}
               onFocus={() => handleRadioFocus(amountId)}
               onBlur={handleRadioBlur}
               className={cn(
-                'w-4 h-4 text-primary border-border focus:ring-primary',
-                'opacity-0 absolute inset-0 z-10 cursor-pointer'
+                'h-4 w-4 border-border text-primary focus:ring-primary',
+                'absolute inset-0 z-10 cursor-pointer opacity-0'
               )}
-              aria-labelledby="amount-label"
+              aria-labelledby='amount-label'
               disabled={disabled}
             />
             {/* Custom styled radio */}
             <div
               className={cn(
-                'w-4 h-4 rounded-full border transition-colors duration-200',
+                'h-4 w-4 rounded-full border transition-colors duration-200',
                 'border-gray-400 dark:border-glass',
                 type === 'amount'
                   ? 'border-primary'
@@ -155,20 +157,20 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
                     ? 'border-primary/50'
                     : ''
               )}
-              aria-hidden="true"
+              aria-hidden='true'
             >
               {type === 'amount' && (
-                <div className="w-2 h-2 mx-auto mt-0.5 rounded-full bg-primary" />
+                <div className='mx-auto mt-0.5 h-2 w-2 rounded-full bg-primary' />
               )}
             </div>
           </div>
           <label
-            id="amount-label"
+            id={amountId}
             htmlFor={amountId}
             className={cn(
-              'ml-2 block text-sm font-medium cursor-pointer',
+              'ml-2 block cursor-pointer font-medium text-sm',
               type === 'amount' ? 'text-foreground' : 'text-foreground/80',
-              disabled && 'opacity-70 cursor-not-allowed'
+              disabled && 'cursor-not-allowed opacity-70'
             )}
           >
             Amount
@@ -177,7 +179,7 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
       </fieldset>
 
       {/* Input field with modern styling and appropriate ARIA attributes */}
-      <div className="relative">
+      <div className='relative'>
         <NumberInput
           id={inputId}
           value={value}
@@ -187,26 +189,26 @@ const PensionContributionInput: React.FC<PensionContributionInputProps> = ({
           decimals={type === 'percentage' ? 1 : 2}
           min={0}
           max={type === 'percentage' ? 100 : undefined}
-          className="w-full"
+          className='w-full'
           placeholder={type === 'percentage' ? '5.0' : '0.00'}
           aria-label={`Pension contribution as ${type}`}
           aria-describedby={descriptionId}
           disabled={disabled}
         />
-        <p id={descriptionId} className="sr-only">
+        <p id={descriptionId} className='sr-only'>
           {type === 'percentage'
             ? 'Enter percentage of salary to contribute to pension. Values from 0 to 100 percent.'
             : 'Enter fixed amount to contribute to pension.'}
         </p>
 
         {/* Help text to explain contribution options */}
-        <p className="mt-1 text-xs text-foreground/70">
+        <p className='mt-1 text-foreground/70 text-xs'>
           {type === 'percentage'
             ? 'Percentage of gross salary for pension contribution'
             : 'Fixed amount for pension contribution per payment period'}
         </p>
       </div>
-    </div>
+    </fieldset>
   );
 };
 

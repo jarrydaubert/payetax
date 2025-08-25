@@ -94,9 +94,9 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className='container mx-auto px-4 py-12'>
       {/* Structured Data Script */}
-      <Script id="category-schema" type="application/ld+json" strategy="afterInteractive">
+      <Script type='application/ld+json' strategy='afterInteractive'>
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
@@ -112,40 +112,40 @@ export default async function CategoryPage({
       </Script>
 
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumbs" className="mb-8 text-small text-white/90">
-        <ol className="flex items-center space-x-2">
+      <nav aria-label='Breadcrumbs' className='mb-8 text-small text-white/90'>
+        <ol className='flex items-center space-x-2'>
           <li>
-            <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400">
+            <Link href='/' className='hover:text-blue-600 dark:hover:text-blue-400'>
               Home
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400">
+            <Link href='/blog' className='hover:text-blue-600 dark:hover:text-blue-400'>
               Blog
             </Link>
           </li>
           <li>/</li>
-          <li className="text-blue-600 dark:text-blue-400">{category.name}</li>
+          <li className='text-blue-600 dark:text-blue-400'>{category.name}</li>
         </ol>
       </nav>
 
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-title md:text-display font-bold mb-4">{category.name} Insights</h1>
-        <p className="text-large text-white/80 max-w-3xl mx-auto">
+      <div className='mb-12 text-center'>
+        <h1 className='mb-4 font-bold text-title md:text-display'>{category.name} Insights</h1>
+        <p className='mx-auto max-w-3xl text-large text-white/80'>
           Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
           guidance, and practical advice.
         </p>
       </div>
 
       {/* Categories */}
-      <div className="mb-12">
-        <h2 className="text-subheading font-bold mb-6">Categories</h2>
-        <div className="flex flex-wrap gap-3">
+      <div className='mb-12'>
+        <h2 className='mb-6 font-bold text-subheading'>Categories</h2>
+        <div className='flex flex-wrap gap-3'>
           <Link
-            href="/blog"
-            className="px-4 py-2 rounded-full font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            href='/blog'
+            className='rounded-full bg-gray-200 px-4 py-2 font-medium transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
           >
             All Posts
           </Link>
@@ -153,10 +153,10 @@ export default async function CategoryPage({
             <Link
               key={cat.slug}
               href={`/blog/category/${cat.slug}`}
-              className={`px-4 py-2 rounded-full font-medium transition-colors ${
+              className={`rounded-full px-4 py-2 font-medium transition-colors ${
                 slug === cat.slug
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
               }`}
             >
               {cat.name} {cat.count ? `(${cat.count})` : ''}
@@ -166,64 +166,60 @@ export default async function CategoryPage({
       </div>
 
       {/* Posts Grid with Suspense for PPR */}
-      <Suspense fallback={<div className="text-center py-16">Loading articles...</div>}>
+      <Suspense fallback={<div className='py-16 text-center'>Loading articles...</div>}>
         {posts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                className='overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'
               >
                 {post.image && (
-                  <Link href={`/blog/${post.slug}`} className="block relative h-48 overflow-hidden">
+                  <Link href={`/blog/${post.slug}`} className='relative block h-48 overflow-hidden'>
                     <Image
                       src={post.image}
                       alt={post.imageAlt || post.title}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className='object-cover transition-transform duration-300 hover:scale-105'
+                      sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                     />
                   </Link>
                 )}
-                <div className="p-6">
-                  <div className="flex items-center justify-between text-small text-white/90 mb-3">
-                    <span className="font-medium text-blue-600 dark:text-blue-400">
+                <div className='p-6'>
+                  <div className='mb-3 flex items-center justify-between text-small text-white/90'>
+                    <span className='font-medium text-blue-600 dark:text-blue-400'>
                       {post.categoryData?.name || post.category}
                     </span>
                     <span>{formatDate(post.publishedAt)}</span>
                   </div>
-                  <h3 className="text-xl font-bold mb-3">
+                  <h3 className='mb-3 font-bold text-xl'>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      className='transition-colors hover:text-blue-600 dark:hover:text-blue-400'
                     >
                       {post.title}
                     </Link>
                   </h3>
-                  <p className="text-white mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-small text-white/90">
-                      {post.readTime}
-                    </span>
+                  <p className='mb-4 line-clamp-3 text-white'>{post.excerpt}</p>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-small text-white/90'>{post.readTime}</span>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-small inline-flex items-center"
+                      className='inline-flex items-center font-medium text-blue-600 text-small hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
                     >
                       Read more
                       <svg
-                        className="ml-1 w-3 h-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
+                        className='ml-1 h-3 w-3'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                        aria-hidden='true'
                       >
                         <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
                           strokeWidth={2}
-                          d="M9 5l7 7-7 7"
+                          d='M9 5l7 7-7 7'
                         />
                       </svg>
                     </Link>
@@ -233,8 +229,8 @@ export default async function CategoryPage({
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <p className="text-large text-white/80">
+          <div className='py-16 text-center'>
+            <p className='text-large text-white/80'>
               No articles found in this category. Check back soon!
             </p>
           </div>
@@ -243,24 +239,24 @@ export default async function CategoryPage({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <nav className="flex justify-center items-center space-x-2" aria-label="Pagination">
+        <nav className='flex items-center justify-center space-x-2' aria-label='Pagination'>
           {currentPage > 1 && (
             <Link
               href={`/blog/category/${slug}?page=${currentPage - 1}`}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className='rounded-md bg-gray-200 px-4 py-2 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
             >
               Previous
             </Link>
           )}
-          <div className="flex space-x-1">
+          <div className='flex space-x-1'>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <Link
                 key={page}
                 href={`/blog/category/${slug}?page=${page}`}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className={`rounded-md px-4 py-2 transition-colors ${
                   page === currentPage
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
                 }`}
               >
                 {page}
@@ -270,7 +266,7 @@ export default async function CategoryPage({
           {currentPage < totalPages && (
             <Link
               href={`/blog/category/${slug}?page=${currentPage + 1}`}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className='rounded-md bg-gray-200 px-4 py-2 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
             >
               Next
             </Link>
@@ -279,15 +275,15 @@ export default async function CategoryPage({
       )}
 
       {/* CTA */}
-      <div className="glass mt-12 p-6 rounded-lg">
-        <h2 className="text-xl font-bold mb-3">Calculate Your UK Tax Now</h2>
-        <p className="mb-4">
+      <div className='glass mt-12 rounded-lg p-6'>
+        <h2 className='mb-3 font-bold text-xl'>Calculate Your UK Tax Now</h2>
+        <p className='mb-4'>
           Use our free PAYE tax calculator to determine your take-home pay and plan your finances
           better.
         </p>
         <Link
-          href="/"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex"
+          href='/'
+          className='inline-flex rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700'
         >
           Try Tax Calculator
         </Link>

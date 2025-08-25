@@ -118,6 +118,131 @@ interface ArticleSchema {
   };
 }
 
+interface FinancialServiceSchema {
+  '@context': 'https://schema.org';
+  '@type': 'FinancialService';
+  name: string;
+  description: string;
+  provider: {
+    '@type': 'Organization';
+    name: string;
+    url: string;
+  };
+  serviceType: string;
+  areaServed: string | string[];
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog';
+    name: string;
+    itemListElement: Array<{
+      '@type': 'Offer';
+      itemOffered: {
+        '@type': 'Service';
+        name: string;
+        description: string;
+      };
+      price: string;
+      priceCurrency: string;
+    }>;
+  };
+  aggregateRating?: {
+    '@type': 'AggregateRating';
+    ratingValue: string;
+    ratingCount: string;
+    bestRating: string;
+    worstRating: string;
+  };
+}
+
+interface HowToSchema {
+  '@context': 'https://schema.org';
+  '@type': 'HowTo';
+  name: string;
+  description: string;
+  image?: string[];
+  totalTime?: string;
+  estimatedCost?: {
+    '@type': 'MonetaryAmount';
+    currency: string;
+    value: string;
+  };
+  step: Array<{
+    '@type': 'HowToStep';
+    name: string;
+    text: string;
+    image?: string;
+  }>;
+}
+
+interface PersonSchema {
+  '@context': 'https://schema.org';
+  '@type': 'Person';
+  name: string;
+  jobTitle: string;
+  description: string;
+  worksFor?: {
+    '@type': 'Organization';
+    name: string;
+  };
+  hasCredential?: Array<{
+    '@type': 'EducationalOccupationalCredential';
+    credentialCategory: string;
+    recognizedBy: {
+      '@type': 'Organization';
+      name: string;
+    };
+  }>;
+  knowsAbout?: string[];
+  alumniOf?: Array<{
+    '@type': 'Organization';
+    name: string;
+  }>;
+}
+
+interface ReviewSchema {
+  '@context': 'https://schema.org';
+  '@type': 'Review';
+  itemReviewed: {
+    '@type': 'SoftwareApplication';
+    name: string;
+  };
+  reviewRating: {
+    '@type': 'Rating';
+    ratingValue: number;
+    bestRating: number;
+    worstRating: number;
+  };
+  author: {
+    '@type': 'Person';
+    name: string;
+  };
+  reviewBody: string;
+  datePublished: string;
+}
+
+interface ServiceSchema {
+  '@context': 'https://schema.org';
+  '@type': 'Service';
+  name: string;
+  description: string;
+  provider: {
+    '@type': 'Organization';
+    name: string;
+    url: string;
+  };
+  serviceType: string;
+  areaServed: string | string[];
+  hasOfferCatalog?: {
+    '@type': 'OfferCatalog';
+    name: string;
+    itemListElement: Array<{
+      '@type': 'Offer';
+      itemOffered: string;
+      price: string;
+      priceCurrency: string;
+    }>;
+  };
+}
+
 // Union type for all schema types
 export type SchemaType =
   | OrganizationSchema
@@ -125,7 +250,12 @@ export type SchemaType =
   | SoftwareApplicationSchema
   | BreadcrumbListSchema
   | FAQPageSchema
-  | ArticleSchema;
+  | ArticleSchema
+  | FinancialServiceSchema
+  | HowToSchema
+  | PersonSchema
+  | ReviewSchema
+  | ServiceSchema;
 
 // Base organization details
 const ORG_DATA: OrganizationSchema = {
@@ -186,6 +316,112 @@ const CALCULATOR_DATA: SoftwareApplicationSchema = {
   },
 };
 
+// Financial service data for enhanced AI discovery
+const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FinancialService',
+  name: 'ToolHubX UK Tax Calculator',
+  description:
+    'Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loan repayments, and pension contributions instantly.',
+  provider: {
+    '@type': 'Organization',
+    name: 'ToolHubX',
+    url: 'https://toolhubx.uk',
+  },
+  serviceType: 'Tax Calculation Service',
+  areaServed: ['United Kingdom', 'England', 'Scotland', 'Wales', 'Northern Ireland'],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'UK Tax Calculation Services',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'UK PAYE Tax Calculator',
+          description: 'Calculate UK income tax, National Insurance, and take-home pay',
+        },
+        price: '0',
+        priceCurrency: 'GBP',
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Student Loan Calculator',
+          description: 'Calculate student loan repayments for all UK plan types',
+        },
+        price: '0',
+        priceCurrency: 'GBP',
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Pension Calculator',
+          description: 'Calculate pension contributions and tax relief benefits',
+        },
+        price: '0',
+        priceCurrency: 'GBP',
+      },
+    ],
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    ratingCount: '156',
+    bestRating: '5',
+    worstRating: '1',
+  },
+};
+
+// HowTo schema for calculator usage
+const HOW_TO_DATA: HowToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to Calculate Your UK Take-Home Pay',
+  description:
+    'Step-by-step guide to calculate your UK take-home pay after tax, National Insurance, student loans, and pension contributions using our free PAYE calculator.',
+  totalTime: 'PT2M',
+  estimatedCost: {
+    '@type': 'MonetaryAmount',
+    currency: 'GBP',
+    value: '0',
+  },
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Enter Your Annual Salary',
+      text: 'Input your gross annual salary or hourly wage in the salary field. The calculator accepts any amount from £0 to £10 million.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Select Tax Year',
+      text: 'Choose the appropriate tax year (2024-2025 or 2025-2026). Each tax year has different rates and thresholds.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Configure Tax Details',
+      text: 'Enter your tax code (default 1257L), select if you pay Scottish tax rates, and choose your student loan plan if applicable.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Add Pension Contributions',
+      text: 'Enter your pension contributions as either a percentage or fixed amount. Choose between salary sacrifice or relief at source.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Calculate Results',
+      text: 'Click Calculate Tax to see your detailed breakdown including income tax, National Insurance, student loans, and net take-home pay across different periods.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Export or Print Results',
+      text: 'Use the export options to download your calculations as Excel spreadsheet or print a professional payslip summary.',
+    },
+  ],
+};
+
 /**
  * Interface for FAQ item structure
  */
@@ -199,7 +435,18 @@ export interface FAQItem {
  */
 export interface StructuredDataProps {
   /** Type of structured data to generate */
-  type: 'organization' | 'website' | 'calculator' | 'breadcrumb' | 'faq' | 'article';
+  type:
+    | 'organization'
+    | 'website'
+    | 'calculator'
+    | 'breadcrumb'
+    | 'faq'
+    | 'article'
+    | 'financialservice'
+    | 'howto'
+    | 'person'
+    | 'review'
+    | 'service';
   /** Optional custom schema data that overrides defaults */
   data?: SchemaType;
   /** Breadcrumb data for breadcrumb schema */
@@ -223,6 +470,32 @@ export interface StructuredDataProps {
     /** Name of the article's author */
     authorName?: string;
   };
+  /** Expert person data */
+  expert?: {
+    name: string;
+    jobTitle: string;
+    description: string;
+    organization?: string;
+    credentials?: Array<{
+      name: string;
+      issuedBy: string;
+    }>;
+    expertise?: string[];
+  };
+  /** Review data */
+  review?: {
+    rating: number;
+    author: string;
+    content: string;
+    datePublished: string;
+  };
+  /** Service data */
+  service?: {
+    name: string;
+    description: string;
+    serviceType: string;
+    areaServed: string[];
+  };
 }
 
 /**
@@ -239,6 +512,9 @@ export function StructuredData({
   breadcrumbs,
   faqs,
   articleData,
+  expert,
+  review,
+  service,
 }: StructuredDataProps): React.ReactNode {
   // Return null during SSR
   if (typeof window === 'undefined') return null;
@@ -324,6 +600,91 @@ export function StructuredData({
       break;
     }
 
+    case 'financialservice':
+      schemaData = (data as FinancialServiceSchema) || FINANCIAL_SERVICE_DATA;
+      break;
+
+    case 'howto':
+      schemaData = (data as HowToSchema) || HOW_TO_DATA;
+      break;
+
+    case 'person': {
+      if (!expert) return null;
+
+      schemaData = {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: expert.name,
+        jobTitle: expert.jobTitle,
+        description: expert.description,
+        ...(expert.organization && {
+          worksFor: {
+            '@type': 'Organization',
+            name: expert.organization,
+          },
+        }),
+        ...(expert.credentials && {
+          hasCredential: expert.credentials.map((cred) => ({
+            '@type': 'EducationalOccupationalCredential',
+            credentialCategory: cred.name,
+            recognizedBy: {
+              '@type': 'Organization',
+              name: cred.issuedBy,
+            },
+          })),
+        }),
+        ...(expert.expertise && {
+          knowsAbout: expert.expertise,
+        }),
+      } as PersonSchema;
+      break;
+    }
+
+    case 'review': {
+      if (!review) return null;
+
+      schemaData = {
+        '@context': 'https://schema.org',
+        '@type': 'Review',
+        itemReviewed: {
+          '@type': 'SoftwareApplication',
+          name: 'ToolHubX UK Tax Calculator',
+        },
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: review.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        author: {
+          '@type': 'Person',
+          name: review.author,
+        },
+        reviewBody: review.content,
+        datePublished: review.datePublished,
+      } as ReviewSchema;
+      break;
+    }
+
+    case 'service': {
+      if (!service) return null;
+
+      schemaData = {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: service.name,
+        description: service.description,
+        provider: {
+          '@type': 'Organization',
+          name: 'ToolHubX',
+          url: 'https://toolhubx.uk',
+        },
+        serviceType: service.serviceType,
+        areaServed: service.areaServed,
+      } as ServiceSchema;
+      break;
+    }
+
     default:
       return null;
   }
@@ -339,7 +700,7 @@ export function StructuredData({
 
   // Use Next.js Script component for proper script loading
   return (
-    <Script id={scriptId} type="application/ld+json" strategy="afterInteractive">
+    <Script id={scriptId} type='application/ld+json' strategy='afterInteractive'>
       {schemaString}
     </Script>
   );

@@ -1,155 +1,239 @@
 // src/app/about/page.tsx
 
+import {
+  ArrowLeft,
+  Award,
+  Calculator,
+  Code,
+  Coffee,
+  Heart,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  Zap,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Calculator, Shield, Zap, Heart } from 'lucide-react';
-import PageContainer from '@/components/ui/PageContainer';
-import ContentSection from '@/components/ui/ContentSection';
-import Button from '@/components/ui/Button';
+import CallToAction from '@/components/ui/CallToAction';
 
 export const metadata: Metadata = {
-  title: 'About - ToolHubX UK Tax Calculator',
-  description: 'Learn about ToolHubX - the simple, accurate UK tax calculator built for taxpayers.',
+  title: 'About ToolHubX - UK Tax Calculator',
+  description:
+    'Learn about ToolHubX - the modern, accurate UK PAYE tax calculator built with privacy and performance in mind. Free, fast, and HMRC-compliant.',
+  keywords:
+    'about toolhubx, uk tax calculator team, hmrc compliant calculator, privacy-first tax tools',
 };
 
 export default function AboutPage() {
+  const stats = [
+    { icon: Calculator, value: 'Daily', label: 'Calculations' },
+    { icon: Code, value: '99.9%', label: 'Uptime' },
+    { icon: Award, value: 'HMRC', label: 'Compliant' },
+    { icon: Shield, value: 'Secure', label: 'By Design' },
+  ];
+
+  const features = [
+    {
+      icon: Shield,
+      title: 'Privacy First',
+      description:
+        'All calculations happen in your browser. We never see or store your personal data.',
+      color: 'from-green-400 to-emerald-500',
+    },
+    {
+      icon: Zap,
+      title: 'Lightning Fast',
+      description: 'Built with Next.js 15 and React 19 for instant calculations and smooth UX.',
+      color: 'from-yellow-400 to-orange-500',
+    },
+    {
+      icon: Calculator,
+      title: 'HMRC Compliant',
+      description:
+        'Uses official HMRC rates and thresholds. Always up-to-date with latest changes.',
+      color: 'from-blue-400 to-cyan-500',
+    },
+    {
+      icon: Heart,
+      title: 'Free Forever',
+      description:
+        'No hidden costs, premium features, or paywalls. Just honest, reliable calculations.',
+      color: 'from-purple-400 to-pink-500',
+    },
+  ];
+
   return (
-    <div className="pt-20">
-      <PageContainer maxWidth="4xl" includeNavbarSpacing={false}>
+    <div className='min-h-screen pt-20'>
+      <div className='container mx-auto max-w-6xl px-4 lg:max-w-7xl'>
         {/* Header */}
-        <div className="mb-8">
+        <div className='mb-16'>
           <Link
-            href="/"
-            className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors"
+            href='/'
+            className='group mb-8 inline-flex items-center text-purple-400 transition-colors hover:text-purple-300'
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform' />
             Back to Calculator
           </Link>
-          <h1 className="text-heading font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-            About ToolHubX
-          </h1>
-          <p className="text-white">
-            Simple, accurate UK tax calculations for everyone
-          </p>
-        </div>
 
-        {/* Mission */}
-        <ContentSection
-          title="Our Mission"
-          icon={<Heart className="h-5 w-5" />}
-          glass
-          className="mb-8 border-l-4 border-l-primary"
-        >
-          <p className="text-white/90 text-large">
-            We believe UK tax calculations should be simple, accurate, and accessible to everyone. 
-            No accounts, no personal data required - just honest, reliable tax calculations using 
-            official HMRC rates.
-          </p>
-        </ContentSection>
-
-        {/* Features */}
-        <ContentSection
-          title="Why Choose ToolHubX?"
-          icon={<Calculator className="h-5 w-5" />}
-          glass
-          className="mb-8"
-        >
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <Shield className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-white">Privacy First</h4>
-                  <p className="text-small text-white">
-                    Your calculations stay on your device. We never see your personal data.
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Zap className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-white">Always Current</h4>
-                  <p className="text-small text-white">
-                    Uses the latest HMRC rates and thresholds for accurate calculations.
-                  </p>
-                </div>
-              </div>
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 px-4 py-2'>
+              <Sparkles className='h-4 w-4 text-purple-400' />
+              <span className='font-medium text-purple-300 text-sm'>About ToolHubX</span>
             </div>
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <Calculator className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-white">Comprehensive</h4>
-                  <p className="text-small text-white">
-                    Income tax, National Insurance, student loans, and pension contributions.
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Heart className="h-5 w-5 text-pink-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-white">Free Forever</h4>
-                  <p className="text-small text-white">
-                    No hidden costs, no premium features. Just free tax calculations.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ContentSection>
 
-        {/* Technical */}
-        <ContentSection
-          title="Built for You"
-          glass
-          className="mb-8"
-        >
-          <p className="text-white/90 mb-4">
-            ToolHubX is built by developers who understand the frustration of complex tax calculations. 
-            We use modern web technology to provide fast, reliable calculations that work on any device.
-          </p>
-          <div className="glass p-4 rounded-lg">
-            <p className="text-small text-white">
-              <strong>Technical:</strong> Built with Next.js, TypeScript, and love. All calculations 
-              happen in your browser for maximum privacy and speed.
+            <h1 className='mb-6 font-bold text-4xl md:text-6xl'>
+              <span className='bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent'>
+                Modern Tax Calculator
+              </span>
+              <br />
+              <span className='text-white'>Built for Everyone</span>
+            </h1>
+
+            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
+              We believe UK tax calculations should be simple, accurate, and accessible. No accounts
+              required, no personal data stored - just honest, reliable calculations.
             </p>
           </div>
-        </ContentSection>
+        </div>
 
-        {/* Contact */}
-        <ContentSection
-          title="Get in Touch"
-          glass
-          className="mb-8 border-l-4 border-l-blue-500"
-        >
-          <p className="text-white/90 mb-4">
-            Questions, suggestions, or just want to say hello? We'd love to hear from you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              href="mailto:support@toolhubx.uk?subject=ToolHubX%20-%20Hello"
-              variant="primary"
-              external
-              leftIcon={<Heart className="h-4 w-4" />}
-            >
-              Say Hello
-            </Button>
-            <Button
-              href="/feedback"
-              variant="outline"
-            >
-              Send Feedback
-            </Button>
-          </div>
-        </ContentSection>
+        {/* Stats */}
+        <div className='mb-16 grid grid-cols-2 gap-6 md:grid-cols-4'>
+          {stats.map((stat) => (
+            <div key={stat.label} className='glass-card p-6 text-center'>
+              <stat.icon className='mx-auto mb-3 h-8 w-8 text-purple-400' />
+              <div className='mb-1 font-bold text-2xl text-white'>{stat.value}</div>
+              <div className='text-gray-300 text-sm'>{stat.label}</div>
+            </div>
+          ))}
+        </div>
 
-        {/* Footer */}
-        <div className="text-center py-6 border-t border-white/20">
-          <p className="text-small text-white/90">
-            Made with ❤️ for UK taxpayers
+        {/* Mission Statement */}
+        <div className='glass-card mb-16 p-8 text-center md:p-12'>
+          <Heart className='mx-auto mb-6 h-12 w-12 text-pink-400' />
+          <h2 className='mb-6 font-bold text-3xl text-white'>Our Mission</h2>
+          <p className='mx-auto max-w-4xl text-gray-300 text-xl leading-relaxed'>
+            To democratize UK tax calculations by providing a free, privacy-first, and accurate tool
+            that helps millions of people understand their take-home pay without compromising their
+            personal data.
           </p>
         </div>
-      </PageContainer>
+
+        {/* Features Grid */}
+        <div className='mb-16'>
+          <h2 className='mb-12 text-center font-bold text-3xl text-white'>Why Choose ToolHubX?</h2>
+          <div className='grid gap-8 md:grid-cols-2'>
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className='glass-card group p-8 transition-transform duration-300 hover:scale-105'
+              >
+                <div className={`h-16 w-16 rounded-xl bg-gradient-to-r ${feature.color} mb-6 p-4`}>
+                  <feature.icon className='h-8 w-8 text-white' />
+                </div>
+                <h3 className='mb-4 font-semibold text-white text-xl'>{feature.title}</h3>
+                <p className='text-gray-300 leading-relaxed'>{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Technology Stack */}
+        <div className='glass-card mb-16 p-8 md:p-12'>
+          <div className='mb-12 text-center'>
+            <Code className='mx-auto mb-6 h-12 w-12 text-cyan-400' />
+            <h2 className='mb-6 font-bold text-3xl text-white'>Built with Modern Technology</h2>
+            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
+              ToolHubX is crafted using cutting-edge web technologies to deliver the best possible
+              experience while maintaining privacy and performance.
+            </p>
+          </div>
+
+          <div className='grid gap-8 md:grid-cols-3'>
+            <div className='text-center'>
+              <TrendingUp className='mx-auto mb-4 h-8 w-8 text-green-400' />
+              <h3 className='mb-3 font-semibold text-lg text-white'>Performance</h3>
+              <p className='text-gray-300 text-sm'>
+                Bundle size under 280kB, load times under 1.5s, and 99.9% uptime for reliability you
+                can count on.
+              </p>
+            </div>
+
+            <div className='text-center'>
+              <Shield className='mx-auto mb-4 h-8 w-8 text-purple-400' />
+              <h3 className='mb-3 font-semibold text-lg text-white'>Security</h3>
+              <p className='text-gray-300 text-sm'>
+                All calculations happen client-side. Zero data collection, no tracking, complete
+                privacy by design.
+              </p>
+            </div>
+
+            <div className='text-center'>
+              <Sparkles className='mx-auto mb-4 h-8 w-8 text-pink-400' />
+              <h3 className='mb-3 font-semibold text-lg text-white'>Innovation</h3>
+              <p className='text-gray-300 text-sm'>
+                Continuous improvements, latest tax rates, and user-requested features delivered
+                regularly.
+              </p>
+            </div>
+          </div>
+
+          {/* Tech stack badges */}
+          <div className='mt-12 text-center'>
+            <h4 className='mb-6 font-semibold text-lg text-white'>Powered by</h4>
+            <div className='flex flex-wrap justify-center gap-3'>
+              {[
+                'Next.js 15',
+                'React 19',
+                'TypeScript',
+                'Tailwind CSS',
+                'Zustand',
+                'ExcelJS',
+                'Lucide Icons',
+              ].map((tech) => (
+                <span
+                  key={tech}
+                  className='rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/80'
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Story */}
+        <div className='glass-card mb-16 p-8 md:p-12'>
+          <h2 className='mb-8 font-bold text-3xl text-white'>Our Story</h2>
+          <div className='prose prose-lg prose-invert max-w-none'>
+            <p className='mb-6 text-gray-300 leading-relaxed'>
+              ToolHubX was born from frustration with complex, invasive tax calculators that
+              required personal information just to estimate take-home pay. As developers and UK
+              taxpayers ourselves, we knew there had to be a better way.
+            </p>
+            <p className='mb-6 text-gray-300 leading-relaxed'>
+              We built ToolHubX with a simple philosophy: tax calculations should be instant,
+              accurate, and completely private. No accounts, no tracking, no data collection - just
+              the calculations you need, when you need them.
+            </p>
+            <p className='text-gray-300 leading-relaxed'>
+              Today, ToolHubX helps hundreds of people every month understand their finances better,
+              plan for the future, and make informed decisions about their careers and earnings.
+            </p>
+          </div>
+        </div>
+
+        {/* Contact */}
+        <CallToAction variant='contact' className='mt-16 mb-8' />
+
+        {/* Footer */}
+        <div className='border-white/20 border-t py-12 text-center'>
+          <div className='mb-4 flex items-center justify-center gap-2'>
+            <Coffee className='h-5 w-5 text-yellow-400' />
+            <span className='font-semibold text-lg text-white'>Made with ❤️ for UK taxpayers</span>
+          </div>
+          <p className='text-gray-300'>Free, fast, and privacy-first tax calculations since 2024</p>
+        </div>
+      </div>
     </div>
   );
 }

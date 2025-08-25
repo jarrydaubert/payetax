@@ -80,7 +80,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
       className={cn(
         'container mx-auto px-4 sm:px-6',
         // FIXED: Add proper navbar spacing to prevent overlap
-        includeNavbarSpacing 
+        includeNavbarSpacing
           ? 'pt-24 pb-8 sm:pt-28 sm:pb-12' // Top padding for navbar clearance
           : 'py-8 sm:py-12', // Original padding for non-navbar pages
         getMaxWidthClass(),
@@ -88,8 +88,8 @@ const PageContainer: React.FC<PageContainerProps> = ({
       )}
     >
       {glass ? (
-        <section className="glass-card relative overflow-hidden">
-          <div className="glass-card-inner">{children}</div>
+        <section className='glass-card relative overflow-hidden'>
+          <div className='glass-card-inner'>{children}</div>
         </section>
       ) : (
         children

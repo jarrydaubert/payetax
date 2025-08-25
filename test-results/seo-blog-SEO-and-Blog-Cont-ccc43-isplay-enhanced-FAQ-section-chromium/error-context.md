@@ -1,0 +1,445 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#_R_alb_"
+    - navigation [ref=e4]:
+      - generic [ref=e5]:
+        - link "ToolHubX" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8] [cursor=pointer]: ToolHubX
+        - generic [ref=e10]:
+          - link "Home" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e13] [cursor=pointer]: Home
+          - link "About" [ref=e16] [cursor=pointer]:
+            - /url: /about
+            - generic [ref=e17] [cursor=pointer]: About
+          - link "Blog" [ref=e19] [cursor=pointer]:
+            - /url: /blog
+            - generic [ref=e20] [cursor=pointer]: Blog
+        - link "Feedback" [ref=e22] [cursor=pointer]:
+          - /url: /feedback
+          - img [ref=e23] [cursor=pointer]
+          - generic [ref=e25] [cursor=pointer]: Feedback
+    - main [ref=e26]:
+      - main [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e31]:
+            - img [ref=e33]
+            - heading "Free UK PAYE Tax Calculator 2025-2026" [level=1] [ref=e35]
+            - paragraph [ref=e36]: Calculate your take-home pay instantly with our comprehensive UK tax calculator. Includes income tax, National Insurance, student loans, and pension contributions.
+            - button "Start Calculating" [ref=e37]:
+              - text: Start Calculating
+              - img [ref=e38]
+          - img [ref=e42]
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - generic [ref=e51]:
+                - img [ref=e52]
+                - heading "Salary Information" [level=2] [ref=e54]
+              - generic [ref=e55]:
+                - generic [ref=e56]:
+                  - generic [ref=e57]:
+                    - generic [ref=e58]: Gross Salary (£)
+                    - textbox "Gross salary in pounds" [ref=e59]
+                  - generic [ref=e60]:
+                    - generic [ref=e61]: Input Period
+                    - combobox "Pay period for salary input" [ref=e62]:
+                      - option "Yearly" [selected]
+                      - option "Monthly"
+                      - option "Weekly"
+                      - option "Daily"
+                - generic [ref=e63]:
+                  - generic [ref=e64]:
+                    - generic [ref=e65]: Tax Year
+                    - combobox "Tax year for calculations" [ref=e66]:
+                      - option "2025/26" [selected]
+                      - option "2024/25"
+                      - option "2023/24"
+                  - generic [ref=e67]:
+                    - generic [ref=e68]: Tax Region
+                    - combobox "Tax region for calculations" [ref=e69]:
+                      - option "England" [selected]
+                      - option "Wales"
+                      - option "Northern Ireland"
+                      - option "Scotland"
+                - generic [ref=e70]:
+                  - generic [ref=e71]: Tax Code
+                  - textbox "Tax Code" [ref=e73]
+                - group "Student Loan Plans" [ref=e76]:
+                  - generic [ref=e77]: Student Loan Plans
+                  - generic [ref=e78]:
+                    - generic [ref=e79] [cursor=pointer]:
+                      - checkbox "Plan 1" [ref=e80]
+                      - generic [ref=e81] [cursor=pointer]: Plan 1
+                    - generic [ref=e82] [cursor=pointer]:
+                      - checkbox "Plan 2" [ref=e83]
+                      - generic [ref=e84] [cursor=pointer]: Plan 2
+                    - generic [ref=e85] [cursor=pointer]:
+                      - checkbox "Plan 4" [ref=e86]
+                      - generic [ref=e87] [cursor=pointer]: Plan 4
+                    - generic [ref=e88] [cursor=pointer]:
+                      - checkbox "Postgrad" [ref=e89]
+                      - generic [ref=e90] [cursor=pointer]: Postgrad
+                - generic [ref=e91]:
+                  - generic [ref=e92]:
+                    - generic [ref=e93]: Pension Type
+                    - combobox "Pension Type" [ref=e94]:
+                      - option "%" [selected]
+                      - option "£"
+                  - generic [ref=e95]:
+                    - generic [ref=e96]: Amount
+                    - textbox "Amount" [ref=e97]
+                - generic [ref=e98]:
+                  - generic [ref=e99]: Allowances/Deductions (£)
+                  - textbox "Allowances/Deductions (£)" [ref=e100]
+                - group "Personal Circumstances" [ref=e102]:
+                  - generic [ref=e103]: Personal Circumstances
+                  - generic [ref=e104]:
+                    - generic [ref=e105] [cursor=pointer]:
+                      - checkbox "Over State Pension Age" [ref=e106]
+                      - generic [ref=e107] [cursor=pointer]: Over State Pension Age
+                    - generic [ref=e108] [cursor=pointer]:
+                      - checkbox "Married/Civil Partnership" [ref=e109]
+                      - generic [ref=e110] [cursor=pointer]: Married/Civil Partnership
+                    - generic [ref=e111] [cursor=pointer]:
+                      - checkbox "Blind" [ref=e112]
+                      - generic [ref=e113] [cursor=pointer]: Blind
+                    - generic [ref=e114] [cursor=pointer]:
+                      - checkbox "No National Insurance" [ref=e115]
+                      - generic [ref=e116] [cursor=pointer]: No National Insurance
+            - generic [ref=e118]:
+              - button "Calculate Tax" [ref=e119]
+              - button "Reset" [ref=e120]:
+                - img [ref=e121]
+                - text: Reset
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - heading "Your Payslip Summary" [level=2] [ref=e126]:
+                - img [ref=e127]
+                - text: Your Payslip Summary
+              - generic [ref=e129]:
+                - generic [ref=e130]:
+                  - checkbox "Toggle Yearly column visibility" [checked] [ref=e131]
+                  - text: Yearly
+                - generic [ref=e132]:
+                  - checkbox "Toggle Monthly column visibility" [checked] [ref=e133]
+                  - text: Monthly
+                - generic [ref=e134]:
+                  - checkbox "Toggle 4-Weekly column visibility" [ref=e135]
+                  - text: 4-Weekly
+                - generic [ref=e136]:
+                  - checkbox "Toggle Fortnightly column visibility" [ref=e137]
+                  - text: Fortnightly
+                - generic [ref=e138]:
+                  - checkbox "Toggle Weekly column visibility" [checked] [ref=e139]
+                  - text: Weekly
+                - generic [ref=e140]:
+                  - checkbox "Toggle Daily column visibility" [checked] [ref=e141]
+                  - text: Daily
+                - generic [ref=e142]:
+                  - checkbox "Toggle Hourly column visibility" [ref=e143]
+                  - text: Hourly
+              - generic [ref=e144]:
+                - table [ref=e145]:
+                  - rowgroup [ref=e153]:
+                    - row "Category % Yearly (£) Monthly (£) Weekly (£) Daily (£)" [ref=e154]:
+                      - cell "Category" [ref=e155]
+                      - cell "%" [ref=e156]
+                      - cell "Yearly (£)" [ref=e157]:
+                        - generic [ref=e158]:
+                          - generic [ref=e159]: Yearly
+                          - generic [ref=e160]: (£)
+                      - cell "Monthly (£)" [ref=e161]:
+                        - generic [ref=e162]:
+                          - generic [ref=e163]: Monthly
+                          - generic [ref=e164]: (£)
+                      - cell "Weekly (£)" [ref=e165]:
+                        - generic [ref=e166]:
+                          - generic [ref=e167]: Weekly
+                          - generic [ref=e168]: (£)
+                      - cell "Daily (£)" [ref=e169]:
+                        - generic [ref=e170]:
+                          - generic [ref=e171]: Daily
+                          - generic [ref=e172]: (£)
+                  - rowgroup [ref=e173]:
+                    - row "Gross Pay 100% 0.00 0.00 0.00 0.00" [ref=e174]:
+                      - cell "Gross Pay" [ref=e175]:
+                        - generic [ref=e176]:
+                          - img [ref=e177]
+                          - generic [ref=e180]: Gross Pay
+                      - cell "100%" [ref=e181]
+                      - cell "0.00" [ref=e182]
+                      - cell "0.00" [ref=e183]
+                      - cell "0.00" [ref=e184]
+                      - cell "0.00" [ref=e185]
+                    - row "Tax-Free Allowance 0.0% 12,570.00 1,047.50 241.73 48.35" [ref=e186]:
+                      - cell "Tax-Free Allowance" [ref=e187]:
+                        - generic [ref=e188]:
+                          - img [ref=e189]
+                          - generic [ref=e191]: Tax-Free Allowance
+                      - cell "0.0%" [ref=e192]
+                      - cell "12,570.00" [ref=e193]
+                      - cell "1,047.50" [ref=e194]
+                      - cell "241.73" [ref=e195]
+                      - cell "48.35" [ref=e196]
+                    - row "Total Taxable 0.0% 0.00 0.00 0.00 0.00" [ref=e197]:
+                      - cell "Total Taxable" [ref=e198]:
+                        - generic [ref=e199]:
+                          - img [ref=e200]
+                          - generic [ref=e204]: Total Taxable
+                      - cell "0.0%" [ref=e205]
+                      - cell "0.00" [ref=e206]
+                      - cell "0.00" [ref=e207]
+                      - cell "0.00" [ref=e208]
+                      - cell "0.00" [ref=e209]
+                    - row "Total Tax Due 0.0% 0.00 0.00 0.00 0.00" [ref=e210]:
+                      - cell "Total Tax Due" [ref=e211]:
+                        - generic [ref=e212]:
+                          - img [ref=e213]
+                          - generic [ref=e219]: Total Tax Due
+                      - cell "0.0%" [ref=e220]
+                      - cell "0.00" [ref=e221]
+                      - cell "0.00" [ref=e222]
+                      - cell "0.00" [ref=e223]
+                      - cell "0.00" [ref=e224]
+                    - row "National Insurance 0.0% 0.00 0.00 0.00 0.00" [ref=e225]:
+                      - cell "National Insurance" [ref=e226]:
+                        - generic [ref=e227]:
+                          - img [ref=e228]
+                          - generic [ref=e230]: National Insurance
+                      - cell "0.0%" [ref=e231]
+                      - cell "0.00" [ref=e232]
+                      - cell "0.00" [ref=e233]
+                      - cell "0.00" [ref=e234]
+                      - cell "0.00" [ref=e235]
+                    - row "Pension [You] 0.0% 0.00 0.00 0.00 0.00" [ref=e236]:
+                      - cell "Pension [You]" [ref=e237]:
+                        - generic [ref=e238]:
+                          - img [ref=e239]
+                          - generic [ref=e242]: Pension [You]
+                      - cell "0.0%" [ref=e243]
+                      - cell "0.00" [ref=e244]
+                      - cell "0.00" [ref=e245]
+                      - cell "0.00" [ref=e246]
+                      - cell "0.00" [ref=e247]
+                    - row "Pension [HMRC Relief] N/A 0.00 0.00 0.00 0.00" [ref=e248]:
+                      - cell "Pension [HMRC Relief]" [ref=e249]:
+                        - generic [ref=e250]:
+                          - img [ref=e251]
+                          - generic [ref=e253]: Pension [HMRC Relief]
+                      - cell "N/A" [ref=e254]
+                      - cell "0.00" [ref=e255]
+                      - cell "0.00" [ref=e256]
+                      - cell "0.00" [ref=e257]
+                      - cell "0.00" [ref=e258]
+                    - row "Allowances/Deductions 0.0% 0.00 0.00 0.00 0.00" [ref=e259]:
+                      - cell "Allowances/Deductions" [ref=e260]:
+                        - generic [ref=e261]:
+                          - img [ref=e262]
+                          - generic [ref=e268]: Allowances/Deductions
+                      - cell "0.0%" [ref=e269]
+                      - cell "0.00" [ref=e270]
+                      - cell "0.00" [ref=e271]
+                      - cell "0.00" [ref=e272]
+                      - cell "0.00" [ref=e273]
+                    - row "Net Pay 0.0% 0.00 0.00 0.00 0.00" [ref=e274]:
+                      - cell "Net Pay" [ref=e275]:
+                        - generic [ref=e276]:
+                          - img [ref=e277]
+                          - generic [ref=e280]: Net Pay
+                      - cell "0.0%" [ref=e281]
+                      - cell "0.00" [ref=e282]
+                      - cell "0.00" [ref=e283]
+                      - cell "0.00" [ref=e284]
+                      - cell "0.00" [ref=e285]
+                    - row "Employers NI 0.0% 0.00 0.00 0.00 0.00" [ref=e286]:
+                      - cell "Employers NI" [ref=e287]:
+                        - generic [ref=e288]:
+                          - img [ref=e289]
+                          - generic [ref=e293]: Employers NI
+                      - cell "0.0%" [ref=e294]
+                      - cell "0.00" [ref=e295]
+                      - cell "0.00" [ref=e296]
+                      - cell "0.00" [ref=e297]
+                      - cell "0.00" [ref=e298]
+                    - row "Net Change from Previous Year 0.0% 0.00 0.00 0.00 0.00" [ref=e299]:
+                      - cell "Net Change from Previous Year" [ref=e300]:
+                        - generic [ref=e301]:
+                          - img [ref=e302]
+                          - generic [ref=e305]: Net Change from Previous Year
+                      - cell "0.0%" [ref=e306]
+                      - cell "0.00" [ref=e307]
+                      - cell "0.00" [ref=e308]
+                      - cell "0.00" [ref=e309]
+                      - cell "0.00" [ref=e310]
+                - paragraph [ref=e311]: "*Pension calculated as salary sacrifice; relief reflected in reduced tax and NI."
+            - button "Export payslip summary" [ref=e314]:
+              - img [ref=e315]
+              - text: Export
+        - generic [ref=e319]:
+          - generic [ref=e320]:
+            - generic [ref=e321]:
+              - img [ref=e322]
+              - generic [ref=e325]: Cutting-Edge Technology
+            - heading "Built with Modern Web Tech" [level=2] [ref=e326]
+            - paragraph [ref=e327]: Professional-grade tax calculator powered by the latest technologies and optimized for performance
+          - generic [ref=e328]:
+            - generic [ref=e329]:
+              - img [ref=e330]
+              - generic [ref=e333]: 279kB
+              - generic [ref=e334]: Bundle Size
+              - generic [ref=e335]: Optimized & fast
+            - generic [ref=e336]:
+              - img [ref=e337]
+              - generic [ref=e339]: <1.5s
+              - generic [ref=e340]: Load Time
+              - generic [ref=e341]: Lightning fast
+            - generic [ref=e342]:
+              - img [ref=e343]
+              - generic [ref=e347]: 40+
+              - generic [ref=e348]: Components
+              - generic [ref=e349]: Modular design
+            - generic [ref=e350]:
+              - img [ref=e351]
+              - generic [ref=e356]: WCAG AA
+              - generic [ref=e357]: Accessibility
+              - generic [ref=e358]: Inclusive design
+          - generic [ref=e359]:
+            - button "View details for Lightning Fast" [ref=e360] [cursor=pointer]:
+              - img [ref=e362] [cursor=pointer]
+              - heading "Lightning Fast" [level=3] [ref=e364] [cursor=pointer]
+              - paragraph [ref=e365] [cursor=pointer]: Real-time calculations powered by Next.js 15 and React 19
+              - generic [ref=e366] [cursor=pointer]: Next.js 15 • React 19 • TypeScript
+              - paragraph [ref=e368] [cursor=pointer]: Built with the latest React Server Components and Next.js App Router for blazing fast performance
+              - generic [ref=e369] [cursor=pointer]:
+                - generic [ref=e370] [cursor=pointer]: Learn more
+                - img [ref=e371] [cursor=pointer]
+            - button "View details for HMRC Compliant" [ref=e373] [cursor=pointer]:
+              - img [ref=e375] [cursor=pointer]
+              - heading "HMRC Compliant" [level=3] [ref=e377] [cursor=pointer]
+              - paragraph [ref=e378] [cursor=pointer]: Accurate UK tax calculations using official HMRC rates
+              - generic [ref=e379] [cursor=pointer]: Tax Engine • Zustand • Validation
+              - generic [ref=e380] [cursor=pointer]:
+                - generic [ref=e381] [cursor=pointer]: Learn more
+                - img [ref=e382] [cursor=pointer]
+            - button "View details for Professional Exports" [ref=e384] [cursor=pointer]:
+              - img [ref=e386] [cursor=pointer]
+              - heading "Professional Exports" [level=3] [ref=e389] [cursor=pointer]
+              - paragraph [ref=e390] [cursor=pointer]: Beautiful Excel reports with landscape formatting
+              - generic [ref=e391] [cursor=pointer]: ExcelJS • Professional Layout • Dynamic Columns
+              - generic [ref=e392] [cursor=pointer]:
+                - generic [ref=e393] [cursor=pointer]: Learn more
+                - img [ref=e394] [cursor=pointer]
+            - button "View details for Mobile First" [ref=e396] [cursor=pointer]:
+              - img [ref=e398] [cursor=pointer]
+              - heading "Mobile First" [level=3] [ref=e400] [cursor=pointer]
+              - paragraph [ref=e401] [cursor=pointer]: Responsive design that works perfectly on all devices
+              - generic [ref=e402] [cursor=pointer]: Tailwind CSS • Mobile UX • Touch Optimized
+              - generic [ref=e403] [cursor=pointer]:
+                - generic [ref=e404] [cursor=pointer]: Learn more
+                - img [ref=e405] [cursor=pointer]
+            - button "View details for Smart Defaults" [ref=e407] [cursor=pointer]:
+              - img [ref=e409] [cursor=pointer]
+              - heading "Smart Defaults" [level=3] [ref=e417] [cursor=pointer]
+              - paragraph [ref=e418] [cursor=pointer]: Intelligent form handling with auto-detection
+              - generic [ref=e419] [cursor=pointer]: Scottish Tax Detection • Validation • UX
+              - generic [ref=e420] [cursor=pointer]:
+                - generic [ref=e421] [cursor=pointer]: Learn more
+                - img [ref=e422] [cursor=pointer]
+            - button "View details for Optimized Performance" [ref=e424] [cursor=pointer]:
+              - img [ref=e426] [cursor=pointer]
+              - heading "Optimized Performance" [level=3] [ref=e429] [cursor=pointer]
+              - paragraph [ref=e430] [cursor=pointer]: Bundle size under 280kB with dynamic imports
+              - generic [ref=e431] [cursor=pointer]: Bundle Analysis • Tree Shaking • Code Splitting
+              - generic [ref=e432] [cursor=pointer]:
+                - generic [ref=e433] [cursor=pointer]: Learn more
+                - img [ref=e434] [cursor=pointer]
+          - generic [ref=e436]:
+            - heading "Want to see the code?" [level=3] [ref=e437]
+            - paragraph [ref=e438]: This calculator is built with modern web technologies and best practices. Check out our technical implementation and architecture.
+            - generic [ref=e439]:
+              - link "Technical Details" [ref=e440] [cursor=pointer]:
+                - /url: /about
+                - img [ref=e441] [cursor=pointer]
+                - text: Technical Details
+              - link "Read Blog" [ref=e449] [cursor=pointer]:
+                - /url: /blog
+                - img [ref=e450] [cursor=pointer]
+                - text: Read Blog
+          - generic [ref=e458]:
+            - heading "Powered by" [level=4] [ref=e459]
+            - generic [ref=e460]:
+              - generic [ref=e461]: Next.js 15
+              - generic [ref=e462]: React 19
+              - generic [ref=e463]: TypeScript
+              - generic [ref=e464]: Tailwind CSS
+              - generic [ref=e465]: Zustand
+              - generic [ref=e466]: ExcelJS
+              - generic [ref=e467]: Lucide Icons
+              - generic [ref=e468]: Vercel
+    - contentinfo [ref=e469]:
+      - generic [ref=e472]:
+        - generic [ref=e473]:
+          - generic [ref=e474]:
+            - generic [ref=e475]:
+              - img [ref=e477]
+              - generic [ref=e480]: ToolHubX
+            - paragraph [ref=e481]: Professional UK tax calculations using official HMRC rates.
+            - generic [ref=e482]:
+              - generic [ref=e483]: Built with
+              - img [ref=e484]
+              - generic [ref=e486]: for UK taxpayers
+          - generic [ref=e487]:
+            - heading "Product" [level=3] [ref=e488]
+            - list [ref=e489]:
+              - listitem [ref=e490]:
+                - link "Tax Calculator" [ref=e491] [cursor=pointer]:
+                  - /url: /
+                  - img [ref=e493] [cursor=pointer]
+                  - generic [ref=e495] [cursor=pointer]: Tax Calculator
+              - listitem [ref=e496]:
+                - link "Blog" [ref=e497] [cursor=pointer]:
+                  - /url: /blog
+                  - img [ref=e499] [cursor=pointer]
+                  - generic [ref=e502] [cursor=pointer]: Blog
+              - listitem [ref=e503]:
+                - link "About" [ref=e504] [cursor=pointer]:
+                  - /url: /about
+                  - img [ref=e506] [cursor=pointer]
+                  - generic [ref=e509] [cursor=pointer]: About
+          - generic [ref=e510]:
+            - heading "Legal" [level=3] [ref=e511]
+            - list [ref=e512]:
+              - listitem [ref=e513]:
+                - link "Privacy Policy" [ref=e514] [cursor=pointer]:
+                  - /url: /privacy
+                  - img [ref=e516] [cursor=pointer]
+                  - generic [ref=e518] [cursor=pointer]: Privacy Policy
+          - generic [ref=e519]:
+            - heading "Support" [level=3] [ref=e520]
+            - list [ref=e521]:
+              - listitem [ref=e522]:
+                - link "Contact Us" [ref=e523] [cursor=pointer]:
+                  - /url: /feedback
+                  - img [ref=e525] [cursor=pointer]
+                  - generic [ref=e527] [cursor=pointer]: Contact Us
+              - listitem [ref=e528]:
+                - link "Send email to support" [ref=e529] [cursor=pointer]:
+                  - /url: mailto:support@toolhubx.uk?subject=ToolHubX%20Tax%20Calculator%20-%20Support%20Request
+                  - img [ref=e531] [cursor=pointer]
+                  - generic [ref=e534] [cursor=pointer]: Email Us
+        - generic [ref=e536]:
+          - generic [ref=e537]: © 2025 ToolHubX. All rights reserved.
+          - generic [ref=e538]: Tax calculations for guidance only. Uses official HMRC rates. Not financial advice.
+    - button "View sustainability information" [ref=e540]:
+      - img [ref=e541]
+      - generic [ref=e544]: Carbon Neutral
+  - button "Open Next.js Dev Tools" [ref=e550] [cursor=pointer]:
+    - img [ref=e551] [cursor=pointer]
+  - alert [ref=e554]
+```

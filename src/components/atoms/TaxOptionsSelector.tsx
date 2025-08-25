@@ -2,7 +2,7 @@
 // Component for selecting additional tax options with modern styling and accessibility
 
 import type React from 'react';
-import { useCallback, useState, useId } from 'react';
+import { useCallback, useId, useState } from 'react';
 import type { NICategory } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import NumberInput from './NumberInput';
@@ -119,31 +119,31 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
     <div className={cn('space-y-4', className)}>
       {/* Toggle button for expanding/collapsing */}
       <button
-        type="button"
+        type='button'
         id={expandButtonId}
         onClick={toggleExpanded}
         className={cn(
-          'text-sm font-medium flex items-center justify-between w-full',
-          'bg-glass backdrop-blur-glass-sm p-3 rounded-lg border-glass shadow-glass-sm',
+          'flex w-full items-center justify-between font-medium text-sm',
+          'rounded-lg border-glass bg-glass p-3 shadow-glass-sm backdrop-blur-glass-sm',
           'focus:outline-none focus:ring-1 focus:ring-primary',
           'transition-all duration-200'
         )}
         aria-expanded={expanded}
         aria-controls={contentId}
       >
-        <span className="text-foreground">Tax Options & Circumstances</span>
+        <span className='text-foreground'>Tax Options & Circumstances</span>
         <svg
-          xmlns="http://www.w3.org/2000/svg"
+          xmlns='http://www.w3.org/2000/svg'
           className={cn(
             'h-4 w-4 text-foreground/70 transition-transform duration-200',
-            expanded ? 'transform rotate-180' : ''
+            expanded ? 'rotate-180 transform' : ''
           )}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
+          fill='none'
+          viewBox='0 0 24 24'
+          stroke='currentColor'
+          aria-hidden='true'
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
         </svg>
       </button>
 
@@ -157,20 +157,20 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
         aria-hidden={!expanded}
       >
         <fieldset
-          className="bg-glass backdrop-blur-glass-sm rounded-lg p-4 border-glass shadow-glass-sm space-y-3"
+          className='space-y-3 rounded-lg border-glass bg-glass p-4 shadow-glass-sm backdrop-blur-glass-sm'
           aria-labelledby={expandButtonId}
         >
-          <legend className="sr-only">Tax circumstances options</legend>
+          <legend className='sr-only'>Tax circumstances options</legend>
 
           {/* Pension Age Option */}
-          <div className="flex items-start">
-            <div className="relative flex items-center h-5 mt-0.5">
+          <div className='flex items-start'>
+            <div className='relative mt-0.5 flex h-5 items-center'>
               <input
                 id={`${optionPrefix}-pension-age`}
-                type="checkbox"
+                type='checkbox'
                 checked={isPensionAge}
                 onChange={handlePensionAgeChange}
-                className="opacity-0 absolute h-4 w-4 cursor-pointer z-10"
+                className='absolute z-10 h-4 w-4 cursor-pointer opacity-0'
                 aria-describedby={`${optionPrefix}-pension-age-description`}
               />
               <div
@@ -178,39 +178,37 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
                   'h-4 w-4 rounded border transition-colors duration-200',
                   // Better visibility in both light and dark modes
                   'border-gray-400 dark:border-glass',
-                  isPensionAge
-                    ? 'bg-primary border-primary'
-                    : 'bg-white/90 dark:bg-glass-deep'
+                  isPensionAge ? 'border-primary bg-primary' : 'bg-white/90 dark:bg-glass-deep'
                 )}
-                aria-hidden="true"
+                aria-hidden='true'
               >
                 {isPensionAge && (
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mx-auto text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='mx-auto h-3 w-3 text-white'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                    aria-hidden='true'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 )}
               </div>
             </div>
-            <div className="ml-3 flex-1">
+            <div className='ml-3 flex-1'>
               <label
                 htmlFor={`${optionPrefix}-pension-age`}
-                className="font-medium text-foreground cursor-pointer"
+                className='cursor-pointer font-medium text-foreground'
               >
                 Over State Pension Age
               </label>
               <p
                 id={`${optionPrefix}-pension-age-description`}
-                className="text-foreground/70 text-xs mt-0.5"
+                className='mt-0.5 text-foreground/70 text-xs'
               >
                 No National Insurance if over 66 (HMRC rule)
               </p>
@@ -218,53 +216,51 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
           </div>
 
           {/* Marriage/Civil Partnership Option */}
-          <div className="flex items-start">
-            <div className="relative flex items-center h-5 mt-0.5">
+          <div className='flex items-start'>
+            <div className='relative mt-0.5 flex h-5 items-center'>
               <input
                 id={`${optionPrefix}-married`}
-                type="checkbox"
+                type='checkbox'
                 checked={isMarried}
                 onChange={handleMarriedChange}
-                className="opacity-0 absolute h-4 w-4 cursor-pointer z-10"
+                className='absolute z-10 h-4 w-4 cursor-pointer opacity-0'
                 aria-describedby={`${optionPrefix}-married-description`}
               />
               <div
                 className={cn(
                   'h-4 w-4 rounded border transition-colors duration-200',
                   'border-gray-400 dark:border-glass',
-                  isMarried
-                    ? 'bg-primary border-primary'
-                    : 'bg-white/90 dark:bg-glass-deep'
+                  isMarried ? 'border-primary bg-primary' : 'bg-white/90 dark:bg-glass-deep'
                 )}
-                aria-hidden="true"
+                aria-hidden='true'
               >
                 {isMarried && (
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mx-auto text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='mx-auto h-3 w-3 text-white'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                    aria-hidden='true'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 )}
               </div>
             </div>
-            <div className="ml-3 flex-1">
+            <div className='ml-3 flex-1'>
               <label
                 htmlFor={`${optionPrefix}-married`}
-                className="font-medium text-foreground cursor-pointer"
+                className='cursor-pointer font-medium text-foreground'
               >
                 Marriage/Civil Partnership Allowance
               </label>
               <p
                 id={`${optionPrefix}-married-description`}
-                className="text-foreground/70 text-xs mt-0.5"
+                className='mt-0.5 text-foreground/70 text-xs'
               >
                 May qualify for additional allowance transfer of £252 (HMRC rule)
               </p>
@@ -272,53 +268,51 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
           </div>
 
           {/* Blind Person's Allowance Option */}
-          <div className="flex items-start">
-            <div className="relative flex items-center h-5 mt-0.5">
+          <div className='flex items-start'>
+            <div className='relative mt-0.5 flex h-5 items-center'>
               <input
                 id={`${optionPrefix}-blind`}
-                type="checkbox"
+                type='checkbox'
                 checked={isBlind}
                 onChange={handleBlindChange}
-                className="opacity-0 absolute h-4 w-4 cursor-pointer z-10"
+                className='absolute z-10 h-4 w-4 cursor-pointer opacity-0'
                 aria-describedby={`${optionPrefix}-blind-description`}
               />
               <div
                 className={cn(
                   'h-4 w-4 rounded border transition-colors duration-200',
                   'border-gray-400 dark:border-glass',
-                  isBlind
-                    ? 'bg-primary border-primary'
-                    : 'bg-white/90 dark:bg-glass-deep'
+                  isBlind ? 'border-primary bg-primary' : 'bg-white/90 dark:bg-glass-deep'
                 )}
-                aria-hidden="true"
+                aria-hidden='true'
               >
                 {isBlind && (
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mx-auto text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='mx-auto h-3 w-3 text-white'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                    aria-hidden='true'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 )}
               </div>
             </div>
-            <div className="ml-3 flex-1">
+            <div className='ml-3 flex-1'>
               <label
                 htmlFor={`${optionPrefix}-blind`}
-                className="font-medium text-foreground cursor-pointer"
+                className='cursor-pointer font-medium text-foreground'
               >
                 {"Blind Person's Allowance"}
               </label>
               <p
                 id={`${optionPrefix}-blind-description`}
-                className="text-foreground/70 text-xs mt-0.5"
+                className='mt-0.5 text-foreground/70 text-xs'
               >
                 Extra £3,070 allowance for registered blind persons (HMRC rule)
               </p>
@@ -326,14 +320,14 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
           </div>
 
           {/* No National Insurance Option */}
-          <div className="flex items-start">
-            <div className="relative flex items-center h-5 mt-0.5">
+          <div className='flex items-start'>
+            <div className='relative mt-0.5 flex h-5 items-center'>
               <input
                 id={`${optionPrefix}-no-ni`}
-                type="checkbox"
+                type='checkbox'
                 checked={noNationalInsurance}
                 onChange={handleNoNIChange}
-                className="opacity-0 absolute h-4 w-4 cursor-pointer z-10"
+                className='absolute z-10 h-4 w-4 cursor-pointer opacity-0'
                 aria-describedby={`${optionPrefix}-no-ni-description`}
               />
               <div
@@ -341,38 +335,38 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
                   'h-4 w-4 rounded border transition-colors duration-200',
                   'border-gray-400 dark:border-glass',
                   noNationalInsurance
-                    ? 'bg-primary border-primary'
+                    ? 'border-primary bg-primary'
                     : 'bg-white/90 dark:bg-glass-deep'
                 )}
-                aria-hidden="true"
+                aria-hidden='true'
               >
                 {noNationalInsurance && (
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mx-auto text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='mx-auto h-3 w-3 text-white'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                    aria-hidden='true'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 )}
               </div>
             </div>
-            <div className="ml-3 flex-1">
+            <div className='ml-3 flex-1'>
               <label
                 htmlFor={`${optionPrefix}-no-ni`}
-                className="font-medium text-foreground cursor-pointer"
+                className='cursor-pointer font-medium text-foreground'
               >
                 No National Insurance
               </label>
               <p
                 id={`${optionPrefix}-no-ni-description`}
-                className="text-foreground/70 text-xs mt-0.5"
+                className='mt-0.5 text-foreground/70 text-xs'
               >
                 Exempt from NI contributions (special circumstances under HMRC rules)
               </p>
@@ -381,22 +375,19 @@ const TaxOptionsSelector: React.FC<TaxOptionsProps> = ({
 
           {/* Partner Income Input - only visible when married */}
           {isMarried && (
-            <div className="border-t border-glass pt-3">
+            <div className='border-glass border-t pt-3'>
               <NumberInput
                 id={partnerIncomeId}
                 value={partnerIncome}
                 onChange={onPartnerIncomeChange}
-                prefix="£"
+                prefix='£'
                 clearOnFocus
-                className="w-full"
-                placeholder="0"
+                className='w-full'
+                placeholder='0'
                 aria-label="Partner's annual income"
                 aria-describedby={`${partnerIncomeId}-description`}
               />
-              <p
-                id={`${partnerIncomeId}-description`}
-                className="text-foreground/70 text-xs mt-1"
-              >
+              <p id={`${partnerIncomeId}-description`} className='mt-1 text-foreground/70 text-xs'>
                 Partner's annual income (for marriage allowance calculations)
               </p>
             </div>

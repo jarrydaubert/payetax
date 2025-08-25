@@ -1,15 +1,26 @@
 // src/app/blog/page.tsx
 
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  Clock,
+  FileText,
+  Sparkles,
+  Star,
+  Tag,
+  TrendingUp,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import CallToAction from '@/components/ui/CallToAction';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
 
 export const metadata: Metadata = {
   title: 'UK Tax Insights & Updates | ToolHubX Blog',
   description:
-    'Stay informed with the latest UK tax news, expert guidance, and practical advice for taxpayers. Explore articles on PAYE, self-assessment, tax codes, and more.',
+    'Stay informed with the latest UK tax news, expert guidance, and practical advice for taxpayers. PAYE, self-assessment, tax codes, and more.',
   keywords:
     'UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips',
   alternates: {
@@ -22,19 +33,13 @@ export const metadata: Metadata = {
     type: 'website',
     images: ['/images/blog-og-image.jpg'],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'UK Tax Insights & Updates | ToolHubX Blog',
-    description: 'Expert tax guidance, practical advice, and the latest updates on UK taxation.',
-    images: ['/images/blog-twitter-image.jpg'],
-  },
 };
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   }).format(date);
 }
@@ -57,7 +62,7 @@ export default async function BlogPage({
   const [posts, featuredPost, categories] = await Promise.all([
     getBlogPosts({
       page: currentPage,
-      pageSize: 12,
+      pageSize: 9,
       category: selectedCategory,
     }),
     getFeaturedPost(),
@@ -65,67 +70,100 @@ export default async function BlogPage({
   ]);
 
   const totalCount = await getBlogPostsCount(selectedCategory);
-  const totalPages = Math.ceil(totalCount / 12);
+  const totalPages = Math.ceil(totalCount / 9);
 
   return (
-    <div className="pt-20"> {/* Add top padding to clear fixed navbar */}
-      <div className="container mx-auto px-4 py-12">
-        {/* Header with back button */}
-        <div className="mb-8">
+    <div className='min-h-screen pt-20'>
+      <div className='container mx-auto max-w-7xl px-4'>
+        {/* Header */}
+        <div className='mb-16'>
           <Link
-            href="/"
-            className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors"
+            href='/'
+            className='group mb-8 inline-flex items-center text-purple-400 transition-colors hover:text-purple-300'
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform' />
             Back to Calculator
           </Link>
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              UK Tax Insights & Updates
+
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-2'>
+              <BookOpen className='h-4 w-4 text-blue-400' />
+              <span className='font-medium text-blue-300 text-sm'>Tax Insights Blog</span>
+            </div>
+
+            <h1 className='mb-6 font-bold text-4xl md:text-6xl'>
+              <span className='bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent'>
+                UK Tax Insights
+              </span>
+              <br />
+              <span className='text-white'>& Updates</span>
             </h1>
-            <p className="text-lg text-white max-w-3xl mx-auto">
-              Expert guidance, practical advice, and the latest updates on UK taxation.
+
+            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
+              Expert guidance, practical advice, and the latest updates on UK taxation. Stay
+              informed and make better financial decisions.
             </p>
+
             {selectedCategory && (
-              <div className="mt-4">
-                <span className="text-small text-white/90">Showing posts in: </span>
-                <span className="text-primary font-medium">
-                  {categories.find(cat => cat.slug === selectedCategory)?.name || selectedCategory}
+              <div className='mt-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2'>
+                <Tag className='h-4 w-4 text-purple-400' />
+                <span className='text-gray-300 text-sm'>Category: </span>
+                <span className='font-medium text-sm text-white'>
+                  {categories.find((cat) => cat.slug === selectedCategory)?.name ||
+                    selectedCategory}
                 </span>
               </div>
             )}
           </div>
         </div>
 
+        {/* Stats Bar */}
+        <div className='mx-auto mb-16 grid max-w-2xl grid-cols-1 gap-6 md:grid-cols-3'>
+          <div className='glass-card p-6 text-center'>
+            <FileText className='mx-auto mb-3 h-8 w-8 text-blue-400' />
+            <div className='mb-1 font-bold text-2xl text-white'>{totalCount}</div>
+            <div className='text-gray-300 text-sm'>Expert Articles</div>
+          </div>
+          <div className='glass-card p-6 text-center'>
+            <TrendingUp className='mx-auto mb-3 h-8 w-8 text-purple-400' />
+            <div className='mb-1 font-bold text-2xl text-white'>Weekly</div>
+            <div className='text-gray-300 text-sm'>Updates</div>
+          </div>
+          <div className='glass-card p-6 text-center'>
+            <Star className='mx-auto mb-3 h-8 w-8 text-yellow-400' />
+            <div className='mb-1 font-bold text-2xl text-white'>Free</div>
+            <div className='text-gray-300 text-sm'>Always</div>
+          </div>
+        </div>
+
         {/* Categories Filter */}
         {categories.length > 0 && (
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-3 justify-center">
+          <div className='mb-16'>
+            <h2 className='mb-8 text-center font-bold text-2xl text-white'>Browse by Topic</h2>
+            <div className='mx-auto flex max-w-6xl flex-wrap justify-center gap-2 lg:flex-nowrap lg:gap-3'>
               <Link
-                href="/blog"
-                className={`px-4 py-2 rounded-full text-small font-medium transition-all duration-200 ${
+                href='/blog#categories'
+                className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
                   !selectedCategory
-                    ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                    : 'glass text-white/90 hover:glass-strong hover:scale-105'
+                    ? 'scale-105 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                    : 'glass-card border border-white/20 text-white/90 hover:scale-105'
                 }`}
               >
-                All Posts
-                <span className="ml-1 text-caption opacity-75">
-                  ({totalCount})
-                </span>
+                <span>All Posts</span>
+                <span className='ml-1 text-xs opacity-75 lg:ml-2 lg:text-sm'>({totalCount})</span>
               </Link>
               {categories.map((category) => (
                 <Link
                   key={category.slug}
-                  href={`/blog?category=${category.slug}`}
-                  className={`px-4 py-2 rounded-full text-small font-medium transition-all duration-200 ${
+                  href={`/blog?category=${category.slug}#categories`}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
                     selectedCategory === category.slug
-                      ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                      : 'glass text-white/90 hover:glass-strong hover:scale-105'
+                      ? 'scale-105 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                      : 'glass-card border border-white/20 text-white/90 hover:scale-105'
                   }`}
                 >
-                  {category.name}
-                  <span className="ml-1 text-caption opacity-75">
+                  <span>{category.name}</span>
+                  <span className='ml-1 text-xs opacity-75 lg:ml-2 lg:text-sm'>
                     ({category.count || 0})
                   </span>
                 </Link>
@@ -136,80 +174,106 @@ export default async function BlogPage({
 
         {/* Featured Post */}
         {featuredPost && !selectedCategory && currentPage === 1 && (
-          <Link href={`/blog/${featuredPost.slug}`} className="block mb-12">
-            <div className="glass-card border border-foreground/10 hover:shadow-2xl hover:border-primary/30 transition-all duration-500 group">
-              <div className="glass-card-inner p-8">
-                <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className='mb-16'>
+            <div className='mb-8 text-center'>
+              <div className='mb-2 inline-flex items-center gap-2 text-yellow-400'>
+                <Sparkles className='h-5 w-5' />
+                <span className='font-semibold'>Featured Article</span>
+                <Sparkles className='h-5 w-5' />
+              </div>
+            </div>
+
+            <Link href={`/blog/${featuredPost.slug}`} className='group block'>
+              <div className='glass-card border-yellow-400 border-l-4 p-8 transition-transform duration-300 hover:scale-[1.02] md:p-12'>
+                <div className='grid items-center gap-8 md:grid-cols-2'>
                   <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="px-3 py-1 text-caption font-semibold text-white bg-gradient-to-r from-primary to-accent rounded-full uppercase tracking-wide">
-                        Featured
-                      </span>
-                      <span className="text-small text-white/90">
-                        {formatDate(featuredPost.publishedAt)}
-                      </span>
+                    <div className='mb-6 flex items-center gap-4'>
+                      <div className='rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 px-4 py-2 font-bold text-black text-sm'>
+                        FEATURED
+                      </div>
+                      <div className='flex items-center gap-2 text-gray-300'>
+                        <Calendar className='h-4 w-4' />
+                        <span className='text-sm'>{formatDate(featuredPost.publishedAt)}</span>
+                      </div>
                     </div>
-                    <h2 className="text-3xl font-bold mb-4 text-white leading-tight group-hover:text-primary transition-colors">
+
+                    <h2 className='mb-6 font-bold text-3xl text-white leading-tight group-hover:text-gradient md:text-4xl'>
                       {featuredPost.title}
                     </h2>
-                    <p className="text-white/90 mb-6 text-lg leading-relaxed">{featuredPost.excerpt}</p>
-                    <div className="inline-flex items-center text-primary hover:text-primary/80 font-medium text-lg group transition-colors">
-                      <span>Read Article</span>
-                      <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+
+                    <p className='mb-8 text-gray-300 text-lg leading-relaxed'>
+                      {featuredPost.excerpt}
+                    </p>
+
+                    <div className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 font-medium text-white transition-shadow group-hover:shadow-lg'>
+                      <span>Read Full Article</span>
+                      <ArrowLeft className='h-4 w-4 rotate-180 transition-transform group-hover:translate-x-1' />
                     </div>
                   </div>
+
                   {featuredPost.image && (
-                    <div className="relative h-80 rounded-xl overflow-hidden shadow-lg">
+                    <div className='relative h-80 overflow-hidden rounded-xl shadow-2xl'>
                       <Image
                         src={featuredPost.image}
                         alt={featuredPost.imageAlt || featuredPost.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className='object-cover transition-transform duration-500 group-hover:scale-105'
                       />
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </div>
         )}
 
         {/* Posts Grid */}
         {posts.length > 0 ? (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {posts.map((post: any) => (
-                <Link key={post.slug} href={`/blog/${post.slug}`} className="block">
-                  <article className="glass-card group hover:shadow-2xl hover:border-primary/20 transition-all duration-500 border border-foreground/10 h-full">
-                    <div className="glass-card-inner p-6 h-full flex flex-col">
-                      {post.image && (
-                        <div className="relative h-48 mb-6 rounded-lg overflow-hidden">
-                          <Image
-                            src={post.image}
-                            alt={post.imageAlt || post.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="px-3 py-1 text-caption text-primary bg-primary/10 rounded-full font-medium">
+            <div className='mb-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
+              {posts.map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className='group block'>
+                  <article className='glass-card h-full transition-all duration-300 hover:scale-105'>
+                    {post.image && (
+                      <div className='relative h-48 overflow-hidden rounded-t-xl'>
+                        <Image
+                          src={post.image}
+                          alt={post.imageAlt || post.title}
+                          fill
+                          className='object-cover transition-transform duration-500 group-hover:scale-110'
+                        />
+                      </div>
+                    )}
+
+                    <div className='p-6'>
+                      <div className='mb-4 flex items-center justify-between'>
+                        <span className='rounded-full border border-purple-400/30 bg-purple-500/20 px-3 py-1 font-medium text-purple-300 text-sm'>
                           {post.category}
                         </span>
-                        <span className="text-caption text-white/90">
-                          {formatDate(post.publishedAt)}
-                        </span>
-                        {post.readTime && (
-                          <span className="text-caption text-white/90">• {post.readTime}</span>
-                        )}
+                        <div className='flex items-center gap-2 text-gray-300 text-sm'>
+                          <Calendar className='h-3 w-3' />
+                          <span>{formatDate(post.publishedAt)}</span>
+                        </div>
                       </div>
-                      <h3 className="text-xl font-bold mb-3 text-white leading-tight group-hover:text-primary transition-colors flex-grow">
+
+                      <h3 className='mb-3 font-bold text-white text-xl leading-tight transition-colors group-hover:text-purple-300'>
                         {post.title}
                       </h3>
-                      <p className="text-white mb-4 leading-relaxed text-small line-clamp-3">{post.excerpt}</p>
-                      <div className="inline-flex items-center text-primary hover:text-primary/80 font-medium group mt-auto">
+
+                      <p className='mb-4 line-clamp-3 text-gray-300 text-sm leading-relaxed'>
+                        {post.excerpt}
+                      </p>
+
+                      {post.readTime && (
+                        <div className='mb-4 flex items-center gap-2 text-gray-300 text-sm'>
+                          <Clock className='h-3 w-3' />
+                          <span>{post.readTime} read</span>
+                        </div>
+                      )}
+
+                      <div className='inline-flex items-center gap-2 font-medium text-purple-400 transition-all hover:text-purple-300 group-hover:gap-3'>
                         <span>Read More</span>
-                        <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                        <ArrowLeft className='h-4 w-4 rotate-180' />
                       </div>
                     </div>
                   </article>
@@ -219,36 +283,54 @@ export default async function BlogPage({
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2">
+              <div className='mb-16 flex items-center justify-center gap-4'>
                 {currentPage > 1 && (
                   <Link
-                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                    className="px-4 py-2 glass text-white/90 rounded-lg hover:glass-strong transition-colors"
+                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
+                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-transform hover:scale-105'
                   >
-                    Previous
+                    ← Previous
                   </Link>
                 )}
-                
-                <span className="px-4 py-2 text-white/90">
-                  Page {currentPage} of {totalPages}
-                </span>
+
+                <div className='flex items-center gap-2'>
+                  <span className='px-4 py-2 text-gray-300'>Page</span>
+                  <span className='rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 font-bold text-white'>
+                    {currentPage}
+                  </span>
+                  <span className='px-4 py-2 text-gray-300'>of {totalPages}</span>
+                </div>
 
                 {currentPage < totalPages && (
                   <Link
-                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                    className="px-4 py-2 glass text-white/90 rounded-lg hover:glass-strong transition-colors"
+                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
+                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-transform hover:scale-105'
                   >
-                    Next
+                    Next →
                   </Link>
                 )}
               </div>
             )}
           </>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-white/90">No blog posts found.</p>
+          <div className='glass-card mb-16 p-16 text-center'>
+            <FileText className='mx-auto mb-6 h-16 w-16 text-gray-300' />
+            <h3 className='mb-4 font-bold text-2xl text-white'>No Articles Found</h3>
+            <p className='mx-auto mb-8 max-w-md text-gray-300'>
+              We couldn't find any articles matching your criteria. Try browsing all posts or
+              selecting a different category.
+            </p>
+            <Link
+              href='/blog'
+              className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 font-medium text-white transition-shadow hover:shadow-lg'
+            >
+              <span>Browse All Posts</span>
+            </Link>
           </div>
         )}
+
+        {/* Newsletter CTA */}
+        <CallToAction variant='newsletter' />
       </div>
     </div>
   );

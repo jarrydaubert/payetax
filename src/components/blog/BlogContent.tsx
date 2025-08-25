@@ -2,11 +2,12 @@
 
 'use client';
 
+import { Copy, ExternalLink, Hash } from 'lucide-react';
+import Image from 'next/image';
 import type React from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Copy, ExternalLink, Hash } from 'lucide-react';
-import { useState } from 'react';
 
 interface BlogContentProps {
   content: string;
@@ -26,11 +27,14 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
   };
 
   const generateId = (text: string): string => {
-    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
   };
 
   return (
-    <div className="prose prose-lg max-w-none">
+    <div className='prose prose-lg max-w-none'>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -39,18 +43,18 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
             const text = children?.toString() || '';
             const id = generateId(text);
             return (
-              <h1 
-                className="text-4xl font-bold mt-12 mb-6 text-foreground group flex items-center gap-3 scroll-mt-20" 
-                id={id} 
+              <h1
+                className='group mt-12 mb-6 flex scroll-mt-20 items-center gap-3 font-bold text-4xl text-foreground'
+                id={id}
                 {...props}
               >
                 <span>{children}</span>
-                <a 
+                <a
                   href={`#${id}`}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary/80"
-                  aria-label="Link to this heading"
+                  className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
+                  aria-label='Link to this heading'
                 >
-                  <Hash className="h-6 w-6" />
+                  <Hash className='h-6 w-6' />
                 </a>
               </h1>
             );
@@ -59,18 +63,18 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
             const text = children?.toString() || '';
             const id = generateId(text);
             return (
-              <h2 
-                className="text-3xl font-bold mt-10 mb-5 text-foreground group flex items-center gap-3 scroll-mt-20" 
-                id={id} 
+              <h2
+                className='group mt-10 mb-5 flex scroll-mt-20 items-center gap-3 font-bold text-3xl text-foreground'
+                id={id}
                 {...props}
               >
                 <span>{children}</span>
-                <a 
+                <a
                   href={`#${id}`}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary/80"
-                  aria-label="Link to this heading"
+                  className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
+                  aria-label='Link to this heading'
                 >
-                  <Hash className="h-5 w-5" />
+                  <Hash className='h-5 w-5' />
                 </a>
               </h2>
             );
@@ -79,58 +83,58 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
             const text = children?.toString() || '';
             const id = generateId(text);
             return (
-              <h3 
-                className="text-2xl font-bold mt-8 mb-4 text-foreground group flex items-center gap-2 scroll-mt-20" 
-                id={id} 
+              <h3
+                className='group mt-8 mb-4 flex scroll-mt-20 items-center gap-2 font-bold text-2xl text-foreground'
+                id={id}
                 {...props}
               >
                 <span>{children}</span>
-                <a 
+                <a
                   href={`#${id}`}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary/80"
-                  aria-label="Link to this heading"
+                  className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
+                  aria-label='Link to this heading'
                 >
-                  <Hash className="h-4 w-4" />
+                  <Hash className='h-4 w-4' />
                 </a>
               </h3>
             );
           },
           h4: ({ children, ...props }) => (
-            <h4 className="text-xl font-semibold mt-6 mb-3 text-foreground" {...props}>
+            <h4 className='mt-6 mb-3 font-semibold text-foreground text-xl' {...props}>
               {children}
             </h4>
           ),
           h5: ({ children, ...props }) => (
-            <h5 className="text-lg font-semibold mt-5 mb-2 text-foreground" {...props}>
+            <h5 className='mt-5 mb-2 font-semibold text-foreground text-lg' {...props}>
               {children}
             </h5>
           ),
           h6: ({ children, ...props }) => (
-            <h6 className="text-base font-semibold mt-4 mb-2 text-foreground" {...props}>
+            <h6 className='mt-4 mb-2 font-semibold text-base text-foreground' {...props}>
               {children}
             </h6>
           ),
 
-          // Enhanced paragraphs  
+          // Enhanced paragraphs
           p: ({ children, ...props }) => (
-            <p className="mb-6 text-foreground/80 leading-relaxed text-lg" {...props}>
+            <p className='mb-6 text-foreground/80 text-lg leading-relaxed' {...props}>
               {children}
             </p>
           ),
 
           // Enhanced lists
           ul: ({ children, ...props }) => (
-            <ul className="list-disc pl-6 mb-6 space-y-2 text-foreground/80" {...props}>
+            <ul className='mb-6 list-disc space-y-2 pl-6 text-foreground/80' {...props}>
               {children}
             </ul>
           ),
           ol: ({ children, ...props }) => (
-            <ol className="list-decimal pl-6 mb-6 space-y-2 text-foreground/80" {...props}>
+            <ol className='mb-6 list-decimal space-y-2 pl-6 text-foreground/80' {...props}>
               {children}
             </ol>
           ),
           li: ({ children, ...props }) => (
-            <li className="leading-relaxed" {...props}>
+            <li className='leading-relaxed' {...props}>
               {children}
             </li>
           ),
@@ -141,25 +145,25 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
             return (
               <a
                 href={href}
-                className="text-primary hover:text-primary/80 font-medium underline underline-offset-2 transition-colors inline-flex items-center gap-1"
+                className='inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80'
                 target={isExternal ? '_blank' : undefined}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
                 {...props}
               >
                 {children}
-                {isExternal && <ExternalLink className="h-3 w-3" />}
+                {isExternal && <ExternalLink className='h-3 w-3' />}
               </a>
             );
           },
 
           // Enhanced emphasis
           strong: ({ children, ...props }) => (
-            <strong className="font-bold text-foreground" {...props}>
+            <strong className='font-bold text-foreground' {...props}>
               {children}
             </strong>
           ),
           em: ({ children, ...props }) => (
-            <em className="italic text-foreground/90" {...props}>
+            <em className='text-foreground/90 italic' {...props}>
               {children}
             </em>
           ),
@@ -167,29 +171,30 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
           // Enhanced code blocks
           code: ({ children, className, ...props }) => {
             const isCodeBlock = className?.includes('language-');
-            
+
             if (isCodeBlock) {
               const language = className?.replace('language-', '') || 'text';
               const codeText = children?.toString() || '';
               const codeId = `code-${Math.random().toString(36).substr(2, 9)}`;
-              
+
               return (
-                <div className="relative group my-6">
-                  <div className="flex items-center justify-between glass-card-inner px-4 py-2 rounded-t-lg border-b border-foreground/10">
-                    <span className="text-xs font-medium text-foreground/60 uppercase tracking-wide">
+                <div className='group relative my-6'>
+                  <div className='glass-card-inner flex items-center justify-between rounded-t-lg border-foreground/10 border-b px-4 py-2'>
+                    <span className='font-medium text-foreground/60 text-xs uppercase tracking-wide'>
                       {language}
                     </span>
                     <button
+                      type='button'
                       onClick={() => copyToClipboard(codeText, codeId)}
-                      className="flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
-                      aria-label="Copy code"
+                      className='flex items-center gap-1 text-foreground/60 text-xs transition-colors hover:text-foreground'
+                      aria-label='Copy code'
                     >
-                      <Copy className="h-3 w-3" />
+                      <Copy className='h-3 w-3' />
                       {copiedCode === codeId ? 'Copied!' : 'Copy'}
                     </button>
                   </div>
-                  <pre className="glass-card-inner p-4 rounded-b-lg overflow-x-auto border border-foreground/10">
-                    <code className="text-sm text-foreground font-mono" {...props}>
+                  <pre className='glass-card-inner overflow-x-auto rounded-b-lg border border-foreground/10 p-4'>
+                    <code className='font-mono text-foreground text-sm' {...props}>
                       {children}
                     </code>
                   </pre>
@@ -199,8 +204,8 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
 
             // Inline code
             return (
-              <code 
-                className="bg-foreground/10 text-foreground px-1.5 py-0.5 rounded text-sm font-mono border border-foreground/20" 
+              <code
+                className='rounded border border-foreground/20 bg-foreground/10 px-1.5 py-0.5 font-mono text-foreground text-sm'
                 {...props}
               >
                 {children}
@@ -211,74 +216,69 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
           // Enhanced blockquotes
           blockquote: ({ children, ...props }) => (
             <blockquote
-              className="border-l-4 border-primary/50 pl-6 my-8 glass-card-inner py-4 rounded-r-lg"
+              className='glass-card-inner my-8 rounded-r-lg border-primary/50 border-l-4 py-4 pl-6'
               {...props}
             >
-              <div className="text-foreground/80 italic text-lg">
-                {children}
-              </div>
+              <div className='text-foreground/80 text-lg italic'>{children}</div>
             </blockquote>
           ),
 
           // Enhanced tables
           table: ({ children, ...props }) => (
-            <div className="overflow-x-auto my-8 rounded-lg border border-foreground/20">
-              <table
-                className="min-w-full glass-card-inner backdrop-blur-sm"
-                {...props}
-              >
+            <div className='my-8 overflow-x-auto rounded-lg border border-foreground/20'>
+              <table className='glass-card-inner min-w-full backdrop-blur-sm' {...props}>
                 {children}
               </table>
             </div>
           ),
           thead: ({ children, ...props }) => (
-            <thead className="bg-foreground/10" {...props}>
+            <thead className='bg-foreground/10' {...props}>
               {children}
             </thead>
           ),
           tbody: ({ children, ...props }) => (
-            <tbody className="divide-y divide-foreground/10" {...props}>
+            <tbody className='divide-y divide-foreground/10' {...props}>
               {children}
             </tbody>
           ),
           tr: ({ children, ...props }) => (
-            <tr className="hover:bg-foreground/5 transition-colors" {...props}>
+            <tr className='transition-colors hover:bg-foreground/5' {...props}>
               {children}
             </tr>
           ),
           th: ({ children, ...props }) => (
             <th
-              className="px-6 py-3 text-left text-sm font-semibold text-foreground uppercase tracking-wider"
+              className='px-6 py-3 text-left font-semibold text-foreground text-sm uppercase tracking-wider'
               {...props}
             >
               {children}
             </th>
           ),
           td: ({ children, ...props }) => (
-            <td className="px-6 py-4 text-sm text-foreground/80" {...props}>
+            <td className='px-6 py-4 text-foreground/80 text-sm' {...props}>
               {children}
             </td>
           ),
 
           // Enhanced horizontal rule
           hr: ({ ...props }) => (
-            <hr className="my-12 border-0 h-px bg-gradient-to-r from-transparent via-foreground/30 to-transparent" {...props} />
+            <hr
+              className='my-12 h-px border-0 bg-gradient-to-r from-transparent via-foreground/30 to-transparent'
+              {...props}
+            />
           ),
 
           // Enhanced images
-          img: ({ src, alt, ...props }) => (
-            <div className="my-8">
-              <img
-                src={src}
-                alt={alt}
-                className="rounded-lg shadow-lg w-full border border-foreground/20"
-                {...props}
+          img: ({ src, alt }) => (
+            <div className='my-8'>
+              <Image
+                src={typeof src === 'string' ? src : ''}
+                alt={alt || ''}
+                width={800}
+                height={400}
+                className='w-full rounded-lg border border-foreground/20 shadow-lg'
               />
-              {alt && (
-                <p className="text-center text-sm text-foreground/60 mt-2 italic">
-                  {alt}
-                </p>
-              )}
+              {alt && <p className='mt-2 text-center text-foreground/60 text-sm italic'>{alt}</p>}
             </div>
           ),
         }}

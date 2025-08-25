@@ -22,23 +22,17 @@ const PRECACHE_ASSETS = [
 ];
 
 // Assets to cache on first access
-const CACHE_ON_NAVIGATE = [
+const _CACHE_ON_NAVIGATE = [
   /^https:\/\/toolhubx\.uk\/.*$/,
   /^https:\/\/fonts\.googleapis\.com\/.*$/,
   /^https:\/\/fonts\.gstatic\.com\/.*$/,
 ];
 
 // API endpoints to cache with different strategies
-const API_ENDPOINTS = [
-  '/api/send-feedback',
-];
+const API_ENDPOINTS = ['/api/send-feedback'];
 
 // Network-first resources (always try network first)
-const NETWORK_FIRST = [
-  '/api/',
-  '/blog/category/',
-  '/_next/static/chunks/',
-];
+const NETWORK_FIRST = ['/api/', '/blog/category/', '/_next/static/chunks/'];
 
 // Cache-first resources (serve from cache if available)
 const CACHE_FIRST = [
@@ -56,7 +50,7 @@ const CACHE_FIRST = [
 // Install event - precache essential assets
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker v2025.1.0');
-  
+
   event.waitUntil(
     (async () => {
       try {
@@ -64,7 +58,7 @@ self.addEventListener('install', (event) => {
         console.log('[SW] Precaching core assets');
         await cache.addAll(PRECACHE_ASSETS);
         console.log('[SW] Precache complete');
-        
+
         // Skip waiting to activate immediately
         await self.skipWaiting();
       } catch (error) {
@@ -77,23 +71,26 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating service worker v2025.1.0');
-  
+
   event.waitUntil(
     (async () => {
       // Clean up old caches
       const cacheNames = await caches.keys();
-      const oldCaches = cacheNames.filter(name => 
-        name.startsWith('toolhubx-') && 
-        !['toolhubx-v2025.1.0', 'toolhubx-static-v2025.1.0', 'toolhubx-api-v2025.1.0'].includes(name)
+      const oldCaches = cacheNames.filter(
+        (name) =>
+          name.startsWith('toolhubx-') &&
+          !['toolhubx-v2025.1.0', 'toolhubx-static-v2025.1.0', 'toolhubx-api-v2025.1.0'].includes(
+            name
+          )
       );
-      
+
       await Promise.all(
-        oldCaches.map(cacheName => {
+        oldCaches.map((cacheName) => {
           console.log('[SW] Deleting old cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
-      
+
       // Take control of all open clients
       await self.clients.claim();
       console.log('[SW] Service worker activated and controlling all clients');
@@ -105,13 +102,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const { url, method } = request;
-  
+
   // Only handle GET requests
   if (method !== 'GET') return;
-  
+
   // Skip non-HTTP(S) requests
   if (!url.startsWith('http')) return;
-  
+
   // Determine caching strategy based on URL
   if (shouldUseNetworkFirst(url)) {
     event.respondWith(networkFirstStrategy(request));
@@ -128,27 +125,27 @@ self.addEventListener('fetch', (event) => {
 async function networkFirstStrategy(request) {
   try {
     const networkResponse = await fetch(request);
-    
+
     // Cache successful responses
     if (networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
     console.log('[SW] Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
-    
+
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Return offline page for navigation requests
     if (request.mode === 'navigate') {
       return caches.match('/');
     }
-    
+
     throw error;
   }
 }
@@ -156,19 +153,19 @@ async function networkFirstStrategy(request) {
 // Cache-first strategy (for static assets)
 async function cacheFirstStrategy(request) {
   const cachedResponse = await caches.match(request);
-  
+
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const cache = await caches.open(STATIC_CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
     console.error('[SW] Cache-first failed:', error);
@@ -180,17 +177,19 @@ async function cacheFirstStrategy(request) {
 async function staleWhileRevalidateStrategy(request) {
   const cache = await caches.open(CACHE_NAME);
   const cachedResponse = await cache.match(request);
-  
-  const fetchPromise = fetch(request).then(networkResponse => {
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  }).catch(error => {
-    console.log('[SW] Network request failed:', error);
-    return cachedResponse;
-  });
-  
+
+  const fetchPromise = fetch(request)
+    .then((networkResponse) => {
+      if (networkResponse.ok) {
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    })
+    .catch((error) => {
+      console.log('[SW] Network request failed:', error);
+      return cachedResponse;
+    });
+
   // Return cached response immediately, network response when available
   return cachedResponse || fetchPromise;
 }
@@ -199,12 +198,12 @@ async function staleWhileRevalidateStrategy(request) {
 async function apiCacheStrategy(request) {
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const cache = await caches.open(API_CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
     // For API requests, try cache as fallback
@@ -218,7 +217,7 @@ async function apiCacheStrategy(request) {
 
 // Helper functions to determine caching strategy
 function shouldUseNetworkFirst(url) {
-  return NETWORK_FIRST.some(pattern => {
+  return NETWORK_FIRST.some((pattern) => {
     if (typeof pattern === 'string') {
       return url.includes(pattern);
     }
@@ -227,7 +226,7 @@ function shouldUseNetworkFirst(url) {
 }
 
 function shouldUseCacheFirst(url) {
-  return CACHE_FIRST.some(pattern => {
+  return CACHE_FIRST.some((pattern) => {
     if (typeof pattern === 'string') {
       return url.includes(pattern);
     }
@@ -236,7 +235,7 @@ function shouldUseCacheFirst(url) {
 }
 
 function isAPIEndpoint(url) {
-  return API_ENDPOINTS.some(endpoint => url.includes(endpoint));
+  return API_ENDPOINTS.some((endpoint) => url.includes(endpoint));
 }
 
 // Handle background sync for offline form submissions
@@ -260,44 +259,42 @@ async function syncFeedback() {
 // Handle push notifications (for future features)
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  
+
   const options = {
     body: event.data.text(),
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
     vibrate: [200, 100, 200],
     data: {
-      url: '/'
+      url: '/',
     },
     actions: [
       {
         action: 'open-calculator',
         title: 'Open Calculator',
-        icon: '/favicon-32x32.png'
-      }
-    ]
+        icon: '/favicon-32x32.png',
+      },
+    ],
   };
-  
-  event.waitUntil(
-    self.registration.showNotification('ToolHubX Tax Calculator', options)
-  );
+
+  event.waitUntil(self.registration.showNotification('ToolHubX Tax Calculator', options));
 });
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   const targetUrl = event.notification.data?.url || '/';
-  
+
   event.waitUntil(
-    self.clients.matchAll().then(clients => {
+    self.clients.matchAll().then((clients) => {
       // Check if the app is already open
-      const client = clients.find(c => c.url === targetUrl && 'focus' in c);
-      
+      const client = clients.find((c) => c.url === targetUrl && 'focus' in c);
+
       if (client) {
         return client.focus();
       }
-      
+
       // Open new window/tab
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
@@ -317,7 +314,7 @@ self.addEventListener('periodicsync', (event) => {
 async function updateCriticalAssets() {
   try {
     const cache = await caches.open(CACHE_NAME);
-    
+
     // Update critical pages
     const criticalPages = ['/', '/blog'];
     await Promise.all(
@@ -332,7 +329,7 @@ async function updateCriticalAssets() {
         }
       })
     );
-    
+
     console.log('[SW] Critical assets updated');
   } catch (error) {
     console.error('[SW] Periodic sync failed:', error);

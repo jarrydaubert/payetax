@@ -12,13 +12,13 @@ export function getCookieConsent(): CookieConsent {
     if (typeof window === 'undefined' || !window.localStorage) {
       return null;
     }
-    
+
     const consent = localStorage.getItem('cookie-consent');
-    
+
     if (consent === 'accepted' || consent === 'declined') {
       return consent as CookieConsent;
     }
-    
+
     return null;
   } catch (error) {
     console.warn('Failed to get cookie consent status:', error);
@@ -48,13 +48,13 @@ export function getConsentTimestamp(): Date | null {
     if (typeof window === 'undefined' || !window.localStorage) {
       return null;
     }
-    
+
     const timestamp = localStorage.getItem('cookie-consent-timestamp');
-    
+
     if (timestamp) {
       return new Date(timestamp);
     }
-    
+
     return null;
   } catch (error) {
     console.warn('Failed to get consent timestamp:', error);
@@ -82,14 +82,14 @@ export function clearCookieConsent(): void {
 export function isConsentExpired(): boolean {
   try {
     const timestamp = getConsentTimestamp();
-    
+
     if (!timestamp) {
       return false; // No consent given, so not expired
     }
-    
+
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    
+
     return timestamp < twelveMonthsAgo;
   } catch (error) {
     console.warn('Failed to check if consent is expired:', error);

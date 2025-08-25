@@ -82,7 +82,7 @@ export function ImageWithFallback({
   return (
     <div
       className={cn(
-        'relative overflow-hidden w-full h-full', // Ensure full width/height
+        'relative h-full w-full overflow-hidden', // Ensure full width/height
         containerClassName
       )}
       aria-busy={!isLoaded}
@@ -91,14 +91,14 @@ export function ImageWithFallback({
       {lowQualitySrc && !isLoaded && !isError && (
         <Image
           src={lowQualitySrc}
-          alt=""
+          alt=''
           className={cn(
-            'absolute inset-0 w-full h-full object-cover blur-md opacity-75',
+            'absolute inset-0 h-full w-full object-cover opacity-75 blur-md',
             className
           )}
           fill // Match main image layout
           {...props}
-          aria-hidden="true"
+          aria-hidden='true'
           priority={false}
           quality={10}
         />
@@ -112,7 +112,7 @@ export function ImageWithFallback({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'transition-opacity duration-500 w-full h-full', // Ensure image fills container
+          'h-full w-full transition-opacity duration-500', // Ensure image fills container
           !isLoaded && 'opacity-0',
           isLoaded && 'opacity-100',
           className
@@ -121,14 +121,14 @@ export function ImageWithFallback({
 
       {/* Accessible loading indicator for screen readers */}
       {!isLoaded && (
-        <span className="sr-only" aria-live="polite">
+        <span className='sr-only' aria-live='polite'>
           Loading image: {alt}
         </span>
       )}
 
       {/* Accessible error message for screen readers */}
       {isError && (
-        <span className="sr-only" aria-live="assertive">
+        <span className='sr-only' aria-live='assertive'>
           Image failed to load: {alt}
         </span>
       )}

@@ -15,6 +15,7 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { cn } from '@/lib/utils';
+import type { Route } from '@/types/routes';
 
 /**
  * Props for the PageHeader component
@@ -25,7 +26,7 @@ interface PageHeaderProps {
   /** Optional page description displayed below the title */
   description?: string;
   /** Optional back link URL */
-  backLink?: string;
+  backLink?: Route;
   /** Optional back link text (defaults to "Back to Calculator") */
   backLinkText?: string;
   /** Optional actions to display in the header */
@@ -62,7 +63,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       {backLink && (
         <Link
           href={backLink}
-          className="inline-flex items-center mb-6 group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-sm transition-all duration-300"
+          className='group mb-6 inline-flex items-center rounded-sm transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
           style={{
             color: 'hsl(270, 100%, 70%)', // Purple from your gradient
           }}
@@ -75,35 +76,40 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           aria-label={`Return to ${backLinkText}`}
         >
           <ArrowLeft
-            className="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1"
-            aria-hidden="true"
+            className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform'
+            aria-hidden='true'
           />
-          <span className="border-b border-transparent group-hover:border-current transition-all duration-300">
+          <span className='border-transparent border-b transition-all duration-300 group-hover:border-current'>
             {backLinkText}
           </span>
         </Link>
       )}
 
       {/* Title and actions row */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <h1
           className={cn(
-            'text-3xl font-bold',
-            gradientTitle 
+            'font-bold text-3xl',
+            gradientTitle
               ? 'bg-gradient-to-r from-[hsl(270,100%,80%)] to-[hsl(200,100%,70%)] bg-clip-text text-transparent'
               : 'text-gray-900 dark:text-white'
           )}
-          style={gradientTitle ? {
-            backgroundImage: 'linear-gradient(135deg, hsl(270, 100%, 80%) 0%, hsl(200, 100%, 70%) 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          } : undefined}
+          style={
+            gradientTitle
+              ? {
+                  backgroundImage:
+                    'linear-gradient(135deg, hsl(270, 100%, 80%) 0%, hsl(200, 100%, 70%) 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }
+              : undefined
+          }
         >
           {title}
         </h1>
         {actions && (
-          <div className="flex items-center space-x-3" role="toolbar" aria-label="Page actions">
+          <div className='flex items-center space-x-3' role='toolbar' aria-label='Page actions'>
             {actions}
           </div>
         )}
@@ -111,7 +117,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* Optional description */}
       {description && (
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-3xl">{description}</p>
+        <p className='mt-4 max-w-3xl text-gray-600 text-lg dark:text-gray-400'>{description}</p>
       )}
     </header>
   );

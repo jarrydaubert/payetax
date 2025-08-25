@@ -17,8 +17,9 @@
 
 import Link from 'next/link';
 import type React from 'react';
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import { cn } from '@/lib/utils';
+import type { Route } from '@/types/routes';
 
 /**
  * Button style variants - maps directly to globals.css classes
@@ -39,55 +40,55 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Button content - can be text, JSX, or React nodes */
   children: React.ReactNode;
-  
+
   /** Visual variant affecting styling via globals.css classes */
   variant?: ButtonVariant;
-  
+
   /** Size variant for different use cases */
   size?: ButtonSize;
-  
+
   /** Icon displayed before button text with proper spacing */
   leftIcon?: React.ReactNode;
-  
+
   /** Icon displayed after button text with proper spacing */
   rightIcon?: React.ReactNode;
-  
+
   /** Whether button should take full width of container */
   fullWidth?: boolean;
-  
+
   /** If provided, renders as Next.js Link instead of button */
-  href?: string;
-  
+  href?: Route;
+
   /** External link handling - adds security attributes */
   external?: boolean;
-  
+
   /** Additional CSS classes for customization */
   className?: string;
-  
+
   /** Loading state for async operations */
   loading?: boolean;
-  
+
   /** Custom aria-label for accessibility */
   'aria-label'?: string;
 }
 
 /**
  * Standardized button component following ToolHubX design system
- * 
+ *
  * USAGE EXAMPLES:
- * 
+ *
  * Basic button:
  * <Button>Click me</Button>
- * 
+ *
  * Primary action with icon:
  * <Button variant="primary" leftIcon={<Save />}>Save Changes</Button>
- * 
+ *
  * Navigation link:
  * <Button href="/about">Learn More</Button>
- * 
+ *
  * External link with security:
  * <Button href="https://example.com" external>External Site</Button>
- * 
+ *
  * Loading state:
  * <Button loading disabled>Processing...</Button>
  *
@@ -113,7 +114,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ): React.ReactElement => {
-    
+    const externalWarningId = useId();
     /**
      * Base button classes from globals.css
      * All styling comes from the design system
@@ -126,10 +127,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
      */
     const variantClasses: Record<ButtonVariant, string> = {
       primary: 'btn-primary',
-      secondary: 'btn-secondary', 
+      secondary: 'btn-secondary',
       outline: 'btn-outline',
       ghost: 'btn-ghost',
-      glass: 'btn-glass'
+      glass: 'btn-glass',
     };
 
     /**
@@ -137,9 +138,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
      * Mobile-first approach with appropriate touch targets
      */
     const sizeClasses: Record<ButtonSize, string> = {
-      sm: 'text-small px-3 py-1.5 min-h-[2rem]',      // 32px min height
-      md: 'text-body px-4 py-2 min-h-[2.5rem]',       // 40px min height  
-      lg: 'text-large px-6 py-3 min-h-[3rem]'         // 48px min height
+      sm: 'text-small px-3 py-1.5 min-h-[2rem]', // 32px min height
+      md: 'text-body px-4 py-2 min-h-[2.5rem]', // 40px min height
+      lg: 'text-large px-6 py-3 min-h-[3rem]', // 48px min height
     };
 
     /**
@@ -151,7 +152,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variantClasses[variant],
       sizeClasses[size],
       fullWidth && 'w-full',
-      loading && 'opacity-75 cursor-not-allowed',
+      loading && 'cursor-not-allowed opacity-75',
       className
     );
 
@@ -162,37 +163,39 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonContent = (
       <>
         {leftIcon && !loading && (
-          <span className="mr-2 flex-shrink-0" aria-hidden="true">
+          <span className='mr-2 flex-shrink-0' aria-hidden='true'>
             {leftIcon}
           </span>
         )}
         {loading && (
-          <span className="mr-2 flex-shrink-0" aria-hidden="true">
-            <svg 
-              className="animate-spin h-4 w-4" 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24"
+          <span className='mr-2 flex-shrink-0' aria-hidden='true'>
+            <svg
+              className='h-4 w-4 animate-spin'
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              aria-label='Loading'
             >
-              <circle 
-                className="opacity-25" 
-                cx="12" 
-                cy="12" 
-                r="10" 
-                stroke="currentColor" 
-                strokeWidth="4"
+              <title>Loading</title>
+              <circle
+                className='opacity-25'
+                cx='12'
+                cy='12'
+                r='10'
+                stroke='currentColor'
+                strokeWidth='4'
               />
-              <path 
-                className="opacity-75" 
-                fill="currentColor" 
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              <path
+                className='opacity-75'
+                fill='currentColor'
+                d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
               />
             </svg>
           </span>
         )}
         <span className={loading ? 'opacity-75' : ''}>{children}</span>
         {rightIcon && !loading && (
-          <span className="ml-2 flex-shrink-0" aria-hidden="true">
+          <span className='ml-2 flex-shrink-0' aria-hidden='true'>
             {rightIcon}
           </span>
         )}
@@ -213,13 +216,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             ? {
                 target: '_blank',
                 rel: 'noopener noreferrer',
-                'aria-describedby': 'external-link-warning'
+                'aria-describedby': externalWarningId,
               }
             : {})}
         >
           {buttonContent}
           {external && (
-            <span id="external-link-warning" className="sr-only">
+            <span id={externalWarningId} className='sr-only'>
               (opens in a new tab)
             </span>
           )}

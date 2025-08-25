@@ -37,8 +37,8 @@ const ScrollIndicator: React.FC<ScrollIndicatorProps> = ({ targetRef, className 
   if (!showIndicator) return null;
 
   return (
-    <div className={`text-xs text-gray-500 flex items-center justify-center mb-2 ${className}`}>
-      <ArrowLeftRight className="h-3 w-3 mr-1" />
+    <div className={`mb-2 flex items-center justify-center text-gray-500 text-xs ${className}`}>
+      <ArrowLeftRight className='mr-1 h-3 w-3' />
       <span>Swipe horizontally to see more</span>
     </div>
   );

@@ -13,8 +13,8 @@
  * - Responsive design
  */
 
-import React from 'react';
 import { AlertCircle, CheckCircle, Info, X, XCircle } from 'lucide-react';
+import type React from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -48,10 +48,10 @@ export interface AlertProps {
  * Default icons for each variant
  */
 const variantIcons: Record<AlertVariant, React.ReactNode> = {
-  info: <Info className="h-5 w-5" />,
-  success: <CheckCircle className="h-5 w-5" />,
-  warning: <AlertCircle className="h-5 w-5" />,
-  error: <XCircle className="h-5 w-5" />,
+  info: <Info className='h-5 w-5' />,
+  success: <CheckCircle className='h-5 w-5' />,
+  warning: <AlertCircle className='h-5 w-5' />,
+  error: <XCircle className='h-5 w-5' />,
 };
 
 /**
@@ -71,7 +71,7 @@ const Alert = ({
   // Determine styling based on variant using CSS variables
   const variantStyles: Record<AlertVariant, string> = {
     info: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300',
-    success: 'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-300', 
+    success: 'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-300',
     warning: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
     error: 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300',
   };
@@ -79,53 +79,43 @@ const Alert = ({
   const iconStyles: Record<AlertVariant, string> = {
     info: 'text-blue-600 dark:text-blue-400',
     success: 'text-green-600 dark:text-green-400',
-    warning: 'text-amber-600 dark:text-amber-400', 
+    warning: 'text-amber-600 dark:text-amber-400',
     error: 'text-red-600 dark:text-red-400',
   };
 
   return (
     <div
-      role="alert"
+      role='alert'
       id={id}
-      className={cn(
-        'glass-card border rounded-lg p-4',
-        variantStyles[variant],
-        className
-      )}
+      className={cn('glass-card rounded-lg border p-4', variantStyles[variant], className)}
     >
-      <div className="flex">
+      <div className='flex'>
         {/* Icon */}
         <div className={cn('flex-shrink-0', iconStyles[variant])}>
           {icon || variantIcons[variant]}
         </div>
 
         {/* Content */}
-        <div className="ml-3 flex-1">
-          {title && (
-            <h3 className="text-sm font-medium mb-1">
-              {title}
-            </h3>
-          )}
-          <div className={cn('text-sm', title ? '' : 'mt-0.5')}>
-            {children}
-          </div>
+        <div className='ml-3 flex-1'>
+          {title && <h3 className='mb-1 font-medium text-sm'>{title}</h3>}
+          <div className={cn('text-sm', title ? '' : 'mt-0.5')}>{children}</div>
         </div>
 
         {/* Dismiss button */}
         {dismissible && onDismiss && (
-          <div className="ml-auto pl-3">
-            <div className="-mx-1.5 -my-1.5">
+          <div className='ml-auto pl-3'>
+            <div className='-mx-1.5 -my-1.5'>
               <button
-                type="button"
+                type='button'
                 onClick={onDismiss}
                 className={cn(
-                  'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors',
+                  'inline-flex rounded-md p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
                   iconStyles[variant],
-                  'hover:bg-black/5 dark:hover:bg-white/5 focus:ring-current'
+                  'hover:bg-black/5 focus:ring-current dark:hover:bg-white/5'
                 )}
-                aria-label="Dismiss alert"
+                aria-label='Dismiss alert'
               >
-                <X className="h-4 w-4" />
+                <X className='h-4 w-4' />
               </button>
             </div>
           </div>

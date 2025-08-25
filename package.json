@@ -6,6 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
     "check": "biome check --write .",
@@ -14,32 +19,33 @@
     "lighthouse-check": "npx lighthouse http://localhost:3000 --view --quiet",
     "watch-post-change": "chokidar 'src/**/*' --ignore '.next/**' -c 'npm run post-change' --initial",
     "full-audit": "npm run fix-all && rm -rf .next && concurrently \"npm run dev\" \"sleep 10 && npm run lighthouse-check\"",
-    "update-deps": "npx npm-check-updates -u && npm install"
+    "update-deps": "npx npm-check-updates --doctor -u && npm install",
+    "security-audit": "npm audit --audit-level=high",
+    "prepare": "husky install || true"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.5.0",
-    "@sentry/nextjs": "^10.5.0",
+    "@types/exceljs": "^1.3.2",
     "clsx": "^2.1.1",
+    "exceljs": "^4.4.0",
     "gray-matter": "^4.0.3",
     "jspdf": "^3.0.1",
-    "lucide-react": "^0.540.0",
+    "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.541.0",
     "next": "^15.5.0",
-    "nodemailer": "^7.0.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-hook-form": "^7.62.0",
     "react-markdown": "^10.1.0",
-    "react-number-format": "^5.4.4",
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.12",
-    "zod": "^4.0.17",
+    "zod": "^4.1.1",
     "zustand": "^5.0.8"
   },
   "overrides": {
@@ -48,18 +54,29 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
+    "@biomejs/biome": "^2.2.2",
     "@next/bundle-analyzer": "^15.5.0",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.12",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.3.0",
-    "@types/react": "^19.1.10",
+    "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^9.2.0",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "lighthouse": "^12.8.1",
-    "tsx": "^4.20.4",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "webpack": "^5.101.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "keywords": [
     "uk-tax-calculator",
@@ -73,9 +90,5 @@
     "wcag",
     "financial-tools",
     "tax-planning"
-  ],
-  "engines": {
-    "node": ">=18.17.0",
-    "npm": ">=9.0.0"
-  }
+  ]
 }

@@ -206,8 +206,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {/* Prefix (e.g., currency symbol) */}
         {prefix && (
           <span
-            className="absolute left-3 text-foreground/70 pointer-events-none z-10"
-            aria-hidden="true"
+            className='pointer-events-none absolute left-3 z-10 text-foreground/70'
+            aria-hidden='true'
           >
             {prefix}
           </span>
@@ -216,8 +216,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {/* Main input field */}
         <input
           ref={ref}
-          type="text"
-          inputMode="decimal"
+          type='text'
+          inputMode='decimal'
           id={inputId}
           value={displayValue}
           onChange={handleChange}
@@ -231,9 +231,9 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           aria-required={props['aria-required'] || props.required}
           aria-controls={showControls ? controlsId : undefined}
           className={cn(
-            'w-full px-3 py-2 glass-input backdrop-blur-glass-sm',
-            'border-glass rounded-lg shadow-glass-sm',
-            'focus:outline-none focus:ring-1 focus:ring-primary focus:glow-sm',
+            'glass-input w-full px-3 py-2 backdrop-blur-glass-sm',
+            'rounded-lg border-glass shadow-glass-sm',
+            'focus:glow-sm focus:outline-none focus:ring-1 focus:ring-primary',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'placeholder:text-foreground/50',
             'transition-all duration-200',
@@ -250,8 +250,8 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {/* Suffix (e.g., percentage symbol) */}
         {suffix && (
           <span
-            className="absolute right-3 text-foreground/70 pointer-events-none z-10"
-            aria-hidden="true"
+            className='pointer-events-none absolute right-3 z-10 text-foreground/70'
+            aria-hidden='true'
           >
             {suffix}
           </span>
@@ -262,71 +262,71 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           <fieldset
             id={controlsId}
             className={cn(
-              'absolute right-1 inset-y-1 flex flex-col border-l',
+              'absolute inset-y-1 right-1 flex flex-col border-l',
               'border-glass',
-              'backdrop-blur-glass-sm bg-glass-deep',
-              'rounded-r-md overflow-hidden',
+              'bg-glass-deep backdrop-blur-glass-sm',
+              'overflow-hidden rounded-r-md',
               'shadow-sm',
               disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100'
             )}
-            aria-label="Value controls"
+            aria-label='Value controls'
           >
             <button
               id={incrementId}
-              type="button"
+              type='button'
               tabIndex={-1}
               onClick={handleIncrement}
               disabled={disabled}
               className={cn(
-                'flex-1 px-2 flex items-center justify-center',
-                'text-foreground hover:bg-glass transition-colors',
-                'disabled:pointer-events-none focus:outline-none focus:bg-glass-deep'
+                'flex flex-1 items-center justify-center px-2',
+                'text-foreground transition-colors hover:bg-glass',
+                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none'
               )}
-              aria-label="Increment value"
+              aria-label='Increment value'
               aria-controls={inputId}
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+                xmlns='http://www.w3.org/2000/svg'
+                width='12'
+                height='12'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
               >
-                <path d="M18 15l-6-6-6 6" />
+                <path d='M18 15l-6-6-6 6' />
               </svg>
             </button>
             <button
               id={decrementId}
-              type="button"
+              type='button'
               tabIndex={-1}
               onClick={handleDecrement}
               disabled={disabled}
               className={cn(
-                'flex-1 px-2 flex items-center justify-center',
-                'text-foreground hover:bg-glass transition-colors',
-                'disabled:pointer-events-none focus:outline-none focus:bg-glass-deep'
+                'flex flex-1 items-center justify-center px-2',
+                'text-foreground transition-colors hover:bg-glass',
+                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none'
               )}
-              aria-label="Decrement value"
+              aria-label='Decrement value'
               aria-controls={inputId}
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+                xmlns='http://www.w3.org/2000/svg'
+                width='12'
+                height='12'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
               >
-                <path d="M6 9l6 6 6-6" />
+                <path d='M6 9l6 6 6-6' />
               </svg>
             </button>
           </fieldset>

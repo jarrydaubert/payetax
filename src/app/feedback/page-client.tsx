@@ -2,23 +2,24 @@
 
 'use client';
 
-// TODO: Restore animations with CSS-based approach
-import { 
-  MessageSquare, 
-  Send, 
-  User, 
-  Mail, 
-  Sparkles,
-  Heart,
-  CheckCircle,
+import {
   ArrowLeft,
-  ArrowRight,
+  CheckCircle,
+  Heart,
+  Mail,
+  MessageSquare,
+  Send,
+  Shield,
+  Sparkles,
+  Star,
+  User,
   Zap,
-  Shield
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import type React from 'react';
+import { useId, useState } from 'react';
 import Button from '@/components/ui/Button';
+import CallToAction from '@/components/ui/CallToAction';
 
 interface FeedbackFormData {
   name: string;
@@ -28,6 +29,12 @@ interface FeedbackFormData {
 }
 
 export default function FeedbackPageClient() {
+  const titleId = useId();
+  const nameId = useId();
+  const emailId = useId();
+  const feedbackTypeId = useId();
+  const messageId = useId();
+
   const [formData, setFormData] = useState<FeedbackFormData>({
     name: '',
     email: '',
@@ -79,9 +86,10 @@ export default function FeedbackPageClient() {
         message: '',
       });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : 'Something went wrong. Please try again or email us directly.';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong. Please try again or email us directly.';
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -89,47 +97,104 @@ export default function FeedbackPageClient() {
   };
 
   const feedbackTypes = [
-    { value: 'suggestion', label: 'Suggestion', icon: <Sparkles className="h-4 w-4" /> },
-    { value: 'issue', label: 'Report Issue', icon: <Shield className="h-4 w-4" /> },
-    { value: 'question', label: 'Question', icon: <MessageSquare className="h-4 w-4" /> },
-    { value: 'other', label: 'Other', icon: <Zap className="h-4 w-4" /> },
+    { value: 'suggestion' as const, label: 'Suggestion', icon: Sparkles },
+    { value: 'issue' as const, label: 'Report Issue', icon: Shield },
+    { value: 'question' as const, label: 'Question', icon: MessageSquare },
+    { value: 'other' as const, label: 'Other', icon: Zap },
   ];
 
   if (submitted) {
     return (
-      <div className="pt-20 min-h-screen"> {/* Add top padding for navbar */}
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div
-            className="max-w-2xl mx-auto"
-          >
-            <div className="w-20 h-20 rounded-full mx-auto mb-8 flex items-center justify-center bg-green-500 shadow-lg">
-              <CheckCircle className="h-10 w-10 text-white" />
-            </div>
-            
-            <h1 className="text-title font-bold mb-6 bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-              Thank You!
-            </h1>
-            
-            <p className="text-large text-white/90 mb-8 leading-relaxed">
-              Your feedback has been received and is very much appreciated. 
-              We'll review it carefully and use it to improve ToolHubX.
-            </p>
+      <div className='relative min-h-screen pt-20'>
+        {/* Gradient Background */}
+        <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-green-500/10 via-background to-primary/5' />
+        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-transparent' />
 
-            <div className="space-y-4">
-              <Button
-                href="/"
-                variant="primary"
-                leftIcon={<ArrowLeft className="h-4 w-4" />}
-              >
-                Back to Calculator
-              </Button>
-              <div>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="text-primary hover:text-primary/80 underline underline-offset-2"
-                >
-                  Send more feedback
-                </button>
+        <div className='container relative z-10 mx-auto max-w-4xl px-4 py-20 text-center lg:max-w-5xl'>
+          <div className='mx-auto max-w-3xl'>
+            <div className='glass-card'>
+              <div className='glass-card-inner text-center'>
+                {/* Success Icon */}
+                <div className='mb-8 flex items-center justify-center'>
+                  <div className='relative'>
+                    <div className='absolute inset-0 animate-pulse rounded-full bg-gradient-to-r from-green-500 to-green-600 opacity-30 blur-xl' />
+                    <div className='relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-green-600 shadow-2xl'>
+                      <CheckCircle className='h-10 w-10 text-white' />
+                    </div>
+                  </div>
+                </div>
+
+                <h1 className='mb-6 bg-gradient-to-r from-green-500 via-green-400 to-green-600 bg-clip-text font-bold text-3xl text-transparent md:text-5xl'>
+                  Thank You!
+                </h1>
+
+                <p className='mx-auto mb-8 max-w-2xl text-gray-200 text-lg leading-relaxed md:text-xl'>
+                  Your feedback has been received and is very much appreciated. We'll review it
+                  carefully and use it to improve ToolHubX.
+                </p>
+
+                {/* Success Stats */}
+                <div className='mb-8 grid grid-cols-1 gap-4 md:grid-cols-3'>
+                  <div className='glass rounded-lg border border-white/10 p-4'>
+                    <div className='mb-1 font-bold text-2xl text-green-400'>✓</div>
+                    <div className='text-gray-300 text-sm'>Feedback Received</div>
+                  </div>
+                  <div className='glass rounded-lg border border-white/10 p-4'>
+                    <div className='mb-1 font-bold text-2xl text-blue-400'>24h</div>
+                    <div className='text-gray-300 text-sm'>Response Time</div>
+                  </div>
+                  <div className='glass rounded-lg border border-white/10 p-4'>
+                    <div className='mb-1 font-bold text-2xl text-purple-400'>100%</div>
+                    <div className='text-gray-300 text-sm'>Read Rate</div>
+                  </div>
+                </div>
+
+                <div className='space-y-4'>
+                  <Button
+                    href='/'
+                    variant='primary'
+                    size='lg'
+                    className='group relative overflow-hidden'
+                    leftIcon={<ArrowLeft className='h-4 w-4' />}
+                  >
+                    <div className='absolute inset-0 animate-gradient-x bg-gradient-to-r from-primary via-accent to-primary opacity-0 transition-opacity group-hover:opacity-100' />
+                    <span className='relative z-10'>Back to Calculator</span>
+                  </Button>
+                  <div>
+                    <button
+                      type='button'
+                      onClick={() => setSubmitted(false)}
+                      className='text-primary underline underline-offset-2 transition-colors hover:text-accent'
+                    >
+                      Send more feedback
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Follow-up Actions */}
+            <div className='mt-12 grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <div className='glass-card'>
+                <div className='glass-card-inner text-center'>
+                  <Heart className='mx-auto mb-4 h-8 w-8 text-red-400' />
+                  <h3 className='mb-2 font-semibold text-white'>Spread the Word</h3>
+                  <p className='mb-4 text-gray-300 text-sm'>Help others discover ToolHubX</p>
+                  <Button variant='outline' size='sm' className='w-full'>
+                    Share with Friends
+                  </Button>
+                </div>
+              </div>
+
+              <div className='glass-card'>
+                <div className='glass-card-inner text-center'>
+                  <Star className='mx-auto mb-4 h-8 w-8 text-yellow-400' />
+                  <h3 className='mb-2 font-semibold text-white'>Rate Your Experience</h3>
+                  <p className='mb-4 text-gray-300 text-sm'>Help us improve further</p>
+                  <Button variant='outline' size='sm' className='w-full'>
+                    Leave a Review
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -139,151 +204,234 @@ export default function FeedbackPageClient() {
   }
 
   return (
-    <div className="pt-20 min-h-screen"> {/* Add top padding for navbar */}
-      <div className="container mx-auto px-4 py-12">
-        {/* Header with back button */}
-        <div className="mb-8">
+    <div className='relative min-h-screen pt-20'>
+      {/* Gradient Background */}
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5' />
+      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent' />
+
+      <div className='container relative z-10 mx-auto max-w-5xl px-4 py-12 lg:max-w-6xl'>
+        {/* Header Section */}
+        <div className='mb-16'>
           <Link
-            href="/"
-            className="inline-flex items-center text-primary hover:text-primary/80 mb-6 transition-colors"
+            href='/'
+            className='group mb-8 inline-flex items-center text-primary transition-colors hover:text-primary/80'
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform' />
             Back to Calculator
           </Link>
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 id="feedback-form-title" className="text-title md:text-display font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              We'd Love Your Feedback
+
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-2'>
+              <MessageSquare className='h-4 w-4 text-blue-400' />
+              <span className='font-medium text-blue-300 text-sm'>Share Your Feedback</span>
+            </div>
+
+            <h1 id={titleId} className='mb-6 font-bold text-4xl md:text-6xl'>
+              <span className='bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent'>
+                Your Voice Matters
+              </span>
+              <br />
+              <span className='text-white'>Help Us Improve</span>
             </h1>
-            <p className="text-large text-white/80">
-              Help us improve ToolHubX by sharing your thoughts, reporting issues, or asking questions.
+
+            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
+              Help us make ToolHubX even better by sharing your thoughts, reporting issues, or
+              asking questions. Your feedback directly shapes our development priorities.
             </p>
           </div>
         </div>
 
-        {/* Feedback Form */}
-        <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="glass-card" role="form" aria-labelledby="feedback-form-title">
-            <div className="glass-card-inner space-y-6">
-              {/* Error Message */}
-              {error && (
-                <div role="alert" aria-live="polite" className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 dark:text-red-400">
-                  {error}
-                </div>
-              )}
-
-              {/* Name Field */}
-              <div>
-                <label htmlFor="name" className="block text-small font-medium text-white mb-2">
-                  Name (Optional)
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/80" />
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('name')}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Your name"
-                    className="w-full pl-10 pr-4 py-3 glass border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-small font-medium text-white mb-2">
-                  Email (Optional)
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/80" />
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('email')}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="your.email@example.com"
-                    className="w-full pl-10 pr-4 py-3 glass border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  />
-                </div>
-                <p className="text-caption text-white/90 mt-1">
-                  Only used if we need to follow up
-                </p>
-              </div>
-
-              {/* Feedback Type */}
-              <div>
-                <label htmlFor="feedbackType" className="block text-small font-medium text-white mb-2">
-                  Feedback Type
-                </label>
-                <select
-                  id="feedbackType"
-                  name="feedbackType"
-                  value={formData.feedbackType}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 glass border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                >
-                  {feedbackTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Message Field */}
-              <div>
-                <label htmlFor="message" className="block text-small font-medium text-white mb-2">
-                  Your Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('message')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  rows={6}
-                  placeholder="Share your thoughts, describe an issue, or ask a question..."
-                  className="w-full px-4 py-3 glass border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
-                />
-                <p className="text-caption text-white/90 mt-1">
-                  The more detail you provide, the better we can help!
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-4">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !formData.message.trim()}
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                  leftIcon={isSubmitting ? null : <Send className="h-5 w-5" />}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
-                      <span>Sending...</span>
+        {/* Feedback Types Grid */}
+        <div className='mb-12'>
+          <div className='mx-auto grid max-w-4xl grid-cols-2 gap-4 md:grid-cols-4'>
+            {feedbackTypes.map((type, index) => (
+              <button
+                type='button'
+                key={type.value}
+                onClick={() => setFormData((prev) => ({ ...prev, feedbackType: type.value }))}
+                className={`glass-card cursor-pointer border-2 transition-all hover:scale-105 ${
+                  formData.feedbackType === type.value
+                    ? 'border-primary/50 bg-primary/10'
+                    : 'border-transparent hover:border-white/20'
+                }`}
+              >
+                <div className='glass-card-inner text-center'>
+                  <div className='mb-3 flex items-center justify-center'>
+                    <div
+                      className={`rounded-full p-3 transition-colors ${
+                        index === 0
+                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-600'
+                          : index === 1
+                            ? 'bg-gradient-to-r from-red-500 to-red-600'
+                            : index === 2
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                              : 'bg-gradient-to-r from-purple-500 to-purple-600'
+                      } ${formData.feedbackType === type.value ? 'ring-2 ring-white/50' : ''}`}
+                    >
+                      <type.icon className='h-4 w-4 text-white' />
                     </div>
-                  ) : (
-                    'Send Feedback'
-                  )}
-                </Button>
-                <p className="text-center text-caption text-white/90 mt-3">
-                  Your feedback helps us build a better tax calculator 🇬🇧
-                </p>
-              </div>
-            </div>
-          </form>
+                  </div>
+                  <div className='font-medium text-sm text-white'>{type.label}</div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Main Form */}
+        <div className='mx-auto max-w-3xl'>
+          <div className='glass-card'>
+            <div className='glass-card-inner'>
+              <form onSubmit={handleSubmit} aria-labelledby={titleId} className='space-y-6'>
+                {/* Error Message */}
+                {error && (
+                  <div
+                    role='alert'
+                    aria-live='polite'
+                    className='rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400 backdrop-blur-sm'
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <Shield className='h-5 w-5 text-red-400' />
+                      <span>{error}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                  {/* Name Field */}
+                  <div>
+                    <label htmlFor={nameId} className='mb-2 block font-medium text-sm text-white'>
+                      Name (Optional)
+                    </label>
+                    <div className='relative'>
+                      <User
+                        className={`-translate-y-1/2 absolute top-1/2 left-3 h-5 w-5 transform transition-colors ${
+                          focusedField === 'name' ? 'text-blue-400' : 'text-gray-300'
+                        }`}
+                      />
+                      <input
+                        type='text'
+                        id={nameId}
+                        name='name'
+                        value={formData.name}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('name')}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder='Your name'
+                        className='glass w-full rounded-lg border border-white/10 py-3 pr-4 pl-10 transition-all hover:border-white/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50'
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email Field */}
+                  <div>
+                    <label htmlFor={emailId} className='mb-2 block font-medium text-sm text-white'>
+                      Email (Optional)
+                    </label>
+                    <div className='relative'>
+                      <Mail
+                        className={`-translate-y-1/2 absolute top-1/2 left-3 h-5 w-5 transform transition-colors ${
+                          focusedField === 'email' ? 'text-blue-400' : 'text-gray-300'
+                        }`}
+                      />
+                      <input
+                        type='email'
+                        id={emailId}
+                        name='email'
+                        value={formData.email}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder='your.email@example.com'
+                        className='glass w-full rounded-lg border border-white/10 py-3 pr-4 pl-10 transition-all hover:border-white/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50'
+                      />
+                    </div>
+                    <p className='mt-1 text-gray-300 text-xs'>Only used if we need to follow up</p>
+                  </div>
+                </div>
+
+                {/* Feedback Type */}
+                <div>
+                  <label
+                    htmlFor={feedbackTypeId}
+                    className='mb-2 block font-medium text-sm text-white'
+                  >
+                    Feedback Type
+                  </label>
+                  <select
+                    id={feedbackTypeId}
+                    name='feedbackType'
+                    value={formData.feedbackType}
+                    onChange={handleChange}
+                    className='glass w-full rounded-lg border border-white/10 px-4 py-3 transition-all hover:border-white/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50'
+                  >
+                    {feedbackTypes.map((type) => (
+                      <option
+                        key={type.value}
+                        value={type.value}
+                        className='bg-background text-white'
+                      >
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Message Field */}
+                <div>
+                  <label htmlFor={messageId} className='mb-2 block font-medium text-sm text-white'>
+                    Your Message *
+                  </label>
+                  <textarea
+                    id={messageId}
+                    name='message'
+                    value={formData.message}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('message')}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    rows={6}
+                    placeholder='Share your thoughts, describe an issue, or ask a question...'
+                    className='glass w-full resize-none rounded-lg border border-white/10 px-4 py-3 transition-all hover:border-white/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50'
+                  />
+                  <p className='mt-1 text-gray-300 text-xs'>
+                    The more detail you provide, the better we can help!
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <div className='pt-6'>
+                  <Button
+                    type='submit'
+                    disabled={isSubmitting || !formData.message.trim()}
+                    variant='primary'
+                    size='lg'
+                    className='group relative w-full overflow-hidden'
+                    leftIcon={isSubmitting ? null : <Send className='h-5 w-5' />}
+                  >
+                    <div className='absolute inset-0 animate-gradient-x bg-gradient-to-r from-primary via-accent to-primary opacity-0 transition-opacity group-hover:opacity-100' />
+                    <span className='relative z-10'>
+                      {isSubmitting ? (
+                        <div className='flex items-center justify-center space-x-2'>
+                          <div className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                          <span>Sending your feedback...</span>
+                        </div>
+                      ) : (
+                        'Send Feedback'
+                      )}
+                    </span>
+                  </Button>
+                  <p className='mt-4 text-center text-gray-300 text-xs'>
+                    Your feedback helps us build a better tax calculator for everyone 🇬🇧
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Related Actions */}
+        <CallToAction variant='calculator' className='mt-16 mb-8' />
       </div>
     </div>
   );

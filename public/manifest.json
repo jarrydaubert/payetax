@@ -80,7 +80,7 @@
     {
       "src": "/images/pwa-screenshot-narrow.png",
       "sizes": "640x1280",
-      "type": "image/png", 
+      "type": "image/png",
       "form_factor": "narrow",
       "label": "ToolHubX Tax Calculator on Mobile"
     }

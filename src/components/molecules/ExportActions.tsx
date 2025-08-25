@@ -10,7 +10,6 @@
 import { Download, Printer } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
-import Button from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 /**
@@ -20,53 +19,53 @@ import { cn } from '@/lib/utils';
 interface ExportActionsProps {
   /** Callback function for print action */
   onPrint: () => void;
-  
+
   /** Callback function for CSV download action */
   onDownload: () => void;
-  
+
   /** Additional CSS classes for customization */
   className?: string;
-  
+
   /** Whether actions are currently disabled */
   disabled?: boolean;
-  
+
   /** Loading state for print operation */
   printLoading?: boolean;
-  
+
   /** Loading state for download operation */
   downloadLoading?: boolean;
-  
+
   /** Custom aria-label for the action group */
   'aria-label'?: string;
 }
 
 /**
  * Export actions component for tax calculation results
- * 
+ *
  * Provides print and CSV export functionality with proper loading states
  * and accessibility features. Uses the standardized Button component
  * for consistency across the application.
- * 
+ *
  * USAGE EXAMPLES:
- * 
+ *
  * Basic usage:
  * <ExportActions onPrint={handlePrint} onDownload={handleDownload} />
- * 
+ *
  * With loading states:
- * <ExportActions 
- *   onPrint={handlePrint} 
+ * <ExportActions
+ *   onPrint={handlePrint}
  *   onDownload={handleDownload}
  *   printLoading={isPrinting}
  *   downloadLoading={isDownloading}
  * />
- * 
+ *
  * Disabled state:
- * <ExportActions 
- *   onPrint={handlePrint} 
+ * <ExportActions
+ *   onPrint={handlePrint}
  *   onDownload={handleDownload}
  *   disabled={!hasResults}
  * />
- * 
+ *
  * @param props - ExportActions component props
  * @returns Accessible export actions component
  */
@@ -77,7 +76,7 @@ const ExportActions: React.FC<ExportActionsProps> = ({
   disabled = false,
   printLoading = false,
   downloadLoading = false,
-  'aria-label': ariaLabel = 'Export calculation results'
+  'aria-label': ariaLabel = 'Export calculation results',
 }) => {
   // Local state for handling action feedback
   const [lastAction, setLastAction] = useState<'print' | 'download' | null>(null);
@@ -87,7 +86,7 @@ const ExportActions: React.FC<ExportActionsProps> = ({
    */
   const handlePrint = async () => {
     if (disabled || printLoading) return;
-    
+
     try {
       setLastAction('print');
       await onPrint();
@@ -104,7 +103,7 @@ const ExportActions: React.FC<ExportActionsProps> = ({
    */
   const handleDownload = async () => {
     if (disabled || downloadLoading) return;
-    
+
     try {
       setLastAction('download');
       await onDownload();
@@ -117,40 +116,39 @@ const ExportActions: React.FC<ExportActionsProps> = ({
   };
 
   return (
-    <div 
-      className={cn(
-        'flex gap-2 justify-center',
-        className
-      )}
-      role="toolbar"
+    <div
+      className={cn('flex justify-center gap-2', className)}
+      role='toolbar'
       aria-label={ariaLabel}
     >
       {/* Print Button - Icon Only */}
       <button
+        type='button'
         onClick={handlePrint}
         disabled={disabled || printLoading}
-        aria-label="Print tax calculation results"
+        aria-label='Print tax calculation results'
         className={cn(
-          'p-2 rounded-lg glass border border-white/20 hover:bg-white/10 transition-colors',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
+          'glass rounded-lg border border-white/20 p-2 transition-colors hover:bg-white/10',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           lastAction === 'print' && 'ring-2 ring-purple-500/50'
         )}
       >
-        <Printer className="h-4 w-4 text-white/80" />
+        <Printer className='h-4 w-4 text-white/80' />
       </button>
 
       {/* CSV Download Button - Icon Only */}
       <button
+        type='button'
         onClick={handleDownload}
         disabled={disabled || downloadLoading}
-        aria-label="Download tax calculation results as CSV file"
+        aria-label='Download tax calculation results as CSV file'
         className={cn(
-          'p-2 rounded-lg glass border border-white/20 hover:bg-white/10 transition-colors',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
+          'glass rounded-lg border border-white/20 p-2 transition-colors hover:bg-white/10',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           lastAction === 'download' && 'ring-2 ring-purple-500/50'
         )}
       >
-        <Download className="h-4 w-4 text-white/80" />
+        <Download className='h-4 w-4 text-white/80' />
       </button>
     </div>
   );

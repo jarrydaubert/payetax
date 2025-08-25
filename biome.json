@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -18,21 +18,22 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "error",
-        "useExhaustiveDependencies": "warn",
+        "useExhaustiveDependencies": "error",
         "noConstantCondition": "error",
         "noUnusedImports": "error",
         "noUndeclaredVariables": "error",
         "useValidForDirection": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn",
+        "noExplicitAny": "error",
         "noConsole": {
-          "level": "warn",
+          "level": "error",
           "options": {
             "allow": ["log", "warn", "error", "info"]
           }
         },
-        "noArrayIndexKey": "warn",
+        "noDebugger": "error",
+        "noArrayIndexKey": "error",
         "noDoubleEquals": "error",
         "noImplicitAnyLet": "error",
         "noMisleadingCharacterClass": "error"
@@ -48,7 +49,8 @@
         },
         "useShorthandAssign": "error",
         "useConst": "error",
-        "useExponentiationOperator": "error"
+        "useExponentiationOperator": "error",
+        "useFragmentSyntax": "error"
       },
       "a11y": {
         "useKeyWithClickEvents": "error",
@@ -57,13 +59,18 @@
         "useAltText": "error",
         "noAccessKey": "error",
         "useValidAnchor": "error",
-        "useAriaPropsForRole": "error"
+        "useAriaPropsForRole": "error",
+        "useMediaCaption": "error",
+        "useValidAriaRole": "error",
+        "useValidAriaProps": "error",
+        "useValidAriaValues": "error"
       },
       "complexity": {
-        "noForEach": "warn",
+        "noForEach": "error",
         "useLiteralKeys": "error",
         "noUselessFragments": "error",
-        "noUselessRename": "error"
+        "noUselessRename": "error",
+        "noUselessSwitchCase": "error"
       },
       "performance": {
         "noDelete": "error",
@@ -71,6 +78,14 @@
       },
       "security": {
         "noDangerouslySetInnerHtml": "error"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "error",
+          "options": {
+            "functions": ["cn", "clsx", "twMerge", "classNames"]
+          }
+        }
       }
     }
   },
@@ -83,8 +98,21 @@
     "lineEnding": "lf"
   },
   "javascript": {
+    "globals": [
+      "jest",
+      "describe",
+      "it",
+      "expect",
+      "beforeEach",
+      "afterEach",
+      "beforeAll",
+      "afterAll",
+      "test",
+      "gtag"
+    ],
     "formatter": {
       "quoteStyle": "single",
+      "jsxQuoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "always",
       "arrowParentheses": "always",
@@ -96,8 +124,16 @@
       "trailingCommas": "none"
     }
   },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100
+    }
+  },
   "files": {
-    "includes": ["/*.ts", "/.tsx", "**/.js", "/*.jsx", "/*.json"],
+    "includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json", "**/*.mdx"],
     "ignoreUnknown": false
   }
 }

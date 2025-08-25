@@ -24,12 +24,12 @@ export const inter = Inter({
   // Optimize with system fonts as fallbacks
   fallback: [
     'Helvetica Neue',
-    '-apple-system', 
-    'BlinkMacSystemFont', 
-    'Segoe UI', 
-    'Roboto', 
-    'system-ui', 
-    'sans-serif'
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI',
+    'Roboto',
+    'system-ui',
+    'sans-serif',
   ],
 
   // Optimize font weights for better performance

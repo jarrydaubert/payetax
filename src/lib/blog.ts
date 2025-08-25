@@ -54,7 +54,7 @@ async function getAllMDXFiles(): Promise<string[]> {
     await ensureBlogContentDir();
     const files = await fs.promises.readdir(getBlogContentPath());
     return files.filter((file) => file.endsWith('.mdx') || file.endsWith('.md'));
-  } catch (error) {
+  } catch (_error) {
     console.warn('No blog content directory found, returning empty array');
     return [];
   }
@@ -82,9 +82,9 @@ async function readMDXFile(filename: string): Promise<BlogPost | null> {
               console.error(`YAML parse error in ${filename}:`, error);
               return {};
             }
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     // Validate frontmatter - must have required fields
@@ -96,8 +96,13 @@ async function readMDXFile(filename: string): Promise<BlogPost | null> {
     const frontmatter = data as Partial<BlogPostFrontmatter>;
 
     // Check for required fields
-    if (!frontmatter.title || !frontmatter.slug || !frontmatter.excerpt || 
-        !frontmatter.publishedAt || !frontmatter.category) {
+    if (
+      !frontmatter.title ||
+      !frontmatter.slug ||
+      !frontmatter.excerpt ||
+      !frontmatter.publishedAt ||
+      !frontmatter.category
+    ) {
       console.warn(`Invalid frontmatter in ${filename}: missing required fields`, {
         title: !!frontmatter.title,
         slug: !!frontmatter.slug,
@@ -180,7 +185,7 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
 
   // Filter by tag
   if (options.tag) {
-    filtered = filtered.filter((post) => 
+    filtered = filtered.filter((post) =>
       post.tags?.some((tag) => tag.toLowerCase() === options.tag?.toLowerCase())
     );
   }
@@ -193,11 +198,12 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
   // Filter by search query
   if (options.searchQuery) {
     const query = options.searchQuery.toLowerCase();
-    filtered = filtered.filter((post) =>
-      post.title.toLowerCase().includes(query) ||
-      post.excerpt.toLowerCase().includes(query) ||
-      post.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
-      post.content.toLowerCase().includes(query)
+    filtered = filtered.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query) ||
+        post.excerpt.toLowerCase().includes(query) ||
+        post.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
+        post.content.toLowerCase().includes(query)
     );
   }
 
@@ -223,16 +229,16 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
     const files = await getAllMDXFiles();
     const posts = await Promise.all(files.map((file) => readMDXFile(file)));
     const validPosts = posts.filter((post): post is BlogPost => post !== null);
-    
+
     // Apply filters
     const filteredPosts = filterPosts(validPosts, options);
-    
+
     // Sort posts (default: newest first)
     const sortedPosts = sortPosts(filteredPosts, 'date-desc');
-    
+
     // Apply pagination
     const paginatedPosts = paginatePosts(sortedPosts, page, pageSize);
-    
+
     return paginatedPosts;
   } catch (error) {
     console.error('Error getting blog posts:', error);
@@ -248,11 +254,11 @@ export async function getBlogPostsCount(category?: string): Promise<number> {
     const files = await getAllMDXFiles();
     const posts = await Promise.all(files.map((file) => readMDXFile(file)));
     const validPosts = posts.filter((post): post is BlogPost => post !== null);
-    
+
     if (category) {
       return validPosts.filter((post) => post.category === category).length;
     }
-    
+
     return validPosts.length;
   } catch {
     return 0;
@@ -340,21 +346,21 @@ export async function getRelatedPosts(
 ): Promise<RelatedPost[]> {
   try {
     const allPosts = await getBlogPosts();
-    
+
     // Filter out the current post
     const otherPosts = allPosts.filter((post) => post.id !== postId);
-    
+
     // Prefer posts from the same category
-    let relatedPosts = categorySlug 
+    let relatedPosts = categorySlug
       ? otherPosts.filter((post) => post.category === categorySlug)
       : otherPosts;
-    
+
     // If not enough posts in the same category, add posts from other categories
     if (relatedPosts.length < count) {
       const remainingPosts = otherPosts.filter((post) => post.category !== categorySlug);
       relatedPosts = [...relatedPosts, ...remainingPosts];
     }
-    
+
     // Take only the required count and map to RelatedPost format
     return relatedPosts.slice(0, count).map((post) => ({
       title: post.title,
@@ -376,13 +382,16 @@ export async function getRelatedPosts(
 export async function getBlogCategories(): Promise<BlogCategory[]> {
   try {
     const allPosts = await getBlogPosts();
-    
+
     // Count posts per category
-    const categoryCounts = allPosts.reduce((counts, post) => {
-      counts[post.category] = (counts[post.category] || 0) + 1;
-      return counts;
-    }, {} as Record<string, number>);
-    
+    const categoryCounts = allPosts.reduce(
+      (counts, post) => {
+        counts[post.category] = (counts[post.category] || 0) + 1;
+        return counts;
+      },
+      {} as Record<string, number>
+    );
+
     // Return categories with counts
     return BLOG_CONFIG.categories.map((category) => ({
       ...category,

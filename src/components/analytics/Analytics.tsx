@@ -8,13 +8,12 @@ import { useCallback, useEffect, useState } from 'react';
 // GA4 Measurement ID
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-99DW6ZQWMT';
 
+import type { GtagFunction } from '@/types/gtag';
+
 // Track consent status in window object for persistence
 declare global {
   interface Window {
-    gtag: (
-      command: 'consent' | 'config' | 'event' | 'js' | 'set' | 'require',
-      ...args: unknown[]
-    ) => void;
+    gtag?: GtagFunction;
     dataLayer: Record<string, unknown>[];
     consentMode: {
       isConsentGiven: boolean;
@@ -40,7 +39,7 @@ export function Analytics() {
   const updateConsent = useCallback((hasConsent: boolean) => {
     if (typeof window === 'undefined' || !window.gtag) return;
 
-    window.gtag('consent', 'update', {
+    window.gtag?.('consent', 'update', {
       analytics_storage: hasConsent ? 'granted' : 'denied',
       ad_storage: hasConsent ? 'granted' : 'denied',
       functionality_storage: hasConsent ? 'granted' : 'denied',
@@ -67,7 +66,7 @@ export function Analytics() {
     const trackTimeSpent = () => {
       const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
       if (timeSpentSeconds >= 30) {
-        window.gtag('event', 'engagement', {
+        window.gtag?.('event', 'engagement', {
           event_category: 'time_on_page',
           event_label: pathname,
           value: timeSpentSeconds,
@@ -97,7 +96,7 @@ export function Analytics() {
           maxScrollPercentage === 100
         ) {
           const scrollLabel = `${Math.floor(maxScrollPercentage / 25) * 25}%`;
-          window.gtag('event', 'scroll_depth', {
+          window.gtag?.('event', 'scroll_depth', {
             event_category: 'engagement',
             event_label: scrollLabel,
             value: maxScrollPercentage,
@@ -125,7 +124,7 @@ export function Analytics() {
     // Initialize consent mode
     if (typeof window !== 'undefined' && window.gtag) {
       // Default to denied consent until user accepts
-      window.gtag('consent', 'default', {
+      window.gtag?.('consent', 'default', {
         analytics_storage: 'denied',
         ad_storage: 'denied',
         functionality_storage: 'denied',
@@ -161,7 +160,7 @@ export function Analytics() {
     const url = pathname + (searchParamsString ? `?${searchParamsString}` : '');
 
     // Track page view
-    window.gtag('config', GA_MEASUREMENT_ID, {
+    window.gtag?.('config', GA_MEASUREMENT_ID, {
       page_path: url,
       send_page_view: true,
       cookie_flags: 'SameSite=None;Secure', // Enhanced cookie security
@@ -205,12 +204,12 @@ export function Analytics() {
       {/* Google Analytics Script */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
+        strategy='afterInteractive'
         onLoad={() => setIsLoaded(true)}
       />
 
       {/* Google Analytics Initialization */}
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script strategy='afterInteractive'>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

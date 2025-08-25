@@ -1,0 +1,733 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#_R_alb_"
+    - navigation [ref=e4]:
+      - generic [ref=e5]:
+        - link "ToolHubX" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8] [cursor=pointer]: ToolHubX
+        - generic [ref=e10]:
+          - link "Home" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e13] [cursor=pointer]: Home
+          - link "About" [ref=e15] [cursor=pointer]:
+            - /url: /about
+            - generic [ref=e16] [cursor=pointer]: About
+          - link "Blog" [ref=e18] [cursor=pointer]:
+            - /url: /blog
+            - generic [ref=e19] [cursor=pointer]: Blog
+        - link "Feedback" [ref=e21] [cursor=pointer]:
+          - /url: /feedback
+          - img [ref=e22] [cursor=pointer]
+          - generic [ref=e24] [cursor=pointer]: Feedback
+    - main [ref=e25]:
+      - generic [ref=e29]:
+        - link "Back to Blog" [ref=e31] [cursor=pointer]:
+          - /url: /blog
+          - img [ref=e32] [cursor=pointer]
+          - text: Back to Blog
+        - article [ref=e34]:
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]: tax-comparison
+              - generic [ref=e38]: Scottish tax rates
+              - generic [ref=e39]: English tax rates
+              - generic [ref=e40]: UK tax comparison
+            - 'heading "Scottish vs English Tax Rates 2025: Complete Comparison & Calculator" [level=1] [ref=e41]'
+            - paragraph [ref=e42]: Compare Scottish and English tax rates for 2025-2026. See exact differences in income tax, National Insurance, and take-home pay with real salary examples and our interactive calculator.
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - img [ref=e45]
+                - generic [ref=e47]: 25 August 2025
+              - generic [ref=e48]:
+                - img [ref=e49]
+                - generic [ref=e52]: 10 min read
+              - generic [ref=e53]:
+                - img [ref=e54]
+                - generic [ref=e57]: ToolHubX Tax Experts
+            - img "Scottish vs English tax rates 2025 comparison chart" [ref=e59]
+          - generic [ref=e62]:
+            - 'heading "Scottish vs English Tax Rates 2025: How Much More Do You Pay in Scotland? Link to this heading" [level=1] [ref=e63]':
+              - generic [ref=e64]: "Scottish vs English Tax Rates 2025: How Much More Do You Pay in Scotland?"
+              - link "Link to this heading" [ref=e65] [cursor=pointer]:
+                - /url: "#scottish-vs-english-tax-rates-2025-how-much-more-do-you-pay-in-scotland"
+                - img [ref=e66] [cursor=pointer]
+            - paragraph [ref=e69]:
+              - strong [ref=e70]: Are Scottish taxpayers paying more than their English counterparts in 2025?
+              - text: The answer is complex and depends on your income level. This comprehensive comparison shows exactly how Scottish and English tax rates differ, with real examples and calculations.
+            - 'heading "Quick Answer: The Tax Difference Link to this heading" [level=2] [ref=e71]':
+              - generic [ref=e72]: "Quick Answer: The Tax Difference"
+              - link "Link to this heading" [ref=e73] [cursor=pointer]:
+                - /url: "#quick-answer-the-tax-difference"
+                - img [ref=e74] [cursor=pointer]
+            - list [ref=e77]:
+              - listitem [ref=e78]:
+                - strong [ref=e79]: "Under £26,562:"
+                - text: Scottish taxpayers pay
+                - strong [ref=e80]: slightly less
+              - listitem [ref=e81]:
+                - strong [ref=e82]: "£26,562 - £43,662:"
+                - text: Scottish taxpayers pay
+                - strong [ref=e83]: similar amounts
+              - listitem [ref=e84]:
+                - strong [ref=e85]: "Over £43,662:"
+                - text: Scottish taxpayers pay
+                - strong [ref=e86]: significantly more
+              - listitem [ref=e87]:
+                - strong [ref=e88]: "Over £75,000:"
+                - text: The difference becomes
+                - strong [ref=e89]: substantial
+            - heading "Understanding Scottish Income Tax (SRIT) Link to this heading" [level=2] [ref=e90]:
+              - generic [ref=e91]: Understanding Scottish Income Tax (SRIT)
+              - link "Link to this heading" [ref=e92] [cursor=pointer]:
+                - /url: "#understanding-scottish-income-tax-srit"
+                - img [ref=e93] [cursor=pointer]
+            - paragraph [ref=e96]:
+              - text: Scotland has devolved powers over income tax rates and bands, creating the
+              - strong [ref=e97]: Scottish Rate of Income Tax (SRIT)
+              - text: . While National Insurance rates remain the same across the UK, Scottish residents pay different income tax rates.
+            - heading "Who Pays Scottish Tax? Link to this heading" [level=3] [ref=e98]:
+              - generic [ref=e99]: Who Pays Scottish Tax?
+              - link "Link to this heading" [ref=e100] [cursor=pointer]:
+                - /url: "#who-pays-scottish-tax"
+                - img [ref=e101] [cursor=pointer]
+            - paragraph [ref=e104]:
+              - text: You pay Scottish income tax if you're a
+              - strong [ref=e105]: Scottish taxpayer
+              - text: ", which generally means:"
+            - list [ref=e106]:
+              - listitem [ref=e107]: Your main place of residence is in Scotland
+              - listitem [ref=e108]: You spend more time in Scotland than elsewhere in the UK
+              - listitem [ref=e109]: Scotland is where you have your closest personal and economic ties
+            - paragraph [ref=e110]:
+              - emphasis [ref=e111]: "Note: Your workplace location doesn't determine your tax residence - it's based on where you live."
+            - heading "2025-2026 Tax Rate Comparison Link to this heading" [level=2] [ref=e112]:
+              - generic [ref=e113]: 2025-2026 Tax Rate Comparison
+              - link "Link to this heading" [ref=e114] [cursor=pointer]:
+                - /url: "#2025-2026-tax-rate-comparison"
+                - img [ref=e115] [cursor=pointer]
+            - heading "Scottish Income Tax Rates & Bands Link to this heading" [level=3] [ref=e118]:
+              - generic [ref=e119]: Scottish Income Tax Rates & Bands
+              - link "Link to this heading" [ref=e120] [cursor=pointer]:
+                - /url: "#scottish-income-tax-rates-bands"
+                - img [ref=e121] [cursor=pointer]
+            - paragraph [ref=e124]:
+              - strong [ref=e125]: "Scottish Income Tax Structure (6 bands):"
+            - table [ref=e127]:
+              - rowgroup [ref=e128]:
+                - row "Band Income Range Rate Cumulative Tax" [ref=e129]:
+                  - cell "Band" [ref=e130]
+                  - cell "Income Range" [ref=e131]
+                  - cell "Rate" [ref=e132]
+                  - cell "Cumulative Tax" [ref=e133]
+              - rowgroup [ref=e134]:
+                - row "Personal Allowance £0 - £12,570 0% £0" [ref=e135]:
+                  - cell "Personal Allowance" [ref=e136]
+                  - cell "£0 - £12,570" [ref=e137]
+                  - cell "0%" [ref=e138]
+                  - cell "£0" [ref=e139]
+                - row "Starter Rate £12,571 - £14,876 19% £438" [ref=e140]:
+                  - cell "Starter Rate" [ref=e141]
+                  - cell "£12,571 - £14,876" [ref=e142]
+                  - cell "19%" [ref=e143]
+                  - cell "£438" [ref=e144]
+                - row "Basic Rate £14,877 - £26,561 20% £2,775" [ref=e145]:
+                  - cell "Basic Rate" [ref=e146]
+                  - cell "£14,877 - £26,561" [ref=e147]
+                  - cell "20%" [ref=e148]
+                  - cell "£2,775" [ref=e149]
+                - row "Intermediate Rate £26,562 - £43,662 21% £6,366" [ref=e150]:
+                  - cell "Intermediate Rate" [ref=e151]
+                  - cell "£26,562 - £43,662" [ref=e152]
+                  - cell "21%" [ref=e153]
+                  - cell "£6,366" [ref=e154]
+                - row "Higher Rate £43,663 - £75,000 42% £19,518" [ref=e155]:
+                  - cell "Higher Rate" [ref=e156]
+                  - cell "£43,663 - £75,000" [ref=e157]
+                  - cell "42%" [ref=e158]
+                  - cell "£19,518" [ref=e159]
+                - row "Advanced Rate £75,001 - £125,140 45% £42,081" [ref=e160]:
+                  - cell "Advanced Rate" [ref=e161]
+                  - cell "£75,001 - £125,140" [ref=e162]
+                  - cell "45%" [ref=e163]
+                  - cell "£42,081" [ref=e164]
+                - row "Top Rate Over £125,140 48% -" [ref=e165]:
+                  - cell "Top Rate" [ref=e166]
+                  - cell "Over £125,140" [ref=e167]
+                  - cell "48%" [ref=e168]
+                  - cell "-" [ref=e169]
+            - heading "English, Welsh & Northern Irish Income Tax Rates Link to this heading" [level=3] [ref=e170]:
+              - generic [ref=e171]: English, Welsh & Northern Irish Income Tax Rates
+              - link "Link to this heading" [ref=e172] [cursor=pointer]:
+                - /url: "#english-welsh-northern-irish-income-tax-rates"
+                - img [ref=e173] [cursor=pointer]
+            - paragraph [ref=e176]:
+              - strong [ref=e177]: "Rest of UK Income Tax Structure (4 bands):"
+            - table [ref=e179]:
+              - rowgroup [ref=e180]:
+                - row "Band Income Range Rate Cumulative Tax" [ref=e181]:
+                  - cell "Band" [ref=e182]
+                  - cell "Income Range" [ref=e183]
+                  - cell "Rate" [ref=e184]
+                  - cell "Cumulative Tax" [ref=e185]
+              - rowgroup [ref=e186]:
+                - row "Personal Allowance £0 - £12,570 0% £0" [ref=e187]:
+                  - cell "Personal Allowance" [ref=e188]
+                  - cell "£0 - £12,570" [ref=e189]
+                  - cell "0%" [ref=e190]
+                  - cell "£0" [ref=e191]
+                - row "Basic Rate £12,571 - £50,270 20% £7,540" [ref=e192]:
+                  - cell "Basic Rate" [ref=e193]
+                  - cell "£12,571 - £50,270" [ref=e194]
+                  - cell "20%" [ref=e195]
+                  - cell "£7,540" [ref=e196]
+                - row "Higher Rate £50,271 - £125,140 40% £37,488" [ref=e197]:
+                  - cell "Higher Rate" [ref=e198]
+                  - cell "£50,271 - £125,140" [ref=e199]
+                  - cell "40%" [ref=e200]
+                  - cell "£37,488" [ref=e201]
+                - row "Additional Rate Over £125,140 45% -" [ref=e202]:
+                  - cell "Additional Rate" [ref=e203]
+                  - cell "Over £125,140" [ref=e204]
+                  - cell "45%" [ref=e205]
+                  - cell "-" [ref=e206]
+            - heading "Salary Comparison Examples Link to this heading" [level=2] [ref=e207]:
+              - generic [ref=e208]: Salary Comparison Examples
+              - link "Link to this heading" [ref=e209] [cursor=pointer]:
+                - /url: "#salary-comparison-examples"
+                - img [ref=e210] [cursor=pointer]
+            - paragraph [ref=e213]: "Let's see exactly how much difference Scottish tax makes across different income levels:"
+            - 'heading "£25,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e214]':
+              - generic [ref=e215]: "£25,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e216] [cursor=pointer]:
+                - /url: "#25-000-salary-scotland-vs-england"
+                - img [ref=e217] [cursor=pointer]
+            - paragraph [ref=e220]:
+              - strong [ref=e221]: "Scottish Tax:"
+            - list [ref=e222]:
+              - listitem [ref=e223]: "Income Tax: £2,314 (19% on £2,305 + 20% on £10,124)"
+              - listitem [ref=e224]: "National Insurance: £993"
+              - listitem [ref=e225]:
+                - strong [ref=e226]: "Total Tax: £3,307"
+              - listitem [ref=e227]:
+                - strong [ref=e228]: "Take-Home: £21,693"
+            - paragraph [ref=e229]:
+              - strong [ref=e230]: "English Tax:"
+            - list [ref=e231]:
+              - listitem [ref=e232]: "Income Tax: £2,486 (20% on £12,430)"
+              - listitem [ref=e233]: "National Insurance: £993"
+              - listitem [ref=e234]:
+                - strong [ref=e235]: "Total Tax: £3,479"
+              - listitem [ref=e236]:
+                - strong [ref=e237]: "Take-Home: £21,521"
+            - paragraph [ref=e238]:
+              - strong [ref=e239]: "Scottish Advantage: £172 per year (£14 per month)"
+            - 'heading "£35,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e240]':
+              - generic [ref=e241]: "£35,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e242] [cursor=pointer]:
+                - /url: "#35-000-salary-scotland-vs-england"
+                - img [ref=e243] [cursor=pointer]
+            - paragraph [ref=e246]:
+              - strong [ref=e247]: "Scottish Tax:"
+            - list [ref=e248]:
+              - listitem [ref=e249]: "Income Tax: £4,085 (£2,775 + 21% on £8,438)"
+              - listitem [ref=e250]: "National Insurance: £1,794"
+              - listitem [ref=e251]:
+                - strong [ref=e252]: "Total Tax: £5,879"
+              - listitem [ref=e253]:
+                - strong [ref=e254]: "Take-Home: £29,121"
+            - paragraph [ref=e255]:
+              - strong [ref=e256]: "English Tax:"
+            - list [ref=e257]:
+              - listitem [ref=e258]: "Income Tax: £4,486 (20% on £22,430)"
+              - listitem [ref=e259]: "National Insurance: £1,794"
+              - listitem [ref=e260]:
+                - strong [ref=e261]: "Total Tax: £6,280"
+              - listitem [ref=e262]:
+                - strong [ref=e263]: "Take-Home: £28,720"
+            - paragraph [ref=e264]:
+              - strong [ref=e265]: "Scottish Advantage: £401 per year (£33 per month)"
+            - 'heading "£50,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e266]':
+              - generic [ref=e267]: "£50,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e268] [cursor=pointer]:
+                - /url: "#50-000-salary-scotland-vs-england"
+                - img [ref=e269] [cursor=pointer]
+            - paragraph [ref=e272]:
+              - strong [ref=e273]: "Scottish Tax:"
+            - list [ref=e274]:
+              - listitem [ref=e275]: "Income Tax: £7,665 (£6,366 + 42% on £6,338)"
+              - listitem [ref=e276]: "National Insurance: £2,994"
+              - listitem [ref=e277]:
+                - strong [ref=e278]: "Total Tax: £10,659"
+              - listitem [ref=e279]:
+                - strong [ref=e280]: "Take-Home: £39,341"
+            - paragraph [ref=e281]:
+              - strong [ref=e282]: "English Tax:"
+            - list [ref=e283]:
+              - listitem [ref=e284]: "Income Tax: £7,486 (20% on £37,430)"
+              - listitem [ref=e285]: "National Insurance: £2,994"
+              - listitem [ref=e286]:
+                - strong [ref=e287]: "Total Tax: £10,480"
+              - listitem [ref=e288]:
+                - strong [ref=e289]: "Take-Home: £39,520"
+            - paragraph [ref=e290]:
+              - strong [ref=e291]: "English Advantage: £179 per year (£15 per month)"
+            - 'heading "£75,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e292]':
+              - generic [ref=e293]: "£75,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e294] [cursor=pointer]:
+                - /url: "#75-000-salary-scotland-vs-england"
+                - img [ref=e295] [cursor=pointer]
+            - paragraph [ref=e298]:
+              - strong [ref=e299]: "Scottish Tax:"
+            - list [ref=e300]:
+              - listitem [ref=e301]: "Income Tax: £19,518 (Maximum higher rate band)"
+              - listitem [ref=e302]: "National Insurance: £3,494"
+              - listitem [ref=e303]:
+                - strong [ref=e304]: "Total Tax: £23,012"
+              - listitem [ref=e305]:
+                - strong [ref=e306]: "Take-Home: £51,988"
+            - paragraph [ref=e307]:
+              - strong [ref=e308]: "English Tax:"
+            - list [ref=e309]:
+              - listitem [ref=e310]: "Income Tax: £12,486 (£7,540 + 40% on £24,730)"
+              - listitem [ref=e311]: "National Insurance: £3,494"
+              - listitem [ref=e312]:
+                - strong [ref=e313]: "Total Tax: £15,980"
+              - listitem [ref=e314]:
+                - strong [ref=e315]: "Take-Home: £59,020"
+            - paragraph [ref=e316]:
+              - strong [ref=e317]: "English Advantage: £7,032 per year (£586 per month)"
+            - 'heading "£100,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e318]':
+              - generic [ref=e319]: "£100,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e320] [cursor=pointer]:
+                - /url: "#100-000-salary-scotland-vs-england"
+                - img [ref=e321] [cursor=pointer]
+            - paragraph [ref=e324]:
+              - strong [ref=e325]: "Scottish Tax (with allowance tapering):"
+            - list [ref=e326]:
+              - listitem [ref=e327]: "Income Tax: £30,768 (including reduced personal allowance)"
+              - listitem [ref=e328]: "National Insurance: £3,494"
+              - listitem [ref=e329]:
+                - strong [ref=e330]: "Total Tax: £34,262"
+              - listitem [ref=e331]:
+                - strong [ref=e332]: "Take-Home: £65,738"
+            - paragraph [ref=e333]:
+              - strong [ref=e334]: "English Tax (with allowance tapering):"
+            - list [ref=e335]:
+              - listitem [ref=e336]: "Income Tax: £22,432 (including reduced personal allowance)"
+              - listitem [ref=e337]: "National Insurance: £3,494"
+              - listitem [ref=e338]:
+                - strong [ref=e339]: "Total Tax: £25,926"
+              - listitem [ref=e340]:
+                - strong [ref=e341]: "Take-Home: £74,074"
+            - paragraph [ref=e342]:
+              - strong [ref=e343]: "English Advantage: £8,336 per year (£695 per month)"
+            - 'heading "£150,000 Salary: Scotland vs England Link to this heading" [level=3] [ref=e344]':
+              - generic [ref=e345]: "£150,000 Salary: Scotland vs England"
+              - link "Link to this heading" [ref=e346] [cursor=pointer]:
+                - /url: "#150-000-salary-scotland-vs-england"
+                - img [ref=e347] [cursor=pointer]
+            - paragraph [ref=e350]:
+              - strong [ref=e351]: "Scottish Tax:"
+            - list [ref=e352]:
+              - listitem [ref=e353]: "Income Tax: £54,081 (£42,081 + 48% on £24,860)"
+              - listitem [ref=e354]: "National Insurance: £3,494"
+              - listitem [ref=e355]:
+                - strong [ref=e356]: "Total Tax: £57,575"
+              - listitem [ref=e357]:
+                - strong [ref=e358]: "Take-Home: £92,425"
+            - paragraph [ref=e359]:
+              - strong [ref=e360]: "English Tax:"
+            - list [ref=e361]:
+              - listitem [ref=e362]: "Income Tax: £48,682 (£37,488 + 45% on £24,860)"
+              - listitem [ref=e363]: "National Insurance: £3,494"
+              - listitem [ref=e364]:
+                - strong [ref=e365]: "Total Tax: £52,176"
+              - listitem [ref=e366]:
+                - strong [ref=e367]: "Take-Home: £97,824"
+            - paragraph [ref=e368]:
+              - strong [ref=e369]: "English Advantage: £5,399 per year (£450 per month)"
+            - heading "Key Breakeven Points Link to this heading" [level=2] [ref=e370]:
+              - generic [ref=e371]: Key Breakeven Points
+              - link "Link to this heading" [ref=e372] [cursor=pointer]:
+                - /url: "#key-breakeven-points"
+                - img [ref=e373] [cursor=pointer]
+            - heading "Where Scottish Tax Becomes More Expensive Link to this heading" [level=3] [ref=e376]:
+              - generic [ref=e377]: Where Scottish Tax Becomes More Expensive
+              - link "Link to this heading" [ref=e378] [cursor=pointer]:
+                - /url: "#where-scottish-tax-becomes-more-expensive"
+                - img [ref=e379] [cursor=pointer]
+            - list [ref=e382]:
+              - listitem [ref=e383]:
+                - strong [ref=e384]: "£28,867:"
+                - text: The exact point where Scottish tax exceeds English tax
+              - listitem [ref=e385]:
+                - strong [ref=e386]: "£43,663:"
+                - text: Higher rate kicks in - substantial difference begins
+              - listitem [ref=e387]:
+                - strong [ref=e388]: "£75,001:"
+                - text: Advanced rate creates even larger gaps
+            - heading "Most Affected Income Ranges Link to this heading" [level=3] [ref=e389]:
+              - generic [ref=e390]: Most Affected Income Ranges
+              - link "Link to this heading" [ref=e391] [cursor=pointer]:
+                - /url: "#most-affected-income-ranges"
+                - img [ref=e392] [cursor=pointer]
+            - list [ref=e395]:
+              - listitem [ref=e396]:
+                - strong [ref=e397]: "£43,663 - £75,000:"
+                - text: Pay 42% vs 40% (2 percentage points more)
+              - listitem [ref=e398]:
+                - strong [ref=e399]: "£75,001 - £125,140:"
+                - text: Pay 45% vs 40% (5 percentage points more)
+              - listitem [ref=e400]:
+                - strong [ref=e401]: "Over £125,140:"
+                - text: Pay 48% vs 45% (3 percentage points more)
+            - 'heading "National Insurance: The Same Across UK Link to this heading" [level=2] [ref=e402]':
+              - generic [ref=e403]: "National Insurance: The Same Across UK"
+              - link "Link to this heading" [ref=e404] [cursor=pointer]:
+                - /url: "#national-insurance-the-same-across-uk"
+                - img [ref=e405] [cursor=pointer]
+            - paragraph [ref=e408]:
+              - strong [ref=e409]: "Important:"
+              - text: "National Insurance rates and thresholds are identical across the UK:"
+            - list [ref=e410]:
+              - listitem [ref=e411]:
+                - strong [ref=e412]: "Employee Rate:"
+                - text: 8% on earnings £12,570-£50,270, then 2%
+              - listitem [ref=e413]:
+                - strong [ref=e414]: "Employer Rate:"
+                - text: 13.8% on earnings above £9,100
+              - listitem [ref=e415]:
+                - strong [ref=e416]: "Self-Employed:"
+                - text: Class 2 (£3.45/week) + Class 4 (6% then 2%)
+            - heading "Other Tax Considerations Link to this heading" [level=2] [ref=e417]:
+              - generic [ref=e418]: Other Tax Considerations
+              - link "Link to this heading" [ref=e419] [cursor=pointer]:
+                - /url: "#other-tax-considerations"
+                - img [ref=e420] [cursor=pointer]
+            - heading "Council Tax Differences Link to this heading" [level=3] [ref=e423]:
+              - generic [ref=e424]: Council Tax Differences
+              - link "Link to this heading" [ref=e425] [cursor=pointer]:
+                - /url: "#council-tax-differences"
+                - img [ref=e426] [cursor=pointer]
+            - paragraph [ref=e429]: "Scottish council tax is generally lower than England:"
+            - list [ref=e430]:
+              - listitem [ref=e431]:
+                - strong [ref=e432]: "Average Band D Scotland:"
+                - text: £1,417
+              - listitem [ref=e433]:
+                - strong [ref=e434]: "Average Band D England:"
+                - text: £2,065
+              - listitem [ref=e435]:
+                - strong [ref=e436]: "Scottish Advantage:"
+                - text: ~£648 per year
+            - heading "Student Loan Repayments Link to this heading" [level=3] [ref=e437]:
+              - generic [ref=e438]: Student Loan Repayments
+              - link "Link to this heading" [ref=e439] [cursor=pointer]:
+                - /url: "#student-loan-repayments"
+                - img [ref=e440] [cursor=pointer]
+            - paragraph [ref=e443]:
+              - strong [ref=e444]: "Plan 4 (Scottish students):"
+            - list [ref=e445]:
+              - listitem [ref=e446]: "Threshold: £27,660"
+              - listitem [ref=e447]: "Rate: 9%"
+              - listitem [ref=e448]:
+                - strong [ref=e449]: Higher threshold
+                - text: than Plan 2 (£27,295) benefits Scottish graduates
+            - heading "Benefits and Credits Link to this heading" [level=3] [ref=e450]:
+              - generic [ref=e451]: Benefits and Credits
+              - link "Link to this heading" [ref=e452] [cursor=pointer]:
+                - /url: "#benefits-and-credits"
+                - img [ref=e453] [cursor=pointer]
+            - paragraph [ref=e456]: "Tax credits and universal credit calculations use gross income, so higher Scottish tax bills can mean:"
+            - list [ref=e457]:
+              - listitem [ref=e458]: Slightly higher entitlements to means-tested benefits
+              - listitem [ref=e459]: Reduced liability for High Income Child Benefit Charge
+            - heading "Should You Move for Tax Reasons? Link to this heading" [level=2] [ref=e460]:
+              - generic [ref=e461]: Should You Move for Tax Reasons?
+              - link "Link to this heading" [ref=e462] [cursor=pointer]:
+                - /url: "#should-you-move-for-tax-reasons"
+                - img [ref=e463] [cursor=pointer]
+            - heading "Considerations Beyond Tax Link to this heading" [level=3] [ref=e466]:
+              - generic [ref=e467]: Considerations Beyond Tax
+              - link "Link to this heading" [ref=e468] [cursor=pointer]:
+                - /url: "#considerations-beyond-tax"
+                - img [ref=e469] [cursor=pointer]
+            - paragraph [ref=e472]:
+              - strong [ref=e473]: "For Higher Earners (£50,000+):"
+            - list [ref=e474]:
+              - listitem [ref=e475]:
+                - strong [ref=e476]: "Tax Savings:"
+                - text: £1,000-£8,000+ per year moving to England
+              - listitem [ref=e477]:
+                - strong [ref=e478]: "Cost of Living:"
+                - text: Often higher in London/South East
+              - listitem [ref=e479]:
+                - strong [ref=e480]: "Property Prices:"
+                - text: Significantly higher outside Scotland
+              - listitem [ref=e481]:
+                - strong [ref=e482]: "Lifestyle Factors:"
+                - text: Family, career, quality of life
+            - paragraph [ref=e483]:
+              - strong [ref=e484]: "For Middle Earners (£25,000-£45,000):"
+            - list [ref=e485]:
+              - listitem [ref=e486]:
+                - strong [ref=e487]: "Tax Impact:"
+                - text: Minimal (£0-£500 difference either way)
+              - listitem [ref=e488]:
+                - strong [ref=e489]: "Other Factors:"
+                - text: More important than tax considerations
+              - listitem [ref=e490]:
+                - strong [ref=e491]: "Council Tax:"
+                - text: Scottish advantage often offsets income tax difference
+            - heading "Professional Advice Recommended Link to this heading" [level=3] [ref=e492]:
+              - generic [ref=e493]: Professional Advice Recommended
+              - link "Link to this heading" [ref=e494] [cursor=pointer]:
+                - /url: "#professional-advice-recommended"
+                - img [ref=e495] [cursor=pointer]
+            - paragraph [ref=e498]: "For significant income differences, consider:"
+            - list [ref=e499]:
+              - listitem [ref=e500]: Tax planning with qualified advisors
+              - listitem [ref=e501]: Timing of bonuses and income recognition
+              - listitem [ref=e502]: Pension contribution strategies
+              - listitem [ref=e503]: Scottish vs UK domicile planning
+            - heading "Using Our Tax Calculator Link to this heading" [level=2] [ref=e504]:
+              - generic [ref=e505]: Using Our Tax Calculator
+              - link "Link to this heading" [ref=e506] [cursor=pointer]:
+                - /url: "#using-our-tax-calculator"
+                - img [ref=e507] [cursor=pointer]
+            - paragraph [ref=e510]:
+              - text: Our
+              - link "Scottish Tax Calculator" [ref=e511] [cursor=pointer]:
+                - /url: /
+              - text: "includes:"
+            - list [ref=e512]:
+              - listitem [ref=e513]:
+                - strong [ref=e514]: Real-time comparison
+                - text: of Scottish vs English tax
+              - listitem [ref=e515]:
+                - strong [ref=e516]: Side-by-side breakdowns
+                - text: showing exact differences
+              - listitem [ref=e517]:
+                - strong [ref=e518]: Net pay calculations
+                - text: including National Insurance
+              - listitem [ref=e519]:
+                - strong [ref=e520]: Annual and monthly
+                - text: take-home pay comparisons
+              - listitem [ref=e521]:
+                - strong [ref=e522]: Student loan impact
+                - text: for Scottish and English graduates
+            - paragraph [ref=e523]: Simply select "Scottish taxpayer" to see your Scottish tax calculation, or compare both rates instantly.
+            - heading "Planning Strategies for Scottish Taxpayers Link to this heading" [level=2] [ref=e524]:
+              - generic [ref=e525]: Planning Strategies for Scottish Taxpayers
+              - link "Link to this heading" [ref=e526] [cursor=pointer]:
+                - /url: "#planning-strategies-for-scottish-taxpayers"
+                - img [ref=e527] [cursor=pointer]
+            - heading "Pension Contributions Link to this heading" [level=3] [ref=e530]:
+              - generic [ref=e531]: Pension Contributions
+              - link "Link to this heading" [ref=e532] [cursor=pointer]:
+                - /url: "#pension-contributions"
+                - img [ref=e533] [cursor=pointer]
+            - paragraph [ref=e536]:
+              - strong [ref=e537]: Higher rate relief
+              - text: "more valuable in Scotland:"
+            - list [ref=e538]:
+              - listitem [ref=e539]: 42% relief vs 40% in England (intermediate/higher rate)
+              - listitem [ref=e540]: 45%/48% relief vs 45% in England (advanced/top rate)
+            - heading "Timing Income Link to this heading" [level=3] [ref=e541]:
+              - generic [ref=e542]: Timing Income
+              - link "Link to this heading" [ref=e543] [cursor=pointer]:
+                - /url: "#timing-income"
+                - img [ref=e544] [cursor=pointer]
+            - paragraph [ref=e547]:
+              - strong [ref=e548]: "For variable income earners:"
+            - list [ref=e549]:
+              - listitem [ref=e550]: Consider timing bonuses/dividends to optimize bands
+              - listitem [ref=e551]: Self-employed can time income recognition
+              - listitem [ref=e552]: Professional advice essential for complex situations
+            - heading "Marriage Allowance Link to this heading" [level=3] [ref=e553]:
+              - generic [ref=e554]: Marriage Allowance
+              - link "Link to this heading" [ref=e555] [cursor=pointer]:
+                - /url: "#marriage-allowance"
+                - img [ref=e556] [cursor=pointer]
+            - paragraph [ref=e559]:
+              - strong [ref=e560]: Works the same
+              - text: "in Scotland and England:"
+            - list [ref=e561]:
+              - listitem [ref=e562]: Transfer £1,260 of allowance
+              - listitem [ref=e563]: Save up to £252 per year
+              - listitem [ref=e564]: Apply through HMRC online
+            - heading "The Future of Scottish Tax Link to this heading" [level=2] [ref=e565]:
+              - generic [ref=e566]: The Future of Scottish Tax
+              - link "Link to this heading" [ref=e567] [cursor=pointer]:
+                - /url: "#the-future-of-scottish-tax"
+                - img [ref=e568] [cursor=pointer]
+            - heading "Potential Changes Link to this heading" [level=3] [ref=e571]:
+              - generic [ref=e572]: Potential Changes
+              - link "Link to this heading" [ref=e573] [cursor=pointer]:
+                - /url: "#potential-changes"
+                - img [ref=e574] [cursor=pointer]
+            - paragraph [ref=e577]:
+              - strong [ref=e578]: "SNP Government Priorities:"
+            - list [ref=e579]:
+              - listitem [ref=e580]: Further divergence from UK tax policy
+              - listitem [ref=e581]: Progressive taxation focus
+              - listitem [ref=e582]: Revenue generation for Scottish services
+            - paragraph [ref=e583]:
+              - strong [ref=e584]: "Conservative/Labour Policies:"
+            - list [ref=e585]:
+              - listitem [ref=e586]: Potential convergence with UK rates
+              - listitem [ref=e587]: Economic competitiveness focus
+              - listitem [ref=e588]: Business-friendly taxation
+            - heading "Planning Considerations Link to this heading" [level=3] [ref=e589]:
+              - generic [ref=e590]: Planning Considerations
+              - link "Link to this heading" [ref=e591] [cursor=pointer]:
+                - /url: "#planning-considerations"
+                - img [ref=e592] [cursor=pointer]
+            - list [ref=e595]:
+              - listitem [ref=e596]:
+                - strong [ref=e597]: "Long-term residence:"
+                - text: Consider potential future changes
+              - listitem [ref=e598]:
+                - strong [ref=e599]: "Career planning:"
+                - text: Factor in lifetime tax implications
+              - listitem [ref=e600]:
+                - strong [ref=e601]: "Retirement location:"
+                - text: Different tax implications for pensions
+            - heading "Key Takeaways Link to this heading" [level=2] [ref=e602]:
+              - generic [ref=e603]: Key Takeaways
+              - link "Link to this heading" [ref=e604] [cursor=pointer]:
+                - /url: "#key-takeaways"
+                - img [ref=e605] [cursor=pointer]
+            - list [ref=e608]:
+              - listitem [ref=e609]:
+                - strong [ref=e610]: "Scottish tax is progressive:"
+                - text: Lower earners pay less, higher earners pay significantly more
+              - listitem [ref=e611]:
+                - strong [ref=e612]: "Break-even around £28,867:"
+                - text: Above this, Scottish taxpayers pay more
+              - listitem [ref=e613]:
+                - strong [ref=e614]: "Substantial differences at high incomes:"
+                - text: £5,000-£8,000+ per year difference
+              - listitem [ref=e615]:
+                - strong [ref=e616]: "Council tax offsets some difference:"
+                - text: Scottish council tax is typically lower
+              - listitem [ref=e617]:
+                - strong [ref=e618]: "Professional advice valuable:"
+                - text: For incomes over £75,000, tax planning essential
+            - heading "Need to Calculate Your Scottish Tax? Link to this heading" [level=2] [ref=e619]:
+              - generic [ref=e620]: Need to Calculate Your Scottish Tax?
+              - link "Link to this heading" [ref=e621] [cursor=pointer]:
+                - /url: "#need-to-calculate-your-scottish-tax"
+                - img [ref=e622] [cursor=pointer]
+            - paragraph [ref=e625]:
+              - text: Use our comprehensive
+              - link "UK Tax Calculator" [ref=e626] [cursor=pointer]:
+                - /url: /
+              - text: "to compare:"
+            - list [ref=e627]:
+              - listitem [ref=e628]:
+                - strong [ref=e629]: Scottish vs English tax rates
+                - text: side-by-side
+              - listitem [ref=e630]:
+                - strong [ref=e631]: Exact take-home pay
+                - text: for your salary
+              - listitem [ref=e632]:
+                - strong [ref=e633]: Annual and monthly breakdowns
+                - text: with all deductions
+              - listitem [ref=e634]:
+                - strong [ref=e635]: Student loan calculations
+                - text: for Scottish students
+              - listitem [ref=e636]:
+                - strong [ref=e637]: Pension contribution optimization
+                - text: strategies
+            - paragraph [ref=e638]:
+              - strong [ref=e639]: "Quick Links:"
+            - list [ref=e640]:
+              - listitem [ref=e641]:
+                - link "Calculate Scottish Tax" [ref=e642] [cursor=pointer]:
+                  - /url: /?region=scotland
+              - listitem [ref=e643]:
+                - link "Compare UK Tax Rates" [ref=e644] [cursor=pointer]:
+                  - /url: /?compare=true
+              - listitem [ref=e645]:
+                - link "Student Loan Calculator" [ref=e646] [cursor=pointer]:
+                  - /url: /?focus=studentloans
+            - paragraph [ref=e647]: Understanding the Scottish vs English tax difference helps you make informed decisions about career, location, and financial planning. While the headlines focus on higher Scottish tax rates, the reality depends entirely on your income level and personal circumstances.
+          - generic [ref=e650]:
+            - generic [ref=e651]:
+              - heading "Found this helpful?" [level=3] [ref=e652]
+              - paragraph [ref=e653]: Try our free UK tax calculator to see how much you'll take home.
+            - link "Calculate Your Tax" [ref=e654] [cursor=pointer]:
+              - /url: /
+              - text: Calculate Your Tax
+              - img [ref=e655] [cursor=pointer]
+        - link "Back to All Posts" [ref=e658] [cursor=pointer]:
+          - /url: /blog
+          - img [ref=e659] [cursor=pointer]
+          - text: Back to All Posts
+    - contentinfo [ref=e661]:
+      - generic [ref=e664]:
+        - generic [ref=e665]:
+          - generic [ref=e666]:
+            - generic [ref=e667]:
+              - img [ref=e669]
+              - generic [ref=e672]: ToolHubX
+            - paragraph [ref=e673]: Professional UK tax calculations using official HMRC rates.
+            - generic [ref=e674]:
+              - generic [ref=e675]: Built with
+              - img [ref=e676]
+              - generic [ref=e678]: for UK taxpayers
+          - generic [ref=e679]:
+            - heading "Product" [level=3] [ref=e680]
+            - list [ref=e681]:
+              - listitem [ref=e682]:
+                - link "Tax Calculator" [ref=e683] [cursor=pointer]:
+                  - /url: /
+                  - img [ref=e685] [cursor=pointer]
+                  - generic [ref=e687] [cursor=pointer]: Tax Calculator
+              - listitem [ref=e688]:
+                - link "Blog" [ref=e689] [cursor=pointer]:
+                  - /url: /blog
+                  - img [ref=e691] [cursor=pointer]
+                  - generic [ref=e694] [cursor=pointer]: Blog
+              - listitem [ref=e695]:
+                - link "About" [ref=e696] [cursor=pointer]:
+                  - /url: /about
+                  - img [ref=e698] [cursor=pointer]
+                  - generic [ref=e701] [cursor=pointer]: About
+          - generic [ref=e702]:
+            - heading "Legal" [level=3] [ref=e703]
+            - list [ref=e704]:
+              - listitem [ref=e705]:
+                - link "Privacy Policy" [ref=e706] [cursor=pointer]:
+                  - /url: /privacy
+                  - img [ref=e708] [cursor=pointer]
+                  - generic [ref=e710] [cursor=pointer]: Privacy Policy
+          - generic [ref=e711]:
+            - heading "Support" [level=3] [ref=e712]
+            - list [ref=e713]:
+              - listitem [ref=e714]:
+                - link "Contact Us" [ref=e715] [cursor=pointer]:
+                  - /url: /feedback
+                  - img [ref=e717] [cursor=pointer]
+                  - generic [ref=e719] [cursor=pointer]: Contact Us
+              - listitem [ref=e720]:
+                - link "Send email to support" [ref=e721] [cursor=pointer]:
+                  - /url: mailto:support@toolhubx.uk?subject=ToolHubX%20Tax%20Calculator%20-%20Support%20Request
+                  - img [ref=e723] [cursor=pointer]
+                  - generic [ref=e726] [cursor=pointer]: Email Us
+        - generic [ref=e728]:
+          - generic [ref=e729]: © 2025 ToolHubX. All rights reserved.
+          - generic [ref=e730]: Tax calculations for guidance only. Uses official HMRC rates. Not financial advice.
+    - button "View sustainability information" [ref=e732]:
+      - img [ref=e733]
+      - generic [ref=e736]: Carbon Neutral
+  - button "Open Next.js Dev Tools" [ref=e742] [cursor=pointer]:
+    - img [ref=e743] [cursor=pointer]
+  - alert [ref=e746]
+```

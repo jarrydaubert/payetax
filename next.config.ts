@@ -2,7 +2,8 @@
 import type { NextConfig } from 'next';
 // FIXED: Import webpack directly for plugins
 import webpack from 'webpack';
-import { withSentryConfig } from '@sentry/nextjs';
+
+// Sentry removed as requested
 
 // Bundle analyzer setup
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -12,8 +13,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig: NextConfig = {
   // Enhanced React 19 dev warnings and best practices
   reactStrictMode: true,
-  
+
   // Enable React 19 features and optimizations
+  // Enable typed routes for better type safety (Next.js 15.5+)
+  typedRoutes: true,
+
   experimental: {
     // Optimize specific package imports for better tree-shaking
     optimizePackageImports: [
@@ -23,18 +27,20 @@ const nextConfig: NextConfig = {
       'react-hook-form',
       'zod',
       'react-markdown',
-      '@mdx-js/react'
+      '@mdx-js/react',
     ],
     // Enable for memory-intensive builds (recommended for large apps)
     webpackMemoryOptimizations: true,
+    // Enable instrumentation hook for monitoring (Next.js experimental)
+    // instrumentationHook: true, // Temporarily disabled - may not be available in current Next.js version
   },
 
   // Turbopack configuration (stable for dev, alpha for prod)
   // Note: Custom webpack plugins may not apply in Turbopack prod (alpha)
   turbopack: {
     rules: {
-      '*.svg': ['@svgr/webpack']
-    }
+      '*.svg': ['@svgr/webpack'],
+    },
   },
 
   // Compiler optimizations
@@ -102,7 +108,7 @@ const nextConfig: NextConfig = {
       // FIXED: Proper IgnorePlugin usage to exclude esprima from bundle
       config.plugins.push(
         new webpack.IgnorePlugin({
-          resourceRegExp: /^esprima$/
+          resourceRegExp: /^esprima$/,
         })
       );
     }
@@ -110,7 +116,7 @@ const nextConfig: NextConfig = {
     // Optimize imports with path aliases
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': require('path').resolve('./src'),
+      '@': require('node:path').resolve('./src'),
     };
 
     return config;
@@ -139,6 +145,19 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://bmac-cdn.nyc3.digitaloceanspaces.com;",
+          },
         ],
       },
       {
@@ -165,26 +184,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Sentry configuration options
-const sentryWebpackPluginOptions = {
-  // Automatically tree-shake Sentry logger statements
-  silent: true,
-  org: "toolhubx",
-  project: "toolhubx-tax-calculator",
-  // Auth tokens can be found at https://sentry.io/settings/account/api/auth-tokens/
-  // and needs to be set as SENTRY_AUTH_TOKEN environment variable
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  // Upload source maps in production for better error tracking
-  widenClientFileUpload: true,
-  // Automatically clean up source maps after upload
-  hideSourceMaps: true,
-  // Disable sentry CLI telemetry in CI/CD
-  disableServerWebpackPlugin: process.env.CI === 'true',
-  tunnelRoute: "/monitoring",
-};
-
-// Export with Sentry and bundle analyzer wrappers
-export default withSentryConfig(
-  withBundleAnalyzer(nextConfig),
-  sentryWebpackPluginOptions
-);
+// Export with bundle analyzer only (Sentry removed)
+export default withBundleAnalyzer(nextConfig);

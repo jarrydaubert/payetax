@@ -1,9 +1,7 @@
 // Enhanced Service Worker Registration for ToolHubX PWA
 // Includes update notifications and offline capabilities
 
-(function() {
-  'use strict';
-
+(() => {
   // Check if service workers are supported
   if (!('serviceWorker' in navigator)) {
     console.log('[PWA] Service Worker not supported');
@@ -17,32 +15,34 @@
   window.addEventListener('load', async () => {
     try {
       registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
+        scope: '/',
       });
-      
+
       console.log('[PWA] Service Worker registered successfully');
-      
+
       // Listen for updates
       registration.addEventListener('updatefound', handleUpdate);
-      
+
       // Check for updates periodically (every hour when page is visible)
       if (document.visibilityState === 'visible') {
-        setInterval(() => {
-          if (document.visibilityState === 'visible') {
-            registration.update();
-          }
-        }, 60 * 60 * 1000); // 1 hour
+        setInterval(
+          () => {
+            if (document.visibilityState === 'visible') {
+              registration.update();
+            }
+          },
+          60 * 60 * 1000
+        ); // 1 hour
       }
 
       // Handle messages from service worker
       navigator.serviceWorker.addEventListener('message', handleSWMessage);
-      
+
       // Request notification permission for future features
       if ('Notification' in window && Notification.permission === 'default') {
         // Don't request immediately, wait for user interaction
         document.addEventListener('click', requestNotificationPermission, { once: true });
       }
-
     } catch (error) {
       console.error('[PWA] Service Worker registration failed:', error);
     }
@@ -137,7 +137,7 @@
     if (!registration || !registration.waiting) return;
 
     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-    
+
     // Prevent multiple refreshes
     if (isRefreshing) return;
     isRefreshing = true;
@@ -153,7 +153,7 @@
   // Handle messages from service worker
   function handleSWMessage(event) {
     const { data } = event;
-    
+
     if (data?.type === 'VERSION_INFO') {
       console.log('[PWA] Service Worker version:', data.version);
     }
@@ -162,7 +162,7 @@
   // Request notification permission (for future features)
   async function requestNotificationPermission() {
     if (!('Notification' in window)) return;
-    
+
     try {
       const permission = await Notification.requestPermission();
       console.log('[PWA] Notification permission:', permission);
@@ -215,12 +215,12 @@
   }
 
   // Install prompt handling
-  let deferredPrompt;
+  let _deferredPrompt;
 
   window.addEventListener('beforeinstallprompt', (e) => {
     console.log('[PWA] Install prompt triggered');
     e.preventDefault();
-    deferredPrompt = e;
+    _deferredPrompt = e;
     showInstallPrompt();
   });
 
@@ -228,7 +228,7 @@
   function showInstallPrompt() {
     // For now, just log. Can be enhanced with custom UI
     console.log('[PWA] App can be installed');
-    
+
     // Could show a custom install banner here
     // Example: createInstallBanner();
   }
@@ -236,15 +236,14 @@
   // Handle app installation
   window.addEventListener('appinstalled', () => {
     console.log('[PWA] App was installed');
-    deferredPrompt = null;
-    
+    _deferredPrompt = null;
+
     // Track installation for analytics
     if (typeof gtag !== 'undefined') {
       gtag('event', 'pwa_install', {
         event_category: 'PWA',
-        event_label: 'App Installed'
+        event_label: 'App Installed',
       });
     }
   });
-
 })();

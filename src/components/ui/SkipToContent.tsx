@@ -23,19 +23,19 @@ import { cn } from '@/lib/utils';
 export const SkipToContent: React.FC = (): React.ReactElement => {
   return (
     <Link
-      href="#main-content"
+      href='#calculator'
       className={cn(
         // Visually hidden by default
         'sr-only',
         // Becomes visible and positioned when focused
-        'focus:not-sr-only focus:absolute focus:top-0 focus:left-0 z-50',
+        'z-50 focus:not-sr-only focus:absolute focus:top-0 focus:left-0',
         // Styling when focused
-        'focus:p-3 focus:bg-white dark:focus:bg-gray-800 focus:text-blue-600 dark:focus:text-blue-400',
+        'focus:bg-white focus:p-3 focus:text-blue-600 dark:focus:bg-gray-800 dark:focus:text-blue-400',
         'focus:outline-none focus:ring-2 focus:ring-blue-500',
         // Transition for smooth appearance
         'transition-colors duration-200'
       )}
-      aria-label="Skip to main content"
+      aria-label='Skip to main content'
     >
       Skip to main content
     </Link>

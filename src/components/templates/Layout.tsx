@@ -2,30 +2,31 @@
 'use client';
 
 import type React from 'react';
-import { Suspense } from 'react';
-import SimpleNavbar from '@/components/molecules/SimpleNavbar';
+import { Suspense, useId } from 'react';
 import Footer from '@/components/molecules/Footer';
+import SimpleNavbar from '@/components/molecules/SimpleNavbar';
 import CookieBanner from '@/components/ui/CookieBanner';
 import SustainabilityBadge from '@/components/ui/SustainabilityBadge';
 
 interface LayoutProps {
   children: React.ReactNode;
-  showScrollTop?: boolean;
 }
 
-export function Layout({ children, showScrollTop = true }: LayoutProps): React.ReactElement {
+export function Layout({ children }: LayoutProps): React.ReactElement {
+  const mainContentId = useId();
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className='flex min-h-screen flex-col'>
       {/* Skip to main content for screen readers */}
-      <a href="#main-content" className="skip-link">
+      <a href={`#${mainContentId}`} className='skip-link'>
         Skip to main content
       </a>
-      
+
       {/* Navigation - Fixed at top */}
       <SimpleNavbar />
-      
+
       {/* Main content with proper spacing for fixed navbar */}
-      <main id="main-content" className="relative flex-1">
+      <main id={mainContentId} className='relative flex-1'>
         {children}
       </main>
 

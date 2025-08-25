@@ -1,20 +1,11 @@
 // src/components/molecules/TaxResultsDisplay.tsx
 'use client';
 
-import React from 'react';
-import { 
-  PoundSterling, 
-  TrendingUp, 
-  Percent,
-  Calculator,
-  PieChart,
-  Download
-} from 'lucide-react';
+import { Calculator, PieChart } from 'lucide-react';
+import ExportActions from '@/components/molecules/ExportActions';
+import { downloadCSV, type ExportData, generateCSV } from '@/lib/exportUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
-import Button from '@/components/ui/Button';
-import ExportActions from '@/components/molecules/ExportActions';
-import { generateCSV, downloadCSV, type ExportData } from '@/lib/exportUtils';
 
 interface TaxResultsDisplayProps {
   results: TaxCalculationResults | null;
@@ -26,19 +17,18 @@ interface TaxResultsDisplayProps {
   className?: string;
 }
 
-export default function TaxResultsDisplay({ 
-  results, 
+export default function TaxResultsDisplay({
+  results,
   salary,
   taxYear,
   taxCode,
   isScottish,
   studentLoanPlans,
-  className = '' 
+  className = '',
 }: TaxResultsDisplayProps) {
-  
   const handleExport = async (format: 'csv' | 'pdf') => {
     if (!results) return;
-    
+
     const exportData: ExportData = {
       results,
       salary,
@@ -48,7 +38,7 @@ export default function TaxResultsDisplay({
       studentLoans: studentLoanPlans || [],
       exportDate: new Date().toLocaleDateString('en-GB'),
     };
-    
+
     try {
       if (format === 'csv') {
         const csvContent = generateCSV(exportData);
@@ -56,48 +46,50 @@ export default function TaxResultsDisplay({
         downloadCSV(csvContent, filename);
       } else if (format === 'pdf') {
         // Dynamically import PDF generation to keep it out of the main bundle
-        const { generatePDF } = await import(/* webpackChunkName: "pdf-export" */ '@/lib/pdfExport');
+        const { generatePDF } = await import(
+          /* webpackChunkName: "pdf-export" */ '@/lib/pdfExport'
+        );
         await generatePDF(exportData);
       }
     } catch (error) {
       console.error(`${format.toUpperCase()} export failed:`, error);
     }
   };
-  
+
   // Early return if no results - but make it educational and helpful
   if (!results) {
     return (
-      <div className="glass-card">
-        <div className="text-center py-6">
-          <Calculator className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">UK Tax Calculator</h3>
-          <p className="text-white/70 mb-4 text-sm">
+      <div className='glass-card'>
+        <div className='py-6 text-center'>
+          <Calculator className='mx-auto mb-4 h-12 w-12 text-purple-400' />
+          <h3 className='mb-2 font-semibold text-lg text-white'>UK Tax Calculator</h3>
+          <p className='mb-4 text-sm text-white/70'>
             Enter your salary to see a detailed breakdown of:
           </p>
-          <div className="space-y-2 text-left max-w-xs mx-auto">
-            <div className="flex items-center gap-2 text-sm text-white/60">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className='mx-auto max-w-xs space-y-2 text-left'>
+            <div className='flex items-center gap-2 text-sm text-white/60'>
+              <div className='h-2 w-2 rounded-full bg-green-500'></div>
               <span>Take-home pay (after tax)</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-white/60">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            <div className='flex items-center gap-2 text-sm text-white/60'>
+              <div className='h-2 w-2 rounded-full bg-red-500'></div>
               <span>Income tax breakdown</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-white/60">
-              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+            <div className='flex items-center gap-2 text-sm text-white/60'>
+              <div className='h-2 w-2 rounded-full bg-orange-500'></div>
               <span>National Insurance</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-white/60">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <div className='flex items-center gap-2 text-sm text-white/60'>
+              <div className='h-2 w-2 rounded-full bg-blue-500'></div>
               <span>Student loan repayments</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-white/60">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+            <div className='flex items-center gap-2 text-sm text-white/60'>
+              <div className='h-2 w-2 rounded-full bg-purple-500'></div>
               <span>Pension contributions</span>
             </div>
           </div>
-          <div className="mt-6 p-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-lg border border-purple-400/20">
-            <p className="text-xs text-white/70">
+          <div className='mt-6 rounded-lg border border-purple-400/20 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 p-4'>
+            <p className='text-white/70 text-xs'>
               💡 <strong>Tip:</strong> Try entering £30,000 to see a typical UK salary breakdown
             </p>
           </div>
@@ -160,104 +152,140 @@ export default function TaxResultsDisplay({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Results Header */}
-      <div className="glass-card">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white flex items-center">
-            <PieChart className="h-4 w-4 text-purple-400 mr-2" />
+      <div className='glass-card'>
+        <div className='mb-3 flex items-center justify-between'>
+          <h3 className='flex items-center font-semibold text-lg text-white'>
+            <PieChart className='mr-2 h-4 w-4 text-purple-400' />
             Results
           </h3>
           <ExportActions
             onPrint={() => handleExport('pdf')}
             onDownload={() => handleExport('csv')}
-            className="flex gap-2"
+            className='flex gap-2'
           />
         </div>
 
         {/* Key Metrics Summary - Compact */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30">
-            <div className="text-xs text-purple-300 mb-1">Take Home</div>
-            <div className="text-lg font-bold text-white">{formatCurrency(netAnnual)}</div>
+        <div className='mb-4 grid grid-cols-3 gap-3'>
+          <div className='rounded-lg border border-purple-400/30 bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-3 text-center'>
+            <div className='mb-1 text-purple-300 text-xs'>Take Home</div>
+            <div className='font-bold text-lg text-white'>{formatCurrency(netAnnual)}</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30">
-            <div className="text-xs text-cyan-300 mb-1">Tax Rate</div>
-            <div className="text-lg font-bold text-white">{effectiveRate.toFixed(1)}%</div>
+          <div className='rounded-lg border border-cyan-400/30 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 p-3 text-center'>
+            <div className='mb-1 text-cyan-300 text-xs'>Tax Rate</div>
+            <div className='font-bold text-lg text-white'>{effectiveRate.toFixed(1)}%</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-400/30">
-            <div className="text-xs text-emerald-300 mb-1">Monthly</div>
-            <div className="text-lg font-bold text-white">{formatCurrency(netMonthly)}</div>
+          <div className='rounded-lg border border-emerald-400/30 bg-gradient-to-br from-emerald-500/20 to-green-500/20 p-3 text-center'>
+            <div className='mb-1 text-emerald-300 text-xs'>Monthly</div>
+            <div className='font-bold text-lg text-white'>{formatCurrency(netMonthly)}</div>
           </div>
         </div>
 
         {/* Professional Results Table */}
-        <div className="overflow-hidden rounded-lg border border-purple-400/30">
-          <table className="w-full text-sm">
+        <div className='overflow-hidden rounded-lg border border-purple-400/30'>
+          <table className='w-full text-sm'>
             <thead>
-              <tr className="bg-gradient-to-r from-purple-600/30 to-cyan-600/30 border-b border-purple-400/20">
-                <th className="text-left p-3 font-medium text-white">Description</th>
-                <th className="text-right p-3 font-medium text-white">Annual</th>
-                <th className="text-right p-3 font-medium text-white">Monthly</th>
-                <th className="text-right p-3 font-medium text-white">Weekly</th>
+              <tr className='border-purple-400/20 border-b bg-gradient-to-r from-purple-600/30 to-cyan-600/30'>
+                <th className='p-3 text-left font-medium text-white'>Description</th>
+                <th className='p-3 text-right font-medium text-white'>Annual</th>
+                <th className='p-3 text-right font-medium text-white'>Monthly</th>
+                <th className='p-3 text-right font-medium text-white'>Weekly</th>
               </tr>
             </thead>
-            <tbody className="glass">
-              <tr className="border-b border-white/10">
-                <td className="p-3 text-white/90 font-medium">Gross Salary</td>
-                <td className="p-3 text-right text-white font-mono">{formatCurrency(results.grossSalary.annually)}</td>
-                <td className="p-3 text-right text-white font-mono">{formatCurrency(results.grossSalary.monthly)}</td>
-                <td className="p-3 text-right text-white font-mono">{formatCurrency(results.grossSalary.weekly)}</td>
+            <tbody className='glass'>
+              <tr className='border-white/10 border-b'>
+                <td className='p-3 font-medium text-white/90'>Gross Salary</td>
+                <td className='p-3 text-right font-mono text-white'>
+                  {formatCurrency(results.grossSalary.annually)}
+                </td>
+                <td className='p-3 text-right font-mono text-white'>
+                  {formatCurrency(results.grossSalary.monthly)}
+                </td>
+                <td className='p-3 text-right font-mono text-white'>
+                  {formatCurrency(results.grossSalary.weekly)}
+                </td>
               </tr>
-              
-              <tr className="border-b border-white/10">
-                <td className="p-3 text-red-300">Income Tax ({incomeTaxRate.toFixed(1)}%)</td>
-                <td className="p-3 text-right text-red-300 font-mono">-{formatCurrency(results.incomeTax.annually)}</td>
-                <td className="p-3 text-right text-red-300 font-mono">-{formatCurrency(results.incomeTax.monthly)}</td>
-                <td className="p-3 text-right text-red-300 font-mono">-{formatCurrency(results.incomeTax.weekly)}</td>
+
+              <tr className='border-white/10 border-b'>
+                <td className='p-3 text-red-300'>Income Tax ({incomeTaxRate.toFixed(1)}%)</td>
+                <td className='p-3 text-right font-mono text-red-300'>
+                  -{formatCurrency(results.incomeTax.annually)}
+                </td>
+                <td className='p-3 text-right font-mono text-red-300'>
+                  -{formatCurrency(results.incomeTax.monthly)}
+                </td>
+                <td className='p-3 text-right font-mono text-red-300'>
+                  -{formatCurrency(results.incomeTax.weekly)}
+                </td>
               </tr>
-              
-              <tr className="border-b border-white/10">
-                <td className="p-3 text-orange-300">National Insurance ({niRate.toFixed(1)}%)</td>
-                <td className="p-3 text-right text-orange-300 font-mono">-{formatCurrency(results.nationalInsurance.annually)}</td>
-                <td className="p-3 text-right text-orange-300 font-mono">-{formatCurrency(results.nationalInsurance.monthly)}</td>
-                <td className="p-3 text-right text-orange-300 font-mono">-{formatCurrency(results.nationalInsurance.weekly)}</td>
+
+              <tr className='border-white/10 border-b'>
+                <td className='p-3 text-orange-300'>National Insurance ({niRate.toFixed(1)}%)</td>
+                <td className='p-3 text-right font-mono text-orange-300'>
+                  -{formatCurrency(results.nationalInsurance.annually)}
+                </td>
+                <td className='p-3 text-right font-mono text-orange-300'>
+                  -{formatCurrency(results.nationalInsurance.monthly)}
+                </td>
+                <td className='p-3 text-right font-mono text-orange-300'>
+                  -{formatCurrency(results.nationalInsurance.weekly)}
+                </td>
               </tr>
-              
+
               {results.pensionContribution.annually > 0 && (
-                <tr className="border-b border-white/10">
-                  <td className="p-3 text-blue-300">Pension Contribution</td>
-                  <td className="p-3 text-right text-blue-300 font-mono">-{formatCurrency(results.pensionContribution.annually)}</td>
-                  <td className="p-3 text-right text-blue-300 font-mono">-{formatCurrency(results.pensionContribution.monthly)}</td>
-                  <td className="p-3 text-right text-blue-300 font-mono">-{formatCurrency(results.pensionContribution.weekly)}</td>
+                <tr className='border-white/10 border-b'>
+                  <td className='p-3 text-blue-300'>Pension Contribution</td>
+                  <td className='p-3 text-right font-mono text-blue-300'>
+                    -{formatCurrency(results.pensionContribution.annually)}
+                  </td>
+                  <td className='p-3 text-right font-mono text-blue-300'>
+                    -{formatCurrency(results.pensionContribution.monthly)}
+                  </td>
+                  <td className='p-3 text-right font-mono text-blue-300'>
+                    -{formatCurrency(results.pensionContribution.weekly)}
+                  </td>
                 </tr>
               )}
-              
+
               {results.studentLoan.annually > 0 && (
-                <tr className="border-b border-white/10">
-                  <td className="p-3 text-purple-300">Student Loan</td>
-                  <td className="p-3 text-right text-purple-300 font-mono">-{formatCurrency(results.studentLoan.annually)}</td>
-                  <td className="p-3 text-right text-purple-300 font-mono">-{formatCurrency(results.studentLoan.monthly)}</td>
-                  <td className="p-3 text-right text-purple-300 font-mono">-{formatCurrency(results.studentLoan.weekly)}</td>
+                <tr className='border-white/10 border-b'>
+                  <td className='p-3 text-purple-300'>Student Loan</td>
+                  <td className='p-3 text-right font-mono text-purple-300'>
+                    -{formatCurrency(results.studentLoan.annually)}
+                  </td>
+                  <td className='p-3 text-right font-mono text-purple-300'>
+                    -{formatCurrency(results.studentLoan.monthly)}
+                  </td>
+                  <td className='p-3 text-right font-mono text-purple-300'>
+                    -{formatCurrency(results.studentLoan.weekly)}
+                  </td>
                 </tr>
               )}
-              
-              <tr className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-t-2 border-emerald-400/50">
-                <td className="p-3 text-emerald-300 font-bold">Net Take-Home Pay</td>
-                <td className="p-3 text-right text-emerald-300 font-bold font-mono">{formatCurrency(results.netPay.annually)}</td>
-                <td className="p-3 text-right text-emerald-300 font-bold font-mono">{formatCurrency(results.netPay.monthly)}</td>
-                <td className="p-3 text-right text-emerald-300 font-bold font-mono">{formatCurrency(results.netPay.weekly)}</td>
+
+              <tr className='border-emerald-400/50 border-t-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20'>
+                <td className='p-3 font-bold text-emerald-300'>Net Take-Home Pay</td>
+                <td className='p-3 text-right font-bold font-mono text-emerald-300'>
+                  {formatCurrency(results.netPay.annually)}
+                </td>
+                <td className='p-3 text-right font-bold font-mono text-emerald-300'>
+                  {formatCurrency(results.netPay.monthly)}
+                </td>
+                <td className='p-3 text-right font-bold font-mono text-emerald-300'>
+                  {formatCurrency(results.netPay.weekly)}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
         {/* Visual Breakdown Bar */}
-        <div className="mt-4">
-          <div className="text-xs text-white/70 mb-2">Salary Breakdown</div>
-          <div className="w-full h-4 bg-slate-700 rounded-full overflow-hidden flex">
-            {breakdownData.map((item, index) => (
+        <div className='mt-4'>
+          <div className='mb-2 text-white/70 text-xs'>Salary Breakdown</div>
+          <div className='flex h-4 w-full overflow-hidden rounded-full bg-slate-700'>
+            {breakdownData.map((item) => (
               <div
-                key={index}
-                className={`${item.color.replace('bg-', 'bg-gradient-to-r from-').replace('-500', '-400 to-').concat('-600')} h-full flex items-center justify-center text-xs font-medium text-white`}
+                key={item.label}
+                className={`${item.color.replace('bg-', 'from- bg-gradient-to-r').replace('-500', '-400 to-').concat('-600')} flex h-full items-center justify-center font-medium text-white text-xs`}
                 style={{ width: `${item.percentage}%` }}
                 title={`${item.label}: ${formatCurrency(item.amount)} (${item.percentage.toFixed(1)}%)`}
               >
@@ -265,11 +293,11 @@ export default function TaxResultsDisplay({
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {breakdownData.map((item, index) => (
-              <div key={index} className="flex items-center text-xs">
-                <div className={`w-2 h-2 ${item.color} rounded-full mr-1`} />
-                <span className="text-white/80">{item.label}</span>
+          <div className='mt-2 flex flex-wrap gap-2'>
+            {breakdownData.map((item) => (
+              <div key={item.label} className='flex items-center text-xs'>
+                <div className={`h-2 w-2 ${item.color} mr-1 rounded-full`} />
+                <span className='text-white/80'>{item.label}</span>
               </div>
             ))}
           </div>

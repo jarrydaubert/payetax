@@ -1,7 +1,7 @@
 // src/components/atoms/TaxCodeInput.tsx
 /**
  * Enhanced Tax Code Input with robust validation and formatting
- * 
+ *
  * FEATURES:
  * ✅ Auto-uppercase conversion (lowercase → UPPERCASE)
  * ✅ Format validation (1257L, S1257L, etc.)
@@ -92,22 +92,22 @@ function validateTaxCode(input: string): {
 
   // Normalize: trim and uppercase
   const normalized = input.trim().toUpperCase();
-  
+
   // Check if Scottish (starts with S)
   const isScottish = normalized.startsWith('S');
   const codeWithoutS = isScottish ? normalized.substring(1) : normalized;
-  
+
   // Validate pattern
   const isStandardValid = TAX_CODE_PATTERNS.STANDARD.test(normalized);
   const isScottishValid = isScottish && TAX_CODE_PATTERNS.SCOTTISH.test(normalized);
   const isValid = isStandardValid || isScottishValid;
-  
+
   // Check if emergency code
   const isEmergency = TAX_CODE_PATTERNS.EMERGENCY.test(codeWithoutS);
-  
+
   // Extract suffix for information
-  const suffix = codeWithoutS.match(/[LMNPTY]$/)?.[0] || 
-                 codeWithoutS.match(/^(BR|D[01]|0T|NT)$/)?.[0] || '';
+  const suffix =
+    codeWithoutS.match(/[LMNPTY]$/)?.[0] || codeWithoutS.match(/^(BR|D[01]|0T|NT)$/)?.[0] || '';
 
   if (!isValid) {
     // Return default based on Scottish preference
@@ -141,29 +141,32 @@ const TaxCodeInput: React.FC<TaxCodeInputProps> = ({
   className,
   id,
   disabled = false,
-  placeholder = '1257L',
+  placeholder = '',
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [validationState, setValidationState] = useState(() => validateTaxCode(value));
   const [isFocused, setIsFocused] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [_showTooltip, _setShowTooltip] = useState(false);
 
   // Handle input change with real-time validation
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      setInputValue(newValue);
 
-    // Validate and format
-    const validation = validateTaxCode(newValue);
-    setValidationState(validation);
+      // Validate and format
+      const validation = validateTaxCode(newValue);
+      setValidationState(validation);
 
-    // Always call onChange with normalized value
-    onChange(validation.normalizedCode, validation.isScottish);
-    
-    if (onScottishChange) {
-      onScottishChange(validation.isScottish);
-    }
-  }, [onChange, onScottishChange]);
+      // Always call onChange with normalized value
+      onChange(validation.normalizedCode, validation.isScottish);
+
+      if (onScottishChange) {
+        onScottishChange(validation.isScottish);
+      }
+    },
+    [onChange, onScottishChange]
+  );
 
   // Handle blur - apply final formatting
   const handleBlur = useCallback(() => {
@@ -187,7 +190,7 @@ const TaxCodeInput: React.FC<TaxCodeInputProps> = ({
   // Get validation styling
   const getValidationStyle = () => {
     if (!inputValue.trim()) return '';
-    
+
     if (validationState.isValid) {
       return 'border-green-300 dark:border-green-600 focus:ring-green-500/50';
     } else {
@@ -202,12 +205,12 @@ const TaxCodeInput: React.FC<TaxCodeInputProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className='relative'>
       {/* Input Field */}
-      <div className="relative">
+      <div className='relative'>
         <input
           id={id}
-          type="text"
+          type='text'
           value={inputValue}
           onChange={handleInputChange}
           onFocus={handleFocus}
@@ -217,68 +220,71 @@ const TaxCodeInput: React.FC<TaxCodeInputProps> = ({
           className={cn(
             'glass-input w-full pr-10',
             getValidationStyle(),
-            disabled && 'opacity-50 cursor-not-allowed',
+            disabled && 'cursor-not-allowed opacity-50',
             className
           )}
           aria-invalid={!validationState.isValid}
           aria-describedby={`${id}-validation ${id}-help`}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="characters"
+          autoComplete='off'
+          autoCorrect='off'
+          autoCapitalize='characters'
           spellCheck={false}
         />
 
         {/* Validation Icon */}
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          {inputValue.trim() && (
-            <>
-              {validationState.isValid ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-red-500" />
-              )}
-            </>
-          )}
+        <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3'>
+          {inputValue.trim() &&
+            (validationState.isValid ? (
+              <CheckCircle className='h-5 w-5 text-green-500' />
+            ) : (
+              <AlertCircle className='h-5 w-5 text-red-500' />
+            ))}
         </div>
 
         {/* Scottish Indicator */}
         {validationState.isScottish && validationState.isValid && (
-          <div className="absolute -top-2 left-3 px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full border border-blue-200 dark:border-blue-800">
+          <div className='-top-2 absolute left-3 rounded-full border border-blue-200 bg-blue-100 px-2 py-0.5 font-medium text-blue-700 text-xs dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-300'>
             Scottish
           </div>
         )}
       </div>
 
       {/* Validation Message */}
-      <div id={`${id}-validation`} className="mt-1 min-h-[1.25rem]">
+      <div id={`${id}-validation`} className='mt-1 min-h-[1.25rem]'>
         {validationState.message && (
-          <div className={cn(
-            'text-xs flex items-center gap-1',
-            validationState.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-          )}>
-            <Info className="h-3 w-3 flex-shrink-0" />
+          <div
+            className={cn(
+              'flex items-center gap-1 text-xs',
+              validationState.isValid
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-red-600 dark:text-red-400'
+            )}
+          >
+            <Info className='h-3 w-3 flex-shrink-0' />
             {validationState.message}
           </div>
         )}
       </div>
 
       {/* Help Text */}
-      <div id={`${id}-help`} className="mt-1">
+      <div id={`${id}-help`} className='mt-1'>
         {getSuffixInfo() && validationState.isValid && (
-          <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
-            <Info className="h-3 w-3 flex-shrink-0" />
-            <span>{validationState.suffix}: {getSuffixInfo()}</span>
+          <div className='flex items-center gap-1 text-gray-600 text-xs dark:text-gray-400'>
+            <Info className='h-3 w-3 flex-shrink-0' />
+            <span>
+              {validationState.suffix}: {getSuffixInfo()}
+            </span>
           </div>
         )}
       </div>
 
       {/* Interactive Tooltip for Emergency Codes */}
       {validationState.isEmergency && validationState.isValid && (
-        <div className="mt-2 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-          <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-orange-700 dark:text-orange-300">
-              <strong>Emergency Tax Code:</strong> This code may result in higher tax deductions. 
+        <div className='mt-2 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20'>
+          <div className='flex items-start gap-2'>
+            <AlertCircle className='mt-0.5 h-4 w-4 flex-shrink-0 text-orange-600 dark:text-orange-400' />
+            <div className='text-orange-700 text-xs dark:text-orange-300'>
+              <strong>Emergency Tax Code:</strong> This code may result in higher tax deductions.
               Contact HMRC or your employer to get your correct tax code.
             </div>
           </div>
@@ -287,10 +293,10 @@ const TaxCodeInput: React.FC<TaxCodeInputProps> = ({
 
       {/* Examples Helper (shown on focus when empty) */}
       {isFocused && !inputValue.trim() && (
-        <div className="absolute z-10 mt-1 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-full">
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            <div className="font-medium mb-2">Common tax codes:</div>
-            <div className="grid grid-cols-2 gap-1">
+        <div className='absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800'>
+          <div className='text-gray-600 text-xs dark:text-gray-400'>
+            <div className='mb-2 font-medium'>Common tax codes:</div>
+            <div className='grid grid-cols-2 gap-1'>
               <div>1257L - Standard</div>
               <div>S1257L - Scottish</div>
               <div>1257M - Marriage allowance</div>

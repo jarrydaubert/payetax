@@ -4,13 +4,16 @@
 
 import { Cookie } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+import '@/types/gtag';
 import Button from '@/components/ui/Button';
-import { cn } from '@/lib/utils';
 import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
+import { cn } from '@/lib/utils';
 
 const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     try {
@@ -18,10 +21,10 @@ const CookieBanner: React.FC = () => {
       if (typeof window === 'undefined' || !window.localStorage) {
         return;
       }
-      
+
       const consent = getCookieConsent();
       const expired = isConsentExpired();
-      
+
       // Show banner if no consent has been given or if consent has expired
       if (consent === null || expired) {
         if (expired) {
@@ -45,20 +48,20 @@ const CookieBanner: React.FC = () => {
         localStorage.setItem('cookie-consent', 'accepted');
         localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
       }
-      
+
       setShowBanner(false);
-      
+
       // Update Google Analytics consent if available
-      if (typeof window !== 'undefined' && 'gtag' in window) {
+      if (typeof window !== 'undefined' && window.gtag) {
         try {
-          (window as any).gtag('consent', 'update', {
+          window.gtag('consent', 'update', {
             analytics_storage: 'granted',
           });
         } catch (gtagError) {
           console.warn('Failed to update gtag consent:', gtagError);
         }
       }
-      
+
       console.info('Cookie consent: Accepted');
     } catch (error) {
       console.error('Failed to accept cookies:', error);
@@ -74,20 +77,20 @@ const CookieBanner: React.FC = () => {
         localStorage.setItem('cookie-consent', 'declined');
         localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
       }
-      
+
       setShowBanner(false);
-      
+
       // Update Google Analytics consent if available
-      if (typeof window !== 'undefined' && 'gtag' in window) {
+      if (typeof window !== 'undefined' && window.gtag) {
         try {
-          (window as any).gtag('consent', 'update', {
+          window.gtag('consent', 'update', {
             analytics_storage: 'denied',
           });
         } catch (gtagError) {
           console.warn('Failed to update gtag consent:', gtagError);
         }
       }
-      
+
       console.info('Cookie consent: Declined');
     } catch (error) {
       console.error('Failed to decline cookies:', error);
@@ -99,49 +102,49 @@ const CookieBanner: React.FC = () => {
   if (!showBanner) return null;
 
   return (
-    <div 
+    <div
       className={cn(
-        'fixed bottom-4 right-4 z-50 max-w-sm',
+        'fixed right-4 bottom-4 z-50 max-w-sm',
         'glass-card border border-border/50',
-        'animate-in slide-in-from-bottom-8 duration-500'
+        'slide-in-from-bottom-8 animate-in duration-500'
       )}
-      role="dialog"
-      aria-labelledby="cookie-title"
-      aria-describedby="cookie-description"
+      role='dialog'
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
     >
-      <div className="p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <Cookie className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+      <div className='p-4'>
+        <div className='mb-3 flex items-start gap-3'>
+          <Cookie className='mt-0.5 h-5 w-5 flex-shrink-0 text-primary' />
           <div>
-            <h3 id="cookie-title" className="font-medium text-sm text-foreground mb-1">
+            <h3 id={titleId} className='mb-1 font-medium text-foreground text-sm'>
               We use cookies
             </h3>
-            <p id="cookie-description" className="text-xs text-foreground/80 leading-relaxed">
+            <p id={descriptionId} className='text-foreground/80 text-xs leading-relaxed'>
               We use cookies to analyze traffic and improve your experience.{' '}
-              <Link 
-                href="/privacy" 
-                className="text-primary hover:text-primary/80 underline underline-offset-2"
+              <Link
+                href='/privacy'
+                className='text-primary underline underline-offset-2 hover:text-primary/80'
               >
                 Learn more
               </Link>
             </p>
           </div>
         </div>
-        
-        <div className="flex gap-2">
+
+        <div className='flex gap-2'>
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={declineCookies}
-            className="text-xs px-3 py-1.5 flex-1"
+            className='flex-1 px-3 py-1.5 text-xs'
           >
             Decline
           </Button>
           <Button
-            variant="primary"
-            size="sm"
+            variant='primary'
+            size='sm'
             onClick={acceptCookies}
-            className="text-xs px-3 py-1.5 flex-1"
+            className='flex-1 px-3 py-1.5 text-xs'
           >
             Accept
           </Button>

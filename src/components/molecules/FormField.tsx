@@ -33,23 +33,23 @@ const FormField: React.FC<FormFieldProps> = ({
   return (
     <div className={cn('mb-5', className)}>
       {/* Label with required indicator and tooltip */}
-      <div className="flex justify-between items-baseline mb-1.5">
+      <div className='mb-1.5 flex items-baseline justify-between'>
         <label
           htmlFor={id}
           className={cn(
-            'block text-sm font-medium flex items-center',
+            'block flex items-center font-medium text-sm',
             error ? 'text-destructive' : 'text-foreground'
           )}
         >
           {label}
-          {required && showRequired && <span className="text-destructive ml-1 text-xs">*</span>}
+          {required && showRequired && <span className='ml-1 text-destructive text-xs'>*</span>}
 
           {tooltip && (
-            <div className="relative ml-1.5">
+            <div className='relative ml-1.5'>
               <button
-                type="button"
-                aria-label="Show more information"
-                className="text-foreground/50 hover:text-foreground/80 focus:outline-none focus:text-foreground transition-colors"
+                type='button'
+                aria-label='Show more information'
+                className='text-foreground/50 transition-colors hover:text-foreground/80 focus:text-foreground focus:outline-none'
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onClick={() => setShowTooltip(!showTooltip)}
@@ -58,7 +58,7 @@ const FormField: React.FC<FormFieldProps> = ({
               </button>
 
               {showTooltip && (
-                <div className="absolute z-50 left-0 top-full mt-1 w-64 p-3 text-xs bg-glass backdrop-blur-glass rounded-md shadow-glass animate-fade-in">
+                <div className='absolute top-full left-0 z-50 mt-1 w-64 animate-fade-in rounded-md bg-glass p-3 text-xs shadow-glass backdrop-blur-glass'>
                   {tooltip}
                 </div>
               )}
@@ -68,7 +68,7 @@ const FormField: React.FC<FormFieldProps> = ({
       </div>
 
       {/* Description text */}
-      {description && !error && <p className="mb-1.5 text-xs text-foreground/70">{description}</p>}
+      {description && !error && <p className='mb-1.5 text-foreground/70 text-xs'>{description}</p>}
 
       {/* Input wrapper with error styling */}
       <div
@@ -82,8 +82,8 @@ const FormField: React.FC<FormFieldProps> = ({
 
       {/* Error message */}
       {error && (
-        <p className="mt-2 text-xs text-destructive flex items-center animate-fade-in">
-          <AlertCircle size={12} className="mr-1 flex-shrink-0" />
+        <p className='mt-2 flex animate-fade-in items-center text-destructive text-xs'>
+          <AlertCircle size={12} className='mr-1 flex-shrink-0' />
           <span>{error}</span>
         </p>
       )}

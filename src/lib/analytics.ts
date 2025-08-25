@@ -7,14 +7,21 @@
  */
 
 // Types for analytics events
-export type SEOActionType = 'external_link' | 'download' | 'share' | 'print' | 'scroll_to_top' | 'navigation' | 'form_interaction';
+export type SEOActionType =
+  | 'external_link'
+  | 'download'
+  | 'share'
+  | 'print'
+  | 'scroll_to_top'
+  | 'navigation'
+  | 'form_interaction';
 
 export interface AnalyticsEvent {
   action: string;
   category?: string;
   label?: string;
   value?: number;
-  custom_data?: Record<string, any>;
+  custom_data?: Record<string, unknown>;
 }
 
 export interface SEOAnalyticsData {
@@ -24,12 +31,12 @@ export interface SEOAnalyticsData {
   page_path?: string;
   user_agent?: string;
   timestamp?: string;
-  destination?: string; // Added this property
+  destination?: string;
 }
 
 /**
  * Track SEO-related actions for analytics
- * 
+ *
  * @param action - The type of SEO action being tracked
  * @param data - Additional data about the action
  */
@@ -49,8 +56,8 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as any).gtag('event', action, {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', action, {
         event_category: 'seo_actions',
         event_label: data.source || 'unknown',
         custom_parameters: enhancedData,
@@ -59,7 +66,6 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 
     // Track with other analytics providers here
     // Example: Mixpanel, Amplitude, etc.
-    
   } catch (error) {
     console.warn('Analytics tracking error:', error);
   }
@@ -67,7 +73,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 
 /**
  * Track general analytics events
- * 
+ *
  * @param event - The analytics event to track
  */
 export function trackEvent(event: AnalyticsEvent): void {
@@ -77,8 +83,8 @@ export function trackEvent(event: AnalyticsEvent): void {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as any).gtag('event', event.action, {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', event.action, {
         event_category: event.category || 'general',
         event_label: event.label,
         value: event.value,
@@ -110,14 +116,11 @@ export function trackCalculatorEvent(
 
 /**
  * Track calculator usage
- * 
+ *
  * @param calculation_type - Type of calculation performed
  * @param salary_range - Salary range for analytics segmentation
  */
-export function trackCalculatorUsage(
-  calculation_type: string,
-  salary_range?: string
-): void {
+export function trackCalculatorUsage(calculation_type: string, salary_range?: string): void {
   trackEvent({
     action: 'calculator_usage',
     category: 'engagement',
@@ -131,7 +134,7 @@ export function trackCalculatorUsage(
 
 /**
  * Track page views
- * 
+ *
  * @param page_path - The path of the page being viewed
  * @param page_title - The title of the page
  */
@@ -142,8 +145,8 @@ export function trackPageView(page_path: string, page_title?: string): void {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as any).gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
         page_path,
         page_title,
       });
@@ -155,16 +158,12 @@ export function trackPageView(page_path: string, page_title?: string): void {
 
 /**
  * Track form interactions
- * 
+ *
  * @param form_name - Name of the form
  * @param action - The action taken (submit, focus, etc.)
  * @param field_name - Optional field name for field-specific tracking
  */
-export function trackFormInteraction(
-  form_name: string, 
-  action: string, 
-  field_name?: string
-): void {
+export function trackFormInteraction(form_name: string, action: string, field_name?: string): void {
   trackSEOAction('form_interaction', {
     source: form_name,
     action_type: action,
@@ -174,7 +173,7 @@ export function trackFormInteraction(
 
 /**
  * Track performance metrics
- * 
+ *
  * @param metric_name - Name of the performance metric
  * @param value - The measured value
  * @param unit - The unit of measurement
@@ -201,12 +200,20 @@ if (typeof window !== 'undefined') {
   // Track initial page load performance
   window.addEventListener('load', () => {
     if ('performance' in window) {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
+
       if (navigation) {
         trackPerformanceMetric('page_load_time', navigation.loadEventEnd - navigation.fetchStart);
-        trackPerformanceMetric('dom_content_loaded', navigation.domContentLoadedEventEnd - navigation.fetchStart);
-        trackPerformanceMetric('first_contentful_paint', navigation.loadEventEnd - navigation.fetchStart);
+        trackPerformanceMetric(
+          'dom_content_loaded',
+          navigation.domContentLoadedEventEnd - navigation.fetchStart
+        );
+        trackPerformanceMetric(
+          'first_contentful_paint',
+          navigation.loadEventEnd - navigation.fetchStart
+        );
       }
     }
   });

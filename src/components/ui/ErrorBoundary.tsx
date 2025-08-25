@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import * as Sentry from '@sentry/nextjs';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+// Sentry removed as requested
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import React from 'react';
 
 interface Props {
   children: React.ReactNode;
@@ -41,24 +41,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Capture the error with Sentry
-    Sentry.withScope((scope) => {
-      scope.setTag('errorBoundary', true);
-      scope.setLevel('error');
-      scope.setContext('componentStack', {
-        componentStack: errorInfo.componentStack,
-      });
-      
-      // Add additional context for tax calculator errors
-      scope.setContext('taxCalculator', {
-        timestamp: new Date().toISOString(),
-        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
-        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      });
-      
-      const eventId = Sentry.captureException(error);
-      this.setState({ eventId });
-    });
+    // Log error for debugging (Sentry removed)
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Generate a simple error ID for tracking
+    const eventId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    this.setState({ eventId });
   }
 
   resetError = () => {
@@ -87,56 +75,115 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
 function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <div className="max-w-md w-full mx-4">
-        <div className="glass-card text-center p-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 border border-red-400/30 mb-6">
-            <AlertTriangle className="h-8 w-8 text-red-400" />
+    <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
+      {/* Animated background */}
+      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900'>
+        <div className='absolute inset-0'>
+          {/* Floating error particles */}
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={`error-particle-${i}-${Math.random()}`}
+              className='absolute h-2 w-2 animate-pulse rounded-full bg-red-400 opacity-20'
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 4}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className='relative z-10 mx-4 w-full max-w-4xl'>
+        <div className='glass-card border border-red-400/20 p-8 text-center md:p-12'>
+          {/* Error icon with animation */}
+          <div className='relative mb-8 inline-block'>
+            <div className='mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-red-400/30 bg-red-500/20'>
+              <AlertTriangle className='h-10 w-10 animate-pulse text-red-400' />
+            </div>
+            <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20' />
           </div>
-          
-          <h1 className="text-2xl font-bold text-white mb-4">
-            Something went wrong
+
+          <h1 className='mb-6 font-bold text-3xl text-white md:text-4xl'>
+            Oops! Something Went Wrong
           </h1>
-          
-          <p className="text-white/80 mb-6">
-            We're sorry, but something unexpected happened while using the tax calculator. 
-            The error has been automatically reported and we'll work to fix it.
+
+          <p className='mx-auto mb-8 max-w-2xl text-gray-300 text-xl leading-relaxed'>
+            Don't worry - even the best tax calculators have their off days! We've automatically
+            logged this error and our team will investigate.
           </p>
-          
+
+          {/* What happened section */}
+          <div className='glass-card mb-8 border border-yellow-400/20 bg-yellow-500/5 p-6'>
+            <h3 className='mb-3 font-semibold text-lg text-yellow-300'>What can you do?</h3>
+            <ul className='mx-auto max-w-md space-y-2 text-left text-gray-300'>
+              <li>• Try refreshing the page or clicking "Try Again"</li>
+              <li>• Clear your browser cache and cookies</li>
+              <li>• Try using a different browser</li>
+              <li>• Contact us if the problem persists</li>
+            </ul>
+          </div>
+
           {eventId && (
-            <div className="text-xs text-white/60 mb-6 p-3 bg-black/20 rounded border border-white/10">
-              <strong>Error ID:</strong> {eventId}
+            <div className='mx-auto mb-8 max-w-md rounded-lg border border-white/10 bg-black/20 p-4 text-sm text-white/70'>
+              <strong className='text-white'>Error Reference:</strong>
+              <br />
+              <code className='break-all font-mono text-purple-300 text-xs'>{eventId}</code>
+              <p className='mt-2 text-white/50 text-xs'>Share this ID when reporting the issue</p>
             </div>
           )}
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+
+          {/* Action buttons */}
+          <div className='mb-8 flex flex-col justify-center gap-4 sm:flex-row'>
             <button
+              type='button'
               onClick={resetError}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+              className='inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-700'
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className='h-5 w-5' />
               Try Again
             </button>
-            
+
             <Link
-              href="/"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-colors duration-200 border border-white/20"
+              href='/'
+              className='inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-white/20'
             >
-              <Home className="h-4 w-4" />
+              <Home className='h-5 w-5' />
               Go Home
             </Link>
+
+            <Link
+              href='/feedback'
+              className='inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-purple-700'
+            >
+              <AlertTriangle className='h-5 w-5' />
+              Report Issue
+            </Link>
           </div>
-          
+
+          {/* Help text */}
+          <p className='mb-6 text-gray-500 text-sm'>
+            This error has been automatically logged with reference{' '}
+            {eventId ? `#${eventId.slice(-8)}` : 'N/A'}
+          </p>
+
+          {/* Development mode error details */}
           {process.env.NODE_ENV === 'development' && error && (
-            <details className="mt-6 text-left">
-              <summary className="text-white/60 cursor-pointer mb-2">
-                Developer Info (Dev Mode Only)
+            <details className='mx-auto max-w-4xl text-left'>
+              <summary className='mb-4 cursor-pointer font-semibold text-lg text-yellow-300 transition-colors hover:text-yellow-200'>
+                🔧 Developer Debug Info (Dev Mode Only)
               </summary>
-              <pre className="text-xs text-red-300 bg-black/20 p-3 rounded border border-red-400/20 overflow-auto max-h-48">
-                {error.message}
-                {'\n\n'}
-                {error.stack}
-              </pre>
+              <div className='glass-card border border-yellow-400/30 bg-yellow-500/5 p-4'>
+                <h4 className='mb-2 font-semibold text-yellow-300'>Error Message:</h4>
+                <p className='mb-4 font-mono text-red-300 text-sm'>{error.message}</p>
+
+                <h4 className='mb-2 font-semibold text-yellow-300'>Stack Trace:</h4>
+                <pre className='max-h-64 overflow-auto whitespace-pre-wrap rounded border border-red-400/20 bg-black/40 p-4 font-mono text-red-300 text-xs'>
+                  {error.stack}
+                </pre>
+              </div>
             </details>
           )}
         </div>

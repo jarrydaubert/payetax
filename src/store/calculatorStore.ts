@@ -2,9 +2,8 @@
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import * as Sentry from '@sentry/nextjs';
+// Sentry removed as requested
 import {
-  DEFAULT_TAX_CODE,
   type NICategory,
   type PayPeriod,
   PERIODS,
@@ -111,11 +110,11 @@ const currentYearRates = TAX_RATES[defaultTaxYear];
 
 // UK minimum wage (April 2024 - March 2025): £11.44 per hour
 // Full-time annual: £11.44 × 37.5 hours × 52 weeks = £22,308
-const MINIMUM_WAGE_ANNUAL = 22308;
+const _MINIMUM_WAGE_ANNUAL = 22308;
 
 // Default inputs
 const defaultInput: CalculatorInput = {
-  salary: MINIMUM_WAGE_ANNUAL,
+  salary: 0, // Empty by default - show as placeholder
   payPeriod: PERIODS.ANNUALLY,
   taxYear: defaultTaxYear,
   taxCode: '', // Empty by default - use standard allowance
@@ -195,60 +194,32 @@ export const useCalculatorStore = create<CalculatorState>()(
         calculate: () => {
           try {
             const { input } = get();
-            
+
             // Allow calculations with £0 salary for demonstration purposes
             if (input.salary < 0) {
               throw new Error('Salary cannot be negative');
             }
-            
-            // Add Sentry context for tax calculation
-            Sentry.addBreadcrumb({
-              category: 'tax-calculation',
-              message: 'Starting tax calculation',
-              level: 'info',
-              data: {
-                salary: input.salary,
-                taxYear: input.taxYear,
-                payPeriod: input.payPeriod,
-                isScottish: input.isScottish,
-                hasStudentLoan: input.studentLoanPlans.length > 0 && !input.studentLoanPlans.includes('none'),
-                hasPension: input.pensionContribution > 0,
-              },
+
+            // Log calculation start for debugging
+            console.log('Starting tax calculation:', {
+              salary: input.salary,
+              taxYear: input.taxYear,
+              payPeriod: input.payPeriod,
+              isScottish: input.isScottish,
             });
-            
+
             const results = calculateTax(input);
             set({ results });
-            
+
             // Log successful calculation
-            Sentry.addBreadcrumb({
-              category: 'tax-calculation',
-              message: 'Tax calculation completed successfully',
-              level: 'info',
-              data: {
-                netPay: results.netPay.annually,
-                incomeTax: results.incomeTax.annually,
-                nationalInsurance: results.nationalInsurance.annually,
-              },
+            console.log('Tax calculation completed:', {
+              netPay: results.netPay.annually,
+              incomeTax: results.incomeTax.annually,
             });
-            
           } catch (error) {
-            // Capture calculation errors with context
-            Sentry.withScope((scope) => {
-              const { input } = get();
-              scope.setTag('feature', 'tax-calculation');
-              scope.setLevel('error');
-              scope.setContext('calculationInput', {
-                salary: input.salary,
-                taxYear: input.taxYear,
-                payPeriod: input.payPeriod,
-                taxCode: input.taxCode,
-                isScottish: input.isScottish,
-                pensionContribution: input.pensionContribution,
-                studentLoanPlans: input.studentLoanPlans,
-              });
-              Sentry.captureException(error);
-            });
-            
+            // Log calculation errors for debugging
+            console.error('Tax calculation error:', error);
+
             // Reset results on error
             set({ results: null });
             throw error; // Re-throw to let UI handle it
@@ -258,7 +229,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const { input } = get();
 
           // Get previous tax year
-          const currentYear = Number.parseInt(input.taxYear.split('-')[0]);
+          const currentYear = Number.parseInt(input.taxYear.split('-')[0], 10);
           const previousYear = `${currentYear - 1}-${currentYear}` as TaxYear;
 
           // Only calculate if the previous year is a valid tax year

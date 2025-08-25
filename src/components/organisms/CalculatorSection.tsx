@@ -1,16 +1,15 @@
 // src/components/organisms/CalculatorSectionNew.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { RotateCcw, AlertTriangle } from 'lucide-react';
-import * as Sentry from '@sentry/nextjs';
-import Button from '@/components/ui/Button';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import SimpleExportButton from '@/components/molecules/SimpleExportButton';
+import EnhancedPayslipTable from '@/components/organisms/EnhancedPayslipTable';
 import StreamlinedTaxInputForm from '@/components/organisms/StreamlinedTaxInputForm';
-import PayslipSummaryTable from '@/components/organisms/PayslipSummaryTable';
-import ExportActions from '@/components/molecules/ExportActions';
-import { useCalculatorStore } from '@/store/calculatorStore';
+import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
-import type { TaxYear, PayPeriod } from '@/constants/taxRates';
+import { useCalculatorStore } from '@/store/calculatorStore';
 
 interface CalculatorSectionProps {
   className?: string;
@@ -35,7 +34,7 @@ interface PensionContribution {
 const CalculatorSection: React.FC<CalculatorSectionProps> = ({
   className,
   id = 'calculator',
-  isFullScreen = false
+  isFullScreen = false,
 }) => {
   // Local state for advanced options and error handling
   const [taxOptions, setTaxOptions] = useState<TaxOptions>({
@@ -45,16 +44,37 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
     noNationalInsurance: false,
     marriageAllowanceTransfer: 0,
   });
-  
+
   const [calculationError, setCalculationError] = useState<string | null>(null);
-  const [selectedResultsPeriods, setSelectedResultsPeriods] = useState<string[]>(['yearly', 'monthly', 'weekly']);
+  const [_selectedResultsPeriods, setSelectedResultsPeriods] = useState<string[]>([
+    'yearly',
+    'monthly',
+    'weekly',
+  ]);
+
+  // Export data state
+  const [exportPeriods, setExportPeriods] = useState<string[]>([
+    'Yearly',
+    'Monthly',
+    'Weekly',
+    'Daily',
+  ]);
+  const [exportPeriodOptions, setExportPeriodOptions] = useState<Record<string, number>>({
+    Yearly: 1,
+    Monthly: 12,
+    '4-Weekly': 13,
+    Fortnightly: 26,
+    Weekly: 52,
+    Daily: 260,
+    Hourly: 1950,
+  });
 
   const [pensionContribution, setPensionContribution] = useState<PensionContribution>({
     amount: 0,
     type: 'percentage',
     isBeforeTax: true,
   });
-  
+
   // Calculator store
   const {
     input,
@@ -67,7 +87,6 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
     setStudentLoanPlans,
     setPensionContribution: setStorePensionContribution,
     setPensionContributionType,
-    setNiCategory,
     setAdditionalAllowances,
     calculate,
     reset,
@@ -105,7 +124,7 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
     }
   };
 
-  const handleResultsPeriodsChange = (periods: string[]) => {
+  const _handleResultsPeriodsChange = (periods: string[]) => {
     setSelectedResultsPeriods(periods);
   };
 
@@ -121,17 +140,65 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
   const handleCalculate = async () => {
     try {
       setCalculationError(null);
+
+      // Comprehensive input validation - matching toolhubx-live
+      if (input.salary <= 0) {
+        setCalculationError('Please enter a salary greater than zero.');
+        return;
+      }
+
+      if (pensionContribution.amount < 0) {
+        setCalculationError('Pension contribution cannot be negative.');
+        return;
+      }
+
+      if (pensionContribution.type === 'percentage' && pensionContribution.amount > 100) {
+        setCalculationError('Pension percentage cannot exceed 100%.');
+        return;
+      }
+
+      if (input.hoursPerWeek <= 0 && input.payPeriod === 'hourly') {
+        setCalculationError('Hours per week must be positive for hourly calculations.');
+        return;
+      }
+
+      const totalAllowances = input.additionalAllowances.reduce(
+        (sum, allowance) => sum + allowance.amount,
+        0
+      );
+      if (totalAllowances < 0) {
+        setCalculationError('Allowances/Deductions cannot be negative.');
+        return;
+      }
+
+      // Additional validation for extreme values
+      if (input.salary > 100000000) {
+        // £100M cap
+        setCalculationError('Salary amount is too large for calculation.');
+        return;
+      }
+
+      if (pensionContribution.type === 'amount' && pensionContribution.amount > input.salary) {
+        setCalculationError('Pension contribution cannot exceed gross salary.');
+        return;
+      }
+
       calculate();
+
+      // Track calculation event with gtag
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag?.('event', 'calculate_tax', {
+          tool: 'uk-tax-calculator',
+          salary: input.salary,
+        });
+      }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred during calculation';
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred during calculation';
       setCalculationError(errorMessage);
-      
-      // Additional Sentry context for UI-triggered calculations
-      Sentry.addBreadcrumb({
-        category: 'user-action',
-        message: 'User clicked calculate button',
-        level: 'info',
-      });
+
+      // Debug logging for calculations
+      console.error('Calculation error:', errorMessage);
     }
   };
 
@@ -150,43 +217,34 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
       type: 'percentage',
       isBeforeTax: true,
     });
-    
-    Sentry.addBreadcrumb({
-      category: 'user-action',
-      message: 'User reset calculator',
-      level: 'info',
-    });
+
+    // Reset calculator to default state
+    console.log('Calculator reset by user');
   };
 
-
   return (
-    <section 
+    <section
       id={id}
       className={cn(
         'relative',
-        isFullScreen 
-          ? 'min-h-screen flex items-center pt-16 pb-4' // Full height minus navbar, small bottom padding for footer peek
+        isFullScreen
+          ? 'flex min-h-screen items-center pt-16 pb-4' // Full height minus navbar, small bottom padding for footer peek
           : 'py-8 lg:py-12',
         className
       )}
     >
-      <div className={cn(
-        'mx-auto px-4',
-        isFullScreen ? 'w-full max-w-none' : 'container'
-      )}>
-        <div className={cn(
-          'mx-auto',
-          isFullScreen ? 'max-w-7xl' : 'max-w-7xl'
-        )}>
-          <div className={cn(
-            'gap-6 items-start',
-            isFullScreen 
-              ? 'grid lg:grid-cols-[400px_1fr] xl:grid-cols-[450px_1fr] h-full' 
-              : 'grid lg:grid-cols-[400px_1fr] xl:grid-cols-[450px_1fr]'
-          )}>
-            
+      <div className={cn('mx-auto px-4', isFullScreen ? 'w-full max-w-7xl' : 'container')}>
+        <div className={cn('mx-auto', isFullScreen ? 'max-w-7xl' : 'max-w-6xl')}>
+          <div
+            className={cn(
+              'items-start gap-6',
+              isFullScreen
+                ? 'grid h-full lg:grid-cols-5 xl:grid-cols-5'
+                : 'grid lg:grid-cols-5 xl:grid-cols-5'
+            )}
+          >
             {/* Left Side - Input Form */}
-            <div className="space-y-3">
+            <div className='space-y-3 lg:col-span-2'>
               <StreamlinedTaxInputForm
                 salary={input.salary}
                 taxYear={input.taxYear}
@@ -194,7 +252,10 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
                 taxCode={input.taxCode || ''}
                 isScottish={input.isScottish || false}
                 studentLoanPlans={input.studentLoanPlans || []}
-                allowancesDeductions={input.additionalAllowances.reduce((sum, allowance) => sum + allowance.amount, 0)}
+                allowancesDeductions={input.additionalAllowances.reduce(
+                  (sum, allowance) => sum + allowance.amount,
+                  0
+                )}
                 taxOptions={taxOptions}
                 pensionContribution={pensionContribution}
                 onSalaryChange={handleSalaryChange}
@@ -219,13 +280,15 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
                   }
                 }}
                 onAllowancesDeductionsChange={(amount) => {
-                  setAdditionalAllowances([{ 
-                    type: 'other', 
-                    name: 'Additional Allowances',
-                    description: 'Additional allowances/deductions', 
-                    amount,
-                    period: input.payPeriod
-                  }]);
+                  setAdditionalAllowances([
+                    {
+                      type: 'other',
+                      name: 'Additional Allowances',
+                      description: 'Additional allowances/deductions',
+                      amount,
+                      period: input.payPeriod,
+                    },
+                  ]);
                   if (input.salary >= 0) {
                     setTimeout(() => calculate(), 100);
                   }
@@ -239,16 +302,15 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
                 onPensionChange={handlePensionChange}
               />
 
-
               {/* Error Display */}
               {calculationError && (
-                <div className="glass-card border border-red-400/30 bg-red-500/10">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+                <div className='glass-card border border-red-400/30 bg-red-500/10'>
+                  <div className='flex items-start gap-2'>
+                    <AlertTriangle className='mt-0.5 h-4 w-4 flex-shrink-0 text-red-400' />
                     <div>
-                      <h4 className="text-red-300 font-medium mb-1 text-sm">Calculation Error</h4>
-                      <p className="text-red-200 text-xs">{calculationError}</p>
-                      <p className="text-red-200/80 text-xs mt-1">
+                      <h4 className='mb-1 font-medium text-red-300 text-sm'>Calculation Error</h4>
+                      <p className='text-red-200 text-xs'>{calculationError}</p>
+                      <p className='mt-1 text-red-200/80 text-xs'>
                         Please check your inputs and try again.
                       </p>
                     </div>
@@ -257,21 +319,23 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
               )}
 
               {/* Action Buttons - Professional Sizing */}
-              <div className="glass-card">
-                <div className="flex gap-2">
+              <div className='glass-card'>
+                <div className='flex gap-2'>
                   <button
+                    type='button'
                     onClick={handleCalculate}
                     disabled={input.salary < 0}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 focus:ring-2 focus:ring-purple-500"
+                    className='flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-6 py-3 font-medium text-base text-white hover:from-purple-500 hover:to-cyan-500 focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
                   >
                     Calculate Tax
                   </button>
-                  
+
                   <button
+                    type='button'
                     onClick={handleReset}
-                    className="px-3 py-2 text-sm font-medium text-white/80 rounded-lg glass border border-purple-400/30 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-purple-500 flex items-center gap-1"
+                    className='glass flex items-center gap-1 rounded-lg border border-purple-400/30 px-4 py-3 font-medium text-base text-white/80 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-purple-500'
                   >
-                    <RotateCcw className="h-3 w-3" />
+                    <RotateCcw className='h-3 w-3' />
                     Reset
                   </button>
                 </div>
@@ -279,45 +343,37 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
             </div>
 
             {/* Right Side - Results */}
-            <div className="lg:sticky lg:top-24 space-y-3">
-              <PayslipSummaryTable
+            <div className='space-y-3 lg:sticky lg:top-24 lg:col-span-3'>
+              <EnhancedPayslipTable
                 results={results}
-                onPeriodsChange={handleResultsPeriodsChange}
+                allowancesDeductions={input.additionalAllowances
+                  .reduce((sum, allowance) => sum + allowance.amount, 0)
+                  .toString()}
+                studentLoans={input.studentLoanPlans}
+                isMarried={taxOptions.isMarried}
+                hoursPerWeek={input.hoursPerWeek?.toString() || '37.5'}
+                onPeriodsChange={(periods, periodOptions) => {
+                  setExportPeriods(periods);
+                  setExportPeriodOptions(periodOptions);
+                }}
               />
-              
-              {/* Export Actions - Below Results */}
+
+              {/* Export Button - Outside table container */}
               {results && (
-                <div className="glass-card">
-                  <ExportActions
-                    onPrint={async () => {
-                      try {
-                        const { generatePDF } = await import('@/lib/pdfExport');
-                        const exportData = {
-                          results,
-                          salary: input.salary,
-                          taxYear: input.taxYear,
-                          taxCode: input.taxCode || '1257L',
-                          region: input.isScottish ? 'Scotland' : 'England, Wales & Northern Ireland',
-                          studentLoans: input.studentLoanPlans || [],
-                          exportDate: new Date().toLocaleDateString('en-GB'),
-                        };
-                        await generatePDF(exportData);
-                      } catch (error) {
-                        console.error('PDF export failed:', error);
-                      }
-                    }}
-                    onDownload={() => {
-                      try {
-                        // CSV export implementation
-                        console.log('CSV export not yet implemented');
-                      } catch (error) {
-                        console.error('CSV export failed:', error);
-                      }
-                    }}
-                    className="flex gap-2 justify-center"
+                <div className='mt-3 flex justify-center'>
+                  <SimpleExportButton
+                    result={results}
+                    visiblePeriods={exportPeriods}
+                    periodOptions={exportPeriodOptions}
+                    taxYear={input.taxYear}
+                    allowancesDeductions={input.additionalAllowances
+                      .reduce((sum, allowance) => sum + allowance.amount, 0)
+                      .toString()}
+                    studentLoans={input.studentLoanPlans}
                   />
                 </div>
               )}
+              {/* Export functionality now integrated into EnhancedPayslipTable */}
             </div>
           </div>
         </div>

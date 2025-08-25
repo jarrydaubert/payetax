@@ -18,15 +18,15 @@ const HomePageClientWrapper = () => {
  * Enhanced metadata for the homepage with tax calculator
  */
 export const metadata: Metadata = generateMetadata({
-  title: 'UK PAYE Tax Calculator 2024-2025 | Free Take-Home Pay Calculator',
+  title: 'UK PAYE Tax Calculator 2025 | Free Take-Home Pay Calculator with HMRC Rates',
   description:
-    'Calculate your exact UK take-home pay after tax, National Insurance, student loan and pension deductions with our free PAYE calculator. Updated for 2024-2025 tax year.',
+    'Calculate your exact UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-2026. Includes Scottish tax rates, student loans, pension contributions and marriage allowance.',
   keywords:
-    'UK tax calculator, PAYE calculator, income tax calculator, take home pay calculator, salary calculator, net pay calculator, UK tax 2024-2025, tax year calculator',
+    'UK tax calculator 2025, PAYE calculator, income tax calculator, take home pay calculator, salary calculator, Scottish tax rates 2025, student loan calculator UK, pension tax relief calculator, marriage allowance calculator',
   pathname: '/',
 });
 
-// Tax calculator FAQ items for structured data
+// Enhanced Tax calculator FAQ items for structured data and AI discovery
 const TAX_FAQS = [
   {
     question: 'How is UK income tax calculated?',
@@ -54,6 +54,36 @@ const TAX_FAQS = [
       'Salary sacrifice pension contributions are deducted from your gross salary before tax and National Insurance are calculated. This reduces your taxable income, potentially lowering the amount of income tax and National Insurance you pay. This is more advantageous than relief at source pension contributions where only income tax (not NI) relief is provided.',
   },
   {
+    question: 'How does the marriage allowance affect UK tax calculations in 2025?',
+    answer:
+      'Marriage allowance allows you to transfer £1,260 of your personal allowance to your spouse or civil partner if you earn less than the personal allowance threshold (£12,570) and they are a basic rate taxpayer. This can save up to £252 per year in tax. You can backdate claims for up to 4 tax years and must apply through HMRC.',
+  },
+  {
+    question: 'What are the Scottish tax rates for 2024-2025?',
+    answer:
+      'Scottish taxpayers pay different income tax rates: 19% starter rate (£12,571-£14,876), 20% basic rate (£14,877-£26,561), 21% intermediate rate (£26,562-£43,662), 42% higher rate (£43,663-£75,000), 45% advanced rate (£75,001-£125,140), and 48% top rate (over £125,140). National Insurance rates remain the same across the UK.',
+  },
+  {
+    question: 'How do I calculate tax on bonus payments and overtime?',
+    answer:
+      'Bonus payments and overtime are taxed as regular income using your cumulative tax position. HMRC uses your tax code to calculate tax owed across the entire tax year. Large bonuses may push you into higher tax bands temporarily, but this evens out over the tax year through your regular payroll.',
+  },
+  {
+    question: 'What expenses can I claim to reduce my taxable income?',
+    answer:
+      'You can claim tax relief on work-related expenses including uniforms, professional subscriptions, home working costs (£6 per week or actual costs), travel between work sites, and tools/equipment. You cannot claim for normal commuting costs. Keep receipts and apply through HMRC or your Self Assessment.',
+  },
+  {
+    question: 'How does pension auto-enrolment affect my tax calculation?',
+    answer:
+      'Auto-enrolment requires employers to contribute minimum 3% of qualifying earnings (£6,240-£50,270 for 2024-25) with employees contributing at least 5%. Employee contributions reduce taxable income, providing immediate tax relief. Total minimum contribution is 8% including employer contribution.',
+  },
+  {
+    question: 'What happens if I have multiple jobs or income sources?',
+    answer:
+      'With multiple jobs, your personal allowance applies only to your main job (tax code 1257L). Secondary jobs typically use BR (20%) or D0 (40%) tax codes, taxing all income at those rates. You may need to complete a Self Assessment if total income exceeds certain thresholds or for complex tax situations.',
+  },
+  {
     question: 'How accurate is this tax calculator?',
     answer:
       'This calculator uses the latest tax rates and thresholds from HMRC and provides accurate estimates for most standard employment situations. However, it may not account for all individual circumstances or special tax rules. For complex situations or official tax calculations, always consult with a qualified tax professional or HMRC directly.',
@@ -66,20 +96,22 @@ const TAX_FAQS = [
 export default function HomePage() {
   return (
     <>
-      {/* Add structured data for SEO */}
-      <StructuredData type="organization" />
-      <StructuredData type="website" />
-      <StructuredData type="calculator" />
-      <StructuredData type="faq" faqs={TAX_FAQS} />
+      {/* Enhanced structured data for SEO and AI discovery */}
+      <StructuredData type='organization' />
+      <StructuredData type='website' />
+      <StructuredData type='calculator' />
+      <StructuredData type='financialservice' />
+      <StructuredData type='howto' />
+      <StructuredData type='faq' faqs={TAX_FAQS} />
 
       {/* Main content with Suspense for client components */}
-      <Suspense fallback={<div className="p-8 text-center">Loading calculator...</div>}>
+      <Suspense fallback={<div className='p-8 text-center'>Loading calculator...</div>}>
         <HomePageClientWrapper />
       </Suspense>
 
       {/* Add structured breadcrumbs */}
       <StructuredData
-        type="breadcrumb"
+        type='breadcrumb'
         breadcrumbs={[{ name: 'Home', url: 'https://toolhubx.uk/' }]}
       />
     </>

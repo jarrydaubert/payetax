@@ -104,17 +104,17 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
   if (showTabs) {
     return (
       <fieldset className={cn('flex flex-wrap gap-1', className)} aria-label={label}>
-        <legend className="sr-only">{label}</legend>
+        <legend className='sr-only'>{label}</legend>
         {DISPLAY_PERIODS.map((period) => (
           <button
             key={period.id}
-            type="button"
+            type='button'
             onClick={() => handlePeriodToggle(period.id)}
             className={cn(
-              'px-3 py-1.5 text-sm rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
+              'rounded-md px-3 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
               selectedPeriods.includes(period.id)
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-glass-deep hover:bg-glass text-foreground/80'
+                : 'bg-glass-deep text-foreground/80 hover:bg-glass'
             )}
             aria-pressed={selectedPeriods.includes(period.id)}
             aria-label={`${period.label} period`}
@@ -135,23 +135,23 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
             ref={buttonRef}
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
-              'inline-flex items-center px-3 py-2 rounded-md transition-colors',
+              'inline-flex items-center rounded-md px-3 py-2 transition-colors',
               'border border-glass bg-glass hover:bg-glass-deep',
-              'focus:outline-none focus:ring-2 focus:ring-ring text-sm font-medium',
+              'font-medium text-sm focus:outline-none focus:ring-2 focus:ring-ring',
               open && 'ring-2 ring-ring ring-offset-1'
             )}
             aria-label={`Select pay periods, currently: ${getVisiblePeriodsText()}`}
             aria-expanded={open}
-            aria-haspopup="true"
+            aria-haspopup='true'
           >
-            <Calendar className="h-4 w-4 mr-2 text-foreground/70" aria-hidden="true" />
-            <span className="max-w-[150px] truncate">{getVisiblePeriodsText()}</span>
+            <Calendar className='mr-2 h-4 w-4 text-foreground/70' aria-hidden='true' />
+            <span className='max-w-[150px] truncate'>{getVisiblePeriodsText()}</span>
             <ChevronDown
               className={cn(
                 'ml-2 h-4 w-4 text-foreground/70 transition-transform duration-200',
-                open && 'transform rotate-180'
+                open && 'rotate-180 transform'
               )}
-              aria-hidden="true"
+              aria-hidden='true'
             />
           </Popover.Button>
 
@@ -159,53 +159,55 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
             <div
               ref={popoverRef}
               className={cn(
-                'fixed md:absolute right-0 mt-2 w-56 rounded-md shadow-glass',
-                'bg-glass border border-glass animate-fade-in origin-top-right',
-                'z-super popover-dropdown' // Use our utility classes
+                'fixed right-0 mt-2 w-56 rounded-md shadow-glass md:absolute',
+                'origin-top-right animate-fade-in border border-glass bg-glass',
+                'popover-dropdown z-super' // Use our utility classes
               )}
               style={{
                 top: '100%',
                 zIndex: 9999, // Inline style for maximum specificity
               }}
             >
-              <div className="py-1 divide-y divide-glass">
-                <div className="px-3 py-2">
-                  <h3 className="text-sm font-medium text-foreground">{label}</h3>
-                  <p className="text-xs text-foreground/70 mt-1">
+              <div className='divide-y divide-glass py-1'>
+                <div className='px-3 py-2'>
+                  <h3 className='font-medium text-foreground text-sm'>{label}</h3>
+                  <p className='mt-1 text-foreground/70 text-xs'>
                     Select which pay periods to display in results
                   </p>
                 </div>
 
-                <ul className="py-1" aria-multiselectable="true">
+                <div className='py-1' role='listbox' aria-multiselectable='true'>
                   {DISPLAY_PERIODS.map((period) => (
-                    <li
+                    <div
                       key={period.id}
-                      className="px-2"
+                      className='px-2'
+                      role='option'
                       aria-selected={selectedPeriods.includes(period.id)}
+                      tabIndex={-1}
                     >
                       <button
-                        type="button"
+                        type='button'
                         className={cn(
-                          'w-full text-left px-2 py-2 text-sm flex items-center justify-between rounded-md',
-                          'hover:bg-glass-deep transition-colors',
-                          'focus:outline-none focus:bg-glass-deep'
+                          'flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm',
+                          'transition-colors hover:bg-glass-deep',
+                          'focus:bg-glass-deep focus:outline-none'
                         )}
                         onClick={() => handlePeriodToggle(period.id)}
                       >
-                        <div className="flex flex-col">
-                          <span className="font-medium">{period.label}</span>
-                          <span className="text-xs text-foreground/70">{period.description}</span>
+                        <div className='flex flex-col'>
+                          <span className='font-medium'>{period.label}</span>
+                          <span className='text-foreground/70 text-xs'>{period.description}</span>
                         </div>
                         {selectedPeriods.includes(period.id) && (
-                          <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                          <Check className='h-4 w-4 text-primary' aria-hidden='true' />
                         )}
                       </button>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
-                <div className="px-3 py-2 text-right">
-                  <span className="text-xs text-foreground/70">
+                <div className='px-3 py-2 text-right'>
+                  <span className='text-foreground/70 text-xs'>
                     {selectedPeriods.length} selected
                   </span>
                 </div>

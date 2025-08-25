@@ -3,7 +3,7 @@
  * A reusable content section component with consistent styling
  * Used across about, privacy, and feedback pages to provide
  * a consistent layout and visual hierarchy.
- * 
+ *
  * Updated to use CSS variables and glass morphism classes instead of inline styles
  */
 
@@ -53,7 +53,7 @@ interface ContentSectionProps {
 /**
  * ContentSection component provides consistent layout and styling
  * for content sections throughout the application.
- * 
+ *
  * Now uses CSS variables and glass morphism classes for consistency
  */
 const ContentSection: React.FC<ContentSectionProps> = ({
@@ -72,30 +72,21 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   return (
     <section
       id={id}
-      className={cn(
-        'mb-8',
-        glass ? 'glass-card' : '',
-        animationClass,
-        className
-      )}
+      className={cn('mb-8', glass ? 'glass-card' : '', animationClass, className)}
       aria-labelledby={title ? `${id || ''}-title` : undefined}
     >
       {/* Section header if title is provided */}
       {title && (
-        <div className="flex items-start mb-4">
+        <div className='mb-4 flex items-start'>
           {/* Optional icon using CSS variables for gradient colors */}
-          {icon && (
-            <div className="mr-3 flex-shrink-0 text-primary">
-              {icon}
-            </div>
-          )}
+          {icon && <div className='mr-3 flex-shrink-0 text-primary'>{icon}</div>}
 
           <div>
             {/* Title with proper heading level for accessibility */}
             <h2
               id={title ? `${id || ''}-title` : undefined}
               className={cn(
-                'text-subheading font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent',
+                'mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text font-bold text-subheading text-transparent',
                 titleClassName
               )}
             >
@@ -104,12 +95,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
 
             {/* Optional description */}
             {description && (
-              <p 
-                className={cn(
-                  'text-foreground/70 leading-relaxed',
-                  descriptionClassName
-                )}
-              >
+              <p className={cn('text-foreground/70 leading-relaxed', descriptionClassName)}>
                 {description}
               </p>
             )}
@@ -118,9 +104,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       )}
 
       {/* Content container */}
-      <div className={cn('space-y-4', contentClassName)}>
-        {children}
-      </div>
+      <div className={cn('space-y-4', contentClassName)}>{children}</div>
     </section>
   );
 };

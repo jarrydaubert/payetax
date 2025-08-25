@@ -117,28 +117,28 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
     <div className={cn('space-y-3', className)}>
       {/* Checkbox layout with modern styling and accessibility */}
       <fieldset
-        className="bg-glass backdrop-blur-glass-sm rounded-lg p-3 transition-all duration-200 border-glass shadow-glass-sm"
+        className='rounded-lg border-glass bg-glass p-3 shadow-glass-sm backdrop-blur-glass-sm transition-all duration-200'
         id={groupId}
         aria-describedby={showInfo ? infoId : undefined}
         disabled={disabled}
       >
-        <legend className="sr-only">Student Loan Plans</legend>
-        <div className="flex flex-wrap gap-3">
+        <legend className='sr-only'>Student Loan Plans</legend>
+        <div className='flex flex-wrap gap-3'>
           {STUDENT_LOAN_PLANS.map((plan) => {
             const checkboxId = `${groupId}-${plan.value}`;
             return (
-              <div key={plan.value} className="flex items-center">
-                <div className="relative">
+              <div key={plan.value} className='flex items-center'>
+                <div className='relative'>
                   <input
                     id={checkboxId}
                     name={`student-loan-${plan.value}`}
-                    type="checkbox"
+                    type='checkbox'
                     checked={selectedPlans.includes(plan.value)}
                     onChange={() => handlePlanChange(plan.value)}
                     disabled={disabled}
                     className={cn(
-                      'h-4 w-4 text-primary border-border rounded focus:ring-primary transition-colors',
-                      'opacity-0 absolute inset-0 z-10 cursor-pointer'
+                      'h-4 w-4 rounded border-border text-primary transition-colors focus:ring-primary',
+                      'absolute inset-0 z-10 cursor-pointer opacity-0'
                     )}
                     aria-describedby={showInfo ? infoId : undefined}
                   />
@@ -149,23 +149,23 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
                       // Better visibility in both light and dark modes
                       'border-gray-400 dark:border-glass',
                       selectedPlans.includes(plan.value)
-                        ? 'bg-primary border-primary'
+                        ? 'border-primary bg-primary'
                         : 'bg-white/90 dark:bg-glass-deep'
                     )}
-                    aria-hidden="true"
+                    aria-hidden='true'
                   >
                     {selectedPlans.includes(plan.value) && (
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3 mx-auto text-white"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='mx-auto h-3 w-3 text-white'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                        aria-hidden='true'
                       >
                         <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
+                          fillRule='evenodd'
+                          d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                          clipRule='evenodd'
                         />
                       </svg>
                     )}
@@ -174,10 +174,10 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
                 <label
                   htmlFor={checkboxId}
                   className={cn(
-                    'ml-2 text-sm whitespace-nowrap cursor-pointer',
+                    'ml-2 cursor-pointer whitespace-nowrap text-sm',
                     disabled
                       ? 'opacity-70'
-                      : 'hover:text-foreground transition-colors duration-200',
+                      : 'transition-colors duration-200 hover:text-foreground',
                     selectedPlans.includes(plan.value)
                       ? 'font-medium text-foreground'
                       : 'text-foreground/80'
@@ -192,29 +192,29 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
       </fieldset>
 
       {/* Information button and popup */}
-      <div className="relative">
+      <div className='relative'>
         <button
-          type="button"
+          type='button'
           id={infoButtonId}
           onClick={toggleInfo}
           className={cn(
-            'text-xs flex items-center transition-colors duration-200',
-            'focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2 rounded',
+            'flex items-center text-xs transition-colors duration-200',
+            'rounded focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2',
             showInfo ? 'text-primary' : 'text-foreground/70 hover:text-foreground'
           )}
           aria-expanded={showInfo}
           aria-controls={infoId}
-          aria-label="View student loan repayment thresholds"
+          aria-label='View student loan repayment thresholds'
         >
           <div
             className={cn(
-              'p-1.5 rounded-full mr-1.5 transition-colors duration-200',
+              'mr-1.5 rounded-full p-1.5 transition-colors duration-200',
               showInfo ? 'bg-primary/10' : 'bg-glass hover:bg-glass-deep'
             )}
           >
-            <Info className="h-3 w-3" aria-hidden="true" />
+            <Info className='h-3 w-3' aria-hidden='true' />
           </div>
-          <span className="hover:underline underline-offset-2">
+          <span className='underline-offset-2 hover:underline'>
             View student loan repayment thresholds
           </span>
         </button>
@@ -223,28 +223,28 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
           <section
             id={infoId}
             className={cn(
-              'mt-3 text-xs bg-glass backdrop-blur-glass-sm p-4 rounded-lg animate-fade-in absolute z-10 left-0 right-0',
+              'absolute right-0 left-0 z-10 mt-3 animate-fade-in rounded-lg bg-glass p-4 text-xs backdrop-blur-glass-sm',
               'border-glass shadow-glass'
             )}
-            aria-live="polite"
+            aria-live='polite'
           >
-            <h4 className="font-medium mb-3 text-foreground/90 border-b border-glass pb-2">
+            <h4 className='mb-3 border-glass border-b pb-2 font-medium text-foreground/90'>
               Student Loan Repayment Thresholds
             </h4>
-            <div className="space-y-2.5">
+            <div className='space-y-2.5'>
               {STUDENT_LOAN_PLANS.map((plan) => (
-                <div key={plan.value} className="flex justify-between items-center">
+                <div key={plan.value} className='flex items-center justify-between'>
                   <div>
-                    <span className="font-medium text-foreground">{plan.label}:</span>
-                    <span className="text-foreground/70 ml-1.5 text-xs">{plan.description}</span>
+                    <span className='font-medium text-foreground'>{plan.label}:</span>
+                    <span className='ml-1.5 text-foreground/70 text-xs'>{plan.description}</span>
                   </div>
-                  <span className="text-primary font-medium bg-glass-deep px-2 py-0.5 rounded-full text-right ml-2">
+                  <span className='ml-2 rounded-full bg-glass-deep px-2 py-0.5 text-right font-medium text-primary'>
                     {plan.threshold}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-foreground/70 bg-glass-deep p-2 rounded">
+            <p className='mt-3 rounded bg-glass-deep p-2 text-foreground/70'>
               You pay {STUDENT_LOAN_PLANS[0].rate} of income above these thresholds (
               {STUDENT_LOAN_PLANS[4].rate} for Postgraduate loans).
             </p>
@@ -254,13 +254,13 @@ const StudentLoanSelector: React.FC<StudentLoanSelectorProps> = ({
 
       {/* Selected plans summary - simplified design */}
       {selectedPlans.length > 0 && selectedPlans[0] !== 'none' && (
-        <div className="text-xs bg-glass-deep p-3 rounded-md text-foreground/80 relative overflow-hidden animate-fade-in">
+        <div className='relative animate-fade-in overflow-hidden rounded-md bg-glass-deep p-3 text-foreground/80 text-xs'>
           {/* Left accent border */}
           <div
-            className="absolute inset-y-0 left-0 w-1 bg-primary/20 rounded-l-md"
-            aria-hidden="true"
+            className='absolute inset-y-0 left-0 w-1 rounded-l-md bg-primary/20'
+            aria-hidden='true'
           />
-          <div className="pl-2">
+          <div className='pl-2'>
             {selectedPlans.length > 1 ? (
               <span>
                 You have selected <strong>{selectedPlans.length}</strong> student loan plans.
