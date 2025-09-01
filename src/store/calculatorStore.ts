@@ -1,4 +1,28 @@
 // src/store/calculatorStore.ts
+/**
+ * UK Tax Calculator - Zustand State Management Store
+ *
+ * This file implements the global state management for the UK Tax Calculator using Zustand.
+ * It handles all calculator inputs, results, and provides actions to update and calculate taxes.
+ *
+ * Features:
+ * - Persistent state across browser sessions
+ * - Redux DevTools integration for debugging
+ * - Type-safe actions and state
+ * - Centralized tax calculation logic
+ * - Default values and initialization
+ *
+ * The store follows a pattern where:
+ * - State contains current inputs and calculated results
+ * - Actions update individual properties and trigger recalculations
+ * - Complex business logic is delegated to dedicated calculation functions
+ *
+ * State Management Pattern:
+ * - Input changes update store immediately
+ * - Calculations are triggered manually via calculate() action
+ * - Results are cached in the store until inputs change
+ * - Persistence allows users to return to their previous calculation
+ */
 
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -15,18 +39,32 @@ import {
 } from '@/constants/taxRates';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 
-// Interface for tax calculator inputs
+/**
+ * Interface defining all inputs required for tax calculations
+ * These values are collected from the UI and passed to the calculation engine
+ */
 interface CalculatorInput {
+  /** Gross salary amount in the specified pay period */
   salary: number;
+  /** How often the salary is paid (annually, monthly, weekly, etc.) */
   payPeriod: PayPeriod;
+  /** Tax year to use for rates and thresholds */
   taxYear: TaxYear;
+  /** HMRC tax code (e.g., 1257L, S1257L) */
   taxCode: string;
+  /** Whether Scottish tax rates apply */
   isScottish: boolean;
+  /** Pension contribution amount */
   pensionContribution: number;
+  /** Whether pension contribution is a percentage or fixed amount */
   pensionContributionType: 'percentage' | 'amount';
+  /** Student loan plans that apply (can be multiple) */
   studentLoanPlans: StudentLoanPlan[];
+  /** National Insurance category (A, B, C, etc.) */
   niCategory: NICategory;
+  /** Hours worked per week (for hourly rate calculations) */
   hoursPerWeek: number;
+  /** Additional tax allowances like working from home */
   additionalAllowances: TaxAllowance[];
 }
 

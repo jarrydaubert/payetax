@@ -32,6 +32,7 @@ interface StreamlinedTaxInputFormProps {
   allowancesDeductions: number;
   taxOptions: TaxOptions;
   pensionContribution: PensionContribution;
+  hoursPerWeek?: number;
   onSalaryChange: (salary: number) => void;
   onTaxYearChange: (taxYear: TaxYear) => void;
   onPayPeriodChange: (payPeriod: PayPeriod) => void;
@@ -41,6 +42,7 @@ interface StreamlinedTaxInputFormProps {
   onAllowancesDeductionsChange: (amount: number) => void;
   onTaxOptionsChange: (options: TaxOptions) => void;
   onPensionChange: (pension: PensionContribution) => void;
+  onHoursPerWeekChange: (hours: number) => void;
 }
 
 export default function StreamlinedTaxInputForm({
@@ -53,6 +55,7 @@ export default function StreamlinedTaxInputForm({
   allowancesDeductions,
   taxOptions,
   pensionContribution,
+  hoursPerWeek = 37.5,
   onSalaryChange,
   onTaxYearChange,
   onPayPeriodChange,
@@ -62,6 +65,7 @@ export default function StreamlinedTaxInputForm({
   onAllowancesDeductionsChange,
   onTaxOptionsChange,
   onPensionChange,
+  onHoursPerWeekChange,
 }: StreamlinedTaxInputFormProps) {
   const salaryId = useId();
   const payPeriodId = useId();
@@ -265,6 +269,7 @@ export default function StreamlinedTaxInputForm({
             </label>
             <input
               id={salaryId}
+              data-testid='salary-input'
               type='text'
               value={formatSalaryDisplay(salary)}
               onChange={handleSalaryChange}
@@ -279,6 +284,7 @@ export default function StreamlinedTaxInputForm({
             </label>
             <select
               id={payPeriodId}
+              data-testid='pay-period-select'
               value={payPeriod}
               onChange={(e) => onPayPeriodChange(e.target.value as PayPeriod)}
               aria-label='Pay period for salary input'
@@ -288,9 +294,40 @@ export default function StreamlinedTaxInputForm({
               <option value='monthly'>Monthly</option>
               <option value='weekly'>Weekly</option>
               <option value='daily'>Daily</option>
+              <option value='hourly'>Hourly</option>
             </select>
           </div>
         </div>
+
+        {/* Hours Per Week - only show for hourly pay period */}
+        {payPeriod === 'hourly' && (
+          <div className='glass-card'>
+            <div className='mb-3 flex items-center'>
+              <span className='mr-2 text-purple-400'>⏰</span>
+              <h2 className='font-medium text-base text-white'>Working Hours</h2>
+            </div>
+            <div>
+              <label htmlFor={`${salaryId}-hours`} className='mb-1 block text-sm text-white'>
+                Hours per Week
+              </label>
+              <input
+                id={`${salaryId}-hours`}
+                type='number'
+                value={hoursPerWeek}
+                onChange={(e) => onHoursPerWeekChange(parseFloat(e.target.value) || 0)}
+                placeholder='37.5'
+                min='0'
+                max='168'
+                step='0.5'
+                aria-label='Hours worked per week'
+                className='glass w-full rounded border border-purple-400/30 px-3 py-2 text-sm text-white placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500'
+              />
+              <p className='mt-1 text-gray-400 text-xs'>
+                Standard full-time is 37.5 hours per week
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Tax Year and Region */}
         <div className='grid grid-cols-2 gap-2'>
@@ -425,6 +462,7 @@ export default function StreamlinedTaxInputForm({
             </label>
             <select
               id={pensionTypeId}
+              data-testid='pension-type-select'
               value={pensionContribution?.type || 'percentage'}
               onChange={(e) => handlePensionChange('type', e.target.value)}
               className='glass w-full rounded border border-purple-400/30 px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500'
@@ -439,6 +477,7 @@ export default function StreamlinedTaxInputForm({
             </label>
             <input
               id={pensionAmountId}
+              data-testid='pension-amount-input'
               type='text'
               value={pensionContribution?.amount || ''}
               onChange={(e) => handlePensionChange('amount', Number(e.target.value) || 0)}

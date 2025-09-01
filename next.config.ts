@@ -156,7 +156,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://bmac-cdn.nyc3.digitaloceanspaces.com;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://cdnjs.buymeacoffee.com; worker-src 'self'; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com;",
           },
         ],
       },

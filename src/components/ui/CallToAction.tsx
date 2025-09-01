@@ -2,13 +2,18 @@
 'use client';
 
 import { Calculator, Coffee, Mail, MessageSquare } from 'lucide-react';
+import type React from 'react';
+import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
   variant?: 'contact' | 'newsletter' | 'calculator';
   className?: string;
 }
 
-export default function CallToAction({ variant = 'contact', className = '' }: CallToActionProps) {
+export default function CallToAction({
+  variant = 'contact',
+  className = '',
+}: CallToActionProps): React.JSX.Element {
   const variants = {
     contact: {
       icon: MessageSquare,
@@ -65,7 +70,7 @@ export default function CallToAction({ variant = 'contact', className = '' }: Ca
   const SecondaryIcon = config.secondaryAction.icon;
 
   return (
-    <div className={`glass-card my-16 p-8 text-center md:p-12 ${className}`}>
+    <div className={cn('glass-card my-16 p-8 text-center md:p-12', className)}>
       <IconComponent className='mx-auto mb-6 h-12 w-12 text-blue-400' />
       <h2 className='mb-6 font-bold text-3xl text-white'>{config.title}</h2>
       <p className='mx-auto mb-8 max-w-2xl text-gray-300 text-xl leading-relaxed'>

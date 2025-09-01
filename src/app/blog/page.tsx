@@ -136,38 +136,44 @@ export default async function BlogPage({
           </div>
         </div>
 
-        {/* Categories Filter */}
+        {/* Categories Filter - Optimized Layout */}
         {categories.length > 0 && (
           <div className='mb-16'>
-            <h2 className='mb-8 text-center font-bold text-2xl text-white'>Browse by Topic</h2>
-            <div className='mx-auto flex max-w-6xl flex-wrap justify-center gap-2 lg:flex-nowrap lg:gap-3'>
-              <Link
-                href='/blog#categories'
-                className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
-                  !selectedCategory
-                    ? 'scale-105 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                    : 'glass-card border border-white/20 text-white/90 hover:scale-105'
-                }`}
-              >
-                <span>All Posts</span>
-                <span className='ml-1 text-xs opacity-75 lg:ml-2 lg:text-sm'>({totalCount})</span>
-              </Link>
-              {categories.map((category) => (
+            <h2 className='mb-6 text-center font-semibold text-white text-xl'>Browse by Topic</h2>
+            <div className='mx-auto max-w-full'>
+              <div className='flex flex-wrap justify-center gap-2 lg:gap-3'>
                 <Link
-                  key={category.slug}
-                  href={`/blog?category=${category.slug}#categories`}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
-                    selectedCategory === category.slug
-                      ? 'scale-105 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                      : 'glass-card border border-white/20 text-white/90 hover:scale-105'
+                  href='/blog#categories'
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-colors duration-200 lg:px-4 lg:py-2.5 lg:text-base ${
+                    !selectedCategory
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
+                      : 'glass-card border border-white/10 text-white/80 hover:border-white/20 hover:text-white'
                   }`}
                 >
-                  <span>{category.name}</span>
-                  <span className='ml-1 text-xs opacity-75 lg:ml-2 lg:text-sm'>
-                    ({category.count || 0})
+                  <span>All Posts</span>
+                  <span className='ml-1.5 text-xs opacity-70 lg:ml-2 lg:text-sm'>
+                    ({totalCount})
                   </span>
                 </Link>
-              ))}
+                {categories
+                  .filter((category) => (category.count || 0) > 0)
+                  .map((category) => (
+                    <Link
+                      key={category.slug}
+                      href={`/blog?category=${category.slug}#categories`}
+                      className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-colors duration-200 lg:px-4 lg:py-2.5 lg:text-base ${
+                        selectedCategory === category.slug
+                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
+                          : 'glass-card border border-white/10 text-white/80 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <span>{category.name}</span>
+                      <span className='ml-1.5 text-xs opacity-70 lg:ml-2 lg:text-sm'>
+                        ({category.count})
+                      </span>
+                    </Link>
+                  ))}
+              </div>
             </div>
           </div>
         )}
@@ -184,7 +190,7 @@ export default async function BlogPage({
             </div>
 
             <Link href={`/blog/${featuredPost.slug}`} className='group block'>
-              <div className='glass-card border-yellow-400 border-l-4 p-8 transition-transform duration-300 hover:scale-[1.02] md:p-12'>
+              <div className='glass-card border-yellow-400 border-l-4 p-8 transition-colors duration-200 hover:border-yellow-300 md:p-12'>
                 <div className='grid items-center gap-8 md:grid-cols-2'>
                   <div>
                     <div className='mb-6 flex items-center gap-4'>
@@ -233,7 +239,7 @@ export default async function BlogPage({
             <div className='mb-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
               {posts.map((post) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`} className='group block'>
-                  <article className='glass-card h-full transition-all duration-300 hover:scale-105'>
+                  <article className='glass-card h-full transition-colors duration-200 hover:border-white/30'>
                     {post.image && (
                       <div className='relative h-48 overflow-hidden rounded-t-xl'>
                         <Image
@@ -287,7 +293,7 @@ export default async function BlogPage({
                 {currentPage > 1 && (
                   <Link
                     href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
-                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-transform hover:scale-105'
+                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-colors duration-200 hover:border-white/30'
                   >
                     ← Previous
                   </Link>
@@ -304,7 +310,7 @@ export default async function BlogPage({
                 {currentPage < totalPages && (
                   <Link
                     href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
-                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-transform hover:scale-105'
+                    className='glass-card rounded-lg px-6 py-3 font-medium text-white transition-colors duration-200 hover:border-white/30'
                   >
                     Next →
                   </Link>

@@ -1,26 +1,66 @@
 // src/components/organisms/EnhancedPayslipTable.tsx
+/**
+ * Enhanced Payslip Table - Comprehensive Tax Breakdown Display
+ *
+ * This component displays tax calculation results in a professional payslip-style table.
+ * It provides a detailed breakdown of all deductions, allowances, and net pay across
+ * different pay periods with visual indicators and export functionality.
+ *
+ * Features:
+ * - Multi-period display (Annual, Monthly, Weekly, etc.)
+ * - Visual breakdown with icons and color coding
+ * - Tax band breakdown with progressive tax visualization
+ * - Student loan repayments and pension contributions
+ * - Export functionality integration
+ * - Responsive design for mobile and desktop
+ * - Professional payslip-style formatting
+ * - Accessibility compliance with ARIA attributes
+ *
+ * The component follows the atomic design pattern as an organism, combining
+ * multiple molecules and atoms to create a complete functional unit.
+ *
+ * Data Flow:
+ * - Receives calculation results from calculator engine
+ * - Processes data into table rows with formatting
+ * - Provides period selection and export callbacks
+ * - Handles responsive layout and mobile optimization
+ *
+ * Design System:
+ * - Uses glass-morphism styling for modern appearance
+ * - Consistent with ToolHubX visual identity
+ * - Icon system for visual recognition
+ * - Color coding for different types of entries
+ */
 'use client';
 
 import type React from 'react';
 import { useState } from 'react';
-import { getColorForCategory, getIconForCategory, TAX_TABLE_ICONS } from '@/lib/iconMapping';
+import { TAX_TABLE_ICONS } from '@/lib/iconMapping';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
-// Export moved outside table container
-
+/**
+ * Props for the EnhancedPayslipTable component
+ */
 interface EnhancedPayslipTableProps {
+  /** Tax calculation results to display, null during loading */
   results: TaxCalculationResults | null;
+  /** Additional allowances and deductions description */
   allowancesDeductions?: string;
+  /** Student loan plans applied to the calculation */
   studentLoans?: string[];
+  /** Whether the taxpayer is married (affects certain allowances) */
   isMarried?: boolean;
+  /** Hours worked per week for hourly rate calculations */
   hoursPerWeek?: string;
+  /** Additional CSS classes for styling */
   className?: string;
+  /** Callback when selected periods change for export purposes */
   onPeriodsChange?: (periods: string[], periodOptions: Record<string, number>) => void;
 }
 
 interface TableRow {
   category: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: string;
   annual: number;
   percentage: string;
   color: string;
@@ -37,13 +77,8 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
   className = '',
   onPeriodsChange,
 }) => {
-  // Period toggle state - exactly like toolhubx-live
-  const [visiblePeriods, setVisiblePeriods] = useState<string[]>([
-    'Yearly',
-    'Monthly',
-    'Weekly',
-    'Daily',
-  ]);
+  // Period toggle state - limited initially to prevent horizontal scrolling on desktop
+  const [visiblePeriods, setVisiblePeriods] = useState<string[]>(['Yearly', 'Monthly', 'Weekly']);
 
   // Period options - EXACT from toolhubx-live
   const periodOptions: Record<string, number> = {
@@ -72,7 +107,10 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
 
   if (!results) {
     return (
-      <div className={`overflow-x-auto rounded bg-gray-800 p-4 shadow-md ${className}`}>
+      <div
+        className={`overflow-x-auto rounded bg-gray-800 p-4 shadow-md ${className}`}
+        data-testid='tax-results'
+      >
         <h2 className='mb-4 font-semibold text-gray-100 text-lg md:text-xl'>
           <TAX_TABLE_ICONS.table className='mr-2 inline h-5 w-5 text-blue-500' />
           Tax Summary
@@ -100,50 +138,50 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
     // 1. Gross Pay
     {
       category: 'Gross Pay',
-      icon: getIconForCategory('Gross Pay'),
+      icon: 'fas fa-money-bill-wave',
       annual: grossAnnual,
       percentage: '100%',
-      color: getColorForCategory('Gross Pay'),
+      color: '',
       isHighlight: false,
     },
 
     // 2. Tax-Free Allowance
     {
       category: 'Tax-Free Allowance',
-      icon: getIconForCategory('Tax-Free Allowance'),
+      icon: 'fas fa-shield-alt',
       annual: taxFreeAllowance,
       percentage: calculatePercentage(taxFreeAllowance, grossAnnual),
-      color: getColorForCategory('Tax-Free Allowance'),
+      color: '',
       isHighlight: false,
     },
 
     // 3. Total Taxable
     {
       category: 'Total Taxable',
-      icon: getIconForCategory('Total Taxable'),
+      icon: 'fas fa-balance-scale',
       annual: taxableIncome,
       percentage: calculatePercentage(taxableIncome, grossAnnual),
-      color: getColorForCategory('Total Taxable'),
+      color: '',
       isHighlight: false,
     },
 
     // 4. Total Tax Due
     {
       category: 'Total Tax Due',
-      icon: getIconForCategory('Total Tax Due'),
+      icon: 'fas fa-hand-holding-usd',
       annual: results.incomeTax.annually,
       percentage: calculatePercentage(results.incomeTax.annually, grossAnnual),
-      color: getColorForCategory('Total Tax Due'),
+      color: 'text-red-400',
       isHighlight: false,
     },
 
     // 5. Tax Band Breakdown (sub-rows)
     ...results.taxBands.map((band) => ({
       category: `${band.rate}% Rate`,
-      icon: getIconForCategory('rate'),
+      icon: 'fas fa-percentage',
       annual: band.amount,
       percentage: calculatePercentage(band.amount, grossAnnual),
-      color: getColorForCategory('tax band'),
+      color: 'text-red-400',
       isHighlight: false,
       isSubRow: true,
     })),
@@ -153,10 +191,10 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
       ? [
           {
             category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
-            icon: getIconForCategory('Student Loan'),
+            icon: 'fas fa-graduation-cap',
             annual: results.studentLoan.annually,
             percentage: calculatePercentage(results.studentLoan.annually, grossAnnual),
-            color: getColorForCategory('Student Loan'),
+            color: 'text-orange-400',
             isHighlight: false,
           },
         ]
@@ -165,30 +203,30 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
     // 7. National Insurance
     {
       category: 'National Insurance',
-      icon: getIconForCategory('National Insurance'),
+      icon: 'fas fa-id-card',
       annual: results.nationalInsurance.annually,
       percentage: calculatePercentage(results.nationalInsurance.annually, grossAnnual),
-      color: getColorForCategory('National Insurance'),
+      color: 'text-yellow-400',
       isHighlight: false,
     },
 
     // 8. Pension [You]
     {
       category: 'Pension [You]',
-      icon: getIconForCategory('Pension'),
+      icon: 'fas fa-piggy-bank',
       annual: results.pensionContribution.annually,
       percentage: calculatePercentage(results.pensionContribution.annually, grossAnnual),
-      color: getColorForCategory('Pension'),
+      color: 'text-purple-400',
       isHighlight: false,
     },
 
     // 9. Pension [HMRC Relief]
     {
       category: 'Pension [HMRC Relief]',
-      icon: getIconForCategory('HMRC Relief'),
+      icon: 'fas fa-hand-holding-heart',
       annual: 0, // Pension relief calculation to be implemented
       percentage: 'N/A',
-      color: getColorForCategory('HMRC Relief'),
+      color: 'text-purple-400',
       isHighlight: false,
     },
 
@@ -197,10 +235,10 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
       ? [
           {
             category: 'Marriage Allowance',
-            icon: getIconForCategory('Marriage Allowance'),
+            icon: 'fas fa-ring',
             annual: results.additionalAllowances.annually,
             percentage: calculatePercentage(results.additionalAllowances.annually, grossAnnual),
-            color: getColorForCategory('Marriage Allowance'),
+            color: 'text-green-400',
             isHighlight: false,
           },
         ]
@@ -209,53 +247,55 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
     // 11. Allowances/Deductions
     {
       category: 'Allowances/Deductions',
-      icon: getIconForCategory('Allowances/Deductions'),
+      icon: 'fas fa-hand-holding-usd',
       annual: allowancesAmount,
       percentage: calculatePercentage(allowancesAmount, grossAnnual),
-      color: getColorForCategory('Allowances/Deductions'),
+      color: 'text-teal-400',
       isHighlight: false,
     },
 
     // 12. Net Pay (highlighted)
     {
       category: 'Net Pay',
-      icon: getIconForCategory('Net Pay'),
+      icon: 'fas fa-wallet',
       annual: results.netPay.annually,
       percentage: calculatePercentage(results.netPay.annually, grossAnnual),
-      color: getColorForCategory('Net Pay'),
+      color: 'text-green-400',
       isHighlight: true,
     },
 
     // 13. Employers NI
     {
       category: 'Employers NI',
-      icon: getIconForCategory('Employers NI'),
+      icon: 'fas fa-building',
       annual: results.employerNI,
       percentage: calculatePercentage(results.employerNI, grossAnnual),
-      color: getColorForCategory('Employers NI'),
+      color: 'text-gray-400',
       isHighlight: false,
     },
 
     // 14. Net Change from Previous Year
     {
       category: 'Net Change from Previous Year',
-      icon: getIconForCategory('Net Change'),
+      icon: 'fas fa-exchange-alt',
       annual: 0, // Net change calculation to be implemented
       percentage: '0.0%',
-      color: getColorForCategory('Net Change'),
+      color: 'text-blue-400',
       isHighlight: false,
     },
   ];
 
   return (
-    <div className={`overflow-x-auto rounded bg-gray-800 p-4 ${className}`}>
+    <div
+      className={`overflow-x-auto rounded bg-gray-800 p-4 ${className}`}
+      data-testid='tax-results'
+    >
       {/* Header - EXACT from toolhubx-live */}
       <h2 className='sticky top-0 z-10 mb-4 bg-gray-800 font-semibold text-gray-100 text-lg md:text-xl'>
-        <TAX_TABLE_ICONS.table className='mr-2 inline h-5 w-5 text-blue-500' />
+        <i className='fas fa-table mr-2 text-blue-500'></i>
         Your Payslip Summary
       </h2>
 
-      {/* Period Toggle Checkboxes - EXACT from toolhubx-live */}
       <div className='mb-4 flex flex-wrap gap-2'>
         {Object.keys(periodOptions).map((period) => (
           <label key={period} className='flex items-center gap-1 text-gray-100 text-sm'>
@@ -271,85 +311,62 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
         ))}
       </div>
 
-      {/* Table container with proper fixed layout */}
-      <div className='overflow-x-auto'>
-        <table
-          className='w-full min-w-[1400px] border border-gray-600 text-gray-100 text-sm'
-          data-testid='results-table'
-        >
-          <colgroup>
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '50px' }} />
+      <table
+        className='w-full border border-gray-600 text-gray-100 text-sm'
+        data-testid='results-table'
+      >
+        <thead>
+          <tr className='sticky top-8 z-10 border-gray-600 border-b bg-gray-700'>
+            <th className='border-gray-600 border-r p-2 text-left'>Category</th>
+            <th className='border-gray-600 border-r p-2 text-right'>%</th>
             {visiblePeriods.map((period) => (
-              <col key={period} style={{ width: visiblePeriods.length >= 6 ? '110px' : '130px' }} />
+              <th key={period} className='border-gray-600 border-r p-2 text-right'>
+                {period} (£)
+              </th>
             ))}
-          </colgroup>
-          <thead>
-            <tr className='border-gray-600 border-b bg-gray-700'>
-              <th className='whitespace-nowrap border-gray-600 border-r px-3 py-3 text-left font-bold text-sm'>
-                Category
-              </th>
-              <th className='whitespace-nowrap border-gray-600 border-r px-2 py-3 text-right font-bold text-xs'>
-                %
-              </th>
-              {visiblePeriods.map((period) => (
-                <th
-                  key={period}
-                  className='whitespace-nowrap border-gray-600 border-r px-1 py-3 text-right font-bold text-xs'
-                >
-                  <div className='flex flex-col items-end'>
-                    <span className='font-semibold text-xs'>{period}</span>
-                    <span className='text-gray-300 text-xs'>(£)</span>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tableRows.map((row, index) => (
-              <tr
-                key={`${row.category}-${index}`}
-                className={`border-gray-600 border-b ${row.isHighlight ? 'bg-green-500/10' : ''}`}
+          </tr>
+        </thead>
+        <tbody>
+          {tableRows.map((row, index) => (
+            <tr
+              key={`${row.category}-${index}`}
+              className={`border-gray-600 border-b ${row.isHighlight ? 'font-bold' : ''}`}
+            >
+              <td
+                className={`border-gray-600 border-r p-2 ${row.isSubRow ? 'pl-4' : ''} ${row.isHighlight ? 'font-bold' : ''}`}
               >
-                <td
-                  className={`border-gray-600 border-r px-3 py-3 ${row.color} ${row.isSubRow ? 'pl-6' : ''} overflow-hidden whitespace-nowrap`}
-                >
-                  <div className='flex min-w-0 items-center'>
-                    <row.icon className='mr-2 h-4 w-4 flex-shrink-0' />
-                    <span className='truncate text-sm'>{row.category}</span>
-                  </div>
-                </td>
-                <td
-                  className={`border-gray-600 border-r px-2 py-3 text-right ${row.color} whitespace-nowrap text-xs tabular-nums`}
-                >
-                  {row.percentage}
-                </td>
-                {visiblePeriods.map((period) => {
-                  const periodValue = row.annual / periodOptions[period];
-                  return (
-                    <td
-                      key={period}
-                      className={`border-gray-600 border-r px-2 py-3 text-right ${row.color} ${
-                        row.isHighlight ? 'font-bold' : ''
-                      } whitespace-nowrap text-xs tabular-nums`}
-                    >
-                      {periodValue.toLocaleString('en-GB', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                <i className={`${row.icon} mr-2`}></i>
+                {row.category}
+              </td>
+              <td
+                className={`border-gray-600 border-r p-2 text-right ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+              >
+                {row.percentage}
+              </td>
+              {visiblePeriods.map((period) => {
+                const periodValue = row.annual / periodOptions[period];
+                return (
+                  <td
+                    key={period}
+                    className={`p-2 text-right ${row.color} border-gray-600 border-r ${
+                      row.isHighlight ? 'font-bold' : ''
+                    }`}
+                  >
+                    {periodValue.toLocaleString('en-GB', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {/* Footer note - like toolhubx-live */}
-        <p className='mt-2 text-gray-400 text-xs'>
-          *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
-        </p>
-      </div>
+      <p className='mt-2 text-gray-400 text-xs'>
+        *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
+      </p>
     </div>
   );
 };

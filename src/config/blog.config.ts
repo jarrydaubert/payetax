@@ -22,9 +22,24 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     description: 'Practical advice to optimize your tax situation',
   },
   {
-    name: 'Tax News',
-    slug: 'tax-news',
+    name: 'Tax Changes',
+    slug: 'tax-changes',
     description: 'Latest updates and changes in UK tax legislation',
+  },
+  {
+    name: 'Tax Tools',
+    slug: 'tax-tools',
+    description: 'Calculators and tools for UK tax planning',
+  },
+  {
+    name: 'Tax Comparison',
+    slug: 'tax-comparison',
+    description: 'Compare tax rates and systems across UK regions',
+  },
+  {
+    name: 'Student Loans',
+    slug: 'student-loans',
+    description: 'Student loan repayment and tax implications',
   },
   {
     name: 'Personal Finance',

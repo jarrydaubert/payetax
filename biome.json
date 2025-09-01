@@ -135,5 +135,25 @@
   "files": {
     "includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json", "**/*.mdx"],
     "ignoreUnknown": false
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "playwright-report/**",
+        "test-results/**",
+        ".next/**",
+        "out/**",
+        "coverage/**",
+        ".nyc_output/**",
+        "dist/**",
+        "build/**"
+      ],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

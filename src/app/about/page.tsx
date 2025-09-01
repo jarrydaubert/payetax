@@ -1,4 +1,30 @@
 // src/app/about/page.tsx
+/**
+ * About Page - Company and Product Information
+ *
+ * This page provides comprehensive information about ToolHubX, including:
+ * - Mission and values
+ * - Product features and benefits
+ * - Privacy and security commitments
+ * - Technical specifications
+ * - Team and company background
+ *
+ * The page is designed to build trust with users by being transparent about
+ * our approach to tax calculations, data privacy, and technical standards.
+ *
+ * Features:
+ * - Responsive hero section with company overview
+ * - Statistical highlights showing credibility
+ * - Feature showcase with icons and descriptions
+ * - Privacy-first messaging
+ * - Call-to-action for calculator usage
+ * - Clean glass-morphism design consistent with app
+ *
+ * SEO Optimized:
+ * - Comprehensive metadata for search engines
+ * - Structured content for rich snippets
+ * - Keyword optimization for UK tax calculator searches
+ */
 
 import {
   ArrowLeft,

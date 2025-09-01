@@ -1,17 +1,59 @@
 // src/lib/exportUtils.ts
+/**
+ * Export Utilities for UK Tax Calculator
+ *
+ * This module provides functions to export tax calculation results in various formats.
+ * It handles data transformation, formatting, and generation of export files including
+ * CSV format for spreadsheet applications.
+ *
+ * Features:
+ * - CSV export with comprehensive tax breakdown
+ * - Proper currency formatting for UK audience
+ * - Structured output with clear section headers
+ * - Support for optional fields (pension, student loans)
+ * - Professional formatting suitable for sharing with employers or advisors
+ */
+
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
+/**
+ * Data structure containing all information needed for export
+ * Combines calculation results with input parameters for complete context
+ */
 export interface ExportData {
+  /** Detailed tax calculation results from the calculator engine */
   results: TaxCalculationResults;
+  /** Original salary input amount */
   salary: number;
+  /** Tax year used for calculations (e.g., "2024-25") */
   taxYear: string;
+  /** HMRC tax code applied */
   taxCode: string;
+  /** Tax region (England/Wales or Scotland) */
   region: string;
+  /** Student loan plans that were applied */
   studentLoans: string[];
+  /** Date when the export was generated */
   exportDate: string;
 }
 
+/**
+ * Generates a CSV (Comma-Separated Values) file content from tax calculation data
+ *
+ * Creates a structured CSV file that includes:
+ * - Header information with generation date
+ * - Input parameters used for calculation
+ * - Annual breakdown of all deductions
+ * - Monthly breakdown for practical use
+ * - Tax bands breakdown showing progressive taxation
+ *
+ * The CSV format is compatible with Excel, Google Sheets, and other spreadsheet applications.
+ * Currency values are formatted in British pounds with proper negative indicators for deductions.
+ *
+ * @param data - Complete export data including results and metadata
+ * @returns CSV content as a string ready for file download
+ */
 export function generateCSV(data: ExportData): string {
   const { results, salary, taxYear, taxCode, region, studentLoans, exportDate } = data;
 

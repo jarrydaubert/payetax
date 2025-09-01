@@ -36,8 +36,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en' suppressHydrationWarning data-scroll-behavior='smooth'>
       <head>
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
         <link rel='icon' type='image/x-icon' href='/favicon.ico' />
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
         <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
@@ -57,19 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Service Worker Registration */}
         <script src='/register-sw.js' async />
 
-        {/* Buy Me Coffee Widget */}
-        <script
-          data-name='BMC-Widget'
-          data-cfasync='false'
-          src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
-          data-id='toolhubx.uk'
-          data-description='Support me on Buy me a coffee!'
-          data-message=''
-          data-color='#FF813F'
-          data-position='Right'
-          data-x_margin='18'
-          data-y_margin='18'
-        />
+        {/* Buy Me Coffee Widget - moved to body for better timing */}
 
         {/* Structured Data for SEO */}
         <script
@@ -116,19 +102,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body
-        className={cn(
-          inter.variable,
-          'font-sans antialiased',
-          'min-h-screen text-[hsl(var(--foreground-primary))]'
-        )}
-      >
+      <body className={cn(inter.variable, 'font-sans antialiased', 'min-h-screen text-white')}>
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>
         <ErrorBoundary>
           <Layout>{children}</Layout>
         </ErrorBoundary>
+
+        {/* Buy Me Coffee Widget - load only in production */}
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            data-name='BMC-Widget'
+            data-cfasync='false'
+            src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
+            data-id='toolhubx.uk'
+            data-description='Support ToolHubX development!'
+            data-message='Thank you for using our free UK tax calculator! 💚'
+            data-color='#FF813F'
+            data-position='Right'
+            data-x_margin='18'
+            data-y_margin='18'
+            data-z_index='99999'
+            defer
+          />
+        )}
       </body>
     </html>
   );

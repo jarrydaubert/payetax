@@ -109,6 +109,20 @@ self.addEventListener('fetch', (event) => {
   // Skip non-HTTP(S) requests
   if (!url.startsWith('http')) return;
 
+  // Skip external domains that have CSP restrictions
+  const skipDomains = [
+    'googletagmanager.com',
+    'google-analytics.com',
+    'buymeacoffee.com',
+    'cdnjs.buymeacoffee.com',
+    'bmac-cdn.nyc3.digitaloceanspaces.com',
+  ];
+
+  if (skipDomains.some((domain) => url.includes(domain))) {
+    // Let browser handle these requests normally without SW intervention
+    return;
+  }
+
   // Determine caching strategy based on URL
   if (shouldUseNetworkFirst(url)) {
     event.respondWith(networkFirstStrategy(request));

@@ -21,7 +21,8 @@ interface FooterProps {
 }
 
 export function Footer({ className }: FooterProps) {
-  const currentYear = new Date().getFullYear();
+  // Fix hydration mismatch by using static year
+  const currentYear = 2025;
 
   const footerLinks: NavigationSection[] = [
     {

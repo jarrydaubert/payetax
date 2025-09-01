@@ -397,7 +397,7 @@ body::after {
 /* Enhanced Layout Utilities */
 .container {
   width: 100%;
-  max-width: var(--container-xl);
+  max-width: var(--container-2xl);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
 }
@@ -740,4 +740,46 @@ button:disabled {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Buy Me Coffee Widget Optimizations */
+#bmc-wbtn {
+  z-index: 9999 !important;
+  position: fixed !important;
+  right: 18px !important;
+  bottom: 18px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  transform: translateZ(0) !important; /* Force hardware acceleration */
+  will-change: transform !important;
+  transition: transform 0.2s ease-in-out !important;
+}
+
+#bmc-wbtn:hover {
+  transform: translateZ(0) scale(1.05) !important;
+}
+
+.bmc-btn {
+  z-index: 9999 !important;
+  position: fixed !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 50px !important;
+}
+
+/* Ensure BMC widget isn't affected by our glass effects */
+div[data-name*="BMC"],
+iframe[src*="buymeacoffee"] {
+  backdrop-filter: none !important;
+  background: transparent !important;
+  border: none !important;
+  contain: layout style paint !important; /* Optimize rendering */
+}
+
+/* BMC widget iframe optimizations */
+iframe[src*="buymeacoffee"] {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
 }

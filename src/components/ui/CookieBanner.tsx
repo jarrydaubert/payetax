@@ -114,16 +114,16 @@ const CookieBanner: React.FC = () => {
     >
       <div className='p-4'>
         <div className='mb-3 flex items-start gap-3'>
-          <Cookie className='mt-0.5 h-5 w-5 flex-shrink-0 text-primary' />
+          <Cookie className='mt-0.5 h-5 w-5 flex-shrink-0 text-purple-400' />
           <div>
-            <h3 id={titleId} className='mb-1 font-medium text-foreground text-sm'>
+            <h3 id={titleId} className='mb-1 font-medium text-sm text-white'>
               We use cookies
             </h3>
-            <p id={descriptionId} className='text-foreground/80 text-xs leading-relaxed'>
+            <p id={descriptionId} className='text-gray-300 text-xs leading-relaxed'>
               We use cookies to analyze traffic and improve your experience.{' '}
               <Link
                 href='/privacy'
-                className='text-primary underline underline-offset-2 hover:text-primary/80'
+                className='text-purple-400 underline underline-offset-2 hover:text-purple-300'
               >
                 Learn more
               </Link>

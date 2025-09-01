@@ -79,14 +79,14 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       {title && (
         <div className='mb-4 flex items-start'>
           {/* Optional icon using CSS variables for gradient colors */}
-          {icon && <div className='mr-3 flex-shrink-0 text-primary'>{icon}</div>}
+          {icon && <div className='mr-3 flex-shrink-0 text-purple-400'>{icon}</div>}
 
           <div>
             {/* Title with proper heading level for accessibility */}
             <h2
               id={title ? `${id || ''}-title` : undefined}
               className={cn(
-                'mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text font-bold text-subheading text-transparent',
+                'mb-2 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text font-bold text-2xl text-transparent',
                 titleClassName
               )}
             >
@@ -95,7 +95,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
 
             {/* Optional description */}
             {description && (
-              <p className={cn('text-foreground/70 leading-relaxed', descriptionClassName)}>
+              <p className={cn('text-gray-300 leading-relaxed', descriptionClassName)}>
                 {description}
               </p>
             )}

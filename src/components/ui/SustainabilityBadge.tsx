@@ -26,7 +26,7 @@ export default function SustainabilityBadge() {
       {/* Sustainability Details Modal */}
       {showDetails && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm'>
-          <div className='w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6'>
+          <div className='glass-card w-full max-w-md border border-white/20'>
             <div className='mb-4 flex items-start justify-between'>
               <div className='flex items-center gap-2'>
                 <Leaf className='h-5 w-5 text-green-400' />

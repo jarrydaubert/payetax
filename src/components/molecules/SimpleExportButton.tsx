@@ -374,6 +374,7 @@ const SimpleExportButton: React.FC<SimpleExportButtonProps> = ({
 
           <button
             type='button'
+            data-testid='export-excel-button'
             onClick={exportToExcel}
             className='group flex w-full items-center gap-3 px-4 py-3 text-left text-white transition-all duration-200 hover:bg-white/10'
             role='menuitem'
