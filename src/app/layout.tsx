@@ -110,23 +110,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Layout>{children}</Layout>
         </ErrorBoundary>
 
-        {/* Buy Me Coffee Widget - load only in production */}
-        {process.env.NODE_ENV === 'production' && (
-          <script
-            data-name='BMC-Widget'
-            data-cfasync='false'
-            src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
-            data-id='toolhubx.uk'
-            data-description='Support ToolHubX development!'
-            data-message='Thank you for using our free UK tax calculator! 💚'
-            data-color='#FF813F'
-            data-position='Right'
-            data-x_margin='18'
-            data-y_margin='18'
-            data-z_index='99999'
-            defer
-          />
-        )}
+        {/* Buy Me Coffee Widget - optimized loading */}
+        <script
+          data-name='BMC-Widget'
+          data-cfasync='false'
+          src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
+          data-id='toolhubx.uk'
+          data-description='Support ToolHubX development!'
+          data-message='Thank you for using our free UK tax calculator! 💚'
+          data-color='#FF813F'
+          data-position='Right'
+          data-x_margin='18'
+          data-y_margin='18'
+          data-z_index='99999'
+          defer
+        />
       </body>
     </html>
   );

@@ -783,3 +783,127 @@ iframe[src*="buymeacoffee"] {
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
 }
+
+/* Shimmer Effects - Animated Gradients */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Test if animations work at all */
+@keyframes shimmer-test {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Performance optimizations for shimmer effects */
+.shimmer-logo,
+.shimmer-button {
+  will-change: background-position;
+  contain: layout style paint;
+}
+
+.shimmer-logo.shimmer-active,
+.shimmer-button.shimmer-active {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Shimmer Effects - Class-based approach for better performance */
+
+/* Logo Shimmer Effect - Shine overlay on gradient */
+.shimmer-logo {
+  background: linear-gradient(
+    90deg,
+    #6b21c4 0%,
+    #06b6d4 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  position: relative;
+}
+
+.shimmer-logo.shimmer-active {
+  background: linear-gradient(
+    90deg,
+    #6b21c4 0%,
+    #06b6d4 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.shimmer-logo.shimmer-active::before {
+  content: 'ToolHubX';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: continuousShine 15s linear infinite;
+}
+
+/* Button Shimmer Effect */
+.shimmer-button {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%);
+  transition: background-position 0.3s ease;
+}
+
+.shimmer-button.shimmer-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  animation: continuousShine 12s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Shimmer keyframe animations */
+@keyframes continuousShine {
+  0% {
+    background-position: -300% 0;
+  }
+  100% {
+    background-position: 300% 0;
+  }
+}
+
+/* Accessibility: Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-logo.shimmer-active,
+  .shimmer-button.shimmer-active {
+    animation: none;
+    background-position: 0 0;
+  }
+}

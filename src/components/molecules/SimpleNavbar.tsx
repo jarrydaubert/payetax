@@ -5,7 +5,7 @@ import { Menu, MessageSquare, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { NavigationLink } from '@/types/navigation';
 
@@ -15,7 +15,25 @@ interface SimpleNavbarProps {
 
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [shimmerEnabled, setShimmerEnabled] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setIsClient(true);
+
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReducedMotion) {
+      // Start shimmer animation after component mounts and page is loaded
+      const timer = setTimeout(() => {
+        setShimmerEnabled(true);
+      }, 1000); // Delay to ensure page is fully loaded
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const navigationLinks: (NavigationLink & { label: string; active: boolean })[] = [
     { href: '/', label: 'Home', name: 'Home', active: pathname === '/' },
@@ -52,7 +70,11 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Logo/Brand */}
           <div className='flex items-center'>
             <Link href='/' className='group'>
-              <span className='bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text font-bold text-2xl text-transparent transition-all duration-300 group-hover:from-purple-300 group-hover:via-pink-300 group-hover:to-cyan-300'>
+              <span
+                className={`shimmer-logo font-bold text-2xl transition-all duration-300 ${
+                  isClient && shimmerEnabled ? 'shimmer-active' : ''
+                }`}
+              >
                 ToolHubX
               </span>
             </Link>
@@ -97,8 +119,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               href='/feedback'
               className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-cyan-500 px-4 py-2 font-medium text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl'
             >
-              <MessageSquare className='h-4 w-4' />
-              <span>Feedback</span>
+              <MessageSquare className='relative z-10 h-4 w-4' />
+              <span className='relative z-10'>Feedback</span>
             </Link>
           </div>
 
@@ -159,6 +181,18 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                     </Link>
                   </div>
                 ))}
+
+                {/* Mobile Feedback Button */}
+                <div className='mt-4 w-full max-w-xs'>
+                  <Link
+                    href='/feedback'
+                    className='flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 p-4 font-medium text-base text-white transition-all duration-300'
+                    onClick={closeMobileMenu}
+                  >
+                    <MessageSquare className='relative z-10 h-4 w-4' />
+                    <span className='relative z-10'>Feedback</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
