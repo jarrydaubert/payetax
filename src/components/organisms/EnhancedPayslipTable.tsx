@@ -34,7 +34,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { TAX_TABLE_ICONS } from '@/lib/iconMapping';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
@@ -77,19 +77,40 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
   className = '',
   onPeriodsChange,
 }) => {
-  // Period toggle state - limited initially to prevent horizontal scrolling on desktop
-  const [visiblePeriods, setVisiblePeriods] = useState<string[]>(['Yearly', 'Monthly', 'Weekly']);
+  // Period toggle state - fewer periods on mobile, more on desktop
+  const [visiblePeriods, setVisiblePeriods] = useState<string[]>([]);
+  const [showLeftIndicator, setShowLeftIndicator] = useState(false);
+  const [showRightIndicator, setShowRightIndicator] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Period options - EXACT from toolhubx-live
-  const periodOptions: Record<string, number> = {
-    Yearly: 1,
-    Monthly: 12,
-    '4-Weekly': 13,
-    Fortnightly: 26,
-    Weekly: 52,
-    Daily: 260,
-    Hourly: 1950 * (parseFloat(hoursPerWeek) / 37.5),
-  };
+  const periodOptions: Record<string, number> = useMemo(
+    () => ({
+      Yearly: 1,
+      Monthly: 12,
+      '4-Weekly': 13,
+      Fortnightly: 26,
+      Weekly: 52,
+      Daily: 260,
+      Hourly: 1950 * (parseFloat(hoursPerWeek) / 37.5),
+    }),
+    [hoursPerWeek]
+  );
+
+  // Initialize visible periods based on screen size - only on mount
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const defaultPeriods = isMobile ? ['Monthly', 'Weekly'] : ['Yearly', 'Monthly', 'Weekly'];
+    setVisiblePeriods(defaultPeriods);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty - only run once on mount
+
+  // Notify parent when periods are initialized
+  useEffect(() => {
+    if (visiblePeriods.length > 0 && onPeriodsChange) {
+      onPeriodsChange(visiblePeriods, periodOptions);
+    }
+  }, [visiblePeriods, onPeriodsChange, periodOptions]);
 
   // Handle period toggle
   const handlePeriodToggle = (period: string) => {
@@ -104,6 +125,33 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
       onPeriodsChange(newPeriods, periodOptions);
     }
   };
+
+  // Check scroll position to show/hide indicators
+  useEffect(() => {
+    const checkScrollPosition = () => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      const hasHorizontalScroll = scrollWidth > clientWidth;
+
+      setShowLeftIndicator(hasHorizontalScroll && scrollLeft > 5);
+      setShowRightIndicator(hasHorizontalScroll && scrollLeft < scrollWidth - clientWidth - 5);
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      // Initial check with a delay to ensure DOM is ready
+      setTimeout(checkScrollPosition, 100);
+      container.addEventListener('scroll', checkScrollPosition);
+      window.addEventListener('resize', checkScrollPosition);
+
+      return () => {
+        container.removeEventListener('scroll', checkScrollPosition);
+        window.removeEventListener('resize', checkScrollPosition);
+      };
+    }
+  }, []);
 
   if (!results) {
     return (
@@ -286,87 +334,115 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
   ];
 
   return (
-    <div
-      className={`overflow-x-auto rounded bg-gray-800 p-4 ${className}`}
-      data-testid='tax-results'
-    >
-      {/* Header - EXACT from toolhubx-live */}
-      <h2 className='sticky top-0 z-10 mb-4 bg-gray-800 font-semibold text-gray-100 text-lg md:text-xl'>
-        <i className='fas fa-table mr-2 text-blue-500'></i>
-        Your Payslip Summary
-      </h2>
-
-      <div className='mb-4 flex flex-wrap gap-2'>
-        {Object.keys(periodOptions).map((period) => (
-          <label key={period} className='flex items-center gap-1 text-gray-100 text-sm'>
-            <input
-              type='checkbox'
-              checked={visiblePeriods.includes(period)}
-              onChange={() => handlePeriodToggle(period)}
-              className='h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-600'
-              aria-label={`Toggle ${period} column visibility`}
-            />
-            {period}
-          </label>
-        ))}
+    <div className={`relative ${className}`}>
+      {/* Scroll Indicators */}
+      <div
+        className={`scroll-indicator-left pointer-events-none absolute top-0 bottom-0 left-0 z-20 flex w-8 items-center justify-start bg-gradient-to-r from-gray-800 to-transparent pl-1 transition-opacity duration-300 ${showLeftIndicator ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <div className='animate-pulse text-white text-xs'>←</div>
+      </div>
+      <div
+        className={`scroll-indicator-right pointer-events-none absolute top-0 right-0 bottom-0 z-20 flex w-8 items-center justify-end bg-gradient-to-l from-gray-800 to-transparent pr-1 transition-opacity duration-300 ${showRightIndicator ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <div className='animate-pulse text-white text-xs'>→</div>
       </div>
 
-      <table
-        className='w-full border border-gray-600 text-gray-100 text-sm'
-        data-testid='results-table'
+      <section
+        ref={containerRef}
+        className='table-container overflow-x-auto scroll-smooth rounded bg-gray-800 p-4'
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#6b7280 #374151',
+        }}
+        data-testid='tax-results'
+        aria-label='Scrollable payslip tax breakdown table'
       >
-        <thead>
-          <tr className='sticky top-8 z-10 border-gray-600 border-b bg-gray-700'>
-            <th className='border-gray-600 border-r p-2 text-left'>Category</th>
-            <th className='border-gray-600 border-r p-2 text-right'>%</th>
-            {visiblePeriods.map((period) => (
-              <th key={period} className='border-gray-600 border-r p-2 text-right'>
-                {period} (£)
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tableRows.map((row, index) => (
-            <tr
-              key={`${row.category}-${index}`}
-              className={`border-gray-600 border-b ${row.isHighlight ? 'font-bold' : ''}`}
-            >
-              <td
-                className={`border-gray-600 border-r p-2 ${row.isSubRow ? 'pl-4' : ''} ${row.isHighlight ? 'font-bold' : ''}`}
-              >
-                <i className={`${row.icon} mr-2`}></i>
-                {row.category}
-              </td>
-              <td
-                className={`border-gray-600 border-r p-2 text-right ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
-              >
-                {row.percentage}
-              </td>
-              {visiblePeriods.map((period) => {
-                const periodValue = row.annual / periodOptions[period];
-                return (
-                  <td
-                    key={period}
-                    className={`p-2 text-right ${row.color} border-gray-600 border-r ${
-                      row.isHighlight ? 'font-bold' : ''
-                    }`}
-                  >
-                    {periodValue.toLocaleString('en-GB', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {/* Header - EXACT from toolhubx-live */}
+        <h2 className='sticky top-0 z-10 mb-4 bg-gray-800 font-semibold text-gray-100 text-lg md:text-xl'>
+          <i className='fas fa-table mr-2 text-blue-500'></i>
+          Your Payslip Summary
+        </h2>
 
-      <p className='mt-2 text-gray-400 text-xs'>
-        *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
-      </p>
+        <div className='mb-4 flex flex-wrap gap-2'>
+          {Object.keys(periodOptions).map((period) => (
+            <label key={period} className='flex items-center gap-1 text-gray-100 text-sm'>
+              <input
+                type='checkbox'
+                checked={visiblePeriods.includes(period)}
+                onChange={() => handlePeriodToggle(period)}
+                className='h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-600'
+                aria-label={`Toggle ${period} column visibility`}
+              />
+              {period}
+            </label>
+          ))}
+        </div>
+
+        <table
+          className='w-full border border-gray-600 text-gray-100 text-sm'
+          data-testid='results-table'
+          style={{ minWidth: `${180 + visiblePeriods.length * 95}px` }}
+        >
+          <thead>
+            <tr className='sticky top-8 z-10 border-gray-600 border-b bg-gray-700'>
+              <th className='min-w-[140px] whitespace-nowrap border-gray-600 border-r p-2 text-left'>
+                Category
+              </th>
+              <th className='min-w-[40px] whitespace-nowrap border-gray-600 border-r p-1 text-right'>
+                %
+              </th>
+              {visiblePeriods.map((period) => (
+                <th
+                  key={period}
+                  className='min-w-[95px] whitespace-nowrap border-gray-600 border-r p-1 text-right'
+                >
+                  {period} (£)
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {tableRows.map((row, index) => (
+              <tr
+                key={`${row.category}-${index}`}
+                className={`border-gray-600 border-b ${row.isHighlight ? 'font-bold' : ''}`}
+              >
+                <td
+                  className={`whitespace-nowrap border-gray-600 border-r p-2 ${row.isSubRow ? 'pl-4' : ''} ${row.isHighlight ? 'font-bold' : ''}`}
+                >
+                  <i className={`${row.icon} mr-2`}></i>
+                  {row.category}
+                </td>
+                <td
+                  className={`whitespace-nowrap border-gray-600 border-r p-1 text-right ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                >
+                  {row.percentage}
+                </td>
+                {visiblePeriods.map((period) => {
+                  const periodValue = row.annual / periodOptions[period];
+                  return (
+                    <td
+                      key={period}
+                      className={`whitespace-nowrap p-1 text-right ${row.color} border-gray-600 border-r ${
+                        row.isHighlight ? 'font-bold' : ''
+                      }`}
+                    >
+                      {periodValue.toLocaleString('en-GB', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <p className='mt-2 text-gray-400 text-xs'>
+          *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
+        </p>
+      </section>
     </div>
   );
 };

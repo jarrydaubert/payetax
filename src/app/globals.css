@@ -144,7 +144,7 @@
 html {
   font-size: clamp(14px, 1.8vw, 18px);
   scroll-behavior: smooth;
-  scroll-padding-top: var(--spacing-xl);
+  scroll-padding-top: 100px; /* Fixed value instead of variable for better scrolling */
   color-scheme: dark;
   accent-color: hsl(var(--accent-purple));
   text-rendering: optimizeLegibility;
@@ -905,5 +905,203 @@ iframe[src*="buymeacoffee"] {
   .shimmer-button.shimmer-active {
     animation: none;
     background-position: 0 0;
+  }
+}
+
+/* Custom scrollbar styling for table horizontal scroll */
+.overflow-x-auto {
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #374151;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+
+/* Proper fluid responsive form inputs - following best practices */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+select {
+  width: 100%; /* Fluid base */
+  max-width: clamp(12rem, 80%, 20rem); /* Scales with container; cap at 20rem on large screens */
+  min-width: clamp(8rem, 50%, 12rem); /* Better min for mobile */
+}
+
+/* Media queries for refinement */
+@media (min-width: 768px) { /* Tablet+ */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: clamp(14rem, 50%, 24rem); /* Looser for better fit in grids */
+  }
+}
+
+@media (min-width: 1024px) { /* Desktop+ */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: clamp(16rem, 40%, 28rem); /* Even more flexible */
+  }
+}
+
+/* Prevent dropdown menu viewport overflow on mobile */
+select {
+  appearance: none; /* Custom styling if needed */
+}
+
+select::-ms-expand { 
+  display: none; /* IE fix */
+}
+
+@media (max-width: 768px) {
+  select {
+    max-height: 50vh; /* Limit open menu height with scroll */
+    overflow-y: auto;
+  }
+}
+
+/* Glass card specific styles - more adaptive */
+.glass-card input.w-full,
+.glass-card select.w-full {
+  width: 100%; /* Prefer full width in card */
+  max-width: clamp(10rem, 100%, 18rem); /* Full fluidity with soft cap */
+  min-width: 8rem;
+}
+
+/* Proper grid handling */
+.glass-card .grid.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Flexible columns */
+  gap: clamp(0.5rem, 2vw, 1rem); /* Responsive gaps */
+}
+
+.glass-card .grid.grid-cols-2 > div {
+  min-width: clamp(8rem, 45%, 12rem); /* Scale with viewport */
+  max-width: 100%; /* No hard cap—let it fill column */
+}
+
+/* Add overflow handling for the card itself on small screens */
+@media (max-width: 768px) {
+  .glass-card {
+    overflow-x: auto; /* Scroll horizontally if grid overflows */
+  }
+  
+  /* Single column on very small screens */
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: 1fr; /* Stack vertically on mobile */
+  }
+}
+
+/* Form group enhancements */
+.form-group {
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .form-group {
+    flex-direction: row; /* Side-by-side on larger screens */
+    align-items: center;
+  }
+  
+  .form-group label {
+    flex: 0 0 clamp(6rem, 20%, 8rem); /* Fixed label width */
+    white-space: nowrap; /* Prevent label wrapping */
+  }
+  
+  .form-group select {
+    flex: 1; /* Grow to fill remaining space */
+  }
+}
+
+/* Custom focus styles to replace default browser outlines and Tailwind rings */
+*:focus {
+  outline: none !important;
+}
+
+/* Override Tailwind ring utilities completely */
+*:focus {
+  --tw-ring-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* Professional focus styles for form elements */
+.glass-card input:focus,
+.glass-card select:focus {
+  outline: none !important;
+  outline-offset: 0;
+  --tw-ring-shadow: none !important;
+  border-color: hsl(var(--accent-purple)) !important;
+  box-shadow: 0 0 0 2px hsla(var(--accent-purple), 0.2) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus styles for checkboxes */
+.glass-card input[type="checkbox"]:focus {
+  outline: none !important;
+  outline-offset: 0;
+  --tw-ring-shadow: none !important;
+  box-shadow: 0 0 0 2px hsla(var(--accent-purple), 0.3) !important;
+  border-color: hsl(var(--accent-purple));
+}
+
+/* Focus styles for buttons */
+button:focus,
+.button:focus {
+  outline: none !important;
+  outline-offset: 0;
+  --tw-ring-shadow: none !important;
+  box-shadow: 0 0 0 2px hsla(var(--accent-purple), 0.3) !important;
+}
+
+/* Focus styles for links */
+a:focus {
+  outline: none !important;
+  outline-offset: 0;
+  --tw-ring-shadow: none !important;
+  box-shadow: 0 0 0 2px hsla(var(--accent-purple), 0.3) !important;
+  border-radius: 4px;
+}
+
+/* Table responsive improvements */
+@media (max-width: 768px) { /* Mobile */
+  .table-container {
+    overflow-x: auto; /* Reinforces scroll */
+  }
+  th, td {
+    min-width: 75px; /* Slightly narrower on mobile to fit more before scrolling */
+    padding: 0.25rem; /* Tighter padding on mobile */
+  }
+}
+
+@media (min-width: 1024px) { /* Desktop */
+  table {
+    max-width: 100%; /* Prevent table from exceeding container */
+  }
+}
+
+/* Mobile-specific layout improvements */
+@media (max-width: 768px) {
+  .flex-col {
+    overflow-y: auto; /* Vertical scroll if content is long */
   }
 }

@@ -18,7 +18,7 @@
  */
 'use client';
 
-import { AlertTriangle, RotateCcw } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import SimpleExportButton from '@/components/molecules/SimpleExportButton';
@@ -349,14 +349,16 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
       <div className={cn('mx-auto px-4', isFullScreen ? 'w-full' : 'container')}>
         <div
           className={cn(
-            'items-start gap-8',
+            'mx-auto flex flex-col gap-8',
+            // More flexible max-width for ultra-wide screens
+            'w-full max-w-none lg:max-w-7xl xl:max-w-[90vw] 2xl:max-w-[1600px]',
             isFullScreen
-              ? 'grid h-full lg:grid-cols-12 xl:grid-cols-12'
-              : 'grid lg:grid-cols-12 xl:grid-cols-12'
+              ? 'lg:grid lg:h-full lg:grid-cols-12 lg:items-start xl:grid-cols-12'
+              : 'lg:grid lg:grid-cols-12 lg:items-start xl:grid-cols-12'
           )}
         >
-          {/* Left Side - Input Form */}
-          <div className='space-y-3 lg:col-span-4'>
+          {/* Input Form - More compact on larger screens */}
+          <div className='space-y-3 lg:col-span-3 xl:col-span-3'>
             <StreamlinedTaxInputForm
               salary={input.salary}
               taxYear={input.taxYear}
@@ -442,23 +444,22 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
                   disabled={input.salary < 0 || isRecalculating}
                   className='flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-6 py-3 font-medium text-base text-white transition-all duration-200 hover:from-purple-500 hover:to-cyan-500 focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
                 >
-                  {isRecalculating ? '⏳ Calculating...' : '🔄 Recalculate'}
+                  {isRecalculating ? 'Calculating...' : 'Recalculate'}
                 </button>
 
                 <button
                   type='button'
                   onClick={handleReset}
-                  className='glass flex items-center gap-1 rounded-lg border border-purple-400/30 px-4 py-3 font-medium text-base text-white/80 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-purple-500'
+                  className='glass rounded-lg border border-purple-400/30 px-4 py-3 font-medium text-base text-white/80 hover:bg-white/10 hover:text-white focus:ring-2 focus:ring-purple-500'
                 >
-                  <RotateCcw className='h-3 w-3' />
                   Reset
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Right Side - Results */}
-          <div className='space-y-3 lg:sticky lg:top-24 lg:col-span-8'>
+          {/* Results - Below inputs on mobile, side-by-side on desktop */}
+          <div className='space-y-3 overflow-x-auto lg:col-span-9 xl:col-span-9'>
             <EnhancedPayslipTable
               results={results}
               allowancesDeductions={input.additionalAllowances

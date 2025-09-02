@@ -25,19 +25,22 @@ export const SkipToContent: React.FC = (): React.ReactElement => {
     <Link
       href='#calculator'
       className={cn(
-        // Visually hidden by default
-        'sr-only',
+        // Completely hidden by default
+        '-top-96 -left-96 absolute opacity-0',
         // Becomes visible and positioned when focused
-        'z-50 focus:not-sr-only focus:absolute focus:top-0 focus:left-0',
-        // Styling when focused
-        'focus:bg-white focus:p-3 focus:text-blue-600 dark:focus:bg-gray-800 dark:focus:text-blue-400',
-        'focus:outline-none focus:ring-2 focus:ring-blue-500',
-        // Transition for smooth appearance
-        'transition-colors duration-200'
+        'z-50 focus:top-4 focus:left-4 focus:opacity-100',
+        // Professional styling when focused with brand colors
+        'focus:bg-gradient-to-r focus:from-purple-600 focus:to-cyan-600',
+        'focus:rounded-lg focus:px-4 focus:py-2 focus:font-medium focus:text-sm focus:text-white',
+        'focus:shadow-lg focus:shadow-purple-500/25',
+        // Remove default outline and add custom focus ring
+        'focus:outline-none focus:ring-2 focus:ring-white/20',
+        // Smooth transitions
+        'transition-all duration-200 ease-out'
       )}
-      aria-label='Skip to main content'
+      aria-label='Skip to calculator section'
     >
-      Skip to main content
+      Skip to Calculator
     </Link>
   );
 };

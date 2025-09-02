@@ -54,22 +54,26 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ```bash
 # Development
 npm run dev              # Start development server with hot reload
+npm run dev:turbo        # Start development server with Turbopack
 npm run build           # Build for production
 npm run start           # Start production server
 
 # Code Quality
 npm run fix-all         # Fix all linting, formatting, and type issues
 npm run format          # Format code with Biome
-npm run check           # Run type checking and linting
+npm run typecheck       # Run TypeScript type checking
+npm run lint            # Run Biome linting
 
 # Testing
 npm test                # Run unit tests (130+ test cases)
 npm run test:e2e        # Run E2E tests (5 test suites)
 npm run test:coverage   # Generate test coverage reports
+npm run test:all        # Run both unit and E2E tests
 
-# Performance & Maintenance
-npm run lighthouse-check # Run Lighthouse performance audit
-npm run post-change     # Complete check: format, lint, build, dev server
+# Performance & Monitoring
+npm run bundle:analyze  # Analyze bundle size and dependencies
+npm run monitor:performance # Run performance monitoring
+npm run audit:security  # Security audit and vulnerability scan
 ```
 
 ---
@@ -78,11 +82,11 @@ npm run post-change     # Complete check: format, lint, build, dev server
 
 ### Tech Stack
 
-- **Frontend:** Next.js 15.5, React 19, TypeScript 5.9
-- **Styling:** Tailwind CSS 4.1, Glass-morphism components
+- **Frontend:** Next.js 15.5, React 19, TypeScript 5.9 (ES2020 target)
+- **Styling:** Tailwind CSS 4.1, Glass-morphism components with clamp() responsive design
 - **State:** Zustand for calculator state management
-- **Testing:** Jest + React Testing Library + Playwright
-- **Quality:** Biome for linting/formatting, strict TypeScript
+- **Testing:** Jest 30.1.3 + React Testing Library + Playwright
+- **Quality:** Biome for linting/formatting, strict TypeScript with consistent casing
 - **Deployment:** Vercel with automatic CI/CD
 
 ### Key Components
@@ -149,15 +153,15 @@ Modern aesthetic with consistent design language:
 
 ### Responsive Design
 
-- **📱 Mobile First** - Touch-optimized with 320px+ support
-- **📊 Tablet Ready** - Enhanced experience on 768px+ screens
-- **💻 Desktop Perfect** - Full feature set on 1024px+ displays
-- **🖥️ 4K Optimized** - Scaling and typography for ultra-wide displays
+- **📱 Mobile First** - Touch-optimized with 320px+ support using clamp() functions
+- **📊 Tablet Ready** - Enhanced experience on 768px+ screens with adaptive layouts
+- **💻 Desktop Perfect** - Full feature set on 1024px+ displays with optimized grid layouts
+- **🖥️ Ultra-wide Optimized** - Professional scaling for 2560x1440+ displays with fluid container sizing
 
 ### Accessibility
 
 - **WCAG 2.1 AA Compliant** - Full keyboard navigation and screen reader support
-- **Focus Management** - Clear focus indicators and logical tab order
+- **Focus Management** - Custom focus styles replacing browser defaults, professional skip-to-content navigation
 - **Color Contrast** - Exceeds minimum ratios for all text and interactive elements
 
 ---
@@ -266,16 +270,17 @@ Contributions welcome! Please ensure:
 
 ---
 
-## 🏆 Recent Achievements (August 2025)
+## 🏆 Recent Achievements (September 2025)
 
 ### ✅ Completed Optimizations
 
-- **🎨 UI/UX Excellence** - Glass-morphism design with perfect table alignment
+- **🎨 UI/UX Excellence** - Glass-morphism design with perfect table alignment and custom focus styles
 - **🛡️ Error Handling** - Professional error boundaries at all levels
 - **📊 Testing Coverage** - 28+ new test cases, comprehensive E2E coverage
-- **⚡ Performance** - 30-50% render time improvement with React 19
+- **⚡ Performance** - 30-50% render time improvement with React 19, Turbopack support
 - **🔒 Security** - CSP, HSTS, Permissions Policy headers implemented
-- **📱 Responsive Design** - Perfect experience on all device sizes
+- **📱 Responsive Design** - Ultra-wide display optimization with fluid clamp() scaling
+- **⚙️ Configuration** - TypeScript ES2020 target, Jest 30.1.3, enhanced build scripts
 
 ### 📈 Current Status
 
