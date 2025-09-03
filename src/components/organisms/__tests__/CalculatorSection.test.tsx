@@ -1,10 +1,10 @@
 /**
  * @fileoverview CalculatorSection Component Test Suite
- * 
+ *
  * **Purpose**: Comprehensive testing of the main calculator orchestration component.
  * This suite validates the integration between user input forms, tax calculations,
  * result display, and state management through the Zustand store.
- * 
+ *
  * ### Component Architecture Tested:
  * The CalculatorSection serves as the main container component that:
  * - Orchestrates tax calculation workflow
@@ -13,7 +13,7 @@
  * - Integrates with Zustand store for state management
  * - Provides responsive layout for mobile and desktop
  * - Implements error boundaries and graceful error handling
- * 
+ *
  * ### Test Categories:
  * 1. **Basic Rendering** - Component structure and essential elements
  * 2. **User Interactions** - Button clicks, form submissions, state transitions
@@ -21,26 +21,26 @@
  * 4. **Responsive Design** - Layout adaptation across screen sizes
  * 5. **Error Handling** - Graceful degradation and error recovery
  * 6. **Integration Testing** - Component interaction with child components
- * 
+ *
  * ### State Management Testing:
  * Tests extensively mock the Zustand calculator store to validate:
  * - Proper state initialization and updates
  * - Action dispatch and side effects
  * - Component re-rendering on state changes
  * - Error state handling and recovery
- * 
+ *
  * ### Responsive Design Validation:
  * Ensures proper CSS class application for:
  * - Mobile-first responsive design
  * - Sticky positioning for results table
  * - Grid layouts that adapt to screen size
  * - Full-screen mode support
- * 
+ *
  * ### Testing Libraries Used:
  * - **@testing-library/react** - Component rendering and interaction testing
  * - **@testing-library/jest-dom** - Custom Jest matchers for DOM assertions
  * - **Jest** - Mocking, spying, and test framework functionality
- * 
+ *
  * @author ToolHubX Development Team
  * @version 2.1.0
  * @since 2024-08-20
@@ -101,7 +101,7 @@ describe('CalculatorSection', () => {
       render(<CalculatorSection />);
 
       expect(screen.getByText('Salary Information')).toBeInTheDocument();
-      expect(screen.getByText('🔄 Recalculate')).toBeInTheDocument();
+      expect(screen.getByText('Recalculate')).toBeInTheDocument();
       expect(screen.getByText('Reset')).toBeInTheDocument();
     });
 
@@ -118,7 +118,7 @@ describe('CalculatorSection', () => {
     it('should show recalculate button text by default', () => {
       render(<CalculatorSection />);
 
-      const recalculateButton = screen.getByText('🔄 Recalculate');
+      const recalculateButton = screen.getByText('Recalculate');
       expect(recalculateButton).toBeInTheDocument();
       expect(recalculateButton).not.toBeDisabled();
     });
@@ -126,13 +126,13 @@ describe('CalculatorSection', () => {
     it('should show loading state when recalculating', async () => {
       render(<CalculatorSection />);
 
-      const recalculateButton = screen.getByText('🔄 Recalculate');
+      const recalculateButton = screen.getByText('Recalculate');
       fireEvent.click(recalculateButton);
 
       // Should show loading state briefly
       await waitFor(
         () => {
-          expect(screen.getByText('⏳ Calculating...')).toBeInTheDocument();
+          expect(screen.getByText('Calculating...')).toBeInTheDocument();
         },
         { timeout: 100 }
       );
@@ -170,7 +170,7 @@ describe('CalculatorSection', () => {
 
       render(<CalculatorSection />);
 
-      const recalculateButton = screen.getByText('🔄 Recalculate');
+      const recalculateButton = screen.getByText('Recalculate');
       expect(recalculateButton).toBeDisabled();
     });
   });
@@ -188,6 +188,7 @@ describe('CalculatorSection', () => {
 
       const resultsSection = container.querySelector('.lg\\:sticky');
       expect(resultsSection).toBeInTheDocument();
+      expect(resultsSection).toHaveClass('lg:top-8');
     });
   });
 
@@ -195,7 +196,7 @@ describe('CalculatorSection', () => {
     it('should display calculation errors when present', () => {
       render(<CalculatorSection />);
 
-      const recalculateButton = screen.getByText('🔄 Recalculate');
+      const recalculateButton = screen.getByText('Recalculate');
 
       // Mock the calculate function to throw an error
       const mockCalculate = require('@/store/calculatorStore').useCalculatorStore().calculate;

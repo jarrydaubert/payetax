@@ -55,6 +55,23 @@ import {
 import { convertPeriodToAnnual } from './periodCalculator';
 
 /**
+ * Round monetary values to pence for accurate financial calculations
+ *
+ * This function ensures all monetary calculations maintain pence-level precision
+ * by rounding to 2 decimal places, which is critical for matching HMRC calculations.
+ *
+ * @param value - The monetary value to round
+ * @returns Value rounded to the nearest penny
+ *
+ * @example
+ * roundToPence(123.456789) // Returns 123.46
+ * roundToPence(99.994) // Returns 99.99
+ */
+function roundToPence(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
  * Input parameters required for tax calculation
  */
 export interface TaxCalculationInput {
@@ -171,12 +188,11 @@ function isTaxableAllowance(type: AllowanceType): boolean {
       // Added to net pay rather than reducing taxable income
       return false;
 
-    case 'uniformAllowance':
+    case 'uniformUpkeep':
       // Uniform and tool allowances - typically tax-free benefits
       // Not deductions from gross pay
       return false;
 
-    case 'other':
     default:
       // Conservative approach - treat as post-tax benefit unless specifically identified
       // Avoids incorrectly reducing taxable income for non-qualifying expenses
@@ -281,6 +297,22 @@ function isTaxableAllowance(type: AllowanceType): boolean {
  * ```
  */
 export function calculateTax(input: TaxCalculationInput): TaxCalculationResults {
+  // Debug logging for input verification (can be removed in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🧮 Tax Calculation Debug - Input Values:', {
+      salary: input.salary,
+      payPeriod: input.payPeriod,
+      taxYear: input.taxYear,
+      taxCode: input.taxCode,
+      isScottish: input.isScottish,
+      pensionContribution: input.pensionContribution,
+      pensionContributionType: input.pensionContributionType,
+      studentLoanPlans: input.studentLoanPlans,
+      niCategory: input.niCategory,
+      additionalAllowances: input.additionalAllowances?.length || 0,
+    });
+  }
+
   // ---------------
   // 1. Prepare input data and tax rates
   // ---------------
@@ -610,6 +642,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
   }
 
+  // Round monthly tax to pence for accuracy
+  monthlyTax = roundToPence(monthlyTax);
+
   // Calculate annual tax (for output)
   const annualTax = monthlyTax * 12;
 
@@ -643,6 +678,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       monthlyNationalInsurance += (upperAmount * niRates.upper.rate) / 100;
     }
   }
+
+  // Round monthly NI to pence for accuracy
+  monthlyNationalInsurance = roundToPence(monthlyNationalInsurance);
 
   // Calculate annual NI (for output)
   const annualNationalInsurance = monthlyNationalInsurance * 12;
@@ -692,6 +730,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       }
     }
   }
+
+  // Round monthly student loan to pence for accuracy
+  monthlyStudentLoan = roundToPence(monthlyStudentLoan);
 
   // Calculate annual student loan (for output)
   const annualStudentLoan = monthlyStudentLoan * 12;
@@ -759,48 +800,60 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       case PERIODS.FOUR_WEEKLY: {
         // Monthly * (12/13) - averages to four-weekly
         const fourWeeklyFactor = 12 / 13;
-        grossSalary[period] = monthlyGrossSalary * fourWeeklyFactor;
-        incomeTax[period] = monthlyTax * fourWeeklyFactor;
-        nationalInsuranceByPeriod[period] = monthlyNationalInsurance * fourWeeklyFactor;
-        studentLoanByPeriod[period] = monthlyStudentLoan * fourWeeklyFactor;
-        pensionContributionByPeriod[period] = monthlyPensionContribution * fourWeeklyFactor;
-        netPay[period] = monthlyNetPay * fourWeeklyFactor;
+        grossSalary[period] = roundToPence(monthlyGrossSalary * fourWeeklyFactor);
+        incomeTax[period] = roundToPence(monthlyTax * fourWeeklyFactor);
+        nationalInsuranceByPeriod[period] = roundToPence(
+          monthlyNationalInsurance * fourWeeklyFactor
+        );
+        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fourWeeklyFactor);
+        pensionContributionByPeriod[period] = roundToPence(
+          monthlyPensionContribution * fourWeeklyFactor
+        );
+        netPay[period] = roundToPence(monthlyNetPay * fourWeeklyFactor);
         break;
       }
 
       case PERIODS.FORTNIGHTLY: {
         // Monthly * (12/26) - averages to fortnightly
         const fortnightlyFactor = 12 / 26;
-        grossSalary[period] = monthlyGrossSalary * fortnightlyFactor;
-        incomeTax[period] = monthlyTax * fortnightlyFactor;
-        nationalInsuranceByPeriod[period] = monthlyNationalInsurance * fortnightlyFactor;
-        studentLoanByPeriod[period] = monthlyStudentLoan * fortnightlyFactor;
-        pensionContributionByPeriod[period] = monthlyPensionContribution * fortnightlyFactor;
-        netPay[period] = monthlyNetPay * fortnightlyFactor;
+        grossSalary[period] = roundToPence(monthlyGrossSalary * fortnightlyFactor);
+        incomeTax[period] = roundToPence(monthlyTax * fortnightlyFactor);
+        nationalInsuranceByPeriod[period] = roundToPence(
+          monthlyNationalInsurance * fortnightlyFactor
+        );
+        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fortnightlyFactor);
+        pensionContributionByPeriod[period] = roundToPence(
+          monthlyPensionContribution * fortnightlyFactor
+        );
+        netPay[period] = roundToPence(monthlyNetPay * fortnightlyFactor);
         break;
       }
 
       case PERIODS.WEEKLY: {
         // Monthly * (12/52) - averages to weekly
         const weeklyFactor = 12 / 52;
-        grossSalary[period] = monthlyGrossSalary * weeklyFactor;
-        incomeTax[period] = monthlyTax * weeklyFactor;
-        nationalInsuranceByPeriod[period] = monthlyNationalInsurance * weeklyFactor;
-        studentLoanByPeriod[period] = monthlyStudentLoan * weeklyFactor;
-        pensionContributionByPeriod[period] = monthlyPensionContribution * weeklyFactor;
-        netPay[period] = monthlyNetPay * weeklyFactor;
+        grossSalary[period] = roundToPence(monthlyGrossSalary * weeklyFactor);
+        incomeTax[period] = roundToPence(monthlyTax * weeklyFactor);
+        nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * weeklyFactor);
+        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * weeklyFactor);
+        pensionContributionByPeriod[period] = roundToPence(
+          monthlyPensionContribution * weeklyFactor
+        );
+        netPay[period] = roundToPence(monthlyNetPay * weeklyFactor);
         break;
       }
 
       case PERIODS.DAILY: {
         // Monthly * (12/260) - averages to daily (5 working days per week)
         const dailyFactor = 12 / 260;
-        grossSalary[period] = monthlyGrossSalary * dailyFactor;
-        incomeTax[period] = monthlyTax * dailyFactor;
-        nationalInsuranceByPeriod[period] = monthlyNationalInsurance * dailyFactor;
-        studentLoanByPeriod[period] = monthlyStudentLoan * dailyFactor;
-        pensionContributionByPeriod[period] = monthlyPensionContribution * dailyFactor;
-        netPay[period] = monthlyNetPay * dailyFactor;
+        grossSalary[period] = roundToPence(monthlyGrossSalary * dailyFactor);
+        incomeTax[period] = roundToPence(monthlyTax * dailyFactor);
+        nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * dailyFactor);
+        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * dailyFactor);
+        pensionContributionByPeriod[period] = roundToPence(
+          monthlyPensionContribution * dailyFactor
+        );
+        netPay[period] = roundToPence(monthlyNetPay * dailyFactor);
         break;
       }
 
@@ -809,20 +862,22 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         if (input.hoursPerWeek > 0) {
           // Monthly / (hours per week * 4.333 weeks per month)
           const monthlyHours = input.hoursPerWeek * 4.333; // Average weeks per month
-          grossSalary[period] = monthlyGrossSalary / monthlyHours;
-          incomeTax[period] = monthlyTax / monthlyHours;
-          nationalInsuranceByPeriod[period] = monthlyNationalInsurance / monthlyHours;
-          studentLoanByPeriod[period] = monthlyStudentLoan / monthlyHours;
-          pensionContributionByPeriod[period] = monthlyPensionContribution / monthlyHours;
-          netPay[period] = monthlyNetPay / monthlyHours;
+          grossSalary[period] = roundToPence(monthlyGrossSalary / monthlyHours);
+          incomeTax[period] = roundToPence(monthlyTax / monthlyHours);
+          nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance / monthlyHours);
+          studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan / monthlyHours);
+          pensionContributionByPeriod[period] = roundToPence(
+            monthlyPensionContribution / monthlyHours
+          );
+          netPay[period] = roundToPence(monthlyNetPay / monthlyHours);
         } else {
           // Default to annual / (52 * 40) if no hours specified
-          grossSalary[period] = annualGrossSalary / (52 * 40);
-          incomeTax[period] = annualTax / (52 * 40);
-          nationalInsuranceByPeriod[period] = annualNationalInsurance / (52 * 40);
-          studentLoanByPeriod[period] = annualStudentLoan / (52 * 40);
-          pensionContributionByPeriod[period] = annualPensionContribution / (52 * 40);
-          netPay[period] = annualNetPay / (52 * 40);
+          grossSalary[period] = roundToPence(annualGrossSalary / (52 * 40));
+          incomeTax[period] = roundToPence(annualTax / (52 * 40));
+          nationalInsuranceByPeriod[period] = roundToPence(annualNationalInsurance / (52 * 40));
+          studentLoanByPeriod[period] = roundToPence(annualStudentLoan / (52 * 40));
+          pensionContributionByPeriod[period] = roundToPence(annualPensionContribution / (52 * 40));
+          netPay[period] = roundToPence(annualNetPay / (52 * 40));
         }
         break;
     }
@@ -832,7 +887,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 12. Return results
   // ---------------
 
-  return {
+  const results = {
     grossSalary,
     taxFreeAmount: annualTaxFreeAmount,
     taxableIncome: annualTaxableIncome,
@@ -851,4 +906,23 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           }
         : undefined,
   };
+
+  // Debug logging for output verification (can be removed in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🧮 Tax Calculation Debug - Results:', {
+      annualGross: results.grossSalary.annually,
+      monthlyGross: results.grossSalary.monthly,
+      taxFreeAmount: results.taxFreeAmount,
+      taxableIncome: results.taxableIncome,
+      annualTax: results.incomeTax.annually,
+      monthlyTax: results.incomeTax.monthly,
+      annualNI: results.nationalInsurance.annually,
+      monthlyNI: results.nationalInsurance.monthly,
+      annualNet: results.netPay.annually,
+      monthlyNet: results.netPay.monthly,
+      taxBands: results.taxBands.map((b) => `${b.name}: £${b.amount} at ${b.rate}%`),
+    });
+  }
+
+  return results;
 }

@@ -10,19 +10,19 @@ This document provides comprehensive testing strategies, manual test suites, aut
 
 | Testing Type | Status | Coverage | Tools |
 |--------------|--------|----------|-------|
-| **Unit Tests** | ✅ Active | 89% | Jest + React Testing Library |
-| **E2E Tests** | ✅ Active | 5 Test Suites | Playwright |
-| **Linting** | ✅ Active | 110 Files | Biome |
-| **Type Checking** | ✅ Active | Zero Errors | TypeScript 5.9 |
+| **Unit Tests** | ✅ Active | 131 tests, 25.35% coverage | Jest + React Testing Library |
+| **E2E Tests** | ✅ Active | 157 tests across all browsers | Playwright |
+| **Linting** | ✅ Active | 116 files, 0 errors | Biome |
+| **Type Checking** | ✅ Active | Zero errors | TypeScript 5.9 |
 | **Performance** | ✅ Active | Lighthouse CI | Automated |
 
 ### Quality Metrics
 
-- **Test Coverage**: 89% (Target: 90%)
-- **Biome Violations**: 0 across 110 files
-- **TypeScript Errors**: 0
-- **E2E Pass Rate**: 100% on critical user journeys
-- **Performance Score**: 97/100 (Lighthouse)
+- **Unit Tests**: 131 passing tests (room for coverage improvement)
+- **E2E Tests**: 157 tests covering Chrome, Firefox, Safari + Mobile
+- **Code Quality**: 0 linting errors, 0 TypeScript errors
+- **Tax Accuracy**: HMRC-compliant with precise rounding fixes
+- **Auto-Reports**: All tests auto-generate and open HTML reports
 
 ---
 
@@ -40,19 +40,22 @@ This document provides comprehensive testing strategies, manual test suites, aut
 // - Form validation
 ```
 
-**Running Tests**:
+**Running Tests** (All Auto-Open HTML Reports):
 ```bash
-# Run all tests
+# Unit tests + coverage (auto-opens HTML coverage report)
 npm test
 
 # Watch mode for development
 npm run test:watch
 
-# Coverage report
-npm run test:coverage
+# E2E tests - all browsers + mobile (auto-opens HTML E2E report)  
+npm run test:e2e
 
-# Update snapshots
-npm run test:update-snapshots
+# Quick E2E - Chrome only (fast feedback, auto-opens report)
+npm run test:dev
+
+# Complete test suite (unit + E2E all browsers)
+npm run test:all
 ```
 
 **Key Test Categories**:
@@ -63,26 +66,36 @@ npm run test:update-snapshots
 
 ### End-to-End Testing (Playwright)
 
-**Test Suites**:
-1. **Basic Calculator Flow**: Salary input → calculation → results
-2. **Advanced Options**: Scottish rates, student loans, pensions
-3. **Export Functionality**: Excel export and print preview
-4. **Responsive Design**: Mobile/tablet/desktop layouts
-5. **Error Handling**: Invalid inputs and edge cases
+**157 E2E Tests** across 5 projects:
+1. **Chrome Desktop**: Core functionality and performance
+2. **Firefox Desktop**: Cross-browser compatibility  
+3. **Safari Desktop**: WebKit engine compatibility
+4. **Mobile Chrome**: Touch interactions and responsive design
+5. **Mobile Safari**: iOS compatibility
 
-**Running E2E Tests**:
+**Test Categories**:
+- **Basic Calculator Flow**: Salary input → calculation → results
+- **Advanced Options**: Scottish rates, student loans, pensions  
+- **Export Functionality**: Excel export and print preview
+- **Browser Compatibility**: Modern CSS and JavaScript features
+- **Performance**: Timing and interaction speed
+- **Accessibility**: Screen reader and keyboard navigation
+- **Responsive Design**: Mobile viewports and touch interactions
+- **Error Handling**: Invalid inputs and edge cases
+
+**Running E2E Tests** (All Auto-Open HTML Reports):
 ```bash
-# Run all E2E tests
+# All browsers + mobile (Chrome, Firefox, Safari + Mobile) - auto-opens report
 npm run test:e2e
 
-# Run specific suite
+# Quick Chrome-only testing - auto-opens report  
+npm run test:dev
+
+# Interactive test runner UI
+npm run test:e2e:ui
+
+# Run specific test file
 npx playwright test calculator-basic
-
-# Debug mode with browser
-npx playwright test --debug
-
-# Generate test report
-npx playwright show-report
 ```
 
 ### Performance Testing
@@ -364,6 +377,42 @@ npm run lighthouse-check
 
 ---
 
-**Last Updated**: August 27, 2025  
-**Test Suite Version**: v2.0.0  
-**Status**: ✅ Comprehensive testing strategy active with 89% coverage
+## 🚀 Production Build & Deployment
+
+### Streamlined Build Scripts
+
+```bash
+# Complete production build process
+npm run release       # Clean → Fix → Test → Analyze → Audit
+
+# Production deployment ready  
+npm run deploy        # Release + deployment confirmation
+
+# Quick production build (no tests)
+npm run build:analyze # Build with bundle analyzer
+```
+
+### Release Process Checklist
+
+The `npm run release` command automatically:
+
+1. **🧹 Clean**: Remove build artifacts and cache
+2. **🔧 Fix**: Format, lint, and typecheck code  
+3. **🧪 Test**: Run unit tests with coverage
+4. **📊 Analyze**: Generate bundle analysis
+5. **🛡️ Audit**: Check for security vulnerabilities
+
+### Build Validation
+
+Before deployment, verify:
+- ✅ All 131 unit tests pass
+- ✅ Code coverage meets standards
+- ✅ Zero linting/TypeScript errors
+- ✅ Bundle size is optimized
+- ✅ No security vulnerabilities
+
+---
+
+**Last Updated**: September 3, 2025  
+**Test Suite Version**: v2.1.0  
+**Status**: ✅ 131 unit tests + 157 E2E tests, all auto-generate HTML reports

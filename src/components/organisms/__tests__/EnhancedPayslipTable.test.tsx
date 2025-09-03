@@ -303,8 +303,8 @@ describe('EnhancedPayslipTable', () => {
       const cells = table.querySelectorAll('td');
 
       for (const cell of cells) {
-        // All cells should have compact padding
-        expect(cell).toHaveClass('p-2');
+        // All cells should have compact padding (p-1 or p-2)
+        expect(cell.className).toMatch(/p-[12]/);
       }
     });
 

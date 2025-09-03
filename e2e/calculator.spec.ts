@@ -25,8 +25,8 @@ test.describe('Tax Calculator E2E Tests', () => {
 
   test('should perform basic tax calculation with HMRC-compliant amounts', async ({ page }) => {
     // Use the page already loaded by beforeEach - no need to navigate again
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000); // Allow any dynamic loading to complete
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Allow any dynamic loading to complete
 
     const testData = generateUniqueTestData({ salary: 30000 });
 
@@ -35,7 +35,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.clear(); // Clear existing value first
     await salaryInput.fill(testData.salary.toString());
-    await page.waitForTimeout(200); // Wait for auto-calculation debounce
+    await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
     // Select tax year (if available)
     const taxYearSelect = page.getByLabel(/tax year/i);
@@ -46,72 +46,15 @@ test.describe('Tax Calculator E2E Tests', () => {
     // Auto-calculation should have triggered, but let's click calculate button as backup
     const calculateButton = page.getByRole('button', { name: /calculate/i });
     await calculateButton.click();
+    await page.waitForTimeout(1000); // Give calculation time to process
 
     // Wait for results to appear and calculation to complete
     const taxResults = page.locator('[data-testid="tax-results"]');
     await expect(taxResults).toBeVisible({ timeout: 10000 });
 
-    // Wait for calculation to complete - look for actual results table
-    await page.waitForTimeout(2000); // Give time for calculation
-
-    // Check if we have the results table or still showing "Enter your salary" message
+    // Simple and robust approach - wait for results table with generous timeout
     const resultsTable = taxResults.locator('[data-testid="results-table"]');
-    const noResultsMessage = taxResults.locator(
-      'text=Enter your salary to see detailed calculations'
-    );
-
-    if (await noResultsMessage.isVisible()) {
-      console.log('Still showing no results message - calculation may have failed');
-      // Try clicking calculate again
-      const calcButton = page.locator('[data-testid="calculate-button"]');
-      await calcButton.click({ force: true });
-      await page.waitForTimeout(3000);
-    }
-
-    // ENHANCED retry logic for calculation results table - AGGRESSIVE for mobile
-    let tableVisible = false;
-    let retryCount = 0;
-    const maxRetries = 6; // Increased from 4 to 6 for mobile issues
-
-    while (!tableVisible && retryCount < maxRetries) {
-      try {
-        await expect(resultsTable).toBeVisible({ timeout: 5000 }); // Increased timeout
-        tableVisible = true;
-        console.log(`✓ Results table visible after ${retryCount} retries`);
-      } catch (_error) {
-        retryCount++;
-        console.log(`Results table not visible, retry ${retryCount}/${maxRetries}...`);
-
-        if (retryCount < maxRetries) {
-          // AGGRESSIVE retry approach for mobile
-          await page.waitForTimeout(500);
-
-          // Clear and refill salary input with force
-          await salaryInput.clear();
-          await page.waitForTimeout(400);
-          await salaryInput.fill(testData.salary.toString(), { force: true });
-          await page.waitForTimeout(800);
-
-          // Multiple click approaches for stubborn mobile
-          const retryButton = page.locator('[data-testid="calculate-button"]');
-          await retryButton.click({ force: true });
-          await page.waitForTimeout(500);
-          await retryButton.click({ force: true }); // Double click for mobile
-          await page.waitForTimeout(2500 + retryCount * 1000); // Longer progressive backoff
-
-          // Additional trigger for mobile - try alternate selector
-          if (retryCount >= 3) {
-            const altButton = page.getByRole('button', { name: /calculate/i });
-            if (await altButton.isVisible()) {
-              await altButton.click({ force: true });
-              await page.waitForTimeout(1000);
-            }
-          }
-        } else {
-          throw new Error(`Results table failed to appear after ${maxRetries} retries`);
-        }
-      }
-    }
+    await expect(resultsTable).toBeVisible({ timeout: 15000 }); // Generous timeout for calculation processing
 
     // Check that tax amounts are displayed
     const taxTable = page.locator('[data-testid="results-table"]');
@@ -416,48 +359,35 @@ test.describe('Tax Calculator E2E Tests', () => {
   test('should export results to Excel', async ({ page }) => {
     // Ensure clean state by navigating to fresh page
     // Use the page already loaded by beforeEach - avoid navigation conflicts
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000); // Allow any dynamic loading to complete
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Allow any dynamic loading to complete
 
-    // Perform calculation first using consistent data-testid selector
+    // Perform calculation using the same successful approach as basic tax calculation test
+    const testData = generateUniqueTestData({ salary: 35000 }); // Use same pattern as working test
+
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.clear();
-    await salaryInput.fill('35000');
-    await page.waitForTimeout(200); // Wait for auto-calculation debounce
-    await page.getByRole('button', { name: /calculate/i }).click();
-    await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 10000 });
+    await salaryInput.fill(testData.salary.toString()); // Use testData like the working test
+    await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
-    // CRITICAL: Wait for actual calculation results table before export
-    const resultsTable = page
-      .locator('[data-testid="tax-results"]')
-      .locator('[data-testid="results-table"]');
-    let tableVisible = false;
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    while (!tableVisible && retryCount < maxRetries) {
-      try {
-        await expect(resultsTable).toBeVisible({ timeout: 4000 });
-        tableVisible = true;
-        console.log(`✓ Export test - results table visible after ${retryCount} retries`);
-      } catch (_error) {
-        retryCount++;
-        console.log(
-          `Export test - results table not visible, retry ${retryCount}/${maxRetries}...`
-        );
-
-        if (retryCount < maxRetries) {
-          // Force another calculation
-          await page.waitForTimeout(500);
-          await page.locator('[data-testid="calculate-button"]').click({ force: true });
-          await page.waitForTimeout(2000 + retryCount * 1000);
-        } else {
-          console.log('Export test proceeding without results table - testing button availability');
-          break;
-        }
-      }
+    // Select tax year (if available) - same as working test
+    const taxYearSelect = page.getByLabel(/tax year/i);
+    if (await taxYearSelect.isVisible()) {
+      await taxYearSelect.selectOption('2024-2025');
     }
+
+    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    await calculateButton.click();
+    await page.waitForTimeout(1000); // Give calculation time to process
+
+    // Wait for results to appear and calculation to complete
+    const taxResults = page.locator('[data-testid="tax-results"]');
+    await expect(taxResults).toBeVisible({ timeout: 10000 });
+
+    // Wait for results table - same simple approach as working basic tax test
+    const resultsTable = taxResults.locator('[data-testid="results-table"]');
+    await expect(resultsTable).toBeVisible({ timeout: 15000 }); // Generous timeout for calculation processing
 
     // Dismiss any overlays or notifications that might interfere
     const cookieBanner = page.locator('role=dialog');
@@ -594,8 +524,8 @@ test.describe('Tax Calculator E2E Tests', () => {
   test('should navigate between pages correctly', async ({ page }) => {
     // Ensure clean state by navigating to fresh page
     // Use the page already loaded by beforeEach - avoid navigation conflicts
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000); // Allow any dynamic loading to complete
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Allow any dynamic loading to complete
 
     // Test navigation to about page - target navigation link specifically
     const aboutLink = page.getByRole('navigation').getByRole('link', { name: /about/i });

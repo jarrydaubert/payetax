@@ -81,16 +81,30 @@ export function clearCookieConsent(): void {
  */
 export function isConsentExpired(): boolean {
   try {
-    const timestamp = getConsentTimestamp();
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return false; // No consent storage available, not expired
+    }
+
+    // Check if consent timestamp exists
+    let timestamp: string | null = null;
+    try {
+      timestamp = localStorage.getItem('cookie-consent-timestamp');
+    } catch (error) {
+      console.warn('Failed to check if consent is expired:', error);
+      return true; // Error accessing storage, assume expired for safety
+    }
 
     if (!timestamp) {
       return false; // No consent given, so not expired
     }
 
+    // Parse and check if expired
+    const consentDate = new Date(timestamp);
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
-    return timestamp < twelveMonthsAgo;
+    return consentDate < twelveMonthsAgo;
   } catch (error) {
     console.warn('Failed to check if consent is expired:', error);
     return true; // Assume expired on error for safety

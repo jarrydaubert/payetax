@@ -1,11 +1,29 @@
-# 📜 Package.json Scripts Guide
+# 📜 ToolHubX Scripts Guide
 
-This document explains all the npm scripts available in the project and when to use them.
+This document explains all the npm scripts available in ToolHubX and when to use them.
+
+**Last Updated**: September 3, 2025  
+**Version**: v2.1.0 - Streamlined Scripts
+
+---
+
+## 🚀 Quick Reference
+
+| Need | Command | Auto-Opens Report |
+|------|---------|-------------------|
+| **Start Development** | `npm run dev` | ❌ |
+| **Run Tests** | `npm test` | ✅ Coverage HTML |
+| **Quick E2E Test** | `npm run test:dev` | ✅ E2E HTML |
+| **Full Testing** | `npm run test:all` | ✅ Both Reports |
+| **Production Build** | `npm run release` | ❌ |
+| **Deploy Ready** | `npm run deploy` | ❌ |
+
+---
 
 ## 🏃 Development Scripts
 
 ### `npm run dev`
-**Purpose**: Start the development server with hot reloading  
+**Purpose**: Start development server with hot reloading  
 **When to use**: Daily development work  
 **What it does**:
 - Starts Next.js development server on port 3000
@@ -13,22 +31,13 @@ This document explains all the npm scripts available in the project and when to 
 - Provides detailed error messages and debugging info
 - Loads in development mode with unoptimized assets
 
-### `npm run quick-start`
-**Purpose**: Clean build artifacts and start development server  
-**When to use**: When dev server is acting up or after switching branches  
+### `npm run dev:turbo`
+**Purpose**: Start development server with Turbopack  
+**When to use**: Faster development builds (experimental)  
 **What it does**:
-- Runs `npm run clean` to remove build artifacts
-- Starts development server fresh
-- Faster alternative to full reset
-
-### `npm run dev-setup`
-**Purpose**: Complete fresh development environment setup  
-**When to use**: First time setup or after major changes  
-**What it does**:
-- Runs `npm run clean:all` (removes node_modules and reinstalls)
-- Runs `npm run fix-all` (formatting, linting, type checking)
-- Starts development server
-- Takes longer but ensures clean environment
+- Uses Next.js Turbopack for faster builds
+- Experimental faster bundling
+- Same hot reloading as regular dev mode
 
 ---
 
@@ -36,7 +45,7 @@ This document explains all the npm scripts available in the project and when to 
 
 ### `npm run build`
 **Purpose**: Create production build  
-**When to use**: Before deployment or testing production builds  
+**When to use**: Testing production builds locally  
 **What it does**:
 - Compiles TypeScript to JavaScript
 - Optimizes and minifies all assets
@@ -47,380 +56,256 @@ This document explains all the npm scripts available in the project and when to 
 **Purpose**: Build with bundle size analysis  
 **When to use**: Investigating bundle size or optimizing performance  
 **What it does**:
-- Runs production build
-- Generates bundle analysis report
-- Opens webpack-bundle-analyzer in browser
-- Shows detailed breakdown of what's in your bundles
+- Runs production build with webpack analyzer
+- Opens interactive bundle analysis in browser
+- Shows detailed breakdown of bundle composition
+- Identifies large dependencies and optimization opportunities
 
-### `npm run debug-build`
-**Purpose**: Isolate and debug build issues  
-**When to use**: When builds are failing  
+### `npm run start`
+**Purpose**: Start production server  
+**When to use**: Testing production builds locally  
 **What it does**:
-- Runs clean to remove old artifacts
-- Runs type checking to catch TypeScript errors
-- Runs build to identify specific build problems
-- Helps isolate whether issues are caching or code-related
+- Serves the built `.next` directory
+- Runs in production mode
+- Requires `npm run build` to be run first
 
 ---
 
-## ✅ Testing Scripts
+## ✅ Testing Scripts (Auto-Report Generation)
 
-### `npm run test`
-**Purpose**: Run unit tests with Jest  
+### `npm test`
+**Purpose**: Run unit tests with coverage  
 **When to use**: After writing code, before commits  
+**Auto-Opens**: Coverage HTML report  
 **What it does**:
-- Executes all `.test.ts` and `.test.tsx` files
-- Shows test results and coverage summary
-- Fails if any tests fail
+- Runs all 131 unit tests with Jest
+- Generates coverage report (25.35% current coverage)
+- Opens interactive HTML coverage report in browser
+- Shows line-by-line coverage with red/green highlighting
 
 ### `npm run test:watch`
 **Purpose**: Run tests in watch mode  
 **When to use**: During test-driven development  
+**Auto-Opens**: No  
 **What it does**:
 - Runs tests continuously
 - Re-runs tests when files change
 - Interactive mode for focusing on specific tests
-
-### `npm run test:coverage`
-**Purpose**: Generate detailed code coverage report  
-**When to use**: Checking test coverage quality  
-**What it does**:
-- Runs all tests
-- Generates coverage report in `coverage/` directory
-- Shows which lines/branches are not tested
+- Great for TDD workflow
 
 ### `npm run test:e2e`
-**Purpose**: Run end-to-end tests with Playwright  
-**When to use**: Before releases, testing user workflows  
+**Purpose**: Run full E2E test suite  
+**When to use**: Before releases, comprehensive testing  
+**Auto-Opens**: E2E HTML report  
 **What it does**:
-- Starts development server automatically
-- Runs tests in multiple browsers (Chrome, Firefox, Safari)
+- Runs 157 E2E tests across ALL browsers:
+  - Chrome Desktop
+  - Firefox Desktop  
+  - Safari Desktop
+  - Mobile Chrome
+  - Mobile Safari
 - Tests real user interactions and workflows
+- Opens comprehensive HTML report with videos/screenshots
 
-### `npm run test:e2e:ui`
-**Purpose**: Run E2E tests with interactive UI  
-**When to use**: Debugging failing E2E tests  
+### `npm run test:dev`
+**Purpose**: Quick E2E testing (Chrome only)  
+**When to use**: Fast feedback during development  
+**Auto-Opens**: E2E HTML report  
 **What it does**:
-- Opens Playwright test runner UI
-- Allows step-by-step debugging
-- Visual test execution and inspection
+- Runs E2E tests in Chrome only (fastest)
+- Perfect for rapid iteration
+- Opens HTML report with test results
+- Much faster than full cross-browser testing
 
-### Browser-Specific Testing
-
-#### `npm run test:chrome`
-**Purpose**: Run tests only in Chrome  
-**What it does**: Fast E2E testing in single browser
-
-#### `npm run test:firefox`
-**Purpose**: Run tests only in Firefox  
-**What it does**: Test Firefox-specific compatibility
-
-#### `npm run test:safari`
-**Purpose**: Run tests only in WebKit/Safari  
-**What it does**: Test Safari-specific compatibility
-
-#### `npm run test:browsers`
-**Purpose**: Run tests across all desktop browsers  
-**What it does**: Tests Chrome, Firefox, and Safari together
-
-#### `npm run test:mobile`
-**Purpose**: Run tests on mobile browsers  
-**What it does**: Tests Mobile Chrome and Mobile Safari
-
-#### `npm run test:compatibility`
-**Purpose**: Run comprehensive browser compatibility tests  
-**What it does**: Executes the dedicated browser compatibility test suite
+### `npm run test:all`
+**Purpose**: Complete test suite  
+**When to use**: Before major releases, comprehensive validation  
+**Auto-Opens**: Both HTML reports  
+**What it does**:
+- Runs unit tests + coverage (opens coverage report)
+- Runs full E2E tests all browsers (opens E2E report)
+- Most comprehensive testing option
+- Takes longest but most thorough
 
 ---
 
 ## 🔧 Code Quality Scripts
 
-### `npm run lint`
-**Purpose**: Check and fix code style issues  
-**When to use**: Before commits, daily development  
+### `npm run fix-all`
+**Purpose**: Fix all code quality issues  
+**When to use**: Before commits, after major changes  
 **What it does**:
-- Runs Biome linter on all source files
-- Automatically fixes auto-fixable issues
-- Reports remaining issues that need manual attention
+- Formats code with Biome (`npm run format`)
+- Fixes linting issues with Biome (`npm run lint`)
+- Runs TypeScript type checking (`npm run typecheck`)
+- Ensures zero errors across all quality checks
 
 ### `npm run format`
-**Purpose**: Format code according to project standards  
-**When to use**: Before commits, after messy coding sessions  
+**Purpose**: Format code with Biome  
+**When to use**: Code formatting issues  
 **What it does**:
-- Runs Biome formatter on all source files
-- Ensures consistent indentation, spacing, and style
-- Modifies files in place
+- Formats all TypeScript/JavaScript files
+- Applies consistent code style
+- Fixes indentation, spacing, semicolons
+- Uses modern Biome formatter
+
+### `npm run lint`
+**Purpose**: Run Biome linting  
+**When to use**: Code quality issues  
+**What it does**:
+- Lints 116 files with Biome
+- Fixes automatically fixable issues
+- Reports remaining issues
+- Ensures code quality standards
 
 ### `npm run typecheck`
-**Purpose**: Check TypeScript types without building  
-**When to use**: Quick type checking, before commits  
+**Purpose**: Run TypeScript type checking  
+**When to use**: Type errors, after major changes  
 **What it does**:
-- Runs TypeScript compiler in check mode
-- Reports type errors without generating files
-- Faster than full build for type checking
+- Runs `tsc --noEmit` to check types
+- Reports TypeScript errors without building
+- Validates type safety across codebase
+- Currently maintains zero errors
 
 ---
 
-## 🚀 Combined Workflow Scripts
+## 🚀 Production & Deployment Scripts
 
-### `npm run fix-all`
-**Purpose**: Complete code quality check and fix  
-**When to use**: Before every commit, daily cleanup  
+### `npm run release`
+**Purpose**: Complete production build process  
+**When to use**: **Main production build command**  
 **What it does**:
-1. Formats all code (`npm run format`)
-2. Runs linter with fixes (`npm run lint`)
-3. Checks all TypeScript types (`npm run typecheck`)
-**Success means**: Code is properly formatted, linted, and type-safe
+1. **🧹 Clean**: Remove build artifacts and cache
+2. **🔧 Fix**: Format, lint, and typecheck code
+3. **🧪 Test**: Run unit tests with coverage
+4. **📊 Analyze**: Generate bundle analysis
+5. **🛡️ Audit**: Check for security vulnerabilities
 
-### `npm run check-all`
-**Purpose**: Comprehensive validation without changes  
-**When to use**: CI checks, pre-push validation  
+### `npm run deploy`
+**Purpose**: Production deployment ready  
+**When to use**: Final deployment preparation  
 **What it does**:
-1. Type checking (`npm run typecheck`)
-2. Linting validation (`npm run lint`)
-3. Security audit (`npm run audit:deps`)
-**Success means**: Code quality and security are acceptable
+- Runs complete `npm run release` process
+- Adds deployment confirmation message
+- Final validation before deployment
 
-### `npm run test-quick`
-**Purpose**: Fast test suite for quick feedback  
-**When to use**: During development, before commits  
+### `npm run debug`
+**Purpose**: Debug build issues  
+**When to use**: When builds are failing  
 **What it does**:
-- Runs unit tests (allows no tests to pass)
-- Runs Chrome E2E tests only
-- Optimized for speed over comprehensiveness
-
-### `npm run test-full`
-**Purpose**: Comprehensive testing across all environments  
-**When to use**: Before releases, important milestones  
-**What it does**:
-1. Runs tests with coverage report
-2. Tests all browsers (Chrome, Firefox, Safari)
-3. Runs compatibility tests
-**Takes longer but ensures quality**
-
-### `npm run test-all`
-**Purpose**: Standard test suite (unit + E2E)  
-**When to use**: Regular testing, CI pipelines  
-**What it does**:
-- Runs unit tests
-- Runs E2E tests in all configured browsers
-- Good balance of speed and coverage
+- Runs clean to remove old artifacts
+- Runs TypeScript checking to catch errors
+- Runs build to identify specific problems
+- Helps isolate caching vs code issues
 
 ---
 
-## 🧹 Cleanup Scripts
+## 🧹 Maintenance Scripts
 
 ### `npm run clean`
-**Purpose**: Remove build artifacts and temporary files  
-**When to use**: When builds are acting weird, switching branches  
+**Purpose**: Remove build artifacts  
+**When to use**: Build issues, cache problems  
 **What it does**:
 - Removes `.next` directory
 - Removes `coverage` directory
-- Removes `playwright-report` and `test-results`
+- Removes `playwright-report` directory
+- Removes `test-results` directory
 - Removes TypeScript build info files
 
-### `npm run clean:all`
-**Purpose**: Nuclear option - complete project reset  
-**When to use**: When everything is broken, dependency conflicts  
+### `npm run clean:dev`
+**Purpose**: Clean and restart development  
+**When to use**: Dev server issues  
 **What it does**:
-1. Runs `npm run clean`
-2. Removes `node_modules` directory
-3. Runs fresh `npm install`
-**Warning**: Takes several minutes but fixes most issues
+- Runs `npm run clean`
+- Starts development server fresh
+- Good for resolver cache issues
 
-### `npm run full-reset`
-**Purpose**: Complete reset and setup  
-**When to use**: After major package updates, corruption  
+### `npm run clean:all`
+**Purpose**: Complete environment reset  
+**When to use**: Major dependency issues  
 **What it does**:
-1. Complete cleanup (`npm run clean:all`)
-2. Full development setup (`npm run dev-setup`)
-**Nuclear option with immediate usability**
+- Runs `npm run clean`
+- Removes `node_modules`
+- Runs `npm install`
+- Nuclear option for dependency issues
 
 ---
 
 ## 📊 Monitoring & Analysis Scripts
 
-### `npm run lighthouse`
-**Purpose**: Run Lighthouse performance audit  
-**When to use**: Checking performance metrics  
-**What it does**:
-- Audits localhost:3000 for performance
-- Generates HTML report
-- Opens report in browser automatically
-
-### `npm run lighthouse:ci`
-**Purpose**: Automated Lighthouse testing  
-**When to use**: CI/CD pipelines, automated testing  
-**What it does**:
-- Builds and starts server automatically
-- Runs multiple Lighthouse audits
-- Suitable for automation
-
-### `npm run monitor:performance`
-**Purpose**: Comprehensive performance monitoring  
-**When to use**: Regular performance checkups  
-**What it does**:
-- Runs detailed performance analysis
-- Tracks performance trends over time
-- Generates recommendations for improvements
-
 ### `npm run bundle:analyze`
-**Purpose**: Analyze bundle size without building  
-**When to use**: Quick bundle size check  
+**Purpose**: Analyze bundle composition  
+**When to use**: Performance optimization  
 **What it does**:
-- Analyzes existing build for bundle sizes
-- Shows size trends over time
-- Requires existing build
-
-### `npm run bundle:monitor`
-**Purpose**: Full bundle analysis with fresh build  
-**When to use**: Comprehensive bundle investigation  
-**What it does**:
-1. Fresh production build
-2. Complete bundle size analysis
-3. Historical comparison and trends
-
----
-
-## 🔒 Security Scripts
+- Runs production build
+- Generates webpack bundle analysis
+- Opens interactive visualization
+- Shows what's contributing to bundle size
 
 ### `npm run audit:deps`
-**Purpose**: Check for vulnerable dependencies  
-**When to use**: Monthly security checkups, before releases  
+**Purpose**: Security audit for dependencies  
+**When to use**: Security validation, regular maintenance  
 **What it does**:
-- Scans all dependencies for known vulnerabilities
-- Reports high-severity issues only
-- Fails build if critical vulnerabilities found
+- Runs `npm audit --audit-level=high`
+- Reports security vulnerabilities
+- Shows only high-severity issues
+- Part of release process
 
-### `npm run audit:security`
-**Purpose**: Comprehensive security audit with reporting  
-**When to use**: Detailed security analysis  
+### `npm run check-all`
+**Purpose**: Comprehensive code quality check  
+**When to use**: Pre-commit validation  
 **What it does**:
-- Detailed vulnerability analysis
-- Security trend tracking
-- Recommendations for fixes
-- Historical security posture tracking
-
-### `npm run audit:security:fix`
-**Purpose**: Attempt automatic security fixes  
-**When to use**: After finding security issues  
-**What it does**:
-1. Runs `npm audit fix` to auto-fix issues
-2. Re-runs security audit to verify fixes
-3. Shows remaining manual issues
+- Runs TypeScript checking
+- Runs Biome linting
+- Runs dependency audit
+- Comprehensive validation without building
 
 ---
 
-## 🚢 Deployment Workflow Scripts
-
-### `npm run pre-commit`
-**Purpose**: Validate code before committing  
-**When to use**: Git pre-commit hooks, manual validation  
-**What it does**:
-1. Fix all code quality issues (`npm run fix-all`)
-2. Run quick tests (`npm run test-quick`)
-**Fast validation suitable for every commit**
-
-### `npm run pre-push`
-**Purpose**: Comprehensive validation before pushing  
-**When to use**: Before pushing to main branch  
-**What it does**:
-1. Complete validation (`npm run check-all`)
-2. Full test suite (`npm run test-all`)
-3. Production build verification (`npm run build`)
-**Ensures push won't break main branch**
-
-### `npm run release-check`
-**Purpose**: Complete pre-release validation  
-**When to use**: Before creating releases or deploying  
-**What it does**:
-1. Code quality fixes (`npm run fix-all`)
-2. Comprehensive testing (`npm run test-full`)
-3. Production build (`npm run build`)
-4. Performance audit (`npm run audit:perf:ci`)
-**Most thorough validation available**
-
-### `npm run deploy-prep`
-**Purpose**: Prepare for deployment  
-**When to use**: Before deploying to production  
-**What it does**:
-1. Clean environment (`npm run clean`)
-2. Code quality fixes (`npm run fix-all`)
-3. Full testing (`npm run test-full`)
-4. Bundle analysis (`npm run build:analyze`)
-**Ensures deployment readiness**
-
-### `npm run post-deploy`
-**Purpose**: Verify deployment health  
-**When to use**: After successful deployment  
-**What it does**:
-1. Performance monitoring (`npm run monitor:performance`)
-2. Health check (`npm run health-check`)
-**Confirms deployment is working correctly**
-
----
-
-## 🔍 Debug Scripts
-
-### `npm run debug-tests`
-**Purpose**: Investigate test failures  
-**When to use**: When tests are failing unexpectedly  
-**What it does**:
-- Runs tests with coverage report
-- Opens interactive E2E test UI
-- Provides detailed failure information
-
-### `npm run health-check`
-**Purpose**: Overall project health assessment  
-**When to use**: Weekly health checks, after major changes  
-**What it does**:
-1. Code quality validation (`npm run check-all`)
-2. All monitoring checks (`npm run monitor-all`)
-**Comprehensive project health report**
-
-### `npm run monitor-all`
-**Purpose**: Run all monitoring and analysis tools  
-**When to use**: Comprehensive project analysis  
-**What it does**:
-1. Security audit (`npm run audit:security`)
-2. Bundle analysis (`npm run bundle:analyze`)  
-3. Performance monitoring (`npm run monitor:performance`)
-**Takes time but provides complete project insights**
-
----
-
-## 🎯 Quick Reference
+## 🎯 Workflow Recommendations
 
 ### Daily Development
 ```bash
-npm run quick-start      # Start fresh development
-npm run pre-commit       # Before each commit
-npm run test-quick       # Quick testing
+npm run dev          # Start development
+npm test             # Quick unit test validation
+npm run test:dev     # Quick E2E validation
 ```
 
-### Weekly Maintenance
+### Before Committing
 ```bash
-npm run health-check     # Overall project health
-npm run test-full        # Comprehensive testing
-npm run monitor-all      # Complete analysis
+npm run fix-all      # Fix code quality issues
+npm test             # Validate unit tests
 ```
 
-### Before Important Milestones
+### Before Release
 ```bash
-npm run pre-push         # Before pushing to main
-npm run release-check    # Before releases
-npm run deploy-prep      # Before deployment
+npm run release      # Complete production build
+npm run deploy       # Final deployment validation
 ```
 
-### When Things Go Wrong
+### Debugging Issues
 ```bash
-npm run debug-build      # Build issues
-npm run debug-tests      # Test failures
-npm run full-reset       # Nuclear option
+npm run clean        # Clear cache
+npm run debug        # Debug build issues
+npm run clean:all    # Nuclear option
 ```
 
 ---
 
-**Last Updated**: August 28, 2025  
-**Scripts Count**: 45 total scripts  
-**Workflow Coverage**: Development, Testing, Building, Deployment, Monitoring, Debugging
+## 🏆 Script Evolution
+
+**Previous Version**: 15+ scripts with manual report management  
+**Current Version**: 9 essential scripts with auto-report generation  
+
+**Key Improvements**:
+- ✅ Auto-opening HTML reports for all test commands
+- ✅ Cross-browser E2E testing by default  
+- ✅ Streamlined production build process
+- ✅ Eliminated redundant/confusing scripts
+- ✅ Clear workflow recommendations
+
+---
+
+**Last Updated**: September 3, 2025  
+**Script Version**: v2.1.0  
+**Status**: ✅ Production-ready streamlined scripts

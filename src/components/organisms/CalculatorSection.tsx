@@ -799,7 +799,7 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
           </div>
 
           {/* Results - Below inputs on mobile, side-by-side on desktop */}
-          <div className='space-y-3 overflow-x-auto lg:col-span-9 xl:col-span-9'>
+          <div className='space-y-3 overflow-x-auto lg:sticky lg:top-8 lg:col-span-9 xl:col-span-9'>
             <EnhancedPayslipTable
               results={results}
               allowancesDeductions={input.additionalAllowances

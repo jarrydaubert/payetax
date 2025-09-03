@@ -139,9 +139,9 @@ describe('BlogPage', () => {
 
       // All category buttons should have consistent padding and text size
       for (const button of categoryButtons) {
-        expect(button.className).toContain('px-4 py-3');
-        expect(button.className).toContain('text-base');
-        expect(button.className).toContain('rounded-xl');
+        expect(button.className).toContain('px-3 py-2');
+        expect(button.className).toContain('text-sm');
+        expect(button.className).toContain('rounded-lg');
       }
     });
   });

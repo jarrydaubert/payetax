@@ -84,8 +84,8 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
   });
 
   test('should meet accessibility standards', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Give page time to fully render
 
     // Test keyboard navigation
     await page.keyboard.press('Tab');
@@ -106,7 +106,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     const startTime = Date.now();
 
     // Navigate and measure load time with modern optimizations
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(
       page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
     ).toBeVisible();
@@ -129,8 +129,8 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
   });
 
   test('should handle form validation gracefully', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Give page time to fully render
 
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });

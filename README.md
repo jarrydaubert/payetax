@@ -24,7 +24,7 @@ ToolHubX is a production-ready UK PAYE tax calculator built with Next.js 15 and 
 - **⚡ Exceptional Performance** - 95+ Lighthouse scores, zero TypeScript errors
 - **📱 Fully Responsive** - Optimized for mobile, tablet, desktop, and 4K displays
 - **🎨 Glass-Morphism Design** - Modern aesthetic with consistent UI components
-- **🧪 Comprehensive Testing** - 130+ unit tests + E2E test coverage
+- **🧪 Comprehensive Testing** - 131 unit tests (25.35% coverage) + 157 E2E tests across all browsers
 
 ---
 
@@ -64,17 +64,31 @@ npm run format          # Format code with Biome
 npm run typecheck       # Run TypeScript type checking
 npm run lint            # Run Biome linting
 
-# Testing
-npm test                # Run unit tests (130+ test cases)
-npm run test:e2e        # Run E2E tests (5 test suites)
-npm run test:coverage   # Generate test coverage reports
-npm run test:all        # Run both unit and E2E tests
+# Testing (Auto-Opens Reports)
+npm test                # Unit tests + coverage (131 tests, opens HTML report)
+npm run test:e2e        # E2E tests all browsers + mobile (157 tests, opens HTML report)
+npm run test:dev        # Quick E2E Chrome-only (fast feedback, opens HTML report)
+npm run test:all        # Complete test suite (unit + E2E all browsers)
+
+# Production Build
+npm run release         # Complete production build (clean, test, analyze, audit)
+npm run deploy          # Production deployment ready
 
 # Performance & Monitoring
-npm run bundle:analyze  # Analyze bundle size and dependencies
-npm run monitor:performance # Run performance monitoring
-npm run audit:security  # Security audit and vulnerability scan
+npm run build:analyze   # Bundle analysis with webpack analyzer
+npm run audit:deps      # Security audit for dependencies
 ```
+
+### 🎯 Quick Commands Summary
+
+| Need | Command | What It Does |
+|------|---------|--------------|
+| **Start Development** | `npm run dev` | Dev server with hot reload |
+| **Run Tests** | `npm test` | Unit tests + coverage (auto-opens report) |
+| **Quick E2E Test** | `npm run test:dev` | Chrome E2E tests (auto-opens report) |
+| **Full Testing** | `npm run test:all` | All unit + E2E tests |
+| **Production Build** | `npm run release` | Complete build process |
+| **Deploy Ready** | `npm run deploy` | Production deployment ready |
 
 ---
 
