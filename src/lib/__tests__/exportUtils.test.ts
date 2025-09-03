@@ -1,36 +1,93 @@
+/**
+ * @fileoverview Export Utilities Test Suite
+ * 
+ * **Purpose**: Comprehensive testing of CSV export functionality for tax calculations.
+ * This suite validates data export accuracy, browser compatibility, and security features
+ * of the client-side CSV generation and download system.
+ * 
+ * ### Test Categories:
+ * 1. **CSV Generation Tests** - Content formatting, data accuracy, structure validation
+ * 2. **Download Mechanism Tests** - Browser API integration, file handling, security
+ * 3. **Integration Tests** - End-to-end export workflow validation
+ * 4. **Edge Case Handling** - Empty data, large files, complex scenarios
+ * 
+ * ### Security & Privacy Features Tested:
+ * - Client-side processing (no server data transmission)
+ * - Secure blob URL creation and cleanup
+ * - GDPR-compliant data handling (no storage/tracking)
+ * - Cross-browser compatibility for download mechanisms
+ * 
+ * ### Browser API Mocking:
+ * Tests mock crucial browser APIs including:
+ * - Document.createElement() for anchor element creation
+ * - URL.createObjectURL() for blob URL generation
+ * - DOM manipulation methods for download triggering
+ * 
+ * ### Export Format Validation:
+ * Ensures exported CSV files contain:
+ * - Complete calculation breakdowns (annual, monthly, weekly)
+ * - Input parameter documentation
+ * - HMRC-compliant tax information
+ * - Professional formatting suitable for accountants/HR
+ * 
+ * @author ToolHubX Development Team
+ * @version 2.1.0
+ * @since 2024-08-15
+ */
+
 // src/lib/__tests__/exportUtils.test.ts
 
 import type { ExportData } from '../exportUtils';
 import { downloadCSV, generateCSV } from '../exportUtils';
 import type { TaxCalculationResults } from '../taxCalculator';
 
-// Mock browser APIs
+/**
+ * **Browser API Mocking Setup**
+ * 
+ * Mock implementations of browser APIs required for client-side CSV download functionality.
+ * These mocks enable testing of file download behavior without requiring actual browser
+ * interactions or file system access.
+ * 
+ * ### APIs Mocked:
+ * 1. **document.createElement** - Creates anchor elements for download links
+ * 2. **document.body** - DOM manipulation for temporary link insertion
+ * 3. **window.URL** - Blob URL creation and cleanup for file downloads
+ * 
+ * ### Security Considerations:
+ * Mocks simulate the secure blob URL pattern used in production, ensuring tests
+ * validate the same security-conscious download mechanism used by real browsers.
+ */
+
+// Mock document.createElement to simulate anchor element creation
 Object.defineProperty(document, 'createElement', {
   value: jest.fn((tagName) => {
     if (tagName === 'a') {
+      // Mock anchor element with all properties needed for download
       return {
         href: '',
         download: '',
-        click: jest.fn(),
+        click: jest.fn(), // Simulate click event for download trigger
         style: { visibility: 'visible' },
-        setAttribute: jest.fn(),
+        setAttribute: jest.fn(), // Mock attribute setting for href/download
       };
     }
-    return {};
+    return {}; // Return empty object for other element types
   }),
 });
 
+// Mock document.body for DOM manipulation during download process
 Object.defineProperty(document, 'body', {
   value: {
-    appendChild: jest.fn(),
-    removeChild: jest.fn(),
+    appendChild: jest.fn(), // Temporary anchor insertion
+    removeChild: jest.fn(), // Cleanup after download
   },
 });
 
+// Mock URL API for blob URL creation (security-critical for client-side downloads)
 Object.defineProperty(window, 'URL', {
   value: {
-    createObjectURL: jest.fn(() => 'blob:mock-url'),
-    revokeObjectURL: jest.fn(),
+    createObjectURL: jest.fn(() => 'blob:mock-url'), // Mock blob URL creation
+    revokeObjectURL: jest.fn(), // Mock cleanup to prevent memory leaks
   },
 });
 

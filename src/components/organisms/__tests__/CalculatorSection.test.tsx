@@ -1,3 +1,51 @@
+/**
+ * @fileoverview CalculatorSection Component Test Suite
+ * 
+ * **Purpose**: Comprehensive testing of the main calculator orchestration component.
+ * This suite validates the integration between user input forms, tax calculations,
+ * result display, and state management through the Zustand store.
+ * 
+ * ### Component Architecture Tested:
+ * The CalculatorSection serves as the main container component that:
+ * - Orchestrates tax calculation workflow
+ * - Manages component state transitions
+ * - Handles user interactions and form validation
+ * - Integrates with Zustand store for state management
+ * - Provides responsive layout for mobile and desktop
+ * - Implements error boundaries and graceful error handling
+ * 
+ * ### Test Categories:
+ * 1. **Basic Rendering** - Component structure and essential elements
+ * 2. **User Interactions** - Button clicks, form submissions, state transitions
+ * 3. **State Management** - Zustand store integration and data flow
+ * 4. **Responsive Design** - Layout adaptation across screen sizes
+ * 5. **Error Handling** - Graceful degradation and error recovery
+ * 6. **Integration Testing** - Component interaction with child components
+ * 
+ * ### State Management Testing:
+ * Tests extensively mock the Zustand calculator store to validate:
+ * - Proper state initialization and updates
+ * - Action dispatch and side effects
+ * - Component re-rendering on state changes
+ * - Error state handling and recovery
+ * 
+ * ### Responsive Design Validation:
+ * Ensures proper CSS class application for:
+ * - Mobile-first responsive design
+ * - Sticky positioning for results table
+ * - Grid layouts that adapt to screen size
+ * - Full-screen mode support
+ * 
+ * ### Testing Libraries Used:
+ * - **@testing-library/react** - Component rendering and interaction testing
+ * - **@testing-library/jest-dom** - Custom Jest matchers for DOM assertions
+ * - **Jest** - Mocking, spying, and test framework functionality
+ * 
+ * @author ToolHubX Development Team
+ * @version 2.1.0
+ * @since 2024-08-20
+ */
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CalculatorSection from '../CalculatorSection';
