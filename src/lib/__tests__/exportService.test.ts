@@ -264,7 +264,7 @@ describe('Export Service', () => {
     });
 
     test('should include CSV headers for selected periods', () => {
-      const csvBlob = (URL.createObjectURL as jest.Mock).mock.calls[0][0];
+      const _csvBlob = (URL.createObjectURL as jest.Mock).mock.calls[0][0];
 
       downloadCSV(mockTaxResults, mockSelectedPeriods);
 

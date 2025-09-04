@@ -72,7 +72,7 @@ describe('Tax Rate Descriptions', () => {
     test('should return fallback message for invalid tax year', () => {
       // Test with an invalid tax year by mocking TAX_RATES
       const originalTaxRates = TAX_RATES;
-      delete (TAX_RATES as any)['2024-2025'];
+      (TAX_RATES as Record<string, unknown>)['2024-2025'] = undefined;
 
       const description = getTaxRateDescription('2024-2025');
       expect(description).toBe('Tax rates not available for this year');
@@ -108,7 +108,7 @@ describe('Tax Rate Descriptions', () => {
     test('should return fallback when 2025-2026 data does not exist', () => {
       // Mock scenario where 2025-2026 data is not available
       const original2025Data = TAX_RATES['2025-2026'];
-      delete (TAX_RATES as any)['2025-2026'];
+      (TAX_RATES as Record<string, unknown>)['2025-2026'] = undefined;
 
       const label = getCurrentTaxYearLabel();
       expect(label).toBe('current tax year');
@@ -134,12 +134,12 @@ describe('Tax Rate Descriptions', () => {
 
     test('should return default allowance for invalid tax year', () => {
       // Test with non-existent tax year
-      const allowance = getPersonalAllowance('2030-2031' as any);
+      const allowance = getPersonalAllowance('2030-2031' as never);
       expect(allowance).toBe(12570); // Should return default
     });
 
     test('should handle undefined tax year', () => {
-      const allowance = getPersonalAllowance(undefined as any);
+      const allowance = getPersonalAllowance(undefined as never);
       expect(allowance).toBe(12570);
     });
   });
@@ -168,9 +168,9 @@ describe('Tax Rate Descriptions', () => {
         getTaxCodeExplanation('1257T'),
       ];
 
-      explanations.forEach((explanation) => {
+      for (const explanation of explanations) {
         expect(explanation).toContain('£12,570 tax-free allowance');
-      });
+      }
     });
 
     test('should extract numbers correctly from complex tax codes', () => {

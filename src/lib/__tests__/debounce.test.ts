@@ -83,7 +83,7 @@ describe('Debounce Utility', () => {
   test('should maintain this context', () => {
     const obj = {
       value: 42,
-      method: jest.fn(function (this: any) {
+      method: jest.fn(function (this: { value: number }) {
         return this.value;
       }),
     };

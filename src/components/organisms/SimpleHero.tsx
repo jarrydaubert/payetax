@@ -17,7 +17,7 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
       <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-cyan-900/20 to-transparent' />
 
       {/* Content */}
-      <div className='relative z-10 mx-auto max-w-4xl px-4 text-center'>
+      <div className='relative z-10 mx-auto max-w-4xl px-4 text-center md:px-8 lg:px-12'>
         <div className='mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full border border-purple-400/40 bg-gradient-to-br from-purple-500/20 to-cyan-500/20'>
           <Calculator className='h-8 w-8 text-purple-400' />
         </div>

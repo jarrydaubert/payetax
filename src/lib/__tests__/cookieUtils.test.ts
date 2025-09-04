@@ -3,7 +3,6 @@
 import {
   areCookiesAccepted,
   areCookiesDeclined,
-  type CookieConsent,
   clearCookieConsent,
   getConsentTimestamp,
   getCookieConsent,
@@ -66,7 +65,7 @@ describe('Cookie Utils', () => {
 
     test('should return null when localStorage is not available', () => {
       const originalLocalStorage = window.localStorage;
-      delete (window as any).localStorage;
+      (window as typeof window & { localStorage?: unknown }).localStorage = undefined;
 
       expect(getCookieConsent()).toBeNull();
 
@@ -75,7 +74,7 @@ describe('Cookie Utils', () => {
 
     test('should return null in server environment', () => {
       const originalWindow = global.window;
-      delete (global as any).window;
+      (global as typeof global & { window?: unknown }).window = undefined;
 
       expect(getCookieConsent()).toBeNull();
 
@@ -143,7 +142,7 @@ describe('Cookie Utils', () => {
 
     test('should return null when localStorage is not available', () => {
       const originalLocalStorage = window.localStorage;
-      delete (window as any).localStorage;
+      (window as typeof window & { localStorage?: unknown }).localStorage = undefined;
 
       expect(getConsentTimestamp()).toBeNull();
 
@@ -152,7 +151,7 @@ describe('Cookie Utils', () => {
 
     test('should return null in server environment', () => {
       const originalWindow = global.window;
-      delete (global as any).window;
+      (global as typeof global & { window?: unknown }).window = undefined;
 
       expect(getConsentTimestamp()).toBeNull();
 
@@ -176,7 +175,7 @@ describe('Cookie Utils', () => {
 
       const result = getConsentTimestamp();
       expect(result).toBeInstanceOf(Date);
-      expect(isNaN(result!.getTime())).toBe(true);
+      expect(Number.isNaN(result?.getTime())).toBe(true);
     });
   });
 
@@ -193,7 +192,7 @@ describe('Cookie Utils', () => {
 
     test('should handle missing localStorage gracefully', () => {
       const originalLocalStorage = window.localStorage;
-      delete (window as any).localStorage;
+      (window as typeof window & { localStorage?: unknown }).localStorage = undefined;
 
       expect(() => clearCookieConsent()).not.toThrow();
 
@@ -202,7 +201,7 @@ describe('Cookie Utils', () => {
 
     test('should handle server environment gracefully', () => {
       const originalWindow = global.window;
-      delete (global as any).window;
+      (global as typeof global & { window?: unknown }).window = undefined;
 
       expect(() => clearCookieConsent()).not.toThrow();
 
@@ -281,23 +280,25 @@ describe('Cookie Utils', () => {
       const twelveMonthsEarlier = new Date('2023-03-31T10:00:00Z');
 
       // Mock current date
-      const originalNow = Date.now;
+      const originalDate = global.Date;
       Date.now = jest.fn(() => testDate.getTime());
-      global.Date = class extends Date {
-        constructor(...args: any[]) {
+      global.Date = class extends originalDate {
+        constructor(...args: ConstructorParameters<typeof Date>) {
+          super();
           if (args.length === 0) {
-            return new (originalNow as any)(Date.now());
+            super.setTime(Date.now());
+          } else {
+            super.setTime(new originalDate(...args).getTime());
           }
-          return new (originalNow as any)(...args);
         }
-      } as any;
+      };
 
       localStorageMock.setItem('cookie-consent-timestamp', twelveMonthsEarlier.toISOString());
 
       expect(isConsentExpired()).toBe(false);
 
       // Restore original Date
-      global.Date = originalNow as any;
+      global.Date = originalDate;
     });
   });
 });

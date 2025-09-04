@@ -1,17 +1,14 @@
 // src/lib/__tests__/blog.test.ts
 
 import fs from 'node:fs';
-import path from 'node:path';
 import type { BlogPost } from '@/types/blog';
 import {
   BlogError,
-  getBlogCategories,
   getBlogPostBySlug,
   getBlogPosts,
   getBlogPostsCount,
   getFeaturedPost,
   getFeaturedPosts,
-  getPaginatedBlogPosts,
   getRelatedPosts,
 } from '../blog';
 
@@ -52,10 +49,14 @@ jest.mock('@/config/blog.config', () => ({
 }));
 
 const mockFs = fs.promises as jest.Mocked<typeof fs.promises>;
-const mockMatter = require('gray-matter') as jest.MockedFunction<any>;
-const mockYaml = require('js-yaml') as jest.Mocked<any>;
+const mockMatter = require('gray-matter') as jest.MockedFunction<
+  (content: string) => { data: Record<string, unknown>; content: string }
+>;
+const mockYaml = require('js-yaml') as { load: jest.MockedFunction<(content: string) => unknown> };
 const mockGetCategoryBySlug = require('@/config/blog.config')
-  .getCategoryBySlug as jest.MockedFunction<any>;
+  .getCategoryBySlug as jest.MockedFunction<
+  (slug: string) => { name: string; slug: string } | null
+>;
 
 describe('Blog Library', () => {
   beforeEach(() => {

@@ -2,15 +2,16 @@
 'use client';
 
 import { Info, Leaf, X } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 export default function SustainabilityBadge() {
   const [showDetails, setShowDetails] = useState(false);
+  const titleId = useId();
 
   return (
     <>
       {/* Sustainability Badge */}
-      <div className='fixed bottom-4 left-4 z-40'>
+      <div className='fixed bottom-4 left-4 z-50'>
         <button
           type='button'
           onClick={() => setShowDetails(true)}
@@ -25,12 +26,26 @@ export default function SustainabilityBadge() {
 
       {/* Sustainability Details Modal */}
       {showDetails && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm'>
-          <div className='glass-card w-full max-w-md border border-white/20'>
+        <div
+          className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm'
+          onClick={() => setShowDetails(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setShowDetails(false)}
+          role='dialog'
+          aria-modal='true'
+          aria-labelledby={titleId}
+        >
+          <div
+            className='glass-card w-full max-w-md border border-white/20'
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            role='document'
+          >
             <div className='mb-4 flex items-start justify-between'>
               <div className='flex items-center gap-2'>
                 <Leaf className='h-5 w-5 text-green-400' />
-                <h3 className='font-semibold text-white'>Eco-Friendly Calculator</h3>
+                <h3 id={titleId} className='font-semibold text-white'>
+                  Eco-Friendly Calculator
+                </h3>
               </div>
               <button
                 type='button'

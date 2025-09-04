@@ -51,8 +51,10 @@ const HomePageContent = memo(function HomePageContent() {
     <main className='flex min-h-screen flex-col'>
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
-      <section id={calculatorId}>
-        <CalculatorSection isFullScreen={isCalculatorFullScreen} />
+      <section id={calculatorId} className='py-8 lg:py-12'>
+        <div className='container mx-auto px-4'>
+          <CalculatorSection isFullScreen={isCalculatorFullScreen} />
+        </div>
       </section>
 
       {/* AI-optimized quick answers for voice search and featured snippets */}

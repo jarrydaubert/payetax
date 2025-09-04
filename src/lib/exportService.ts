@@ -263,8 +263,6 @@ export function downloadCSV(
  */
 function getPeriodLabel(period: DisplayPeriod): string {
   switch (period) {
-    case 'annually':
-      return 'Annual';
     case 'yearly':
       return 'Yearly';
     case 'monthly':

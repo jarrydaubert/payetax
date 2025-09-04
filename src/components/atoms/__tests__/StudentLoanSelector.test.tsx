@@ -73,7 +73,7 @@ describe('StudentLoanSelector', () => {
   });
 
   test('should show selected plans as checked', () => {
-    render(<StudentLoanSelector {...defaultProps} selectedPlans={['plan2', 'postgraduate']} />);
+    render(<StudentLoanSelector {...defaultProps} selectedPlans={['plan2', 'postgrad']} />);
 
     const plan2Checkbox = screen.getByLabelText(/Plan 2/) as HTMLInputElement;
     const postgraduateCheckbox = screen.getByLabelText(/Postgraduate/) as HTMLInputElement;
@@ -119,9 +119,9 @@ describe('StudentLoanSelector', () => {
     render(<StudentLoanSelector {...defaultProps} selectedPlans={[]} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
-    checkboxes.forEach((checkbox) => {
+    for (const checkbox of checkboxes) {
       expect(checkbox).not.toBeChecked();
-    });
+    }
   });
 
   test('should allow combining undergraduate and postgraduate loans', () => {

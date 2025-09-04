@@ -83,6 +83,11 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
   const [showRightIndicator, setShowRightIndicator] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Mouse drag functionality
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [scrollStartLeft, setScrollStartLeft] = useState(0);
+
   // Period options - EXACT from toolhubx-live
   const periodOptions: Record<string, number> = useMemo(
     () => ({
@@ -99,8 +104,32 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
 
   // Initialize visible periods based on screen size - only on mount
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const defaultPeriods = isMobile ? ['Monthly', 'Weekly'] : ['Yearly', 'Monthly', 'Weekly'];
+    const width = window.innerWidth;
+    let defaultPeriods: string[];
+
+    if (width < 640) {
+      // Small mobile: 2 columns max
+      defaultPeriods = ['Monthly', 'Weekly'];
+    } else if (width < 768) {
+      // Large mobile: 2 columns
+      defaultPeriods = ['Monthly', 'Weekly'];
+    } else if (width < 1024) {
+      // Tablet: 3 columns
+      defaultPeriods = ['Yearly', 'Monthly', 'Weekly'];
+    } else if (width < 1280) {
+      // Laptop: 3-4 columns
+      defaultPeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily'];
+    } else if (width < 1536) {
+      // Desktop/half-screen: 4 columns
+      defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Weekly'];
+    } else if (width < 1920) {
+      // Large desktop: 5 columns
+      defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Weekly', 'Daily'];
+    } else {
+      // Ultra-wide: All columns
+      defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily'];
+    }
+
     setVisiblePeriods(defaultPeriods);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Intentionally empty - only run once on mount
@@ -128,6 +157,14 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
 
   // Check scroll position to show/hide indicators
   useEffect(() => {
+    const debounce = <T extends (...args: unknown[]) => void>(fn: T, ms = 150) => {
+      let timeoutId: ReturnType<typeof setTimeout>;
+      return (...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), ms);
+      };
+    };
+
     const checkScrollPosition = () => {
       const container = containerRef.current;
       if (!container) return;
@@ -139,19 +176,41 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
       setShowRightIndicator(hasHorizontalScroll && scrollLeft < scrollWidth - clientWidth - 5);
     };
 
+    const debouncedCheck = debounce(checkScrollPosition, 150);
     const container = containerRef.current;
     if (container) {
-      // Initial check with a delay to ensure DOM is ready
-      setTimeout(checkScrollPosition, 100);
+      debouncedCheck(); // Initial
       container.addEventListener('scroll', checkScrollPosition);
-      window.addEventListener('resize', checkScrollPosition);
-
+      window.addEventListener('resize', debouncedCheck);
       return () => {
         container.removeEventListener('scroll', checkScrollPosition);
-        window.removeEventListener('resize', checkScrollPosition);
+        window.removeEventListener('resize', debouncedCheck);
       };
     }
   }, []);
+
+  // Mouse drag handlers for table scrolling
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setDragStartX(e.pageX);
+    setScrollStartLeft(containerRef.current.scrollLeft);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    const deltaX = e.pageX - dragStartX;
+    containerRef.current.scrollLeft = scrollStartLeft - deltaX;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
 
   if (!results) {
     return (
@@ -337,14 +396,14 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
     <div className={`relative ${className}`}>
       {/* Scroll Indicators */}
       <div
-        className={`scroll-indicator-left pointer-events-none absolute top-0 bottom-0 left-0 z-20 flex w-8 items-center justify-start bg-gradient-to-r from-gray-800 to-transparent pl-1 transition-opacity duration-300 ${showLeftIndicator ? 'opacity-100' : 'opacity-0'}`}
+        className={`scroll-indicator-left pointer-events-none absolute top-0 bottom-0 left-0 z-20 flex w-12 items-center justify-start bg-gradient-to-r from-gray-800 to-transparent pl-2 transition-opacity duration-300 ${showLeftIndicator ? 'opacity-100' : 'opacity-0'}`}
       >
-        <div className='animate-pulse text-white text-xs'>←</div>
+        <div className='animate-pulse text-base text-white'>←</div>
       </div>
       <div
-        className={`scroll-indicator-right pointer-events-none absolute top-0 right-0 bottom-0 z-20 flex w-8 items-center justify-end bg-gradient-to-l from-gray-800 to-transparent pr-1 transition-opacity duration-300 ${showRightIndicator ? 'opacity-100' : 'opacity-0'}`}
+        className={`scroll-indicator-right pointer-events-none absolute top-0 right-0 bottom-0 z-20 flex w-12 items-center justify-end bg-gradient-to-l from-gray-800 to-transparent pr-2 transition-opacity duration-300 ${showRightIndicator ? 'opacity-100' : 'opacity-0'}`}
       >
-        <div className='animate-pulse text-white text-xs'>→</div>
+        <div className='animate-pulse text-base text-white'>→</div>
       </div>
 
       <section
@@ -353,12 +412,17 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
         style={{
           scrollbarWidth: 'thin',
           scrollbarColor: '#6b7280 #374151',
+          cursor: isDragging ? 'grabbing' : 'grab',
         }}
         data-testid='tax-results'
         aria-label='Scrollable payslip tax breakdown table'
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
       >
-        {/* Header - EXACT from toolhubx-live */}
-        <h2 className='sticky top-0 z-10 mb-4 bg-gray-800 font-semibold text-gray-100 text-lg md:text-xl'>
+        {/* Header - Fixed positioning */}
+        <h2 className='mb-4 font-semibold text-gray-100 text-lg md:text-xl'>
           <i className='fas fa-table mr-2 text-blue-500'></i>
           Your Payslip Summary
         </h2>
@@ -381,20 +445,20 @@ const EnhancedPayslipTable: React.FC<EnhancedPayslipTableProps> = ({
         <table
           className='w-full border border-gray-600 text-gray-100 text-sm'
           data-testid='results-table'
-          style={{ minWidth: `${180 + visiblePeriods.length * 95}px` }}
+          style={{ minWidth: `${160 + visiblePeriods.length * 120}px` }}
         >
           <thead>
-            <tr className='sticky top-8 z-10 border-gray-600 border-b bg-gray-700'>
-              <th className='min-w-[140px] whitespace-nowrap border-gray-600 border-r p-2 text-left'>
+            <tr className='sticky top-0 z-20 border-gray-600 border-b bg-gray-700'>
+              <th className='min-w-[120px] whitespace-nowrap border-gray-600 border-r p-2 text-left'>
                 Category
               </th>
-              <th className='min-w-[40px] whitespace-nowrap border-gray-600 border-r p-1 text-right'>
+              <th className='min-w-[35px] whitespace-nowrap border-gray-600 border-r p-1 text-right'>
                 %
               </th>
               {visiblePeriods.map((period) => (
                 <th
                   key={period}
-                  className='min-w-[95px] whitespace-nowrap border-gray-600 border-r p-1 text-right'
+                  className='min-w-[80px] whitespace-nowrap border-gray-600 border-r p-1 text-right'
                 >
                   {period} (£)
                 </th>

@@ -416,7 +416,7 @@ describe('PDF Export', () => {
 
     test('should handle jsPDF import failure', async () => {
       // Mock import to throw error
-      const mockImport = jest.fn().mockRejectedValue(new Error('Failed to import jsPDF'));
+      const _mockImport = jest.fn().mockRejectedValue(new Error('Failed to import jsPDF'));
       jest.doMock('jspdf', () => {
         throw new Error('Import failed');
       });

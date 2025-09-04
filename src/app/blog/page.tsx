@@ -59,7 +59,7 @@ export default async function BlogPage({
       : params.category
     : undefined;
 
-  const [posts, featuredPost, categories] = await Promise.all([
+  const [posts, featuredPost, categories, totalCount, allPostsCount] = await Promise.all([
     getBlogPosts({
       page: currentPage,
       pageSize: 9,
@@ -67,9 +67,10 @@ export default async function BlogPage({
     }),
     getFeaturedPost(),
     getBlogCategories(),
+    getBlogPostsCount(selectedCategory), // Filtered count for pagination
+    getBlogPostsCount(), // Total count for "All Posts" button
   ]);
 
-  const totalCount = await getBlogPostsCount(selectedCategory);
   const totalPages = Math.ceil(totalCount / 9);
 
   return (
@@ -136,23 +137,23 @@ export default async function BlogPage({
           </div>
         </div>
 
-        {/* Categories Filter - Optimized Layout */}
+        {/* Categories Filter - Improved Spacing */}
         {categories.length > 0 && (
-          <div className='mb-16'>
-            <h2 className='mb-6 text-center font-semibold text-white text-xl'>Browse by Topic</h2>
-            <div className='mx-auto max-w-full'>
-              <div className='flex flex-wrap justify-center gap-2 lg:gap-3'>
+          <div className='mb-20'>
+            <h2 className='mb-8 text-center font-semibold text-white text-xl'>Browse by Topic</h2>
+            <div className='mx-auto max-w-5xl'>
+              <div className='blog-filters'>
                 <Link
                   href='/blog#categories'
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-colors duration-200 lg:px-4 lg:py-2.5 lg:text-base ${
+                  className={`inline-flex items-center justify-center rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 ${
                     !selectedCategory
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                      : 'glass-card border border-white/10 text-white/80 hover:border-white/20 hover:text-white'
+                      ? 'scale-105 transform bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                      : 'glass-card border border-white/10 text-white/80 hover:scale-105 hover:border-white/20 hover:text-white hover:shadow-md'
                   }`}
                 >
                   <span>All Posts</span>
-                  <span className='ml-1.5 text-xs opacity-70 lg:ml-2 lg:text-sm'>
-                    ({totalCount})
+                  <span className='ml-2 rounded-full bg-white/20 px-2 py-0.5 font-bold text-xs'>
+                    {allPostsCount}
                   </span>
                 </Link>
                 {categories
@@ -161,15 +162,15 @@ export default async function BlogPage({
                     <Link
                       key={category.slug}
                       href={`/blog?category=${category.slug}#categories`}
-                      className={`inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-center font-medium text-sm transition-colors duration-200 lg:px-4 lg:py-2.5 lg:text-base ${
+                      className={`inline-flex items-center justify-center rounded-lg px-3 py-2 text-center font-medium text-sm transition-all duration-300 ${
                         selectedCategory === category.slug
-                          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                          : 'glass-card border border-white/10 text-white/80 hover:border-white/20 hover:text-white'
+                          ? 'scale-105 transform bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+                          : 'glass-card border border-white/10 text-white/80 hover:scale-105 hover:border-white/20 hover:text-white hover:shadow-md'
                       }`}
                     >
                       <span>{category.name}</span>
-                      <span className='ml-1.5 text-xs opacity-70 lg:ml-2 lg:text-sm'>
-                        ({category.count})
+                      <span className='ml-2 rounded-full bg-white/20 px-2 py-0.5 font-bold text-xs'>
+                        {category.count}
                       </span>
                     </Link>
                   ))}

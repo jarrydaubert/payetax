@@ -30,7 +30,7 @@ const CookieBanner: React.FC = () => {
         if (expired) {
           console.info('Cookie consent expired, showing banner again');
         }
-        const timer = setTimeout(() => setShowBanner(true), 2000);
+        const timer = setTimeout(() => setShowBanner(true), 1000);
         return () => clearTimeout(timer);
       }
     } catch (error) {
@@ -104,9 +104,9 @@ const CookieBanner: React.FC = () => {
   return (
     <div
       className={cn(
-        'fixed right-4 bottom-4 z-50 max-w-sm',
+        'fixed right-4 bottom-28 z-[60] w-80 max-w-[calc(100vw-2rem)]',
         'glass-card border border-border/50',
-        'slide-in-from-bottom-8 animate-in duration-500'
+        'animate-slide-in-from-bottom-8'
       )}
       role='dialog'
       aria-labelledby={titleId}

@@ -120,9 +120,10 @@ export function calculateAllowance(
     isMarried &&
     partnerIncome <= rates.personalAllowance &&
     annualSalary > rates.personalAllowance &&
-    annualSalary < rates.bands[1].threshold + rates.personalAllowance
+    annualSalary <= rates.bands[0].threshold + rates.personalAllowance
   ) {
     // Only basic rate taxpayers can receive marriage allowance
+    // Check if they would still be basic rate after receiving the marriage allowance
     if (!cleanTaxCode.endsWith('M')) {
       // Only apply if not already in tax code
       marriageAllowance = rates.marriageAllowance || 1260;

@@ -681,7 +681,7 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
       className={cn(
         'relative',
         isFullScreen
-          ? 'flex min-h-screen items-center pt-16 pb-4' // Full height minus navbar, small bottom padding for footer peek
+          ? 'calculator-fullscreen flex min-h-screen items-center pt-16 pb-4' // Full height minus navbar, small bottom padding for footer peek
           : 'py-8 lg:py-12',
         className
       )}
@@ -693,12 +693,12 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
             // More flexible max-width for ultra-wide screens
             'w-full max-w-none lg:max-w-7xl xl:max-w-[90vw] 2xl:max-w-[1600px]',
             isFullScreen
-              ? 'lg:grid lg:h-full lg:grid-cols-12 lg:items-start xl:grid-cols-12'
-              : 'lg:grid lg:grid-cols-12 lg:items-start xl:grid-cols-12'
+              ? 'lg:grid lg:h-full lg:grid-cols-12 lg:items-start xl:grid-cols-10 2xl:grid-cols-12'
+              : 'lg:grid lg:grid-cols-12 lg:items-start xl:grid-cols-10 2xl:grid-cols-12'
           )}
         >
-          {/* Input Form - More compact on larger screens */}
-          <div className='space-y-3 lg:col-span-3 xl:col-span-3'>
+          {/* Input Form - Adaptive width for all screen sizes */}
+          <div className='space-y-3 lg:col-span-4 xl:col-span-3 2xl:col-span-3'>
             <StreamlinedTaxInputForm
               salary={input.salary}
               taxYear={input.taxYear}
@@ -799,7 +799,7 @@ const CalculatorSection: React.FC<CalculatorSectionProps> = ({
           </div>
 
           {/* Results - Below inputs on mobile, side-by-side on desktop */}
-          <div className='space-y-3 overflow-x-auto lg:sticky lg:top-8 lg:col-span-9 xl:col-span-9'>
+          <div className='space-y-3 overflow-x-auto lg:sticky lg:top-8 lg:col-span-8 xl:col-span-7 2xl:col-span-9'>
             <EnhancedPayslipTable
               results={results}
               allowancesDeductions={input.additionalAllowances

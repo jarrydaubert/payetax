@@ -291,7 +291,7 @@ describe('Routes Types and Functions', () => {
 
       if (isInternalRoute(testRoute)) {
         // This shouldn't execute for external route
-        fail('Should not reach this point for external route');
+        throw new Error('Should not reach this point for external route');
       }
     });
 

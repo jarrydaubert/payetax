@@ -46,7 +46,7 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
       // Show prompt after a delay (don't be too eager)
       setTimeout(() => {
         setShowPrompt(true);
-      }, 30000); // 30 seconds after page load
+      }, 3000); // 3 seconds after page load for testing
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -86,7 +86,7 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
   }
 
   return (
-    <div className='fixed right-4 bottom-4 left-4 z-50 md:right-4 md:left-auto md:max-w-sm'>
+    <div className='fixed left-4 bottom-4 right-4 z-50 md:left-4 md:right-auto md:max-w-sm'>
       <div className='glass-card overflow-hidden border border-white/20 p-0'>
         <div className='p-4'>
           {/* Close button */}

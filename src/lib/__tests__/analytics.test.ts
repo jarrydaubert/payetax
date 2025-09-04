@@ -108,7 +108,7 @@ describe('Analytics Module', () => {
     test('should handle missing gtag gracefully', () => {
       // Temporarily remove gtag
       const originalGtag = window.gtag;
-      (window as any).gtag = undefined;
+      (window as typeof window & { gtag?: unknown }).gtag = undefined;
 
       expect(() => {
         trackSEOAction('navigation', { source: 'menu' });
@@ -219,7 +219,7 @@ describe('Analytics Module', () => {
         'error',
       ];
 
-      actions.forEach((action) => {
+      for (const action of actions) {
         trackCalculatorEvent(action);
         expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_action', {
           event_category: 'calculator',
@@ -227,7 +227,7 @@ describe('Analytics Module', () => {
           value: undefined,
           custom_parameters: undefined,
         });
-      });
+      }
 
       expect(mockGtag).toHaveBeenCalledTimes(4);
     });

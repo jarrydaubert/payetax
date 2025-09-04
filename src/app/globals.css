@@ -15,37 +15,37 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Refined Fluid Typography */
-  --font-size-xs: clamp(0.75rem, 1.5vw, 0.875rem);
-  --font-size-sm: clamp(0.875rem, 2vw, 1rem);
-  --font-size-base: clamp(1rem, 2.5vw, 1.125rem);
-  --font-size-lg: clamp(1.125rem, 3vw, 1.25rem);
-  --font-size-xl: clamp(1.25rem, 3.5vw, 1.5rem);
-  --font-size-2xl: clamp(1.5rem, 4vw, 2rem);
-  --font-size-3xl: clamp(2rem, 5vw, 2.5rem);
-  --font-size-4xl: clamp(2.5rem, 5.5vw, 3.5rem);
-  --font-size-5xl: clamp(3rem, 6vw, 4rem);
-  --font-size-hero: clamp(3.5rem, 7vw, 5.5rem);
+  /* Typography: Reduced sizes for better readability */
+  --font-size-xs: 0.6875rem;   /* ~11px at 16px base */
+  --font-size-sm: 0.8125rem;   /* ~13px at 16px base */
+  --font-size-base: 0.9375rem; /* ~15px at 16px base */
+  --font-size-lg: 1rem;        /* ~16px at 16px base */
+  --font-size-xl: 1.125rem;    /* ~18px at 16px base */
+  --font-size-2xl: 1.375rem;   /* ~22px at 16px base */
+  --font-size-3xl: 1.75rem;    /* ~28px at 16px base */
+  --font-size-4xl: 2.125rem;   /* ~34px at 16px base */
+  --font-size-5xl: 2.5rem;     /* ~40px at 16px base */
+  --font-size-hero: 3rem;      /* ~48px at 16px base */
 
-  /* Professional Spacing System */
-  --spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
-  --spacing-sm: clamp(0.5rem, 1.5vw, 1rem);
-  --spacing-md: clamp(1rem, 2.5vw, 2rem);
-  --spacing-lg: clamp(1.5rem, 4vw, 3rem);
-  --spacing-xl: clamp(2rem, 5vw, 4rem);
-  --spacing-2xl: clamp(3rem, 6vw, 6rem);
-  --spacing-3xl: clamp(4rem, 8vw, 8rem);
-  --spacing-section: clamp(5rem, 10vw, 10rem);
-  --spacing-hero: clamp(6rem, 12vw, 12rem);
+  /* Spacing: Fixed with minimal clamp for large */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: clamp(2.5rem, 4vw, 3rem);
+  --spacing-3xl: clamp(3rem, 6vw, 4rem);
+  --spacing-section: clamp(4rem, 8vw, 5rem);
+  --spacing-hero: clamp(5rem, 10vw, 6rem);
 
-  /* Responsive Containers */
-  --container-xs: clamp(20rem, 90vw, 28rem);
-  --container-sm: clamp(24rem, 95vw, 36rem);
-  --container-md: clamp(28rem, 95vw, 48rem);
-  --container-lg: clamp(32rem, 95vw, 64rem);
-  --container-xl: clamp(40rem, 95vw, 80rem);
-  --container-2xl: clamp(48rem, 95vw, 96rem);
-  --container-4k: clamp(60rem, 95vw, 120rem);
+  /* Containers: Use min() for simplicity */
+  --container-xs: min(90%, 28rem);
+  --container-sm: min(95%, 36rem);
+  --container-md: min(95%, 48rem);
+  --container-lg: min(95%, 64rem);
+  --container-xl: min(95%, 80rem);
+  --container-2xl: min(95%, 96rem);
+  --container-4k: min(95%, 120rem);
 
   /* 🌌 COSMIC COLOR SYSTEM - High Contrast Optimized */
   --background-primary: 240, 90%, 3%;                    /* Deep cosmic black */
@@ -71,6 +71,10 @@
   --accent-green: 160, 84%, 39%;                         /* Success */
   --accent-amber: 38, 92%, 50%;                          /* Warning */
   --accent-red: 0, 84%, 60%;                             /* Error */
+
+  /* Component-specific font size overrides */
+  --table-font-size: 0.75rem;                            /* Ensure tables stay compact */
+  --input-font-size: var(--font-size-sm);                /* Input field sizing */
 
   /* Enhanced Glassmorphism System */
   --glass-opacity: clamp(0.08, 0.5vw, 0.15);
@@ -775,13 +779,192 @@ iframe[src*="buymeacoffee"] {
   backdrop-filter: none !important;
   background: transparent !important;
   border: none !important;
-  contain: layout style paint !important; /* Optimize rendering */
+  /* CSS containment removed to fix position: fixed issues */
 }
 
 /* BMC widget iframe optimizations */
 iframe[src*="buymeacoffee"] {
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* BMC Widget - Fix positioning and size only */
+div[data-name*="BMC"],
+div[data-name*="bmc"],
+#bmc-wbtn,
+.bmc-button,
+div[id*="bmc"],
+div[class*="bmc"] {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  z-index: 99999 !important;
+  visibility: visible !important;
+  display: block !important;
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+}
+
+/* BMC Button - Apply brand gradient to button element only */
+div[data-name*="BMC"] > button,
+div[data-name*="bmc"] > button,
+#bmc-wbtn > button,
+.bmc-button > button,
+div[id*="bmc"] > button,
+div[class*="bmc"] > button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+  padding: 0 !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+}
+
+/* BMC Coffee Cup Icon - LARGER SIZE and Force absolute centering with broader targeting */
+div[data-name*="BMC"] svg,
+div[data-name*="bmc"] svg,
+#bmc-wbtn svg,
+.bmc-button svg,
+div[id*="bmc"] svg,
+div[class*="bmc"] svg,
+div[data-name*="BMC"] img,
+div[data-name*="bmc"] img,
+#bmc-wbtn img,
+.bmc-button img,
+div[id*="bmc"] img,
+div[class*="bmc"] img,
+div[data-name*="BMC"] > button svg,
+div[data-name*="bmc"] > button svg,
+#bmc-wbtn > button svg,
+.bmc-button > button svg,
+div[id*="bmc"] > button svg,
+div[class*="bmc"] > button svg,
+div[data-name*="BMC"] > button img,
+div[data-name*="bmc"] > button img,
+#bmc-wbtn > button img,
+.bmc-button > button img,
+div[id*="bmc"] > button img,
+div[class*="bmc"] > button img {
+  width: 32px !important;
+  height: 32px !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+
+/* BMC Hover Effects - Only on button */
+div[data-name*="BMC"] > button:hover,
+div[data-name*="bmc"] > button:hover,
+#bmc-wbtn > button:hover,
+.bmc-button > button:hover,
+div[id*="bmc"] > button:hover,
+div[class*="bmc"] > button:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Hide feedback widget close button */
+[data-testid*="close"],
+[aria-label*="close"],
+[aria-label*="Close"],
+button[title*="close"],
+button[title*="Close"],
+svg path[d*="27.6516"],
+button svg path[fill="#666"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Fixed element positioning */
+.sustainability-badge {
+  position: fixed !important;
+  bottom: 1rem !important;
+  left: 1rem !important;
+  z-index: 50 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+.cookie-banner {
+  position: fixed !important;
+  right: 1rem !important;
+  bottom: 5rem !important;
+  z-index: 50 !important;
+  visibility: visible !important;
+  display: block !important;
+  max-width: 24rem !important;
+}
+
+/* Force proper viewport positioning for all fixed elements */
+.fixed {
+  position: fixed !important;
+}
+
+/* Payslip Table Improvements - Based on Live Site */
+[data-testid="results-table"] th,
+[data-testid="results-table"] td {
+  height: 37px !important;
+  padding: 8px !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
+  border: 1px solid #4b5563 !important;
+  box-sizing: border-box !important;
+  font-family: ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* Number cells - right aligned with tabular numbers */
+[data-testid="results-table"] td:not(:first-child) {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums !important;
+  white-space: nowrap !important;
+  min-width: 87px !important;
+}
+
+/* Category column - left aligned */
+[data-testid="results-table"] td:first-child {
+  text-align: left !important;
+  font-weight: 500 !important;
+  min-width: 140px !important;
+  padding-left: 12px !important;
+}
+
+/* Header improvements */
+[data-testid="results-table"] th {
+  font-weight: 600 !important;
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  text-align: center !important;
+}
+
+[data-testid="results-table"] th:first-child {
+  text-align: left !important;
+  padding-left: 12px !important;
+}
+
+/* Percentage column */
+[data-testid="results-table"] th:nth-child(2),
+[data-testid="results-table"] td:nth-child(2) {
+  min-width: 60px !important;
+  text-align: right !important;
 }
 
 /* Shimmer Effects - Animated Gradients */
@@ -805,7 +988,7 @@ iframe[src*="buymeacoffee"] {
 .shimmer-logo,
 .shimmer-button {
   will-change: background-position;
-  contain: layout style paint;
+  /* CSS containment removed to prevent position: fixed issues */
 }
 
 .shimmer-logo.shimmer-active,
@@ -908,49 +1091,57 @@ iframe[src*="buymeacoffee"] {
   }
 }
 
-/* Custom scrollbar styling for table horizontal scroll */
+/* Custom Scrollbar Enhancements: Make table scrollbar more visible/reliable */
 .overflow-x-auto {
-  /* Webkit browsers (Chrome, Safari, Edge) */
-  scrollbar-width: thin;
+  scrollbar-width: auto; /* 'auto' instead of 'thin' for visibility */
   scrollbar-color: #6b7280 #374151;
 }
 
 .overflow-x-auto::-webkit-scrollbar {
-  height: 8px;
+  height: 12px; /* Thicker */
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {
   background: #374151;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb {
   background: #6b7280;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
+.table-container {
+  overflow-x: scroll; /* 'scroll' to always show bar if overflow */
+}
 
-/* Proper fluid responsive form inputs - following best practices */
+@media (min-width: 1280px) {
+  .table-container {
+    max-width: 100%;
+  }
+}
+
+
+/* Streamlined Input/Select Rules */
 input[type="text"],
 input[type="number"],
 input[type="email"],
 select {
-  width: 100%; /* Fluid base */
-  max-width: clamp(12rem, 80%, 20rem); /* Scales with container; cap at 20rem on large screens */
-  min-width: clamp(8rem, 50%, 12rem); /* Better min for mobile */
+  width: 100%;
+  max-width: 24rem; /* Base: Simpler, no clamp */
+  min-width: 8rem;
 }
 
-/* Media queries for refinement */
 @media (min-width: 768px) { /* Tablet+ */
   input[type="text"],
   input[type="number"],
   input[type="email"],
   select {
-    max-width: clamp(14rem, 50%, 24rem); /* Looser for better fit in grids */
+    max-width: 28rem; /* Step up */
   }
 }
 
@@ -959,7 +1150,40 @@ select {
   input[type="number"],
   input[type="email"],
   select {
-    max-width: clamp(16rem, 40%, 28rem); /* Even more flexible */
+    max-width: 40%; /* Percentage for fluidity */
+  }
+}
+
+@media (min-width: 1280px) { /* Half-screen on 2560x1440 */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: 32rem; /* Wider for comfort */
+  }
+}
+
+@media (min-width: 1536px) { /* 2K+ screens */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: 36rem; /* Even more space on large screens */
+  }
+}
+
+@media (min-width: 1920px) { /* Full HD+ wide screens */
+  :root {
+    /* Slightly reduce font sizes on large screens */
+    --font-size-base: 0.9rem;
+    --font-size-lg: 0.96875rem;
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: 42rem; /* Generous space for ultra-wide */
+    font-size: var(--font-size-base);
   }
 }
 
@@ -979,57 +1203,69 @@ select::-ms-expand {
   }
 }
 
-/* Glass card specific styles - more adaptive */
-.glass-card input.w-full,
-.glass-card select.w-full {
-  width: 100%; /* Prefer full width in card */
-  max-width: clamp(10rem, 100%, 18rem); /* Full fluidity with soft cap */
-  min-width: 8rem;
-}
-
-/* Proper grid handling */
+/* Glass Card Grid: Fixed gap, earlier stacking */
 .glass-card .grid.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Flexible columns */
-  gap: clamp(0.5rem, 2vw, 1rem); /* Responsive gaps */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem; /* Fixed, no clamp */
 }
 
 .glass-card .grid.grid-cols-2 > div {
-  min-width: clamp(8rem, 45%, 12rem); /* Scale with viewport */
-  max-width: 100%; /* No hard cap—let it fill column */
+  min-width: 8rem;
+  max-width: 100%;
 }
 
-/* Add overflow handling for the card itself on small screens */
-@media (max-width: 768px) {
-  .glass-card {
-    overflow-x: auto; /* Scroll horizontally if grid overflows */
+@media (max-width: 767px) { /* Stack on mobile */
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Portrait orientation optimization */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: 1fr; /* Single column in portrait */
   }
   
-  /* Single column on very small screens */
-  .glass-card .grid.grid-cols-2 {
-    grid-template-columns: 1fr; /* Stack vertically on mobile */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: none; /* Full width in portrait */
   }
 }
 
-/* Form group enhancements */
+/* Landscape small screens */
+@media (max-height: 600px) and (orientation: landscape) {
+  .section {
+    padding: var(--spacing-md) 0; /* Reduce vertical padding */
+  }
+}
+
+/* Ultra-wide aspect ratios (21:9, etc.) */
+@media (min-aspect-ratio: 21/9) and (min-width: 1920px) {
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: repeat(3, 1fr); /* More columns for ultra-wide */
+  }
+}
+
+/* Form Group: Simplify flex */
 .form-group {
   display: flex;
-  flex-direction: column; /* Stack on mobile */
+  flex-direction: column;
   gap: 0.5rem;
 }
 
 @media (min-width: 768px) {
   .form-group {
-    flex-direction: row; /* Side-by-side on larger screens */
+    flex-direction: row;
     align-items: center;
   }
-  
   .form-group label {
-    flex: 0 0 clamp(6rem, 20%, 8rem); /* Fixed label width */
-    white-space: nowrap; /* Prevent label wrapping */
+    flex: 0 0 8rem; /* Fixed width */
+    white-space: nowrap;
   }
-  
   .form-group select {
-    flex: 1; /* Grow to fill remaining space */
+    flex: 1;
   }
 }
 
@@ -1082,20 +1318,63 @@ a:focus {
   border-radius: 4px;
 }
 
-/* Table responsive improvements */
-@media (max-width: 768px) { /* Mobile */
+/* Table responsive improvements - Enhanced for all screen sizes */
+@media (max-width: 480px) { /* Small mobile */
   .table-container {
-    overflow-x: auto; /* Reinforces scroll */
+    overflow-x: scroll; /* Always show scroll on small screens */
   }
   th, td {
-    min-width: 75px; /* Slightly narrower on mobile to fit more before scrolling */
-    padding: 0.25rem; /* Tighter padding on mobile */
+    min-width: 65px; /* Extra narrow for small screens */
+    padding: 0.2rem;
+    font-size: 0.75rem; /* Smaller text */
   }
 }
 
-@media (min-width: 1024px) { /* Desktop */
+@media (min-width: 481px) and (max-width: 768px) { /* Large mobile */
+  .table-container {
+    overflow-x: auto;
+  }
+  th, td {
+    min-width: 75px;
+    padding: 0.25rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) { /* Tablet */
+  th, td {
+    min-width: 85px;
+    padding: 0.375rem;
+  }
+}
+
+@media (min-width: 1025px) { /* Desktop+ */
   table {
-    max-width: 100%; /* Prevent table from exceeding container */
+    max-width: 100%;
+  }
+  th, td {
+    padding: 0.5rem; /* Comfortable padding */
+  }
+}
+
+/* Container Queries for modern browsers */
+@supports (container-type: inline-size) {
+  .table-container {
+    container-type: inline-size;
+  }
+  
+  @container (max-width: 600px) {
+    th, td {
+      min-width: 70px;
+      padding: 0.25rem;
+      font-size: 0.8rem;
+    }
+  }
+  
+  @container (min-width: 800px) {
+    th, td {
+      min-width: 90px;
+      padding: 0.5rem;
+    }
   }
 }
 
@@ -1103,5 +1382,525 @@ a:focus {
 @media (max-width: 768px) {
   .flex-col {
     overflow-y: auto; /* Vertical scroll if content is long */
+  }
+}
+
+/* === COMPREHENSIVE RESPONSIVE ENHANCEMENTS === */
+
+/* Additional Breakpoints for Ultra-Small and Large Screens */
+/* Very small mobiles (e.g., 320px+ like older iPhones) */
+@media (max-width: 320px) {
+  :root {
+    --font-size-base: 0.875rem; /* Smaller base font */
+    --spacing-md: 0.75rem; /* Tighter spacing */
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    min-width: 100%; /* Full width on tiny screens */
+    font-size: 0.875rem; /* Readable but compact */
+  }
+  th, td {
+    min-width: 60px; /* Extra narrow */
+    padding: 0.15rem;
+    font-size: 0.7rem;
+  }
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: 1fr; /* Always stack */
+  }
+}
+
+/* Mid-desktop (e.g., 1440px like MacBook Pro) */
+@media (min-width: 1440px) and (max-width: 1535px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: 34rem; /* Slight increase */
+  }
+  th, td {
+    min-width: 95px; /* Wider cells */
+    padding: 0.6rem;
+  }
+}
+
+/* Ultra-wide/4K (e.g., 2560px+ like high-end monitors) */
+@media (min-width: 2560px) {
+  :root {
+    --container-xl: min(95%, 140rem); /* Cap for sanity */
+    /* Reduce font sizes on ultra-wide screens */
+    --font-size-base: 0.875rem; /* Smaller base on huge screens */
+    --font-size-lg: 0.9375rem;
+    --font-size-xl: 1rem;
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select {
+    max-width: 48rem; /* Generous space */
+    font-size: var(--font-size-base); /* Use reduced base size */
+  }
+  .glass-card .grid.grid-cols-2 {
+    grid-template-columns: repeat(4, 1fr); /* More columns */
+    gap: 1.5rem;
+  }
+  th, td {
+    min-width: 110px; /* Spacious */
+    padding: 0.75rem;
+  }
+}
+
+/* High-DPI/Retina Screens (e.g., 2x density like Retina) */
+@media (min-resolution: 2dppx) {
+  /* Sharpen images/backgrounds */
+  img {
+    image-rendering: crisp-edges; /* Or -webkit-optimize-contrast for Safari */
+  }
+  /* Adjust fonts/spacing slightly for clarity */
+  :root {
+    --font-size-base: 0.95rem; /* Reduced upscale for high-DPI */
+  }
+}
+
+/* Expanded Orientation/Aspect Queries */
+/* Tall portrait (e.g., foldables or tall mobiles) */
+@media (orientation: portrait) and (min-aspect-ratio: 1/2) {
+  .section {
+    padding: var(--spacing-lg) 0; /* More vertical space */
+  }
+  .table-container {
+    overflow-y: auto; /* Vertical scroll for tall content */
+    max-height: 70vh;
+  }
+}
+
+/* Wide landscape (e.g., ultra-wide monitors) */
+@media (min-aspect-ratio: 21/9) {
+  .glass-card {
+    max-width: 80%; /* Prevent over-stretching */
+    margin: 0 auto;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible columns */
+  }
+}
+
+/* Enhanced Container Queries (for modular components) */
+@supports (container-type: inline-size) {
+  .glass-card {
+    container-type: inline-size;
+  }
+  
+  @container (max-width: 400px) {
+    .grid.grid-cols-2 {
+      grid-template-columns: 1fr; /* Stack in small containers */
+    }
+    input, select {
+      font-size: 0.9rem; /* Compact */
+    }
+  }
+  
+  @container (min-width: 800px) {
+    .grid.grid-cols-2 {
+      grid-template-columns: repeat(3, 1fr); /* Expand */
+    }
+  }
+}
+
+/* Prevent Layout Shifts (CLS Optimizations) */
+/* Reserve space for images/videos/embeds */
+img, video, iframe {
+  width: 100%;
+  height: auto; /* Maintain ratio */
+  max-width: 100%; /* Prevent overflow */
+}
+
+/* Font Loading: Avoid FOIT/reflows - apply to font declarations */
+@font-face {
+  font-display: swap; /* Show fallback immediately, swap when ready */
+}
+
+/* Animations: Use transform/opacity to avoid reflows */
+@keyframes optimized-animation {
+  from { transform: scale(1); opacity: 0; }
+  to { transform: scale(1.05); opacity: 1; }
+}
+
+/* Performance optimizations */
+.shimmer-active, 
+.animated-element,
+.scroll-indicator-left,
+.scroll-indicator-right {
+  will-change: transform, opacity; /* Prep GPU for animations */
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Dynamic Content: Reserve min-height to prevent CLS */
+.dynamic-content, .results-placeholder {
+  min-height: 200px; /* Reserve space for loading content */
+  position: relative; /* For placeholders/spinners */
+}
+
+/* General Anti-Shift: Mobile-first fluid base with performance */
+html {
+  font-size: clamp(14px, 1rem, 16px); /* Caps at 16px max, starts at 14px */
+  scroll-behavior: smooth;
+  /* Note: CSS containment removed as it breaks position: fixed for widgets */
+}
+
+/* Accessibility: Min font size on zoom */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .shimmer-active, .animated-element {
+    will-change: auto; /* Remove GPU hints when motion is reduced */
+    animation: none;
+  }
+}
+
+/* High zoom/accessibility support */
+@media (min-resolution: 96dpi) {
+  :root {
+    --font-size-xs: max(0.6875rem, 11px); /* Ensure minimum readable size */
+    --font-size-sm: max(0.8125rem, 13px);
+    --font-size-base: max(0.9375rem, 15px);
+  }
+}
+
+/* Global font size overrides for consistency */
+.text-sm { 
+  font-size: var(--font-size-sm) !important; 
+}
+
+table, 
+th, 
+td { 
+  font-size: var(--table-font-size) !important; 
+}
+
+/* Ensure inputs use consistent sizing */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+select,
+textarea {
+  font-size: var(--input-font-size) !important;
+}
+
+/* Button text sizing */
+button,
+.btn {
+  font-size: var(--font-size-sm) !important;
+}
+
+/* Section Layout Consistency & Container Fixes */
+section {
+  position: relative; /* For smooth scrolling anchors */
+}
+
+/* Uniform section spacing */
+.section-spacing {
+  padding: var(--spacing-section) 0;
+}
+
+/* Enhanced Table Container for Better Spacing */
+.table-container {
+  min-height: 400px; /* Prevent squishing */
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+table tr {
+  min-height: 2.75rem; /* More breathing room */
+}
+
+th, td {
+  padding: 0.875rem 0.75rem !important; /* Increase vertical padding */
+}
+
+@media (min-width: 1024px) {
+  .table-container {
+    min-height: 500px; /* Desktop expansion */
+  }
+  th, td {
+    padding: 1rem 0.875rem !important; /* More luxurious on desktop */
+  }
+}
+
+/* Container Stability Fixes */
+.container {
+  max-width: none; /* Override Tailwind defaults */
+}
+
+@media (min-width: 640px) {
+  .container { max-width: 640px; }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+
+@media (min-width: 1280px) {
+  .container { max-width: 1280px; }
+}
+
+@media (min-width: 1440px) {
+  .container { max-width: 1440px; }
+}
+
+@media (min-width: 1920px) {
+  .container { max-width: 1920px; /* Cap for consistency */}
+}
+
+/* Sticky Element Stability */
+.lg\:sticky {
+  top: 2rem !important; /* More stable than top-8 */
+  transition: top 0.3s ease;
+}
+
+/* Fullscreen Transition Smoothing */
+.calculator-fullscreen {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Blog Typography Consistency - Override Hardcoded Tailwind */
+.prose h1 {
+  font-size: var(--font-size-4xl) !important;
+}
+
+.prose h2 {
+  font-size: var(--font-size-3xl) !important;
+}
+
+.prose h3 {
+  font-size: var(--font-size-2xl) !important;
+}
+
+.prose h4 {
+  font-size: var(--font-size-xl) !important;
+}
+
+.prose h5 {
+  font-size: var(--font-size-lg) !important;
+}
+
+.prose h6 {
+  font-size: var(--font-size-base) !important;
+}
+
+.prose p {
+  font-size: var(--font-size-base) !important;
+  line-height: 1.7;
+}
+
+.prose li {
+  font-size: var(--font-size-base) !important;
+}
+
+.prose td {
+  font-size: var(--font-size-sm) !important;
+}
+
+.prose th {
+  font-size: var(--font-size-sm) !important;
+}
+
+/* Reduce VW Impact for Position Stability */
+:root {
+  --spacing-section: clamp(3rem, 5vw, 4rem); /* Tighter clamp */
+}
+
+/* =============================================================================
+   COMPREHENSIVE STYLING AUDIT IMPROVEMENTS
+   Based on responsive design best practices for large desktop and mobile
+   ============================================================================= */
+
+/* 1. LARGE DESKTOP CONTAINER OPTIMIZATIONS (1920px+) */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 75% !important; /* Better utilization of ultra-wide displays */
+  }
+  
+  /* Wider containers for better space utilization */
+  .max-w-7xl {
+    max-width: 90rem !important; /* ~1440px */
+  }
+  
+  .max-w-6xl {
+    max-width: 80rem !important; /* ~1280px */
+  }
+  
+  .max-w-4xl {
+    max-width: 60rem !important; /* ~960px for hero content */
+  }
+}
+
+/* 2. RESPONSIVE FONT SIZING IMPROVEMENTS */
+@media (min-width: 1024px) {
+  /* Larger fonts on desktop for better readability */
+  input, select, textarea {
+    font-size: var(--font-size-base) !important; /* 15px on desktop vs 13px mobile */
+  }
+  
+  /* Table cells get larger padding and fonts on desktop */
+  [data-testid="results-table"] th,
+  [data-testid="results-table"] td {
+    padding: 12px 16px !important; /* More spacious on desktop */
+    font-size: 15px !important;
+  }
+}
+
+/* 3. STANDARDIZED SECTION PADDING */
+section {
+  padding: var(--spacing-md) 0; /* Default 1rem top/bottom */
+}
+
+@media (min-width: 1024px) {
+  section {
+    padding: var(--spacing-xl) 0; /* 2rem on desktop for breathing room */
+  }
+}
+
+/* 4. IMPROVED INPUT FIELD STYLING */
+input, select, textarea {
+  font-size: var(--font-size-sm) !important; /* 13px base for mobile */
+  line-height: 1.5 !important; /* Better readability */
+}
+
+/* Remove default select appearance for consistent styling */
+select {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E") !important;
+  background-position: right 8px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px !important;
+  padding-right: 32px !important;
+}
+
+/* 5. MOBILE-SPECIFIC OPTIMIZATIONS */
+@media (max-width: 640px) {
+  /* Increase touch targets for better mobile UX */
+  button, input, select, textarea {
+    min-height: 44px !important; /* WCAG AA touch target minimum */
+  }
+  
+  /* Reduce padding on mobile to maximize content space */
+  .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Better mobile table scrolling indicators */
+  [data-testid="results-table"] {
+    scrollbar-width: thin !important;
+    scrollbar-color: #6366f1 transparent !important;
+  }
+}
+
+/* 6. BMC WIDGET MOBILE POSITIONING */
+@media (max-width: 640px) {
+  div[data-name*="BMC"],
+  div[data-name*="bmc"],
+  #bmc-wbtn,
+  .bmc-button {
+    bottom: 80px !important; /* Avoid footer overlap on mobile */
+    right: 16px !important; /* Closer to edge on mobile */
+  }
+}
+
+/* 7. BLOG FILTER IMPROVEMENTS - Fix layout issues */
+.blog-filters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .blog-filters {
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .blog-filters {
+    gap: 1rem !important;
+  }
+}
+
+/* Ensure filter buttons have consistent sizing */
+.blog-filters a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  min-height: 36px !important;
+  font-size: 14px !important;
+}
+
+/* 7. ACCESSIBILITY IMPROVEMENTS */
+/* Faster tap response on touch devices */
+button, [role="button"], input[type="submit"], input[type="button"] {
+  touch-action: manipulation !important;
+}
+
+/* Better focus indicators */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #6366f1 !important;
+  outline-offset: 2px !important;
+}
+
+/* 8. PERFORMANCE OPTIMIZATIONS */
+/* Reserve space for BMC widget to prevent CLS */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 9. ENHANCED TABLE STYLING */
+@media (min-width: 1024px) {
+  /* More generous table spacing on desktop */
+  [data-testid="results-table"] th,
+  [data-testid="results-table"] td {
+    padding: var(--spacing-sm) var(--spacing-lg) !important; /* 0.5rem 1.5rem */
+  }
+}
+
+/* 10. IMPROVED RESPONSIVE GRID LAYOUTS */
+@media (min-width: 1536px) {
+  /* 2xl: Better grid utilization on very large screens */
+  .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* 11. HERO SECTION IMPROVEMENTS */
+.min-h-screen {
+  min-height: 100svh !important; /* Use small viewport height for mobile */
+}
+
+/* 12. REDUCED MOTION RESPECT */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

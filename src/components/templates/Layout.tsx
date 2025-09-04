@@ -6,6 +6,7 @@ import { Suspense, useId } from 'react';
 import Footer from '@/components/molecules/Footer';
 import SimpleNavbar from '@/components/molecules/SimpleNavbar';
 import CookieBanner from '@/components/ui/CookieBanner';
+import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt';
 import SustainabilityBadge from '@/components/ui/SustainabilityBadge';
 
 interface LayoutProps {
@@ -37,6 +38,9 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       <Suspense fallback={null}>
         <CookieBanner />
       </Suspense>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
 
       {/* Sustainability Badge */}
       <SustainabilityBadge />

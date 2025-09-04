@@ -110,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Layout>{children}</Layout>
         </ErrorBoundary>
 
-        {/* Buy Me Coffee Widget - optimized loading */}
+        {/* Buy Me Coffee Widget - optimized loading with better client-side routing support */}
         <script
           data-name='BMC-Widget'
           data-cfasync='false'
@@ -124,6 +124,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data-y_margin='18'
           data-z_index='99999'
           defer
+        />
+
+        {/* BMC Widget Route Change Handler */}
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe BMC widget initialization script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // Re-initialize BMC widget on route changes for Next.js client-side routing
+                function initializeBMC() {
+                  if (window.BMC && window.BMC.Widget) {
+                    window.BMC.Widget.init();
+                  }
+                }
+                
+                // Listen for Next.js route changes
+                if (typeof window !== 'undefined') {
+                  // Initialize after load
+                  window.addEventListener('load', initializeBMC);
+                  
+                  // Re-initialize on popstate (browser back/forward)
+                  window.addEventListener('popstate', function() {
+                    setTimeout(initializeBMC, 100);
+                  });
+                  
+                  // Listen for Next.js router events if available
+                  if (window.next && window.next.router) {
+                    window.next.router.events.on('routeChangeComplete', initializeBMC);
+                  }
+                }
+              })();
+            `,
+          }}
         />
       </body>
     </html>

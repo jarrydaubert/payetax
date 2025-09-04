@@ -75,6 +75,7 @@ export default function StreamlinedTaxInputForm({
   const pensionTypeId = useId();
   const pensionAmountId = useId();
   const allowancesId = useId();
+  const marriageAllowanceId = useId();
 
   const [taxCodeError, setTaxCodeError] = useState<string | null>(null);
   const [taxCodeValid, setTaxCodeValid] = useState<boolean>(true);
@@ -410,7 +411,7 @@ export default function StreamlinedTaxInputForm({
         <div>
           <fieldset>
             <legend className='mb-1 block text-sm text-white'>Student Loan Plans</legend>
-            <div className='flex flex-wrap gap-1'>
+            <div className='flex flex-wrap gap-2'>
               {[
                 { plan: 'plan1' as const, label: 'Plan 1' },
                 { plan: 'plan2' as const, label: 'Plan 2' },
@@ -506,8 +507,8 @@ export default function StreamlinedTaxInputForm({
         <div>
           <fieldset>
             <legend className='mb-1 block text-sm text-white'>Personal Circumstances</legend>
-            <div className='flex flex-wrap gap-1'>
-              <label className='glass flex cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-2 py-1 text-sm hover:bg-white/5'>
+            <div className='flex flex-wrap gap-2'>
+              <label className='glass flex min-w-[120px] cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-3 py-1.5 text-sm hover:bg-white/5'>
                 <input
                   type='checkbox'
                   checked={taxOptions?.isPensionAge || false}
@@ -516,7 +517,7 @@ export default function StreamlinedTaxInputForm({
                 />
                 <span className='text-white'>Over State Pension Age</span>
               </label>
-              <label className='glass flex cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-2 py-1 text-sm hover:bg-white/5'>
+              <label className='glass flex min-w-[120px] cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-3 py-1.5 text-sm hover:bg-white/5'>
                 <input
                   type='checkbox'
                   checked={taxOptions?.isMarried || false}
@@ -525,7 +526,7 @@ export default function StreamlinedTaxInputForm({
                 />
                 <span className='text-white'>Married/Civil Partnership</span>
               </label>
-              <label className='glass flex cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-2 py-1 text-sm hover:bg-white/5'>
+              <label className='glass flex min-w-[120px] cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-3 py-1.5 text-sm hover:bg-white/5'>
                 <input
                   type='checkbox'
                   checked={taxOptions?.isBlind || false}
@@ -534,7 +535,7 @@ export default function StreamlinedTaxInputForm({
                 />
                 <span className='text-white'>Blind</span>
               </label>
-              <label className='glass flex cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-2 py-1 text-sm hover:bg-white/5'>
+              <label className='glass flex min-w-[120px] cursor-pointer items-center space-x-2 rounded border border-purple-400/20 px-3 py-1.5 text-sm hover:bg-white/5'>
                 <input
                   type='checkbox'
                   checked={taxOptions?.noNationalInsurance || false}
@@ -546,6 +547,38 @@ export default function StreamlinedTaxInputForm({
             </div>
           </fieldset>
         </div>
+
+        {/* Marriage Allowance Transfer - Show when married */}
+        {taxOptions?.isMarried && (
+          <div>
+            <label htmlFor={marriageAllowanceId} className='mb-1 block text-sm text-white'>
+              Marriage Allowance Transfer (£)
+              <span className='ml-1 text-white/60 text-xs'>(Partner transfers to you)</span>
+            </label>
+            <input
+              id={marriageAllowanceId}
+              type='text'
+              value={taxOptions?.marriageAllowanceTransfer || ''}
+              onChange={(e) => {
+                try {
+                  const cleanValue = e.target.value.replace(/[^0-9]/g, '');
+                  const numericValue = Number(cleanValue) || 0;
+                  // Marriage allowance is capped at £1,260 for 2024-25
+                  const cappedValue = Math.min(numericValue, 1260);
+                  handleTaxOptionChange('marriageAllowanceTransfer', cappedValue);
+                } catch (error) {
+                  console.error('Error handling marriage allowance change:', error);
+                  handleTaxOptionChange('marriageAllowanceTransfer', 0);
+                }
+              }}
+              placeholder='0'
+              className='glass w-full rounded border border-purple-400/30 px-3 py-2 text-sm text-white placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500'
+            />
+            <p className='mt-1 text-white/60 text-xs'>
+              Maximum £1,260 can be transferred from partner who earns less than personal allowance
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

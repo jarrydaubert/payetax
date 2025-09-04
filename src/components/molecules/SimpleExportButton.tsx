@@ -367,7 +367,7 @@ const SimpleExportButton: React.FC<SimpleExportButtonProps> = ({
 
       {/* Export Options Dropdown */}
       {isOpen && !isExporting && (
-        <div className='glass slide-in-from-top-2 absolute right-0 z-50 mt-3 min-w-64 animate-in rounded-xl border border-white/20 py-2 shadow-2xl backdrop-blur-xl duration-200 md:min-w-80'>
+        <div className='glass absolute right-0 z-50 mt-3 min-w-64 animate-fade-in rounded-xl border border-white/20 py-2 shadow-2xl backdrop-blur-xl md:min-w-80'>
           <div className='border-white/10 border-b px-3 py-2 font-medium text-white/60 text-xs'>
             Export Options
           </div>
