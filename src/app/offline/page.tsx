@@ -6,9 +6,9 @@
 
 'use client';
 
-import { ArrowLeft, Calculator, Wifi } from 'lucide-react';
+import { Calculator, Wifi } from 'lucide-react';
 import Link from 'next/link';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 export default function OfflinePage() {
   return (
@@ -55,12 +55,7 @@ export default function OfflinePage() {
 
             {/* Actions */}
             <div className='space-y-4'>
-              <Button
-                onClick={() => window.history.back()}
-                variant='primary'
-                size='lg'
-                leftIcon={<ArrowLeft className='h-5 w-5' />}
-              >
+              <Button onClick={() => window.history.back()} variant='default' size='lg'>
                 Go Back
               </Button>
 

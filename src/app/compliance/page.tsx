@@ -10,7 +10,8 @@ import {
   Users,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Button from '@/components/ui/Button';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { StructuredData } from '@/components/ui/StructuredData';
 import { BodyText, H1, H2, H3, SmallText } from '@/components/ui/Typography';
 
@@ -360,11 +361,11 @@ export default function CompliancePage() {
             </BodyText>
 
             <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-              <Button href='/' variant='primary'>
-                Try the Calculator
+              <Button asChild variant='default'>
+                <Link href='/'>Try the Calculator</Link>
               </Button>
-              <Button href='/feedback' variant='ghost'>
-                Report an Issue
+              <Button asChild variant='ghost'>
+                <Link href='/feedback'>Report an Issue</Link>
               </Button>
             </div>
           </div>

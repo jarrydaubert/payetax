@@ -6,12 +6,12 @@ This document provides comprehensive documentation of the project's file organiz
 
 | Metric | Value | Details |
 |--------|--------|---------|
-| **Total Files** | 110 files | Processed by Biome (TS/TSX/JS/JSX/JSON/MDX) |
-| **Components** | 47 files | Atomic design with UI library |
-| **Tests** | 14 test files | 9 unit tests + 5 E2E test suites |
+| **Total Files** | 147 files | Processed by Biome (TS/TSX/JS/JSX/JSON/MDX) |
+| **Components** | 58 files | Atomic design with UI library |
+| **Tests** | 21 test files | 16 unit tests + 5 E2E test suites |
 | **Code Quality** | Zero violations | All Biome linting issues resolved |
 | **TypeScript** | Strict mode | Zero errors across entire codebase |
-| **Architecture** | Next.js 15 App Router | Server/client component separation |
+| **Architecture** | Next.js 15.5 App Router | Server/client component separation |
 
 ---
 
@@ -48,21 +48,39 @@ toolhubx/
 
 ```
 📊 Test Coverage Overview
-├── Unit Tests (9 files)
+├── Unit Tests (21 files)
 │   ├── src/app/blog/__tests__/
-│   │   └── page.test.tsx              # Blog page tests (16 cases)
-│   ├── src/components/organisms/__tests__/
-│   │   ├── CalculatorSection.test.tsx # Calculator tests (18 cases)
-│   │   └── EnhancedPayslipTable.test.tsx
+│   │   └── page.test.tsx              # Blog page tests
+│   │
+│   ├── src/components/atoms/__tests__/
+│   │   ├── NumberInput.test.tsx       # Numeric input validation
+│   │   ├── StudentLoanSelector.test.tsx # Loan selector tests
+│   │   └── TaxYearSelect.test.tsx     # Tax year dropdown tests
+│   │
 │   ├── src/components/ui/__tests__/
-│   │   └── Button.test.tsx
+│   │   └── Button.test.tsx            # Button component tests
+│   │
 │   ├── src/lib/__tests__/
-│   │   ├── exportUtils.test.ts
-│   │   ├── taxCalculator.test.ts
-│   │   ├── taxCalculator-simple.test.ts
-│   │   └── utils.test.ts
-│   └── src/store/__tests__/
-│       └── calculatorStore.test.ts
+│   │   ├── allowanceCalculator.test.ts # Allowance calculations
+│   │   ├── analytics.test.ts          # Analytics utilities
+│   │   ├── blog.test.ts               # Blog management
+│   │   ├── cookieUtils.test.ts        # Cookie utilities
+│   │   ├── debounce.test.ts           # Debounce utilities
+│   │   ├── exportUtils.test.ts        # Export functionality
+│   │   ├── metadata.test.ts           # SEO metadata
+│   │   ├── pdfExport.test.ts          # PDF generation
+│   │   ├── taxCalculator.test.ts      # Main tax engine
+│   │   ├── taxCalculator-simple.test.ts # Basic tax calculations
+│   │   ├── taxRateDescriptions.test.ts # Tax band descriptions
+│   │   └── utils.test.ts              # General utilities
+│   │
+│   ├── src/store/__tests__/
+│   │   └── calculatorStore.test.ts    # Zustand store tests
+│   │
+│   └── src/types/__tests__/
+│       ├── gtag.test.ts               # Google Analytics types
+│       ├── navigation.test.ts         # Navigation types
+│       └── routes.test.ts             # Route types
 │
 └── E2E Tests (5 files)
     ├── calculator.spec.ts             # Core calculator functionality
@@ -89,36 +107,45 @@ toolhubx/
 
 ```
 src/components/
-├── 🔬 atoms/                          # Basic building blocks
+├── 🔬 atoms/                          # Basic building blocks (9 files)
 │   ├── NumberInput.tsx                # Numeric input with validation
 │   ├── PayPeriodSelect.tsx           # Pay period dropdown
 │   ├── PensionContributionInput.tsx  # Pension input component
+│   ├── PeriodCheckbox.tsx            # Period selection checkbox (NEW)
+│   ├── ScrollIndicator.tsx           # Scroll indicator with gradient (NEW)
 │   ├── StudentLoanSelector.tsx       # Student loan type selector
 │   ├── TaxCodeInput.tsx              # Tax code input with validation
 │   ├── TaxOptionsSelector.tsx        # Additional tax options
 │   ├── TaxYearSelect.tsx             # Tax year dropdown
 │   └── __tests__/                    # (Directory exists, tests pending)
 │
-├── 🧬 molecules/                      # Simple combinations
-│   ├── ExportActions.tsx             # Export button group
+├── 🧬 molecules/                      # Simple combinations (7 files)
+│   ├── CurrencyInput.tsx             # Currency input with formatting
 │   ├── Footer.tsx                    # Site footer
 │   ├── FormField.tsx                 # Form field wrapper
-│   ├── PeriodSelector.tsx            # Period selection controls
-│   ├── ScrollIndicator.tsx           # Scroll progress indicator
-│   ├── SimpleExportButton.tsx        # Single export button
-│   ├── SimpleNavbar.tsx              # Site navigation
-│   ├── TaxDataUpdater.tsx            # Tax data update component
-│   └── TaxResultsDisplay.tsx         # Results display component
+│   ├── PeriodSelectorCard.tsx        # Period selection card (NEW)
+│   ├── ResultCard.tsx                # Result display card
+│   ├── ResultTableRow.tsx            # Table row for results (NEW)
+│   └── SimpleNavbar.tsx              # Site navigation
 │
-├── 🧩 organisms/                      # Complex components
-│   ├── CalculatorSection.tsx         # Main calculator container
-│   ├── EnhancedPayslipTable.tsx      # Advanced results table
+├── 🧩 organisms/                      # Complex components (10 files)
+│   ├── CalculatorContainer.tsx       # Main calculator orchestrator
 │   ├── SimpleHero.tsx                # Homepage hero section
-│   ├── StreamlinedTaxInputForm.tsx   # Tax input form
 │   ├── TechShowcase.tsx              # Technology showcase
+│   │
+│   ├── CalculatorInputs/             # Input form components
+│   │   ├── BasicInputs.tsx           # Salary, pay period, tax year inputs
+│   │   ├── CalculatorInputsSection.tsx # Input section wrapper
+│   │   ├── DeductionsInputs.tsx      # Pension & student loan inputs
+│   │   └── TaxSettings.tsx           # Tax code & region settings
+│   │
+│   ├── CalculatorResults/            # Results display components
+│   │   ├── CalculatorResultsSection.tsx # Results section wrapper
+│   │   ├── ResultsSummaryCards.tsx   # Summary cards display
+│   │   └── ResultsTable.tsx          # Detailed results table (refactored)
+│   │
 │   └── __tests__/                    # Component tests
-│       ├── CalculatorSection.test.tsx
-│       └── EnhancedPayslipTable.test.tsx
+│       └── (tests pending)
 │
 ├── 📄 pages/                          # Page-level components
 │   ├── HomePageContent.tsx           # Homepage client component
@@ -369,20 +396,20 @@ public/
 |--------|---------|--------|---------|
 | TypeScript Errors | 0 | 0 | ✅ |
 | Biome Violations | 0 | 0 | ✅ |
-| Test Coverage | 89% | 90% | 🟡 |
-| Bundle Size | 280kB | <350kB | ✅ |
-| Lighthouse Performance | 95+ | 95+ | ✅ |
+| Test Coverage | TBD | 80% | ⚪ |
+| Bundle Size | ~280kB | <300kB | ✅ |
+| Lighthouse Performance | TBD | 95+ | ⚪ |
 
 ### File Distribution
 
-| Category | Count | Percentage |
-|----------|--------|-----------|
-| Components | 47 | 43% |
-| Tests | 14 | 13% |
-| Pages | 12 | 11% |
-| Utilities | 15 | 14% |
-| Configuration | 12 | 11% |
-| Assets | 10 | 9% |
+| Category | Count | Notes |
+|----------|--------|-------|
+| Components | 58 | Atomic design (atoms, molecules, organisms, ui) |
+| Tests | 26 | 21 unit tests + 5 E2E test suites |
+| Pages | 12 | Next.js 15.5 App Router pages |
+| Utilities | 17 | Business logic & helper functions |
+| Configuration | 10 | Build, lint, test configs |
+| Assets | 15+ | Images, icons, manifest files |
 
 ---
 

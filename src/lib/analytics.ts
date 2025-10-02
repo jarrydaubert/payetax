@@ -56,7 +56,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (window?.gtag) {
       window.gtag('event', action, {
         event_category: 'seo_actions',
         event_label: data.source || 'unknown',
@@ -83,7 +83,7 @@ export function trackEvent(event: AnalyticsEvent): void {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (window?.gtag) {
       window.gtag('event', event.action, {
         event_category: event.category || 'general',
         event_label: event.label,
@@ -145,7 +145,7 @@ export function trackPageView(page_path: string, page_title?: string): void {
     }
 
     // Track with Google Analytics if available
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (window?.gtag) {
       window.gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
         page_path,
         page_title,

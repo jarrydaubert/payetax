@@ -17,6 +17,9 @@ import Link from 'next/link';
 import CallToAction from '@/components/ui/CallToAction';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
 
+// Enable ISR - revalidate every hour for blog listing page
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: 'UK Tax Insights & Updates | ToolHubX Blog',
   description:

@@ -291,17 +291,19 @@ vercel rollback           # Rollback to previous deployment
 
 ### Recent Releases
 
+#### v2.1.0 (October 2025) - Code Quality & Atomic Design Refactor ✅
+- **Features**: Atomic component refactoring, accessibility improvements
+- **Stack**: Next.js 15.5, React 19, TypeScript 5.9
+- **Bundle**: ~280kB (maintained optimization)
+- **Tests**: 21 unit tests + 5 E2E suites (coverage audit pending)
+- **Quality**: Zero TypeScript errors, zero Biome violations
+- **Status**: Active development - cleanup & refinement phase
+
 #### v2.0.0 (August 2025) - Major UI/UX Overhaul ✅
 - **Features**: Glass-morphism design system, enhanced table presentation
 - **Performance**: 30-50% render time improvement with React 19
 - **Bundle**: 280kB (optimized from 455kB)
-- **Tests**: 130+ unit tests, 5 E2E suites
-- **Status**: Production ready with zero errors
-
-#### v1.1.3 (August 2025) - Analytics & Compliance ✅
-- **Features**: GDPR-compliant analytics, cookie consent
-- **Bundle**: 455kB → 280kB (optimized)
-- **Status**: Successfully deployed, later superseded
+- **Status**: Successfully deployed, later refined
 
 ### Performance Improvements Over Time
 
@@ -368,6 +370,6 @@ const securityHeaders = [
 
 ---
 
-**Last Updated**: August 27, 2025  
-**Current Version**: v2.0.0  
+**Last Updated**: October 2, 2025
+**Current Version**: v2.1.0 (Active Development)
 **Deployment Status**: ✅ Fully Automated with Monitoring

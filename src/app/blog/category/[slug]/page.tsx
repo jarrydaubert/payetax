@@ -12,6 +12,9 @@ import { Suspense } from 'react';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
+// Enable ISR - revalidate every hour for category pages
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   const categories = await getBlogCategories();
   return categories.map((category) => ({

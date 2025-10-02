@@ -5,6 +5,7 @@ import { generateMetadata as metadataGenerator } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import './globals.css';
 import { Suspense } from 'react';
+import { Toaster } from 'sonner';
 import Analytics from '@/components/analytics/Analytics';
 import Layout from '@/components/templates/Layout';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ErrorBoundary>
           <Layout>{children}</Layout>
         </ErrorBoundary>
+        <Toaster position='top-right' theme='dark' richColors expand={true} closeButton />
 
         {/* Buy Me Coffee Widget - optimized loading with better client-side routing support */}
         <script

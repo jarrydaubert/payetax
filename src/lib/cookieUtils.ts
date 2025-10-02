@@ -67,7 +67,7 @@ export function getConsentTimestamp(): Date | null {
  */
 export function clearCookieConsent(): void {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (window?.localStorage) {
       localStorage.removeItem('cookie-consent');
       localStorage.removeItem('cookie-consent-timestamp');
     }

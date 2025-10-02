@@ -122,7 +122,7 @@ export function Analytics() {
     if (!isLoaded) return;
 
     // Initialize consent mode
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (window?.gtag) {
       // Default to denied consent until user accepts
       window.gtag?.('consent', 'default', {
         analytics_storage: 'denied',

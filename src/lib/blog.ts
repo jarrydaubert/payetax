@@ -3,11 +3,13 @@
  * Blog library for managing local MDX blog posts
  * Replaces Strapi API integration with file-based blog system
  * FIXED: js-yaml v4 compatibility
+ * OPTIMIZED: Added Next.js caching for better build performance
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { unstable_cache } from 'next/cache';
 import {
   BLOG_CONFIG,
   BLOG_CONTENT_DIR,
@@ -47,18 +49,23 @@ async function ensureBlogContentDir(): Promise<void> {
 }
 
 /**
- * Get all MDX files from the blog content directory
+ * Get all MDX files from the blog content directory (cached)
+ * Cache revalidates every hour to reduce filesystem I/O
  */
-async function getAllMDXFiles(): Promise<string[]> {
-  try {
-    await ensureBlogContentDir();
-    const files = await fs.promises.readdir(getBlogContentPath());
-    return files.filter((file) => file.endsWith('.mdx') || file.endsWith('.md'));
-  } catch (_error) {
-    console.warn('No blog content directory found, returning empty array');
-    return [];
-  }
-}
+const getAllMDXFiles = unstable_cache(
+  async (): Promise<string[]> => {
+    try {
+      await ensureBlogContentDir();
+      const files = await fs.promises.readdir(getBlogContentPath());
+      return files.filter((file) => file.endsWith('.mdx') || file.endsWith('.md'));
+    } catch (_error) {
+      console.warn('No blog content directory found, returning empty array');
+      return [];
+    }
+  },
+  ['blog-mdx-files'],
+  { revalidate: 3600, tags: ['blog'] }
+);
 
 /**
  * Read and parse a single MDX file with improved error handling
@@ -247,23 +254,28 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
 }
 
 /**
- * Get total count of posts (with optional category filter)
+ * Get total count of posts (with optional category filter, cached)
+ * Cache revalidates every hour for performance
  */
-export async function getBlogPostsCount(category?: string): Promise<number> {
-  try {
-    const files = await getAllMDXFiles();
-    const posts = await Promise.all(files.map((file) => readMDXFile(file)));
-    const validPosts = posts.filter((post): post is BlogPost => post !== null);
+export const getBlogPostsCount = unstable_cache(
+  async (category?: string): Promise<number> => {
+    try {
+      const files = await getAllMDXFiles();
+      const posts = await Promise.all(files.map((file) => readMDXFile(file)));
+      const validPosts = posts.filter((post): post is BlogPost => post !== null);
 
-    if (category) {
-      return validPosts.filter((post) => post.category === category).length;
+      if (category) {
+        return validPosts.filter((post) => post.category === category).length;
+      }
+
+      return validPosts.length;
+    } catch {
+      return 0;
     }
-
-    return validPosts.length;
-  } catch {
-    return 0;
-  }
-}
+  },
+  ['blog-posts-count'],
+  { revalidate: 3600, tags: ['blog'] }
+);
 
 /**
  * Get paginated blog response with metadata
@@ -377,28 +389,33 @@ export async function getRelatedPosts(
 }
 
 /**
- * Get all available blog categories with post counts
+ * Get all available blog categories with post counts (cached)
+ * Cache revalidates every hour to improve build performance
  */
-export async function getBlogCategories(): Promise<BlogCategory[]> {
-  try {
-    const allPosts = await getBlogPosts();
+export const getBlogCategories = unstable_cache(
+  async (): Promise<BlogCategory[]> => {
+    try {
+      const allPosts = await getBlogPosts();
 
-    // Count posts per category
-    const categoryCounts = allPosts.reduce(
-      (counts, post) => {
-        counts[post.category] = (counts[post.category] || 0) + 1;
-        return counts;
-      },
-      {} as Record<string, number>
-    );
+      // Count posts per category
+      const categoryCounts = allPosts.reduce(
+        (counts, post) => {
+          counts[post.category] = (counts[post.category] || 0) + 1;
+          return counts;
+        },
+        {} as Record<string, number>
+      );
 
-    // Return categories with counts
-    return BLOG_CONFIG.categories.map((category) => ({
-      ...category,
-      count: categoryCounts[category.slug] || 0,
-    }));
-  } catch (error) {
-    console.error('Error getting blog categories:', error);
-    return BLOG_CONFIG.categories;
-  }
-}
+      // Return categories with counts
+      return BLOG_CONFIG.categories.map((category) => ({
+        ...category,
+        count: categoryCounts[category.slug] || 0,
+      }));
+    } catch (error) {
+      console.error('Error getting blog categories:', error);
+      return BLOG_CONFIG.categories;
+    }
+  },
+  ['blog-categories'],
+  { revalidate: 3600, tags: ['blog'] }
+);

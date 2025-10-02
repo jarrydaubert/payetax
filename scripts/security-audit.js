@@ -4,7 +4,13 @@ const { exec } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const SECURITY_LOG = path.join(__dirname, '..', 'security-audit-history.json');
+const AUDIT_DIR = path.join(__dirname, '..', 'audit-outputs');
+const SECURITY_LOG = path.join(AUDIT_DIR, 'security-audit-history.json');
+
+// Ensure audit-outputs directory exists
+if (!fs.existsSync(AUDIT_DIR)) {
+  fs.mkdirSync(AUDIT_DIR, { recursive: true });
+}
 
 // Security audit configuration
 const SECURITY_THRESHOLDS = {

@@ -1,50 +1,33 @@
 // src/components/pages/HomePageContent.tsx
 'use client';
 
-import { memo, useEffect, useId, useState, useTransition } from 'react';
-import CalculatorSection from '@/components/organisms/CalculatorSection';
+import { memo, useEffect, useId, useTransition } from 'react';
+import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import SimpleHero from '@/components/organisms/SimpleHero';
 import TechShowcase from '@/components/organisms/TechShowcase';
 import QuickAnswers from '@/components/ui/QuickAnswers';
 import VoiceSearchAnswers from '@/components/ui/VoiceSearchAnswers';
 
 const HomePageContent = memo(function HomePageContent() {
-  const [_isLoaded, setIsLoaded] = useState(false);
-  const [isCalculatorFullScreen, setIsCalculatorFullScreen] = useState(false);
   const [_isPending, startTransition] = useTransition();
   const calculatorId = useId();
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
+    // Initialize calculator store on mount
+    const { init } = require('@/store/calculatorStore').useCalculatorStore.getState();
+    init();
   }, []);
 
   const handleScrollToCalculator = () => {
     startTransition(() => {
-      setIsCalculatorFullScreen(true);
+      const calculatorElement = document.getElementById(calculatorId);
+      if (calculatorElement) {
+        calculatorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     });
-
-    const calculatorElement = document.getElementById(calculatorId);
-    if (calculatorElement) {
-      calculatorElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  };
-
-  const _scrollToSection = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
   };
 
   return (
@@ -52,9 +35,7 @@ const HomePageContent = memo(function HomePageContent() {
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
       <section id={calculatorId} className='py-8 lg:py-12'>
-        <div className='container mx-auto px-4'>
-          <CalculatorSection isFullScreen={isCalculatorFullScreen} />
-        </div>
+        <CalculatorContainer />
       </section>
 
       {/* AI-optimized quick answers for voice search and featured snippets */}

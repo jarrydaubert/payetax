@@ -5,6 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  /* Output directory - consolidate all test artifacts */
+  outputDir: './audit-outputs/test-results',
   /* Run tests in files in parallel - with proper test isolation */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -13,8 +15,10 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   /* Optimal worker count for parallel execution */
   workers: process.env.CI ? 2 : 4,
-  /* Enhanced reporting */
-  reporter: process.env.CI ? [['html'], ['github']] : 'html',
+  /* Enhanced reporting - output to audit-outputs */
+  reporter: process.env.CI
+    ? [['html', { outputFolder: 'audit-outputs/playwright-report' }], ['github']]
+    : [['html', { outputFolder: 'audit-outputs/playwright-report' }]],
   /* Timeout configuration */
   timeout: 60000, // 60 seconds per test
   expect: {

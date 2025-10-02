@@ -8,7 +8,6 @@ import {
   Heart,
   Mail,
   MessageSquare,
-  Send,
   Shield,
   Sparkles,
   Star,
@@ -18,7 +17,7 @@ import {
 import Link from 'next/link';
 import type React from 'react';
 import { useId, useState } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import CallToAction from '@/components/ui/CallToAction';
 
 interface FeedbackFormData {
@@ -142,14 +141,16 @@ export default function FeedbackPageClient() {
               </div>
               <div className='space-y-4'>
                 <Button
-                  href='/'
-                  variant='primary'
+                  asChild
+                  variant='default'
                   size='lg'
                   className='group relative overflow-hidden'
-                  leftIcon={<ArrowLeft className='h-4 w-4' />}
                 >
-                  <div className='absolute inset-0 bg-gradient-to-r from-purple-600 via-cyan-600 to-purple-600 opacity-0 transition-opacity group-hover:opacity-100' />
-                  <span className='relative z-10'>Back to Calculator</span>
+                  <Link href='/'>
+                    <ArrowLeft className='mr-2 h-4 w-4' />
+                    <div className='absolute inset-0 bg-gradient-to-r from-purple-600 via-cyan-600 to-purple-600 opacity-0 transition-opacity group-hover:opacity-100' />
+                    <span className='relative z-10'>Back to Calculator</span>
+                  </Link>
                 </Button>
                 <div>
                   <button
@@ -386,10 +387,9 @@ export default function FeedbackPageClient() {
                 <Button
                   type='submit'
                   disabled={isSubmitting || !formData.message.trim()}
-                  variant='primary'
+                  variant='default'
                   size='lg'
                   className='group relative w-full overflow-hidden'
-                  leftIcon={isSubmitting ? null : <Send className='h-5 w-5' />}
                 >
                   <div className='absolute inset-0 bg-gradient-to-r from-purple-600 via-cyan-600 to-purple-600 opacity-0 transition-opacity group-hover:opacity-100' />
                   <span className='relative z-10'>

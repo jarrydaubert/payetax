@@ -1,7 +1,9 @@
 // src/components/organisms/SimpleHero.tsx
 'use client';
 
-import { ArrowRight, Calculator } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface SimpleHeroProps {
@@ -11,41 +13,73 @@ interface SimpleHeroProps {
 
 export default function SimpleHero({ className, onScrollToCalculator }: SimpleHeroProps) {
   return (
-    <section className={cn('relative flex min-h-screen items-center justify-center', className)}>
-      {/* Background gradient - Purple to Cyan */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900' />
-      <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-cyan-900/20 to-transparent' />
-
+    // biome-ignore lint/correctness/useUniqueElementIds: Accessibility landmark for skip-to-content link
+    <section
+      id='main-content'
+      className={cn('relative flex min-h-screen items-center justify-center py-20', className)}
+    >
       {/* Content */}
-      <div className='relative z-10 mx-auto max-w-4xl px-4 text-center md:px-8 lg:px-12'>
-        <div className='mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full border border-purple-400/40 bg-gradient-to-br from-purple-500/20 to-cyan-500/20'>
-          <Calculator className='h-8 w-8 text-purple-400' />
-        </div>
-
-        <h1 className='mb-6 font-bold text-4xl text-white md:text-6xl'>
-          Free UK PAYE Tax Calculator 2025-2026
-        </h1>
-
-        <p className='mx-auto mb-8 max-w-2xl text-white/80 text-xl'>
-          Calculate your take-home pay instantly with our comprehensive UK tax calculator. Includes
-          income tax, National Insurance, student loans, and pension contributions.
-        </p>
-
-        <button
-          type='button'
-          onClick={onScrollToCalculator}
-          className='inline-flex items-center gap-3 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-purple-500 hover:to-cyan-500 hover:shadow-purple-500/25 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900'
+      <div className='relative z-10 mx-auto max-w-5xl px-4 text-center'>
+        {/* Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className='mb-6 font-bold text-5xl text-foreground tracking-tight md:text-7xl'
         >
-          Start Calculating
-          <ArrowRight className='h-4 w-4' />
-        </button>
-      </div>
+          Free UK PAYE Tax
+          <br />
+          <span className='text-gradient'>Calculator 2025-2026</span>
+        </motion.h1>
 
-      {/* Scroll indicator */}
-      <div className='-translate-x-1/2 absolute bottom-8 left-1/2 transform'>
-        <div className='animate-bounce'>
-          <ArrowRight className='h-6 w-6 rotate-90 text-white/60' />
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className='mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl'
+        >
+          Calculate your take-home pay instantly. Includes income tax, National Insurance, student
+          loans, and pension contributions.
+        </motion.p>
+
+        {/* CTA Button */}
+        <div className='inline-block rounded-lg bg-gradient-to-r from-blue-400 to-blue-600 p-[1px] transition-transform hover:scale-[1.02]'>
+          <Button
+            size='lg'
+            onClick={onScrollToCalculator}
+            className='gap-2 rounded-lg bg-background px-8'
+          >
+            Calculate My Salary
+            <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-0.5' />
+          </Button>
         </div>
+
+        {/* Features */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className='mt-16 flex flex-wrap items-center justify-center gap-8 text-muted-foreground text-sm'
+        >
+          {[
+            'Accurate Calculations',
+            '2025-2026 Tax Year',
+            'Scottish Tax Support',
+            'Instant Results',
+          ].map((feature, index) => (
+            <motion.div
+              key={feature}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+              className='flex items-center gap-2'
+            >
+              <div className='h-1.5 w-1.5 rounded-full bg-primary' />
+              <span>{feature}</span>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

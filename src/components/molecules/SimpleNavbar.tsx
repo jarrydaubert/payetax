@@ -1,13 +1,13 @@
 // src/components/molecules/SimpleNavbar.tsx
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, MessageSquare, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { NavigationLink } from '@/types/navigation';
 
 interface SimpleNavbarProps {
   className?: string;
@@ -15,204 +15,136 @@ interface SimpleNavbarProps {
 
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const [shimmerEnabled, setShimmerEnabled] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => {
-    setIsClient(true);
-
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (!prefersReducedMotion) {
-      // Start shimmer animation after component mounts and page is loaded
-      const timer = setTimeout(() => {
-        setShimmerEnabled(true);
-      }, 1000); // Delay to ensure page is fully loaded
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const navigationLinks: (NavigationLink & { label: string; active: boolean })[] = [
-    { href: '/', label: 'Home', name: 'Home', active: pathname === '/' },
-    { href: '/about', label: 'About', name: 'About', active: pathname === '/about' },
-    { href: '/blog', label: 'Blog', name: 'Blog', active: pathname === '/blog' },
-  ];
-
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const links = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/blog', label: 'Blog' },
+  ] as const;
 
   return (
     <>
-      <nav
-        className={cn(
-          'fixed top-0 right-0 left-0 z-40',
-          'glass border-white/10 border-b',
-          className
-        )}
-        style={{
-          background: 'transparent',
-          height: '80px',
-          padding: '1rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          className='flex w-full items-center justify-between'
-          style={{
-            maxWidth: '1920px',
-            margin: '0 auto',
-          }}
-        >
-          {/* Logo/Brand */}
-          <div className='flex items-center'>
-            <Link href='/' className='group'>
-              <span
-                className={`shimmer-logo font-bold text-2xl transition-all duration-300 ${
-                  isClient && shimmerEnabled ? 'shimmer-active' : ''
-                }`}
-              >
-                ToolHubX
-              </span>
-            </Link>
-          </div>
+      {/* Skip to main content */}
+      <a href='#main-content' className='skip-link'>
+        Skip to content
+      </a>
+
+      <nav className={cn('relative z-40 w-full py-4', className)}>
+        <div className='container mx-auto flex max-w-7xl items-center justify-between px-4'>
+          {/* Logo */}
+          <Link href='/' className='group'>
+            <motion.span
+              className='bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text font-bold text-2xl text-transparent'
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              ToolHubX
+            </motion.span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className='hidden flex-1 items-center justify-center md:flex'>
-            <div className='flex items-center gap-8 lg:gap-10'>
-              {navigationLinks.map((link) => (
-                <div key={link.href} className='relative'>
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      'relative flex items-center px-2 py-3',
-                      'font-medium text-sm transition-all duration-300',
-                      'focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2',
-                      link.active ? 'text-white' : 'text-white/70 hover:text-white'
-                    )}
-                    aria-current={link.active ? 'page' : undefined}
-                  >
-                    <span>{link.label}</span>
-                  </Link>
-
-                  {/* Underline indicator */}
-                  {link.active && (
-                    <div
-                      className='absolute right-0 bottom-0 left-0 h-0.5'
-                      style={{
-                        background:
-                          'linear-gradient(135deg, hsl(270, 100%, 80%) 0%, hsl(200, 100%, 70%) 100%)',
-                      }}
+          <div className='hidden items-center gap-8 md:flex'>
+            {links.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'relative px-3 py-2 font-medium text-sm transition-colors',
+                    isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {link.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId='navbar-indicator'
+                      className='absolute right-0 bottom-0 left-0 h-0.5 bg-primary'
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                </div>
-              ))}
-            </div>
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Right side - Feedback Link */}
-          <div className='hidden items-center md:flex'>
-            <Link
-              href='/feedback'
-              className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-cyan-500 px-4 py-2 font-medium text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl'
-            >
-              <MessageSquare className='relative z-10 h-4 w-4' />
-              <span className='relative z-10'>Feedback</span>
-            </Link>
+          {/* Feedback Button - Desktop */}
+          <div className='hidden md:block'>
+            <Button asChild size='sm' className='gap-2'>
+              <Link href='/feedback'>
+                <MessageSquare className='h-4 w-4' />
+                Feedback
+              </Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            type='button'
-            className='relative rounded-lg p-3 md:hidden'
-            style={{
-              background:
-                'linear-gradient(135deg, hsla(270, 100%, 80%, 0.1) 0%, hsla(200, 100%, 70%, 0.1) 100%)',
-              border: '1px solid hsla(270, 100%, 80%, 0.2)',
-              marginRight: '0.5rem',
-            }}
-            onClick={toggleMobileMenu}
+          <Button
+            variant='ghost'
+            size='icon'
+            className='md:hidden'
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? (
-              <X className='h-6 w-6 text-white' />
-            ) : (
-              <Menu className='h-6 w-6 text-white' />
-            )}
-          </button>
+            {isMobileMenuOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+          </Button>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div
-            className='absolute top-full right-0 left-0 border-t md:hidden'
-            style={{
-              background:
-                'linear-gradient(135deg, hsla(230, 70%, 8%, 0.98) 0%, hsla(270, 100%, 12%, 0.95) 100%)',
-              borderTopColor: 'hsla(270, 100%, 80%, 0.2)',
-            }}
-          >
-            <div className='container mx-auto max-w-7xl px-4 py-8'>
-              <div className='flex flex-col items-center gap-6'>
-                {navigationLinks.map((link) => (
-                  <div key={link.href} className='w-full max-w-xs'>
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className='overflow-hidden border-border/50 border-t md:hidden'
+            >
+              <div className='container mx-auto max-w-7xl space-y-2 px-4 py-4'>
+                {links.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
                     <Link
+                      key={link.href}
                       href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
-                        'flex items-center justify-center rounded-xl p-4',
-                        'font-medium text-base transition-all duration-300',
-                        'focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2',
-                        link.active ? 'text-white' : 'text-white/70 hover:text-white'
+                        'block rounded-lg px-4 py-3 font-medium text-sm transition-colors',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                       )}
-                      style={{
-                        background: link.active
-                          ? 'linear-gradient(135deg, hsla(270, 100%, 80%, 0.2) 0%, hsla(200, 100%, 70%, 0.2) 100%)'
-                          : 'hsla(270, 100%, 80%, 0.1)',
-                        border: '1px solid hsla(270, 100%, 80%, 0.1)',
-                      }}
-                      onClick={closeMobileMenu}
-                      aria-current={link.active ? 'page' : undefined}
                     >
-                      <span>{link.label}</span>
+                      {link.label}
                     </Link>
-                  </div>
-                ))}
-
-                {/* Mobile Feedback Button */}
-                <div className='mt-4 w-full max-w-xs'>
-                  <Link
-                    href='/feedback'
-                    className='flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 p-4 font-medium text-base text-white transition-all duration-300'
-                    onClick={closeMobileMenu}
-                  >
-                    <MessageSquare className='relative z-10 h-4 w-4' />
-                    <span className='relative z-10'>Feedback</span>
+                  );
+                })}
+                <Button asChild size='sm' className='mt-4 w-full gap-2'>
+                  <Link href='/feedback' onClick={() => setIsMobileMenuOpen(false)}>
+                    <MessageSquare className='h-4 w-4' />
+                    Feedback
                   </Link>
-                </div>
+                </Button>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* Backdrop for mobile menu */}
-      {isMobileMenuOpen && (
-        <button
-          type='button'
-          className='fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden'
-          onClick={closeMobileMenu}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              closeMobileMenu();
-            }
-          }}
-          aria-label='Close mobile menu'
-        />
-      )}
+      {/* Mobile Menu Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className='fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden'
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

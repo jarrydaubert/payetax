@@ -1,111 +1,164 @@
 // src/components/ui/SustainabilityBadge.tsx
 'use client';
 
-import { Info, Leaf, X } from 'lucide-react';
-import { useId, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Leaf, X } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function SustainabilityBadge() {
   const [showDetails, setShowDetails] = useState(false);
-  const titleId = useId();
 
   return (
     <>
       {/* Sustainability Badge */}
-      <div className='fixed bottom-4 left-4 z-50'>
-        <button
-          type='button'
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className='fixed bottom-4 left-4 z-40'
+      >
+        <Button
           onClick={() => setShowDetails(true)}
-          className='flex items-center gap-2 rounded-full bg-green-600/90 px-3 py-2 text-white text-xs backdrop-blur-sm transition-colors hover:bg-green-600'
+          size='sm'
+          className='gap-2 rounded-full bg-green-600/90 text-xs backdrop-blur-sm hover:bg-green-600'
           aria-label='View sustainability information'
         >
           <Leaf className='h-3 w-3' />
           <span className='hidden sm:inline'>Carbon Neutral</span>
-          <Info className='h-3 w-3 sm:hidden' />
-        </button>
-      </div>
+        </Button>
+      </motion.div>
 
       {/* Sustainability Details Modal */}
-      {showDetails && (
-        <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm'
-          onClick={() => setShowDetails(false)}
-          onKeyDown={(e) => e.key === 'Escape' && setShowDetails(false)}
-          role='dialog'
-          aria-modal='true'
-          aria-labelledby={titleId}
-        >
-          <div
-            className='glass-card w-full max-w-md border border-white/20'
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-            role='document'
-          >
-            <div className='mb-4 flex items-start justify-between'>
-              <div className='flex items-center gap-2'>
-                <Leaf className='h-5 w-5 text-green-400' />
-                <h3 id={titleId} className='font-semibold text-white'>
-                  Eco-Friendly Calculator
-                </h3>
-              </div>
-              <button
-                type='button'
-                onClick={() => setShowDetails(false)}
-                className='text-gray-400 hover:text-white'
-                aria-label='Close sustainability details'
+      <AnimatePresence>
+        {showDetails && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className='fixed inset-0 z-50 bg-black/60 backdrop-blur-sm'
+              onClick={() => setShowDetails(false)}
+            />
+
+            {/* Modal */}
+            <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.2 }}
+                className='relative w-full max-w-md'
+                onClick={(e) => e.stopPropagation()}
               >
-                <X className='h-4 w-4' />
-              </button>
+                <Card className='border-0 bg-card/95 p-6 backdrop-blur-xl'>
+                  {/* Header */}
+                  <div className='mb-6 flex items-start justify-between'>
+                    <div className='flex items-center gap-2'>
+                      <Leaf className='h-5 w-5 text-green-400' />
+                      <h3 className='font-semibold text-lg'>Eco-Friendly Calculator</h3>
+                    </div>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      onClick={() => setShowDetails(false)}
+                      className='h-8 w-8'
+                      aria-label='Close'
+                    >
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
+
+                  {/* Content */}
+                  <div className='space-y-5 text-muted-foreground text-sm'>
+                    {/* Environmental Impact */}
+                    <div>
+                      <h4 className='mb-3 flex items-center gap-2 font-medium text-foreground'>
+                        🌱 Environmental Impact
+                      </h4>
+                      <ul className='space-y-2 text-xs'>
+                        <li className='flex gap-2'>
+                          <span className='text-green-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Low Carbon:</strong> ~0.2g CO₂ per
+                            page visit (avg. web page: 1.76g)
+                          </span>
+                        </li>
+                        <li className='flex gap-2'>
+                          <span className='text-green-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Efficient Code:</strong> 285KB
+                            initial bundle, optimized for minimal energy
+                          </span>
+                        </li>
+                        <li className='flex gap-2'>
+                          <span className='text-green-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Green Hosting:</strong> Deployed on
+                            Vercel's carbon-neutral infrastructure
+                          </span>
+                        </li>
+                        <li className='flex gap-2'>
+                          <span className='text-green-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Offline Ready:</strong> PWA reduces
+                            repeat network requests
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Performance Benefits */}
+                    <div>
+                      <h4 className='mb-3 flex items-center gap-2 font-medium text-foreground'>
+                        ⚡ Performance Benefits
+                      </h4>
+                      <ul className='space-y-2 text-xs'>
+                        <li className='flex gap-2'>
+                          <span className='text-blue-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Fast Loading:</strong> Static
+                            generation with ISR
+                          </span>
+                        </li>
+                        <li className='flex gap-2'>
+                          <span className='text-blue-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Edge Caching:</strong> Content
+                            served from nearest location
+                          </span>
+                        </li>
+                        <li className='flex gap-2'>
+                          <span className='text-blue-400'>•</span>
+                          <span>
+                            <strong className='text-foreground'>Client-Side Calculations:</strong>{' '}
+                            No server requests needed
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Footer */}
+                    <div className='border-border border-t pt-4 text-xs'>
+                      <p className='mb-2'>Making tax calculations sustainable for everyone.</p>
+                      <a
+                        href='https://www.websitecarbon.com/'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='inline-flex items-center gap-1 text-green-400 hover:underline'
+                      >
+                        Learn more about web sustainability →
+                      </a>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
             </div>
-
-            <div className='space-y-4 text-gray-300 text-sm'>
-              <div>
-                <h4 className='mb-2 font-medium text-white'>🌱 Environmental Impact</h4>
-                <ul className='space-y-1 text-xs'>
-                  <li>
-                    • <strong>Low Carbon:</strong> ~0.12g CO₂ per page visit
-                  </li>
-                  <li>
-                    • <strong>Efficient Code:</strong> Optimized for minimal energy use
-                  </li>
-                  <li>
-                    • <strong>Optimized Hosting:</strong> Efficient serverless infrastructure
-                  </li>
-                  <li>
-                    • <strong>Offline Ready:</strong> Reduces network requests
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className='mb-2 font-medium text-white'>⚡ Performance Benefits</h4>
-                <ul className='space-y-1 text-xs'>
-                  <li>
-                    • <strong>Fast Loading:</strong> Under 1.5s initial load
-                  </li>
-                  <li>
-                    • <strong>Cached Assets:</strong> Instant subsequent visits
-                  </li>
-                  <li>
-                    • <strong>Minimal JS:</strong> Efficient calculations
-                  </li>
-                </ul>
-              </div>
-
-              <div className='border-gray-700 border-t pt-2 text-gray-400 text-xs'>
-                Making tax calculations sustainable for everyone.
-                <a
-                  href='https://www.websitecarbon.com/'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='ml-1 text-green-400 hover:underline'
-                >
-                  Learn more about web sustainability
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -8,7 +8,18 @@ import { notFound } from 'next/navigation';
 import BlogContent from '@/components/blog/BlogContent';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
-import { getBlogPostBySlug } from '@/lib/blog';
+import { getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
+
+// Enable ISR - revalidate every 24 hours for fresh tax content
+export const revalidate = 86400;
+
+// Generate static params for all blog posts at build time
+export async function generateStaticParams() {
+  const posts = await getBlogPosts({ pageSize: 1000 });
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 export async function generateMetadata({
   params,

@@ -29,7 +29,7 @@ describe('Button Component', () => {
 
   describe('Variants', () => {
     it('renders primary variant correctly', () => {
-      render(<Button variant='primary'>Primary</Button>);
+      render(<Button variant='default'>Primary</Button>);
       const button = screen.getByRole('button');
 
       expect(button).toHaveClass('btn', 'btn-primary');
@@ -224,7 +224,7 @@ describe('Button Component', () => {
     });
 
     it('handles multiple variant props (should use first valid one)', () => {
-      render(<Button variant='primary'>Multi Variant</Button>);
+      render(<Button variant='default'>Multi Variant</Button>);
       const button = screen.getByRole('button');
 
       expect(button).toHaveClass('btn-primary');
