@@ -43,7 +43,7 @@ VERCEL_PROJECT_ID=prj_xxxxxxxxxxxxxxxxxxxx
 - IDs: Vercel Dashboard > Project > Settings > General
 
 **Use in**: GitLab > Settings > CI/CD > Variables (Protected + Masked)
-**URL**: https://gitlab.com/jarrydaubert/paye-tax/-/settings/ci_cd
+**URL**: https://gitlab.com/ukpayetax/payetax/-/settings/ci_cd
 
 ---
 
@@ -166,7 +166,7 @@ cat .vercel/project.json
 
 **Where to Set**:
 - GitLab: Settings > CI/CD > Variables (Protected + Masked)
-  - https://gitlab.com/jarrydaubert/paye-tax/-/settings/ci_cd
+  - https://gitlab.com/ukpayetax/payetax/-/settings/ci_cd
 
 **Status**: ❌ Not configured yet
 
@@ -319,7 +319,7 @@ git push origin main  # Triggers GitLab CI → Vercel
 | Service | Dashboard URL | Docs |
 |---------|--------------|------|
 | **Vercel** | https://vercel.com/dashboard | https://vercel.com/docs |
-| **GitLab CI/CD** | https://gitlab.com/jarrydaubert/paye-tax/-/pipelines | https://docs.gitlab.com/ee/ci/ |
+| **GitLab CI/CD** | https://gitlab.com/ukpayetax/payetax/-/pipelines | https://docs.gitlab.com/ee/ci/ |
 | **Google Analytics** | https://analytics.google.com | https://support.google.com/analytics |
 | **M365 Admin** | https://admin.microsoft.com | https://docs.microsoft.com/microsoft-365 |
 
@@ -337,4 +337,4 @@ git push origin main  # Triggers GitLab CI → Vercel
 
 **Last Updated**: 2025-10-03
 **Status**: Ready for deployment after completing "Must Complete" items above
-**Repository**: https://gitlab.com/jarrydaubert/paye-tax
+**Repository**: https://gitlab.com/ukpayetax/payetax

@@ -4,14 +4,14 @@
 [![React](https://img.shields.io/badge/React-19.2-61dafb?style=flat-square&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38b2ac?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![GitLab CI](https://img.shields.io/badge/GitLab_CI-passing-green?style=flat-square&logo=gitlab)](https://gitlab.com/jarrydaubert/paye-tax)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](https://gitlab.com/jarrydaubert/paye-tax/-/releases)
+[![GitLab CI](https://img.shields.io/badge/GitLab_CI-passing-green?style=flat-square&logo=gitlab)](https://gitlab.com/ukpayetax/payetax)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](https://gitlab.com/ukpayetax/payetax/-/releases)
 
 > **Production-ready UK Tax Calculator** - HMRC-compliant PAYE calculations with AEO optimization, WCAG 2.2 AA accessibility, and exceptional performance.
 
 **🌐 Live Demo:** [payetax.co.uk](https://payetax.co.uk)
 **📊 Status:** 🟢 **v1.0.0 Released** - Production-ready with GitLab CI/CD
-**🔗 Repository:** [gitlab.com/jarrydaubert/paye-tax](https://gitlab.com/jarrydaubert/paye-tax)
+**🔗 Repository:** [gitlab.com/ukpayetax/payetax](https://gitlab.com/ukpayetax/payetax)
 
 ---
 
@@ -46,7 +46,7 @@ PayeTax is a production-ready UK PAYE tax calculator built with Next.js 15 and R
 
 ```bash
 # Clone and setup
-git clone https://gitlab.com/jarrydaubert/paye-tax.git
+git clone https://gitlab.com/ukpayetax/payetax.git
 cd paye-tax
 npm install
 
