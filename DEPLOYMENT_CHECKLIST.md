@@ -6,12 +6,6 @@ Complete list of all credentials, IDs, and tokens needed for production deployme
 
 ## ✅ Completed / Already Have
 
-### Google Analytics
-- **GA ID**: `G-99DW6ZQWMT` ✅
-- **Location**: Set in `.env.local`
-- **Used by**: GA4 tracking in `src/components/analytics/Analytics.tsx`
-- **Status**: Active and configured
-
 ### Domain
 - **Production URL**: `https://payetax.co.uk` ✅
 - **Status**: Configured in `.gitlab-ci.yml` and documentation
@@ -20,7 +14,44 @@ Complete list of all credentials, IDs, and tokens needed for production deployme
 
 ## ⚠️ CRITICAL - Required Before Launch
 
-### 1. M365 SMTP Configuration (Email Feedback System)
+### 1. Google Analytics 4 (GA4) Configuration
+**Purpose**: User analytics and traffic tracking
+
+**Required Values**:
+```env
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+**Action Required**:
+1. Create new GA4 property at: https://analytics.google.com
+2. Property Settings:
+   - Property Name: `PayeTax UK Tax Calculator`
+   - Time Zone: `United Kingdom`
+   - Currency: `Pound Sterling (£)`
+3. Data Streams > Add Stream > Web
+   - Website URL: `https://payetax.co.uk`
+   - Stream Name: `PayeTax Production`
+4. Copy Measurement ID (format: `G-XXXXXXXXXX`)
+5. Add to `.env.local`:
+   ```env
+   NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+   ```
+
+**Where to Set**:
+- **Local Development**: `/Users/jarrydaubert/Desktop/payetax/.env.local`
+- **Vercel Production**: Project Settings > Environment Variables
+
+**Features Configured**:
+- IP anonymization for GDPR compliance ✅
+- Consent mode (cookie banner) ✅
+- Custom events (calculator usage, exports) ✅
+- Page view tracking ✅
+
+**Status**: ❌ New property needs to be created
+
+---
+
+### 2. M365 SMTP Configuration (Email Feedback System)
 **Purpose**: Error reporting and user feedback emails
 
 **Required Values**:
@@ -46,7 +77,7 @@ M365_PASSWORD=<your-new-app-password>
 
 ---
 
-### 2. Vercel Deployment Tokens (GitLab CI/CD)
+### 3. Vercel Deployment Tokens (GitLab CI/CD)
 **Purpose**: Automated deployments from GitLab CI/CD pipeline
 
 **Required Values**:
@@ -87,7 +118,7 @@ cat .vercel/project.json
 
 ---
 
-### 3. Vercel Analytics (Optional but Recommended)
+### 4. Vercel Analytics (Optional but Recommended)
 **Purpose**: Web Vitals and performance tracking
 
 **How to Enable**:
@@ -108,7 +139,7 @@ cat .vercel/project.json
 
 ## 📋 Optional Configuration (Post-Launch)
 
-### 4. Buy Me a Coffee Widget
+### 5. Buy Me a Coffee Widget
 **Purpose**: Optional donation support widget
 
 **Current Status**: Configured with username `payetax`
@@ -121,7 +152,7 @@ cat .vercel/project.json
 
 ---
 
-### 5. PWA & Service Worker (Already Configured)
+### 6. PWA & Service Worker (Already Configured)
 **Purpose**: Progressive Web App functionality
 
 **Files**:
@@ -138,7 +169,7 @@ cat .vercel/project.json
 
 ---
 
-### 6. Structured Data & SEO (Already Configured)
+### 7. Structured Data & SEO (Already Configured)
 **Purpose**: Search engine optimization
 
 **Configured**:
@@ -154,7 +185,7 @@ cat .vercel/project.json
 
 ## 🔐 Security Configuration
 
-### 7. GitLab Branch Protection
+### 8. GitLab Branch Protection
 **Purpose**: Prevent force pushes to main
 
 **Current Issue**: Main branch is protected (good!) but blocks force push
@@ -162,7 +193,7 @@ cat .vercel/project.json
 
 ---
 
-### 8. Security Headers (Vercel)
+### 9. Security Headers (Vercel)
 **Purpose**: CSP, HSTS, Permissions Policy
 
 **Configured in**: `/vercel.json`
@@ -189,6 +220,8 @@ cat .vercel/project.json
 
 ### Must Complete Before Going Live:
 
+- [ ] **Create new GA4 property and get Measurement ID**
+- [ ] **Add GA4 ID to `.env.local` and Vercel**
 - [ ] **Change M365 password** (security critical!)
 - [ ] **Add M365 credentials to `.env.local`**
 - [ ] **Get Vercel deployment token**
