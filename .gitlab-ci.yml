@@ -35,7 +35,7 @@ secret_detection:
     - main
     - tags
 
-# Test stage - Run linting, type checking, and unit tests
+# Test stage - Run linting and unit tests
 test:
   stage: test
   image: node:20-alpine
@@ -44,7 +44,7 @@ test:
   script:
     - npm run lint
     - npm test # Run unit tests
-    - npm run build # This includes TypeScript type checking
+    - npm run typecheck # TypeScript validation
   only:
     - merge_requests
     - main
@@ -90,8 +90,8 @@ deploy_preview:
   before_script:
     - npm install -g vercel@latest
   script:
-    - echo "Deploying preview..."
-    - vercel --token $VERCEL_TOKEN --yes
+    - echo "Deploying preview for MR !$CI_MERGE_REQUEST_IID..."
+    - vercel --token $VERCEL_TOKEN --name payetax-preview-$CI_MERGE_REQUEST_IID --yes
   environment:
     name: preview/$CI_MERGE_REQUEST_IID
     url: $CI_ENVIRONMENT_URL
@@ -132,7 +132,22 @@ dependency_audit:
     - merge_requests
     - tags
 
+# Performance Budget Check (Optional - Post-Launch Enhancement)
+# lighthouse:
+#   stage: build
+#   image: node:20-alpine
+#   before_script:
+#     - npm ci --cache .npm --prefer-offline
+#   script:
+#     - npm run lighthouse:ci
+#   artifacts:
+#     reports:
+#       lighthouse: lighthouse-report.html
+#   only:
+#     - main
+#   allow_failure: true
+
 # Variables needed in GitLab CI/CD Settings:
 # VERCEL_TOKEN - Vercel CLI token for deployments
-# VERCEL_ORG_ID - Your Vercel organization ID  
+# VERCEL_ORG_ID - Your Vercel organization ID
 # VERCEL_PROJECT_ID - Your Vercel project ID
