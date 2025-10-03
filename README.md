@@ -47,7 +47,7 @@ PayeTax is a production-ready UK PAYE tax calculator built with Next.js 15 and R
 ```bash
 # Clone and setup
 git clone https://gitlab.com/ukpayetax/payetax.git
-cd paye-tax
+cd payetax
 npm install
 
 # Start development server

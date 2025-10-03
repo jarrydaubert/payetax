@@ -316,11 +316,11 @@ npm run test       # Unit test execution
 
 ### Continuous Integration
 
-**GitHub Actions Pipeline**:
-1. **Quality Stage**: Biome formatting and TypeScript checking
-2. **Test Stage**: Unit tests with coverage reporting
-3. **E2E Stage**: Playwright tests in multiple browsers
-4. **Performance Stage**: Lighthouse CI auditing
+**GitLab CI/CD Pipeline**:
+1. **Security Stage**: Secret detection and dependency auditing
+2. **Test Stage**: Biome linting, TypeScript checking, unit tests
+3. **Build Stage**: Production build with bundle analysis
+4. **Deploy Stage**: Automated Vercel deployment
 
 ---
 
@@ -413,6 +413,6 @@ Before deployment, verify:
 
 ---
 
-**Last Updated**: September 3, 2025  
-**Test Suite Version**: v2.1.0  
+**Last Updated**: October 3, 2025
+**Test Suite Version**: v2.1.0
 **Status**: ✅ 131 unit tests + 157 E2E tests, all auto-generate HTML reports

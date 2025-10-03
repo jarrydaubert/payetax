@@ -18,7 +18,7 @@ This document provides comprehensive documentation of the project's file organiz
 ## 🗂️ Directory Structure
 
 ```
-toolhubx/
+payetax/
 ├── 📁 docs/                           # Streamlined documentation (NEW)
 │   ├── STRUCTURE.md                   # This file - architecture overview
 │   ├── DEPLOYMENT.md                  # Production deployment guide

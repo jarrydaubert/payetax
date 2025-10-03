@@ -27,7 +27,7 @@ npm run build:analyze
 
 ### Continuous Monitoring
 
-- **GitHub Actions**: Automated bundle analysis on every PR
+- **GitLab CI/CD**: Automated bundle analysis on every MR
 - **Bundle History**: Tracks size changes over time
 - **Threshold Alerts**: Fails CI if bundle size exceeds limits
 
@@ -310,6 +310,6 @@ cat bundle-history.json | jq '.measurements[-5:]'
 
 ---
 
-**Last Updated**: August 28, 2025
-**Bundle Analysis**: Automated via GitHub Actions
+**Last Updated**: October 3, 2025
+**Bundle Analysis**: Automated via GitLab CI/CD
 **Monitoring**: Continuous with threshold alerts
