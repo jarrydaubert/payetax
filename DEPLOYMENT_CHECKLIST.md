@@ -4,6 +4,60 @@ Complete list of all credentials, IDs, and tokens needed for production deployme
 
 ---
 
+## 📝 Quick Reference - All IDs & Tokens
+
+Copy your actual values here as you obtain them. This is your single source of truth.
+
+### Google Analytics
+```env
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+**Status**: ⬜ Not yet created
+**Get from**: https://analytics.google.com > Data Streams > Measurement ID
+**Use in**: `.env.local` and Vercel Environment Variables
+
+---
+
+### M365 SMTP (Email System)
+```env
+M365_SMTP_HOST=smtp.office365.com
+M365_SMTP_PORT=587
+M365_EMAIL=jarryd@payetax.co.uk
+M365_PASSWORD=your-new-app-password-here
+```
+**Status**: ⬜ Password needs to be changed
+**Get from**: https://account.microsoft.com/security > App passwords
+**Use in**: `.env.local` and Vercel Environment Variables
+
+---
+
+### Vercel Deployment (GitLab CI/CD)
+```bash
+VERCEL_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+VERCEL_ORG_ID=team_xxxxxxxxxxxxxxxxxxxx
+VERCEL_PROJECT_ID=prj_xxxxxxxxxxxxxxxxxxxx
+```
+**Status**: ⬜ Not yet obtained
+**Get from**:
+- Token: https://vercel.com/account/tokens
+- IDs: Vercel Dashboard > Project > Settings > General
+
+**Use in**: GitLab > Settings > CI/CD > Variables (Protected + Masked)
+**URL**: https://gitlab.com/jarrydaubert/paye-tax/-/settings/ci_cd
+
+---
+
+### Optional: Buy Me a Coffee
+```
+Username: payetax
+Account URL: https://buymeacoffee.com/payetax
+```
+**Status**: ⬜ Verify account exists
+**Get from**: https://buymeacoffee.com
+**Use in**: Already configured in `layout.tsx` (line 159)
+
+---
+
 ## ✅ Completed / Already Have
 
 ### Domain
