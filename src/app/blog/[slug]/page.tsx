@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import BlogContent from '@/components/blog/BlogContent';
+import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
@@ -30,13 +31,16 @@ export async function generateMetadata({
   const post = await getBlogPostBySlug(resolvedParams.slug);
 
   if (!post) {
-    return { title: 'Post Not Found | ToolHubX Blog' };
+    return { title: 'Post Not Found | PayeTax Blog' };
   }
 
   return {
-    title: `${post.title} | ToolHubX Blog`,
+    title: `${post.title} | PayeTax Blog`,
     description: post.excerpt,
     keywords: post.seoKeywords?.join(', '),
+    alternates: {
+      canonical: `https://payetax.co.uk/blog/${resolvedParams.slug}`,
+    },
     openGraph: {
       title: post.seoTitle || post.title,
       description: post.seoDescription || post.excerpt,
@@ -150,13 +154,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     Try our free UK tax calculator to see how much you'll take home.
                   </p>
                 </div>
-                <Link
-                  href='/'
-                  className='inline-flex items-center rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90'
-                >
-                  Calculate Your Tax
-                  <ArrowLeft className='ml-2 h-4 w-4 rotate-180' />
-                </Link>
+                <Button asChild>
+                  <Link href='/'>
+                    Calculate Your Tax
+                    <ArrowLeft className='ml-2 h-4 w-4 rotate-180' />
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>

@@ -52,14 +52,24 @@ interface CalculatorInput {
   taxYear: TaxYear;
   /** HMRC tax code (e.g., 1257L, S1257L) */
   taxCode: string;
-  /** Whether Scottish tax rates apply */
+  /** Tax region (England, Scotland, Wales, Northern Ireland) */
+  region: 'England' | 'Scotland' | 'Wales' | 'Northern Ireland';
+  /** Whether Scottish tax rates apply (derived from region) */
   isScottish: boolean;
+  /** Whether married/civil partnership for marriage allowance */
+  isMarried: boolean;
+  /** Partner's gross wage for marriage allowance calculation */
+  partnerGrossWage: number;
+  /** Whether blind person's allowance applies */
+  isBlind: boolean;
+  /** Whether paying no National Insurance (e.g., over state pension age) */
+  payNoNI: boolean;
+  /** Student loan plan (single selection or none) */
+  studentLoanPlan: StudentLoanPlan | 'none';
   /** Pension contribution amount */
   pensionContribution: number;
   /** Whether pension contribution is a percentage or fixed amount */
   pensionContributionType: 'percentage' | 'amount';
-  /** Student loan plans that apply (can be multiple) */
-  studentLoanPlans: StudentLoanPlan[];
   /** National Insurance category (A, B, C, etc.) */
   niCategory: NICategory;
   /** Hours worked per week (for hourly rate calculations) */
@@ -105,10 +115,15 @@ interface CalculatorState {
   setPayPeriod: (period: PayPeriod) => void;
   setTaxYear: (year: TaxYear) => void;
   setTaxCode: (code: string) => void;
+  setRegion: (region: 'England' | 'Scotland' | 'Wales' | 'Northern Ireland') => void;
   setIsScottish: (isScottish: boolean) => void;
+  setIsMarried: (isMarried: boolean) => void;
+  setPartnerGrossWage: (wage: number) => void;
+  setIsBlind: (isBlind: boolean) => void;
+  setPayNoNI: (payNoNI: boolean) => void;
+  setStudentLoanPlan: (plan: StudentLoanPlan | 'none') => void;
   setPensionContribution: (amount: number) => void;
   setPensionContributionType: (type: 'percentage' | 'amount') => void;
-  setStudentLoanPlans: (plans: StudentLoanPlan[]) => void;
   setNiCategory: (category: NICategory) => void;
   setHoursPerWeek: (hours: number) => void;
   setAdditionalAllowances: (allowances: TaxAllowance[]) => void;
@@ -156,10 +171,15 @@ const defaultInput: CalculatorInput = {
   payPeriod: PERIODS.ANNUALLY,
   taxYear: defaultTaxYear,
   taxCode: '', // Empty by default - use standard allowance
+  region: 'England',
   isScottish: false,
+  isMarried: false,
+  partnerGrossWage: 0,
+  isBlind: false,
+  payNoNI: false,
+  studentLoanPlan: 'none',
   pensionContribution: 0,
   pensionContributionType: 'percentage',
-  studentLoanPlans: [],
   niCategory: 'A',
   hoursPerWeek: 40,
   additionalAllowances: [],
@@ -201,13 +221,22 @@ export const useCalculatorStore = create<CalculatorState>()(
         setPayPeriod: (payPeriod) => set((state) => ({ input: { ...state.input, payPeriod } })),
         setTaxYear: (taxYear) => set((state) => ({ input: { ...state.input, taxYear } })),
         setTaxCode: (taxCode) => set((state) => ({ input: { ...state.input, taxCode } })),
+        setRegion: (region) =>
+          set((state) => ({
+            input: { ...state.input, region, isScottish: region === 'Scotland' },
+          })),
         setIsScottish: (isScottish) => set((state) => ({ input: { ...state.input, isScottish } })),
+        setIsMarried: (isMarried) => set((state) => ({ input: { ...state.input, isMarried } })),
+        setPartnerGrossWage: (partnerGrossWage) =>
+          set((state) => ({ input: { ...state.input, partnerGrossWage } })),
+        setIsBlind: (isBlind) => set((state) => ({ input: { ...state.input, isBlind } })),
+        setPayNoNI: (payNoNI) => set((state) => ({ input: { ...state.input, payNoNI } })),
         setPensionContribution: (pensionContribution) =>
           set((state) => ({ input: { ...state.input, pensionContribution } })),
         setPensionContributionType: (pensionContributionType) =>
           set((state) => ({ input: { ...state.input, pensionContributionType } })),
-        setStudentLoanPlans: (studentLoanPlans) =>
-          set((state) => ({ input: { ...state.input, studentLoanPlans } })),
+        setStudentLoanPlan: (studentLoanPlan) =>
+          set((state) => ({ input: { ...state.input, studentLoanPlan } })),
         setNiCategory: (niCategory) => set((state) => ({ input: { ...state.input, niCategory } })),
         setHoursPerWeek: (hoursPerWeek) =>
           set((state) => ({ input: { ...state.input, hoursPerWeek } })),

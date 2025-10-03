@@ -15,14 +15,13 @@ export default function robots(): MetadataRoute.Robots {
         // Default rules for all crawlers
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/_next/', '/_vercel/', '/private/', '*.json'],
+        disallow: ['/api/', '/admin/', '/_next/', '/_vercel/', '/private/'],
       },
       {
         // Googlebot-specific rules
         userAgent: 'Googlebot',
         allow: '/',
         disallow: ['/api/', '/_next/', '/_vercel/'],
-        crawlDelay: 2, // Wait 2 seconds between page requests
       },
       {
         // Bingbot-specific rules
@@ -32,8 +31,6 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     // Path to sitemap - important for search engines to find all pages
-    sitemap: 'https://toolhubx.uk/sitemap.xml',
-    // Host directive helps search engines identify the preferred domain
-    host: 'https://toolhubx.uk',
+    sitemap: 'https://payetax.co.uk/sitemap.xml',
   };
 }

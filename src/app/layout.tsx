@@ -9,10 +9,11 @@ import { Toaster } from 'sonner';
 import Analytics from '@/components/analytics/Analytics';
 import Layout from '@/components/templates/Layout';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { ThemeProvider } from '@/lib/theme';
 import { inter } from './fonts';
 
 export const metadata: Metadata = metadataGenerator({
-  title: 'ToolHubX - Free UK PAYE Tax Calculator 2025 | Salary & Take-Home Pay',
+  title: 'PayeTax - Free UK PAYE Tax Calculator 2025 | Salary & Take-Home Pay',
   description:
     'Free UK PAYE tax calculator with official HMRC rates 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.',
   pathname: '/',
@@ -37,6 +38,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en' suppressHydrationWarning data-scroll-behavior='smooth'>
       <head>
+        {/* Flash Prevention Script - Loads theme before paint */}
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for flash prevention
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function getTheme() {
+                  const stored = localStorage.getItem('theme');
+                  if (stored) return stored;
+                  return 'system';
+                }
+
+                function applyTheme(theme) {
+                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark'
+                    : 'light';
+                  const resolved = theme === 'system' ? systemTheme : theme;
+
+                  document.documentElement.classList.remove('light', 'dark');
+                  document.documentElement.classList.add(resolved);
+                  document.documentElement.style.colorScheme = resolved;
+                }
+
+                try {
+                  const theme = getTheme();
+                  applyTheme(theme);
+                } catch (e) {
+                  // Fallback to dark if error
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.style.colorScheme = 'dark';
+                }
+              })();
+            `,
+          }}
+        />
+
         <link rel='icon' type='image/x-icon' href='/favicon.ico' />
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
         <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
@@ -44,10 +81,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel='manifest' href='/manifest.json' />
 
         {/* PWA Meta Tags */}
-        <meta name='application-name' content='ToolHubX' />
+        <meta name='application-name' content='PayeTax' />
         <meta name='apple-mobile-web-app-capable' content='yes' />
         <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
-        <meta name='apple-mobile-web-app-title' content='ToolHubX' />
+        <meta name='apple-mobile-web-app-title' content='PayeTax' />
         <meta name='mobile-web-app-capable' content='yes' />
         <meta name='msapplication-TileColor' content='#1f2937' />
         <meta name='msapplication-tap-highlight' content='no' />
@@ -66,10 +103,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name: 'ToolHubX UK Tax Calculator',
+              name: 'PayeTax UK Tax Calculator',
               description:
                 'Free UK tax calculator with official HMRC rates 2025-2026. Calculate PAYE, self-employment tax, National Insurance, and take-home pay instantly.',
-              url: 'https://toolhubx.uk',
+              url: 'https://payetax.co.uk',
               applicationCategory: 'FinanceApplication',
               operatingSystem: 'Web Browser',
               offers: {
@@ -79,8 +116,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
               author: {
                 '@type': 'Organization',
-                name: 'ToolHubX',
-                url: 'https://toolhubx.uk',
+                name: 'PayeTax',
+                url: 'https://payetax.co.uk',
               },
               featureList: [
                 'UK PAYE Tax Calculator',
@@ -91,7 +128,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 'Pension Contribution Calculator',
                 'Weekly/Monthly/Annual Breakdowns',
               ],
-              screenshot: 'https://toolhubx.uk/images/calculator-screenshot.jpg',
+              screenshot: 'https://payetax.co.uk/images/calculator-screenshot.jpg',
               aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: '4.8',
@@ -103,22 +140,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={cn(inter.variable, 'font-sans antialiased', 'min-h-screen text-white')}>
-        <Suspense fallback={null}>
-          <Analytics />
-        </Suspense>
-        <ErrorBoundary>
-          <Layout>{children}</Layout>
-        </ErrorBoundary>
-        <Toaster position='top-right' theme='dark' richColors expand={true} closeButton />
+      <body className={cn(inter.variable, 'font-sans antialiased', 'min-h-screen text-foreground')}>
+        <ThemeProvider>
+          <Suspense fallback={null}>
+            <Analytics />
+          </Suspense>
+          <ErrorBoundary>
+            <Layout>{children}</Layout>
+          </ErrorBoundary>
+          <Toaster position='top-right' richColors expand={true} closeButton />
+        </ThemeProvider>
 
         {/* Buy Me Coffee Widget - optimized loading with better client-side routing support */}
         <script
           data-name='BMC-Widget'
           data-cfasync='false'
           src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
-          data-id='toolhubx.uk'
-          data-description='Support ToolHubX development!'
+          data-id='payetax'
+          data-description='Support PayeTax development!'
           data-message='Thank you for using our free UK tax calculator! 💚'
           data-color='#FF813F'
           data-position='Right'

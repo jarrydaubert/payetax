@@ -6,7 +6,6 @@ import { Suspense, useId } from 'react';
 import Footer from '@/components/molecules/Footer';
 import SimpleNavbar from '@/components/molecules/SimpleNavbar';
 import CookieBanner from '@/components/ui/CookieBanner';
-import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt';
 import SustainabilityBadge from '@/components/ui/SustainabilityBadge';
 
 interface LayoutProps {
@@ -15,6 +14,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
   const mainContentId = useId();
+  const mainLabelId = useId();
 
   return (
     <div className='flex min-h-screen flex-col'>
@@ -24,23 +24,27 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       </a>
 
       {/* Navigation - Fixed at top */}
-      <SimpleNavbar />
+      <header>
+        <SimpleNavbar />
+      </header>
 
       {/* Main content with proper spacing for fixed navbar */}
-      <main id={mainContentId} className='relative flex-1'>
+      <main id={mainContentId} className='relative flex-1' aria-labelledby={mainLabelId}>
+        <h1 id={mainLabelId} className='sr-only'>
+          Main Content
+        </h1>
         {children}
       </main>
 
       {/* Footer */}
-      <Footer />
+      <footer>
+        <Footer />
+      </footer>
 
       {/* Cookie Banner - GDPR Compliance */}
       <Suspense fallback={null}>
         <CookieBanner />
       </Suspense>
-
-      {/* PWA Install Prompt */}
-      <PWAInstallPrompt />
 
       {/* Sustainability Badge */}
       <SustainabilityBadge />

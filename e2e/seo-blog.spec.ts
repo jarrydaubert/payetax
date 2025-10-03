@@ -8,7 +8,7 @@ test.describe('Essential SEO Tests', () => {
     await page.goto('/');
 
     // Check page title
-    await expect(page).toHaveTitle(/UK.*Tax.*Calculator.*ToolHubX/i);
+    await expect(page).toHaveTitle(/UK.*Tax.*Calculator.*PayeTax/i);
 
     // Check meta description exists
     const metaDescription = page.locator('meta[name="description"]');

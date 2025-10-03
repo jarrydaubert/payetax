@@ -1,11 +1,19 @@
 /**
- * ToolHubX - Minimalist Design System
+ * PayeTax - Minimalist Design System
  * Shadcn + Framer Motion + Fluid Typography
  */
 @import "tailwindcss";
 
 :root {
-  /* Shadcn Color System */
+  /* Typography */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --radius: 0.5rem;
+}
+
+/* Dark Mode Theme (Default) */
+.dark {
+  /* Shadcn Color System - Dark */
   --background: 222 47% 11%;
   --foreground: 210 40% 98%;
   --card: 222 47% 11%;
@@ -17,7 +25,7 @@
   --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 98%;
   --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
+  --muted-foreground: 215 20% 75%;
   --accent: 217 33% 17%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 62% 30%;
@@ -25,11 +33,6 @@
   --border: 217 33% 17%;
   --input: 217 33% 17%;
   --ring: 217 91% 60%;
-  --radius: 0.5rem;
-
-  /* Typography */
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* Slate/Titanium Gradient */
   --gradient-background:
@@ -39,6 +42,40 @@
       hsl(220, 40%, 13%) 50%,
       hsl(217, 33%, 17%) 75%,
       hsl(215, 28%, 17%) 100%
+    );
+}
+
+/* Light Mode Theme */
+.light {
+  /* Shadcn Color System - Light */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 217 91% 60%;
+
+  /* Light Blue Gradient */
+  --gradient-background:
+    linear-gradient(135deg,
+      hsl(210, 40%, 98%) 0%,
+      hsl(214, 32%, 95%) 25%,
+      hsl(210, 38%, 95%) 50%,
+      hsl(214, 32%, 95%) 75%,
+      hsl(210, 40%, 98%) 100%
     );
 }
 
@@ -116,6 +153,19 @@ body {
   top: 8px;
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Screen Reader Only - Hidden visually but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Focus States */

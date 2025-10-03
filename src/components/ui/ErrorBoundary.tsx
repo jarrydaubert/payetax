@@ -4,6 +4,7 @@
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: React.ReactNode;
@@ -137,30 +138,29 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
           {/* Action buttons */}
           <div className='mb-8 flex flex-col justify-center gap-4 sm:flex-row'>
-            <button
+            <Button
               type='button'
               onClick={resetError}
-              className='inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-700'
+              size='lg'
+              className='bg-blue-600 hover:bg-blue-700'
             >
-              <RefreshCw className='h-5 w-5' />
+              <RefreshCw className='mr-2 h-5 w-5' />
               Try Again
-            </button>
+            </Button>
 
-            <Link
-              href='/'
-              className='inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 font-semibold text-white transition-all duration-200 hover:scale-105 hover:bg-white/20'
-            >
-              <Home className='h-5 w-5' />
-              Go Home
-            </Link>
+            <Button asChild variant='outline' size='lg'>
+              <Link href='/'>
+                <Home className='mr-2 h-5 w-5' />
+                Go Home
+              </Link>
+            </Button>
 
-            <Link
-              href='/feedback'
-              className='inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-purple-700'
-            >
-              <AlertTriangle className='h-5 w-5' />
-              Report Issue
-            </Link>
+            <Button asChild size='lg' className='bg-purple-600 hover:bg-purple-700'>
+              <a href='mailto:support@payetax.co.uk?subject=Error Report'>
+                <AlertTriangle className='mr-2 h-5 w-5' />
+                Report Issue
+              </a>
+            </Button>
           </div>
 
           {/* Help text */}

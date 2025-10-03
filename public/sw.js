@@ -1,4 +1,4 @@
-// Enhanced Service Worker for ToolHubX - UK PAYE Tax Calculator
+// Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
 const CACHE_NAME = 'toolhubx-v2025.1.0';
@@ -291,7 +291,7 @@ self.addEventListener('push', (event) => {
     ],
   };
 
-  event.waitUntil(self.registration.showNotification('ToolHubX Tax Calculator', options));
+  event.waitUntil(self.registration.showNotification('PayeTax Tax Calculator', options));
 });
 
 // Handle notification clicks

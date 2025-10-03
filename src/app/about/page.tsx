@@ -2,7 +2,7 @@
 /**
  * About Page - Company and Product Information
  *
- * This page provides comprehensive information about ToolHubX, including:
+ * This page provides comprehensive information about PayeTax, including:
  * - Mission and values
  * - Product features and benefits
  * - Privacy and security commitments
@@ -43,9 +43,9 @@ import Link from 'next/link';
 import CallToAction from '@/components/ui/CallToAction';
 
 export const metadata: Metadata = {
-  title: 'About ToolHubX - UK Tax Calculator',
+  title: 'About PayeTax - UK Tax Calculator',
   description:
-    'Learn about ToolHubX - the modern, accurate UK PAYE tax calculator built with privacy and performance in mind. Free, fast, and HMRC-compliant.',
+    'Learn about PayeTax - the modern, accurate UK PAYE tax calculator built with privacy and performance in mind. Free, fast, and HMRC-compliant.',
   keywords:
     'about toolhubx, uk tax calculator team, hmrc compliant calculator, privacy-first tax tools',
 };
@@ -104,7 +104,7 @@ export default function AboutPage() {
           <div className='text-center'>
             <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 px-4 py-2'>
               <Sparkles className='h-4 w-4 text-purple-400' />
-              <span className='font-medium text-purple-300 text-sm'>About ToolHubX</span>
+              <span className='font-medium text-purple-300 text-sm'>About PayeTax</span>
             </div>
 
             <h1 className='mb-6 font-bold text-4xl md:text-6xl'>
@@ -146,7 +146,7 @@ export default function AboutPage() {
 
         {/* Features Grid */}
         <div className='mb-16'>
-          <h2 className='mb-12 text-center font-bold text-3xl text-white'>Why Choose ToolHubX?</h2>
+          <h2 className='mb-12 text-center font-bold text-3xl text-white'>Why Choose PayeTax?</h2>
           <div className='grid gap-8 md:grid-cols-2'>
             {features.map((feature) => (
               <div
@@ -169,7 +169,7 @@ export default function AboutPage() {
             <Code className='mx-auto mb-6 h-12 w-12 text-cyan-400' />
             <h2 className='mb-6 font-bold text-3xl text-white'>Built with Modern Technology</h2>
             <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
-              ToolHubX is crafted using cutting-edge web technologies to deliver the best possible
+              PayeTax is crafted using cutting-edge web technologies to deliver the best possible
               experience while maintaining privacy and performance.
             </p>
           </div>
@@ -232,17 +232,17 @@ export default function AboutPage() {
           <h2 className='mb-8 font-bold text-3xl text-white'>Our Story</h2>
           <div className='prose prose-lg prose-invert max-w-none'>
             <p className='mb-6 text-gray-300 leading-relaxed'>
-              ToolHubX was born from frustration with complex, invasive tax calculators that
-              required personal information just to estimate take-home pay. As developers and UK
-              taxpayers ourselves, we knew there had to be a better way.
+              PayeTax was born from frustration with complex, invasive tax calculators that required
+              personal information just to estimate take-home pay. As developers and UK taxpayers
+              ourselves, we knew there had to be a better way.
             </p>
             <p className='mb-6 text-gray-300 leading-relaxed'>
-              We built ToolHubX with a simple philosophy: tax calculations should be instant,
+              We built PayeTax with a simple philosophy: tax calculations should be instant,
               accurate, and completely private. No accounts, no tracking, no data collection - just
               the calculations you need, when you need them.
             </p>
             <p className='text-gray-300 leading-relaxed'>
-              Today, ToolHubX helps hundreds of people every month understand their finances better,
+              Today, PayeTax helps hundreds of people every month understand their finances better,
               plan for the future, and make informed decisions about their careers and earnings.
             </p>
           </div>

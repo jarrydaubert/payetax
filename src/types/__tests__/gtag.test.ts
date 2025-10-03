@@ -440,7 +440,7 @@ describe('Gtag Types', () => {
     test('should handle page tracking with custom parameters', () => {
       const pageConfig: GtagConfig = {
         page_path: '/calculator/results',
-        page_title: 'Tax Calculation Results - ToolHubX',
+        page_title: 'Tax Calculation Results - PayeTax',
         custom_map: {
           calculator_type: 'dimension1',
           user_type: 'dimension2',

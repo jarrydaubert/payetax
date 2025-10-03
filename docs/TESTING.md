@@ -1,6 +1,6 @@
-# 🧪 ToolHubX Testing & Quality Assurance Guide
+# 🧪 PayeTax Testing & Quality Assurance Guide
 
-This document provides comprehensive testing strategies, manual test suites, automated testing information, and troubleshooting guides for maintaining quality in the ToolHubX UK Tax Calculator.
+This document provides comprehensive testing strategies, manual test suites, automated testing information, and troubleshooting guides for maintaining quality in the PayeTax UK Tax Calculator.
 
 ---
 

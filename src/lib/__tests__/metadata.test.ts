@@ -20,8 +20,8 @@ describe('Metadata Module', () => {
       const metadata = generateMetadata({});
 
       expect(metadata.title).toEqual({
-        default: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay | ToolHubX',
-        template: '%s | ToolHubX',
+        default: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay | PayeTax',
+        template: '%s | PayeTax',
       });
       expect(metadata.description).toContain('Free UK PAYE tax calculator');
       expect(metadata.keywords).toContain('UK tax calculator 2025');
@@ -46,19 +46,19 @@ describe('Metadata Module', () => {
       });
 
       expect(metadata.title).toEqual({
-        default: 'Custom Page Title | ToolHubX',
-        template: '%s | ToolHubX',
+        default: 'Custom Page Title | PayeTax',
+        template: '%s | PayeTax',
       });
     });
 
     test('should not duplicate site name when already included', () => {
       const metadata = generateMetadata({
-        title: 'Custom Page | ToolHubX',
+        title: 'Custom Page | PayeTax',
       });
 
       expect(metadata.title).toEqual({
-        default: 'Custom Page | ToolHubX',
-        template: '%s | ToolHubX',
+        default: 'Custom Page | PayeTax',
+        template: '%s | PayeTax',
       });
     });
 
@@ -85,7 +85,7 @@ describe('Metadata Module', () => {
 
       expect(metadata.openGraph?.images).toEqual([
         {
-          url: 'https://toolhubx.uk/images/custom-og.png',
+          url: 'https://payetax.co.uk/images/custom-og.png',
           width: 1200,
           height: 630,
           alt: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay',
@@ -136,7 +136,7 @@ describe('Metadata Module', () => {
         publishedTime: '2024-01-15T10:00:00Z',
       });
 
-      expect(metadata.openGraph?.article?.authors).toEqual([{ name: 'ToolHubX' }]);
+      expect(metadata.openGraph?.article?.authors).toEqual([{ name: 'PayeTax' }]);
     });
 
     test('should handle noIndex parameter', () => {
@@ -172,8 +172,10 @@ describe('Metadata Module', () => {
         pathname: '/calculator/paye',
       });
 
-      expect(metadata.alternates?.canonical).toBe('https://toolhubx.uk/calculator/paye');
-      expect(metadata.alternates?.languages?.['en-GB']).toBe('https://toolhubx.uk/calculator/paye');
+      expect(metadata.alternates?.canonical).toBe('https://payetax.co.uk/calculator/paye');
+      expect(metadata.alternates?.languages?.['en-GB']).toBe(
+        'https://payetax.co.uk/calculator/paye'
+      );
     });
 
     test('should set Twitter card type', () => {
@@ -242,8 +244,8 @@ describe('Metadata Module', () => {
     test('should set creator and publisher', () => {
       const metadata = generateMetadata({});
 
-      expect(metadata.creator).toBe('ToolHubX');
-      expect(metadata.publisher).toBe('ToolHubX');
+      expect(metadata.creator).toBe('PayeTax');
+      expect(metadata.publisher).toBe('PayeTax');
     });
 
     test('should handle custom authors', () => {

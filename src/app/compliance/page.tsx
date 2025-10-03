@@ -16,13 +16,13 @@ import { StructuredData } from '@/components/ui/StructuredData';
 import { BodyText, H1, H2, H3, SmallText } from '@/components/ui/Typography';
 
 export const metadata: Metadata = {
-  title: 'HMRC Compliance & Accuracy | ToolHubX Tax Calculator',
+  title: 'HMRC Compliance & Accuracy | PayeTax Tax Calculator',
   description:
-    'Learn how ToolHubX ensures HMRC compliance with official tax rates, professional oversight, and regular updates. Trusted by tax professionals and verified for accuracy.',
+    'Learn how PayeTax ensures HMRC compliance with official tax rates, professional oversight, and regular updates. Trusted by tax professionals and verified for accuracy.',
   keywords:
     'HMRC compliance, UK tax accuracy, official tax rates, professional tax calculator, HMRC verification',
   alternates: {
-    canonical: 'https://toolhubx.uk/compliance',
+    canonical: 'https://payetax.co.uk/compliance',
   },
 };
 
@@ -289,14 +289,11 @@ export default function CompliancePage() {
                   </div>
 
                   <div className='mt-4 border-gray-700 border-t pt-4'>
-                    <a
-                      href={source.url}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='btn btn-outline btn-sm w-full'
-                    >
-                      View Official Source
-                    </a>
+                    <Button asChild variant='outline' size='sm' className='w-full'>
+                      <a href={source.url} target='_blank' rel='noopener noreferrer'>
+                        View Official Source
+                      </a>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -365,7 +362,9 @@ export default function CompliancePage() {
                 <Link href='/'>Try the Calculator</Link>
               </Button>
               <Button asChild variant='ghost'>
-                <Link href='/feedback'>Report an Issue</Link>
+                <a href='mailto:support@payetax.co.uk?subject=Compliance Issue Report'>
+                  Report an Issue
+                </a>
               </Button>
             </div>
           </div>

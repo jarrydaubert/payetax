@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FileDown, Printer, Share2, TrendingUp } from 'lucide-react';
+import { FileDown, Printer, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
@@ -32,26 +32,6 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'My Tax Calculation',
-          text: `Take-home pay: £${results.netPay.annually.toLocaleString()} per year`,
-          url: window.location.href,
-        });
-        toast.success('Shared successfully!');
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          toast.error('Failed to share');
-        }
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -78,10 +58,6 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
           <Button variant='outline' size='sm' onClick={handlePrint}>
             <Printer className='mr-2 h-4 w-4' />
             Print
-          </Button>
-          <Button variant='outline' size='sm' onClick={handleShare}>
-            <Share2 className='mr-2 h-4 w-4' />
-            Share
           </Button>
           <Button variant='outline' size='sm' onClick={handleExport}>
             <FileDown className='mr-2 h-4 w-4' />

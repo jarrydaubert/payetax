@@ -19,7 +19,7 @@ import Link from 'next/link';
 import CallToAction from '@/components/ui/CallToAction';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - ToolHubX UK Tax Calculator',
+  title: 'Privacy Policy - PayeTax UK Tax Calculator',
   description:
     "Simple, transparent privacy policy. We don't store your tax data, don't track you, and use minimal cookies. Privacy-first tax calculations.",
   keywords:
@@ -316,7 +316,7 @@ export default function PrivacyPolicyPage() {
             <span className='font-semibold text-lg text-white'>Privacy-First Tax Calculations</span>
           </div>
           <p className='text-gray-300 text-sm'>
-            This policy applies to toolhubx.uk and is designed to be clear, honest, and protective
+            This policy applies to payetax.co.uk and is designed to be clear, honest, and protective
             of your privacy.
           </p>
         </div>

@@ -163,6 +163,7 @@ export function Analytics() {
     window.gtag?.('config', GA_MEASUREMENT_ID, {
       page_path: url,
       send_page_view: true,
+      anonymize_ip: true, // Enhanced privacy compliance
       cookie_flags: 'SameSite=None;Secure', // Enhanced cookie security
       transport_type: 'beacon', // Improves tracking reliability
     });
@@ -227,7 +228,8 @@ export function Analytics() {
           // Configure GA with detailed settings
           gtag('config', '${GA_MEASUREMENT_ID}', {
             send_page_view: false,
-            cookie_domain: 'toolhubx.uk',
+            anonymize_ip: true,
+            cookie_domain: 'payetax.co.uk',
             cookie_flags: 'SameSite=None;Secure',
             transport_type: 'beacon'
           });

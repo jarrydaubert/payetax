@@ -261,18 +261,18 @@ export type SchemaType =
 const ORG_DATA: OrganizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'ToolHubX',
-  url: 'https://toolhubx.uk',
+  name: 'PayeTax',
+  url: 'https://payetax.co.uk',
   logo: {
     '@type': 'ImageObject',
-    url: 'https://toolhubx.uk/logo.png',
+    url: 'https://payetax.co.uk/logo.png',
     width: 192,
     height: 192,
   },
   description: 'Free UK PAYE tax calculator and financial tools for UK taxpayers.',
   contactPoint: {
     '@type': 'ContactPoint',
-    email: 'support@toolhubx.uk',
+    email: 'support@payetax.co.uk',
     contactType: 'customer support',
   },
   sameAs: [],
@@ -282,13 +282,13 @@ const ORG_DATA: OrganizationSchema = {
 const WEBSITE_DATA: WebsiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'ToolHubX',
-  url: 'https://toolhubx.uk',
+  name: 'PayeTax',
+  url: 'https://payetax.co.uk',
   description:
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
   potentialAction: {
     '@type': 'SearchAction',
-    target: 'https://toolhubx.uk/search?q={search_term_string}',
+    target: 'https://payetax.co.uk/search?q={search_term_string}',
     'query-input': 'required name=search_term_string',
   },
 };
@@ -320,13 +320,13 @@ const CALCULATOR_DATA: SoftwareApplicationSchema = {
 const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
   '@context': 'https://schema.org',
   '@type': 'FinancialService',
-  name: 'ToolHubX UK Tax Calculator',
+  name: 'PayeTax UK Tax Calculator',
   description:
     'Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loan repayments, and pension contributions instantly.',
   provider: {
     '@type': 'Organization',
-    name: 'ToolHubX',
-    url: 'https://toolhubx.uk',
+    name: 'PayeTax',
+    url: 'https://payetax.co.uk',
   },
   serviceType: 'Tax Calculation Service',
   areaServed: ['United Kingdom', 'England', 'Scotland', 'Wales', 'Northern Ireland'],
@@ -582,14 +582,14 @@ export function StructuredData({
         dateModified: articleData.modifiedDate || articleData.publishDate,
         author: {
           '@type': 'Person',
-          name: articleData.authorName || 'ToolHubX',
+          name: articleData.authorName || 'PayeTax',
         },
         publisher: {
           '@type': 'Organization',
-          name: 'ToolHubX',
+          name: 'PayeTax',
           logo: {
             '@type': 'ImageObject',
-            url: 'https://toolhubx.uk/logo.png',
+            url: 'https://payetax.co.uk/logo.png',
           },
         },
         mainEntityOfPage: {
@@ -648,7 +648,7 @@ export function StructuredData({
         '@type': 'Review',
         itemReviewed: {
           '@type': 'SoftwareApplication',
-          name: 'ToolHubX UK Tax Calculator',
+          name: 'PayeTax UK Tax Calculator',
         },
         reviewRating: {
           '@type': 'Rating',
@@ -676,8 +676,8 @@ export function StructuredData({
         description: service.description,
         provider: {
           '@type': 'Organization',
-          name: 'ToolHubX',
-          url: 'https://toolhubx.uk',
+          name: 'PayeTax',
+          url: 'https://payetax.co.uk',
         },
         serviceType: service.serviceType,
         areaServed: service.areaServed,

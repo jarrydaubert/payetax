@@ -1,6 +1,6 @@
 # 📦 Bundle Size Optimization Guide
 
-This document provides comprehensive guidelines for monitoring and optimizing bundle size in the ToolHubX application.
+This document provides comprehensive guidelines for monitoring and optimizing bundle size in the PayeTax application.
 
 ## 🎯 Current Bundle Status
 

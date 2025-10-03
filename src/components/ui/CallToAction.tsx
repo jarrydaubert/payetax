@@ -2,7 +2,9 @@
 'use client';
 
 import { Calculator, Coffee, Mail, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 import type React from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
@@ -20,14 +22,14 @@ export default function CallToAction({
       title: 'Get in Touch',
       description: "Questions, suggestions, or just want to say hello? We'd love to hear from you.",
       primaryAction: {
-        href: '/feedback',
-        text: 'Send Feedback',
-        icon: MessageSquare,
-      },
-      secondaryAction: {
-        href: 'mailto:hello@toolhubx.uk',
+        href: 'mailto:support@payetax.co.uk?subject=Contact from PayeTax' as const,
         text: 'Email Us',
         icon: Mail,
+      },
+      secondaryAction: {
+        href: '/' as const,
+        text: 'Try Calculator',
+        icon: Calculator,
       },
     },
     newsletter: {
@@ -36,12 +38,12 @@ export default function CallToAction({
       description:
         'Get the latest UK tax insights, updates, and practical tips. No spam, just valuable content.',
       primaryAction: {
-        href: '/feedback',
+        href: 'mailto:support@payetax.co.uk?subject=Newsletter Subscription' as const,
         text: 'Subscribe to Updates',
         icon: Mail,
       },
       secondaryAction: {
-        href: '/',
+        href: '/' as const,
         text: 'Try Tax Calculator',
         icon: Calculator,
       },
@@ -52,12 +54,12 @@ export default function CallToAction({
       description:
         'Use our free UK tax calculator to see your exact take-home pay after tax, National Insurance, and deductions.',
       primaryAction: {
-        href: '/',
+        href: '/' as const,
         text: 'Start Calculating',
         icon: Calculator,
       },
       secondaryAction: {
-        href: '/about',
+        href: '/about' as const,
         text: 'Learn More',
         icon: MessageSquare,
       },
@@ -78,21 +80,39 @@ export default function CallToAction({
       </p>
 
       <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-        <a
-          href={config.primaryAction.href}
-          className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-6 py-3 font-medium text-white transition-colors hover:from-purple-700 hover:to-cyan-700'
+        <Button
+          asChild
+          size='lg'
+          className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
         >
-          <PrimaryIcon className='h-4 w-4' />
-          {config.primaryAction.text}
-        </a>
+          {config.primaryAction.href.startsWith('http') ||
+          config.primaryAction.href.startsWith('mailto:') ? (
+            <a href={config.primaryAction.href}>
+              <PrimaryIcon className='mr-2 h-4 w-4' />
+              {config.primaryAction.text}
+            </a>
+          ) : (
+            <Link href={config.primaryAction.href}>
+              <PrimaryIcon className='mr-2 h-4 w-4' />
+              {config.primaryAction.text}
+            </Link>
+          )}
+        </Button>
 
-        <a
-          href={config.secondaryAction.href}
-          className='inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 font-medium text-white transition-colors hover:bg-white/20'
-        >
-          <SecondaryIcon className='h-4 w-4' />
-          {config.secondaryAction.text}
-        </a>
+        <Button asChild variant='outline' size='lg'>
+          {config.secondaryAction.href.startsWith('http') ||
+          config.secondaryAction.href.startsWith('mailto:') ? (
+            <a href={config.secondaryAction.href}>
+              <SecondaryIcon className='mr-2 h-4 w-4' />
+              {config.secondaryAction.text}
+            </a>
+          ) : (
+            <Link href={config.secondaryAction.href}>
+              <SecondaryIcon className='mr-2 h-4 w-4' />
+              {config.secondaryAction.text}
+            </Link>
+          )}
+        </Button>
       </div>
     </div>
   );

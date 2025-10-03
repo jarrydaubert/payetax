@@ -69,7 +69,7 @@ export function printResults(results: TaxCalculationResults): void {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Tax Calculation - ToolHubX</title>
+        <title>Tax Calculation - PayeTax</title>
         <meta charset="utf-8">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -162,7 +162,7 @@ export function printResults(results: TaxCalculationResults): void {
         </table>
 
         <div class="footer">
-          <p>ToolHubX UK PAYE Tax Calculator • toolhubx.uk</p>
+          <p>PayeTax UK PAYE Tax Calculator • payetax.co.uk</p>
           <p style="margin-top: 8px;">
             This calculation is for illustrative purposes only.
             For official tax advice, consult HMRC or a qualified accountant.

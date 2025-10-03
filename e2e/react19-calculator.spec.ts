@@ -10,7 +10,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
 
   test('should load the calculator page with modern components', async ({ page }) => {
     // Check page title
-    await expect(page).toHaveTitle(/ToolHubX/);
+    await expect(page).toHaveTitle(/PayeTax/);
 
     // Check main heading is visible using working selector
     await expect(

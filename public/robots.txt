@@ -1,0 +1,43 @@
+# PayeTax.co.uk - Robots Configuration
+# Optimized for Answer Engine Optimization (AEO) and AI search crawlers
+
+# Allow all major search engine crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# AI Search Engine Crawlers - Explicitly Allow for AEO
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Default for all other bots
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://payetax.co.uk/sitemap.xml
+
+# Disallow admin/private areas (add as needed)
+# User-agent: *
+# Disallow: /api/
+# Disallow: /admin/

@@ -21,6 +21,9 @@ export const inter = Inter({
   // Swap display strategy improves perceived performance
   display: 'swap',
 
+  // Preload for LCP optimization on homepage
+  preload: true,
+
   // Optimize with system fonts as fallbacks
   fallback: [
     'Helvetica Neue',

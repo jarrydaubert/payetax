@@ -1,14 +1,14 @@
-# 📖 ToolHubX User Guide
+# 📖 PayeTax User Guide
 
-Complete guide for using the ToolHubX UK Tax Calculator - from basic salary calculations to advanced tax planning features.
+Complete guide for using the PayeTax UK Tax Calculator - from basic salary calculations to advanced tax planning features.
 
 ---
 
 ## 🚀 Getting Started
 
-### What is ToolHubX?
+### What is PayeTax?
 
-ToolHubX is a comprehensive UK tax calculator that helps you understand your take-home pay, tax obligations, and deductions. Whether you're an employee, freelancer, or employer, our calculator provides accurate, up-to-date calculations for all UK tax scenarios.
+PayeTax is a comprehensive UK tax calculator that helps you understand your take-home pay, tax obligations, and deductions. Whether you're an employee, freelancer, or employer, our calculator provides accurate, up-to-date calculations for all UK tax scenarios.
 
 ### Key Features
 

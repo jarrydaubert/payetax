@@ -10,7 +10,7 @@
 import type { Metadata, Viewport } from 'next';
 
 // Base domain for absolute URLs
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolhubx.uk';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
 // Default metadata values
 const DEFAULT_TITLE = 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay';
@@ -97,7 +97,7 @@ export function generateMetadata({
   const url = `${SITE_URL}${pathname}`;
 
   // Format title with site name if not already included
-  const formattedTitle = title.includes('ToolHubX') ? title : `${title} | ToolHubX`;
+  const formattedTitle = title.includes('PayeTax') ? title : `${title} | PayeTax`;
 
   // Generate article-specific metadata if applicable
   const articleMetadata =
@@ -105,7 +105,7 @@ export function generateMetadata({
       ? {
           publishedTime,
           modifiedTime: modifiedTime || publishedTime,
-          authors: authors?.map((name) => ({ name })) || [{ name: 'ToolHubX' }],
+          authors: authors?.map((name) => ({ name })) || [{ name: 'PayeTax' }],
           section,
           tags,
         }
@@ -116,15 +116,15 @@ export function generateMetadata({
     // Basic metadata
     title: {
       default: formattedTitle,
-      template: '%s | ToolHubX',
+      template: '%s | PayeTax',
     },
     description,
     keywords: keywords.split(',').map((keyword) => keyword.trim()),
 
     // Authorship and publishing information
-    authors: authors?.map((name) => ({ name })) || [{ name: 'ToolHubX' }],
-    creator: 'ToolHubX',
-    publisher: 'ToolHubX',
+    authors: authors?.map((name) => ({ name })) || [{ name: 'PayeTax' }],
+    creator: 'PayeTax',
+    publisher: 'PayeTax',
 
     // Mobile optimization
     formatDetection: {
@@ -166,7 +166,7 @@ export function generateMetadata({
       title: formattedTitle,
       description,
       url,
-      siteName: 'ToolHubX',
+      siteName: 'PayeTax',
       images: [
         {
           url: imageUrl,

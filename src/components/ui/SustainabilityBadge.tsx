@@ -20,12 +20,12 @@ export default function SustainabilityBadge() {
       >
         <Button
           onClick={() => setShowDetails(true)}
-          size='sm'
-          className='gap-2 rounded-full bg-green-600/90 text-xs backdrop-blur-sm hover:bg-green-600'
-          aria-label='View sustainability information'
+          size='default'
+          className='gap-2 rounded-full bg-green-600/90 text-sm backdrop-blur-sm hover:bg-green-600'
+          aria-label='View eco-friendly information'
         >
-          <Leaf className='h-3 w-3' />
-          <span className='hidden sm:inline'>Carbon Neutral</span>
+          <Leaf className='h-4 w-4' />
+          <span className='hidden sm:inline'>Eco-Friendly</span>
         </Button>
       </motion.div>
 
@@ -57,8 +57,8 @@ export default function SustainabilityBadge() {
                   {/* Header */}
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-2'>
-                      <Leaf className='h-5 w-5 text-green-400' />
-                      <h3 className='font-semibold text-lg'>Eco-Friendly Calculator</h3>
+                      <Leaf className='h-6 w-6 text-green-400' />
+                      <h3 className='font-semibold text-xl'>Eco-Friendly Calculator</h3>
                     </div>
                     <Button
                       variant='ghost'
@@ -75,10 +75,10 @@ export default function SustainabilityBadge() {
                   <div className='space-y-5 text-muted-foreground text-sm'>
                     {/* Environmental Impact */}
                     <div>
-                      <h4 className='mb-3 flex items-center gap-2 font-medium text-foreground'>
+                      <h4 className='mb-3 flex items-center gap-2 font-medium text-base text-foreground'>
                         🌱 Environmental Impact
                       </h4>
-                      <ul className='space-y-2 text-xs'>
+                      <ul className='space-y-2 text-sm'>
                         <li className='flex gap-2'>
                           <span className='text-green-400'>•</span>
                           <span>
@@ -89,7 +89,7 @@ export default function SustainabilityBadge() {
                         <li className='flex gap-2'>
                           <span className='text-green-400'>•</span>
                           <span>
-                            <strong className='text-foreground'>Efficient Code:</strong> 285KB
+                            <strong className='text-foreground'>Efficient Code:</strong> 286KB
                             initial bundle, optimized for minimal energy
                           </span>
                         </li>
@@ -112,10 +112,10 @@ export default function SustainabilityBadge() {
 
                     {/* Performance Benefits */}
                     <div>
-                      <h4 className='mb-3 flex items-center gap-2 font-medium text-foreground'>
+                      <h4 className='mb-3 flex items-center gap-2 font-medium text-base text-foreground'>
                         ⚡ Performance Benefits
                       </h4>
-                      <ul className='space-y-2 text-xs'>
+                      <ul className='space-y-2 text-sm'>
                         <li className='flex gap-2'>
                           <span className='text-blue-400'>•</span>
                           <span>
@@ -141,7 +141,7 @@ export default function SustainabilityBadge() {
                     </div>
 
                     {/* Footer */}
-                    <div className='border-border border-t pt-4 text-xs'>
+                    <div className='border-border border-t pt-4 text-sm'>
                       <p className='mb-2'>Making tax calculations sustainable for everyone.</p>
                       <a
                         href='https://www.websitecarbon.com/'

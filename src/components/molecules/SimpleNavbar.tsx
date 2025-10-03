@@ -2,11 +2,13 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, MessageSquare, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { FeedbackDialog } from '@/components/molecules/FeedbackDialog';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 
 interface SimpleNavbarProps {
@@ -39,7 +41,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              ToolHubX
+              PayeTax
             </motion.span>
           </Link>
 
@@ -52,7 +54,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'relative px-3 py-2 font-medium text-sm transition-colors',
+                    'relative px-3 py-2 font-medium text-base transition-colors',
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
@@ -69,14 +71,10 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             })}
           </div>
 
-          {/* Feedback Button - Desktop */}
-          <div className='hidden md:block'>
-            <Button asChild size='sm' className='gap-2'>
-              <Link href='/feedback'>
-                <MessageSquare className='h-4 w-4' />
-                Feedback
-              </Link>
-            </Button>
+          {/* Desktop Utilities */}
+          <div className='hidden items-center gap-2 md:flex'>
+            <FeedbackDialog />
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
@@ -110,7 +108,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
-                        'block rounded-lg px-4 py-3 font-medium text-sm transition-colors',
+                        'block rounded-lg px-4 py-3 font-medium text-base transition-colors',
                         isActive
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -120,12 +118,12 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                     </Link>
                   );
                 })}
-                <Button asChild size='sm' className='mt-4 w-full gap-2'>
-                  <Link href='/feedback' onClick={() => setIsMobileMenuOpen(false)}>
-                    <MessageSquare className='h-4 w-4' />
-                    Feedback
-                  </Link>
-                </Button>
+
+                {/* Mobile Utilities */}
+                <div className='mt-4 flex items-center justify-between gap-2'>
+                  <FeedbackDialog />
+                  <ThemeToggle />
+                </div>
               </div>
             </motion.div>
           )}

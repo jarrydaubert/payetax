@@ -5,8 +5,8 @@ export type InternalRoute =
   | '/'
   | '/about'
   | '/blog'
-  | '/feedback'
   | '/privacy'
+  | '/compliance'
   | '/offline'
   | `/blog/${string}` // Dynamic blog routes
   | `/blog/category/${string}`; // Dynamic category routes

@@ -33,10 +33,10 @@ export async function generateMetadata({
   const category = categories.find((c) => c.slug === slug);
 
   if (!category) {
-    return { title: 'Category Not Found | ToolHubX Blog' };
+    return { title: 'Category Not Found | PayeTax Blog' };
   }
 
-  const title = `${category.name} | UK Tax Insights & Updates | ToolHubX Blog`;
+  const title = `${category.name} | UK Tax Insights & Updates | PayeTax Blog`;
   const description = `Expert guidance and articles on ${category.name.toLowerCase()} including UK tax news, tips, and updates.`;
 
   return {
@@ -47,10 +47,10 @@ export async function generateMetadata({
       title,
       description,
       type: 'website',
-      url: `https://toolhubx.uk/blog/category/${slug}`,
+      url: `https://payetax.co.uk/blog/category/${slug}`,
     },
     alternates: {
-      canonical: `https://toolhubx.uk/blog/category/${slug}`,
+      canonical: `https://payetax.co.uk/blog/category/${slug}`,
     },
   };
 }
@@ -103,13 +103,13 @@ export default async function CategoryPage({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
-          headline: `${category.name} - ToolHubX Blog`,
+          headline: `${category.name} - PayeTax Blog`,
           description: `Articles and guides about ${category.name.toLowerCase()} in UK taxation.`,
-          url: `https://toolhubx.uk/blog/category/${slug}`,
+          url: `https://payetax.co.uk/blog/category/${slug}`,
           author: {
             '@type': 'Organization',
-            name: 'ToolHubX',
-            url: 'https://toolhubx.uk',
+            name: 'PayeTax',
+            url: 'https://payetax.co.uk',
           },
         })}
       </Script>

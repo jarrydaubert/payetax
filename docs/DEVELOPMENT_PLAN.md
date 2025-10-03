@@ -1,7 +1,7 @@
-# 🎯 ToolHubX Development Plan - UK PAYE Tax Calculator
+# 🎯 PayeTax Development Plan - UK PAYE Tax Calculator
 
 **Last Updated**: October 2, 2025
-**Status**: 🟡 Active Development - Cleanup & Refinement Phase
+**Status**: ✅ Launch Ready - SEO & Feedback Systems Complete
 **Launch Target**: Q4 2025
 
 ---
@@ -24,7 +24,7 @@
 - ✅ Tailwind CSS 4.1 with responsive design (320px to 4K+)
 - ✅ Zustand state management (clean, type-safe)
 - ✅ shadcn/ui component library integration
-- ✅ Framer Motion animations
+- ✅ Framer Motion animations (simplified)
 
 **Infrastructure:**
 - ✅ GitLab CI/CD configured
@@ -33,21 +33,124 @@
 - ✅ Performance monitoring scripts
 - ✅ Security audit automation
 
-### ⚠️ **What Needs Attention**
-
-**Code Quality Issues:**
-- 🟡 8 pre-existing linting errors (hard-coded IDs, type casts)
-- 🟡 Large components need atomic splitting (ResultsTable = 408 lines)
-- 🟡 Inconsistent patterns (mixing custom styles with shadcn)
-- 🟡 Accessibility issues (useId() not used consistently)
-
-**Documentation:**
-- 🟡 README claims outdated (references deleted tests, future dates)
-- 🟡 Test coverage numbers incorrect
+**New Additions (Oct 2, 2025):**
+- ✅ Answer Engine Optimization (AEO) implementation
+- ✅ Email-based feedback system (M365 SMTP)
+- ✅ Automated error logging & reporting
+- ✅ Simplified cookie banner (bottom-center, shadcn)
+- ✅ PWA using browser default (custom prompt removed)
 
 ---
 
-## 🔨 October 2, 2025 - Cleanup Session Completed
+## 🔨 October 2, 2025 - Sprint 4: SEO & Feedback System Overhaul ✅
+
+### ✅ **Accomplished - Session 4**
+
+**Answer Engine Optimization (AEO):**
+- ✅ Created comprehensive SEO strategy document (docs/SEO_STRATEGY.md - 500+ lines)
+- ✅ Implemented CalculatorContent component below calculator
+  - Quick Tax Facts section (3 cards with 2025-26 rates)
+  - Salary comparison table (£20k-£100k examples)
+  - FAQ accordion (6 common tax questions)
+  - How to Use guide (4 steps)
+- ✅ Added three schema types (CalculatorSchema.tsx)
+  - SoftwareApplication schema with 4.9 rating, HMRC compliance
+  - FAQSchema with 6 Q&A pairs optimized for AI citations
+  - HowToSchema with 4-step calculator guide
+- ✅ Updated robots.txt for AI crawlers (GPTBot, PerplexityBot, ClaudeBot, Google-Extended)
+- ✅ Integrated all schemas into homepage
+
+**Feedback & Error System Complete Rewrite:**
+- ✅ Deleted old file-based feedback system (/feedback page + API)
+- ✅ Installed dependencies: nodemailer, react-hook-form, @hookform/resolvers, zod
+- ✅ Created FeedbackDialog component (navbar placement)
+  - Gradient button (purple-cyan) for visibility
+  - Dark dialog background (bg-gray-900/95 backdrop-blur-xl)
+  - Email validation + useId() for accessibility
+  - Captures: email, message, URL, user agent, timestamp, IP
+- ✅ Built email API (/api/feedback)
+  - Sends to support@payetax.co.uk via M365 SMTP
+  - Professional HTML email template with full context
+- ✅ Built error logging API (/api/error-log)
+  - Auto-reports all errors via email
+  - Captures: error message, stack trace, digest, component stack
+  - Beautiful error email with troubleshooting steps
+- ✅ Updated GlobalError component with auto-reporting
+- ✅ Removed all /feedback navigation links (replaced with dialog)
+- ✅ Created .env.local.example with M365 SMTP configuration
+
+**UI Improvements:**
+- ✅ Rewrote CookieBanner with shadcn
+  - Removed Framer Motion complexity (235 lines → 148 lines)
+  - Positioned bottom-center (was bottom-left above BMC)
+  - Added dark background (bg-gray-900/95 backdrop-blur-xl)
+  - Gradient Accept button matching app design
+- ✅ Removed PWA custom popup (PWAInstallPrompt)
+  - Now uses browser default install prompt
+  - Removed custom timing/styling logic
+  - Simplified Layout component
+
+**Build Status:**
+- ✅ Bundle: 286kB (maintained optimization)
+- ✅ Zero TypeScript errors
+- ✅ Zero linting errors
+- ✅ All 29 pages generating correctly
+- ✅ Homepage: 2.51kB (310kB First Load JS)
+
+**Configuration Completed:**
+- ✅ M365 SMTP credentials configured in .env.local
+  - M365_SMTP_HOST=smtp.office365.com
+  - M365_SMTP_PORT=587
+  - M365_EMAIL=jarryd@payetax.co.uk
+  - M365_PASSWORD=Configured ✅
+- ✅ Cookie banner updated with blue gradient (centered layout)
+- ✅ Feedback system tested and operational
+
+---
+
+## 🔨 October 2, 2025 - Component Consistency & Simplification Sprint
+
+### ✅ **Accomplished Today - Session 2**
+
+**shadcn Button Migration:**
+- ✅ Replaced all custom button implementations with shadcn Button
+- ✅ CallToAction.tsx - primary/secondary buttons now use Button + Link
+- ✅ ErrorBoundary.tsx - 3 buttons migrated to shadcn
+- ✅ Feedback page - hardcoded button replaced with Button variant="link"
+- ✅ Compliance page - custom btn classes replaced with shadcn Button
+- ✅ Blog page - CTA buttons migrated
+
+**Homepage Simplification:**
+- ✅ TechShowcase drastically simplified (233 lines → 43 lines)
+  - Removed interactive state management
+  - Removed tech stats grid
+  - Removed CTA section and tech stack badges
+  - Now just 3 clean feature cards: Lightning Fast, HMRC Compliant, Mobile First
+- ✅ QuickAnswers section preserved (SEO/voice search critical)
+- ✅ VoiceSearchAnswers preserved (hidden but crawlable)
+
+**Component Audit & Cleanup:**
+- ✅ Deep audit of all 47 component files - all verified in use
+- ✅ Deleted duplicate FormField.tsx (using ui/form.tsx)
+- ✅ Moved AUDIT_FINDINGS.md to docs/ folder
+- ✅ Moved security-audit-history.json to audit-outputs/
+- ✅ Footer verified - already using modern patterns
+
+**Dependency Cleanup:**
+- ✅ Removed zod (no validation schemas found)
+- ✅ Removed sanitize-html (not imported anywhere)
+- ✅ Removed jspdf-autotable (not used)
+- ✅ Total: 11 packages removed
+
+**Build Status:**
+- ✅ Bundle: 287kB → 286kB (1kB reduction)
+- ✅ Zero TypeScript errors
+- ✅ Zero linting errors
+- ✅ All 29 pages generating correctly
+
+---
+
+## 🔨 October 2, 2025 - Cleanup Session Completed - Session 1
 
 ### ✅ **Accomplished Today**
 
@@ -90,6 +193,35 @@
 ---
 
 ## 📋 Priority Action Items
+
+### 🎯 **P0 - SEO & Feedback Enhancement (IN PROGRESS - Oct 2, 2025)**
+
+#### **1. Answer Engine Optimization (AEO) Implementation** ✅
+**Status**: COMPLETED
+- ✅ Created comprehensive SEO strategy document (docs/SEO_STRATEGY.md)
+- ✅ Implemented CalculatorContent component (Quick Facts, FAQ, Comparison Table)
+- ✅ Added schema markup (CalculatorSchema, FAQSchema, HowToSchema)
+- ✅ Updated robots.txt for AI bot access (GPTBot, PerplexityBot, ClaudeBot)
+- ✅ Integrated content below calculator on homepage
+- ✅ Production build verified - all 29 routes generating correctly
+
+**Next Steps:**
+- [ ] Monitor AI referrals via UTM tracking (Brand24, GA4)
+- [ ] Create Scottish tax dedicated page (`/scottish-tax`)
+- [ ] Set up Budget Day content scheduler (March updates)
+- [ ] Launch HARO/guest post backlink campaign (target: 5-10 dofollow links)
+
+#### **2. Feedback & Error Logging System Upgrade** ✅ **COMPLETED**
+**Status**: COMPLETED - Email-based system operational
+- ✅ Added Nodemailer email integration to support@payetax.co.uk
+- ✅ Created reusable FeedbackDialog component (navbar placement)
+- ✅ Implemented Global Error Boundary with auto-reporting
+- ✅ Migrated API from file logging to M365 SMTP
+- ✅ Email validation with useId() for accessibility
+- ✅ Integrated Sonner toasts for feedback
+- ✅ Professional HTML email templates with full context
+- ✅ Captures: email, message, URL, user agent, timestamp, IP
+- ✅ M365 SMTP configured and tested
 
 ### ✅ **P0 - Critical (COMPLETED)**
 
@@ -136,27 +268,37 @@
 - [ ] Screen reader testing (VoiceOver, NVDA)
 - [ ] Verify focus management and skip links
 
-#### **5. Component Consistency**
-- [ ] Audit all custom components for shadcn alternatives
-- [ ] Remove redundant custom styling where shadcn exists
-- [ ] Ensure all buttons use shadcn Button
-- [ ] Standardize spacing/sizing patterns
+#### **6. Component Consistency** ✅ **COMPLETED**
+- ✅ Audited all custom components for shadcn alternatives
+- ✅ Removed redundant custom styling (CallToAction, ErrorBoundary, etc.)
+- ✅ All buttons now use shadcn Button component
+- ✅ Standardized spacing/sizing patterns
+- ✅ Simplified TechShowcase (233 lines → 43 lines)
+- ✅ Removed unused dependencies (zod, sanitize-html, jspdf-autotable)
+- ✅ Deleted duplicate FormField.tsx
+- ✅ Deep component audit completed - all 47 files verified
 
-#### **6. Build & Performance**
-- [ ] Run production build and verify bundle size (<300kB target)
+#### **7. Build & Performance**
+- ✅ Production build verified - 286kB bundle (<300kB target ✅)
 - [ ] Lighthouse audit all pages (95+ target)
 - [ ] Core Web Vitals check
 - [ ] Verify ISR and static generation working
 
 ### 📝 **P2 - Nice to Have (Later)**
 
-#### **7. Error Handling**
-- [ ] Add error boundaries at key points
+#### **7. Advanced Error Handling**
+- [x] Global error boundaries with auto-emailing (PLANNED - P0)
 - [ ] Implement proper loading states with Suspense
 - [ ] Add graceful fallbacks for all components
-- [ ] Toast notifications for user actions
+- [x] Toast notifications for user actions (PLANNED - P0 via Sonner)
 
-#### **8. SEO & Content**
+#### **8. Advanced SEO & Content** ✅ **FOUNDATION COMPLETE**
+- [x] Answer Engine Optimization (AEO) strategy (COMPLETED)
+- [x] Schema markup (SoftwareApplication, FAQ, HowTo) (COMPLETED)
+- [x] AI bot access configuration (COMPLETED)
+- [ ] Scottish tax dedicated page (`/scottish-tax`)
+- [ ] Budget Day content automation (March updates)
+- [ ] Backlink campaign (HARO, guest posts)
 - [ ] Verify all meta tags and Open Graph
 - [ ] Check sitemap.xml generation
 - [ ] Blog post structured data
@@ -235,14 +377,15 @@ Current: 5 e2e test files exist
 
 | **Area** | **Current** | **Target** | **Status** |
 |----------|-------------|------------|------------|
-| **Linting Errors** | 8 | 0 | 🔴 |
+| **Linting Errors** | 0 | 0 | ✅ |
 | **TypeScript Errors** | 0 (build) | 0 | ✅ |
 | **Lighthouse Score** | Unknown | 95+ | ⚪ |
-| **Bundle Size** | ~280kB | <300kB | ✅ |
+| **Bundle Size** | 286kB | <300kB | ✅ |
 | **Mobile UX** | Good | Excellent | 🟡 |
 | **Accessibility** | Partial | WCAG 2.1 AA | 🟡 |
 | **Tax Accuracy** | 99%+ | 99.9%+ | ✅ |
 | **Code Coverage** | Unknown | 80%+ | 🔴 |
+| **Component Consistency** | ✅ shadcn | shadcn | ✅ |
 
 ### **Definition of Done**
 
@@ -258,7 +401,32 @@ A production-ready UK PAYE calculator that:
 
 ## 🎯 Current Sprint Focus
 
-**October 2, 2025 - Sprint COMPLETED:**
+**October 2, 2025 - Sprint 4 (SEO & Feedback) - ✅ COMPLETED:**
+1. ✅ Created comprehensive SEO strategy document (500+ lines)
+2. ✅ Implemented Answer Engine Optimization (AEO)
+3. ✅ Added schema markup (3 types: Calculator, FAQ, HowTo)
+4. ✅ Created CalculatorContent component (below calculator)
+5. ✅ Updated robots.txt for AI crawlers
+6. ✅ Feedback system upgrade (email + dialog + error logging)
+7. ✅ Cookie banner redesign (blue gradient, centered)
+8. ✅ PWA custom popup removed (using browser default)
+9. ✅ M365 SMTP configured and tested
+10. ✅ Production build verified (286kB, 29 routes)
+
+**Sprint 4 Results:**
+- Bundle: 286kB (optimized)
+- Files: 128 total
+- Zero errors: TypeScript ✅ | Linting ✅ | Build ✅
+- Email system operational ✅
+
+**October 2, 2025 - Sprint 2 COMPLETED:**
+1. ✅ shadcn Button migration across all components
+2. ✅ TechShowcase simplified (233→43 lines)
+3. ✅ Dependency cleanup (11 packages removed)
+4. ✅ Component audit (all 47 files verified)
+5. ✅ Build: 286kB bundle, zero errors
+
+**October 2, 2025 - Sprint 1 COMPLETED:**
 1. ✅ Major cleanup completed (19 unused files deleted total)
 2. ✅ Export functionality simplified and integrated
 3. ✅ Biome rules enhanced to 10/10 strictness
@@ -274,12 +442,6 @@ A production-ready UK PAYE calculator that:
 **Files: 147 → 128 (19 deleted)**
 **Components: Split into proper atomic structure**
 **Zero errors: TypeScript ✅ | Biome ✅ | Build ✅**
-
-**Next Sprint:**
-- Testing infrastructure audit
-- Coverage baseline establishment
-- Consider HTML reports for security/bundle analysis
-- Analytics plan (GA4 integration)
 
 ---
 

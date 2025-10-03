@@ -11,7 +11,7 @@ test.describe('Tax Calculator E2E Tests', () => {
 
   test('should load the calculator page correctly', async ({ page }) => {
     // Check page title
-    await expect(page).toHaveTitle(/ToolHubX/);
+    await expect(page).toHaveTitle(/PayeTax/);
 
     // Check main heading is visible
     await expect(

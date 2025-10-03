@@ -21,18 +21,18 @@ import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } f
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'UK Tax Insights & Updates | ToolHubX Blog',
+  title: 'UK Tax Insights & Updates | PayeTax Blog',
   description:
     'Stay informed with the latest UK tax news, expert guidance, and practical advice for taxpayers. PAYE, self-assessment, tax codes, and more.',
   keywords:
     'UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips',
   alternates: {
-    canonical: 'https://toolhubx.uk/blog',
+    canonical: 'https://payetax.co.uk/blog',
   },
   openGraph: {
-    title: 'UK Tax Insights & Updates | ToolHubX Blog',
+    title: 'UK Tax Insights & Updates | PayeTax Blog',
     description: 'Expert tax guidance, practical advice, and the latest updates on UK taxation.',
-    url: 'https://toolhubx.uk/blog',
+    url: 'https://payetax.co.uk/blog',
     type: 'website',
     images: ['/images/blog-og-image.jpg'],
   },

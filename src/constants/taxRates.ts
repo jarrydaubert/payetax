@@ -21,7 +21,7 @@ export const PERIODS = {
 export type PayPeriod = (typeof PERIODS)[keyof typeof PERIODS];
 export type TaxYear = '2023-2024' | '2024-2025' | '2025-2026';
 export type TaxBand = { name: string; rate: number; threshold: number };
-export type StudentLoanPlan = 'plan1' | 'plan2' | 'plan4' | 'plan5' | 'postgrad' | 'none';
+export type StudentLoanPlan = 'plan1' | 'plan2' | 'plan4' | 'plan5' | 'postgrad';
 export type NICategory = 'A' | 'B' | 'C' | 'H' | 'J' | 'M' | 'Z';
 export type AllowanceType =
   | 'workingFromHome'

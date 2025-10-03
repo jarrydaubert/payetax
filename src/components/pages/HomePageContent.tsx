@@ -3,10 +3,8 @@
 
 import { memo, useEffect, useId, useTransition } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
+import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import SimpleHero from '@/components/organisms/SimpleHero';
-import TechShowcase from '@/components/organisms/TechShowcase';
-import QuickAnswers from '@/components/ui/QuickAnswers';
-import VoiceSearchAnswers from '@/components/ui/VoiceSearchAnswers';
 
 const HomePageContent = memo(function HomePageContent() {
   const [_isPending, startTransition] = useTransition();
@@ -38,17 +36,10 @@ const HomePageContent = memo(function HomePageContent() {
         <CalculatorContainer />
       </section>
 
-      {/* AI-optimized quick answers for voice search and featured snippets */}
-      <section className='bg-gray-900/30 py-12'>
-        <div className='container mx-auto px-4'>
-          <QuickAnswers limit={6} />
-        </div>
+      {/* SEO-optimized content for Answer Engine Optimization */}
+      <section className='container mx-auto px-4 pb-16'>
+        <CalculatorContent />
       </section>
-
-      <TechShowcase />
-
-      {/* Voice search optimization - hidden but crawlable */}
-      <VoiceSearchAnswers />
     </main>
   );
 });

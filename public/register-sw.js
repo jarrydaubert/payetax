@@ -1,4 +1,4 @@
-// Enhanced Service Worker Registration for ToolHubX PWA
+// Enhanced Service Worker Registration for PayeTax PWA
 // Includes update notifications and offline capabilities
 
 (() => {
@@ -85,7 +85,7 @@
           <strong>🚀 Update Available</strong>
         </div>
         <div style="margin-bottom: 12px; opacity: 0.9;">
-          A new version of ToolHubX is ready!
+          A new version of PayeTax is ready!
         </div>
         <div style="display: flex; gap: 8px;">
           <button id="sw-update-btn" style="

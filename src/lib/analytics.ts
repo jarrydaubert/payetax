@@ -1,6 +1,6 @@
 // src/lib/analytics.ts
 /**
- * Analytics tracking utilities for ToolHubX
+ * Analytics tracking utilities for PayeTax
  * Includes event tracking, performance monitoring, and SEO analytics
  *
  * @module lib/analytics

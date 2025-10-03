@@ -26,7 +26,7 @@ export default function OfflinePage() {
 
             {/* Description */}
             <p className='mb-8 text-large text-white/80 leading-relaxed'>
-              It looks like you're not connected to the internet. Don't worry - ToolHubX works
+              It looks like you're not connected to the internet. Don't worry - PayeTax works
               offline too! Your previous calculations are still available.
             </p>
 
@@ -72,7 +72,7 @@ export default function OfflinePage() {
             {/* Connection Status */}
             <div className='mt-8 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4'>
               <p className='text-blue-300 text-small'>
-                💡 <strong>Tip:</strong> When you're back online, ToolHubX will automatically sync
+                💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync
                 and show the latest tax rates.
               </p>
             </div>

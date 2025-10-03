@@ -102,9 +102,12 @@ export default function NotFound() {
         {/* Help text */}
         <p className='text-gray-500 text-sm'>
           If you think this is an error, please{' '}
-          <Link href='/feedback' className='text-purple-400 underline hover:text-purple-300'>
+          <a
+            href='mailto:support@payetax.co.uk?subject=404 Error Report'
+            className='text-purple-400 underline hover:text-purple-300'
+          >
             contact us
-          </Link>{' '}
+          </a>{' '}
           and let us know what happened.
         </p>
       </div>

@@ -30,7 +30,7 @@
  * - HMRC-compliant tax information
  * - Professional formatting suitable for accountants/HR
  *
- * @author ToolHubX Development Team
+ * @author PayeTax Development Team
  * @version 2.1.0
  * @since 2024-08-15
  */
@@ -178,7 +178,7 @@ describe('Export Utils', () => {
     it('generates CSV with correct headers', () => {
       const csv = generateCSV(mockExportData);
 
-      expect(csv).toContain('ToolHubX UK Tax Calculator Results');
+      expect(csv).toContain('PayeTax UK Tax Calculator Results');
       expect(csv).toContain('Generated on');
       expect(csv).toContain('Input Details');
       expect(csv).toContain('Annual Breakdown');

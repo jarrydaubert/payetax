@@ -1,4 +1,4 @@
-# 🏗️ ToolHubX Project Structure & Architecture
+# 🏗️ PayeTax Project Structure & Architecture
 
 This document provides comprehensive documentation of the project's file organization, architecture patterns, and development statistics.
 

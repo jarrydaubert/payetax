@@ -96,17 +96,17 @@ export const BLOG_IMAGES_DIR = '/images/blog';
  * Default metadata for blog posts (used as fallbacks)
  */
 export const DEFAULT_BLOG_METADATA = {
-  author: 'ToolHubX Team',
+  author: 'PayeTax Team',
   readTime: '5 min read',
   image: '/images/blog/default-blog-image.jpg',
-  imageAlt: 'ToolHubX Blog',
+  imageAlt: 'PayeTax Blog',
 };
 
 /**
  * SEO defaults for blog pages
  */
 export const BLOG_SEO_DEFAULTS = {
-  titleTemplate: '%s | ToolHubX Blog',
+  titleTemplate: '%s | PayeTax Blog',
   descriptionTemplate:
     'Read our latest article on %s. Expert UK tax advice and financial guidance.',
   keywords: ['UK tax', 'PAYE', 'tax calculator', 'financial advice', 'tax tips'],

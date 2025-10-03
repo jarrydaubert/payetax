@@ -16,10 +16,12 @@ interface ResultCardProps {
 }
 
 const variantStyles = {
-  default: 'border-border bg-card',
-  success: 'border-green-500/30 bg-gradient-to-br from-green-500/10 to-emerald-500/10',
-  warning: 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10',
-  info: 'border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10',
+  default: 'border-border/50 bg-secondary/60 backdrop-blur-md',
+  success:
+    'border-green-500/30 bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-md',
+  warning:
+    'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 backdrop-blur-md',
+  info: 'border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md',
 };
 
 export function ResultCard({
@@ -35,24 +37,13 @@ export function ResultCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
-      whileHover={{ scale: 1.02, y: -2 }}
-      className={cn('group', className)}
+      className={className}
     >
-      <Card className={cn('relative overflow-hidden p-4', variantStyles[variant])}>
-        {/* Shimmer effect on hover */}
-        <motion.div
-          className='absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent'
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '100%' }}
-          transition={{ duration: 0.6 }}
-        />
-
-        <div className='relative space-y-2'>
+      <Card className={cn('p-4', variantStyles[variant])}>
+        <div className='space-y-2'>
           <div className='flex items-center justify-between'>
             <p className='font-medium text-muted-foreground text-sm'>{label}</p>
-            {Icon && (
-              <Icon className='h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground' />
-            )}
+            {Icon && <Icon className='h-4 w-4 text-muted-foreground' />}
           </div>
           <p className='font-bold text-2xl text-foreground'>{value}</p>
         </div>

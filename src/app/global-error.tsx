@@ -1,6 +1,8 @@
 // src/app/global-error.tsx
 'use client';
 
+import { useEffect } from 'react';
+
 export default function GlobalError({
   error,
   reset,
@@ -9,6 +11,22 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const errorId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+  // Auto-report error via email
+  useEffect(() => {
+    fetch('/api/error-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: error.message,
+        stack: error.stack,
+        digest: error.digest,
+        url: typeof window !== 'undefined' ? window.location.href : 'Unknown',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch(console.error);
+  }, [error]);
 
   return (
     <html lang='en'>

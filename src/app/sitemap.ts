@@ -13,7 +13,7 @@ interface SitemapEntry {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://toolhubx.uk';
+  const baseUrl = 'https://payetax.co.uk';
   const currentDate = new Date().toISOString();
 
   // Static pages
@@ -29,12 +29,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/feedback`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
     },
     {
       url: `${baseUrl}/about`,

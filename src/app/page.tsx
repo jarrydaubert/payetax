@@ -2,6 +2,12 @@
 
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import {
+  CalculatorSchema,
+  DatasetSchema,
+  FAQSchema,
+  HowToSchema,
+} from '@/components/seo/CalculatorSchema';
 import { StructuredData } from '@/components/ui/StructuredData';
 import { generateMetadata } from '@/lib/metadata';
 
@@ -27,7 +33,7 @@ export const metadata: Metadata = generateMetadata({
 });
 
 // Enhanced Tax calculator FAQ items for structured data and AI discovery
-const TAX_FAQS = [
+const _TAX_FAQS = [
   {
     question: 'How is UK income tax calculated?',
     answer:
@@ -96,23 +102,26 @@ const TAX_FAQS = [
 export default function HomePage() {
   return (
     <>
-      {/* Enhanced structured data for SEO and AI discovery */}
+      {/* Enhanced structured data for Answer Engine Optimization (AEO) */}
       <StructuredData type='organization' />
       <StructuredData type='website' />
-      <StructuredData type='calculator' />
       <StructuredData type='financialservice' />
-      <StructuredData type='howto' />
-      <StructuredData type='faq' faqs={TAX_FAQS} />
+
+      {/* AEO-optimized schema markup for AI search engines */}
+      <CalculatorSchema />
+      <FAQSchema />
+      <HowToSchema />
+      <DatasetSchema />
 
       {/* Main content with Suspense for client components */}
       <Suspense fallback={<div className='p-8 text-center'>Loading calculator...</div>}>
         <HomePageClientWrapper />
       </Suspense>
 
-      {/* Add structured breadcrumbs */}
+      {/* Breadcrumb structured data */}
       <StructuredData
         type='breadcrumb'
-        breadcrumbs={[{ name: 'Home', url: 'https://toolhubx.uk/' }]}
+        breadcrumbs={[{ name: 'Home', url: 'https://payetax.co.uk/' }]}
       />
     </>
   );

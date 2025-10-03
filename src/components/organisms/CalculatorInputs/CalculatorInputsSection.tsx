@@ -2,19 +2,19 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calculator, Sparkles } from 'lucide-react';
+import { Calculator, RotateCcw, Sparkles } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
-import { DeductionsInputs } from './DeductionsInputs';
-import { TaxSettings } from './TaxSettings';
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
 }
 
 export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSectionProps) {
+  const { reset } = useCalculatorStore();
   const [isCalculating, setIsCalculating] = React.useState(false);
 
   const handleCalculate = async () => {
@@ -34,29 +34,19 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
     }
   };
 
+  const handleReset = () => {
+    reset();
+    toast.info('Calculator reset', {
+      description: 'All inputs have been cleared',
+    });
+  };
+
   return (
-    <div className='space-y-6'>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <h2 className='mb-2 font-bold text-2xl'>Calculate Your Take-Home Pay</h2>
-        <p className='text-muted-foreground'>
-          Enter your salary details to see a complete tax breakdown
-        </p>
-      </motion.div>
-
+    <div className='space-y-4'>
       <BasicInputs />
-      <TaxSettings />
-      <DeductionsInputs />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <Button onClick={handleCalculate} disabled={isCalculating} size='lg' className='w-full'>
+      <div className='flex gap-2'>
+        <Button onClick={handleCalculate} disabled={isCalculating} size='lg' className='flex-1'>
           {isCalculating ? (
             <>
               <motion.div
@@ -70,11 +60,16 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
           ) : (
             <>
               <Calculator className='mr-2 h-5 w-5' />
-              Calculate Tax
+              Calculate
             </>
           )}
         </Button>
-      </motion.div>
+
+        <Button onClick={handleReset} variant='outline' size='lg'>
+          <RotateCcw className='mr-2 h-5 w-5' />
+          Reset
+        </Button>
+      </div>
     </div>
   );
 }

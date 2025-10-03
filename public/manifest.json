@@ -1,6 +1,6 @@
 {
-  "name": "ToolHubX - Free UK PAYE Tax Calculator",
-  "short_name": "ToolHubX",
+  "name": "PayeTax - Free UK PAYE Tax Calculator",
+  "short_name": "PayeTax",
   "description": "Free UK PAYE tax calculator with official HMRC rates 2025-2026. Calculate income tax, National Insurance, and take-home pay instantly.",
   "start_url": "/?utm_source=pwa",
   "display": "standalone",
@@ -77,14 +77,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "ToolHubX Tax Calculator on Desktop"
+      "label": "PayeTax Tax Calculator on Desktop"
     },
     {
       "src": "/images/pwa-screenshot-narrow.png",
       "sizes": "640x1280",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "ToolHubX Tax Calculator on Mobile"
+      "label": "PayeTax Tax Calculator on Mobile"
     }
   ]
 }

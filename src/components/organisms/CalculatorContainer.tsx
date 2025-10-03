@@ -2,11 +2,16 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { FileDown, Printer, Sparkles } from 'lucide-react';
 import * as React from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
-import { CalculatorResultsSection } from './CalculatorResults/CalculatorResultsSection';
+import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
+import { ResultsTable } from './CalculatorResults/ResultsTable';
 
 export function CalculatorContainer() {
   const { results, calculate } = useCalculatorStore();
@@ -23,8 +28,27 @@ export function CalculatorContainer() {
     }
   }, [results]);
 
+  const handleExport = () => {
+    if (!results) return;
+    try {
+      exportToCSV(results);
+      toast.success('CSV exported successfully!');
+    } catch {
+      toast.error('Failed to export CSV');
+    }
+  };
+
+  const handlePrint = () => {
+    if (!results) return;
+    try {
+      printResults(results);
+    } catch {
+      toast.error('Failed to open print dialog');
+    }
+  };
+
   return (
-    <div className='mx-auto w-full max-w-7xl space-y-8 px-4 py-8'>
+    <div className='mx-auto w-full max-w-7xl space-y-6 px-4 py-8'>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -32,14 +56,6 @@ export function CalculatorContainer() {
         transition={{ duration: 0.5 }}
         className='text-center'
       >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, type: 'spring' }}
-          className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'
-        >
-          <Sparkles className='h-8 w-8 text-primary' />
-        </motion.div>
         <h1 className='mb-3 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
         </h1>
@@ -49,37 +65,69 @@ export function CalculatorContainer() {
         </p>
       </motion.div>
 
-      {/* Main Calculator Grid */}
-      <div className='grid gap-8 lg:grid-cols-2'>
-        {/* Inputs Column */}
-        <div>
-          <CalculatorInputsSection onCalculate={handleCalculate} />
-        </div>
+      {/* Summary Cards (top) */}
+      <AnimatePresence mode='wait'>
+        {showResults && results && <ResultsSummaryCards results={results} />}
+      </AnimatePresence>
 
-        {/* Results Column */}
-        <div>
-          <AnimatePresence mode='wait'>
-            {showResults && results ? (
-              <CalculatorResultsSection results={results} />
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className='flex h-full items-center justify-center rounded-lg border border-border border-dashed bg-card/50 p-12 text-center'
-              >
-                <div>
-                  <Sparkles className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
-                  <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
-                  <p className='text-muted-foreground text-sm'>
-                    Enter your salary details and click Calculate Tax to see your results
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      {/* Main Calculator Grid: Inputs (left) + Results Table (right) */}
+      <div className='grid gap-6 lg:grid-cols-[420px_1fr]'>
+        {/* Inputs Column */}
+        <Card className='border-border/50 bg-secondary/60 p-6 backdrop-blur-md'>
+          <CalculatorInputsSection onCalculate={handleCalculate} />
+        </Card>
+
+        {/* Results Table Column */}
+        <AnimatePresence mode='wait'>
+          {showResults && results ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ResultsTable results={results} />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className='flex h-full items-center justify-center rounded-lg border border-border border-dashed bg-secondary/40 p-12 text-center backdrop-blur-md'
+            >
+              <div>
+                <Sparkles className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
+                <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
+                <p className='text-muted-foreground text-sm'>
+                  Enter your salary details and click Calculate to see your results
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* Export Buttons (bottom) */}
+      <AnimatePresence mode='wait'>
+        {showResults && results && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className='flex justify-center gap-3'
+          >
+            <Button variant='outline' size='lg' onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' />
+              Print
+            </Button>
+            <Button variant='outline' size='lg' onClick={handleExport}>
+              <FileDown className='mr-2 h-4 w-4' />
+              Export CSV
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

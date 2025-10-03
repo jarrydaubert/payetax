@@ -27,7 +27,7 @@
  * Tests use actual HMRC calculation examples and cross-verify results against
  * official tax calculators to ensure accuracy within acceptable tolerances.
  *
- * @author ToolHubX Development Team
+ * @author PayeTax Development Team
  * @version 2.1.0
  * @since 2024-08-01
  */

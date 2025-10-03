@@ -1,19 +1,19 @@
-# 🚀 ToolHubX Deployment & CI/CD Guide
+# 🚀 PayeTax Deployment & CI/CD Guide
 
-This document provides comprehensive deployment setup, configuration, and troubleshooting information for the ToolHubX UK Tax Calculator.
+This document provides comprehensive deployment setup, configuration, and troubleshooting information for the PayeTax UK Tax Calculator.
 
 ---
 
 ## 📋 Overview
 
-ToolHubX uses a modern deployment strategy with Vercel for production hosting and GitLab for version control. The application leverages Next.js 15's static and server-side rendering capabilities for optimal performance.
+PayeTax uses a modern deployment strategy with Vercel for production hosting and GitLab for version control. The application leverages Next.js 15's static and server-side rendering capabilities for optimal performance.
 
 ### Current Setup Status
 
 | Component | Status | Details |
 |-----------|---------|---------|
 | **Production Hosting** | ✅ Active | Vercel with automatic deployments |
-| **Domain** | ✅ Connected | toolhubx.uk with SSL |
+| **Domain** | ✅ Connected | payetax.co.uk with SSL |
 | **CI/CD Pipeline** | ✅ Automated | GitLab CI/CD with quality gates |
 | **Environment Variables** | ✅ Configured | Production and preview environments |
 | **Performance Monitoring** | ✅ Active | Lighthouse CI + Vercel Analytics |
@@ -25,7 +25,7 @@ ToolHubX uses a modern deployment strategy with Vercel for production hosting an
 ### Hosting Configuration
 
 - **Platform**: Vercel (Next.js optimized)
-- **Domain**: [toolhubx.uk](https://toolhubx.uk)
+- **Domain**: [payetax.co.uk](https://payetax.co.uk)
 - **CDN**: Global edge network with 99.99% uptime
 - **SSL**: Automatic Let's Encrypt certificates
 - **Performance**: Sub-3 second loading times globally
@@ -47,7 +47,7 @@ NEXT_PUBLIC_ENABLE_PWA=true            # Progressive Web App features
 NEXT_PUBLIC_ENABLE_ANALYTICS=true      # Analytics tracking
 
 # API Configuration
-FEEDBACK_EMAIL=feedback@toolhubx.uk    # Feedback form destination
+FEEDBACK_EMAIL=support@payetax.co.uk    # Feedback form destination
 ```
 
 #### Vercel-Specific Variables
@@ -56,7 +56,7 @@ FEEDBACK_EMAIL=feedback@toolhubx.uk    # Feedback form destination
 # Deployment (automatically set by Vercel)
 VERCEL=1                               # Vercel environment flag
 VERCEL_ENV=production                  # Environment type
-VERCEL_URL=toolhubx.uk                # Production URL
+VERCEL_URL=payetax.co.uk                # Production URL
 ```
 
 ### Build Configuration
@@ -154,7 +154,7 @@ npm run build             # Verify production build
 vercel --prod             # Deploy to production
 
 # 3. Verify deployment
-curl -I https://toolhubx.uk  # Check response headers
+curl -I https://payetax.co.uk  # Check response headers
 ```
 
 ---
@@ -163,7 +163,7 @@ curl -I https://toolhubx.uk  # Check response headers
 
 ### Production Environment
 
-- **URL**: [toolhubx.uk](https://toolhubx.uk)
+- **URL**: [payetax.co.uk](https://payetax.co.uk)
 - **Purpose**: Live application for end users
 - **Monitoring**: Full analytics and error tracking
 - **Performance**: Optimized for speed and SEO

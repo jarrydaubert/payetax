@@ -1,6 +1,6 @@
-# 📜 ToolHubX Scripts Guide
+# 📜 PayeTax Scripts Guide
 
-This document explains all the npm scripts available in ToolHubX and when to use them.
+This document explains all the npm scripts available in PayeTax and when to use them.
 
 **Last Updated**: September 3, 2025  
 **Version**: v2.1.0 - Streamlined Scripts

@@ -138,7 +138,7 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
 
                 <div className='flex-1'>
                   <h3 className='mb-1 flex items-center gap-2 font-bold text-foreground text-lg'>
-                    Install ToolHubX
+                    Install PayeTax
                     <motion.span
                       animate={{ rotate: [0, 15, -15, 0] }}
                       transition={{

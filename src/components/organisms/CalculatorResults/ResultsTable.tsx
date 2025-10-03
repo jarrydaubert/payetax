@@ -77,12 +77,9 @@ export function ResultsTable({
     } else if (width < 1024) {
       // Tablet: 3 columns
       defaultPeriods = ['Yearly', 'Monthly', 'Weekly'];
-    } else if (width < 1536) {
-      // Desktop: 4 columns
-      defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Weekly'];
     } else {
-      // Large desktop: 5 columns
-      defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Weekly', 'Daily'];
+      // Desktop: 4 columns max (Yearly, Monthly, Weekly, Daily)
+      defaultPeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily'];
     }
 
     setVisiblePeriods(defaultPeriods);
@@ -115,9 +112,24 @@ export function ResultsTable({
   }, []);
 
   const handlePeriodToggle = (period: string) => {
-    setVisiblePeriods((prev) =>
-      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-    );
+    setVisiblePeriods((prev) => {
+      if (prev.includes(period)) {
+        // Remove period
+        return prev.filter((p) => p !== period);
+      }
+      // Add period and sort by logical order
+      const allPeriods = [
+        'Yearly',
+        'Monthly',
+        '4-Weekly',
+        'Fortnightly',
+        'Weekly',
+        'Daily',
+        'Hourly',
+      ];
+      const newPeriods = [...prev, period];
+      return allPeriods.filter((p) => newPeriods.includes(p));
+    });
   };
 
   const calculatePercentage = (amount: number, total: number): string => {
@@ -277,7 +289,7 @@ export function ResultsTable({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='overflow-hidden'>
+        <Card className='overflow-hidden border-border/50 bg-secondary/60 backdrop-blur-md'>
           <div
             ref={containerRef}
             className='overflow-x-auto scroll-smooth'

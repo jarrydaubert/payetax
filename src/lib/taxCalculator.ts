@@ -89,8 +89,8 @@ export interface TaxCalculationInput {
   pensionContribution: number;
   /** Type of pension contribution (percentage or fixed amount) */
   pensionContributionType: 'percentage' | 'amount';
-  /** Student loan plans that apply */
-  studentLoanPlans: StudentLoanPlan[];
+  /** Student loan plan that applies */
+  studentLoanPlan: StudentLoanPlan | 'none';
   /** National Insurance category */
   niCategory: NICategory;
   /** Hours worked per week (for hourly calculations) */
@@ -286,7 +286,7 @@ function isTaxableAllowance(type: AllowanceType): boolean {
  *   isScottish: false,
  *   pensionContribution: 5,
  *   pensionContributionType: 'percentage',
- *   studentLoanPlans: ['plan2'],
+ *   studentLoanPlan: 'plan2',
  *   niCategory: 'A',
  *   hoursPerWeek: 37.5,
  *   additionalAllowances: []
@@ -307,7 +307,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       isScottish: input.isScottish,
       pensionContribution: input.pensionContribution,
       pensionContributionType: input.pensionContributionType,
-      studentLoanPlans: input.studentLoanPlans,
+      studentLoanPlan: input.studentLoanPlan,
       niCategory: input.niCategory,
       additionalAllowances: input.additionalAllowances?.length || 0,
     });
@@ -711,23 +711,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   let monthlyStudentLoan = 0;
 
-  // Only calculate if student loan plans are selected
-  if (!input.studentLoanPlans.includes('none')) {
-    // Process each selected plan
-    for (const plan of input.studentLoanPlans) {
-      if (plan !== 'none') {
-        const loanRates = standardRates.studentLoan[plan];
+  // Only calculate if student loan plan is selected
+  if (input.studentLoanPlan && input.studentLoanPlan !== 'none') {
+    const loanRates = standardRates.studentLoan[input.studentLoanPlan];
 
-        // Convert annual threshold to monthly
-        const monthlyLoanThreshold = loanRates.threshold / 12;
+    // Convert annual threshold to monthly
+    const monthlyLoanThreshold = loanRates.threshold / 12;
 
-        // Student loan is calculated on gross salary, not adjusted salary
-        // This matches how student loan is calculated on payslips
-        if (monthlyGrossSalary > monthlyLoanThreshold) {
-          monthlyStudentLoan +=
-            ((monthlyGrossSalary - monthlyLoanThreshold) * loanRates.rate) / 100;
-        }
-      }
+    // Student loan is calculated on gross salary, not adjusted salary
+    // This matches how student loan is calculated on payslips
+    if (monthlyGrossSalary > monthlyLoanThreshold) {
+      monthlyStudentLoan = ((monthlyGrossSalary - monthlyLoanThreshold) * loanRates.rate) / 100;
     }
   }
 
