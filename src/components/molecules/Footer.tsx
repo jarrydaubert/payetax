@@ -46,6 +46,12 @@ export function Footer({ className }: FooterProps) {
                 Blog
               </Link>
               <Link
+                href='/compliance'
+                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+              >
+                Compliance
+              </Link>
+              <Link
                 href='/privacy'
                 className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >

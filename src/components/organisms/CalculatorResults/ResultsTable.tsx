@@ -31,6 +31,8 @@ interface ResultsTableProps {
   studentLoans?: string[];
   isMarried?: boolean;
   hoursPerWeek?: string;
+  visiblePeriods?: string[];
+  onVisiblePeriodsChange?: (periods: string[]) => void;
 }
 
 interface ResultRowData {
@@ -58,32 +60,13 @@ export function ResultsTable({
   allowancesDeductions = '0',
   studentLoans = [],
   isMarried = false,
+  visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
+  onVisiblePeriodsChange,
 }: ResultsTableProps) {
   // Scroll indicators
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [showLeftIndicator, setShowLeftIndicator] = React.useState(false);
   const [showRightIndicator, setShowRightIndicator] = React.useState(false);
-
-  // Initialize with default visible periods based on screen size
-  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([]);
-
-  React.useEffect(() => {
-    const width = window.innerWidth;
-    let defaultPeriods: string[];
-
-    if (width < 640) {
-      // Mobile: 2 columns
-      defaultPeriods = ['Monthly', 'Weekly'];
-    } else if (width < 1024) {
-      // Tablet: 3 columns
-      defaultPeriods = ['Yearly', 'Monthly', 'Weekly'];
-    } else {
-      // Desktop: 4 columns max (Yearly, Monthly, Weekly, Daily)
-      defaultPeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily'];
-    }
-
-    setVisiblePeriods(defaultPeriods);
-  }, []);
 
   // Check scroll position
   React.useEffect(() => {
@@ -112,24 +95,26 @@ export function ResultsTable({
   }, []);
 
   const handlePeriodToggle = (period: string) => {
-    setVisiblePeriods((prev) => {
-      if (prev.includes(period)) {
-        // Remove period
-        return prev.filter((p) => p !== period);
-      }
-      // Add period and sort by logical order
-      const allPeriods = [
-        'Yearly',
-        'Monthly',
-        '4-Weekly',
-        'Fortnightly',
-        'Weekly',
-        'Daily',
-        'Hourly',
-      ];
-      const newPeriods = [...prev, period];
-      return allPeriods.filter((p) => newPeriods.includes(p));
-    });
+    if (!onVisiblePeriodsChange) return;
+
+    const newPeriods = visiblePeriods.includes(period)
+      ? visiblePeriods.filter((p) => p !== period)
+      : (() => {
+          // Add period and sort by logical order
+          const allPeriods = [
+            'Yearly',
+            'Monthly',
+            '4-Weekly',
+            'Fortnightly',
+            'Weekly',
+            'Daily',
+            'Hourly',
+          ];
+          const combined = [...visiblePeriods, period];
+          return allPeriods.filter((p) => combined.includes(p));
+        })();
+
+    onVisiblePeriodsChange(newPeriods);
   };
 
   const calculatePercentage = (amount: number, total: number): string => {

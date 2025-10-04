@@ -3,6 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { FileDown, Printer, TrendingUp } from 'lucide-react';
+import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
@@ -15,6 +16,25 @@ interface CalculatorResultsSectionProps {
 }
 
 export function CalculatorResultsSection({ results }: CalculatorResultsSectionProps) {
+  // Manage visible periods state at this level so it can be passed to print function
+  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([]);
+
+  // Initialize with default visible periods based on screen size
+  React.useEffect(() => {
+    const width = window.innerWidth;
+    let defaultPeriods: string[];
+
+    if (width < 640) {
+      defaultPeriods = ['Monthly', 'Weekly'];
+    } else if (width < 1024) {
+      defaultPeriods = ['Yearly', 'Monthly', 'Weekly'];
+    } else {
+      defaultPeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily'];
+    }
+
+    setVisiblePeriods(defaultPeriods);
+  }, []);
+
   const handleExport = () => {
     try {
       exportToCSV(results);
@@ -26,7 +46,7 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
 
   const handlePrint = () => {
     try {
-      printResults(results);
+      printResults(results, visiblePeriods);
     } catch {
       toast.error('Failed to open print dialog');
     }
@@ -67,7 +87,11 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
       </motion.div>
 
       <ResultsSummaryCards results={results} />
-      <ResultsTable results={results} />
+      <ResultsTable
+        results={results}
+        visiblePeriods={visiblePeriods}
+        onVisiblePeriodsChange={setVisiblePeriods}
+      />
 
       <motion.div
         initial={{ opacity: 0 }}

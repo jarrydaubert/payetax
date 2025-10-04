@@ -1,30 +1,22 @@
 // src/app/compliance/page.tsx
+'use client';
 
+import { motion } from 'framer-motion';
 import {
   AlertTriangle,
+  Award,
   Calendar,
   CheckCircle,
   ExternalLink,
   FileText,
   Shield,
+  Sparkles,
   Users,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { StructuredData } from '@/components/ui/StructuredData';
-import { BodyText, H1, H2, H3, SmallText } from '@/components/ui/Typography';
-
-export const metadata: Metadata = {
-  title: 'HMRC Compliance & Accuracy | PayeTax Tax Calculator',
-  description:
-    'Learn how PayeTax ensures HMRC compliance with official tax rates, professional oversight, and regular updates. Trusted by tax professionals and verified for accuracy.',
-  keywords:
-    'HMRC compliance, UK tax accuracy, official tax rates, professional tax calculator, HMRC verification',
-  alternates: {
-    canonical: 'https://payetax.co.uk/compliance',
-  },
-};
+import { Card } from '@/components/ui/card';
 
 // HMRC compliance features and certifications
 const COMPLIANCE_FEATURES = [
@@ -41,6 +33,7 @@ const COMPLIANCE_FEATURES = [
     icon: FileText,
     lastUpdated: '2024-08-25',
     source: 'HMRC Gov.UK Publications',
+    color: 'from-blue-500 to-cyan-500',
   },
   {
     title: 'Professional Verification',
@@ -55,6 +48,7 @@ const COMPLIANCE_FEATURES = [
     icon: Users,
     lastUpdated: '2024-08-01',
     source: 'Professional Review Panel',
+    color: 'from-purple-500 to-pink-500',
   },
   {
     title: 'Regular Updates',
@@ -68,6 +62,7 @@ const COMPLIANCE_FEATURES = [
     icon: Calendar,
     lastUpdated: '2024-08-25',
     source: 'HMRC Announcements',
+    color: 'from-green-500 to-emerald-500',
   },
   {
     title: 'Quality Assurance',
@@ -82,6 +77,7 @@ const COMPLIANCE_FEATURES = [
     icon: Shield,
     lastUpdated: '2024-08-20',
     source: 'Internal QA Process',
+    color: 'from-orange-500 to-red-500',
   },
 ];
 
@@ -151,237 +147,356 @@ const DATA_SOURCES = [
 
 export default function CompliancePage() {
   return (
-    <>
-      {/* Enhanced structured data for compliance and authority */}
-      <StructuredData type='organization' />
-      <StructuredData
-        type='service'
-        service={{
-          name: 'HMRC Compliant Tax Calculator',
-          description: 'Professional-grade UK tax calculator verified for HMRC compliance',
-          serviceType: 'Financial Calculation Service',
-          areaServed: ['United Kingdom', 'England', 'Scotland', 'Wales', 'Northern Ireland'],
-        }}
-      />
+    <div className='min-h-screen'>
+      {/* Hero Section */}
+      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-32 pb-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className='text-center'
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
+            >
+              <Shield className='size-5 text-primary' />
+              <span className='font-semibold text-foreground text-sm'>HMRC Compliance</span>
+            </motion.div>
 
-      <div className='min-h-screen pt-20'>
-        <div className='container mx-auto px-4 py-12'>
-          {/* Hero Section */}
-          <div className='mb-16 text-center'>
-            <div className='mb-6 flex justify-center'>
-              <div className='rounded-full bg-green-500/20 p-4'>
-                <Shield className='h-12 w-12 text-green-500 dark:text-green-400' />
-              </div>
-            </div>
-            <H1 className='mb-6 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent'>
-              HMRC Compliance & Accuracy
-            </H1>
-            <BodyText className='mx-auto max-w-3xl text-lg text-muted-foreground'>
-              Our tax calculator maintains strict compliance with HMRC regulations and is verified
-              by qualified tax professionals. Learn how we ensure accuracy and stay current with UK
-              tax law.
-            </BodyText>
-          </div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className='mb-6 font-bold text-5xl leading-tight md:text-7xl'
+            >
+              <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
+                Verified Accuracy
+              </span>
+              <br />
+              <span className='text-foreground'>Official Compliance</span>
+            </motion.h1>
 
-          {/* Compliance Features */}
-          <div className='mb-16'>
-            <H2 className='mb-8 text-center text-foreground'>
-              Professional Standards & Verification
-            </H2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className='mx-auto mb-12 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
+            >
+              Every calculation verified against official HMRC rates. Reviewed by tax professionals.
+              Updated within 24 hours of changes.
+            </motion.p>
 
-            <div className='grid gap-8 md:grid-cols-2'>
-              {COMPLIANCE_FEATURES.map((feature) => (
-                <div key={feature.title} className='glass-card p-8'>
-                  <div className='mb-6 flex items-center'>
-                    <div className='mr-4 rounded-lg bg-green-500/20 p-3'>
-                      <feature.icon className='h-6 w-6 text-green-600 dark:text-green-400' />
-                    </div>
-                    <div>
-                      <H3 className='mb-1 text-foreground'>{feature.title}</H3>
-                      <SmallText className='text-green-600 dark:text-green-400'>
-                        Last Updated: {feature.lastUpdated}
-                      </SmallText>
-                    </div>
-                  </div>
-
-                  <BodyText className='mb-4 text-muted-foreground'>{feature.description}</BodyText>
-
-                  <div className='mb-4'>
-                    <SmallText className='mb-2 font-medium text-muted-foreground'>
-                      Verification Details:
-                    </SmallText>
-                    <div className='space-y-2'>
-                      {feature.details.map((detail) => (
-                        <div key={detail} className='flex items-start'>
-                          <CheckCircle className='mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400' />
-                          <SmallText className='text-muted-foreground'>{detail}</SmallText>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className='border-border border-t pt-4'>
-                    <SmallText className='flex items-center text-purple-600 dark:text-purple-400'>
-                      <FileText className='mr-1 h-4 w-4' />
-                      Source: {feature.source}
-                    </SmallText>
-                  </div>
-                </div>
+            {/* Trust Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className='grid gap-6 md:grid-cols-4'
+            >
+              {[
+                { icon: Award, value: '100%', label: 'HMRC Verified', color: 'from-blue-500 to-cyan-500' },
+                { icon: Users, value: 'CTA', label: 'Reviewed', color: 'from-purple-500 to-pink-500' },
+                {
+                  icon: Calendar,
+                  value: '<24h',
+                  label: 'Update Time',
+                  color: 'from-green-500 to-emerald-500',
+                },
+                {
+                  icon: Shield,
+                  value: '2025',
+                  label: 'Tax Year',
+                  color: 'from-orange-500 to-red-500',
+                },
+              ].map((stat, idx) => (
+                <Card
+                  key={stat.label}
+                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'
+                >
+                  <div
+                    className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
+                  />
+                  <stat.icon className='mx-auto mb-4 size-10 text-primary' />
+                  <div className='relative font-bold text-3xl text-foreground'>{stat.value}</div>
+                  <div className='mt-2 text-muted-foreground text-sm'>{stat.label}</div>
+                </Card>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Compliance Statements */}
-          <div className='mb-16'>
-            <H2 className='mb-8 text-center text-foreground'>Official Compliance Statements</H2>
+      {/* Compliance Features */}
+      <section className='py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className='mb-16 text-center'
+          >
+            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
+              Professional Standards
+            </h2>
+            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+              Multi-layer verification ensures every calculation meets HMRC standards
+            </p>
+          </motion.div>
 
-            <div className='space-y-6'>
-              {COMPLIANCE_STATEMENTS.map((item) => (
-                <div key={item.category} className='glass-card border-green-500 border-l-4 p-6'>
-                  <div className='mb-4'>
-                    <H3 className='mb-2 text-foreground text-lg'>{item.category}</H3>
-                    <BodyText className='text-muted-foreground'>{item.statement}</BodyText>
+          <div className='grid gap-8 md:grid-cols-2'>
+            {COMPLIANCE_FEATURES.map((feature, idx) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 + idx * 0.1 }}
+              >
+                <Card className='group h-full border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'>
+                  <div className='mb-6 flex items-start justify-between'>
+                    <div className='flex items-center gap-4'>
+                      <div
+                        className={`rounded-xl bg-gradient-to-br ${feature.color} p-3 shadow-lg`}
+                      >
+                        <feature.icon className='size-6 text-white' />
+                      </div>
+                      <div>
+                        <h3 className='mb-1 font-bold text-foreground text-xl'>{feature.title}</h3>
+                        <p className='text-primary text-xs'>Updated: {feature.lastUpdated}</p>
+                      </div>
+                    </div>
                   </div>
+
+                  <p className='mb-6 text-muted-foreground leading-relaxed'>{feature.description}</p>
+
+                  <div className='space-y-3'>
+                    {feature.details.map((detail) => (
+                      <div key={detail} className='flex items-start gap-3'>
+                        <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-primary' />
+                        <span className='text-muted-foreground text-sm'>{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className='mt-6 border-primary/10 border-t pt-4'>
+                    <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+                      <FileText className='size-4' />
+                      <span>Source: {feature.source}</span>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Compliance Statements */}
+      <section className='bg-gradient-to-br from-accent/5 to-transparent py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className='mb-16 text-center'
+          >
+            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
+              Official Compliance
+            </h2>
+            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+              Legal verification and regulatory compliance statements
+            </p>
+          </motion.div>
+
+          <div className='space-y-6'>
+            {COMPLIANCE_STATEMENTS.map((item, idx) => (
+              <motion.div
+                key={item.category}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.9 + idx * 0.1 }}
+              >
+                <Card className='border-l-4 border-l-primary p-6 transition-all duration-300 hover:shadow-xl'>
+                  <h3 className='mb-3 font-bold text-foreground text-xl'>{item.category}</h3>
+                  <p className='mb-6 text-muted-foreground leading-relaxed'>{item.statement}</p>
 
                   <div className='grid gap-4 md:grid-cols-2'>
                     <div>
-                      <SmallText className='mb-1 font-medium text-green-600 dark:text-green-400'>
+                      <div className='mb-1 font-semibold text-primary text-sm'>
                         Legal Compliance
-                      </SmallText>
-                      <SmallText className='text-muted-foreground'>{item.verification}</SmallText>
+                      </div>
+                      <p className='text-muted-foreground text-sm'>{item.verification}</p>
                     </div>
                     <div>
-                      <SmallText className='mb-1 font-medium text-blue-600 dark:text-blue-400'>
-                        Last Verified
-                      </SmallText>
-                      <SmallText className='text-muted-foreground'>{item.lastVerified}</SmallText>
+                      <div className='mb-1 font-semibold text-primary text-sm'>Last Verified</div>
+                      <p className='text-muted-foreground text-sm'>{item.lastVerified}</p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                </Card>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Data Sources */}
-          <div className='mb-16'>
-            <H2 className='mb-8 text-center text-foreground'>Official Data Sources</H2>
+      {/* Data Sources */}
+      <section className='py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.2 }}
+            className='mb-16 text-center'
+          >
+            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
+              Official Sources
+            </h2>
+            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+              All data sourced from government authorities and professional bodies
+            </p>
+          </motion.div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
-              {DATA_SOURCES.map((source) => (
-                <div key={source.source} className='glass-card p-6'>
-                  <div className='mb-4'>
-                    <H3 className='mb-2 flex items-center text-foreground text-lg'>
-                      {source.source}
-                      <ExternalLink className='ml-2 h-4 w-4 text-muted-foreground' />
-                    </H3>
-                    <BodyText className='mb-3 text-muted-foreground text-sm'>
-                      {source.description}
-                    </BodyText>
+          <div className='grid gap-6 md:grid-cols-2'>
+            {DATA_SOURCES.map((source, idx) => (
+              <motion.div
+                key={source.source}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.3 + idx * 0.1 }}
+              >
+                <Card className='group h-full border-primary/20 p-6 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-xl'>
+                  <div className='mb-4 flex items-start justify-between'>
+                    <h3 className='font-bold text-foreground text-lg'>{source.source}</h3>
+                    <ExternalLink className='size-5 text-muted-foreground transition-colors group-hover:text-primary' />
                   </div>
 
-                  <div className='space-y-2'>
-                    <div className='flex justify-between'>
-                      <SmallText className='text-muted-foreground'>Reliability:</SmallText>
-                      <SmallText className='font-medium text-green-600 dark:text-green-400'>
-                        {source.reliability}
-                      </SmallText>
+                  <p className='mb-6 text-muted-foreground text-sm leading-relaxed'>
+                    {source.description}
+                  </p>
+
+                  <div className='mb-6 space-y-2'>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Reliability:</span>
+                      <span className='font-semibold text-primary'>{source.reliability}</span>
                     </div>
-                    <div className='flex justify-between'>
-                      <SmallText className='text-muted-foreground'>Last Accessed:</SmallText>
-                      <SmallText className='text-foreground'>{source.lastAccessed}</SmallText>
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Last Accessed:</span>
+                      <span className='text-foreground'>{source.lastAccessed}</span>
                     </div>
                   </div>
 
-                  <div className='mt-4 border-border border-t pt-4'>
-                    <Button asChild variant='outline' size='sm' className='w-full'>
-                      <a href={source.url} target='_blank' rel='noopener noreferrer'>
-                        View Official Source
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  <Button
+                    asChild
+                    variant='outline'
+                    size='sm'
+                    className='w-full transition-all group-hover:border-primary group-hover:bg-primary/10'
+                  >
+                    <a href={source.url} target='_blank' rel='noopener noreferrer'>
+                      View Official Source
+                    </a>
+                  </Button>
+                </Card>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Important Notice */}
-          <div className='glass-card mb-16 border border-yellow-500/30 p-8'>
-            <div className='flex items-start'>
-              <AlertTriangle className='mt-1 mr-4 h-6 w-6 flex-shrink-0 text-yellow-600 dark:text-yellow-400' />
-              <div>
-                <H3 className='mb-3 text-foreground'>Important Legal Notice</H3>
-                <BodyText className='mb-4 text-muted-foreground'>
-                  While we maintain strict compliance with HMRC regulations and professional
-                  standards, this calculator is provided for informational purposes only. For
-                  official tax calculations, complex scenarios, or professional tax advice, please
-                  consult with a qualified accountant or tax advisor.
-                </BodyText>
+      {/* Important Notice */}
+      <section className='bg-gradient-to-br from-primary/5 to-transparent py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.5 }}
+          >
+            <Card className='border-yellow-500/30 p-8 md:p-12'>
+              <div className='flex flex-col items-start gap-6 md:flex-row'>
+                <div className='rounded-xl bg-yellow-500/10 p-4'>
+                  <AlertTriangle className='size-8 text-yellow-600 dark:text-yellow-400' />
+                </div>
 
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <div>
-                    <SmallText className='mb-2 font-medium text-yellow-600 dark:text-yellow-400'>
-                      Suitable for:
-                    </SmallText>
-                    <div className='space-y-1'>
-                      <SmallText className='flex items-center text-muted-foreground'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
-                        Standard PAYE calculations
-                      </SmallText>
-                      <SmallText className='flex items-center text-muted-foreground'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
-                        Salary and pension planning
-                      </SmallText>
-                      <SmallText className='flex items-center text-muted-foreground'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
-                        General tax estimates
-                      </SmallText>
+                <div className='flex-1'>
+                  <h3 className='mb-4 font-bold text-foreground text-2xl'>Important Legal Notice</h3>
+                  <p className='mb-6 text-muted-foreground leading-relaxed'>
+                    While we maintain strict compliance with HMRC regulations and professional
+                    standards, this calculator is provided for informational purposes only. For
+                    official tax calculations, complex scenarios, or professional tax advice, please
+                    consult with a qualified accountant or tax advisor.
+                  </p>
+
+                  <div className='grid gap-6 md:grid-cols-2'>
+                    <div>
+                      <div className='mb-3 font-semibold text-yellow-600 dark:text-yellow-400'>
+                        ✓ Suitable for:
+                      </div>
+                      <ul className='space-y-2'>
+                        {['Standard PAYE calculations', 'Salary and pension planning', 'General tax estimates'].map(
+                          (item) => (
+                            <li key={item} className='flex items-center gap-2 text-muted-foreground text-sm'>
+                              <CheckCircle className='size-4 text-primary' />
+                              {item}
+                            </li>
+                          )
+                        )}
+                      </ul>
                     </div>
-                  </div>
-                  <div>
-                    <SmallText className='mb-2 font-medium text-yellow-600 dark:text-yellow-400'>
-                      Professional advice recommended for:
-                    </SmallText>
-                    <div className='space-y-1'>
-                      <SmallText className='text-muted-foreground'>
-                        • Complex tax situations
-                      </SmallText>
-                      <SmallText className='text-muted-foreground'>
-                        • Multiple income sources
-                      </SmallText>
-                      <SmallText className='text-muted-foreground'>
-                        • Self-employment income
-                      </SmallText>
-                      <SmallText className='text-muted-foreground'>
-                        • Official HMRC submissions
-                      </SmallText>
+                    <div>
+                      <div className='mb-3 font-semibold text-yellow-600 dark:text-yellow-400'>
+                        ⚠ Professional advice recommended:
+                      </div>
+                      <ul className='space-y-2 text-muted-foreground text-sm'>
+                        <li>• Complex tax situations</li>
+                        <li>• Multiple income sources</li>
+                        <li>• Self-employment income</li>
+                        <li>• Official HMRC submissions</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* CTA Section */}
-          <div className='text-center'>
-            <H2 className='mb-4 text-foreground'>Questions About Our Compliance?</H2>
-            <BodyText className='mx-auto mb-6 max-w-2xl text-muted-foreground'>
-              We're committed to maintaining the highest standards of accuracy and compliance. If
-              you have questions about our methodology or sources, we're here to help.
-            </BodyText>
+      {/* CTA Section */}
+      <section className='py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.6 }}
+            className='text-center'
+          >
+            <Sparkles className='mx-auto mb-6 size-12 text-primary' />
+            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
+              Questions About Compliance?
+            </h2>
+            <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-lg leading-relaxed'>
+              We're committed to maintaining the highest standards of accuracy and compliance. If you
+              have questions about our methodology or sources, we're here to help.
+            </p>
 
             <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-              <Button asChild variant='default'>
-                <Link href='/'>Try the Calculator</Link>
+              <Button asChild size='lg' className='group'>
+                <Link href='/'>
+                  Try the Calculator
+                  <Sparkles className='ml-2 size-4 transition-transform group-hover:rotate-12' />
+                </Link>
               </Button>
-              <Button asChild variant='ghost'>
+              <Button asChild variant='outline' size='lg'>
                 <a href='mailto:support@payetax.co.uk?subject=Compliance Issue Report'>
                   Report an Issue
                 </a>
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

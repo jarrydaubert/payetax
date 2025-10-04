@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calculator, RotateCcw, Sparkles } from 'lucide-react';
+import { Calculator, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -21,10 +21,7 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
     setIsCalculating(true);
     try {
       onCalculate();
-      toast.success('Calculation complete!', {
-        description: 'Your tax breakdown is ready',
-        icon: <Sparkles className='size-4' />,
-      });
+      // Success is implicit - results appear on screen
     } catch (error) {
       toast.error('Calculation failed', {
         description: error instanceof Error ? error.message : 'Please check your inputs',
@@ -36,9 +33,7 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
 
   const handleReset = () => {
     reset();
-    toast.info('Calculator reset', {
-      description: 'All inputs have been cleared',
-    });
+    // Reset is visually obvious - no toast needed
   };
 
   return (

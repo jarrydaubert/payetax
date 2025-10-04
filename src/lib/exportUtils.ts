@@ -3,6 +3,7 @@ import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 /**
  * Export tax calculation results to CSV
+ * CSV always includes all timeframes for maximum data export
  */
 export function exportToCSV(results: TaxCalculationResults): void {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -10,11 +11,11 @@ export function exportToCSV(results: TaxCalculationResults): void {
     currency: 'GBP',
   });
 
-  // Build CSV content
-  let csv = 'Category,Yearly,Monthly,Weekly\n';
+  // Build CSV content with all timeframes
+  let csv = 'Category,Yearly,Monthly,4-Weekly,Fortnightly,Weekly,Daily,Hourly\n';
 
   const addRow = (label: string, annually: number) => {
-    csv += `${label},${formatter.format(annually)},${formatter.format(annually / 12)},${formatter.format(annually / 52)}\n`;
+    csv += `${label},${formatter.format(annually)},${formatter.format(annually / 12)},${formatter.format(annually / 13)},${formatter.format(annually / 26)},${formatter.format(annually / 52)},${formatter.format(annually / 260)},${formatter.format(annually / 1950)}\n`;
   };
 
   addRow('Gross Pay', results.grossSalary.annually);
@@ -43,8 +44,12 @@ export function exportToCSV(results: TaxCalculationResults): void {
 
 /**
  * Print tax calculation results
+ * Uses user's selected visible periods from the results table
  */
-export function printResults(results: TaxCalculationResults): void {
+export function printResults(
+  results: TaxCalculationResults,
+  visiblePeriods: string[] = ['Yearly', 'Monthly', 'Weekly'],
+): void {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
@@ -53,17 +58,34 @@ export function printResults(results: TaxCalculationResults): void {
     currency: 'GBP',
   });
 
+  const periodDivisors: Record<string, number> = {
+    Yearly: 1,
+    Monthly: 12,
+    '4-Weekly': 13,
+    Fortnightly: 26,
+    Weekly: 52,
+    Daily: 260,
+    Hourly: 1950,
+  };
+
   const row = (label: string, annually: number, highlight = false) => {
     const className = highlight ? ' class="highlight"' : '';
+    const periodCells = visiblePeriods
+      .map((period) => {
+        const value = annually / periodDivisors[period];
+        return `<td>${formatter.format(value)}</td>`;
+      })
+      .join('');
+
     return `
       <tr${className}>
         <td>${label}</td>
-        <td>${formatter.format(annually)}</td>
-        <td>${formatter.format(annually / 12)}</td>
-        <td>${formatter.format(annually / 52)}</td>
+        ${periodCells}
       </tr>
     `;
   };
+
+  const periodHeaders = visiblePeriods.map((period) => `<th>${period}</th>`).join('');
 
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -73,63 +95,69 @@ export function printResults(results: TaxCalculationResults): void {
         <meta charset="utf-8">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
+          @page { size: A4; margin: 15mm; }
           body {
             font-family: system-ui, -apple-system, sans-serif;
-            padding: 40px;
+            padding: 20px;
             color: #1e293b;
+            max-width: 210mm;
           }
           .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #6366f1;
           }
           h1 {
-            color: #0f172a;
-            font-size: 28px;
+            color: #6366f1;
+            font-size: 24px;
             margin-bottom: 8px;
           }
           .subtitle {
             color: #64748b;
-            font-size: 14px;
+            font-size: 12px;
           }
           table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            font-size: 11px;
           }
           th, td {
-            padding: 12px;
+            padding: 10px 8px;
             text-align: right;
             border-bottom: 1px solid #e2e8f0;
           }
           th:first-child, td:first-child {
             text-align: left;
             font-weight: 500;
+            color: #1e293b;
           }
           th {
             background: #f8fafc;
             font-weight: 600;
-            color: #475569;
-            font-size: 13px;
+            color: #6366f1;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 2px solid #6366f1;
           }
           .highlight {
-            background: #f0f9ff;
-            font-weight: 600;
+            background: #fef3c7;
+            font-weight: 700;
+            color: #1e293b;
           }
           .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
             color: #64748b;
           }
           @media print {
-            body { padding: 20px; }
-            .header { margin-bottom: 20px; }
+            body { padding: 0; }
+            @page { margin: 15mm; }
           }
         </style>
       </head>
@@ -146,9 +174,7 @@ export function printResults(results: TaxCalculationResults): void {
           <thead>
             <tr>
               <th>Category</th>
-              <th>Yearly</th>
-              <th>Monthly</th>
-              <th>Weekly</th>
+              ${periodHeaders}
             </tr>
           </thead>
           <tbody>
@@ -162,7 +188,7 @@ export function printResults(results: TaxCalculationResults): void {
         </table>
 
         <div class="footer">
-          <p>PayeTax UK PAYE Tax Calculator • payetax.co.uk</p>
+          <p><strong>PayeTax</strong> UK PAYE Tax Calculator • payetax.co.uk</p>
           <p style="margin-top: 8px;">
             This calculation is for illustrative purposes only.
             For official tax advice, consult HMRC or a qualified accountant.
