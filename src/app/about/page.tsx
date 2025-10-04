@@ -1,238 +1,396 @@
 // src/app/about/page.tsx
 'use client';
 
+import { motion } from 'framer-motion';
 import {
   Award,
   Calculator,
   Code,
-  Coffee,
+  Eye,
   Heart,
+  Lightbulb,
+  Lock,
+  Rocket,
   Shield,
   Sparkles,
-  TrendingUp,
+  Target,
   Zap,
 } from 'lucide-react';
-import CallToAction from '@/components/ui/CallToAction';
+import Link from 'next/link';
+import { Card } from '@/components/ui/card';
 
 export default function AboutPage() {
   const stats = [
-    { icon: Calculator, value: 'Free', label: 'Always' },
-    { icon: Code, value: '99.9%', label: 'Uptime' },
-    { icon: Award, value: 'HMRC', label: 'Compliant' },
-    { icon: Shield, value: 'Zero', label: 'Data Collected' },
+    { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-blue-500 to-cyan-500' },
+    { icon: Lock, value: '0', label: 'Data Stored', color: 'from-green-500 to-emerald-500' },
+    {
+      icon: Award,
+      value: 'HMRC',
+      label: 'Official Rates',
+      color: 'from-purple-500 to-pink-500',
+    },
+    { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-orange-500 to-red-500' },
   ];
 
-  const features = [
+  const values = [
     {
       icon: Shield,
-      title: 'Privacy First, Always',
+      title: 'Privacy is Sacred',
       description:
-        'Every calculation happens in your browser. Your salary, tax code, and personal details never touch our servers. Privacy by architecture, not just policy.',
-      color: 'from-green-400 to-emerald-500',
+        "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
+      gradient: 'from-green-500/20 to-emerald-500/20',
+      iconGradient: 'from-green-500 to-emerald-500',
     },
     {
-      icon: Zap,
-      title: 'Lightning Fast Performance',
+      icon: Eye,
+      title: 'Radical Transparency',
       description:
-        'Built with cutting-edge Next.js 15 and React 19. Sub-second load times, instant calculations, and silky smooth animations.',
-      color: 'from-yellow-400 to-orange-500',
+        'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
+      gradient: 'from-blue-500/20 to-cyan-500/20',
+      iconGradient: 'from-blue-500 to-cyan-500',
     },
     {
-      icon: Calculator,
-      title: 'HMRC Compliant Calculations',
+      icon: Target,
+      title: 'Accuracy First',
       description:
-        'Official tax rates and thresholds from HMRC. Updated within 24 hours of any government changes. Scottish rates fully supported.',
-      color: 'from-blue-400 to-cyan-500',
+        'Official HMRC rates updated within 24 hours of changes. Comprehensive testing for Scottish rates, student loans, pensions, and edge cases.',
+      gradient: 'from-purple-500/20 to-pink-500/20',
+      iconGradient: 'from-purple-500 to-pink-500',
     },
     {
       icon: Heart,
-      title: 'Actually Free Forever',
+      title: 'Genuinely Free',
       description:
-        'No premium features, no paywalls, no "trial periods". Every feature is free for everyone, forever. Because tax calculations should be accessible to all.',
-      color: 'from-purple-400 to-pink-500',
+        'No premium tiers, no paywalls, no "upgrade to see more". Every feature is free for everyone, forever. Tax calculations should be accessible to all.',
+      gradient: 'from-red-500/20 to-orange-500/20',
+      iconGradient: 'from-red-500 to-orange-500',
+    },
+  ];
+
+  const techFeatures = [
+    {
+      icon: Rocket,
+      title: 'Blazing Fast',
+      metric: '<1.5s',
+      description: 'Sub-second page loads, instant calculations, 60fps animations',
+    },
+    {
+      icon: Code,
+      title: 'Modern Stack',
+      metric: 'Next.js 15',
+      description: 'React 19, TypeScript, Tailwind CSS v4, cutting-edge architecture',
+    },
+    {
+      icon: Sparkles,
+      title: 'Lighthouse Score',
+      metric: '95+',
+      description: 'Performance, accessibility, SEO, and best practices',
     },
   ];
 
   return (
-    <div className='min-h-screen pt-20'>
-      <div className='container mx-auto max-w-6xl px-4 lg:max-w-7xl'>
-        {/* Header */}
-        <div className='mb-16'>
-          <div className='text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2'>
-              <Sparkles className='h-4 w-4 text-primary' />
-              <span className='font-medium text-primary text-sm'>About PayeTax</span>
-            </div>
+    <div className='min-h-screen'>
+      {/* Hero Section */}
+      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-32 pb-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className='text-center'
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
+            >
+              <Sparkles className='size-5 text-primary' />
+              <span className='font-semibold text-foreground text-sm'>About PayeTax</span>
+            </motion.div>
 
-            <h1 className='mb-6 font-bold text-4xl md:text-6xl'>
-              <span className='bg-gradient-to-r from-primary via-purple-400 to-cyan-400 bg-clip-text text-transparent'>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className='mb-6 font-bold text-5xl leading-tight md:text-7xl'
+            >
+              <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
                 Tax Calculations
               </span>
               <br />
-              <span className='text-foreground'>That Respect Your Privacy</span>
-            </h1>
+              <span className='text-foreground'>Built for Privacy</span>
+            </motion.h1>
 
-            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
-              UK tax shouldn't require handing over your personal data. We built PayeTax as the
-              calculator we wished existed - instant, accurate, and completely private.
-            </p>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className='mb-16 grid grid-cols-2 gap-6 md:grid-cols-4'>
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className='glass-card p-6 text-center transition-colors hover:border-primary/50'
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className='mx-auto mb-12 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
             >
-              <stat.icon className='mx-auto mb-3 h-8 w-8 text-primary' />
-              <div className='mb-1 font-bold text-2xl text-foreground'>{stat.value}</div>
-              <div className='text-muted-foreground text-sm'>{stat.label}</div>
-            </div>
-          ))}
-        </div>
+              The UK tax calculator that respects your privacy, delivers instant accuracy, and costs
+              nothing. No compromises.
+            </motion.p>
 
-        {/* Mission Statement */}
-        <div className='glass-card mb-16 border-primary border-l-4 p-8 text-center md:p-12'>
-          <Heart className='mx-auto mb-6 h-12 w-12 text-primary' />
-          <h2 className='mb-6 font-bold text-3xl text-foreground'>Our Mission</h2>
-          <p className='mx-auto max-w-4xl text-muted-foreground text-xl leading-relaxed'>
-            Every UK taxpayer deserves instant, accurate tax calculations without sacrificing their
-            privacy or opening their wallet. We're building the most transparent, accessible, and
-            trustworthy tax calculator in the UK - and it will always be free.
-          </p>
-        </div>
-
-        {/* Features Grid */}
-        <div className='mb-16'>
-          <h2 className='mb-12 text-center font-bold text-3xl text-foreground'>Built Different</h2>
-          <div className='grid gap-8 md:grid-cols-2'>
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className='glass-card group p-8 transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg'
-              >
-                <div
-                  className={`h-16 w-16 rounded-xl bg-gradient-to-r ${feature.color} mb-6 p-4 transition-transform group-hover:scale-110`}
+            {/* Stats Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className='grid gap-6 md:grid-cols-4'
+            >
+              {stats.map((stat, _idx) => (
+                <Card
+                  key={stat.label}
+                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'
                 >
-                  <feature.icon className='h-8 w-8 text-white' />
-                </div>
-                <h3 className='mb-4 font-semibold text-foreground text-xl'>{feature.title}</h3>
-                <p className='text-muted-foreground leading-relaxed'>{feature.description}</p>
-              </div>
+                  <div
+                    className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
+                  />
+                  <stat.icon className='mx-auto mb-4 size-10 text-primary' />
+                  <div className='mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
+                  <div className='text-muted-foreground text-sm'>{stat.label}</div>
+                </Card>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='py-20'
+      >
+        <div className='container mx-auto max-w-5xl px-4'>
+          <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
+            <Heart className='mx-auto mb-6 size-16 text-primary' />
+            <h2 className='mb-6 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+              Our Mission
+            </h2>
+            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
+              Every UK taxpayer deserves instant, accurate tax calculations without sacrificing
+              privacy or paying a penny. We&apos;re building the most transparent, accessible, and
+              trustworthy tax calculator in the UK.
+            </p>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* Values Grid */}
+      <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+            className='mb-16 text-center'
+          >
+            <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+              What We Stand For
+            </h2>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+              Four principles that guide everything we build
+            </p>
+          </motion.div>
+
+          <div className='grid gap-8 md:grid-cols-2'>
+            {values.map((value, idx) => (
+              <motion.div
+                key={value.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <Card
+                  className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${value.gradient} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-2xl`}
+                >
+                  <div
+                    className={`mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br ${value.iconGradient} p-4 shadow-lg transition-transform group-hover:scale-110`}
+                  >
+                    <value.icon className='size-8 text-white' />
+                  </div>
+                  <h3 className='mb-4 font-bold text-2xl text-foreground'>{value.title}</h3>
+                  <p className='text-muted-foreground leading-relaxed'>{value.description}</p>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Technology Stack */}
-        <div className='glass-card mb-16 p-8 md:p-12'>
-          <div className='mb-12 text-center'>
-            <Code className='mx-auto mb-6 h-12 w-12 text-primary' />
-            <h2 className='mb-6 font-bold text-3xl text-foreground'>
-              Built with Modern Technology
+      {/* Technology Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='py-20'
+      >
+        <div className='container mx-auto max-w-7xl px-4'>
+          <div className='mb-16 text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-6 py-2.5'>
+              <Code className='size-5 text-blue-500' />
+              <span className='font-semibold text-blue-500 text-sm'>Modern Technology</span>
+            </div>
+            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+              Built for Performance
             </h2>
-            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
-              We use the latest web technologies to deliver exceptional performance, security, and
-              user experience.
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+              Cutting-edge web technologies for exceptional speed, security, and experience
             </p>
           </div>
 
-          <div className='grid gap-8 md:grid-cols-3'>
-            <div className='text-center'>
-              <TrendingUp className='mx-auto mb-4 h-8 w-8 text-green-500' />
-              <h3 className='mb-3 font-semibold text-foreground text-lg'>Performance</h3>
-              <p className='text-muted-foreground text-sm'>
-                Sub-300kB bundle size, &lt; 1.5s load times, and 95+ Lighthouse scores across the
-                board.
-              </p>
-            </div>
-
-            <div className='text-center'>
-              <Shield className='mx-auto mb-4 h-8 w-8 text-blue-500' />
-              <h3 className='mb-3 font-semibold text-foreground text-lg'>Security</h3>
-              <p className='text-muted-foreground text-sm'>
-                Client-side calculations mean zero data collection. Not "minimal" tracking -
-                actually zero.
-              </p>
-            </div>
-
-            <div className='text-center'>
-              <Sparkles className='mx-auto mb-4 h-8 w-8 text-purple-500' />
-              <h3 className='mb-3 font-semibold text-foreground text-lg'>Innovation</h3>
-              <p className='text-muted-foreground text-sm'>
-                Weekly improvements, instant tax rate updates, and features requested by users like
-                you.
-              </p>
-            </div>
+          <div className='mb-12 grid gap-8 md:grid-cols-3'>
+            {techFeatures.map((feature, idx) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <Card className='group h-full border-primary/20 p-8 text-center transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'>
+                  <feature.icon className='mx-auto mb-4 size-12 text-primary' />
+                  <div className='mb-2 font-bold text-3xl text-foreground'>{feature.metric}</div>
+                  <h3 className='mb-3 font-semibold text-foreground text-lg'>{feature.title}</h3>
+                  <p className='text-muted-foreground text-sm'>{feature.description}</p>
+                </Card>
+              </motion.div>
+            ))}
           </div>
 
-          {/* Tech stack badges */}
-          <div className='mt-12 text-center'>
-            <h4 className='mb-6 font-semibold text-foreground text-lg'>Powered by</h4>
+          {/* Tech Stack */}
+          <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-8'>
+            <h3 className='mb-6 text-center font-bold text-foreground text-xl'>Powered By</h3>
             <div className='flex flex-wrap justify-center gap-3'>
               {[
                 'Next.js 15',
                 'React 19',
-                'TypeScript',
-                'Tailwind CSS 4',
-                'Zustand',
+                'TypeScript 5',
+                'Tailwind CSS v4',
+                'Zustand 5',
                 'shadcn/ui',
-                'Framer Motion',
+                'Framer Motion 12',
+                'Biome',
               ].map((tech) => (
                 <span
                   key={tech}
-                  className='rounded-full border border-border bg-muted px-4 py-2 text-muted-foreground text-sm transition-colors hover:border-primary/50 hover:text-foreground'
+                  className='rounded-full border border-primary/30 bg-background px-5 py-2.5 font-medium text-foreground text-sm transition-all hover:scale-105 hover:border-primary hover:shadow-lg'
                 >
                   {tech}
                 </span>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
+      </motion.section>
 
-        {/* Story */}
-        <div className='glass-card mb-16 p-8 md:p-12'>
-          <h2 className='mb-8 font-bold text-3xl text-foreground'>Why We Built PayeTax</h2>
-          <div className='prose prose-lg max-w-none'>
-            <p className='mb-6 text-muted-foreground leading-relaxed'>
-              As UK taxpayers and software engineers, we were frustrated by the state of online tax
-              calculators. They were slow, cluttered with ads, required personal information, or hid
-              features behind paywalls. We knew it didn't have to be this way.
-            </p>
-            <p className='mb-6 text-muted-foreground leading-relaxed'>
-              PayeTax started with a simple philosophy: tax calculations should be instant,
-              accurate, and completely private. No accounts, no tracking, no compromises. Just pure,
-              client-side calculations using official HMRC rates.
-            </p>
-            <p className='mb-6 text-muted-foreground leading-relaxed'>
-              Today, we're proud to help people across the UK understand their take-home pay, plan
-              salary negotiations, compare job offers, and make informed financial decisions - all
-              while respecting their privacy.
-            </p>
-            <p className='text-muted-foreground leading-relaxed'>
-              We're continuously improving based on your feedback. Every feature request matters,
-              every bug report helps, and every suggestion makes PayeTax better for everyone.
-            </p>
-          </div>
+      {/* Story Section */}
+      <section className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-20'>
+        <div className='container mx-auto max-w-5xl px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className='border-primary/20 p-12'>
+              <div className='mb-8 text-center'>
+                <Lightbulb className='mx-auto mb-6 size-16 text-primary' />
+                <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+                  Why We Built PayeTax
+                </h2>
+              </div>
+
+              <div className='space-y-6'>
+                <p className='text-lg text-muted-foreground leading-relaxed'>
+                  As UK taxpayers and software engineers, we were frustrated by online tax
+                  calculators. They were slow, cluttered with ads, required personal information, or
+                  hid features behind paywalls.
+                </p>
+                <p className='text-lg text-muted-foreground leading-relaxed'>
+                  We knew it didn&apos;t have to be this way. Tax calculations should be instant,
+                  accurate, and completely private. No accounts, no tracking, no compromises.
+                </p>
+                <p className='text-lg text-muted-foreground leading-relaxed'>
+                  Today, PayeTax helps thousands of people across the UK understand their take-home
+                  pay, plan salary negotiations, compare job offers, and make informed financial
+                  decisions - all while respecting their privacy.
+                </p>
+                <p className='text-lg text-muted-foreground leading-relaxed'>
+                  We're continuously improving based on your feedback. Every feature request
+                  matters, every bug report helps, and every suggestion makes PayeTax better for
+                  everyone.
+                </p>
+              </div>
+            </Card>
+          </motion.div>
         </div>
+      </section>
 
-        {/* Contact */}
-        <CallToAction variant='contact' className='mt-16 mb-8' />
+      {/* CTA Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='py-20'
+      >
+        <div className='container mx-auto max-w-4xl px-4'>
+          <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
+            <h2 className='mb-4 font-bold text-3xl text-foreground md:text-4xl'>
+              Ready to Calculate Your Take-Home Pay?
+            </h2>
+            <p className='mb-8 text-lg text-muted-foreground'>
+              Free, fast, and completely private. No sign-up required.
+            </p>
+            <Link
+              href='/'
+              className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-lg text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+            >
+              Try the Calculator →
+            </Link>
+          </Card>
+        </div>
+      </motion.section>
 
-        {/* Footer */}
-        <div className='border-border border-t py-12 text-center'>
-          <div className='mb-4 flex items-center justify-center gap-2'>
-            <Coffee className='h-5 w-5 text-primary' />
-            <span className='font-semibold text-foreground text-lg'>
-              Built with care for UK taxpayers
-            </span>
-          </div>
-          <p className='text-muted-foreground text-sm'>
-            Free, fast, and privacy-first tax calculations since 2024
+      {/* Contact Footer */}
+      <section className='border-border border-t py-16'>
+        <div className='container mx-auto max-w-4xl px-4 text-center'>
+          <h3 className='mb-4 font-bold text-2xl text-foreground'>Get in Touch</h3>
+          <p className='mb-6 text-muted-foreground'>
+            Questions, feedback, or suggestions? We&apos;d love to hear from you.
           </p>
+          <div className='flex flex-wrap items-center justify-center gap-6'>
+            <a
+              href='mailto:support@payetax.co.uk'
+              className='text-primary transition-colors hover:text-brand-gradient-end'
+            >
+              support@payetax.co.uk
+            </a>
+            <span className='text-muted-foreground'>•</span>
+            <Link
+              href='/privacy'
+              className='text-primary transition-colors hover:text-brand-gradient-end'
+            >
+              Privacy Policy
+            </Link>
+            <span className='text-muted-foreground'>•</span>
+            <Link
+              href='/blog'
+              className='text-primary transition-colors hover:text-brand-gradient-end'
+            >
+              Blog
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
