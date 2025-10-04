@@ -36,18 +36,18 @@ const COMPLIANCE_FEATURES = [
     color: 'from-blue-500 to-cyan-500',
   },
   {
-    title: 'Professional Verification',
+    title: 'Formula Verification',
     description:
-      'Calculations reviewed and verified by qualified tax professionals and chartered accountants',
+      'Calculation formulas verified against official HMRC examples and test cases',
     details: [
-      'Reviewed by HMRC registered agents',
-      'Verified by qualified Chartered Accountants (ACA/ACCA)',
-      'Cross-checked by Chartered Tax Advisers (CTA)',
-      'Annual review by professional tax bodies',
+      'Tested against HMRC published example calculations',
+      'Formulas match official PAYE calculation methods',
+      'Edge cases validated against gov.uk guidance',
+      'Open source for professional review and verification',
     ],
     icon: Users,
     lastUpdated: '2024-08-01',
-    source: 'Professional Review Panel',
+    source: 'HMRC Example Calculations',
     color: 'from-purple-500 to-pink-500',
   },
   {
@@ -186,8 +186,8 @@ export default function CompliancePage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className='mx-auto mb-12 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
             >
-              Every calculation verified against official HMRC rates. Reviewed by tax professionals.
-              Updated within 24 hours of changes.
+              Every calculation verified against official HMRC rates and examples. Transparent
+              formulas. Updated within 24 hours of changes.
             </motion.p>
 
             {/* Trust Stats */}
@@ -198,8 +198,8 @@ export default function CompliancePage() {
               className='grid gap-6 md:grid-cols-4'
             >
               {[
-                { icon: Award, value: '100%', label: 'HMRC Verified', color: 'from-blue-500 to-cyan-500' },
-                { icon: Users, value: 'CTA', label: 'Reviewed', color: 'from-purple-500 to-pink-500' },
+                { icon: Award, value: '100%', label: 'HMRC Rates', color: 'from-blue-500 to-cyan-500' },
+                { icon: FileText, value: 'Open', label: 'Source', color: 'from-purple-500 to-pink-500' },
                 {
                   icon: Calendar,
                   value: '<24h',

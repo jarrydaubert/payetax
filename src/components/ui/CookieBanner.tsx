@@ -109,27 +109,28 @@ const CookieBanner: React.FC = () => {
               <Cookie className='size-6 text-white' />
             </div>
           </div>
-          <h3 className='mb-2 font-semibold text-foreground text-lg'>We use cookies</h3>
+          <h3 className='mb-2 font-semibold text-foreground text-lg'>Cookie preferences</h3>
           <p className='text-muted-foreground text-sm leading-relaxed'>
-            We use cookies to analyze traffic and improve your experience. View our{' '}
+            We use analytics cookies to understand how visitors use our site and improve your
+            experience. Essential cookies (to remember your choice) are always active. See our{' '}
             <Link
               href='/privacy'
               className='font-medium text-primary underline-offset-2 hover:underline'
             >
               Privacy Policy
             </Link>{' '}
-            to learn more.
+            for details.
           </p>
         </CardContent>
 
         <CardFooter className='flex justify-center gap-3 p-6 pt-0'>
-          <Button onClick={declineCookies} variant='outline' size='sm' className='min-w-[120px]'>
-            Decline
+          <Button onClick={declineCookies} variant='outline' size='sm' className='min-w-[140px]'>
+            Essential Only
           </Button>
           <Button
             onClick={acceptCookies}
             size='sm'
-            className='min-w-[120px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
+            className='min-w-[140px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
           >
             Accept All
           </Button>
