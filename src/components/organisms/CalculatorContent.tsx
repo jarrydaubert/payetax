@@ -92,16 +92,16 @@ export function CalculatorContent() {
                 <h3 className='font-bold text-foreground text-lg'>Quick Examples</h3>
               </div>
               <ul className='space-y-3'>
-                <li className='flex justify-between rounded-md bg-gradient-to-r from-green-50 to-emerald-50 p-2 text-sm dark:from-green-950/30 dark:to-emerald-950/30'>
-                  <span className='text-foreground'>£20,000 salary</span>
+                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
+                  <span className='text-muted-foreground'>£20,000 salary</span>
                   <strong className='text-green-600 dark:text-green-400'>£17,294</strong>
                 </li>
-                <li className='flex justify-between rounded-md bg-gradient-to-r from-blue-50 to-cyan-50 p-2 text-sm dark:from-blue-950/30 dark:to-cyan-950/30'>
-                  <span className='text-foreground'>£30,000 salary</span>
+                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
+                  <span className='text-muted-foreground'>£30,000 salary</span>
                   <strong className='text-blue-600 dark:text-blue-400'>£23,894</strong>
                 </li>
-                <li className='flex justify-between rounded-md bg-gradient-to-r from-purple-50 to-pink-50 p-2 text-sm dark:from-purple-950/30 dark:to-pink-950/30'>
-                  <span className='text-foreground'>£50,000 salary</span>
+                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
+                  <span className='text-muted-foreground'>£50,000 salary</span>
                   <strong className='text-purple-600 dark:text-purple-400'>£37,794</strong>
                 </li>
                 <li className='pt-1 text-center text-muted-foreground text-xs'>
@@ -156,7 +156,7 @@ export function CalculatorContent() {
                   ].map((row, idx) => (
                     <tr
                       key={row.salary}
-                      className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''} ${row.salary === 30000 || row.salary === 50000 ? 'border-l-4 border-l-primary bg-primary/10' : ''}`}
+                      className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''} ${row.salary === 30000 || row.salary === 50000 ? 'border-l-4 border-l-primary' : ''}`}
                     >
                       <td className='p-4 font-semibold text-foreground'>
                         £{row.salary.toLocaleString()}
@@ -215,7 +215,7 @@ export function CalculatorContent() {
           <div className='space-y-4'>
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                💷 How much tax do I pay on £30,000 in UK 2025?
+                How much tax do I pay on £30,000 in UK 2025?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -244,7 +244,7 @@ export function CalculatorContent() {
 
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                🛡️ What is the UK personal allowance for 2025-26?
+                What is the UK personal allowance for 2025-26?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -263,7 +263,7 @@ export function CalculatorContent() {
 
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                🧮 How is PAYE tax calculated in the UK?
+                How is PAYE tax calculated in the UK?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -294,7 +294,7 @@ export function CalculatorContent() {
 
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                🏴󐁧󐁢󐁳󐁣󐁴󐁿 What&apos;s the difference between Scottish and English tax rates?
+                What&apos;s the difference between Scottish and English tax rates?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -323,7 +323,7 @@ export function CalculatorContent() {
 
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                🎓 How do student loan repayments work with PAYE?
+                How do student loan repayments work with PAYE?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -359,7 +359,7 @@ export function CalculatorContent() {
 
             <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
               <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                💰 How does pension tax relief work?
+                How does pension tax relief work?
               </summary>
               <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
                 <p>
@@ -426,8 +426,8 @@ export function CalculatorContent() {
               </div>
             </Card>
 
-            <Card className='group relative overflow-hidden border-2 border-accent/30 bg-gradient-to-br from-accent/10 to-accent/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-accent/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-accent/10'>2</div>
+            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
+              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>2</div>
               <div className='relative'>
                 <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
                   2
@@ -440,7 +440,7 @@ export function CalculatorContent() {
               </div>
             </Card>
 
-            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/15 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
+            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
               <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>3</div>
               <div className='relative'>
                 <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
@@ -456,8 +456,8 @@ export function CalculatorContent() {
               </div>
             </Card>
 
-            <Card className='group relative overflow-hidden border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-accent/15 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-accent/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-accent/10'>4</div>
+            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
+              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>4</div>
               <div className='relative'>
                 <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
                   4
