@@ -164,19 +164,19 @@ export default function CompliancePage() {
         }}
       />
 
-      <div className='min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900'>
+      <div className='min-h-screen pt-20'>
         <div className='container mx-auto px-4 py-12'>
           {/* Hero Section */}
           <div className='mb-16 text-center'>
             <div className='mb-6 flex justify-center'>
               <div className='rounded-full bg-green-500/20 p-4'>
-                <Shield className='h-12 w-12 text-green-400' />
+                <Shield className='h-12 w-12 text-green-500 dark:text-green-400' />
               </div>
             </div>
-            <H1 className='mb-6 bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent'>
+            <H1 className='mb-6 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent'>
               HMRC Compliance & Accuracy
             </H1>
-            <BodyText className='mx-auto max-w-3xl text-gray-300 text-lg'>
+            <BodyText className='mx-auto max-w-3xl text-lg text-muted-foreground'>
               Our tax calculator maintains strict compliance with HMRC regulations and is verified
               by qualified tax professionals. Learn how we ensure accuracy and stay current with UK
               tax law.
@@ -185,41 +185,43 @@ export default function CompliancePage() {
 
           {/* Compliance Features */}
           <div className='mb-16'>
-            <H2 className='mb-8 text-center text-white'>Professional Standards & Verification</H2>
+            <H2 className='mb-8 text-center text-foreground'>
+              Professional Standards & Verification
+            </H2>
 
             <div className='grid gap-8 md:grid-cols-2'>
               {COMPLIANCE_FEATURES.map((feature) => (
                 <div key={feature.title} className='glass-card p-8'>
                   <div className='mb-6 flex items-center'>
                     <div className='mr-4 rounded-lg bg-green-500/20 p-3'>
-                      <feature.icon className='h-6 w-6 text-green-400' />
+                      <feature.icon className='h-6 w-6 text-green-600 dark:text-green-400' />
                     </div>
                     <div>
-                      <H3 className='mb-1 text-white'>{feature.title}</H3>
-                      <SmallText className='text-green-300'>
+                      <H3 className='mb-1 text-foreground'>{feature.title}</H3>
+                      <SmallText className='text-green-600 dark:text-green-400'>
                         Last Updated: {feature.lastUpdated}
                       </SmallText>
                     </div>
                   </div>
 
-                  <BodyText className='mb-4 text-gray-300'>{feature.description}</BodyText>
+                  <BodyText className='mb-4 text-muted-foreground'>{feature.description}</BodyText>
 
                   <div className='mb-4'>
-                    <SmallText className='mb-2 font-medium text-gray-400'>
+                    <SmallText className='mb-2 font-medium text-muted-foreground'>
                       Verification Details:
                     </SmallText>
                     <div className='space-y-2'>
                       {feature.details.map((detail) => (
                         <div key={detail} className='flex items-start'>
-                          <CheckCircle className='mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-green-400' />
-                          <SmallText className='text-gray-400'>{detail}</SmallText>
+                          <CheckCircle className='mt-0.5 mr-2 h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400' />
+                          <SmallText className='text-muted-foreground'>{detail}</SmallText>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className='border-gray-700 border-t pt-4'>
-                    <SmallText className='flex items-center text-purple-300'>
+                  <div className='border-border border-t pt-4'>
+                    <SmallText className='flex items-center text-purple-600 dark:text-purple-400'>
                       <FileText className='mr-1 h-4 w-4' />
                       Source: {feature.source}
                     </SmallText>
@@ -231,28 +233,28 @@ export default function CompliancePage() {
 
           {/* Compliance Statements */}
           <div className='mb-16'>
-            <H2 className='mb-8 text-center text-white'>Official Compliance Statements</H2>
+            <H2 className='mb-8 text-center text-foreground'>Official Compliance Statements</H2>
 
             <div className='space-y-6'>
               {COMPLIANCE_STATEMENTS.map((item) => (
-                <div key={item.category} className='glass-card border-green-400 border-l-4 p-6'>
+                <div key={item.category} className='glass-card border-green-500 border-l-4 p-6'>
                   <div className='mb-4'>
-                    <H3 className='mb-2 text-lg text-white'>{item.category}</H3>
-                    <BodyText className='text-gray-300'>{item.statement}</BodyText>
+                    <H3 className='mb-2 text-foreground text-lg'>{item.category}</H3>
+                    <BodyText className='text-muted-foreground'>{item.statement}</BodyText>
                   </div>
 
                   <div className='grid gap-4 md:grid-cols-2'>
                     <div>
-                      <SmallText className='mb-1 font-medium text-green-400'>
+                      <SmallText className='mb-1 font-medium text-green-600 dark:text-green-400'>
                         Legal Compliance
                       </SmallText>
-                      <SmallText className='text-gray-400'>{item.verification}</SmallText>
+                      <SmallText className='text-muted-foreground'>{item.verification}</SmallText>
                     </div>
                     <div>
-                      <SmallText className='mb-1 font-medium text-blue-400'>
+                      <SmallText className='mb-1 font-medium text-blue-600 dark:text-blue-400'>
                         Last Verified
                       </SmallText>
-                      <SmallText className='text-gray-400'>{item.lastVerified}</SmallText>
+                      <SmallText className='text-muted-foreground'>{item.lastVerified}</SmallText>
                     </div>
                   </div>
                 </div>
@@ -262,33 +264,35 @@ export default function CompliancePage() {
 
           {/* Data Sources */}
           <div className='mb-16'>
-            <H2 className='mb-8 text-center text-white'>Official Data Sources</H2>
+            <H2 className='mb-8 text-center text-foreground'>Official Data Sources</H2>
 
             <div className='grid gap-6 md:grid-cols-2'>
               {DATA_SOURCES.map((source) => (
                 <div key={source.source} className='glass-card p-6'>
                   <div className='mb-4'>
-                    <H3 className='mb-2 flex items-center text-lg text-white'>
+                    <H3 className='mb-2 flex items-center text-foreground text-lg'>
                       {source.source}
-                      <ExternalLink className='ml-2 h-4 w-4 text-gray-400' />
+                      <ExternalLink className='ml-2 h-4 w-4 text-muted-foreground' />
                     </H3>
-                    <BodyText className='mb-3 text-gray-300 text-sm'>{source.description}</BodyText>
+                    <BodyText className='mb-3 text-muted-foreground text-sm'>
+                      {source.description}
+                    </BodyText>
                   </div>
 
                   <div className='space-y-2'>
                     <div className='flex justify-between'>
-                      <SmallText className='text-gray-500'>Reliability:</SmallText>
-                      <SmallText className='font-medium text-green-400'>
+                      <SmallText className='text-muted-foreground'>Reliability:</SmallText>
+                      <SmallText className='font-medium text-green-600 dark:text-green-400'>
                         {source.reliability}
                       </SmallText>
                     </div>
                     <div className='flex justify-between'>
-                      <SmallText className='text-gray-500'>Last Accessed:</SmallText>
-                      <SmallText className='text-gray-300'>{source.lastAccessed}</SmallText>
+                      <SmallText className='text-muted-foreground'>Last Accessed:</SmallText>
+                      <SmallText className='text-foreground'>{source.lastAccessed}</SmallText>
                     </div>
                   </div>
 
-                  <div className='mt-4 border-gray-700 border-t pt-4'>
+                  <div className='mt-4 border-border border-t pt-4'>
                     <Button asChild variant='outline' size='sm' className='w-full'>
                       <a href={source.url} target='_blank' rel='noopener noreferrer'>
                         View Official Source
@@ -303,10 +307,10 @@ export default function CompliancePage() {
           {/* Important Notice */}
           <div className='glass-card mb-16 border border-yellow-500/30 p-8'>
             <div className='flex items-start'>
-              <AlertTriangle className='mt-1 mr-4 h-6 w-6 flex-shrink-0 text-yellow-400' />
+              <AlertTriangle className='mt-1 mr-4 h-6 w-6 flex-shrink-0 text-yellow-600 dark:text-yellow-400' />
               <div>
-                <H3 className='mb-3 text-white'>Important Legal Notice</H3>
-                <BodyText className='mb-4 text-gray-300'>
+                <H3 className='mb-3 text-foreground'>Important Legal Notice</H3>
+                <BodyText className='mb-4 text-muted-foreground'>
                   While we maintain strict compliance with HMRC regulations and professional
                   standards, this calculator is provided for informational purposes only. For
                   official tax calculations, complex scenarios, or professional tax advice, please
@@ -315,33 +319,41 @@ export default function CompliancePage() {
 
                 <div className='grid gap-4 md:grid-cols-2'>
                   <div>
-                    <SmallText className='mb-2 font-medium text-yellow-400'>
+                    <SmallText className='mb-2 font-medium text-yellow-600 dark:text-yellow-400'>
                       Suitable for:
                     </SmallText>
                     <div className='space-y-1'>
-                      <SmallText className='flex items-center text-gray-400'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-400' />
+                      <SmallText className='flex items-center text-muted-foreground'>
+                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
                         Standard PAYE calculations
                       </SmallText>
-                      <SmallText className='flex items-center text-gray-400'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-400' />
+                      <SmallText className='flex items-center text-muted-foreground'>
+                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
                         Salary and pension planning
                       </SmallText>
-                      <SmallText className='flex items-center text-gray-400'>
-                        <CheckCircle className='mr-2 h-3 w-3 text-green-400' />
+                      <SmallText className='flex items-center text-muted-foreground'>
+                        <CheckCircle className='mr-2 h-3 w-3 text-green-600 dark:text-green-400' />
                         General tax estimates
                       </SmallText>
                     </div>
                   </div>
                   <div>
-                    <SmallText className='mb-2 font-medium text-yellow-400'>
+                    <SmallText className='mb-2 font-medium text-yellow-600 dark:text-yellow-400'>
                       Professional advice recommended for:
                     </SmallText>
                     <div className='space-y-1'>
-                      <SmallText className='text-gray-400'>• Complex tax situations</SmallText>
-                      <SmallText className='text-gray-400'>• Multiple income sources</SmallText>
-                      <SmallText className='text-gray-400'>• Self-employment income</SmallText>
-                      <SmallText className='text-gray-400'>• Official HMRC submissions</SmallText>
+                      <SmallText className='text-muted-foreground'>
+                        • Complex tax situations
+                      </SmallText>
+                      <SmallText className='text-muted-foreground'>
+                        • Multiple income sources
+                      </SmallText>
+                      <SmallText className='text-muted-foreground'>
+                        • Self-employment income
+                      </SmallText>
+                      <SmallText className='text-muted-foreground'>
+                        • Official HMRC submissions
+                      </SmallText>
                     </div>
                   </div>
                 </div>
@@ -351,8 +363,8 @@ export default function CompliancePage() {
 
           {/* CTA Section */}
           <div className='text-center'>
-            <H2 className='mb-4 text-white'>Questions About Our Compliance?</H2>
-            <BodyText className='mx-auto mb-6 max-w-2xl text-gray-300'>
+            <H2 className='mb-4 text-foreground'>Questions About Our Compliance?</H2>
+            <BodyText className='mx-auto mb-6 max-w-2xl text-muted-foreground'>
               We're committed to maintaining the highest standards of accuracy and compliance. If
               you have questions about our methodology or sources, we're here to help.
             </BodyText>

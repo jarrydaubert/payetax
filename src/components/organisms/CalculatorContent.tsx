@@ -28,7 +28,7 @@ export function CalculatorContent() {
           <div className='grid gap-6 md:grid-cols-3'>
             <Card className='p-6'>
               <div className='mb-4 flex items-center gap-2'>
-                <Wallet className='h-5 w-5 text-primary' />
+                <Wallet className='size-5 text-primary' />
                 <h3 className='font-semibold text-lg'>Income Tax Bands</h3>
               </div>
               <ul className='space-y-2 text-muted-foreground text-sm'>
@@ -53,7 +53,7 @@ export function CalculatorContent() {
 
             <Card className='p-6'>
               <div className='mb-4 flex items-center gap-2'>
-                <TrendingUp className='h-5 w-5 text-primary' />
+                <TrendingUp className='size-5 text-primary' />
                 <h3 className='font-semibold text-lg'>National Insurance 2025-26</h3>
               </div>
               <ul className='space-y-2 text-muted-foreground text-sm'>
@@ -75,7 +75,7 @@ export function CalculatorContent() {
 
             <Card className='p-6'>
               <div className='mb-4 flex items-center gap-2'>
-                <Calculator className='h-5 w-5 text-primary' />
+                <Calculator className='size-5 text-primary' />
                 <h3 className='font-semibold text-lg'>Quick Examples</h3>
               </div>
               <ul className='space-y-2 text-muted-foreground text-sm'>
@@ -99,7 +99,13 @@ export function CalculatorContent() {
       </motion.section>
 
       {/* Salary Comparison Table */}
-      <section className='py-12'>
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='py-12'
+      >
         <div className='mx-auto max-w-6xl px-4'>
           <h2 className='mb-4 text-center font-bold text-3xl'>
             UK Salary Take-Home Comparison 2025-26
@@ -154,10 +160,16 @@ export function CalculatorContent() {
             </a>
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* FAQ Section with Schema */}
-      <section className='bg-card/30 py-12'>
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='bg-card/30 py-12'
+      >
         <div className='mx-auto max-w-4xl px-4'>
           <h2 className='mb-4 text-center font-bold text-3xl'>Common UK Tax Questions 2025</h2>
           <p className='mb-8 text-center text-muted-foreground'>
@@ -343,10 +355,16 @@ export function CalculatorContent() {
             </p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* How to Use Section */}
-      <section className='py-12'>
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5 }}
+        className='bg-gradient-to-b from-primary/5 to-transparent py-12'
+      >
         <div className='mx-auto max-w-4xl px-4'>
           <h2 className='mb-4 text-center font-bold text-3xl'>How to Use PayeTax Calculator</h2>
           <p className='mb-8 text-center text-muted-foreground'>
@@ -354,52 +372,56 @@ export function CalculatorContent() {
           </p>
 
           <div className='grid gap-6 md:grid-cols-2'>
-            <Card className='p-6'>
-              <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-bold text-primary'>
+            <Card className='border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg'>
+              <div className='mb-3 flex size-12 items-center justify-center rounded-full bg-primary font-bold text-lg text-primary-foreground shadow-lg'>
                 1
               </div>
-              <h3 className='mb-2 font-semibold'>Enter Your Salary</h3>
-              <p className='text-muted-foreground text-sm'>
+              <h3 className='mb-2 font-semibold text-foreground text-lg'>Enter Your Salary</h3>
+              <p className='text-muted-foreground text-sm leading-relaxed'>
                 Input your gross annual, monthly, or weekly salary. Our calculator automatically
                 formats numbers with commas for easy reading.
               </p>
             </Card>
 
-            <Card className='p-6'>
-              <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-bold text-primary'>
+            <Card className='border-2 border-accent/30 bg-gradient-to-br from-accent/10 to-accent/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:shadow-lg'>
+              <div className='mb-3 flex size-12 items-center justify-center rounded-full bg-accent font-bold text-accent-foreground text-lg shadow-lg'>
                 2
               </div>
-              <h3 className='mb-2 font-semibold'>Select Tax Year & Region</h3>
-              <p className='text-muted-foreground text-sm'>
+              <h3 className='mb-2 font-semibold text-foreground text-lg'>
+                Select Tax Year & Region
+              </h3>
+              <p className='text-muted-foreground text-sm leading-relaxed'>
                 Choose the tax year (2025-26 for current rates) and your region (England, Scotland,
                 Wales, or Northern Ireland).
               </p>
             </Card>
 
-            <Card className='p-6'>
-              <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-bold text-primary'>
+            <Card className='border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/15 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg'>
+              <div className='mb-3 flex size-12 items-center justify-center rounded-full bg-primary/90 font-bold text-lg text-primary-foreground shadow-lg'>
                 3
               </div>
-              <h3 className='mb-2 font-semibold'>Add Deductions (Optional)</h3>
-              <p className='text-muted-foreground text-sm'>
+              <h3 className='mb-2 font-semibold text-foreground text-lg'>
+                Add Deductions (Optional)
+              </h3>
+              <p className='text-muted-foreground text-sm leading-relaxed'>
                 Include pension contributions, student loan plans, and other deductions for accurate
                 results. Leave blank if not applicable.
               </p>
             </Card>
 
-            <Card className='p-6'>
-              <div className='mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-bold text-primary'>
+            <Card className='border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-accent/15 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-accent/50 hover:shadow-lg'>
+              <div className='mb-3 flex size-12 items-center justify-center rounded-full bg-accent/90 font-bold text-accent-foreground text-lg shadow-lg'>
                 4
               </div>
-              <h3 className='mb-2 font-semibold'>View & Export Results</h3>
-              <p className='text-muted-foreground text-sm'>
+              <h3 className='mb-2 font-semibold text-foreground text-lg'>View & Export Results</h3>
+              <p className='text-muted-foreground text-sm leading-relaxed'>
                 See your breakdown by income tax, National Insurance, and take-home pay across
                 multiple periods. Export to CSV or print for your records.
               </p>
             </Card>
           </div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }

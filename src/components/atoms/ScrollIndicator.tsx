@@ -26,7 +26,7 @@ export function ScrollIndicator({ direction, visible }: ScrollIndicatorProps) {
       transition={{ duration: 0.2 }}
       className={`pointer-events-none absolute top-0 bottom-0 ${positionClass} z-10 flex w-8 items-center ${gradientClass} from-background to-transparent sm:w-12`}
     >
-      <Icon className='h-5 w-5 animate-pulse text-primary sm:h-6 sm:w-6' />
+      <Icon className='size-5 animate-pulse text-primary sm:h-6 sm:w-6' />
     </motion.div>
   );
 }

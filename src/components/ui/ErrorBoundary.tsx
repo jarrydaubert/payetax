@@ -84,7 +84,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           {[...Array(15)].map((_, i) => (
             <div
               key={`error-particle-${i}-${Math.random()}`}
-              className='absolute h-2 w-2 animate-pulse rounded-full bg-red-400 opacity-20'
+              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20'
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -101,8 +101,8 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
         <div className='glass-card border border-red-400/20 p-8 text-center md:p-12'>
           {/* Error icon with animation */}
           <div className='relative mb-8 inline-block'>
-            <div className='mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-red-400/30 bg-red-500/20'>
-              <AlertTriangle className='h-10 w-10 animate-pulse text-red-400' />
+            <div className='mb-4 inline-flex size-20 items-center justify-center rounded-full border border-red-400/30 bg-red-500/20'>
+              <AlertTriangle className='size-10 animate-pulse text-red-400' />
             </div>
             <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20' />
           </div>
@@ -144,20 +144,20 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               size='lg'
               className='bg-blue-600 hover:bg-blue-700'
             >
-              <RefreshCw className='mr-2 h-5 w-5' />
+              <RefreshCw className='mr-2 size-5' />
               Try Again
             </Button>
 
             <Button asChild variant='outline' size='lg'>
               <Link href='/'>
-                <Home className='mr-2 h-5 w-5' />
+                <Home className='mr-2 size-5' />
                 Go Home
               </Link>
             </Button>
 
             <Button asChild size='lg' className='bg-purple-600 hover:bg-purple-700'>
               <a href='mailto:support@payetax.co.uk?subject=Error Report'>
-                <AlertTriangle className='mr-2 h-5 w-5' />
+                <AlertTriangle className='mr-2 size-5' />
                 Report Issue
               </a>
             </Button>

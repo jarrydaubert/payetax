@@ -4,10 +4,10 @@ import type React from 'react';
 import { generateMetadata as metadataGenerator } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { Suspense } from 'react';
-import { Toaster } from 'sonner';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Suspense } from 'react';
+import { Toaster } from 'sonner';
 import Analytics from '@/components/analytics/Analytics';
 import Layout from '@/components/templates/Layout';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
@@ -29,11 +29,12 @@ export const viewport: Viewport = {
   maximumScale: 2,
   userScalable: true,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#6366f1' },
-    { media: '(prefers-color-scheme: dark)', color: '#1f2937' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#252525' },
   ],
   colorScheme: 'dark light',
   viewportFit: 'cover', // For notched devices
+  interactiveWidget: 'resizes-visual', // Better keyboard handling on iOS PWAs
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   document.documentElement.classList.remove('light', 'dark');
                   document.documentElement.classList.add(resolved);
                   document.documentElement.style.colorScheme = resolved;
+                  document.documentElement.setAttribute('data-theme', resolved);
                 }
 
                 try {
@@ -70,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   // Fallback to dark if error
                   document.documentElement.classList.add('dark');
                   document.documentElement.style.colorScheme = 'dark';
+                  document.documentElement.setAttribute('data-theme', 'dark');
                 }
               })();
             `,
@@ -172,7 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           defer
         />
 
-        {/* BMC Widget Route Change Handler */}
+        {/* BMC Widget Route Change Handler and Footer Collision Detection */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe BMC widget initialization script
           dangerouslySetInnerHTML={{
@@ -184,20 +187,54 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     window.BMC.Widget.init();
                   }
                 }
-                
+
+                // Adjust widget position to avoid footer overlap
+                function adjustWidgetPosition() {
+                  const widget = document.querySelector('.bmc-btn-container');
+                  const footer = document.querySelector('footer');
+
+                  if (!widget || !footer) return;
+
+                  const footerRect = footer.getBoundingClientRect();
+                  const viewportHeight = window.innerHeight;
+                  const footerVisible = footerRect.top < viewportHeight;
+
+                  if (footerVisible) {
+                    const footerHeight = footerRect.height;
+                    const overlap = viewportHeight - footerRect.top;
+                    const offset = Math.max(footerHeight + 18, overlap + 18);
+                    widget.style.bottom = offset + 'px';
+                  } else {
+                    widget.style.bottom = '18px';
+                  }
+                }
+
                 // Listen for Next.js route changes
                 if (typeof window !== 'undefined') {
                   // Initialize after load
-                  window.addEventListener('load', initializeBMC);
-                  
+                  window.addEventListener('load', function() {
+                    initializeBMC();
+                    setTimeout(adjustWidgetPosition, 500);
+                  });
+
+                  // Adjust on scroll
+                  window.addEventListener('scroll', adjustWidgetPosition);
+                  window.addEventListener('resize', adjustWidgetPosition);
+
                   // Re-initialize on popstate (browser back/forward)
                   window.addEventListener('popstate', function() {
-                    setTimeout(initializeBMC, 100);
+                    setTimeout(function() {
+                      initializeBMC();
+                      adjustWidgetPosition();
+                    }, 100);
                   });
-                  
+
                   // Listen for Next.js router events if available
                   if (window.next && window.next.router) {
-                    window.next.router.events.on('routeChangeComplete', initializeBMC);
+                    window.next.router.events.on('routeChangeComplete', function() {
+                      initializeBMC();
+                      setTimeout(adjustWidgetPosition, 100);
+                    });
                   }
                 }
               })();

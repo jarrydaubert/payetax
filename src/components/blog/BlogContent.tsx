@@ -55,7 +55,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
                   className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
                   aria-label='Link to this heading'
                 >
-                  <Hash className='h-6 w-6' />
+                  <Hash className='size-6' />
                 </a>
               </h1>
             );
@@ -76,7 +76,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
                   className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
                   aria-label='Link to this heading'
                 >
-                  <Hash className='h-5 w-5' />
+                  <Hash className='size-5' />
                 </a>
               </h2>
             );
@@ -97,7 +97,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
                   className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
                   aria-label='Link to this heading'
                 >
-                  <Hash className='h-4 w-4' />
+                  <Hash className='size-4' />
                 </a>
               </h3>
             );
@@ -170,7 +170,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
                 {...props}
               >
                 {children}
-                {isExternal && <ExternalLink className='h-3 w-3' />}
+                {isExternal && <ExternalLink className='size-3' />}
               </a>
             );
           },
@@ -208,7 +208,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ content }) => {
                       className='flex items-center gap-1 text-foreground/60 text-xs transition-colors hover:text-foreground'
                       aria-label='Copy code'
                     >
-                      <Copy className='h-3 w-3' />
+                      <Copy className='size-3' />
                       {copiedCode === codeId ? 'Copied!' : 'Copy'}
                     </button>
                   </div>

@@ -1,14 +1,14 @@
 // src/components/pages/HomePageContent.tsx
 'use client';
 
-import { memo, useEffect, useId, useTransition } from 'react';
+import { memo, useEffect, useRef, useTransition } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import SimpleHero from '@/components/organisms/SimpleHero';
 
 const HomePageContent = memo(function HomePageContent() {
   const [_isPending, startTransition] = useTransition();
-  const calculatorId = useId();
+  const calculatorRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     // Initialize calculator store on mount
@@ -18,9 +18,8 @@ const HomePageContent = memo(function HomePageContent() {
 
   const handleScrollToCalculator = () => {
     startTransition(() => {
-      const calculatorElement = document.getElementById(calculatorId);
-      if (calculatorElement) {
-        calculatorElement.scrollIntoView({
+      if (calculatorRef.current) {
+        calculatorRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
@@ -32,7 +31,7 @@ const HomePageContent = memo(function HomePageContent() {
     <main className='flex min-h-screen flex-col'>
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
-      <section id={calculatorId} className='py-8 lg:py-12'>
+      <section ref={calculatorRef} className='py-8 lg:py-12'>
         <CalculatorContainer />
       </section>
 

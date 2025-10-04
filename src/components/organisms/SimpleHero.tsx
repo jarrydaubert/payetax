@@ -44,16 +44,21 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
         </motion.p>
 
         {/* CTA Button */}
-        <div className='inline-block rounded-lg bg-gradient-to-r from-blue-400 to-blue-600 p-[1px] transition-transform hover:scale-[1.02]'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px] transition-transform hover:scale-[1.02]'
+        >
           <Button
             size='lg'
             onClick={onScrollToCalculator}
-            className='gap-2 rounded-lg bg-background px-8'
+            className='gap-2 rounded-lg bg-background px-8 text-foreground hover:bg-card'
           >
             Calculate My Salary
-            <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-0.5' />
+            <ArrowRight className='size-4 transition-transform group-hover:translate-x-0.5' />
           </Button>
-        </div>
+        </motion.div>
 
         {/* Features */}
         <motion.div

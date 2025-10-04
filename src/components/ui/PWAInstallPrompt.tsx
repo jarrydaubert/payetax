@@ -116,7 +116,7 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
               className='absolute top-3 right-3 z-10 rounded-full bg-background/50 p-1.5 text-foreground/60 transition-colors hover:bg-background/80 hover:text-foreground'
               aria-label='Dismiss install prompt'
             >
-              <X className='h-4 w-4' />
+              <X className='size-4' />
             </motion.button>
 
             <CardHeader className='relative pb-3'>
@@ -131,9 +131,9 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
                     repeat: Number.POSITIVE_INFINITY,
                     ease: 'easeInOut',
                   }}
-                  className='flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border-2 border-primary/40 bg-gradient-to-br from-primary/30 to-blue-500/20'
+                  className='flex size-12 flex-shrink-0 items-center justify-center rounded-xl border-2 border-primary/40 bg-gradient-to-br from-primary/30 to-blue-500/20'
                 >
-                  <Smartphone className='h-6 w-6 text-primary' />
+                  <Smartphone className='size-6 text-primary' />
                 </motion.div>
 
                 <div className='flex-1'>
@@ -147,7 +147,7 @@ export default function PWAInstallPrompt({ onInstall, onDismiss }: PWAInstallPro
                         ease: 'easeInOut',
                       }}
                     >
-                      <Sparkles className='h-4 w-4 text-yellow-400' />
+                      <Sparkles className='size-4 text-yellow-400' />
                     </motion.span>
                   </h3>
                   <p className='text-muted-foreground text-sm leading-relaxed'>

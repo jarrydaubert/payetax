@@ -2,8 +2,8 @@
 
 This document explains all the npm scripts available in PayeTax and when to use them.
 
-**Last Updated**: September 3, 2025  
-**Version**: v2.1.0 - Streamlined Scripts
+**Last Updated**: October 4, 2025
+**Version**: v2.2.0 - Optimized Scripts
 
 ---
 
@@ -132,31 +132,22 @@ This document explains all the npm scripts available in PayeTax and when to use 
 ## 🔧 Code Quality Scripts
 
 ### `npm run fix-all`
-**Purpose**: Fix all code quality issues  
-**When to use**: Before commits, after major changes  
+**Purpose**: Fix all code quality issues
+**When to use**: Before commits, after major changes
 **What it does**:
 - Formats code with Biome (`npm run format`)
-- Fixes linting issues with Biome (`npm run lint`)
+- Fixes linting issues with Biome (`biome check --write .`)
 - Runs TypeScript type checking (`npm run typecheck`)
 - Ensures zero errors across all quality checks
 
 ### `npm run format`
-**Purpose**: Format code with Biome  
-**When to use**: Code formatting issues  
+**Purpose**: Format code with Biome
+**When to use**: Code formatting issues
 **What it does**:
 - Formats all TypeScript/JavaScript files
 - Applies consistent code style
 - Fixes indentation, spacing, semicolons
 - Uses modern Biome formatter
-
-### `npm run lint`
-**Purpose**: Run Biome linting  
-**When to use**: Code quality issues  
-**What it does**:
-- Lints 116 files with Biome
-- Fixes automatically fixable issues
-- Reports remaining issues
-- Ensures code quality standards
 
 ### `npm run typecheck`
 **Purpose**: Run TypeScript type checking  
@@ -252,12 +243,12 @@ This document explains all the npm scripts available in PayeTax and when to use 
 - Part of release process
 
 ### `npm run check-all`
-**Purpose**: Comprehensive code quality check  
-**When to use**: Pre-commit validation  
+**Purpose**: Comprehensive code quality check
+**When to use**: Pre-commit validation
 **What it does**:
-- Runs TypeScript checking
-- Runs Biome linting
-- Runs dependency audit
+- Runs TypeScript checking (`npm run typecheck`)
+- Runs Biome linting (`biome check --write .`)
+- Runs dependency audit (`npm run audit:deps`)
 - Comprehensive validation without building
 
 ---
@@ -306,6 +297,6 @@ npm run clean:all    # Nuclear option
 
 ---
 
-**Last Updated**: September 3, 2025  
-**Script Version**: v2.1.0  
-**Status**: ✅ Production-ready streamlined scripts
+**Last Updated**: October 4, 2025
+**Script Version**: v2.2.0
+**Status**: ✅ Production-ready optimized scripts

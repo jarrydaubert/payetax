@@ -90,7 +90,7 @@ export function CurrencyInput({
           {label}
         </Label>
         <div className='relative flex-1'>
-          <PoundSterling className='-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground' />
+          <PoundSterling className='-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground' />
           <Input
             id={id}
             type='text'
@@ -110,7 +110,7 @@ export function CurrencyInput({
     <div className={cn('space-y-2', className)}>
       <Label htmlFor={id}>{label}</Label>
       <div className='relative'>
-        <PoundSterling className='-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground' />
+        <PoundSterling className='-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground' />
         <Input
           id={id}
           type='text'

@@ -91,9 +91,9 @@ export function FeedbackDialog() {
       <DialogTrigger asChild>
         <Button
           size='sm'
-          className='gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
+          className='gap-2 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
         >
-          <MessageSquare className='h-4 w-4' />
+          <MessageSquare className='size-4' />
           Feedback
         </Button>
       </DialogTrigger>
@@ -136,12 +136,12 @@ export function FeedbackDialog() {
             <Button type='submit' className='w-full' disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                  <div className='mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
                   Sending...
                 </>
               ) : (
                 <>
-                  <Send className='mr-2 h-4 w-4' />
+                  <Send className='mr-2 size-4' />
                   Send Feedback
                 </>
               )}

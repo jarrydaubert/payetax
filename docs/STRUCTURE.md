@@ -369,12 +369,38 @@ public/
 
 ### Key Patterns
 
-#### Glass-Morphism Design System
+#### Modern Styling System (October 2025 Update)
+**Tailwind CSS v4** with OKLCH color system:
+
 ```css
-.glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/20 rounded-xl;
+/* Modern @theme inline pattern */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 ```
+
+**Key Features:**
+- ✅ **OKLCH colors** - Superior perceptual uniformity
+- ✅ **@theme inline** - Simplified variable management
+- ✅ **Modern utilities** - `size-*` instead of `h-* w-*`
+- ✅ **March 2025 dark mode** - Latest accessible colors
+- ✅ **tw-animate-css** - Modern animation library
+
+For complete styling documentation see **[docs/STYLING.md](./STYLING.md)**
 
 #### State Management Pattern
 - **Zustand Store** for calculator state
@@ -422,6 +448,7 @@ public/
 3. **Image Optimization** - Next.js automatic WebP conversion
 4. **Bundle Analysis** - Regular size monitoring
 5. **Caching Strategy** - Effective static and dynamic caching
+6. **Optimized Styling** - Modern `size-*` utilities, OKLCH colors (52% faster builds)
 
 ### Developer Experience
 

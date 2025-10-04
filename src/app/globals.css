@@ -1,137 +1,122 @@
 /**
  * PayeTax - Minimalist Design System
- * Shadcn + Framer Motion + Fluid Typography
+ * Tailwind v4 + Shadcn + Framer Motion + Fluid Typography
  */
 @import "tailwindcss";
+@import "tw-animate-css";
 
 :root {
   /* Typography */
   --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --radius: 0.5rem;
+  --radius: 0.625rem;
+
+  /* Brand Colors - Maintain identity across themes */
+  --brand-primary: oklch(0.55 0.22 264);        /* Indigo-blue */
+  --brand-accent: oklch(0.65 0.25 240);         /* Lighter blue */
+  --brand-gradient-start: oklch(0.50 0.20 264);
+  --brand-gradient-end: oklch(0.60 0.24 250);
+
+  /* Shadcn Official Light Theme (OKLCH) */
+  --background: oklch(0.98 0 0);                /* Softer white */
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.708 0 0);
 }
 
-/* Dark Mode Theme (Default) */
+/* Dark Mode Theme (Updated March 12, 2025) */
 .dark {
-  /* Shadcn Color System - Dark */
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
-  --card: 222 47% 11%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 47% 15%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 75%;
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 217 91% 60%;
+  /* Brand colors stay consistent in dark mode */
+  --brand-primary: oklch(0.60 0.24 264);        /* Slightly lighter for contrast */
+  --brand-accent: oklch(0.70 0.26 240);
+  --brand-gradient-start: oklch(0.55 0.22 264);
+  --brand-gradient-end: oklch(0.65 0.25 250);
 
-  /* Slate/Titanium Gradient */
-  --gradient-background:
-    linear-gradient(135deg,
-      hsl(215, 28%, 17%) 0%,
-      hsl(217, 33%, 17%) 25%,
-      hsl(220, 40%, 13%) 50%,
-      hsl(217, 33%, 17%) 75%,
-      hsl(215, 28%, 17%) 100%
-    );
+  --background: oklch(0.18 0.02 260);           /* Warm dark slate - easier on eyes */
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.22 0.02 260);                 /* Slightly elevated card */
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.24 0.02 260);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.90 0 0);                   /* Lighter for better contrast */
+  --primary-foreground: oklch(0.15 0 0);
+  --secondary: oklch(0.26 0.02 260);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.26 0.02 260);
+  --muted-foreground: oklch(0.65 0 0);          /* Better readability */
+  --accent: oklch(0.32 0.02 260);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.32 0.02 260);               /* Subtle but visible */
+  --input: oklch(0.24 0.02 260);
+  --ring: oklch(0.556 0 0);
 }
 
-/* Light Mode Theme */
-.light {
-  /* Shadcn Color System - Light */
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 217 91% 60%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 217 91% 60%;
+/* Tailwind v4 Theme Directive */
+@theme inline {
+  /* Brand colors */
+  --color-brand: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-gradient-start: var(--brand-gradient-start);
+  --color-brand-gradient-end: var(--brand-gradient-end);
 
-  /* Light Blue Gradient */
-  --gradient-background:
-    linear-gradient(135deg,
-      hsl(210, 40%, 98%) 0%,
-      hsl(214, 32%, 95%) 25%,
-      hsl(210, 38%, 95%) 50%,
-      hsl(214, 32%, 95%) 75%,
-      hsl(210, 40%, 98%) 100%
-    );
+  /* Semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius: var(--radius);
 }
 
-/* Base Styles */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Text gradient utility using brand colors */
+  .text-gradient {
+    background: linear-gradient(to right, var(--brand-gradient-start), var(--brand-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: hsl(var(--foreground));
-  background: var(--gradient-background);
-  background-attachment: fixed;
-}
-
-/* Transparent Glass Containers */
-.glass {
-  background: hsla(var(--card), 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid hsla(var(--border), 0.5);
-  border-radius: var(--radius);
-}
-
-.glass-card {
-  background: hsla(var(--card), 0.3);
-  backdrop-filter: blur(16px);
-  border: 1px solid hsla(var(--border), 0.3);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-}
-
-/* Text Utilities */
-.text-gradient {
-  background: linear-gradient(135deg,
-    hsl(210, 100%, 70%) 0%,
-    hsl(217, 91%, 60%) 50%,
-    hsl(210, 100%, 70%) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
 
 /* Skip Link - Completely hidden until focused */
 .skip-link {
@@ -140,8 +125,8 @@ body {
   left: 8px;
   z-index: 100;
   padding: 8px 16px;
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
   border-radius: var(--radius);
   text-decoration: none;
   font-weight: 500;
@@ -170,7 +155,7 @@ body {
 
 /* Focus States */
 *:focus-visible {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid oklch(var(--ring));
   outline-offset: 2px;
 }
 
@@ -206,13 +191,18 @@ body {
 /* High Contrast Mode */
 @media (prefers-contrast: high) {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --background: 0 0 0;
+    --foreground: 1 0 0;
   }
 
   .glass,
   .glass-card {
-    background: hsla(0, 0%, 0%, 0.9);
-    border: 2px solid hsl(0, 0%, 100%);
+    background: oklch(0 0 0 / 0.9);
+    border: 2px solid oklch(1 0 0);
   }
+}
+
+/* Buy Me Coffee Widget - Smooth transition when avoiding footer */
+.bmc-btn-container {
+  transition: bottom 0.3s ease-out !important;
 }

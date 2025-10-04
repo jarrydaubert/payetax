@@ -39,6 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.remove('light', 'dark');
     root.classList.add(t);
     root.style.colorScheme = t;
+    root.setAttribute('data-theme', t);
   }, []);
 
   // Set theme with localStorage and GA4 tracking

@@ -73,7 +73,7 @@ export default function CallToAction({
 
   return (
     <div className={cn('glass-card my-16 p-8 text-center md:p-12', className)}>
-      <IconComponent className='mx-auto mb-6 h-12 w-12 text-blue-400' />
+      <IconComponent className='mx-auto mb-6 size-12 text-blue-400' />
       <h2 className='mb-6 font-bold text-3xl text-white'>{config.title}</h2>
       <p className='mx-auto mb-8 max-w-2xl text-gray-300 text-xl leading-relaxed'>
         {config.description}
@@ -88,12 +88,12 @@ export default function CallToAction({
           {config.primaryAction.href.startsWith('http') ||
           config.primaryAction.href.startsWith('mailto:') ? (
             <a href={config.primaryAction.href}>
-              <PrimaryIcon className='mr-2 h-4 w-4' />
+              <PrimaryIcon className='mr-2 size-4' />
               {config.primaryAction.text}
             </a>
           ) : (
             <Link href={config.primaryAction.href}>
-              <PrimaryIcon className='mr-2 h-4 w-4' />
+              <PrimaryIcon className='mr-2 size-4' />
               {config.primaryAction.text}
             </Link>
           )}
@@ -103,12 +103,12 @@ export default function CallToAction({
           {config.secondaryAction.href.startsWith('http') ||
           config.secondaryAction.href.startsWith('mailto:') ? (
             <a href={config.secondaryAction.href}>
-              <SecondaryIcon className='mr-2 h-4 w-4' />
+              <SecondaryIcon className='mr-2 size-4' />
               {config.secondaryAction.text}
             </a>
           ) : (
             <Link href={config.secondaryAction.href}>
-              <SecondaryIcon className='mr-2 h-4 w-4' />
+              <SecondaryIcon className='mr-2 size-4' />
               {config.secondaryAction.text}
             </Link>
           )}

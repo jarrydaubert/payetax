@@ -20,10 +20,26 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const pathname = usePathname();
 
   const links = [
-    { href: '/', label: 'Home' },
+    { href: '/#tax-calculator', label: 'Calculator' },
     { href: '/about', label: 'About' },
     { href: '/blog', label: 'Blog' },
   ] as const;
+
+  const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // If we're already on the homepage, scroll to calculator
+    if (pathname === '/') {
+      e.preventDefault();
+      const calculatorElement = document.getElementById('tax-calculator');
+      if (calculatorElement) {
+        calculatorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+      setIsMobileMenuOpen(false);
+    }
+    // Otherwise, let the link navigate normally (it will scroll to #tax-calculator)
+  };
 
   return (
     <>
@@ -37,7 +53,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span
-              className='bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text font-bold text-2xl text-transparent'
+              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-2xl text-transparent'
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
@@ -48,11 +64,13 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Desktop Navigation */}
           <div className='hidden items-center gap-8 md:flex'>
             {links.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                pathname === link.href || (link.label === 'Calculator' && pathname === '/');
               return (
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
                   className={cn(
                     'relative px-3 py-2 font-medium text-base transition-colors',
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
@@ -85,7 +103,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
-            {isMobileMenuOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+            {isMobileMenuOpen ? <X className='size-5' /> : <Menu className='size-5' />}
           </Button>
         </div>
 
@@ -93,20 +111,26 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              exit={{ opacity: 0, scaleY: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              style={{ originY: 0 }}
               className='overflow-hidden border-border/50 border-t md:hidden'
             >
               <div className='container mx-auto max-w-7xl space-y-2 px-4 py-4'>
                 {links.map((link) => {
-                  const isActive = pathname === link.href;
+                  const isActive =
+                    pathname === link.href || (link.label === 'Calculator' && pathname === '/');
                   return (
                     <Link
                       key={link.href}
                       href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={
+                        link.label === 'Calculator'
+                          ? handleCalculatorClick
+                          : () => setIsMobileMenuOpen(false)
+                      }
                       className={cn(
                         'block rounded-lg px-4 py-3 font-medium text-base transition-colors',
                         isActive

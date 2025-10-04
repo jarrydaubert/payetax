@@ -56,7 +56,7 @@ export function CalculatorContainer() {
         transition={{ duration: 0.5 }}
         className='text-center'
       >
-        <h1 className='mb-3 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+        <h1 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
         </h1>
         <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
@@ -73,7 +73,7 @@ export function CalculatorContainer() {
       {/* Main Calculator Grid: Inputs (left) + Results Table (right) */}
       <div className='grid gap-6 lg:grid-cols-[420px_1fr]'>
         {/* Inputs Column */}
-        <Card className='border-border/50 bg-secondary/60 p-6 backdrop-blur-md'>
+        <Card className='p-6'>
           <CalculatorInputsSection onCalculate={handleCalculate} />
         </Card>
 
@@ -93,10 +93,10 @@ export function CalculatorContainer() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className='flex h-full items-center justify-center rounded-lg border border-border border-dashed bg-secondary/40 p-12 text-center backdrop-blur-md'
+              className='flex h-full items-center justify-center rounded-lg border border-dashed p-12 text-center'
             >
               <div>
-                <Sparkles className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
+                <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
                 <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
                 <p className='text-muted-foreground text-sm'>
                   Enter your salary details and click Calculate to see your results
@@ -118,11 +118,11 @@ export function CalculatorContainer() {
             className='flex justify-center gap-3'
           >
             <Button variant='outline' size='lg' onClick={handlePrint}>
-              <Printer className='mr-2 h-4 w-4' />
+              <Printer className='mr-2 size-4' />
               Print
             </Button>
             <Button variant='outline' size='lg' onClick={handleExport}>
-              <FileDown className='mr-2 h-4 w-4' />
+              <FileDown className='mr-2 size-4' />
               Export CSV
             </Button>
           </motion.div>

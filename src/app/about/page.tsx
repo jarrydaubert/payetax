@@ -1,33 +1,7 @@
 // src/app/about/page.tsx
-/**
- * About Page - Company and Product Information
- *
- * This page provides comprehensive information about PayeTax, including:
- * - Mission and values
- * - Product features and benefits
- * - Privacy and security commitments
- * - Technical specifications
- * - Team and company background
- *
- * The page is designed to build trust with users by being transparent about
- * our approach to tax calculations, data privacy, and technical standards.
- *
- * Features:
- * - Responsive hero section with company overview
- * - Statistical highlights showing credibility
- * - Feature showcase with icons and descriptions
- * - Privacy-first messaging
- * - Call-to-action for calculator usage
- * - Clean glass-morphism design consistent with app
- *
- * SEO Optimized:
- * - Comprehensive metadata for search engines
- * - Structured content for rich snippets
- * - Keyword optimization for UK tax calculator searches
- */
+'use client';
 
 import {
-  ArrowLeft,
   Award,
   Calculator,
   Code,
@@ -38,52 +12,43 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react';
-import type { Metadata } from 'next';
-import Link from 'next/link';
 import CallToAction from '@/components/ui/CallToAction';
-
-export const metadata: Metadata = {
-  title: 'About PayeTax - UK Tax Calculator',
-  description:
-    'Learn about PayeTax - the modern, accurate UK PAYE tax calculator built with privacy and performance in mind. Free, fast, and HMRC-compliant.',
-  keywords:
-    'about toolhubx, uk tax calculator team, hmrc compliant calculator, privacy-first tax tools',
-};
 
 export default function AboutPage() {
   const stats = [
-    { icon: Calculator, value: 'Daily', label: 'Calculations' },
+    { icon: Calculator, value: 'Free', label: 'Always' },
     { icon: Code, value: '99.9%', label: 'Uptime' },
     { icon: Award, value: 'HMRC', label: 'Compliant' },
-    { icon: Shield, value: 'Secure', label: 'By Design' },
+    { icon: Shield, value: 'Zero', label: 'Data Collected' },
   ];
 
   const features = [
     {
       icon: Shield,
-      title: 'Privacy First',
+      title: 'Privacy First, Always',
       description:
-        'All calculations happen in your browser. We never see or store your personal data.',
+        'Every calculation happens in your browser. Your salary, tax code, and personal details never touch our servers. Privacy by architecture, not just policy.',
       color: 'from-green-400 to-emerald-500',
     },
     {
       icon: Zap,
-      title: 'Lightning Fast',
-      description: 'Built with Next.js 15 and React 19 for instant calculations and smooth UX.',
+      title: 'Lightning Fast Performance',
+      description:
+        'Built with cutting-edge Next.js 15 and React 19. Sub-second load times, instant calculations, and silky smooth animations.',
       color: 'from-yellow-400 to-orange-500',
     },
     {
       icon: Calculator,
-      title: 'HMRC Compliant',
+      title: 'HMRC Compliant Calculations',
       description:
-        'Uses official HMRC rates and thresholds. Always up-to-date with latest changes.',
+        'Official tax rates and thresholds from HMRC. Updated within 24 hours of any government changes. Scottish rates fully supported.',
       color: 'from-blue-400 to-cyan-500',
     },
     {
       icon: Heart,
-      title: 'Free Forever',
+      title: 'Actually Free Forever',
       description:
-        'No hidden costs, premium features, or paywalls. Just honest, reliable calculations.',
+        'No premium features, no paywalls, no "trial periods". Every feature is free for everyone, forever. Because tax calculations should be accessible to all.',
       color: 'from-purple-400 to-pink-500',
     },
   ];
@@ -93,31 +58,23 @@ export default function AboutPage() {
       <div className='container mx-auto max-w-6xl px-4 lg:max-w-7xl'>
         {/* Header */}
         <div className='mb-16'>
-          <Link
-            href='/'
-            className='group mb-8 inline-flex items-center text-purple-400 transition-colors hover:text-purple-300'
-          >
-            <ArrowLeft className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform' />
-            Back to Calculator
-          </Link>
-
           <div className='text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 px-4 py-2'>
-              <Sparkles className='h-4 w-4 text-purple-400' />
-              <span className='font-medium text-purple-300 text-sm'>About PayeTax</span>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2'>
+              <Sparkles className='h-4 w-4 text-primary' />
+              <span className='font-medium text-primary text-sm'>About PayeTax</span>
             </div>
 
             <h1 className='mb-6 font-bold text-4xl md:text-6xl'>
-              <span className='bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent'>
-                Modern Tax Calculator
+              <span className='bg-gradient-to-r from-primary via-purple-400 to-cyan-400 bg-clip-text text-transparent'>
+                Tax Calculations
               </span>
               <br />
-              <span className='text-white'>Built for Everyone</span>
+              <span className='text-foreground'>That Respect Your Privacy</span>
             </h1>
 
-            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
-              We believe UK tax calculations should be simple, accurate, and accessible. No accounts
-              required, no personal data stored - just honest, reliable calculations.
+            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
+              UK tax shouldn't require handing over your personal data. We built PayeTax as the
+              calculator we wished existed - instant, accurate, and completely private.
             </p>
           </div>
         </div>
@@ -125,39 +82,44 @@ export default function AboutPage() {
         {/* Stats */}
         <div className='mb-16 grid grid-cols-2 gap-6 md:grid-cols-4'>
           {stats.map((stat) => (
-            <div key={stat.label} className='glass-card p-6 text-center'>
-              <stat.icon className='mx-auto mb-3 h-8 w-8 text-purple-400' />
-              <div className='mb-1 font-bold text-2xl text-white'>{stat.value}</div>
-              <div className='text-gray-300 text-sm'>{stat.label}</div>
+            <div
+              key={stat.label}
+              className='glass-card p-6 text-center transition-colors hover:border-primary/50'
+            >
+              <stat.icon className='mx-auto mb-3 h-8 w-8 text-primary' />
+              <div className='mb-1 font-bold text-2xl text-foreground'>{stat.value}</div>
+              <div className='text-muted-foreground text-sm'>{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Mission Statement */}
-        <div className='glass-card mb-16 p-8 text-center md:p-12'>
-          <Heart className='mx-auto mb-6 h-12 w-12 text-pink-400' />
-          <h2 className='mb-6 font-bold text-3xl text-white'>Our Mission</h2>
-          <p className='mx-auto max-w-4xl text-gray-300 text-xl leading-relaxed'>
-            To democratize UK tax calculations by providing a free, privacy-first, and accurate tool
-            that helps millions of people understand their take-home pay without compromising their
-            personal data.
+        <div className='glass-card mb-16 border-primary border-l-4 p-8 text-center md:p-12'>
+          <Heart className='mx-auto mb-6 h-12 w-12 text-primary' />
+          <h2 className='mb-6 font-bold text-3xl text-foreground'>Our Mission</h2>
+          <p className='mx-auto max-w-4xl text-muted-foreground text-xl leading-relaxed'>
+            Every UK taxpayer deserves instant, accurate tax calculations without sacrificing their
+            privacy or opening their wallet. We're building the most transparent, accessible, and
+            trustworthy tax calculator in the UK - and it will always be free.
           </p>
         </div>
 
         {/* Features Grid */}
         <div className='mb-16'>
-          <h2 className='mb-12 text-center font-bold text-3xl text-white'>Why Choose PayeTax?</h2>
+          <h2 className='mb-12 text-center font-bold text-3xl text-foreground'>Built Different</h2>
           <div className='grid gap-8 md:grid-cols-2'>
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className='glass-card group p-8 transition-transform duration-300 hover:scale-105'
+                className='glass-card group p-8 transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg'
               >
-                <div className={`h-16 w-16 rounded-xl bg-gradient-to-r ${feature.color} mb-6 p-4`}>
+                <div
+                  className={`h-16 w-16 rounded-xl bg-gradient-to-r ${feature.color} mb-6 p-4 transition-transform group-hover:scale-110`}
+                >
                   <feature.icon className='h-8 w-8 text-white' />
                 </div>
-                <h3 className='mb-4 font-semibold text-white text-xl'>{feature.title}</h3>
-                <p className='text-gray-300 leading-relaxed'>{feature.description}</p>
+                <h3 className='mb-4 font-semibold text-foreground text-xl'>{feature.title}</h3>
+                <p className='text-muted-foreground leading-relaxed'>{feature.description}</p>
               </div>
             ))}
           </div>
@@ -166,59 +128,61 @@ export default function AboutPage() {
         {/* Technology Stack */}
         <div className='glass-card mb-16 p-8 md:p-12'>
           <div className='mb-12 text-center'>
-            <Code className='mx-auto mb-6 h-12 w-12 text-cyan-400' />
-            <h2 className='mb-6 font-bold text-3xl text-white'>Built with Modern Technology</h2>
-            <p className='mx-auto max-w-3xl text-gray-300 text-xl leading-relaxed'>
-              PayeTax is crafted using cutting-edge web technologies to deliver the best possible
-              experience while maintaining privacy and performance.
+            <Code className='mx-auto mb-6 h-12 w-12 text-primary' />
+            <h2 className='mb-6 font-bold text-3xl text-foreground'>
+              Built with Modern Technology
+            </h2>
+            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
+              We use the latest web technologies to deliver exceptional performance, security, and
+              user experience.
             </p>
           </div>
 
           <div className='grid gap-8 md:grid-cols-3'>
             <div className='text-center'>
-              <TrendingUp className='mx-auto mb-4 h-8 w-8 text-green-400' />
-              <h3 className='mb-3 font-semibold text-lg text-white'>Performance</h3>
-              <p className='text-gray-300 text-sm'>
-                Bundle size under 280kB, load times under 1.5s, and 99.9% uptime for reliability you
-                can count on.
+              <TrendingUp className='mx-auto mb-4 h-8 w-8 text-green-500' />
+              <h3 className='mb-3 font-semibold text-foreground text-lg'>Performance</h3>
+              <p className='text-muted-foreground text-sm'>
+                Sub-300kB bundle size, &lt; 1.5s load times, and 95+ Lighthouse scores across the
+                board.
               </p>
             </div>
 
             <div className='text-center'>
-              <Shield className='mx-auto mb-4 h-8 w-8 text-purple-400' />
-              <h3 className='mb-3 font-semibold text-lg text-white'>Security</h3>
-              <p className='text-gray-300 text-sm'>
-                All calculations happen client-side. Zero data collection, no tracking, complete
-                privacy by design.
+              <Shield className='mx-auto mb-4 h-8 w-8 text-blue-500' />
+              <h3 className='mb-3 font-semibold text-foreground text-lg'>Security</h3>
+              <p className='text-muted-foreground text-sm'>
+                Client-side calculations mean zero data collection. Not "minimal" tracking -
+                actually zero.
               </p>
             </div>
 
             <div className='text-center'>
-              <Sparkles className='mx-auto mb-4 h-8 w-8 text-pink-400' />
-              <h3 className='mb-3 font-semibold text-lg text-white'>Innovation</h3>
-              <p className='text-gray-300 text-sm'>
-                Continuous improvements, latest tax rates, and user-requested features delivered
-                regularly.
+              <Sparkles className='mx-auto mb-4 h-8 w-8 text-purple-500' />
+              <h3 className='mb-3 font-semibold text-foreground text-lg'>Innovation</h3>
+              <p className='text-muted-foreground text-sm'>
+                Weekly improvements, instant tax rate updates, and features requested by users like
+                you.
               </p>
             </div>
           </div>
 
           {/* Tech stack badges */}
           <div className='mt-12 text-center'>
-            <h4 className='mb-6 font-semibold text-lg text-white'>Powered by</h4>
+            <h4 className='mb-6 font-semibold text-foreground text-lg'>Powered by</h4>
             <div className='flex flex-wrap justify-center gap-3'>
               {[
                 'Next.js 15',
                 'React 19',
                 'TypeScript',
-                'Tailwind CSS',
+                'Tailwind CSS 4',
                 'Zustand',
-                'ExcelJS',
-                'Lucide Icons',
+                'shadcn/ui',
+                'Framer Motion',
               ].map((tech) => (
                 <span
                   key={tech}
-                  className='rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/80'
+                  className='rounded-full border border-border bg-muted px-4 py-2 text-muted-foreground text-sm transition-colors hover:border-primary/50 hover:text-foreground'
                 >
                   {tech}
                 </span>
@@ -229,21 +193,26 @@ export default function AboutPage() {
 
         {/* Story */}
         <div className='glass-card mb-16 p-8 md:p-12'>
-          <h2 className='mb-8 font-bold text-3xl text-white'>Our Story</h2>
-          <div className='prose prose-lg prose-invert max-w-none'>
-            <p className='mb-6 text-gray-300 leading-relaxed'>
-              PayeTax was born from frustration with complex, invasive tax calculators that required
-              personal information just to estimate take-home pay. As developers and UK taxpayers
-              ourselves, we knew there had to be a better way.
+          <h2 className='mb-8 font-bold text-3xl text-foreground'>Why We Built PayeTax</h2>
+          <div className='prose prose-lg max-w-none'>
+            <p className='mb-6 text-muted-foreground leading-relaxed'>
+              As UK taxpayers and software engineers, we were frustrated by the state of online tax
+              calculators. They were slow, cluttered with ads, required personal information, or hid
+              features behind paywalls. We knew it didn't have to be this way.
             </p>
-            <p className='mb-6 text-gray-300 leading-relaxed'>
-              We built PayeTax with a simple philosophy: tax calculations should be instant,
-              accurate, and completely private. No accounts, no tracking, no data collection - just
-              the calculations you need, when you need them.
+            <p className='mb-6 text-muted-foreground leading-relaxed'>
+              PayeTax started with a simple philosophy: tax calculations should be instant,
+              accurate, and completely private. No accounts, no tracking, no compromises. Just pure,
+              client-side calculations using official HMRC rates.
             </p>
-            <p className='text-gray-300 leading-relaxed'>
-              Today, PayeTax helps hundreds of people every month understand their finances better,
-              plan for the future, and make informed decisions about their careers and earnings.
+            <p className='mb-6 text-muted-foreground leading-relaxed'>
+              Today, we're proud to help people across the UK understand their take-home pay, plan
+              salary negotiations, compare job offers, and make informed financial decisions - all
+              while respecting their privacy.
+            </p>
+            <p className='text-muted-foreground leading-relaxed'>
+              We're continuously improving based on your feedback. Every feature request matters,
+              every bug report helps, and every suggestion makes PayeTax better for everyone.
             </p>
           </div>
         </div>
@@ -252,12 +221,16 @@ export default function AboutPage() {
         <CallToAction variant='contact' className='mt-16 mb-8' />
 
         {/* Footer */}
-        <div className='border-white/20 border-t py-12 text-center'>
+        <div className='border-border border-t py-12 text-center'>
           <div className='mb-4 flex items-center justify-center gap-2'>
-            <Coffee className='h-5 w-5 text-yellow-400' />
-            <span className='font-semibold text-lg text-white'>Made with ❤️ for UK taxpayers</span>
+            <Coffee className='h-5 w-5 text-primary' />
+            <span className='font-semibold text-foreground text-lg'>
+              Built with care for UK taxpayers
+            </span>
           </div>
-          <p className='text-gray-300'>Free, fast, and privacy-first tax calculations since 2024</p>
+          <p className='text-muted-foreground text-sm'>
+            Free, fast, and privacy-first tax calculations since 2024
+          </p>
         </div>
       </div>
     </div>

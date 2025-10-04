@@ -16,12 +16,22 @@ interface ResultCardProps {
 }
 
 const variantStyles = {
-  default: 'border-border/50 bg-secondary/60 backdrop-blur-md',
-  success:
-    'border-green-500/30 bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-md',
-  warning:
-    'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 backdrop-blur-md',
-  info: 'border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md',
+  default: {
+    card: '',
+    icon: 'text-primary',
+  },
+  success: {
+    card: '',
+    icon: 'text-green-600 dark:text-green-400',
+  },
+  warning: {
+    card: '',
+    icon: 'text-amber-600 dark:text-amber-400',
+  },
+  info: {
+    card: '',
+    icon: 'text-blue-600 dark:text-blue-400',
+  },
 };
 
 export function ResultCard({
@@ -32,6 +42,8 @@ export function ResultCard({
   className,
   delay = 0,
 }: ResultCardProps) {
+  const styles = variantStyles[variant];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -39,11 +51,11 @@ export function ResultCard({
       transition={{ duration: 0.3, delay }}
       className={className}
     >
-      <Card className={cn('p-4', variantStyles[variant])}>
+      <Card className={cn('p-4', styles.card)}>
         <div className='space-y-2'>
           <div className='flex items-center justify-between'>
             <p className='font-medium text-muted-foreground text-sm'>{label}</p>
-            {Icon && <Icon className='h-4 w-4 text-muted-foreground' />}
+            {Icon && <Icon className={cn('size-4', styles.icon)} />}
           </div>
           <p className='font-bold text-2xl text-foreground'>{value}</p>
         </div>

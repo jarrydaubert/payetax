@@ -102,19 +102,19 @@ const CookieBanner: React.FC = () => {
 
   return (
     <div className='fixed inset-x-0 bottom-0 z-50 flex justify-center p-4'>
-      <Card className='w-full max-w-2xl border-border/50 bg-gray-900/95 shadow-2xl backdrop-blur-xl'>
+      <Card className='w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
         <CardContent className='p-6 text-center'>
           <div className='mb-4 flex justify-center'>
-            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-400'>
-              <Cookie className='h-6 w-6 text-white' />
+            <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
+              <Cookie className='size-6 text-white' />
             </div>
           </div>
-          <h3 className='mb-2 font-semibold text-lg text-white'>We use cookies</h3>
-          <p className='text-gray-300 text-sm leading-relaxed'>
+          <h3 className='mb-2 font-semibold text-foreground text-lg'>We use cookies</h3>
+          <p className='text-muted-foreground text-sm leading-relaxed'>
             We use cookies to analyze traffic and improve your experience. View our{' '}
             <Link
               href='/privacy'
-              className='font-medium text-blue-400 underline-offset-2 hover:underline'
+              className='font-medium text-primary underline-offset-2 hover:underline'
             >
               Privacy Policy
             </Link>{' '}
@@ -129,7 +129,7 @@ const CookieBanner: React.FC = () => {
           <Button
             onClick={acceptCookies}
             size='sm'
-            className='min-w-[120px] bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500'
+            className='min-w-[120px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
           >
             Accept All
           </Button>

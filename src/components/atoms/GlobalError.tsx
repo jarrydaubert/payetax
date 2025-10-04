@@ -40,7 +40,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <div className='glass-card text-center'>
               <div className='mb-6 flex items-center justify-center'>
                 <div className='rounded-full bg-red-500/20 p-4'>
-                  <AlertTriangle className='h-12 w-12 text-red-400' />
+                  <AlertTriangle className='size-12 text-red-400' />
                 </div>
               </div>
 

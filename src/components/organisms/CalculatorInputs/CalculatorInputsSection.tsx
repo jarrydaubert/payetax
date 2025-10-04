@@ -23,7 +23,7 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
       onCalculate();
       toast.success('Calculation complete!', {
         description: 'Your tax breakdown is ready',
-        icon: <Sparkles className='h-4 w-4' />,
+        icon: <Sparkles className='size-4' />,
       });
     } catch (error) {
       toast.error('Calculation failed', {
@@ -53,20 +53,20 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
               >
-                <Calculator className='mr-2 h-5 w-5' />
+                <Calculator className='mr-2 size-5' />
               </motion.div>
               Calculating...
             </>
           ) : (
             <>
-              <Calculator className='mr-2 h-5 w-5' />
+              <Calculator className='mr-2 size-5' />
               Calculate
             </>
           )}
         </Button>
 
         <Button onClick={handleReset} variant='outline' size='lg'>
-          <RotateCcw className='mr-2 h-5 w-5' />
+          <RotateCcw className='mr-2 size-5' />
           Reset
         </Button>
       </div>

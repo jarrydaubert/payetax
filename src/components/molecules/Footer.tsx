@@ -17,7 +17,7 @@ export function Footer({ className }: FooterProps) {
   return (
     <footer className={cn('mt-auto', className)}>
       {/* Subtle separator line */}
-      <div className='h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent' />
+      <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
 
       {/* Main footer content */}
       <div className='glass py-8'>
@@ -26,35 +26,37 @@ export function Footer({ className }: FooterProps) {
             {/* Brand and copyright */}
             <div className='space-y-2'>
               <div className='flex items-center justify-center gap-2 md:justify-start'>
-                <Sparkles className='h-4 w-4 text-blue-400' />
-                <span className='font-bold text-base text-white'>PayeTax</span>
+                <Sparkles className='size-4 text-primary' />
+                <span className='font-bold text-base text-foreground'>PayeTax</span>
               </div>
-              <p className='text-sm text-white/70'>© {currentYear} PayeTax. All rights reserved.</p>
+              <p className='text-muted-foreground text-sm'>
+                © {currentYear} PayeTax. All rights reserved.
+              </p>
             </div>
 
             {/* Quick links */}
             <div className='flex flex-wrap items-center justify-center gap-6'>
               <Link
                 href='/about'
-                className='text-sm text-white/80 transition-colors hover:text-blue-400'
+                className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 About
               </Link>
               <Link
                 href='/blog'
-                className='text-sm text-white/80 transition-colors hover:text-blue-400'
+                className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Blog
               </Link>
               <Link
                 href='/privacy'
-                className='text-sm text-white/80 transition-colors hover:text-blue-400'
+                className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Privacy
               </Link>
               <a
                 href='mailto:support@payetax.co.uk'
-                className='text-sm text-white/80 transition-colors hover:text-blue-400'
+                className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Contact
               </a>

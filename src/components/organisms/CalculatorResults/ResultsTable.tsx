@@ -172,7 +172,7 @@ export function ResultsTable({
       icon: Calculator,
       annual: results.incomeTax.annually,
       percentage: calculatePercentage(results.incomeTax.annually, grossAnnual),
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       isHighlight: false,
     },
     // Tax Band Breakdown
@@ -181,7 +181,7 @@ export function ResultsTable({
       icon: Percent,
       annual: band.amount,
       percentage: calculatePercentage(band.amount, grossAnnual),
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       isHighlight: false,
       isSubRow: true,
     })),
@@ -193,7 +193,7 @@ export function ResultsTable({
             icon: GraduationCap,
             annual: results.studentLoan.annually,
             percentage: calculatePercentage(results.studentLoan.annually, grossAnnual),
-            color: 'text-orange-400',
+            color: 'text-orange-600 dark:text-orange-400',
             isHighlight: false,
           },
         ]
@@ -203,7 +203,7 @@ export function ResultsTable({
       icon: CreditCard,
       annual: results.nationalInsurance.annually,
       percentage: calculatePercentage(results.nationalInsurance.annually, grossAnnual),
-      color: 'text-yellow-400',
+      color: 'text-amber-600 dark:text-yellow-400',
       isHighlight: false,
     },
     {
@@ -211,7 +211,7 @@ export function ResultsTable({
       icon: PiggyBank,
       annual: results.pensionContribution.annually,
       percentage: calculatePercentage(results.pensionContribution.annually, grossAnnual),
-      color: 'text-purple-400',
+      color: 'text-purple-600 dark:text-purple-400',
       isHighlight: false,
     },
     {
@@ -219,7 +219,7 @@ export function ResultsTable({
       icon: Heart,
       annual: 0,
       percentage: 'N/A',
-      color: 'text-purple-400',
+      color: 'text-purple-600 dark:text-purple-400',
       isHighlight: false,
     },
     // Marriage Allowance
@@ -230,7 +230,7 @@ export function ResultsTable({
             icon: Users,
             annual: results.additionalAllowances.annually,
             percentage: calculatePercentage(results.additionalAllowances.annually, grossAnnual),
-            color: 'text-green-400',
+            color: 'text-green-600 dark:text-green-400',
             isHighlight: false,
           },
         ]
@@ -240,7 +240,7 @@ export function ResultsTable({
       icon: DollarSign,
       annual: allowancesAmount,
       percentage: calculatePercentage(allowancesAmount, grossAnnual),
-      color: 'text-teal-400',
+      color: 'text-teal-600 dark:text-teal-400',
       isHighlight: false,
     },
     {
@@ -248,7 +248,7 @@ export function ResultsTable({
       icon: Wallet,
       annual: results.netPay.annually,
       percentage: calculatePercentage(results.netPay.annually, grossAnnual),
-      color: 'text-green-400',
+      color: 'text-green-600 dark:text-green-400',
       isHighlight: true,
     },
     {
@@ -264,7 +264,7 @@ export function ResultsTable({
       icon: TrendingUp,
       annual: 0,
       percentage: '0.0%',
-      color: 'text-blue-400',
+      color: 'text-blue-600 dark:text-blue-400',
       isHighlight: false,
     },
   ];
@@ -289,13 +289,13 @@ export function ResultsTable({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='overflow-hidden border-border/50 bg-secondary/60 backdrop-blur-md'>
+        <Card className='overflow-hidden'>
           <div
             ref={containerRef}
             className='overflow-x-auto scroll-smooth'
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: 'hsl(var(--muted-foreground)) transparent',
+              scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
             }}
           >
             <Table>

@@ -48,7 +48,7 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
       >
         <div>
           <h2 className='mb-2 flex items-center gap-2 font-bold text-2xl'>
-            <TrendingUp className='h-6 w-6 text-primary' />
+            <TrendingUp className='size-6 text-primary' />
             Your Results
           </h2>
           <p className='text-muted-foreground'>Complete breakdown of your tax and take-home pay</p>
@@ -56,11 +56,11 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
 
         <div className='flex gap-2'>
           <Button variant='outline' size='sm' onClick={handlePrint}>
-            <Printer className='mr-2 h-4 w-4' />
+            <Printer className='mr-2 size-4' />
             Print
           </Button>
           <Button variant='outline' size='sm' onClick={handleExport}>
-            <FileDown className='mr-2 h-4 w-4' />
+            <FileDown className='mr-2 size-4' />
             Export
           </Button>
         </div>
@@ -73,7 +73,7 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
-        className='rounded-lg border border-primary/20 bg-primary/5 p-4'
+        className='rounded-lg border p-4'
       >
         <p className='text-sm'>
           <strong>💡 Tip:</strong> Tax calculations are based on official HMRC rates for{' '}

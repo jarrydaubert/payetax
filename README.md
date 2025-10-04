@@ -66,10 +66,9 @@ npm run build           # Build for production
 npm run start           # Start production server
 
 # Code Quality
-npm run fix-all         # Fix all linting, formatting, and type issues
+npm run fix-all         # Fix all linting, formatting, and type issues (includes Biome check)
 npm run format          # Format code with Biome
 npm run typecheck       # Run TypeScript type checking
-npm run lint            # Run Biome linting
 
 # Testing (Auto-Opens Reports)
 npm test                # Unit tests + coverage (131 tests, opens HTML report)
@@ -104,7 +103,7 @@ npm run audit:deps      # Security audit for dependencies
 ### Tech Stack
 
 - **Frontend:** Next.js 15.5.4, React 19.2, TypeScript 5.9.3 (ES2020 target)
-- **Styling:** Tailwind CSS 4.1.14, Glass-morphism components with clamp() responsive design
+- **Styling:** Tailwind CSS 4.1.14 (OKLCH colors, @theme inline), shadcn-ui v3.3.1, tw-animate-css
 - **State:** Zustand for calculator state management
 - **Testing:** Jest 30.2.0 + React Testing Library + Playwright 1.55.1
 - **Quality:** Biome 2.2.5 for linting/formatting, strict TypeScript with consistent casing
@@ -163,15 +162,31 @@ src/
 
 ## 🎨 Design System
 
-### Glass-Morphism Components
+### Modern Styling Architecture (October 2025)
 
-Modern aesthetic with consistent design language:
+**Tailwind v4** with **OKLCH color system** for superior color accuracy:
 
 ```css
-.glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-6;
+/* Modern @theme inline pattern */
+:root {
+  --background: oklch(1 0 0);      /* Pure white */
+  --primary: oklch(0.205 0 0);     /* Dark gray */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);  /* Near black */
+  --primary: oklch(0.922 0 0);     /* Light gray */
 }
 ```
+
+**Key Features:**
+- ✅ **OKLCH Colors** - Better perceptual uniformity than HSL
+- ✅ **@theme inline** - Simplified CSS variable management
+- ✅ **Modern Utilities** - `size-*` instead of `h-* w-*` (52% faster builds)
+- ✅ **March 2025 Dark Mode** - Latest accessible color palette
+- ✅ **shadcn-ui v3.3.1** - Modern component library
+
+📚 **Complete Guide:** [docs/STYLING.md](docs/STYLING.md)
 
 ### Responsive Design
 
@@ -182,7 +197,7 @@ Modern aesthetic with consistent design language:
 
 ### Accessibility
 
-- **WCAG 2.1 AA Compliant** - Full keyboard navigation and screen reader support
+- **WCAG 2.2 AA Compliant** - Full keyboard navigation and screen reader support
 - **Focus Management** - Custom focus styles replacing browser defaults, professional skip-to-content navigation
 - **Color Contrast** - Exceeds minimum ratios for all text and interactive elements
 
@@ -267,6 +282,7 @@ npm run test:e2e:ui     # E2E tests with browser UI
 | Document | Purpose |
 |----------|---------|
 | **[docs/STRUCTURE.md](docs/STRUCTURE.md)** | File organization, architecture diagrams, project stats |
+| **[docs/STYLING.md](docs/STYLING.md)** | Styling system, Tailwind v4, OKLCH colors, best practices |
 | **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** | Production setup, CI/CD, environment variables |
 | **[docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md)** | Roadmap, priorities, lessons learned |
 | **[docs/TESTING.md](docs/TESTING.md)** | Test coverage, manual checklists, troubleshooting |

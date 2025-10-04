@@ -5,47 +5,46 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTheme } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 
 export function ThemeToggle() {
-  const { theme, cycleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
-  const icons = {
-    light: Sun,
-    dark: Moon,
-    system: Monitor,
-  };
-
-  const labels = {
-    light: 'Light mode',
-    dark: 'Dark mode',
-    system: 'System preference',
-  };
-
-  const Icon = icons[theme];
+  const options = [
+    { value: 'light' as const, icon: Sun, label: 'Light' },
+    { value: 'dark' as const, icon: Moon, label: 'Dark' },
+    { value: 'system' as const, icon: Monitor, label: 'System' },
+  ];
 
   return (
     <TooltipProvider delayDuration={300}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={cycleTheme}
-            aria-label={`Current theme: ${labels[theme]}. Click to cycle themes.`}
-            aria-live='polite'
-            className='h-9 w-9'
-          >
-            <Icon className='h-5 w-5 transition-all' />
-            <span className='sr-only'>{labels[theme]} (click to cycle)</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side='bottom'>
-          <p className='text-sm'>
-            Theme: <span className='font-semibold'>{theme}</span>
-          </p>
-          <p className='text-muted-foreground text-xs'>Click to cycle</p>
-        </TooltipContent>
-      </Tooltip>
+      <div className='inline-flex gap-0.5 rounded-lg border border-border bg-muted p-1'>
+        {options.map(({ value, icon: Icon, label }) => (
+          <Tooltip key={value}>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => setTheme(value)}
+                aria-label={`Switch to ${label} mode`}
+                aria-pressed={theme === value}
+                className={cn(
+                  'size-7 transition-all',
+                  theme === value
+                    ? 'bg-background text-foreground shadow-sm hover:bg-background/90'
+                    : 'text-muted-foreground hover:bg-transparent hover:text-foreground'
+                )}
+              >
+                <Icon className='size-4' />
+                <span className='sr-only'>{label} mode</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side='bottom' className='text-xs'>
+              <p>{label}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
     </TooltipProvider>
   );
 }

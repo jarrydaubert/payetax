@@ -24,7 +24,7 @@ export default function SustainabilityBadge() {
           className='gap-2 rounded-full bg-green-600/90 text-sm backdrop-blur-sm hover:bg-green-600'
           aria-label='View eco-friendly information'
         >
-          <Leaf className='h-4 w-4' />
+          <Leaf className='size-4' />
           <span className='hidden sm:inline'>Eco-Friendly</span>
         </Button>
       </motion.div>
@@ -57,17 +57,17 @@ export default function SustainabilityBadge() {
                   {/* Header */}
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-2'>
-                      <Leaf className='h-6 w-6 text-green-400' />
+                      <Leaf className='size-6 text-green-400' />
                       <h3 className='font-semibold text-xl'>Eco-Friendly Calculator</h3>
                     </div>
                     <Button
                       variant='ghost'
                       size='icon'
                       onClick={() => setShowDetails(false)}
-                      className='h-8 w-8'
+                      className='size-8'
                       aria-label='Close'
                     >
-                      <X className='h-4 w-4' />
+                      <X className='size-4' />
                     </Button>
                   </div>
 

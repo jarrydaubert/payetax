@@ -46,10 +46,13 @@ export function ResultTableRow({
         } sticky left-0 z-10 bg-background`}
       >
         <div className='flex items-center gap-2'>
-          <Icon className='h-3 w-3 flex-shrink-0 sm:h-4 sm:w-4' />
+          <Icon className='size-3 flex-shrink-0 sm:h-4 sm:w-4' />
           <span className='text-xs sm:text-sm'>{category}</span>
           {isHighlight && (
-            <Badge variant='default' className='text-xs'>
+            <Badge
+              variant='outline'
+              className='ml-1 border-brand text-[10px] text-brand sm:text-xs'
+            >
               Final
             </Badge>
           )}

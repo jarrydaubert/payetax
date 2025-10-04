@@ -81,14 +81,6 @@ export default async function BlogPage({
       <div className='container mx-auto max-w-7xl px-4'>
         {/* Header */}
         <div className='mb-16'>
-          <Link
-            href='/'
-            className='group mb-8 inline-flex items-center text-purple-400 transition-colors hover:text-purple-300'
-          >
-            <ArrowLeft className='group-hover:-translate-x-1 mr-2 h-4 w-4 transition-transform' />
-            Back to Calculator
-          </Link>
-
           <div className='text-center'>
             <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-2'>
               <BookOpen className='h-4 w-4 text-blue-400' />

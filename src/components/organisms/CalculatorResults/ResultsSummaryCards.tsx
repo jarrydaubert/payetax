@@ -16,7 +16,12 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
 
   return (
-    <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+    <section
+      className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'
+      aria-live='polite'
+      aria-atomic='true'
+      aria-label='Tax calculation summary results'
+    >
       <ResultCard
         label='Annual Take-Home'
         value={formatCurrency(results.netPay.annually)}
@@ -45,6 +50,6 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         variant='default'
         delay={0.15}
       />
-    </div>
+    </section>
   );
 }
