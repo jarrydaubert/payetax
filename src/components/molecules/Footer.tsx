@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Sparkles } from 'lucide-react';
+import { Twitter } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -25,10 +25,7 @@ export function Footer({ className }: FooterProps) {
           <div className='flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left'>
             {/* Brand and copyright */}
             <div className='space-y-2'>
-              <div className='flex items-center justify-center gap-2 md:justify-start'>
-                <Sparkles className='size-4 text-primary' />
-                <span className='font-bold text-base text-foreground'>PayeTax</span>
-              </div>
+              <span className='font-bold text-base text-foreground'>PayeTax</span>
               <p className='text-muted-foreground text-sm'>
                 © {currentYear} PayeTax. All rights reserved.
               </p>
@@ -59,6 +56,16 @@ export function Footer({ className }: FooterProps) {
                 className='text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Contact
+              </a>
+              <a
+                href='https://x.com/PayeTaxUK'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex items-center gap-1.5 text-muted-foreground text-sm transition-colors hover:text-primary'
+                aria-label='Follow us on X (formerly Twitter)'
+              >
+                <Twitter className='size-4' />
+                @PayeTaxUK
               </a>
             </div>
           </div>
