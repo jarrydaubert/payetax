@@ -289,7 +289,7 @@ export function ResultsTable({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='overflow-hidden'>
+        <Card className='overflow-hidden border-primary/20'>
           <div
             ref={containerRef}
             className='overflow-x-auto scroll-smooth'

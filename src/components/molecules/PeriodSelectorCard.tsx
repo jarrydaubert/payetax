@@ -21,7 +21,7 @@ export function PeriodSelectorCard({
   onPeriodToggle,
 }: PeriodSelectorCardProps) {
   return (
-    <Card className='p-4'>
+    <Card className='border-primary/20 p-4'>
       <h3 className='mb-3 font-semibold text-sm'>Display Periods</h3>
       <div className='flex flex-wrap gap-3 sm:gap-4'>
         {periods.map((period) => (

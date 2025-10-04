@@ -51,7 +51,7 @@ export function ResultCard({
       transition={{ duration: 0.3, delay }}
       className={className}
     >
-      <Card className={cn('p-4', styles.card)}>
+      <Card className={cn('border-primary/20 p-4', styles.card)}>
         <div className='space-y-2'>
           <div className='flex items-center justify-between'>
             <p className='font-medium text-muted-foreground text-sm'>{label}</p>

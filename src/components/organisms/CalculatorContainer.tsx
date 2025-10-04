@@ -73,7 +73,7 @@ export function CalculatorContainer() {
       {/* Main Calculator Grid: Inputs (left) + Results Table (right) */}
       <div className='grid gap-6 lg:grid-cols-[420px_1fr]'>
         {/* Inputs Column */}
-        <Card className='p-6'>
+        <Card className='border-primary/20 p-6'>
           <CalculatorInputsSection onCalculate={handleCalculate} />
         </Card>
 
@@ -93,7 +93,7 @@ export function CalculatorContainer() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className='flex h-full items-center justify-center rounded-lg border border-dashed p-12 text-center'
+              className='flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center'
             >
               <div>
                 <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
