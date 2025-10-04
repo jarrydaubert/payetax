@@ -2,7 +2,6 @@
 'use client';
 
 import type * as React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 
@@ -48,14 +47,6 @@ export function ResultTableRow({
         <div className='flex items-center gap-2'>
           <Icon className='size-3 flex-shrink-0 sm:h-4 sm:w-4' />
           <span className='text-xs sm:text-sm'>{category}</span>
-          {isHighlight && (
-            <Badge
-              variant='outline'
-              className='ml-1 border-brand text-[10px] text-brand sm:text-xs'
-            >
-              Final
-            </Badge>
-          )}
         </div>
       </TableCell>
       <TableCell
