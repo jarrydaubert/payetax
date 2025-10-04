@@ -53,7 +53,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span
-              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-2xl text-transparent'
+              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-2xl text-transparent md:text-3xl lg:text-4xl'
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >

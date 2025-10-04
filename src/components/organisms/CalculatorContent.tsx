@@ -119,7 +119,7 @@ export function CalculatorContent() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='py-16'
+        className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
       >
         <div className='mx-auto max-w-6xl px-4'>
           <div className='mb-10 text-center'>
@@ -156,7 +156,7 @@ export function CalculatorContent() {
                   ].map((row, idx) => (
                     <tr
                       key={row.salary}
-                      className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''} ${row.salary === 30000 || row.salary === 50000 ? 'border-l-4 border-l-primary' : ''}`}
+                      className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
                     >
                       <td className='p-4 font-semibold text-foreground'>
                         £{row.salary.toLocaleString()}

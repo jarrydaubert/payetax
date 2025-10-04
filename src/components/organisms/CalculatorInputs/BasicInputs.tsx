@@ -225,18 +225,37 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      <CurrencyInput
-        id={pensionId}
-        label={
-          input.pensionContributionType === 'percentage'
-            ? 'Pension Contribution %'
-            : 'Pension Contribution'
-        }
-        value={input.pensionContribution}
-        onChange={setPensionContribution}
-        placeholder='5'
-        inline
-      />
+      {input.pensionContributionType === 'percentage' ? (
+        <div className='flex items-center gap-3'>
+          <Label htmlFor={pensionId} className='min-w-[140px] text-sm'>
+            Pension Contribution %
+          </Label>
+          <div className='relative flex-1'>
+            <Input
+              id={pensionId}
+              type='number'
+              value={input.pensionContribution === 0 ? '' : input.pensionContribution}
+              onChange={(e) => setPensionContribution(Number(e.target.value) || 0)}
+              placeholder='5'
+              min='0'
+              max='100'
+              className='pr-8'
+            />
+            <span className='-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground text-sm'>
+              %
+            </span>
+          </div>
+        </div>
+      ) : (
+        <CurrencyInput
+          id={pensionId}
+          label='Pension Contribution'
+          value={input.pensionContribution}
+          onChange={setPensionContribution}
+          placeholder='0'
+          inline
+        />
+      )}
     </motion.div>
   );
 }
