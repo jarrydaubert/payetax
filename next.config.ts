@@ -1,5 +1,6 @@
 // next.config.ts
 import type { NextConfig } from 'next';
+import { withContentlayer } from 'next-contentlayer2';
 // FIXED: Import webpack directly for plugins
 import webpack from 'webpack';
 
@@ -184,5 +185,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Export with bundle analyzer only (Sentry removed)
-export default withBundleAnalyzer(nextConfig);
+// Export with Contentlayer and bundle analyzer (Sentry removed)
+export default withContentlayer(withBundleAnalyzer(nextConfig));

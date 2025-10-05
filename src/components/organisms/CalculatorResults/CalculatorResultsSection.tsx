@@ -37,8 +37,13 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
 
   const handleExport = () => {
     try {
-      exportToCSV(results);
-      toast.success('CSV exported successfully!');
+      const success = exportToCSV(results);
+      if (success) {
+        // Delay toast to show after save dialog appears
+        setTimeout(() => {
+          toast.success('CSV exported successfully!');
+        }, 100);
+      }
     } catch {
       toast.error('Failed to export CSV');
     }

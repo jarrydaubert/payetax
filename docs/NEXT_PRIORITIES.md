@@ -1,13 +1,33 @@
 # 🎯 PayeTax - Next Priorities
 
-**Last Updated**: October 4, 2025
+**Last Updated**: October 5, 2025
 **Current Status**: ✅ v1.0.0 Production - Post-Launch Optimization
 
 > **Note:** This document tracks post-launch improvements and future enhancements.
 
 ---
 
-## ✅ **Recently Completed (October 4, 2025)**
+## ✅ **Recently Completed (October 5, 2025)**
+
+### **5. Blog System Enhancement & Bug Fixes** ✅
+- **Contentlayer2 Integration**: Migrated from abandoned Contentlayer to Next.js 15-compatible fork
+  - Fixed js-yaml version conflicts (3.14.1 override)
+  - Configured type-safe MDX blog posts with computed fields (readingTime, wordCount)
+  - Generated 7 blog posts successfully with ISR (revalidate: 1h)
+- **UX Improvements**:
+  - Fixed period selector checkboxes (now properly clickable)
+  - Print now defaults to landscape orientation (A4)
+  - CSV toast appears after save dialog (not on button click)
+  - Removed debug console logs from production
+- **Theme Support**:
+  - Blog page now supports light theme (was hardcoded dark)
+  - Theme-aware text colors (`text-slate-900 dark:text-white`)
+- **Navigation Fixes**:
+  - Blog filters no longer cause page jumps (removed anchor)
+  - Even spacing with proper flex layout
+  - Navbar enhanced with glassmorphism on blog pages
+
+## ✅ **Previously Completed (October 4, 2025)**
 
 ### **1. Theme System Overhaul** ✅
 - Implemented warm dark slate background (`oklch(0.18 0.02 260)`) for reduced eye strain

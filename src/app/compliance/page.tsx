@@ -13,7 +13,6 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -37,8 +36,7 @@ const COMPLIANCE_FEATURES = [
   },
   {
     title: 'Formula Verification',
-    description:
-      'Calculation formulas verified against official HMRC examples and test cases',
+    description: 'Calculation formulas verified against official HMRC examples and test cases',
     details: [
       'Tested against HMRC published example calculations',
       'Formulas match official PAYE calculation methods',
@@ -198,8 +196,18 @@ export default function CompliancePage() {
               className='grid gap-6 md:grid-cols-4'
             >
               {[
-                { icon: Award, value: '100%', label: 'HMRC Rates', color: 'from-blue-500 to-cyan-500' },
-                { icon: FileText, value: 'Open', label: 'Source', color: 'from-purple-500 to-pink-500' },
+                {
+                  icon: Award,
+                  value: '100%',
+                  label: 'HMRC Rates',
+                  color: 'from-blue-500 to-cyan-500',
+                },
+                {
+                  icon: FileText,
+                  value: 'Open',
+                  label: 'Source',
+                  color: 'from-purple-500 to-pink-500',
+                },
                 {
                   icon: Calendar,
                   value: '<24h',
@@ -212,7 +220,7 @@ export default function CompliancePage() {
                   label: 'Tax Year',
                   color: 'from-orange-500 to-red-500',
                 },
-              ].map((stat, idx) => (
+              ].map((stat, _idx) => (
                 <Card
                   key={stat.label}
                   className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'
@@ -242,7 +250,7 @@ export default function CompliancePage() {
             <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
               Professional Standards
             </h2>
-            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Multi-layer verification ensures every calculation meets HMRC standards
             </p>
           </motion.div>
@@ -270,7 +278,9 @@ export default function CompliancePage() {
                     </div>
                   </div>
 
-                  <p className='mb-6 text-muted-foreground leading-relaxed'>{feature.description}</p>
+                  <p className='mb-6 text-muted-foreground leading-relaxed'>
+                    {feature.description}
+                  </p>
 
                   <div className='space-y-3'>
                     {feature.details.map((detail) => (
@@ -306,7 +316,7 @@ export default function CompliancePage() {
             <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
               Official Compliance
             </h2>
-            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Legal verification and regulatory compliance statements
             </p>
           </motion.div>
@@ -354,7 +364,7 @@ export default function CompliancePage() {
             <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
               Official Sources
             </h2>
-            <p className='mx-auto max-w-2xl text-muted-foreground text-lg'>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               All data sourced from government authorities and professional bodies
             </p>
           </motion.div>
@@ -420,7 +430,9 @@ export default function CompliancePage() {
                 </div>
 
                 <div className='flex-1'>
-                  <h3 className='mb-4 font-bold text-foreground text-2xl'>Important Legal Notice</h3>
+                  <h3 className='mb-4 font-bold text-2xl text-foreground'>
+                    Important Legal Notice
+                  </h3>
                   <p className='mb-6 text-muted-foreground leading-relaxed'>
                     While we maintain strict compliance with HMRC regulations and professional
                     standards, this calculator is provided for informational purposes only. For
@@ -434,14 +446,19 @@ export default function CompliancePage() {
                         ✓ Suitable for:
                       </div>
                       <ul className='space-y-2'>
-                        {['Standard PAYE calculations', 'Salary and pension planning', 'General tax estimates'].map(
-                          (item) => (
-                            <li key={item} className='flex items-center gap-2 text-muted-foreground text-sm'>
-                              <CheckCircle className='size-4 text-primary' />
-                              {item}
-                            </li>
-                          )
-                        )}
+                        {[
+                          'Standard PAYE calculations',
+                          'Salary and pension planning',
+                          'General tax estimates',
+                        ].map((item) => (
+                          <li
+                            key={item}
+                            className='flex items-center gap-2 text-muted-foreground text-sm'
+                          >
+                            <CheckCircle className='size-4 text-primary' />
+                            {item}
+                          </li>
+                        ))}
                       </ul>
                     </div>
                     <div>
@@ -476,9 +493,9 @@ export default function CompliancePage() {
             <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
               Questions About Compliance?
             </h2>
-            <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-lg leading-relaxed'>
-              We're committed to maintaining the highest standards of accuracy and compliance. If you
-              have questions about our methodology or sources, we're here to help.
+            <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
+              We're committed to maintaining the highest standards of accuracy and compliance. If
+              you have questions about our methodology or sources, we're here to help.
             </p>
 
             <div className='flex flex-col justify-center gap-4 sm:flex-row'>

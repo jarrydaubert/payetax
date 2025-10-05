@@ -4,8 +4,9 @@ import type { TaxCalculationResults } from '@/lib/taxCalculator';
 /**
  * Export tax calculation results to CSV
  * CSV always includes all timeframes for maximum data export
+ * Returns true when download is initiated
  */
-export function exportToCSV(results: TaxCalculationResults): void {
+export function exportToCSV(results: TaxCalculationResults): boolean {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP',
@@ -40,6 +41,9 @@ export function exportToCSV(results: TaxCalculationResults): void {
   link.download = `tax-calculation-${new Date().toISOString().split('T')[0]}.csv`;
   link.click();
   URL.revokeObjectURL(url);
+
+  // Return success flag for external toast handling
+  return true;
 }
 
 /**
@@ -48,7 +52,7 @@ export function exportToCSV(results: TaxCalculationResults): void {
  */
 export function printResults(
   results: TaxCalculationResults,
-  visiblePeriods: string[] = ['Yearly', 'Monthly', 'Weekly'],
+  visiblePeriods: string[] = ['Yearly', 'Monthly', 'Weekly']
 ): void {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
@@ -95,7 +99,7 @@ export function printResults(
         <meta charset="utf-8">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          @page { size: A4; margin: 15mm; }
+          @page { size: A4 landscape; margin: 15mm; }
           body {
             font-family: system-ui, -apple-system, sans-serif;
             padding: 20px;

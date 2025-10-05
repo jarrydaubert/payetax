@@ -267,22 +267,8 @@ export const useCalculatorStore = create<CalculatorState>()(
               throw new Error('Salary cannot be negative');
             }
 
-            // Log calculation start for debugging
-            console.log('Starting tax calculation:', {
-              salary: input.salary,
-              taxYear: input.taxYear,
-              payPeriod: input.payPeriod,
-              isScottish: input.isScottish,
-            });
-
             const results = calculateTax(input);
             set({ results });
-
-            // Log successful calculation
-            console.log('Tax calculation completed:', {
-              netPay: results.netPay.annually,
-              incomeTax: results.incomeTax.annually,
-            });
           } catch (error) {
             // Log calculation errors for debugging
             console.error('Tax calculation error:', error);

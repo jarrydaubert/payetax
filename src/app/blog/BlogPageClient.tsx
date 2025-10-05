@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { BlogCategory, BlogPost } from '@/types/blog';
 import CallToAction from '@/components/ui/CallToAction';
+import type { BlogCategory, BlogPost } from '@/types/blog';
 
 interface BlogPageClientProps {
   posts: BlogPost[];
@@ -50,7 +50,7 @@ export function BlogPageClient({
   const totalPages = Math.ceil(totalCount / 9);
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950'>
+    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-100 dark:from-slate-950 dark:via-purple-950/20 dark:to-slate-950'>
       {/* Animated background grid */}
       <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]' />
 
@@ -91,7 +91,7 @@ export function BlogPageClient({
                 Tax Knowledge
               </span>
               <br />
-              <span className='text-white'>Decoded</span>
+              <span className='text-slate-900 dark:text-white'>Decoded</span>
             </motion.h1>
 
             {/* Subtitle */}
@@ -130,7 +130,7 @@ export function BlogPageClient({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className='mx-auto -mt-8 mb-20 grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-3'
+          className='-mt-8 mx-auto mb-20 grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-3'
         >
           {[
             {
@@ -139,8 +139,18 @@ export function BlogPageClient({
               label: 'Expert Articles',
               gradient: 'from-purple-500 to-pink-500',
             },
-            { icon: TrendingUp, value: 'Weekly', label: 'Updates', gradient: 'from-cyan-500 to-blue-500' },
-            { icon: Star, value: 'Free', label: 'Always', gradient: 'from-orange-500 to-yellow-500' },
+            {
+              icon: TrendingUp,
+              value: 'Weekly',
+              label: 'Updates',
+              gradient: 'from-cyan-500 to-blue-500',
+            },
+            {
+              icon: Star,
+              value: 'Free',
+              label: 'Always',
+              gradient: 'from-orange-500 to-yellow-500',
+            },
           ].map((stat, idx) => (
             <motion.div
               key={stat.label}
@@ -153,7 +163,9 @@ export function BlogPageClient({
                 className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
               />
               <stat.icon className='relative mx-auto mb-4 size-10 text-purple-400' />
-              <div className='relative mb-2 font-bold text-3xl text-white'>{stat.value}</div>
+              <div className='relative mb-2 font-bold text-3xl text-slate-900 dark:text-white'>
+                {stat.value}
+              </div>
               <div className='relative text-slate-400 text-sm'>{stat.label}</div>
             </motion.div>
           ))}
@@ -167,15 +179,17 @@ export function BlogPageClient({
             transition={{ duration: 0.6, delay: 0.6 }}
             className='mb-20'
           >
-            <h2 className='mb-8 text-center font-semibold text-white text-xl'>Browse Topics</h2>
+            <h2 className='mb-8 text-center font-semibold text-slate-900 text-xl dark:text-white'>
+              Browse Topics
+            </h2>
             <div className='mx-auto max-w-5xl'>
-              <div className='blog-filters'>
+              <div className='flex flex-wrap items-center justify-center gap-3'>
                 <Link
-                  href='/blog#categories'
+                  href='/blog'
                   className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-4 py-2.5 text-center font-medium text-sm transition-all duration-300 ${
                     !selectedCategory
-                      ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                      : 'border border-white/10 bg-white/5 text-slate-300 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 hover:text-white'
+                      ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-slate-900 shadow-[0_0_20px_rgba(168,85,247,0.4)] dark:text-white'
+                      : 'border border-white/10 bg-white/5 text-slate-300 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 hover:text-slate-900 dark:text-white'
                   }`}
                 >
                   <span className='relative z-10'>All Posts</span>
@@ -191,11 +205,11 @@ export function BlogPageClient({
                   .map((category) => (
                     <Link
                       key={category.slug}
-                      href={`/blog?category=${category.slug}#categories`}
+                      href={`/blog?category=${category.slug}`}
                       className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-4 py-2.5 text-center font-medium text-sm transition-all duration-300 ${
                         selectedCategory === category.slug
-                          ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                          : 'border border-white/10 bg-white/5 text-slate-300 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 hover:text-white'
+                          ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-slate-900 shadow-[0_0_20px_rgba(168,85,247,0.4)] dark:text-white'
+                          : 'border border-white/10 bg-white/5 text-slate-300 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 hover:text-slate-900 dark:text-white'
                       }`}
                     >
                       <span className='relative z-10'>{category.name}</span>
@@ -235,7 +249,7 @@ export function BlogPageClient({
                 <div className='relative grid items-center gap-8 md:grid-cols-2'>
                   <div>
                     <div className='mb-6 flex items-center gap-4'>
-                      <div className='rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 px-5 py-2 font-mono font-bold text-black text-sm shadow-lg'>
+                      <div className='rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 px-5 py-2 font-bold font-mono text-black text-sm shadow-lg'>
                         FEATURED
                       </div>
                       <div className='flex items-center gap-2 text-slate-400'>
@@ -244,11 +258,11 @@ export function BlogPageClient({
                       </div>
                     </div>
 
-                    <h2 className='mb-6 font-bold text-4xl text-white leading-tight transition-all duration-300 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-orange-400 group-hover:bg-clip-text md:text-5xl'>
+                    <h2 className='mb-6 font-bold text-4xl text-slate-900 leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent md:text-5xl dark:text-white'>
                       {featuredPost.title}
                     </h2>
 
-                    <p className='mb-8 text-slate-300 text-lg leading-relaxed'>
+                    <p className='mb-8 text-lg text-slate-300 leading-relaxed'>
                       {featuredPost.excerpt}
                     </p>
 
@@ -309,7 +323,7 @@ export function BlogPageClient({
 
                       <div className='relative p-6'>
                         <div className='mb-4 flex items-center justify-between'>
-                          <span className='rounded-full border border-purple-500/30 bg-purple-500/20 px-3 py-1 font-mono font-medium text-purple-300 text-xs'>
+                          <span className='rounded-full border border-purple-500/30 bg-purple-500/20 px-3 py-1 font-medium font-mono text-purple-300 text-xs'>
                             {post.category}
                           </span>
                           <div className='flex items-center gap-2 text-slate-400 text-sm'>
@@ -318,7 +332,7 @@ export function BlogPageClient({
                           </div>
                         </div>
 
-                        <h3 className='mb-3 font-bold text-white text-xl leading-tight transition-all duration-300 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text'>
+                        <h3 className='mb-3 font-bold text-slate-900 text-xl leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text group-hover:text-transparent dark:text-white'>
                           {post.title}
                         </h3>
 
@@ -349,8 +363,8 @@ export function BlogPageClient({
               <div className='mb-20 flex items-center justify-center gap-4'>
                 {currentPage > 1 && (
                   <Link
-                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
-                    className='rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-white backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-white/10'
+                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                    className='rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-slate-900 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 dark:text-white'
                   >
                     ← Previous
                   </Link>
@@ -358,7 +372,7 @@ export function BlogPageClient({
 
                 <div className='flex items-center gap-3'>
                   <span className='text-slate-400'>Page</span>
-                  <span className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-mono font-bold text-white shadow-lg'>
+                  <span className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono text-slate-900 shadow-lg dark:text-white'>
                     {currentPage}
                   </span>
                   <span className='text-slate-400'>of {totalPages}</span>
@@ -366,8 +380,8 @@ export function BlogPageClient({
 
                 {currentPage < totalPages && (
                   <Link
-                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}#categories`}
-                    className='rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-white backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-white/10'
+                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                    className='rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-slate-900 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-white/10 dark:text-white'
                   >
                     Next →
                   </Link>
@@ -378,14 +392,16 @@ export function BlogPageClient({
         ) : (
           <div className='mb-20 rounded-3xl border border-white/10 bg-white/5 p-16 text-center backdrop-blur-xl'>
             <FileText className='mx-auto mb-6 size-20 text-slate-500' />
-            <h3 className='mb-4 font-bold text-3xl text-white'>No Articles Found</h3>
+            <h3 className='mb-4 font-bold text-3xl text-slate-900 dark:text-white'>
+              No Articles Found
+            </h3>
             <p className='mx-auto mb-8 max-w-md text-slate-400 leading-relaxed'>
               We couldn't find any articles matching your criteria. Try browsing all posts or
               selecting a different category.
             </p>
             <Link
               href='/blog'
-              className='inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-4 font-semibold text-white transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]'
+              className='inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-4 font-semibold text-slate-900 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] dark:text-white'
             >
               <BookOpen className='size-5' />
               <span>Browse All Posts</span>

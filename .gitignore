@@ -55,6 +55,9 @@ next-env.d.ts
 /.swc
 .cache
 
+# Contentlayer
+.contentlayer
+
 # Consolidated Audit & Reports Directory
 /audit-outputs
 

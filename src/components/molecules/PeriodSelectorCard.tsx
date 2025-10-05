@@ -29,7 +29,11 @@ export function PeriodSelectorCard({
             key={period}
             period={period}
             checked={visiblePeriods.includes(period)}
-            onCheckedChange={() => onPeriodToggle(period)}
+            onCheckedChange={(checked) => {
+              if (checked !== visiblePeriods.includes(period)) {
+                onPeriodToggle(period);
+              }
+            }}
           />
         ))}
       </div>

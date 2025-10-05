@@ -18,6 +18,7 @@ interface SimpleNavbarProps {
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const isBlogPage = pathname?.startsWith('/blog') ?? false;
 
   const links = [
     { href: '/#tax-calculator', label: 'Calculator' },
@@ -48,7 +49,13 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         Skip to content
       </a>
 
-      <nav className={cn('relative z-40 w-full py-4', className)}>
+      <nav
+        className={cn(
+          'relative z-40 w-full py-4',
+          isBlogPage && 'border-white/10 border-b bg-white/5 backdrop-blur-xl',
+          className
+        )}
+      >
         <div className='container mx-auto flex max-w-7xl items-center justify-between px-4'>
           {/* Logo */}
           <Link href='/' className='group'>

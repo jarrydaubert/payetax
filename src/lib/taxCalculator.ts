@@ -297,22 +297,6 @@ function isTaxableAllowance(type: AllowanceType): boolean {
  * ```
  */
 export function calculateTax(input: TaxCalculationInput): TaxCalculationResults {
-  // Debug logging for input verification (can be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧮 Tax Calculation Debug - Input Values:', {
-      salary: input.salary,
-      payPeriod: input.payPeriod,
-      taxYear: input.taxYear,
-      taxCode: input.taxCode,
-      isScottish: input.isScottish,
-      pensionContribution: input.pensionContribution,
-      pensionContributionType: input.pensionContributionType,
-      studentLoanPlan: input.studentLoanPlan,
-      niCategory: input.niCategory,
-      additionalAllowances: input.additionalAllowances?.length || 0,
-    });
-  }
-
   // ---------------
   // 1. Prepare input data and tax rates
   // ---------------
@@ -900,23 +884,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           }
         : undefined,
   };
-
-  // Debug logging for output verification (can be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧮 Tax Calculation Debug - Results:', {
-      annualGross: results.grossSalary.annually,
-      monthlyGross: results.grossSalary.monthly,
-      taxFreeAmount: results.taxFreeAmount,
-      taxableIncome: results.taxableIncome,
-      annualTax: results.incomeTax.annually,
-      monthlyTax: results.incomeTax.monthly,
-      annualNI: results.nationalInsurance.annually,
-      monthlyNI: results.nationalInsurance.monthly,
-      annualNet: results.netPay.annually,
-      monthlyNet: results.netPay.monthly,
-      taxBands: results.taxBands.map((b) => `${b.name}: £${b.amount} at ${b.rate}%`),
-    });
-  }
 
   return results;
 }
