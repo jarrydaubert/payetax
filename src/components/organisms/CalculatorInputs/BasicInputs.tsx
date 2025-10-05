@@ -15,11 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
-import { useCalculatorStore } from '@/store/calculatorStore';
+import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
 export function BasicInputs() {
+  // Use optimized selectors - extract only input state and actions
+  const input = useCalculatorStore((state) => state.input);
   const {
-    input,
     setSalary,
     setPayPeriod,
     setTaxYear,
@@ -32,7 +33,7 @@ export function BasicInputs() {
     setStudentLoanPlan,
     setPensionContribution,
     setPensionContributionType,
-  } = useCalculatorStore();
+  } = useCalculatorActions();
 
   const salaryId = useId();
   const payPeriodId = useId();

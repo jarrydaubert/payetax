@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
 
   experimental: {
+    // Note: PPR (Partial Prerendering) requires Next.js canary
+    // ppr: 'incremental', // Disabled - requires canary version
+
     // Optimize specific package imports for better tree-shaking
     optimizePackageImports: [
       'lucide-react',

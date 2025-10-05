@@ -114,9 +114,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme, applyTheme, getSystemTheme, resolveTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, cycleTheme, resolvedTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext value={{ theme, setTheme, cycleTheme, resolvedTheme }}>{children}</ThemeContext>
   );
 }
 

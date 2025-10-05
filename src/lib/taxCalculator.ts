@@ -467,7 +467,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Only pension and taxable allowances reduce taxable income
   const monthlyTaxableAdjustedSalary =
     monthlyGrossSalary - monthlyPensionContribution - monthlyTaxableAllowancesTotal;
-  const _annualTaxableAdjustedSalary = monthlyTaxableAdjustedSalary * 12;
 
   // Calculate taxable income (adjusted salary minus tax-free amount)
   const monthlyTaxableIncome = Math.max(0, monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount);

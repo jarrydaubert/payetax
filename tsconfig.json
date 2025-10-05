@@ -7,9 +7,8 @@
     // TODO: Remove when Contentlayer2 types are fixed or when migrating away
     "skipLibCheck": true,
     "strict": true,
-    // Temporarily disabled - some intentional unused vars for future features
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     // noUncheckedIndexedAccess: Disabled for now - too strict for current codebase
     // TODO: Enable and fix array access patterns in future refactor

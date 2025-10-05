@@ -8,13 +8,15 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
-import { useCalculatorStore } from '@/store/calculatorStore';
+import { useCalculatorActions, useCalculatorResults } from '@/store/calculatorStore';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 
 export function CalculatorContainer() {
-  const { results, calculate } = useCalculatorStore();
+  // Use optimized selectors to prevent unnecessary re-renders
+  const results = useCalculatorResults();
+  const { calculate } = useCalculatorActions();
   const [showResults, setShowResults] = React.useState(false);
 
   const handleCalculate = () => {

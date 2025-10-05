@@ -6,7 +6,7 @@ import { Calculator, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useCalculatorStore } from '@/store/calculatorStore';
+import { useCalculatorActions } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
 
 interface CalculatorInputsSectionProps {
@@ -14,7 +14,7 @@ interface CalculatorInputsSectionProps {
 }
 
 export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSectionProps) {
-  const { reset } = useCalculatorStore();
+  const { reset } = useCalculatorActions();
   const [isCalculating, setIsCalculating] = React.useState(false);
 
   const handleCalculate = async () => {

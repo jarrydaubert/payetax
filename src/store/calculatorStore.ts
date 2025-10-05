@@ -307,3 +307,42 @@ export const useCalculatorStore = create<CalculatorState>()(
     )
   )
 );
+
+/**
+ * Optimized selector hooks to prevent unnecessary re-renders
+ * These hooks use granular selectors instead of extracting the entire state
+ */
+
+// Selector for calculator results only (most commonly used)
+export const useCalculatorResults = () => useCalculatorStore((state) => state.results);
+
+// Selector for previous year results
+export const usePreviousYearResults = () =>
+  useCalculatorStore((state) => state.previousYearResults);
+
+// Selector for calculator actions (stable, won't trigger re-renders)
+export const useCalculatorActions = () =>
+  useCalculatorStore((state) => ({
+    setSalary: state.setSalary,
+    setPayPeriod: state.setPayPeriod,
+    setTaxYear: state.setTaxYear,
+    setTaxCode: state.setTaxCode,
+    setRegion: state.setRegion,
+    setIsScottish: state.setIsScottish,
+    setIsMarried: state.setIsMarried,
+    setPartnerGrossWage: state.setPartnerGrossWage,
+    setIsBlind: state.setIsBlind,
+    setPayNoNI: state.setPayNoNI,
+    setStudentLoanPlan: state.setStudentLoanPlan,
+    setPensionContribution: state.setPensionContribution,
+    setPensionContributionType: state.setPensionContributionType,
+    setNiCategory: state.setNiCategory,
+    setHoursPerWeek: state.setHoursPerWeek,
+    setAdditionalAllowances: state.setAdditionalAllowances,
+    updateTaxRates: state.updateTaxRates,
+    updateScottishRates: state.updateScottishRates,
+    updateNIRates: state.updateNIRates,
+    calculate: state.calculate,
+    calculatePreviousYear: state.calculatePreviousYear,
+    reset: state.reset,
+  }));

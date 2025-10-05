@@ -62,7 +62,6 @@ export function calculateAllowance(
 
   // Initialize values
   let allowance = baseAllowance;
-  const _adjustedTaxCode = cleanTaxCode;
   let marriageAllowance = 0;
 
   // Handle special tax codes that override the standard calculation
