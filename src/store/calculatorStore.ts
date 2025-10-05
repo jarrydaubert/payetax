@@ -162,9 +162,6 @@ const defaultTaxYear = getCurrentTaxYear();
 const currentYearRates = TAX_RATES[defaultTaxYear];
 
 // UK minimum wage (April 2024 - March 2025): £11.44 per hour
-// Full-time annual: £11.44 × 37.5 hours × 52 weeks = £22,308
-const _MINIMUM_WAGE_ANNUAL = 22308;
-
 // Default inputs
 const defaultInput: CalculatorInput = {
   salary: 0, // Empty by default - show as placeholder
@@ -282,7 +279,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const { input } = get();
 
           // Get previous tax year
-          const currentYear = Number.parseInt(input.taxYear.split('-')[0], 10);
+          const currentYear = Number.parseInt(input.taxYear.split('-')[0] || '', 10);
           const previousYear = `${currentYear - 1}-${currentYear}` as TaxYear;
 
           // Only calculate if the previous year is a valid tax year

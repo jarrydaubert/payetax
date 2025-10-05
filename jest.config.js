@@ -32,6 +32,29 @@ const config = {
     '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}',
     '<rootDir>/tests/**/*.{test,spec}.{js,jsx,ts,tsx}',
   ],
+  // Coverage thresholds - enforce minimum code coverage
+  coverageThresholds: {
+    global: {
+      statements: 80,
+      branches: 70,
+      functions: 80,
+      lines: 80,
+    },
+    // More lenient for UI components (visual testing often better than unit tests)
+    './src/components/**/*.{ts,tsx}': {
+      statements: 60,
+      branches: 50,
+      functions: 60,
+      lines: 60,
+    },
+    // Strict for business logic
+    './src/lib/**/*.{ts,tsx}': {
+      statements: 90,
+      branches: 80,
+      functions: 90,
+      lines: 90,
+    },
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

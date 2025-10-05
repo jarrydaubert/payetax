@@ -159,6 +159,16 @@
       "formatter": {
         "enabled": false
       }
+    },
+    {
+      "includes": ["contentlayer.config.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
     }
   ]
 }

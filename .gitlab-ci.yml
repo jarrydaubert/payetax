@@ -42,13 +42,41 @@ test:
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
-    - npm run lint
-    - npm test # Run unit tests
+    - npm run lint # Biome linting
     - npm run typecheck # TypeScript validation
+    - npm run test:ci # Unit tests with coverage thresholds
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: audit-outputs/coverage/cobertura-coverage.xml
+    paths:
+      - audit-outputs/coverage/
+    expire_in: 7 days
   only:
     - merge_requests
     - main
     - develop
+
+# E2E Test stage - Run Playwright tests (critical paths only for speed)
+test:e2e:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.40.0-focal
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+    - npx playwright install --with-deps
+  script:
+    - npm run test:e2e:ci
+  artifacts:
+    when: always
+    paths:
+      - audit-outputs/playwright-report/
+    expire_in: 7 days
+  only:
+    - merge_requests
+    - main
+  allow_failure: false
 
 # Build stage - Create production build
 build:

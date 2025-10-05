@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'node:util';
+import { TextDecoder, TextEncoder } from 'node:util';
 
 // Polyfill TextEncoder/TextDecoder for Node.js (required by Next.js modules)
 global.TextEncoder = TextEncoder;

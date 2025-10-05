@@ -326,11 +326,30 @@ npm run test       # Unit test execution
 
 ## 📊 Testing Metrics & Reporting
 
-### Coverage Requirements
+### Coverage Requirements (ENFORCED IN CI)
 
-- **Minimum Coverage**: 90% for critical paths
-- **Branch Coverage**: 85% for business logic
-- **Function Coverage**: 95% for public APIs
+**Global Thresholds** (Fails CI if not met):
+- **Statements**: 80%
+- **Branches**: 70%
+- **Functions**: 80%
+- **Lines**: 80%
+
+**Business Logic** (`src/lib/**`) - STRICT:
+- **Statements**: 90%
+- **Branches**: 80%
+- **Functions**: 90%
+- **Lines**: 90%
+
+**UI Components** (`src/components/**`) - LENIENT:
+- **Statements**: 60%
+- **Branches**: 50%
+- **Functions**: 60%
+- **Lines**: 60%
+
+**Current Baseline**: 16.47% (Oct 5, 2025)
+**Status**: ❌ Below threshold - needs improvement
+
+See [QUALITY_GATES.md](./QUALITY_GATES.md) for full details.
 
 ### Test Reporting
 

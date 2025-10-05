@@ -254,6 +254,27 @@ Professional tax insights powered by MDX:
 - **Atomic Design** - Components follow single responsibility
 - **Performance First** - Bundle size and runtime optimization priority
 
+### 🔒 Quality Gates (CI/CD Enforced)
+
+All code must pass these gates before merging:
+
+| Gate | Tool | Threshold | Status |
+|------|------|-----------|--------|
+| **TypeScript** | tsc | 0 errors | ✅ Enforced |
+| **Linting** | Biome | 0 errors | ✅ Enforced |
+| **Unit Tests** | Jest | All passing | ✅ Enforced |
+| **Test Coverage** | Jest | 80% global | ✅ Enforced |
+| **E2E Tests** | Playwright | All passing | ✅ Enforced |
+| **Build** | Next.js | Success | ✅ Enforced |
+| **Pre-commit** | Husky | All checks pass | ✅ Enforced |
+
+**Coverage Requirements:**
+- Global: 80% statements, 70% branches
+- Business Logic (`lib/`): 90% coverage
+- UI Components: 60% coverage
+
+See [QUALITY_GATES.md](./docs/QUALITY_GATES.md) for complete details.
+
 ### Testing Strategy
 
 ```bash

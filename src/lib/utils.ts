@@ -129,7 +129,7 @@ export function getTaxBandColor(index: number, isDarkMode: boolean): string {
       ];
 
   // Cycle through colors for indices beyond array length
-  return baseColors[index % baseColors.length];
+  return baseColors[index % baseColors.length] ?? baseColors[0] ?? '#000000';
 }
 
 /**

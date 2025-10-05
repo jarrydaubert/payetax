@@ -16,7 +16,7 @@ export function getTaxRateDescription(taxYear: TaxYear = '2025-2026'): string {
   // Build description from actual tax bands
   const bandDescriptions = bands
     .map((band, index) => {
-      const prevThreshold = index === 0 ? personalAllowance : bands[index - 1].threshold;
+      const prevThreshold = index === 0 ? personalAllowance : (bands[index - 1]?.threshold ?? 0);
       const rate = Math.round(band.rate * 100);
 
       if (band.threshold === Infinity) {

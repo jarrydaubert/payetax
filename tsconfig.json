@@ -3,8 +3,17 @@
     "target": "ES2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
+    // skipLibCheck: Required due to Contentlayer2 type definition issues
+    // TODO: Remove when Contentlayer2 types are fixed or when migrating away
     "skipLibCheck": true,
     "strict": true,
+    // Temporarily disabled - some intentional unused vars for future features
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // noUncheckedIndexedAccess: Disabled for now - too strict for current codebase
+    // TODO: Enable and fix array access patterns in future refactor
+    // "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -32,5 +41,12 @@
     "next.config.ts",
     ".contentlayer/generated"
   ],
-  "exclude": ["node_modules", "**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+  "exclude": [
+    "node_modules",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }
