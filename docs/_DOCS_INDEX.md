@@ -21,7 +21,8 @@ Quick reference for all documentation files and their purpose.
 - **STYLING.md** - Styling system, Tailwind v4, OKLCH colors, component optimization, forwardRef migration
 
 ### Quality & Performance
-- **TESTING.md** - Test coverage, manual checklists, E2E test guides
+- **QUALITY_GATES.md** - Quality gates, coverage thresholds, pre-commit hooks, CI/CD enforcement (NEW Oct 5, 2025)
+- **TESTING.md** - Test coverage, manual checklists, E2E test guides, coverage requirements
 - **BUNDLE_OPTIMIZATION.md** - Bundle size monitoring, optimization strategies
 - **SEO_STRATEGY.md** - SEO implementation, AEO optimization, structured data guide
 
@@ -35,10 +36,11 @@ Quick reference for all documentation files and their purpose.
 **Running npm scripts?** → SCRIPT_GUIDE.md
 **Understanding codebase?** → STRUCTURE.md + README.md
 **Styling & Design System?** → STYLING.md
-**Testing?** → TESTING.md
+**Quality gates & enforcement?** → QUALITY_GATES.md ⭐ NEW
+**Testing?** → TESTING.md + QUALITY_GATES.md
 **Optimizing performance?** → BUNDLE_OPTIMIZATION.md
 **SEO work?** → SEO_STRATEGY.md
 
 ---
 
-**Last Updated**: October 2025
+**Last Updated**: October 5, 2025
