@@ -362,6 +362,105 @@ Already implemented in blog template:
 
 ---
 
+## 🔗 **Dofollow Backlink Strategy (SEO Growth)**
+
+**Goal:** 10-20 quality dofollow backlinks in first 3 months
+
+### What Are Dofollow Backlinks?
+Dofollow backlinks pass "link juice" (SEO authority) to your site, unlike nofollow links. Quality dofollow links from high-authority, relevant sites build domain authority, improve rankings, and drive traffic.
+
+**Key Criteria:**
+- **Relevance:** Niche-aligned sites (UK tax, finance, accounting)
+- **Authority:** Domain Rating 30+ (check with Ahrefs free tool)
+- **Natural:** Earned through value, not bought
+
+### 3-Month Roadmap
+
+#### **Month 1: Foundation (3-5 Links)** - Quick Wins
+1. **Social Profiles (Dofollow)**
+   - Update LinkedIn, Twitter (X), Facebook bios with blog URL
+   - Join 5-10 niche groups (r/UKPersonalFinance, r/TaxUK)
+   - Share intro posts linking back
+   - *Target:* 1-2 links in week 1
+
+2. **HARO (Help a Reporter Out)**
+   - Sign up at helpareporter.com
+   - Respond to 3-5 daily queries as "tax expert"
+   - Get quoted in articles = high-quality dofollow from media
+   - *Target:* 1-2 links by month-end
+
+3. **Resource Page Submissions**
+   - Search "UK tax resources" / "PAYE calculator resources"
+   - Email 10-15 curators pitching best post as fit
+   - *Target:* 1-2 links
+
+#### **Month 2: Content-Led Outreach (4-7 Links)**
+1. **Guest Posting**
+   - Find sites via "UK tax + write for us" searches
+   - Pitch 2-3 original articles (800+ words) with dofollow bio link
+   - Start with mid-tier sites (DR 20-40) for faster acceptance
+   - *Target:* 2-3 links
+
+2. **Broken Link Building**
+   - Use Check My Links Chrome extension on competitor sites
+   - Scan 20 resource pages for dead links
+   - Email owners suggesting your post as replacement
+   - *Target:* 1-2 links
+
+3. **Influencer Outreach**
+   - Identify 10 UK tax/finance influencers via Twitter
+   - Email personalized pitches sharing their content
+   - Link your post in relevant reply/thread
+   - *Target:* 1-2 links
+
+#### **Month 3: Scale and Refine (3-6 Links)**
+1. **Skyscraper Technique**
+   - Find top-ranking UK tax posts (Ahrefs free Content Explorer)
+   - Create better version (more data/visuals/2025 updates)
+   - Email 20-30 linkers to original suggesting yours
+   - *Target:* 2-3 links
+
+2. **Shareable Visuals/Webinars**
+   - Design 1-2 infographics on tax topics (Canva)
+   - Submit to Visual.ly (dofollow potential)
+   - Host free Zoom webinar on UK tax changes
+   - *Target:* 1-2 links
+
+3. **Community Engagement**
+   - Answer Quora/Reddit questions with value + subtle links
+   - Run link-sharing thread on Twitter
+   - Nurture early linkers by promoting their sites
+   - *Target:* 1 link
+
+### Tools & Tracking
+**Free Tools:**
+- Google Search Console (backlink monitoring)
+- Moz's Link Explorer (free 10 queries/month)
+- Ahrefs Backlink Checker (free, limited)
+- Check My Links Chrome extension
+
+**Track Weekly:**
+- New backlinks acquired
+- Referral traffic from backlinks
+- Domain Authority changes (Moz)
+
+### Best Practices
+✅ **Do:**
+- Prioritize relevance over quantity
+- Use natural anchor text ("UK tax guide" not "click here")
+- Build relationships before asking for links
+- Create genuinely useful content worth linking to
+
+❌ **Don't:**
+- Buy links (Google penalty risk)
+- Use comment spam (mostly nofollow now)
+- Submit to directory farms
+- Use exact-match anchor text excessively
+
+**Timeline:** Links take 2-4 weeks to appear/index. Combine with on-page SEO for faster results.
+
+---
+
 ## ⚠️ Legal & Compliance Checklist
 
 Every post must include:
