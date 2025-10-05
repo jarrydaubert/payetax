@@ -77,7 +77,7 @@ const createBasicInput = (
   isScottish: false,
   pensionContribution: 0,
   pensionContributionType: 'percentage',
-  studentLoanPlans: [],
+  studentLoanPlan: 'none',
   niCategory: 'A',
   hoursPerWeek: 37.5,
   additionalAllowances: [],
@@ -384,7 +384,7 @@ describe('Tax Calculator', () => {
      * National Insurance, creating a triple deduction effect.
      */
     it('calculates Plan 2 student loan repayments', () => {
-      const input = createBasicInput(35000, { studentLoanPlans: ['plan2'] });
+      const input = createBasicInput(35000, { studentLoanPlan: 'plan2' });
       const result = calculateTax(input);
 
       // Should calculate student loan repayment (above £27,295 threshold)
@@ -415,7 +415,7 @@ describe('Tax Calculator', () => {
      * low earners from repayment obligations that would cause hardship.
      */
     it('does not calculate student loan for low income', () => {
-      const input = createBasicInput(20000, { studentLoanPlans: ['plan2'] });
+      const input = createBasicInput(20000, { studentLoanPlan: 'plan2' });
       const result = calculateTax(input);
 
       // No repayment below threshold
@@ -423,28 +423,26 @@ describe('Tax Calculator', () => {
     });
 
     /**
-     * **Test Case**: Multiple Student Loan Plans
+     * **Test Case**: Postgraduate Student Loan
      *
-     * Tests handling of graduates with multiple student loan types, such as
-     * undergraduate Plan 2 and postgraduate loans. This scenario is common
-     * for people who did both undergraduate and postgraduate study.
+     * Tests postgraduate loan repayments which have different thresholds
+     * and repayment rates compared to undergraduate plans.
      *
      * ### Expected Behavior:
-     * For £40,000 salary with Plan 2 + Postgraduate:
-     * - **Plan 2**: 9% on income above £27,295 = £1,143.45
-     * - **Postgraduate**: 6% on income above £21,000 = £1,140.00
-     * - **Total Repayment**: £2,283.45 annually
+     * For £40,000 salary with Postgraduate loan:
+     * - **Postgraduate**: 6% on income above £21,000
+     * - **Repayable Income**: £19,000
+     * - **Annual Repayment**: £1,140.00
      *
      * ### Calculation Detail:
-     * Multiple plans apply their rates independently to the same income,
-     * creating cumulative repayment obligations that can significantly
-     * impact net pay for higher earners with multiple qualifications.
+     * Postgraduate loans have a 6% rate and lower threshold (£21,000)
+     * compared to undergraduate Plan 2 (9% above £27,295).
      */
-    it('handles multiple student loan plans', () => {
-      const input = createBasicInput(40000, { studentLoanPlans: ['plan2', 'postgrad'] });
+    it('handles postgraduate student loan', () => {
+      const input = createBasicInput(40000, { studentLoanPlan: 'postgrad' });
       const result = calculateTax(input);
 
-      // Should calculate repayments for multiple plans
+      // Should calculate repayments for postgraduate loan
       expect(result.studentLoan.annually).toBeGreaterThan(0);
     });
   });

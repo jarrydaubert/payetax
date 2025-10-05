@@ -1,4 +1,14 @@
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'node:util';
+
+// Polyfill TextEncoder/TextDecoder for Node.js (required by Next.js modules)
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+// Polyfill Request/Response for Next.js web APIs
+global.Request = class Request {};
+global.Response = class Response {};
+global.Headers = class Headers {};
 
 // Optional: configure or set up a testing framework before each test
 // Add global test utilities, mocks, or configurations here
