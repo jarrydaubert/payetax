@@ -17,7 +17,7 @@ export default function NotFound() {
             const duration = 2 + (i % 4);
             return (
               <div
-                key={`floating-${i}`}
+                key={`particle-${left}-${top}-${delay}`}
                 className='absolute h-2 w-2 animate-pulse rounded-full bg-primary opacity-20'
                 style={{
                   left: `${left}%`,
@@ -65,7 +65,7 @@ export default function NotFound() {
         <div className='mb-12 grid grid-cols-1 gap-6 md:grid-cols-3'>
           <Link
             href='/'
-            className='group glass-card rounded-xl border border-primary/20 p-6 transition-all duration-300 hover:scale-105 hover:border-primary/40'
+            className='group glass-card rounded-xl border border-primary/20 p-6 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40'
           >
             <Home className='mx-auto mb-4 h-8 w-8 text-primary transition-colors group-hover:text-primary/80' />
             <h3 className='mb-2 font-semibold text-foreground'>Go Home</h3>
@@ -75,7 +75,7 @@ export default function NotFound() {
 
           <Link
             href='/#tax-calculator'
-            className='group glass-card rounded-xl border border-cyan-500/20 p-6 transition-all duration-300 hover:scale-105 hover:border-cyan-500/40'
+            className='group glass-card rounded-xl border border-cyan-500/20 p-6 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] hover:border-cyan-500/40'
           >
             <Calculator className='mx-auto mb-4 h-8 w-8 text-cyan-500 transition-colors group-hover:text-cyan-400' />
             <h3 className='mb-2 font-semibold text-foreground'>Tax Calculator</h3>
@@ -85,7 +85,7 @@ export default function NotFound() {
 
           <Link
             href='/blog'
-            className='group glass-card rounded-xl border border-pink-500/20 p-6 transition-all duration-300 hover:scale-105 hover:border-pink-500/40'
+            className='group glass-card rounded-xl border border-pink-500/20 p-6 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] hover:border-pink-500/40'
           >
             <FileText className='mx-auto mb-4 h-8 w-8 text-pink-500 transition-colors group-hover:text-pink-400' />
             <h3 className='mb-2 font-semibold text-foreground'>Read Blog</h3>

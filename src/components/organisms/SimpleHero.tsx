@@ -16,7 +16,7 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
     // biome-ignore lint/correctness/useUniqueElementIds: Accessibility landmark for skip-to-content link
     <section
       id='main-content'
-      className={cn('relative flex min-h-screen items-center justify-center py-20', className)}
+      className={cn('relative flex min-h-[50vh] md:min-h-screen items-center justify-center py-12 md:py-20', className)}
     >
       {/* Content */}
       <div className='relative z-10 mx-auto max-w-5xl px-4 text-center'>

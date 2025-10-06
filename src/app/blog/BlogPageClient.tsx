@@ -69,7 +69,7 @@ export function BlogPageClient({
       <div className='pointer-events-none absolute top-1/3 left-1/4 h-96 w-96 bg-cyan-500/20 opacity-20 blur-[120px]' />
 
       {/* Hero Section */}
-      <section className='relative pt-32 pb-20'>
+      <section className='relative pt-20 md:pt-32 pb-10 md:pb-20'>
         <div className='container relative z-10 mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -138,7 +138,7 @@ export function BlogPageClient({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className='-mt-8 mx-auto mb-20 grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-3'
+          className='-mt-8 mx-auto mb-12 md:mb-20 grid max-w-4xl grid-cols-1 gap-3 md:gap-6 md:grid-cols-3'
         >
           {[
             {
@@ -183,7 +183,7 @@ export function BlogPageClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className='mb-20'
+            className='mb-12 md:mb-20'
           >
             <h2 className='mb-8 text-center font-semibold text-foreground text-xl'>
               Browse Topics
@@ -240,7 +240,7 @@ export function BlogPageClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className='mb-20'
+            className='mb-12 md:mb-20'
           >
             <div className='mb-8 flex items-center justify-center gap-3 text-center'>
               <Sparkles className='size-6 text-yellow-400' />
@@ -251,7 +251,7 @@ export function BlogPageClient({
             </div>
 
             <Link href={`/blog/${featuredPost.slug}`} className='group block'>
-              <div className='relative overflow-hidden rounded-3xl border border-yellow-500/30 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl transition-all duration-500 hover:scale-[1.02] hover:border-yellow-500/50 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] md:p-12'>
+              <div className='relative overflow-hidden rounded-3xl border border-yellow-500/30 bg-gradient-to-br from-white/10 to-white/5 p-6 md:p-12 backdrop-blur-xl transition-all duration-500 md:hover:scale-[1.02] hover:border-yellow-500/50 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)]'>
                 <div className='absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-orange-500/0 opacity-0 transition-opacity duration-500 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 group-hover:opacity-100' />
 
                 <div className='relative grid items-center gap-8 md:grid-cols-2'>
@@ -305,7 +305,7 @@ export function BlogPageClient({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className='mb-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3'
+              className='mb-12 md:mb-20 grid gap-4 md:gap-8 md:grid-cols-2 lg:grid-cols-3'
             >
               {posts.map((post, idx) => (
                 <motion.div
@@ -315,7 +315,7 @@ export function BlogPageClient({
                   transition={{ duration: 0.5, delay: 0.8 + idx * 0.05 }}
                 >
                   <Link href={`/blog/${post.slug}`} className='group block h-full'>
-                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]'>
+                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-xl transition-all duration-300 md:hover:scale-105 hover:border-purple-500/50 md:hover:bg-card/70 md:hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] active:scale-[1.02]'>
                       <div className='absolute inset-0 bg-gradient-to-br from-purple-500/0 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:from-purple-500/10 group-hover:to-cyan-500/10 group-hover:opacity-100' />
 
                       {post.image && (
@@ -331,7 +331,7 @@ export function BlogPageClient({
                         </div>
                       )}
 
-                      <div className='relative p-6'>
+                      <div className='relative p-4 md:p-6'>
                         <div className='mb-4 flex items-center justify-between'>
                           <span className='rounded-full border border-purple-500/30 bg-purple-500/20 px-3 py-1 font-medium font-mono text-purple-300 text-xs'>
                             {post.category}

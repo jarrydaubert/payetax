@@ -1,9 +1,18 @@
 // src/components/molecules/__tests__/PeriodSelectorCard.test.tsx
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PeriodSelectorCard } from '../PeriodSelectorCard';
+
 describe('PeriodSelectorCard', () => {
-  const defaultPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily', 'Hourly'];
+  const defaultPeriods = [
+    'Yearly',
+    'Monthly',
+    '4-Weekly',
+    'Fortnightly',
+    'Weekly',
+    'Daily',
+    'Hourly',
+  ];
 
   describe('Rendering', () => {
     it('renders the Display Periods title', () => {
@@ -110,7 +119,7 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      const weeklyCheckbox = screen.getByRole('checkbox', { name: "Weekly" });
+      const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
       await user.click(weeklyCheckbox);
 
       expect(handleToggle).toHaveBeenCalledWith('Weekly');
@@ -129,9 +138,9 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      await user.click(screen.getByRole('checkbox', { name: "Weekly" }));
-      await user.click(screen.getByRole('checkbox', { name: "Monthly" }));
-      await user.click(screen.getByRole('checkbox', { name: "Yearly" }));
+      await user.click(screen.getByRole('checkbox', { name: 'Weekly' }));
+      await user.click(screen.getByRole('checkbox', { name: 'Monthly' }));
+      await user.click(screen.getByRole('checkbox', { name: 'Yearly' }));
 
       expect(handleToggle).toHaveBeenCalledTimes(3);
       expect(handleToggle).toHaveBeenNthCalledWith(1, 'Weekly');
@@ -169,7 +178,7 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      const weeklyCheckbox = screen.getByRole('checkbox', { name: "Weekly" });
+      const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
       await user.click(weeklyCheckbox);
 
       expect(handleToggle).toHaveBeenCalledWith('Weekly');
@@ -187,7 +196,7 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      const weeklyCheckbox = screen.getByRole('checkbox', { name: "Weekly" });
+      const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
       weeklyCheckbox.focus();
       await user.keyboard(' ');
 
@@ -251,9 +260,7 @@ describe('PeriodSelectorCard', () => {
 
   describe('Edge Cases', () => {
     it('handles empty periods array', () => {
-      render(
-        <PeriodSelectorCard periods={[]} visiblePeriods={[]} onPeriodToggle={jest.fn()} />
-      );
+      render(<PeriodSelectorCard periods={[]} visiblePeriods={[]} onPeriodToggle={jest.fn()} />);
 
       expect(screen.getByText('Display Periods')).toBeInTheDocument();
       expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
@@ -261,11 +268,7 @@ describe('PeriodSelectorCard', () => {
 
     it('handles single period', () => {
       render(
-        <PeriodSelectorCard
-          periods={['Weekly']}
-          visiblePeriods={[]}
-          onPeriodToggle={jest.fn()}
-        />
+        <PeriodSelectorCard periods={['Weekly']} visiblePeriods={[]} onPeriodToggle={jest.fn()} />
       );
 
       expect(screen.getAllByRole('checkbox')).toHaveLength(1);
@@ -312,8 +315,8 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      expect(screen.getByRole('checkbox', { name: "4-Weekly" })).toBeChecked();
-      expect(screen.getByRole('checkbox', { name: "Fortnightly" })).not.toBeChecked();
+      expect(screen.getByRole('checkbox', { name: '4-Weekly' })).toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Fortnightly' })).not.toBeChecked();
     });
 
     it('maintains correct state after re-render', () => {
@@ -325,7 +328,7 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      expect(screen.getByRole('checkbox', { name: "Weekly" })).toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Weekly' })).toBeChecked();
 
       rerender(
         <PeriodSelectorCard
@@ -335,8 +338,8 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      expect(screen.getByRole('checkbox', { name: "Weekly" })).not.toBeChecked();
-      expect(screen.getByRole('checkbox', { name: "Monthly" })).toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Weekly' })).not.toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Monthly' })).toBeChecked();
     });
   });
 
@@ -384,13 +387,13 @@ describe('PeriodSelectorCard', () => {
 
       // Tab through checkboxes (they render in array order)
       await user.tab();
-      expect(screen.getByRole('checkbox', { name: "Weekly" })).toHaveFocus();
+      expect(screen.getByRole('checkbox', { name: 'Weekly' })).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole('checkbox', { name: "Monthly" })).toHaveFocus();
+      expect(screen.getByRole('checkbox', { name: 'Monthly' })).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole('checkbox', { name: "Yearly" })).toHaveFocus();
+      expect(screen.getByRole('checkbox', { name: 'Yearly' })).toHaveFocus();
     });
   });
 
@@ -405,10 +408,10 @@ describe('PeriodSelectorCard', () => {
       );
 
       // Verify Weekly is checked
-      expect(screen.getByRole('checkbox', { name: "Weekly" })).toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Weekly' })).toBeChecked();
 
       // Verify Monthly is unchecked
-      expect(screen.getByRole('checkbox', { name: "Monthly" })).not.toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Monthly' })).not.toBeChecked();
     });
 
     it('passes unique keys to each PeriodCheckbox', () => {

@@ -82,10 +82,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const relatedPosts = await getRelatedPosts(post.id, post.category, 3);
 
   return (
-    <div className='pt-20'>
+    <div className='pt-16 md:pt-20'>
       <PageContainer maxWidth='4xl' includeNavbarSpacing={false}>
         {/* Header */}
-        <div className='mb-8'>
+        <div className='mb-6 md:mb-8'>
           <Link
             href='/blog'
             className='mb-6 inline-flex items-center text-primary transition-colors hover:text-primary/80'
@@ -97,7 +97,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Article Header */}
         <article>
-          <header className='mb-8'>
+          <header className='mb-6 md:mb-8'>
             <div className='mb-4 flex items-center gap-2'>
               <span className='rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-xs'>
                 {post.categoryData?.name || post.category}
@@ -140,7 +140,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
 
             {post.image && (
-              <div className='relative mb-8 h-96 overflow-hidden rounded-xl'>
+              <div className='relative mb-6 md:mb-8 h-64 md:h-96 overflow-hidden rounded-xl'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -154,7 +154,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </header>
 
           {/* Article Content */}
-          <ContentSection glass className='mb-8'>
+          <ContentSection glass className='mb-6 md:mb-8'>
             {post.body && <BlogContent body={post.body} />}
           </ContentSection>
 
@@ -183,12 +183,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {relatedPosts.length > 0 && (
           <div className='mb-12'>
             <h2 className='mb-6 font-bold text-2xl text-foreground'>Related Articles</h2>
-            <div className='grid gap-6 md:grid-cols-3'>
+            <div className='grid gap-4 md:gap-6 md:grid-cols-3'>
               {relatedPosts.map((relatedPost) => (
                 <Link
                   key={relatedPost.slug}
                   href={`/blog/${relatedPost.slug}`}
-                  className='glass-card group border border-foreground/10 transition-all hover:border-primary/50'
+                  className='glass-card group border border-foreground/10 transition-all md:hover:border-primary/50 active:scale-[1.02]'
                 >
                   <div className='glass-card-inner p-6'>
                     <div className='mb-2 text-primary text-sm'>{relatedPost.category}</div>

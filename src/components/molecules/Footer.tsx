@@ -36,31 +36,31 @@ export function Footer({ className }: FooterProps) {
             <div className='flex flex-wrap items-center justify-center gap-6'>
               <Link
                 href='/about'
-                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 About
               </Link>
               <Link
                 href='/blog'
-                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Blog
               </Link>
               <Link
                 href='/compliance'
-                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Compliance
               </Link>
               <Link
                 href='/privacy'
-                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Privacy
               </Link>
               <a
                 href='mailto:support@payetax.co.uk'
-                className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
               >
                 Contact
               </a>
@@ -68,7 +68,7 @@ export function Footer({ className }: FooterProps) {
                 href='https://x.com/PayeTaxUK'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='flex items-center gap-1.5 text-muted-foreground text-sm transition-colors hover:text-primary'
+                className='flex items-center gap-1.5 py-2 px-3 -mx-3 text-muted-foreground text-sm transition-colors hover:text-primary'
                 aria-label='X: @PayeTaxUK'
               >
                 <Twitter className='size-4' />

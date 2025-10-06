@@ -50,7 +50,7 @@ export function CalculatorContainer() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-7xl space-y-6 px-4 py-8'>
+    <div className='mx-auto w-full max-w-7xl space-y-3 md:space-y-6 px-4 py-4 md:py-8'>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -73,7 +73,7 @@ export function CalculatorContainer() {
       </AnimatePresence>
 
       {/* Main Calculator Grid: Inputs (left) + Results Table (right) */}
-      <div className='grid gap-6 lg:grid-cols-[420px_1fr]'>
+      <div className='grid gap-3 md:gap-6 lg:grid-cols-[420px_1fr]'>
         {/* Inputs Column */}
         <Card className='border-primary/20 p-6'>
           <CalculatorInputsSection onCalculate={handleCalculate} />
@@ -117,7 +117,7 @@ export function CalculatorContainer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
-            className='flex justify-center gap-3'
+            className='flex justify-center gap-2 md:gap-3'
           >
             <Button variant='outline' size='lg' onClick={handlePrint}>
               <Printer className='mr-2 size-4' />

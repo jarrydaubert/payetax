@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
 
     // Validate message length (prevent abuse)
     if (message.length > 5000) {
-      return NextResponse.json({ error: 'Message too long (max 5000 characters)' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Message too long (max 5000 characters)' },
+        { status: 400 }
+      );
     }
 
     // Validate email format if provided

@@ -91,7 +91,7 @@ export default function AboutPage() {
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}
-      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-32 pb-20'>
+      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 md:pt-32 pb-10 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -137,12 +137,12 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className='grid gap-6 md:grid-cols-4'
+              className='grid gap-3 md:gap-6 md:grid-cols-4'
             >
               {stats.map((stat, _idx) => (
                 <Card
                   key={stat.label}
-                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'
+                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl'
                 >
                   <div
                     className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
@@ -163,7 +163,7 @@ export default function AboutPage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='py-20'
+        className='py-12 md:py-20'
       >
         <div className='container mx-auto max-w-5xl px-4'>
           <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
@@ -181,7 +181,7 @@ export default function AboutPage() {
       </motion.section>
 
       {/* Values Grid */}
-      <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-20'>
+      <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -198,7 +198,7 @@ export default function AboutPage() {
             </p>
           </motion.div>
 
-          <div className='grid gap-8 md:grid-cols-2'>
+          <div className='grid gap-4 md:gap-8 md:grid-cols-2'>
             {values.map((value, idx) => (
               <motion.div
                 key={value.title}
@@ -208,7 +208,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
               >
                 <Card
-                  className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${value.gradient} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-2xl`}
+                  className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${value.gradient} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl`}
                 >
                   <div
                     className={`mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br ${value.iconGradient} p-4 shadow-lg transition-transform group-hover:scale-110`}
@@ -230,7 +230,7 @@ export default function AboutPage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='py-20'
+        className='py-12 md:py-20'
       >
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
@@ -255,7 +255,7 @@ export default function AboutPage() {
                 viewport={{ once: true, margin: '-100px' }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
               >
-                <Card className='group h-full border-primary/20 p-8 text-center transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'>
+                <Card className='group h-full border-primary/20 p-8 text-center transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl'>
                   <feature.icon className='mx-auto mb-4 size-12 text-primary' />
                   <div className='mb-2 font-bold text-3xl text-foreground'>{feature.metric}</div>
                   <h3 className='mb-3 font-semibold text-foreground text-lg'>{feature.title}</h3>
@@ -281,7 +281,7 @@ export default function AboutPage() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className='rounded-full border border-primary/30 bg-background px-5 py-2.5 font-medium text-foreground text-sm transition-all hover:scale-105 hover:border-primary hover:shadow-lg'
+                  className='rounded-full border border-primary/30 bg-background px-5 py-2.5 font-medium text-foreground text-sm transition-all md:hover:scale-105 active:scale-[1.02] hover:border-primary hover:shadow-lg'
                 >
                   {tech}
                 </span>
@@ -292,7 +292,7 @@ export default function AboutPage() {
       </motion.section>
 
       {/* Story Section */}
-      <section className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-20'>
+      <section className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-5xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -340,7 +340,7 @@ export default function AboutPage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='py-20'
+        className='py-12 md:py-20'
       >
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
@@ -352,7 +352,7 @@ export default function AboutPage() {
             </p>
             <Link
               href='/'
-              className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-lg text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+              className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-lg text-white shadow-lg transition-all md:hover:scale-105 active:scale-[1.02] hover:shadow-xl'
             >
               Try the Calculator →
             </Link>

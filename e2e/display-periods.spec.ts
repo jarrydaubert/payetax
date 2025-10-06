@@ -216,7 +216,7 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Tab to first checkbox
       await page.keyboard.press('Tab');
       let focusedElement = await page.evaluateHandle(() => document.activeElement);
-      let focusedId = await focusedElement.evaluate((el) => el?.id);
+      const focusedId = await focusedElement.evaluate((el) => el?.id);
 
       // Should be on one of the period checkboxes
       expect(focusedId).toContain('period-');
@@ -303,7 +303,15 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
     test('should display columns in correct order after toggling', async ({ page }) => {
       // Check all periods
-      const allPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily', 'Hourly'];
+      const allPeriods = [
+        'Yearly',
+        'Monthly',
+        '4-Weekly',
+        'Fortnightly',
+        'Weekly',
+        'Daily',
+        'Hourly',
+      ];
 
       for (const period of allPeriods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
@@ -325,7 +333,15 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Periods should be in logical order
       const periodHeaders = headers.slice(2);
-      const expectedOrder = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily', 'Hourly'];
+      const expectedOrder = [
+        'Yearly',
+        'Monthly',
+        '4-Weekly',
+        'Fortnightly',
+        'Weekly',
+        'Daily',
+        'Hourly',
+      ];
 
       for (let i = 0; i < expectedOrder.length; i++) {
         expect(periodHeaders[i]).toContain(expectedOrder[i]);
@@ -401,7 +417,7 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Verify flex-wrap allows wrapping on small screens
       const checkboxContainer = periodsCard.locator('div').nth(1);
-      const containerWidth = await checkboxContainer.evaluate((el) => el.offsetWidth);
+      const _containerWidth = await checkboxContainer.evaluate((el) => el.offsetWidth);
       const checkboxes = await checkboxContainer.locator('[role="checkbox"]').all();
 
       // All checkboxes should be visible

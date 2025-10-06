@@ -147,7 +147,7 @@ export default function CompliancePage() {
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}
-      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-32 pb-20'>
+      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 md:pt-32 pb-10 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -223,7 +223,7 @@ export default function CompliancePage() {
               ].map((stat, _idx) => (
                 <Card
                   key={stat.label}
-                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'
+                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl'
                 >
                   <div
                     className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
@@ -239,7 +239,7 @@ export default function CompliancePage() {
       </section>
 
       {/* Compliance Features */}
-      <section className='py-20'>
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -255,7 +255,7 @@ export default function CompliancePage() {
             </p>
           </motion.div>
 
-          <div className='grid gap-8 md:grid-cols-2'>
+          <div className='grid gap-4 md:gap-8 md:grid-cols-2'>
             {COMPLIANCE_FEATURES.map((feature, idx) => (
               <motion.div
                 key={feature.title}
@@ -263,7 +263,7 @@ export default function CompliancePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 + idx * 0.1 }}
               >
-                <Card className='group h-full border-primary/20 p-8 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-2xl'>
+                <Card className='group h-full border-primary/20 p-8 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl'>
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-4'>
                       <div
@@ -305,7 +305,7 @@ export default function CompliancePage() {
       </section>
 
       {/* Compliance Statements */}
-      <section className='bg-gradient-to-br from-accent/5 to-transparent py-20'>
+      <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -329,7 +329,7 @@ export default function CompliancePage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.9 + idx * 0.1 }}
               >
-                <Card className='border-l-4 border-l-primary p-6 transition-all duration-300 hover:shadow-xl'>
+                <Card className='border-l-4 border-l-primary p-6 transition-all duration-300 md:hover:shadow-xl'>
                   <h3 className='mb-3 font-bold text-foreground text-xl'>{item.category}</h3>
                   <p className='mb-6 text-muted-foreground leading-relaxed'>{item.statement}</p>
 
@@ -353,7 +353,7 @@ export default function CompliancePage() {
       </section>
 
       {/* Data Sources */}
-      <section className='py-20'>
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -369,7 +369,7 @@ export default function CompliancePage() {
             </p>
           </motion.div>
 
-          <div className='grid gap-6 md:grid-cols-2'>
+          <div className='grid gap-4 md:gap-6 md:grid-cols-2'>
             {DATA_SOURCES.map((source, idx) => (
               <motion.div
                 key={source.source}
@@ -377,7 +377,7 @@ export default function CompliancePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 1.3 + idx * 0.1 }}
               >
-                <Card className='group h-full border-primary/20 p-6 transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-xl'>
+                <Card className='group h-full border-primary/20 p-6 transition-all duration-300 md:hover:scale-105 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                   <div className='mb-4 flex items-start justify-between'>
                     <h3 className='font-bold text-foreground text-lg'>{source.source}</h3>
                     <ExternalLink className='size-5 text-muted-foreground transition-colors group-hover:text-primary' />
@@ -416,7 +416,7 @@ export default function CompliancePage() {
       </section>
 
       {/* Important Notice */}
-      <section className='bg-gradient-to-br from-primary/5 to-transparent py-20'>
+      <section className='bg-gradient-to-br from-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -440,7 +440,7 @@ export default function CompliancePage() {
                     consult with a qualified accountant or tax advisor.
                   </p>
 
-                  <div className='grid gap-6 md:grid-cols-2'>
+                  <div className='grid gap-4 md:gap-6 md:grid-cols-2'>
                     <div>
                       <div className='mb-3 font-semibold text-yellow-500'>✓ Suitable for:</div>
                       <ul className='space-y-2'>
@@ -479,7 +479,7 @@ export default function CompliancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className='py-20'>
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -31,7 +31,8 @@ const HomePageContent = memo(function HomePageContent() {
     <main className='flex min-h-screen flex-col'>
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
-      <section id='calculator' ref={calculatorRef} className='py-8 lg:py-12'>
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator */}
+      <section id='tax-calculator' ref={calculatorRef} className='py-8 lg:py-12'>
         <CalculatorContainer />
       </section>
 
