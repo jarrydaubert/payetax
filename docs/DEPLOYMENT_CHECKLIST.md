@@ -18,16 +18,14 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 
 ---
 
-### M365 SMTP (Email System)
+### Resend API (Email System)
 ```env
-M365_SMTP_HOST=smtp.office365.com
-M365_SMTP_PORT=587
-M365_EMAIL=jarryd@payetax.co.uk
-M365_PASSWORD=your-new-app-password-here
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 ```
-**Status**: ⬜ Password needs to be changed
-**Get from**: https://account.microsoft.com/security > App passwords
+**Status**: ✅ API key obtained
+**Get from**: https://resend.com/api-keys
 **Use in**: `.env.local` and Vercel Environment Variables
+**Free Tier**: 100 emails/day, 3,000 emails/month
 
 ---
 
@@ -105,29 +103,39 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 
 ---
 
-### 2. M365 SMTP Configuration (Email Feedback System)
+### 2. Resend API Configuration (Email System)
 **Purpose**: Error reporting and user feedback emails
 
 **Required Values**:
 ```env
-M365_SMTP_HOST=smtp.office365.com
-M365_SMTP_PORT=587
-M365_EMAIL=jarryd@payetax.co.uk
-M365_PASSWORD=<your-new-app-password>
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 ```
 
 **Action Required**:
-1. ⚠️ **CHANGE PASSWORD** - Old password `Hermanus01!` was exposed in `.env.local.example`
-2. Go to: https://account.microsoft.com/security
-3. Navigate to "Security" > "Advanced security options"
-4. Under "App passwords", select "Create a new app password"
-5. Copy generated password to `.env.local` file (NOT `.env.local.example`)
+1. Go to: https://resend.com/api-keys
+2. Click "Create API Key"
+3. Name: `PayeTax Production`
+4. Permission: Full Access (for sending emails)
+5. Copy API key (shown once only!)
+6. Add to `.env.local` and Vercel Environment Variables
 
 **Where to Set**:
 - **Local Development**: `/Users/jarrydaubert/Desktop/payetax/.env.local`
 - **Vercel Production**: Project Settings > Environment Variables
 
-**Status**: ❌ Password needs to be changed and set
+**Domain Verification**:
+1. Add your domain in Resend Dashboard: https://resend.com/domains
+2. Add DNS records to your domain provider
+3. Wait for verification (usually 10-15 minutes)
+4. Once verified, emails will be sent from `support@payetax.co.uk`
+
+**Free Tier Limits**:
+- 100 emails per day
+- 3,000 emails per month
+- 1 custom domain
+- 1-day data retention
+
+**Status**: ✅ API key obtained, awaiting domain verification
 
 ---
 
@@ -276,15 +284,16 @@ cat .vercel/project.json
 
 - [ ] **Create new GA4 property and get Measurement ID**
 - [ ] **Add GA4 ID to `.env.local` and Vercel**
-- [ ] **Change M365 password** (security critical!)
-- [ ] **Add M365 credentials to `.env.local`**
+- [x] **Get Resend API key** ✅
+- [x] **Add Resend API key to `.env.local`** ✅
+- [ ] **Complete Resend domain verification**
 - [ ] **Get Vercel deployment token**
 - [ ] **Get Vercel Org ID and Project ID**
 - [ ] **Add Vercel variables to GitLab CI/CD**
 - [ ] **Enable Vercel Analytics in dashboard**
 - [ ] **Verify Buy Me a Coffee account exists**
 - [ ] **Test deployment pipeline end-to-end**
-- [ ] **Verify emails work (feedback form)**
+- [ ] **Verify emails work (feedback form and error monitoring)**
 
 ### Nice to Have (Can do post-launch):
 
@@ -321,7 +330,7 @@ git push origin main  # Triggers GitLab CI → Vercel
 | **Vercel** | https://vercel.com/dashboard | https://vercel.com/docs |
 | **GitLab CI/CD** | https://gitlab.com/ukpayetax/payetax/-/pipelines | https://docs.gitlab.com/ee/ci/ |
 | **Google Analytics** | https://analytics.google.com | https://support.google.com/analytics |
-| **M365 Admin** | https://admin.microsoft.com | https://docs.microsoft.com/microsoft-365 |
+| **Resend** | https://resend.com/domains | https://resend.com/docs |
 
 ---
 
@@ -331,10 +340,10 @@ git push origin main  # Triggers GitLab CI → Vercel
 2. **Always use** GitLab CI/CD Variables (Masked + Protected)
 3. **Rotate tokens** every 90 days (calendar reminder)
 4. **Use separate** tokens for dev/staging/prod
-5. **Enable 2FA** on Vercel, GitLab, Microsoft accounts
+5. **Enable 2FA** on Vercel, GitLab, Resend accounts
 
 ---
 
-**Last Updated**: 2025-10-03
+**Last Updated**: 2025-10-06
 **Status**: Ready for deployment after completing "Must Complete" items above
 **Repository**: https://gitlab.com/ukpayetax/payetax

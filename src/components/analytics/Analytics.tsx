@@ -5,8 +5,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useState } from 'react';
 
-// GA4 Measurement ID
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-99DW6ZQWMT';
+// GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 import type { GtagFunction } from '@/types/gtag';
 

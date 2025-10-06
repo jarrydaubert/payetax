@@ -64,7 +64,12 @@ export async function POST(request: NextRequest) {
     const { error } = await resend.emails.send({
       from: 'PayeTax <support@payetax.co.uk>',
       to: ['support@payetax.co.uk'],
+      replyTo: email || undefined,
       subject: `New Feedback from ${safeEmail} on PayeTax`,
+      tags: [
+        { name: 'source', value: 'website' },
+        { name: 'type', value: 'feedback' },
+      ],
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 10px;">
@@ -94,8 +99,16 @@ export async function POST(request: NextRequest) {
           </p>
         </div>
       `,
-      // Optional: Add plain text version for better accessibility
-      // text: `New feedback from ${email || 'Anonymous'}: ${message}`,
+      text: `New feedback from ${email || 'Anonymous'}
+
+Message: ${message}
+
+---
+Page: ${url || 'N/A'}
+Timestamp: ${timestamp || new Date().toLocaleString()}
+IP: ${ipAddress}
+
+Submitted via PayeTax.co.uk`,
     });
 
     if (error) {
