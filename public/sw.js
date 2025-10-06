@@ -1,9 +1,9 @@
 // Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
-const CACHE_NAME = 'toolhubx-v2025.1.0';
-const STATIC_CACHE_NAME = 'toolhubx-static-v2025.1.0';
-const API_CACHE_NAME = 'toolhubx-api-v2025.1.0';
+const CACHE_NAME = 'payetax-v2025.1.0';
+const STATIC_CACHE_NAME = 'payetax-static-v2025.1.0';
+const API_CACHE_NAME = 'payetax-api-v2025.1.0';
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
@@ -17,19 +17,19 @@ const PRECACHE_ASSETS = [
   '/blog',
   '/about',
   '/privacy',
-  '/feedback',
+  '/compliance',
   // Critical CSS and JS will be added dynamically
 ];
 
 // Assets to cache on first access
 const _CACHE_ON_NAVIGATE = [
-  /^https:\/\/toolhubx\.uk\/.*$/,
+  /^https:\/\/payetax\.co\.uk\/.*$/,
   /^https:\/\/fonts\.googleapis\.com\/.*$/,
   /^https:\/\/fonts\.gstatic\.com\/.*$/,
 ];
 
 // API endpoints to cache with different strategies
-const API_ENDPOINTS = ['/api/send-feedback'];
+const API_ENDPOINTS = ['/api/feedback', '/api/error-log'];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST = ['/api/', '/blog/category/', '/_next/static/chunks/'];

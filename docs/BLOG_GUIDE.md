@@ -5,7 +5,7 @@ Last Updated: October 2025
 
 ---
 
-## 📋 Table of Contents
+## 📋 Table of Contents 
 
 1. [Content Strategy Overview](#content-strategy-overview)
 2. [Writing Style Guide](#writing-style-guide)

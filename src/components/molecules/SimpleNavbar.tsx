@@ -8,7 +8,6 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { FeedbackDialog } from '@/components/molecules/FeedbackDialog';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 
 interface SimpleNavbarProps {
@@ -99,7 +98,6 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Desktop Utilities */}
           <div className='hidden items-center gap-2 md:flex'>
             <FeedbackDialog />
-            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
@@ -151,9 +149,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                 })}
 
                 {/* Mobile Utilities */}
-                <div className='mt-4 flex items-center justify-between gap-2'>
+                <div className='mt-4'>
                   <FeedbackDialog />
-                  <ThemeToggle />
                 </div>
               </div>
             </motion.div>

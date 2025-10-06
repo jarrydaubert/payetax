@@ -4,6 +4,7 @@
 
 import { Twitter } from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 
 interface FooterProps {
@@ -31,7 +32,7 @@ export function Footer({ className }: FooterProps) {
               </p>
             </div>
 
-            {/* Quick links */}
+            {/* Quick links and theme toggle */}
             <div className='flex flex-wrap items-center justify-center gap-6'>
               <Link
                 href='/about'
@@ -73,6 +74,7 @@ export function Footer({ className }: FooterProps) {
                 <Twitter className='size-4' />
                 @PayeTaxUK
               </a>
+              <ThemeToggle />
             </div>
           </div>
         </div>
