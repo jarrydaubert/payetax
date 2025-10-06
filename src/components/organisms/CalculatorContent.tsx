@@ -182,14 +182,8 @@ export function CalculatorContent() {
 
           <div className='mt-6 text-center'>
             <p className='text-muted-foreground text-sm'>
-              Based on England/Wales/NI rates for 2025-26. Scottish rates differ.{' '}
+              Based on England/Wales/NI rates for 2025-26. Scottish rates differ.
             </p>
-            <a
-              href='#calculator'
-              className='mt-2 inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-2 font-semibold text-white transition-transform hover:scale-105'
-            >
-              Calculate Your Exact Salary →
-            </a>
           </div>
         </div>
       </motion.section>

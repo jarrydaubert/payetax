@@ -22,18 +22,14 @@ export function PeriodSelectorCard({
 }: PeriodSelectorCardProps) {
   return (
     <Card className='border-primary/20 p-4'>
-      <h3 className='mb-3 font-semibold text-sm'>Display Periods</h3>
+      <p className='mb-3 font-semibold text-foreground text-sm'>Display Periods</p>
       <div className='flex flex-wrap gap-3 sm:gap-4'>
         {periods.map((period) => (
           <PeriodCheckbox
             key={period}
             period={period}
             checked={visiblePeriods.includes(period)}
-            onCheckedChange={(checked) => {
-              if (checked !== visiblePeriods.includes(period)) {
-                onPeriodToggle(period);
-              }
-            }}
+            onCheckedChange={() => onPeriodToggle(period)}
           />
         ))}
       </div>

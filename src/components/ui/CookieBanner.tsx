@@ -101,15 +101,15 @@ const CookieBanner: React.FC = () => {
   }
 
   return (
-    <div className='fixed inset-x-0 bottom-0 z-50 flex justify-center p-4'>
+    <div className='fixed inset-x-0 bottom-0 z-50 flex justify-center p-2 sm:p-4'>
       <Card className='w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
-        <CardContent className='p-6 text-center'>
+        <CardContent className='p-4 text-center sm:p-6'>
           <div className='mb-4 flex justify-center'>
             <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
               <Cookie className='size-6 text-white' />
             </div>
           </div>
-          <h3 className='mb-2 font-semibold text-foreground text-lg'>Cookie preferences</h3>
+          <h2 className='mb-2 font-semibold text-foreground text-lg'>Cookie preferences</h2>
           <p className='text-muted-foreground text-sm leading-relaxed'>
             We use analytics cookies to understand how visitors use our site and improve your
             experience. Essential cookies (to remember your choice) are always active. See our{' '}
@@ -123,7 +123,7 @@ const CookieBanner: React.FC = () => {
           </p>
         </CardContent>
 
-        <CardFooter className='flex justify-center gap-3 p-6 pt-0'>
+        <CardFooter className='flex flex-col justify-center gap-2 p-4 pt-0 sm:flex-row sm:gap-3 sm:p-6'>
           <Button onClick={declineCookies} variant='outline' size='sm' className='min-w-[140px]'>
             Essential Only
           </Button>

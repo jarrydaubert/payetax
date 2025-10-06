@@ -33,7 +33,7 @@ const config = {
     '<rootDir>/tests/**/*.{test,spec}.{js,jsx,ts,tsx}',
   ],
   // Coverage thresholds - enforce minimum code coverage
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       statements: 80,
       branches: 70,

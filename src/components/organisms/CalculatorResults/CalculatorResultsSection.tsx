@@ -37,15 +37,11 @@ export function CalculatorResultsSection({ results }: CalculatorResultsSectionPr
 
   const handleExport = () => {
     try {
-      const success = exportToCSV(results);
-      if (success) {
-        // Delay toast to show after save dialog appears
-        setTimeout(() => {
-          toast.success('CSV exported successfully!');
-        }, 100);
-      }
+      exportToCSV(results);
+      // Show toast immediately since download is triggered
+      toast.success('Download started');
     } catch {
-      toast.error('Failed to export CSV');
+      toast.error('Failed to start download');
     }
   };
 

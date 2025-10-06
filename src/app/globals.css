@@ -11,6 +11,15 @@
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
   --radius: 0.625rem;
 
+  /* Fluid Typography for Blog Content */
+  --font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem);
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+  --font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
+  --font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
+
   /* Brand Colors - Maintain identity across themes */
   --brand-primary: oklch(0.55 0.22 264);        /* Indigo-blue */
   --brand-accent: oklch(0.65 0.25 240);         /* Lighter blue */
@@ -114,6 +123,8 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    /* Add shadow for better contrast */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
 }
 
@@ -124,12 +135,18 @@
   top: -100px;
   left: 8px;
   z-index: 100;
-  padding: 8px 16px;
+  /* Increased padding for WCAG 2.2 AA touch target size (44x44px min) */
+  padding: 12px 20px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: oklch(var(--primary));
   color: oklch(var(--primary-foreground));
   border-radius: var(--radius);
   text-decoration: none;
   font-weight: 500;
+  font-size: 1rem;
   opacity: 0;
   pointer-events: none;
 }

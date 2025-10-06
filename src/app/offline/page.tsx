@@ -17,7 +17,7 @@ export default function OfflinePage() {
         <div className='glass-card p-8 md:p-16'>
           {/* Offline Icon */}
           <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
-            <Wifi className='h-10 w-10 text-amber-600 dark:text-amber-400' />
+            <Wifi className='h-10 w-10 text-amber-500' />
           </div>
 
           {/* Title */}
@@ -34,19 +34,19 @@ export default function OfflinePage() {
             <h2 className='mb-4 font-semibold text-foreground text-xl'>Available Offline:</h2>
             <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400' />
+                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
                 <span className='text-muted-foreground'>Tax calculations</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400' />
+                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
                 <span className='text-muted-foreground'>Cached tax rates</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400' />
+                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
                 <span className='text-muted-foreground'>Previous results</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400' />
+                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
                 <span className='text-muted-foreground'>Saved calculations</span>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function OfflinePage() {
 
           {/* Connection Status */}
           <div className='mt-8 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4'>
-            <p className='text-blue-600 text-sm dark:text-blue-400'>
+            <p className='text-blue-500 text-sm'>
               💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
               show the latest tax rates.
             </p>

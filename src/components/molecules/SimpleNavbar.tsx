@@ -23,7 +23,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const links = [
     { href: '/#tax-calculator', label: 'Calculator' },
     { href: '/about', label: 'About' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/blog', label: 'TaxInsights' },
   ] as const;
 
   const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -79,7 +79,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                   href={link.href}
                   onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
                   className={cn(
-                    'relative px-3 py-2 font-medium text-base transition-colors',
+                    'relative flex min-h-[44px] items-center px-4 py-3 font-medium text-base transition-colors',
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >

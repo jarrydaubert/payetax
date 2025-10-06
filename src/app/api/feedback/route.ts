@@ -1,17 +1,8 @@
 // src/app/api/feedback/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.M365_SMTP_HOST,
-  port: Number(process.env.M365_SMTP_PORT),
-  secure: false,
-  auth: {
-    user: process.env.M365_EMAIL,
-    pass: process.env.M365_PASSWORD,
-  },
-  tls: { rejectUnauthorized: false },
-});
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface FeedbackData {
   email?: string;
@@ -22,6 +13,14 @@ interface FeedbackData {
 }
 
 export async function POST(request: NextRequest) {
+  // Early exit if Resend not configured
+  if (!resend) {
+    return NextResponse.json(
+      { error: 'Server configuration error. Please check environment variables.' },
+      { status: 500 }
+    );
+  }
+
   try {
     const data: FeedbackData = await request.json();
     const { email, message, url, userAgent, timestamp } = data;
@@ -38,11 +37,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email
-    await transporter.sendMail({
-      from: `"PayeTax Feedback" <${process.env.M365_EMAIL}>`,
-      to: 'support@payetax.co.uk',
-      subject: `New Feedback from ${email || 'Anonymous'} on PayeTax`,
+    // Validate message length (prevent abuse)
+    if (message.length > 5000) {
+      return NextResponse.json({ error: 'Message too long (max 5000 characters)' }, { status: 400 });
+    }
+
+    // Validate email format if provided
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    // Escape HTML to prevent XSS in email
+    const escapeHtml = (str: string) =>
+      str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    const safeMessage = escapeHtml(message);
+    const safeEmail = email ? escapeHtml(email) : 'Not provided';
+    const safeUrl = url ? escapeHtml(url) : 'N/A';
+
+    // Send via Resend
+    const { error } = await resend.emails.send({
+      from: 'PayeTax <support@payetax.co.uk>',
+      to: ['support@payetax.co.uk'],
+      subject: `New Feedback from ${safeEmail} on PayeTax`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 10px;">
@@ -50,20 +72,20 @@ export async function POST(request: NextRequest) {
           </h2>
 
           <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0 0 10px 0;"><strong>📧 Email:</strong> ${email || 'Not provided'}</p>
+            <p style="margin: 0 0 10px 0;"><strong>📧 Email:</strong> ${safeEmail}</p>
             <p style="margin: 0 0 10px 0;"><strong>📅 Timestamp:</strong> ${timestamp || new Date().toLocaleString()}</p>
-            <p style="margin: 0 0 10px 0;"><strong>🌐 Page URL:</strong> <a href="${url || 'N/A'}">${url || 'N/A'}</a></p>
+            <p style="margin: 0 0 10px 0;"><strong>🌐 Page URL:</strong> ${safeUrl}</p>
             <p style="margin: 0;"><strong>🖥️ IP Address:</strong> ${ipAddress}</p>
           </div>
 
           <div style="background: white; padding: 20px; border-left: 4px solid #7c3aed; margin: 20px 0;">
             <h3 style="margin-top: 0; color: #374151;">Message:</h3>
-            <p style="white-space: pre-wrap; color: #1f2937;">${message}</p>
+            <p style="white-space: pre-wrap; color: #1f2937;">${safeMessage}</p>
           </div>
 
           <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
             <p style="margin: 0; font-size: 12px; color: #6b7280;"><strong>User Agent:</strong></p>
-            <p style="margin: 5px 0 0 0; font-size: 11px; color: #9ca3af; font-family: monospace;">${userAgent || 'N/A'}</p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; color: #9ca3af; font-family: monospace;">${(userAgent || 'N/A').slice(0, 200)}...</p>
           </div>
 
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
@@ -72,7 +94,13 @@ export async function POST(request: NextRequest) {
           </p>
         </div>
       `,
+      // Optional: Add plain text version for better accessibility
+      // text: `New feedback from ${email || 'Anonymous'}: ${message}`,
     });
+
+    if (error) {
+      throw new Error(error.message); // Handle Resend errors
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

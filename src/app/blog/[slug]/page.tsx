@@ -9,7 +9,7 @@ import BlogContent from '@/components/blog/BlogContent';
 import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
-import { getBlogPostBySlug, getBlogPosts } from '@/lib/blog';
+import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 
 // Enable ISR - revalidate every 24 hours for fresh tax content
 export const revalidate = 86400;
@@ -35,7 +35,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${post.title} | PayeTax Blog`,
+    title: `${post.title} | TaxInsights by PayeTax`,
     description: post.excerpt,
     keywords: post.seoKeywords?.join(', '),
     alternates: {
@@ -45,11 +45,18 @@ export async function generateMetadata({
       title: post.seoTitle || post.title,
       description: post.seoDescription || post.excerpt,
       type: 'article',
+      siteName: 'TaxInsights by PayeTax',
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: post.author ? [post.author] : undefined,
       tags: post.tags,
       images: post.image ? [{ url: post.image, alt: post.imageAlt || post.title }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: post.image ? [post.image] : undefined,
     },
   };
 }
@@ -70,6 +77,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) {
     notFound();
   }
+
+  // Get related posts
+  const relatedPosts = await getRelatedPosts(post.id, post.category, 3);
 
   return (
     <div className='pt-20'>
@@ -95,19 +105,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {post.tags &&
                 post.tags.length > 0 &&
                 post.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className='glass rounded-full px-2 py-1 text-white/90 text-xs'>
+                  <span
+                    key={tag}
+                    className='glass rounded-full px-2 py-1 text-foreground/90 text-xs'
+                  >
                     {tag}
                   </span>
                 ))}
             </div>
 
-            <h1 className='mb-6 font-bold text-4xl text-white leading-tight md:text-5xl'>
+            <h1 className='mb-6 font-bold text-4xl text-foreground leading-tight md:text-5xl'>
               {post.title}
             </h1>
 
-            <p className='mb-6 text-white/90 text-xl leading-relaxed'>{post.excerpt}</p>
+            <p className='mb-6 text-foreground/90 text-xl leading-relaxed'>{post.excerpt}</p>
 
-            <div className='mb-8 flex items-center gap-6 text-sm text-white/90'>
+            <div className='mb-8 flex items-center gap-6 text-foreground/90 text-sm'>
               <div className='flex items-center gap-2'>
                 <Calendar className='h-4 w-4' />
                 <span>{formatDate(post.publishedAt)}</span>
@@ -132,6 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   src={post.image}
                   alt={post.imageAlt || post.title}
                   fill
+                  sizes='(max-width: 1024px) 100vw, 896px'
                   className='object-cover'
                   priority
                 />
@@ -141,7 +155,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Article Content */}
           <ContentSection glass className='mb-8'>
-            <BlogContent content={post.content} />
+            {post.body && <BlogContent body={post.body} />}
           </ContentSection>
 
           {/* Article Footer */}
@@ -149,8 +163,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className='glass-card-inner p-6'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <h3 className='mb-2 font-semibold text-white'>Found this helpful?</h3>
-                  <p className='text-sm text-white'>
+                  <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>
+                  <p className='text-foreground text-sm'>
                     Try our free UK tax calculator to see how much you'll take home.
                   </p>
                 </div>
@@ -164,6 +178,41 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           </div>
         </article>
+
+        {/* Related Posts */}
+        {relatedPosts.length > 0 && (
+          <div className='mb-12'>
+            <h2 className='mb-6 font-bold text-2xl text-foreground'>Related Articles</h2>
+            <div className='grid gap-6 md:grid-cols-3'>
+              {relatedPosts.map((relatedPost) => (
+                <Link
+                  key={relatedPost.slug}
+                  href={`/blog/${relatedPost.slug}`}
+                  className='glass-card group border border-foreground/10 transition-all hover:border-primary/50'
+                >
+                  <div className='glass-card-inner p-6'>
+                    <div className='mb-2 text-primary text-sm'>{relatedPost.category}</div>
+                    <h3 className='mb-3 font-semibold text-foreground text-xl group-hover:text-primary'>
+                      {relatedPost.title}
+                    </h3>
+                    <p className='mb-4 line-clamp-2 text-foreground/80 text-sm'>
+                      {relatedPost.excerpt}
+                    </p>
+                    <div className='flex items-center gap-4 text-foreground/60 text-xs'>
+                      {relatedPost.readTime && (
+                        <div className='flex items-center gap-1'>
+                          <Clock className='h-3 w-3' />
+                          <span>{relatedPost.readTime}</span>
+                        </div>
+                      )}
+                      <time>{formatDate(relatedPost.publishedAt)}</time>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Footer Navigation */}
         <div className='flex justify-center border-foreground/10 border-t pt-8'>

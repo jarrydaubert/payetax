@@ -54,6 +54,7 @@
     "debug": "npm run clean && npm run typecheck && npm run build"
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
     "@headlessui/react": "^2.2.9",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
@@ -68,6 +69,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-email/components": "^0.5.5",
     "@types/exceljs": "^1.3.2",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
@@ -93,6 +95,7 @@
     "rehype-slug": "^6.0.0",
     "remark-code-import": "^1.2.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.1.2",
     "shiki": "^3.13.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
@@ -148,6 +151,11 @@
     "accessibility",
     "wcag",
     "financial-tools",
-    "tax-planning"
+    "tax-planning",
+    "tax-blog",
+    "TaxInsights",
+    "uk-tax-news",
+    "tax-guidance",
+    "tax-insights"
   ]
 }

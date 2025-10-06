@@ -7,10 +7,6 @@ import { codeImport } from 'remark-code-import';
 import remarkGfm from 'remark-gfm';
 
 const computedFields = {
-  slug: {
-    type: 'string' as const,
-    resolve: (doc: any) => doc._raw.flattenedPath,
-  },
   slugAsParams: {
     type: 'string' as const,
     resolve: (doc: any) => doc._raw.flattenedPath.split('/').slice(1).join('/'),
@@ -40,6 +36,11 @@ export const Post = defineDocumentType(() => ({
       description: 'The title of the post',
       required: true,
     },
+    slug: {
+      type: 'string',
+      description: 'URL slug for the post',
+      required: false, // Auto-generated from filename if not provided
+    },
     excerpt: {
       type: 'string',
       description: 'Short excerpt for SEO and post listings',
@@ -60,6 +61,12 @@ export const Post = defineDocumentType(() => ({
       description: 'Post category (Tax Basics, Tax Tips, etc.)',
       required: true,
     },
+    tags: {
+      type: 'list',
+      description: 'Post tags for categorization',
+      of: { type: 'string' },
+      required: false,
+    },
     image: {
       type: 'string',
       description: 'Featured image URL',
@@ -74,7 +81,12 @@ export const Post = defineDocumentType(() => ({
       type: 'string',
       description: 'Post author',
       required: false,
-      default: 'PayeTax Team',
+      default: 'TaxInsights Editorial Team',
+    },
+    readTime: {
+      type: 'string',
+      description: 'Estimated reading time',
+      required: false,
     },
     featured: {
       type: 'boolean',
@@ -98,10 +110,21 @@ export const Post = defineDocumentType(() => ({
       description: 'SEO description override',
       required: false,
     },
+    seoKeywords: {
+      type: 'list',
+      description: 'SEO keywords (alternative to keywords)',
+      of: { type: 'string' },
+      required: false,
+    },
     keywords: {
       type: 'list',
       description: 'SEO keywords',
       of: { type: 'string' },
+      required: false,
+    },
+    canonicalUrl: {
+      type: 'string',
+      description: 'Canonical URL for the post',
       required: false,
     },
   },
@@ -111,6 +134,7 @@ export const Post = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: './content',
   documentTypes: [Post],
+  disableImportAliasWarning: true,
   mdx: {
     remarkPlugins: [remarkGfm, codeImport],
     rehypePlugins: [

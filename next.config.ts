@@ -64,6 +64,9 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
+  // Enable source maps for debugging (Best Practices requirement)
+  productionBrowserSourceMaps: true,
+
   // Advanced webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
     // Production-only optimizations
@@ -160,7 +163,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://cdnjs.buymeacoffee.com; worker-src 'self'; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com https://vitals.vercel-insights.com; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://cdnjs.buymeacoffee.com; worker-src 'self'; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com;",
           },
         ],
       },

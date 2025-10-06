@@ -97,7 +97,7 @@ export function FeedbackDialog() {
           Feedback
         </Button>
       </DialogTrigger>
-      <DialogContent className='border-border/50 bg-gray-900/95 backdrop-blur-xl sm:max-w-md'>
+      <DialogContent className='border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Share Your Feedback</DialogTitle>
           <DialogDescription>

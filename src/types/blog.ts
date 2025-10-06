@@ -4,6 +4,8 @@
  * Replaces the Strapi-based types with local MDX-based blog types
  */
 
+import type { MDX } from 'contentlayer2/core';
+
 /**
  * Frontmatter structure for MDX blog posts
  * This defines all the metadata that can be included at the top of each .mdx file
@@ -37,8 +39,10 @@ export interface BlogPostFrontmatter {
  */
 export interface BlogPost extends BlogPostFrontmatter {
   id: string; // generated from filename
-  content: string; // MDX content
+  content: string; // MDX content (raw)
+  body?: MDX; // Contentlayer MDX body with code for rendering
   categoryData?: BlogCategory; // populated category info
+  published?: boolean; // publication status
 }
 
 /**

@@ -91,9 +91,7 @@ export default function PrivacyPolicyPage() {
               className='mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-6 py-2.5 backdrop-blur-sm'
             >
               <Shield className='size-5 text-green-500' />
-              <span className='font-semibold text-green-600 text-sm dark:text-green-400'>
-                Privacy Policy
-              </span>
+              <span className='font-semibold text-green-500 text-sm'>Privacy Policy</span>
             </motion.div>
 
             <motion.h1

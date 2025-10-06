@@ -7,6 +7,22 @@
 import type { BlogCategory, BlogConfig } from '@/types/blog';
 
 /**
+ * Blog brand identity
+ * Defines the blog as a distinct publication within PayeTax
+ */
+export const BLOG_BRAND = {
+  name: 'TaxInsights',
+  fullName: 'TaxInsights by PayeTax',
+  tagline: 'Expert UK Tax Guidance & Financial Insights',
+  description: 'Clear, actionable UK tax advice from qualified experts. No jargon, just insights.',
+  author: 'TaxInsights Editorial Team',
+  publisher: 'PayeTax',
+  url: 'https://payetax.co.uk/blog',
+  logo: '/images/blog/taxinsights-logo.svg',
+  socialImage: '/images/blog/taxinsights-og.jpg',
+};
+
+/**
  * Available blog categories
  * These replace the categories that were previously managed in Strapi
  */
@@ -96,18 +112,18 @@ export const BLOG_IMAGES_DIR = '/images/blog';
  * Default metadata for blog posts (used as fallbacks)
  */
 export const DEFAULT_BLOG_METADATA = {
-  author: 'PayeTax Team',
+  author: 'TaxInsights Editorial Team',
   readTime: '5 min read',
   image: '/images/blog/default-blog-image.jpg',
-  imageAlt: 'PayeTax Blog',
+  imageAlt: 'TaxInsights by PayeTax',
 };
 
 /**
  * SEO defaults for blog pages
  */
 export const BLOG_SEO_DEFAULTS = {
-  titleTemplate: '%s | PayeTax Blog',
+  titleTemplate: '%s | TaxInsights by PayeTax',
   descriptionTemplate:
-    'Read our latest article on %s. Expert UK tax advice and financial guidance.',
-  keywords: ['UK tax', 'PAYE', 'tax calculator', 'financial advice', 'tax tips'],
+    'Read our latest article on %s. Expert UK tax advice and financial guidance from TaxInsights.',
+  keywords: ['UK tax', 'PAYE', 'tax calculator', 'financial advice', 'tax tips', 'TaxInsights'],
 };

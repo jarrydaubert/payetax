@@ -68,7 +68,7 @@ export function Footer({ className }: FooterProps) {
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center gap-1.5 text-muted-foreground text-sm transition-colors hover:text-primary'
-                aria-label='Follow us on X (formerly Twitter)'
+                aria-label='X: @PayeTaxUK'
               >
                 <Twitter className='size-4' />
                 @PayeTaxUK

@@ -97,7 +97,7 @@ export function Heading({
     headingStyles[level],
     weight && weightStyles[weight],
     alignStyles[align],
-    muted ? 'text-gray-400' : 'text-white',
+    muted ? 'text-muted-foreground' : 'text-foreground',
     className
   );
 
@@ -127,7 +127,7 @@ export function Text({
     textVariantStyles[variant],
     weightStyles[weight],
     alignStyles[align],
-    muted ? 'text-gray-400' : 'text-gray-300',
+    muted ? 'text-muted-foreground' : 'text-foreground/90',
     className
   );
 

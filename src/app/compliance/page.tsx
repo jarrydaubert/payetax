@@ -426,7 +426,7 @@ export default function CompliancePage() {
             <Card className='border-yellow-500/30 p-8 md:p-12'>
               <div className='flex flex-col items-start gap-6 md:flex-row'>
                 <div className='rounded-xl bg-yellow-500/10 p-4'>
-                  <AlertTriangle className='size-8 text-yellow-600 dark:text-yellow-400' />
+                  <AlertTriangle className='size-8 text-yellow-500' />
                 </div>
 
                 <div className='flex-1'>
@@ -442,9 +442,7 @@ export default function CompliancePage() {
 
                   <div className='grid gap-6 md:grid-cols-2'>
                     <div>
-                      <div className='mb-3 font-semibold text-yellow-600 dark:text-yellow-400'>
-                        ✓ Suitable for:
-                      </div>
+                      <div className='mb-3 font-semibold text-yellow-500'>✓ Suitable for:</div>
                       <ul className='space-y-2'>
                         {[
                           'Standard PAYE calculations',
@@ -462,7 +460,7 @@ export default function CompliancePage() {
                       </ul>
                     </div>
                     <div>
-                      <div className='mb-3 font-semibold text-yellow-600 dark:text-yellow-400'>
+                      <div className='mb-3 font-semibold text-yellow-500'>
                         ⚠ Professional advice recommended:
                       </div>
                       <ul className='space-y-2 text-muted-foreground text-sm'>

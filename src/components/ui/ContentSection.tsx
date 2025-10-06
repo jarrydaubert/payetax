@@ -95,7 +95,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
 
             {/* Optional description */}
             {description && (
-              <p className={cn('text-gray-300 leading-relaxed', descriptionClassName)}>
+              <p className={cn('text-muted-foreground leading-relaxed', descriptionClassName)}>
                 {description}
               </p>
             )}

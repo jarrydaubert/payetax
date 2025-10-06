@@ -33,21 +33,27 @@ export async function generateMetadata({
   const category = categories.find((c) => c.slug === slug);
 
   if (!category) {
-    return { title: 'Category Not Found | PayeTax Blog' };
+    return { title: 'Category Not Found | TaxInsights by PayeTax' };
   }
 
-  const title = `${category.name} | UK Tax Insights & Updates | PayeTax Blog`;
-  const description = `Expert guidance and articles on ${category.name.toLowerCase()} including UK tax news, tips, and updates.`;
+  const title = `${category.name} | TaxInsights by PayeTax`;
+  const description = `Expert guidance and articles on ${category.name.toLowerCase()} from TaxInsights. Clear UK tax advice with no jargon.`;
 
   return {
     title,
     description,
-    keywords: `${category.name}, UK tax, tax guide, tax advice, PAYE, tax calculator`,
+    keywords: `${category.name}, UK tax, tax guide, tax advice, PAYE, tax calculator, TaxInsights`,
     openGraph: {
       title,
       description,
       type: 'website',
+      siteName: 'TaxInsights by PayeTax',
       url: `https://payetax.co.uk/blog/category/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
     alternates: {
       canonical: `https://payetax.co.uk/blog/category/${slug}`,
@@ -115,28 +121,28 @@ export default async function CategoryPage({
       </Script>
 
       {/* Breadcrumbs */}
-      <nav aria-label='Breadcrumbs' className='mb-8 text-small text-white/90'>
+      <nav aria-label='Breadcrumbs' className='mb-8 text-muted-foreground text-small'>
         <ol className='flex items-center space-x-2'>
           <li>
-            <Link href='/' className='hover:text-blue-600 dark:hover:text-blue-400'>
+            <Link href='/' className='hover:text-primary'>
               Home
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link href='/blog' className='hover:text-blue-600 dark:hover:text-blue-400'>
+            <Link href='/blog' className='hover:text-primary'>
               Blog
             </Link>
           </li>
           <li>/</li>
-          <li className='text-blue-600 dark:text-blue-400'>{category.name}</li>
+          <li className='text-primary'>{category.name}</li>
         </ol>
       </nav>
 
       {/* Header */}
       <div className='mb-12 text-center'>
         <h1 className='mb-4 font-bold text-title md:text-display'>{category.name} Insights</h1>
-        <p className='mx-auto max-w-3xl text-large text-white/80'>
+        <p className='mx-auto max-w-3xl text-large text-muted-foreground'>
           Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
           guidance, and practical advice.
         </p>
@@ -148,7 +154,7 @@ export default async function CategoryPage({
         <div className='flex flex-wrap gap-3'>
           <Link
             href='/blog'
-            className='rounded-full bg-gray-200 px-4 py-2 font-medium transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            className='rounded-full border border-border bg-secondary px-4 py-2 font-medium text-foreground transition-colors hover:bg-accent'
           >
             All Posts
           </Link>
@@ -158,8 +164,8 @@ export default async function CategoryPage({
               href={`/blog/category/${cat.slug}`}
               className={`rounded-full px-4 py-2 font-medium transition-colors ${
                 slug === cat.slug
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border border-border bg-secondary text-foreground hover:bg-accent'
               }`}
             >
               {cat.name} {cat.count ? `(${cat.count})` : ''}
@@ -175,7 +181,7 @@ export default async function CategoryPage({
             {posts.map((post) => (
               <article
                 key={post.id}
-                className='overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800'
+                className='overflow-hidden rounded-lg border border-border bg-card shadow-md transition-shadow hover:shadow-lg'
               >
                 {post.image && (
                   <Link href={`/blog/${post.slug}`} className='relative block h-48 overflow-hidden'>
@@ -189,8 +195,8 @@ export default async function CategoryPage({
                   </Link>
                 )}
                 <div className='p-6'>
-                  <div className='mb-3 flex items-center justify-between text-small text-white/90'>
-                    <span className='font-medium text-blue-600 dark:text-blue-400'>
+                  <div className='mb-3 flex items-center justify-between text-muted-foreground text-small'>
+                    <span className='font-medium text-primary'>
                       {post.categoryData?.name || post.category}
                     </span>
                     <span>{formatDate(post.publishedAt)}</span>
@@ -198,17 +204,17 @@ export default async function CategoryPage({
                   <h3 className='mb-3 font-bold text-xl'>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className='transition-colors hover:text-blue-600 dark:hover:text-blue-400'
+                      className='text-foreground transition-colors hover:text-primary'
                     >
                       {post.title}
                     </Link>
                   </h3>
-                  <p className='mb-4 line-clamp-3 text-white'>{post.excerpt}</p>
+                  <p className='mb-4 line-clamp-3 text-muted-foreground'>{post.excerpt}</p>
                   <div className='flex items-center justify-between'>
-                    <span className='text-small text-white/90'>{post.readTime}</span>
+                    <span className='text-muted-foreground text-small'>{post.readTime}</span>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className='inline-flex items-center font-medium text-blue-600 text-small hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
+                      className='inline-flex items-center font-medium text-primary text-small hover:text-primary/80'
                     >
                       Read more
                       <svg
@@ -233,7 +239,7 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className='py-16 text-center'>
-            <p className='text-large text-white/80'>
+            <p className='text-large text-muted-foreground'>
               No articles found in this category. Check back soon!
             </p>
           </div>
@@ -246,7 +252,7 @@ export default async function CategoryPage({
           {currentPage > 1 && (
             <Link
               href={`/blog/category/${slug}?page=${currentPage - 1}`}
-              className='rounded-md bg-gray-200 px-4 py-2 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+              className='rounded-md border border-border bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent'
             >
               Previous
             </Link>
@@ -258,8 +264,8 @@ export default async function CategoryPage({
                 href={`/blog/category/${slug}?page=${page}`}
                 className={`rounded-md px-4 py-2 transition-colors ${
                   page === currentPage
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border bg-secondary text-foreground hover:bg-accent'
                 }`}
               >
                 {page}
@@ -269,7 +275,7 @@ export default async function CategoryPage({
           {currentPage < totalPages && (
             <Link
               href={`/blog/category/${slug}?page=${currentPage + 1}`}
-              className='rounded-md bg-gray-200 px-4 py-2 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+              className='rounded-md border border-border bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent'
             >
               Next
             </Link>

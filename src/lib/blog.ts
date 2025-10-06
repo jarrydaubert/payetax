@@ -1,26 +1,17 @@
 // src/lib/blog.ts
 /**
- * Blog library for managing local MDX blog posts
- * Replaces Strapi API integration with file-based blog system
- * FIXED: js-yaml v4 compatibility
- * OPTIMIZED: Added Next.js caching for better build performance
+ * Blog library for managing local MDX blog posts using Contentlayer
+ * Uses Contentlayer2 for MDX compilation and type-safe blog posts
+ * OPTIMIZED: Direct Contentlayer integration instead of manual parsing
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
+import { allPosts, type Post } from 'contentlayer/generated';
 import { unstable_cache } from 'next/cache';
-import {
-  BLOG_CONFIG,
-  BLOG_CONTENT_DIR,
-  DEFAULT_BLOG_METADATA,
-  getCategoryBySlug,
-} from '@/config/blog.config';
+import { BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
 import type {
   BlogCategory,
   BlogPaginationOptions,
   BlogPost,
-  BlogPostFrontmatter,
   BlogSortOption,
   PaginatedBlogResponse,
   RelatedPost,
@@ -30,134 +21,49 @@ import type {
 export { BlogError } from '@/types/blog';
 
 /**
- * Get the absolute path to the blog content directory
+ * Convert Contentlayer Post to BlogPost type
  */
-function getBlogContentPath(): string {
-  return path.join(process.cwd(), BLOG_CONTENT_DIR);
+function convertContentlayerPost(post: Post): BlogPost {
+  const categoryData = getCategoryBySlug(post.category);
+
+  return {
+    id: post._id,
+    title: post.title,
+    slug: post.slugAsParams, // Use slugAsParams which strips the "blog/" prefix
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    category: post.category,
+    content: post.body.raw, // Keep for compatibility
+    body: post.body, // Add the MDX body for rendering
+    categoryData,
+
+    // Optional fields
+    updatedAt: post.updatedAt || post.publishedAt,
+    featured: post.featured || false,
+    published: post.published !== false, // Default to true if not specified
+    author: post.author,
+    readTime: `${post.readingTime} min read`,
+    tags: post.keywords || [],
+    image: post.image,
+    imageAlt: post.imageAlt,
+
+    // SEO fields
+    seoTitle: post.seoTitle || post.title,
+    seoDescription: post.seoDescription || post.excerpt,
+    seoKeywords: post.keywords || [],
+  };
 }
 
 /**
- * Check if the blog content directory exists, create it if it doesn't
+ * Get all published posts from Contentlayer (cached)
  */
-async function ensureBlogContentDir(): Promise<void> {
-  const contentPath = getBlogContentPath();
-  try {
-    await fs.promises.access(contentPath);
-  } catch {
-    await fs.promises.mkdir(contentPath, { recursive: true });
-  }
-}
-
-/**
- * Get all MDX files from the blog content directory (cached)
- * Cache revalidates every hour to reduce filesystem I/O
- */
-const getAllMDXFiles = unstable_cache(
-  async (): Promise<string[]> => {
-    try {
-      await ensureBlogContentDir();
-      const files = await fs.promises.readdir(getBlogContentPath());
-      return files.filter((file) => file.endsWith('.mdx') || file.endsWith('.md'));
-    } catch (_error) {
-      console.warn('No blog content directory found, returning empty array');
-      return [];
-    }
+const getAllContentlayerPosts = unstable_cache(
+  async (): Promise<BlogPost[]> => {
+    return allPosts.filter((post) => post.published !== false).map(convertContentlayerPost);
   },
-  ['blog-mdx-files'],
+  ['blog-all-posts'],
   { revalidate: 3600, tags: ['blog'] }
 );
-
-/**
- * Read and parse a single MDX file with improved error handling
- */
-async function readMDXFile(filename: string): Promise<BlogPost | null> {
-  try {
-    const filePath = path.join(getBlogContentPath(), filename);
-    const fileContent = await fs.promises.readFile(filePath, 'utf-8');
-
-    // Parse frontmatter and content with js-yaml v4 compatibility
-    const { data, content } = matter(fileContent, {
-      // Configure gray-matter to use js-yaml v4 safely
-      engines: {
-        yaml: {
-          parse: (str: string) => {
-            try {
-              // Use yaml.load instead of yaml.safeLoad for js-yaml v4
-              const yaml = require('js-yaml');
-              return yaml.load(str);
-            } catch (error) {
-              console.error(`YAML parse error in ${filename}:`, error);
-              return {};
-            }
-          },
-        },
-      },
-    });
-
-    // Validate frontmatter - must have required fields
-    if (!data || typeof data !== 'object') {
-      console.warn(`Invalid frontmatter in ${filename}: not an object`);
-      return null;
-    }
-
-    const frontmatter = data as Partial<BlogPostFrontmatter>;
-
-    // Check for required fields
-    if (
-      !frontmatter.title ||
-      !frontmatter.slug ||
-      !frontmatter.excerpt ||
-      !frontmatter.publishedAt ||
-      !frontmatter.category
-    ) {
-      console.warn(`Invalid frontmatter in ${filename}: missing required fields`, {
-        title: !!frontmatter.title,
-        slug: !!frontmatter.slug,
-        excerpt: !!frontmatter.excerpt,
-        publishedAt: !!frontmatter.publishedAt,
-        category: !!frontmatter.category,
-      });
-      return null;
-    }
-
-    // Generate ID from filename
-    const id = filename.replace(/\.mdx?$/, '');
-
-    // Get category data
-    const categoryData = getCategoryBySlug(frontmatter.category);
-
-    // Apply defaults for optional fields
-    const post: BlogPost = {
-      id,
-      title: frontmatter.title,
-      slug: frontmatter.slug,
-      excerpt: frontmatter.excerpt,
-      publishedAt: frontmatter.publishedAt,
-      category: frontmatter.category,
-      content,
-      categoryData,
-
-      // Optional fields with defaults
-      updatedAt: frontmatter.updatedAt || frontmatter.publishedAt,
-      featured: frontmatter.featured || false,
-      author: frontmatter.author || DEFAULT_BLOG_METADATA.author,
-      readTime: frontmatter.readTime || DEFAULT_BLOG_METADATA.readTime,
-      tags: frontmatter.tags || [],
-      image: frontmatter.image || DEFAULT_BLOG_METADATA.image,
-      imageAlt: frontmatter.imageAlt || DEFAULT_BLOG_METADATA.imageAlt,
-
-      // SEO fields
-      seoTitle: frontmatter.seoTitle || frontmatter.title,
-      seoDescription: frontmatter.seoDescription || frontmatter.excerpt,
-      seoKeywords: frontmatter.seoKeywords || [],
-    };
-
-    return post;
-  } catch (error) {
-    console.error(`Error reading MDX file ${filename}:`, error);
-    return null;
-  }
-}
 
 /**
  * Sort posts based on the specified criteria
@@ -233,12 +139,11 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
   const { page = 1, pageSize = BLOG_CONFIG.postsPerPage } = options;
 
   try {
-    const files = await getAllMDXFiles();
-    const posts = await Promise.all(files.map((file) => readMDXFile(file)));
-    const validPosts = posts.filter((post): post is BlogPost => post !== null);
+    // Get all posts from Contentlayer
+    const allContentPosts = await getAllContentlayerPosts();
 
     // Apply filters
-    const filteredPosts = filterPosts(validPosts, options);
+    const filteredPosts = filterPosts(allContentPosts, options);
 
     // Sort posts (default: newest first)
     const sortedPosts = sortPosts(filteredPosts, 'date-desc');
@@ -260,15 +165,13 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
 export const getBlogPostsCount = unstable_cache(
   async (category?: string): Promise<number> => {
     try {
-      const files = await getAllMDXFiles();
-      const posts = await Promise.all(files.map((file) => readMDXFile(file)));
-      const validPosts = posts.filter((post): post is BlogPost => post !== null);
+      const allContentPosts = await getAllContentlayerPosts();
 
       if (category) {
-        return validPosts.filter((post) => post.category === category).length;
+        return allContentPosts.filter((post) => post.category === category).length;
       }
 
-      return validPosts.length;
+      return allContentPosts.length;
     } catch {
       return 0;
     }
@@ -304,17 +207,9 @@ export async function getPaginatedBlogPosts(
  */
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const files = await getAllMDXFiles();
-
-    // Try to find file by slug
-    for (const file of files) {
-      const post = await readMDXFile(file);
-      if (post && post.slug === slug) {
-        return post;
-      }
-    }
-
-    return null;
+    const allContentPosts = await getAllContentlayerPosts();
+    const post = allContentPosts.find((p) => p.slug === slug);
+    return post || null;
   } catch (error) {
     console.error(`Error getting blog post by slug ${slug}:`, error);
     return null;
@@ -395,10 +290,10 @@ export async function getRelatedPosts(
 export const getBlogCategories = unstable_cache(
   async (): Promise<BlogCategory[]> => {
     try {
-      const allPosts = await getBlogPosts();
+      const allContentPosts = await getAllContentlayerPosts();
 
       // Count posts per category
-      const categoryCounts = allPosts.reduce(
+      const categoryCounts = allContentPosts.reduce(
         (counts, post) => {
           counts[post.category] = (counts[post.category] || 0) + 1;
           return counts;

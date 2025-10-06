@@ -20,17 +20,26 @@ export function exportToCSV(results: TaxCalculationResults): boolean {
   };
 
   addRow('Gross Pay', results.grossSalary.annually);
-  addRow('Income Tax', -results.incomeTax.annually);
-  addRow('National Insurance', -results.nationalInsurance.annually);
+  addRow('Tax-Free Allowance', results.taxFreeAmount);
+  addRow('Total Taxable', results.taxableIncome);
+  addRow('Total Tax Due', -results.incomeTax.annually);
 
-  if (results.pensionContribution.annually > 0) {
-    addRow('Pension', -results.pensionContribution.annually);
+  // Tax band breakdown
+  for (const band of results.taxBands) {
+    addRow(`  ${band.rate}% Rate`, -band.amount);
   }
 
   if (results.studentLoan.annually > 0) {
     addRow('Student Loan', -results.studentLoan.annually);
   }
 
+  addRow('National Insurance', -results.nationalInsurance.annually);
+
+  if (results.pensionContribution.annually > 0) {
+    addRow('Pension [You]', -results.pensionContribution.annually);
+  }
+
+  addRow('Pension [HMRC Relief]', 0);
   addRow('Net Pay', results.netPay.annually);
 
   // Download
@@ -48,14 +57,25 @@ export function exportToCSV(results: TaxCalculationResults): boolean {
 
 /**
  * Print tax calculation results
- * Uses user's selected visible periods from the results table
+ * Shows user's selected visible periods from the results table
  */
 export function printResults(
   results: TaxCalculationResults,
   visiblePeriods: string[] = ['Yearly', 'Monthly', 'Weekly']
 ): void {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
+  // Create hidden iframe for printing
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'absolute';
+  iframe.style.width = '0px';
+  iframe.style.height = '0px';
+  iframe.style.border = 'none';
+  document.body.appendChild(iframe);
+
+  const printWindow = iframe.contentWindow;
+  if (!printWindow) {
+    document.body.removeChild(iframe);
+    return;
+  }
 
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
@@ -105,6 +125,7 @@ export function printResults(
             padding: 20px;
             color: #1e293b;
             max-width: 210mm;
+            margin: 0 auto;
           }
           .header {
             text-align: center;
@@ -183,10 +204,14 @@ export function printResults(
           </thead>
           <tbody>
             ${row('Gross Pay', results.grossSalary.annually, true)}
-            ${row('Income Tax', -results.incomeTax.annually)}
-            ${row('National Insurance', -results.nationalInsurance.annually)}
-            ${results.pensionContribution.annually > 0 ? row('Pension', -results.pensionContribution.annually) : ''}
+            ${row('Tax-Free Allowance', results.taxFreeAmount)}
+            ${row('Total Taxable', results.taxableIncome)}
+            ${row('Total Tax Due', -results.incomeTax.annually)}
+            ${results.taxBands.map((band) => row(`  ${band.rate}% Rate`, -band.amount)).join('')}
             ${results.studentLoan.annually > 0 ? row('Student Loan', -results.studentLoan.annually) : ''}
+            ${row('National Insurance', -results.nationalInsurance.annually)}
+            ${results.pensionContribution.annually > 0 ? row('Pension [You]', -results.pensionContribution.annually) : ''}
+            ${row('Pension [HMRC Relief]', 0)}
             ${row('Net Pay', results.netPay.annually, true)}
           </tbody>
         </table>
@@ -204,5 +229,13 @@ export function printResults(
 
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => printWindow.print(), 250);
+  setTimeout(() => {
+    printWindow.print();
+    // Remove iframe after printing
+    setTimeout(() => {
+      if (iframe.parentNode) {
+        document.body.removeChild(iframe);
+      }
+    }, 1000);
+  }, 250);
 }

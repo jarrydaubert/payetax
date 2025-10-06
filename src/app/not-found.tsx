@@ -10,18 +10,24 @@ export default function NotFound() {
       <div className='absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background'>
         <div className='absolute inset-0'>
           {/* Floating particles */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={`floating-${i}-${Math.random()}`}
-              className='absolute h-2 w-2 animate-pulse rounded-full bg-primary opacity-20'
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
+          {[...Array(20)].map((_, i) => {
+            const left = (i * 137.5) % 100; // Golden angle distribution
+            const top = (i * 37.5) % 100;
+            const delay = (i * 0.15) % 3;
+            const duration = 2 + (i % 4);
+            return (
+              <div
+                key={`floating-${i}`}
+                className='absolute h-2 w-2 animate-pulse rounded-full bg-primary opacity-20'
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`,
+                }}
+              />
+            );
+          })}
         </div>
       </div>
 

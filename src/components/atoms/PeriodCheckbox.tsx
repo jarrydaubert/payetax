@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 interface PeriodCheckboxProps {
   period: string;
   checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  onCheckedChange: () => void;
 }
 
 /**

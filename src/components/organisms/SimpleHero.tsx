@@ -20,23 +20,18 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
     >
       {/* Content */}
       <div className='relative z-10 mx-auto max-w-5xl px-4 text-center'>
-        {/* Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className='mb-6 font-bold text-5xl text-foreground tracking-tight md:text-7xl'
-        >
+        {/* Heading - No animation for LCP optimization */}
+        <h1 className='mb-6 font-bold text-5xl text-foreground tracking-tight md:text-7xl'>
           Free UK PAYE Tax
           <br />
           <span className='text-gradient'>Calculator 2025-2026</span>
-        </motion.h1>
+        </h1>
 
-        {/* Description */}
+        {/* Description - Subtle animation */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
           className='mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl'
         >
           Calculate your take-home pay instantly. Includes income tax, National Insurance, student
@@ -44,12 +39,7 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
         </motion.p>
 
         {/* CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px] transition-transform hover:scale-[1.02]'
-        >
+        <div className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px] transition-transform hover:scale-[1.02]'>
           <Button
             size='lg'
             onClick={onScrollToCalculator}
@@ -58,7 +48,7 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
             Calculate My Salary
             <ArrowRight className='size-4 transition-transform group-hover:translate-x-0.5' />
           </Button>
-        </motion.div>
+        </div>
 
         {/* Features */}
         <motion.div

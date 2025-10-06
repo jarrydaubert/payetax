@@ -31,7 +31,7 @@ const HomePageContent = memo(function HomePageContent() {
     <main className='flex min-h-screen flex-col'>
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
-      <section ref={calculatorRef} className='py-8 lg:py-12'>
+      <section id='calculator' ref={calculatorRef} className='py-8 lg:py-12'>
         <CalculatorContainer />
       </section>
 

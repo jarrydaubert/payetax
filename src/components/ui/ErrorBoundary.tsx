@@ -75,21 +75,34 @@ export class ErrorBoundary extends React.Component<Props, State> {
 }
 
 function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
+  // Generate stable particle data to avoid infinite re-renders
+  const particles = React.useMemo(
+    () =>
+      [...Array(15)].map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        delay: Math.random() * 3,
+        duration: 2 + Math.random() * 4,
+      })),
+    []
+  );
+
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
       {/* Animated background */}
       <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900'>
         <div className='absolute inset-0'>
           {/* Floating error particles */}
-          {[...Array(15)].map((_, i) => (
+          {particles.map((particle) => (
             <div
-              key={`error-particle-${i}-${Math.random()}`}
+              key={`error-particle-${particle.id}`}
               className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20'
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 4}s`,
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+                animationDelay: `${particle.delay}s`,
+                animationDuration: `${particle.duration}s`,
               }}
             />
           ))}
@@ -107,19 +120,19 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20' />
           </div>
 
-          <h1 className='mb-6 font-bold text-3xl text-white md:text-4xl'>
+          <h1 className='mb-6 font-bold text-3xl text-foreground md:text-4xl'>
             Oops! Something Went Wrong
           </h1>
 
-          <p className='mx-auto mb-8 max-w-2xl text-gray-300 text-xl leading-relaxed'>
+          <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-xl leading-relaxed'>
             Don't worry - even the best tax calculators have their off days! We've automatically
             logged this error and our team will investigate.
           </p>
 
           {/* What happened section */}
           <div className='glass-card mb-8 border border-yellow-400/20 bg-yellow-500/5 p-6'>
-            <h3 className='mb-3 font-semibold text-lg text-yellow-300'>What can you do?</h3>
-            <ul className='mx-auto max-w-md space-y-2 text-left text-gray-300'>
+            <h3 className='mb-3 font-semibold text-lg text-yellow-500'>What can you do?</h3>
+            <ul className='mx-auto max-w-md space-y-2 text-left text-muted-foreground'>
               <li>• Try refreshing the page or clicking "Try Again"</li>
               <li>• Clear your browser cache and cookies</li>
               <li>• Try using a different browser</li>
@@ -164,7 +177,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           </div>
 
           {/* Help text */}
-          <p className='mb-6 text-gray-500 text-sm'>
+          <p className='mb-6 text-muted-foreground text-sm'>
             This error has been automatically logged with reference{' '}
             {eventId ? `#${eventId.slice(-8)}` : 'N/A'}
           </p>
