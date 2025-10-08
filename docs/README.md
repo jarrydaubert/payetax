@@ -1,7 +1,7 @@
 # 📚 PayeTax Documentation
 
-**Last Updated:** October 5, 2025
-**Total Docs:** 10 files (streamlined from 16)
+**Last Updated:** October 7, 2025
+**Total Docs:** 13 files
 
 Quick reference guide for all PayeTax documentation.
 
@@ -14,6 +14,7 @@ Quick reference guide for all PayeTax documentation.
 | **Deploy to production?** | [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) + [DEPLOYMENT.md](./DEPLOYMENT.md) |
 | **Understand the tech stack?** | [TECH_STACK.md](./TECH_STACK.md) ⭐ |
 | **Run npm scripts?** | [SCRIPT_GUIDE.md](./SCRIPT_GUIDE.md) |
+| **Set up Linear integration?** | [LINEAR_SETUP.md](./LINEAR_SETUP.md) |
 | **Write blog content?** | [BLOG_GUIDE.md](./BLOG_GUIDE.md) |
 | **Implement SEO?** | [SEO_STRATEGY.md](./SEO_STRATEGY.md) |
 | **Set up testing?** | [TESTING.md](./TESTING.md) + [QUALITY_GATES.md](./QUALITY_GATES.md) |
@@ -38,10 +39,18 @@ Quick reference guide for all PayeTax documentation.
 - CI/CD pipeline overview
 - Troubleshooting common issues
 
-**[SCRIPT_GUIDE.md](./SCRIPT_GUIDE.md)** (8.5K)
+**[SCRIPT_GUIDE.md](./SCRIPT_GUIDE.md)** (10K)
 - Complete npm scripts reference
 - Build, dev, test, deploy commands
+- Linear project management commands
 - Usage examples and best practices
+
+**[LINEAR_SETUP.md](./LINEAR_SETUP.md)** (27K)
+- Linear API integration guide
+- Task and project management workflow
+- Sprint/cycle planning with Linear
+- Claude-assisted project management
+- API key setup and configuration
 
 ---
 
@@ -128,19 +137,41 @@ Quick reference guide for all PayeTax documentation.
 
 | Category | Files | Total Size |
 |----------|-------|------------|
-| **Deployment** | 3 | 26.8K |
-| **Technical** | 1 | 15K |
-| **Quality** | 2 | 21.1K |
-| **Content/SEO** | 2 | 38K |
-| **Planning** | 1 | 10K |
-| **User Docs** | 1 | 10K |
-| **TOTAL** | **10** | **120.9K** |
+| **Deployment** | 5 | ~58K |
+| **Technical** | 1 | ~15K |
+| **Quality** | 2 | ~21K |
+| **Content/SEO** | 2 | ~38K |
+| **Planning** | 1 | ~10K |
+| **User Docs** | 1 | ~10K |
+| **Meta** | 1 | ~6K |
+| **TOTAL** | **13** | **~158K** |
 
 ---
 
-## 🔄 Recent Changes (Oct 5, 2025)
+## 🔄 Recent Changes
 
-### ✅ Consolidated Documentation
+### ✅ Oct 7, 2025 - Linear Integration & Documentation Cleanup
+
+**Added:**
+- `LINEAR_SETUP.md` (27K) - Complete Linear API integration guide
+- 7 new npm scripts for Linear project management
+- Claude-assisted workflow documentation
+
+**Updated:**
+- `SCRIPT_GUIDE.md` - Added Linear commands section
+- `TESTING.md` - Updated test counts (508 tests, 19 suites)
+- `README.md` (root) - Linear integration, test counts, achievements
+- `TECH_STACK.md` - Added @linear/sdk dependency
+- Tax data corrections (2025-26 student loans, Scottish rates)
+- E2E test infrastructure (data-testid attributes)
+
+**Removed:**
+- `TEST_COVERAGE_PLAN.md` - Historical audit, superseded by actual test implementation
+- `MOBILE_UX_AUDIT.md` - Completed audit from Oct 6, issues resolved
+
+**Result:** 15 → 13 files (added Linear, removed historical audits)
+
+### ✅ Oct 5, 2025 - Documentation Consolidation
 
 **Created:**
 - `TECH_STACK.md` - Unified technical documentation

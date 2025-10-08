@@ -41,7 +41,13 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
       <BasicInputs />
 
       <div className='flex gap-2'>
-        <Button onClick={handleCalculate} disabled={isCalculating} size='lg' className='flex-1'>
+        <Button
+          onClick={handleCalculate}
+          disabled={isCalculating}
+          size='lg'
+          className='flex-1'
+          data-testid='calculate-button'
+        >
           {isCalculating ? (
             <>
               <motion.div

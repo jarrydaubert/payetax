@@ -41,7 +41,6 @@
  */
 
 import {
-  type AllowanceType,
   type NICategory,
   type PayPeriod,
   PERIODS,
@@ -49,7 +48,6 @@ import {
   SCOTTISH_TAX_RATES,
   type StudentLoanPlan,
   TAX_RATES,
-  type TaxAllowance,
   type TaxYear,
 } from '@/constants/taxRates';
 import { convertPeriodToAnnual } from './periodCalculator';
@@ -85,6 +83,14 @@ export interface TaxCalculationInput {
   taxCode: string;
   /** Whether Scottish tax rates apply */
   isScottish: boolean;
+  /** Whether married/civil partnership for marriage allowance */
+  isMarried: boolean;
+  /** Partner's gross wage for marriage allowance calculation */
+  partnerGrossWage: number;
+  /** Whether blind person's allowance applies */
+  isBlind: boolean;
+  /** Whether paying no National Insurance */
+  payNoNI: boolean;
   /** Pension contribution amount or percentage */
   pensionContribution: number;
   /** Type of pension contribution (percentage or fixed amount) */
@@ -95,8 +101,6 @@ export interface TaxCalculationInput {
   niCategory: NICategory;
   /** Hours worked per week (for hourly calculations) */
   hoursPerWeek: number;
-  /** Additional tax allowances */
-  additionalAllowances: TaxAllowance[];
 }
 
 /**
@@ -131,73 +135,6 @@ export interface TaxCalculationResults {
     rate: number;
     amount: number;
   }>;
-
-  /** Additional allowances breakdown (if applicable) */
-  additionalAllowances?: {
-    annually: number;
-    breakdown: Array<{
-      name: string;
-      type: AllowanceType;
-      annually: number;
-    }>;
-  };
-}
-
-/**
- * Determines Tax Treatment of Employment Allowances
- *
- * This function implements HMRC's distinction between allowances that:
- * 1. **Reduce taxable income** (tax relief at source) - deducted before tax calculation
- * 2. **Are added to net pay** (tax-free benefits) - added after tax calculation
- *
- * ### HMRC Guidelines for Tax-Deductible Expenses
- * Per ITEPA 2003 Section 336, expenses are allowable if they are:
- * - Wholly, exclusively, and necessarily incurred in the performance of duties
- * - Not reimbursed by the employer
- * - Not capital expenditure or personal expenses
- *
- * ### Implementation Logic
- * - **Professional Subscriptions**: Tax relief under Section 344 ITEPA 2003 (List 3 approved bodies)
- * - **Business Travel**: Tax relief under Section 337 ITEPA 2003 (travel between workplaces)
- * - **Working from Home**: Tax-free allowance under Section 316A ITEPA 2003 (flat rate or actual costs)
- * - **Uniform Allowance**: Usually tax-free benefit rather than deduction
- *
- * @param type - The employment allowance type to classify
- * @returns true if allowance reduces taxable income (deducted pre-tax), false if added to net pay (post-tax benefit)
- *
- * @see {@link https://www.gov.uk/tax-relief-for-employees/professional-subscriptions} HMRC Professional Subscriptions
- * @see {@link https://www.gov.uk/tax-relief-for-employees/business-travel-mileage} HMRC Business Travel Relief
- * @see {@link https://www.gov.uk/tax-relief-for-employees/working-at-home} HMRC Working from Home Relief
- */
-function isTaxableAllowance(type: AllowanceType): boolean {
-  switch (type) {
-    // Tax-deductible allowances (reduce taxable income)
-    case 'professionalSubscriptions':
-      // Professional body subscriptions - tax relief at marginal rate
-      // Examples: Law Society, BMA, RICS, etc. (HMRC List 3 approved bodies)
-      return true;
-
-    case 'businessTravel':
-      // Business travel between workplaces - tax relief on excess over normal commuting
-      // Includes mileage allowances above HMRC approved rates
-      return true;
-
-    // Tax-free benefits (added to net pay)
-    case 'workingFromHome':
-      // Working from home allowance - tax-free benefit up to £6/week or actual costs
-      // Added to net pay rather than reducing taxable income
-      return false;
-
-    case 'uniformUpkeep':
-      // Uniform and tool allowances - typically tax-free benefits
-      // Not deductions from gross pay
-      return false;
-
-    default:
-      // Conservative approach - treat as post-tax benefit unless specifically identified
-      // Avoids incorrectly reducing taxable income for non-qualifying expenses
-      return false;
-  }
 }
 
 /**
@@ -288,8 +225,7 @@ function isTaxableAllowance(type: AllowanceType): boolean {
  *   pensionContributionType: 'percentage',
  *   studentLoanPlan: 'plan2',
  *   niCategory: 'A',
- *   hoursPerWeek: 37.5,
- *   additionalAllowances: []
+ *   hoursPerWeek: 37.5
  * });
  *
  * console.log(`Net pay: £${result.netPay.annually.toFixed(2)}`);
@@ -384,6 +320,45 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     // At £125,140+, allowance becomes zero
   }
 
+  // Blind Person's Allowance (additional allowance for registered blind)
+  // This is an additional allowance that's added on top of the Personal Allowance
+  // For 2024-25: £2,870, For 2025-26: £3,070
+  if (input.isBlind) {
+    annualTaxFreeAmount += taxRates.blindPersonsAllowance;
+  }
+
+  // Marriage Allowance (transferable allowance for married couples/civil partners)
+  // One partner can transfer 10% of their Personal Allowance to the other if:
+  // - The transferring partner earns less than the Personal Allowance
+  // - The receiving partner is a basic rate taxpayer (under £50,270 in England/Wales/NI, £43,662 in Scotland)
+  // This saves up to £252/year (10% of £12,570 at 20% basic rate)
+  // For 2024-25 onwards: £1,260 transferable allowance
+  if (input.isMarried && input.partnerGrossWage > 0) {
+    // Check if partner qualifies to receive the allowance:
+    // - Partner must earn above the Personal Allowance (otherwise they don't benefit)
+    // - Partner must be a basic rate taxpayer (below higher rate threshold)
+
+    // Find the threshold where "Higher rate" (40% or 42%) starts
+    // For English rates: Basic rate (20%) ends at £37,700, Higher rate (40%) starts after
+    // For Scottish rates: Intermediate rate (21%) ends at £31,092, Higher rate (42%) starts after
+    const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
+    const basicRateThreshold =
+      higherRateBandIndex > 0
+        ? taxRates.bands[higherRateBandIndex - 1].threshold
+        : taxRates.bands[0]?.threshold || 37700;
+    const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
+
+    if (
+      input.partnerGrossWage > taxRates.personalAllowance &&
+      input.partnerGrossWage <= higherRateThreshold
+    ) {
+      // The RECEIVING partner gets the marriage allowance added to their personal allowance
+      // This calculation assumes the USER is the receiving partner
+      // In reality, users would specify who transfers to whom, but we make a simplifying assumption
+      annualTaxFreeAmount += taxRates.marriageAllowance;
+    }
+  }
+
   // Calculate monthly tax-free amount for payslip calculation
   const monthlyTaxFreeAmount = annualTaxFreeAmount / 12;
 
@@ -411,62 +386,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
   }
 
-  // Calculate allowances - separate taxable and non-taxable
-  let annualTaxableAllowancesTotal = 0;
-  let monthlyTaxableAllowancesTotal = 0;
-  let annualNonTaxableAllowancesTotal = 0;
-  let monthlyNonTaxableAllowancesTotal = 0;
-
-  // Track total for all allowances (for reporting)
-  let annualAllowancesTotal = 0;
-
-  const allowanceBreakdown: Array<{
-    name: string;
-    type: AllowanceType;
-    annually: number;
-  }> = [];
-
-  // Process each allowance
-  for (const allowance of input.additionalAllowances) {
-    // Convert allowance to annual amount from its input period
-    const annualAllowance = convertPeriodToAnnual(
-      allowance.amount,
-      allowance.period,
-      input.hoursPerWeek
-    );
-
-    // Add to appropriate total based on type
-    if (isTaxableAllowance(allowance.type)) {
-      // This allowance reduces taxable income (e.g., professional subscriptions)
-      annualTaxableAllowancesTotal += annualAllowance;
-    } else {
-      // This allowance doesn't reduce taxable income (e.g., working from home)
-      annualNonTaxableAllowancesTotal += annualAllowance;
-    }
-
-    // Add to total (for reporting)
-    annualAllowancesTotal += annualAllowance;
-
-    // Add to breakdown
-    allowanceBreakdown.push({
-      name: allowance.name,
-      type: allowance.type,
-      annually: annualAllowance,
-    });
-  }
-
-  // Calculate monthly allowances
-  monthlyTaxableAllowancesTotal = annualTaxableAllowancesTotal / 12;
-  monthlyNonTaxableAllowancesTotal = annualNonTaxableAllowancesTotal / 12;
-
   // ---------------
   // 5. Calculate adjusted salary and taxable income (annual and monthly)
   // ---------------
 
-  // Adjusted salary (after taxable pre-tax deductions only)
-  // Only pension and taxable allowances reduce taxable income
-  const monthlyTaxableAdjustedSalary =
-    monthlyGrossSalary - monthlyPensionContribution - monthlyTaxableAllowancesTotal;
+  // Adjusted salary (after pre-tax deductions - pension only)
+  const monthlyTaxableAdjustedSalary = monthlyGrossSalary - monthlyPensionContribution;
 
   // Calculate taxable income (adjusted salary minus tax-free amount)
   const monthlyTaxableIncome = Math.max(0, monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount);
@@ -638,7 +563,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   let monthlyNationalInsurance = 0;
 
   // Only calculate NI if not exempt
-  if (input.niCategory !== 'C') {
+  // payNoNI = true for people over State Pension age or other exemptions
+  // niCategory 'C' = employees over State Pension age (no employee NI but employer still pays)
+  if (!input.payNoNI && input.niCategory !== 'C') {
     const niRates = standardRates.nationalInsurance.employee[input.niCategory];
 
     // Convert annual thresholds to monthly
@@ -718,13 +645,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 10. Calculate Net Pay (monthly calculation)
   // ---------------
 
-  // Monthly net pay - Add non-taxable allowances to net pay
+  // Monthly net pay
   const monthlyNetPay =
-    monthlyTaxableAdjustedSalary -
-    monthlyTax -
-    monthlyNationalInsurance -
-    monthlyStudentLoan +
-    monthlyNonTaxableAllowancesTotal;
+    monthlyTaxableAdjustedSalary - monthlyTax - monthlyNationalInsurance - monthlyStudentLoan;
 
   // Annual net pay (for output)
   const annualNetPay = monthlyNetPay * 12;
@@ -875,13 +798,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     employerNI: annualEmployerNI,
     netPay,
     taxBands,
-    additionalAllowances:
-      annualAllowancesTotal > 0
-        ? {
-            annually: annualAllowancesTotal,
-            breakdown: allowanceBreakdown,
-          }
-        : undefined,
   };
 
   return results;

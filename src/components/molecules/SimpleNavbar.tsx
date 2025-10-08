@@ -21,8 +21,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
   const links = [
     { href: '/#tax-calculator', label: 'Calculator' },
-    { href: '/about', label: 'About' },
     { href: '/blog', label: 'TaxInsights' },
+    { href: '/about', label: 'About' },
   ] as const;
 
   const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

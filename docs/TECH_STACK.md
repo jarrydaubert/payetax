@@ -1,6 +1,6 @@
 # PayeTax Technical Stack & Architecture
 
-**Last Updated:** October 5, 2025
+**Last Updated:** October 7, 2025
 **Status:** ✅ Production Ready
 **Version:** 1.0.0
 
@@ -32,7 +32,8 @@
 | **shadcn/ui** | 3.3.1 | Component library |
 | **Framer Motion** | 12.23.22 | Animations |
 | **Contentlayer2** | 0.5.8 | MDX blog processing |
-| **Biome** | Latest | Linting & formatting |
+| **@linear/sdk** | 60.0.0 | Project management integration |
+| **Biome** | 2.2.5 | Linting & formatting |
 
 ### Key Features
 

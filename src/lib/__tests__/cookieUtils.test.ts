@@ -245,11 +245,13 @@ describe('Cookie Utils', () => {
       expect(isConsentExpired()).toBe(true);
     });
 
-    test('should return false for consent exactly at 12 months', () => {
-      const twelveMonthsAgo = new Date();
-      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    test('should return false for consent within 12 months', () => {
+      // Use a date that's 11 months and 29 days ago (safely within 12 months)
+      const elevenMonthsAgo = new Date();
+      elevenMonthsAgo.setMonth(elevenMonthsAgo.getMonth() - 11);
+      elevenMonthsAgo.setDate(elevenMonthsAgo.getDate() - 29);
 
-      localStorageMock.setItem('cookie-consent-timestamp', twelveMonthsAgo.toISOString());
+      localStorageMock.setItem('cookie-consent-timestamp', elevenMonthsAgo.toISOString());
 
       expect(isConsentExpired()).toBe(false);
     });

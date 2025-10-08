@@ -34,7 +34,6 @@ import {
   PERIODS,
   type StudentLoanPlan,
   TAX_RATES,
-  type TaxAllowance,
   type TaxBand,
   type TaxYear,
 } from '@/constants/taxRates';
@@ -75,8 +74,6 @@ interface CalculatorInput {
   niCategory: NICategory;
   /** Hours worked per week (for hourly rate calculations) */
   hoursPerWeek: number;
-  /** Additional tax allowances like working from home */
-  additionalAllowances: TaxAllowance[];
 }
 
 // Interface for tax rates that can be updated
@@ -127,7 +124,6 @@ interface CalculatorState {
   setPensionContributionType: (type: 'percentage' | 'amount') => void;
   setNiCategory: (category: NICategory) => void;
   setHoursPerWeek: (hours: number) => void;
-  setAdditionalAllowances: (allowances: TaxAllowance[]) => void;
 
   // Tax rate actions
   updateTaxRates: (rates: Partial<TaxRatesState>) => void;
@@ -180,7 +176,6 @@ const defaultInput: CalculatorInput = {
   pensionContributionType: 'percentage',
   niCategory: 'A',
   hoursPerWeek: 40,
-  additionalAllowances: [],
 };
 
 // Create the calculator store
@@ -238,8 +233,6 @@ export const useCalculatorStore = create<CalculatorState>()(
         setNiCategory: (niCategory) => set((state) => ({ input: { ...state.input, niCategory } })),
         setHoursPerWeek: (hoursPerWeek) =>
           set((state) => ({ input: { ...state.input, hoursPerWeek } })),
-        setAdditionalAllowances: (additionalAllowances) =>
-          set((state) => ({ input: { ...state.input, additionalAllowances } })),
 
         // Tax rate actions
         updateTaxRates: (updatedRates) =>
@@ -340,7 +333,6 @@ export const useCalculatorActions = () =>
       setPensionContributionType: state.setPensionContributionType,
       setNiCategory: state.setNiCategory,
       setHoursPerWeek: state.setHoursPerWeek,
-      setAdditionalAllowances: state.setAdditionalAllowances,
       updateTaxRates: state.updateTaxRates,
       updateScottishRates: state.updateScottishRates,
       updateNIRates: state.updateNIRates,

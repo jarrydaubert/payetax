@@ -30,7 +30,7 @@ PayeTax is a production-ready UK PAYE tax calculator built with Next.js 15 and R
 - **⚡ Exceptional Performance** - 100 Accessibility, 100 SEO, 91 Performance (Lighthouse), <252kB bundle
 - **📱 Fully Responsive** - Optimized for mobile, tablet, desktop, and 4K displays
 - **🎨 Glass-Morphism Design** - Modern aesthetic with consistent UI components
-- **🧪 Testing Infrastructure** - 21 unit tests + 5 E2E Playwright suites
+- **🧪 Testing Infrastructure** - 508 unit tests + comprehensive E2E Playwright coverage
 - **🔒 Privacy-First** - GA4 with IP anonymization, GDPR-compliant consent
 
 ---
@@ -71,8 +71,8 @@ npm run format          # Format code with Biome
 npm run typecheck       # Run TypeScript type checking
 
 # Testing (Auto-Opens Reports)
-npm test                # Unit tests + coverage (131 tests, opens HTML report)
-npm run test:e2e        # E2E tests all browsers + mobile (157 tests, opens HTML report)
+npm test                # Unit tests + coverage (508 tests, opens HTML report)
+npm run test:e2e        # E2E tests all browsers + mobile (opens HTML report)
 npm run test:dev        # Quick E2E Chrome-only (fast feedback, opens HTML report)
 npm run test:all        # Complete test suite (unit + E2E all browsers)
 
@@ -83,6 +83,15 @@ npm run deploy          # Production deployment ready
 # Performance & Monitoring
 npm run build:analyze   # Bundle analysis with webpack analyzer
 npm run audit:deps      # Security audit for dependencies
+
+# Project Management (Linear Integration)
+npm run linear          # Show Linear CLI help
+npm run linear:list     # List all team issues
+npm run linear:me       # List issues assigned to you
+npm run linear:create   # Create new issue (interactive)
+npm run linear:cycles   # View sprints/cycles
+npm run linear:projects # View all projects
+npm run linear:info     # Show workspace info
 ```
 
 ### 🎯 Quick Commands Summary
@@ -239,10 +248,11 @@ Professional tax insights powered by MDX with distinct branding:
 
 - **147 Files** processed by Biome with strict rules (10/10 strictness)
 - **58 Components** following atomic design (atoms, molecules, organisms)
-- **21 Unit Tests** + 5 E2E Test Suites (coverage audit pending)
+- **508 Unit Tests** + comprehensive E2E coverage (19 test suites)
 - **Zero TypeScript Errors** - Strict mode enabled
 - **Zero Biome Violations** - All accessibility & security rules passing
 - **shadcn/ui Integration** - Consistent, accessible component library
+- **Linear Integration** - Project management with 7 CLI commands
 
 ---
 
@@ -331,9 +341,23 @@ Contributions welcome! Please ensure:
 
 ---
 
-## 🏆 Recent Achievements (October 2024)
+## 🏆 Recent Achievements
 
-### ✅ October 6 - Performance & Launch Preparation 🚀
+### ✅ October 7, 2025 - Linear Integration & Test Infrastructure
+
+**Linear Project Management:**
+- **📋 Full Linear SDK Integration** - @linear/sdk v60.0.0 with GraphQL API
+- **🛠️ 7 CLI Commands** - List, create, manage issues, cycles, and projects
+- **🤖 Claude-Assisted Workflow** - Bidirectional task management
+- **📚 Complete Documentation** - LINEAR_SETUP.md with workflow examples
+
+**Test Infrastructure Enhancements:**
+- **🧪 508 Unit Tests** - Comprehensive coverage across 19 test suites
+- **✅ E2E Infrastructure Fixed** - All data-testid attributes properly configured
+- **🎯 Tax Data Updated** - 2025-26 student loan thresholds, Scottish rates corrected
+- **🔧 Code Quality** - 0 linting errors, 0 TypeScript errors maintained
+
+### ✅ October 6, 2024 - Performance & Launch Preparation 🚀
 
 **TaxInsights Blog Enhancement:**
 - **📰 TaxInsights Branding** - Distinct blog brand "TaxInsights by PayeTax"
@@ -394,10 +418,11 @@ Contributions welcome! Please ensure:
 - **Zero TypeScript Errors** (strict mode enabled)
 - **Zero Biome Violations** (10/10 strictness, WCAG 2.2 AA compliant)
 - **Zero Vulnerabilities** (dependencies audited and secured)
-- **289kB Bundle Size** (under 300kB target with all features)
+- **252kB Bundle Size** (well under 350kB target)
 - **58 Components** (atomic design complete)
-- **131 Unit Tests + 157 E2E Tests** (comprehensive coverage)
+- **508 Unit Tests** (19 test suites) + **E2E Coverage** (5 browser projects)
 - **147 Files Processed** (Biome linting & formatting)
+- **Linear Integration** (7 project management commands)
 
 ---
 

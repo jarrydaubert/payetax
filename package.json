@@ -51,7 +51,14 @@
     "monitor-all": "npm run audit:security && npm run bundle:analyze && npm run monitor:performance",
     "health-check": "npm run check-all && npm run monitor-all",
     "deploy": "npm run clean && npm run release && echo '✅ Ready for deployment!'",
-    "debug": "npm run clean && npm run typecheck && npm run build"
+    "debug": "npm run clean && npm run typecheck && npm run build",
+    "linear": "node scripts/linear.js",
+    "linear:list": "node scripts/linear.js list",
+    "linear:me": "node scripts/linear.js list --me",
+    "linear:create": "node scripts/linear.js create",
+    "linear:cycles": "node scripts/linear.js cycles",
+    "linear:projects": "node scripts/linear.js projects",
+    "linear:info": "node scripts/linear.js info"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",
@@ -81,7 +88,7 @@
     "gray-matter": "^4.0.3",
     "js-yaml": "3.14.1",
     "jspdf": "^3.0.3",
-    "lucide-react": "^0.544.0",
+    "lucide-react": "^0.545.0",
     "next": "^15.5.4",
     "next-contentlayer2": "^0.5.8",
     "react": "^19.2.0",
@@ -113,6 +120,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.5",
     "@lhci/cli": "^0.15.1",
+    "@linear/sdk": "^60.0.0",
     "@next/bundle-analyzer": "^15.5.4",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/postcss": "^4.1.14",

@@ -10,19 +10,20 @@ This document provides comprehensive testing strategies, manual test suites, aut
 
 | Testing Type | Status | Coverage | Tools |
 |--------------|--------|----------|-------|
-| **Unit Tests** | ✅ Active | 131 tests, 25.35% coverage | Jest + React Testing Library |
-| **E2E Tests** | ✅ Active | 157 tests across all browsers | Playwright |
-| **Linting** | ✅ Active | 116 files, 0 errors | Biome |
+| **Unit Tests** | ✅ Active | 508 tests passing, 2 skipped | Jest + React Testing Library |
+| **E2E Tests** | ✅ Active | 19 test suites (Chrome, Firefox, Safari, Mobile) | Playwright |
+| **Linting** | ✅ Active | 147 files, 0 errors | Biome |
 | **Type Checking** | ✅ Active | Zero errors | TypeScript 5.9 |
 | **Performance** | ✅ Active | Lighthouse CI | Automated |
 
 ### Quality Metrics
 
-- **Unit Tests**: 131 passing tests (room for coverage improvement)
-- **E2E Tests**: 157 tests covering Chrome, Firefox, Safari + Mobile
+- **Unit Tests**: 508 passing tests, 2 skipped (blog tests due to Contentlayer)
+- **E2E Tests**: Full coverage across all browsers and mobile platforms
 - **Code Quality**: 0 linting errors, 0 TypeScript errors
-- **Tax Accuracy**: HMRC-compliant with precise rounding fixes
+- **Tax Accuracy**: HMRC-compliant with 2025-26 rates updated
 - **Auto-Reports**: All tests auto-generate and open HTML reports
+- **Test Infrastructure**: All data-testid attributes properly configured for E2E reliability
 
 ---
 
@@ -32,12 +33,14 @@ This document provides comprehensive testing strategies, manual test suites, aut
 
 **Configuration**: `jest.config.ts`
 ```typescript
-// 130+ unit tests covering:
-// - Tax calculation logic
-// - Component rendering
-// - User interactions
-// - Error handling
-// - Form validation
+// 508 unit tests covering:
+// - Tax calculation logic (taxCalculator, taxRates, studentLoans)
+// - Component rendering and interactions
+// - State management (Zustand calculator store)
+// - User interactions and form validation
+// - Error handling and edge cases
+// - Export utilities (CSV, print)
+// - Analytics tracking
 ```
 
 **Running Tests** (All Auto-Open HTML Reports):
@@ -66,22 +69,23 @@ npm run test:all
 
 ### End-to-End Testing (Playwright)
 
-**157 E2E Tests** across 5 projects:
+**Comprehensive E2E Test Suite** across 5 browser projects:
 1. **Chrome Desktop**: Core functionality and performance
-2. **Firefox Desktop**: Cross-browser compatibility  
+2. **Firefox Desktop**: Cross-browser compatibility
 3. **Safari Desktop**: WebKit engine compatibility
 4. **Mobile Chrome**: Touch interactions and responsive design
 5. **Mobile Safari**: iOS compatibility
 
 **Test Categories**:
-- **Basic Calculator Flow**: Salary input → calculation → results
-- **Advanced Options**: Scottish rates, student loans, pensions  
-- **Export Functionality**: Excel export and print preview
+- **Basic Calculator Flow**: Salary input → calculation → results display
+- **Advanced Options**: Scottish rates, student loans, pensions, tax codes
+- **Export Functionality**: CSV export and print preview
 - **Browser Compatibility**: Modern CSS and JavaScript features
 - **Performance**: Timing and interaction speed
 - **Accessibility**: Screen reader and keyboard navigation
-- **Responsive Design**: Mobile viewports and touch interactions
+- **Responsive Design**: Mobile viewports (320px+) and touch interactions
 - **Error Handling**: Invalid inputs and edge cases
+- **Data Test IDs**: All critical elements properly tagged for reliable E2E testing
 
 **Running E2E Tests** (All Auto-Open HTML Reports):
 ```bash
@@ -432,6 +436,6 @@ Before deployment, verify:
 
 ---
 
-**Last Updated**: October 5, 2025
-**Test Suite Version**: v2.1.0
-**Status**: ✅ 131 unit tests + 157 E2E tests, all auto-generate HTML reports
+**Last Updated**: October 7, 2025
+**Test Suite Version**: v2.2.0
+**Status**: ✅ 508 unit tests (2 skipped) across 19 suites, E2E infrastructure updated

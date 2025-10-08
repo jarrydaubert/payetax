@@ -91,6 +91,7 @@ export function BasicInputs() {
         onChange={setSalary}
         placeholder='0.00'
         inline
+        data-testid='salary-input'
       />
 
       <div className='flex items-center gap-3'>

@@ -13,7 +13,6 @@ import type {
   BlogPaginationOptions,
   BlogPost,
   BlogSortOption,
-  PaginatedBlogResponse,
   RelatedPost,
 } from '@/types/blog';
 
@@ -179,28 +178,6 @@ export const getBlogPostsCount = unstable_cache(
   ['blog-posts-count'],
   { revalidate: 3600, tags: ['blog'] }
 );
-
-/**
- * Get paginated blog response with metadata
- */
-export async function getPaginatedBlogPosts(
-  options: BlogPaginationOptions = {}
-): Promise<PaginatedBlogResponse> {
-  const { page = 1, pageSize = BLOG_CONFIG.postsPerPage } = options;
-
-  const posts = await getBlogPosts(options);
-  const total = await getBlogPostsCount(options.category);
-
-  return {
-    posts,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      pageCount: Math.ceil(total / pageSize),
-    },
-  };
-}
 
 /**
  * Get a blog post by slug

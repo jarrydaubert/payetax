@@ -19,7 +19,16 @@ export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheck
 
   return (
     <div className='flex items-center space-x-2'>
-      <Checkbox id={checkboxId} checked={checked} onCheckedChange={onCheckedChange} />
+      <Checkbox
+        id={checkboxId}
+        checked={checked}
+        onCheckedChange={(checked) => {
+          // Only toggle if checked is boolean (not "indeterminate")
+          if (typeof checked === 'boolean') {
+            onCheckedChange();
+          }
+        }}
+      />
       <Label htmlFor={checkboxId} className='cursor-pointer select-none font-normal text-sm'>
         {period}
       </Label>

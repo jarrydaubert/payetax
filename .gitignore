@@ -1,4 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Git ignore patterns for PayeTax. See https://git-scm.com/docs/gitignore for more about ignoring files.
 
 # dependencies
 /node_modules

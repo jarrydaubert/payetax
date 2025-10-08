@@ -112,4 +112,26 @@ describe('CalculatorStore', () => {
     expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
     expect(state.results).toBeNull();
   });
+
+  it('should clear previousYearResults on reset', () => {
+    const { setSalary, calculate, calculatePreviousYear, reset } = useCalculatorStore.getState();
+
+    // Set up calculation
+    setSalary(50000);
+    calculate();
+    calculatePreviousYear();
+
+    // Verify both results exist
+    let state = useCalculatorStore.getState();
+    expect(state.results).not.toBeNull();
+    expect(state.previousYearResults).not.toBeNull();
+
+    // Reset
+    reset();
+
+    // Verify both are cleared
+    state = useCalculatorStore.getState();
+    expect(state.results).toBeNull();
+    expect(state.previousYearResults).toBeNull();
+  });
 });

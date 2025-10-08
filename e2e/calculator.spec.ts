@@ -13,9 +13,9 @@ test.describe('Tax Calculator E2E Tests', () => {
     // Check page title
     await expect(page).toHaveTitle(/PayeTax/);
 
-    // Check main heading is visible
+    // Check main heading is visible (specifically the h1 from hero)
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator/i, level: 1 })
     ).toBeVisible();
 
     // Check calculator components are present
@@ -37,10 +37,11 @@ test.describe('Tax Calculator E2E Tests', () => {
     await salaryInput.fill(testData.salary.toString());
     await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
-    // Select tax year (if available)
+    // Select tax year (if available) - shadcn Select component
     const taxYearSelect = page.getByLabel(/tax year/i);
     if (await taxYearSelect.isVisible()) {
-      await taxYearSelect.selectOption('2024-2025');
+      await taxYearSelect.click();
+      await page.getByRole('option', { name: '2024-2025' }).click();
     }
 
     // Auto-calculation should have triggered, but let's click calculate button as backup
@@ -260,10 +261,11 @@ test.describe('Tax Calculator E2E Tests', () => {
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('35000');
 
-    // Add student loan Plan 2
+    // Add student loan Plan 2 - shadcn Select component
     const studentLoanSelect = page.getByLabel(/student.*loan/i);
     if (await studentLoanSelect.isVisible()) {
-      await studentLoanSelect.selectOption('plan2');
+      await studentLoanSelect.click();
+      await page.getByRole('option', { name: /plan 2/i }).click();
     }
 
     // Calculate
@@ -371,10 +373,11 @@ test.describe('Tax Calculator E2E Tests', () => {
     await salaryInput.fill(testData.salary.toString()); // Use testData like the working test
     await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
-    // Select tax year (if available) - same as working test
+    // Select tax year (if available) - shadcn Select component
     const taxYearSelect = page.getByLabel(/tax year/i);
     if (await taxYearSelect.isVisible()) {
-      await taxYearSelect.selectOption('2024-2025');
+      await taxYearSelect.click();
+      await page.getByRole('option', { name: '2024-2025' }).click();
     }
 
     const calculateButton = page.getByRole('button', { name: /calculate/i });

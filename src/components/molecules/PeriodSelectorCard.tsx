@@ -21,9 +21,9 @@ export function PeriodSelectorCard({
   onPeriodToggle,
 }: PeriodSelectorCardProps) {
   return (
-    <Card className='border-primary/20 p-4'>
+    <Card className='w-full border-primary/20 p-3 sm:p-4'>
       <p className='mb-3 font-semibold text-foreground text-sm'>Display Periods</p>
-      <div className='flex flex-wrap gap-3 sm:gap-4'>
+      <div className='flex flex-wrap gap-2 sm:gap-3 md:gap-4'>
         {periods.map((period) => (
           <PeriodCheckbox
             key={period}

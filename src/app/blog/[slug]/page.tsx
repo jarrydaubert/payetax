@@ -140,7 +140,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
 
             {post.image && (
-              <div className='relative mb-6 md:mb-8 h-64 md:h-96 overflow-hidden rounded-xl'>
+              <div className='relative mb-6 h-64 overflow-hidden rounded-xl md:mb-8 md:h-96'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -183,12 +183,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {relatedPosts.length > 0 && (
           <div className='mb-12'>
             <h2 className='mb-6 font-bold text-2xl text-foreground'>Related Articles</h2>
-            <div className='grid gap-4 md:gap-6 md:grid-cols-3'>
+            <div className='grid gap-4 md:grid-cols-3 md:gap-6'>
               {relatedPosts.map((relatedPost) => (
                 <Link
                   key={relatedPost.slug}
                   href={`/blog/${relatedPost.slug}`}
-                  className='glass-card group border border-foreground/10 transition-all md:hover:border-primary/50 active:scale-[1.02]'
+                  className='glass-card group border border-foreground/10 transition-all active:scale-[1.02] md:hover:border-primary/50'
                 >
                   <div className='glass-card-inner p-6'>
                     <div className='mb-2 text-primary text-sm'>{relatedPost.category}</div>

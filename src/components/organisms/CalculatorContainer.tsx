@@ -50,7 +50,10 @@ export function CalculatorContainer() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-7xl space-y-3 md:space-y-6 px-4 py-4 md:py-8'>
+    <div
+      className='mx-auto w-full max-w-7xl space-y-3 px-4 py-4 md:space-y-6 md:py-8'
+      data-testid='calculator-section'
+    >
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -58,55 +61,64 @@ export function CalculatorContainer() {
         transition={{ duration: 0.5 }}
         className='text-center'
       >
-        <h1 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+        <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
-        </h1>
+        </h2>
         <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
           Calculate your take-home pay with official HMRC rates. Fast, accurate, and completely
           free.
         </p>
       </motion.div>
 
-      {/* Summary Cards (top) */}
-      <AnimatePresence mode='wait'>
-        {showResults && results && <ResultsSummaryCards results={results} />}
-      </AnimatePresence>
-
-      {/* Main Calculator Grid: Inputs (left) + Results Table (right) */}
+      {/* Main Calculator Grid: Inputs (left) + Results (right) */}
       <div className='grid gap-3 md:gap-6 lg:grid-cols-[420px_1fr]'>
-        {/* Inputs Column */}
-        <Card className='border-primary/20 p-6'>
+        {/* Inputs Column - Always first, full width on mobile */}
+        <Card className='border-primary/20 p-4 sm:p-6 lg:order-1'>
           <CalculatorInputsSection onCalculate={handleCalculate} />
         </Card>
 
-        {/* Results Table Column */}
-        <AnimatePresence mode='wait'>
-          {showResults && results ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ResultsTable results={results} />
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className='flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center'
-            >
-              <div>
-                <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
-                <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
-                <p className='text-muted-foreground text-sm'>
-                  Enter your salary details and click Calculate to see your results
-                </p>
+        {/* Results Column - Contains both table and summary */}
+        <div className='flex flex-col gap-3 md:gap-6 lg:order-2'>
+          {/* Results Table - Shows first on mobile, second on desktop */}
+          <AnimatePresence mode='wait'>
+            {showResults && results ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className='order-2 md:order-1'
+                data-testid='tax-results'
+              >
+                <ResultsTable results={results} />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className='order-2 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center md:order-1'
+              >
+                <div>
+                  <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
+                  <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
+                  <p className='text-muted-foreground text-sm'>
+                    Enter your salary details and click Calculate to see your results
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Summary Cards - Shows second on mobile, first on desktop */}
+          <AnimatePresence mode='wait'>
+            {showResults && results && (
+              <div className='order-1 md:order-2'>
+                <ResultsSummaryCards results={results} />
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Export Buttons (bottom) */}

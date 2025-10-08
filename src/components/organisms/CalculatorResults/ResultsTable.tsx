@@ -14,7 +14,6 @@ import {
   Scale,
   Shield,
   TrendingUp,
-  Users,
   Wallet,
 } from 'lucide-react';
 import * as React from 'react';
@@ -29,7 +28,6 @@ interface ResultsTableProps {
   results: TaxCalculationResults;
   allowancesDeductions?: string;
   studentLoans?: string[];
-  isMarried?: boolean;
   hoursPerWeek?: string;
   visiblePeriods?: string[];
   onVisiblePeriodsChange?: (periods: string[]) => void;
@@ -59,7 +57,6 @@ export function ResultsTable({
   results,
   allowancesDeductions = '0',
   studentLoans = [],
-  isMarried = false,
   visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
   onVisiblePeriodsChange,
 }: ResultsTableProps) {
@@ -207,19 +204,6 @@ export function ResultsTable({
       color: 'text-purple-600 dark:text-purple-400',
       isHighlight: false,
     },
-    // Marriage Allowance
-    ...(isMarried && results.additionalAllowances
-      ? [
-          {
-            category: 'Marriage Allowance',
-            icon: Users,
-            annual: results.additionalAllowances.annually,
-            percentage: calculatePercentage(results.additionalAllowances.annually, grossAnnual),
-            color: 'text-green-600 dark:text-green-400',
-            isHighlight: false,
-          },
-        ]
-      : []),
     {
       category: 'Allowances/Deductions',
       icon: DollarSign,
@@ -283,7 +267,7 @@ export function ResultsTable({
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
             }}
           >
-            <Table>
+            <Table data-testid='results-table'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
                   <TableHead className='sticky left-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'>

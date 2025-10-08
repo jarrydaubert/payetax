@@ -2,8 +2,8 @@
 
 This document explains all the npm scripts available in PayeTax and when to use them.
 
-**Last Updated**: October 4, 2025
-**Version**: v2.2.0 - Optimized Scripts
+**Last Updated**: October 7, 2025
+**Version**: v2.3.0 - Added Linear Integration
 
 ---
 
@@ -126,6 +126,73 @@ This document explains all the npm scripts available in PayeTax and when to use 
 - Runs full E2E tests all browsers (opens E2E report)
 - Most comprehensive testing option
 - Takes longest but most thorough
+
+---
+
+## 📋 Project Management Scripts
+
+### `npm run linear`
+**Purpose**: Show Linear CLI help and commands
+**When to use**: First time setup, command reference
+**What it does**:
+- Shows available Linear commands
+- Displays usage examples
+- Lists environment variables needed (LINEAR_API_KEY, LINEAR_TEAM_KEY)
+
+### `npm run linear:list`
+**Purpose**: List all Linear issues for the team
+**When to use**: View all tasks and issues
+**What it does**:
+- Fetches all issues from Linear workspace
+- Shows issue identifiers, titles, status, assignees
+- Displays priority, cycles, projects, and due dates
+- Provides clickable URLs to view in Linear
+
+### `npm run linear:me`
+**Purpose**: List issues assigned to you
+**When to use**: View your personal task list
+**What it does**:
+- Filters issues assigned to the authenticated user
+- Shows your current workload
+- Helps prioritize your tasks
+
+### `npm run linear:create`
+**Purpose**: Create new Linear issue (interactive)
+**When to use**: Adding new tasks or bug reports
+**What it does**:
+- Interactive prompts for title, description, priority
+- Option to assign to yourself
+- Add labels (comma-separated)
+- Returns issue URL and identifier
+
+### `npm run linear:cycles`
+**Purpose**: View current and upcoming sprints
+**When to use**: Sprint planning and progress tracking
+**What it does**:
+- Lists all cycles/sprints for the team
+- Shows date ranges and progress percentages
+- Displays completed vs total issues
+- Highlights current active cycle
+
+### `npm run linear:projects`
+**Purpose**: View all projects
+**When to use**: Project planning and tracking
+**What it does**:
+- Lists all projects with descriptions
+- Shows project status and progress
+- Displays target dates
+- Provides project URLs
+
+### `npm run linear:info`
+**Purpose**: Show workspace and user info
+**When to use**: Verify API connection and team settings
+**What it does**:
+- Displays current user and email
+- Shows organization name
+- Lists all teams with current team highlighted
+- Confirms LINEAR_TEAM_KEY setting
+
+**Setup Required**: See [LINEAR_SETUP.md](./LINEAR_SETUP.md) for API key configuration.
 
 ---
 
@@ -297,6 +364,6 @@ npm run clean:all    # Nuclear option
 
 ---
 
-**Last Updated**: October 4, 2025
-**Script Version**: v2.2.0
-**Status**: ✅ Production-ready optimized scripts
+**Last Updated**: October 7, 2025
+**Script Version**: v2.3.0
+**Status**: ✅ Production-ready with Linear integration

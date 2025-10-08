@@ -42,7 +42,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       const id = generateId(text);
       return (
         <h1
-          className='group mt-8 md:mt-12 mb-4 md:mb-6 flex scroll-mt-20 items-center gap-3 font-bold text-foreground'
+          className='group mt-8 mb-4 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-12 md:mb-6'
           style={{ fontSize: 'var(--font-size-4xl)' }}
           id={id}
           {...props}
@@ -63,7 +63,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       const id = generateId(text);
       return (
         <h2
-          className='group mt-6 md:mt-10 mb-3 md:mb-5 flex scroll-mt-20 items-center gap-3 font-bold text-foreground'
+          className='group mt-6 mb-3 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-10 md:mb-5'
           style={{ fontSize: 'var(--font-size-3xl)' }}
           id={id}
           {...props}
@@ -84,7 +84,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       const id = generateId(text);
       return (
         <h3
-          className='group mt-5 md:mt-8 mb-2 md:mb-4 flex scroll-mt-20 items-center gap-2 font-bold text-foreground'
+          className='group mt-5 mb-2 flex scroll-mt-20 items-center gap-2 font-bold text-foreground md:mt-8 md:mb-4'
           style={{ fontSize: 'var(--font-size-2xl)' }}
           id={id}
           {...props}
@@ -102,7 +102,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     },
     h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
       <h4
-        className='mt-4 md:mt-6 mb-2 md:mb-3 font-semibold text-foreground'
+        className='mt-4 mb-2 font-semibold text-foreground md:mt-6 md:mb-3'
         style={{ fontSize: 'var(--font-size-xl)' }}
         {...props}
       >

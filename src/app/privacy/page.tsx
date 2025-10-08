@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}
-      <section className='relative overflow-hidden bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 pt-20 md:pt-32 pb-10 md:pb-20'>
+      <section className='relative overflow-hidden bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -147,7 +147,7 @@ export default function PrivacyPolicyPage() {
             <p className='text-lg text-muted-foreground'>Everything you need to know at a glance</p>
           </div>
 
-          <div className='grid gap-4 md:gap-8 md:grid-cols-2'>
+          <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='overflow-hidden border-red-500/30 bg-gradient-to-br from-red-500/5 to-red-500/10 p-8'>
               <div className='mb-6 flex items-center gap-3'>
                 <div className='flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg'>
@@ -217,7 +217,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </motion.div>
 
-          <div className='grid gap-4 md:gap-8 md:grid-cols-2'>
+          <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             {privacyPrinciples.map((principle, idx) => (
               <motion.div
                 key={principle.title}
@@ -262,14 +262,14 @@ export default function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className='grid gap-4 md:gap-8 md:grid-cols-3'>
+          <div className='grid gap-4 md:grid-cols-3 md:gap-8'>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 md:hover:border-primary/40 md:hover:shadow-xl active:scale-[1.02]'>
+              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg'>
                   <Database className='size-10 text-white' />
                 </div>
@@ -287,7 +287,7 @@ export default function PrivacyPolicyPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 md:hover:border-primary/40 md:hover:shadow-xl active:scale-[1.02]'>
+              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg'>
                   <Server className='size-10 text-white' />
                 </div>
@@ -305,7 +305,7 @@ export default function PrivacyPolicyPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 md:hover:border-primary/40 md:hover:shadow-xl active:scale-[1.02]'>
+              <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg'>
                   <FileText className='size-10 text-white' />
                 </div>
@@ -434,8 +434,8 @@ export default function PrivacyPolicyPage() {
         className='py-12 md:py-20'
       >
         <div className='container mx-auto max-w-6xl px-4'>
-          <div className='grid gap-4 md:gap-8 md:grid-cols-2'>
-            <Card className='border-primary/20 p-8 transition-all duration-300 md:hover:border-primary/40 md:hover:shadow-xl active:scale-[1.02]'>
+          <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
+            <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
               <Globe className='mb-4 size-12 text-cyan-500' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>External Links</h3>
               <p className='text-muted-foreground leading-relaxed'>
@@ -444,7 +444,7 @@ export default function PrivacyPolicyPage() {
               </p>
             </Card>
 
-            <Card className='border-primary/20 p-8 transition-all duration-300 md:hover:border-primary/40 md:hover:shadow-xl active:scale-[1.02]'>
+            <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
               <Calendar className='mb-4 size-12 text-green-500' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>Policy Updates</h3>
               <p className='text-muted-foreground leading-relaxed'>

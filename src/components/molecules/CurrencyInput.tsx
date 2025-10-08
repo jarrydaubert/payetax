@@ -17,6 +17,7 @@ interface CurrencyInputProps {
   max?: number;
   className?: string;
   inline?: boolean;
+  'data-testid'?: string;
 }
 
 export function CurrencyInput({
@@ -29,6 +30,7 @@ export function CurrencyInput({
   max,
   className,
   inline = true,
+  'data-testid': dataTestId,
 }: CurrencyInputProps) {
   const [displayValue, setDisplayValue] = React.useState('');
   const [isFocused, setIsFocused] = React.useState(false);
@@ -100,6 +102,7 @@ export function CurrencyInput({
             onBlur={handleBlur}
             placeholder={placeholder}
             className='pl-9'
+            data-testid={dataTestId}
           />
         </div>
       </div>
@@ -120,6 +123,7 @@ export function CurrencyInput({
           onBlur={handleBlur}
           placeholder={placeholder}
           className='pl-9'
+          data-testid={dataTestId}
         />
       </div>
     </div>

@@ -215,7 +215,8 @@ describe('PeriodSelectorCard', () => {
       );
 
       const card = container.firstChild;
-      expect(card).toHaveClass('p-4');
+      // Updated to responsive padding
+      expect(card).toHaveClass('p-3', 'sm:p-4');
     });
 
     it('applies correct title styling', () => {
@@ -253,7 +254,8 @@ describe('PeriodSelectorCard', () => {
         />
       );
 
-      const checkboxContainer = container.querySelector('.gap-3');
+      // Updated to responsive gap
+      const checkboxContainer = container.querySelector('.gap-2');
       expect(checkboxContainer).toBeInTheDocument();
     });
   });

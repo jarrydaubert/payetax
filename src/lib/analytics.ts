@@ -195,26 +195,82 @@ export function trackPerformanceMetric(
   });
 }
 
-// Initialize analytics on client-side
-if (typeof window !== 'undefined') {
-  // Track initial page load performance
-  window.addEventListener('load', () => {
-    if ('performance' in window) {
-      const navigation = performance.getEntriesByType(
-        'navigation'
-      )[0] as PerformanceNavigationTiming;
+/**
+ * Track Core Web Vitals and page performance metrics
+ * Exported for testing and manual triggering
+ */
+export function trackCoreWebVitals(): void {
+  try {
+    if (typeof window === 'undefined' || !('performance' in window)) return;
 
-      if (navigation) {
-        trackPerformanceMetric('page_load_time', navigation.loadEventEnd - navigation.fetchStart);
-        trackPerformanceMetric(
-          'dom_content_loaded',
-          navigation.domContentLoadedEventEnd - navigation.fetchStart
-        );
-        trackPerformanceMetric(
-          'first_contentful_paint',
-          navigation.loadEventEnd - navigation.fetchStart
-        );
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+
+    if (navigation) {
+      // Track page load time
+      const pageLoadTime = navigation.loadEventEnd - navigation.fetchStart;
+      if (pageLoadTime > 0) {
+        trackPerformanceMetric('page_load_time', pageLoadTime);
+      }
+
+      // Track DOM content loaded time
+      const domContentLoaded = navigation.domContentLoadedEventEnd - navigation.fetchStart;
+      if (domContentLoaded > 0) {
+        trackPerformanceMetric('dom_content_loaded', domContentLoaded);
+      }
+
+      // Track time to interactive
+      const timeToInteractive = navigation.domInteractive - navigation.fetchStart;
+      if (timeToInteractive > 0) {
+        trackPerformanceMetric('time_to_interactive', timeToInteractive);
       }
     }
-  });
+
+    // Track First Contentful Paint (FCP) - use the actual FCP metric
+    const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+    if (fcpEntry?.startTime) {
+      trackPerformanceMetric('first_contentful_paint', fcpEntry.startTime);
+    }
+
+    // Track Largest Contentful Paint (LCP) if available
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
+      try {
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1] as PerformanceEntry & {
+            renderTime?: number;
+            loadTime?: number;
+          };
+          if (lastEntry) {
+            const lcp = lastEntry.renderTime || lastEntry.loadTime || 0;
+            if (lcp > 0) {
+              trackPerformanceMetric('largest_contentful_paint', lcp);
+            }
+            lcpObserver.disconnect();
+          }
+        });
+        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+      } catch {
+        // LCP not supported
+      }
+    }
+  } catch (error) {
+    console.warn('Performance metrics tracking error:', error);
+  }
+}
+
+// Initialize analytics on client-side (non-blocking)
+if (typeof window !== 'undefined') {
+  // Use requestIdleCallback to avoid blocking main thread, fallback to setTimeout
+  const windowWithIdleCallback = window as Window & {
+    requestIdleCallback?: (callback: () => void) => number;
+  };
+  if ('requestIdleCallback' in window && windowWithIdleCallback.requestIdleCallback) {
+    windowWithIdleCallback.requestIdleCallback(() => {
+      trackCoreWebVitals();
+    });
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(trackCoreWebVitals, 0);
+    });
+  }
 }
