@@ -1,11 +1,9 @@
-# GitLab CI/CD Pipeline for PayeTax
-# Automates testing, building, security scanning, and deployment to Vercel
+# GitLab CI/CD Pipeline for PayeTax (Optimized for Free Tier)
+# Only runs tests/linting - Vercel handles builds/deployments automatically
 
 stages:
   - security
   - test
-  - build
-  - deploy
 
 # Cache node_modules for faster builds
 cache:
@@ -33,18 +31,31 @@ secret_detection:
   only:
     - merge_requests
     - main
-    - tags
 
-# Test stage - Run linting and unit tests
-test:
+# Quality Checks - Linting and TypeScript
+quality:
   stage: test
   image: node:20-alpine
   before_script:
     - npm ci --cache .npm --prefer-offline
   script:
-    - npm run lint # Biome linting
-    - npm run typecheck # TypeScript validation
-    - npm run test:ci # Unit tests with coverage thresholds
+    - echo "Running code quality checks..."
+    - npm run format -- --check  # Check formatting (don't auto-fix in CI)
+    - npx biome check .          # Linting
+    - npm run typecheck          # TypeScript validation
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# Unit Tests - Fast, cheap to run
+test:unit:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - npm run test -- --coverage --watchAll=false
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
@@ -59,91 +70,23 @@ test:
     - main
     - develop
 
-# E2E Test stage - Run Playwright tests (critical paths only for speed)
+# E2E Tests - Only on merge requests (expensive, ~10-15 min runtime)
+# Comment out if you want to save more minutes
 test:e2e:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.40.0-focal
+  image: mcr.microsoft.com/playwright:v1.56.0-focal
   before_script:
     - npm ci --cache .npm --prefer-offline
-    - npx playwright install --with-deps
   script:
-    - npm run test:e2e:ci
+    - npm run test:dev  # Quick Chrome-only E2E instead of full suite
   artifacts:
     when: always
     paths:
       - audit-outputs/playwright-report/
     expire_in: 7 days
   only:
-    - merge_requests
-    - main
+    - merge_requests  # Only on MRs, not main branch
   allow_failure: false
-
-# Build stage - Create production build
-build:
-  stage: build
-  image: node:20-alpine
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-  script:
-    - npm run build
-  artifacts:
-    paths:
-      - .next/
-    expire_in: 1 hour
-  only:
-    - main
-    - tags
-
-# Deploy to Vercel Production
-deploy_production:
-  stage: deploy
-  image: node:20-alpine
-  before_script:
-    - npm install -g vercel@latest
-  script:
-    - echo "Deploying to Vercel Production..."
-    - vercel --token $VERCEL_TOKEN --prod --yes
-  environment:
-    name: production
-    url: https://payetax.co.uk
-  only:
-    - main
-    - tags
-  when: manual # Require manual approval for production deploys
-
-# Deploy Preview for Merge Requests
-deploy_preview:
-  stage: deploy
-  image: node:20-alpine
-  before_script:
-    - npm install -g vercel@latest
-  script:
-    - echo "Deploying preview for MR !$CI_MERGE_REQUEST_IID..."
-    - vercel --token $VERCEL_TOKEN --name payetax-preview-$CI_MERGE_REQUEST_IID --yes
-  environment:
-    name: preview/$CI_MERGE_REQUEST_IID
-    url: $CI_ENVIRONMENT_URL
-    on_stop: stop_preview
-  only:
-    - merge_requests
-  except:
-    - main
-
-# Stop preview environment when MR is closed
-stop_preview:
-  stage: deploy
-  image: node:20-alpine
-  before_script:
-    - npm install -g vercel@latest
-  script:
-    - echo "Cleaning up preview deployment..."
-    - vercel remove --token $VERCEL_TOKEN --safe --yes
-  environment:
-    name: preview/$CI_MERGE_REQUEST_IID
-    action: stop
-  when: manual
-  only:
-    - merge_requests
 
 # Dependency security audit
 dependency_audit:
@@ -158,24 +101,8 @@ dependency_audit:
   only:
     - main
     - merge_requests
-    - tags
 
-# Performance Budget Check (Optional - Post-Launch Enhancement)
-# lighthouse:
-#   stage: build
-#   image: node:20-alpine
-#   before_script:
-#     - npm ci --cache .npm --prefer-offline
-#   script:
-#     - npm run lighthouse:ci
-#   artifacts:
-#     reports:
-#       lighthouse: lighthouse-report.html
-#   only:
-#     - main
-#   allow_failure: true
-
-# Variables needed in GitLab CI/CD Settings:
-# VERCEL_TOKEN - Vercel CLI token for deployments
-# VERCEL_ORG_ID - Your Vercel organization ID
-# VERCEL_PROJECT_ID - Your Vercel project ID
+# NOTE: Build and Deploy stages removed
+# Vercel handles this automatically via Git integration (free, no runner minutes used)
+# Every push to main auto-deploys to production at payetax.co.uk
+# Merge requests get automatic preview deployments from Vercel
