@@ -18,10 +18,19 @@ export function CalculatorContainer() {
   const results = useCalculatorResults();
   const { calculate } = useCalculatorActions();
   const [showResults, setShowResults] = React.useState(false);
+  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
+    'Yearly',
+    'Monthly',
+    'Weekly',
+  ]);
 
   const handleCalculate = () => {
     calculate();
     setShowResults(true);
+  };
+
+  const handleVisiblePeriodsChange = (periods: string[]) => {
+    setVisiblePeriods(periods);
   };
 
   React.useEffect(() => {
@@ -51,7 +60,7 @@ export function CalculatorContainer() {
 
   return (
     <div
-      className='mx-auto w-full max-w-7xl space-y-3 px-4 py-4 md:space-y-6 md:py-8'
+      className='mx-auto flex w-full max-w-7xl flex-col gap-3 px-2 py-4 sm:px-4 md:gap-6 md:py-8 lg:grid lg:grid-cols-[420px_1fr]'
       data-testid='calculator-section'
     >
       {/* Header */}
@@ -59,7 +68,7 @@ export function CalculatorContainer() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className='text-center'
+        className='order-1 text-center lg:col-span-2'
       >
         <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
@@ -70,58 +79,62 @@ export function CalculatorContainer() {
         </p>
       </motion.div>
 
-      {/* Main Calculator Grid: Inputs (left) + Results (right) */}
-      <div className='grid gap-3 md:gap-6 lg:grid-cols-[420px_1fr]'>
-        {/* Inputs Column - Always first, full width on mobile */}
-        <Card className='border-primary/20 p-4 sm:p-6 lg:order-1'>
-          <CalculatorInputsSection onCalculate={handleCalculate} />
-        </Card>
+      {/* Summary Cards - Between inputs and table on mobile (order-3), top on desktop (order-2) */}
+      <AnimatePresence mode='wait'>
+        {showResults && results && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className='order-3 lg:order-2 lg:col-span-2'
+          >
+            <ResultsSummaryCards results={results} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Results Column - Contains both table and summary */}
-        <div className='flex flex-col gap-3 md:gap-6 lg:order-2'>
-          {/* Results Table - Shows first on mobile, second on desktop */}
-          <AnimatePresence mode='wait'>
-            {showResults && results ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className='order-2 md:order-1'
-                data-testid='tax-results'
-              >
-                <ResultsTable results={results} />
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className='order-2 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center md:order-1'
-              >
-                <div>
-                  <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
-                  <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
-                  <p className='text-muted-foreground text-sm'>
-                    Enter your salary details and click Calculate to see your results
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Inputs Section - order-2 on mobile, left column on desktop */}
+      <Card className='order-2 border-primary/20 p-3 sm:p-4 md:p-6 lg:order-3'>
+        <CalculatorInputsSection onCalculate={handleCalculate} />
+      </Card>
 
-          {/* Summary Cards - Shows second on mobile, first on desktop */}
-          <AnimatePresence mode='wait'>
-            {showResults && results && (
-              <div className='order-1 md:order-2'>
-                <ResultsSummaryCards results={results} />
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+      {/* Results Table - order-4 on mobile, right column on desktop */}
+      <AnimatePresence mode='wait'>
+        {showResults && results ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className='order-4 lg:order-3'
+            data-testid='tax-results'
+          >
+            <ResultsTable
+              results={results}
+              visiblePeriods={visiblePeriods}
+              onVisiblePeriodsChange={handleVisiblePeriodsChange}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className='order-4 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center lg:order-3'
+          >
+            <div>
+              <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
+              <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
+              <p className='text-muted-foreground text-sm'>
+                Enter your salary details and click Calculate to see your results
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Export Buttons (bottom) */}
+      {/* Export Buttons (bottom) - always last */}
       <AnimatePresence mode='wait'>
         {showResults && results && (
           <motion.div
@@ -129,7 +142,7 @@ export function CalculatorContainer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
-            className='flex justify-center gap-2 md:gap-3'
+            className='order-5 flex justify-center gap-2 md:gap-3 lg:col-span-2'
           >
             <Button variant='outline' size='lg' onClick={handlePrint}>
               <Printer className='mr-2 size-4' />

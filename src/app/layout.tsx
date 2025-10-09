@@ -203,12 +203,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }
                 }
 
+                // Prevent stray BMC overlay clicks
+                function handleDocumentClick(e) {
+                  const iframe = document.querySelector('iframe[src*="buymeacoffee"]');
+
+                  // If no iframe or iframe is hidden
+                  if (!iframe || iframe.offsetParent === null ||
+                      iframe.style.display === 'none' ||
+                      iframe.style.visibility === 'hidden') {
+
+                    // Check if click is on a BMC-related element
+                    const target = e.target;
+                    const isBMCElement = target.closest('a[href*="buymeacoffee"]') ||
+                                        target.closest('iframe[src*="buymeacoffee"]') ||
+                                        target.closest('.bmc-btn-container') ||
+                                        target.id?.includes('bmc') ||
+                                        target.className?.includes('bmc');
+
+                    // If clicking on BMC elements when popup is closed, allow only the main button
+                    if (isBMCElement && !target.closest('.bmc-btn-container')) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }
+                }
+
                 // Listen for Next.js route changes
                 if (typeof window !== 'undefined') {
                   // Initialize after load
                   window.addEventListener('load', function() {
                     initializeBMC();
                     setTimeout(adjustWidgetPosition, 500);
+
+                    // Add click handler to prevent stray overlay clicks
+                    document.addEventListener('click', handleDocumentClick, true);
                   });
 
                   // Adjust on scroll

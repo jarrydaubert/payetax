@@ -1,7 +1,7 @@
 # 📚 PayeTax Documentation
 
-**Last Updated:** October 7, 2025
-**Total Docs:** 13 files
+**Last Updated:** October 9, 2025
+**Total Docs:** 10 files (active)
 
 Quick reference guide for all PayeTax documentation.
 
@@ -11,13 +11,12 @@ Quick reference guide for all PayeTax documentation.
 
 | Need to... | Read this |
 |------------|-----------|
-| **Deploy to production?** | [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) + [DEPLOYMENT.md](./DEPLOYMENT.md) |
 | **Understand the tech stack?** | [TECH_STACK.md](./TECH_STACK.md) ⭐ |
-| **Run npm scripts?** | [SCRIPT_GUIDE.md](./SCRIPT_GUIDE.md) |
 | **Set up Linear integration?** | [LINEAR_SETUP.md](./LINEAR_SETUP.md) |
 | **Write blog content?** | [BLOG_GUIDE.md](./BLOG_GUIDE.md) |
 | **Implement SEO?** | [SEO_STRATEGY.md](./SEO_STRATEGY.md) |
 | **Set up testing?** | [TESTING.md](./TESTING.md) + [QUALITY_GATES.md](./QUALITY_GATES.md) |
+| **Track code audits?** | [CODE_AUDIT_TRACKER.md](./CODE_AUDIT_TRACKER.md) |
 | **See current priorities?** | [NEXT_PRIORITIES.md](./NEXT_PRIORITIES.md) |
 | **Help end-users?** | [USER_GUIDE.md](./USER_GUIDE.md) |
 
@@ -25,32 +24,21 @@ Quick reference guide for all PayeTax documentation.
 
 ## 📁 Documentation Index
 
-### 🚀 Deployment & Operations
+### 🚀 Project Management
 
-**[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** (8.8K)
-- All required IDs, tokens, and credentials
-- M365 SMTP, GA4, Vercel tokens
-- Quick reference for environment variables
-
-**[DEPLOYMENT.md](./DEPLOYMENT.md)** (9.5K)
-- Production deployment guide
-- Vercel setup and configuration
-- Environment variable management
-- CI/CD pipeline overview
-- Troubleshooting common issues
-
-**[SCRIPT_GUIDE.md](./SCRIPT_GUIDE.md)** (10K)
-- Complete npm scripts reference
-- Build, dev, test, deploy commands
-- Linear project management commands
-- Usage examples and best practices
-
-**[LINEAR_SETUP.md](./LINEAR_SETUP.md)** (27K)
+**[LINEAR_SETUP.md](./LINEAR_SETUP.md)** (15K)
 - Linear API integration guide
 - Task and project management workflow
 - Sprint/cycle planning with Linear
 - Claude-assisted project management
 - API key setup and configuration
+
+**[CODE_AUDIT_TRACKER.md](./CODE_AUDIT_TRACKER.md)** (16K)
+- Ongoing code quality audits
+- Component architecture analysis
+- Cleanup history and decisions
+- UI, atoms, molecules audit findings
+- Future audit roadmap
 
 ---
 
@@ -137,39 +125,52 @@ Quick reference guide for all PayeTax documentation.
 
 | Category | Files | Total Size |
 |----------|-------|------------|
-| **Deployment** | 5 | ~58K |
-| **Technical** | 1 | ~15K |
-| **Quality** | 2 | ~21K |
-| **Content/SEO** | 2 | ~38K |
-| **Planning** | 1 | ~10K |
-| **User Docs** | 1 | ~10K |
-| **Meta** | 1 | ~6K |
-| **TOTAL** | **13** | **~158K** |
+| **Project Management** | 2 | ~31K |
+| **Technical** | 1 | ~16K |
+| **Quality** | 2 | ~22K |
+| **Content/SEO** | 2 | ~39K |
+| **Planning** | 1 | ~16K |
+| **User Docs** | 1 | ~11K |
+| **Meta** | 1 | ~7K |
+| **TOTAL** | **10** | **~142K** |
 
 ---
 
 ## 🔄 Recent Changes
 
+### ✅ Oct 9, 2025 - Code Audit Consolidation
+
+**Consolidated:**
+- `COMPONENT_ARCHITECTURE_ANALYSIS.md` → `CODE_AUDIT_TRACKER.md`
+- `UNUSED_COMPONENTS.md` → `CODE_AUDIT_TRACKER.md`
+- All code audit findings now in single source of truth
+
+**Removed (Historical Audits):**
+- `TEST_QUALITY_AUDIT.md` - Oct 8 audit, issues already fixed
+- `TEST_QUALITY_FIXES.md` - Oct 8 fixes, changes already applied
+- `COMPONENT_ARCHITECTURE_ANALYSIS.md` - Consolidated into tracker
+- `UNUSED_COMPONENTS.md` - Consolidated into tracker
+
+**Updated:**
+- `CODE_AUDIT_TRACKER.md` - Added atoms/molecules audit findings
+- `TESTING.md` - Updated test counts (1,104 tests, 100% UI coverage)
+- `README.md` - Removed references to deleted docs, updated stats
+
+**Result:** 14 → 10 files (29% reduction, -1,311 lines, no information loss)
+
 ### ✅ Oct 7, 2025 - Linear Integration & Documentation Cleanup
 
 **Added:**
-- `LINEAR_SETUP.md` (27K) - Complete Linear API integration guide
+- `LINEAR_SETUP.md` (15K) - Complete Linear API integration guide
 - 7 new npm scripts for Linear project management
 - Claude-assisted workflow documentation
 
 **Updated:**
-- `SCRIPT_GUIDE.md` - Added Linear commands section
-- `TESTING.md` - Updated test counts (508 tests, 19 suites)
-- `README.md` (root) - Linear integration, test counts, achievements
-- `TECH_STACK.md` - Added @linear/sdk dependency
+- `TESTING.md` - Updated test counts (1,104 tests across all suites)
 - Tax data corrections (2025-26 student loans, Scottish rates)
 - E2E test infrastructure (data-testid attributes)
 
-**Removed:**
-- `TEST_COVERAGE_PLAN.md` - Historical audit, superseded by actual test implementation
-- `MOBILE_UX_AUDIT.md` - Completed audit from Oct 6, issues resolved
-
-**Result:** 15 → 13 files (added Linear, removed historical audits)
+**Result:** Previously consolidated from 15 files
 
 ### ✅ Oct 5, 2025 - Documentation Consolidation
 

@@ -109,12 +109,20 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   body {
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
   }
 
   /* Text gradient utility using brand colors */
@@ -219,7 +227,49 @@
   }
 }
 
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Ensure tables can scroll horizontally on mobile */
+  table {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+  }
+
+  /* Better touch scrolling for iOS */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Buy Me Coffee Widget - Smooth transition when avoiding footer */
 .bmc-btn-container {
-  transition: bottom 0.3s ease-out !important;
+  transition: bottom 0.3s ease-out;
+}
+
+/* BMC Widget - Mobile optimizations */
+@media (max-width: 640px) {
+  .bmc-btn-container {
+    /* Smaller margins on mobile to avoid edge overlap */
+    right: 8px !important;
+    bottom: 8px !important;
+  }
+
+  /* Scale down the button slightly on mobile */
+  .bmc-btn-container .bmc-btn {
+    transform: scale(0.85);
+    transform-origin: bottom right;
+  }
+
+  /* Constrain BMC popup/iframe to viewport on mobile */
+  .bmc-btn-container iframe,
+  #bmc-wbtn iframe,
+  iframe[src*="buymeacoffee"] {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 80px) !important;
+    width: 360px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+  }
 }

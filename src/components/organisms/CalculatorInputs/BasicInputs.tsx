@@ -3,7 +3,8 @@
 
 import { motion } from 'framer-motion';
 import { useId } from 'react';
-import { CurrencyInput } from '@/components/molecules/CurrencyInput';
+import NumberInput from '@/components/atoms/NumberInput';
+import TaxYearSelect from '@/components/atoms/TaxYearSelect';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
+import { PERIODS } from '@/constants/taxRates';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
 export function BasicInputs() {
@@ -56,11 +57,6 @@ export function BasicInputs() {
     { value: PERIODS.FOUR_WEEKLY, label: 'Four Weekly' },
   ];
 
-  const taxYearOptions = TAX_YEARS.map((year) => ({
-    value: year,
-    label: year,
-  }));
-
   const regionOptions = [
     { value: 'England' as const, label: 'England' },
     { value: 'Scotland' as const, label: 'Scotland' },
@@ -84,15 +80,22 @@ export function BasicInputs() {
       transition={{ duration: 0.3 }}
       className='space-y-3'
     >
-      <CurrencyInput
-        id={salaryId}
-        label='Salary'
-        value={input.salary}
-        onChange={setSalary}
-        placeholder='0.00'
-        inline
-        data-testid='salary-input'
-      />
+      <div className='flex items-center gap-3'>
+        <Label htmlFor={salaryId} className='min-w-[140px] text-sm'>
+          Salary
+        </Label>
+        <NumberInput
+          id={salaryId}
+          value={input.salary}
+          onChange={setSalary}
+          prefix='£'
+          decimals={2}
+          placeholder='0.00'
+          min={0}
+          className='flex-1'
+          data-testid='salary-input'
+        />
+      </div>
 
       <div className='flex items-center gap-3'>
         <Label htmlFor={payPeriodId} className='min-w-[140px] text-sm'>
@@ -116,18 +119,13 @@ export function BasicInputs() {
         <Label htmlFor={taxYearId} className='min-w-[140px] text-sm'>
           Tax Year
         </Label>
-        <Select value={input.taxYear} onValueChange={setTaxYear}>
-          <SelectTrigger id={taxYearId} className='flex-1'>
-            <SelectValue placeholder='Select tax year' />
-          </SelectTrigger>
-          <SelectContent>
-            {taxYearOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <TaxYearSelect
+          id={taxYearId}
+          value={input.taxYear}
+          onChange={setTaxYear}
+          label=''
+          className='flex-1'
+        />
       </div>
 
       <div className='flex items-center gap-3'>
@@ -170,14 +168,21 @@ export function BasicInputs() {
       </div>
 
       {input.isMarried && (
-        <CurrencyInput
-          id={partnerWageId}
-          label="Partner's Gross Wage"
-          value={input.partnerGrossWage}
-          onChange={setPartnerGrossWage}
-          placeholder='0'
-          inline
-        />
+        <div className='flex items-center gap-3'>
+          <Label htmlFor={partnerWageId} className='min-w-[140px] text-sm'>
+            Partner's Gross Wage
+          </Label>
+          <NumberInput
+            id={partnerWageId}
+            value={input.partnerGrossWage}
+            onChange={setPartnerGrossWage}
+            prefix='£'
+            decimals={2}
+            placeholder='0.00'
+            min={0}
+            className='flex-1'
+          />
+        </div>
       )}
 
       <div className='flex items-center gap-3'>
@@ -232,31 +237,34 @@ export function BasicInputs() {
           <Label htmlFor={pensionId} className='min-w-[140px] text-sm'>
             Pension Contribution %
           </Label>
-          <div className='relative flex-1'>
-            <Input
-              id={pensionId}
-              type='number'
-              value={input.pensionContribution === 0 ? '' : input.pensionContribution}
-              onChange={(e) => setPensionContribution(Number(e.target.value) || 0)}
-              placeholder='5'
-              min='0'
-              max='100'
-              className='pr-8'
-            />
-            <span className='-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground text-sm'>
-              %
-            </span>
-          </div>
+          <NumberInput
+            id={pensionId}
+            value={input.pensionContribution}
+            onChange={setPensionContribution}
+            suffix='%'
+            decimals={2}
+            placeholder='5.00'
+            min={0}
+            max={100}
+            className='flex-1'
+          />
         </div>
       ) : (
-        <CurrencyInput
-          id={pensionId}
-          label='Pension Contribution'
-          value={input.pensionContribution}
-          onChange={setPensionContribution}
-          placeholder='0'
-          inline
-        />
+        <div className='flex items-center gap-3'>
+          <Label htmlFor={pensionId} className='min-w-[140px] text-sm'>
+            Pension Contribution
+          </Label>
+          <NumberInput
+            id={pensionId}
+            value={input.pensionContribution}
+            onChange={setPensionContribution}
+            prefix='£'
+            decimals={2}
+            placeholder='0.00'
+            min={0}
+            className='flex-1'
+          />
+        </div>
       )}
     </motion.div>
   );

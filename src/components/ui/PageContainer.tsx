@@ -78,7 +78,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
     <div
       id={id}
       className={cn(
-        'container mx-auto px-4 sm:px-6',
+        'container mx-auto px-2 sm:px-4 md:px-6',
         // FIXED: Add proper navbar spacing to prevent overlap
         includeNavbarSpacing
           ? 'pt-24 pb-8 sm:pt-28 sm:pb-12' // Top padding for navbar clearance

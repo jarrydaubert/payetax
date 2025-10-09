@@ -137,10 +137,12 @@ test.describe('Browser Compatibility Tests', () => {
     const salaryValue = await page.inputValue('input[data-testid="salary-input"]');
     expect(salaryValue.replace(/[^\d]/g, '')).toBe('50000'); // Remove formatting
 
-    // Test select dropdown
-    await page.selectOption('select[data-testid="pay-period-select"]', 'monthly');
-    const selectedValue = await page.inputValue('select[data-testid="pay-period-select"]');
-    expect(selectedValue).toBe('monthly');
+    // Test select dropdown (shadcn Select component)
+    const payPeriodSelect = page.getByLabel(/pay period/i);
+    await payPeriodSelect.click();
+    await page.getByRole('option', { name: /monthly/i }).click();
+    // Verify by checking if the trigger shows the selected value
+    await expect(payPeriodSelect).toContainText(/monthly/i);
 
     // Test calculate button click
     await page.click('[data-testid="calculate-button"]');

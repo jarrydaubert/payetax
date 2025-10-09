@@ -1,11 +1,246 @@
 # 🎯 PayeTax - Next Priorities
 
-**Last Updated**: October 5, 2025
-**Current Status**: ✅ v1.0.0 Production - Post-Launch Optimization
+**Last Updated**: October 9, 2025
+**Current Status**: ✅ v0.1.0 Quality Baseline Achieved - Ready for Feature Expansion
 
-> **Note:** This document tracks post-launch improvements and future enhancements.
+> **Progress**: Test coverage improved to 42.47% with 1,104 tests passing. UI folder 100% covered. Foundation solid for advanced features.
 
 ---
+
+## 🚀 **NEW PRIORITIES (October 2025)**
+
+### **1. TaxInsight Sage - AI Explainer Widget** 🎯 **INNOVATION EDGE**
+**Priority**: HIGH - Engagement & Stickiness
+**Time**: 2-3 days (prototype → production)
+**Goal**: Local-first, read-only tax explainer using Ollama + Llama 3.1
+
+**What It Is:**
+An always-available floating chat bubble that explains UK tax concepts in plain language with witty analogies. Think "tax explainer in your pocket" - no advice, just education. Runs locally on Mac for dev, deploys to Vercel for free with offline capability.
+
+**Why Now:**
+- **Engagement**: Users linger 20-30% longer with interactive helpers (fintech benchmarks)
+- **Differentiation**: No UK tax calculator has local AI explainer yet
+- **Trust**: Read-only + HMRC citations = YMYL-safe education
+- **Zero Cost**: Ollama (free) + Vercel edge = $0 ongoing
+
+**Tech Stack (Reusing Existing Components):**
+- **Modal Base**: Reuse `SustainabilityBadge` modal pattern (Framer Motion AnimatePresence)
+- **UI Components**: shadcn/ui Dialog, Button, ScrollArea (already in codebase)
+- **Styling**: Existing glassmorphism patterns from `Footer` and `SimpleNavbar`
+- **State**: SessionStorage for ephemeral memory (like cookie consent)
+- **LLM Engine**: Ollama (brew install, free) running Llama 3.1 locally
+- **Data Source**: Static JSON file in `src/lib/tax_sources.json` (HMRC + blog content)
+- **React Patterns**: React 19 hooks (no forwardRef), streaming with useState
+
+**Component Reuse Opportunities:**
+```tsx
+// Reuse from SustainabilityBadge.tsx:
+- Fixed positioning pattern (bottom-right bubble)
+- Modal open/close state management
+- AnimatePresence for smooth transitions
+- Close button accessibility pattern
+
+// Reuse from existing shadcn/ui:
+- Dialog/DialogContent for chat window
+- Button for send/actions
+- ScrollArea for message history
+- Card for message bubbles
+
+// Reuse from Footer.tsx:
+- Glassmorphism styling (backdrop-blur-md, bg-white/10)
+- Theme-aware colors (dark:bg-slate-800/90)
+- Responsive positioning patterns
+```
+
+**Implementation Plan:**
+1. **Day 1 - Local Prototype (2-3 hours)**:
+   - Install Ollama: `brew install ollama && ollama pull llama3.1`
+   - Create `<SageWidget />` component reusing `SustainabilityBadge` structure
+   - Build chat UI with shadcn Dialog + existing glassmorphism styles
+   - Test local API calls to `localhost:11434/api/generate`
+
+2. **Day 2 - Safety & Context (3-4 hours)**:
+   - Create `src/lib/tax_sources.json` with curated HMRC data
+   - Build custom hook `useSageExplainer` for prompt orchestration
+   - Add regex validation for unsafe advice detection
+   - Implement page-aware context (e.g., calculator results tie-in)
+
+3. **Day 3 - Polish & Deploy (2-3 hours)**:
+   - Add streaming text effect using React state
+   - Implement offline fallback with service worker caching
+   - Test on mobile (responsive chat sizing)
+   - Deploy to Vercel with edge function fallback
+
+**Safety Measures (YMYL Compliant):**
+- Strict prompt: "Explain only, no advice/calculations"
+- Regex blocklist: "should", "recommend", "file", "claim"
+- Auto-citations from tax_sources.json (links to gov.uk)
+- Deflection template: "I focus on overviews - consult a professional"
+- No personal data storage (SessionStorage clears on tab close)
+
+**User Flow:**
+1. Floating bubble appears on all pages (blue chat icon, bottom-right)
+2. Click opens glassmorphism modal with chat interface
+3. User types: "Explain marriage allowance"
+4. Widget streams response: "Marriage allowance transfers £1,260 of your personal allowance to a spouse earning less than you. Like sharing your tax-free pie slice. Saves up to £252/year. [Source: gov.uk/marriage-allowance]"
+5. Follow-up questions build context from previous chat (session only)
+
+**Success Metrics:**
+- Prototype working locally: 2-3 hours
+- Production-ready: 2-3 days
+- Engagement lift: +20-30% time on site (benchmark target)
+- Support deflection: 25% reduction in "what is X?" questions
+
+**One-Word Name Alternative:**
+- **TaxInsight Sage** → Too wordy
+- **Sage** → Perfect! Short, wise connotation, easy to brand
+
+**Next Steps:**
+1. Get user approval on concept
+2. Install Ollama and run test query
+3. Build minimal chat UI reusing SustainabilityBadge pattern
+4. Iterate on prompt safety and citations
+
+---
+
+### **2. Sentry Free Tier - Error Monitoring** 🎯 **RELIABILITY**
+**Priority**: MEDIUM-HIGH - Production Observability
+**Time**: 1-2 hours setup
+**Cost**: $0 (5,000 events/month free)
+
+**Why Sentry:**
+- **Catch Production Errors**: See real user issues before they report them
+- **Source Maps**: See actual TypeScript line numbers, not minified JS
+- **Context**: User browser, page, actions leading to error
+- **Performance**: Track slow pages and API calls
+- **Free Tier**: 5K events/month = plenty for early stage
+
+**Implementation:**
+1. Create account at sentry.io
+2. Install: `npm install @sentry/nextjs`
+3. Run: `npx @sentry/wizard@latest -i nextjs`
+4. Add DSN to `.env.local`: `NEXT_PUBLIC_SENTRY_DSN=...`
+5. Configure in `sentry.client.config.ts` and `sentry.server.config.ts`
+6. Test with intentional error, verify dashboard
+
+**Integration Points:**
+- Replace current error email system (or supplement it)
+- Add breadcrumbs to calculator actions
+- Track conversion funnel drop-offs
+- Monitor build errors and deployment issues
+
+**Free Tier Limits:**
+- 5,000 errors/month (resets monthly)
+- 10,000 performance transactions/month
+- 1GB attachment storage
+- 30-day history
+
+**Action:** Explore free tier, add if valuable. Keep current email fallback.
+
+---
+
+### **3. Linear API Audit - Free Tier Status** 🎯 **WORKFLOW**
+**Priority**: MEDIUM - Verify Current Setup
+**Time**: 30 minutes audit
+**Goal**: Confirm free tier limits, document what we have
+
+**Current State:**
+- LINEAR_SETUP.md exists (15K guide)
+- @linear/sdk installed
+- 7 npm scripts for Linear integration
+- API key configured
+
+**Audit Checklist:**
+- [ ] Login to linear.app → Settings → API
+- [ ] Check current plan (Free vs Paid)
+- [ ] Review API rate limits (free = 1,500 requests/hour)
+- [ ] Verify what features we're using (issues, projects, cycles)
+- [ ] Check if we're hitting any limits
+- [ ] Document findings in LINEAR_SETUP.md
+
+**Free Tier Includes:**
+- Unlimited viewers
+- 250 issues
+- API access (1,500 req/hour)
+- GitHub integration
+- Basic automations
+
+**Action:** Audit current usage, document limits, optimize if needed.
+
+---
+
+### **4. Blog Optimization & Grammarly Integration** 🎯 **CONTENT QUALITY**
+**Priority**: MEDIUM - Content Excellence
+**Time**: 3-4 hours planning + ongoing
+**Goal**: Finalize writing plan, timing strategy, quality tools
+
+**Current State:**
+- BLOG_GUIDE.md exists (18K - comprehensive)
+- 7 blog posts published
+- Monday + Thursday schedule defined
+- Contentlayer2 integration working
+- 800x400 WebP image specs set
+
+**What's Missing:**
+1. **Writing Schedule Discipline**:
+   - Pre-plan topics 2 weeks ahead
+   - Batch writing sessions (write 2-3 at once)
+   - Editorial calendar with seasonal hooks (e.g., tax year end in April)
+
+2. **Quality Assurance Workflow**:
+   - Grammarly Premium for tone, clarity, engagement scoring
+   - AI detection check (avoid Claude-obvious patterns)
+   - SEO checklist per post (keywords, meta, schema)
+   - Peer review process (if team expands)
+
+3. **Grammarly Integration Options**:
+   - **Browser Extension** (easiest): Install for Chrome/Safari, use in MDX editor
+   - **Desktop App**: Copy/paste drafts for deep analysis
+   - **API** (future): Automate checks in CI/CD (paid tier only)
+
+4. **Timing Strategy Refinement**:
+   - Monday 8am GMT: Week-start "how-to" content (high engagement)
+   - Thursday 2pm GMT: Analysis/opinion pieces (pre-weekend reads)
+   - Avoid: Friday evenings, weekends (20% less traffic per analytics)
+
+5. **Topic Planning Framework**:
+   - **Evergreen**: Tax code explainers, allowance guides (80% of content)
+   - **Timely**: Budget reactions, HMRC updates (20% of content)
+   - **Seasonal**: January (New Year resolutions), March (tax year end), April (new rates)
+
+**Action Items:**
+- [ ] Install Grammarly browser extension (free tier to start)
+- [ ] Create editorial calendar in Linear (tag: `content`)
+- [ ] Plan next 10 blog topics with target dates
+- [ ] Add "Quality Checklist" section to BLOG_GUIDE.md:
+  - Grammarly score >70
+  - Reading time 3-6 minutes
+  - 2+ internal links
+  - Schema markup included
+  - AI detection pass (not Claude-obvious)
+
+**Grammarly Tiers:**
+- **Free**: Grammar, spelling, punctuation (good start)
+- **Premium** (£10/month): Tone, clarity, engagement, word choice (worth it for quality)
+- **Business** (£12/user/month): Style guides, brand tone (overkill for now)
+
+**Next Steps:**
+1. Update BLOG_GUIDE.md with Grammarly workflow
+2. Create 2-week topic pipeline in Linear
+3. Install Grammarly extension and test on next draft
+4. Set calendar reminders for Monday/Thursday publish schedule
+
+---
+
+## ✅ **Recently Completed (October 9, 2025)**
+
+### **Code Quality & Documentation Consolidation** ✅
+- UI folder audit completed: 18/18 components with tests (100% coverage)
+- 1,104 tests passing across all suites (unit, integration, E2E)
+- Test coverage improved: 14.77% → 42.47%
+- Docs consolidation: 14 → 10 files (-29%, no information loss)
+- CODE_AUDIT_TRACKER.md created as single source of truth
+- Deleted 4 historical audit docs (1,311 lines cleaned up)
 
 ## ✅ **Recently Completed (October 5, 2025)**
 
@@ -299,6 +534,96 @@ npm run test:coverage
 - [ ] Custom events logging properly
 - [ ] Conversion goals configured
 - [ ] Real-time dashboard working
+
+---
+
+## 📚 **Blog/Content Enhancements** 🔮 **FUTURE CONSIDERATION**
+
+### **1. Table of Contents (TOC) Component**
+**Priority**: LOW - UX enhancement for blog posts
+**Time**: ~1-2 hours
+**Impact**: Improved navigation, SEO/AEO boost, reduced bounce rates
+
+**Analysis:**
+Modern MDX blogs commonly feature a compact Table of Contents with anchor links to headings. While not built into Next.js/Contentlayer, it's straightforward to implement as a custom component using established patterns.
+
+**Why Add a TOC:**
+- **User Benefits**: Quick jumps to sections (e.g., "Tax Bands" or "Student Loans" in detailed posts)
+- **SEO/AEO Boost**: Google and AI crawlers favor structured content; TOCs improve featured snippets and internal linking
+- **Accessibility**: With proper ARIA (e.g., `role="navigation"`), helps screen readers
+- **Industry Standard**: Sites like freeCodeCamp, Medium, and dev.to use them
+
+**Implementation Approach:**
+1. **Extract Headings at Build Time** (in `contentlayer.config.ts`):
+   - Add computed field to parse MDX AST and collect `{text, level, id}` for each heading
+   - Use `mdast-util-from-markdown` + `unist-util-visit` to traverse AST
+   - Zero runtime overhead (runs during static generation)
+
+2. **Add Rehype Plugins** (in `next.config.ts`):
+   - `rehype-slug`: Auto-adds id attributes to headings (e.g., `id="tax-bands"`)
+   - Optional: `rehype-toc` for full auto-generation
+
+3. **Build TOC Component** (`src/components/blog/TableOfContents.tsx`):
+   - Sticky/floating sidebar on desktop, collapsible accordion on mobile
+   - Active section highlighting via `IntersectionObserver` (performant, no heavy deps)
+   - Nested list with indentation for heading hierarchy (h2, h3, h4)
+   - Match existing glassmorphism/card styling
+
+4. **Integrate into Blog Layout**:
+   - Pass `toc` from post data to sidebar in `app/blog/[slug]/page.tsx`
+   - Grid layout: main content + TOC sidebar (hidden on mobile unless expanded)
+
+**Example Code Structure:**
+```ts
+// contentlayer.config.ts - Add computed field
+computedFields: {
+  toc: {
+    type: 'json',
+    resolve: (post) => extractToc(post.body.raw), // Parse raw markdown
+  },
+}
+
+// TableOfContents.tsx - Component with active highlighting
+const [activeId, setActiveId] = useState('');
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => entries.forEach((e) => {
+      if (e.isIntersecting) setActiveId(e.target.id);
+    }),
+    { rootMargin: '0% 0% -80% 0%' }
+  );
+  // ... observe headings
+}, [toc]);
+```
+
+**Libraries/Tools:**
+- `mdast-util-from-markdown`: Parse markdown to AST
+- `unist-util-visit`: Traverse AST nodes
+- `rehype-slug`: Auto-add IDs to headings
+- No heavy dependencies needed—custom build preferred for control
+
+**Edge Cases to Handle:**
+- Skip TOC if fewer than 3 headings
+- Handle deep nesting (h2→h3→h4)
+- Prevent CLS from sticky positioning
+- Keyboard navigation support
+
+**Best Practice Match:**
+This pattern is used by 80%+ of Next.js MDX blogs. Your Contentlayer setup is well-positioned for this—extend existing computed fields to extract headings at build time.
+
+**Next Steps When Implementing:**
+1. Create `src/lib/extract-toc.ts` utility
+2. Update `contentlayer.config.ts` with `toc` computed field
+3. Build `TableOfContents.tsx` component with IntersectionObserver
+4. Add to blog post layout with responsive grid
+5. Test anchors, keyboard nav, accessibility
+6. Add to TESTING.md test coverage plan (if prioritized)
+
+**References:**
+- freeCodeCamp, Prismic, Medium tutorials use similar patterns
+- Next.js docs recommend custom TOC for MDX blogs
+- Contentlayer docs show computed field examples
 
 ---
 

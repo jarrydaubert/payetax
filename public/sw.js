@@ -116,6 +116,8 @@ self.addEventListener('fetch', (event) => {
     'buymeacoffee.com',
     'cdnjs.buymeacoffee.com',
     'bmac-cdn.nyc3.digitaloceanspaces.com',
+    'va.vercel-scripts.com',
+    'vercel-insights.com',
   ];
 
   if (skipDomains.some((domain) => url.includes(domain))) {

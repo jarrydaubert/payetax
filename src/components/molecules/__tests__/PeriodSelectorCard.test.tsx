@@ -216,7 +216,7 @@ describe('PeriodSelectorCard', () => {
 
       const card = container.firstChild;
       // Updated to responsive padding
-      expect(card).toHaveClass('p-3', 'sm:p-4');
+      expect(card).toHaveClass('p-2', 'sm:p-3', 'md:p-4');
     });
 
     it('applies correct title styling', () => {
@@ -229,7 +229,7 @@ describe('PeriodSelectorCard', () => {
       );
 
       const title = screen.getByText('Display Periods');
-      expect(title).toHaveClass('mb-3', 'font-semibold', 'text-foreground', 'text-sm');
+      expect(title).toHaveClass('mb-2', 'font-semibold', 'text-foreground', 'text-sm', 'sm:mb-3');
     });
 
     it('uses flex-wrap for checkbox layout', () => {

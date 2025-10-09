@@ -55,7 +55,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           className
         )}
       >
-        <div className='container mx-auto flex max-w-7xl items-center justify-between px-4'>
+        <div className='container mx-auto flex max-w-7xl items-center justify-between px-2 sm:px-4'>
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span

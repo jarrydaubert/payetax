@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
@@ -12,8 +13,23 @@ export default function GlobalError({
 }) {
   const errorId = Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-  // Auto-report error via email
+  // Auto-report error to Sentry and email
   useEffect(() => {
+    // Send to Sentry for monitoring
+    Sentry.captureException(error, {
+      tags: {
+        error_boundary: 'global',
+        error_id: errorId
+      },
+      contexts: {
+        error_details: {
+          digest: error.digest,
+          error_id: errorId
+        }
+      }
+    });
+
+    // Also send email notification
     fetch('/api/error-log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -26,7 +42,7 @@ export default function GlobalError({
         timestamp: new Date().toISOString(),
       }),
     }).catch(console.error);
-  }, [error]);
+  }, [error, errorId]);
 
   return (
     <html lang='en'>

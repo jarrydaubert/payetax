@@ -32,7 +32,7 @@ test.describe('Essential SEO Tests', () => {
 
     // Should have blog heading with longer timeout for dynamic content
     await expect(
-      page.getByRole('heading', { name: /UK Tax Insights|tax insights|updates/i })
+      page.getByRole('heading', { name: /UK Tax Insights|tax insights|updates/i }).first()
     ).toBeVisible({ timeout: 10000 });
 
     // Should be able to navigate back to calculator - target the specific "Back to Calculator" link
@@ -40,7 +40,9 @@ test.describe('Essential SEO Tests', () => {
     if (await homeLink.isVisible()) {
       await homeLink.click();
       await expect(
-        page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+        page
+          .getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+          .first()
       ).toBeVisible();
     }
   });

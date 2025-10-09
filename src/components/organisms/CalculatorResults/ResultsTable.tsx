@@ -244,6 +244,7 @@ export function ResultsTable({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
       className='space-y-4'
+      style={{ minHeight: '650px', width: '100%' }}
     >
       {/* Period Selection */}
       <PeriodSelectorCard
@@ -253,7 +254,7 @@ export function ResultsTable({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='relative'>
+      <div className='-mx-2 relative sm:mx-0'>
         {/* Scroll Indicators */}
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
@@ -265,6 +266,7 @@ export function ResultsTable({
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <Table data-testid='results-table'>
@@ -305,9 +307,26 @@ export function ResultsTable({
         </Card>
       </div>
 
-      <p className='text-center text-muted-foreground text-xs'>
-        *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
-      </p>
+      <div className='mt-4 flex flex-col items-center gap-2'>
+        <p className='text-center text-muted-foreground text-xs'>
+          *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
+        </p>
+        {visiblePeriods.length > 0 && (
+          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+            <span>Scroll for more</span>
+            <svg
+              className='size-4 animate-bounce'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              aria-label='Scroll right indicator'
+            >
+              <title>Scroll right</title>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+            </svg>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }

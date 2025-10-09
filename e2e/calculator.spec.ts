@@ -45,7 +45,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     }
 
     // Auto-calculation should have triggered, but let's click calculate button as backup
-    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
     await page.waitForTimeout(1000); // Give calculation time to process
 
@@ -230,7 +230,7 @@ test.describe('Tax Calculator E2E Tests', () => {
 
           // Alternative approach for stubborn cases
           if (retryCount >= 3) {
-            const altButton = page.getByRole('button', { name: /calculate/i });
+            const altButton = page.getByTestId('calculate-button');
             if (await altButton.isVisible()) {
               await altButton.click({ force: true });
               await page.waitForTimeout(1000);
@@ -269,7 +269,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     }
 
     // Calculate
-    await page.getByRole('button', { name: /calculate/i }).click();
+    await page.getByTestId('calculate-button').click();
     await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 10000 });
 
     // Dynamic Plan 2 calculation - use row-based targeting
@@ -318,7 +318,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     await salaryInput.fill('45000');
 
     // Calculate with English rates first
-    await page.getByRole('button', { name: /calculate/i }).click();
+    await page.getByTestId('calculate-button').click();
     await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 10000 });
 
     // Get the initial tax amount with better error handling - use row-based targeting
@@ -338,7 +338,7 @@ test.describe('Tax Calculator E2E Tests', () => {
       await scottishToggle.check();
 
       // Recalculate
-      await page.getByRole('button', { name: /calculate/i }).click();
+      await page.getByTestId('calculate-button').click();
       await expect(taxResults).toBeVisible({ timeout: 5000 }); // Wait for calculation
 
       // Get Scottish tax amount using row-based targeting
@@ -380,7 +380,7 @@ test.describe('Tax Calculator E2E Tests', () => {
       await page.getByRole('option', { name: '2024-2025' }).click();
     }
 
-    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
     await page.waitForTimeout(1000); // Give calculation time to process
 
@@ -476,7 +476,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('30000');
-    await page.getByRole('button', { name: /calculate/i }).click();
+    await page.getByTestId('calculate-button').click();
     await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 10000 });
 
     // Test different period buttons
@@ -499,16 +499,16 @@ test.describe('Tax Calculator E2E Tests', () => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
 
-    // Check page loads correctly on mobile
+    // Check page loads correctly on mobile - use first() to avoid strict mode violation
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i }).first()
     ).toBeVisible();
 
     // Check form is usable
     const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('25000');
-    await page.getByRole('button', { name: /calculate/i }).click();
+    await page.getByTestId('calculate-button').click();
 
     // Check results display properly on mobile
     await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 10000 });
@@ -534,12 +534,16 @@ test.describe('Tax Calculator E2E Tests', () => {
     const aboutLink = page.getByRole('navigation').getByRole('link', { name: /about/i });
     if (await aboutLink.isVisible()) {
       await aboutLink.click();
-      await expect(page.getByRole('heading', { name: /Modern Tax Calculator/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /Modern Tax Calculator/i }).first()
+      ).toBeVisible();
 
       // Navigate back
       await page.goBack();
       await expect(
-        page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+        page
+          .getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+          .first()
       ).toBeVisible();
     }
 
@@ -547,7 +551,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     const blogLink = page.getByRole('navigation').getByRole('link', { name: 'Blog' });
     if (await blogLink.isVisible()) {
       await blogLink.click();
-      await expect(page.getByRole('heading', { name: /UK Tax Insights/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /UK Tax Insights/i }).first()).toBeVisible();
     }
   });
 
@@ -588,7 +592,7 @@ test.describe('Tax Calculator E2E Tests', () => {
 
     // Wait for main content to load
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i }).first()
     ).toBeVisible();
 
     const loadTime = Date.now() - startTime;

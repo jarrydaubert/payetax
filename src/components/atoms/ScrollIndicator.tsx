@@ -19,14 +19,35 @@ export function ScrollIndicator({ direction, visible }: ScrollIndicatorProps) {
   const positionClass = direction === 'left' ? 'left-0 justify-start' : 'right-0 justify-end';
   const gradientClass = direction === 'left' ? 'bg-gradient-to-r' : 'bg-gradient-to-l';
 
+  // Right indicator bounces to show users they can scroll
+  const animationProps =
+    direction === 'right' && visible
+      ? {
+          opacity: 1,
+          x: [0, -8, 0],
+          transition: {
+            opacity: { duration: 0.2 },
+            x: {
+              duration: 1.5,
+              repeat: Number.POSITIVE_INFINITY,
+              repeatDelay: 0.5,
+              ease: 'easeInOut',
+            },
+          },
+        }
+      : {
+          opacity: visible ? 1 : 0,
+          x: 0,
+          transition: { duration: 0.2 },
+        };
+
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: visible ? 1 : 0 }}
-      transition={{ duration: 0.2 }}
-      className={`pointer-events-none absolute top-0 bottom-0 ${positionClass} z-10 flex w-8 items-center ${gradientClass} from-background to-transparent sm:w-12`}
+      initial={{ opacity: 0, x: 0 }}
+      animate={animationProps}
+      className={`pointer-events-none absolute top-0 bottom-0 ${positionClass} z-10 flex w-12 items-center ${gradientClass} from-background via-background/80 to-transparent sm:w-16`}
     >
-      <Icon className='size-5 animate-pulse text-primary sm:h-6 sm:w-6' />
+      <Icon className='size-6 text-primary drop-shadow-lg sm:h-8 sm:w-8' />
     </motion.div>
   );
 }

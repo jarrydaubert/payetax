@@ -22,7 +22,7 @@ export function Footer({ className }: FooterProps) {
 
       {/* Main footer content */}
       <div className='glass py-8'>
-        <div className='container mx-auto max-w-7xl px-4'>
+        <div className='container mx-auto max-w-7xl px-2 sm:px-4'>
           <div className='flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left'>
             {/* Brand and copyright */}
             <div className='space-y-2'>

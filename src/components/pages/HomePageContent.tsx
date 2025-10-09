@@ -37,7 +37,7 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* SEO-optimized content for Answer Engine Optimization */}
-      <section className='container mx-auto px-4 pb-16'>
+      <section className='container mx-auto px-2 pb-16 sm:px-4'>
         <CalculatorContent />
       </section>
     </main>

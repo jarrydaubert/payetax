@@ -17,12 +17,12 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
     <section
       id='main-content'
       className={cn(
-        'relative flex min-h-[50vh] items-center justify-center py-12 md:min-h-screen md:py-20',
+        'relative flex items-center justify-center py-16 md:min-h-screen md:py-20',
         className
       )}
     >
       {/* Content */}
-      <div className='relative z-10 mx-auto max-w-5xl px-4 text-center'>
+      <div className='relative z-10 mx-auto max-w-5xl px-2 text-center sm:px-4'>
         {/* Heading - No animation for LCP optimization */}
         <h1 className='mb-6 font-bold text-5xl text-foreground tracking-tight md:text-7xl'>
           Free UK PAYE Tax
@@ -42,16 +42,25 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
         </motion.p>
 
         {/* CTA Button */}
-        <div className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px] transition-transform hover:scale-[1.02]'>
-          <Button
-            size='lg'
-            onClick={onScrollToCalculator}
-            className='gap-2 rounded-lg bg-background px-8 text-foreground hover:bg-card'
-          >
-            Calculate My Salary
-            <ArrowRight className='size-4 transition-transform group-hover:translate-x-0.5' />
-          </Button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+          className='inline-block'
+        >
+          <div className='rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px]'>
+            <Button
+              size='lg'
+              onClick={onScrollToCalculator}
+              className='group gap-2 rounded-lg bg-background px-8 text-foreground hover:bg-card'
+            >
+              Calculate My Salary
+              <ArrowRight className='size-4 transition-transform group-hover:translate-x-1' />
+            </Button>
+          </div>
+        </motion.div>
 
         {/* Features */}
         <motion.div

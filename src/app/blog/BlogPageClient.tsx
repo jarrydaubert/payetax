@@ -137,7 +137,7 @@ export function BlogPageClient({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
           className='-mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'
         >
           {[
@@ -159,13 +159,10 @@ export function BlogPageClient({
               label: 'Always',
               gradient: 'from-orange-500 to-yellow-500',
             },
-          ].map((stat, idx) => (
-            <motion.div
+          ].map((stat, _idx) => (
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 + idx * 0.1 }}
-              className='group relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 text-center backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-border/60 hover:bg-card/70'
+              className='group relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 text-center backdrop-blur-xl transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-border/60 md:hover:bg-card/70'
             >
               <div
                 className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
@@ -173,7 +170,7 @@ export function BlogPageClient({
               <stat.icon className='relative mx-auto mb-4 size-10 text-purple-400' />
               <div className='relative mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
               <div className='relative text-muted-foreground text-sm'>{stat.label}</div>
-            </motion.div>
+            </div>
           ))}
         </motion.div>
 

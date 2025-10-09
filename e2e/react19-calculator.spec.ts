@@ -12,9 +12,9 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     // Check page title
     await expect(page).toHaveTitle(/PayeTax/);
 
-    // Check main heading is visible using working selector
+    // Check main heading is visible using working selector - use first() to avoid strict mode violation
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i }).first()
     ).toBeVisible();
 
     // Check calculator components are present using data-testids
@@ -37,7 +37,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     expect(inputValue).toMatch(/30[,]?000/); // Account for number formatting
 
     // Test calculate button is clickable
-    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    const calculateButton = page.getByTestId('calculate-button');
     await expect(calculateButton).toBeVisible();
     await expect(calculateButton).toBeEnabled();
   });
@@ -65,7 +65,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
 
     // Check responsive components adapt to mobile
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i }).first()
     ).toBeVisible();
 
     // Test mobile form interaction
@@ -108,7 +108,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     // Navigate and measure load time with modern optimizations
     await page.waitForLoadState('domcontentloaded');
     await expect(
-      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
+      page.getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i }).first()
     ).toBeVisible();
 
     const loadTime = Date.now() - startTime;
@@ -140,7 +140,7 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     await salaryInput.fill('invalid-salary');
 
     // Button should still be present (validation may prevent calculation but UI should remain stable)
-    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    const calculateButton = page.getByTestId('calculate-button');
     await expect(calculateButton).toBeVisible();
 
     // Tax results container should still be present

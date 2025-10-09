@@ -7,24 +7,29 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}`);
 
-    // Wait for page to load
-    await page.waitForLoadState('domcontentloaded');
+    // Wait for page to fully load
+    await page.waitForLoadState('networkidle');
 
     // Enter salary to trigger results display
     const salaryInput = page.locator('[data-testid="salary-input"]');
-    await expect(salaryInput).toBeVisible({ timeout: 5000 });
+    await expect(salaryInput).toBeVisible({ timeout: 10000 });
     await salaryInput.clear();
     await salaryInput.fill('50000');
 
-    // Click calculate button
-    const calculateButton = page.getByRole('button', { name: /calculate/i });
+    // Click calculate button and wait for results
+    const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
-    // Wait for results to appear
-    await page.waitForTimeout(1500);
+    // Wait for results table to appear (reliable indicator)
+    await expect(page.locator('[data-testid="results-table"]')).toBeVisible({ timeout: 10000 });
 
     // Wait for Display Periods section to be visible
-    await expect(page.getByText('Display Periods')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Display Periods')).toBeVisible({ timeout: 10000 });
+
+    // Wait for all checkboxes to be rendered
+    await expect(page.locator('[role="checkbox"][id^="period-"]').first()).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test.describe('Initial Rendering', () => {
@@ -86,10 +91,9 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Click to check
       await hourlyCheckbox.click();
-      await page.waitForTimeout(300);
 
-      // Verify now checked
-      await expect(hourlyCheckbox).toBeChecked();
+      // Verify now checked (auto-waits for state change)
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
     });
 
     test('should uncheck a checked checkbox when clicked', async ({ page }) => {
@@ -100,10 +104,9 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Click to uncheck
       await weeklyCheckbox.click();
-      await page.waitForTimeout(300);
 
-      // Verify now unchecked
-      await expect(weeklyCheckbox).not.toBeChecked();
+      // Verify now unchecked (auto-waits for state change)
+      await expect(weeklyCheckbox).not.toBeChecked({ timeout: 3000 });
     });
 
     test('should toggle checkbox multiple times', async ({ page }) => {
@@ -114,18 +117,27 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // First click - toggle
       await dailyCheckbox.click();
-      await page.waitForTimeout(200);
-      expect(await dailyCheckbox.isChecked()).toBe(!initiallyChecked);
+      if (initiallyChecked) {
+        await expect(dailyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(dailyCheckbox).toBeChecked({ timeout: 3000 });
+      }
 
       // Second click - toggle back
       await dailyCheckbox.click();
-      await page.waitForTimeout(200);
-      expect(await dailyCheckbox.isChecked()).toBe(initiallyChecked);
+      if (initiallyChecked) {
+        await expect(dailyCheckbox).toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(dailyCheckbox).not.toBeChecked({ timeout: 3000 });
+      }
 
       // Third click - toggle again
       await dailyCheckbox.click();
-      await page.waitForTimeout(200);
-      expect(await dailyCheckbox.isChecked()).toBe(!initiallyChecked);
+      if (initiallyChecked) {
+        await expect(dailyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(dailyCheckbox).toBeChecked({ timeout: 3000 });
+      }
     });
 
     test('should allow clicking label to toggle checkbox', async ({ page }) => {
@@ -137,10 +149,9 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Click label
       await hourlyLabel.click();
-      await page.waitForTimeout(300);
 
-      // Verify checkbox is now checked
-      await expect(hourlyCheckbox).toBeChecked();
+      // Verify checkbox is now checked (auto-waits)
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
     });
 
     test('should handle checking multiple periods simultaneously', async ({ page }) => {
@@ -150,30 +161,33 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Check all three
       await hourlyCheckbox.click();
-      await page.waitForTimeout(200);
-      await fortnightlyCheckbox.click();
-      await page.waitForTimeout(200);
-      await fourWeeklyCheckbox.click();
-      await page.waitForTimeout(200);
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
 
-      // Verify all are checked
-      await expect(hourlyCheckbox).toBeChecked();
-      await expect(fortnightlyCheckbox).toBeChecked();
-      await expect(fourWeeklyCheckbox).toBeChecked();
+      await fortnightlyCheckbox.click();
+      await expect(fortnightlyCheckbox).toBeChecked({ timeout: 3000 });
+
+      await fourWeeklyCheckbox.click();
+      await expect(fourWeeklyCheckbox).toBeChecked({ timeout: 3000 });
     });
 
     test('should handle rapid clicks without breaking', async ({ page }) => {
       const dailyCheckbox = page.getByRole('checkbox', { name: /daily/i });
 
+      // Get initial state
+      const initialState = await dailyCheckbox.isChecked();
+
       // Rapid clicks (3 times quickly)
       await dailyCheckbox.click();
       await dailyCheckbox.click();
       await dailyCheckbox.click();
+
+      // Wait for final state to settle
       await page.waitForTimeout(500);
 
-      // Should have a definite state (not broken)
-      const isChecked = await dailyCheckbox.isChecked();
-      expect(typeof isChecked).toBe('boolean');
+      // Should have toggled odd number of times (3)
+      const finalState = await dailyCheckbox.isChecked();
+      expect(typeof finalState).toBe('boolean');
+      expect(finalState).toBe(!initialState);
     });
   });
 
@@ -189,10 +203,13 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Press Space to toggle
       await page.keyboard.press('Space');
-      await page.waitForTimeout(300);
 
-      // Verify toggled
-      expect(await hourlyCheckbox.isChecked()).toBe(!initiallyChecked);
+      // Verify toggled (auto-waits for state change)
+      if (initiallyChecked) {
+        await expect(hourlyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
+      }
     });
 
     test('should toggle checkbox with Enter key', async ({ page }) => {
@@ -206,10 +223,13 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Press Enter to toggle
       await page.keyboard.press('Enter');
-      await page.waitForTimeout(300);
 
-      // Verify toggled
-      expect(await hourlyCheckbox.isChecked()).toBe(!initiallyChecked);
+      // Verify toggled (auto-waits for state change)
+      if (initiallyChecked) {
+        await expect(hourlyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
+      }
     });
 
     test('should navigate between checkboxes with Tab key', async ({ page }) => {
@@ -258,7 +278,12 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Toggle Hourly on
       const hourlyCheckbox = page.getByRole('checkbox', { name: /hourly/i });
       await hourlyCheckbox.click();
-      await page.waitForTimeout(500);
+
+      // Wait for checkbox state change
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
+
+      // Wait a bit for table to re-render
+      await page.waitForTimeout(300);
 
       // Get new column count
       const newHeaders = await page.locator('th').count();
@@ -276,7 +301,12 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Uncheck Weekly
       await weeklyCheckbox.click();
-      await page.waitForTimeout(500);
+
+      // Wait for checkbox state change
+      await expect(weeklyCheckbox).not.toBeChecked({ timeout: 3000 });
+
+      // Wait a bit for table to re-render
+      await page.waitForTimeout(300);
 
       // Get new column count
       const newHeaders = await page.locator('th').count();
@@ -294,7 +324,12 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Toggle a different period (Hourly)
       const hourlyCheckbox = page.getByRole('checkbox', { name: /hourly/i });
       await hourlyCheckbox.click();
-      await page.waitForTimeout(500);
+
+      // Wait for checkbox state change
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
+
+      // Wait for table to re-render
+      await page.waitForTimeout(300);
 
       // Verify Yearly value is still the same
       const yearlyValueAfter = await yearlyCell.textContent();
@@ -318,10 +353,12 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
         const isChecked = await checkbox.isChecked();
         if (!isChecked) {
           await checkbox.click();
-          await page.waitForTimeout(200);
+          // Wait for this specific checkbox to be checked
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
         }
       }
 
+      // Wait for final table render
       await page.waitForTimeout(500);
 
       // Get header texts
@@ -382,7 +419,13 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       // Toggle checkbox
       await hourlyCheckbox.click();
-      await page.waitForTimeout(300);
+
+      // Wait for state change
+      if (initialAriaChecked === 'true') {
+        await expect(hourlyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
+      }
 
       // Check new aria-checked value
       const newAriaChecked = await hourlyCheckbox.getAttribute('aria-checked');
@@ -458,9 +501,13 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       for (const checkbox of checkboxes) {
         if (await checkbox.isChecked()) {
           await checkbox.click();
-          await page.waitForTimeout(200);
+          // Wait for state change
+          await expect(checkbox).not.toBeChecked({ timeout: 3000 });
         }
       }
+
+      // Wait for table to re-render
+      await page.waitForTimeout(300);
 
       // Table should still exist but with minimal columns
       await expect(page.locator('table')).toBeVisible();
@@ -474,10 +521,9 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Check Hourly
       const hourlyCheckbox = page.getByRole('checkbox', { name: /hourly/i });
       await hourlyCheckbox.click();
-      await page.waitForTimeout(300);
 
       // Verify Hourly is checked
-      await expect(hourlyCheckbox).toBeChecked();
+      await expect(hourlyCheckbox).toBeChecked({ timeout: 3000 });
 
       // Change salary and recalculate
       const salaryInput = page.locator('[data-testid="salary-input"]');
@@ -486,7 +532,9 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
 
       const calculateButton = page.getByRole('button', { name: /calculate/i });
       await calculateButton.click();
-      await page.waitForTimeout(1000);
+
+      // Wait for new results
+      await expect(page.locator('[data-testid="results-table"]')).toBeVisible({ timeout: 10000 });
 
       // Hourly should still be checked
       await expect(hourlyCheckbox).toBeChecked();
@@ -500,9 +548,13 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Should toggle normally
       const initialState = await fourWeeklyCheckbox.isChecked();
       await fourWeeklyCheckbox.click();
-      await page.waitForTimeout(300);
 
-      expect(await fourWeeklyCheckbox.isChecked()).toBe(!initialState);
+      // Wait for state change
+      if (initialState) {
+        await expect(fourWeeklyCheckbox).not.toBeChecked({ timeout: 3000 });
+      } else {
+        await expect(fourWeeklyCheckbox).toBeChecked({ timeout: 3000 });
+      }
     });
   });
 

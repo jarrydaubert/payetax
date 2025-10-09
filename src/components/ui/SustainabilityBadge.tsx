@@ -82,14 +82,14 @@ export default function SustainabilityBadge() {
                         <li className='flex gap-2'>
                           <span className='text-green-400'>•</span>
                           <span>
-                            <strong className='text-foreground'>Low Carbon:</strong> ~0.2g CO₂ per
+                            <strong className='text-foreground'>Low Carbon:</strong> Estimated ~0.2g CO₂ per
                             page visit (avg. web page: 1.76g)
                           </span>
                         </li>
                         <li className='flex gap-2'>
                           <span className='text-green-400'>•</span>
                           <span>
-                            <strong className='text-foreground'>Efficient Code:</strong> 286KB
+                            <strong className='text-foreground'>Efficient Code:</strong> 309KB
                             initial bundle, optimized for minimal energy
                           </span>
                         </li>
