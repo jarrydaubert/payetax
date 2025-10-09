@@ -5,12 +5,12 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38b2ac?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![GitLab CI](https://img.shields.io/badge/GitLab_CI-passing-green?style=flat-square&logo=gitlab)](https://gitlab.com/ukpayetax/payetax)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)](https://gitlab.com/ukpayetax/payetax/-/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue?style=flat-square)](https://gitlab.com/ukpayetax/payetax/-/releases)
 
-> **Production-ready UK Tax Calculator** - HMRC-compliant PAYE calculations with AEO optimization, WCAG 2.2 AA accessibility, and exceptional performance.
+> **Production-ready UK Tax Calculator** - HMRC-compliant PAYE calculations with Sentry error monitoring, AEO optimization, WCAG 2.2 AA accessibility, and exceptional performance.
 
 **🌐 Live Demo:** [payetax.co.uk](https://payetax.co.uk)
-**📊 Status:** 🟢 **v1.0.0 Released** - Production-ready with GitLab CI/CD
+**📊 Status:** 🟢 **v1.1.0 Released** - Production-ready with Sentry monitoring & GitLab CI/CD
 **🔗 Repository:** [gitlab.com/ukpayetax/payetax](https://gitlab.com/ukpayetax/payetax)
 
 ---
@@ -22,15 +22,16 @@ PayeTax is a production-ready UK PAYE tax calculator built with Next.js 15 and R
 ### ✨ Key Features
 
 - **🔢 HMRC-Compliant Engine** - Official tax rates with comprehensive validation
+- **🛡️ Sentry Error Monitoring** - Production error tracking with session replay & source maps
 - **🤖 AEO Optimization** - Dataset schema for AI search engines (ChatGPT, Perplexity, Google SGE)
 - **♿ WCAG 2.2 AA Compliant** - Full screen reader support with ARIA roles and semantic HTML
 - **🌓 Theme System** - Light/Dark/System modes with flash prevention
 - **📊 Professional Exports** - Color-preserved print, Excel/PDF generation
-- **🛡️ Modern Error Handling** - Animated error boundaries with recovery options
+- **🛡️ Modern Error Handling** - Animated error boundaries with Sentry integration
 - **⚡ Exceptional Performance** - 100 Accessibility, 100 SEO, 91 Performance (Lighthouse), <252kB bundle
 - **📱 Fully Responsive** - Optimized for mobile, tablet, desktop, and 4K displays
 - **🎨 Glass-Morphism Design** - Modern aesthetic with consistent UI components
-- **🧪 Testing Infrastructure** - 508 unit tests + comprehensive E2E Playwright coverage
+- **🧪 Comprehensive Testing** - 1,104 unit tests (42.47% coverage) + E2E Playwright coverage
 - **🔒 Privacy-First** - GA4 with IP anonymization, GDPR-compliant consent
 
 ---
@@ -71,7 +72,7 @@ npm run format          # Format code with Biome
 npm run typecheck       # Run TypeScript type checking
 
 # Testing (Auto-Opens Reports)
-npm test                # Unit tests + coverage (508 tests, opens HTML report)
+npm test                # Unit tests + coverage (1,104 tests, 42.47% coverage, opens HTML report)
 npm run test:e2e        # E2E tests all browsers + mobile (opens HTML report)
 npm run test:dev        # Quick E2E Chrome-only (fast feedback, opens HTML report)
 npm run test:all        # Complete test suite (unit + E2E all browsers)
@@ -246,11 +247,12 @@ Professional tax insights powered by MDX with distinct branding:
 
 ### Code Quality
 
-- **147 Files** processed by Biome with strict rules (10/10 strictness)
+- **159 Files** processed by Biome with strict rules (10/10 strictness)
 - **58 Components** following atomic design (atoms, molecules, organisms)
-- **508 Unit Tests** + comprehensive E2E coverage (19 test suites)
+- **1,104 Unit Tests** (42.47% coverage) + comprehensive E2E coverage
 - **Zero TypeScript Errors** - Strict mode enabled
-- **Zero Biome Violations** - All accessibility & security rules passing
+- **Zero Critical Biome Violations** - All accessibility & security rules passing
+- **Sentry Integration** - Production error monitoring with session replay
 - **shadcn/ui Integration** - Consistent, accessible component library
 - **Linear Integration** - Project management with 7 CLI commands
 
@@ -290,8 +292,8 @@ See [QUALITY_GATES.md](./docs/QUALITY_GATES.md) for complete details.
 
 ```bash
 # Run all tests
-npm test                 # Unit tests (130+ cases)
-npm run test:e2e        # E2E tests (5 suites)
+npm test                 # Unit tests (1,104 tests, 42.47% coverage)
+npm run test:e2e        # E2E tests (5 browser suites)
 npm run test:coverage   # Coverage reports
 
 # Watch modes for development
@@ -315,10 +317,14 @@ npm run test:e2e:ui     # E2E tests with browser UI
 |----------|---------|
 | **[docs/STRUCTURE.md](docs/STRUCTURE.md)** | File organization, architecture diagrams, project stats |
 | **[docs/STYLING.md](docs/STYLING.md)** | Styling system, Tailwind v4, OKLCH colors, best practices |
-| **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** | Production setup, CI/CD, environment variables |
-| **[docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md)** | Roadmap, priorities, lessons learned |
 | **[docs/TESTING.md](docs/TESTING.md)** | Test coverage, manual checklists, troubleshooting |
 | **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** | How to use the calculator, FAQs, examples |
+| **[docs/NEXT_PRIORITIES.md](docs/NEXT_PRIORITIES.md)** | Roadmap, next features (Sage AI, Grammarly, Linear audit) |
+| **[docs/CODE_AUDIT_TRACKER.md](docs/CODE_AUDIT_TRACKER.md)** | Code audit history, component analysis, cleanup tracking |
+| **[docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md)** | Sentry configuration guide, environment setup |
+| **[docs/SAGE_IMPLEMENTATION_PLAN.md](docs/SAGE_IMPLEMENTATION_PLAN.md)** | AI explainer blueprint (10-12hr implementation) |
+| **[docs/VERSION_1.1.0_RELEASE.md](docs/VERSION_1.1.0_RELEASE.md)** | v1.1.0 release notes, deployment checklist |
+| **[CHANGELOG.md](CHANGELOG.md)** | Complete version history with all changes |
 
 ---
 
@@ -342,6 +348,33 @@ Contributions welcome! Please ensure:
 ---
 
 ## 🏆 Recent Achievements
+
+### ✅ October 9, 2025 - v1.1.0 Production Release 🚀
+
+**Sentry Error Monitoring:**
+- **🛡️ Full Sentry Integration** - @sentry/nextjs v10.19.0 with client, server, and edge support
+- **📹 Session Replay** - 10% of all sessions, 100% of error sessions
+- **🗺️ Source Maps** - Readable stack traces in production (not minified)
+- **🧪 Test Page** - `/sentry-test` with 6 error scenarios
+- **🔒 Privacy-First** - PII scrubbing, localhost filtering, GDPR-safe
+
+**Test Coverage Expansion:**
+- **🧪 1,104 Unit Tests** - Up from 1,004 (+100 new tests, +10%)
+- **📊 42.47% Coverage** - Up from 14.77% (+188% improvement)
+- **✅ 100% UI Folder Coverage** - All atoms, molecules, organisms fully tested
+- **🎯 Test Quality: A-** - Up from C+ grade
+
+**Code Cleanup & Optimization:**
+- **🧹 Zero Unused Components** - Removed 5 legacy components (-1,311 lines)
+- **📚 Docs Consolidation** - 14 → 10 files (-29%, better organization)
+- **⚡ Performance** - CSP optimized for Sentry, bundle size stable at 504kB
+- **🐛 Production Fixes** - CSP worker-src, className error on SVG elements fixed
+
+**Documentation:**
+- **📖 CODE_AUDIT_TRACKER.md** - Single source of truth for audits
+- **🤖 SAGE_IMPLEMENTATION_PLAN.md** - AI explainer blueprint (10-12hrs, $0)
+- **📝 VERSION_1.1.0_RELEASE.md** - Comprehensive release notes
+- **📋 SENTRY_SETUP.md** - Complete Sentry configuration guide
 
 ### ✅ October 7, 2025 - Linear Integration & Test Infrastructure
 
@@ -412,17 +445,19 @@ Contributions welcome! Please ensure:
 - **📱 Responsive Design** - Optimized for 320px to 4K+ displays
 - **⚙️ Modern Stack** - Next.js 15.5, React 19, TypeScript 5.9
 
-### 📈 Current Status (v1.0.0)
+### 📈 Current Status (v1.1.0)
 
-- **🟢 Production Ready** - Live on GitLab with automated CI/CD
+- **🟢 Production Ready** - Live on GitLab with Sentry monitoring & CI/CD
+- **🛡️ Error Monitoring** - Sentry with session replay & source maps
 - **Zero TypeScript Errors** (strict mode enabled)
-- **Zero Biome Violations** (10/10 strictness, WCAG 2.2 AA compliant)
+- **Zero Critical Biome Violations** (10/10 strictness, WCAG 2.2 AA compliant)
 - **Zero Vulnerabilities** (dependencies audited and secured)
-- **252kB Bundle Size** (well under 350kB target)
+- **504kB Bundle Size** (with Sentry, efficient tree-shaking)
 - **58 Components** (atomic design complete)
-- **508 Unit Tests** (19 test suites) + **E2E Coverage** (5 browser projects)
-- **147 Files Processed** (Biome linting & formatting)
+- **1,104 Unit Tests** (42.47% coverage) + **E2E Coverage** (5 browser projects)
+- **159 Files Processed** (Biome linting & formatting)
 - **Linear Integration** (7 project management commands)
+- **Sentry Integration** (production error tracking with privacy-first approach)
 
 ---
 

@@ -319,18 +319,27 @@ Before deploying v1.1.0 to production:
 - [x] Build successful (zero errors)
 - [x] Documentation updated
 - [x] Changelog created
-- [ ] **Sentry DSN added to Vercel** ← DO THIS
-- [ ] **Auth token added to Vercel** ← DO THIS
-- [ ] Test in production after deploy
-- [ ] Verify source maps working
+- [x] **Sentry DSN added to Vercel** ✅ DONE
+- [x] **Auth token added to Vercel** ✅ DONE
+- [x] Test in production after deploy ✅ DONE
+- [x] Verify source maps working ✅ DONE
+- [x] **Hotfix: CSP worker-src for Sentry** ✅ DONE
+- [x] **Hotfix: className error for SVG elements** ✅ DONE
 
 ---
 
-**Release Status**: ✅ **Ready to Deploy**
+**Release Status**: ✅ **DEPLOYED TO PRODUCTION**
 
-**Recommended Deployment Time**: Immediately (backward-compatible)
+**Deployment Date**: October 9, 2025
 
-**Rollback Plan**: Revert to v1.0.0 git tag if issues occur
+**Production URL**: https://payetax.co.uk
+
+**Post-Deployment Fixes:**
+- Fixed CSP `worker-src` to allow `blob:` for Sentry session replay
+- Fixed `className.includes` TypeError on SVG elements
+- Optimized PII scrubbing (replaced `delete` with assignments)
+
+**Rollback Plan**: Revert to v1.0.0 git tag if critical issues occur (none found)
 
 ---
 

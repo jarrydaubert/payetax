@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2025-10-09
+
+### 🐛 Fixed
+
+#### Production Hotfixes (Post v1.1.0 Deployment)
+- **CSP Worker-Src Directive** - Added `blob:` to `worker-src` CSP directive to allow Sentry session replay workers
+  - Fixes: "Refused to create a worker from blob:" console error
+  - Impact: Sentry session replay now fully functional in production
+  - File: `next.config.ts:164`
+
+- **SVG Element Type Error** - Fixed `className.includes is not a function` error on SVG elements
+  - Changed: `target.className?.includes('bmc')` → `target.classList?.contains('bmc')`
+  - Fixes: TypeError when clicking on SVG elements in Buy Me a Coffee handler
+  - Impact: No more console errors on SVG interactions
+  - File: `src/app/layout.tsx:221`
+
+- **Performance Optimization** - Replaced `delete` operator with undefined assignments in Sentry PII scrubbing
+  - Changed: `delete sanitized.email` → `sanitized.email = undefined`
+  - Impact: Better performance, satisfies Biome linter rules
+  - File: `sentry.client.config.ts:69-72`
+
+### 📊 Deployment Status
+
+- **Deployed**: October 9, 2025
+- **Environment Variables Added to Vercel**:
+  - `RESEND_API_KEY` (feedback emails working in production)
+  - `SENTRY_AUTH_TOKEN` (source maps uploaded successfully)
+- **Production Tests**: All passing ✅
+- **Console Errors**: Zero critical errors ✅
+
+---
+
 ## [1.1.0] - 2025-10-09
 
 ### 🚀 Added
