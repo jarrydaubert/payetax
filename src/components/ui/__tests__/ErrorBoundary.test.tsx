@@ -1,7 +1,7 @@
 // src/components/ui/__tests__/ErrorBoundary.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import type React from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';
-import React from 'react';
 
 // Mock Next.js Link
 jest.mock('next/link', () => {

@@ -30,7 +30,7 @@ Sentry.init({
     'Failed to fetch',
     'NetworkError',
     // Random plugins/extensions
-    'Can\'t find variable: ZiteReader',
+    "Can't find variable: ZiteReader",
     'jigsaw is not defined',
     'CommentBackboneEnd',
     'atomicFindClose',
@@ -66,10 +66,10 @@ Sentry.init({
     if (event.request?.data && typeof event.request.data === 'object') {
       const sanitized = { ...event.request.data } as Record<string, unknown>;
       // Remove potentially sensitive fields
-      delete sanitized.email;
-      delete sanitized.name;
-      delete sanitized.phone;
-      delete sanitized.address;
+      sanitized.email = undefined;
+      sanitized.name = undefined;
+      sanitized.phone = undefined;
+      sanitized.address = undefined;
       event.request.data = sanitized;
     }
 

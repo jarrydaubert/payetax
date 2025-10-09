@@ -1,12 +1,7 @@
 // src/components/ui/__tests__/tooltip.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../tooltip';
 
 describe('Tooltip Component', () => {
   describe('Basic Rendering', () => {
@@ -86,7 +81,9 @@ describe('Tooltip Component', () => {
 
       await waitFor(() => {
         const tooltips = screen.queryAllByText('Tooltip text');
-        expect(tooltips.every(el => !el.isVisible || el.getAttribute('data-state') === 'closed')).toBe(true);
+        expect(
+          tooltips.every((el) => !el.isVisible || el.getAttribute('data-state') === 'closed')
+        ).toBe(true);
       });
     });
   });
@@ -109,7 +106,7 @@ describe('Tooltip Component', () => {
 
       await waitFor(() => {
         const contents = screen.getAllByText('Tooltip text');
-        expect(contents.some(el => el.classList.contains('custom-tooltip'))).toBe(true);
+        expect(contents.some((el) => el.classList.contains('custom-tooltip'))).toBe(true);
       });
     });
   });

@@ -22,12 +22,12 @@ export async function onRequestError(
   Sentry.captureException(err, {
     tags: {
       router_kind: context.routerKind,
-      request_path: request.path
+      request_path: request.path,
     },
     contexts: {
       request: {
-        url: request.path
-      }
-    }
+        url: request.path,
+      },
+    },
   });
 }

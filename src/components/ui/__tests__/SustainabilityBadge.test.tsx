@@ -1,5 +1,5 @@
 // src/components/ui/__tests__/SustainabilityBadge.test.tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SustainabilityBadge from '../SustainabilityBadge';
 
 describe('SustainabilityBadge Component', () => {

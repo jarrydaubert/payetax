@@ -1,21 +1,29 @@
 // src/components/ui/__tests__/StructuredData.test.tsx
 import { render } from '@testing-library/react';
-import StructuredData from '../StructuredData';
 import React from 'react';
+import StructuredData from '../StructuredData';
 
 // Mock Next.js Script component to render as regular script tag
 jest.mock('next/script', () => {
   return {
     __esModule: true,
-    default: function MockScript({ id, type, children }: { id: string; type: string; children: React.ReactNode }) {
+    default: function MockScript({
+      id,
+      type,
+      children,
+    }: {
+      id: string;
+      type: string;
+      children: React.ReactNode;
+    }) {
       // Children might be a string or ReactNode
       const content = typeof children === 'string' ? children : String(children);
       return React.createElement('script', {
         id,
         type,
-        dangerouslySetInnerHTML: { __html: content }
+        dangerouslySetInnerHTML: { __html: content },
       });
-    }
+    },
   };
 });
 
@@ -114,12 +122,7 @@ describe('StructuredData Component', () => {
         publishDate: '2024-01-01',
       };
 
-      const { container } = render(
-        <StructuredData
-          type='article'
-          articleData={articleData}
-        />
-      );
+      const { container } = render(<StructuredData type='article' articleData={articleData} />);
 
       const script = container.querySelector('script[type="application/ld+json"]');
       expect(script).toBeInTheDocument();
@@ -187,12 +190,7 @@ describe('StructuredData Component', () => {
         authorName: 'John Doe',
       };
 
-      const { container } = render(
-        <StructuredData
-          type='article'
-          articleData={articleData}
-        />
-      );
+      const { container } = render(<StructuredData type='article' articleData={articleData} />);
 
       const script = container.querySelector('script[type="application/ld+json"]');
       if (script?.textContent) {

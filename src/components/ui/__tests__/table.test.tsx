@@ -1,13 +1,6 @@
 // src/components/ui/__tests__/table.test.tsx
 import { render, screen } from '@testing-library/react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table';
 
 describe('Table Component', () => {
   describe('Basic Rendering', () => {
@@ -100,7 +93,7 @@ describe('Table Component', () => {
   describe('Custom Styling', () => {
     it('should accept className on Table', () => {
       render(
-        <Table className="custom-table">
+        <Table className='custom-table'>
           <TableBody>
             <TableRow>
               <TableCell>Test</TableCell>
@@ -117,7 +110,7 @@ describe('Table Component', () => {
       render(
         <Table>
           <TableBody>
-            <TableRow className="custom-row">
+            <TableRow className='custom-row'>
               <TableCell>Test</TableCell>
             </TableRow>
           </TableBody>
@@ -133,7 +126,7 @@ describe('Table Component', () => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell className="custom-cell">Test</TableCell>
+              <TableCell className='custom-cell'>Test</TableCell>
             </TableRow>
           </TableBody>
         </Table>

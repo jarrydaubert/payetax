@@ -32,7 +32,7 @@ describe('ContentSection Component', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <ContentSection className="custom-section">
+        <ContentSection className='custom-section'>
           <p>Content</p>
         </ContentSection>
       );
@@ -55,7 +55,7 @@ describe('ContentSection Component', () => {
   describe('Layout Props', () => {
     it('should render with optional title', () => {
       render(
-        <ContentSection title="Section Title">
+        <ContentSection title='Section Title'>
           <p>Content</p>
         </ContentSection>
       );
@@ -88,7 +88,7 @@ describe('ContentSection Component', () => {
 
     it('should be accessible with heading', () => {
       render(
-        <ContentSection title="Accessible Section">
+        <ContentSection title='Accessible Section'>
           <p>Content</p>
         </ContentSection>
       );

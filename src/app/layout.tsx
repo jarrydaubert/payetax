@@ -218,7 +218,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                         target.closest('iframe[src*="buymeacoffee"]') ||
                                         target.closest('.bmc-btn-container') ||
                                         target.id?.includes('bmc') ||
-                                        target.className?.includes('bmc');
+                                        target.classList?.contains('bmc');
 
                     // If clicking on BMC elements when popup is closed, allow only the main button
                     if (isBMCElement && !target.closest('.bmc-btn-container')) {

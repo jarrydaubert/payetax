@@ -1,9 +1,10 @@
 // next.config.ts
+
+import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 import { withContentlayer } from 'next-contentlayer2';
 // FIXED: Import webpack directly for plugins
 import webpack from 'webpack';
-import { withSentryConfig } from '@sentry/nextjs';
 
 // Bundle analyzer setup
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -161,7 +162,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://cdnjs.buymeacoffee.com; worker-src 'self'; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://cdnjs.buymeacoffee.com; worker-src 'self' blob:; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com;",
           },
         ],
       },
@@ -190,25 +191,22 @@ const nextConfig: NextConfig = {
 };
 
 // Wrap config with Sentry for error monitoring
-const configWithSentry = withSentryConfig(
-  withContentlayer(withBundleAnalyzer(nextConfig)),
-  {
-    // Sentry configuration options
-    org: 'payetax',
-    project: 'javascript-nextjs',
+const configWithSentry = withSentryConfig(withContentlayer(withBundleAnalyzer(nextConfig)), {
+  // Sentry configuration options
+  org: 'payetax',
+  project: 'javascript-nextjs',
 
-    // Only print logs for uploading source maps in CI
-    silent: !process.env.CI,
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
 
-    // Upload a larger set of source maps for prettier stack traces
-    widenClientFileUpload: true,
+  // Upload a larger set of source maps for prettier stack traces
+  widenClientFileUpload: true,
 
-    // Route browser requests to Sentry through a Next.js rewrite
-    tunnelRoute: '/monitoring',
+  // Route browser requests to Sentry through a Next.js rewrite
+  tunnelRoute: '/monitoring',
 
-    // Automatically tree-shake Sentry logger statements
-    disableLogger: true,
-  }
-);
+  // Automatically tree-shake Sentry logger statements
+  disableLogger: true,
+});
 
 export default configWithSentry;

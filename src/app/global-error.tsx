@@ -1,8 +1,8 @@
 // src/app/global-error.tsx
 'use client';
 
-import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
 
 export default function GlobalError({
   error,
@@ -19,14 +19,14 @@ export default function GlobalError({
     Sentry.captureException(error, {
       tags: {
         error_boundary: 'global',
-        error_id: errorId
+        error_id: errorId,
       },
       contexts: {
         error_details: {
           digest: error.digest,
-          error_id: errorId
-        }
-      }
+          error_id: errorId,
+        },
+      },
     });
 
     // Also send email notification

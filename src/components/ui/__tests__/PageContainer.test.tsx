@@ -32,7 +32,7 @@ describe('PageContainer Component', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <PageContainer className="custom-container">
+        <PageContainer className='custom-container'>
           <div>Content</div>
         </PageContainer>
       );
