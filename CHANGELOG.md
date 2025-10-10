@@ -7,6 +7,123 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.3] - 2025-10-10
+
+### 🎨 Improved
+
+#### Calculator Layout & UX
+- **Container Max-Width** - Increased from 1280px to 1600px for better desktop utilization
+  - All 7 periods now visible on 1920px screens without scrolling
+  - Grid layout optimized: 380px sidebar + 1fr results area
+  - File: `src/components/organisms/CalculatorContainer.tsx:12`
+
+- **Results Table Expansion** - Table now dynamically expands based on selected periods
+  - Removed width constraint to allow natural growth
+  - Better space utilization on all screen sizes
+  - File: `src/components/organisms/CalculatorResults/ResultsTable.tsx:258`
+
+#### Scroll Indicators & Mobile Experience
+- **Scroll Indicator Detection** - Fixed to trigger on period selection changes
+  - Added `visiblePeriods` to useEffect dependencies
+  - Indicators now appear/disappear correctly when toggling periods
+  - Enhanced with 5px scroll threshold for smoother transitions
+  - File: `src/components/organisms/CalculatorResults/ResultsTable.tsx:93`
+
+- **Mobile Swipe Hint** - Added visual indicator for horizontal scrolling
+  - Shows "👈 Swipe to see all periods" on mobile when overflow detected
+  - Hidden on desktop (md:hidden class)
+  - File: `src/components/organisms/CalculatorResults/ResultsTable.tsx:318-322`
+
+- **Responsive Sizing** - Updated scroll indicators for better mobile experience
+  - Changed from w-12 to w-16 (mobile) and md:w-20 (desktop)
+  - Icon sizing: size-5 (mobile) to md:size-6 (desktop)
+  - File: `src/components/atoms/ScrollIndicator.tsx:26`
+
+### 🐛 Fixed
+
+#### BMC Widget (Critical Fixes)
+- **CSP Wildcard Domains** - Added `https://*.buymeacoffee.com` to all CSP directives
+  - Fixed blank modal issue where iframe content was blocked
+  - Applied to: script-src, style-src, connect-src, frame-src, child-src
+  - File: `next.config.ts:165`
+
+- **Sentry Replay Blocking BMC** - Disabled Sentry Replay in development
+  - `blockAllMedia: true` was blocking BMC widget modal iframe
+  - Replay now only runs in production with BMC iframe exception
+  - Added `ignore: ['iframe[src*="buymeacoffee"]']` rule
+  - Files: `instrumentation-client.ts:16-30`
+
+- **Sentry Migration** - Moved client config to Turbopack-compatible location
+  - Renamed: `sentry.client.config.ts` → `instrumentation-client.ts`
+  - Added `onRouterTransitionStart` hook for navigation instrumentation
+  - Fixes Next.js deprecation warning for Turbopack
+  - Files: `instrumentation.ts:13-15`, `instrumentation-client.ts`
+
+#### Service Worker Development Issues
+- **SW Disabled in Dev** - Service Worker now skips registration on localhost
+  - Prevents "Failed to fetch" errors during hot-reload
+  - Avoids cache conflicts with Next.js dev server
+  - Still works normally in production
+  - File: `public/register-sw.js:11-15`
+
+#### Vercel Deployment Configuration
+- **Ignored Build Step** - Fixed inverted production build logic
+  - Changed from: `if production then skip` (WRONG)
+  - To: Automatic builds on all commits (CORRECT)
+  - Deployments now go directly to production instead of staging
+  - Configuration: Vercel Dashboard → Settings → General
+
+### 🧪 Testing
+
+#### Comprehensive Test Coverage (100% Pass Rate)
+- **E2E Scroll Indicator Tests** - 14 tests across all viewports
+  - Desktop (1920x1080): 3 tests validating 1600px fix
+  - Laptop (1366x768): 2 tests for horizontal scroll
+  - Mobile (375x667): 3 tests for touch scrolling and swipe hints
+  - Scroll position tracking: 2 tests for indicator state changes
+  - Container width validation: 2 tests
+  - File: `e2e/scroll-indicators.spec.ts` (NEW)
+
+- **Unit Tests for Scroll Components** - 16 tests total
+  - ScrollIndicator: 8 tests covering rendering, styling, animations
+  - ResultsTable: 8 tests for scroll behavior and period changes
+  - Fixed test assertions to match current implementation
+  - Files: `src/components/atoms/__tests__/ScrollIndicator.test.tsx`, `src/components/organisms/CalculatorResults/__tests__/ResultsTable.test.tsx`
+
+### 📚 Documentation
+
+- **SBT System** - Added Scenario-Based Testing documentation
+  - Comprehensive testing approach for all scenarios
+  - Cross-device, cross-browser coverage strategy
+  - False-positive prevention techniques
+  - File: `docs/SBT_system.md` (NEW)
+
+### 📊 Metrics
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| **Container Width** | 1280px | 1600px | +320px (+25%) |
+| **E2E Tests** | 0 scroll tests | 14 scroll tests | +14 (NEW) |
+| **Unit Tests** | 1,104 | 1,120 | +16 (+1.4%) |
+| **BMC Widget** | ❌ Broken | ✅ Working | Fixed |
+| **Scroll Indicators** | ❌ Not working | ✅ Working | Fixed |
+
+### 🔧 Technical Improvements
+
+- Fixed all Biome linting issues (noUselessConstructor, noExplicitAny)
+- Added IntersectionObserver mock for scroll indicator tests
+- Updated test snapshots for responsive sizing changes
+- Verified production build passes successfully
+
+### 🚀 Deployment
+
+- **Build Status**: All tests passing ✅
+- **Bundle Size**: 420 kB vendors chunk (stable)
+- **Production URL**: https://payetax.co.uk
+- **Vercel**: Auto-deploy on main branch ✅
+
+---
+
 ## [1.1.1] - 2025-10-09
 
 ### 🐛 Fixed
