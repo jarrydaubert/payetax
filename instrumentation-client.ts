@@ -12,15 +12,22 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
+  // Only enable replays in production
+  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0,
+  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
 
-  integrations: [
-    Sentry.replayIntegration({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
+  integrations:
+    process.env.NODE_ENV === 'production'
+      ? [
+          Sentry.replayIntegration({
+            maskAllText: true,
+            blockAllMedia: true,
+            // Don't block BMC widget
+            block: ['.sentry-block', '[data-sentry-block]'],
+            ignore: ['iframe[src*="buymeacoffee"]'],
+          }),
+        ]
+      : [],
 
   // Ignore common non-critical errors
   ignoreErrors: [
