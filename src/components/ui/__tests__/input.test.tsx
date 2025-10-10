@@ -161,6 +161,7 @@ describe('Input Component', () => {
     });
 
     it('should support id attribute', () => {
+      // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
       render(<Input id='test-input' />);
       const input = screen.getByRole('textbox');
       expect(input).toHaveAttribute('id', 'test-input');

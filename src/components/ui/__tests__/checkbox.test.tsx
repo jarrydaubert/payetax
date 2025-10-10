@@ -160,6 +160,7 @@ describe('Checkbox Component', () => {
     });
 
     it('should support id attribute', () => {
+      // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
       render(<Checkbox id='terms-checkbox' />);
       const checkbox = screen.getByRole('checkbox');
       expect(checkbox).toHaveAttribute('id', 'terms-checkbox');

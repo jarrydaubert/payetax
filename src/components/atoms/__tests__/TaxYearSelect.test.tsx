@@ -162,6 +162,7 @@ describe('TaxYearSelect Component', () => {
     });
 
     it('should have unique ID for accessibility', () => {
+      // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} id='test-select' />);
 
       const button = screen.getByRole('button');
@@ -169,6 +170,7 @@ describe('TaxYearSelect Component', () => {
     });
 
     it('should associate label with button', () => {
+      // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} id='test-select' />);
 
       const label = screen.getByText('Tax Year');

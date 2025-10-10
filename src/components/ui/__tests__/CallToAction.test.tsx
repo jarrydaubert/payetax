@@ -128,9 +128,9 @@ describe('CallToAction Component', () => {
 
       const links = screen.getAllByRole('link');
       expect(links).toHaveLength(2);
-      links.forEach((link) => {
+      for (const link of links) {
         expect(link).toBeInTheDocument();
-      });
+      }
     });
   });
 });

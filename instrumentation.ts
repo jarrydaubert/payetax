@@ -8,6 +8,11 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === 'edge') {
     await import('./sentry.edge.config');
   }
+
+  // Client-side Sentry configuration (replaces sentry.client.config.ts)
+  if (process.env.NEXT_RUNTIME === 'browser') {
+    await import('./instrumentation-client');
+  }
 }
 
 export async function onRequestError(

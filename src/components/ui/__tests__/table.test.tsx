@@ -122,7 +122,7 @@ describe('Table Component', () => {
     });
 
     it('should accept className on TableCell', () => {
-      const { container } = render(
+      render(
         <Table>
           <TableBody>
             <TableRow>

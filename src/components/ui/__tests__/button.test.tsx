@@ -137,7 +137,7 @@ describe('Button Component', () => {
         { variant: 'outline', size: 'icon' },
       ] as const;
 
-      combinations.forEach(({ variant, size }) => {
+      for (const { variant, size } of combinations) {
         const { unmount } = render(
           <Button variant={variant} size={size}>
             Test
@@ -146,7 +146,7 @@ describe('Button Component', () => {
         const button = screen.getByRole('button');
         expect(button).toBeInTheDocument();
         unmount();
-      });
+      }
     });
   });
 });

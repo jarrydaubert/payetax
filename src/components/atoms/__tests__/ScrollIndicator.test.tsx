@@ -150,8 +150,8 @@ describe('ScrollIndicator Component', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('w-12');
-      expect(indicator.className).toContain('sm:w-16');
+      expect(indicator.className).toContain('w-16');
+      expect(indicator.className).toContain('md:w-20');
     });
   });
 
@@ -174,9 +174,8 @@ describe('ScrollIndicator Component', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('size-6');
-      expect(icon).toHaveClass('sm:h-8');
-      expect(icon).toHaveClass('sm:w-8');
+      expect(icon).toHaveClass('size-5');
+      expect(icon).toHaveClass('md:size-6');
     });
   });
 

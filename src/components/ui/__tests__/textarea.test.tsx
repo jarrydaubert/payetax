@@ -99,6 +99,7 @@ describe('Textarea Component', () => {
     });
 
     it('should support id attribute', () => {
+      // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
       render(<Textarea id='test-textarea' />);
       const textarea = screen.getByRole('textbox');
       expect(textarea).toHaveAttribute('id', 'test-textarea');

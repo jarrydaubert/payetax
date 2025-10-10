@@ -60,7 +60,7 @@ export function CalculatorContainer() {
 
   return (
     <div
-      className='mx-auto flex w-full max-w-7xl flex-col gap-3 px-2 py-4 sm:px-4 md:gap-6 md:py-8 lg:grid lg:grid-cols-[420px_1fr]'
+      className='mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-2 py-4 sm:px-4 md:gap-6 md:py-8 lg:grid lg:grid-cols-[380px_1fr] lg:gap-4 xl:gap-6 xl:px-8'
       data-testid='calculator-section'
     >
       {/* Header */}

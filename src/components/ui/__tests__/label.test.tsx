@@ -28,6 +28,7 @@ describe('Label Component', () => {
   });
 
   it('should support id attribute', () => {
+    // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
     render(<Label id='label-id'>Label</Label>);
     const label = screen.getByText('Label');
     expect(label).toHaveAttribute('id', 'label-id');

@@ -153,112 +153,60 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SpeedInsights />
         </ThemeProvider>
 
-        {/* Buy Me Coffee Widget - optimized loading with better client-side routing support */}
+        {/* Buy Me Coffee Widget - Official BMC code */}
         <script
           data-name='BMC-Widget'
           data-cfasync='false'
           src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
           data-id='payetax'
           data-description='Support PayeTax development!'
-          data-message='Thank you for using our free UK tax calculator! 💚'
+          data-message='Thank you for using our free UK tax calculator! Your support helps keep this tool free for everyone. 💚'
           data-color='#FF813F'
           data-position='Right'
           data-x_margin='18'
           data-y_margin='18'
-          data-z_index='99999'
-          defer
         />
 
-        {/* BMC Widget Route Change Handler and Footer Collision Detection */}
+        {/* BMC Cleanup - Fix ghost overlay bug */}
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe BMC widget initialization script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Minimal cleanup for BMC widget bug
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                // Re-initialize BMC widget on route changes for Next.js client-side routing
-                function initializeBMC() {
-                  if (window.BMC && window.BMC.Widget) {
-                    window.BMC.Widget.init();
-                  }
-                }
+                if (typeof window === 'undefined') return;
 
-                // Adjust widget position to avoid footer overlap
-                function adjustWidgetPosition() {
-                  const widget = document.querySelector('.bmc-btn-container');
-                  const footer = document.querySelector('footer');
-
-                  if (!widget || !footer) return;
-
-                  const footerRect = footer.getBoundingClientRect();
-                  const viewportHeight = window.innerHeight;
-                  const footerVisible = footerRect.top < viewportHeight;
-
-                  if (footerVisible) {
-                    const footerHeight = footerRect.height;
-                    const overlap = viewportHeight - footerRect.top;
-                    const offset = Math.max(footerHeight + 18, overlap + 18);
-                    widget.style.bottom = offset + 'px';
-                  } else {
-                    widget.style.bottom = '18px';
-                  }
-                }
-
-                // Prevent stray BMC overlay clicks
-                function handleDocumentClick(e) {
-                  const iframe = document.querySelector('iframe[src*="buymeacoffee"]');
-
-                  // If no iframe or iframe is hidden
-                  if (!iframe || iframe.offsetParent === null ||
-                      iframe.style.display === 'none' ||
-                      iframe.style.visibility === 'hidden') {
-
-                    // Check if click is on a BMC-related element
-                    const target = e.target;
-                    const isBMCElement = target.closest('a[href*="buymeacoffee"]') ||
-                                        target.closest('iframe[src*="buymeacoffee"]') ||
-                                        target.closest('.bmc-btn-container') ||
-                                        target.id?.includes('bmc') ||
-                                        target.classList?.contains('bmc');
-
-                    // If clicking on BMC elements when popup is closed, allow only the main button
-                    if (isBMCElement && !target.closest('.bmc-btn-container')) {
-                      e.preventDefault();
-                      e.stopPropagation();
+                // Watch for BMC iframe visibility changes
+                const observer = new MutationObserver(function(mutations) {
+                  mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                      const iframe = mutation.target;
+                      if (iframe.tagName === 'IFRAME' && iframe.src && iframe.src.includes('buymeacoffee')) {
+                        // If iframe is hidden, remove any stray overlays
+                        if (iframe.style.display === 'none' || iframe.style.visibility === 'hidden') {
+                          // Remove any BMC overlay elements
+                          const overlays = document.querySelectorAll('[class*="bmc"], [id*="bmc"], [class*="BMC"], [id*="BMC"]');
+                          overlays.forEach(function(el) {
+                            if (el !== iframe && el.tagName !== 'SCRIPT' && el.style.position === 'fixed') {
+                              el.remove();
+                            }
+                          });
+                        }
+                      }
                     }
-                  }
-                }
-
-                // Listen for Next.js route changes
-                if (typeof window !== 'undefined') {
-                  // Initialize after load
-                  window.addEventListener('load', function() {
-                    initializeBMC();
-                    setTimeout(adjustWidgetPosition, 500);
-
-                    // Add click handler to prevent stray overlay clicks
-                    document.addEventListener('click', handleDocumentClick, true);
                   });
+                });
 
-                  // Adjust on scroll
-                  window.addEventListener('scroll', adjustWidgetPosition);
-                  window.addEventListener('resize', adjustWidgetPosition);
-
-                  // Re-initialize on popstate (browser back/forward)
-                  window.addEventListener('popstate', function() {
-                    setTimeout(function() {
-                      initializeBMC();
-                      adjustWidgetPosition();
-                    }, 100);
-                  });
-
-                  // Listen for Next.js router events if available
-                  if (window.next && window.next.router) {
-                    window.next.router.events.on('routeChangeComplete', function() {
-                      initializeBMC();
-                      setTimeout(adjustWidgetPosition, 100);
+                // Start observing after a delay to let BMC initialize
+                setTimeout(function() {
+                  const container = document.body;
+                  if (container) {
+                    observer.observe(container, {
+                      attributes: true,
+                      attributeFilter: ['style'],
+                      subtree: true
                     });
                   }
-                }
+                }, 2000);
               })();
             `,
           }}

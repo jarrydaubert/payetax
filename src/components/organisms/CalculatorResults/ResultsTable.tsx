@@ -65,7 +65,8 @@ export function ResultsTable({
   const [showLeftIndicator, setShowLeftIndicator] = React.useState(false);
   const [showRightIndicator, setShowRightIndicator] = React.useState(false);
 
-  // Check scroll position
+  // Check scroll position - recheck when periods change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: visiblePeriods needed to trigger recheck when toggling periods
   React.useEffect(() => {
     const checkScrollPosition = () => {
       const container = containerRef.current;
@@ -81,7 +82,7 @@ export function ResultsTable({
     const container = containerRef.current;
     if (container) {
       checkScrollPosition();
-      container.addEventListener('scroll', checkScrollPosition);
+      container.addEventListener('scroll', checkScrollPosition, { passive: true });
       window.addEventListener('resize', checkScrollPosition);
 
       return () => {
@@ -89,7 +90,7 @@ export function ResultsTable({
         window.removeEventListener('resize', checkScrollPosition);
       };
     }
-  }, []);
+  }, [visiblePeriods]);
 
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
@@ -244,7 +245,7 @@ export function ResultsTable({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
       className='space-y-4'
-      style={{ minHeight: '650px', width: '100%' }}
+      style={{ minHeight: '650px' }}
     >
       {/* Period Selection */}
       <PeriodSelectorCard
@@ -260,14 +261,17 @@ export function ResultsTable({
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
         <Card className='overflow-hidden border-primary/20'>
+          {/* biome-ignore lint/a11y/useSemanticElements: div needed for ref and scroll functionality */}
           <div
             ref={containerRef}
-            className='overflow-x-auto scroll-smooth'
+            className='touch-pan-x overflow-x-auto scroll-smooth'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
+            role='region'
+            aria-label='Tax calculation results table'
           >
             <Table data-testid='results-table'>
               <TableHeader>
@@ -311,19 +315,9 @@ export function ResultsTable({
         <p className='text-center text-muted-foreground text-xs'>
           *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
         </p>
-        {visiblePeriods.length > 0 && (
-          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
-            <span>Scroll for more</span>
-            <svg
-              className='size-4 animate-bounce'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-              aria-label='Scroll right indicator'
-            >
-              <title>Scroll right</title>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-            </svg>
+        {showRightIndicator && (
+          <div className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'>
+            <span>👈 Swipe to see all periods</span>
           </div>
         )}
       </div>

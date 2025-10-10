@@ -230,6 +230,7 @@ describe('NumberInput Component', () => {
 
     it('should have unique IDs for accessibility', () => {
       const { container } = render(
+        // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
         <NumberInput value={10} onChange={mockOnChange} id='test-input' />
       );
       const input = container.querySelector('#test-input');

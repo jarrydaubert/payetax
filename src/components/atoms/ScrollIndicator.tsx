@@ -45,9 +45,12 @@ export function ScrollIndicator({ direction, visible }: ScrollIndicatorProps) {
     <motion.div
       initial={{ opacity: 0, x: 0 }}
       animate={animationProps}
-      className={`pointer-events-none absolute top-0 bottom-0 ${positionClass} z-10 flex w-12 items-center ${gradientClass} from-background via-background/80 to-transparent sm:w-16`}
+      className={`pointer-events-none absolute inset-y-0 ${positionClass} z-10 flex w-16 items-center ${gradientClass} from-background via-background/90 to-transparent md:w-20`}
+      aria-hidden='true'
     >
-      <Icon className='size-6 text-primary drop-shadow-lg sm:h-8 sm:w-8' />
+      <div className='flex size-8 items-center justify-center rounded-full bg-primary/10 backdrop-blur-sm md:size-10'>
+        <Icon className='size-5 text-primary drop-shadow-lg md:size-6' strokeWidth={2.5} />
+      </div>
     </motion.div>
   );
 }

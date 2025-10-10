@@ -239,37 +239,23 @@
   /* Better touch scrolling for iOS */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: none; /* Allow free scrolling */
+  }
+
+  /* Enhance touch-pan-x for horizontal scrolling */
+  .touch-pan-x {
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
   }
 }
 
-/* Buy Me Coffee Widget - Smooth transition when avoiding footer */
-.bmc-btn-container {
-  transition: bottom 0.3s ease-out;
-}
-
-/* BMC Widget - Mobile optimizations */
-@media (max-width: 640px) {
-  .bmc-btn-container {
-    /* Smaller margins on mobile to avoid edge overlap */
-    right: 8px !important;
-    bottom: 8px !important;
-  }
-
-  /* Scale down the button slightly on mobile */
-  .bmc-btn-container .bmc-btn {
-    transform: scale(0.85);
-    transform-origin: bottom right;
-  }
-
-  /* Constrain BMC popup/iframe to viewport on mobile */
-  .bmc-btn-container iframe,
-  #bmc-wbtn iframe,
-  iframe[src*="buymeacoffee"] {
-    max-width: calc(100vw - 16px) !important;
-    max-height: calc(100vh - 80px) !important;
-    width: 360px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
+/* Tablet and laptop optimizations (641px - 1440px) */
+@media (min-width: 641px) and (max-width: 1440px) {
+  /* Add extra padding for calculator container on smaller laptops */
+  [data-testid="calculator-section"] {
+    padding-left: clamp(1rem, 2vw, 2rem);
+    padding-right: clamp(1rem, 2vw, 2rem);
   }
 }
+

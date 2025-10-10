@@ -152,9 +152,9 @@ describe('ThemeToggle Component', () => {
       render(<ThemeToggle />);
 
       const buttons = screen.getAllByRole('button');
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         expect(button).toHaveAttribute('aria-pressed');
-      });
+      }
     });
   });
 
