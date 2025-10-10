@@ -8,6 +8,12 @@
     return;
   }
 
+  // Skip SW registration in development to avoid cache conflicts
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('[PWA] Service Worker disabled in development');
+    return;
+  }
+
   let registration;
   let isRefreshing = false;
 
