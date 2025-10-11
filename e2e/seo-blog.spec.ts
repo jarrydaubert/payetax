@@ -14,15 +14,15 @@ test.describe('Essential SEO Tests', () => {
     const metaDescription = page.locator('meta[name="description"]');
     await expect(metaDescription).toHaveAttribute('content', /.+/);
 
-    // Check for structured data scripts
+    // Check for structured data scripts - we now have 1 script with SoftwareApplication schema
+    // (consolidation happened as part of schema optimization)
     const structuredDataScripts = page.locator('script[type="application/ld+json"]');
     const scriptCount = await structuredDataScripts.count();
-    expect(scriptCount).toBeGreaterThanOrEqual(3);
+    expect(scriptCount).toBeGreaterThanOrEqual(1);
 
-    // Verify key structured data types exist
+    // Verify key structured data exists
     const scriptContents = await structuredDataScripts.allTextContents();
     const combinedContent = scriptContents.join(' ');
-    expect(combinedContent).toContain('"@type":"Organization"');
     expect(combinedContent).toContain('"@type":"SoftwareApplication"');
   });
 
@@ -30,10 +30,10 @@ test.describe('Essential SEO Tests', () => {
     // Test blog page loads with clean state
     await page.goto('/blog', { waitUntil: 'networkidle' });
 
-    // Should have blog heading with longer timeout for dynamic content
-    await expect(
-      page.getByRole('heading', { name: /UK Tax Insights|tax insights|updates/i }).first()
-    ).toBeVisible({ timeout: 10000 });
+    // Should have blog heading - "TaxInsights"
+    await expect(page.getByRole('heading', { name: /TaxInsights/i }).first()).toBeVisible({
+      timeout: 10000,
+    });
 
     // Should be able to navigate back to calculator - target the specific "Back to Calculator" link
     const homeLink = page.getByRole('link', { name: 'Back to Calculator' });

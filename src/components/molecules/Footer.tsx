@@ -16,7 +16,10 @@ export function Footer({ className }: FooterProps) {
   const currentYear = 2025;
 
   return (
-    <footer className={cn('mt-auto', className)}>
+    <footer
+      className={cn('mt-auto min-h-[140px] md:min-h-[120px]', className)}
+      style={{ contain: 'layout' }}
+    >
       {/* Subtle separator line */}
       <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
 

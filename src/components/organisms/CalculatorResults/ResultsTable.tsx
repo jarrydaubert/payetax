@@ -8,7 +8,6 @@ import {
   CreditCard,
   DollarSign,
   GraduationCap,
-  Heart,
   Percent,
   PiggyBank,
   Scale,
@@ -26,9 +25,9 @@ import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 interface ResultsTableProps {
   results: TaxCalculationResults;
-  allowancesDeductions?: string;
+  allowancesDeductions?: number;
   studentLoans?: string[];
-  hoursPerWeek?: string;
+  previousYearResults?: TaxCalculationResults | null;
   visiblePeriods?: string[];
   onVisiblePeriodsChange?: (periods: string[]) => void;
 }
@@ -55,8 +54,9 @@ const periodOptions: Record<string, number> = {
 
 export function ResultsTable({
   results,
-  allowancesDeductions = '0',
+  allowancesDeductions = 0,
   studentLoans = [],
+  previousYearResults = null,
   visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
   onVisiblePeriodsChange,
 }: ResultsTableProps) {
@@ -123,7 +123,15 @@ export function ResultsTable({
   const grossAnnual = results.grossSalary.annually;
   const taxFreeAllowance = results.taxFreeAmount;
   const taxableIncome = results.taxableIncome;
-  const allowancesAmount = parseFloat(allowancesDeductions.replace(/,/g, ''));
+  const allowancesAmount = allowancesDeductions;
+
+  // Calculate year-over-year change
+  const yearChange = previousYearResults
+    ? results.netPay.annually - previousYearResults.netPay.annually
+    : 0;
+  const yearChangePercentage = previousYearResults
+    ? calculatePercentage(yearChange, previousYearResults.netPay.annually)
+    : '0.0%';
 
   const tableRows: ResultRowData[] = [
     {
@@ -198,14 +206,6 @@ export function ResultsTable({
       isHighlight: false,
     },
     {
-      category: 'Pension [HMRC Relief]',
-      icon: Heart,
-      annual: 0,
-      percentage: 'N/A',
-      color: 'text-purple-600 dark:text-purple-400',
-      isHighlight: false,
-    },
-    {
       category: 'Allowances/Deductions',
       icon: DollarSign,
       annual: allowancesAmount,
@@ -232,9 +232,10 @@ export function ResultsTable({
     {
       category: 'Net Change from Previous Year',
       icon: TrendingUp,
-      annual: 0,
-      percentage: '0.0%',
-      color: 'text-blue-600 dark:text-blue-400',
+      annual: yearChange,
+      percentage: yearChangePercentage,
+      color:
+        yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
       isHighlight: false,
     },
   ];

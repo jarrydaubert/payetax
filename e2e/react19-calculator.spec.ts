@@ -50,10 +50,10 @@ test.describe('Modern Tax Calculator E2E Tests', () => {
     const taxResults = page.locator('[data-testid="tax-results"]');
     await expect(taxResults).toBeVisible({ timeout: 10000 });
 
-    // Verify it has some content (even if just the placeholder text)
+    // Verify it has some content (even if just the placeholder text or results table)
     const hasContent = await taxResults.textContent();
     expect(hasContent).toBeTruthy();
-    expect(hasContent).toMatch(/(Tax Summary|Payslip Summary)/); // Should contain either header
+    expect(hasContent).toMatch(/(Display Periods|Category|Gross Pay|Ready to Calculate)/); // Should contain results table or placeholder
   });
 
   test('should handle responsive design effectively', async ({ page }) => {

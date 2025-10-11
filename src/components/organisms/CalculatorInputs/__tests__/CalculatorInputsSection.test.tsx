@@ -1,0 +1,285 @@
+// src/components/organisms/CalculatorInputs/__tests__/CalculatorInputsSection.test.tsx
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { toast } from 'sonner';
+import { useCalculatorActions } from '@/store/calculatorStore';
+import { CalculatorInputsSection } from '../CalculatorInputsSection';
+
+// Mock dependencies
+jest.mock('sonner', () => ({
+  toast: {
+    error: jest.fn(),
+  },
+}));
+
+jest.mock('@/store/calculatorStore', () => ({
+  useCalculatorActions: jest.fn(),
+}));
+
+jest.mock('../BasicInputs', () => ({
+  BasicInputs: () => <div data-testid='basic-inputs-mock'>Basic Inputs</div>,
+}));
+
+describe('CalculatorInputsSection Component', () => {
+  const mockOnCalculate = jest.fn();
+  const mockReset = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useCalculatorActions as jest.Mock).mockReturnValue({
+      reset: mockReset,
+    });
+  });
+
+  describe('Rendering', () => {
+    it('should render BasicInputs component', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      expect(screen.getByTestId('basic-inputs-mock')).toBeInTheDocument();
+    });
+
+    it('should render Calculate button', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveTextContent('Calculate');
+    });
+
+    it('should render Reset button', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByRole('button', { name: /Reset/i });
+      expect(button).toBeInTheDocument();
+    });
+
+    it('should render Calculate button with icon', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const calculateButton = screen.getByTestId('calculate-button');
+      const icon = calculateButton.querySelector('svg');
+      expect(icon).toBeInTheDocument();
+    });
+
+    it('should render Reset button with icon', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const resetButton = screen.getByRole('button', { name: /Reset/i });
+      const icon = resetButton.querySelector('svg');
+      expect(icon).toBeInTheDocument();
+    });
+  });
+
+  describe('Calculate Button Interaction', () => {
+    it('should call onCalculate when Calculate button is clicked', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      expect(mockOnCalculate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should disable Calculate button while calculating', async () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      expect(button).toBeDisabled();
+
+      // Button should re-enable after 500ms timeout
+      await waitFor(() => expect(button).not.toBeDisabled(), { timeout: 1000 });
+    });
+
+    it('should show "Calculating..." text while calculating', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      expect(button).toHaveTextContent('Calculating...');
+    });
+
+    it('should show rotating icon while calculating', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      // Icon should still be present during calculation
+      const icon = button.querySelector('svg');
+      expect(icon).toBeInTheDocument();
+    });
+
+    it('should handle calculation errors with toast', async () => {
+      const errorOnCalculate = jest.fn(() => {
+        throw new Error('Test calculation error');
+      });
+
+      render(<CalculatorInputsSection onCalculate={errorOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Calculation failed', {
+          description: 'Test calculation error',
+        });
+      });
+    });
+
+    it('should handle non-Error exceptions', async () => {
+      const errorOnCalculate = jest.fn(() => {
+        throw 'String error';
+      });
+
+      render(<CalculatorInputsSection onCalculate={errorOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Calculation failed', {
+          description: 'Please check your inputs',
+        });
+      });
+    });
+
+    it('should re-enable button after error', async () => {
+      const errorOnCalculate = jest.fn(() => {
+        throw new Error('Test error');
+      });
+
+      render(<CalculatorInputsSection onCalculate={errorOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      await waitFor(() => expect(button).not.toBeDisabled(), { timeout: 1000 });
+    });
+  });
+
+  describe('Reset Button Interaction', () => {
+    it('should call reset action when Reset button is clicked', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByRole('button', { name: /Reset/i });
+      fireEvent.click(button);
+
+      expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call onCalculate when Reset is clicked', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByRole('button', { name: /Reset/i });
+      fireEvent.click(button);
+
+      expect(mockOnCalculate).not.toHaveBeenCalled();
+    });
+
+    it('should not show toast on successful reset', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByRole('button', { name: /Reset/i });
+      fireEvent.click(button);
+
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Button Styling', () => {
+    it('should render Calculate button with correct variant', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      expect(button).toHaveClass('flex-1'); // Takes full width
+    });
+
+    it('should render Reset button with outline variant', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByRole('button', { name: /Reset/i });
+      // Button component adds variant classes
+      expect(button).toBeInTheDocument();
+    });
+
+    it('should render buttons with large size', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const calculateButton = screen.getByTestId('calculate-button');
+      const resetButton = screen.getByRole('button', { name: /Reset/i });
+
+      expect(calculateButton).toBeInTheDocument();
+      expect(resetButton).toBeInTheDocument();
+    });
+  });
+
+  describe('Layout', () => {
+    it('should have correct spacing between elements', () => {
+      const { container } = render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const wrapper = container.querySelector('.space-y-4');
+      expect(wrapper).toBeInTheDocument();
+    });
+
+    it('should have gap between buttons', () => {
+      const { container } = render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const buttonContainer = container.querySelector('.flex.gap-2');
+      expect(buttonContainer).toBeInTheDocument();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have accessible button labels', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      expect(screen.getByRole('button', { name: /Calculate/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Reset/i })).toBeInTheDocument();
+    });
+
+    it('should properly disable Calculate button during operation', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      expect(button).toHaveAttribute('disabled');
+    });
+
+    it('should keep Reset button enabled during calculation', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const calculateButton = screen.getByTestId('calculate-button');
+      fireEvent.click(calculateButton);
+
+      const resetButton = screen.getByRole('button', { name: /Reset/i });
+      expect(resetButton).not.toBeDisabled();
+    });
+  });
+
+  describe('Animation', () => {
+    it('should use Framer Motion for calculating animation', () => {
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      const button = screen.getByTestId('calculate-button');
+      fireEvent.click(button);
+
+      // Motion.div should be present in calculating state
+      expect(button).toHaveTextContent('Calculating...');
+    });
+
+    it('should not throw errors on mount', () => {
+      expect(() => {
+        render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+      }).not.toThrow();
+    });
+
+    it('should not throw errors on unmount', () => {
+      const { unmount } = render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      expect(() => unmount()).not.toThrow();
+    });
+  });
+});

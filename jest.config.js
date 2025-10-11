@@ -11,6 +11,9 @@ const config = {
   coverageProvider: 'v8',
   coverageDirectory: '<rootDir>/audit-outputs/coverage',
   testEnvironment: 'jsdom',
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleDirectories: ['node_modules', '<rootDir>/'],
@@ -21,16 +24,22 @@ const config = {
     '<rootDir>/src/lib/__tests__/__mocks__/',
     '<rootDir>/.contentlayer/',
   ],
-  transformIgnorePatterns: ['node_modules/(?!(contentlayer2|@contentlayer2)/)', '\\.contentlayer/'],
+  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?)/)'],
   moduleNameMapper: {
-    // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
-    '^@/(.*)$': '<rootDir>/src/$1',
-    // Mock Contentlayer generated files (must be before other patterns)
-    '^\\.contentlayer/generated(.*)$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    // Mock Contentlayer generated files (must be first to catch before other patterns)
     '^contentlayer/generated$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    '^\\./.contentlayer/generated(.*)$':
+      '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    '^\\.contentlayer/generated(.*)$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    '.contentlayer/generated': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    '<rootDir>/.contentlayer/generated(.*)$':
+      '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
+    '^contentlayer2/client$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
     '^@contentlayer2/client$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
     '^contentlayer2/dist/client/index.js$':
       '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
+    // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

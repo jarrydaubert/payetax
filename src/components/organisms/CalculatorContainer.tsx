@@ -8,7 +8,11 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
-import { useCalculatorActions, useCalculatorResults } from '@/store/calculatorStore';
+import {
+  useCalculatorActions,
+  useCalculatorResults,
+  useCalculatorStore,
+} from '@/store/calculatorStore';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
@@ -16,7 +20,9 @@ import { ResultsTable } from './CalculatorResults/ResultsTable';
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
-  const { calculate } = useCalculatorActions();
+  const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
+  const input = useCalculatorStore((state) => state.input);
+  const { calculate, calculatePreviousYear } = useCalculatorActions();
   const [showResults, setShowResults] = React.useState(false);
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
@@ -26,6 +32,7 @@ export function CalculatorContainer() {
 
   const handleCalculate = () => {
     calculate();
+    calculatePreviousYear();
     setShowResults(true);
   };
 
@@ -112,6 +119,9 @@ export function CalculatorContainer() {
           >
             <ResultsTable
               results={results}
+              studentLoans={input.studentLoanPlan !== 'none' ? [input.studentLoanPlan] : []}
+              allowancesDeductions={input.allowancesDeductions}
+              previousYearResults={previousYearResults}
               visiblePeriods={visiblePeriods}
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
             />

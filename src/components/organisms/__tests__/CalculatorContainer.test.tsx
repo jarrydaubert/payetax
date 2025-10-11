@@ -1,0 +1,487 @@
+// src/components/organisms/__tests__/CalculatorContainer.test.tsx
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { toast } from 'sonner';
+import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import {
+  useCalculatorActions,
+  useCalculatorResults,
+  useCalculatorStore,
+} from '@/store/calculatorStore';
+import { CalculatorContainer } from '../CalculatorContainer';
+
+// Mock dependencies
+jest.mock('sonner', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+jest.mock('@/store/calculatorStore', () => ({
+  useCalculatorResults: jest.fn(),
+  useCalculatorActions: jest.fn(),
+  useCalculatorStore: jest.fn(),
+}));
+
+jest.mock('@/lib/exportUtils', () => ({
+  exportToCSV: jest.fn(),
+  printResults: jest.fn(),
+}));
+
+jest.mock('../CalculatorInputs/CalculatorInputsSection', () => ({
+  CalculatorInputsSection: ({ onCalculate }: { onCalculate: () => void }) => (
+    <div data-testid='inputs-section-mock'>
+      <button type='button' onClick={onCalculate}>
+        Calculate
+      </button>
+    </div>
+  ),
+}));
+
+jest.mock('../CalculatorResults/ResultsSummaryCards', () => ({
+  ResultsSummaryCards: () => <div data-testid='summary-cards-mock'>Summary Cards</div>,
+}));
+
+jest.mock('../CalculatorResults/ResultsTable', () => ({
+  ResultsTable: () => <div data-testid='results-table-mock'>Results Table</div>,
+}));
+
+describe('CalculatorContainer Component', () => {
+  const mockResults: TaxCalculationResults = {
+    grossSalary: {
+      annually: 30000,
+      monthly: 2500,
+      fourWeekly: 2307.69,
+      fortnightly: 1153.84,
+      weekly: 576.92,
+      daily: 115.38,
+      hourly: 15.38,
+    },
+    taxFreeAmount: 12570,
+    taxableIncome: 17430,
+    incomeTax: {
+      annually: 3486,
+      monthly: 290.5,
+      fourWeekly: 268.15,
+      fortnightly: 134.07,
+      weekly: 67.04,
+      daily: 13.41,
+      hourly: 1.79,
+    },
+    nationalInsurance: {
+      annually: 2028,
+      monthly: 169,
+      fourWeekly: 155.69,
+      fortnightly: 77.85,
+      weekly: 38.92,
+      daily: 7.78,
+      hourly: 1.04,
+    },
+    studentLoan: {
+      annually: 0,
+      monthly: 0,
+      fourWeekly: 0,
+      fortnightly: 0,
+      weekly: 0,
+      daily: 0,
+      hourly: 0,
+    },
+    pensionContribution: {
+      annually: 0,
+      monthly: 0,
+      fourWeekly: 0,
+      fortnightly: 0,
+      weekly: 0,
+      daily: 0,
+      hourly: 0,
+    },
+    netPay: {
+      annually: 24486,
+      monthly: 2040.5,
+      fourWeekly: 1884.15,
+      fortnightly: 942.07,
+      weekly: 471.04,
+      daily: 94.21,
+      hourly: 12.56,
+    },
+    employerNI: 1872.48,
+    totalTaxBurden: 5514,
+    effectiveTaxRate: 18.38,
+    marginalTaxRate: 32,
+    taxBands: [{ rate: 20, amount: 3486, name: 'Basic Rate' }],
+  };
+
+  const mockCalculate = jest.fn();
+  const mockCalculatePreviousYear = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useCalculatorActions as jest.Mock).mockReturnValue({
+      calculate: mockCalculate,
+      calculatePreviousYear: mockCalculatePreviousYear,
+    });
+    (useCalculatorResults as jest.Mock).mockReturnValue(null);
+    (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+      selector({
+        previousYearResults: null,
+        input: {
+          studentLoanPlan: 'none',
+          allowancesDeductions: 0,
+        },
+      })
+    );
+  });
+
+  describe('Initial Rendering', () => {
+    it('should render calculator section', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('calculator-section')).toBeInTheDocument();
+    });
+
+    it('should render header with title', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByRole('heading', { name: /UK Tax Calculator/i })).toBeInTheDocument();
+    });
+
+    it('should render header description', () => {
+      render(<CalculatorContainer />);
+
+      expect(
+        screen.getByText(/Calculate your take-home pay with official HMRC rates/i)
+      ).toBeInTheDocument();
+    });
+
+    it('should render inputs section', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('inputs-section-mock')).toBeInTheDocument();
+    });
+
+    it('should not show results initially', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.queryByTestId('summary-cards-mock')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('results-table-mock')).not.toBeInTheDocument();
+    });
+
+    it('should show placeholder text when no results', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByText('Ready to Calculate')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Enter your salary details and click Calculate to see your results/i)
+      ).toBeInTheDocument();
+    });
+
+    it('should render placeholder icon', () => {
+      render(<CalculatorContainer />);
+
+      // Sparkles icon in placeholder
+      const placeholder = screen.getByText('Ready to Calculate').closest('div');
+      const icon = placeholder?.querySelector('svg');
+      expect(icon).toBeInTheDocument();
+    });
+  });
+
+  describe('Calculate Interaction', () => {
+    it('should call calculate action when Calculate button is clicked', () => {
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Calculate/i });
+      fireEvent.click(button);
+
+      expect(mockCalculate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show results after calculation', async () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      const { rerender } = render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Calculate/i });
+      fireEvent.click(button);
+
+      // Update mock to return results
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      rerender(<CalculatorContainer />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('summary-cards-mock')).toBeInTheDocument();
+      });
+    });
+
+    it('should show results table after calculation', async () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      const { rerender } = render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Calculate/i });
+      fireEvent.click(button);
+
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      rerender(<CalculatorContainer />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('results-table-mock')).toBeInTheDocument();
+      });
+    });
+
+    it('should hide placeholder when results are shown', async () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      const { rerender } = render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Calculate/i });
+      fireEvent.click(button);
+
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      rerender(<CalculatorContainer />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Ready to Calculate')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Results Display', () => {
+    beforeEach(() => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+    });
+
+    it('should render summary cards when results exist', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('summary-cards-mock')).toBeInTheDocument();
+    });
+
+    it('should render results table when results exist', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('tax-results')).toBeInTheDocument();
+      expect(screen.getByTestId('results-table-mock')).toBeInTheDocument();
+    });
+
+    it('should show export buttons when results exist', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByRole('button', { name: /Print/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Export CSV/i })).toBeInTheDocument();
+    });
+
+    it('should not show export buttons when no results', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      render(<CalculatorContainer />);
+
+      expect(screen.queryByRole('button', { name: /Print/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Export CSV/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Export Functionality', () => {
+    beforeEach(() => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+    });
+
+    it('should call exportToCSV when Export button is clicked', async () => {
+      const { exportToCSV } = await import('@/lib/exportUtils');
+
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Export CSV/i });
+      fireEvent.click(button);
+
+      expect(exportToCSV).toHaveBeenCalledWith(mockResults);
+    });
+
+    it('should show success toast after successful export', async () => {
+      const { exportToCSV } = await import('@/lib/exportUtils');
+      (exportToCSV as jest.Mock).mockImplementation(() => {});
+
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Export CSV/i });
+      fireEvent.click(button);
+
+      expect(toast.success).toHaveBeenCalledWith('CSV exported successfully!');
+    });
+
+    it('should show error toast if export fails', async () => {
+      const { exportToCSV } = await import('@/lib/exportUtils');
+      (exportToCSV as jest.Mock).mockImplementation(() => {
+        throw new Error('Export failed');
+      });
+
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Export CSV/i });
+      fireEvent.click(button);
+
+      expect(toast.error).toHaveBeenCalledWith('Failed to export CSV');
+    });
+
+    it('should not export if no results', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      render(<CalculatorContainer />);
+
+      // Export button shouldn't be visible
+      expect(screen.queryByRole('button', { name: /Export CSV/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Print Functionality', () => {
+    beforeEach(() => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+    });
+
+    it('should call printResults when Print button is clicked', async () => {
+      const { printResults } = await import('@/lib/exportUtils');
+
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Print/i });
+      fireEvent.click(button);
+
+      expect(printResults).toHaveBeenCalledWith(mockResults);
+    });
+
+    it('should show error toast if print fails', async () => {
+      const { printResults } = await import('@/lib/exportUtils');
+      (printResults as jest.Mock).mockImplementation(() => {
+        throw new Error('Print failed');
+      });
+
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Print/i });
+      fireEvent.click(button);
+
+      expect(toast.error).toHaveBeenCalledWith('Failed to open print dialog');
+    });
+
+    it('should not print if no results', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      render(<CalculatorContainer />);
+
+      // Print button shouldn't be visible
+      expect(screen.queryByRole('button', { name: /Print/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Layout and Styling', () => {
+    it('should have correct grid layout', () => {
+      render(<CalculatorContainer />);
+
+      const section = screen.getByTestId('calculator-section');
+      expect(section).toHaveClass('lg:grid');
+      expect(section).toHaveClass('lg:grid-cols-[380px_1fr]');
+    });
+
+    it('should have responsive spacing', () => {
+      render(<CalculatorContainer />);
+
+      const section = screen.getByTestId('calculator-section');
+      expect(section).toHaveClass('px-2');
+      expect(section).toHaveClass('sm:px-4');
+      expect(section).toHaveClass('xl:px-8');
+    });
+
+    it('should have max width constraint', () => {
+      render(<CalculatorContainer />);
+
+      const section = screen.getByTestId('calculator-section');
+      expect(section).toHaveClass('max-w-[1600px]');
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have main calculator section with testid', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('calculator-section')).toBeInTheDocument();
+    });
+
+    it('should have results section with testid when results exist', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('tax-results')).toBeInTheDocument();
+    });
+
+    it('should have proper heading hierarchy', () => {
+      render(<CalculatorContainer />);
+
+      const heading = screen.getByRole('heading', { name: /UK Tax Calculator/i });
+      expect(heading).toBeInTheDocument();
+    });
+
+    it('should have accessible button labels', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      render(<CalculatorContainer />);
+
+      expect(screen.getByRole('button', { name: /Print/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Export CSV/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('Animation', () => {
+    it('should use Framer Motion for animations', () => {
+      render(<CalculatorContainer />);
+
+      // Component should render without throwing
+      expect(screen.getByTestId('calculator-section')).toBeInTheDocument();
+    });
+
+    it('should not throw errors on unmount', () => {
+      const { unmount } = render(<CalculatorContainer />);
+
+      expect(() => unmount()).not.toThrow();
+    });
+
+    it('should animate results appearance', async () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      const { rerender } = render(<CalculatorContainer />);
+
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      rerender(<CalculatorContainer />);
+
+      // Results should appear with animation
+      await waitFor(() => {
+        expect(screen.getByTestId('tax-results')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle results becoming null', async () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      const { rerender } = render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('summary-cards-mock')).toBeInTheDocument();
+
+      (useCalculatorResults as jest.Mock).mockReturnValue(null);
+      rerender(<CalculatorContainer />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('summary-cards-mock')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should initialize with default visible periods', () => {
+      render(<CalculatorContainer />);
+
+      // Component should render without errors
+      expect(screen.getByTestId('calculator-section')).toBeInTheDocument();
+    });
+
+    it('should handle rapid Calculate clicks', () => {
+      render(<CalculatorContainer />);
+
+      const button = screen.getByRole('button', { name: /Calculate/i });
+      fireEvent.click(button);
+      fireEvent.click(button);
+      fireEvent.click(button);
+
+      // Should call calculate for each click
+      expect(mockCalculate).toHaveBeenCalledTimes(3);
+    });
+  });
+});

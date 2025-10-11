@@ -137,11 +137,10 @@ describe('ResultsTable Component', () => {
       expect(screen.getAllByText(/£2,028/).length).toBeGreaterThan(0);
     });
 
-    it('should render pension rows', () => {
+    it('should render pension row', () => {
       render(<ResultsTable results={mockResults} />);
 
       expect(screen.getByText('Pension [You]')).toBeInTheDocument();
-      expect(screen.getByText('Pension [HMRC Relief]')).toBeInTheDocument();
     });
 
     it('should render net pay row', () => {
@@ -388,8 +387,8 @@ describe('ResultsTable Component', () => {
       expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
     });
 
-    it('should handle allowances with commas', () => {
-      render(<ResultsTable results={mockResults} allowancesDeductions='10,000' />);
+    it('should handle allowances as number', () => {
+      render(<ResultsTable results={mockResults} allowancesDeductions={10000} />);
 
       expect(screen.getAllByText(/£10,000/).length).toBeGreaterThan(0);
     });
@@ -759,6 +758,478 @@ describe('ResultsTable Component', () => {
       const wrapper = container.firstChild as HTMLElement;
       // No inline width style allows table to expand dynamically based on content
       expect(wrapper.style.width).toBeFalsy();
+    });
+  });
+
+  describe('Previous Year Comparison', () => {
+    const previousYearResults: TaxCalculationResults = {
+      ...mockResults,
+      netPay: {
+        annually: 20000,
+        monthly: 1666.67,
+        fourWeekly: 1538.46,
+        fortnightly: 769.23,
+        weekly: 384.62,
+        daily: 76.92,
+        hourly: 10.26,
+      },
+    };
+
+    it('should show year change row when previous year data exists', () => {
+      render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
+
+      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+    });
+
+    it('should calculate positive year change correctly', () => {
+      // Current: £22,986, Previous: £20,000 = +£2,986
+      render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
+
+      expect(screen.getAllByText(/£2,986/).length).toBeGreaterThan(0);
+    });
+
+    it('should show green color for positive year change', () => {
+      render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
+
+      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
+      expect(yearChangeValue).toBeInTheDocument();
+    });
+
+    it('should calculate negative year change correctly', () => {
+      const higherPreviousYear: TaxCalculationResults = {
+        ...mockResults,
+        netPay: {
+          annually: 25000,
+          monthly: 2083.33,
+          fourWeekly: 1923.08,
+          fortnightly: 961.54,
+          weekly: 480.77,
+          daily: 96.15,
+          hourly: 12.82,
+        },
+      };
+
+      // Current: £22,986, Previous: £25,000 = -£2,014
+      render(<ResultsTable results={mockResults} previousYearResults={higherPreviousYear} />);
+
+      expect(screen.getAllByText(/-£2,014/).length).toBeGreaterThan(0);
+    });
+
+    it('should show red color for negative year change', () => {
+      const higherPreviousYear: TaxCalculationResults = {
+        ...mockResults,
+        netPay: {
+          annually: 25000,
+          monthly: 2083.33,
+          fourWeekly: 1923.08,
+          fortnightly: 961.54,
+          weekly: 480.77,
+          daily: 96.15,
+          hourly: 12.82,
+        },
+      };
+
+      render(<ResultsTable results={mockResults} previousYearResults={higherPreviousYear} />);
+
+      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeValue = yearChangeRow?.querySelector('.text-red-600');
+      expect(yearChangeValue).toBeInTheDocument();
+    });
+
+    it('should show zero change when net pay is same', () => {
+      const sameYearResults: TaxCalculationResults = {
+        ...mockResults,
+        netPay: mockResults.netPay,
+      };
+
+      render(<ResultsTable results={mockResults} previousYearResults={sameYearResults} />);
+
+      expect(screen.getAllByText(/£0\.00/).length).toBeGreaterThan(0);
+    });
+
+    it('should show green color for zero change', () => {
+      const sameYearResults: TaxCalculationResults = {
+        ...mockResults,
+        netPay: mockResults.netPay,
+      };
+
+      render(<ResultsTable results={mockResults} previousYearResults={sameYearResults} />);
+
+      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
+      expect(yearChangeValue).toBeInTheDocument();
+    });
+
+    it('should show 0.0% and £0.00 when no previous year data', () => {
+      render(<ResultsTable results={mockResults} previousYearResults={null} />);
+
+      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      expect(yearChangeRow?.textContent).toMatch(/0\.0%/);
+    });
+
+    it('should calculate percentage change correctly', () => {
+      // Change: £2,986 / £20,000 * 100 = 14.93%
+      render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
+
+      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      expect(yearChangeRow?.textContent).toMatch(/14\.9%/);
+    });
+  });
+
+  describe('WFH Allowance Scenarios', () => {
+    it('should display £312 WFH allowance correctly', () => {
+      render(<ResultsTable results={mockResults} allowancesDeductions={312} />);
+
+      expect(screen.getAllByText(/£312/).length).toBeGreaterThan(0);
+    });
+
+    it('should calculate correct percentage for £312 allowance on £30k salary', () => {
+      // £312 / £30,000 * 100 = 1.04%
+      render(<ResultsTable results={mockResults} allowancesDeductions={312} />);
+
+      const allowanceRow = screen.getByText('Allowances/Deductions').closest('tr');
+      expect(allowanceRow?.textContent).toMatch(/1\.0%/);
+    });
+
+    it('should handle monthly WFH allowance (£26)', () => {
+      // £26 * 12 = £312 annual
+      render(<ResultsTable results={mockResults} allowancesDeductions={26} />);
+
+      expect(screen.getAllByText(/£26/).length).toBeGreaterThan(0);
+    });
+
+    it('should display large allowances with proper formatting', () => {
+      render(<ResultsTable results={mockResults} allowancesDeductions={5000} />);
+
+      expect(screen.getAllByText(/£5,000/).length).toBeGreaterThan(0);
+    });
+
+    it('should show 0.0% for zero allowances', () => {
+      render(<ResultsTable results={mockResults} allowancesDeductions={0} />);
+
+      const allowanceRow = screen.getByText('Allowances/Deductions').closest('tr');
+      expect(allowanceRow?.textContent).toMatch(/0\.0%/);
+    });
+  });
+
+  describe('Enhanced Student Loan Tests', () => {
+    it('should display Plan 2 student loan correctly', () => {
+      const resultsWithPlan2: TaxCalculationResults = {
+        ...mockResults,
+        studentLoan: {
+          annually: 675,
+          monthly: 56.25,
+          fourWeekly: 51.92,
+          fortnightly: 25.96,
+          weekly: 12.98,
+          daily: 2.6,
+          hourly: 0.35,
+        },
+      };
+
+      render(<ResultsTable results={resultsWithPlan2} studentLoans={['plan2']} />);
+
+      expect(screen.getByText('Student Loan')).toBeInTheDocument();
+      expect(screen.getAllByText(/£675/).length).toBeGreaterThan(0);
+    });
+
+    it('should display Plan 1 student loan with different amount', () => {
+      const resultsWithPlan1: TaxCalculationResults = {
+        ...mockResults,
+        studentLoan: {
+          annually: 450,
+          monthly: 37.5,
+          fourWeekly: 34.62,
+          fortnightly: 17.31,
+          weekly: 8.65,
+          daily: 1.73,
+          hourly: 0.23,
+        },
+      };
+
+      render(<ResultsTable results={resultsWithPlan1} studentLoans={['plan1']} />);
+
+      expect(screen.getAllByText(/£450/).length).toBeGreaterThan(0);
+    });
+
+    it('should show correct percentage for student loan', () => {
+      const resultsWithLoan: TaxCalculationResults = {
+        ...mockResults,
+        studentLoan: {
+          annually: 600,
+          monthly: 50,
+          fourWeekly: 46.15,
+          fortnightly: 23.08,
+          weekly: 11.54,
+          daily: 2.31,
+          hourly: 0.31,
+        },
+      };
+
+      // £600 / £30,000 * 100 = 2.0%
+      render(<ResultsTable results={resultsWithLoan} studentLoans={['plan2']} />);
+
+      const loanRow = screen.getByText('Student Loan').closest('tr');
+      expect(loanRow?.textContent).toMatch(/2\.0%/);
+    });
+
+    it('should display postgraduate loan correctly', () => {
+      const resultsWithPostgrad: TaxCalculationResults = {
+        ...mockResults,
+        studentLoan: {
+          annually: 900,
+          monthly: 75,
+          fourWeekly: 69.23,
+          fortnightly: 34.62,
+          weekly: 17.31,
+          daily: 3.46,
+          hourly: 0.46,
+        },
+      };
+
+      render(<ResultsTable results={resultsWithPostgrad} studentLoans={['postgrad']} />);
+
+      expect(screen.getAllByText(/£900/).length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Integration Scenarios', () => {
+    const previousYearResults: TaxCalculationResults = {
+      ...mockResults,
+      netPay: {
+        annually: 21000,
+        monthly: 1750,
+        fourWeekly: 1615.38,
+        fortnightly: 807.69,
+        weekly: 403.85,
+        daily: 80.77,
+        hourly: 10.77,
+      },
+    };
+
+    it('should handle all features together: student loan + allowances + previous year', () => {
+      const fullResults: TaxCalculationResults = {
+        ...mockResults,
+        studentLoan: {
+          annually: 500,
+          monthly: 41.67,
+          fourWeekly: 38.46,
+          fortnightly: 19.23,
+          weekly: 9.62,
+          daily: 1.92,
+          hourly: 0.26,
+        },
+        netPay: {
+          annually: 22486,
+          monthly: 1873.83,
+          fourWeekly: 1729.69,
+          fortnightly: 864.85,
+          weekly: 432.42,
+          daily: 86.48,
+          hourly: 11.53,
+        },
+      };
+
+      render(
+        <ResultsTable
+          results={fullResults}
+          studentLoans={['plan2']}
+          allowancesDeductions={312}
+          previousYearResults={previousYearResults}
+        />
+      );
+
+      expect(screen.getByText('Student Loan')).toBeInTheDocument();
+      expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+    });
+
+    it('should handle high earner with all deductions', () => {
+      const highEarnerResults: TaxCalculationResults = {
+        grossSalary: {
+          annually: 100000,
+          monthly: 8333.33,
+          fourWeekly: 7692.31,
+          fortnightly: 3846.15,
+          weekly: 1923.08,
+          daily: 384.62,
+          hourly: 51.28,
+        },
+        taxFreeAmount: 12570,
+        taxableIncome: 85430,
+        incomeTax: {
+          annually: 27860,
+          monthly: 2321.67,
+          fourWeekly: 2143.08,
+          fortnightly: 1071.54,
+          weekly: 535.77,
+          daily: 107.15,
+          hourly: 14.29,
+        },
+        nationalInsurance: {
+          annually: 6372,
+          monthly: 531,
+          fourWeekly: 490.15,
+          fortnightly: 245.08,
+          weekly: 122.54,
+          daily: 24.51,
+          hourly: 3.27,
+        },
+        studentLoan: {
+          annually: 5400,
+          monthly: 450,
+          fourWeekly: 415.38,
+          fortnightly: 207.69,
+          weekly: 103.85,
+          daily: 20.77,
+          hourly: 2.77,
+        },
+        pensionContribution: {
+          annually: 5000,
+          monthly: 416.67,
+          fourWeekly: 384.62,
+          fortnightly: 192.31,
+          weekly: 96.15,
+          daily: 19.23,
+          hourly: 2.56,
+        },
+        netPay: {
+          annually: 60768,
+          monthly: 5064,
+          fourWeekly: 4674.46,
+          fortnightly: 2337.23,
+          weekly: 1168.62,
+          daily: 233.72,
+          hourly: 31.16,
+        },
+        employerNI: 12890,
+        totalTaxBurden: 39632,
+        effectiveTaxRate: 39.63,
+        marginalTaxRate: 42,
+        taxBands: [
+          { rate: 20, amount: 7486, name: 'Basic Rate' },
+          { rate: 40, amount: 20374, name: 'Higher Rate' },
+        ],
+      };
+
+      const previousHighEarner: TaxCalculationResults = {
+        ...highEarnerResults,
+        netPay: {
+          annually: 58000,
+          monthly: 4833.33,
+          fourWeekly: 4461.54,
+          fortnightly: 2230.77,
+          weekly: 1115.38,
+          daily: 223.08,
+          hourly: 29.74,
+        },
+      };
+
+      render(
+        <ResultsTable
+          results={highEarnerResults}
+          studentLoans={['plan2', 'postgrad']}
+          allowancesDeductions={2000}
+          previousYearResults={previousHighEarner}
+        />
+      );
+
+      // Verify all components render
+      expect(screen.getByText(/£100,000/)).toBeInTheDocument();
+      expect(screen.getByText('Student Loans')).toBeInTheDocument(); // Plural
+      expect(screen.getAllByText(/£2,000/).length).toBeGreaterThan(0);
+      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+
+      // Verify year change: £60,768 - £58,000 = £2,768
+      expect(screen.getAllByText(/£2,768/).length).toBeGreaterThan(0);
+    });
+
+    it('should handle complex scenario with pension and all deductions', () => {
+      const complexResults: TaxCalculationResults = {
+        ...mockResults,
+        pensionContribution: {
+          annually: 3000,
+          monthly: 250,
+          fourWeekly: 230.77,
+          fortnightly: 115.38,
+          weekly: 57.69,
+          daily: 11.54,
+          hourly: 1.54,
+        },
+        studentLoan: {
+          annually: 600,
+          monthly: 50,
+          fourWeekly: 46.15,
+          fortnightly: 23.08,
+          weekly: 11.54,
+          daily: 2.31,
+          hourly: 0.31,
+        },
+      };
+
+      render(
+        <ResultsTable
+          results={complexResults}
+          studentLoans={['plan2']}
+          allowancesDeductions={312}
+          previousYearResults={previousYearResults}
+        />
+      );
+
+      expect(screen.getAllByText(/£3,000/).length).toBeGreaterThan(0); // Pension
+      expect(screen.getAllByText(/£600/).length).toBeGreaterThan(0); // Student loan
+      expect(screen.getAllByText(/£312/).length).toBeGreaterThan(0); // Allowances
+    });
+  });
+
+  describe('Visual and Color Verification', () => {
+    it('should apply correct color to tax rows', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const taxRow = screen.getByText('Total Tax Due').closest('tr');
+      const taxValue = taxRow?.querySelector('.text-red-600');
+      expect(taxValue).toBeInTheDocument();
+    });
+
+    it('should apply correct color to NI rows', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const niRow = screen.getByText('National Insurance').closest('tr');
+      const niValue = niRow?.querySelector('.text-amber-600');
+      expect(niValue).toBeInTheDocument();
+    });
+
+    it('should apply correct color to pension rows', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const pensionRow = screen.getByText('Pension [You]').closest('tr');
+      const pensionValue = pensionRow?.querySelector('.text-purple-600');
+      expect(pensionValue).toBeInTheDocument();
+    });
+
+    it('should apply correct color to net pay row', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const netPayRow = screen.getByText('Net Pay').closest('tr');
+      const netPayValue = netPayRow?.querySelector('.text-green-600');
+      expect(netPayValue).toBeInTheDocument();
+    });
+
+    it('should apply muted color to employer NI', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const employerNIRow = screen.getByText('Employers NI').closest('tr');
+      const employerNIValue = employerNIRow?.querySelector('.text-muted-foreground');
+      expect(employerNIValue).toBeInTheDocument();
+    });
+
+    it('should highlight net pay row', () => {
+      render(<ResultsTable results={mockResults} />);
+
+      const netPayRow = screen.getByText('Net Pay').closest('tr');
+      // Net pay row should have highlight styling (bg-muted)
+      expect(netPayRow).toBeInTheDocument();
     });
   });
 });

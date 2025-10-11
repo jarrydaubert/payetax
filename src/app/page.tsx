@@ -2,12 +2,6 @@
 
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import {
-  CalculatorSchema,
-  DatasetSchema,
-  FAQSchema,
-  HowToSchema,
-} from '@/components/seo/CalculatorSchema';
 import { StructuredData } from '@/components/ui/StructuredData';
 import { generateMetadata } from '@/lib/metadata';
 
@@ -34,6 +28,7 @@ export const metadata: Metadata = generateMetadata({
 
 /**
  * Home page component with enhanced SEO
+ * All structured data now consolidated in StructuredData component
  */
 export default function HomePage() {
   return (
@@ -44,10 +39,9 @@ export default function HomePage() {
       <StructuredData type='financialservice' />
 
       {/* AEO-optimized schema markup for AI search engines */}
-      <CalculatorSchema />
-      <FAQSchema />
-      <HowToSchema />
-      <DatasetSchema />
+      <StructuredData type='calculator' />
+      <StructuredData type='howto' />
+      <StructuredData type='dataset' />
 
       {/* Main content with Suspense for client components */}
       <Suspense fallback={<div className='p-8 text-center'>Loading calculator...</div>}>

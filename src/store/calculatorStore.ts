@@ -74,6 +74,8 @@ interface CalculatorInput {
   niCategory: NICategory;
   /** Hours worked per week (for hourly rate calculations) */
   hoursPerWeek: number;
+  /** Additional allowances or deductions (annual) */
+  allowancesDeductions: number;
 }
 
 // Interface for tax rates that can be updated
@@ -124,6 +126,7 @@ interface CalculatorState {
   setPensionContributionType: (type: 'percentage' | 'amount') => void;
   setNiCategory: (category: NICategory) => void;
   setHoursPerWeek: (hours: number) => void;
+  setAllowancesDeductions: (amount: number) => void;
 
   // Tax rate actions
   updateTaxRates: (rates: Partial<TaxRatesState>) => void;
@@ -176,6 +179,7 @@ const defaultInput: CalculatorInput = {
   pensionContributionType: 'percentage',
   niCategory: 'A',
   hoursPerWeek: 40,
+  allowancesDeductions: 0,
 };
 
 // Create the calculator store
@@ -233,6 +237,8 @@ export const useCalculatorStore = create<CalculatorState>()(
         setNiCategory: (niCategory) => set((state) => ({ input: { ...state.input, niCategory } })),
         setHoursPerWeek: (hoursPerWeek) =>
           set((state) => ({ input: { ...state.input, hoursPerWeek } })),
+        setAllowancesDeductions: (allowancesDeductions) =>
+          set((state) => ({ input: { ...state.input, allowancesDeductions } })),
 
         // Tax rate actions
         updateTaxRates: (updatedRates) =>
@@ -333,6 +339,7 @@ export const useCalculatorActions = () =>
       setPensionContributionType: state.setPensionContributionType,
       setNiCategory: state.setNiCategory,
       setHoursPerWeek: state.setHoursPerWeek,
+      setAllowancesDeductions: state.setAllowancesDeductions,
       updateTaxRates: state.updateTaxRates,
       updateScottishRates: state.updateScottishRates,
       updateNIRates: state.updateNIRates,

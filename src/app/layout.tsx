@@ -165,6 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data-position='Right'
           data-x_margin='18'
           data-y_margin='18'
+          defer
         />
 
         {/* BMC Cleanup - Fix ghost overlay bug */}

@@ -34,6 +34,7 @@ export function BasicInputs() {
     setStudentLoanPlan,
     setPensionContribution,
     setPensionContributionType,
+    setAllowancesDeductions,
   } = useCalculatorActions();
 
   const salaryId = useId();
@@ -46,6 +47,7 @@ export function BasicInputs() {
   const blindId = useId();
   const payNoNIId = useId();
   const studentLoanId = useId();
+  const allowancesId = useId();
   const pensionTypeId = useId();
   const pensionId = useId();
 
@@ -215,6 +217,22 @@ export function BasicInputs() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className='flex items-center gap-3'>
+        <Label htmlFor={allowancesId} className='min-w-[140px] text-sm'>
+          Allowances/Deductions
+        </Label>
+        <NumberInput
+          id={allowancesId}
+          value={input.allowancesDeductions}
+          onChange={setAllowancesDeductions}
+          prefix='£'
+          decimals={2}
+          placeholder='0.00'
+          min={0}
+          className='flex-1'
+        />
       </div>
 
       <div className='flex items-center gap-3'>

@@ -243,6 +243,49 @@ interface ServiceSchema {
   };
 }
 
+interface DatasetSchema {
+  '@context': 'https://schema.org';
+  '@type': 'Dataset';
+  name: string;
+  description: string;
+  url: string;
+  datePublished: string;
+  dateModified: string;
+  license: string;
+  creator: {
+    '@type': 'Organization';
+    name: string;
+    url: string;
+  };
+  keywords: string[];
+  includedInDataCatalog: {
+    '@type': 'DataCatalog';
+    name: string;
+    description: string;
+  };
+  variableMeasured: Array<{
+    '@type': 'PropertyValue';
+    name: string;
+    value: string;
+    description: string;
+  }>;
+  distribution?: Array<{
+    '@type': 'DataDownload';
+    encodingFormat: string;
+    contentUrl: string;
+    description: string;
+  }>;
+  temporalCoverage?: string;
+  spatialCoverage?: {
+    '@type': 'Place';
+    name: string;
+    geo: {
+      '@type': 'GeoShape';
+      addressCountry: string;
+    };
+  };
+}
+
 // Union type for all schema types
 export type SchemaType =
   | OrganizationSchema
@@ -255,7 +298,8 @@ export type SchemaType =
   | HowToSchema
   | PersonSchema
   | ReviewSchema
-  | ServiceSchema;
+  | ServiceSchema
+  | DatasetSchema;
 
 // Base organization details
 const ORG_DATA: OrganizationSchema = {
@@ -422,6 +466,92 @@ const HOW_TO_DATA: HowToSchema = {
   ],
 };
 
+// Dataset schema for UK tax rates data
+const DATASET_DATA: DatasetSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'UK Tax Rates Dataset 2025-26',
+  description:
+    'Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the 2025-26 tax year',
+  url: 'https://payetax.co.uk',
+  datePublished: '2025-01-01',
+  dateModified: '2025-10-03',
+  license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+  creator: {
+    '@type': 'Organization',
+    name: 'PayeTax',
+    url: 'https://payetax.co.uk',
+  },
+  keywords: [
+    'UK tax rates 2025',
+    'PAYE calculator',
+    'National Insurance rates',
+    'HMRC tax bands',
+    'income tax calculator',
+    'salary calculator UK',
+  ],
+  includedInDataCatalog: {
+    '@type': 'DataCatalog',
+    name: 'PayeTax Tax Data',
+    description: 'UK tax calculation data and examples',
+  },
+  variableMeasured: [
+    {
+      '@type': 'PropertyValue',
+      name: 'Personal Allowance',
+      value: '£12,570',
+      description: 'Tax-free income threshold for 2025-26',
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'Basic Rate Tax',
+      value: '20%',
+      description: 'Tax on income between £12,571 and £50,270',
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'Higher Rate Tax',
+      value: '40%',
+      description: 'Tax on income between £50,271 and £125,140',
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'Additional Rate Tax',
+      value: '45%',
+      description: 'Tax on income above £125,140',
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'National Insurance (Standard)',
+      value: '12%',
+      description: 'NI on income between £12,571 and £50,270',
+    },
+    {
+      '@type': 'PropertyValue',
+      name: 'National Insurance (Higher)',
+      value: '2%',
+      description: 'NI on income above £50,270',
+    },
+  ],
+  distribution: [
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://payetax.co.uk/api/tax-rates',
+      description: 'Tax rates and calculation data in JSON format',
+    },
+  ],
+  temporalCoverage: '2025-04-06/2026-04-05',
+  spatialCoverage: {
+    '@type': 'Place',
+    name: 'United Kingdom',
+    geo: {
+      '@type': 'GeoShape',
+      addressCountry: 'GB',
+    },
+  },
+};
+
 /**
  * Interface for FAQ item structure
  */
@@ -446,7 +576,8 @@ export interface StructuredDataProps {
     | 'howto'
     | 'person'
     | 'review'
-    | 'service';
+    | 'service'
+    | 'dataset';
   /** Optional custom schema data that overrides defaults */
   data?: SchemaType;
   /** Breadcrumb data for breadcrumb schema */
@@ -684,6 +815,10 @@ export function StructuredData({
       } as ServiceSchema;
       break;
     }
+
+    case 'dataset':
+      schemaData = (data as DatasetSchema) || DATASET_DATA;
+      break;
 
     default:
       return null;
