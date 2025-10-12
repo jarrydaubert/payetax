@@ -7,6 +7,104 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2025-10-12
+
+### 🚀 Major Features
+
+#### SEO & Marketing Improvements
+- **Blog Meta Description Optimization** - Expanded from 45→158 chars for better CTR
+- **Answer Engine Optimization (AEO)** - Content now discoverable by AI search engines:
+  - Explicitly allowed: GPTBot (ChatGPT), ClaudeBot (Claude), PerplexityBot, Applebot-Extended
+  - Blocked training-only: CCBot, Google-Extended
+- **Honest Marketing Copy** - Removed all fabricated "expert" claims
+  - Updated to factual: "Based on official HMRC rates and guidance"
+  - Changed UI from "Expert Articles" → "Articles"
+- **Smart Related Posts Algorithm** - Intelligent scoring system:
+  - Same category = +10 points
+  - Matching tags = +5 points per tag
+  - Featured post = +2 points
+  - Recent post (<30 days) = +1 point
+
+### ✨ Added
+
+#### Documentation
+- **AUDIT_GAPS.md** - Comprehensive tracking for 21 audit areas (11/21 complete)
+- **SYSTEM_AUDITS.md** - Overview of system audit process
+- **SEO_IMPROVEMENTS_2025-10-12.md** - Detailed changelog for SEO work
+- **7 Comprehensive Audit Reports**:
+  - Test Coverage Audit (90.73% coverage achieved)
+  - CI/CD Pipeline Audit (GitLab integration documented)
+  - Security Audit (Sentry, CSP, authentication reviewed)
+  - Accessibility Audit (WCAG 2.1 AA compliance verified)
+  - PWA Completion Audit (service worker, manifest, offline support)
+  - Performance Audit (Lighthouse 99 mobile, 100 desktop)
+  - SEO Audit (meta tags, structured data, AEO implementation)
+
+#### Component Refactoring (Atomic Design)
+- **FAQItem.tsx** - Reusable FAQ accordion component
+- **HowToStepCard.tsx** - Step-by-step guide card component
+- **TaxRateCard.tsx** - Tax rate display card component
+- **useHorizontalScrollIndicator.ts** - Custom hook for scroll indicators
+- Added comprehensive test coverage for new components
+
+### 🐛 Bug Fixes
+
+#### Service Worker
+- **Cache Cleanup Bug** - Fixed incorrect app name references (`toolhubx-` → `payetax-`)
+- Refactored to use constants instead of hardcoded strings
+- Added logging for cache cleanup operations
+
+#### Build Conflicts
+- **Robots.txt Conflict** - Removed `public/robots.txt` (caused Next.js build error)
+- Consolidated all robots rules into `src/app/robots.ts`
+- Single source of truth for crawler directives
+
+#### UI/UX
+- **UK Localization** - Fixed dollar sign icons in UK tax calculator:
+  - Gross Pay: `DollarSign` → `PoundSterling`
+  - Allowances/Deductions: `DollarSign` → `Coins`
+- **Icon Alignment** - Fixed misaligned tax rate rows:
+  - Changed from `size-3 sm:h-4 sm:w-4` → `h-4 w-4` (consistent 16px)
+  - Added `aria-hidden='true'` for better accessibility
+
+### 🔧 Technical Changes
+
+#### SEO Infrastructure
+- **robots.ts** - Enhanced with comprehensive AEO documentation
+- **blog.ts** - Enhanced `getRelatedPosts()` with scoring algorithm
+- **BlogPageClient.tsx** - Updated marketing copy (removed expertise claims)
+
+#### Component Updates
+- **ResultsTable.tsx** - Updated icons for UK localization
+- **ResultTableRow.tsx** - Fixed icon sizing for consistent alignment
+- **CalculatorContent.tsx** - Refactored to use extracted components
+
+### 📊 Metrics
+
+#### Build Results
+- **Pages Generated**: 29/29 successfully ✅
+- **Bundle Size**: 516 kB First Load JS (stable)
+- **TypeScript**: Zero errors
+- **Lint**: Zero critical errors
+- **Test Coverage**: 90.73% (maintained)
+
+#### Performance (Production)
+- **Lighthouse Mobile**: 99/100
+- **Lighthouse Desktop**: 100/100
+- **Build Time**: ~20s
+- **Static Pages**: All routes pre-rendered
+
+### 🎯 Impact
+
+- **AI Discovery**: Content indexed by ChatGPT, Perplexity, Claude AI search
+- **CTR**: Meta descriptions optimized for better click-through rates
+- **Legal**: Removed regulatory risk from false expertise claims
+- **SEO**: Better internal linking via smart related posts
+- **UX**: Correct UK localization, fixed alignment issues
+- **Code Quality**: Atomic design patterns, reusable components
+
+---
+
 ## [1.1.4] - 2025-10-11
 
 ### 🧪 Testing

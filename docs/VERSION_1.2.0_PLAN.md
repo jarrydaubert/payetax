@@ -2,8 +2,56 @@
 
 **Created**: October 9, 2025
 **Target Release**: October 16-20, 2025 (1-2 weeks)
+**Actual Release**: October 12, 2025 ✅
 **Release Type**: Minor (Feature Addition)
-**Status**: 📋 Planning Phase
+**Status**: ✅ **COMPLETED** (with different priorities)
+
+---
+
+## 🎯 ACTUAL v1.2.0 RELEASE (What We Shipped)
+
+**Released**: October 12, 2025
+**Theme**: **SEO Optimization, AEO, & Code Quality**
+
+### What Changed from Original Plan
+The original plan focused on **Sage AI Explainer** as the primary feature. However, during audit work (Oct 11-12), we pivoted to address more immediate priorities:
+
+1. **SEO & AEO** - Complete blog optimization and AI search engine discovery
+2. **UI Bug Fixes** - Dollar signs → pound sterling, icon alignment
+3. **Code Quality** - Component refactoring, audit completion
+4. **Service Worker Bug** - Fixed cache cleanup issue
+
+**Rationale**: SEO improvements provide immediate value (AI search discovery) with no ongoing maintenance cost, while Sage AI would require continuous monitoring and rate limit management. We'll revisit Sage AI in v1.3.0.
+
+### What Was Delivered in v1.2.0
+
+#### Major Features ✅
+- **Answer Engine Optimization (AEO)** - Content discoverable by ChatGPT, Perplexity, Claude
+- **Blog SEO Optimization** - Meta descriptions 45→158 chars, removed false claims
+- **Smart Related Posts** - Intelligent scoring algorithm (+10 category, +5/tag, +2 featured, +1 recent)
+- **7 Comprehensive Audits** - Test, CI/CD, Security, Accessibility, PWA, Performance, SEO
+
+#### Bug Fixes ✅
+- **Service Worker** - Fixed cache cleanup (toolhubx→payetax)
+- **Robots.txt** - Consolidated, removed build conflict
+- **UI Icons** - Dollar signs → pound sterling (UK localization)
+- **Icon Alignment** - Fixed misaligned tax rate rows
+
+#### Code Quality ✅
+- **Component Refactoring** - Extracted FAQItem, HowToStepCard, TaxRateCard
+- **Custom Hooks** - Created useHorizontalScrollIndicator
+- **Test Coverage** - Maintained 90.73% coverage
+- **Documentation** - 10+ new audit/tracking docs
+
+#### Metrics ✅
+- **Build**: 29/29 pages generated successfully
+- **Bundle**: 516 kB (stable, no increase)
+- **Lighthouse**: 99 mobile / 100 desktop
+- **Tests**: 1,411 passing, 90.73% coverage
+
+---
+
+## 📋 ORIGINAL PLAN (For Reference)
 
 ---
 
