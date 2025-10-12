@@ -1,12 +1,21 @@
 // src/app/robots.ts
+
 import type { MetadataRoute } from 'next';
 
 /**
- * Enhanced robots.txt configuration
- * Provides detailed crawling instructions for search engines
- * Optimized for PayeTax and TaxInsights blog
+ * Generates robots.txt directives for the site via Next.js App Router
  *
- * @returns Next.js MetadataRoute.Robots
+ * Includes Answer Engine Optimization (AEO) - Explicitly allows AI search crawlers:
+ * - GPTBot, ChatGPT-User (ChatGPT search)
+ * - PerplexityBot (Perplexity AI search)
+ * - ClaudeBot, anthropic-ai (Claude AI search)
+ * - Applebot-Extended (Apple Intelligence)
+ *
+ * While blocking AI training-only bots:
+ * - CCBot (Common Crawl training)
+ * - Google-Extended (Bard training)
+ *
+ * @see https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots
  */
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -37,6 +46,40 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: 'Bingbot',
         allow: '/',
         disallow: ['/api/', '/_next/', '/_vercel/', '/offline'],
+      },
+      // AI Search Engine Crawlers - AEO (Answer Engine Optimization)
+      {
+        userAgent: 'GPTBot', // ChatGPT search
+        allow: '/',
+      },
+      {
+        userAgent: 'ChatGPT-User', // ChatGPT web browsing
+        allow: '/',
+      },
+      {
+        userAgent: 'PerplexityBot', // Perplexity AI
+        allow: '/',
+      },
+      {
+        userAgent: 'ClaudeBot', // Claude AI
+        allow: '/',
+      },
+      {
+        userAgent: 'anthropic-ai', // Claude indexing
+        allow: '/',
+      },
+      {
+        userAgent: 'Applebot-Extended', // Apple Intelligence
+        allow: '/',
+      },
+      // Block AI training bots (but allow search)
+      {
+        userAgent: 'CCBot', // Common Crawl (training only)
+        disallow: '/',
+      },
+      {
+        userAgent: 'Google-Extended', // Bard training (Google Search still allowed)
+        disallow: '/',
       },
     ],
     // Path to sitemap - important for search engines to find all pages

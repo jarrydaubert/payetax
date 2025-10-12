@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import {
   Building,
   Calculator,
+  Coins,
   CreditCard,
-  DollarSign,
   GraduationCap,
   Percent,
   PiggyBank,
+  PoundSterling,
   Scale,
   Shield,
   TrendingUp,
@@ -21,6 +22,7 @@ import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 interface ResultsTableProps {
@@ -60,37 +62,11 @@ export function ResultsTable({
   visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
   onVisiblePeriodsChange,
 }: ResultsTableProps) {
-  // Scroll indicators
+  // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [showLeftIndicator, setShowLeftIndicator] = React.useState(false);
-  const [showRightIndicator, setShowRightIndicator] = React.useState(false);
-
-  // Check scroll position - recheck when periods change
-  // biome-ignore lint/correctness/useExhaustiveDependencies: visiblePeriods needed to trigger recheck when toggling periods
-  React.useEffect(() => {
-    const checkScrollPosition = () => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      const hasHorizontalScroll = scrollWidth > clientWidth;
-
-      setShowLeftIndicator(hasHorizontalScroll && scrollLeft > 5);
-      setShowRightIndicator(hasHorizontalScroll && scrollLeft < scrollWidth - clientWidth - 5);
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      checkScrollPosition();
-      container.addEventListener('scroll', checkScrollPosition, { passive: true });
-      window.addEventListener('resize', checkScrollPosition);
-
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition);
-        window.removeEventListener('resize', checkScrollPosition);
-      };
-    }
-  }, [visiblePeriods]);
+  const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef, [
+    visiblePeriods,
+  ]);
 
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
@@ -136,7 +112,7 @@ export function ResultsTable({
   const tableRows: ResultRowData[] = [
     {
       category: 'Gross Pay',
-      icon: DollarSign,
+      icon: PoundSterling,
       annual: grossAnnual,
       percentage: '100%',
       color: 'text-foreground',
@@ -207,7 +183,7 @@ export function ResultsTable({
     },
     {
       category: 'Allowances/Deductions',
-      icon: DollarSign,
+      icon: Coins,
       annual: allowancesAmount,
       percentage: calculatePercentage(allowancesAmount, grossAnnual),
       color: 'text-teal-600 dark:text-teal-400',

@@ -43,7 +43,7 @@ export function ResultTableRow({
         className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 bg-background`}
       >
         <div className={`flex items-center gap-2 ${isSubRow ? 'pl-6 sm:pl-8' : ''}`}>
-          <Icon className='size-3 flex-shrink-0 sm:h-4 sm:w-4' />
+          <Icon className='h-4 w-4 flex-shrink-0' aria-hidden='true' />
           <span className='text-xs sm:text-sm'>{category}</span>
         </div>
       </TableCell>

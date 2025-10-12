@@ -74,14 +74,12 @@ self.addEventListener('activate', (event) => {
 
   event.waitUntil(
     (async () => {
-      // Clean up old caches
+      // Clean up old caches (keep only current version caches)
       const cacheNames = await caches.keys();
+      const currentCaches = [CACHE_NAME, STATIC_CACHE_NAME, API_CACHE_NAME];
+
       const oldCaches = cacheNames.filter(
-        (name) =>
-          name.startsWith('toolhubx-') &&
-          !['toolhubx-v2025.1.0', 'toolhubx-static-v2025.1.0', 'toolhubx-api-v2025.1.0'].includes(
-            name
-          )
+        (name) => name.startsWith('payetax-') && !currentCaches.includes(name)
       );
 
       await Promise.all(
@@ -90,6 +88,8 @@ self.addEventListener('activate', (event) => {
           return caches.delete(cacheName);
         })
       );
+
+      console.log(`[SW] Cleaned up ${oldCaches.length} old cache(s)`);
 
       // Take control of all open clients
       await self.clients.claim();

@@ -221,7 +221,12 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
 }
 
 /**
- * Get related posts for a given post
+ * Get related posts for a given post with intelligent scoring
+ * Algorithm:
+ * - Same category = +10 points
+ * - Matching tags = +5 points per tag
+ * - Featured post = +2 points
+ * - Recent post (< 30 days) = +1 point
  */
 export async function getRelatedPosts(
   postId: string,
@@ -231,28 +236,59 @@ export async function getRelatedPosts(
   try {
     const allPosts = await getBlogPosts();
 
+    // Find current post to get its tags
+    const currentPost = allPosts.find((post) => post.id === postId);
+
     // Filter out the current post
     const otherPosts = allPosts.filter((post) => post.id !== postId);
 
-    // Prefer posts from the same category
-    let relatedPosts = categorySlug
-      ? otherPosts.filter((post) => post.category === categorySlug)
-      : otherPosts;
+    // Calculate relevance score for each post
+    const scoredPosts = otherPosts.map((post) => {
+      let score = 0;
 
-    // If not enough posts in the same category, add posts from other categories
-    if (relatedPosts.length < count) {
-      const remainingPosts = otherPosts.filter((post) => post.category !== categorySlug);
-      relatedPosts = [...relatedPosts, ...remainingPosts];
-    }
+      // Same category = +10 points
+      if (categorySlug && post.category === categorySlug) {
+        score += 10;
+      }
 
-    // Take only the required count and map to RelatedPost format
-    return relatedPosts.slice(0, count).map((post) => ({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt,
-      publishedAt: post.publishedAt,
-      readTime: post.readTime,
-      category: post.category,
+      // Matching tags = +5 points per match
+      if (currentPost?.tags && post.tags) {
+        const matchingTags = post.tags.filter((tag) => currentPost.tags?.includes(tag));
+        score += matchingTags.length * 5;
+      }
+
+      // Featured post = +2 points
+      if (post.featured) {
+        score += 2;
+      }
+
+      // Recency bonus (newer posts < 30 days old)
+      const daysSincePublish = Math.floor(
+        (Date.now() - new Date(post.publishedAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (daysSincePublish < 30) {
+        score += 1;
+      }
+
+      return { post, score };
+    });
+
+    // Sort by score desc, then by date desc
+    const sortedPosts = scoredPosts.sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime();
+    });
+
+    // Return top N posts in RelatedPost format
+    return sortedPosts.slice(0, count).map((item) => ({
+      title: item.post.title,
+      slug: item.post.slug,
+      excerpt: item.post.excerpt,
+      publishedAt: item.post.publishedAt,
+      readTime: item.post.readTime,
+      category: item.post.category,
     }));
   } catch (error) {
     console.error(`Error getting related posts for ${postId}:`, error);

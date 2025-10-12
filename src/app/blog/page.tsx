@@ -8,18 +8,18 @@ import { BlogPageClient } from './BlogPageClient';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'TaxInsights by PayeTax | Expert UK Tax Guidance & Financial Insights',
+  title: 'TaxInsights by PayeTax | UK Tax Guidance & Financial Insights',
   description:
-    'Clear, actionable UK tax advice from qualified experts. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights. No jargon, just insights.',
+    'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights. No jargon, just insights.',
   keywords:
     'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips, financial advice',
   alternates: {
     canonical: 'https://payetax.co.uk/blog',
   },
   openGraph: {
-    title: 'TaxInsights by PayeTax | Expert UK Tax Guidance',
+    title: 'TaxInsights by PayeTax | UK Tax Guidance',
     description:
-      'Clear, actionable UK tax advice from qualified experts. No jargon, just insights.',
+      'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights.',
     url: 'https://payetax.co.uk/blog',
     type: 'website',
     siteName: 'TaxInsights by PayeTax',
@@ -28,7 +28,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'TaxInsights by PayeTax',
-    description: 'Expert UK tax guidance and financial insights',
+    description:
+      'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, and practical financial insights.',
     images: ['/images/blog/taxinsights-og.jpg'],
   },
 };

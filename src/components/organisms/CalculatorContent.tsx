@@ -6,7 +6,11 @@ import { Calculator, TrendingUp, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
+import { FAQItem } from '@/components/molecules/FAQItem';
+import { HowToStepCard } from '@/components/molecules/HowToStepCard';
+import { TaxRateCard } from '@/components/molecules/TaxRateCard';
 import { Card } from '@/components/ui/card';
+import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 
 /**
  * SEO-optimized content section below calculator
@@ -14,34 +18,8 @@ import { Card } from '@/components/ui/card';
  */
 export function CalculatorContent() {
   const comparisonTableRef = React.useRef<HTMLDivElement>(null);
-  const [showLeftIndicator, setShowLeftIndicator] = React.useState(false);
-  const [showRightIndicator, setShowRightIndicator] = React.useState(false);
-
-  // Check scroll position for comparison table
-  React.useEffect(() => {
-    const checkScrollPosition = () => {
-      const container = comparisonTableRef.current;
-      if (!container) return;
-
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      const hasHorizontalScroll = scrollWidth > clientWidth;
-
-      setShowLeftIndicator(hasHorizontalScroll && scrollLeft > 5);
-      setShowRightIndicator(hasHorizontalScroll && scrollLeft < scrollWidth - clientWidth - 5);
-    };
-
-    const container = comparisonTableRef.current;
-    if (container) {
-      checkScrollPosition();
-      container.addEventListener('scroll', checkScrollPosition);
-      window.addEventListener('resize', checkScrollPosition);
-
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition);
-        window.removeEventListener('resize', checkScrollPosition);
-      };
-    }
-  }, []);
+  const { showLeftIndicator, showRightIndicator } =
+    useHorizontalScrollIndicator(comparisonTableRef);
 
   return (
     <div className='space-y-16'>
@@ -63,84 +41,70 @@ export function CalculatorContent() {
           </div>
 
           <div className='grid gap-6 md:grid-cols-3'>
-            <Card className='group overflow-hidden border-primary/20 p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl'>
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
-                  <Wallet className='size-5 text-white' />
-                </div>
-                <h3 className='font-bold text-foreground text-lg'>Income Tax Bands</h3>
-              </div>
-              <ul className='space-y-3'>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>Personal Allowance</span>
-                  <strong className='text-foreground'>0%</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£12,571 - £50,270</span>
-                  <strong className='text-green-600 dark:text-green-400'>20%</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£50,271 - £125,140</span>
-                  <strong className='text-orange-600 dark:text-orange-400'>40%</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£125,140+</span>
-                  <strong className='text-red-600 dark:text-red-400'>45%</strong>
-                </li>
-              </ul>
-            </Card>
+            <TaxRateCard
+              icon={Wallet}
+              title='Income Tax Bands'
+              items={[
+                { label: 'Personal Allowance', value: '0%' },
+                {
+                  label: '£12,571 - £50,270',
+                  value: '20%',
+                  colorClass: 'text-green-600 dark:text-green-400',
+                },
+                {
+                  label: '£50,271 - £125,140',
+                  value: '40%',
+                  colorClass: 'text-orange-600 dark:text-orange-400',
+                },
+                {
+                  label: '£125,140+',
+                  value: '45%',
+                  colorClass: 'text-red-600 dark:text-red-400',
+                },
+              ]}
+            />
 
-            <Card className='group overflow-hidden border-primary/20 p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl'>
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
-                  <TrendingUp className='size-5 text-white' />
-                </div>
-                <h3 className='font-bold text-foreground text-lg'>National Insurance</h3>
-              </div>
-              <ul className='space-y-3'>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£0 - £12,570</span>
-                  <strong className='text-foreground'>0%</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£12,571 - £50,270</span>
-                  <strong className='text-amber-600 dark:text-amber-400'>12%</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£50,270+</span>
-                  <strong className='text-amber-600 dark:text-amber-400'>2%</strong>
-                </li>
-                <li className='pt-1 text-center text-muted-foreground text-xs'>
-                  Class 1 contributions for employees
-                </li>
-              </ul>
-            </Card>
+            <TaxRateCard
+              icon={TrendingUp}
+              title='National Insurance'
+              items={[
+                { label: '£0 - £12,570', value: '0%' },
+                {
+                  label: '£12,571 - £50,270',
+                  value: '12%',
+                  colorClass: 'text-amber-600 dark:text-amber-400',
+                },
+                {
+                  label: '£50,270+',
+                  value: '2%',
+                  colorClass: 'text-amber-600 dark:text-amber-400',
+                },
+              ]}
+              footerNote='Class 1 contributions for employees'
+            />
 
-            <Card className='group overflow-hidden border-primary/20 p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl'>
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
-                  <Calculator className='size-5 text-white' />
-                </div>
-                <h3 className='font-bold text-foreground text-lg'>Quick Examples</h3>
-              </div>
-              <ul className='space-y-3'>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£20,000 salary</span>
-                  <strong className='text-green-600 dark:text-green-400'>£17,294</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£30,000 salary</span>
-                  <strong className='text-blue-600 dark:text-blue-400'>£23,894</strong>
-                </li>
-                <li className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
-                  <span className='text-muted-foreground'>£50,000 salary</span>
-                  <strong className='text-purple-600 dark:text-purple-400'>£37,794</strong>
-                </li>
-                <li className='pt-1 text-center text-muted-foreground text-xs'>
-                  Annual take-home pay
-                </li>
-              </ul>
-            </Card>
+            <TaxRateCard
+              icon={Calculator}
+              title='Quick Examples'
+              items={[
+                {
+                  label: '£20,000 salary',
+                  value: '£17,294',
+                  colorClass: 'text-green-600 dark:text-green-400',
+                },
+                {
+                  label: '£30,000 salary',
+                  value: '£23,894',
+                  colorClass: 'text-blue-600 dark:text-blue-400',
+                },
+                {
+                  label: '£50,000 salary',
+                  value: '£37,794',
+                  colorClass: 'text-purple-600 dark:text-purple-400',
+                },
+              ]}
+              footerNote='Annual take-home pay'
+            />
           </div>
         </div>
       </motion.section>
@@ -256,169 +220,138 @@ export function CalculatorContent() {
           </div>
 
           <div className='space-y-4'>
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                How much tax do I pay on £30,000 in UK 2025?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for
-                  2025-26:
-                </p>
-                <ul className='ml-6 list-disc space-y-1'>
-                  <li>
-                    <strong>Income Tax</strong>: £3,486 (20% on £17,430 taxable income)
-                  </li>
-                  <li>
-                    <strong>National Insurance</strong>: £2,620 (12% on £17,430)
-                  </li>
-                  <li>
-                    <strong>Total Deductions</strong>: £6,106
-                  </li>
-                  <li>
-                    <strong>Take-Home Pay</strong>: £23,894/year or £1,991/month
-                  </li>
-                </ul>
-                <a href='#calculator' className='inline-block text-primary'>
-                  Calculate your exact salary →
-                </a>
-              </div>
-            </details>
+            <FAQItem question='How much tax do I pay on £30,000 in UK 2025?'>
+              <p>
+                <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for 2025-26:
+              </p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>
+                  <strong>Income Tax</strong>: £3,486 (20% on £17,430 taxable income)
+                </li>
+                <li>
+                  <strong>National Insurance</strong>: £2,620 (12% on £17,430)
+                </li>
+                <li>
+                  <strong>Total Deductions</strong>: £6,106
+                </li>
+                <li>
+                  <strong>Take-Home Pay</strong>: £23,894/year or £1,991/month
+                </li>
+              </ul>
+              <a href='#calculator' className='inline-block text-primary'>
+                Calculate your exact salary →
+              </a>
+            </FAQItem>
 
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                What is the UK personal allowance for 2025-26?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  The UK personal allowance for 2025-26 is <strong>£12,570</strong>. This is the
-                  amount you can earn tax-free each year.
-                </p>
-                <p className='font-medium'>Important notes:</p>
-                <ul className='ml-6 list-disc space-y-1'>
-                  <li>You pay 0% tax on the first £12,570 you earn</li>
-                  <li>The allowance reduces by £1 for every £2 earned over £100,000</li>
-                  <li>It&apos;s completely lost when you earn £125,140 or more</li>
-                  <li>Scottish rates have the same allowance but different tax bands</li>
-                </ul>
-              </div>
-            </details>
+            <FAQItem question='What is the UK personal allowance for 2025-26?'>
+              <p>
+                The UK personal allowance for 2025-26 is <strong>£12,570</strong>. This is the
+                amount you can earn tax-free each year.
+              </p>
+              <p className='font-medium'>Important notes:</p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>You pay 0% tax on the first £12,570 you earn</li>
+                <li>The allowance reduces by £1 for every £2 earned over £100,000</li>
+                <li>It&apos;s completely lost when you earn £125,140 or more</li>
+                <li>Scottish rates have the same allowance but different tax bands</li>
+              </ul>
+            </FAQItem>
 
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                How is PAYE tax calculated in the UK?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
-                </p>
-                <ol className='ml-6 list-decimal space-y-2'>
-                  <li>
-                    <strong>Calculate taxable income</strong>: Gross salary - Personal allowance
-                    (£12,570)
-                  </li>
-                  <li>
-                    <strong>Apply tax bands</strong>: 20% basic rate (£12,571-£50,270), 40% higher
-                    rate (£50,271-£125,140), 45% additional rate (£125,140+)
-                  </li>
-                  <li>
-                    <strong>Add National Insurance</strong>: 12% on £12,571-£50,270, then 2% above
-                  </li>
-                  <li>
-                    <strong>Deduct pension contributions</strong> (if applicable)
-                  </li>
-                  <li>
-                    <strong>Deduct student loan repayments</strong> (if applicable)
-                  </li>
-                </ol>
-                <p>Your employer reports this to HMRC through Real Time Information (RTI).</p>
-              </div>
-            </details>
+            <FAQItem question='How is PAYE tax calculated in the UK?'>
+              <p>
+                PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
+              </p>
+              <ol className='ml-6 list-decimal space-y-2'>
+                <li>
+                  <strong>Calculate taxable income</strong>: Gross salary - Personal allowance
+                  (£12,570)
+                </li>
+                <li>
+                  <strong>Apply tax bands</strong>: 20% basic rate (£12,571-£50,270), 40% higher
+                  rate (£50,271-£125,140), 45% additional rate (£125,140+)
+                </li>
+                <li>
+                  <strong>Add National Insurance</strong>: 12% on £12,571-£50,270, then 2% above
+                </li>
+                <li>
+                  <strong>Deduct pension contributions</strong> (if applicable)
+                </li>
+                <li>
+                  <strong>Deduct student loan repayments</strong> (if applicable)
+                </li>
+              </ol>
+              <p>Your employer reports this to HMRC through Real Time Information (RTI).</p>
+            </FAQItem>
 
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                What&apos;s the difference between Scottish and English tax rates?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  Scotland has different income tax bands but the same National Insurance and
-                  personal allowance (£12,570).
-                </p>
-                <p className='font-medium'>Key differences for 2025-26:</p>
-                <ul className='ml-6 list-disc space-y-1'>
-                  <li>
-                    <strong>Scotland</strong> has 5 tax bands (19%, 20%, 21%, 42%, 47%)
-                  </li>
-                  <li>
-                    <strong>England/Wales/NI</strong> has 3 tax bands (20%, 40%, 45%)
-                  </li>
-                  <li>Scottish taxpayers generally pay more tax on salaries above £28,000</li>
-                  <li>The difference increases significantly above £50,000</li>
-                </ul>
-                <Link
-                  href='/blog/scottish-vs-english-tax-rates-2025-comparison'
-                  className='inline-block text-primary'
-                >
-                  Read full Scottish vs English comparison →
-                </Link>
-              </div>
-            </details>
+            <FAQItem question="What's the difference between Scottish and English tax rates?">
+              <p>
+                Scotland has different income tax bands but the same National Insurance and personal
+                allowance (£12,570).
+              </p>
+              <p className='font-medium'>Key differences for 2025-26:</p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>
+                  <strong>Scotland</strong> has 5 tax bands (19%, 20%, 21%, 42%, 47%)
+                </li>
+                <li>
+                  <strong>England/Wales/NI</strong> has 3 tax bands (20%, 40%, 45%)
+                </li>
+                <li>Scottish taxpayers generally pay more tax on salaries above £28,000</li>
+                <li>The difference increases significantly above £50,000</li>
+              </ul>
+              <Link
+                href='/blog/scottish-vs-english-tax-rates-2025-comparison'
+                className='inline-block text-primary'
+              >
+                Read full Scottish vs English comparison →
+              </Link>
+            </FAQItem>
 
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                How do student loan repayments work with PAYE?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  Student loan repayments are deducted automatically through PAYE if you earn above
-                  the threshold for your plan type:
-                </p>
-                <ul className='ml-6 list-disc space-y-1'>
-                  <li>
-                    <strong>Plan 1</strong>: 9% on earnings above £24,990
-                  </li>
-                  <li>
-                    <strong>Plan 2</strong>: 9% on earnings above £27,295
-                  </li>
-                  <li>
-                    <strong>Plan 4</strong> (Scotland): 9% on earnings above £31,395
-                  </li>
-                  <li>
-                    <strong>Plan 5</strong>: 9% on earnings above £25,000
-                  </li>
-                  <li>
-                    <strong>Postgraduate</strong>: 6% on earnings above £21,000
-                  </li>
-                </ul>
-                <p>You can have multiple plans and repay to each simultaneously.</p>
-                <Link
-                  href='/blog/student-loan-repayment-changes-2025-26'
-                  className='inline-block text-primary'
-                >
-                  Read full student loan guide →
-                </Link>
-              </div>
-            </details>
+            <FAQItem question='How do student loan repayments work with PAYE?'>
+              <p>
+                Student loan repayments are deducted automatically through PAYE if you earn above
+                the threshold for your plan type:
+              </p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>
+                  <strong>Plan 1</strong>: 9% on earnings above £24,990
+                </li>
+                <li>
+                  <strong>Plan 2</strong>: 9% on earnings above £27,295
+                </li>
+                <li>
+                  <strong>Plan 4</strong> (Scotland): 9% on earnings above £31,395
+                </li>
+                <li>
+                  <strong>Plan 5</strong>: 9% on earnings above £25,000
+                </li>
+                <li>
+                  <strong>Postgraduate</strong>: 6% on earnings above £21,000
+                </li>
+              </ul>
+              <p>You can have multiple plans and repay to each simultaneously.</p>
+              <Link
+                href='/blog/student-loan-repayment-changes-2025-26'
+                className='inline-block text-primary'
+              >
+                Read full student loan guide →
+              </Link>
+            </FAQItem>
 
-            <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
-              <summary className='cursor-pointer font-bold text-foreground text-lg transition-colors hover:text-primary'>
-                How does pension tax relief work?
-              </summary>
-              <div className='mt-4 space-y-3 text-muted-foreground text-sm'>
-                <p>
-                  Pension contributions are deducted <strong>before</strong> tax is calculated,
-                  reducing your taxable income. This means you get tax relief automatically.
-                </p>
-                <p className='font-medium'>Example on £50,000 salary with 5% pension:</p>
-                <ul className='ml-6 list-disc space-y-1'>
-                  <li>Pension contribution: £2,500 (5% of £50,000)</li>
-                  <li>Taxable income: £37,500 (£50,000 - £12,570 allowance)</li>
-                  <li>Tax saved: £500 (20% of £2,500)</li>
-                  <li>Net cost of pension: £2,000 (£2,500 - £500 tax relief)</li>
-                </ul>
-                <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
-              </div>
-            </details>
+            <FAQItem question='How does pension tax relief work?'>
+              <p>
+                Pension contributions are deducted <strong>before</strong> tax is calculated,
+                reducing your taxable income. This means you get tax relief automatically.
+              </p>
+              <p className='font-medium'>Example on £50,000 salary with 5% pension:</p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>Pension contribution: £2,500 (5% of £50,000)</li>
+                <li>Taxable income: £37,500 (£50,000 - £12,570 allowance)</li>
+                <li>Tax saved: £500 (20% of £2,500)</li>
+                <li>Net cost of pension: £2,000 (£2,500 - £500 tax relief)</li>
+              </ul>
+              <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
+            </FAQItem>
           </div>
 
           <div className='mt-8 text-center'>
@@ -455,63 +388,29 @@ export function CalculatorContent() {
           </div>
 
           <div className='grid gap-6 md:grid-cols-2'>
-            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>1</div>
-              <div className='relative'>
-                <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
-                  1
-                </div>
-                <h3 className='mb-3 font-bold text-foreground text-xl'>Enter Your Salary</h3>
-                <p className='text-muted-foreground leading-relaxed'>
-                  Input your gross annual, monthly, or weekly salary. Our calculator automatically
-                  formats numbers with commas for easy reading.
-                </p>
-              </div>
-            </Card>
+            <HowToStepCard
+              step={1}
+              title='Enter Your Salary'
+              description='Input your gross annual, monthly, or weekly salary. Our calculator automatically formats numbers with commas for easy reading.'
+            />
 
-            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>2</div>
-              <div className='relative'>
-                <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
-                  2
-                </div>
-                <h3 className='mb-3 font-bold text-foreground text-xl'>Select Tax Year & Region</h3>
-                <p className='text-muted-foreground leading-relaxed'>
-                  Choose the tax year (2025-26 for current rates) and your region (England,
-                  Scotland, Wales, or Northern Ireland).
-                </p>
-              </div>
-            </Card>
+            <HowToStepCard
+              step={2}
+              title='Select Tax Year & Region'
+              description='Choose the tax year (2025-26 for current rates) and your region (England, Scotland, Wales, or Northern Ireland).'
+            />
 
-            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>3</div>
-              <div className='relative'>
-                <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
-                  3
-                </div>
-                <h3 className='mb-3 font-bold text-foreground text-xl'>
-                  Add Deductions (Optional)
-                </h3>
-                <p className='text-muted-foreground leading-relaxed'>
-                  Include pension contributions, student loan plans, and other deductions for
-                  accurate results. Leave blank if not applicable.
-                </p>
-              </div>
-            </Card>
+            <HowToStepCard
+              step={3}
+              title='Add Deductions (Optional)'
+              description='Include pension contributions, student loan plans, and other deductions for accurate results. Leave blank if not applicable.'
+            />
 
-            <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
-              <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>4</div>
-              <div className='relative'>
-                <div className='mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-2xl text-white shadow-lg'>
-                  4
-                </div>
-                <h3 className='mb-3 font-bold text-foreground text-xl'>View & Export Results</h3>
-                <p className='text-muted-foreground leading-relaxed'>
-                  See your breakdown by income tax, National Insurance, and take-home pay across
-                  multiple periods. Export to CSV or print for your records.
-                </p>
-              </div>
-            </Card>
+            <HowToStepCard
+              step={4}
+              title='View & Export Results'
+              description='See your breakdown by income tax, National Insurance, and take-home pay across multiple periods. Export to CSV or print for your records.'
+            />
           </div>
         </div>
       </motion.section>

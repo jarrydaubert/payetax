@@ -109,7 +109,7 @@ export function BlogPageClient({
               transition={{ duration: 0.6, delay: 0.3 }}
               className='mx-auto mb-12 max-w-3xl text-foreground/70 text-xl leading-relaxed md:text-2xl'
             >
-              Expert UK Tax Guidance & Financial Insights. No jargon, just insights.
+              UK Tax Guidance & Financial Insights. No jargon, just insights.
             </motion.p>
 
             {/* Category Badge */}
@@ -144,7 +144,7 @@ export function BlogPageClient({
             {
               icon: FileText,
               value: totalCount,
-              label: 'Expert Articles',
+              label: 'Articles',
               gradient: 'from-purple-500 to-pink-500',
             },
             {
