@@ -1,9 +1,9 @@
 // Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
-const CACHE_NAME = 'payetax-v2025.1.0';
-const STATIC_CACHE_NAME = 'payetax-static-v2025.1.0';
-const API_CACHE_NAME = 'payetax-api-v2025.1.0';
+const CACHE_NAME = 'payetax-v2025.1.2.1';
+const STATIC_CACHE_NAME = 'payetax-static-v2025.1.2.1';
+const API_CACHE_NAME = 'payetax-api-v2025.1.2.1';
 
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
@@ -361,4 +361,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-console.log('[SW] Service Worker v2025.1.0 loaded successfully');
+// Only log in development (check using URL since we can't access window in SW)
+if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+  console.log('[SW] Service Worker v2025.1.2.1 loaded successfully');
+}

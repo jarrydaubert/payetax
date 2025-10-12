@@ -4,7 +4,9 @@
 (() => {
   // Check if service workers are supported
   if (!('serviceWorker' in navigator)) {
-    console.log('[PWA] Service Worker not supported');
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log('[PWA] Service Worker not supported');
+    }
     return;
   }
 
@@ -13,6 +15,13 @@
     console.log('[PWA] Service Worker disabled in development');
     return;
   }
+
+  // Helper to log only in development
+  const devLog = (message, ...args) => {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log(message, ...args);
+    }
+  };
 
   let registration;
   let isRefreshing = false;
@@ -24,7 +33,7 @@
         scope: '/',
       });
 
-      console.log('[PWA] Service Worker registered successfully');
+      devLog('[PWA] Service Worker registered successfully');
 
       // Listen for updates
       registration.addEventListener('updatefound', handleUpdate);
@@ -161,7 +170,7 @@
     const { data } = event;
 
     if (data?.type === 'VERSION_INFO') {
-      console.log('[PWA] Service Worker version:', data.version);
+      devLog('[PWA] Service Worker version:', data.version);
     }
   }
 
@@ -171,20 +180,20 @@
 
     try {
       const permission = await Notification.requestPermission();
-      console.log('[PWA] Notification permission:', permission);
+      devLog('[PWA] Notification permission:', permission);
     } catch (error) {
-      console.log('[PWA] Notification permission request failed:', error);
+      devLog('[PWA] Notification permission request failed:', error);
     }
   }
 
   // Handle offline/online status
   window.addEventListener('online', () => {
-    console.log('[PWA] Back online');
+    devLog('[PWA] Back online');
     showConnectionStatus('online');
   });
 
   window.addEventListener('offline', () => {
-    console.log('[PWA] Gone offline');
+    devLog('[PWA] Gone offline');
     showConnectionStatus('offline');
   });
 
@@ -224,7 +233,7 @@
   let _deferredPrompt;
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('[PWA] Install prompt triggered');
+    devLog('[PWA] Install prompt triggered');
     e.preventDefault();
     _deferredPrompt = e;
     showInstallPrompt();
@@ -233,7 +242,7 @@
   // Show install prompt (can be customized)
   function showInstallPrompt() {
     // For now, just log. Can be enhanced with custom UI
-    console.log('[PWA] App can be installed');
+    devLog('[PWA] App can be installed');
 
     // Could show a custom install banner here
     // Example: createInstallBanner();
@@ -241,7 +250,7 @@
 
   // Handle app installation
   window.addEventListener('appinstalled', () => {
-    console.log('[PWA] App was installed');
+    devLog('[PWA] App was installed');
     _deferredPrompt = null;
 
     // Track installation for analytics

@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2025-10-12
+
+### 🐛 Bug Fixes
+
+#### Production Console Logs
+- **PWA Debug Logs** - Silenced all `[PWA]` logs in production environment
+  - Added `devLog()` helper function that only logs on localhost
+  - Fixed: "Service Worker registered successfully" showing in production
+  - Fixed: "Install prompt triggered" and "App can be installed" logs
+  - Fixed: "Back online / Gone offline" connection status logs
+  - Fixed: "Notification permission" logs
+  - Files: `public/register-sw.js` (lines 7-24, 36, 173, 183-185, 191-196, 236, 245, 253)
+
+- **Service Worker Logs** - Silenced SW initialization log in production
+  - Wrapped console.log in hostname check (localhost/127.0.0.1 only)
+  - Fixed: "[SW] Service Worker v2025.1.0 loaded successfully" showing in production
+  - Files: `public/sw.js` (lines 364-367)
+
+### 🔧 Technical Changes
+
+#### Service Worker
+- **Version Bump** - Updated cache names from `v2025.1.0` → `v2025.1.2.1`
+  - Updated `CACHE_NAME`, `STATIC_CACHE_NAME`, and `API_CACHE_NAME` constants
+  - Ensures fresh cache after production deployment
+
+### 📊 Metrics
+
+- **Build Status**: 29/29 pages generated successfully ✅
+- **Bundle Size**: 516 kB First Load JS (stable)
+- **Production Console**: Significantly cleaner (PWA/SW logs removed)
+
+### 🎯 Impact
+
+- **User Experience**: Cleaner browser console for end users
+- **Developer Experience**: Easier debugging without noise from PWA logs
+- **Production Quality**: Professional console output (errors/warnings only)
+
+### 📝 Notes
+
+**Remaining Console Messages (Expected)**:
+- Image preload warnings: Normal Next.js behavior for og:images (used for social sharing)
+- "Banner not shown": Native Chrome browser messages (intentional PWA behavior)
+- Third-party logs: PostHog, analytics extensions (not from codebase)
+
+---
+
 ## [1.2.0] - 2025-10-12
 
 ### 🚀 Major Features
