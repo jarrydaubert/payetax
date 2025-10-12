@@ -5,6 +5,14 @@ const CACHE_NAME = 'payetax-v2025.1.2.1';
 const STATIC_CACHE_NAME = 'payetax-static-v2025.1.2.1';
 const API_CACHE_NAME = 'payetax-api-v2025.1.2.1';
 
+// Helper function to log only in development
+const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+const devLog = (...args) => {
+  if (isDev) {
+    console.log(...args);
+  }
+};
+
 // Assets to cache immediately on install
 const PRECACHE_ASSETS = [
   '/',
@@ -49,15 +57,15 @@ const CACHE_FIRST = [
 
 // Install event - precache essential assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v2025.1.0');
+  devLog(`[SW] Installing service worker ${CACHE_NAME}`);
 
   event.waitUntil(
     (async () => {
       try {
         const cache = await caches.open(CACHE_NAME);
-        console.log('[SW] Precaching core assets');
+        devLog('[SW] Precaching core assets');
         await cache.addAll(PRECACHE_ASSETS);
-        console.log('[SW] Precache complete');
+        devLog('[SW] Precache complete');
 
         // Skip waiting to activate immediately
         await self.skipWaiting();
@@ -70,7 +78,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker v2025.1.0');
+  devLog(`[SW] Activating service worker ${CACHE_NAME}`);
 
   event.waitUntil(
     (async () => {
@@ -84,16 +92,16 @@ self.addEventListener('activate', (event) => {
 
       await Promise.all(
         oldCaches.map((cacheName) => {
-          console.log('[SW] Deleting old cache:', cacheName);
+          devLog('[SW] Deleting old cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
 
-      console.log(`[SW] Cleaned up ${oldCaches.length} old cache(s)`);
+      devLog(`[SW] Cleaned up ${oldCaches.length} old cache(s)`);
 
       // Take control of all open clients
       await self.clients.claim();
-      console.log('[SW] Service worker activated and controlling all clients');
+      devLog('[SW] Service worker activated and controlling all clients');
     })()
   );
 });
@@ -150,7 +158,7 @@ async function networkFirstStrategy(request) {
 
     return networkResponse;
   } catch (error) {
-    console.log('[SW] Network failed, trying cache:', request.url);
+    devLog('[SW] Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
 
     if (cachedResponse) {
@@ -202,7 +210,7 @@ async function staleWhileRevalidateStrategy(request) {
       return networkResponse;
     })
     .catch((error) => {
-      console.log('[SW] Network request failed:', error);
+      devLog('[SW] Network request failed:', error);
       return cachedResponse;
     });
 
@@ -265,7 +273,7 @@ self.addEventListener('sync', (event) => {
 async function syncFeedback() {
   try {
     // Get pending feedback from IndexedDB (would need to be implemented)
-    console.log('[SW] Syncing offline feedback submissions');
+    devLog('[SW] Syncing offline feedback submissions');
     // Implementation would go here
   } catch (error) {
     console.error('[SW] Background sync failed:', error);
@@ -341,12 +349,12 @@ async function updateCriticalAssets() {
             await cache.put(page, response);
           }
         } catch (error) {
-          console.log('[SW] Failed to update page:', page, error);
+          devLog('[SW] Failed to update page:', page, error);
         }
       })
     );
 
-    console.log('[SW] Critical assets updated');
+    devLog('[SW] Critical assets updated');
   } catch (error) {
     console.error('[SW] Periodic sync failed:', error);
   }
@@ -361,7 +369,5 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Only log in development (check using URL since we can't access window in SW)
-if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
-  console.log('[SW] Service Worker v2025.1.2.1 loaded successfully');
-}
+// Log service worker load (dev only via devLog helper)
+devLog(`[SW] Service Worker ${CACHE_NAME} loaded successfully`);
