@@ -1,6 +1,7 @@
 // src/app/api/feedback/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -13,6 +14,20 @@ interface FeedbackData {
 }
 
 export async function POST(request: NextRequest) {
+  // Get client IP for rate limiting
+  const ipAddress =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+
+  // Check rate limit (10 requests per minute per IP)
+  if (!checkRateLimit(ipAddress)) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again in a minute.' },
+      { status: 429 }
+    );
+  }
+
   // Early exit if Resend not configured
   if (!resend) {
     return NextResponse.json(
@@ -24,10 +39,6 @@ export async function POST(request: NextRequest) {
   try {
     const data: FeedbackData = await request.json();
     const { email, message, url, userAgent, timestamp } = data;
-
-    // Get client info
-    const ipAddress =
-      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown';
 
     // Validate required fields
     if (!message || message.trim().length < 10) {

@@ -14,6 +14,7 @@ jest.mock('resend', () => ({
 
 import type { NextRequest } from 'next/server';
 import { POST } from '../route';
+import { clearAllRateLimits } from '@/lib/rateLimit';
 
 describe('Error Log API Route', () => {
   const mockRequest = (body: unknown, headers: Record<string, string> = {}) => {
@@ -33,12 +34,16 @@ describe('Error Log API Route', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Clear rate limits between tests
+    clearAllRateLimits();
     // Mock Resend API key
     process.env.RESEND_API_KEY = 'test-api-key';
   });
 
   afterEach(() => {
     process.env.RESEND_API_KEY = undefined;
+    // Clean up rate limits after tests
+    clearAllRateLimits();
   });
 
   describe('Success Cases', () => {
@@ -115,10 +120,14 @@ describe('Error Log API Route', () => {
 
   describe('Server Configuration', () => {
     it('should return 500 if Resend API key not configured', async () => {
-      process.env.RESEND_API_KEY = undefined;
+      // Store the original value
+      const originalKey = process.env.RESEND_API_KEY;
 
-      // Need to re-import to get the new environment
+      // Reset modules first, then delete the env var
       jest.resetModules();
+      delete process.env.RESEND_API_KEY;
+
+      // Re-import the route with no API key
       const { POST: POSTWithoutKey } = await import('../route');
 
       const req = mockRequest({
@@ -130,6 +139,11 @@ describe('Error Log API Route', () => {
 
       expect(response.status).toBe(500);
       expect(data.error).toContain('configuration error');
+
+      // Restore the original value
+      if (originalKey) {
+        process.env.RESEND_API_KEY = originalKey;
+      }
     });
   });
 
