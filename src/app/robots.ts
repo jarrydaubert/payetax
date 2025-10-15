@@ -28,7 +28,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/admin/',
-          '/_next/',
+          '/_next/data/', // Block Next.js data files but allow static assets
           '/_vercel/',
           '/private/',
           '/offline', // Don't index offline page
@@ -39,13 +39,13 @@ export default function robots(): MetadataRoute.Robots {
         // Googlebot-specific rules (allow faster crawling for Google)
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/_vercel/', '/offline'],
+        disallow: ['/api/', '/_next/data/', '/_vercel/', '/offline'],
       },
       {
         // Bingbot-specific rules
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/_vercel/', '/offline'],
+        disallow: ['/api/', '/_next/data/', '/_vercel/', '/offline'],
       },
       // AI Search Engine Crawlers - AEO (Answer Engine Optimization)
       {

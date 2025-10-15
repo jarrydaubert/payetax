@@ -173,9 +173,7 @@ describe('Metadata Module', () => {
       });
 
       expect(metadata.alternates?.canonical).toBe('https://payetax.co.uk/calculator/paye');
-      expect(metadata.alternates?.languages?.['en-GB']).toBe(
-        'https://payetax.co.uk/calculator/paye'
-      );
+      // Note: languages property removed to fix hreflang conflicts (monolingual site)
     });
 
     test('should set Twitter card type', () => {

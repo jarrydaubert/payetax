@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### 🎨 UI/UX Improvements
+
+#### Universal Translucent Navbar
+- **Changed**: Navbar now uses consistent translucent styling across all pages
+- **Before**: Blog pages had `bg-white/5` overlay, other pages were transparent
+- **After**: All pages use `bg-background/50 backdrop-blur-md border-b border-border/30`
+- **Benefits**:
+  - ✅ Consistent glassmorphism effect site-wide
+  - ✅ Theme-aware (adapts to light/dark mode automatically)
+  - ✅ Better readability with 50% opacity background
+  - ✅ Modern frosted glass aesthetic
+- **File**: `src/components/molecules/SimpleNavbar.tsx`
+
+---
+
 ## [1.2.2] - 2025-10-12
 
 ### 📋 Documentation

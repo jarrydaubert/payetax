@@ -41,10 +41,7 @@ const rateLimitCache = new LRUCache<string, number>({
  * }
  * ```
  */
-export function checkRateLimit(
-  ip: string,
-  config: RateLimitConfig = DEFAULT_CONFIG
-): boolean {
+export function checkRateLimit(ip: string, config: RateLimitConfig = DEFAULT_CONFIG): boolean {
   // Get current request count for this IP
   const requests = rateLimitCache.get(ip) || 0;
 
@@ -67,10 +64,7 @@ export function checkRateLimit(
  * @param config - Optional rate limit configuration
  * @returns Number of remaining requests
  */
-export function getRemainingRequests(
-  ip: string,
-  config: RateLimitConfig = DEFAULT_CONFIG
-): number {
+export function getRemainingRequests(ip: string, config: RateLimitConfig = DEFAULT_CONFIG): number {
   const requests = rateLimitCache.get(ip) || 0;
   return Math.max(0, config.max - requests);
 }

@@ -13,8 +13,8 @@ jest.mock('resend', () => ({
 }));
 
 import type { NextRequest } from 'next/server';
-import { POST } from '../route';
 import { clearAllRateLimits } from '@/lib/rateLimit';
+import { POST } from '../route';
 
 describe('Error Log API Route', () => {
   const mockRequest = (body: unknown, headers: Record<string, string> = {}) => {

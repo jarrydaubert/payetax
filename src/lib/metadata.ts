@@ -139,9 +139,8 @@ export function generateMetadata({
     // Language and canonical URLs
     alternates: {
       canonical: url,
-      languages: {
-        'en-GB': `${SITE_URL}${pathname}`,
-      },
+      // Note: languages removed as we're monolingual (en-GB only)
+      // Having only one language in hreflang creates SEO conflicts
     },
 
     // Robots directives

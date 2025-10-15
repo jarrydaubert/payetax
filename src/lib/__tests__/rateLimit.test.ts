@@ -1,5 +1,10 @@
 // src/lib/__tests__/rateLimit.test.ts
-import { checkRateLimit, getRemainingRequests, resetRateLimit, clearAllRateLimits } from '../rateLimit';
+import {
+  checkRateLimit,
+  clearAllRateLimits,
+  getRemainingRequests,
+  resetRateLimit,
+} from '../rateLimit';
 
 describe('Rate Limiting', () => {
   beforeEach(() => {

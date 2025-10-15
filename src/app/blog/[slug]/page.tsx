@@ -35,8 +35,9 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${post.title} | TaxInsights by PayeTax`,
-    description: post.excerpt,
+    // Use seoTitle for shorter, optimized title tags (avoids SEO title length issues)
+    title: post.seoTitle || post.title,
+    description: post.seoDescription || post.excerpt,
     keywords: post.seoKeywords?.join(', '),
     alternates: {
       canonical: `https://payetax.co.uk/blog/${resolvedParams.slug}`,
@@ -54,8 +55,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt,
+      title: post.seoTitle || post.title,
+      description: post.seoDescription || post.excerpt,
       images: post.image ? [post.image] : undefined,
     },
   };
