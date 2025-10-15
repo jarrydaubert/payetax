@@ -93,11 +93,11 @@
       o.remove();
     }, 3e3);
   }
-  let l;
+  let _l;
   window.addEventListener('beforeinstallprompt', (e) => {
     t('[PWA] Install prompt triggered');
     e.preventDefault();
-    l = e;
+    _l = e;
     c();
   });
   function c() {
@@ -105,7 +105,7 @@
   }
   window.addEventListener('appinstalled', () => {
     t('[PWA] App was installed');
-    l = null;
+    _l = null;
     if (typeof gtag !== 'undefined')
       gtag('event', 'pwa_install', { event_category: 'PWA', event_label: 'App Installed' });
   });

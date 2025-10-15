@@ -3,7 +3,7 @@
  */
 // src/components/analytics/__tests__/Analytics.test.tsx
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { Analytics } from '../Analytics';
 
 // Mock next/navigation
@@ -52,7 +52,7 @@ describe('Analytics Component', () => {
     });
 
     // Clear any existing consent
-    delete (window as any).consentMode;
+    (window as any).consentMode = undefined;
   });
 
   afterEach(() => {
@@ -400,7 +400,7 @@ describe('Analytics Component', () => {
 
   describe('Edge Cases', () => {
     it('should handle missing gtag gracefully', () => {
-      delete (window as any).gtag;
+      (window as any).gtag = undefined;
 
       expect(() => render(<Analytics />)).not.toThrow();
     });

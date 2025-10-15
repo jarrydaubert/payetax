@@ -114,17 +114,16 @@ describe('Layout Component', () => {
     expect(href).toBe(`#${main?.id}`);
   });
 
-  it('should have screen-reader-only heading for main content', () => {
+  it('should have accessible main content landmark', () => {
     const { container } = render(
       <Layout>
         <div>Content</div>
       </Layout>
     );
 
-    const srOnlyHeading = container.querySelector('.sr-only');
-    expect(srOnlyHeading).toBeInTheDocument();
-    expect(srOnlyHeading?.textContent).toBe('Main Content');
-    expect(srOnlyHeading?.tagName).toBe('H1');
+    const main = container.querySelector('main');
+    expect(main).toBeInTheDocument();
+    expect(main).toHaveAttribute('aria-label', 'Main Content');
   });
 
   it('should use flex layout with min-h-screen', () => {

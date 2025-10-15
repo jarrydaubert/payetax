@@ -67,7 +67,8 @@ describe('CalculatorContent Component', () => {
     it('should display personal allowance rate', () => {
       render(<CalculatorContent />);
 
-      expect(screen.getByText('Personal Allowance')).toBeInTheDocument();
+      // Updated: now appears in multiple places (tax rate card + FAQ)
+      expect(screen.getAllByText('Personal Allowance')[0]).toBeInTheDocument();
     });
 
     it('should display basic rate tax band', () => {
@@ -224,7 +225,7 @@ describe('CalculatorContent Component', () => {
       const { container } = render(<CalculatorContent />);
 
       const details = container.querySelectorAll('details');
-      expect(details.length).toBe(6);
+      expect(details.length).toBe(7); // Updated: added new FAQ about tax reliefs
     });
 
     it('should expand FAQ when clicked', () => {
@@ -424,7 +425,7 @@ describe('CalculatorContent Component', () => {
       const { container } = render(<CalculatorContent />);
 
       const summaries = container.querySelectorAll('summary');
-      expect(summaries.length).toBe(6);
+      expect(summaries.length).toBe(7); // Updated: added new FAQ about tax reliefs
 
       for (const summary of summaries) {
         expect(summary).toHaveClass('cursor-pointer');

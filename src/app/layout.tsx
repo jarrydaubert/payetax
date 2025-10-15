@@ -41,6 +41,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en' suppressHydrationWarning data-scroll-behavior='smooth'>
       <head>
+        {/* DNS Prefetch and Preconnect for Performance */}
+        <link rel='dns-prefetch' href='https://vercel.live' />
+        <link rel='dns-prefetch' href='https://cdnjs.buymeacoffee.com' />
+        <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
+        <link rel='preconnect' href='https://cdnjs.buymeacoffee.com' crossOrigin='anonymous' />
+
         {/* Flash Prevention Script - Loads theme before paint */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for flash prevention

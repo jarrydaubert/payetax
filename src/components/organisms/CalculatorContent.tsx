@@ -170,8 +170,13 @@ export function CalculatorContent() {
                         key={row.salary}
                         className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
                       >
-                        <td className='p-4 font-semibold text-foreground'>
-                          £{row.salary.toLocaleString()}
+                        <td className='p-4'>
+                          <Link
+                            href={`/calculator/${row.salary}-after-tax`}
+                            className='font-semibold text-foreground hover:text-primary hover:underline'
+                          >
+                            £{row.salary.toLocaleString()}
+                          </Link>
                         </td>
                         <td className='p-4 text-right text-red-600 dark:text-red-400'>
                           £{row.tax.toLocaleString()}
@@ -245,15 +250,23 @@ export function CalculatorContent() {
 
             <FAQItem question='What is the UK personal allowance for 2025-26?'>
               <p>
-                The UK personal allowance for 2025-26 is <strong>£12,570</strong>. This is the
-                amount you can earn tax-free each year.
+                The UK personal allowance (tax-free allowance) for 2025-26 is{' '}
+                <strong>£12,570</strong>. This is the amount you can earn tax-free each year before
+                paying income tax.
               </p>
               <p className='font-medium'>Important notes:</p>
               <ul className='ml-6 list-disc space-y-1'>
                 <li>You pay 0% tax on the first £12,570 you earn</li>
-                <li>The allowance reduces by £1 for every £2 earned over £100,000</li>
+                <li>
+                  The allowance reduces by £1 for every £2 earned over £100,000 (affecting higher
+                  rate taxpayers)
+                </li>
                 <li>It&apos;s completely lost when you earn £125,140 or more</li>
-                <li>Scottish rates have the same allowance but different tax bands</li>
+                <li>Scottish rates have the same allowance but different income tax bands</li>
+                <li>
+                  This is separate from capital gains tax and inheritance tax allowances which have
+                  their own thresholds
+                </li>
               </ul>
             </FAQItem>
 
@@ -351,6 +364,37 @@ export function CalculatorContent() {
                 <li>Net cost of pension: £2,000 (£2,500 - £500 tax relief)</li>
               </ul>
               <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
+            </FAQItem>
+
+            <FAQItem question='What tax reliefs are available to reduce my tax bill?'>
+              <p>
+                The UK offers several tax reliefs that can reduce your tax bill. Here are the main
+                ones:
+              </p>
+              <ul className='ml-6 list-disc space-y-1'>
+                <li>
+                  <strong>Personal Allowance</strong>: £12,570 tax-free income (for most people)
+                </li>
+                <li>
+                  <strong>Marriage Allowance</strong>: Transfer £1,260 of unused personal allowance
+                  to your spouse (saves up to £252/year)
+                </li>
+                <li>
+                  <strong>Pension Tax Relief</strong>: Automatic relief on workplace pension
+                  contributions
+                </li>
+                <li>
+                  <strong>Blind Person&apos;s Allowance</strong>: Extra £3,070 tax-free income
+                </li>
+                <li>
+                  <strong>Gift Aid</strong>: Tax relief on charitable donations
+                </li>
+              </ul>
+              <p>
+                Note: This is separate from <strong>capital gains tax</strong> (£3,000 annual exempt
+                amount) and <strong>inheritance tax</strong> (£325,000 nil-rate band). Use our
+                calculator to see how these tax reliefs affect your take-home pay.
+              </p>
             </FAQItem>
           </div>
 

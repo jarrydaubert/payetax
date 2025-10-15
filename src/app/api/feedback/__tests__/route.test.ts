@@ -220,7 +220,7 @@ describe('Feedback API Route', () => {
 
       // Reset modules first, then delete the env var
       jest.resetModules();
-      delete process.env.RESEND_API_KEY;
+      process.env.RESEND_API_KEY = undefined;
 
       // Re-import the route with no API key
       const { POST: POSTWithoutKey } = await import('../route');

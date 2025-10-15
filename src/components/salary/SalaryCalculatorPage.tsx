@@ -66,7 +66,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
         <div className='container relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           {/* Breadcrumbs */}
           <nav className='mb-4' aria-label='Breadcrumb'>
-            <ol className='flex items-center space-x-2 text-sm text-muted-foreground'>
+            <ol className='flex items-center space-x-2 text-muted-foreground text-sm'>
               <li>
                 <Link href='/' className='hover:text-primary'>
                   Home
@@ -79,14 +79,14 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                 </Link>
               </li>
               <li>/</li>
-              <li className='text-foreground font-medium'>£{formattedSalary} Salary</li>
+              <li className='font-medium text-foreground'>£{formattedSalary} Salary</li>
             </ol>
           </nav>
 
           <div className='grid gap-6 lg:grid-cols-2'>
             {/* Instant Results Card */}
             <div className='lg:sticky lg:top-24 lg:self-start'>
-              <h1 className='mb-2 text-2xl font-bold sm:text-3xl lg:text-4xl'>
+              <h1 className='mb-2 font-bold text-2xl sm:text-3xl lg:text-4xl'>
                 £{formattedSalary} Salary After Tax
               </h1>
               <p className='mb-6 text-muted-foreground'>
@@ -98,37 +98,37 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                   <div className='space-y-6'>
                     {/* Main Take-Home */}
                     <div className='text-center'>
-                      <p className='text-sm text-muted-foreground uppercase tracking-wide'>
+                      <p className='text-muted-foreground text-sm uppercase tracking-wide'>
                         Monthly Take-Home Pay
                       </p>
-                      <p className='text-4xl font-bold text-primary mt-2'>
+                      <p className='mt-2 font-bold text-4xl text-primary'>
                         £{results.netPay.monthly.toLocaleString('en-GB')}
                       </p>
-                      <p className='text-sm text-muted-foreground mt-2'>
+                      <p className='mt-2 text-muted-foreground text-sm'>
                         After tax and National Insurance
                       </p>
                     </div>
 
                     {/* Quick Breakdown */}
-                    <div className='grid grid-cols-2 gap-4 pt-4 border-t'>
+                    <div className='grid grid-cols-2 gap-4 border-t pt-4'>
                       <div>
-                        <p className='text-xs text-muted-foreground'>Annual Take-Home</p>
-                        <p className='text-xl font-semibold'>
+                        <p className='text-muted-foreground text-xs'>Annual Take-Home</p>
+                        <p className='font-semibold text-xl'>
                           £{results.netPay.annually.toLocaleString('en-GB')}
                         </p>
                       </div>
                       <div>
-                        <p className='text-xs text-muted-foreground'>Weekly Take-Home</p>
-                        <p className='text-xl font-semibold'>
+                        <p className='text-muted-foreground text-xs'>Weekly Take-Home</p>
+                        <p className='font-semibold text-xl'>
                           £{results.netPay.weekly.toLocaleString('en-GB')}
                         </p>
                       </div>
                     </div>
 
                     {/* Tax Breakdown */}
-                    <div className='space-y-3 pt-4 border-t'>
+                    <div className='space-y-3 border-t pt-4'>
                       <div className='flex justify-between'>
-                        <span className='text-sm text-muted-foreground'>Gross Salary</span>
+                        <span className='text-muted-foreground text-sm'>Gross Salary</span>
                         <span className='font-medium'>£{formattedSalary}</span>
                       </div>
                       <div className='flex justify-between text-red-600'>
@@ -143,7 +143,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                           -£{results.nationalInsurance.annually.toLocaleString('en-GB')}
                         </span>
                       </div>
-                      <div className='flex justify-between pt-2 border-t font-semibold'>
+                      <div className='flex justify-between border-t pt-2 font-semibold'>
                         <span>Net Pay (Annual)</span>
                         <span className='text-primary'>
                           £{results.netPay.annually.toLocaleString('en-GB')}
@@ -152,7 +152,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                     </div>
 
                     {/* Effective Tax Rate */}
-                    <div className='bg-muted/50 rounded-lg p-4'>
+                    <div className='rounded-lg bg-muted/50 p-4'>
                       <div className='flex items-center justify-between'>
                         <span className='text-sm'>Effective Tax Rate</span>
                         <Badge variant='secondary' className='font-mono'>
@@ -171,7 +171,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
 
               {/* Compare Salaries */}
               <Card className='mt-4 p-4'>
-                <h3 className='font-semibold mb-3 flex items-center gap-2'>
+                <h3 className='mb-3 flex items-center gap-2 font-semibold'>
                   <TrendingUp className='h-4 w-4' />
                   Compare Similar Salaries
                 </h3>
@@ -181,9 +181,9 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                       key={comp.amount}
                       href={`/calculator/${comp.amount}-after-tax`}
                       className={cn(
-                        'text-sm px-3 py-2 rounded-md text-center',
+                        'rounded-md px-3 py-2 text-center text-sm',
                         'border border-border hover:border-primary',
-                        'hover:bg-primary/5 transition-colors'
+                        'transition-colors hover:bg-primary/5'
                       )}
                     >
                       <span className='text-muted-foreground text-xs'>{comp.label}</span>
@@ -266,10 +266,10 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       </section>
 
       {/* Full Calculator Section */}
-      <section className='py-8 sm:py-12 bg-muted/30'>
+      <section className='bg-muted/30 py-8 sm:py-12'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='text-center mb-8'>
-            <h2 className='text-2xl font-bold mb-2'>Customize Your Calculation</h2>
+          <div className='mb-8 text-center'>
+            <h2 className='mb-2 font-bold text-2xl'>Customize Your Calculation</h2>
             <p className='text-muted-foreground'>
               Add student loans, pension contributions, and more for a precise calculation
             </p>
@@ -281,7 +281,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       {/* Related Searches (SEO) */}
       <section className='py-8 sm:py-12'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <h2 className='text-xl font-semibold mb-4'>Related Salary Calculations</h2>
+          <h2 className='mb-4 font-semibold text-xl'>Related Salary Calculations</h2>
           <div className='flex flex-wrap gap-2'>
             {[25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 90000, 100000]
               .filter((s) => Math.abs(s - salary) > 5000 && Math.abs(s - salary) <= 30000)
@@ -289,7 +289,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                 <Link
                   key={relatedSalary}
                   href={`/calculator/${relatedSalary}-after-tax`}
-                  className='text-sm px-4 py-2 bg-muted hover:bg-muted/80 rounded-md transition-colors'
+                  className='rounded-md bg-muted px-4 py-2 text-sm transition-colors hover:bg-muted/80'
                 >
                   £{relatedSalary.toLocaleString('en-GB')} salary
                 </Link>

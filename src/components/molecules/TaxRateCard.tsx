@@ -1,6 +1,5 @@
 // src/components/molecules/TaxRateCard.tsx
 import type { LucideIcon } from 'lucide-react';
-import * as React from 'react';
 import { Card } from '@/components/ui/card';
 
 export interface TaxRateItem {

@@ -14,14 +14,27 @@ import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
 //   120000, 125000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000,
 // ];
 
-// High-volume keywords from CSV analysis
+// High-volume keywords from CSV analysis - all salaries in sitemap
 const HIGH_PRIORITY_SALARIES = [
+  30000, // 280 searches/month
+  35000, // 250 searches/month
+  40000, // 320 searches/month
+  45000, // 230 searches/month
+  50000, // 350 searches/month
+  55000, // 210 searches/month
+  60000, // 390 searches/month
+  65000, // 190 searches/month
   70000, // 480 searches/month
+  75000, // 180 searches/month
   80000, // 620 searches/month
+  85000, // 160 searches/month
   90000, // 530 searches/month
+  95000, // 150 searches/month
   100000, // 450 searches/month
   105000, // 170 searches/month
+  110000, // 130 searches/month
   115000, // 170 searches/month
+  120000, // 120 searches/month
   125000, // 140 searches/month
 ];
 
@@ -37,7 +50,7 @@ function parseSalary(salaryParam: string): number | null {
   const match = salaryParam.match(/^(\d+)k?(-after-tax)?$/);
   if (!match) return null;
 
-  const value = parseInt(match[1]);
+  const value = parseInt(match[1], 10);
   const multiplier = salaryParam.includes('k') ? 1000 : 1;
   const salary = value * multiplier;
 

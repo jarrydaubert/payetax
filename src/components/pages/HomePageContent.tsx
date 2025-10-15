@@ -1,9 +1,9 @@
 // src/components/pages/HomePageContent.tsx
 'use client';
 
-import { memo, useEffect, useRef, useTransition } from 'react';
-import Link from 'next/link';
 import { BookOpen, Calculator, FileText } from 'lucide-react';
+import Link from 'next/link';
+import { memo, useEffect, useRef, useTransition } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import SimpleHero from '@/components/organisms/SimpleHero';
@@ -41,6 +41,46 @@ const HomePageContent = memo(function HomePageContent() {
       {/* SEO-optimized content for Answer Engine Optimization */}
       <section className='container mx-auto px-2 pb-16 sm:px-4'>
         <CalculatorContent />
+      </section>
+
+      {/* Popular Salary Calculators - Internal linking for SEO */}
+      <section className='container mx-auto max-w-7xl px-4 py-16'>
+        <h2 className='mb-2 text-center font-bold text-3xl'>Popular Salary Calculators</h2>
+        <p className='mb-8 text-center text-muted-foreground'>
+          Calculate exact take-home pay for common UK salaries
+        </p>
+        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
+          {[
+            { salary: 30000, label: '£30k' },
+            { salary: 40000, label: '£40k' },
+            { salary: 50000, label: '£50k' },
+            { salary: 60000, label: '£60k' },
+            { salary: 70000, label: '£70k' },
+            { salary: 80000, label: '£80k' },
+            { salary: 90000, label: '£90k' },
+            { salary: 100000, label: '£100k' },
+            { salary: 110000, label: '£110k' },
+            { salary: 120000, label: '£120k' },
+          ].map(({ salary, label }) => (
+            <Link
+              key={salary}
+              href={`/calculator/${salary}-after-tax`}
+              className='group flex flex-col items-center rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-md'
+            >
+              <Calculator className='mb-2 size-5 text-primary' />
+              <span className='font-semibold text-foreground group-hover:text-primary'>
+                {label} Salary
+              </span>
+              <span className='text-muted-foreground text-xs'>After Tax</span>
+            </Link>
+          ))}
+        </div>
+        <div className='mt-6 text-center'>
+          <p className='text-muted-foreground text-sm'>
+            View detailed breakdowns including income tax, National Insurance, and monthly take-home
+            pay
+          </p>
+        </div>
       </section>
 
       {/* Featured Tax Resources - Internal linking for SEO */}
@@ -105,6 +145,64 @@ const HomePageContent = memo(function HomePageContent() {
               Learn what your tax code means and how it affects your take-home pay. Decode 1257L,
               BR, and more.
             </p>
+          </Link>
+        </div>
+      </section>
+
+      {/* Browse Tax Topics - Internal linking to blog categories */}
+      <section className='container mx-auto max-w-7xl px-4 py-16'>
+        <h2 className='mb-2 text-center font-bold text-3xl'>Browse Tax Topics</h2>
+        <p className='mb-8 text-center text-muted-foreground'>
+          Explore our comprehensive guides organized by topic
+        </p>
+        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3'>
+          {[
+            {
+              slug: 'tax-basics',
+              name: 'Tax Basics',
+              description: 'Essential guides for understanding UK taxation',
+            },
+            {
+              slug: 'tax-tips',
+              name: 'Tax Tips',
+              description: 'Smart strategies to reduce your tax bill',
+            },
+            {
+              slug: 'tax-changes',
+              name: 'Tax Changes',
+              description: 'Latest updates and changes to UK tax laws',
+            },
+            {
+              slug: 'student-loans',
+              name: 'Student Loans',
+              description: 'Understanding loan repayments and thresholds',
+            },
+            {
+              slug: 'personal-finance',
+              name: 'Personal Finance',
+              description: 'Money management and financial planning',
+            },
+            {
+              slug: 'self-assessment',
+              name: 'Self Assessment',
+              description: 'Guides for filing your tax return',
+            },
+          ].map((category) => (
+            <Link
+              key={category.slug}
+              href={`/blog/category/${category.slug}`}
+              className='group block rounded-lg border bg-card p-5 transition-all hover:border-primary hover:shadow-md'
+            >
+              <h3 className='mb-2 font-semibold text-foreground text-lg group-hover:text-primary'>
+                {category.name}
+              </h3>
+              <p className='text-muted-foreground text-sm'>{category.description}</p>
+            </Link>
+          ))}
+        </div>
+        <div className='mt-6 text-center'>
+          <Link href='/blog' className='text-primary hover:underline'>
+            View all articles →
           </Link>
         </div>
       </section>

@@ -2,7 +2,7 @@
 // Check WCAG color contrast ratios
 
 // Convert OKLCH to RGB (simplified - approximate)
-function oklchToRgb(l, c, h) {
+function oklchToRgb(l, _c, _h) {
   // Simplified conversion for contrast checking
   // In production, use a proper color library
   const lightness = l * 255;
@@ -12,7 +12,7 @@ function oklchToRgb(l, c, h) {
 // Calculate relative luminance
 function getLuminance(r, g, b) {
   const [rs, gs, bs] = [r, g, b].map((val) => {
-    val = val / 255;
+    val /= 255;
     return val <= 0.03928 ? val / 12.92 : ((val + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
@@ -108,7 +108,7 @@ for (const [mode, colors] of Object.entries(colorTests)) {
   });
 }
 
-console.log('\n' + '='.repeat(60));
+console.log(`\n${'='.repeat(60)}`);
 console.log('RECOMMENDATIONS');
 console.log('='.repeat(60));
 console.log(`

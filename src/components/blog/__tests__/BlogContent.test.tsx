@@ -3,8 +3,7 @@
  */
 // src/components/blog/__tests__/BlogContent.test.tsx
 
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import BlogContent from '../BlogContent';
 
 // Mock next/image
@@ -17,13 +16,13 @@ jest.mock('next/image', () => ({
 }));
 
 // Store the components for test access
-let storedComponents: any = null;
+let _storedComponents: any = null;
 
 // Mock next-contentlayer2/hooks
 jest.mock('next-contentlayer2/hooks', () => ({
-  useMDXComponent: (code: string) => {
+  useMDXComponent: (_code: string) => {
     return ({ components }: any) => {
-      storedComponents = components;
+      _storedComponents = components;
       const H1 = components.h1;
       const H2 = components.h2;
       const P = components.p;

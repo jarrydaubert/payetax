@@ -1,5 +1,3 @@
-// src/components/molecules/HowToStepCard.tsx
-import * as React from 'react';
 import { Card } from '@/components/ui/card';
 
 export interface HowToStepCardProps {
