@@ -3,213 +3,92 @@
 // Helps ChatGPT, Claude, Perplexity, and other AI search tools understand your site
 
 export async function GET() {
-  const llmsTxt = `PayeTax - Free UK PAYE Tax Calculator
-======================================
+  const llmsTxt = `# PayeTax
 
-Official HMRC-compliant UK tax calculator. Calculate income tax, National Insurance,
-student loans, and take-home pay instantly. No registration, completely private, 100% free.
+> Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with all calculations running client-side.
 
+PayeTax is a comprehensive UK tax calculator providing accurate PAYE calculations using official HMRC rates. The calculator supports England, Wales, Northern Ireland, and Scottish tax systems, with features including student loan repayments (all plans), pension contributions, marriage allowance, and blind person's allowance.
 
-SITE INFORMATION
-----------------
-- Name: PayeTax
-- URL: https://payetax.co.uk
-- Purpose: Free UK PAYE tax calculator with official HMRC rates
-- Updated: 2025-01-15
-- Type: Web Application (Tax Calculator)
-- Privacy: All calculations run client-side (browser-only, zero data collection)
+All calculations are performed entirely in your browser with zero data collection or server-side storage. The tool is free, requires no registration, and is regularly updated within 24 hours of any HMRC rate changes.
 
+## Main Pages
 
-KEY FEATURES
-------------
-- UK Income Tax Calculator (2025-2026 tax year)
-- National Insurance Calculator (Class 1 contributions)
-- Student Loan Repayment Calculator (Plans 1, 2, 4, 5, Postgraduate)
-- Pension Contribution Calculator
-- Scottish Tax Rates Support
-- Tax Code Validator
-- Weekly/Monthly/Annual Breakdowns
+- [Calculator](https://payetax.co.uk): Main PAYE tax calculator with real-time calculations for income tax, NI, student loans, pensions, and take-home pay
+- [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides, HMRC updates, and financial advice covering tax basics, changes, student loans, and calculators
+- [About](https://payetax.co.uk/about): Mission, values, and technology behind PayeTax with focus on privacy-first, open-source philosophy
+- [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy explaining client-side calculations with zero server-side data storage
+- [Compliance](https://payetax.co.uk/compliance): HMRC compliance, tax rate verification, and data sources
 
+## Tax Rates (2025-2026)
 
-MAIN PAGES
-----------
+**Income Tax (England, Wales, Northern Ireland):**
+- Personal Allowance: £12,570 (0%)
+- Basic Rate: £12,571 - £50,270 (20%)
+- Higher Rate: £50,271 - £125,140 (40%)
+- Additional Rate: £125,141+ (45%)
 
-Calculator (/)
-  Main PAYE tax calculator with real-time calculations
-  Features: Income tax, NI, student loans, pensions, take-home pay
+**Scottish Income Tax:**
+- Personal Allowance: £12,570 (0%)
+- Starter Rate: £12,571 - £15,397 (19%)
+- Basic Rate: £15,398 - £27,491 (20%)
+- Intermediate Rate: £27,492 - £43,662 (21%)
+- Higher Rate: £43,663 - £75,000 (42%)
+- Advanced Rate: £75,001 - £125,140 (45%)
+- Top Rate: £125,141+ (48%)
 
-Blog - TaxInsights (/blog)
-  UK tax guides, HMRC updates, and financial advice
-  Topics: Tax basics, tax changes, student loans, calculators, Scottish tax
+**National Insurance (Class 1):**
+- Primary Threshold: £12,570
+- Rate £12,570 - £50,270: 12%
+- Rate £50,270+: 2%
 
-About (/about)
-  Mission, values, and technology behind PayeTax
-  Focus: Privacy-first, open-source philosophy, HMRC compliance
+**Student Loan Repayment Thresholds:**
+- Plan 1: £24,990 (9%)
+- Plan 2: £27,295 (9%)
+- Plan 4: £31,395 (9%)
+- Plan 5: £25,000 (9%)
+- Postgraduate: £21,000 (6%)
 
-Privacy Policy (/privacy)
-  Privacy policy explaining client-side calculations
-  Key Point: Zero server-side data storage, optional anonymous analytics
+## Blog Posts - Tax Basics
 
-Compliance (/compliance)
-  HMRC compliance, tax rate verification, and data sources
-  Key Point: Official rates updated within 24 hours of changes
+- [Understanding UK Tax Codes 2025](https://payetax.co.uk/blog/understanding-uk-tax-codes): Comprehensive guide to UK tax codes including 1257L, K codes, emergency codes, BR, D0, D1, 0T, NT, and Scottish codes
+- [Complete Beginner's Guide to UK Taxation 2025](https://payetax.co.uk/blog/beginners-guide-to-uk-taxation): Everything newcomers need to know about UK Income Tax, National Insurance, PAYE, and allowances
 
+## Blog Posts - Tax Changes
 
-TAX RATES (2025-2026)
----------------------
+- [UK Tax Changes 2025-2026: Complete Guide](https://payetax.co.uk/blog/uk-tax-changes-2025-complete-guide): All HMRC tax rate changes for 2025-2026 including thresholds, allowances, and new rules
+- [Student Loan Repayment Changes 2025-26](https://payetax.co.uk/blog/student-loan-repayment-changes-2025-26): Updated student loan thresholds, interest rates, and Plan 5 forgiveness period reduction
 
-Income Tax (England, Wales, Northern Ireland)
-  Personal Allowance: £12,570 (0%)
-  Basic Rate: £12,571 - £50,270 (20%)
-  Higher Rate: £50,271 - £125,140 (40%)
-  Additional Rate: £125,141+ (45%)
+## Blog Posts - Regional Differences
 
-Scottish Income Tax (2025-2026)
-  Personal Allowance: £12,570 (0%)
-  Starter Rate: £12,571 - £15,397 (19%)
-  Basic Rate: £15,398 - £27,491 (20%)
-  Intermediate Rate: £27,492 - £43,662 (21%)
-  Higher Rate: £43,663 - £75,000 (42%)
-  Advanced Rate: £75,001 - £125,140 (45%)
-  Top Rate: £125,141+ (48%)
+- [Scottish vs English Tax Rates 2025: Complete Comparison](https://payetax.co.uk/blog/scottish-vs-english-tax-rates-2025-comparison): Side-by-side comparison of Scottish and rest-of-UK tax systems with salary examples
 
-National Insurance (Class 1)
-  Primary Threshold: £12,570
-  Upper Earnings Limit: £50,270
-  Rate (£12,570 - £50,270): 12%
-  Rate (£50,270+): 2%
+## Blog Posts - Calculators & Tools
 
-Student Loan Repayment Thresholds
-  Plan 1: £24,990 (9%)
-  Plan 2: £27,295 (9%)
-  Plan 4: £31,395 (9%)
-  Plan 5: £25,000 (9%)
-  Postgraduate: £21,000 (6%)
+- [UK Tax Calculator 2025: Complete Guide](https://payetax.co.uk/blog/uk-tax-calculator-2025-complete-guide): How to use PayeTax calculator for accurate PAYE, NI, and student loan calculations
+- [How Much Tax Will I Pay in UK 2025?](https://payetax.co.uk/blog/how-much-tax-will-i-pay-uk-2025): Real salary examples showing exact tax calculations for £20k, £30k, £50k, £100k+ earners
 
+## Technical Details
 
-CONTENT TOPICS
---------------
-The site covers:
-- UK tax calculator tutorials
-- HMRC rate changes and updates
-- Income tax and National Insurance guides
-- Student loan repayment strategies
-- Scottish vs English tax comparisons
-- Tax code explanations
-- Pension contribution optimization
-- Take-home pay calculations
-- PAYE vs Self-Assessment
-
-
-TECHNICAL DETAILS
------------------
 - Framework: Next.js 15, React 19, TypeScript
-- Hosting: Vercel
+- Hosting: Vercel Edge Network
 - Performance: Lighthouse 95+ (mobile), 100 (desktop)
-- Privacy: Client-side calculations only
+- Privacy: Client-side calculations only, zero data collection
 - Accessibility: WCAG 2.1 AA compliant
 - PWA: Installable progressive web app
 - Open Source: Transparent calculation formulas
 
+## Data Sources
 
-DATA SOURCES
-------------
-1. HM Revenue & Customs (HMRC) - Official UK tax authority
-2. Revenue Scotland - Scottish tax rates
-3. Student Loans Company (SLC) - Loan repayment thresholds
-4. Gov.UK - Official government guidance
+- [HM Revenue & Customs](https://www.gov.uk/government/organisations/hm-revenue-customs): Official UK tax authority
+- [Revenue Scotland](https://www.revenue.scot): Scottish tax rates
+- [Student Loans Company](https://www.gov.uk/government/organisations/student-loans-company): Loan repayment thresholds
+- [Gov.UK](https://www.gov.uk): Official government guidance
 
+## Optional
 
-IMPORTANT NOTES
----------------
-- This calculator is for informational purposes only
-- Calculations based on official HMRC rates (2025-2026 tax year)
-- For complex scenarios or official advice, consult a qualified accountant
-- Suitable for: Standard PAYE, salary planning, general estimates
-- Professional advice recommended for: Self-employment, multiple incomes, complex situations
-
-
-CONTACT
--------
-- Email: support@payetax.co.uk
-- Website: https://payetax.co.uk
-- Sitemap: https://payetax.co.uk/sitemap.xml
-- Blog RSS: https://payetax.co.uk/blog
-
-
-LICENSE & COPYRIGHT
--------------------
-© 2025 PayeTax. Free to use for personal tax calculations.
-
-
-================================================================================
-DETAILED BLOG POSTS
-================================================================================
-
-TAX BASICS
-----------
-
-Understanding UK Tax Codes 2025
-  URL: https://payetax.co.uk/blog/understanding-uk-tax-codes
-  Summary: Comprehensive guide to UK tax codes (1257L, K codes, emergency codes,
-           BR, D0, D1, 0T, NT, and Scottish codes)
-  Topics: Tax code meanings, PAYE codes, how to check your code, what to do if wrong
-
-Complete Beginner's Guide to UK Taxation 2025
-  URL: https://payetax.co.uk/blog/beginners-guide-to-uk-taxation
-  Summary: Everything newcomers need to know about UK Income Tax, National Insurance,
-           PAYE, and allowances
-  Topics: Tax basics, personal allowance, tax bands, NI contributions, PAYE vs Self Assessment
-
-
-TAX CHANGES
------------
-
-UK Tax Changes 2025-2026: Complete Guide
-  URL: https://payetax.co.uk/blog/uk-tax-changes-2025-complete-guide
-  Summary: All HMRC tax rate changes for 2025-2026 including thresholds, allowances, and new rules
-  Topics: Tax freeze extensions, NI changes, student loan updates, Scottish rates
-
-Student Loan Repayment Changes 2025-26
-  URL: https://payetax.co.uk/blog/student-loan-repayment-changes-2025-26
-  Summary: Updated student loan thresholds, interest rates, and Plan 5 forgiveness
-           period reduction (30 years)
-  Topics: Plan 1/2/4/5 loans, repayment calculations, loan forgiveness, salary impact
-
-
-REGIONAL DIFFERENCES
---------------------
-
-Scottish vs English Tax Rates 2025: Complete Comparison
-  URL: https://payetax.co.uk/blog/scottish-vs-english-tax-rates-2025-comparison
-  Summary: Side-by-side comparison of Scottish and rest-of-UK tax systems with salary examples
-  Topics: 6-band Scottish system, when Scottish tax costs more/less, cross-border workers
-
-
-CALCULATORS & TOOLS
--------------------
-
-UK Tax Calculator 2025: Complete Guide
-  URL: https://payetax.co.uk/blog/uk-tax-calculator-2025-complete-guide
-  Summary: How to use PayeTax calculator for accurate PAYE, NI, and student loan calculations
-  Topics: Calculator features, tax code entry, pension contributions, multiple jobs
-
-How Much Tax Will I Pay in UK 2025?
-  URL: https://payetax.co.uk/blog/how-much-tax-will-i-pay-uk-2025
-  Summary: Real salary examples showing exact tax calculations for £20k, £30k, £50k, £100k+ earners
-  Topics: Tax on common salaries, effective tax rates, take-home pay breakdowns
-
-
-================================================================================
-ADDITIONAL RESOURCES
-================================================================================
-
-For complete blog content and detailed calculations, see:
-https://payetax.co.uk/llms-full.txt
-
-
-Last updated: 2025-01-15
-Maintained by: PayeTax Team
+- [Sitemap](https://payetax.co.uk/sitemap.xml): Complete site structure
+- [Compliance Page](https://payetax.co.uk/compliance): HMRC compliance and tax rate verification details
+- [Privacy Policy](https://payetax.co.uk/privacy): Detailed privacy and data handling policy
 `;
 
   return new Response(llmsTxt, {
