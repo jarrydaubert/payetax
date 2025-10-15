@@ -13,7 +13,7 @@ function oklchToRgb(l, c, h) {
 function getLuminance(r, g, b) {
   const [rs, gs, bs] = [r, g, b].map((val) => {
     val = val / 255;
-    return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+    return val <= 0.03928 ? val / 12.92 : ((val + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
@@ -30,14 +30,14 @@ const colorTests = {
   lightMode: {
     background: { l: 0.98, c: 0, h: 0 },
     foreground: { l: 0.145, c: 0, h: 0 },
-    mutedForeground: { l: 0.45, c: 0, h: 0 },  // FIXED: darkened to 0.45
+    mutedForeground: { l: 0.45, c: 0, h: 0 }, // FIXED: darkened to 0.45
     primary: { l: 0.205, c: 0, h: 0 },
   },
   darkMode: {
     background: { l: 0.18, c: 0.02, h: 260 },
     foreground: { l: 0.985, c: 0, h: 0 },
     mutedForeground: { l: 0.65, c: 0, h: 0 },
-    primary: { l: 0.90, c: 0, h: 0 },
+    primary: { l: 0.9, c: 0, h: 0 },
   },
 };
 
@@ -54,7 +54,11 @@ for (const [mode, colors] of Object.entries(colorTests)) {
 
   const bgRgb = oklchToRgb(colors.background.l, colors.background.c, colors.background.h);
   const fgRgb = oklchToRgb(colors.foreground.l, colors.foreground.c, colors.foreground.h);
-  const mutedRgb = oklchToRgb(colors.mutedForeground.l, colors.mutedForeground.c, colors.mutedForeground.h);
+  const mutedRgb = oklchToRgb(
+    colors.mutedForeground.l,
+    colors.mutedForeground.c,
+    colors.mutedForeground.h
+  );
   const primaryRgb = oklchToRgb(colors.primary.l, colors.primary.c, colors.primary.h);
 
   const bgLum = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);

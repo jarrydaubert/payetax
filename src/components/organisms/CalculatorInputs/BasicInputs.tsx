@@ -30,6 +30,7 @@ export function BasicInputs() {
     setIsMarried,
     setPartnerGrossWage,
     setIsBlind,
+    setAge,
     setPayNoNI,
     setStudentLoanPlan,
     setPensionContribution,
@@ -45,6 +46,7 @@ export function BasicInputs() {
   const marriedId = useId();
   const partnerWageId = useId();
   const blindId = useId();
+  const ageId = useId();
   const payNoNIId = useId();
   const studentLoanId = useId();
   const allowancesId = useId();
@@ -192,6 +194,23 @@ export function BasicInputs() {
           Blind Allowance
         </Label>
         <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
+      </div>
+
+      <div className='flex items-center gap-3'>
+        <Label htmlFor={ageId} className='min-w-[140px] text-sm'>
+          Age
+        </Label>
+        <NumberInput
+          id={ageId}
+          value={input.age || 0}
+          onChange={(value) => setAge(value > 0 ? value : undefined)}
+          decimals={0}
+          placeholder='Enter age'
+          min={0}
+          max={120}
+          className='flex-1'
+          data-testid='age-input'
+        />
       </div>
 
       <div className='flex items-center gap-3'>

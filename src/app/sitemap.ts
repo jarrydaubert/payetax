@@ -78,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: currentDate,
     changeFrequency: 'monthly' as SitemapFrequency,
     // Priority based on search volume (0.7-0.9 range)
-    priority: Math.min(0.9, 0.7 + (volume / 3000)),
+    priority: Math.min(0.9, 0.7 + volume / 3000),
   }));
 
   let blogPosts: SitemapEntry[] = [];

@@ -89,6 +89,8 @@ export interface TaxCalculationInput {
   partnerGrossWage: number;
   /** Whether blind person's allowance applies */
   isBlind: boolean;
+  /** Age of the taxpayer (for age-related allowances) */
+  age?: number;
   /** Whether paying no National Insurance */
   payNoNI: boolean;
   /** Pension contribution amount or percentage */
@@ -327,20 +329,40 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     annualTaxFreeAmount += taxRates.blindPersonsAllowance;
   }
 
-  // Marriage Allowance (transferable allowance for married couples/civil partners)
-  // One partner can transfer 10% of their Personal Allowance to the other if:
-  // - The transferring partner earns less than the Personal Allowance
-  // - The receiving partner is a basic rate taxpayer (under £50,270 in England/Wales/NI, £43,662 in Scotland)
-  // This saves up to £252/year (10% of £12,570 at 20% basic rate)
-  // For 2024-25 onwards: £1,260 transferable allowance
-  if (input.isMarried && input.partnerGrossWage > 0) {
-    // Check if partner qualifies to receive the allowance:
-    // - Partner must earn above the Personal Allowance (otherwise they don't benefit)
-    // - Partner must be a basic rate taxpayer (below higher rate threshold)
+  // Age-Related Personal Allowances (for people aged 65+)
+  // Additional allowances for older taxpayers, but with income tapering
+  // For 2024-25: Age 65-74: +£3,660, Age 75+: +£3,960
+  // Tapers down by £1 for every £2 of income over £34,600
+  if (input.age && input.age >= 65) {
+    let ageAllowance = 0;
 
+    // Determine base age allowance
+    if (input.age >= 75) {
+      ageAllowance = 3960; // Higher allowance for 75+
+    } else if (input.age >= 65) {
+      ageAllowance = 3660; // Standard age allowance for 65-74
+    }
+
+    // Apply income taper for high earners (over £34,600)
+    const ageTaperThreshold = 34600;
+    if (annualGrossSalary > ageTaperThreshold && ageAllowance > 0) {
+      const excessIncome = annualGrossSalary - ageTaperThreshold;
+      const taperReduction = Math.floor(excessIncome / 2);
+      ageAllowance = Math.max(0, ageAllowance - taperReduction);
+    }
+
+    // Add the age allowance to the tax-free amount
+    annualTaxFreeAmount += ageAllowance;
+  }
+
+  // Marriage Allowance (transferable allowance for married couples/civil partners)
+  // CRITICAL FIX: Logic was backwards!
+  // CORRECT RULES: The LOWER earner (earning < PA) transfers £1,260 to their partner
+  // - The transferring partner must earn LESS than the Personal Allowance
+  // - The receiving partner (user) must be a basic rate taxpayer
+  // This saves up to £252/year (£1,260 at 20% basic rate)
+  if (input.isMarried && input.partnerGrossWage >= 0) {
     // Find the threshold where "Higher rate" (40% or 42%) starts
-    // For English rates: Basic rate (20%) ends at £37,700, Higher rate (40%) starts after
-    // For Scottish rates: Intermediate rate (21%) ends at £31,092, Higher rate (42%) starts after
     const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
     const basicRateThreshold =
       higherRateBandIndex > 0
@@ -348,13 +370,16 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         : taxRates.bands[0]?.threshold || 37700;
     const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
 
+    // Check if USER can RECEIVE marriage allowance from their partner:
+    // 1. Partner must earn LESS than personal allowance (they transfer it)
+    // 2. User must earn MORE than personal allowance (they pay tax)
+    // 3. User must be a basic rate taxpayer (not higher rate)
     if (
-      input.partnerGrossWage > taxRates.personalAllowance &&
-      input.partnerGrossWage <= higherRateThreshold
+      input.partnerGrossWage < taxRates.personalAllowance && // Partner earns LESS than PA
+      annualGrossSalary > taxRates.personalAllowance && // User pays tax
+      annualGrossSalary <= higherRateThreshold // User is basic rate taxpayer
     ) {
-      // The RECEIVING partner gets the marriage allowance added to their personal allowance
-      // This calculation assumes the USER is the receiving partner
-      // In reality, users would specify who transfers to whom, but we make a simplifying assumption
+      // User RECEIVES the marriage allowance from their lower-earning partner
       annualTaxFreeAmount += taxRates.marriageAllowance;
     }
   }

@@ -62,6 +62,8 @@ interface CalculatorInput {
   partnerGrossWage: number;
   /** Whether blind person's allowance applies */
   isBlind: boolean;
+  /** Age of the taxpayer (for age-related allowances and NI exemptions) */
+  age?: number;
   /** Whether paying no National Insurance (e.g., over state pension age) */
   payNoNI: boolean;
   /** Student loan plan (single selection or none) */
@@ -120,6 +122,7 @@ interface CalculatorState {
   setIsMarried: (isMarried: boolean) => void;
   setPartnerGrossWage: (wage: number) => void;
   setIsBlind: (isBlind: boolean) => void;
+  setAge: (age: number | undefined) => void;
   setPayNoNI: (payNoNI: boolean) => void;
   setStudentLoanPlan: (plan: StudentLoanPlan | 'none') => void;
   setPensionContribution: (amount: number) => void;
@@ -173,6 +176,7 @@ const defaultInput: CalculatorInput = {
   isMarried: false,
   partnerGrossWage: 0,
   isBlind: false,
+  age: undefined,
   payNoNI: false,
   studentLoanPlan: 'none',
   pensionContribution: 0,
@@ -227,6 +231,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         setPartnerGrossWage: (partnerGrossWage) =>
           set((state) => ({ input: { ...state.input, partnerGrossWage } })),
         setIsBlind: (isBlind) => set((state) => ({ input: { ...state.input, isBlind } })),
+        setAge: (age) => set((state) => ({ input: { ...state.input, age } })),
         setPayNoNI: (payNoNI) => set((state) => ({ input: { ...state.input, payNoNI } })),
         setPensionContribution: (pensionContribution) =>
           set((state) => ({ input: { ...state.input, pensionContribution } })),
@@ -333,6 +338,7 @@ export const useCalculatorActions = () =>
       setIsMarried: state.setIsMarried,
       setPartnerGrossWage: state.setPartnerGrossWage,
       setIsBlind: state.setIsBlind,
+      setAge: state.setAge,
       setPayNoNI: state.setPayNoNI,
       setStudentLoanPlan: state.setStudentLoanPlan,
       setPensionContribution: state.setPensionContribution,

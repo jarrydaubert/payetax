@@ -570,11 +570,12 @@ describe('Tax Calculator', () => {
   });
 
   describe('Marriage Allowance', () => {
-    it('applies marriage allowance when user is married and partner qualifies', () => {
-      // User earns £30k, partner earns £40k (qualifies: above PA, below higher rate)
+    it('applies marriage allowance when partner earns LESS than personal allowance', () => {
+      // FIXED: Partner earning LESS than PA transfers allowance to user
+      // User earns £30k, partner earns £10k (partner < PA, can transfer)
       const inputWithMarriage = createBasicInput(30000, {
         isMarried: true,
-        partnerGrossWage: 40000,
+        partnerGrossWage: 10000, // Partner earns LESS than £12,570
       });
 
       const inputWithoutMarriage = createBasicInput(30000);
@@ -589,11 +590,12 @@ describe('Tax Calculator', () => {
       expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(252, 0);
     });
 
-    it('does not apply marriage allowance if partner earns below personal allowance', () => {
-      // Partner earns £10k (below PA - they don't benefit from receiving allowance)
+    it('does NOT apply marriage allowance if partner earns MORE than personal allowance', () => {
+      // FIXED: Partner earning MORE than PA cannot transfer
+      // Partner earns £40k (above PA - cannot transfer allowance)
       const input = createBasicInput(30000, {
         isMarried: true,
-        partnerGrossWage: 10000,
+        partnerGrossWage: 40000, // Partner earns MORE than £12,570
       });
 
       const baseInput = createBasicInput(30000);
@@ -606,27 +608,29 @@ describe('Tax Calculator', () => {
       expect(result.incomeTax.annually).toBe(baseResult.incomeTax.annually);
     });
 
-    it('does not apply marriage allowance if partner is higher rate taxpayer', () => {
-      // Partner earns £60k (above higher rate threshold - not eligible)
-      const input = createBasicInput(30000, {
+    it('does not apply marriage allowance if USER is higher rate taxpayer', () => {
+      // FIXED: It's the USER who must be basic rate, not the partner
+      // User earns £60k (above higher rate threshold - cannot receive)
+      const input = createBasicInput(60000, {
         isMarried: true,
-        partnerGrossWage: 60000,
+        partnerGrossWage: 10000, // Partner earns less than PA
       });
 
-      const baseInput = createBasicInput(30000);
+      const baseInput = createBasicInput(60000);
 
       const result = calculateTax(input);
       const baseResult = calculateTax(baseInput);
 
-      // No marriage allowance should be applied
+      // No marriage allowance should be applied (user is higher rate)
       expect(result.taxFreeAmount).toBe(baseResult.taxFreeAmount);
       expect(result.incomeTax.annually).toBe(baseResult.incomeTax.annually);
     });
 
-    it('does not apply marriage allowance if partner wage is 0', () => {
+    it('DOES apply marriage allowance if partner wage is 0', () => {
+      // FIXED: Partner with £0 income is still below PA and can transfer
       const input = createBasicInput(30000, {
         isMarried: true,
-        partnerGrossWage: 0,
+        partnerGrossWage: 0, // Still less than PA
       });
 
       const baseInput = createBasicInput(30000);
@@ -634,7 +638,8 @@ describe('Tax Calculator', () => {
       const result = calculateTax(input);
       const baseResult = calculateTax(baseInput);
 
-      expect(result.taxFreeAmount).toBe(baseResult.taxFreeAmount);
+      // Should apply allowance since partner earns less than PA
+      expect(result.taxFreeAmount).toBe(baseResult.taxFreeAmount + 1260);
     });
   });
 
@@ -668,7 +673,7 @@ describe('Tax Calculator', () => {
     it('combines with marriage allowance correctly', () => {
       const input = createBasicInput(30000, {
         isMarried: true,
-        partnerGrossWage: 40000,
+        partnerGrossWage: 10000, // Partner must earn LESS than PA to transfer
         isBlind: true,
       });
 
@@ -741,7 +746,7 @@ describe('Tax Calculator', () => {
       const inputWithMarriage = createBasicInput(30000, {
         isScottish: true,
         isMarried: true,
-        partnerGrossWage: 40000,
+        partnerGrossWage: 10000, // Partner must earn LESS than PA
       });
 
       const inputWithoutMarriage = createBasicInput(30000, {
