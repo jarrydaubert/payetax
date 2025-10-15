@@ -128,10 +128,10 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       </h6>
     ),
 
-    // Enhanced paragraphs
+    // Enhanced paragraphs (WCAG AA compliant: 90% opacity ensures 4.5:1+ contrast)
     p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
       <p
-        className='mb-6 text-foreground/80 leading-relaxed'
+        className='mb-6 text-foreground/90 leading-relaxed'
         style={{ fontSize: 'var(--font-size-base)' }}
         {...props}
       >
@@ -139,14 +139,14 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       </p>
     ),
 
-    // Enhanced lists
+    // Enhanced lists (WCAG AA compliant: 90% opacity)
     ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => (
-      <ul className='mb-6 list-disc space-y-2 pl-6 text-foreground/80' {...props}>
+      <ul className='mb-6 list-disc space-y-2 pl-6 text-foreground/90' {...props}>
         {children}
       </ul>
     ),
     ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => (
-      <ol className='mb-6 list-decimal space-y-2 pl-6 text-foreground/80' {...props}>
+      <ol className='mb-6 list-decimal space-y-2 pl-6 text-foreground/90' {...props}>
         {children}
       </ol>
     ),
@@ -197,13 +197,13 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
         return (
           <div className='group relative my-6'>
             <div className='glass-card-inner flex items-center justify-between rounded-t-lg border-foreground/10 border-b px-4 py-2'>
-              <span className='font-medium text-foreground/60 text-xs uppercase tracking-wide'>
+              <span className='font-medium text-muted-foreground text-xs uppercase tracking-wide'>
                 {language}
               </span>
               <button
                 type='button'
                 onClick={() => copyToClipboard(codeText, codeId)}
-                className='flex items-center gap-1 text-foreground/60 text-xs transition-colors hover:text-foreground'
+                className='flex items-center gap-1 text-muted-foreground text-xs transition-colors hover:text-foreground'
                 aria-label='Copy code'
               >
                 <Copy className='size-3' />
@@ -235,13 +235,13 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       );
     },
 
-    // Enhanced blockquotes
+    // Enhanced blockquotes (WCAG AA compliant: 90% opacity)
     blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
       <blockquote
         className='glass-card-inner my-8 rounded-r-lg border-primary/50 border-l-4 py-4 pl-6'
         {...props}
       >
-        <div className='text-foreground/80 text-lg italic'>{children}</div>
+        <div className='text-foreground/90 text-lg italic'>{children}</div>
       </blockquote>
     ),
 
@@ -279,7 +279,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     ),
     td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
       <td
-        className='px-6 py-4 text-foreground/80'
+        className='px-6 py-4 text-foreground/90'
         style={{ fontSize: 'var(--font-size-sm)' }}
         {...props}
       >
@@ -305,7 +305,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
           height={400}
           className='w-full rounded-lg border border-foreground/20 shadow-lg'
         />
-        {alt && <p className='mt-2 text-center text-foreground/60 text-sm italic'>{alt}</p>}
+        {alt && <p className='mt-2 text-center text-muted-foreground text-sm italic'>{alt}</p>}
       </div>
     ),
   };

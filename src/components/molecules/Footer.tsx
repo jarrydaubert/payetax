@@ -26,13 +26,49 @@ export function Footer({ className }: FooterProps) {
       {/* Main footer content */}
       <div className='glass py-8'>
         <div className='container mx-auto max-w-7xl px-2 sm:px-4'>
-          <div className='flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left'>
-            {/* Brand and copyright */}
-            <div className='space-y-2'>
-              <span className='font-bold text-base text-foreground'>PayeTax</span>
-              <p className='text-muted-foreground text-sm'>
-                © {currentYear} PayeTax. All rights reserved.
-              </p>
+          <div className='flex flex-col items-center gap-6 text-center md:text-left'>
+            {/* Top row: Brand and resources */}
+            <div className='flex w-full flex-col items-center justify-between gap-4 md:flex-row'>
+              {/* Brand and copyright */}
+              <div className='space-y-2'>
+                <span className='font-bold text-base text-foreground'>PayeTax</span>
+                <p className='text-muted-foreground text-sm'>
+                  © {currentYear} PayeTax. All rights reserved.
+                </p>
+              </div>
+
+              {/* Helpful Resources */}
+              <div className='space-y-2'>
+                <p className='font-medium text-muted-foreground text-xs uppercase tracking-wide'>
+                  Helpful Resources
+                </p>
+                <div className='flex flex-wrap items-center justify-center gap-4 md:justify-end'>
+                  <a
+                    href='https://www.gov.uk/topic/personal-tax/income-tax'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                  >
+                    HMRC / Gov.UK
+                  </a>
+                  <a
+                    href='https://businessdebtline.org/'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                  >
+                    Business Debtline
+                  </a>
+                  <a
+                    href='https://www.moneyhelper.org.uk'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                  >
+                    Money Helper
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* Quick links and theme toggle */}
