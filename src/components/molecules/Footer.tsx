@@ -51,6 +51,18 @@ export function Footer({ className }: FooterProps) {
                   >
                     HMRC / Gov.UK
                   </a>
+                  <Link
+                    href='/blog/uk-tax-calculator-2025-complete-guide'
+                    className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                  >
+                    Calculator Guide
+                  </Link>
+                  <Link
+                    href='/blog/how-much-tax-will-i-pay-uk-2025'
+                    className='text-muted-foreground text-sm transition-colors hover:text-primary'
+                  >
+                    Tax Examples
+                  </Link>
                   <a
                     href='https://businessdebtline.org/'
                     target='_blank'
