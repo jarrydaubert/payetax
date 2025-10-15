@@ -14,7 +14,6 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
   const mainContentId = useId();
-  const mainLabelId = useId();
 
   return (
     <div className='flex min-h-screen flex-col'>
@@ -29,10 +28,7 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       </header>
 
       {/* Main content with proper spacing for fixed navbar */}
-      <main id={mainContentId} className='relative flex-1' aria-labelledby={mainLabelId}>
-        <h1 id={mainLabelId} className='sr-only'>
-          Main Content
-        </h1>
+      <main id={mainContentId} className='relative flex-1' aria-label='Main Content'>
         {children}
       </main>
 

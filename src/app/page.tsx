@@ -18,7 +18,7 @@ const HomePageClientWrapper = () => {
  * Enhanced metadata for the homepage with tax calculator
  */
 export const metadata: Metadata = generateMetadata({
-  title: 'UK PAYE Tax Calculator 2025 | Free Take-Home Pay Calculator with HMRC Rates',
+  title: 'UK PAYE Tax Calculator 2025 | HMRC Rates',
   description:
     'Calculate your exact UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-2026. Includes Scottish tax rates, student loans, pension contributions and marriage allowance.',
   keywords:
