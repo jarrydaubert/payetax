@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const formattedMonthly = monthlyTakeHome.toLocaleString('en-GB');
 
   return generateMetadataHelper({
-    title: `£${formattedSalary} Salary After Tax UK 2025-26 | Take-Home Pay Calculator`,
+    title: `£${formattedSalary} After Tax UK 2025-26 | PayeTax`,
     description: `Calculate exact take-home pay from a £${formattedSalary} salary in the UK. After tax and NI, you'll take home approximately £${formattedMonthly} per month. Free HMRC-compliant calculator with student loans and pension options.`,
     keywords: `${salary} after tax, ${salary} take home pay, ${salary} salary UK, ${salary} net pay, ${salary} salary calculator, £${formattedSalary} after tax UK`,
     pathname: `/calculator/${salaryParam}`,

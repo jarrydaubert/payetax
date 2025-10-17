@@ -8,7 +8,7 @@ import { BlogPageClient } from './BlogPageClient';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'TaxInsights by PayeTax | UK Tax Guidance & Financial Insights',
+  title: 'TaxInsights by PayeTax | UK Tax Guidance',
   description:
     'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights. No jargon, just insights.',
   keywords:
