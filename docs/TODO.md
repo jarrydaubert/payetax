@@ -117,7 +117,75 @@ export function checkRateLimit(ip: string): boolean {
 
 ## 🟠 HIGH PRIORITY
 
-### 4. Set Secret Detection to Blocking
+### 4. £100k Tax Trap Warning (NEW - Demo Feedback)
+**Source**: Morning Demo January 17, 2026  
+**Priority**: 🟠 HIGH  
+**Time**: 2 hours  
+**Status**: ❌ Not Started
+
+**Issue**: Users earning £100k-£125k aren't warned about 60% effective tax rate
+
+**What to Build**:
+Alert box in results when salary in trap zone:
+- "⚠️ You're in the 60% Tax Trap Zone"
+- Explain personal allowance taper
+- Suggest pension contributions to avoid
+- Link to blog post (higher-rate-taxpayer-guide)
+
+**Files to Update**:
+- `src/components/organisms/CalculatorResults/ResultsSummaryCards.tsx`
+- Or create new `src/components/organisms/InsightsPanel.tsx`
+
+**Reference**: See `docs/planning/DEMO_FEEDBACK_JAN_17_2026.md`
+
+---
+
+### 5. Display Marginal Tax Rate (NEW - Demo Feedback)
+**Source**: Morning Demo January 17, 2026  
+**Priority**: 🟠 HIGH  
+**Time**: 1-2 hours  
+**Status**: ❌ Not Started
+
+**Issue**: We calculate marginalTaxRate but don't show it to users
+
+**What to Build**:
+New card showing:
+- "Your Marginal Rate: X%"
+- "Your next £1,000 raise will cost you £X in tax"
+- Highlight if >= 60% (trap zone)
+
+**Already Calculated**: `results.marginalTaxRate` exists in calculations
+
+**Files to Update**:
+- `src/components/organisms/CalculatorResults/ResultsSummaryCards.tsx`
+
+---
+
+### 6. "What If?" Quick Scenario Toggles (NEW - Demo Feedback)
+**Source**: Morning Demo January 17, 2026  
+**Priority**: 🟠 HIGH  
+**Time**: 3-4 hours  
+**Status**: ❌ Not Started
+
+**Issue**: Users can't easily compare salary scenarios (e.g., "what if I get a raise?")
+
+**What to Build**:
+Quick toggle buttons above results:
+- "+ £5k raise"
+- "+ £10k raise"
+- "- £5k (part-time)"
+
+Shows comparison table with differences highlighted
+
+**Files to Update**:
+- `src/components/organisms/CalculatorContainer.tsx` (add comparison state)
+- Create `src/components/organisms/ComparisonResults.tsx` (new component)
+
+**Reference**: See `docs/planning/DEMO_FEEDBACK_JAN_17_2026.md` for full spec
+
+---
+
+### 7. Set Secret Detection to Blocking
 **Source**: CI/CD Pipeline Audit  
 **Priority**: 🟠 HIGH  
 **Time**: 5 minutes  

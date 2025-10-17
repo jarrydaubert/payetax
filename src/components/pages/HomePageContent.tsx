@@ -44,7 +44,8 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
-      <section className='container mx-auto max-w-4xl px-4 py-12'>
+      <section className='bg-muted/30 py-12'>
+        <div className='container mx-auto max-w-4xl px-4'>
         <h2 className='mb-6 text-center font-bold text-3xl'>Understanding the UK Tax System</h2>
         <div className='prose prose-lg mx-auto dark:prose-invert'>
           <p className='text-center text-foreground/90 text-lg leading-relaxed'>
@@ -77,6 +78,7 @@ const HomePageContent = memo(function HomePageContent() {
             <p className='font-bold text-3xl text-primary'>40%</p>
             <p className='mt-2 text-muted-foreground text-sm'>On income £50,271 - £125,140</p>
           </div>
+        </div>
         </div>
       </section>
 
@@ -121,7 +123,8 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Featured Tax Resources - Internal linking for SEO */}
-      <section className='container mx-auto max-w-7xl px-4 py-16'>
+      <section className='bg-muted/30 py-16'>
+        <div className='container mx-auto max-w-7xl px-4'>
         <h2 className='mb-2 text-center font-bold text-3xl'>Popular Tax Guides</h2>
         <p className='mb-8 text-center text-muted-foreground'>
           Expert guides to help you understand UK tax calculations
@@ -183,6 +186,7 @@ const HomePageContent = memo(function HomePageContent() {
               BR, and more.
             </p>
           </Link>
+        </div>
         </div>
       </section>
 
