@@ -9,7 +9,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
+import { categoryContent } from '@/lib/categoryContent';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
 // Enable ISR - revalidate every hour for category pages
@@ -139,13 +141,30 @@ export default async function CategoryPage({
         </ol>
       </nav>
 
-      {/* Header */}
-      <div className='mb-12 text-center'>
-        <h1 className='mb-4 font-bold text-title md:text-display'>{category.name} Insights</h1>
-        <p className='mx-auto max-w-3xl text-large text-muted-foreground'>
-          Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
-          guidance, and practical advice.
-        </p>
+      {/* Header with Category Description */}
+      <div className='mb-12'>
+        <h1 className='mb-4 text-center font-bold text-title md:text-display'>
+          {categoryContent[slug]?.title || `${category.name} Insights`}
+        </h1>
+        {categoryContent[slug] ? (
+          <div className='mx-auto max-w-3xl'>
+            <p className='mb-6 text-center text-foreground/90 text-lg leading-relaxed'>
+              {categoryContent[slug].description}
+            </p>
+            <div className='flex flex-wrap justify-center gap-2'>
+              {categoryContent[slug].keywords.map((keyword) => (
+                <Badge key={keyword} variant='outline' className='text-sm'>
+                  {keyword}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className='mx-auto max-w-3xl text-center text-large text-muted-foreground'>
+            Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
+            guidance, and practical advice.
+          </p>
+        )}
       </div>
 
       {/* Categories */}

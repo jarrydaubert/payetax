@@ -43,6 +43,45 @@ const HomePageContent = memo(function HomePageContent() {
         <CalculatorContent />
       </section>
 
+      {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
+      <section className='container mx-auto max-w-4xl px-4 py-12'>
+        <h2 className='mb-6 text-center font-bold text-3xl'>
+          Understanding the UK Tax System
+        </h2>
+        <div className='prose prose-lg mx-auto dark:prose-invert'>
+          <p className='text-center text-foreground/90 text-lg leading-relaxed'>
+            Her Majesty's Revenue and Customs (HMRC) administers the UK tax system, which includes
+            income tax rates, National Insurance, capital gains tax, and inheritance tax.
+            Understanding your effective tax rate and tax band is crucial for financial planning.
+          </p>
+          <p className='text-center text-foreground/80 leading-relaxed'>
+            Whether you're a higher rate taxpayer filing a tax return or simply calculating your
+            take-home pay, our calculator uses official HMRC rates to help you understand the UK
+            tax system. From basic income tax rates to complex scenarios involving tax revenue and
+            tax reliefs, we provide accurate calculations for all taxpayers.
+          </p>
+        </div>
+
+        {/* Tax Rates Quick Reference */}
+        <div className='mt-10 grid gap-6 md:grid-cols-3'>
+          <div className='rounded-lg border bg-card p-6 text-center'>
+            <h3 className='mb-2 font-semibold text-lg'>Personal Allowance</h3>
+            <p className='font-bold text-3xl text-primary'>£12,570</p>
+            <p className='mt-2 text-muted-foreground text-sm'>Tax-free earnings for 2025/26</p>
+          </div>
+          <div className='rounded-lg border bg-card p-6 text-center'>
+            <h3 className='mb-2 font-semibold text-lg'>Basic Rate</h3>
+            <p className='font-bold text-3xl text-primary'>20%</p>
+            <p className='mt-2 text-muted-foreground text-sm'>On income £12,571 - £50,270</p>
+          </div>
+          <div className='rounded-lg border bg-card p-6 text-center'>
+            <h3 className='mb-2 font-semibold text-lg'>Higher Rate</h3>
+            <p className='font-bold text-3xl text-primary'>40%</p>
+            <p className='mt-2 text-muted-foreground text-sm'>On income £50,271 - £125,140</p>
+          </div>
+        </div>
+      </section>
+
       {/* Popular Salary Calculators - Internal linking for SEO */}
       <section className='container mx-auto max-w-7xl px-4 py-16'>
         <h2 className='mb-2 text-center font-bold text-3xl'>Popular Salary Calculators</h2>
