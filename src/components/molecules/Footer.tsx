@@ -116,6 +116,15 @@ export function Footer({ className }: FooterProps) {
                 Contact
               </a>
               <a
+                href='https://www.buymeacoffee.com/payetax'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='-mx-3 px-3 py-2 text-muted-foreground text-sm transition-colors hover:text-primary'
+                aria-label='Support PayeTax'
+              >
+                Support Us ☕
+              </a>
+              <a
                 href='https://x.com/PayeTaxUK'
                 target='_blank'
                 rel='noopener noreferrer'

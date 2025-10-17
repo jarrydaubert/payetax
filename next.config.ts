@@ -162,7 +162,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://cdnjs.buymeacoffee.com https://*.buymeacoffee.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://cdnjs.buymeacoffee.com https://*.buymeacoffee.com; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://bmac-cdn.nyc3.digitaloceanspaces.com https://cdnjs.buymeacoffee.com https://*.buymeacoffee.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io; frame-src https://www.buymeacoffee.com https://buymeacoffee.com https://*.buymeacoffee.com; worker-src 'self' blob:; child-src 'self' https://buymeacoffee.com https://www.buymeacoffee.com https://*.buymeacoffee.com;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io; worker-src 'self' blob:; child-src 'self';",
           },
         ],
       },

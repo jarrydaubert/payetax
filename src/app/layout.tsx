@@ -43,9 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* DNS Prefetch and Preconnect for Performance */}
         <link rel='dns-prefetch' href='https://vercel.live' />
-        <link rel='dns-prefetch' href='https://cdnjs.buymeacoffee.com' />
         <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
-        <link rel='preconnect' href='https://cdnjs.buymeacoffee.com' crossOrigin='anonymous' />
 
         {/* Flash Prevention Script - Loads theme before paint */}
         <script
@@ -158,66 +156,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <VercelAnalytics />
           <SpeedInsights />
         </ThemeProvider>
-
-        {/* Buy Me Coffee Widget - Official BMC code */}
-        <script
-          data-name='BMC-Widget'
-          data-cfasync='false'
-          src='https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js'
-          data-id='payetax'
-          data-description='Support PayeTax development!'
-          data-message='Thank you for using our free UK tax calculator! Your support helps keep this tool free for everyone. 💚'
-          data-color='#FF813F'
-          data-position='Right'
-          data-x_margin='18'
-          data-y_margin='18'
-          defer
-        />
-
-        {/* BMC Cleanup - Fix ghost overlay bug */}
-        <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Minimal cleanup for BMC widget bug
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                if (typeof window === 'undefined') return;
-
-                // Watch for BMC iframe visibility changes
-                const observer = new MutationObserver(function(mutations) {
-                  mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                      const iframe = mutation.target;
-                      if (iframe.tagName === 'IFRAME' && iframe.src && iframe.src.includes('buymeacoffee')) {
-                        // If iframe is hidden, remove any stray overlays
-                        if (iframe.style.display === 'none' || iframe.style.visibility === 'hidden') {
-                          // Remove any BMC overlay elements
-                          const overlays = document.querySelectorAll('[class*="bmc"], [id*="bmc"], [class*="BMC"], [id*="BMC"]');
-                          overlays.forEach(function(el) {
-                            if (el !== iframe && el.tagName !== 'SCRIPT' && el.style.position === 'fixed') {
-                              el.remove();
-                            }
-                          });
-                        }
-                      }
-                    }
-                  });
-                });
-
-                // Start observing after a delay to let BMC initialize
-                setTimeout(function() {
-                  const container = document.body;
-                  if (container) {
-                    observer.observe(container, {
-                      attributes: true,
-                      attributeFilter: ['style'],
-                      subtree: true
-                    });
-                  }
-                }, 2000);
-              })();
-            `,
-          }}
-        />
       </body>
     </html>
   );
