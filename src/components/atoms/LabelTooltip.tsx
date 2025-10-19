@@ -29,8 +29,8 @@ function formatTooltipText(content: TooltipData): React.ReactNode {
       <div className='text-xs'>{content.description}</div>
       {content.hmrc && (
         <div className='border-primary-foreground/20 border-t pt-1 text-xs opacity-90'>
-          {content.hmrc.split('\n').map((line, idx) => (
-            <div key={idx}>{line}</div>
+          {content.hmrc.split('\n').map((line) => (
+            <div key={line}>{line}</div>
           ))}
         </div>
       )}

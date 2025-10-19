@@ -156,7 +156,7 @@ export function compareWithOptimization(
 } | null {
   try {
     // Validate inputs
-    if (!isValidSalary(salary) || !isValidSalary(pensionContribution)) {
+    if (!(isValidSalary(salary) && isValidSalary(pensionContribution))) {
       console.warn('[pensionOptimizer] Invalid input to compareWithOptimization');
       return null;
     }

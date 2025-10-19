@@ -29,7 +29,7 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
     }
   };
 
-  const handleCalculate = async () => {
+  const handleCalculate = () => {
     setIsCalculating(true);
     try {
       onCalculate();

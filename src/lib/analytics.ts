@@ -52,6 +52,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 
     // Console logging for development
     if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('🔍 SEO Analytics:', action, enhancedData);
     }
 
@@ -79,6 +80,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 export function trackEvent(event: AnalyticsEvent): void {
   try {
     if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📊 Analytics Event:', event);
     }
 
@@ -141,6 +143,7 @@ export function trackCalculatorUsage(calculation_type: string, salary_range?: st
 export function trackPageView(page_path: string, page_title?: string): void {
   try {
     if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📄 Page View:', page_path, page_title);
     }
 

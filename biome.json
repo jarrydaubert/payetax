@@ -24,21 +24,41 @@
         "noUndeclaredVariables": "error",
         "useValidForDirection": "error",
         "useUniqueElementIds": "error",
-        "noChildrenProp": "error"
+        "noChildrenProp": "error",
+        "noEmptyPattern": "error",
+        "noInnerDeclarations": "error",
+        "noInvalidConstructorSuper": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSwitchDeclarations": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "noUnsafeFinally": "error",
+        "noUnsafeOptionalChaining": "error",
+        "noUnusedLabels": "error",
+        "useIsNan": "error",
+        "useYield": "error"
       },
       "suspicious": {
         "noExplicitAny": "error",
         "noConsole": {
           "level": "error",
           "options": {
-            "allow": ["log", "warn", "error", "info"]
+            "allow": ["warn", "error"]
           }
         },
         "noDebugger": "error",
         "noArrayIndexKey": "error",
         "noDoubleEquals": "error",
         "noImplicitAnyLet": "error",
-        "noMisleadingCharacterClass": "error"
+        "noMisleadingCharacterClass": "error",
+        "noUnsafeDeclarationMerging": "error",
+        "noFallthroughSwitchClause": "error",
+        "noGlobalAssign": "error",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "error",
+        "useAwait": "error"
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -72,7 +92,22 @@
         "useLiteralKeys": "error",
         "noUselessFragments": "error",
         "noUselessRename": "error",
-        "noUselessSwitchCase": "error"
+        "noUselessSwitchCase": "error",
+        "noExtraBooleanCast": "error",
+        "noUselessCatch": "error",
+        "noUselessConstructor": "error",
+        "noUselessEmptyExport": "error",
+        "noUselessLabel": "error",
+        "noUselessLoneBlockStatements": "error",
+        "noUselessTernary": "error",
+        "noVoid": "error",
+        "useArrowFunction": "warn",
+        "useOptionalChain": "error",
+        "useRegexLiterals": "error",
+        "useSimplifiedLogicExpression": "error",
+        "noUselessStringConcat": "error",
+        "useFlatMap": "warn",
+        "useSimpleNumberKeys": "error"
       },
       "performance": {
         "noDelete": "error",
@@ -166,6 +201,44 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/scripts/**",
+        "*.config.ts",
+        "*.config.js",
+        "instrumentation.ts",
+        "jest.setup.js",
+        "public/**/*.js"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "useAwait": "off",
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noArrayIndexKey": "warn"
+          },
+          "complexity": {
+            "noForEach": "warn"
+          },
+          "correctness": {
+            "noUnusedFunctionParameters": "off"
+          },
+          "style": {
+            "useConst": "warn"
           }
         }
       }

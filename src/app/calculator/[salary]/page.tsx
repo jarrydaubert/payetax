@@ -61,7 +61,7 @@ function parseSalary(salaryParam: string): number | null {
 }
 
 // Generate static params for common salaries (for SSG)
-export async function generateStaticParams() {
+export function generateStaticParams() {
   // Start with high-priority salaries for initial deployment
   const salaries = HIGH_PRIORITY_SALARIES;
 

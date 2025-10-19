@@ -37,7 +37,6 @@ function loadPerformanceHistory() {
 function savePerformanceHistory(history) {
   try {
     fs.writeFileSync(PERFORMANCE_LOG, JSON.stringify(history, null, 2));
-    console.log(`✅ Performance data saved to ${PERFORMANCE_LOG}`);
   } catch (error) {
     console.error('❌ Failed to save performance history:', error.message);
   }
@@ -65,73 +64,22 @@ function analyzeTrend(measurements, metric, periods = 5) {
 }
 
 function generateReport(measurement, history) {
-  console.log('\n🔍 PERFORMANCE MONITORING REPORT');
-  console.log('=====================================');
-  console.log(`📅 Timestamp: ${measurement.timestamp}`);
-  console.log(`🌐 URL: ${measurement.url}`);
-
-  console.log('\n📊 LIGHTHOUSE SCORES:');
-  console.log(
-    `  Performance: ${measurement.metrics.performanceScore}/100 ${measurement.metrics.performanceScore >= PERFORMANCE_THRESHOLDS.performance ? '✅' : '⚠️'}`
-  );
-  console.log(
-    `  Accessibility: ${measurement.metrics.accessibilityScore}/100 ${measurement.metrics.accessibilityScore >= PERFORMANCE_THRESHOLDS.accessibility ? '✅' : '❌'}`
-  );
-  console.log(
-    `  Best Practices: ${measurement.metrics.bestPracticesScore}/100 ${measurement.metrics.bestPracticesScore >= PERFORMANCE_THRESHOLDS.bestPractices ? '✅' : '⚠️'}`
-  );
-  console.log(
-    `  SEO: ${measurement.metrics.seoScore}/100 ${measurement.metrics.seoScore >= PERFORMANCE_THRESHOLDS.seo ? '✅' : '❌'}`
-  );
-
-  console.log('\n⚡ CORE WEB VITALS:');
-  console.log(
-    `  First Contentful Paint: ${measurement.metrics.fcp}s ${measurement.metrics.fcp <= PERFORMANCE_THRESHOLDS.fcp ? '✅' : '⚠️'}`
-  );
-  console.log(
-    `  Largest Contentful Paint: ${measurement.metrics.lcp}s ${measurement.metrics.lcp <= PERFORMANCE_THRESHOLDS.lcp ? '✅' : '⚠️'}`
-  );
-  console.log(
-    `  Cumulative Layout Shift: ${measurement.metrics.cls} ${measurement.metrics.cls <= PERFORMANCE_THRESHOLDS.cls ? '✅' : '⚠️'}`
-  );
-  console.log(
-    `  Total Blocking Time: ${measurement.metrics.tbt}ms ${measurement.metrics.tbt <= PERFORMANCE_THRESHOLDS.tbt ? '✅' : '⚠️'}`
-  );
-
-  console.log('\n📈 BUNDLE SIZE:');
-  console.log(`  Total Size: ${(measurement.metrics.totalByteWeight / 1024).toFixed(1)} KB`);
-  console.log(`  Unused JS: ${(measurement.metrics.unusedJavaScript / 1024).toFixed(1)} KB`);
-
   // Trend analysis
   if (history.measurements.length > 1) {
-    console.log('\n📈 TRENDS (last 5 measurements):');
-
     const performanceTrend = analyzeTrend(history.measurements, 'performanceScore');
     if (performanceTrend) {
-      console.log(
-        `  Performance: ${performanceTrend.change}% ${performanceTrend.improving ? '📈' : '📉'} (${performanceTrend.baseline} → ${performanceTrend.recent})`
-      );
     }
 
     const fcpTrend = analyzeTrend(history.measurements, 'fcp');
     if (fcpTrend) {
-      console.log(
-        `  FCP: ${fcpTrend.change}% ${fcpTrend.improving ? '📈' : '📉'} (${fcpTrend.baseline}s → ${fcpTrend.recent}s)`
-      );
     }
 
     const bundleTrend = analyzeTrend(history.measurements, 'totalByteWeight');
     if (bundleTrend) {
-      const baselineKB = (bundleTrend.baseline / 1024).toFixed(1);
-      const recentKB = (bundleTrend.recent / 1024).toFixed(1);
-      console.log(
-        `  Bundle Size: ${bundleTrend.change}% ${bundleTrend.improving ? '📈' : '📉'} (${baselineKB}KB → ${recentKB}KB)`
-      );
+      const _baselineKB = (bundleTrend.baseline / 1024).toFixed(1);
+      const _recentKB = (bundleTrend.recent / 1024).toFixed(1);
     }
   }
-
-  // Recommendations
-  console.log('\n💡 RECOMMENDATIONS:');
   const recommendations = [];
 
   if (measurement.metrics.performanceScore < PERFORMANCE_THRESHOLDS.performance) {
@@ -155,20 +103,13 @@ function generateReport(measurement, history) {
   }
 
   if (recommendations.length === 0) {
-    console.log('  🎉 All metrics are within target thresholds!');
   } else {
-    recommendations.forEach((rec, i) => {
-      console.log(`  ${i + 1}. ${rec}`);
-    });
+    recommendations.forEach((_rec, _i) => {});
   }
-
-  console.log('\n=====================================\n');
 }
 
 async function runPerformanceAudit() {
   return new Promise((resolve, reject) => {
-    console.log('🚀 Running Lighthouse performance audit...');
-
     exec('lhci autorun --collect.numberOfRuns=1 --no-upload', (error, _stdout, _stderr) => {
       if (error) {
         console.error('❌ Lighthouse CI failed:', error.message);
@@ -220,8 +161,6 @@ async function runPerformanceAudit() {
 
 async function main() {
   try {
-    console.log('🔍 Starting performance monitoring...\n');
-
     // Load existing performance history
     const history = loadPerformanceHistory();
 
@@ -250,10 +189,8 @@ async function main() {
     ];
 
     if (criticalFailures.some(Boolean)) {
-      console.log('❌ Critical performance thresholds not met');
       process.exit(1);
     } else {
-      console.log('✅ Performance monitoring completed successfully');
       process.exit(0);
     }
   } catch (error) {

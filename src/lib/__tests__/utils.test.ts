@@ -19,7 +19,7 @@ describe('Utils', () => {
     });
 
     it('handles conditional classes', () => {
-      const result = cn('base', true && 'conditional', false && 'hidden');
+      const result = cn('base', 'conditional', false);
       expect(result).toBe('base conditional');
     });
 
@@ -55,8 +55,8 @@ describe('Utils', () => {
           'obj-true': true,
           'obj-false': false,
         },
-        true && 'conditional',
-        false && 'hidden',
+        'conditional',
+        false,
         undefined,
         'final'
       );

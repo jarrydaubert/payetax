@@ -38,7 +38,7 @@ function convertContentlayerPost(post: Post): BlogPost {
 
     // Optional fields
     updatedAt: post.updatedAt || post.publishedAt,
-    featured: post.featured || false,
+    featured: post.featured,
     published: post.published !== false, // Default to true if not specified
     author: post.author,
     readTime: `${post.readingTime} min read`,
@@ -57,8 +57,8 @@ function convertContentlayerPost(post: Post): BlogPost {
  * Get all published posts from Contentlayer (cached)
  */
 const getAllContentlayerPosts = unstable_cache(
-  async (): Promise<BlogPost[]> => {
-    return allPosts.filter((post) => post.published !== false).map(convertContentlayerPost);
+  (): Promise<BlogPost[]> => {
+    return Promise.resolve(allPosts.filter((post) => post.published !== false).map(convertContentlayerPost));
   },
   ['blog-all-posts'],
   { revalidate: 3600, tags: ['blog'] }

@@ -109,8 +109,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       const scrollWidth = await scrollContainer.evaluate((el) => el.scrollWidth);
       const clientWidth = await scrollContainer.evaluate((el) => el.clientWidth);
 
-      console.log(`Laptop 1366px - scrollWidth: ${scrollWidth}, clientWidth: ${clientWidth}`);
-
       // Should either fit or have minimal overflow
       expect(scrollWidth).toBeGreaterThanOrEqual(clientWidth);
     });
@@ -167,8 +165,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       const scrollContainer = page.locator('[role="region"][aria-label*="Tax calculation"]');
       const hasOverflow = await scrollContainer.evaluate((el) => el.scrollWidth > el.clientWidth);
 
-      console.log(`Mobile - Has overflow: ${hasOverflow}`);
-
       // Swipe hint should be visible if there's overflow
       if (hasOverflow) {
         const swipeHint = page.locator('text=/swipe to see all periods/i');
@@ -204,8 +200,7 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
 
         await page.waitForTimeout(300);
 
-        const scrollLeft = await scrollContainer.evaluate((el) => el.scrollLeft);
-        console.log(`Mobile scroll position: ${scrollLeft}`);
+        const _scrollLeft = await scrollContainer.evaluate((el) => el.scrollLeft);
       }
     });
 
@@ -236,12 +231,8 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
         await page.waitForTimeout(300);
 
         const scrollContainer = page.locator('[role="region"][aria-label*="Tax calculation"]');
-        const scrollWidth = await scrollContainer.evaluate((el) => el.scrollWidth);
-        const clientWidth = await scrollContainer.evaluate((el) => el.clientWidth);
-
-        console.log(
-          `After adding ${period} - scrollWidth: ${scrollWidth}, clientWidth: ${clientWidth}, viewport: ${viewport?.width}x${viewport?.height}`
-        );
+        const _scrollWidth = await scrollContainer.evaluate((el) => el.scrollWidth);
+        const _clientWidth = await scrollContainer.evaluate((el) => el.clientWidth);
       }
     });
 
@@ -265,12 +256,8 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
         await page.waitForTimeout(300);
 
         const scrollContainer = page.locator('[role="region"][aria-label*="Tax calculation"]');
-        const scrollWidth = await scrollContainer.evaluate((el) => el.scrollWidth);
-        const clientWidth = await scrollContainer.evaluate((el) => el.clientWidth);
-
-        console.log(
-          `After removing ${period} - scrollWidth: ${scrollWidth}, clientWidth: ${clientWidth}`
-        );
+        const _scrollWidth = await scrollContainer.evaluate((el) => el.scrollWidth);
+        const _clientWidth = await scrollContainer.evaluate((el) => el.clientWidth);
       }
     });
   });
@@ -305,7 +292,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
         await page.waitForTimeout(300);
 
         const scrollLeft = await scrollContainer.evaluate((el) => el.scrollLeft);
-        console.log(`Scrolled to middle - scrollLeft: ${scrollLeft}`);
 
         expect(scrollLeft).toBeGreaterThan(5); // Should trigger left indicator
       }
@@ -340,8 +326,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
         const scrollLeft = await scrollContainer.evaluate((el) => el.scrollLeft);
         const maxScroll = await scrollContainer.evaluate((el) => el.scrollWidth - el.clientWidth);
 
-        console.log(`Scrolled to end - scrollLeft: ${scrollLeft}, maxScroll: ${maxScroll}`);
-
         expect(Math.abs(scrollLeft - maxScroll)).toBeLessThan(5); // Should be at end
       }
     });
@@ -357,8 +341,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       const maxWidth = await calculatorSection.evaluate((el) => {
         return window.getComputedStyle(el).maxWidth;
       });
-
-      console.log(`Calculator container max-width: ${maxWidth}`);
       expect(maxWidth).toBe('1600px');
     });
 
@@ -367,8 +349,6 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       const gridCols = await calculatorSection.evaluate((el) => {
         return window.getComputedStyle(el).gridTemplateColumns;
       });
-
-      console.log(`Grid template columns: ${gridCols}`);
       // Should have 2-column grid: 380px + 1fr
       expect(gridCols).toContain('380px');
     });

@@ -2,7 +2,7 @@
 'use client';
 
 import { Calculator } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ interface ComparisonInputsProps {
 export function ComparisonInputs({ currentSalary, onCompare, className }: ComparisonInputsProps) {
   const [mode, setMode] = useState<ComparisonMode>('percentage');
   const [value, setValue] = useState<string>('');
+  const inputId = useId();
 
   const handleCompare = () => {
     const numValue = parseFloat(value);
@@ -128,7 +129,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
               </span>
             )}
             <Input
-              id='comparison-value'
+              id={inputId}
               type='number'
               value={value}
               onChange={(e) => setValue(e.target.value)}

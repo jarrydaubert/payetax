@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const { urls } = await request.json();
 
-    if (!urls || !Array.isArray(urls) || urls.length === 0) {
+    if (!(urls && Array.isArray(urls)) || urls.length === 0) {
       return NextResponse.json(
         { error: 'URLs array is required and must not be empty' },
         { status: 400 }
@@ -63,8 +63,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
-    console.log(`IndexNow: Successfully submitted ${urls.length} URLs`);
     return NextResponse.json({
       success: true,
       submitted: urls.length,
@@ -83,7 +81,7 @@ export async function POST(request: Request) {
 }
 
 // Health check endpoint
-export async function GET() {
+export function GET() {
   const configured = !!process.env.INDEXNOW_KEY;
   return NextResponse.json({
     service: 'IndexNow',

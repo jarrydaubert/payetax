@@ -69,7 +69,7 @@ const nextConfig: NextConfig = {
   // Advanced webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
     // Production-only optimizations
-    if (!dev && !isServer) {
+    if (!(dev || isServer)) {
       // Enhanced chunk splitting for better caching
       config.optimization = {
         ...config.optimization,

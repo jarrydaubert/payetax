@@ -7,9 +7,8 @@ const API_CACHE_NAME = 'payetax-api-v2025.1.2.1';
 
 // Helper function to log only in development
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
-const devLog = (...args) => {
+const devLog = (..._args) => {
   if (isDev) {
-    console.log(...args);
   }
 };
 

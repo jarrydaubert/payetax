@@ -25,8 +25,8 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
         <h3 className='font-bold text-foreground text-lg'>{title}</h3>
       </div>
       <ul className='space-y-3'>
-        {items.map((item, idx) => (
-          <li key={idx} className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
+        {items.map((item) => (
+          <li key={item.label} className='flex justify-between rounded-md bg-muted/30 p-2 text-sm'>
             <span className='text-muted-foreground'>{item.label}</span>
             <strong className={item.colorClass || 'text-foreground'}>{item.value}</strong>
           </li>

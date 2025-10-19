@@ -236,7 +236,7 @@ export function WhatIfComparisonDisplay({
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
         <Card className='overflow-hidden border-primary/20'>
-          <div
+          <section
             ref={containerRef}
             className='touch-pan-x overflow-x-auto scroll-smooth'
             style={{
@@ -244,7 +244,6 @@ export function WhatIfComparisonDisplay({
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
-            role='region'
             aria-label='What If comparison table'
           >
             <Table>
@@ -335,7 +334,7 @@ export function WhatIfComparisonDisplay({
                 })}
               </TableBody>
             </Table>
-          </div>
+          </section>
         </Card>
       </div>
 

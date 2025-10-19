@@ -11,6 +11,7 @@ jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: any) => {
     // biome-ignore lint/a11y/useAltText: Test mock
+    // biome-ignore lint/performance/noImgElement: Test mock needs native img element
     return <img {...props} />;
   },
 }));

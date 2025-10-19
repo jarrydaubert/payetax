@@ -73,17 +73,12 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Get the third cell (Category | % | Annual | Monthly | Weekly...)
       const incomeTaxCell = incomeTaxRow.locator('td').nth(2); // Index 2 = third column (Annual)
       const incomeTaxText = await incomeTaxCell.textContent();
-      console.log(`Debug: Income tax text found: "${incomeTaxText}"`);
 
       const incomeTaxAmount = parseFloat(incomeTaxText?.replace(/[£,]/g, '') || '0');
-      console.log(`Debug: Parsed income tax amount: ${incomeTaxAmount}`);
 
       // Verify income tax amount is reasonable for £30,000 salary (should be between £2,000-£5,000 annually)
       expect(incomeTaxAmount).toBeGreaterThan(2000);
       expect(incomeTaxAmount).toBeLessThan(5000);
-      console.log(
-        `✓ Income tax amount (${incomeTaxAmount}) is reasonable for ${testData.salary} salary`
-      );
     }
 
     // Find National Insurance row and get the annual amount (first numeric column after %)
@@ -92,17 +87,12 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Get the third cell (Category | % | Annual | Monthly | Weekly...)
       const niValueCell = nationalInsuranceRow.locator('td').nth(2); // Index 2 = third column (Annual)
       const niText = await niValueCell.textContent();
-      console.log(`Debug: National Insurance text found: "${niText}"`);
 
       const niAmount = parseFloat(niText?.replace(/[£,]/g, '') || '0');
-      console.log(`Debug: Parsed National Insurance amount: ${niAmount}`);
 
       // Verify NI amount is reasonable for £30,000 salary (should be between £1,000-£3,000 annually)
       expect(niAmount).toBeGreaterThan(1000);
       expect(niAmount).toBeLessThan(3000);
-      console.log(
-        `✓ National Insurance amount (${niAmount}) is reasonable for ${testData.salary} salary`
-      );
     }
   });
 
@@ -179,9 +169,7 @@ test.describe('Tax Calculator E2E Tests', () => {
       }).toPass({ timeout: 3000 });
 
       await page.waitForTimeout(500); // Longer wait for pension change to propagate
-      console.log('✓ Pension inputs configured: 5% of £50,000 salary');
     } catch (_error) {
-      console.log('Pension form elements not found, skipping pension setup');
       // Just test basic calculation without pension
     }
 
@@ -206,7 +194,6 @@ test.describe('Tax Calculator E2E Tests', () => {
     );
 
     if (await noResultsMessage.isVisible()) {
-      console.log('Still showing no results message - calculation may have failed');
       // Try clicking calculate again
       const calcButton = page.locator('[data-testid="calculate-button"]');
       await calcButton.click({ force: true });
@@ -222,10 +209,8 @@ test.describe('Tax Calculator E2E Tests', () => {
       try {
         await expect(resultsTable).toBeVisible({ timeout: 5000 });
         tableVisible = true;
-        console.log(`✓ Pension test results table visible after ${retryCount} retries`);
       } catch (_error) {
         retryCount++;
-        console.log(`Pension results table not visible, retry ${retryCount}/${maxRetries}...`);
 
         if (retryCount < maxRetries) {
           // AGGRESSIVE retry approach
@@ -281,7 +266,6 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Verify reasonable amount for 5% of £50,000 (should be around £2,500)
       expect(pensionAmount).toBeGreaterThan(2000);
       expect(pensionAmount).toBeLessThan(3000);
-      console.log(`✓ Pension amount (${pensionAmount}) is reasonable`);
     }
   });
 
@@ -312,7 +296,6 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Verify reasonable amount for Plan 2 on £35,000 (should be around £693)
       expect(studentLoanAmount).toBeGreaterThan(500);
       expect(studentLoanAmount).toBeLessThan(1000);
-      console.log(`✓ Student loan amount (${studentLoanAmount}) is reasonable`);
     }
   });
 
@@ -337,7 +320,6 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Verify reasonable higher rate tax for £60,000 (should be around £11,000-£13,000)
       expect(incomeTaxAmount).toBeGreaterThan(10000);
       expect(incomeTaxAmount).toBeLessThan(15000);
-      console.log(`✓ Higher rate income tax (${incomeTaxAmount}) is reasonable for £60,000`);
     }
   });
 
@@ -359,7 +341,6 @@ test.describe('Tax Calculator E2E Tests', () => {
       const initialTaxCell = initialTaxRow.locator('td').nth(2); // Annual column
       const initialTaxText = await initialTaxCell.textContent();
       initialTaxAmount = parseFloat(initialTaxText?.replace(/[£,]/g, '') || '0');
-      console.log(`Debug: Initial tax amount: ${initialTaxAmount}`);
     }
 
     // Toggle Scottish rates
@@ -378,7 +359,6 @@ test.describe('Tax Calculator E2E Tests', () => {
         const scottishTaxCell = scottishTaxRow.locator('td').nth(2); // Annual column
         const scottishTaxText = await scottishTaxCell.textContent();
         scottishTaxAmount = parseFloat(scottishTaxText?.replace(/[£,]/g, '') || '0');
-        console.log(`Debug: Scottish tax amount: ${scottishTaxAmount}`);
       }
 
       // Scottish rates should be different for £45,000 salary - verify amounts are reasonable
@@ -436,13 +416,7 @@ test.describe('Tax Calculator E2E Tests', () => {
       // Check that no error message appears (indicates successful export initiation)
       const errorMessage = page.locator('text=/export failed/i');
       await expect(errorMessage).not.toBeVisible({ timeout: 2000 });
-
-      // Success if we get here without throwing
-      console.log('Export CSV functionality verified');
-    } catch (_error) {
-      // If export button click fails, just verify the button exists
-      console.log('Export button exists:', await exportButton.isVisible());
-    }
+    } catch (_error) {}
   });
 
   test('should print results correctly', async ({ page }) => {

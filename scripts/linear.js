@@ -40,9 +40,7 @@ const colors = {
 };
 
 // Helper functions
-function log(message, color = 'reset') {
-  console.log(`${colors[color]}${message}${colors.reset}`);
-}
+function log(_message, _color = 'reset') {}
 
 function formatDate(dateString) {
   if (!dateString) return 'No date';

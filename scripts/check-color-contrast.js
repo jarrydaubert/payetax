@@ -41,17 +41,7 @@ const colorTests = {
   },
 };
 
-console.log('='.repeat(60));
-console.log('WCAG COLOR CONTRAST AUDIT');
-console.log('='.repeat(60));
-console.log('Required: 4.5:1 (AA normal text), 3:1 (AA large text)');
-console.log('');
-
-for (const [mode, colors] of Object.entries(colorTests)) {
-  console.log(`\n${'='.repeat(30)}`);
-  console.log(`${mode.toUpperCase()}`);
-  console.log(`${'='.repeat(30)}`);
-
+for (const [_mode, colors] of Object.entries(colorTests)) {
   const bgRgb = oklchToRgb(colors.background.l, colors.background.c, colors.background.h);
   const fgRgb = oklchToRgb(colors.foreground.l, colors.foreground.c, colors.foreground.h);
   const mutedRgb = oklchToRgb(
@@ -107,14 +97,3 @@ for (const [mode, colors] of Object.entries(colorTests)) {
     console.log(`     Ratio: ${ratio.toFixed(2)}:1 (Required: ${required}:1)`);
   }
 }
-
-console.log(`\n${'='.repeat(60)}`);
-console.log('RECOMMENDATIONS');
-console.log('='.repeat(60));
-console.log(`
-If any tests fail:
-1. Increase opacity of text (80% → 90% or 100%)
-2. Adjust muted-foreground lightness
-3. Ensure primary color meets 4.5:1 minimum
-4. Test with actual color values (this uses simplified OKLCH→RGB)
-`);

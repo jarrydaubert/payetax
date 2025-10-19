@@ -96,7 +96,7 @@ describe('Sitemap Generation', () => {
       const result = await sitemap();
 
       const staticPages = result.filter(
-        (entry) => !entry.url.includes('/blog/') && !entry.url.includes('/category/')
+        (entry) => !(entry.url.includes('/blog/') || entry.url.includes('/category/'))
       );
 
       expect(staticPages.length).toBeGreaterThanOrEqual(5);

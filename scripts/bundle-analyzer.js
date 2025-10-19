@@ -33,7 +33,6 @@ function loadBundleHistory() {
 function saveBundleHistory(history) {
   try {
     fs.writeFileSync(BUNDLE_HISTORY_FILE, JSON.stringify(history, null, 2));
-    console.log(`✅ Bundle history saved to ${BUNDLE_HISTORY_FILE}`);
   } catch (error) {
     console.error('❌ Failed to save bundle history:', error.message);
   }
@@ -158,55 +157,25 @@ function analyzeTrend(measurements, metric, periods = 5) {
 }
 
 function generateBundleReport(analysis, history) {
-  console.log('\n📦 BUNDLE SIZE ANALYSIS REPORT');
-  console.log('=====================================');
-  console.log(`📅 Timestamp: ${analysis.timestamp}`);
-
-  console.log('\n📊 BUNDLE OVERVIEW:');
-  console.log(
-    `  Total Bundle Size: ${formatBytes(analysis.totalSize)} ${analysis.thresholds.totalSizeOK ? '✅' : '❌'} (limit: ${formatBytes(BUNDLE_THRESHOLDS.totalSize)})`
-  );
-  console.log(
-    `  First Load JS: ${formatBytes(analysis.firstLoadJSSize)} ${analysis.thresholds.firstLoadOK ? '✅' : '❌'} (limit: ${formatBytes(BUNDLE_THRESHOLDS.firstLoadJS)})`
-  );
-  console.log(`  Total Chunks: ${analysis.chunkCount}`);
-
-  console.log('\n📈 TOP 10 LARGEST CHUNKS:');
-  analysis.chunks.forEach((chunk, index) => {
-    const status = chunk.exceedsThreshold ? '⚠️' : '✅';
-    const firstLoadBadge = chunk.isFirstLoad ? '[FIRST LOAD]' : '';
-    console.log(`  ${index + 1}. ${chunk.name} ${firstLoadBadge}`);
-    console.log(`     Size: ${chunk.sizeFormatted} ${status}`);
+  analysis.chunks.forEach((chunk, _index) => {
+    const _status = chunk.exceedsThreshold ? '⚠️' : '✅';
+    const _firstLoadBadge = chunk.isFirstLoad ? '[FIRST LOAD]' : '';
   });
 
   // Trend analysis
   if (history.measurements.length > 1) {
-    console.log('\n📈 TRENDS (last 5 measurements):');
-
     const totalSizeTrend = analyzeTrend(history.measurements, 'totalSize');
     if (totalSizeTrend) {
-      console.log(
-        `  Total Size: ${totalSizeTrend.change}% ${totalSizeTrend.improving ? '📈' : '📉'} (${formatBytes(totalSizeTrend.baseline)} → ${formatBytes(totalSizeTrend.recent)})`
-      );
     }
 
     const firstLoadTrend = analyzeTrend(history.measurements, 'firstLoadJSSize');
     if (firstLoadTrend) {
-      console.log(
-        `  First Load JS: ${firstLoadTrend.change}% ${firstLoadTrend.improving ? '📈' : '📉'} (${formatBytes(firstLoadTrend.baseline)} → ${formatBytes(firstLoadTrend.recent)})`
-      );
     }
 
     const chunkCountTrend = analyzeTrend(history.measurements, 'chunkCount');
     if (chunkCountTrend) {
-      console.log(
-        `  Chunk Count: ${chunkCountTrend.change}% ${chunkCountTrend.improving ? '📈' : '📉'} (${chunkCountTrend.baseline} → ${chunkCountTrend.recent} chunks)`
-      );
     }
   }
-
-  // Recommendations
-  console.log('\n💡 OPTIMIZATION RECOMMENDATIONS:');
   const recommendations = [];
 
   if (!analysis.thresholds.totalSizeOK) {
@@ -236,32 +205,16 @@ function generateBundleReport(analysis, history) {
   }
 
   if (recommendations.length === 0) {
-    console.log('  🎉 Bundle size is optimized and within all thresholds!');
   } else {
-    recommendations.forEach((rec, i) => {
-      console.log(`  ${i + 1}. ${rec}`);
-    });
+    recommendations.forEach((_rec, _i) => {});
   }
-
-  // Suggested actions
-  console.log('\n🔧 SUGGESTED ACTIONS:');
-  if (!analysis.thresholds.totalSizeOK || !analysis.thresholds.firstLoadOK) {
-    console.log('  • Run `npm run build:analyze` to visualize bundle composition');
-    console.log('  • Consider lazy loading non-critical components');
-    console.log('  • Review and remove unused dependencies');
-    console.log('  • Implement dynamic imports for heavy libraries');
+  if (!(analysis.thresholds.totalSizeOK && analysis.thresholds.firstLoadOK)) {
   } else {
-    console.log('  • Monitor bundle size regularly');
-    console.log('  • Continue following current optimization practices');
   }
-
-  console.log('\n=====================================\n');
 }
 
 async function runBundleAnalysis() {
   try {
-    console.log('🔍 Analyzing bundle size...\n');
-
     // Load existing history
     const history = loadBundleHistory();
 
@@ -283,16 +236,15 @@ async function runBundleAnalysis() {
     generateBundleReport(analysis, history);
 
     // Exit with error if thresholds exceeded
-    const hasErrors =
-      !analysis.thresholds.totalSizeOK ||
-      !analysis.thresholds.firstLoadOK ||
-      !analysis.thresholds.individualChunksOK;
+    const hasErrors = !(
+      analysis.thresholds.totalSizeOK &&
+      analysis.thresholds.firstLoadOK &&
+      analysis.thresholds.individualChunksOK
+    );
 
     if (hasErrors) {
-      console.log('❌ Bundle size thresholds exceeded');
       process.exit(1);
     } else {
-      console.log('✅ Bundle analysis completed successfully');
       process.exit(0);
     }
   } catch (error) {
