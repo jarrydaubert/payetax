@@ -53,6 +53,7 @@ describe('Salary Comparison - Error Handling', () => {
     it('should handle all dangerous inputs gracefully', () => {
       const dangerousInputs = [NaN, Infinity, -Infinity, Number.MAX_VALUE, Number.MIN_VALUE];
 
+      // biome-ignore lint/complexity/noForEach: Testing multiple edge cases
       dangerousInputs.forEach((value) => {
         expect(() =>
           calculateNewSalary({

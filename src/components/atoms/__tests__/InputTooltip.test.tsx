@@ -177,7 +177,7 @@ describe('InputTooltip Component', () => {
     it('should load content for all common fields', () => {
       const fields = ['salary', 'taxCode', 'region', 'pensionContribution', 'studentLoanPlan'];
 
-      fields.forEach((fieldName) => {
+      for (const fieldName of fields) {
         const { container } = render(
           <InputTooltip fieldName={fieldName}>
             <input />
@@ -188,7 +188,7 @@ describe('InputTooltip Component', () => {
         expect(trigger).toBeInTheDocument();
 
         container.remove();
-      });
+      }
     });
   });
 

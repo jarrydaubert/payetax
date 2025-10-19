@@ -25,7 +25,7 @@ describe('Calculator Store - What If Feature', () => {
     });
 
     it('should update What If type', () => {
-      const { setWhatIfType, whatIf } = useCalculatorStore.getState();
+      const { setWhatIfType } = useCalculatorStore.getState();
 
       setWhatIfType('amount');
 
@@ -370,8 +370,6 @@ describe('Calculator Store - What If Feature', () => {
       setTaxCode('1000L'); // Lower allowance
       calculate();
 
-      const { results } = useCalculatorStore.getState();
-
       setWhatIfType('amount'); // Add amount, not percentage
       setWhatIfValue(5000);
       calculateWhatIf();
@@ -392,8 +390,6 @@ describe('Calculator Store - What If Feature', () => {
       setSalary(40000);
       calculate();
       calculateWhatIf();
-
-      const { whatIfResults: initial } = useCalculatorStore.getState();
 
       // Change type (should trigger recalc in current implementation)
       setWhatIfType('amount');

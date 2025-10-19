@@ -58,7 +58,9 @@ function convertContentlayerPost(post: Post): BlogPost {
  */
 const getAllContentlayerPosts = unstable_cache(
   (): Promise<BlogPost[]> => {
-    return Promise.resolve(allPosts.filter((post) => post.published !== false).map(convertContentlayerPost));
+    return Promise.resolve(
+      allPosts.filter((post) => post.published !== false).map(convertContentlayerPost)
+    );
   },
   ['blog-all-posts'],
   { revalidate: 3600, tags: ['blog'] }

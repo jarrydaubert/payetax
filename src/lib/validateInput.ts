@@ -168,7 +168,7 @@ export function getInputErrorMessage(field: string, value: unknown): string | nu
       if (value !== undefined && (typeof value !== 'number' || Number.isNaN(value))) {
         return 'Please enter a valid age';
       }
-      if (value < 0 || value > 120) {
+      if (value !== undefined && (value < 0 || value > 120)) {
         return 'Please enter an age between 0 and 120';
       }
       break;
@@ -192,16 +192,16 @@ export function getInputErrorMessage(field: string, value: unknown): string | nu
       break;
 
     case 'hoursPerWeek':
-      if (value <= 0) {
+      if (typeof value === 'number' && value <= 0) {
         return 'Hours per week must be greater than 0';
       }
-      if (value > 168) {
+      if (typeof value === 'number' && value > 168) {
         return 'Hours per week cannot exceed 168';
       }
       break;
 
     case 'taxCode':
-      if (!value || value.trim() === '') {
+      if (typeof value !== 'string' || !value || value.trim() === '') {
         return 'Please enter a tax code';
       }
       if (!isValidTaxCode(value)) {

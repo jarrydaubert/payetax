@@ -156,6 +156,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
   describe('All NI Categories', () => {
     const categories: TaxCalculationInput['niCategory'][] = ['A', 'B', 'C', 'H', 'J', 'M', 'Z'];
 
+    // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
     categories.forEach((category) => {
       it(`calculates NI for category ${category}`, () => {
         const result = calculateTax(
@@ -224,6 +225,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       { plan: 'postgrad', threshold: 21000, rate: 6 },
     ];
 
+    // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
     plans.forEach(({ plan, threshold, rate }) => {
       it(`calculates ${plan} repayments correctly`, () => {
         const salary = 40000;
@@ -370,6 +372,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         { age: undefined, expectedPA: 12570 }, // No age
       ];
 
+      // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
       testCases.forEach(({ age, expectedPA }) => {
         const result = calculateTax(
           createInput({
@@ -564,6 +567,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
   describe('All Tax Years', () => {
     const taxYears: TaxCalculationInput['taxYear'][] = ['2024-2025', '2025-2026'];
 
+    // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
     taxYears.forEach((year) => {
       it(`calculates correctly for tax year ${year}`, () => {
         const result = calculateTax(

@@ -109,7 +109,7 @@ describe('TaxYearSelect Component', () => {
   });
 
   describe('Disabled State', () => {
-    it('should not open dropdown when disabled', async () => {
+    it('should not open dropdown when disabled', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} disabled={true} />);
 
       const button = screen.getByRole('button');
@@ -129,7 +129,7 @@ describe('TaxYearSelect Component', () => {
       expect(button).toHaveClass('disabled:opacity-50');
     });
 
-    it('should not call onChange when disabled', async () => {
+    it('should not call onChange when disabled', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} disabled={true} />);
 
       const button = screen.getByRole('button');

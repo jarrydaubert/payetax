@@ -335,9 +335,9 @@ describe('Sitemap Generation', () => {
 
       const result = await sitemap();
 
-      result.forEach((entry) => {
+      for (const entry of result) {
         expect(entry.url).toMatch(/^https:\/\/payetax\.co\.uk/);
-      });
+      }
     });
 
     it('should not have duplicate URLs', async () => {
@@ -396,9 +396,9 @@ describe('Sitemap Generation', () => {
         'never',
       ];
 
-      result.forEach((entry) => {
+      for (const entry of result) {
         expect(validFrequencies).toContain(entry.changeFrequency);
-      });
+      }
     });
 
     it('should set priorities between 0 and 1', async () => {
@@ -409,10 +409,10 @@ describe('Sitemap Generation', () => {
 
       const result = await sitemap();
 
-      result.forEach((entry) => {
+      for (const entry of result) {
         expect(entry.priority).toBeGreaterThanOrEqual(0);
         expect(entry.priority).toBeLessThanOrEqual(1);
-      });
+      }
     });
 
     it('should set lastModified in ISO format', async () => {
@@ -421,10 +421,10 @@ describe('Sitemap Generation', () => {
 
       const result = await sitemap();
 
-      result.forEach((entry) => {
+      for (const entry of result) {
         expect(() => new Date(entry.lastModified)).not.toThrow();
         expect(entry.lastModified).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
-      });
+      }
     });
   });
 

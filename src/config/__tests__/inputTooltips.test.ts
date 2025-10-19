@@ -17,15 +17,15 @@ describe('Input Tooltips Configuration', () => {
         'whatIfType',
       ];
 
-      essentialFields.forEach((field) => {
+      for (const field of essentialFields) {
         expect(INPUT_TOOLTIPS[field]).toBeDefined();
         expect(INPUT_TOOLTIPS[field].title).toBeTruthy();
         expect(INPUT_TOOLTIPS[field].description).toBeTruthy();
-      });
+      }
     });
 
     it('should have proper structure for each tooltip', () => {
-      Object.entries(INPUT_TOOLTIPS).forEach(([_key, content]) => {
+      for (const [_key, content] of Object.entries(INPUT_TOOLTIPS)) {
         expect(content).toHaveProperty('title');
         expect(content).toHaveProperty('description');
         expect(typeof content.title).toBe('string');
@@ -34,14 +34,14 @@ describe('Input Tooltips Configuration', () => {
         if (content.hmrc) {
           expect(typeof content.hmrc).toBe('string');
         }
-      });
+      }
     });
 
     it('should have non-empty content', () => {
-      Object.entries(INPUT_TOOLTIPS).forEach(([_key, content]) => {
+      for (const [_key, content] of Object.entries(INPUT_TOOLTIPS)) {
         expect(content.title.length).toBeGreaterThan(0);
         expect(content.description.length).toBeGreaterThan(0);
-      });
+      }
     });
   });
 
@@ -83,25 +83,25 @@ describe('Input Tooltips Configuration', () => {
 
   describe('Content Quality', () => {
     it('should have clear, concise titles (max 30 chars)', () => {
-      Object.entries(INPUT_TOOLTIPS).forEach(([_key, content]) => {
+      for (const [_key, content] of Object.entries(INPUT_TOOLTIPS)) {
         expect(content.title.length).toBeLessThanOrEqual(40);
-      });
+      }
     });
 
     it('should have helpful descriptions (min 20 chars)', () => {
-      Object.entries(INPUT_TOOLTIPS).forEach(([_key, content]) => {
+      for (const [_key, content] of Object.entries(INPUT_TOOLTIPS)) {
         expect(content.description.length).toBeGreaterThanOrEqual(20);
-      });
+      }
     });
 
     it('should include HMRC guidance for tax-related fields', () => {
       const taxFields = ['salary', 'taxCode', 'pensionContribution', 'studentLoanPlan'];
 
-      taxFields.forEach((field) => {
+      for (const field of taxFields) {
         const content = INPUT_TOOLTIPS[field];
         expect(content.hmrc).toBeDefined();
         expect(content.hmrc).toBeTruthy();
-      });
+      }
     });
   });
 

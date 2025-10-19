@@ -74,9 +74,9 @@ describe('TaxRateCard', () => {
 
     render(<TaxRateCard icon={Calculator} title='Multiple Items' items={multipleItems} />);
 
-    multipleItems.forEach((item) => {
+    for (const item of multipleItems) {
       expect(screen.getByText(item.label)).toBeInTheDocument();
       expect(screen.getByText(item.value)).toBeInTheDocument();
-    });
+    }
   });
 });

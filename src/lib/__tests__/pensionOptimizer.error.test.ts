@@ -269,6 +269,7 @@ describe('Pension Optimizer - Error Handling', () => {
         Number.MIN_SAFE_INTEGER,
       ];
 
+      // biome-ignore lint/complexity/noForEach: Testing multiple edge cases
       dangerousInputs.forEach((input) => {
         expect(() => calculateOptimalPension(input)).not.toThrow();
         expect(() => compareWithOptimization(input, 10000)).not.toThrow();

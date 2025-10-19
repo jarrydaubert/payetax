@@ -46,6 +46,11 @@ export const Post = defineDocumentType(() => ({
       description: 'Short excerpt for SEO and post listings',
       required: true,
     },
+    description: {
+      type: 'string',
+      description: 'Post description for SEO',
+      required: false,
+    },
     publishedAt: {
       type: 'date',
       description: 'Publication date',
