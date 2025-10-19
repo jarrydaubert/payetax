@@ -193,7 +193,7 @@ export default function AboutPage() {
                   href='/blog/100k-tax-trap-avoid-60-percent-tax-2025'
                   className='inline-flex items-center gap-2 font-semibold text-amber-600 transition-colors hover:text-amber-700'
                 >
-                  Learn more →
+                  Read our complete £100k tax trap guide →
                 </Link>
               </Card>
             </div>

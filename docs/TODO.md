@@ -1,6 +1,6 @@
 # 📋 PayeTax - Consolidated TODO List
 
-**Last Updated**: January 17, 2026  
+**Last Updated**: October 17, 2026  
 **Purpose**: Single source of truth for all outstanding work  
 **Status**: Active - consolidates all previous planning docs
 
@@ -12,24 +12,6 @@
 - 🟠 **HIGH** - Important features/fixes, do this week
 - 🟡 **MEDIUM** - Should do, schedule this month  
 - 🟢 **LOW** - Nice to have, backlog
-
----
-
-## ✅ JUST COMPLETED (Oct 18, 2025)
-
-### Documentation Cleanup ✅
-- Moved 12 planning docs from root to docs/archived/
-- Root now has only README.md and CHANGELOG.md (clean!)
-- Organized all v2.0 release docs into docs/archived/planning-iterations/
-
-### Test Fixes ✅  
-- Fixed 24 failing tests (down from 46 to 22!)
-- ScrollIndicator: z-10 → z-30
-- ResultsTable: Category → Payslip, Pension [You] → Pension
-- ResultsTable: Removed pension footnote test
-- ResultsTable: Net Change from Previous Year → Net Change from {year}
-- BasicInputs: Complete rewrite to match current implementation
-- Build: ✅ PASSING
 
 ---
 
@@ -64,7 +46,7 @@
 **High-Priority Targets**:
 1. **AccountingWeb** (DA 41) - Follow up on SME Director Tools proposal
 2. **MoneySavingExpert Forums** (DA 77) - Join and contribute helpfully
-3. **Tax Directories** - Submit to ICAEW, tax.org.uk, ICAS
+3. **Tax Directories** - Submit to ICAEW (email to partnerships team sent!), tax.org.uk, ICAS
 
 **Quick Wins**:
 - Submit to 3 tax professional directories (1 hour)
@@ -153,26 +135,13 @@ export function checkRateLimit(ip: string): boolean {
 
 ## 🟠 HIGH PRIORITY
 
-### 4. £100k Tax Trap Warning (NEW - Demo Feedback)
+### 4. £100k Tax Trap Warning (Done!)
 **Source**: Morning Demo January 17, 2026  
 **Priority**: 🟠 HIGH  
 **Time**: 2 hours  
-**Status**: ❌ Not Started
+**Status**: Done!
 
 **Issue**: Users earning £100k-£125k aren't warned about 60% effective tax rate
-
-**What to Build**:
-Alert box in results when salary in trap zone:
-- "⚠️ You're in the 60% Tax Trap Zone"
-- Explain personal allowance taper
-- Suggest pension contributions to avoid
-- Link to blog post (higher-rate-taxpayer-guide)
-
-**Files to Update**:
-- `src/components/organisms/CalculatorResults/ResultsSummaryCards.tsx`
-- Or create new `src/components/organisms/InsightsPanel.tsx`
-
-**Reference**: See `docs/planning/DEMO_FEEDBACK_JAN_17_2026.md`
 
 ---
 
@@ -201,7 +170,7 @@ New card showing:
 **Source**: Morning Demo January 17, 2026  
 **Priority**: 🟠 HIGH  
 **Time**: 3-4 hours  
-**Status**: ❌ Not Started
+**Status**: Done!
 
 **Issue**: Users can't easily compare salary scenarios (e.g., "what if I get a raise?")
 
@@ -212,12 +181,6 @@ Quick toggle buttons above results:
 - "- £5k (part-time)"
 
 Shows comparison table with differences highlighted
-
-**Files to Update**:
-- `src/components/organisms/CalculatorContainer.tsx` (add comparison state)
-- Create `src/components/organisms/ComparisonResults.tsx` (new component)
-
-**Reference**: See `docs/planning/DEMO_FEEDBACK_JAN_17_2026.md` for full spec
 
 ---
 
@@ -481,7 +444,7 @@ const taxCodeSchema = z.string().regex(/^[0-9]{3,4}[LMPKTY]$/);
 **Source**: NEXT_PRIORITIES.md  
 **Priority**: 🟡 MEDIUM  
 **Time**: 1-2 hours  
-**Status**: ❌ Not Started (if not already done)
+**Status**: Done!
 
 **Action**:
 1. Create Sentry account (free tier: 5K events/month)
@@ -498,7 +461,7 @@ const taxCodeSchema = z.string().regex(/^[0-9]{3,4}[LMPKTY]$/);
 **Source**: NEXT_PRIORITIES.md  
 **Priority**: 🟡 MEDIUM  
 **Time**: 30 minutes  
-**Status**: ❌ Not Started
+**Status**: Remove, no longer required!
 
 **Action**:
 - Login to linear.app → Settings → API
@@ -582,7 +545,7 @@ test('no a11y violations', async () => {
 **Time**: 30 minutes  
 **Status**: ❌ Not Started
 
-**What**: Dedicated `/scottish-tax` page for regional targeting (20% of UK searches)
+**What**: Dedicated blog post for regional targeting (20% of UK searches)
 
 **Content**:
 - Scottish tax bands (19%, 20%, 21%, 42%, 47%)
@@ -596,7 +559,7 @@ test('no a11y violations', async () => {
 **Source**: NEXT_PRIORITIES.md  
 **Priority**: 🟢 LOW  
 **Time**: 3-4 hours planning + ongoing  
-**Status**: ❌ Not Started
+**Status**: Done!
 
 **Actions**:
 - Install Grammarly browser extension
@@ -647,107 +610,3 @@ test('no a11y violations', async () => {
 **Scope**: Test concurrent user capacity, serverless cold starts
 
 ---
-
-## 📊 Quick Wins (< 30 min each)
-
-1. ✅ Fix broken external link (10 min)
-2. ✅ Set secret detection to blocking (5 min)
-3. ✅ Add pre-push hook (5 min)
-4. ✅ Update CI coverage thresholds (5 min)
-5. ✅ Add pipeline notifications (15 min)
-
-**Total**: 5 items, ~40 minutes
-
----
-
-## 🎯 Recommended Execution Order
-
-### Week 1: Critical Fixes
-1. Fix failing tests (30 min)
-2. Fix broken blog link (10 min)
-3. Add rate limiting (2-3 hrs)
-4. Set secret detection to blocking (5 min)
-5. Add pre-push hook (5 min)
-
-**Total**: ~4 hours
-
----
-
-### Week 2: Security & Accessibility
-6. Add CSRF protection (2-3 hrs)
-7. Increase touch targets (2 hrs)
-8. Add autocomplete attributes (1 hr)
-9. Add icons to color indicators (2 hrs)
-10. Add error announcements (1 hr)
-
-**Total**: ~10 hours
-
----
-
-### Week 3: Testing & Performance
-11. Add blog system tests (4-6 hrs)
-12. Improve store coverage (2-3 hrs)
-13. Optimize bundle size (3-4 hrs)
-
-**Total**: ~12 hours
-
----
-
-### Week 4: Optional Enhancements
-14. TaxInsight Sage widget (9-13 hrs) - **if approved**
-15. Sentry setup (1-2 hrs)
-16. Linear audit (30 min)
-17. Harden CSP (1-2 hrs)
-
-**Total**: ~12-17 hours
-
----
-
-## 📈 Progress Tracking
-
-### Completed Recently ✅
-- ✅ v1.3.0 release (accessibility fixes, accuracy improvements)
-- ✅ Color contrast WCAG AA compliance
-- ✅ Marriage allowance logic fixed
-- ✅ Hreflang conflicts resolved
-- ✅ 160+ tests added
-
----
-
-### In Progress 🚧
-- None currently
-
----
-
-### Blocked ⛔
-- None currently
-
----
-
-## 📝 Notes
-
-- **Test First**: Always run tests before making changes
-- **Git Status**: Check `git status` before committing
-- **Commit Often**: Small, focused commits
-- **Document Decisions**: Update relevant docs when changing architecture
-
----
-
-## 🗑️ Docs to Archive After Migration
-
-Once all tasks are migrated to this TODO.md, these docs can be moved to `docs/archived/`:
-
-1. ✅ `docs/planning/NEXT_PRIORITIES.md` → Archive after tasks migrated
-2. ✅ `docs/planning/SEMRUSH_NEXT_ACTIONS.md` → Archive after link fixed
-3. ✅ `docs/audits/CONSOLIDATED_ACTION_ITEMS.md` → Archive after tasks migrated
-4. ✅ `docs/audits/AUDIT_GAPS.md` → Archive after tasks migrated
-5. ⏳ `docs/planning/SAGE_IMPLEMENTATION_PLAN.md` → Keep until Sage approved/built
-6. ⏳ `docs/planning/SEO_STRATEGY.md` → Keep as reference (ongoing strategy)
-7. ✅ `docs/proposals/SME_DIRECTOR_TOOLS_PROPOSAL.md` → Keep (external facing)
-
----
-
-**Last Updated**: January 17, 2026  
-**Total Outstanding Tasks**: 28  
-**Estimated Total Time**: ~70 hours  
-**Next Review**: Weekly on Mondays

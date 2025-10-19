@@ -37,6 +37,7 @@ export interface PensionOptimization {
  * Calculate optimal pension contribution for high earners
  *
  * @param salary - Annual gross salary
+ * @param currentPension - Current annual pension contribution (default: 0)
  * @returns Optimization details or null if not in trap zone or invalid input
  * @throws {Error} Never throws - returns null for invalid inputs
  *
@@ -51,21 +52,25 @@ export interface PensionOptimization {
  * // }
  *
  * @example
+ * // With existing pension - if trap is already avoided, returns null
+ * calculateOptimalPension(110000, 10000); // null (adjusted income = £100k, trap avoided)
+ *
+ * @example
  * // Invalid inputs return null
  * calculateOptimalPension(NaN); // null
  * calculateOptimalPension(-5000); // null
  * calculateOptimalPension(Infinity); // null
  */
-export function calculateOptimalPension(salary: number): PensionOptimization | null {
+export function calculateOptimalPension(salary: number, currentPension = 0): PensionOptimization | null {
+  // Validate inputs
   try {
-    // Validate input
     if (!isValidSalary(salary)) {
       console.warn(`[pensionOptimizer] Invalid salary input: ${salary}`);
       return null;
     }
 
-    // Only applies to £100k-£125k range (exclusive of £100k, inclusive until £125,140)
-    if (salary <= 100000 || salary > 125140) {
+    if (currentPension < 0 || !Number.isFinite(currentPension)) {
+      console.warn(`[pensionOptimizer] Invalid pension input: ${currentPension}`);
       return null;
     }
   } catch (error) {
@@ -73,8 +78,17 @@ export function calculateOptimalPension(salary: number): PensionOptimization | n
     return null;
   }
 
-  // Calculate excess over £100k threshold
-  const excessOver100k = salary - 100000;
+  // Calculate adjusted income (what HMRC uses for personal allowance tapering)
+  const adjustedIncome = salary - currentPension;
+
+  // Only applies to £100k-£125k range (exclusive of £100k, inclusive until £125,140)
+  // Check ADJUSTED income, not gross salary - pension contributions reduce this
+  if (adjustedIncome <= 100000 || adjustedIncome > 125140) {
+    return null;
+  }
+
+  // Calculate excess over £100k threshold (using adjusted income)
+  const excessOver100k = adjustedIncome - 100000;
 
   // Personal allowance reduction: £1 lost for every £2 earned over £100k
   // Capped at full personal allowance (£12,570)
@@ -84,16 +98,18 @@ export function calculateOptimalPension(salary: number): PensionOptimization | n
   // (40% income tax + 20% from losing personal allowance)
   const effectiveRate = 60;
 
-  // Suggest contributing enough to drop back to £100k
+  // Suggest contributing ADDITIONAL amount to drop adjusted income back to £100k
+  // This is on top of any existing pension contribution
   // Round up to nearest £1,000 for simplicity
-  const suggested = Math.ceil(excessOver100k / 1000) * 1000;
+  const additionalNeeded = Math.ceil(excessOver100k / 1000) * 1000;
+  const suggested = additionalNeeded;
 
   // Calculate tax savings: 60% of contribution saved in tax
   // Plus 25% tax relief on pension contribution
   const savingsFromOptimizing = suggested * 0.6;
 
-  // Optimization is beneficial if salary is above £100k
-  const shouldOptimize = salary > 100000;
+  // Optimization is beneficial if adjusted income is above £100k
+  const shouldOptimize = adjustedIncome > 100000;
 
   return {
     suggested,
