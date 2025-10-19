@@ -77,10 +77,13 @@ export function ResultsTable({
     visiblePeriods,
   ]);
 
-  // Tax trap detection
+  // Tax trap detection - pass current pension to check if trap is already avoided
   const taxTrapOptimization = React.useMemo(() => {
-    return calculateOptimalPension(results.grossSalary.annually);
-  }, [results.grossSalary.annually]);
+    return calculateOptimalPension(
+      results.grossSalary.annually,
+      results.pensionContribution.annually
+    );
+  }, [results.grossSalary.annually, results.pensionContribution.annually]);
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   // Default to current tax year if not provided

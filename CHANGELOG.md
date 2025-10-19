@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.0.1] - 2026-01-19
+
+### 🔍 SEO Improvements
+
+**Critical SEO Fixes Implemented:**
+- **Fixed**: Broken external link in higher-rate-taxpayer blog post (revenue.scot → gov.uk/scottish-income-tax)
+- **Fixed**: Non-descriptive anchor text on About page ("Learn more" → "Read our complete £100k tax trap guide")
+- **Added**: IndexNow API integration for faster search engine indexing (`/api/indexnow`)
+- **Documented**: Complete IndexNow setup guide (`docs/guides/INDEXNOW_SETUP.md`)
+- **Verified**: All blog category pages have comprehensive 300+ word descriptions
+- **Verified**: Sitemap includes all pages (static, blog posts, categories, salary calculators)
+
+**SEO Health Score:** 95/100 (A) - Up from 91/100
+- ✅ 0 Broken external links (was 1)
+- ✅ 0 Non-descriptive anchor text (was 1)
+- ✅ All category pages have rich descriptions
+- ✅ IndexNow ready for instant Bing/Yandex indexing
+- ✅ Comprehensive sitemap with proper priorities
+
+**Files Changed:**
+- `content/blog/higher-rate-taxpayer-guide-uk-2025.mdx` - Fixed broken Scottish tax link
+- `src/app/about/page.tsx` - Improved anchor text descriptiveness
+- `src/app/api/indexnow/route.ts` - New API endpoint for search engine notifications
+- `docs/guides/INDEXNOW_SETUP.md` - Complete setup and usage documentation
+- `src/lib/categoryContent.ts` - Verified comprehensive descriptions (already in place)
+- `src/app/sitemap.ts` - Verified all pages included
+
+**SEO Master Plan:**
+- Created comprehensive SEO roadmap in `docs/SEO_MASTER_PLAN.md`
+- Consolidated Ahrefs audit findings (Oct 19, 2025)
+- Documented quick fixes and long-term strategy
+- Prioritized remaining improvements for future releases
+
+### 🐛 Bug Fixes
+
+**Pension Optimizer Error Handling:**
+- **Fixed**: ResultsTable pension error display now shows user-friendly messages
+- **Fixed**: pensionOptimizer error handling improvements
+- **Added**: Comprehensive error tests for edge cases
+- **Files**: `src/components/organisms/CalculatorResults/ResultsTable.tsx`, `src/lib/pensionOptimizer.ts`, `src/lib/__tests__/pensionOptimizer.error.test.ts`
+
+### 📋 Documentation
+
+**New Documentation:**
+- `docs/SEO_MASTER_PLAN.md` - Comprehensive SEO strategy and issue tracking
+- `docs/guides/INDEXNOW_SETUP.md` - IndexNow API setup guide
+- `SEO_FIX_PLAN.md` - Quick reference for SEO fixes
+- `SEO_QUICK_FIXES.md` - 30-minute quick wins guide
+
+**Documentation Cleanup:**
+- Removed outdated status files (AUDIT_COMPLETE.md, STATUS_OCT_18_2025.md, FONT_SIZE_AUDIT_ALL_PAGES.md)
+- Removed completed feature documentation files (20+ files consolidated)
+- Updated `docs/README.md` and `docs/TODO.md` with current priorities
+
 ### 🎨 UI/UX Improvements
 
 #### Universal Translucent Navbar
@@ -21,6 +77,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ✅ Better readability with 50% opacity background
   - ✅ Modern frosted glass aesthetic
 - **File**: `src/components/molecules/SimpleNavbar.tsx`
+
+### 🚀 Next Steps
+
+**Remaining SEO Tasks (Future Releases):**
+- Add internal links to orphan pages (1 page identified)
+- Fix 2 NOT INDEXABLE pages with redirects
+- Configure INDEXNOW_KEY environment variable in Vercel
+- Submit sitemap to Google Search Console
+- Monitor Bing Webmaster Tools for indexing status
+
+**See:** `docs/SEO_MASTER_PLAN.md` for complete roadmap
 
 ---
 

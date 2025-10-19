@@ -93,6 +93,53 @@ describe('Pension Optimizer - Error Handling', () => {
     });
   });
 
+  describe('calculateOptimalPension - With Current Pension', () => {
+    it('should return null when existing pension already avoids the trap', () => {
+      // £110k salary, £10k pension = £100k adjusted income (trap avoided)
+      const result = calculateOptimalPension(110000, 10000);
+      expect(result).toBeNull();
+    });
+
+    it('should suggest additional pension when existing pension is insufficient', () => {
+      // £115k salary, £5k pension = £110k adjusted income (still in trap)
+      const result = calculateOptimalPension(115000, 5000);
+      expect(result).not.toBeNull();
+      expect(result?.suggested).toBe(10000); // Need £10k more to reach £100k adjusted
+    });
+
+    it('should handle when current pension brings you exactly to £100k', () => {
+      // £120k salary, £20k pension = £100k adjusted income (exactly at threshold)
+      const result = calculateOptimalPension(120000, 20000);
+      expect(result).toBeNull();
+    });
+
+    it('should return null for invalid negative pension', () => {
+      const result = calculateOptimalPension(110000, -5000);
+      expect(result).toBeNull();
+    });
+
+    it('should return null for non-finite pension', () => {
+      const result = calculateOptimalPension(110000, Infinity);
+      expect(result).toBeNull();
+    });
+
+    it('should calculate allowance lost based on adjusted income', () => {
+      // £110k salary, £0 pension = £110k adjusted income
+      const result1 = calculateOptimalPension(110000, 0);
+      expect(result1?.allowanceLost).toBe(5000); // (110k - 100k) / 2 = 5k
+
+      // £110k salary, £5k pension = £105k adjusted income
+      const result2 = calculateOptimalPension(110000, 5000);
+      expect(result2?.allowanceLost).toBe(2500); // (105k - 100k) / 2 = 2.5k
+    });
+
+    it('should work with zero pension (default parameter)', () => {
+      const resultWithZero = calculateOptimalPension(110000, 0);
+      const resultDefault = calculateOptimalPension(110000);
+      expect(resultWithZero).toEqual(resultDefault);
+    });
+  });
+
   describe('compareWithOptimization - Invalid Inputs', () => {
     it('should return null for NaN salary', () => {
       const result = compareWithOptimization(NaN, 10000);
