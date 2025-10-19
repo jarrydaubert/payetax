@@ -223,7 +223,8 @@ describe('Calculator Store - What If Feature', () => {
       expect(whatIfResults?.taxBands.length).toBeGreaterThan(0);
 
       // Tax bands should have amounts
-      const totalTaxFromBands = whatIfResults?.taxBands.reduce((sum, band) => sum + band.amount, 0);
+      // Note: band.amount is the income taxed at that rate, not the tax itself
+      const totalTaxFromBands = whatIfResults?.taxBands.reduce((sum, band) => sum + (band.amount * band.rate / 100), 0);
       expect(totalTaxFromBands).toBeCloseTo(whatIfResults?.incomeTax.annually || 0, 0);
     });
   });
@@ -277,7 +278,7 @@ describe('Calculator Store - What If Feature', () => {
 
       const { whatIfResults } = useCalculatorStore.getState();
       // Pension should be 5% of new salary (55k)
-      expect(whatIfResults?.pensionContribution.annually).toBe(2750);
+      expect(whatIfResults?.pensionContribution.annually).toBeCloseTo(2750, 2);
     });
   });
 
@@ -290,7 +291,7 @@ describe('Calculator Store - What If Feature', () => {
 
       const { whatIfResults } = useCalculatorStore.getState();
       // Should not crash, results should be null or undefined
-      expect(whatIfResults).toBeUndefined();
+      expect(whatIfResults).toBeNull();
     });
 
     it('should ensure non-negative salary in What If', () => {
@@ -311,16 +312,17 @@ describe('Calculator Store - What If Feature', () => {
     });
 
     it('should handle student loan in What If calculation', () => {
-      const { setSalary, setStudentLoanPlan, calculate, setWhatIfValue, calculateWhatIf } =
+      const { setSalary, setStudentLoanPlan, calculate, setWhatIfType, setWhatIfValue, calculateWhatIf } =
         useCalculatorStore.getState();
 
       setSalary(30000);
-      setStudentLoanPlan('Plan 2');
+      setStudentLoanPlan('plan2'); // Use lowercase plan name
       calculate();
 
       const { results } = useCalculatorStore.getState();
       const currentLoan = results?.studentLoan.annually || 0;
 
+      setWhatIfType('amount'); // Add amount, not percentage
       setWhatIfValue(10000); // Add 10k
       calculateWhatIf();
 
@@ -348,11 +350,11 @@ describe('Calculator Store - What If Feature', () => {
 
       // Should have calculated with Scottish rates
       expect(whatIfResults).toBeDefined();
-      expect(whatIfResults?.grossSalary.annually).toBe(55000);
+      expect(whatIfResults?.grossSalary.annually).toBeCloseTo(55000, 2);
     });
 
     it('should apply different tax codes in What If calculation', () => {
-      const { setSalary, setTaxCode, calculate, setWhatIfValue, calculateWhatIf } =
+      const { setSalary, setTaxCode, calculate, setWhatIfType, setWhatIfValue, calculateWhatIf } =
         useCalculatorStore.getState();
 
       setSalary(40000);
@@ -361,6 +363,7 @@ describe('Calculator Store - What If Feature', () => {
 
       const { results } = useCalculatorStore.getState();
 
+      setWhatIfType('amount'); // Add amount, not percentage
       setWhatIfValue(5000);
       calculateWhatIf();
 

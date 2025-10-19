@@ -263,16 +263,16 @@ describe('CalculatorContainer Component', () => {
     it('should show export buttons when results exist', () => {
       render(<CalculatorContainer />);
 
-      expect(screen.getByRole('button', { name: /Print/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Export CSV/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Print tax calculation results/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Export results to CSV file/i })).toBeInTheDocument();
     });
 
     it('should not show export buttons when no results', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
 
-      expect(screen.queryByRole('button', { name: /Print/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /Export CSV/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Print tax calculation results/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Export results to CSV file/i })).not.toBeInTheDocument();
     });
   });
 
@@ -286,7 +286,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export CSV/i });
+      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
       fireEvent.click(button);
 
       expect(exportToCSV).toHaveBeenCalledWith(mockResults);
@@ -298,7 +298,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export CSV/i });
+      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
       fireEvent.click(button);
 
       expect(toast.success).toHaveBeenCalledWith('CSV exported successfully!');
@@ -312,7 +312,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export CSV/i });
+      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
       fireEvent.click(button);
 
       expect(toast.error).toHaveBeenCalledWith('Failed to export CSV');
@@ -323,7 +323,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       // Export button shouldn't be visible
-      expect(screen.queryByRole('button', { name: /Export CSV/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Export results to CSV file/i })).not.toBeInTheDocument();
     });
   });
 
@@ -337,7 +337,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Print/i });
+      const button = screen.getByRole('button', { name: /Print tax calculation results/i });
       fireEvent.click(button);
 
       expect(printResults).toHaveBeenCalledWith(mockResults);
@@ -351,7 +351,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Print/i });
+      const button = screen.getByRole('button', { name: /Print tax calculation results/i });
       fireEvent.click(button);
 
       expect(toast.error).toHaveBeenCalledWith('Failed to open print dialog');
@@ -362,7 +362,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       // Print button shouldn't be visible
-      expect(screen.queryByRole('button', { name: /Print/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Print tax calculation results/i })).not.toBeInTheDocument();
     });
   });
 
@@ -372,7 +372,7 @@ describe('CalculatorContainer Component', () => {
 
       const section = screen.getByTestId('calculator-section');
       expect(section).toHaveClass('lg:grid');
-      expect(section).toHaveClass('lg:grid-cols-[380px_1fr]');
+      expect(section).toHaveClass('lg:grid-cols-[380px_minmax(0,1fr)]');
     });
 
     it('should have responsive spacing', () => {
@@ -417,8 +417,8 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
       render(<CalculatorContainer />);
 
-      expect(screen.getByRole('button', { name: /Print/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Export CSV/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Print tax calculation results/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Export results to CSV file/i })).toBeInTheDocument();
     });
   });
 

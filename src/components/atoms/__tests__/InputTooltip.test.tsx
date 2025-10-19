@@ -56,7 +56,10 @@ describe('InputTooltip Component', () => {
       await user.hover(trigger);
 
       await waitFor(() => {
-        expect(screen.getByText('Gross Salary')).toBeInTheDocument();
+        // Use getByTestId to target specific tooltip content
+        const tooltipContent = screen.getByTestId('tooltip-content-salary');
+        expect(tooltipContent).toBeInTheDocument();
+        expect(tooltipContent).toHaveTextContent('Gross Salary');
       });
     });
 
@@ -73,12 +76,13 @@ describe('InputTooltip Component', () => {
       await user.hover(trigger);
 
       await waitFor(() => {
+        const tooltipContent = screen.getByTestId('tooltip-content-salary');
         // Title
-        expect(screen.getByText('Gross Salary')).toBeInTheDocument();
+        expect(tooltipContent).toHaveTextContent('Gross Salary');
         // Description
-        expect(screen.getByText(/total earnings before tax/i)).toBeInTheDocument();
+        expect(tooltipContent).toHaveTextContent(/total earnings before tax/i);
         // HMRC guidance
-        expect(screen.getByText(/Include salary, bonuses/i)).toBeInTheDocument();
+        expect(tooltipContent).toHaveTextContent(/Include salary, bonuses/i);
       });
     });
 
@@ -95,8 +99,9 @@ describe('InputTooltip Component', () => {
       await user.hover(trigger);
 
       await waitFor(() => {
-        expect(screen.getByText(/Plan 1:/i)).toBeInTheDocument();
-        expect(screen.getByText(/Plan 2:/i)).toBeInTheDocument();
+        const tooltipContent = screen.getByTestId('tooltip-content-studentLoanPlan');
+        expect(tooltipContent).toHaveTextContent(/Plan 1:/i);
+        expect(tooltipContent).toHaveTextContent(/Plan 2:/i);
       });
     });
   });

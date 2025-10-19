@@ -63,11 +63,17 @@ if (typeof global.Headers === 'undefined') {
       this.map = new Map();
       if (init) {
         if (init instanceof Headers) {
-          init.forEach((value, key) => this.set(key, value));
+          for (const [key, value] of init.entries()) {
+            this.set(key, value);
+          }
         } else if (Array.isArray(init)) {
-          init.forEach(([key, value]) => this.set(key, value));
+          for (const [key, value] of init) {
+            this.set(key, value);
+          }
         } else {
-          Object.entries(init).forEach(([key, value]) => this.set(key, value));
+          for (const [key, value] of Object.entries(init)) {
+            this.set(key, value);
+          }
         }
       }
     }
@@ -89,7 +95,9 @@ if (typeof global.Headers === 'undefined') {
     }
 
     forEach(callback) {
-      this.map.forEach((value, key) => callback(value, key, this));
+      for (const [key, value] of this.map.entries()) {
+        callback(value, key, this);
+      }
     }
 
     entries() {

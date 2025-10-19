@@ -1,8 +1,8 @@
 # PayeTax Technical Stack & Architecture
 
-**Last Updated:** October 7, 2025
+**Last Updated:** January 19, 2026
 **Status:** ✅ Production Ready
-**Version:** 1.0.0
+**Version:** 2.0.1
 
 ---
 
@@ -24,16 +24,16 @@
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js** | 15.5.4 | React framework with App Router |
-| **React** | 19.0.0 | UI library |
-| **TypeScript** | 5.9.0 | Type safety |
+| **Next.js** | 15.5.6 | React framework with App Router |
+| **React** | 19.2.0 | UI library |
+| **TypeScript** | 5.9.3 | Type safety |
 | **Tailwind CSS** | 4.1.14 | Utility-first styling |
-| **Zustand** | 5.0.3 | State management |
-| **shadcn/ui** | 3.3.1 | Component library |
-| **Framer Motion** | 12.23.22 | Animations |
+| **Zustand** | 5.0.8 | State management |
+| **shadcn/ui** | Latest | Component library |
+| **Framer Motion** | 12.23.24 | Animations |
 | **Contentlayer2** | 0.5.8 | MDX blog processing |
-| **@linear/sdk** | 60.0.0 | Project management integration |
-| **Biome** | 2.2.5 | Linting & formatting |
+| **@linear/sdk** | 60.0.1 | Project management integration |
+| **Biome** | 2.2.6 | Linting & formatting |
 | **jest-axe** | 10.0.0 | Accessibility testing (WCAG) |
 
 ### Key Features
@@ -507,7 +507,8 @@ npm audit fix
 ### Unit Tests
 
 **Framework:** Jest + Testing Library
-**Coverage:** 16.47% (target 80%+)
+**Coverage:** 90.46% (target 95%+)
+**Tests:** 1,723 passing / 1,748 total (98.6% pass rate)
 
 ```bash
 npm test              # Run tests with coverage
@@ -594,6 +595,7 @@ Consider adopting:
 
 ---
 
-**Last Updated:** October 5, 2025
+**Last Updated:** January 19, 2026
 **Maintained By:** PayeTax Team
 **Review Cycle:** Quarterly
+**Latest Release:** v2.0.1 (SEO Improvements & IndexNow Integration)

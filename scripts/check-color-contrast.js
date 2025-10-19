@@ -100,12 +100,12 @@ for (const [mode, colors] of Object.entries(colorTests)) {
     },
   ];
 
-  tests.forEach(({ name, ratio, required }) => {
+  for (const { name, ratio, required } of tests) {
     const passes = ratio >= required;
     const status = passes ? '✅ PASS' : '❌ FAIL';
     console.log(`${status} ${name}`);
     console.log(`     Ratio: ${ratio.toFixed(2)}:1 (Required: ${required}:1)`);
-  });
+  }
 }
 
 console.log(`\n${'='.repeat(60)}`);
