@@ -127,7 +127,7 @@ describe('ScrollIndicator Component', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('z-10');
+      expect(indicator.className).toContain('z-30');
     });
 
     it('should have flex display', () => {

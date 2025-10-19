@@ -2,7 +2,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Percent, PoundSterling } from 'lucide-react';
 import { useId } from 'react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -56,9 +58,11 @@ export function BasicInputs() {
   const payPeriodOptions = [
     { value: PERIODS.ANNUALLY, label: 'Annually' },
     { value: PERIODS.MONTHLY, label: 'Monthly' },
-    { value: PERIODS.WEEKLY, label: 'Weekly' },
+    { value: PERIODS.FOUR_WEEKLY, label: '4-Weekly' },
     { value: PERIODS.FORTNIGHTLY, label: 'Fortnightly' },
-    { value: PERIODS.FOUR_WEEKLY, label: 'Four Weekly' },
+    { value: PERIODS.WEEKLY, label: 'Weekly' },
+    { value: PERIODS.DAILY, label: 'Daily' },
+    { value: PERIODS.HOURLY, label: 'Hourly' },
   ];
 
   const regionOptions = [
@@ -84,45 +88,51 @@ export function BasicInputs() {
       transition={{ duration: 0.3 }}
       className='space-y-3'
     >
+      {/* Heading */}
+      <h3 className='font-semibold text-foreground text-lg'>Enter Income Tax Details</h3>
+
+      {/* Salary and Pay Period on one line */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={salaryId} className='min-w-[140px] text-sm'>
-          Salary
-        </Label>
-        <NumberInput
-          id={salaryId}
-          value={input.salary}
-          onChange={setSalary}
-          prefix='£'
-          decimals={2}
-          placeholder='0.00'
-          min={0}
-          className='flex-1'
-          data-testid='salary-input'
-        />
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='salary' />
+          <Label htmlFor={salaryId} className='whitespace-nowrap text-sm'>
+            Salary
+          </Label>
+        </div>
+        <div className='flex flex-1 gap-2'>
+          <NumberInput
+            id={salaryId}
+            value={input.salary}
+            onChange={setSalary}
+            prefix='£'
+            decimals={2}
+            placeholder='0.00'
+            min={0}
+            className='flex-1'
+            data-testid='salary-input'
+          />
+          <Select value={input.payPeriod} onValueChange={setPayPeriod}>
+            <SelectTrigger id={payPeriodId} className='w-[140px]'>
+              <SelectValue placeholder='Annually' />
+            </SelectTrigger>
+            <SelectContent>
+              {payPeriodOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className='flex items-center gap-3'>
-        <Label htmlFor={payPeriodId} className='min-w-[140px] text-sm'>
-          Pay Period
-        </Label>
-        <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-          <SelectTrigger id={payPeriodId} className='flex-1'>
-            <SelectValue placeholder='Select pay period' />
-          </SelectTrigger>
-          <SelectContent>
-            {payPeriodOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className='flex items-center gap-3'>
-        <Label htmlFor={taxYearId} className='min-w-[140px] text-sm'>
-          Tax Year
-        </Label>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='taxYear' />
+          <Label htmlFor={taxYearId} className='whitespace-nowrap text-sm'>
+            Tax Year
+          </Label>
+        </div>
         <TaxYearSelect
           id={taxYearId}
           value={input.taxYear}
@@ -132,24 +142,32 @@ export function BasicInputs() {
         />
       </div>
 
+      {/* Tax Code Input with Tooltip - defaults to 1257L (S1257L for Scotland) */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={taxCodeId} className='min-w-[140px] text-sm'>
-          Tax Code
-        </Label>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='taxCode' />
+          <Label htmlFor={taxCodeId} className='whitespace-nowrap text-sm'>
+            Tax Code
+          </Label>
+        </div>
         <Input
           id={taxCodeId}
           type='text'
           value={input.taxCode}
           onChange={(e) => setTaxCode(e.target.value.toUpperCase())}
-          placeholder='1257L'
+          placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
           className='flex-1 uppercase'
         />
       </div>
 
+      {/* Region Select with Tooltip */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={regionId} className='min-w-[140px] text-sm'>
-          Region
-        </Label>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='region' />
+          <Label htmlFor={regionId} className='whitespace-nowrap text-sm'>
+            Region
+          </Label>
+        </div>
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger id={regionId} className='flex-1'>
             <SelectValue placeholder='Select region' />
@@ -164,18 +182,41 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      <div className='flex items-center gap-3'>
-        <Label htmlFor={marriedId} className='min-w-[140px] text-sm'>
-          Married
-        </Label>
-        <Checkbox id={marriedId} checked={input.isMarried} onCheckedChange={setIsMarried} />
+      {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='marriageAllowance' />
+          <Label htmlFor={marriedId} className='text-sm'>
+            Married
+          </Label>
+          <Checkbox id={marriedId} checked={input.isMarried} onCheckedChange={setIsMarried} />
+        </div>
+
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='blindAllowance' />
+          <Label htmlFor={blindId} className='text-sm'>
+            Blind
+          </Label>
+          <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
+        </div>
+
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='payNoNI' />
+          <Label htmlFor={payNoNIId} className='text-sm'>
+            I pay no NI
+          </Label>
+          <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
+        </div>
       </div>
 
       {input.isMarried && (
         <div className='flex items-center gap-3'>
-          <Label htmlFor={partnerWageId} className='min-w-[140px] text-sm'>
-            Partner's Gross Wage
-          </Label>
+          <div className='flex items-center gap-1.5'>
+            <LabelTooltip fieldName='partnerGrossWage' />
+            <Label htmlFor={partnerWageId} className='whitespace-nowrap text-sm'>
+              Partner's Gross Wage
+            </Label>
+          </div>
           <NumberInput
             id={partnerWageId}
             value={input.partnerGrossWage}
@@ -189,41 +230,50 @@ export function BasicInputs() {
         </div>
       )}
 
+      {/* Age - Dropdown for HMRC NI thresholds */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={blindId} className='min-w-[140px] text-sm'>
-          Blind Allowance
-        </Label>
-        <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='age' />
+          <Label htmlFor={ageId} className='whitespace-nowrap text-sm'>
+            Age
+          </Label>
+        </div>
+        <Select
+          value={
+            !input.age || input.age < 65
+              ? 'under-65'
+              : input.age >= 65 && input.age < 75
+                ? '65-74'
+                : '75-plus'
+          }
+          onValueChange={(value) => {
+            // Set representative age for each bracket (affects NI calculations)
+            if (value === 'under-65')
+              setAge(undefined); // Use default (working age)
+            else if (value === '65-74')
+              setAge(70); // Over state pension age (no NI)
+            else setAge(76); // 75+ (no NI)
+          }}
+        >
+          <SelectTrigger id={ageId} className='flex-1' data-testid='age-select'>
+            <SelectValue placeholder='Select age range' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='under-65'>Under 65</SelectItem>
+            <SelectItem value='65-74'>65-74</SelectItem>
+            <SelectItem value='75-plus'>Over 75</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
+      {/* Student Loan */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={ageId} className='min-w-[140px] text-sm'>
-          Age
-        </Label>
-        <NumberInput
-          id={ageId}
-          value={input.age || 0}
-          onChange={(value) => setAge(value > 0 ? value : undefined)}
-          decimals={0}
-          placeholder='Enter age'
-          min={0}
-          max={120}
-          className='flex-1'
-          data-testid='age-input'
-        />
-      </div>
-
-      <div className='flex items-center gap-3'>
-        <Label htmlFor={payNoNIId} className='min-w-[140px] text-sm'>
-          I pay no NI
-        </Label>
-        <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
-      </div>
-
-      <div className='flex items-center gap-3'>
-        <Label htmlFor={studentLoanId} className='min-w-[140px] text-sm'>
-          Student Loan
-        </Label>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='studentLoanPlan' />
+          <Label htmlFor={studentLoanId} className='whitespace-nowrap text-sm'>
+            Student Loan
+          </Label>
+        </div>
         <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
           <SelectTrigger id={studentLoanId} className='flex-1'>
             <SelectValue placeholder='Select student loan' />
@@ -238,10 +288,14 @@ export function BasicInputs() {
         </Select>
       </div>
 
+      {/* Allowances/Deductions */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={allowancesId} className='min-w-[140px] text-sm'>
-          Allowances/Deductions
-        </Label>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='allowancesDeductions' />
+          <Label htmlFor={allowancesId} className='whitespace-nowrap text-sm'>
+            Allowances/Deductions
+          </Label>
+        </div>
         <NumberInput
           id={allowancesId}
           value={input.allowancesDeductions}
@@ -254,55 +308,55 @@ export function BasicInputs() {
         />
       </div>
 
+      {/* Pension Contribution - Combined Type + Amount on 1 row */}
       <div className='flex items-center gap-3'>
-        <Label htmlFor={pensionTypeId} className='min-w-[140px] text-sm'>
-          Pension Type
-        </Label>
-        <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
-          <SelectTrigger id={pensionTypeId} className='flex-1'>
-            <SelectValue placeholder='Select type' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='percentage'>Percentage</SelectItem>
-            <SelectItem value='amount'>Fixed Amount</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {input.pensionContributionType === 'percentage' ? (
-        <div className='flex items-center gap-3'>
-          <Label htmlFor={pensionId} className='min-w-[140px] text-sm'>
-            Pension Contribution %
-          </Label>
-          <NumberInput
-            id={pensionId}
-            value={input.pensionContribution}
-            onChange={setPensionContribution}
-            suffix='%'
-            decimals={2}
-            placeholder='5.00'
-            min={0}
-            max={100}
-            className='flex-1'
-          />
-        </div>
-      ) : (
-        <div className='flex items-center gap-3'>
-          <Label htmlFor={pensionId} className='min-w-[140px] text-sm'>
+        <div className='flex items-center gap-1.5'>
+          <LabelTooltip fieldName='pensionContribution' />
+          <Label htmlFor={pensionId} className='whitespace-nowrap text-sm'>
             Pension Contribution
           </Label>
+        </div>
+        <div className='flex flex-1 gap-1.5'>
+          {/* Type selector with icons */}
+          <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
+            <SelectTrigger id={pensionTypeId} className='w-[60px] shrink-0'>
+              <SelectValue>
+                {input.pensionContributionType === 'percentage' ? (
+                  <Percent className='size-4' />
+                ) : (
+                  <PoundSterling className='size-4' />
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='percentage'>
+                <div className='flex items-center justify-center'>
+                  <Percent className='size-4' />
+                </div>
+              </SelectItem>
+              <SelectItem value='amount'>
+                <div className='flex items-center justify-center'>
+                  <PoundSterling className='size-4' />
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Input field */}
           <NumberInput
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}
-            prefix='£'
+            prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
+            suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}
             decimals={2}
-            placeholder='0.00'
+            placeholder={input.pensionContributionType === 'percentage' ? '5.00' : '0.00'}
             min={0}
+            max={input.pensionContributionType === 'percentage' ? 100 : undefined}
             className='flex-1'
           />
         </div>
-      )}
+      </div>
     </motion.div>
   );
 }

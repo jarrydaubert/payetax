@@ -98,8 +98,9 @@ export function formatInputValue(value: string): string {
  * @returns Parsed number value (or 0 if invalid)
  */
 export function parseFormattedValue(value: string): number {
-  // Remove all non-numeric characters except decimal point
-  const numericValue = value.replace(/[^\d.]/g, '');
+  // Remove thousand separators (commas) first
+  // Then remove all non-numeric characters except decimal point
+  const numericValue = value.replace(/,/g, '').replace(/[^\d.]/g, '');
   const num = Number.parseFloat(numericValue);
 
   return Number.isNaN(num) ? 0 : num;

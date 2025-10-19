@@ -1,7 +1,7 @@
 // src/components/molecules/ResultTableRow.tsx
 'use client';
 
-import type * as React from 'react';
+import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 
@@ -9,6 +9,7 @@ interface ResultTableRowProps {
   category: string;
   icon: React.ElementType;
   annual: number;
+  whatIfAnnual?: number;
   percentage: string;
   color: string;
   isHighlight?: boolean;
@@ -26,6 +27,7 @@ export function ResultTableRow({
   category,
   icon: Icon,
   annual,
+  whatIfAnnual,
   percentage,
   color,
   isHighlight = false,
@@ -33,10 +35,11 @@ export function ResultTableRow({
   visiblePeriods,
   periodOptions,
 }: ResultTableRowProps) {
+  const hasWhatIf = whatIfAnnual !== undefined;
   return (
     <TableRow
       className={`border-b transition-colors hover:bg-muted/50 ${
-        isHighlight ? 'border-t-2 border-t-primary bg-primary/5' : ''
+        isHighlight ? 'border-t border-t-border bg-primary/5' : ''
       }`}
     >
       <TableCell
@@ -55,7 +58,32 @@ export function ResultTableRow({
         {percentage}
       </TableCell>
       {visiblePeriods.map((period) => {
-        const periodValue = annual / periodOptions[period];
+        const currentValue = annual / periodOptions[period];
+        const whatIfValue = whatIfAnnual ? whatIfAnnual / periodOptions[period] : undefined;
+
+        if (hasWhatIf && whatIfValue !== undefined) {
+          // Render Current and What If columns
+          return (
+            <React.Fragment key={period}>
+              <TableCell
+                className={`bg-blue-500/10 text-right font-mono text-xs sm:text-sm ${color} ${
+                  isHighlight ? 'font-bold' : ''
+                }`}
+              >
+                {formatCurrency(currentValue)}
+              </TableCell>
+              <TableCell
+                className={`bg-purple-500/10 text-right font-mono text-xs sm:text-sm ${color} ${
+                  isHighlight ? 'font-bold' : ''
+                }`}
+              >
+                {formatCurrency(whatIfValue)}
+              </TableCell>
+            </React.Fragment>
+          );
+        }
+
+        // Render single column (normal view)
         return (
           <TableCell
             key={period}
@@ -63,7 +91,7 @@ export function ResultTableRow({
               isHighlight ? 'font-bold' : ''
             }`}
           >
-            {formatCurrency(periodValue)}
+            {formatCurrency(currentValue)}
           </TableCell>
         );
       })}

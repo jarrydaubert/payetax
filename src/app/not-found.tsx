@@ -36,10 +36,10 @@ export default function NotFound() {
         {/* 404 Animation */}
         <div className='mb-8'>
           <div className='relative inline-block'>
-            <h1 className='mb-2 bg-gradient-to-r from-primary via-purple-400 to-cyan-400 bg-clip-text font-black text-8xl text-transparent md:text-9xl'>
+            <h1 className='mb-2 bg-gradient-to-r from-primary via-purple-400 to-cyan-400 bg-clip-text font-black text-7xl text-transparent'>
               404
             </h1>
-            <div className='-z-10 absolute inset-0 animate-pulse font-black text-8xl text-primary/10 md:text-9xl'>
+            <div className='-z-10 absolute inset-0 animate-pulse font-black text-7xl text-primary/10'>
               404
             </div>
           </div>
@@ -47,10 +47,8 @@ export default function NotFound() {
 
         {/* Error message */}
         <div className='mb-12'>
-          <h2 className='mb-4 font-bold text-2xl text-foreground md:text-4xl'>
-            Oops! Page Not Found
-          </h2>
-          <p className='mx-auto mb-6 max-w-2xl text-lg text-muted-foreground leading-relaxed md:text-xl'>
+          <h2 className='mb-4 font-bold text-3xl text-foreground'>Oops! Page Not Found</h2>
+          <p className='mx-auto mb-6 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
             Looks like this page went on vacation to calculate taxes elsewhere. Don't worry, we've
             got plenty more where that came from!
           </p>

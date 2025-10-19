@@ -1,8 +1,9 @@
 // src/app/about/page.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import {
+  AlertTriangle,
+  ArrowLeftRight,
   Award,
   Calculator,
   Code,
@@ -10,6 +11,7 @@ import {
   Heart,
   Lightbulb,
   Lock,
+  Palette,
   Rocket,
   Shield,
   Sparkles,
@@ -93,52 +95,31 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className='text-center'
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
-            >
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'>
               <Sparkles className='size-5 text-primary' />
               <span className='font-semibold text-foreground text-sm'>About PayeTax</span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='mb-6 font-bold text-5xl leading-tight md:text-7xl'
-            >
+            <h1 className='mb-6 font-bold text-6xl leading-tight'>
               <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
                 Tax Calculations
               </span>
               <br />
               <span className='text-foreground'>Built for Privacy</span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className='mx-auto mb-12 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
-            >
+            <p className='mx-auto mb-4 max-w-3xl text-lg text-muted-foreground leading-relaxed'>
               The UK tax calculator that respects your privacy, delivers instant accuracy, and costs
               nothing. No compromises.
-            </motion.p>
+            </p>
+
+            <p className='mx-auto mb-12 max-w-2xl text-lg text-muted-foreground'>
+              With intelligent tax trap detection, salary comparisons, and adaptive theming.
+            </p>
 
             {/* Stats Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className='grid gap-3 md:grid-cols-4 md:gap-6'
-            >
+            <div className='grid gap-3 md:grid-cols-4 md:gap-6'>
               {stats.map((stat, _idx) => (
                 <Card
                   key={stat.label}
@@ -152,19 +133,13 @@ export default function AboutPage() {
                   <div className='text-muted-foreground text-sm'>{stat.label}</div>
                 </Card>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Mission Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-5xl px-4'>
           <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
             <Heart className='mx-auto mb-6 size-16 text-primary' />
@@ -178,35 +153,114 @@ export default function AboutPage() {
             </p>
           </Card>
         </div>
-      </motion.section>
+      </section>
+
+      {/* Unique Features Section - NEW in v2.0.0 */}
+      <section className='py-12 md:py-20'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          <div className='mb-16 text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-6 py-2.5'>
+              <Sparkles className='size-5 text-amber-500' />
+              <span className='font-semibold text-amber-500 text-sm'>Unique Features</span>
+            </div>
+            <h2 className='mb-4 bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text font-bold text-4xl text-transparent'>
+              What Makes Us Different
+            </h2>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+              Features you won't find anywhere else - completely free
+            </p>
+          </div>
+
+          <div className='grid gap-6 md:grid-cols-3 md:gap-8'>
+            {/* Feature 1: Tax Trap Optimizer */}
+            <div>
+              <Card className='group h-full overflow-hidden border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-amber-500/50 md:hover:shadow-2xl'>
+                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
+                  <AlertTriangle className='size-8 text-white' />
+                </div>
+                <div className='mb-4 flex items-baseline gap-2'>
+                  <span className='font-bold text-5xl text-foreground'>60%</span>
+                  <span className='text-muted-foreground text-sm'>tax trap detected</span>
+                </div>
+                <h3 className='mb-4 font-bold text-2xl text-foreground'>
+                  £100k Tax Trap Optimizer
+                </h3>
+                <p className='mb-6 text-muted-foreground leading-relaxed'>
+                  Automatically detects when you&apos;re in the 60% effective tax rate zone
+                  (£100k-£125k) and calculates optimal pension contributions to save thousands.
+                </p>
+                <Link
+                  href='/blog/100k-tax-trap-avoid-60-percent-tax-2025'
+                  className='inline-flex items-center gap-2 font-semibold text-amber-600 transition-colors hover:text-amber-700'
+                >
+                  Learn more →
+                </Link>
+              </Card>
+            </div>
+
+            {/* Feature 2: Salary Comparison */}
+            <div>
+              <Card className='group h-full overflow-hidden border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-blue-500/50 md:hover:shadow-2xl'>
+                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
+                  <ArrowLeftRight className='size-8 text-white' />
+                </div>
+                <div className='mb-4 flex items-baseline gap-2'>
+                  <span className='font-bold text-5xl text-foreground'>3</span>
+                  <span className='text-muted-foreground text-sm'>comparison modes</span>
+                </div>
+                <h3 className='mb-4 font-bold text-2xl text-foreground'>Salary Comparison</h3>
+                <p className='mb-6 text-muted-foreground leading-relaxed'>
+                  Compare job offers or raises with 3 input modes (%, £ amount, total). See marginal
+                  rates and exactly what you keep from every increase.
+                </p>
+                <Link
+                  href='/#calculator'
+                  className='inline-flex items-center gap-2 font-semibold text-blue-600 transition-colors hover:text-blue-700'
+                >
+                  Try it now →
+                </Link>
+              </Card>
+            </div>
+
+            {/* Feature 3: Adaptive Theming */}
+            <div>
+              <Card className='group h-full overflow-hidden border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-pink-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-purple-500/50 md:hover:shadow-2xl'>
+                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
+                  <Palette className='size-8 text-white' />
+                </div>
+                <div className='mb-4 flex items-baseline gap-2'>
+                  <span className='font-bold text-5xl text-foreground'>3</span>
+                  <span className='text-muted-foreground text-sm'>theme options</span>
+                </div>
+                <h3 className='mb-4 font-bold text-2xl text-foreground'>Adaptive Theming</h3>
+                <p className='mb-6 text-muted-foreground leading-relaxed'>
+                  Light, dark, or system-matched themes. Your calculator, your eyes, your choice.
+                  Smooth transitions, zero flash, perfect accessibility.
+                </p>
+                <span className='inline-flex items-center gap-2 font-semibold text-purple-600'>
+                  Check the footer ↓
+                </span>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Values Grid */}
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className='mb-16 text-center'
-          >
-            <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+          <div className='mb-16 text-center'>
+            <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
               What We Stand For
             </h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Four principles that guide everything we build
             </p>
-          </motion.div>
+          </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
-            {values.map((value, idx) => (
-              <motion.div
-                key={value.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
+            {values.map((value) => (
+              <div key={value.title}>
                 <Card
                   className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${value.gradient} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl`}
                 >
@@ -218,27 +272,21 @@ export default function AboutPage() {
                   <h3 className='mb-4 font-bold text-2xl text-foreground'>{value.title}</h3>
                   <p className='text-muted-foreground leading-relaxed'>{value.description}</p>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Technology Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
             <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-6 py-2.5'>
               <Code className='size-5 text-blue-500' />
               <span className='font-semibold text-blue-500 text-sm'>Modern Technology</span>
             </div>
-            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text font-bold text-4xl text-transparent'>
               Built for Performance
             </h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
@@ -247,21 +295,15 @@ export default function AboutPage() {
           </div>
 
           <div className='mb-12 grid gap-8 md:grid-cols-3'>
-            {techFeatures.map((feature, idx) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
+            {techFeatures.map((feature) => (
+              <div key={feature.title}>
                 <Card className='group h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-2xl'>
                   <feature.icon className='mx-auto mb-4 size-12 text-primary' />
                   <div className='mb-2 font-bold text-3xl text-foreground'>{feature.metric}</div>
                   <h3 className='mb-3 font-semibold text-foreground text-lg'>{feature.title}</h3>
                   <p className='text-muted-foreground text-sm'>{feature.description}</p>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -289,17 +331,12 @@ export default function AboutPage() {
             </div>
           </Card>
         </div>
-      </motion.section>
+      </section>
 
       {/* Story Section */}
       <section className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-5xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-          >
+          <div>
             <Card className='border-primary/20 p-12'>
               <div className='mb-8 text-center'>
                 <Lightbulb className='mx-auto mb-6 size-16 text-primary' />
@@ -324,27 +361,26 @@ export default function AboutPage() {
                   decisions - all while respecting their privacy.
                 </p>
                 <p className='text-lg text-muted-foreground leading-relaxed'>
+                  In v2.0.0, we added intelligent tax trap detection and salary comparison tools -
+                  features that would cost £50+/month elsewhere, completely free for everyone.
+                  Because we believe tax planning should be accessible to all.
+                </p>
+                <p className='text-lg text-muted-foreground leading-relaxed'>
                   We're continuously improving based on your feedback. Every feature request
                   matters, every bug report helps, and every suggestion makes PayeTax better for
                   everyone.
                 </p>
               </div>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
-            <h2 className='mb-4 font-bold text-3xl text-foreground md:text-4xl'>
+            <h2 className='mb-4 font-bold text-3xl text-foreground'>
               Ready to Calculate Your Take-Home Pay?
             </h2>
             <p className='mb-8 text-lg text-muted-foreground'>
@@ -358,7 +394,7 @@ export default function AboutPage() {
             </Link>
           </Card>
         </div>
-      </motion.section>
+      </section>
 
       {/* Contact Footer */}
       <section className='border-border border-t py-16'>
@@ -367,21 +403,21 @@ export default function AboutPage() {
           <p className='mb-6 text-muted-foreground'>
             Questions, feedback, or suggestions? We&apos;d love to hear from you.
           </p>
-          <div className='flex flex-wrap items-center justify-center gap-6'>
+          <div className='flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6'>
             <a
               href='mailto:support@payetax.co.uk'
               className='text-primary transition-colors hover:text-brand-gradient-end'
             >
               support@payetax.co.uk
             </a>
-            <span className='text-muted-foreground'>•</span>
+            <span className='hidden text-muted-foreground sm:inline'>•</span>
             <Link
               href='/privacy'
               className='text-primary transition-colors hover:text-brand-gradient-end'
             >
               Privacy Policy
             </Link>
-            <span className='text-muted-foreground'>•</span>
+            <span className='hidden text-muted-foreground sm:inline'>•</span>
             <Link
               href='/blog'
               className='text-primary transition-colors hover:text-brand-gradient-end'

@@ -87,7 +87,7 @@ describe('ResultsTable Component', () => {
       const headers = screen.getAllByRole('columnheader');
       const headerTexts = headers.map((h) => h.textContent);
 
-      expect(headerTexts).toContain('Category');
+      expect(headerTexts).toContain('Payslip');
       expect(headerTexts).toContain('%');
       expect(headerTexts).toContain('Yearly');
       expect(headerTexts).toContain('Monthly');
@@ -140,7 +140,7 @@ describe('ResultsTable Component', () => {
     it('should render pension row', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText('Pension [You]')).toBeInTheDocument();
+      expect(screen.getByText('Pension')).toBeInTheDocument();
     });
 
     it('should render net pay row', () => {
@@ -156,10 +156,10 @@ describe('ResultsTable Component', () => {
       expect(screen.getByText('Employers NI')).toBeInTheDocument();
     });
 
-    it('should render footnote about pension calculation', () => {
+    it('should NOT render pension footnote (removed in UX improvements)', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText(/Pension calculated as salary sacrifice/i)).toBeInTheDocument();
+      expect(screen.queryByText(/Pension calculated as salary sacrifice/i)).not.toBeInTheDocument();
     });
   });
 
@@ -778,7 +778,7 @@ describe('ResultsTable Component', () => {
     it('should show year change row when previous year data exists', () => {
       render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
 
-      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+      expect(screen.getByText(/Net Change from/i)).toBeInTheDocument();
     });
 
     it('should calculate positive year change correctly', () => {
@@ -791,7 +791,7 @@ describe('ResultsTable Component', () => {
     it('should show green color for positive year change', () => {
       render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
 
-      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
       const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
       expect(yearChangeValue).toBeInTheDocument();
     });
@@ -832,7 +832,7 @@ describe('ResultsTable Component', () => {
 
       render(<ResultsTable results={mockResults} previousYearResults={higherPreviousYear} />);
 
-      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
       const yearChangeValue = yearChangeRow?.querySelector('.text-red-600');
       expect(yearChangeValue).toBeInTheDocument();
     });
@@ -856,7 +856,7 @@ describe('ResultsTable Component', () => {
 
       render(<ResultsTable results={mockResults} previousYearResults={sameYearResults} />);
 
-      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
       const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
       expect(yearChangeValue).toBeInTheDocument();
     });
@@ -864,7 +864,7 @@ describe('ResultsTable Component', () => {
     it('should show 0.0% and £0.00 when no previous year data', () => {
       render(<ResultsTable results={mockResults} previousYearResults={null} />);
 
-      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
       expect(yearChangeRow?.textContent).toMatch(/0\.0%/);
     });
 
@@ -872,7 +872,7 @@ describe('ResultsTable Component', () => {
       // Change: £2,986 / £20,000 * 100 = 14.93%
       render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
 
-      const yearChangeRow = screen.getByText('Net Change from Previous Year').closest('tr');
+      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
       expect(yearChangeRow?.textContent).toMatch(/14\.9%/);
     });
   });
@@ -1042,7 +1042,7 @@ describe('ResultsTable Component', () => {
 
       expect(screen.getByText('Student Loan')).toBeInTheDocument();
       expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
-      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+      expect(screen.getByText(/Net Change from/i)).toBeInTheDocument();
     });
 
     it('should handle high earner with all deductions', () => {
@@ -1139,7 +1139,7 @@ describe('ResultsTable Component', () => {
       expect(screen.getByText(/£100,000/)).toBeInTheDocument();
       expect(screen.getByText('Student Loans')).toBeInTheDocument(); // Plural
       expect(screen.getAllByText(/£2,000/).length).toBeGreaterThan(0);
-      expect(screen.getByText('Net Change from Previous Year')).toBeInTheDocument();
+      expect(screen.getByText(/Net Change from/i)).toBeInTheDocument();
 
       // Verify year change: £60,768 - £58,000 = £2,768
       expect(screen.getAllByText(/£2,768/).length).toBeGreaterThan(0);

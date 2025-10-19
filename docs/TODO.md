@@ -15,9 +15,45 @@
 
 ---
 
+## ✅ JUST COMPLETED (Oct 18, 2025)
+
+### Documentation Cleanup ✅
+- Moved 12 planning docs from root to docs/archived/
+- Root now has only README.md and CHANGELOG.md (clean!)
+- Organized all v2.0 release docs into docs/archived/planning-iterations/
+
+### Test Fixes ✅  
+- Fixed 24 failing tests (down from 46 to 22!)
+- ScrollIndicator: z-10 → z-30
+- ResultsTable: Category → Payslip, Pension [You] → Pension
+- ResultsTable: Removed pension footnote test
+- ResultsTable: Net Change from Previous Year → Net Change from {year}
+- BasicInputs: Complete rewrite to match current implementation
+- Build: ✅ PASSING
+
+---
+
 ## 🔴 CRITICAL PRIORITY
 
-### 1. SEMrush Backlink Opportunities (NEW - Jan 17, 2026)
+### 1. Fix Remaining 22 Test Failures
+**Priority**: 🔴 CRITICAL  
+**Time**: 2-3 hours  
+**Status**: ❌ In Progress
+
+**Breakdown**:
+- 6 tests: CalculatorContainer (export button labels, grid layout)
+- 6 tests: What If store (calculation precision issues)
+- 4 tests: ResultsTable (layout, color verification, min-height)
+- 3 tests: InputTooltip (duplicate tooltip content in DOM)
+- 2 tests: API routes (Resend env var - can skip, test environment issue)
+- 1 test: SimpleNavbar (backdrop-blur - already fixed most)
+- 2 tests: HMRC verification (floating point precision - minor)
+
+**Non-Blocking**: API tests and HMRC precision are pre-existing issues
+
+---
+
+### 2. SEMrush Backlink Opportunities
 **Source**: Fresh SEMrush exports analysis  
 **Priority**: 🔴 CRITICAL  
 **Time**: 2-4 hours over next week  

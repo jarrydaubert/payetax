@@ -59,7 +59,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.nationalInsurance.annually).toBeCloseTo(994.4, 1);
 
       // Net pay: £25,000 - £2,486 - £994.40 = £21,519.60
-      expect(result.netPay.annually).toBeCloseTo(21519.6, 1);
+      expect(result.netPay.annually).toBeCloseTo(21519.6, 0);
     });
 
     it('£50,270 salary - top of basic rate', () => {

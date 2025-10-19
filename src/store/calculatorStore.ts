@@ -99,6 +99,13 @@ interface NIRates {
 // Interface for calculation results
 type CalculationResults = TaxCalculationResults | null;
 
+// What If scenario configuration
+interface WhatIfConfig {
+  enabled: boolean;
+  type: 'percentage' | 'amount' | 'total';
+  value: number;
+}
+
 // Calculator store state
 interface CalculatorState {
   // Input values
@@ -111,6 +118,10 @@ interface CalculatorState {
   // Calculation results
   results: CalculationResults;
   previousYearResults: CalculationResults;
+
+  // What If scenario
+  whatIf: WhatIfConfig;
+  whatIfResults: CalculationResults;
 
   // Input actions
   setSalary: (salary: number) => void;
@@ -141,6 +152,12 @@ interface CalculatorState {
   calculatePreviousYear: () => void;
   reset: () => void;
   init: () => void;
+
+  // What If actions
+  toggleWhatIf: () => void;
+  setWhatIfType: (type: 'percentage' | 'amount' | 'total') => void;
+  setWhatIfValue: (value: number) => void;
+  calculateWhatIf: () => void;
 }
 
 // Get current tax year
@@ -204,6 +221,14 @@ export const useCalculatorStore = create<CalculatorState>()(
         niRates: currentYearRates.nationalInsurance.employee.A,
         results: null,
         previousYearResults: null,
+
+        // What If state
+        whatIf: {
+          enabled: false,
+          type: 'percentage',
+          value: 10,
+        },
+        whatIfResults: null,
 
         // Initialize with example calculation on first load
         // This is called after store creation to show £0 example
@@ -269,7 +294,15 @@ export const useCalculatorStore = create<CalculatorState>()(
               throw new Error('Salary cannot be negative');
             }
 
-            const results = calculateTax(input);
+            // Default tax code if not provided
+            const taxCodeToUse =
+              input.taxCode.trim() || (input.region === 'Scotland' ? 'S1257L' : '1257L');
+            const inputWithDefaults = {
+              ...input,
+              taxCode: taxCodeToUse,
+            };
+
+            const results = calculateTax(inputWithDefaults);
             set({ results });
           } catch (error) {
             // Log calculation errors for debugging
@@ -299,7 +332,92 @@ export const useCalculatorStore = create<CalculatorState>()(
             input: { ...defaultInput },
             results: null,
             previousYearResults: null,
+            whatIf: {
+              enabled: false,
+              type: 'percentage',
+              value: 10,
+            },
+            whatIfResults: null,
           });
+        },
+
+        // What If actions
+        toggleWhatIf: () => {
+          const { whatIf, calculateWhatIf } = get();
+          const newEnabled = !whatIf.enabled;
+
+          set({
+            whatIf: { ...whatIf, enabled: newEnabled },
+          });
+
+          // Calculate What If scenario if enabling
+          if (newEnabled) {
+            calculateWhatIf();
+          } else {
+            set({ whatIfResults: null });
+          }
+        },
+
+        setWhatIfType: (type) => {
+          set((state) => ({
+            whatIf: { ...state.whatIf, type },
+          }));
+          // Don't auto-calculate - let user click Compare button
+        },
+
+        setWhatIfValue: (value) => {
+          set((state) => ({
+            whatIf: { ...state.whatIf, value },
+          }));
+          // Don't auto-calculate - let user click Compare button
+        },
+
+        calculateWhatIf: () => {
+          try {
+            const { input, whatIf } = get();
+
+            const currentSalary = input.salary;
+
+            // Don't calculate if no salary entered
+            if (!currentSalary || currentSalary <= 0) {
+              console.warn('Cannot calculate What If: No current salary');
+              return;
+            }
+            let newSalary: number;
+
+            // Calculate new salary based on What If type
+            switch (whatIf.type) {
+              case 'percentage': {
+                // Percentage increase/decrease
+                newSalary = currentSalary * (1 + whatIf.value / 100);
+                break;
+              }
+              case 'amount': {
+                // Fixed amount change
+                newSalary = currentSalary + whatIf.value;
+                break;
+              }
+              case 'total': {
+                // New total salary
+                newSalary = whatIf.value;
+                break;
+              }
+              default:
+                newSalary = currentSalary;
+            }
+
+            // Ensure non-negative
+            newSalary = Math.max(0, newSalary);
+
+            // Calculate tax with new salary
+            const whatIfInput = { ...input, salary: newSalary };
+            const whatIfResults = calculateTax(whatIfInput);
+
+            set({ whatIfResults });
+          } catch (error) {
+            console.error('What If calculation error:', error);
+            set({ whatIfResults: null });
+          }
         },
       }),
       {
@@ -352,5 +470,15 @@ export const useCalculatorActions = () =>
       calculate: state.calculate,
       calculatePreviousYear: state.calculatePreviousYear,
       reset: state.reset,
+      toggleWhatIf: state.toggleWhatIf,
+      setWhatIfType: state.setWhatIfType,
+      setWhatIfValue: state.setWhatIfValue,
+      calculateWhatIf: state.calculateWhatIf,
     }))
   );
+
+// Selector for What If state
+export const useWhatIf = () => useCalculatorStore((state) => state.whatIf);
+
+// Selector for What If results
+export const useWhatIfResults = () => useCalculatorStore((state) => state.whatIfResults);

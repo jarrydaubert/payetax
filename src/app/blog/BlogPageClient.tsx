@@ -1,7 +1,6 @@
 // src/app/blog/BlogPageClient.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BookOpen,
@@ -71,75 +70,45 @@ export function BlogPageClient({
       {/* Hero Section */}
       <section className='relative pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container relative z-10 mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className='text-center'
-          >
+          <div className='text-center'>
             {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className='mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-6 py-2.5 backdrop-blur-xl'
-            >
+            <div className='mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-6 py-2.5 backdrop-blur-xl'>
               <Zap className='size-5 text-purple-400' />
               <span className='bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text font-semibold text-sm text-transparent'>
                 by PayeTax
               </span>
-            </motion.div>
+            </div>
 
             {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className='mb-6 font-bold text-6xl leading-tight md:text-8xl'
-            >
+            <h1 className='mb-6 font-bold text-6xl leading-tight'>
               <span className='bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent'>
                 TaxInsights
               </span>
-            </motion.h1>
+            </h1>
 
             {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className='mx-auto mb-12 max-w-3xl text-foreground/70 text-xl leading-relaxed md:text-2xl'
-            >
+            <p className='mx-auto mb-12 max-w-3xl text-lg text-foreground/70 leading-relaxed'>
               UK Tax Guidance & Financial Insights. No jargon, just insights.
-            </motion.p>
+            </p>
 
             {/* Category Badge */}
             {selectedCategory && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-                className='inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 backdrop-blur-xl'
-              >
+              <div className='inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 backdrop-blur-xl'>
                 <Tag className='size-4 text-cyan-400' />
                 <span className='text-foreground/70 text-sm'>Viewing: </span>
                 <span className='font-semibold text-cyan-400 text-sm'>
                   {categories.find((cat) => cat.slug === selectedCategory)?.name ||
                     selectedCategory}
                 </span>
-              </motion.div>
+              </div>
             )}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <div className='container relative z-10 mx-auto max-w-7xl px-4'>
         {/* Stats Bar - 3D Glass Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className='-mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'
-        >
+        <div className='-mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
           {[
             {
               icon: FileText,
@@ -172,16 +141,11 @@ export function BlogPageClient({
               <div className='relative text-muted-foreground text-sm'>{stat.label}</div>
             </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Categories Filter - Neon Pills */}
         {categories.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className='mb-12 md:mb-20'
-          >
+          <div className='mb-12 md:mb-20'>
             <h2 className='mb-8 text-center font-semibold text-foreground text-xl'>
               Browse Topics
             </h2>
@@ -228,17 +192,12 @@ export function BlogPageClient({
                   ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Featured Post - Hero Card */}
         {featuredPost && !selectedCategory && currentPage === 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className='mb-12 md:mb-20'
-          >
+          <div className='mb-12 md:mb-20'>
             <div className='mb-8 flex items-center justify-center gap-3 text-center'>
               <Sparkles className='size-6 text-yellow-400' />
               <span className='bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text font-bold text-lg text-transparent'>
@@ -263,7 +222,7 @@ export function BlogPageClient({
                       </div>
                     </div>
 
-                    <h2 className='mb-6 font-bold text-4xl text-foreground leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent md:text-5xl'>
+                    <h2 className='mb-6 font-bold text-4xl text-foreground leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent'>
                       {featuredPost.title}
                     </h2>
 
@@ -292,25 +251,15 @@ export function BlogPageClient({
                 </div>
               </div>
             </Link>
-          </motion.div>
+          </div>
         )}
 
         {/* Posts Grid - Glassmorphism Cards */}
         {posts.length > 0 ? (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className='mb-12 grid gap-4 md:mb-20 md:grid-cols-2 md:gap-8 lg:grid-cols-3'
-            >
-              {posts.map((post, idx) => (
-                <motion.div
-                  key={post.slug}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.8 + idx * 0.05 }}
-                >
+            <div className='mb-12 grid gap-4 md:mb-20 md:grid-cols-2 md:gap-8 lg:grid-cols-3'>
+              {posts.map((post) => (
+                <div key={post.slug}>
                   <Link href={`/blog/${post.slug}`} className='group block h-full'>
                     <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-xl transition-all duration-300 hover:border-purple-500/50 active:scale-[1.02] md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]'>
                       <div className='absolute inset-0 bg-gradient-to-br from-purple-500/0 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:from-purple-500/10 group-hover:to-cyan-500/10 group-hover:opacity-100' />
@@ -361,9 +310,9 @@ export function BlogPageClient({
                       </div>
                     </article>
                   </Link>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
 
             {/* Pagination - Neon Style */}
             {totalPages > 1 && (

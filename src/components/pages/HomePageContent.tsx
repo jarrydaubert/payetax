@@ -46,39 +46,39 @@ const HomePageContent = memo(function HomePageContent() {
       {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
       <section className='bg-muted/30 py-12'>
         <div className='container mx-auto max-w-4xl px-4'>
-        <h2 className='mb-6 text-center font-bold text-3xl'>Understanding the UK Tax System</h2>
-        <div className='prose prose-lg mx-auto dark:prose-invert'>
-          <p className='text-center text-foreground/90 text-lg leading-relaxed'>
-            Her Majesty's Revenue and Customs (HMRC) administers the UK tax system, which includes
-            income tax rates, National Insurance, capital gains tax, and inheritance tax.
-            Understanding your effective tax rate and tax band is crucial for financial planning.
-          </p>
-          <p className='text-center text-foreground/80 leading-relaxed'>
-            Whether you're a higher rate taxpayer filing a tax return or simply calculating your
-            take-home pay, our calculator uses official HMRC rates to help you understand the UK tax
-            system. From basic income tax rates to complex scenarios involving tax revenue and tax
-            reliefs, we provide accurate calculations for all taxpayers.
-          </p>
-        </div>
+          <h2 className='mb-6 text-center font-bold text-3xl'>Understanding the UK Tax System</h2>
+          <div className='prose prose-lg dark:prose-invert mx-auto'>
+            <p className='text-center text-foreground/90 text-lg leading-relaxed'>
+              Her Majesty's Revenue and Customs (HMRC) administers the UK tax system, which includes
+              income tax rates, National Insurance, capital gains tax, and inheritance tax.
+              Understanding your effective tax rate and tax band is crucial for financial planning.
+            </p>
+            <p className='text-center text-foreground/80 leading-relaxed'>
+              Whether you're a higher rate taxpayer filing a tax return or simply calculating your
+              take-home pay, our calculator uses official HMRC rates to help you understand the UK
+              tax system. From basic income tax rates to complex scenarios involving tax revenue and
+              tax reliefs, we provide accurate calculations for all taxpayers.
+            </p>
+          </div>
 
-        {/* Tax Rates Quick Reference */}
-        <div className='mt-10 grid gap-6 md:grid-cols-3'>
-          <div className='rounded-lg border bg-card p-6 text-center'>
-            <h3 className='mb-2 font-semibold text-lg'>Personal Allowance</h3>
-            <p className='font-bold text-3xl text-primary'>£12,570</p>
-            <p className='mt-2 text-muted-foreground text-sm'>Tax-free earnings for 2025/26</p>
+          {/* Tax Rates Quick Reference */}
+          <div className='mt-10 grid gap-6 md:grid-cols-3'>
+            <div className='rounded-lg border bg-card p-6 text-center'>
+              <h3 className='mb-2 font-semibold text-lg'>Personal Allowance</h3>
+              <p className='font-bold text-3xl text-primary'>£12,570</p>
+              <p className='mt-2 text-muted-foreground text-sm'>Tax-free earnings for 2025/26</p>
+            </div>
+            <div className='rounded-lg border bg-card p-6 text-center'>
+              <h3 className='mb-2 font-semibold text-lg'>Basic Rate</h3>
+              <p className='font-bold text-3xl text-primary'>20%</p>
+              <p className='mt-2 text-muted-foreground text-sm'>On income £12,571 - £50,270</p>
+            </div>
+            <div className='rounded-lg border bg-card p-6 text-center'>
+              <h3 className='mb-2 font-semibold text-lg'>Higher Rate</h3>
+              <p className='font-bold text-3xl text-primary'>40%</p>
+              <p className='mt-2 text-muted-foreground text-sm'>On income £50,271 - £125,140</p>
+            </div>
           </div>
-          <div className='rounded-lg border bg-card p-6 text-center'>
-            <h3 className='mb-2 font-semibold text-lg'>Basic Rate</h3>
-            <p className='font-bold text-3xl text-primary'>20%</p>
-            <p className='mt-2 text-muted-foreground text-sm'>On income £12,571 - £50,270</p>
-          </div>
-          <div className='rounded-lg border bg-card p-6 text-center'>
-            <h3 className='mb-2 font-semibold text-lg'>Higher Rate</h3>
-            <p className='font-bold text-3xl text-primary'>40%</p>
-            <p className='mt-2 text-muted-foreground text-sm'>On income £50,271 - £125,140</p>
-          </div>
-        </div>
         </div>
       </section>
 
@@ -125,68 +125,68 @@ const HomePageContent = memo(function HomePageContent() {
       {/* Featured Tax Resources - Internal linking for SEO */}
       <section className='bg-muted/30 py-16'>
         <div className='container mx-auto max-w-7xl px-4'>
-        <h2 className='mb-2 text-center font-bold text-3xl'>Popular Tax Guides</h2>
-        <p className='mb-8 text-center text-muted-foreground'>
-          Expert guides to help you understand UK tax calculations
-        </p>
-        <div className='grid gap-6 md:grid-cols-3'>
-          {/* Calculator Guide */}
-          <Link
-            href='/blog/uk-tax-calculator-2025-complete-guide'
-            className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
-          >
-            <div className='mb-4 flex items-center gap-3'>
-              <div className='rounded-full bg-primary/10 p-3'>
-                <Calculator className='size-6 text-primary' />
+          <h2 className='mb-2 text-center font-bold text-3xl'>Popular Tax Guides</h2>
+          <p className='mb-8 text-center text-muted-foreground'>
+            Expert guides to help you understand UK tax calculations
+          </p>
+          <div className='grid gap-6 md:grid-cols-3'>
+            {/* Calculator Guide */}
+            <Link
+              href='/blog/uk-tax-calculator-2025-complete-guide'
+              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+            >
+              <div className='mb-4 flex items-center gap-3'>
+                <div className='rounded-full bg-primary/10 p-3'>
+                  <Calculator className='size-6 text-primary' />
+                </div>
+                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                  UK Tax Calculator Guide
+                </h3>
               </div>
-              <h3 className='font-semibold text-lg group-hover:text-primary'>
-                UK Tax Calculator Guide
-              </h3>
-            </div>
-            <p className='text-muted-foreground text-sm'>
-              Complete guide to using our tax calculator for accurate PAYE calculations with
-              official HMRC rates.
-            </p>
-          </Link>
+              <p className='text-muted-foreground text-sm'>
+                Complete guide to using our tax calculator for accurate PAYE calculations with
+                official HMRC rates.
+              </p>
+            </Link>
 
-          {/* Tax Examples */}
-          <Link
-            href='/blog/how-much-tax-will-i-pay-uk-2025'
-            className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
-          >
-            <div className='mb-4 flex items-center gap-3'>
-              <div className='rounded-full bg-primary/10 p-3'>
-                <FileText className='size-6 text-primary' />
+            {/* Tax Examples */}
+            <Link
+              href='/blog/how-much-tax-will-i-pay-uk-2025'
+              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+            >
+              <div className='mb-4 flex items-center gap-3'>
+                <div className='rounded-full bg-primary/10 p-3'>
+                  <FileText className='size-6 text-primary' />
+                </div>
+                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                  How Much Tax Will I Pay?
+                </h3>
               </div>
-              <h3 className='font-semibold text-lg group-hover:text-primary'>
-                How Much Tax Will I Pay?
-              </h3>
-            </div>
-            <p className='text-muted-foreground text-sm'>
-              Real salary examples showing exact tax calculations for £20k, £30k, £50k, and £100k+
-              UK earners.
-            </p>
-          </Link>
+              <p className='text-muted-foreground text-sm'>
+                Real salary examples showing exact tax calculations for £20k, £30k, £50k, and £100k+
+                UK earners.
+              </p>
+            </Link>
 
-          {/* Tax Codes */}
-          <Link
-            href='/blog/understanding-uk-tax-codes'
-            className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
-          >
-            <div className='mb-4 flex items-center gap-3'>
-              <div className='rounded-full bg-primary/10 p-3'>
-                <BookOpen className='size-6 text-primary' />
+            {/* Tax Codes */}
+            <Link
+              href='/blog/understanding-uk-tax-codes'
+              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+            >
+              <div className='mb-4 flex items-center gap-3'>
+                <div className='rounded-full bg-primary/10 p-3'>
+                  <BookOpen className='size-6 text-primary' />
+                </div>
+                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                  Understanding Tax Codes
+                </h3>
               </div>
-              <h3 className='font-semibold text-lg group-hover:text-primary'>
-                Understanding Tax Codes
-              </h3>
-            </div>
-            <p className='text-muted-foreground text-sm'>
-              Learn what your tax code means and how it affects your take-home pay. Decode 1257L,
-              BR, and more.
-            </p>
-          </Link>
-        </div>
+              <p className='text-muted-foreground text-sm'>
+                Learn what your tax code means and how it affects your take-home pay. Decode 1257L,
+                BR, and more.
+              </p>
+            </Link>
+          </div>
         </div>
       </section>
 

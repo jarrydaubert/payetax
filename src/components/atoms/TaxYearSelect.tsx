@@ -72,13 +72,12 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
               aria-expanded={open}
               aria-controls={listboxId}
               className={cn(
-                'glass-input relative w-full rounded-lg py-2 pr-10 pl-3 text-left',
-                'border-glass shadow-glass-sm backdrop-blur-glass-sm',
-                'focus:glow-sm focus:outline-none focus:ring-1 focus:ring-primary',
-                'cursor-default transition-all duration-200',
-                'bg-glass-deep text-foreground',
+                'relative w-full rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left',
+                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'cursor-default transition-colors duration-200',
+                'text-foreground text-sm',
                 'disabled:cursor-not-allowed disabled:opacity-50',
-                open && 'glow-sm ring-1 ring-primary'
+                open && 'ring-2 ring-ring ring-offset-2'
               )}
             >
               <span className='flex items-center'>
@@ -109,9 +108,9 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
               <ListboxOptions
                 id={listboxId}
                 className={cn(
-                  'absolute z-10 mt-1 w-full overflow-auto bg-glass',
-                  'max-h-60 rounded-lg shadow-glass backdrop-blur-glass-sm',
-                  'border border-glass py-1 text-foreground focus:outline-none'
+                  'absolute z-50 mt-1 w-full overflow-auto bg-popover',
+                  'max-h-60 rounded-md border border-input shadow-md',
+                  'py-1 text-popover-foreground text-sm focus:outline-none'
                 )}
               >
                 {TAX_YEARS.map((taxYear) => (
@@ -122,10 +121,10 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
                       cn(
                         'relative cursor-default select-none py-2 pr-4 pl-10',
                         'transition-colors duration-150',
-                        (active || selected) && 'bg-glass-deep',
+                        active && 'bg-accent text-accent-foreground',
                         selected ? 'font-medium text-primary' : 'text-foreground',
                         // Add focus styles for keyboard navigation
-                        'focus:bg-glass-deep focus:text-primary focus:outline-none'
+                        'focus:bg-accent focus:text-accent-foreground focus:outline-none'
                       )
                     }
                   >
