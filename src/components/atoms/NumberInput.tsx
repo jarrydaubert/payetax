@@ -131,17 +131,53 @@ function NumberInput({
   );
 
   /**
-   * Handle input change - allow only valid numeric input with formatting
+   * Handle input change - format with thousand separators while typing
    */
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // Allow empty string or numeric input with decimal points and commas
-    const inputValue = e.target.value;
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const inputValue = e.target.value;
 
-    // Only update if it's empty or contains valid characters
-    if (inputValue === '' || /^[\d.,-]*$/.test(inputValue)) {
-      setDisplayValue(inputValue);
-    }
-  }, []);
+      // If empty, just clear
+      if (inputValue === '') {
+        setDisplayValue('');
+        return;
+      }
+
+      // Allow decimal point and comma for numbers with decimals
+      if (decimals > 0) {
+        // Remove all non-numeric characters except decimal point
+        const cleaned = inputValue.replace(/[^\d.]/g, '');
+
+        // Prevent multiple decimal points
+        const parts = cleaned.split('.');
+        if (parts.length > 2) {
+          return; // Don't allow more than one decimal point
+        }
+
+        // Format integer part with commas, preserve decimal part
+        if (parts.length === 2) {
+          const integerPart = parts[0] || '';
+          const decimalPart = parts[1] || '';
+          const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          setDisplayValue(`${formattedInteger}.${decimalPart}`);
+        } else {
+          // No decimal point yet, just format with commas
+          const formattedInteger = cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          setDisplayValue(formattedInteger);
+        }
+      } else {
+        // For integers: Remove all non-numeric characters
+        const cleaned = inputValue.replace(/[^\d]/g, '');
+
+        // Format with thousand separators as user types
+        const formattedValue = cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Update display value with formatted number
+        setDisplayValue(formattedValue);
+      }
+    },
+    [decimals]
+  );
 
   /**
    * Handle keydown events - for Enter key and arrow controls

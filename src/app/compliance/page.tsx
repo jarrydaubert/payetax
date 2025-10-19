@@ -1,7 +1,6 @@
 // src/app/compliance/page.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import {
   AlertTriangle,
   Award,
@@ -149,52 +148,27 @@ export default function CompliancePage() {
       {/* Hero Section */}
       <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className='text-center'
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
-            >
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'>
               <Shield className='size-5 text-primary' />
               <span className='font-semibold text-foreground text-sm'>HMRC Compliance</span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='mb-6 font-bold text-5xl leading-tight md:text-7xl'
-            >
+            <h1 className='mb-6 font-bold text-6xl leading-tight'>
               <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
                 Verified Accuracy
               </span>
               <br />
               <span className='text-foreground'>Official Compliance</span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className='mx-auto mb-12 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
-            >
+            <p className='mx-auto mb-12 max-w-3xl text-lg text-muted-foreground leading-relaxed'>
               Every calculation verified against official HMRC rates and examples. Transparent
               formulas. Updated within 24 hours of changes.
-            </motion.p>
+            </p>
 
             {/* Trust Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className='grid gap-6 md:grid-cols-4'
-            >
+            <div className='grid gap-6 md:grid-cols-4'>
               {[
                 {
                   icon: Award,
@@ -233,36 +207,24 @@ export default function CompliancePage() {
                   <div className='mt-2 text-muted-foreground text-sm'>{stat.label}</div>
                 </Card>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Compliance Features */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className='mb-16 text-center'
-          >
-            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
-              Professional Standards
-            </h2>
+          <div className='mb-16 text-center'>
+            <h2 className='mb-4 font-bold text-4xl text-foreground'>Professional Standards</h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Multi-layer verification ensures every calculation meets HMRC standards
             </p>
-          </motion.div>
+          </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
-            {COMPLIANCE_FEATURES.map((feature, idx) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 + idx * 0.1 }}
-              >
+            {COMPLIANCE_FEATURES.map((feature) => (
+              <div key={feature.title}>
                 <Card className='group h-full border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-2xl'>
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-4'>
@@ -298,7 +260,7 @@ export default function CompliancePage() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -307,28 +269,16 @@ export default function CompliancePage() {
       {/* Compliance Statements */}
       <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className='mb-16 text-center'
-          >
-            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
-              Official Compliance
-            </h2>
+          <div className='mb-16 text-center'>
+            <h2 className='mb-4 font-bold text-4xl text-foreground'>Official Compliance</h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Legal verification and regulatory compliance statements
             </p>
-          </motion.div>
+          </div>
 
           <div className='space-y-6'>
-            {COMPLIANCE_STATEMENTS.map((item, idx) => (
-              <motion.div
-                key={item.category}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.9 + idx * 0.1 }}
-              >
+            {COMPLIANCE_STATEMENTS.map((item) => (
+              <div key={item.category}>
                 <Card className='border-l-4 border-l-primary p-6 transition-all duration-300 md:hover:shadow-xl'>
                   <h3 className='mb-3 font-bold text-foreground text-xl'>{item.category}</h3>
                   <p className='mb-6 text-muted-foreground leading-relaxed'>{item.statement}</p>
@@ -346,7 +296,7 @@ export default function CompliancePage() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -355,28 +305,16 @@ export default function CompliancePage() {
       {/* Data Sources */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.2 }}
-            className='mb-16 text-center'
-          >
-            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
-              Official Sources
-            </h2>
+          <div className='mb-16 text-center'>
+            <h2 className='mb-4 font-bold text-4xl text-foreground'>Official Sources</h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               All data sourced from government authorities and professional bodies
             </p>
-          </motion.div>
+          </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-6'>
-            {DATA_SOURCES.map((source, idx) => (
-              <motion.div
-                key={source.source}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1.3 + idx * 0.1 }}
-              >
+            {DATA_SOURCES.map((source) => (
+              <div key={source.source}>
                 <Card className='group h-full border-primary/20 p-6 transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-xl'>
                   <div className='mb-4 flex items-start justify-between'>
                     <h3 className='font-bold text-foreground text-lg'>{source.source}</h3>
@@ -409,7 +347,7 @@ export default function CompliancePage() {
                     </a>
                   </Button>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -418,11 +356,7 @@ export default function CompliancePage() {
       {/* Important Notice */}
       <section className='bg-gradient-to-br from-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.5 }}
-          >
+          <div>
             <Card className='border-yellow-500/30 p-8 md:p-12'>
               <div className='flex flex-col items-start gap-6 md:flex-row'>
                 <div className='rounded-xl bg-yellow-500/10 p-4'>
@@ -474,23 +408,16 @@ export default function CompliancePage() {
                 </div>
               </div>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.6 }}
-            className='text-center'
-          >
+          <div className='text-center'>
             <Sparkles className='mx-auto mb-6 size-12 text-primary' />
-            <h2 className='mb-4 font-bold text-4xl text-foreground md:text-5xl'>
-              Questions About Compliance?
-            </h2>
+            <h2 className='mb-4 font-bold text-4xl text-foreground'>Questions About Compliance?</h2>
             <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
               We're committed to maintaining the highest standards of accuracy and compliance. If
               you have questions about our methodology or sources, we're here to help.
@@ -509,7 +436,7 @@ export default function CompliancePage() {
                 </a>
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

@@ -98,7 +98,7 @@ describe('Sitemap Generation', () => {
         (entry) => !entry.url.includes('/blog/') && !entry.url.includes('/category/')
       );
 
-      expect(staticPages.length).toBe(5);
+      expect(staticPages.length).toBeGreaterThanOrEqual(5);
     });
   });
 

@@ -55,13 +55,27 @@ export function useHorizontalScrollIndicator<T extends HTMLElement = HTMLDivElem
 
     const container = containerRef.current;
     if (container) {
+      // Initial check
       checkScrollPosition();
+
+      // Recheck after a short delay to ensure DOM is fully rendered
+      const timeoutId = setTimeout(checkScrollPosition, 100);
+
+      // Set up event listeners
       container.addEventListener('scroll', checkScrollPosition);
       window.addEventListener('resize', checkScrollPosition);
 
+      // Use ResizeObserver to detect when container content size changes
+      const resizeObserver = new ResizeObserver(() => {
+        checkScrollPosition();
+      });
+      resizeObserver.observe(container);
+
       return () => {
+        clearTimeout(timeoutId);
         container.removeEventListener('scroll', checkScrollPosition);
         window.removeEventListener('resize', checkScrollPosition);
+        resizeObserver.disconnect();
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

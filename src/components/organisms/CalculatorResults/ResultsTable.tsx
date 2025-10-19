@@ -20,9 +20,11 @@ import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
+import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 interface ResultsTableProps {
@@ -30,14 +32,18 @@ interface ResultsTableProps {
   allowancesDeductions?: number;
   studentLoans?: string[];
   previousYearResults?: TaxCalculationResults | null;
+  whatIfResults?: TaxCalculationResults | null;
   visiblePeriods?: string[];
   onVisiblePeriodsChange?: (periods: string[]) => void;
+  taxYear?: string;
+  onApplyPensionOptimization?: (amount: number) => void;
 }
 
 interface ResultRowData {
   category: string;
   icon: React.ElementType;
   annual: number;
+  whatIfAnnual?: number;
   percentage: string;
   color: string;
   isHighlight?: boolean;
@@ -59,14 +65,33 @@ export function ResultsTable({
   allowancesDeductions = 0,
   studentLoans = [],
   previousYearResults = null,
+  whatIfResults = null,
   visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
   onVisiblePeriodsChange,
+  taxYear,
+  onApplyPensionOptimization,
 }: ResultsTableProps) {
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef, [
     visiblePeriods,
   ]);
+
+  // Tax trap detection
+  const taxTrapOptimization = React.useMemo(() => {
+    return calculateOptimalPension(results.grossSalary.annually);
+  }, [results.grossSalary.annually]);
+
+  // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
+  // Default to current tax year if not provided
+  const currentTaxYear = taxYear || '2025-2026'; // e.g., "2025-2026"
+  const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
+  const previousYearLabel = currentYearStart - 1; // 2024
+
+  // Format the previous year row label
+  const previousYearRowLabel = previousYearResults
+    ? `Net Change from ${previousYearLabel}`
+    : `Net Change from ${previousYearLabel}`;
 
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
@@ -114,6 +139,7 @@ export function ResultsTable({
       category: 'Gross Pay',
       icon: PoundSterling,
       annual: grossAnnual,
+      whatIfAnnual: whatIfResults?.grossSalary.annually,
       percentage: '100%',
       color: 'text-foreground',
       isHighlight: false,
@@ -122,6 +148,7 @@ export function ResultsTable({
       category: 'Tax-Free Allowance',
       icon: Shield,
       annual: taxFreeAllowance,
+      whatIfAnnual: whatIfResults?.taxFreeAmount,
       percentage: calculatePercentage(taxFreeAllowance, grossAnnual),
       color: 'text-foreground',
       isHighlight: false,
@@ -130,6 +157,7 @@ export function ResultsTable({
       category: 'Total Taxable',
       icon: Scale,
       annual: taxableIncome,
+      whatIfAnnual: whatIfResults?.taxableIncome,
       percentage: calculatePercentage(taxableIncome, grossAnnual),
       color: 'text-foreground',
       isHighlight: false,
@@ -138,15 +166,17 @@ export function ResultsTable({
       category: 'Total Tax Due',
       icon: Calculator,
       annual: results.incomeTax.annually,
+      whatIfAnnual: whatIfResults?.incomeTax.annually,
       percentage: calculatePercentage(results.incomeTax.annually, grossAnnual),
       color: 'text-red-600 dark:text-red-400',
       isHighlight: false,
     },
     // Tax Band Breakdown
-    ...results.taxBands.map((band) => ({
+    ...results.taxBands.map((band, idx) => ({
       category: `${band.rate}% Rate`,
       icon: Percent,
       annual: band.amount,
+      whatIfAnnual: whatIfResults?.taxBands[idx]?.amount,
       percentage: calculatePercentage(band.amount, grossAnnual),
       color: 'text-red-600 dark:text-red-400',
       isHighlight: false,
@@ -159,6 +189,7 @@ export function ResultsTable({
             category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
             icon: GraduationCap,
             annual: results.studentLoan.annually,
+            whatIfAnnual: whatIfResults?.studentLoan.annually,
             percentage: calculatePercentage(results.studentLoan.annually, grossAnnual),
             color: 'text-orange-600 dark:text-orange-400',
             isHighlight: false,
@@ -169,14 +200,16 @@ export function ResultsTable({
       category: 'National Insurance',
       icon: CreditCard,
       annual: results.nationalInsurance.annually,
+      whatIfAnnual: whatIfResults?.nationalInsurance.annually,
       percentage: calculatePercentage(results.nationalInsurance.annually, grossAnnual),
       color: 'text-amber-600 dark:text-yellow-400',
       isHighlight: false,
     },
     {
-      category: 'Pension [You]',
+      category: 'Pension',
       icon: PiggyBank,
       annual: results.pensionContribution.annually,
+      whatIfAnnual: whatIfResults?.pensionContribution.annually,
       percentage: calculatePercentage(results.pensionContribution.annually, grossAnnual),
       color: 'text-purple-600 dark:text-purple-400',
       isHighlight: false,
@@ -185,6 +218,7 @@ export function ResultsTable({
       category: 'Allowances/Deductions',
       icon: Coins,
       annual: allowancesAmount,
+      whatIfAnnual: whatIfResults ? allowancesAmount : undefined,
       percentage: calculatePercentage(allowancesAmount, grossAnnual),
       color: 'text-teal-600 dark:text-teal-400',
       isHighlight: false,
@@ -193,6 +227,7 @@ export function ResultsTable({
       category: 'Net Pay',
       icon: Wallet,
       annual: results.netPay.annually,
+      whatIfAnnual: whatIfResults?.netPay.annually,
       percentage: calculatePercentage(results.netPay.annually, grossAnnual),
       color: 'text-green-600 dark:text-green-400',
       isHighlight: true,
@@ -201,12 +236,13 @@ export function ResultsTable({
       category: 'Employers NI',
       icon: Building,
       annual: results.employerNI,
+      whatIfAnnual: whatIfResults?.employerNI,
       percentage: calculatePercentage(results.employerNI, grossAnnual),
       color: 'text-muted-foreground',
       isHighlight: false,
     },
     {
-      category: 'Net Change from Previous Year',
+      category: previousYearRowLabel,
       icon: TrendingUp,
       annual: yearChange,
       percentage: yearChangePercentage,
@@ -221,8 +257,7 @@ export function ResultsTable({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className='space-y-4'
-      style={{ minHeight: '650px' }}
+      className='w-full space-y-4'
     >
       {/* Period Selection */}
       <PeriodSelectorCard
@@ -232,40 +267,69 @@ export function ResultsTable({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='-mx-2 relative sm:mx-0'>
-        {/* Scroll Indicators */}
+      <div className='-mx-2 relative w-full sm:mx-0'>
+        {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='overflow-hidden border-primary/20'>
+        <Card className='relative w-full overflow-hidden border-primary/20'>
           {/* biome-ignore lint/a11y/useSemanticElements: div needed for ref and scroll functionality */}
           <div
             ref={containerRef}
-            className='touch-pan-x overflow-x-auto scroll-smooth'
+            className='w-full touch-pan-x overflow-x-auto scroll-smooth'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
+              // Ensure smooth scrolling on all devices
+              scrollBehavior: 'smooth',
             }}
             role='region'
             aria-label='Tax calculation results table'
           >
-            <Table data-testid='results-table'>
+            <Table data-testid='results-table' className='w-full min-w-full'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'>
-                    Category
+                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pr-4 font-semibold'>
+                    Payslip
                   </TableHead>
                   <TableHead className='min-w-[50px] text-right font-semibold'>%</TableHead>
-                  {visiblePeriods.map((period) => (
-                    <TableHead
-                      key={period}
-                      className='min-w-[90px] text-right font-semibold sm:min-w-[100px]'
-                    >
-                      {period}
-                    </TableHead>
-                  ))}
+                  {whatIfResults
+                    ? // Two-row header for What If comparison
+                      visiblePeriods.map((period) => (
+                        <TableHead
+                          key={period}
+                          className='min-w-[160px] text-center font-semibold sm:min-w-[180px] md:min-w-[200px] lg:min-w-[220px]'
+                          colSpan={2}
+                        >
+                          {period}
+                        </TableHead>
+                      ))
+                    : // Single-row header for normal view
+                      visiblePeriods.map((period) => (
+                        <TableHead
+                          key={period}
+                          className='min-w-[80px] text-right font-semibold sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'
+                        >
+                          {period}
+                        </TableHead>
+                      ))}
                 </TableRow>
+                {whatIfResults && (
+                  <TableRow className='bg-card hover:bg-card'>
+                    <TableHead className='sticky left-0 z-20 bg-card' colSpan={2} />
+                    {visiblePeriods.map((period) => (
+                      <React.Fragment key={period}>
+                        <TableHead className='min-w-[80px] bg-blue-500/10 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                          Current
+                        </TableHead>
+                        <TableHead className='min-w-[80px] bg-purple-500/10 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                          What If
+                        </TableHead>
+                      </React.Fragment>
+                    ))}
+                  </TableRow>
+                )}
               </TableHeader>
               <TableBody>
                 {tableRows.map((row, index) => (
@@ -274,6 +338,7 @@ export function ResultsTable({
                     category={row.category}
                     icon={row.icon}
                     annual={row.annual}
+                    whatIfAnnual={row.whatIfAnnual}
                     percentage={row.percentage}
                     color={row.color}
                     isHighlight={row.isHighlight}
@@ -288,16 +353,25 @@ export function ResultsTable({
         </Card>
       </div>
 
+      {/* Swipe hint for mobile */}
       <div className='mt-4 flex flex-col items-center gap-2'>
-        <p className='text-center text-muted-foreground text-xs'>
-          *Pension calculated as salary sacrifice; relief reflected in reduced tax and NI.
-        </p>
         {showRightIndicator && (
           <div className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'>
             <span>👈 Swipe to see all periods</span>
           </div>
         )}
       </div>
+
+      {/* Tax Trap Inline Alert */}
+      {taxTrapOptimization && onApplyPensionOptimization && (
+        <div className='mt-4'>
+          <TaxTrapInlineAlert
+            salary={results.grossSalary.annually}
+            suggestedPension={taxTrapOptimization.suggested}
+            onApplyPension={onApplyPensionOptimization}
+          />
+        </div>
+      )}
     </motion.div>
   );
 }

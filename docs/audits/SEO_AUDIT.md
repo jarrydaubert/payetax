@@ -800,7 +800,7 @@ description: 'Expert UK tax guidance and financial insights. Stay up-to-date wit
 
 **Recommendation**:
 - Add sitemap ping on post-deploy hook
-- Use Vercel deployment hooks or GitHub Actions
+- Use Vercel deployment hooks or GitLab CI/CD
 - Ping Google: `https://www.google.com/ping?sitemap=https://payetax.co.uk/sitemap.xml`
 - Ping Bing: `https://www.bing.com/ping?sitemap=https://payetax.co.uk/sitemap.xml`
 

@@ -227,7 +227,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       expect(nav).toHaveClass('border-b');
-      expect(nav).toHaveClass('backdrop-blur-xl');
+      expect(nav).toHaveClass('backdrop-blur-md');
     });
 
     it('should not apply blog styling on other pages', () => {

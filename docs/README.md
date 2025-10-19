@@ -30,6 +30,7 @@
 | **Understand the tech stack?** | [`/guides/TECH_STACK.md`](./guides/TECH_STACK.md) |
 | **Write blog content?** | [`/guides/BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
 | **Set up testing?** | [`/guides/TESTING.md`](./guides/TESTING.md) |
+| **Test accessibility?** | [`/guides/ACCESSIBILITY_TESTING.md`](./guides/ACCESSIBILITY_TESTING.md) |
 | **See current priorities?** | [`/planning/NEXT_PRIORITIES.md`](./planning/NEXT_PRIORITIES.md) |
 | **Plan SEO strategy?** | [`/planning/SEO_STRATEGY.md`](./planning/SEO_STRATEGY.md) |
 | **Check audit progress?** | [`/audits/AUDIT_GAPS.md`](./audits/AUDIT_GAPS.md) |

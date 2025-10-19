@@ -89,13 +89,13 @@ export function FeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size='sm'
-          className='gap-2 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
+        <button
+          type='button'
+          className='flex min-h-[44px] items-center gap-2 px-4 py-2.5 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground'
         >
           <MessageSquare className='size-4' />
           Feedback
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className='border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md'>
         <DialogHeader>

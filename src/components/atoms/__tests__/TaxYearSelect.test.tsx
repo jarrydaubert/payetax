@@ -200,20 +200,20 @@ describe('TaxYearSelect Component', () => {
       expect(wrapper).toHaveClass('custom-class');
     });
 
-    it('should have glassmorphic styling classes', () => {
+    it('should have styling classes', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('glass-input');
-      expect(button).toHaveClass('backdrop-blur-glass-sm');
+      expect(button).toHaveClass('rounded-md');
+      expect(button).toHaveClass('border');
     });
 
     it('should have focus ring styles', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('focus:ring-1');
-      expect(button).toHaveClass('focus:ring-primary');
+      expect(button).toHaveClass('focus:ring-2');
+      expect(button).toHaveClass('focus:ring-ring');
     });
   });
 

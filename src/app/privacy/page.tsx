@@ -1,7 +1,6 @@
 // src/app/privacy/page.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import {
   Calendar,
   CheckCircle,
@@ -78,66 +77,35 @@ export default function PrivacyPolicyPage() {
       {/* Hero Section */}
       <section className='relative overflow-hidden bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className='text-center'
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className='mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-6 py-2.5 backdrop-blur-sm'
-            >
+          <div className='text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-6 py-2.5 backdrop-blur-sm'>
               <Shield className='size-5 text-green-500' />
               <span className='font-semibold text-green-500 text-sm'>Privacy Policy</span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='mb-6 font-bold text-5xl leading-tight md:text-7xl'
-            >
+            <h1 className='mb-6 font-bold text-5xl leading-tight md:text-7xl'>
               <span className='bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent'>
                 Your Privacy
               </span>
               <br />
               <span className='text-foreground'>Comes First</span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className='mx-auto mb-8 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'
-            >
+            <p className='mx-auto mb-8 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'>
               Radical transparency about your data. Here&apos;s exactly what we do and don&apos;t do
               with your information.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className='inline-flex items-center gap-2 text-muted-foreground'
-            >
+            <div className='inline-flex items-center gap-2 text-muted-foreground'>
               <Calendar className='size-4' />
               <span className='text-sm'>Last updated: October 4, 2025</span>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Quick Summary */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-12 text-center'>
             <CheckCircle className='mx-auto mb-4 size-16 text-green-500' />
@@ -156,18 +124,11 @@ export default function PrivacyPolicyPage() {
                 <h3 className='font-bold text-2xl text-foreground'>What We DON'T Do</h3>
               </div>
               <ul className='space-y-3'>
-                {dontDo.map((item, idx) => (
-                  <motion.li
-                    key={item}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className='flex items-start gap-3 text-muted-foreground'
-                  >
+                {dontDo.map((item) => (
+                  <li key={item} className='flex items-start gap-3 text-muted-foreground'>
                     <UserX className='mt-0.5 size-5 flex-shrink-0 text-red-500' />
                     <span>{item}</span>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             </Card>
@@ -180,52 +141,33 @@ export default function PrivacyPolicyPage() {
                 <h3 className='font-bold text-2xl text-foreground'>What We DO</h3>
               </div>
               <ul className='space-y-3'>
-                {doDo.map((item, idx) => (
-                  <motion.li
-                    key={item}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className='flex items-start gap-3 text-muted-foreground'
-                  >
+                {doDo.map((item) => (
+                  <li key={item} className='flex items-start gap-3 text-muted-foreground'>
                     <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-green-500' />
                     <span>{item}</span>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             </Card>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Privacy Principles */}
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className='mb-16 text-center'
-          >
+          <div className='mb-16 text-center'>
             <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
               How We Protect Your Privacy
             </h2>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Four architectural decisions that make your data truly private
             </p>
-          </motion.div>
+          </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
-            {privacyPrinciples.map((principle, idx) => (
-              <motion.div
-                key={principle.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
+            {privacyPrinciples.map((principle) => (
+              <div key={principle.title}>
                 <Card
                   className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${principle.color} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-2xl`}
                 >
@@ -237,20 +179,14 @@ export default function PrivacyPolicyPage() {
                   <h3 className='mb-4 font-bold text-2xl text-foreground'>{principle.title}</h3>
                   <p className='text-muted-foreground leading-relaxed'>{principle.description}</p>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Data Flow */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-16 text-center'>
             <Lock className='mx-auto mb-6 size-16 text-blue-500' />
@@ -263,12 +199,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className='grid gap-4 md:grid-cols-3 md:gap-8'>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
+            <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg'>
                   <Database className='size-10 text-white' />
@@ -279,14 +210,9 @@ export default function PrivacyPolicyPage() {
                   details never leave this device.
                 </p>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
+            <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg'>
                   <Server className='size-10 text-white' />
@@ -297,14 +223,9 @@ export default function PrivacyPolicyPage() {
                   no calculation results stored.
                 </p>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
+            <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
                 <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg'>
                   <FileText className='size-10 text-white' />
@@ -315,7 +236,7 @@ export default function PrivacyPolicyPage() {
                   can be cleared anytime.
                 </p>
               </Card>
-            </motion.div>
+            </div>
           </div>
 
           <Card className='mt-8 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-blue-500/10 p-8'>
@@ -327,19 +248,14 @@ export default function PrivacyPolicyPage() {
             </p>
           </Card>
         </div>
-      </motion.section>
+      </section>
 
       {/* Analytics & Cookies */}
       <section className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='grid gap-12 md:grid-cols-2'>
             {/* Analytics */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.5 }}
-            >
+            <div>
               <div className='mb-8 text-center'>
                 <Globe className='mx-auto mb-6 size-16 text-purple-500' />
                 <h2 className='mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text font-bold text-3xl text-transparent'>
@@ -372,15 +288,10 @@ export default function PrivacyPolicyPage() {
                   <li>✗ Data that could identify you personally</li>
                 </ul>
               </Card>
-            </motion.div>
+            </div>
 
             {/* Cookies */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
+            <div>
               <div className='mb-8 text-center'>
                 <Cookie className='mx-auto mb-6 size-16 text-yellow-500' />
                 <h2 className='mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-3xl text-transparent'>
@@ -420,19 +331,13 @@ export default function PrivacyPolicyPage() {
                   Examples: Page views, session duration, anonymized patterns
                 </div>
               </Card>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Additional Info */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='py-12 md:py-20'
-      >
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
@@ -454,7 +359,7 @@ export default function PrivacyPolicyPage() {
             </Card>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* CTA Section */}
       <section className='bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 py-12 md:py-20'>

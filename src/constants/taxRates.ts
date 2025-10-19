@@ -40,8 +40,8 @@ export interface TaxAllowance {
   period: PayPeriod;
 }
 
-// Available tax years
-export const TAX_YEARS: TaxYear[] = ['2023-2024', '2024-2025', '2025-2026'];
+// Available tax years (newest to oldest)
+export const TAX_YEARS: TaxYear[] = ['2025-2026', '2024-2025', '2023-2024'];
 
 // Standard UK Tax Rates (England, Wales, NI)
 export const TAX_RATES: Record<

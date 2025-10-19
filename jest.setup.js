@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
 import { TextDecoder, TextEncoder } from 'node:util';
+import { toHaveNoViolations } from 'jest-axe';
+
+// Extend Jest matchers with jest-axe accessibility matchers
+expect.extend(toHaveNoViolations);
 
 // Polyfill TextEncoder/TextDecoder for Node.js (required by Next.js modules)
 global.TextEncoder = TextEncoder;

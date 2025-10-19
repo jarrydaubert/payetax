@@ -58,7 +58,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span
-              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-2xl text-transparent md:text-3xl lg:text-4xl'
+              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-3xl text-transparent'
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
@@ -77,7 +77,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                   href={link.href}
                   onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
                   className={cn(
-                    'relative flex min-h-[44px] items-center px-4 py-3 font-medium text-base transition-colors',
+                    'relative flex min-h-[44px] items-center px-4 py-2.5 font-medium text-sm transition-colors',
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
@@ -136,7 +136,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                           : () => setIsMobileMenuOpen(false)
                       }
                       className={cn(
-                        'block rounded-lg px-4 py-3 font-medium text-base transition-colors',
+                        'block rounded-lg px-4 py-3 font-medium text-sm transition-colors',
                         isActive
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-accent hover:text-foreground'

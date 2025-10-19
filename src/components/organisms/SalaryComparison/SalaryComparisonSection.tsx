@@ -1,0 +1,96 @@
+// src/components/organisms/SalaryComparison/SalaryComparisonSection.tsx
+'use client';
+
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeftRight, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  type ComparisonInput,
+  type ComparisonResults,
+  calculateComparison,
+} from '@/lib/salaryComparison';
+import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/taxCalculator';
+import { cn } from '@/lib/utils';
+import { ComparisonInputs } from './ComparisonInputs';
+import { ComparisonResultsTable } from './ComparisonResultsTable';
+import { MarginalRateInsight } from './MarginalRateInsight';
+
+interface SalaryComparisonSectionProps {
+  currentInput: TaxCalculationInput;
+  currentResults: TaxCalculationResults;
+  className?: string;
+}
+
+export function SalaryComparisonSection({
+  currentInput,
+  currentResults,
+  className,
+}: SalaryComparisonSectionProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [comparisonResults, setComparisonResults] = useState<ComparisonResults | null>(null);
+
+  const handleCompare = (comparisonInput: ComparisonInput) => {
+    const results = calculateComparison(currentInput, comparisonInput);
+    setComparisonResults(results);
+  };
+
+  return (
+    <div className={cn('space-y-4', className)}>
+      {/* Toggle Button */}
+      <Button
+        variant='outline'
+        className='w-full justify-between'
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className='flex items-center gap-2'>
+          <ArrowLeftRight className='size-4' />
+          Compare Salary Scenarios
+        </span>
+        <ChevronDown
+          className={cn('size-4 transition-transform duration-200', isOpen && 'rotate-180')}
+        />
+      </Button>
+
+      {/* Collapsible Content */}
+      <AnimatePresence mode='wait'>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className='space-y-4 overflow-hidden'
+          >
+            {/* Comparison Inputs */}
+            <ComparisonInputs
+              currentSalary={currentResults.grossSalary.annually}
+              onCompare={handleCompare}
+            />
+
+            {/* Results */}
+            {comparisonResults && (
+              <AnimatePresence mode='wait'>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className='space-y-4'
+                >
+                  <MarginalRateInsight
+                    increase={comparisonResults.increase}
+                    netDiff={comparisonResults.netDiff}
+                    marginalRate={comparisonResults.marginalRate}
+                    effectiveRate={comparisonResults.effectiveRate}
+                  />
+                  <ComparisonResultsTable results={comparisonResults} />
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

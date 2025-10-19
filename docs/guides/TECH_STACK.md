@@ -34,6 +34,7 @@
 | **Contentlayer2** | 0.5.8 | MDX blog processing |
 | **@linear/sdk** | 60.0.0 | Project management integration |
 | **Biome** | 2.2.5 | Linting & formatting |
+| **jest-axe** | 10.0.0 | Accessibility testing (WCAG) |
 
 ### Key Features
 

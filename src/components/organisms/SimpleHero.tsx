@@ -24,22 +24,17 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
       {/* Content */}
       <div className='relative z-10 mx-auto max-w-5xl px-2 text-center sm:px-4'>
         {/* Heading - No animation for LCP optimization */}
-        <h1 className='mb-6 font-bold text-5xl text-foreground tracking-tight md:text-7xl'>
+        <h1 className='mb-6 font-bold text-6xl text-foreground tracking-tight'>
           Free UK PAYE Tax
           <br />
           <span className='text-gradient'>Calculator 2025-2026</span>
         </h1>
 
-        {/* Description - Subtle animation */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className='mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl'
-        >
+        {/* Description */}
+        <p className='mx-auto mb-10 max-w-2xl text-lg text-muted-foreground'>
           Calculate your take-home pay instantly. Includes income tax, National Insurance, student
           loans, and pension contributions.
-        </motion.p>
+        </p>
 
         {/* CTA Button */}
         <motion.div
@@ -63,30 +58,19 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
         </motion.div>
 
         {/* Features */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className='mt-16 flex flex-wrap items-center justify-center gap-8 text-muted-foreground text-sm'
-        >
+        <div className='mt-16 flex flex-wrap items-center justify-center gap-8 text-muted-foreground text-sm'>
           {[
             'Accurate Calculations',
             '2025-2026 Tax Year',
             'Scottish Tax Support',
             'Instant Results',
-          ].map((feature, index) => (
-            <motion.div
-              key={feature}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-              className='flex items-center gap-2'
-            >
+          ].map((feature) => (
+            <div key={feature} className='flex items-center gap-2'>
               <div className='h-1.5 w-1.5 rounded-full bg-primary' />
               <span>{feature}</span>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

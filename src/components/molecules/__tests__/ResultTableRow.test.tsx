@@ -94,8 +94,8 @@ describe('ResultTableRow Component', () => {
       });
 
       const row = container.querySelector('tr');
-      expect(row).toHaveClass('border-t-2');
-      expect(row).toHaveClass('border-t-primary');
+      expect(row).toHaveClass('border-t');
+      expect(row).toHaveClass('border-t-border');
       expect(row).toHaveClass('bg-primary/5');
     });
 

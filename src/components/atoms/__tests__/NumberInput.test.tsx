@@ -1,8 +1,66 @@
 // src/components/atoms/__tests__/NumberInput.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import NumberInput from '../NumberInput';
 
 describe('NumberInput Component', () => {
+  describe('Regression Tests - Critical Features', () => {
+    it('should allow decimals when decimals prop is set', async () => {
+      const user = userEvent.setup();
+      const mockOnChange = jest.fn();
+
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.clear(input);
+      await user.type(input, '123.45');
+
+      expect(input.value).toBe('123.45');
+    });
+
+    it('should show thousand separators (commas) as user types', async () => {
+      const user = userEvent.setup();
+      const mockOnChange = jest.fn();
+
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={0} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.clear(input);
+      await user.type(input, '1234567');
+
+      // Should format as 1,234,567
+      expect(input.value).toBe('1,234,567');
+    });
+
+    it('should show commas with decimals', async () => {
+      const user = userEvent.setup();
+      const mockOnChange = jest.fn();
+
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.clear(input);
+      await user.type(input, '12345.67');
+
+      // Should format as 12,345.67
+      expect(input.value).toBe('12,345.67');
+    });
+
+    it('should preserve decimal point while typing', async () => {
+      const user = userEvent.setup();
+      const mockOnChange = jest.fn();
+
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.clear(input);
+      await user.type(input, '100.');
+
+      // Should allow typing decimal point
+      expect(input.value).toBe('100.');
+    });
+  });
+
   const mockOnChange = jest.fn();
 
   beforeEach(() => {

@@ -271,6 +271,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   let annualTaxFreeAmount = taxRates.personalAllowance;
 
   // Parse tax code to determine actual personal allowance (HMRC tax code system)
+  // If no tax code provided, use standard personal allowance from tax rates
   if (input.taxCode.trim()) {
     // HMRC Tax Code Parsing Algorithm:
     // Tax codes contain a numeric part that represents 1/10th of the tax-free allowance
@@ -329,10 +330,13 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     annualTaxFreeAmount += taxRates.blindPersonsAllowance;
   }
 
-  // Age-Related Personal Allowances (for people aged 65+)
-  // Additional allowances for older taxpayers, but with income tapering
+  // Age-Related Personal Allowances (LEGACY - applies only to those born before 6 April 1938)
+  // NOTE: Age allowances were frozen in April 2016 and are being phased out
+  // Most people aged 65+ now use the standard personal allowance
+  // However, for those who were already receiving it, it continues:
   // For 2024-25: Age 65-74: +£3,660, Age 75+: +£3,960
   // Tapers down by £1 for every £2 of income over £34,600
+  // In practice, very few users will be affected by this
   if (input.age && input.age >= 65) {
     let ageAllowance = 0;
 
