@@ -87,7 +87,7 @@ export function BlogPageClient({
             </h1>
 
             {/* Subtitle */}
-            <p className='mx-auto mb-12 max-w-3xl text-lg text-foreground/70 leading-relaxed'>
+            <p className='mx-auto mb-12 max-w-3xl text-foreground/70 text-lg leading-relaxed'>
               UK Tax Guidance & Financial Insights. No jargon, just insights.
             </p>
 

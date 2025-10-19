@@ -61,7 +61,10 @@ export interface PensionOptimization {
  * calculateOptimalPension(-5000); // null
  * calculateOptimalPension(Infinity); // null
  */
-export function calculateOptimalPension(salary: number, currentPension = 0): PensionOptimization | null {
+export function calculateOptimalPension(
+  salary: number,
+  currentPension = 0
+): PensionOptimization | null {
   // Validate inputs
   try {
     if (!isValidSalary(salary)) {

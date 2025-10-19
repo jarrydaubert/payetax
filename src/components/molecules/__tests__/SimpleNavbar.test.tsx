@@ -230,13 +230,15 @@ describe('SimpleNavbar Component', () => {
       expect(nav).toHaveClass('backdrop-blur-md');
     });
 
-    it('should not apply blog styling on other pages', () => {
+    it('should apply consistent styling on all pages', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
 
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      expect(nav).not.toHaveClass('border-b');
+      // Border is now applied consistently across all pages
+      expect(nav).toHaveClass('border-b');
+      expect(nav).toHaveClass('backdrop-blur-md');
     });
   });
 

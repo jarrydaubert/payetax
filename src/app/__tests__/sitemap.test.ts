@@ -13,6 +13,7 @@ jest.mock('contentlayer/generated', () => ({
 jest.mock('@/lib/blog');
 
 import * as blogLib from '@/lib/blog';
+import type { BlogCategory, BlogPost } from '@/types/blog';
 import sitemap from '../sitemap';
 
 describe('Sitemap Generation', () => {
@@ -111,7 +112,7 @@ describe('Sitemap Generation', () => {
           publishedAt: '2025-10-01',
           updatedAt: '2025-10-05',
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
       ]);
       mockGetBlogCategories.mockResolvedValue([]);
 
@@ -131,14 +132,14 @@ describe('Sitemap Generation', () => {
           publishedAt: '2025-10-01',
           updatedAt: '2025-10-05',
           featured: true,
-        } as any,
+        } as Partial<BlogPost>,
         {
           slug: 'regular-post',
           title: 'Regular Post',
           publishedAt: '2025-10-01',
           updatedAt: '2025-10-05',
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
       ]);
       mockGetBlogCategories.mockResolvedValue([]);
 
@@ -163,7 +164,7 @@ describe('Sitemap Generation', () => {
           publishedAt: '2025-10-01',
           updatedAt: '2025-10-10',
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
       ]);
       mockGetBlogCategories.mockResolvedValue([]);
 
@@ -181,7 +182,7 @@ describe('Sitemap Generation', () => {
           publishedAt: '2025-10-01',
           updatedAt: null,
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
       ]);
       mockGetBlogCategories.mockResolvedValue([]);
 
@@ -198,19 +199,19 @@ describe('Sitemap Generation', () => {
           title: 'Post 1',
           publishedAt: '2025-10-01',
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
         {
           slug: 'post-2',
           title: 'Post 2',
           publishedAt: '2025-10-02',
           featured: true,
-        } as any,
+        } as Partial<BlogPost>,
         {
           slug: 'post-3',
           title: 'Post 3',
           publishedAt: '2025-10-03',
           featured: false,
-        } as any,
+        } as Partial<BlogPost>,
       ]);
       mockGetBlogCategories.mockResolvedValue([]);
 
@@ -230,7 +231,7 @@ describe('Sitemap Generation', () => {
         {
           slug: 'tax-tips',
           name: 'Tax Tips',
-        } as any,
+        } as BlogCategory,
       ]);
 
       const result = await sitemap();
@@ -246,9 +247,9 @@ describe('Sitemap Generation', () => {
     it('should handle multiple categories', async () => {
       mockGetBlogPosts.mockResolvedValue([]);
       mockGetBlogCategories.mockResolvedValue([
-        { slug: 'tax-basics', name: 'Tax Basics' } as any,
-        { slug: 'tax-tips', name: 'Tax Tips' } as any,
-        { slug: 'tax-changes', name: 'Tax Changes' } as any,
+        { slug: 'tax-basics', name: 'Tax Basics' } as BlogCategory,
+        { slug: 'tax-tips', name: 'Tax Tips' } as BlogCategory,
+        { slug: 'tax-changes', name: 'Tax Changes' } as BlogCategory,
       ]);
 
       const result = await sitemap();
