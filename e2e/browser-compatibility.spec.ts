@@ -70,13 +70,10 @@ test.describe('Browser Compatibility Tests', () => {
     expect(flexSupport).toBe(true);
 
     // Check backdrop-filter support (may fail on older browsers)
-    const backdropFilterSupported = await page.evaluate(() => {
+    const _backdropFilterSupported = await page.evaluate(() => {
       const testElement = document.createElement('div');
       return 'backdropFilter' in testElement.style || 'webkitBackdropFilter' in testElement.style;
     });
-
-    // Log result but don't fail test for this (progressive enhancement)
-    console.log(`${browserName}: backdrop-filter supported: ${backdropFilterSupported}`);
   });
 
   test('should support required JavaScript features', async ({ page, browserName }) => {
@@ -120,8 +117,6 @@ test.describe('Browser Compatibility Tests', () => {
 
     // All these features should be supported in modern browsers
     for (const [feature, supported] of Object.entries(featureSupport)) {
-      console.log(`${browserName}: ${feature} supported: ${supported}`);
-
       // Critical features must be supported
       if (['fetch', 'Promise', 'localStorage'].includes(feature)) {
         expect(supported).toBe(true);
@@ -192,14 +187,12 @@ test.describe('Browser Compatibility Tests', () => {
     );
 
     // Check that custom fonts are loaded (if any)
-    const fontsLoaded = await page.evaluate(() => {
+    const _fontsLoaded = await page.evaluate(() => {
       const computedStyle = getComputedStyle(document.body);
       const fontFamily = computedStyle.fontFamily;
       // Should not fall back to generic font only
       return !fontFamily.includes('serif') || fontFamily.includes(',');
     });
-
-    console.log(`${browserName}: Fonts loaded correctly: ${fontsLoaded}`);
 
     // Check for broken images
     const brokenImages = await page.evaluate(() => {
@@ -229,7 +222,6 @@ test.describe('Browser Compatibility Tests', () => {
 
     // Log any JS errors but don't fail the test if they're handled gracefully
     if (jsErrors.length > 0) {
-      console.log(`${browserName}: JavaScript errors detected:`, jsErrors);
     }
 
     // The page should still be functional
@@ -246,7 +238,7 @@ test.describe('Browser Compatibility Tests', () => {
     expect(ariaLabels).toBeGreaterThan(0);
 
     // Check for proper form labels
-    const inputsWithLabels = await page.evaluate(() => {
+    const _inputsWithLabels = await page.evaluate(() => {
       const inputs = document.querySelectorAll('input');
       let labeledInputs = 0;
 
@@ -263,10 +255,6 @@ test.describe('Browser Compatibility Tests', () => {
 
       return { total: inputs.length, labeled: labeledInputs };
     });
-
-    console.log(
-      `${browserName}: Input accessibility: ${inputsWithLabels.labeled}/${inputsWithLabels.total} inputs properly labeled`
-    );
 
     // Check for keyboard navigation
     await page.keyboard.press('Tab');
@@ -298,8 +286,6 @@ test.describe('Browser Compatibility Tests', () => {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    console.log(`${browserName}: Calculation workflow completed in ${duration}ms`);
-
     // Should complete within reasonable time (10 seconds is very generous)
     expect(duration).toBeLessThan(10000);
   });
@@ -312,7 +298,7 @@ test.describe('Browser Compatibility Tests', () => {
         return;
       }
 
-      const startTime = Date.now();
+      const _startTime = Date.now();
 
       // The page should already be loaded, but let's test interactions
       await page.fill('input[data-testid="salary-input"]', '35000');
@@ -321,8 +307,7 @@ test.describe('Browser Compatibility Tests', () => {
       // Wait for results - should work even on slow connection
       await expect(page.locator('[data-testid="tax-results"]')).toBeVisible({ timeout: 15000 });
 
-      const endTime = Date.now();
-      console.log(`Slow 3G: Interaction completed in ${endTime - startTime}ms`);
+      const _endTime = Date.now();
     });
   });
 });

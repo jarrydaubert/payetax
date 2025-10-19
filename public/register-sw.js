@@ -1,16 +1,15 @@
 (() => {
   if (!('serviceWorker' in navigator)) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      console.log('[PWA] Service Worker not supported');
-    return;
+      return;
   }
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    console.log('[PWA] Service Worker disabled in development');
     return;
   }
-  const t = (e, ...o) => {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      console.log(e, ...o);
+  const t = (_e, ..._o) => {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return; // No console logging in production
+    }
   };
   let e,
     o = !1;
@@ -55,7 +54,7 @@
     }, 3e4);
   }
   function a() {
-    if (!e || !e.waiting) return;
+    if (!e?.waiting) return;
     e.waiting.postMessage({ type: 'SKIP_WAITING' });
     if (o) return;
     o = !0;

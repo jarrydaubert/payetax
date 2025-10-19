@@ -2,7 +2,7 @@
 // LLMs.txt - AI Search Engine Optimization (AEO)
 // Helps ChatGPT, Claude, Perplexity, and other AI search tools understand your site
 
-export async function GET() {
+export function GET() {
   const llmsTxt = `# PayeTax
 
 > Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with all calculations running client-side.

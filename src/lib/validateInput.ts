@@ -135,7 +135,7 @@ export function isValidTaxCode(code: string): boolean {
 /**
  * Sanitizes salary amount
  */
-export function sanitizeSalary(salary: any): number {
+export function sanitizeSalary(salary: number | string | unknown): number {
   if (typeof salary === 'string') {
     // Remove currency symbols and commas
     const cleaned = salary.replace(/[£$,]/g, '');
@@ -153,7 +153,7 @@ export function sanitizeSalary(salary: any): number {
 /**
  * Gets error message for invalid input
  */
-export function getInputErrorMessage(field: string, value: any): string | null {
+export function getInputErrorMessage(field: string, value: unknown): string | null {
   switch (field) {
     case 'salary':
       if (typeof value !== 'number' || Number.isNaN(value)) {

@@ -263,16 +263,24 @@ describe('CalculatorContainer Component', () => {
     it('should show export buttons when results exist', () => {
       render(<CalculatorContainer />);
 
-      expect(screen.getByRole('button', { name: /Print tax calculation results/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Export results to CSV file/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Print tax calculation results/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Export results to CSV file/i })
+      ).toBeInTheDocument();
     });
 
     it('should not show export buttons when no results', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
 
-      expect(screen.queryByRole('button', { name: /Print tax calculation results/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /Export results to CSV file/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Print tax calculation results/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Export results to CSV file/i })
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -323,7 +331,9 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       // Export button shouldn't be visible
-      expect(screen.queryByRole('button', { name: /Export results to CSV file/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Export results to CSV file/i })
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -362,7 +372,9 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       // Print button shouldn't be visible
-      expect(screen.queryByRole('button', { name: /Print tax calculation results/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Print tax calculation results/i })
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -417,8 +429,12 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
       render(<CalculatorContainer />);
 
-      expect(screen.getByRole('button', { name: /Print tax calculation results/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Export results to CSV file/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Print tax calculation results/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Export results to CSV file/i })
+      ).toBeInTheDocument();
     });
   });
 

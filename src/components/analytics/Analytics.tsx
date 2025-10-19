@@ -153,7 +153,7 @@ export function Analytics() {
 
     // Only track page views if consent is given
     const hasConsent = localStorage.getItem('cookie-consent') === 'accepted';
-    if (!hasConsent || !window.gtag) return;
+    if (!(hasConsent && window.gtag)) return;
 
     // Construct full URL for tracking
     const searchParamsString = searchParams?.toString();

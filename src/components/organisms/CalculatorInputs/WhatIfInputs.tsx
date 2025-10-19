@@ -2,6 +2,7 @@
 'use client';
 
 import { Wand2 } from 'lucide-react';
+import { useId } from 'react';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,8 @@ import { useCalculatorActions, useWhatIf } from '@/store/calculatorStore';
 export function WhatIfInputs() {
   const whatIf = useWhatIf();
   const { setWhatIfType, setWhatIfValue, calculateWhatIf } = useCalculatorActions();
+  const typeSelectId = useId();
+  const valueInputId = useId();
 
   const handleCompare = () => {
     // Enable What If mode and calculate
@@ -82,7 +85,7 @@ export function WhatIfInputs() {
               onValueChange={(value: 'percentage' | 'amount' | 'total') => setWhatIfType(value)}
             >
               <SelectTrigger
-                id='what-if-type'
+                id={typeSelectId}
                 className='border-purple-500/30 bg-background hover:border-purple-500/50 dark:border-purple-400/30 dark:hover:border-purple-400/50'
                 data-testid='what-if-type-select'
               >
@@ -99,12 +102,12 @@ export function WhatIfInputs() {
 
         {/* Value Input */}
         <div>
-          <label htmlFor='what-if-value' className='mb-2 block font-medium text-foreground text-sm'>
+          <label htmlFor={valueInputId} className='mb-2 block font-medium text-foreground text-sm'>
             {getInputLabel()}
           </label>
           <InputTooltip fieldName='whatIfValue'>
             <NumberInput
-              id='what-if-value'
+              id={valueInputId}
               value={whatIf.value}
               onChange={setWhatIfValue}
               prefix={whatIf.type !== 'percentage' ? '£' : undefined}

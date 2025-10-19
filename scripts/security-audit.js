@@ -39,7 +39,6 @@ function loadSecurityHistory() {
 function saveSecurityHistory(history) {
   try {
     fs.writeFileSync(SECURITY_LOG, JSON.stringify(history, null, 2));
-    console.log(`✅ Security audit history saved to ${SECURITY_LOG}`);
   } catch (error) {
     console.error('❌ Failed to save security history:', error.message);
   }
@@ -87,34 +86,7 @@ function checkOutdatedPackages() {
 }
 
 function generateSecurityReport(audit, history) {
-  console.log('\n🔒 SECURITY AUDIT REPORT');
-  console.log('=====================================');
-  console.log(`📅 Timestamp: ${audit.timestamp}`);
-
-  console.log('\n🚨 VULNERABILITY SUMMARY:');
-  console.log(
-    `  Critical: ${audit.summary.critical} ${audit.summary.critical <= SECURITY_THRESHOLDS.critical ? '✅' : '❌'} (max: ${SECURITY_THRESHOLDS.critical})`
-  );
-  console.log(
-    `  High: ${audit.summary.high} ${audit.summary.high <= SECURITY_THRESHOLDS.high ? '✅' : '❌'} (max: ${SECURITY_THRESHOLDS.high})`
-  );
-  console.log(
-    `  Moderate: ${audit.summary.moderate} ${audit.summary.moderate <= SECURITY_THRESHOLDS.moderate ? '✅' : '⚠️'} (max: ${SECURITY_THRESHOLDS.moderate})`
-  );
-  console.log(
-    `  Low: ${audit.summary.low} ${audit.summary.low <= SECURITY_THRESHOLDS.low ? '✅' : '⚠️'} (max: ${SECURITY_THRESHOLDS.low})`
-  );
-  console.log(`  Total: ${audit.summary.total}`);
-
-  console.log('\n📦 DEPENDENCY ANALYSIS:');
-  console.log(`  Production Dependencies: ${audit.dependencies.prod}`);
-  console.log(`  Development Dependencies: ${audit.dependencies.dev}`);
-  console.log(`  Optional Dependencies: ${audit.dependencies.optional}`);
-  console.log(`  Total Dependencies: ${audit.dependencies.total}`);
-
   if (audit.vulnerabilities && audit.vulnerabilities.length > 0) {
-    console.log('\n🔍 DETAILED VULNERABILITIES:');
-
     // Group by severity
     const bySeverity = audit.vulnerabilities.reduce((acc, vuln) => {
       if (!acc[vuln.severity]) acc[vuln.severity] = [];
@@ -124,15 +96,10 @@ function generateSecurityReport(audit, history) {
 
     for (const severity of ['critical', 'high', 'moderate', 'low']) {
       if (bySeverity[severity] && bySeverity[severity].length > 0) {
-        console.log(`\n  ${severity.toUpperCase()} (${bySeverity[severity].length}):`);
-        for (const [i, vuln] of bySeverity[severity].entries()) {
-          console.log(`    ${i + 1}. ${vuln.name}${vuln.version ? `@${vuln.version}` : ''}`);
-          console.log(`       ${vuln.title || 'No description available'}`);
+        for (const [_i, vuln] of bySeverity[severity].entries()) {
           if (vuln.url) {
-            console.log(`       More info: ${vuln.url}`);
           }
           if (vuln.fixAvailable) {
-            console.log(`       Fix: Update to version ${vuln.fixAvailable}`);
           }
         }
       }
@@ -140,7 +107,6 @@ function generateSecurityReport(audit, history) {
   }
 
   if (audit.outdatedPackages && audit.outdatedPackages.length > 0) {
-    console.log('\n📅 OUTDATED PACKAGES:');
     const criticalOutdated = audit.outdatedPackages.filter((pkg) => {
       const currentMajor = parseInt(pkg.current.split('.')[0], 10);
       const latestMajor = parseInt(pkg.latest.split('.')[0], 10);
@@ -148,47 +114,29 @@ function generateSecurityReport(audit, history) {
     });
 
     if (criticalOutdated.length > 0) {
-      console.log('  Major version updates available:');
-      for (const pkg of criticalOutdated.slice(0, 10)) {
-        console.log(`    ${pkg.name}: ${pkg.current} → ${pkg.latest} (${pkg.type})`);
+      for (const _pkg of criticalOutdated.slice(0, 10)) {
       }
 
       if (criticalOutdated.length > 10) {
-        console.log(`    ... and ${criticalOutdated.length - 10} more`);
       }
     } else {
-      console.log('  ✅ No major version updates required');
     }
   }
 
   // Trend analysis
   if (history.audits.length > 1) {
-    console.log('\n📈 SECURITY TRENDS (last 5 audits):');
-
     const totalTrend = analyzeTrend(history.audits, 'total');
     if (totalTrend) {
-      console.log(
-        `  Total Vulnerabilities: ${totalTrend.change > 0 ? '+' : ''}${totalTrend.change} ${totalTrend.improving ? '📈' : '📉'} (${totalTrend.baseline} → ${totalTrend.recent})`
-      );
     }
 
     const criticalTrend = analyzeTrend(history.audits, 'critical');
     if (criticalTrend && criticalTrend.recent > 0) {
-      console.log(
-        `  Critical: ${criticalTrend.change > 0 ? '+' : ''}${criticalTrend.change} ${criticalTrend.improving ? '📈' : '📉'} (${criticalTrend.baseline} → ${criticalTrend.recent})`
-      );
     }
 
     const highTrend = analyzeTrend(history.audits, 'high');
     if (highTrend && highTrend.recent > 0) {
-      console.log(
-        `  High: ${highTrend.change > 0 ? '+' : ''}${highTrend.change} ${highTrend.improving ? '📈' : '📉'} (${highTrend.baseline} → ${highTrend.recent})`
-      );
     }
   }
-
-  // Recommendations
-  console.log('\n💡 SECURITY RECOMMENDATIONS:');
   const recommendations = [];
 
   if (audit.summary.critical > 0) {
@@ -218,34 +166,16 @@ function generateSecurityReport(audit, history) {
   recommendations.push('🚀 Monitor security advisories for used packages');
 
   if (recommendations.length === 0) {
-    console.log('  🎉 No security issues found! Keep up the great work!');
   } else {
-    recommendations.forEach((rec, i) => {
-      console.log(`  ${i + 1}. ${rec}`);
-    });
+    recommendations.forEach((_rec, _i) => {});
   }
-
-  // Next steps
-  console.log('\n🔧 SUGGESTED ACTIONS:');
   if (audit.summary.critical > 0 || audit.summary.high > 0) {
-    console.log('  1. Run `npm audit fix` to automatically fix issues');
-    console.log('  2. Review breaking changes for major updates');
-    console.log('  3. Test application thoroughly after fixes');
-    console.log('  4. Consider alternative packages if fixes unavailable');
   } else {
-    console.log('  ✅ Security posture is good');
-    console.log('  • Continue regular monthly audits');
-    console.log('  • Keep dependencies updated');
-    console.log('  • Monitor security advisories');
   }
-
-  console.log('\n=====================================\n');
 }
 
 async function runSecurityAudit() {
   return new Promise((resolve, reject) => {
-    console.log('🔍 Running security audit...\n');
-
     exec('npm audit --audit-level=info --json', async (_error, stdout, _stderr) => {
       try {
         let auditData;
@@ -318,8 +248,6 @@ async function runSecurityAudit() {
 
 async function main() {
   try {
-    console.log('🔒 Starting security audit...\n');
-
     // Load existing history
     const history = loadSecurityHistory();
 
@@ -346,10 +274,8 @@ async function main() {
       audit.summary.high > SECURITY_THRESHOLDS.high;
 
     if (hasSecurityIssues) {
-      console.log('❌ Critical security vulnerabilities found');
       process.exit(1);
     } else {
-      console.log('✅ Security audit completed successfully');
       process.exit(0);
     }
   } catch (error) {

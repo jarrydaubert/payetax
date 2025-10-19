@@ -25,7 +25,6 @@ const CookieBanner: React.FC = () => {
       // Show banner if no consent has been given or if consent has expired
       if (consent === null || expired) {
         if (expired) {
-          console.info('Cookie consent expired, showing banner again');
         }
         const timer = setTimeout(() => setShowBanner(true), 1000);
         return () => clearTimeout(timer);
@@ -58,8 +57,6 @@ const CookieBanner: React.FC = () => {
           console.warn('Failed to update gtag consent:', gtagError);
         }
       }
-
-      console.info('Cookie consent: Accepted');
     } catch (error) {
       console.error('Failed to accept cookies:', error);
       // Still hide banner to prevent it from being stuck
@@ -87,8 +84,6 @@ const CookieBanner: React.FC = () => {
           console.warn('Failed to update gtag consent:', gtagError);
         }
       }
-
-      console.info('Cookie consent: Declined');
     } catch (error) {
       console.error('Failed to decline cookies:', error);
       // Still hide banner to prevent it from being stuck

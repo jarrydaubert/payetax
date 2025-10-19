@@ -224,7 +224,10 @@ describe('Calculator Store - What If Feature', () => {
 
       // Tax bands should have amounts
       // Note: band.amount is the income taxed at that rate, not the tax itself
-      const totalTaxFromBands = whatIfResults?.taxBands.reduce((sum, band) => sum + (band.amount * band.rate / 100), 0);
+      const totalTaxFromBands = whatIfResults?.taxBands.reduce(
+        (sum, band) => sum + (band.amount * band.rate) / 100,
+        0
+      );
       expect(totalTaxFromBands).toBeCloseTo(whatIfResults?.incomeTax.annually || 0, 0);
     });
   });
@@ -312,8 +315,14 @@ describe('Calculator Store - What If Feature', () => {
     });
 
     it('should handle student loan in What If calculation', () => {
-      const { setSalary, setStudentLoanPlan, calculate, setWhatIfType, setWhatIfValue, calculateWhatIf } =
-        useCalculatorStore.getState();
+      const {
+        setSalary,
+        setStudentLoanPlan,
+        calculate,
+        setWhatIfType,
+        setWhatIfValue,
+        calculateWhatIf,
+      } = useCalculatorStore.getState();
 
       setSalary(30000);
       setStudentLoanPlan('plan2'); // Use lowercase plan name
