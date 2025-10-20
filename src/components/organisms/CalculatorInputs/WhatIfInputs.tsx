@@ -15,6 +15,10 @@ import {
 } from '@/components/ui/select';
 import { useCalculatorActions, useWhatIf } from '@/store/calculatorStore';
 
+interface WhatIfInputsProps {
+  onCompare?: () => void;
+}
+
 /**
  * What If Scenario Input Section
  *
@@ -25,7 +29,7 @@ import { useCalculatorActions, useWhatIf } from '@/store/calculatorStore';
  *
  * Integrates with What If state in calculator store
  */
-export function WhatIfInputs() {
+export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   const whatIf = useWhatIf();
   const { setWhatIfType, setWhatIfValue, calculateWhatIf } = useCalculatorActions();
   const typeSelectId = useId();
@@ -34,6 +38,11 @@ export function WhatIfInputs() {
   const handleCompare = () => {
     // Enable What If mode and calculate
     calculateWhatIf();
+
+    // Notify parent to scroll to results
+    if (onCompare) {
+      onCompare();
+    }
   };
 
   // Get label for input based on type

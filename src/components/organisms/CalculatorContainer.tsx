@@ -63,6 +63,28 @@ export function CalculatorContainer() {
     calculate();
     calculatePreviousYear();
     setShowResults(true);
+
+    // Scroll to results after calculation completes
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 600); // Wait for loading state + render
+  };
+
+  const handleWhatIfCalculate = () => {
+    // Scroll to results and show feedback
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      toast.success('Scenarios compared!', {
+        description: 'Check the results table to see your comparison',
+        duration: 3000,
+      });
+    }, 100);
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
@@ -193,7 +215,10 @@ export function CalculatorContainer() {
 
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card className='order-2 border-primary/20 p-3 sm:p-4 md:p-6 lg:sticky lg:top-4 lg:order-3 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto'>
-        <CalculatorInputsSection onCalculate={handleCalculate} />
+        <CalculatorInputsSection
+          onCalculate={handleCalculate}
+          onWhatIfCalculate={handleWhatIfCalculate}
+        />
       </Card>
 
       {/* Results Table - order-6 on mobile, right column on desktop */}

@@ -13,9 +13,13 @@ import { WhatIfInputs } from './WhatIfInputs';
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
+  onWhatIfCalculate?: () => void;
 }
 
-export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSectionProps) {
+export function CalculatorInputsSection({
+  onCalculate,
+  onWhatIfCalculate,
+}: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
   const [isCalculating, setIsCalculating] = React.useState(false);
   const [whatIfOpen, setWhatIfOpen] = React.useState(false);
@@ -104,7 +108,7 @@ export function CalculatorInputsSection({ onCalculate }: CalculatorInputsSection
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className='pt-4'>
-            <WhatIfInputs />
+            <WhatIfInputs onCompare={onWhatIfCalculate} />
           </div>
         </CollapsibleContent>
       </Collapsible>
