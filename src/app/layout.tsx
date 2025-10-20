@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import Analytics from '@/components/analytics/Analytics';
@@ -144,6 +145,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={cn(inter.variable, 'font-sans antialiased', 'min-h-screen text-foreground')}>
+        {/* Ahrefs Web Analytics - Privacy-first analytics without cookies */}
+        <Script
+          src='https://analytics.ahrefs.com/analytics.js'
+          data-key='QVltTEcUkJo80YKtGhAvrg'
+          strategy='afterInteractive'
+        />
+
         <ThemeProvider>
           <Suspense fallback={null}>
             <Analytics />

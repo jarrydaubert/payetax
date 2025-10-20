@@ -1,6 +1,6 @@
 # 📋 PayeTax - Consolidated TODO List
 
-**Last Updated**: October 17, 2026  
+**Last Updated**: October 17, 2025  
 **Purpose**: Single source of truth for all outstanding work  
 **Status**: Active - consolidates all previous planning docs
 
@@ -136,7 +136,7 @@ export function checkRateLimit(ip: string): boolean {
 ## 🟠 HIGH PRIORITY
 
 ### 4. £100k Tax Trap Warning (Done!)
-**Source**: Morning Demo January 17, 2026  
+**Source**: Morning Demo October 17, 2025  
 **Priority**: 🟠 HIGH  
 **Time**: 2 hours  
 **Status**: Done!
@@ -146,7 +146,7 @@ export function checkRateLimit(ip: string): boolean {
 ---
 
 ### 5. Display Marginal Tax Rate (NEW - Demo Feedback)
-**Source**: Morning Demo January 17, 2026  
+**Source**: Morning Demo October 17, 2025  
 **Priority**: 🟠 HIGH  
 **Time**: 1-2 hours  
 **Status**: ❌ Not Started
@@ -167,7 +167,7 @@ New card showing:
 ---
 
 ### 6. "What If?" Quick Scenario Toggles (NEW - Demo Feedback)
-**Source**: Morning Demo January 17, 2026  
+**Source**: Morning Demo October 17, 2025  
 **Priority**: 🟠 HIGH  
 **Time**: 3-4 hours  
 **Status**: Done!

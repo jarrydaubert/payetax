@@ -357,7 +357,7 @@ description: "Comprehensive guides on [topic] for UK taxpayers"
 
 ---
 
-**Last Updated:** January 2026  
+**Last Updated:** October 2025  
 **Articles:** [X] guides covering all aspects of [topic]
 ```
 
@@ -680,7 +680,7 @@ For more details on student loans, read our [student loan repayment guide](/blog
 **Effort:** 5 hours setup + ongoing  
 **ROI:** Very High
 
-**From SEMrush Analysis (Jan 2026):**
+**From SEMrush Analysis (Oct 2025):**
 
 #### Top Link Building Opportunities:
 

@@ -1,7 +1,8 @@
 {
   "name": "payetax",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
