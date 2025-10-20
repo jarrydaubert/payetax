@@ -16,6 +16,8 @@ Before starting any work, Factory.ai Droid / Claude Code should review:
 - [ ] Run `npm run fix-all` after making changes
 - [ ] Ensure tests pass before committing
 - [ ] Update documentation if needed
+- [ ] **Always push to main** (no feature branches)
+- [ ] **Always tag with version number** (semantic versioning)
 
 ---
 
@@ -271,10 +273,11 @@ git commit -m "feat: Add feature (PAYTAX-XX)"
 
 ### Before Pushing
 
-**Pre-push hook (configured):**
+**Pre-push hook (⚠️ NOT YET CONFIGURED - See PAYTAX-24):**
 ```bash
-# Automatically runs on git push
+# Will run automatically when configured
 npm run test:quick
+npm run build  # Verify build works
 ```
 
 **Manual pre-push checklist:**
@@ -283,6 +286,44 @@ npm run test:quick
 - [ ] No linting warnings
 - [ ] Updated Linear issue
 - [ ] Reviewed all changes
+
+### Always Push to Main & Tag Versions
+
+**IMPORTANT:** For Factory.ai sessions, always:
+
+1. **Push directly to main** (no feature branches unless complex multi-day work)
+2. **Tag every significant change** with semantic versioning
+
+**Version numbering:**
+- **Major (v3.0.0)** - Breaking changes, major features
+- **Minor (v2.1.0)** - New features, non-breaking changes
+- **Patch (v2.0.5)** - Bug fixes, small improvements
+
+**Example workflow:**
+```bash
+# After making changes
+git add -A
+git commit -m "feat: Description
+
+Details...
+
+Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+
+# Tag the version
+git tag -a v2.1.1 -m "v2.1.1 - Brief summary"
+
+# Push both commit and tag
+git push origin main
+git push origin v2.1.1
+
+# Or push everything at once
+git push origin main --follow-tags
+```
+
+**When to increment versions:**
+- **Every session that makes changes** should get a version bump
+- Combine related small commits into one version
+- Document what's new in the tag message
 
 ---
 
