@@ -3,7 +3,8 @@
 
 const { LinearClient } = require('@linear/sdk');
 
-const LINEAR_API_KEY = process.env.LINEAR_API_KEY || 'lin_api_krnJCAJduWg4yzkWQDnV81XAh51i1DN4DmnXAJhL';
+const LINEAR_API_KEY =
+  process.env.LINEAR_API_KEY || 'lin_api_krnJCAJduWg4yzkWQDnV81XAh51i1DN4DmnXAJhL';
 const TEAM_KEY = 'PAYTAX';
 
 const linear = new LinearClient({ apiKey: LINEAR_API_KEY });
@@ -168,7 +169,7 @@ CSV audit shows ALL 79 pages serve unminified JS/CSS. Hurts page speed = hurts r
 - [ ] All JS/CSS minified in production
 - [ ] Lighthouse performance score maintained
 - [ ] Bundle size reduced`,
-    priority: 0, // Urgent  
+    priority: 0, // Urgent
   },
   {
     title: '📄 Add Meta Descriptions - Category Pages',
@@ -1018,7 +1019,7 @@ async function createAllIssues() {
     // Get project
     const projects = await team.projects();
     const project = projects.nodes.find((p) => p.name === 'PayeTax');
-    
+
     if (!project) {
       console.error('❌ PayeTax project not found');
       return;
@@ -1045,7 +1046,7 @@ async function createAllIssues() {
         });
 
         const createdIssue = await issuePayload.issue;
-        
+
         if (createdIssue) {
           console.log(`✅ ${createdIssue.identifier}: ${issue.title}`);
           created++;
@@ -1061,7 +1062,6 @@ async function createAllIssues() {
 
     console.log(`\n🎉 Complete! Created ${created} issues, ${failed} failed`);
     console.log(`\n📊 View all issues: https://linear.app/payetax/project/payetax-3073e7b6c11d`);
-
   } catch (error) {
     console.error('❌ Fatal error:', error);
     process.exit(1);

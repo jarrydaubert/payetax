@@ -217,7 +217,7 @@ async function deleteIssue(identifier) {
     });
 
     const issue = issues.nodes.find((i) => i.identifier === identifier);
-    
+
     if (!issue) {
       log(`❌ Issue ${identifier} not found`, 'red');
       return false;
@@ -538,4 +538,12 @@ if (require.main === module) {
   });
 }
 
-module.exports = { listIssues, createIssue, deleteIssue, deleteIssues, listCycles, listProjects, showInfo };
+module.exports = {
+  listIssues,
+  createIssue,
+  deleteIssue,
+  deleteIssues,
+  listCycles,
+  listProjects,
+  showInfo,
+};

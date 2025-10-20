@@ -2,13 +2,20 @@
 
 > Best practices and guidelines for maintaining high-quality code
 
-**Last Updated:** October 20, 2025
+**Last Updated:** 20 October 2025
 
 ---
 
 ## 🎯 Quick Checklist (For Every Session)
 
-Before starting any work, Factory.ai Droid / Claude Code should review:
+Before starting any work, Factory.ai Droid / Claude Code should:
+
+- [ ] **Check the actual date** (use `date` command - we're in the UK, BST/GMT)
+  - ❌ Don't assume dates from context
+  - ❌ Don't use future dates
+  - ✅ Verify current date before adding timestamps to docs
+
+Then review:
 
 - [ ] Read this CONTRIBUTING.md file
 - [ ] Check Linear project for assigned issues: https://linear.app/payetax/project/payetax-3073e7b6c11d
@@ -518,6 +525,54 @@ npm run lighthouse
 
 ## 📚 Documentation
 
+### ⚠️ EVERGREEN DOCUMENTATION POLICY
+
+**CRITICAL: Only create evergreen documentation that stays relevant.**
+
+**Rules:**
+1. ❌ **NEVER create docs for one-off issues/incidents** (e.g., "January Worker Crisis")
+2. ❌ **NEVER create temporary analysis documents in root folder**
+3. ✅ **UPDATE existing docs** instead of creating new ones
+4. ✅ **Create new docs ONLY for permanent features/guides**
+5. ✅ **All permanent docs belong in `docs/` folder** (organized by category)
+
+**Examples:**
+
+**❌ BAD - Temporary, issue-specific docs:**
+- `GITLAB_WORKER_CAPACITY_ANALYSIS.md` (one-off problem analysis)
+- `CICD_OPTIMIZATION_SUMMARY.md` (specific incident summary)
+- `LINEAR_SETUP_SUMMARY.md` (setup notes, should be in docs/)
+- `DATABASE_MIGRATION_NOTES.md` (temporary notes)
+
+**✅ GOOD - Evergreen docs:**
+- `CONTRIBUTING.md` (always relevant, updated over time)
+- `README.md` (project overview, always needed)
+- `docs/infrastructure/CICD.md` (permanent CI/CD guide)
+- `docs/guides/BLOG_GUIDE.md` (permanent feature guide)
+- `CHANGELOG.md` (historical record, always updated)
+
+**When you fix an issue:**
+1. ✅ Update existing relevant docs (e.g., update CI/CD section in existing doc)
+2. ✅ Add learnings to CONTRIBUTING.md if generally applicable
+3. ✅ Document in Linear issue for historical context
+4. ❌ Don't create `ISSUE_NAME_ANALYSIS.md` in root folder
+
+**Root folder should only contain:**
+- `README.md` - Project overview
+- `CONTRIBUTING.md` - Development guidelines (this file)
+- `CHANGELOG.md` - Version history
+- `SECURITY.md` - Security policy
+- `LICENSE` - License file
+- Config files (package.json, tsconfig.json, etc.)
+
+**Everything else goes in `docs/` organized by:**
+- `docs/guides/` - Feature guides
+- `docs/infrastructure/` - CI/CD, deployment, monitoring
+- `docs/setup/` - Setup and installation
+- `docs/reference/` - API references, schemas
+
+---
+
 ### When to Update Docs
 
 **Update docs when you:**
@@ -525,17 +580,19 @@ npm run lighthouse
 - Change APIs
 - Add new dependencies
 - Change build process
-- Fix complex bugs
+- Fix complex bugs (update relevant guide, don't create new doc!)
 
 ### Where to Document
 
 | What | Where |
 |------|-------|
 | API changes | Code JSDoc comments |
-| Features | README.md |
+| Features | README.md overview + docs/guides/ for details |
 | Setup | docs/setup/ |
 | Architecture | docs/guides/ARCHITECTURE.md |
 | Best practices | This file (CONTRIBUTING.md) |
+| CI/CD | docs/infrastructure/CICD.md |
+| Deployment | docs/infrastructure/DEPLOYMENT.md |
 
 ---
 
