@@ -37,25 +37,35 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
 
 ---
 
-## 🎯 Quick Checklist (For Every Session)
+## 📌 Project Context
 
-Before starting any work, Factory.ai Droid / Claude Code should:
+**What is PayeTax?**
+- UK PAYE (Pay As You Earn) tax calculator
+- Helps users calculate income tax, National Insurance, take-home pay
+- Covers England, Scotland, Wales tax systems
+- Built with: Next.js 15, React 19, TypeScript, Tailwind CSS
 
-- [ ] **Check the actual date** (use `date` command - we're in the UK, BST/GMT)
-  - ❌ Don't assume dates from context
-  - ❌ Don't use future dates
-  - ✅ Verify current date before adding timestamps to docs
+**Key Concepts:**
+- PAYE: UK's tax withholding system
+- Tax codes (e.g., "1257L") determine personal allowance
+- National Insurance (NI): Social security contributions
+- Tax bands: Basic rate (20%), Higher rate (40%), Additional rate (45%)
+- £100k-£125k "tax trap": Effective 60% rate due to allowance taper
 
-Then review:
+**Current version:** Check `package.json` for latest version
 
-- [ ] Read this CONTRIBUTING.md file
-- [ ] Check Linear project for assigned issues: https://linear.app/payetax/project/payetax-3073e7b6c11d
-- [ ] Review recent commits to understand context
-- [ ] Run `npm run fix-all` after making changes
-- [ ] Ensure tests pass before committing
-- [ ] Update documentation if needed
-- [ ] **Always push to main** (no feature branches)
-- [ ] **Always tag with version number** (semantic versioning)
+---
+
+## 📋 Quick Workflow Reminder
+
+**Every commit should:**
+- [ ] Run `npm run fix-all` before committing
+- [ ] Ensure tests pass (`npm run test`)
+- [ ] Have descriptive commit message with Linear issue ID
+- [ ] Include co-authorship footer
+- [ ] **Push directly to main** (no feature branches unless discussed)
+- [ ] **Tag with version number** using semantic versioning
+- [ ] Push with: `git push origin main --follow-tags`
 
 ---
 
@@ -250,10 +260,10 @@ TaxCalculator/
    npm run linear:me
    ```
 
-2. **Create feature branch**
-   ```bash
-   git checkout -b feature/PAYTAX-34-blog-tests
-   ```
+2. **Work directly on main branch**
+   - We push directly to main for most changes
+   - Feature branches only for complex multi-day work (rare)
+   - This keeps workflow simple and fast
 
 3. **Read the issue description carefully**
    - Understand acceptance criteria
@@ -427,14 +437,14 @@ Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.g
 
 ### Test Coverage Goals
 
-| Type | Target | Current |
-|------|--------|---------|
-| Overall | 90%+ | 90.46% ✅ |
-| Business Logic | 99%+ | 99.87% ✅ |
-| Components | 80%+ | ~75% |
-| Utilities | 95%+ | ~85% |
+| Type | Target |
+|------|--------|
+| Overall | 90%+ |
+| Business Logic | 99%+ |
+| Components | 80%+ |
+| Utilities | 95%+ |
 
-**Check coverage:**
+**Check current coverage:**
 ```bash
 npm run test        # Runs with coverage report
 open audit-outputs/coverage/lcov-report/index.html
