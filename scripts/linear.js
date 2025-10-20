@@ -171,6 +171,10 @@ async function createIssue(title, description, options = {}) {
       issueInput.projectId = options.projectId;
     }
 
+    if (options.parentId) {
+      issueInput.parentId = options.parentId;
+    }
+
     if (options.labels) {
       // Fetch labels
       const teamLabels = await team.labels();
@@ -463,10 +467,32 @@ async function main() {
       case 'create':
       case 'new':
         if (args[1]) {
-          await createIssue(args[1], args[2], {
+          const options = {
             priority: args.includes('--high') ? 1 : 2,
             assignToMe: args.includes('--me'),
-          });
+          };
+
+          // Handle parent ID for sub-issues
+          if (args.includes('--parent')) {
+            const parentIdentifier = args[args.indexOf('--parent') + 1];
+            if (parentIdentifier) {
+              // Fetch parent issue to get ID
+              const issues = await linear.issues({
+                filter: {
+                  team: { key: { eq: TEAM_KEY } },
+                },
+              });
+              const parentIssue = issues.nodes.find((i) => i.identifier === parentIdentifier);
+              if (parentIssue) {
+                options.parentId = parentIssue.id;
+                log(`  Creating as sub-issue of ${parentIdentifier}`, 'dim');
+              } else {
+                log(`  ⚠️  Parent issue ${parentIdentifier} not found`, 'yellow');
+              }
+            }
+          }
+
+          await createIssue(args[1], args[2], options);
         } else {
           await interactiveCreate();
         }
@@ -508,6 +534,7 @@ async function main() {
         log('  list --me         List issues assigned to you', 'dim');
         log('  create, new       Create new issue (interactive)', 'dim');
         log('  create "title"    Create issue with title', 'dim');
+        log('    --parent ID     Create as sub-issue (e.g., --parent PAYTAX-123)', 'dim');
         log('  delete, rm        Delete issue(s) by identifier', 'dim');
         log('  cycles            List cycles/sprints', 'dim');
         log('  projects          List projects', 'dim');
