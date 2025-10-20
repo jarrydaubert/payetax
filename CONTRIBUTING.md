@@ -43,7 +43,8 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
 - UK PAYE (Pay As You Earn) tax calculator
 - Helps users calculate income tax, National Insurance, take-home pay
 - Covers England, Scotland, Wales tax systems
-- Built with: Next.js 15, React 19, TypeScript, Tailwind CSS
+- Built with: Next.js, React, TypeScript, Tailwind CSS
+- See `package.json` for current dependency versions
 
 **Key Concepts:**
 - PAYE: UK's tax withholding system
@@ -52,7 +53,7 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
 - Tax bands: Basic rate (20%), Higher rate (40%), Additional rate (45%)
 - £100k-£125k "tax trap": Effective 60% rate due to allowance taper
 
-**Current version:** Check `package.json` for latest version
+**Current version:** Run `grep '"version"' package.json` to check
 
 ---
 
@@ -342,10 +343,10 @@ npm run build  # Verify build works
 1. **Push directly to main** (no feature branches unless complex multi-day work)
 2. **Tag every significant change** with semantic versioning
 
-**Version numbering:**
-- **Major (v3.0.0)** - Breaking changes, major features
-- **Minor (v2.1.0)** - New features, non-breaking changes
-- **Patch (v2.0.5)** - Bug fixes, small improvements
+**Version numbering (Semantic Versioning):**
+- **Major (vX.0.0)** - Breaking changes, major features
+- **Minor (vX.Y.0)** - New features, non-breaking changes
+- **Patch (vX.Y.Z)** - Bug fixes, small improvements
 
 **Example workflow:**
 ```bash
@@ -357,20 +358,17 @@ Details...
 
 Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
 
-# Tag the version
-git tag -a v2.1.1 -m "v2.1.1 - Brief summary"
+# Tag the version (increment appropriately from current version)
+git tag -a vX.Y.Z -m "vX.Y.Z - Brief summary"
 
-# Push both commit and tag
-git push origin main
-git push origin v2.1.1
-
-# Or push everything at once
+# Push both commit and tag at once
 git push origin main --follow-tags
 ```
 
 **When to increment versions:**
 - **Every session that makes changes** should get a version bump
-- Combine related small commits into one version
+- Check current version: `grep '"version"' package.json`
+- Increment appropriately based on change type
 - Document what's new in the tag message
 
 ---
@@ -437,18 +435,19 @@ Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.g
 
 ### Test Coverage Goals
 
-| Type | Target |
-|------|--------|
-| Overall | 90%+ |
-| Business Logic | 99%+ |
-| Components | 80%+ |
-| Utilities | 95%+ |
+**Targets:**
+- Overall: 90%+
+- Business Logic: 99%+
+- Components: 80%+
+- Utilities: 95%+
 
-**Check current coverage:**
+**View current coverage:**
 ```bash
-npm run test        # Runs with coverage report
-open audit-outputs/coverage/lcov-report/index.html
+npm run test        # Generates coverage report
+# Opens: audit-outputs/coverage/lcov-report/index.html
 ```
+
+**Coverage reports are saved to `audit-outputs/coverage/` after running tests.**
 
 ---
 
