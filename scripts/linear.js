@@ -208,6 +208,76 @@ async function createIssue(title, description, options = {}) {
 }
 
 /**
+ * Update an issue's priority
+ */
+async function updateIssuePriority(identifier, priority) {
+  try {
+    log(`\n🔄 Updating priority for ${identifier}...`, 'cyan');
+
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    const issue = issues.nodes.find((i) => i.identifier === identifier);
+
+    if (!issue) {
+      log(`❌ Issue ${identifier} not found`, 'red');
+      return false;
+    }
+
+    await issue.update({
+      priority: priority,
+    });
+
+    log(`✅ Updated ${identifier} priority to ${formatPriority(priority)}`, 'green');
+    return true;
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    return false;
+  }
+}
+
+/**
+ * Update an issue's parent (make it a sub-issue)
+ */
+async function updateIssueParent(identifier, parentIdentifier) {
+  try {
+    log(`\n🔄 Setting ${identifier} as sub-issue of ${parentIdentifier}...`, 'cyan');
+
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    const issue = issues.nodes.find((i) => i.identifier === identifier);
+    const parentIssue = issues.nodes.find((i) => i.identifier === parentIdentifier);
+
+    if (!issue) {
+      log(`❌ Issue ${identifier} not found`, 'red');
+      return false;
+    }
+
+    if (!parentIssue) {
+      log(`❌ Parent issue ${parentIdentifier} not found`, 'red');
+      return false;
+    }
+
+    await issue.update({
+      parentId: parentIssue.id,
+    });
+
+    log(`✅ ${identifier} is now a sub-issue of ${parentIdentifier}`, 'green');
+    return true;
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    return false;
+  }
+}
+
+/**
  * Delete an issue by identifier (e.g., PAYTAX-1)
  */
 async function deleteIssue(identifier) {
@@ -523,6 +593,27 @@ async function main() {
           } else {
             await deleteIssues(identifiers);
           }
+        }
+        break;
+
+      case 'update-priority':
+        if (args.length < 3) {
+          log('❌ Please specify issue and priority', 'red');
+          log('Example: npm run linear update-priority PAYTAX-1 0', 'dim');
+          log('Priority: 0=Urgent, 1=High, 2=Medium, 3=Low, 4=None', 'dim');
+        } else {
+          const identifier = args[1];
+          const priority = parseInt(args[2], 10);
+          await updateIssuePriority(identifier, priority);
+        }
+        break;
+
+      case 'set-parent':
+        if (args.length < 3) {
+          log('❌ Please specify child issue and parent issue', 'red');
+          log('Example: npm run linear set-parent PAYTAX-1 PAYTAX-50', 'dim');
+        } else {
+          await updateIssueParent(args[1], args[2]);
         }
         break;
 
