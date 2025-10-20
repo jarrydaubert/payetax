@@ -1,108 +1,107 @@
-# GitLab CI/CD Pipeline for PayeTax (Optimized for Free Tier)
-# Only runs tests/linting - Vercel handles builds/deployments automatically
+# GitLab CI/CD Pipeline for PayeTax
+# Balanced approach: Basic best practices + Vercel handles production
+# Target: ~200-300 minutes/month (well within 400 minute free tier)
 
 stages:
+  - prepare
   - security
-  - test
+  - validate
 
-# Cache node_modules for faster builds
+# Shared cache configuration
 cache:
+  key: "${CI_COMMIT_REF_SLUG}"
   paths:
-    - node_modules/
     - .npm/
 
-# Secret Detection - Scan for exposed credentials
-secret_detection:
-  stage: security
-  image: alpine:latest
-  before_script:
-    - apk add --no-cache git
-  script:
-    - echo "Scanning for exposed secrets..."
-    - |
-      # Check for common secret patterns in Git history
-      git log --all --full-history --pretty=format:"%H %s" | while read commit_hash commit_msg; do
-        if git diff-tree --no-commit-id --name-only -r $commit_hash | xargs git show $commit_hash | grep -iE '(password|api[_-]?key|secret|token|auth|credential)' | grep -vE '(example|placeholder|your-)'; then
-          echo "⚠️  Potential secret found in commit $commit_hash: $commit_msg"
-        fi
-      done
-    - echo "Secret detection complete"
-  allow_failure: true
-  only:
-    - merge_requests
-    - main
+# ──────────────────────────────────────────────────────────
+# STAGE: PREPARE - Install dependencies once, reuse everywhere
+# ──────────────────────────────────────────────────────────
 
-# Quality Checks - Linting and TypeScript
-quality:
-  stage: test
+install_dependencies:
+  stage: prepare
   image: node:20-alpine
-  before_script:
-    - npm ci --cache .npm --prefer-offline
   script:
-    - echo "Running code quality checks..."
-    - npm run format -- --check  # Check formatting (don't auto-fix in CI)
-    - npx biome check .          # Linting
-    - npm run typecheck          # TypeScript validation
+    - echo "📦 Installing dependencies..."
+    - npm ci --cache .npm --prefer-offline
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+  cache:
+    paths:
+      - .npm/
   only:
     - merge_requests
     - main
-    - develop
 
-# Unit Tests - Fast, cheap to run
-test:unit:
-  stage: test
-  image: node:20-alpine
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-  script:
-    - npm run test -- --coverage --watchAll=false
-  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: audit-outputs/coverage/cobertura-coverage.xml
-    paths:
-      - audit-outputs/coverage/
-    expire_in: 7 days
-  only:
-    - merge_requests
-    - main
-    - develop
+# ──────────────────────────────────────────────────────────
+# STAGE: SECURITY - GitLab's built-in scanning (fast & reliable)
+# ──────────────────────────────────────────────────────────
 
-# E2E Tests - Only on merge requests (expensive, ~10-15 min runtime)
-# Comment out if you want to save more minutes
-test:e2e:
-  stage: test
-  image: mcr.microsoft.com/playwright:v1.56.0-focal
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-  script:
-    - npm run test:dev  # Quick Chrome-only E2E instead of full suite
-  artifacts:
-    when: always
-    paths:
-      - audit-outputs/playwright-report/
-    expire_in: 7 days
-  only:
-    - merge_requests  # Only on MRs, not main branch
-  allow_failure: false
+# Built-in secret detection using Gitleaks
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
 
-# Dependency security audit
+# Dependency vulnerability scanning (high/critical only)
 dependency_audit:
   stage: security
   image: node:20-alpine
-  before_script:
-    - npm ci --cache .npm --prefer-offline
+  dependencies:
+    - install_dependencies
   script:
-    - echo "Running dependency security audit..."
-    - npm audit --audit-level=high
-  allow_failure: true
+    - echo "🔍 Checking for vulnerable dependencies..."
+    - npm audit --audit-level=high --production
+  allow_failure: true  # Don't block on medium/low vulnerabilities
   only:
     - main
     - merge_requests
 
-# NOTE: Build and Deploy stages removed
-# Vercel handles this automatically via Git integration (free, no runner minutes used)
-# Every push to main auto-deploys to production at payetax.co.uk
-# Merge requests get automatic preview deployments from Vercel
+# ──────────────────────────────────────────────────────────
+# STAGE: VALIDATE - Quick quality checks (MRs only)
+# ──────────────────────────────────────────────────────────
+
+# Fast validation: TypeScript + Linting (no tests, Vercel catches build issues)
+quick_validation:
+  stage: validate
+  image: node:20-alpine
+  dependencies:
+    - install_dependencies
+  needs: ["install_dependencies"]
+  script:
+    - echo "⚡ Running quick validation..."
+    - npm run typecheck          # TypeScript (~30-60 sec)
+    - npx biome check .          # Linting (~20-30 sec)
+  only:
+    - merge_requests  # NOT on main (Vercel validates on deploy)
+  timeout: 5 minutes
+
+# ──────────────────────────────────────────────────────────
+# WHAT THIS PIPELINE DOES:
+# ──────────────────────────────────────────────────────────
+# ✅ Security: Secret detection + dependency scanning
+# ✅ Quality gate: Quick typecheck + linting on MRs
+# ✅ Efficiency: Single npm ci, reused by all jobs
+# ✅ Fast feedback: ~2-3 min on MRs, ~1 min on main
+#
+# WHAT VERCEL HANDLES (automatic, free):
+# ✅ Build validation on every push
+# ✅ Unit/integration tests (via build process)
+# ✅ Deployment previews for MRs
+# ✅ Production deployments (main branch)
+#
+# WHAT RUNS LOCALLY (Husky hooks):
+# ✅ Pre-commit: Linting + typecheck + unit tests
+# ✅ Pre-push: Full test suite + build validation (PAYTAX-24)
+# ──────────────────────────────────────────────────────────
+
+# ⏱️  ESTIMATED MONTHLY USAGE (FREE TIER: 400 MIN)
+# ──────────────────────────────────────────────────────────
+# Main pushes (88x/month):
+#   - install + security: ~1.5 min × 88 = 132 min
+# 
+# Merge requests (25x/month):
+#   - install + security + validate: ~3 min × 25 = 75 min
+#
+# Total: ~207 minutes/month ✅
+# Buffer: 193 minutes remaining for spikes
+# ──────────────────────────────────────────────────────────

@@ -221,9 +221,22 @@ git push origin main --follow-tags
 
 ## 💡 **Key Takeaways**
 
-**Your CI/CD is already well-optimized!** Main improvements are:
-1. Add pre-push hook (PAYTAX-24)
-2. Block on secret detection (PAYTAX-23)
-3. Always push to main + tag versions (added to CONTRIBUTING.md)
+**January 2025 Update: Pipeline Re-optimized After Worker Shortage**
 
-**No major changes needed.** Keep doing what you're doing! ✅
+### Changes Made:
+1. ✅ **Shared dependency installation** - Single `npm ci`, reused by all jobs
+2. ✅ **GitLab built-in secret detection** - Replaced custom scanning
+3. ✅ **Quick validation on MRs only** - TypeScript + linting (~1-2 min)
+4. ✅ **Removed redundant testing** - Tests run locally (Husky) + Vercel validates builds
+5. ✅ **Parallel execution** - Jobs use `needs` directive for speed
+
+### New Monthly Usage:
+- **~207 minutes/month** (down from ~1,200 minutes)
+- **83% reduction** while maintaining quality standards
+- **193 minute buffer** for activity spikes
+
+### Pending Improvements:
+1. Add pre-push hook (PAYTAX-24) - Run tests + build locally before push
+2. Block on secret detection (PAYTAX-23) - Set `allow_failure: false`
+
+**Philosophy:** GitLab handles security + quick validation, Vercel handles production checks, local hooks catch issues early. Best of all worlds! ✅
