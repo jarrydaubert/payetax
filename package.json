@@ -58,6 +58,7 @@
     "linear:list": "node scripts/linear.js list",
     "linear:me": "node scripts/linear.js list --me",
     "linear:create": "node scripts/linear.js create",
+    "linear:delete": "node scripts/linear.js delete",
     "linear:cycles": "node scripts/linear.js cycles",
     "linear:projects": "node scripts/linear.js projects",
     "linear:info": "node scripts/linear.js info"

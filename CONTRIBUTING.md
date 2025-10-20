@@ -1,732 +1,667 @@
 # Contributing to PayeTax
 
-Thank you for your interest in contributing to PayeTax! This document provides guidelines and information for contributors.
+> Best practices and guidelines for maintaining high-quality code
 
-## 📜 License & Intellectual Property
-
-**IMPORTANT:** PayeTax is proprietary software. By contributing to this project, you agree that:
-
-1. **Copyright Assignment:** All contributions become the property of PayeTax
-2. **Proprietary License:** Your contributions will be subject to PayeTax's proprietary license
-3. **No License Grant:** You do not retain any license to use contributed code outside of PayeTax
-4. **Confidentiality:** All code, discussions, and project information are confidential
-
-If you cannot agree to these terms, please do not submit contributions.
+**Last Updated:** October 20, 2025
 
 ---
 
-## 📋 Table of Contents
+## 🎯 Quick Checklist (For Every Session)
 
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Workflow](#development-workflow)
-4. [Code Standards](#code-standards)
-5. [Component Guidelines](#component-guidelines)
-6. [Testing Requirements](#testing-requirements)
-7. [Commit Guidelines](#commit-guidelines)
-8. [Pull Request Process](#pull-request-process)
-9. [Documentation](#documentation)
+Before starting any work, Factory.ai Droid / Claude Code should review:
 
----
-
-## 🤝 Code of Conduct
-
-### Our Pledge
-
-We are committed to providing a welcoming and inclusive environment for all contributors, regardless of experience level, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, religion, or nationality.
-
-### Our Standards
-
-**Positive behavior includes:**
-- Using welcoming and inclusive language
-- Being respectful of differing viewpoints
-- Gracefully accepting constructive criticism
-- Focusing on what is best for the community
-- Showing empathy towards other community members
-
-**Unacceptable behavior includes:**
-- Harassment, trolling, or discriminatory comments
-- Publishing others' private information without permission
-- Other conduct which could reasonably be considered inappropriate
+- [ ] Read this CONTRIBUTING.md file
+- [ ] Check Linear project for assigned issues: https://linear.app/payetax/project/payetax-3073e7b6c11d
+- [ ] Review recent commits to understand context
+- [ ] Run `npm run fix-all` after making changes
+- [ ] Ensure tests pass before committing
+- [ ] Update documentation if needed
 
 ---
 
-## 🚀 Getting Started
+## 🏆 Code Quality Standards
 
-### Prerequisites
+### TypeScript Strict Mode
 
-- **Node.js** 20.0.0 or higher
-- **npm** 10.0.0 or higher
-- **Git** 2.x or higher
-
-### Initial Setup
-
-```bash
-# 1. Fork the repository on GitLab
-# 2. Clone your fork
-git clone https://gitlab.com/YOUR_USERNAME/payetax.git
-cd payetax
-
-# 3. Add upstream remote
-git remote add upstream https://gitlab.com/ukpayetax/payetax.git
-
-# 4. Install dependencies
-npm install
-
-# 5. Create a feature branch
-git checkout -b feature/your-feature-name
-
-# 6. Start development server
-npm run dev
-```
-
-### Verify Setup
-
-```bash
-# Run all quality checks
-npm run fix-all
-
-# Should see:
-# ✅ TypeScript: 0 errors
-# ✅ Linting: 0 errors
-# ✅ Tests: All passing
-```
-
----
-
-## 🔄 Development Workflow
-
-### 1. Pick an Issue
-
-- Browse [open issues](https://gitlab.com/ukpayetax/payetax/-/issues)
-- Comment on the issue to claim it
-- Wait for maintainer confirmation
-- If no suitable issue exists, create one first
-
-### 2. Create a Branch
-
-```bash
-# Feature branch
-git checkout -b feature/description
-
-# Bug fix branch
-git checkout -b fix/description
-
-# Documentation branch
-git checkout -b docs/description
-```
-
-**Branch naming:**
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `test/` - Test additions/fixes
-- `chore/` - Maintenance tasks
-
-### 3. Make Changes
-
-Follow our [Code Standards](#code-standards) and [Component Guidelines](#component-guidelines).
-
-### 4. Test Your Changes
-
-```bash
-# Unit tests
-npm test
-
-# E2E tests (quick - Chrome only)
-npm run test:dev
-
-# Full E2E suite (all browsers)
-npm run test:e2e
-
-# All tests
-npm run test:all
-```
-
-### 5. Run Quality Checks
-
-```bash
-# Fix all issues automatically
-npm run fix-all
-
-# Or run individually:
-npm run lint          # Check linting
-npm run format        # Format code
-npm run typecheck     # Check types
-```
-
-### 6. Commit Changes
-
-Follow our [Commit Guidelines](#commit-guidelines).
-
-### 7. Push and Create PR
-
-```bash
-# Push to your fork
-git push origin feature/your-feature-name
-
-# Create Pull Request on GitLab
-```
-
----
-
-## 📏 Code Standards
-
-### TypeScript
-
-**Strict Mode Required:**
-
+**Always use strict TypeScript:**
 ```typescript
-// ✅ Good - Proper typing
-interface ButtonProps {
-  onClick: () => void;
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary';
+// ✅ Good - Explicit types
+interface CalculationResult {
+  grossSalary: number;
+  taxableIncome: number;
+  totalTax: number;
 }
 
-function Button({ onClick, children, variant = 'primary' }: ButtonProps) {
-  return <button onClick={onClick}>{children}</button>;
+function calculateTax(salary: number): CalculationResult {
+  // ...
 }
 
-// ❌ Bad - Using 'any'
-function Button(props: any) {
-  return <button>{props.children}</button>;
+// ❌ Bad - Any types
+function calculateTax(salary: any): any {
+  // ...
 }
 ```
 
 **Rules:**
-- ✅ No `any` types (use `unknown` if necessary)
-- ✅ Explicit return types for functions
-- ✅ Proper interface definitions
-- ✅ Use type guards for narrowing
-
-### Linting (Biome)
-
-**Configuration:** `biome.json` (10/10 strictness)
-
-```bash
-# Check linting
-npm run lint
-
-# Auto-fix issues
-npm run lint:fix
-```
-
-**Key Rules:**
-- Accessibility rules enforced (WCAG 2.2 AA)
-- No console.log in production code (use proper logging)
-- Consistent naming conventions
-- No unused imports/variables
-
-### File Naming
-
-```
-components/
-├── atoms/
-│   └── NumberInput.tsx         # PascalCase for components
-├── molecules/
-│   └── ResultCard.tsx
-└── ui/
-    └── button.tsx              # lowercase for shadcn/ui
-
-lib/
-├── taxCalculator.ts            # camelCase for utilities
-└── utils.ts
-
-types/
-└── calculator.ts               # lowercase for type files
-```
-
-### Import Order
-
-```typescript
-// 1. React imports
-import React, { useState, useCallback } from 'react';
-
-// 2. Third-party libraries
-import { motion } from 'framer-motion';
-import { Calculator } from 'lucide-react';
-
-// 3. Internal components
-import { Button } from '@/components/ui/button';
-import { ResultCard } from '@/components/molecules/ResultCard';
-
-// 4. Utilities and hooks
-import { cn, formatNumber } from '@/lib/utils';
-import { useCalculatorStore } from '@/store/calculatorStore';
-
-// 5. Types
-import type { TaxCalculationResults } from '@/types/calculator';
-
-// 6. Constants
-import { TAX_RATES } from '@/constants/taxRates';
-```
+- No `any` types unless absolutely necessary (document why)
+- All function parameters typed
+- All return types explicit
+- Use proper interfaces/types, not inline object types
 
 ---
 
-## 🧩 Component Guidelines
+### Code Comments & Documentation
 
-### Atomic Design Structure
-
-Place components in the correct layer:
-
-| Layer | Description | Examples |
-|-------|-------------|----------|
-| **Atoms** | Cannot be broken down | `Input`, `Button`, `Label` |
-| **Molecules** | Combine atoms | `InputGroup`, `ResultCard` |
-| **Organisms** | Complex sections | `Calculator`, `Navbar` |
-| **Templates** | Page layouts | `Layout`, `BlogLayout` |
-| **Pages** | Full pages | `HomePage`, `BlogPost` |
-
-### Component Template
-
+**Every function needs JSDoc comments:**
 ```typescript
 /**
- * Brief component description
- *
- * Key features:
- * - Feature 1
- * - Feature 2
- *
- * @module components/[layer]/ComponentName
+ * Calculates PAYE tax for UK taxpayer based on 2025/26 rates
+ * 
+ * @param grossSalary - Annual gross salary in GBP
+ * @param taxCode - HMRC tax code (e.g., "1257L")
+ * @param region - UK region for tax calculation ('england' | 'scotland' | 'wales')
+ * @returns Detailed tax breakdown including NI, student loans, take-home
+ * 
+ * @example
+ * ```typescript
+ * const result = calculatePAYE(45000, '1257L', 'england');
+ * console.log(result.takeHomePay); // £34,123
+ * ```
  */
-
-import type React from 'react';
-import { cn } from '@/lib/utils';
-
-/**
- * Props for the ComponentName component
- */
-interface ComponentNameProps {
-  /** Prop description */
-  value: string;
-  /** Callback when value changes */
-  onChange: (value: string) => void;
-  /** Optional className for styling */
-  className?: string;
-  /** React ref */
-  ref?: React.Ref<HTMLDivElement>;
+export function calculatePAYE(
+  grossSalary: number,
+  taxCode: string,
+  region: Region
+): TaxCalculation {
+  // Implementation
 }
-
-/**
- * ComponentName - Short description
- *
- * Detailed description of what this component does,
- * when to use it, and any important notes.
- *
- * @param props - Component props
- * @returns React component
- */
-export function ComponentName({
-  value,
-  onChange,
-  className,
-  ref,
-}: ComponentNameProps) {
-  return (
-    <div ref={ref} className={cn('base-classes', className)}>
-      {/* Component content */}
-    </div>
-  );
-}
-
-// Set display name for React DevTools
-ComponentName.displayName = 'ComponentName';
 ```
 
-### Accessibility Requirements
-
-**Every component must:**
-
+**Comment complex logic:**
 ```typescript
-// 1. Use semantic HTML
-<nav aria-label="Main navigation">
-  <button aria-label="Close dialog">×</button>
-</nav>
-
-// 2. Support keyboard navigation
-<div
-  role="button"
-  tabIndex={0}
-  onKeyDown={(e) => e.key === 'Enter' && handleClick()}
-  onClick={handleClick}
->
-  Click me
-</div>
-
-// 3. Provide proper ARIA attributes
-<input
-  aria-label="Salary amount"
-  aria-describedby="salary-help"
-  aria-required="true"
-  aria-invalid={hasError}
-/>
-
-// 4. Use unique IDs (useId hook)
-import { useId } from 'react';
-
-const inputId = useId();
-<label htmlFor={inputId}>Label</label>
-<input id={inputId} />
-```
-
-### Performance Optimization
-
-```typescript
-// 1. Use React.memo for expensive components
-export const ExpensiveComponent = React.memo(({ data }: Props) => {
+// Calculate marginal rate in the £100k-£125k trap zone
+// Personal allowance tapers by £1 for every £2 earned over £100k
+// This creates an effective 60% tax rate in this band
+if (grossSalary > 100000 && grossSalary <= 125140) {
+  const taperedAllowance = Math.max(0, personalAllowance - ((grossSalary - 100000) / 2));
   // ...
-});
-
-// 2. useCallback for event handlers
-const handleClick = useCallback(() => {
-  // Handler logic
-}, [dependencies]);
-
-// 3. useMemo for expensive computations
-const expensiveValue = useMemo(() => {
-  return computeExpensiveValue(data);
-}, [data]);
-
-// 4. Granular Zustand selectors
-const results = useCalculatorResults(); // Only this slice
+}
 ```
+
+**Rules:**
+- JSDoc for all exported functions
+- Inline comments for complex business logic
+- Explain **WHY**, not just WHAT
+- Keep comments up-to-date when code changes
 
 ---
 
-## 🧪 Testing Requirements
+### Code Formatting & Linting
 
-### Coverage Requirements
-
-**Minimum Coverage:**
-- New atoms/molecules: 80%
-- New organisms: 60%
-- Bug fixes: Must add regression test
-
-**Target Coverage:**
-- Overall: 85%+
-- Business logic (`lib/`): 90%+
-
-### Test Template
-
-```typescript
-// __tests__/ComponentName.test.tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { axe } from 'jest-axe';
-import { ComponentName } from '../ComponentName';
-
-describe('ComponentName', () => {
-  // Basic rendering
-  it('renders correctly', () => {
-    render(<ComponentName value="test" onChange={vi.fn()} />);
-    expect(screen.getByText('test')).toBeInTheDocument();
-  });
-
-  // User interactions
-  it('calls onChange when value changes', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    
-    render(<ComponentName value="" onChange={onChange} />);
-    await user.type(screen.getByRole('textbox'), 'new value');
-    
-    expect(onChange).toHaveBeenCalledWith('new value');
-  });
-
-  // Accessibility
-  it('has no accessibility violations', async () => {
-    const { container } = render(<ComponentName value="test" onChange={vi.fn()} />);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
-  // Edge cases
-  it('handles empty value', () => {
-    render(<ComponentName value="" onChange={vi.fn()} />);
-    expect(screen.getByRole('textbox')).toHaveValue('');
-  });
-});
-```
-
-### Running Tests
-
+**Always run before committing:**
 ```bash
-# Unit tests with coverage
-npm test
-
-# Watch mode (during development)
-npm run test:watch
-
-# E2E tests (quick - Chrome only)
-npm run test:dev
-
-# Full E2E suite (all browsers)
-npm run test:e2e
-
-# All tests
-npm run test:all
+npm run fix-all
 ```
 
-### Test Best Practices
+This runs:
+1. `npm run format` - Biome code formatting
+2. `biome check --write .` - Linting with auto-fix
+3. `npm run typecheck` - TypeScript type checking
 
-1. **Test behavior, not implementation**
-2. **Use Testing Library queries properly:**
-   - `getByRole` (preferred)
-   - `getByLabelText` (forms)
-   - `getByText` (content)
-   - `getByTestId` (last resort)
-3. **Always test accessibility** with jest-axe
-4. **Test user interactions** with @testing-library/user-event
-5. **Mock external dependencies** (API calls, timers, etc.)
+**Rules:**
+- Never commit without running `fix-all`
+- Fix all linting warnings (zero tolerance)
+- Fix all TypeScript errors
+- Use Biome's formatting (don't fight it)
 
 ---
 
-## 📝 Commit Guidelines
+### Testing Requirements
+
+**Minimum coverage for new code:**
+- **Unit tests:** 80%+ coverage for new functions
+- **Integration tests:** All critical user flows
+- **E2E tests:** Major features only
+
+**Test structure:**
+```typescript
+describe('calculatePAYE', () => {
+  describe('for England taxpayers', () => {
+    it('should calculate correct tax for £45k salary', () => {
+      const result = calculatePAYE(45000, '1257L', 'england');
+      
+      expect(result.incomeTax).toBeCloseTo(6486, 2);
+      expect(result.nationalInsurance).toBeCloseTo(4212, 2);
+      expect(result.takeHomePay).toBeCloseTo(34302, 2);
+    });
+
+    it('should handle £100k tax trap correctly', () => {
+      // Test the 60% marginal rate zone
+      const result = calculatePAYE(110000, '1257L', 'england');
+      expect(result.marginalTaxRate).toBeCloseTo(0.60, 2);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle £0 salary', () => {
+      const result = calculatePAYE(0, '1257L', 'england');
+      expect(result.takeHomePay).toBe(0);
+    });
+
+    it('should handle very high salary (£1M)', () => {
+      const result = calculatePAYE(1000000, '1257L', 'england');
+      expect(result.incomeTax).toBeGreaterThan(0);
+    });
+  });
+});
+```
+
+**Rules:**
+- Test happy path AND edge cases
+- Test boundary conditions
+- Use descriptive test names
+- Group related tests with `describe()`
+- No skipped tests (`it.skip`) without explanation
+
+**Run tests before committing:**
+```bash
+npm run test        # Unit tests
+npm run test:e2e    # E2E tests
+npm run test:all    # Everything
+```
+
+---
+
+### File Organization
+
+**Component structure:**
+```
+src/components/
+├── atoms/          # Smallest reusable pieces (Button, Input)
+├── molecules/      # Combinations of atoms (SearchBar, Card)
+├── organisms/      # Complex components (Header, Calculator)
+└── templates/      # Page layouts
+```
+
+**Naming conventions:**
+- Components: PascalCase (`TaxCalculator.tsx`)
+- Utilities: camelCase (`formatCurrency.ts`)
+- Types/Interfaces: PascalCase (`TaxCalculation`)
+- Constants: UPPER_SNAKE_CASE (`MAX_SALARY`)
+
+**File naming:**
+```
+TaxCalculator/
+├── index.tsx                    # Component
+├── TaxCalculator.test.tsx       # Tests
+├── TaxCalculator.stories.tsx    # Storybook (future)
+└── types.ts                     # Component-specific types
+```
+
+---
+
+## 🔧 Development Workflow
+
+### Starting New Work
+
+1. **Check Linear for your issue**
+   ```bash
+   # View your assigned issues
+   npm run linear:me
+   ```
+
+2. **Create feature branch**
+   ```bash
+   git checkout -b feature/PAYTAX-34-blog-tests
+   ```
+
+3. **Read the issue description carefully**
+   - Understand acceptance criteria
+   - Review any linked docs
+   - Ask questions if unclear
+
+### During Development
+
+1. **Make small, focused commits**
+   ```bash
+   git commit -m "feat: Add blog search tests (PAYTAX-34)
+   
+   - Test search functionality
+   - Test pagination
+   - Test category filtering
+   
+   Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+   ```
+
+2. **Run quality checks frequently**
+   ```bash
+   npm run fix-all    # Format, lint, typecheck
+   npm run test       # Run tests
+   ```
+
+3. **Keep Linear issue updated**
+   - Add comments on progress
+   - Update checkboxes as you complete tasks
+   - Flag blockers immediately
+
+### Before Committing
+
+**The Pre-Commit Checklist:**
+```bash
+# 1. Format and fix
+npm run fix-all
+
+# 2. Run tests
+npm run test
+
+# 3. Check for console.logs
+grep -r "console.log" src/
+
+# 4. Review your changes
+git diff
+
+# 5. Commit with descriptive message
+git commit -m "feat: Add feature (PAYTAX-XX)"
+```
+
+**Pre-commit hook (already configured):**
+- Runs `fix-all` automatically
+- Blocks commit if linting fails
+- Can bypass with `--no-verify` (use sparingly!)
+
+### Before Pushing
+
+**Pre-push hook (configured):**
+```bash
+# Automatically runs on git push
+npm run test:quick
+```
+
+**Manual pre-push checklist:**
+- [ ] All tests passing
+- [ ] No TypeScript errors
+- [ ] No linting warnings
+- [ ] Updated Linear issue
+- [ ] Reviewed all changes
+
+---
+
+## 📝 Git Commit Guidelines
 
 ### Commit Message Format
 
 ```
-<type>(<scope>): <subject>
+<type>: <subject> (<issue-id>)
 
 <body>
 
 <footer>
 ```
 
-### Types
+**Types:**
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation only
+- `style:` - Formatting (no code change)
+- `refactor:` - Code restructuring
+- `test:` - Adding tests
+- `chore:` - Maintenance
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-
-### Examples
-
+**Examples:**
 ```bash
-# Feature
-git commit -m "feat(calculator): add pension optimization feature"
+# Good commits
+git commit -m "feat: Add marginal tax rate display (PAYTAX-22)"
+git commit -m "fix: Correct Scottish tax band calculation (PAYTAX-32)"
+git commit -m "docs: Update CONTRIBUTING.md with testing guidelines"
+git commit -m "test: Add blog search pagination tests (PAYTAX-34)"
 
-# Bug fix
-git commit -m "fix(input): prevent negative values in NumberInput"
-
-# Documentation
-git commit -m "docs(readme): update installation instructions"
-
-# Refactor
-git commit -m "refactor(organisms): extract BasicInputs sub-components"
-
-# Test
-git commit -m "test(molecules): add tests for ResultCard variants"
+# Bad commits
+git commit -m "updates"
+git commit -m "fix bug"
+git commit -m "wip"
 ```
 
-### Commit Best Practices
+**Always include co-authorship:**
+```bash
+git commit -m "feat: Add feature
 
-- ✅ One logical change per commit
-- ✅ Write clear, descriptive messages
-- ✅ Reference issue numbers when applicable
-- ✅ Keep commits focused and atomic
-- ❌ Don't mix unrelated changes
-- ❌ Don't commit broken code
+Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+```
 
 ---
 
-## 🔀 Pull Request Process
+## 🧪 Testing Guidelines
 
-### Before Creating PR
+### What to Test
 
+**Always test:**
+- ✅ Business logic (tax calculations, formulas)
+- ✅ User interactions (button clicks, form submissions)
+- ✅ Edge cases (£0 salary, £1M salary, invalid input)
+- ✅ Error handling (API failures, network errors)
+- ✅ Accessibility (keyboard navigation, screen readers)
+
+**Don't need to test:**
+- ❌ Third-party libraries
+- ❌ Simple getters/setters
+- ❌ UI styling (unless accessibility-critical)
+
+### Test Coverage Goals
+
+| Type | Target | Current |
+|------|--------|---------|
+| Overall | 90%+ | 90.46% ✅ |
+| Business Logic | 99%+ | 99.87% ✅ |
+| Components | 80%+ | ~75% |
+| Utilities | 95%+ | ~85% |
+
+**Check coverage:**
 ```bash
-# 1. Sync with upstream
-git fetch upstream
-git rebase upstream/main
+npm run test        # Runs with coverage report
+open audit-outputs/coverage/lcov-report/index.html
+```
 
-# 2. Run all quality checks
-npm run fix-all
+---
 
-# 3. Ensure all tests pass
+## 🎨 UI/UX Guidelines
+
+### Accessibility First
+
+**Every interactive element must:**
+- Have ARIA labels where needed
+- Support keyboard navigation
+- Work with screen readers
+- Have 44x44px touch targets (mobile)
+- Pass color contrast checks (WCAG AA)
+
+**Test accessibility:**
+```bash
+npm run audit:a11y
+```
+
+### Mobile-First Design
+
+**Always test:**
+1. Mobile (320px - 767px)
+2. Tablet (768px - 1023px)
+3. Desktop (1024px+)
+
+**Responsive breakpoints:**
+```typescript
+// Tailwind breakpoints
+sm: 640px   // Small tablets
+md: 768px   // Tablets
+lg: 1024px  // Laptops
+xl: 1280px  // Desktops
+```
+
+---
+
+## 📦 Dependencies
+
+### Adding New Dependencies
+
+**Before adding a package:**
+1. Check if functionality already exists
+2. Verify package is actively maintained
+3. Check bundle size impact
+4. Review security advisories
+
+**Process:**
+```bash
+# 1. Install
+npm install package-name
+
+# 2. Check bundle impact
+npm run bundle:analyze
+
+# 3. Document why it's needed (in PR/commit)
+```
+
+### Updating Dependencies
+
+**Monthly maintenance (see Linear recurring issue):**
+```bash
+# Check for updates
+npm outdated
+
+# Update (carefully!)
+npm update
+
+# Run full test suite
 npm run test:all
 
-# 4. Build successfully
-npm run build
+# Check for breaking changes
+git diff package-lock.json
 ```
 
-### PR Title Format
-
-Follow commit message format:
-
-```
-feat(calculator): Add pension optimization feature
-fix(input): Prevent negative values in NumberInput
-docs(readme): Update installation instructions
+**Security updates (immediate):**
+```bash
+npm audit
+npm audit fix
 ```
 
-### PR Description Template
+---
 
-```markdown
-## Description
-Brief description of what this PR does.
+## 🚀 SEO & Performance
 
-## Type of Change
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
+### SEO Checklist for New Pages
 
-## Related Issue
-Closes #123
+- [ ] Meta title (50-60 chars)
+- [ ] Meta description (150-160 chars)
+- [ ] H1 tag (one per page)
+- [ ] Internal links (3+ per page)
+- [ ] Alt text on images
+- [ ] Semantic HTML
+- [ ] Schema markup (where applicable)
 
-## Changes Made
-- Change 1
-- Change 2
-- Change 3
+### Performance Checklist
 
-## Testing
-- [ ] Unit tests added/updated
-- [ ] E2E tests added/updated
-- [ ] Manual testing performed
+- [ ] Images optimized (<100KB each)
+- [ ] Lazy loading images
+- [ ] Code splitting for large components
+- [ ] Minimize bundle size
+- [ ] No console.log in production
 
-## Screenshots (if applicable)
-Before:
-![Before](url)
-
-After:
-![After](url)
-
-## Checklist
-- [ ] Code follows project style guidelines
-- [ ] Self-review performed
-- [ ] Comments added for complex logic
-- [ ] Documentation updated
-- [ ] No new warnings generated
-- [ ] Tests added and passing
-- [ ] Build succeeds
+**Check performance:**
+```bash
+npm run lighthouse
 ```
 
-### Review Process
-
-1. **Automated Checks:**
-   - GitLab CI/CD runs all tests
-   - Linting and type checking
-   - Build verification
-
-2. **Code Review:**
-   - At least one maintainer approval required
-   - Address all review comments
-   - Keep discussion constructive
-
-3. **Merge:**
-   - Squash and merge (preferred)
-   - Rebase and merge (for feature branches)
-   - Create merge commit (for releases)
+**Target metrics:**
+- **LCP** (Largest Contentful Paint): <2.5s
+- **FID** (First Input Delay): <100ms
+- **CLS** (Cumulative Layout Shift): <0.1
 
 ---
 
 ## 📚 Documentation
 
-### When to Update Documentation
+### When to Update Docs
 
-Update documentation when:
-- Adding new features
-- Changing existing behavior
-- Modifying configuration
-- Adding new components
-- Changing architecture
+**Update docs when you:**
+- Add new features
+- Change APIs
+- Add new dependencies
+- Change build process
+- Fix complex bugs
 
-### Documentation Files
+### Where to Document
 
-| File | Purpose | Update When |
-|------|---------|-------------|
-| `README.md` | Project overview | Major changes |
-| `COMPONENTS.md` | Component audit | Adding components |
-| `ARCHITECTURE.md` | Architecture guide | Structural changes |
-| `TECH_STACK.md` | Technology details | Dependency updates |
-| `USER_GUIDE.md` | User documentation | Feature changes |
-| `CONTRIBUTING.md` | This file | Process changes |
+| What | Where |
+|------|-------|
+| API changes | Code JSDoc comments |
+| Features | README.md |
+| Setup | docs/setup/ |
+| Architecture | docs/guides/ARCHITECTURE.md |
+| Best practices | This file (CONTRIBUTING.md) |
 
-### JSDoc Comments
+---
 
-```typescript
-/**
- * Calculate UK PAYE tax for a given salary
- *
- * Uses official HMRC rates and thresholds for the specified tax year.
- * Supports Scottish tax rates and various allowances.
- *
- * @param salary - Annual gross salary in GBP
- * @param taxYear - Tax year (e.g., "2025-2026")
- * @param region - UK region for tax calculation
- * @returns Tax calculation results including breakdowns
- *
- * @example
- * ```typescript
- * const results = calculateTax(50000, "2025-2026", "England");
- * console.log(results.totalTax.annually); // 7,486
- * ```
- */
-export function calculateTax(
-  salary: number,
-  taxYear: string,
-  region: Region
-): TaxCalculationResults {
-  // Implementation
-}
+## 🔍 Code Review Guidelines (For Humans)
+
+### What to Look For
+
+**Code quality:**
+- [ ] Follows TypeScript strict mode
+- [ ] Has JSDoc comments
+- [ ] Tests included
+- [ ] No console.log statements
+- [ ] Passes linting
+
+**Functionality:**
+- [ ] Meets acceptance criteria
+- [ ] Handles edge cases
+- [ ] No regressions
+- [ ] Accessible (keyboard, screen reader)
+- [ ] Mobile responsive
+
+**Performance:**
+- [ ] No unnecessary re-renders
+- [ ] Images optimized
+- [ ] No bundle bloat
+
+---
+
+## 🎯 Linear Integration
+
+### Daily Workflow
+
+**Morning:**
+```bash
+# Check your issues
+npm run linear:me
+```
+
+**During work:**
+- Update issue status (Todo → In Progress → Done)
+- Check off completed tasks
+- Add comments on blockers
+- Link related PRs
+
+**End of day:**
+- Move completed issues to Done
+- Update progress on in-progress issues
+
+### Monthly Workflow
+
+**First of month:**
+1. Archive previous month's recurring issues
+2. Create new recurring issues:
+   - Blog Content - [New Month] 2025
+   - X.com Publishing - [New Month] 2025
+3. Review Monthly Maintenance issue
+4. Update Package Dependencies issue
+
+---
+
+## 🐛 Debugging Tips
+
+### Common Issues
+
+**TypeScript errors:**
+```bash
+# Clear build cache
+npm run clean
+
+# Rebuild
+npm run dev
+```
+
+**Test failures:**
+```bash
+# Run specific test
+npm test -- TaxCalculator.test.tsx
+
+# Update snapshots (if needed)
+npm test -- -u
+```
+
+**Build errors:**
+```bash
+# Clean everything
+npm run clean:all
+
+# Fresh install
+npm install
 ```
 
 ---
 
-## 🙋 Getting Help
+## 📖 Key Reference Docs
 
-### Questions?
+| Doc | Purpose |
+|-----|---------|
+| [README.md](./README.md) | Project overview |
+| [LINEAR_SOP.md](./docs/LINEAR_SOP.md) | Linear best practices |
+| [LINEAR_QUICK_REFERENCE.md](./docs/LINEAR_QUICK_REFERENCE.md) | Quick Linear commands |
+| [BLOG_GUIDE.md](./docs/guides/BLOG_GUIDE.md) | Blog writing guidelines |
+| [TECH_STACK.md](./docs/guides/TECH_STACK.md) | Technology overview |
 
-- **Documentation:** Check [docs/](./docs) folder first
-- **Issues:** Search [existing issues](https://gitlab.com/ukpayetax/payetax/-/issues)
-- **Email:** Use feedback form at [payetax.co.uk/feedback](https://payetax.co.uk/feedback)
+---
 
-### Reporting Bugs
+## ⚡ Quick Commands Reference
 
-Use this template:
+```bash
+# Development
+npm run dev                 # Start dev server
+npm run build              # Production build
+npm run fix-all            # Format, lint, typecheck
 
-```markdown
-**Describe the bug**
-Clear description of what the bug is.
+# Testing
+npm run test               # Unit tests with coverage
+npm run test:e2e           # E2E tests
+npm run test:all           # All tests
 
-**To Reproduce**
-Steps to reproduce:
-1. Go to '...'
-2. Click on '...'
-3. See error
+# Linear
+npm run linear:me          # Your issues
+npm run linear:list        # All issues
+npm run linear:create      # Create issue
 
-**Expected behavior**
-What you expected to happen.
+# Quality
+npm run lint:fix           # Fix linting
+npm run typecheck          # Type check
+npm run audit:deps         # Security audit
 
-**Screenshots**
-If applicable, add screenshots.
+# Performance
+npm run lighthouse         # Performance audit
+npm run bundle:analyze     # Bundle size
 
-**Environment:**
-- OS: [e.g., macOS 14]
-- Browser: [e.g., Chrome 120]
-- Node version: [e.g., 20.10.0]
-
-**Additional context**
-Any other context about the problem.
+# Git
+git commit --no-verify     # Bypass pre-commit (use sparingly!)
 ```
 
 ---
 
-## 🏆 Recognition
+## 🤝 Getting Help
 
-Contributors will be recognized in:
-- Release notes
-- Project README
-- Annual contributor list
+**Stuck? Try these in order:**
 
-Thank you for contributing to PayeTax! 🎉
+1. **Check the docs** - `docs/` folder
+2. **Check Linear issue comments** - Others may have same question
+3. **Review recent commits** - See how similar issues were solved
+4. **Check test files** - Often show usage examples
+5. **Ask in issue comments** - Tag relevant people
 
 ---
 
-**Last Updated:** October 20, 2025  
-**Maintained By:** PayeTax Team
+## 🎉 Remember
+
+> "Code is read more than it's written. Make it clear, not clever."
+
+**Priorities (in order):**
+1. **Correctness** - Does it work?
+2. **Clarity** - Can others understand it?
+3. **Maintainability** - Can it be easily changed?
+4. **Performance** - Is it fast enough?
+
+**When in doubt:**
+- Write tests
+- Add comments
+- Ask questions
+- Keep it simple
+
+---
+
+**Questions about this guide?**
+Create a Linear issue: `docs: [Your question about CONTRIBUTING.md]`

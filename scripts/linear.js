@@ -40,7 +40,10 @@ const colors = {
 };
 
 // Helper functions
-function log(_message, _color = 'reset') {}
+function log(message, color = 'reset') {
+  const colorCode = colors[color] || colors.reset;
+  console.log(`${colorCode}${message}${colors.reset}`);
+}
 
 function formatDate(dateString) {
   if (!dateString) return 'No date';
@@ -164,6 +167,10 @@ async function createIssue(title, description, options = {}) {
       issueInput.assigneeId = me.id;
     }
 
+    if (options.projectId) {
+      issueInput.projectId = options.projectId;
+    }
+
     if (options.labels) {
       // Fetch labels
       const teamLabels = await team.labels();
@@ -190,6 +197,67 @@ async function createIssue(title, description, options = {}) {
     } else {
       log('❌ Failed to create issue', 'red');
     }
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    console.error(error);
+  }
+}
+
+/**
+ * Delete an issue by identifier (e.g., PAYTAX-1)
+ */
+async function deleteIssue(identifier) {
+  try {
+    log(`\n🗑️  Deleting issue ${identifier}...`, 'yellow');
+
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    const issue = issues.nodes.find((i) => i.identifier === identifier);
+    
+    if (!issue) {
+      log(`❌ Issue ${identifier} not found`, 'red');
+      return false;
+    }
+
+    const deletePayload = await issue.delete();
+    if (deletePayload.success) {
+      log(`✅ Issue ${identifier} deleted successfully`, 'green');
+      return true;
+    } else {
+      log(`❌ Failed to delete issue ${identifier}`, 'red');
+      return false;
+    }
+  } catch (error) {
+    log(`❌ Error deleting issue: ${error.message}`, 'red');
+    console.error(error);
+    return false;
+  }
+}
+
+/**
+ * Delete multiple issues by identifiers
+ */
+async function deleteIssues(identifiers) {
+  try {
+    log(`\n🗑️  Deleting ${identifiers.length} issues...`, 'yellow');
+
+    let deleted = 0;
+    let failed = 0;
+
+    for (const identifier of identifiers) {
+      const success = await deleteIssue(identifier);
+      if (success) {
+        deleted++;
+      } else {
+        failed++;
+      }
+    }
+
+    log(`\n✨ Summary: ${deleted} deleted, ${failed} failed`, deleted > 0 ? 'green' : 'red');
   } catch (error) {
     log(`❌ Error: ${error.message}`, 'red');
     console.error(error);
@@ -415,6 +483,23 @@ async function main() {
       case 'info':
         await showInfo();
         break;
+
+      case 'delete':
+      case 'rm':
+        if (args.length < 2) {
+          log('❌ Please specify issue identifier(s) to delete', 'red');
+          log('Example: npm run linear delete PAYTAX-1', 'dim');
+          log('Example: npm run linear delete PAYTAX-1 PAYTAX-2 PAYTAX-3', 'dim');
+        } else {
+          const identifiers = args.slice(1);
+          if (identifiers.length === 1) {
+            await deleteIssue(identifiers[0]);
+          } else {
+            await deleteIssues(identifiers);
+          }
+        }
+        break;
+
       default:
         log('\n📊 Linear Helper for PayeTax\n', 'bright');
         log('Usage: npm run linear:<command> [options]\n', 'cyan');
@@ -423,6 +508,7 @@ async function main() {
         log('  list --me         List issues assigned to you', 'dim');
         log('  create, new       Create new issue (interactive)', 'dim');
         log('  create "title"    Create issue with title', 'dim');
+        log('  delete, rm        Delete issue(s) by identifier', 'dim');
         log('  cycles            List cycles/sprints', 'dim');
         log('  projects          List projects', 'dim');
         log('  info              Show workspace info', 'dim');
@@ -452,4 +538,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { listIssues, createIssue, listCycles, listProjects, showInfo };
+module.exports = { listIssues, createIssue, deleteIssue, deleteIssues, listCycles, listProjects, showInfo };

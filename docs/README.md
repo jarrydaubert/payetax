@@ -12,12 +12,17 @@
 /docs/
 ├── README.md (you are here)
 │
-├── /planning/          → Roadmaps, priorities, and strategic plans
-├── /audits/            → 7 completed audits + master action list
-├── /guides/            → Developer and user guides
+├── LINEAR_SOP.md               → Linear best practices & workflows
+├── LINEAR_QUICK_REFERENCE.md   → Quick Linear commands
+├── LINEAR_REFERENCES.md        → Reference links for Linear issues
+│
+├── /guides/            → Evergreen developer and user guides
 ├── /setup/             → Tool setup and configuration
+├── /planning/          → Future feature plans
+├── /proposals/         → Feature proposals
 ├── /ideas/             → Future feature explorations
-└── /archived/          → Historical/completed documents
+├── /audits/            → Historical audit snapshots (reference only)
+└── /archived/          → Time-bound/completed documents
 ```
 
 ---
@@ -26,27 +31,27 @@
 
 | Need to... | Read this |
 |------------|-----------|
-| **See what needs to be done?** | [`/audits/CONSOLIDATED_ACTION_ITEMS.md`](./audits/CONSOLIDATED_ACTION_ITEMS.md) ⭐ |
+| **See what needs to be done?** | [Linear Project](https://linear.app/payetax/project/payetax-3073e7b6c11d) ⭐ |
+| **Use Linear effectively?** | [`LINEAR_SOP.md`](./LINEAR_SOP.md) ⭐ |
+| **Quick Linear reference?** | [`LINEAR_QUICK_REFERENCE.md`](./LINEAR_QUICK_REFERENCE.md) |
+| **Find doc references?** | [`LINEAR_REFERENCES.md`](./LINEAR_REFERENCES.md) |
 | **Understand the tech stack?** | [`/guides/TECH_STACK.md`](./guides/TECH_STACK.md) |
 | **Write blog content?** | [`/guides/BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
-| **Set up testing?** | [`/guides/TESTING.md`](./guides/TESTING.md) |
-| **Test accessibility?** | [`/guides/ACCESSIBILITY_TESTING.md`](./guides/ACCESSIBILITY_TESTING.md) |
-| **See current priorities?** | [`/planning/NEXT_PRIORITIES.md`](./planning/NEXT_PRIORITIES.md) |
-| **Plan SEO strategy?** | [`/planning/SEO_STRATEGY.md`](./planning/SEO_STRATEGY.md) |
-| **Check audit progress?** | [`/audits/AUDIT_GAPS.md`](./audits/AUDIT_GAPS.md) |
+| **Code standards?** | [`/CONTRIBUTING.md`](../CONTRIBUTING.md) (root folder) |
 | **Set up Linear/Sentry?** | [`/setup/`](./setup/) folder |
+| **Review completed audits?** | [`/audits/`](./audits/) folder (historical snapshots) |
 
 ---
 
-## 📋 Planning & Roadmaps
+## 📋 Planning & Future Features
 
 **Location:** `/planning/`
 
-| File | Description | Size |
-|------|-------------|------|
-| [**NEXT_PRIORITIES.md**](./planning/NEXT_PRIORITIES.md) | Current sprint priorities and roadmap | ~23K |
-| [**SEO_STRATEGY.md**](./planning/SEO_STRATEGY.md) | Comprehensive SEO & AEO strategy (2025) | ~20K |
-| [**SAGE_IMPLEMENTATION_PLAN.md**](./planning/SAGE_IMPLEMENTATION_PLAN.md) | Future feature: Sage integration | ~56K |
+| File | Description | Status |
+|------|-------------|--------|
+| [**SAGE_IMPLEMENTATION_PLAN.md**](./planning/SAGE_IMPLEMENTATION_PLAN.md) | AI Explainer Widget concept | Future feature |
+
+**Note:** Current tasks and priorities are tracked in [Linear](https://linear.app/payetax/project/payetax-3073e7b6c11d), not in docs!
 
 ---
 
@@ -54,16 +59,9 @@
 
 **Location:** `/audits/`
 
-### Master Action List
+**Note:** All action items from audits have been migrated to [Linear](https://linear.app/payetax/project/payetax-3073e7b6c11d). Audits below are historical snapshots for reference.
 
-**[CONSOLIDATED_ACTION_ITEMS.md](./audits/CONSOLIDATED_ACTION_ITEMS.md)** ⭐
-**Updated October 2025** - Outstanding tasks from 7 audits:
-- ✅ v1.3.0 completed: Accessibility fixes, SEO fixes, calculator accuracy
-- 🔴 2 critical remaining (3 hours)
-- 🟡 ~15 high/medium priority tasks
-- **Status:** Most critical work complete
-
-### Completed Audits (7/21)
+### Completed Audits
 
 | Audit | Grade | Status | Key Findings |
 |-------|-------|--------|--------------|
@@ -103,7 +101,9 @@
 
 | File | Description | Size |
 |------|-------------|------|
-| [**LINEAR_SETUP.md**](./setup/LINEAR_SETUP.md) | Linear API integration and workflow | ~15K |
+| [**LINEAR_SOP.md**](./LINEAR_SOP.md) | ⭐ Linear best practices, templates, workflows | ~30K |
+| [**LINEAR_QUICK_REFERENCE.md**](./LINEAR_QUICK_REFERENCE.md) | Quick reference for common Linear operations | ~3K |
+| [**LINEAR_SETUP.md**](./setup/LINEAR_SETUP.md) | Linear API integration and technical setup | ~15K |
 | [**SENTRY_SETUP.md**](./setup/SENTRY_SETUP.md) | Sentry error monitoring setup | ~8K |
 | [**QUALITY_GATES.md**](./setup/QUALITY_GATES.md) | Quality gates, pre-commit hooks, thresholds | ~8K |
 
@@ -138,14 +138,17 @@ Outdated or completed documentation (historical reference only):
 
 | Category | Files | Purpose |
 |----------|-------|---------|
-| **Planning** | 3 | Current roadmaps and strategic plans |
-| **Audits** | 10 | Quality audits + action items |
-| **Guides** | 4 | Developer and user documentation |
-| **Setup** | 3 | Tool configuration |
-| **Ideas** | 1 | Future feature explorations |
-| **Archived** | 6 | Historical reference only |
-| **Meta** | 1 | This README |
-| **TOTAL** | **22** | Current, relevant docs only |
+| **Linear Guides** | 3 | Linear SOP, quick ref, references |
+| **Developer Guides** | 5 | Architecture, components, tech stack, blog, user guide |
+| **Setup** | 3 | Tool configuration (Linear, Sentry, Quality Gates) |
+| **Audits** | 11 | Historical snapshots (reference only) |
+| **Planning** | 1 | Future features (Sage AI) |
+| **Proposals** | 1 | Feature proposals (SME Director Tools) |
+| **Ideas** | 1 | Brainstorming (SBT system) |
+| **Meta** | 2 | README + CONTRIBUTING.md |
+| **TOTAL** | **~27** | Evergreen docs only |
+
+**All current tasks tracked in:** [Linear Project](https://linear.app/payetax/project/payetax-3073e7b6c11d)
 
 ---
 
