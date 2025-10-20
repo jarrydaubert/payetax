@@ -6,6 +6,37 @@
 
 ---
 
+## 🚀 START HERE (Every New Session)
+
+**For Factory.ai Droid / Claude Code:**
+
+When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do this:
+
+1. **Check the actual date** (run `date` command - we're in UK, BST/GMT)
+2. **Read this entire CONTRIBUTING.md file** (yes, all of it!)
+3. **Check Linear for assigned issues:**
+   ```bash
+   npm run linear:me
+   ```
+4. **Review recent commits for context:**
+   ```bash
+   git log --oneline -10
+   ```
+5. **Check git status:**
+   ```bash
+   git status
+   ```
+6. **Report back:** 
+   - Current date
+   - Summary of any Linear issues assigned
+   - Brief overview of recent work from commits
+   - Any uncommitted changes
+   - Ask: "What would you like to work on?"
+
+**That's it!** This ensures you have full context before starting any work.
+
+---
+
 ## 🎯 Quick Checklist (For Every Session)
 
 Before starting any work, Factory.ai Droid / Claude Code should:
