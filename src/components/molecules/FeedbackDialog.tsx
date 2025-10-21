@@ -32,12 +32,21 @@ export function FeedbackDialog() {
     message: '',
   });
 
+  const messageLength = formData.message.trim().length;
+  const minLength = 10;
+  const maxLength = 5000;
+
   const validate = () => {
     const newErrors = { email: '', message: '' };
     let isValid = true;
 
-    if (formData.message.trim().length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
+    if (messageLength < minLength) {
+      newErrors.message = `Message must be at least ${minLength} characters (currently ${messageLength})`;
+      isValid = false;
+    }
+
+    if (messageLength > maxLength) {
+      newErrors.message = `Message is too long (max ${maxLength} characters)`;
       isValid = false;
     }
 
@@ -76,7 +85,7 @@ export function FeedbackDialog() {
         setFormData({ email: '', message: '' });
         setOpen(false);
       } else {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({ error: 'Unknown error occurred' }));
         toast.error(data.error || 'Failed to send feedback. Please try again.');
       }
     } catch (_error) {
@@ -113,14 +122,34 @@ export function FeedbackDialog() {
               placeholder='your@email.com'
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? `${emailId}-error` : undefined}
             />
-            {errors.email && <p className='text-destructive text-sm'>{errors.email}</p>}
+            {errors.email && (
+              <p id={`${emailId}-error`} className='text-destructive text-sm' role='alert'>
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor={messageId}>
-              Message <span className='text-destructive'>*</span>
-            </Label>
+            <div className='flex items-center justify-between'>
+              <Label htmlFor={messageId}>
+                Message <span className='text-destructive'>*</span>
+              </Label>
+              <span
+                className={`text-xs ${
+                  messageLength < minLength
+                    ? 'text-destructive'
+                    : messageLength > maxLength - 100
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-muted-foreground'
+                }`}
+                aria-live='polite'
+              >
+                {messageLength}/{maxLength}
+              </span>
+            </div>
             <Textarea
               id={messageId}
               placeholder="What worked? What didn't? Suggestions?"
@@ -128,8 +157,21 @@ export function FeedbackDialog() {
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               required
+              maxLength={maxLength}
+              aria-invalid={!!errors.message}
+              aria-describedby={errors.message ? `${messageId}-error` : `${messageId}-hint`}
             />
-            {errors.message && <p className='text-destructive text-sm'>{errors.message}</p>}
+            {errors.message ? (
+              <p id={`${messageId}-error`} className='text-destructive text-sm' role='alert'>
+                {errors.message}
+              </p>
+            ) : (
+              <p id={`${messageId}-hint`} className='text-muted-foreground text-xs'>
+                {messageLength < minLength
+                  ? `${minLength - messageLength} more character${minLength - messageLength === 1 ? '' : 's'} needed`
+                  : 'Share your thoughts, ideas, or issues'}
+              </p>
+            )}
           </div>
 
           <DialogFooter>

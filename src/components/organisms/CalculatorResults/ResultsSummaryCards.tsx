@@ -43,6 +43,7 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         icon={Wallet}
         variant='success'
         delay={0}
+        tooltip='Your total yearly salary after income tax, National Insurance, and other deductions have been taken out.'
       />
       <ResultCard
         label='Monthly Take-Home'
@@ -50,6 +51,7 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         icon={Calendar}
         variant='info'
         delay={0.05}
+        tooltip='The amount you receive in your bank account each month. This is your annual take-home divided by 12.'
       />
       <ResultCard
         label='Total Tax & NI'
@@ -57,6 +59,7 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         icon={TrendingDown}
         variant='warning'
         delay={0.1}
+        tooltip='The combined total of income tax and National Insurance contributions you pay annually. This money funds public services like the NHS and state pension.'
       />
       <ResultCard
         label='Effective Tax Rate'
@@ -64,6 +67,7 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         icon={Percent}
         variant='default'
         delay={0.15}
+        tooltip='The overall percentage of your gross salary that goes to tax and NI. This is your total tax divided by your gross salary.'
       />
       <ResultCard
         label='Marginal Tax Rate'
@@ -72,6 +76,7 @@ export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
         variant='info'
         delay={0.2}
         className='md:col-span-2 lg:col-span-1'
+        tooltip='The percentage of tax you pay on each additional £1 you earn. This depends on which tax band you are in and helps you understand the value of pay rises or bonuses.'
       />
     </section>
   );

@@ -51,7 +51,7 @@ export function MarriageAllowanceAlert({
       variant='default'
       className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'
     >
-      <Heart className='size-5 text-pink-600 dark:text-pink-400' />
+      <Heart className='size-5 self-start text-pink-600 dark:text-pink-400' />
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex-1'>
           <AlertTitle className='text-pink-900 dark:text-pink-100'>

@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface ResultCardProps {
@@ -13,6 +14,8 @@ interface ResultCardProps {
   variant?: 'default' | 'success' | 'warning' | 'info';
   className?: string;
   delay?: number;
+  /** Tooltip text to explain what this metric means */
+  tooltip?: string;
 }
 
 const variantStyles = {
@@ -41,8 +44,21 @@ export function ResultCard({
   variant = 'default',
   className,
   delay = 0,
+  tooltip,
 }: ResultCardProps) {
   const styles = variantStyles[variant];
+
+  const cardContent = (
+    <Card className={cn('border-primary/20 p-4', tooltip && 'cursor-help', styles.card)}>
+      <div className='space-y-2'>
+        <div className='flex items-center justify-between'>
+          <p className='font-medium text-muted-foreground text-sm'>{label}</p>
+          {Icon && <Icon className={cn('size-4', styles.icon)} />}
+        </div>
+        <p className='font-bold text-2xl text-foreground'>{value}</p>
+      </div>
+    </Card>
+  );
 
   return (
     <motion.div
@@ -51,15 +67,18 @@ export function ResultCard({
       transition={{ duration: 0.3, delay }}
       className={className}
     >
-      <Card className={cn('border-primary/20 p-4', styles.card)}>
-        <div className='space-y-2'>
-          <div className='flex items-center justify-between'>
-            <p className='font-medium text-muted-foreground text-sm'>{label}</p>
-            {Icon && <Icon className={cn('size-4', styles.icon)} />}
-          </div>
-          <p className='font-bold text-2xl text-foreground'>{value}</p>
-        </div>
-      </Card>
+      {tooltip ? (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
+            <TooltipContent className='max-w-xs' side='top'>
+              <p>{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        cardContent
+      )}
     </motion.div>
   );
 }

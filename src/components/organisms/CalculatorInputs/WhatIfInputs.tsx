@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorInputs/WhatIfInputs.tsx
 'use client';
 
-import { Wand2, X } from 'lucide-react';
+import { RotateCcw, Wand2 } from 'lucide-react';
 import { useId } from 'react';
 import { toast } from 'sonner';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
@@ -146,12 +146,12 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
               toast.info('What If scenario cleared');
             }}
             variant='outline'
-            size='lg'
+            size='default'
             className='border-purple-500/30 hover:border-purple-500/50 dark:border-purple-400/30 dark:hover:border-purple-400/50'
             data-testid='clear-what-if-button'
             aria-label='Clear What If scenario'
           >
-            <X className='size-5' />
+            <RotateCcw className='size-4' />
           </Button>
         )}
       </div>
