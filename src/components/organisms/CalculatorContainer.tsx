@@ -242,6 +242,9 @@ export function CalculatorContainer() {
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
               onApplyPensionOptimization={handleApplyPensionOptimization}
+              isMarried={input.isMarried}
+              partnerGrossWage={input.partnerGrossWage}
+              taxCode={input.taxCode}
             />
           </motion.div>
         ) : (

@@ -20,6 +20,7 @@ import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
+import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -37,6 +38,10 @@ interface ResultsTableProps {
   onVisiblePeriodsChange?: (periods: string[]) => void;
   taxYear?: string;
   onApplyPensionOptimization?: (amount: number) => void;
+  // Marriage allowance detection
+  isMarried?: boolean;
+  partnerGrossWage?: number;
+  taxCode?: string;
 }
 
 interface ResultRowData {
@@ -70,6 +75,9 @@ export function ResultsTable({
   onVisiblePeriodsChange,
   taxYear,
   onApplyPensionOptimization,
+  isMarried = false,
+  partnerGrossWage = 0,
+  taxCode = '1257L',
 }: ResultsTableProps) {
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -84,6 +92,27 @@ export function ResultsTable({
       results.pensionContribution.annually
     );
   }, [results.grossSalary.annually, results.pensionContribution.annually]);
+
+  // Marriage allowance eligibility check
+  const marriageAllowanceEligible = React.useMemo(() => {
+    if (!isMarried || !partnerGrossWage) return false;
+
+    // Check if user already has M code (already claiming)
+    const hasMarriageCode = taxCode.toUpperCase().includes('M');
+    if (hasMarriageCode) return false;
+
+    // Partner must earn less than Personal Allowance (£12,570)
+    const personalAllowance = 12570;
+    if (partnerGrossWage >= personalAllowance) return false;
+
+    // User must be a basic rate taxpayer
+    // Basic rate threshold: £12,570 - £50,270
+    const userSalary = results.grossSalary.annually;
+    if (userSalary <= personalAllowance || userSalary > 50270) return false;
+
+    // User is eligible!
+    return true;
+  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually]);
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   // Default to current tax year if not provided
@@ -375,6 +404,17 @@ export function ResultsTable({
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
             onApplyPension={onApplyPensionOptimization}
+          />
+        </div>
+      )}
+
+      {/* Marriage Allowance Alert */}
+      {marriageAllowanceEligible && (
+        <div className='mt-4'>
+          <MarriageAllowanceAlert
+            userSalary={results.grossSalary.annually}
+            partnerSalary={partnerGrossWage}
+            hasMarriageCode={false}
           />
         </div>
       )}
