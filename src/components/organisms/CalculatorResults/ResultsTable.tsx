@@ -137,6 +137,12 @@ export function ResultsTable({
     ? calculatePercentage(yearChange, previousYearResults.netPay.annually)
     : '0.0%';
 
+  // Calculate What If year-over-year change
+  const whatIfYearChange =
+    previousYearResults && whatIfResults
+      ? whatIfResults.netPay.annually - previousYearResults.netPay.annually
+      : undefined;
+
   const tableRows: ResultRowData[] = [
     {
       category: 'Gross Pay',
@@ -248,6 +254,7 @@ export function ResultsTable({
       category: previousYearRowLabel,
       icon: TrendingUp,
       annual: yearChange,
+      whatIfAnnual: whatIfYearChange,
       percentage: yearChangePercentage,
       color:
         yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
@@ -300,11 +307,7 @@ export function ResultsTable({
                   {whatIfResults
                     ? // Two-row header for What If comparison
                       visiblePeriods.map((period) => (
-                        <TableHead
-                          key={period}
-                          className='min-w-[160px] text-center font-semibold sm:min-w-[180px] md:min-w-[200px] lg:min-w-[220px]'
-                          colSpan={2}
-                        >
+                        <TableHead key={period} className='text-center font-semibold' colSpan={2}>
                           {period}
                         </TableHead>
                       ))

@@ -1,8 +1,9 @@
 // src/components/organisms/CalculatorInputs/WhatIfInputs.tsx
 'use client';
 
-import { Wand2 } from 'lucide-react';
+import { Wand2, X } from 'lucide-react';
 import { useId } from 'react';
+import { toast } from 'sonner';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCalculatorActions, useWhatIf } from '@/store/calculatorStore';
+import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
 
 interface WhatIfInputsProps {
   onCompare?: () => void;
@@ -31,7 +32,8 @@ interface WhatIfInputsProps {
  */
 export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   const whatIf = useWhatIf();
-  const { setWhatIfType, setWhatIfValue, calculateWhatIf } = useCalculatorActions();
+  const whatIfResults = useWhatIfResults();
+  const { setWhatIfType, setWhatIfValue, calculateWhatIf, clearWhatIf } = useCalculatorActions();
   const typeSelectId = useId();
   const valueInputId = useId();
 
@@ -95,7 +97,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
             >
               <SelectTrigger
                 id={typeSelectId}
-                className='border-purple-500/30 bg-background hover:border-purple-500/50 dark:border-purple-400/30 dark:hover:border-purple-400/50'
+                className='bg-background'
                 data-testid='what-if-type-select'
               >
                 <SelectValue />
@@ -122,23 +124,41 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
               prefix={whatIf.type !== 'percentage' ? '£' : undefined}
               suffix={whatIf.type === 'percentage' ? '%' : undefined}
               placeholder={getPlaceholder()}
-              className='border-purple-500/30 hover:border-purple-500/50 focus:border-purple-500 focus:ring-purple-500 dark:border-purple-400/30 dark:focus:border-purple-400 dark:hover:border-purple-400/50'
               data-testid='what-if-value-input'
             />
           </InputTooltip>
         </div>
       </div>
 
-      {/* Compare Button */}
-      <Button
-        onClick={handleCompare}
-        size='lg'
-        className='w-full justify-center border-purple-500 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:from-purple-600 hover:to-pink-600 dark:border-purple-400 dark:shadow-purple-400/50'
-        data-testid='compare-button'
-      >
-        <Wand2 className='mr-2 size-5' />
-        Compare Scenarios
-      </Button>
+      {/* Buttons */}
+      <div className='flex gap-2'>
+        <Button
+          onClick={handleCompare}
+          size='lg'
+          className='flex-1 justify-center border-purple-500 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:from-purple-600 hover:to-pink-600 dark:border-purple-400 dark:shadow-purple-400/50'
+          data-testid='compare-button'
+        >
+          <Wand2 className='mr-2 size-5' />
+          Compare Scenarios
+        </Button>
+
+        {/* Clear Button - only show when What If is active */}
+        {whatIfResults && (
+          <Button
+            onClick={() => {
+              clearWhatIf();
+              toast.info('What If scenario cleared');
+            }}
+            variant='outline'
+            size='lg'
+            className='border-purple-500/30 hover:border-purple-500/50 dark:border-purple-400/30 dark:hover:border-purple-400/50'
+            data-testid='clear-what-if-button'
+            aria-label='Clear What If scenario'
+          >
+            <X className='size-5' />
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
       {/* Content */}
       <div className='relative z-10 mx-auto max-w-5xl px-2 text-center sm:px-4'>
         {/* Heading - No animation for LCP optimization */}
-        <h1 className='mb-6 mx-auto max-w-4xl font-bold text-4xl sm:text-5xl md:text-6xl text-foreground tracking-tight'>
+        <h1 className='mx-auto mb-6 max-w-4xl font-bold text-4xl text-foreground tracking-tight sm:text-5xl md:text-6xl'>
           Free UK PAYE Tax
           <br />
           <span className='text-gradient'>Calculator 2025-2026</span>

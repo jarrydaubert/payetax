@@ -158,6 +158,7 @@ interface CalculatorState {
   setWhatIfType: (type: 'percentage' | 'amount' | 'total') => void;
   setWhatIfValue: (value: number) => void;
   calculateWhatIf: () => void;
+  clearWhatIf: () => void;
 }
 
 // Get current tax year
@@ -419,6 +420,21 @@ export const useCalculatorStore = create<CalculatorState>()(
             set({ whatIfResults: null });
           }
         },
+
+        /**
+         * Clear What If scenario
+         * Resets What If results and returns to normal calculation view
+         */
+        clearWhatIf: () => {
+          set({
+            whatIfResults: null,
+            whatIf: {
+              enabled: false,
+              type: 'percentage',
+              value: 10,
+            },
+          });
+        },
       }),
       {
         name: 'tax-calculator-storage',
@@ -474,6 +490,7 @@ export const useCalculatorActions = () =>
       setWhatIfType: state.setWhatIfType,
       setWhatIfValue: state.setWhatIfValue,
       calculateWhatIf: state.calculateWhatIf,
+      clearWhatIf: state.clearWhatIf,
     }))
   );
 

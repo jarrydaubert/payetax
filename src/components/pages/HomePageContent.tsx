@@ -42,18 +42,18 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* SEO-optimized content for Answer Engine Optimization */}
-      <section className='container mx-auto px-4 md:px-6 pb-12 md:pb-16'>
+      <section className='container mx-auto px-4 pb-12 md:px-6 md:pb-16'>
         <CalculatorContent />
       </section>
 
       {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
       <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
         <div className='container mx-auto max-w-4xl px-4 md:px-6'>
-          <h2 className='mb-6 text-center font-bold text-3xl md:text-4xl tracking-tight'>
+          <h2 className='mb-6 text-center font-bold text-3xl tracking-tight md:text-4xl'>
             Understanding the UK Tax System
           </h2>
           <div className='prose prose-lg dark:prose-invert mx-auto'>
-            <p className='text-center text-foreground/90 text-base md:text-lg leading-relaxed'>
+            <p className='text-center text-base text-foreground/90 leading-relaxed md:text-lg'>
               Her Majesty's Revenue and Customs (HMRC) administers the UK tax system, which includes
               income tax rates, National Insurance, capital gains tax, and inheritance tax.
               Understanding your effective tax rate and tax band is crucial for financial planning.
@@ -67,7 +67,7 @@ const HomePageContent = memo(function HomePageContent() {
           </div>
 
           {/* Tax Rates Quick Reference */}
-          <div className='mt-10 grid gap-4 md:gap-6 md:grid-cols-3'>
+          <div className='mt-10 grid gap-4 md:grid-cols-3 md:gap-6'>
             <Card className='text-center'>
               <CardHeader>
                 <CardTitle className='text-lg'>Personal Allowance</CardTitle>
@@ -100,9 +100,9 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Popular Salary Calculators - Internal linking for SEO */}
-      <section className='container mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16 lg:py-20'>
+      <section className='container mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16 lg:py-20'>
         <div className='mb-12 text-center'>
-          <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>
+          <h2 className='mb-3 font-bold text-3xl tracking-tight md:text-4xl'>
             Popular Salary Calculators
           </h2>
           <Separator className='mx-auto my-4 w-24' />
@@ -110,7 +110,7 @@ const HomePageContent = memo(function HomePageContent() {
             Calculate exact take-home pay for common UK salaries
           </p>
         </div>
-        <div className='grid gap-4 md:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5'>
           {[
             { salary: 30000, label: '£30k' },
             { salary: 40000, label: '£40k' },
@@ -127,7 +127,7 @@ const HomePageContent = memo(function HomePageContent() {
               key={salary}
               asChild
               variant='outline'
-              className='h-auto flex-col gap-2 p-4 hover:border-primary hover:shadow-md transition-all'
+              className='h-auto flex-col gap-2 p-4 transition-all hover:border-primary hover:shadow-md'
             >
               <Link href={`/calculator/${salary}-after-tax`}>
                 <Calculator className='size-5 text-primary' />
@@ -149,7 +149,7 @@ const HomePageContent = memo(function HomePageContent() {
       <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
         <div className='container mx-auto max-w-7xl px-4 md:px-6'>
           <div className='mb-12 text-center'>
-            <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>
+            <h2 className='mb-3 font-bold text-3xl tracking-tight md:text-4xl'>
               Popular Tax Guides
             </h2>
             <Separator className='mx-auto my-4 w-24' />
@@ -157,7 +157,7 @@ const HomePageContent = memo(function HomePageContent() {
               Expert guides to help you understand UK tax calculations
             </p>
           </div>
-          <div className='grid gap-4 md:gap-6 md:grid-cols-3'>
+          <div className='grid gap-4 md:grid-cols-3 md:gap-6'>
             {/* Calculator Guide */}
             <Link
               href='/blog/uk-tax-calculator-2025-complete-guide'
@@ -219,15 +219,15 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Browse Tax Topics - Internal linking to blog categories */}
-      <section className='container mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16 lg:py-20'>
+      <section className='container mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16 lg:py-20'>
         <div className='mb-12 text-center'>
-          <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>Browse Tax Topics</h2>
+          <h2 className='mb-3 font-bold text-3xl tracking-tight md:text-4xl'>Browse Tax Topics</h2>
           <Separator className='mx-auto my-4 w-24' />
           <p className='text-muted-foreground md:text-lg'>
             Explore our comprehensive guides organized by topic
           </p>
         </div>
-        <div className='grid gap-4 md:gap-6 sm:grid-cols-2 md:grid-cols-3'>
+        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6'>
           {[
             {
               slug: 'tax-basics',
