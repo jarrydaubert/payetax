@@ -95,11 +95,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
               value={whatIf.type}
               onValueChange={(value: 'percentage' | 'amount' | 'total') => setWhatIfType(value)}
             >
-              <SelectTrigger
-                id={typeSelectId}
-                className='bg-background'
-                data-testid='what-if-type-select'
-              >
+              <SelectTrigger id={typeSelectId} data-testid='what-if-type-select'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
