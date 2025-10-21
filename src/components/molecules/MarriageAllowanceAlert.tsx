@@ -15,7 +15,7 @@
  */
 'use client';
 
-import { Heart, ExternalLink } from 'lucide-react';
+import { ExternalLink, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
@@ -47,7 +47,10 @@ export function MarriageAllowanceAlert({
   const monthlySaving = 21; // £252 / 12
 
   return (
-    <Alert variant='default' className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'>
+    <Alert
+      variant='default'
+      className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'
+    >
       <Heart className='size-5 text-pink-600 dark:text-pink-400' />
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex-1'>
@@ -62,8 +65,8 @@ export function MarriageAllowanceAlert({
             </span>{' '}
             ({formatCurrency(monthlySaving, 0)}/month) in tax.
             <span className='mt-2 block text-sm'>
-              Your partner can transfer 10% of their Personal Allowance (£1,260) to you, which
-              would update your tax code to include an 'M' suffix.
+              Your partner can transfer 10% of their Personal Allowance (£1,260) to you, which would
+              update your tax code to include an 'M' suffix.
             </span>
           </AlertDescription>
         </div>
@@ -74,11 +77,7 @@ export function MarriageAllowanceAlert({
           size='sm'
           className='w-full gap-2 whitespace-nowrap bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 sm:w-auto'
         >
-          <a
-            href='https://www.gov.uk/marriage-allowance'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
+          <a href='https://www.gov.uk/marriage-allowance' target='_blank' rel='noopener noreferrer'>
             Check Eligibility on GOV.UK
             <ExternalLink className='size-4' />
           </a>

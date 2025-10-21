@@ -18,9 +18,9 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
+import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
-import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -95,7 +95,7 @@ export function ResultsTable({
 
   // Marriage allowance eligibility check
   const marriageAllowanceEligible = React.useMemo(() => {
-    if (!isMarried || !partnerGrossWage) return false;
+    if (!(isMarried && partnerGrossWage)) return false;
 
     // Check if user already has M code (already claiming)
     const hasMarriageCode = taxCode.toUpperCase().includes('M');
