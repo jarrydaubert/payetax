@@ -214,12 +214,28 @@ describe('calculatePAYE', () => {
 - Group related tests with `describe()`
 - No skipped tests (`it.skip`) without explanation
 
+**Test assertions - Best practices:**
+- ✅ Test **behavior**, not implementation (avoid testing class names, internal state)
+- ✅ Use semantic queries: `getByRole`, `getByLabelText`, `getByTestId` (stable)
+- ✅ Use `container.textContent` for text split across elements
+- ✅ Test what users see and interact with
+- ❌ Don't test markup details (specific HTML structure, CSS classes)
+- ❌ Avoid brittle selectors like `.className` unless testing visual behavior
+
 **Run tests before committing:**
 ```bash
-npm run test        # Unit tests
-npm run test:e2e    # E2E tests
-npm run test:all    # Everything
+npm run test              # Unit tests with coverage (~10s)
+npm run test:no-coverage  # Faster: Skip coverage (~6s)
+npm run test:changed      # Fastest: Only changed files
+npm run test:watch        # Watch mode for development
+npm run test:e2e          # E2E tests
+npm run test:all          # Everything
 ```
+
+**Performance tips:**
+- Use `test:no-coverage` during development (40% faster)
+- Use `test:changed` when working on specific files
+- Full `test` with coverage before committing
 
 ---
 

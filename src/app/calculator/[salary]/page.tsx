@@ -36,6 +36,21 @@ const HIGH_PRIORITY_SALARIES = [
   115000, // 170 searches/month
   120000, // 120 searches/month
   125000, // 140 searches/month
+  // High-salary pages (lower search volume but found in audits)
+  130000,
+  140000,
+  150000,
+  160000,
+  170000,
+  175000,
+  180000,
+  190000,
+  200000,
+  250000,
+  300000,
+  350000,
+  400000,
+  500000,
 ];
 
 interface PageProps {

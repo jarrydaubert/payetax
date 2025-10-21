@@ -8,7 +8,11 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const config = {
-  coverageProvider: 'v8',
+  // Performance optimizations
+  maxWorkers: process.env.CI ? 2 : '50%', // Use 50% of CPU cores locally, 2 in CI
+  workerIdleMemoryLimit: '512MB', // Kill workers using too much memory
+
+  coverageProvider: 'v8', // v8 is faster than babel
   coverageDirectory: '<rootDir>/audit-outputs/coverage',
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {

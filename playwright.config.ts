@@ -14,7 +14,7 @@ export default defineConfig({
   /* Selective retry logic - only retry genuinely flaky tests */
   retries: process.env.CI ? 2 : 0,
   /* Optimal worker count for parallel execution */
-  workers: process.env.CI ? 2 : 4,
+  workers: process.env.CI ? 2 : '50%', // Use 50% of CPU cores locally
   /* Enhanced reporting - output to audit-outputs */
   reporter: process.env.CI
     ? [['html', { outputFolder: 'audit-outputs/playwright-report' }], ['github']]
