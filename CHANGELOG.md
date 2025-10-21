@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2025-10-21
+
+### Added
+- Interactive tooltips on all 5 summary cards explaining tax metrics
+- Live character counter (10/5000) in feedback form with color-coded warnings
+- Marriage Allowance eligibility alert with centered heart icon
+- Clear explanations for annual/monthly take-home, tax totals, effective rate, and marginal rate
+
+### Changed
+- Replaced X icon with RotateCcw icon in What If Clear button for consistency
+- Reduced What If Clear button size from 'lg' to 'default' for better layout
+- Improved feedback form with dynamic hints and real-time validation
+- Enhanced accessibility with aria-invalid, aria-describedby, and role='alert' attributes
+
+### Fixed
+- Better error handling for malformed API responses in feedback system
+- Maximum length enforcement on textarea to prevent client-side over-submission
+
+## [3.5.1] - 2025-10-21
+
+### Fixed
+- Resolved 5 accessibility linting errors in UI components
+- Replaced div role='group' with semantic fieldset elements
+- Replaced div role='button' with semantic button element
+- Fixed array index key usage with stable identifiers in FieldError component
+- Updated ResultsSummaryCards tests to reflect 5-card layout
+
+## [3.5.0] - 2025-10-20
+
+### Added
+- Marriage Allowance eligibility alert shown when user qualifies
+- What If scenario Clear button for better UX
+- Auto-scroll to results when Calculate or Compare buttons are clicked
+
+### Changed
+- Fixed What If dropdown background styling to use default Select appearance
+- Improved What If scenario UX with clearer visual feedback
+- Updated tooltips and input group components
+
+### Fixed
+- Test coverage improvements for atoms folder
+- Optimized test configurations for better performance
+
+## [3.4.1] - 2025-10-20
+
+### Changed
+- Added CONTRIBUTING.md compliance checklist
+- Moved audit documentation to docs/audits per guidelines
+- Improved documentation organization and clarity
+
+## [3.4.0] - 2025-10-20
+
+### Added
+- Complete homepage optimization with hero section improvements
+- Enhanced tooltip system across the application
+- shadcn UI components (Spinner, Empty, CategoryFilter)
+- Field and Input Group components from shadcn
+
+### Changed
+- Optimized Linear integration with issue update commands
+- Added support for sub-issues with --parent flag
+- Cleaned up duplicate/unused npm scripts
+
+### Fixed
+- CICD documentation organization
+- Various UX improvements based on user feedback
+
+## [Unreleased]
+
 ## [2.0.4] - 2025-10-20
 
 ### Added

@@ -10,7 +10,7 @@
 > **Production-ready UK Tax Calculator** - HMRC-compliant PAYE calculations with Sentry error monitoring, AEO optimization, WCAG 2.2 AA accessibility, and exceptional performance.
 
 **🌐 Live Demo:** [payetax.co.uk](https://payetax.co.uk)
-**📊 Status:** 🟢 **v2.0.3 Released** - Production-ready with zero warnings & A+ grade components
+**📊 Status:** 🟢 **v3.6.0 Released** - UX improvements with tooltips, feedback enhancements & accessibility fixes
 **🔗 Repository:** [gitlab.com/ukpayetax/payetax](https://gitlab.com/ukpayetax/payetax)
 
 ---
