@@ -1,12 +1,12 @@
 // src/components/organisms/CalculatorInputs/CalculatorInputsSection.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import { Calculator, ChevronDown, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Spinner } from '@/components/ui/spinner';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
 import { WhatIfInputs } from './WhatIfInputs';
@@ -67,12 +67,7 @@ export function CalculatorInputsSection({
         >
           {isCalculating ? (
             <>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
-              >
-                <Calculator className='mr-2 size-5' />
-              </motion.div>
+              <Spinner className='mr-2 size-5' />
               Calculating...
             </>
           ) : (

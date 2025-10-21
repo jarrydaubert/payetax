@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/ui/StructuredData';
+import { Spinner } from '@/components/ui/spinner';
 import { generateMetadata } from '@/lib/metadata';
 
 // Import the client-side HomePageContent component
@@ -44,7 +45,16 @@ export default function HomePage() {
       <StructuredData type='dataset' />
 
       {/* Main content with Suspense for client components */}
-      <Suspense fallback={<div className='p-8 text-center'>Loading calculator...</div>}>
+      <Suspense
+        fallback={
+          <div className='flex min-h-[400px] items-center justify-center p-8'>
+            <div className='flex flex-col items-center gap-3'>
+              <Spinner className='size-8' />
+              <p className='text-muted-foreground text-sm'>Loading calculator...</p>
+            </div>
+          </div>
+        }
+      >
         <HomePageClientWrapper />
       </Suspense>
 

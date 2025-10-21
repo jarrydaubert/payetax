@@ -7,6 +7,7 @@ import {
   Calendar,
   Clock,
   FileText,
+  Search,
   Sparkles,
   Star,
   Tag,
@@ -16,7 +17,16 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { CategoryFilter } from '@/components/molecules/CategoryFilter';
+import { Button } from '@/components/ui/button';
 import CallToAction from '@/components/ui/CallToAction';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
 interface BlogPageClientProps {
@@ -143,56 +153,14 @@ export function BlogPageClient({
           ))}
         </div>
 
-        {/* Categories Filter - Neon Pills */}
+        {/* Categories Filter */}
         {categories.length > 0 && (
-          <div className='mb-12 md:mb-20'>
-            <h2 className='mb-8 text-center font-semibold text-foreground text-xl'>
-              Browse Topics
-            </h2>
-            <div className='mx-auto max-w-5xl'>
-              <div className='flex flex-wrap items-center justify-center gap-3'>
-                <button
-                  type='button'
-                  onClick={() => handleCategoryClick()}
-                  className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-4 py-2.5 text-center font-medium text-sm transition-all duration-300 ${
-                    !selectedCategory
-                      ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-foreground shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                      : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:cursor-pointer hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
-                  }`}
-                >
-                  <span className='relative z-10'>All Posts</span>
-                  <span className='relative z-10 ml-2 rounded-full bg-white/20 px-2 py-0.5 font-mono text-xs'>
-                    {allPostsCount}
-                  </span>
-                  {!selectedCategory && (
-                    <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 blur transition-opacity group-hover:opacity-100' />
-                  )}
-                </button>
-                {categories
-                  .filter((category) => (category.count || 0) > 0)
-                  .map((category) => (
-                    <button
-                      key={category.slug}
-                      type='button'
-                      onClick={() => handleCategoryClick(category.slug)}
-                      className={`group relative inline-flex items-center justify-center overflow-hidden rounded-full px-4 py-2.5 text-center font-medium text-sm transition-all duration-300 ${
-                        selectedCategory === category.slug
-                          ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-foreground shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                          : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:cursor-pointer hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
-                      }`}
-                    >
-                      <span className='relative z-10'>{category.name}</span>
-                      <span className='relative z-10 ml-2 rounded-full bg-white/20 px-2 py-0.5 font-mono text-xs'>
-                        {category.count}
-                      </span>
-                      {selectedCategory === category.slug && (
-                        <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 blur transition-opacity group-hover:opacity-100' />
-                      )}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          </div>
+          <CategoryFilter
+            categories={categories}
+            allPostsCount={allPostsCount}
+            selectedCategory={selectedCategory}
+            onCategoryClick={handleCategoryClick}
+          />
         )}
 
         {/* Featured Post - Hero Card */}
@@ -346,21 +314,24 @@ export function BlogPageClient({
             )}
           </>
         ) : (
-          <div className='mb-20 rounded-3xl border border-border bg-card/50 p-16 text-center backdrop-blur-xl'>
-            <FileText className='mx-auto mb-6 size-20 text-muted-foreground' />
-            <h3 className='mb-4 font-bold text-3xl text-foreground'>No Articles Found</h3>
-            <p className='mx-auto mb-8 max-w-md text-muted-foreground leading-relaxed'>
+          <Empty className='mb-20 border bg-card/50 backdrop-blur-xl'>
+            <EmptyMedia variant='icon'>
+              <Search />
+            </EmptyMedia>
+            <EmptyTitle>No Articles Found</EmptyTitle>
+            <EmptyDescription>
               We couldn't find any articles matching your criteria. Try browsing all posts or
               selecting a different category.
-            </p>
-            <Link
-              href='/blog'
-              className='inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-4 font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]'
-            >
-              <BookOpen className='size-5' />
-              <span>Browse All Posts</span>
-            </Link>
-          </div>
+            </EmptyDescription>
+            <EmptyContent>
+              <Button asChild size='lg'>
+                <Link href='/blog'>
+                  <BookOpen className='mr-2 size-5' />
+                  Browse All Posts
+                </Link>
+              </Button>
+            </EmptyContent>
+          </Empty>
         )}
 
         {/* Newsletter CTA */}
