@@ -38,6 +38,6 @@ describe('Label Component', () => {
     render(<Label>Label</Label>);
     const label = screen.getByText('Label');
     expect(label).toHaveClass('peer-disabled:cursor-not-allowed');
-    expect(label).toHaveClass('peer-disabled:opacity-70');
+    expect(label).toHaveClass('peer-disabled:opacity-50');
   });
 });
