@@ -7,6 +7,9 @@ import { memo, useEffect, useRef, useTransition } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import SimpleHero from '@/components/organisms/SimpleHero';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 const HomePageContent = memo(function HomePageContent() {
   const [_isPending, startTransition] = useTransition();
@@ -34,21 +37,23 @@ const HomePageContent = memo(function HomePageContent() {
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
       {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator */}
-      <section id='tax-calculator' ref={calculatorRef} className='py-8 lg:py-12'>
+      <section id='tax-calculator' ref={calculatorRef} className='py-12 md:py-16 lg:py-20'>
         <CalculatorContainer />
       </section>
 
       {/* SEO-optimized content for Answer Engine Optimization */}
-      <section className='container mx-auto px-2 pb-16 sm:px-4'>
+      <section className='container mx-auto px-4 md:px-6 pb-12 md:pb-16'>
         <CalculatorContent />
       </section>
 
       {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
-      <section className='bg-muted/30 py-12'>
-        <div className='container mx-auto max-w-4xl px-4'>
-          <h2 className='mb-6 text-center font-bold text-3xl'>Understanding the UK Tax System</h2>
+      <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
+        <div className='container mx-auto max-w-4xl px-4 md:px-6'>
+          <h2 className='mb-6 text-center font-bold text-3xl md:text-4xl tracking-tight'>
+            Understanding the UK Tax System
+          </h2>
           <div className='prose prose-lg dark:prose-invert mx-auto'>
-            <p className='text-center text-foreground/90 text-lg leading-relaxed'>
+            <p className='text-center text-foreground/90 text-base md:text-lg leading-relaxed'>
               Her Majesty's Revenue and Customs (HMRC) administers the UK tax system, which includes
               income tax rates, National Insurance, capital gains tax, and inheritance tax.
               Understanding your effective tax rate and tax band is crucial for financial planning.
@@ -62,33 +67,50 @@ const HomePageContent = memo(function HomePageContent() {
           </div>
 
           {/* Tax Rates Quick Reference */}
-          <div className='mt-10 grid gap-6 md:grid-cols-3'>
-            <div className='rounded-lg border bg-card p-6 text-center'>
-              <h3 className='mb-2 font-semibold text-lg'>Personal Allowance</h3>
-              <p className='font-bold text-3xl text-primary'>£12,570</p>
-              <p className='mt-2 text-muted-foreground text-sm'>Tax-free earnings for 2025/26</p>
-            </div>
-            <div className='rounded-lg border bg-card p-6 text-center'>
-              <h3 className='mb-2 font-semibold text-lg'>Basic Rate</h3>
-              <p className='font-bold text-3xl text-primary'>20%</p>
-              <p className='mt-2 text-muted-foreground text-sm'>On income £12,571 - £50,270</p>
-            </div>
-            <div className='rounded-lg border bg-card p-6 text-center'>
-              <h3 className='mb-2 font-semibold text-lg'>Higher Rate</h3>
-              <p className='font-bold text-3xl text-primary'>40%</p>
-              <p className='mt-2 text-muted-foreground text-sm'>On income £50,271 - £125,140</p>
-            </div>
+          <div className='mt-10 grid gap-4 md:gap-6 md:grid-cols-3'>
+            <Card className='text-center'>
+              <CardHeader>
+                <CardTitle className='text-lg'>Personal Allowance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='font-bold text-3xl text-primary'>£12,570</p>
+                <CardDescription className='mt-2'>Tax-free earnings for 2025/26</CardDescription>
+              </CardContent>
+            </Card>
+            <Card className='text-center'>
+              <CardHeader>
+                <CardTitle className='text-lg'>Basic Rate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='font-bold text-3xl text-primary'>20%</p>
+                <CardDescription className='mt-2'>On income £12,571 - £50,270</CardDescription>
+              </CardContent>
+            </Card>
+            <Card className='text-center'>
+              <CardHeader>
+                <CardTitle className='text-lg'>Higher Rate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='font-bold text-3xl text-primary'>40%</p>
+                <CardDescription className='mt-2'>On income £50,271 - £125,140</CardDescription>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Popular Salary Calculators - Internal linking for SEO */}
-      <section className='container mx-auto max-w-7xl px-4 py-16'>
-        <h2 className='mb-2 text-center font-bold text-3xl'>Popular Salary Calculators</h2>
-        <p className='mb-8 text-center text-muted-foreground'>
-          Calculate exact take-home pay for common UK salaries
-        </p>
-        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
+      <section className='container mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16 lg:py-20'>
+        <div className='mb-12 text-center'>
+          <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>
+            Popular Salary Calculators
+          </h2>
+          <Separator className='mx-auto my-4 w-24' />
+          <p className='text-muted-foreground md:text-lg'>
+            Calculate exact take-home pay for common UK salaries
+          </p>
+        </div>
+        <div className='grid gap-4 md:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
           {[
             { salary: 30000, label: '£30k' },
             { salary: 40000, label: '£40k' },
@@ -101,17 +123,18 @@ const HomePageContent = memo(function HomePageContent() {
             { salary: 110000, label: '£110k' },
             { salary: 120000, label: '£120k' },
           ].map(({ salary, label }) => (
-            <Link
+            <Button
               key={salary}
-              href={`/calculator/${salary}-after-tax`}
-              className='group flex flex-col items-center rounded-lg border bg-card p-4 transition-all hover:border-primary hover:shadow-md'
+              asChild
+              variant='outline'
+              className='h-auto flex-col gap-2 p-4 hover:border-primary hover:shadow-md transition-all'
             >
-              <Calculator className='mb-2 size-5 text-primary' />
-              <span className='font-semibold text-foreground group-hover:text-primary'>
-                {label} Salary
-              </span>
-              <span className='text-muted-foreground text-xs'>After Tax</span>
-            </Link>
+              <Link href={`/calculator/${salary}-after-tax`}>
+                <Calculator className='size-5 text-primary' />
+                <span className='font-semibold text-foreground'>{label} Salary</span>
+                <span className='text-muted-foreground text-xs'>After Tax</span>
+              </Link>
+            </Button>
           ))}
         </div>
         <div className='mt-6 text-center'>
@@ -123,13 +146,18 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Featured Tax Resources - Internal linking for SEO */}
-      <section className='bg-muted/30 py-16'>
-        <div className='container mx-auto max-w-7xl px-4'>
-          <h2 className='mb-2 text-center font-bold text-3xl'>Popular Tax Guides</h2>
-          <p className='mb-8 text-center text-muted-foreground'>
-            Expert guides to help you understand UK tax calculations
-          </p>
-          <div className='grid gap-6 md:grid-cols-3'>
+      <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
+        <div className='container mx-auto max-w-7xl px-4 md:px-6'>
+          <div className='mb-12 text-center'>
+            <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>
+              Popular Tax Guides
+            </h2>
+            <Separator className='mx-auto my-4 w-24' />
+            <p className='text-muted-foreground md:text-lg'>
+              Expert guides to help you understand UK tax calculations
+            </p>
+          </div>
+          <div className='grid gap-4 md:gap-6 md:grid-cols-3'>
             {/* Calculator Guide */}
             <Link
               href='/blog/uk-tax-calculator-2025-complete-guide'
@@ -191,12 +219,15 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Browse Tax Topics - Internal linking to blog categories */}
-      <section className='container mx-auto max-w-7xl px-4 py-16'>
-        <h2 className='mb-2 text-center font-bold text-3xl'>Browse Tax Topics</h2>
-        <p className='mb-8 text-center text-muted-foreground'>
-          Explore our comprehensive guides organized by topic
-        </p>
-        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3'>
+      <section className='container mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-16 lg:py-20'>
+        <div className='mb-12 text-center'>
+          <h2 className='mb-3 font-bold text-3xl md:text-4xl tracking-tight'>Browse Tax Topics</h2>
+          <Separator className='mx-auto my-4 w-24' />
+          <p className='text-muted-foreground md:text-lg'>
+            Explore our comprehensive guides organized by topic
+          </p>
+        </div>
+        <div className='grid gap-4 md:gap-6 sm:grid-cols-2 md:grid-cols-3'>
           {[
             {
               slug: 'tax-basics',

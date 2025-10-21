@@ -96,14 +96,14 @@ describe('HomePageContent Component', () => {
     const { container } = render(<HomePageContent />);
 
     const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toHaveClass('py-8', 'lg:py-12');
+    expect(calculatorSection).toHaveClass('py-12', 'md:py-16', 'lg:py-20');
   });
 
   it('should render content section in container', () => {
     const { container } = render(<HomePageContent />);
 
     const contentSection = container.querySelectorAll('section')[1];
-    expect(contentSection).toHaveClass('container', 'mx-auto', 'px-2', 'sm:px-4', 'pb-16');
+    expect(contentSection).toHaveClass('container', 'mx-auto', 'px-4', 'md:px-6');
   });
 
   it('should only scroll if calculator ref exists', async () => {

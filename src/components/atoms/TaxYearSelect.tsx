@@ -72,12 +72,12 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
               aria-expanded={open}
               aria-controls={listboxId}
               className={cn(
-                'relative w-full rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'relative w-full rounded-md border border-border/40 bg-secondary/80 py-2 pr-10 pl-3 text-left backdrop-blur-sm shadow-sm',
+                'focus:outline-none focus:ring-1 focus:ring-ring',
                 'cursor-default transition-colors duration-200',
                 'text-foreground text-sm',
                 'disabled:cursor-not-allowed disabled:opacity-50',
-                open && 'ring-2 ring-ring ring-offset-2'
+                open && 'ring-1 ring-ring'
               )}
             >
               <span className='flex items-center'>

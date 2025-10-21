@@ -308,12 +308,12 @@ export function BasicInputs() {
         />
       </div>
 
-      {/* Pension Contribution - Combined Type + Amount on 1 row */}
+      {/* Pension - Combined Type + Amount on 1 row */}
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-1.5'>
           <LabelTooltip fieldName='pensionContribution' />
           <Label htmlFor={pensionId} className='whitespace-nowrap text-sm'>
-            Pension Contribution
+            Pension
           </Label>
         </div>
         <div className='flex flex-1 gap-1.5'>

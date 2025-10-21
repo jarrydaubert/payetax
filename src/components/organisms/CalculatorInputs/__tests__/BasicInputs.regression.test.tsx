@@ -59,7 +59,7 @@ describe('BasicInputs - Regression Tests', () => {
     });
   });
 
-  describe('REGRESSION: Pension Contribution Decimals', () => {
+  describe('REGRESSION: Pension Decimals', () => {
     it('should allow decimal values in pension contribution (e.g., 5.5%)', () => {
       render(<BasicInputs />);
 
@@ -104,8 +104,8 @@ describe('BasicInputs - Regression Tests', () => {
     it('should render pension contribution section (verifies width fix is in place)', () => {
       render(<BasicInputs />);
 
-      // Component renders with Pension Contribution label
-      expect(screen.getByText('Pension Contribution')).toBeInTheDocument();
+      // Component renders with Pension label
+      expect(screen.getByText('Pension')).toBeInTheDocument();
 
       // Input field exists (width fix prevents truncation)
       const pensionInput = screen.getByPlaceholderText('5.00');

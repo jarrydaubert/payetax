@@ -122,9 +122,9 @@ describe('BasicInputs Component', () => {
       expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
     });
 
-    it('should render pension contribution combined type + amount', () => {
+    it('should render pension combined type + amount', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Pension Contribution')).toBeInTheDocument();
+      expect(screen.getByText('Pension')).toBeInTheDocument();
     });
 
     it('should NOT render hours per week field (removed)', () => {

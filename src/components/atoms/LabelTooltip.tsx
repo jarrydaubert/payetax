@@ -74,9 +74,10 @@ export function LabelTooltip({ fieldName, customContent }: LabelTooltipProps) {
         </TooltipTrigger>
 
         <TooltipContent
-          side='left'
+          side='top'
           align='center'
           className='max-w-xs'
+          sideOffset={8}
           data-testid={`tooltip-content-${fieldName}`}
         >
           {formatTooltipText(tooltipContent)}
