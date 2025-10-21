@@ -7,11 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
-function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
+function InputGroup({ className, ...props }: React.ComponentProps<'fieldset'>) {
   return (
-    <div
+    <fieldset
       data-slot='input-group'
-      role='group'
       className={cn(
         'group/input-group relative flex w-full items-center rounded-md border border-input shadow-xs outline-none transition-[color,box-shadow] dark:bg-input/30',
         'h-9 has-[>textarea]:h-auto',
@@ -58,19 +57,21 @@ function InputGroupAddon({
   className,
   align = 'inline-start',
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
+}: React.ComponentProps<'button'> & VariantProps<typeof inputGroupAddonVariants>) {
+  const handleInteraction = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if ((e.target as HTMLElement).closest('button') !== e.currentTarget) {
+      return;
+    }
+    e.currentTarget.parentElement?.querySelector('input')?.focus();
+  };
+
   return (
-    <div
-      role='group'
+    <button
+      type='button'
       data-slot='input-group-addon'
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest('button')) {
-          return;
-        }
-        e.currentTarget.parentElement?.querySelector('input')?.focus();
-      }}
+      onClick={handleInteraction}
       {...props}
     />
   );

@@ -69,13 +69,14 @@ describe('ResultsSummaryCards Component', () => {
   };
 
   describe('Rendering', () => {
-    it('should render all four summary cards', () => {
+    it('should render all five summary cards', () => {
       render(<ResultsSummaryCards results={mockResults} />);
 
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Monthly Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
+      expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
     });
 
     it('should display correct annual take-home value', () => {
@@ -182,7 +183,7 @@ describe('ResultsSummaryCards Component', () => {
       expect(section).toHaveClass('grid');
       expect(section).toHaveClass('gap-4');
       expect(section).toHaveClass('md:grid-cols-2');
-      expect(section).toHaveClass('lg:grid-cols-4');
+      expect(section).toHaveClass('lg:grid-cols-5');
     });
   });
 
@@ -196,6 +197,7 @@ describe('ResultsSummaryCards Component', () => {
       expect(screen.getByText('Monthly Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
+      expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
     });
 
     it('should render all cards with icons', () => {
@@ -203,7 +205,7 @@ describe('ResultsSummaryCards Component', () => {
 
       // ResultCard components render svg icons
       const svgs = container.querySelectorAll('svg');
-      expect(svgs.length).toBeGreaterThanOrEqual(4);
+      expect(svgs.length).toBeGreaterThanOrEqual(5);
     });
   });
 
