@@ -552,12 +552,44 @@ npm audit fix
 ### SEO Checklist for New Pages
 
 - [ ] Meta title (50-60 chars)
-- [ ] Meta description (150-160 chars)
+- [ ] **Meta description (150-158 chars) - CRITICAL**
 - [ ] H1 tag (one per page)
 - [ ] Internal links (3+ per page)
 - [ ] Alt text on images
 - [ ] Semantic HTML
 - [ ] Schema markup (where applicable)
+
+**Meta Description Guidelines:**
+```typescript
+// ✅ GOOD - 155 characters, clear value, includes year
+description: "Calculate UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-26. Scottish rates, student loans included."
+
+// ❌ BAD - 198 characters (too long, will be truncated)
+description: "Calculate your exact UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-2026. Includes Scottish tax rates, student loans, pension contributions and marriage allowance."
+
+// ❌ BAD - 87 characters (too short, not compelling)
+description: "All calculations use official HMRC tax rates and thresholds published"
+```
+
+**Formula:** `[What] + [Key Benefit] + [Credibility] + [Tax Year]`
+
+**Must Include:**
+- Primary keyword naturally
+- Tax year (2025, 2025-26, etc.)
+- Clear benefit/value proposition
+- Call to action (implicit or explicit)
+
+**Target:** 150-158 characters (Google's mobile + desktop sweet spot)
+
+**Audit Tools:**
+```bash
+# Check all meta descriptions
+node scripts/audit-meta-descriptions.js
+
+# Look for: missing, too long (>160), too short (<120)
+# Note: SEMrush only flags "missing" and "duplicate"
+# Character length optimization is our own best practice
+```
 
 ### Performance Checklist
 
