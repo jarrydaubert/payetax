@@ -284,32 +284,63 @@ export function BlogPageClient({
 
             {/* Pagination - Neon Style */}
             {totalPages > 1 && (
-              <div className='mb-20 flex items-center justify-center gap-4'>
-                {currentPage > 1 && (
-                  <Link
-                    href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                    className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
-                  >
-                    ← Previous
-                  </Link>
-                )}
+              <div className='mb-20'>
+                <div className='mb-8 flex items-center justify-center gap-4'>
+                  {currentPage > 1 && (
+                    <Link
+                      href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                      className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
+                    >
+                      ← Previous
+                    </Link>
+                  )}
 
-                <div className='flex items-center gap-3'>
-                  <span className='text-muted-foreground'>Page</span>
-                  <span className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono text-foreground shadow-lg'>
-                    {currentPage}
-                  </span>
-                  <span className='text-muted-foreground'>of {totalPages}</span>
+                  <div className='flex items-center gap-3'>
+                    <span className='text-muted-foreground'>Page</span>
+                    <span className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono text-foreground shadow-lg'>
+                      {currentPage}
+                    </span>
+                    <span className='text-muted-foreground'>of {totalPages}</span>
+                  </div>
+
+                  {currentPage < totalPages && (
+                    <Link
+                      href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                      className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
+                    >
+                      Next →
+                    </Link>
+                  )}
                 </div>
 
-                {currentPage < totalPages && (
-                  <Link
-                    href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                    className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
-                  >
-                    Next →
+                {/* Additional Navigation Links for SEO */}
+                <div className='flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm'>
+                  <Link href='/' className='transition-colors hover:text-purple-400'>
+                    ← Back to Calculator
                   </Link>
-                )}
+                  <span>•</span>
+                  <Link href='/blog' className='transition-colors hover:text-purple-400'>
+                    All Articles
+                  </Link>
+                  <span>•</span>
+                  <Link
+                    href='/blog/category/tax-basics'
+                    className='transition-colors hover:text-purple-400'
+                  >
+                    Tax Basics
+                  </Link>
+                  <span>•</span>
+                  <Link
+                    href='/blog/category/tax-tips'
+                    className='transition-colors hover:text-purple-400'
+                  >
+                    Tax Tips
+                  </Link>
+                  <span>•</span>
+                  <Link href='/about' className='transition-colors hover:text-purple-400'>
+                    About Us
+                  </Link>
+                </div>
               </div>
             )}
           </>
@@ -332,6 +363,34 @@ export function BlogPageClient({
               </Button>
             </EmptyContent>
           </Empty>
+        )}
+
+        {/* Additional Content for Page 2+ (SEO) */}
+        {currentPage > 1 && !selectedCategory && (
+          <div className='mb-12 rounded-2xl border border-border bg-card/50 p-8 backdrop-blur-xl'>
+            <h2 className='mb-6 font-bold text-2xl text-foreground'>Browse Articles by Category</h2>
+            <p className='mb-6 text-foreground/70'>
+              Explore our comprehensive collection of UK tax guides organized by topic. From
+              understanding basic tax concepts to advanced strategies for reducing your tax bill, we
+              cover everything you need to know about UK taxation.
+            </p>
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+              {categories.slice(0, 6).map((cat) => (
+                <Link
+                  key={cat.slug}
+                  href={`/blog/category/${cat.slug}`}
+                  className='group rounded-lg border border-border bg-secondary p-6 transition-all duration-300 hover:border-purple-500/50 hover:bg-card/70 hover:shadow-lg'
+                >
+                  <h3 className='mb-2 font-bold text-foreground transition-colors group-hover:text-purple-400'>
+                    {cat.name}
+                  </h3>
+                  <p className='text-muted-foreground text-sm'>
+                    {cat.count} {cat.count === 1 ? 'article' : 'articles'}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Newsletter CTA */}

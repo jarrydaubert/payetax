@@ -302,12 +302,61 @@ export default async function CategoryPage({
         </nav>
       )}
 
+      {/* Additional SEO Content Section */}
+      {categoryContent[slug] && posts.length > 0 && (
+        <div className='mt-12 rounded-lg border border-border bg-card p-8'>
+          <h2 className='mb-6 font-bold text-2xl'>About {category.name}</h2>
+          <div className='prose prose-slate dark:prose-invert max-w-none'>
+            <p className='mb-4 text-foreground/80 leading-relaxed'>
+              Our {category.name.toLowerCase()} articles are written by tax experts and updated
+              regularly to reflect the latest HMRC guidance and UK tax law changes. Whether you're
+              looking for basic information or detailed guides on specific topics, you'll find
+              comprehensive, easy-to-understand content that helps you navigate the UK tax system
+              with confidence.
+            </p>
+            <p className='mb-4 text-foreground/80 leading-relaxed'>
+              All information is based on official HMRC rates for the current tax year{' '}
+              {new Date().getMonth() >= 3
+                ? `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`
+                : `${new Date().getFullYear() - 1}/${new Date().getFullYear()}`}
+              . We explain complex tax concepts in plain English, providing practical examples and
+              actionable advice you can use immediately. Our goal is to help UK taxpayers understand
+              their tax obligations, maximize their allowances, and make informed financial
+              decisions.
+            </p>
+          </div>
+
+          {/* Related Topics */}
+          <div className='mt-8'>
+            <h3 className='mb-4 font-bold text-xl'>Related Topics</h3>
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+              {categories
+                .filter((cat) => cat.slug !== slug)
+                .slice(0, 4)
+                .map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/blog/category/${cat.slug}`}
+                    className='rounded-lg border border-border bg-secondary p-4 transition-colors hover:bg-accent'
+                  >
+                    <h4 className='mb-2 font-semibold text-foreground'>{cat.name}</h4>
+                    <p className='text-muted-foreground text-sm'>
+                      {cat.count} {cat.count === 1 ? 'article' : 'articles'}
+                    </p>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* CTA */}
       <div className='glass mt-12 rounded-lg p-6'>
         <h2 className='mb-3 font-bold text-xl'>Calculate Your UK Tax Now</h2>
         <p className='mb-4'>
           Use our free PAYE tax calculator to determine your take-home pay and plan your finances
-          better.
+          better. Includes all {new Date().getFullYear()}/{new Date().getFullYear() + 1} tax rates,
+          National Insurance contributions, and student loan repayments.
         </p>
         <Link
           href='/'
