@@ -338,14 +338,21 @@ git commit -m "feat: Add feature (PAYTAX-XX)"
 
 ### Before Pushing
 
-**Pre-push hook (⚠️ NOT YET CONFIGURED - See PAYTAX-24):**
+**Pre-push hook (✅ NOW CONFIGURED - PAYTAX-24):**
 ```bash
-# Will run automatically when configured
-npm run test:quick
-npm run build  # Verify build works
+# Runs automatically before every push
+npm run test:no-coverage  # Full test suite (fast, no coverage report)
+npm run build             # Verify production build works
 ```
 
-**Manual pre-push checklist:**
+**What it prevents:**
+- ❌ Pushing code with failing tests
+- ❌ Pushing code that doesn't build
+- ❌ Breaking production deployments
+
+**Can bypass with:** `git push --no-verify` (use sparingly! Only for docs/emergency fixes)
+
+**Manual pre-push checklist (if bypassing hook):**
 - [ ] All tests passing
 - [ ] No TypeScript errors
 - [ ] No linting warnings
