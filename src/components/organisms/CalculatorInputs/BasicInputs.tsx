@@ -8,7 +8,9 @@ import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -91,28 +93,29 @@ export function BasicInputs() {
       {/* Heading */}
       <h3 className='font-semibold text-foreground text-lg'>Enter Income Tax Details</h3>
 
-      {/* Salary and Pay Period on one line */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Salary and Pay Period - Mobile: stacked, Desktop: inline with £ prefix */}
+      <Field>
+        <FieldLabel htmlFor={salaryId}>
           <LabelTooltip fieldName='salary' />
-          <Label htmlFor={salaryId} className='whitespace-nowrap text-sm'>
-            Salary
-          </Label>
-        </div>
-        <div className='flex flex-1 gap-2'>
-          <NumberInput
-            id={salaryId}
-            value={input.salary}
-            onChange={setSalary}
-            prefix='£'
-            decimals={2}
-            placeholder='0.00'
-            min={0}
-            className='flex-1'
-            data-testid='salary-input'
-          />
+          Salary
+        </FieldLabel>
+        <div className='flex flex-col gap-2 sm:flex-row'>
+          <InputGroup className='flex-1'>
+            <InputGroupAddon align='inline-start'>
+              <PoundSterling className='size-4' />
+            </InputGroupAddon>
+            <NumberInput
+              id={salaryId}
+              value={input.salary || 0}
+              onChange={setSalary}
+              decimals={2}
+              clearOnFocus={true}
+              data-testid='salary-input'
+              className='border-0 bg-transparent'
+            />
+          </InputGroup>
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger id={payPeriodId} className='w-[140px]'>
+            <SelectTrigger id={payPeriodId} className='w-full sm:w-[140px]'>
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -124,15 +127,14 @@ export function BasicInputs() {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </Field>
 
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Tax Year */}
+      <Field>
+        <FieldLabel htmlFor={taxYearId}>
           <LabelTooltip fieldName='taxYear' />
-          <Label htmlFor={taxYearId} className='whitespace-nowrap text-sm'>
-            Tax Year
-          </Label>
-        </div>
+          Tax Year
+        </FieldLabel>
         <TaxYearSelect
           id={taxYearId}
           value={input.taxYear}
@@ -140,16 +142,14 @@ export function BasicInputs() {
           label=''
           className='flex-1'
         />
-      </div>
+      </Field>
 
-      {/* Tax Code Input with Tooltip - defaults to 1257L (S1257L for Scotland) */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Tax Code - defaults to 1257L (S1257L for Scotland) */}
+      <Field>
+        <FieldLabel htmlFor={taxCodeId}>
           <LabelTooltip fieldName='taxCode' />
-          <Label htmlFor={taxCodeId} className='whitespace-nowrap text-sm'>
-            Tax Code
-          </Label>
-        </div>
+          Tax Code
+        </FieldLabel>
         <Input
           id={taxCodeId}
           type='text'
@@ -158,16 +158,14 @@ export function BasicInputs() {
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
           className='flex-1 uppercase'
         />
-      </div>
+      </Field>
 
-      {/* Region Select with Tooltip */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Region Select */}
+      <Field>
+        <FieldLabel htmlFor={regionId}>
           <LabelTooltip fieldName='region' />
-          <Label htmlFor={regionId} className='whitespace-nowrap text-sm'>
-            Region
-          </Label>
-        </div>
+          Region
+        </FieldLabel>
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger id={regionId} className='flex-1'>
             <SelectValue placeholder='Select region' />
@@ -180,7 +178,7 @@ export function BasicInputs() {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Field>
 
       {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
       <div className='flex items-center gap-4'>
@@ -209,35 +207,35 @@ export function BasicInputs() {
         </div>
       </div>
 
+      {/* Partner's Gross Wage - Only shown when married - Using InputGroup with £ prefix */}
       {input.isMarried && (
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-1.5'>
+        <Field>
+          <FieldLabel htmlFor={partnerWageId}>
             <LabelTooltip fieldName='partnerGrossWage' />
-            <Label htmlFor={partnerWageId} className='whitespace-nowrap text-sm'>
-              Partner's Gross Wage
-            </Label>
-          </div>
-          <NumberInput
-            id={partnerWageId}
-            value={input.partnerGrossWage}
-            onChange={setPartnerGrossWage}
-            prefix='£'
-            decimals={2}
-            placeholder='0.00'
-            min={0}
-            className='flex-1'
-          />
-        </div>
+            Partner's Gross Wage
+          </FieldLabel>
+          <InputGroup>
+            <InputGroupAddon align='inline-start'>
+              <PoundSterling className='size-4' />
+            </InputGroupAddon>
+            <NumberInput
+              id={partnerWageId}
+              value={input.partnerGrossWage || 0}
+              onChange={setPartnerGrossWage}
+              decimals={2}
+              clearOnFocus={true}
+              className='border-0 bg-transparent'
+            />
+          </InputGroup>
+        </Field>
       )}
 
       {/* Age - Dropdown for HMRC NI thresholds */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <Field>
+        <FieldLabel htmlFor={ageId}>
           <LabelTooltip fieldName='age' />
-          <Label htmlFor={ageId} className='whitespace-nowrap text-sm'>
-            Age
-          </Label>
-        </div>
+          Age
+        </FieldLabel>
         <Select
           value={
             !input.age || input.age < 65
@@ -264,16 +262,14 @@ export function BasicInputs() {
             <SelectItem value='75-plus'>Over 75</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </Field>
 
       {/* Student Loan */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <Field>
+        <FieldLabel htmlFor={studentLoanId}>
           <LabelTooltip fieldName='studentLoanPlan' />
-          <Label htmlFor={studentLoanId} className='whitespace-nowrap text-sm'>
-            Student Loan
-          </Label>
-        </div>
+          Student Loan
+        </FieldLabel>
         <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
           <SelectTrigger id={studentLoanId} className='flex-1'>
             <SelectValue placeholder='Select student loan' />
@@ -286,77 +282,92 @@ export function BasicInputs() {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </Field>
 
-      {/* Allowances/Deductions */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Allowances/Deductions - Using InputGroup with £ prefix */}
+      <Field>
+        <FieldLabel htmlFor={allowancesId}>
           <LabelTooltip fieldName='allowancesDeductions' />
-          <Label htmlFor={allowancesId} className='whitespace-nowrap text-sm'>
-            Allowances/Deductions
-          </Label>
-        </div>
-        <NumberInput
-          id={allowancesId}
-          value={input.allowancesDeductions}
-          onChange={setAllowancesDeductions}
-          prefix='£'
-          decimals={2}
-          placeholder='0.00'
-          min={0}
-          className='flex-1'
-        />
-      </div>
+          Allowances/Deductions
+        </FieldLabel>
+        <InputGroup>
+          <InputGroupAddon align='inline-start'>
+            <PoundSterling className='size-4' />
+          </InputGroupAddon>
+          <NumberInput
+            id={allowancesId}
+            value={input.allowancesDeductions || 0}
+            onChange={setAllowancesDeductions}
+            decimals={2}
+            clearOnFocus={true}
+            className='border-0 bg-transparent'
+          />
+        </InputGroup>
+      </Field>
 
-      {/* Pension - Combined Type + Amount on 1 row */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      {/* Pension - Mobile: stacked, Desktop: inline with type selector + £/% */}
+      <Field>
+        <FieldLabel htmlFor={pensionId}>
           <LabelTooltip fieldName='pensionContribution' />
-          <Label htmlFor={pensionId} className='whitespace-nowrap text-sm'>
-            Pension
-          </Label>
-        </div>
-        <div className='flex flex-1 gap-1.5'>
-          {/* Type selector with icons */}
+          Pension
+        </FieldLabel>
+        <div className='flex flex-col gap-2 sm:flex-row sm:gap-1.5'>
+          {/* Type selector with icons - full width on mobile */}
           <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
-            <SelectTrigger id={pensionTypeId} className='w-[60px] shrink-0'>
+            <SelectTrigger id={pensionTypeId} className='w-full sm:w-[60px] sm:shrink-0'>
               <SelectValue>
                 {input.pensionContributionType === 'percentage' ? (
-                  <Percent className='size-4' />
+                  <>
+                    <span className='sm:hidden'>Percentage</span>
+                    <Percent className='hidden size-4 sm:block' />
+                  </>
                 ) : (
-                  <PoundSterling className='size-4' />
+                  <>
+                    <span className='sm:hidden'>Fixed Amount</span>
+                    <PoundSterling className='hidden size-4 sm:block' />
+                  </>
                 )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='percentage'>
-                <div className='flex items-center justify-center'>
+                <div className='flex items-center gap-2'>
                   <Percent className='size-4' />
+                  <span className='sm:hidden'>Percentage</span>
                 </div>
               </SelectItem>
               <SelectItem value='amount'>
-                <div className='flex items-center justify-center'>
+                <div className='flex items-center gap-2'>
                   <PoundSterling className='size-4' />
+                  <span className='sm:hidden'>Fixed Amount</span>
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
 
-          {/* Input field */}
-          <NumberInput
-            id={pensionId}
-            value={input.pensionContribution}
-            onChange={setPensionContribution}
-            prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
-            suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}
-            decimals={2}
-            placeholder={input.pensionContributionType === 'percentage' ? '5.00' : '0.00'}
-            min={0}
-            max={input.pensionContributionType === 'percentage' ? 100 : undefined}
-            className='flex-1'
-          />
+          {/* Input field with prefix/suffix */}
+          <InputGroup className='flex-1'>
+            {input.pensionContributionType === 'amount' && (
+              <InputGroupAddon align='inline-start'>
+                <PoundSterling className='size-4' />
+              </InputGroupAddon>
+            )}
+            <NumberInput
+              id={pensionId}
+              value={input.pensionContribution || 0}
+              onChange={setPensionContribution}
+              decimals={2}
+              clearOnFocus={true}
+              className='border-0 bg-transparent'
+            />
+            {input.pensionContributionType === 'percentage' && (
+              <InputGroupAddon align='inline-end'>
+                <Percent className='size-4' />
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </div>
-      </div>
+      </Field>
     </motion.div>
   );
 }

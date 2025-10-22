@@ -1,12 +1,13 @@
 // src/components/organisms/SalaryComparison/ComparisonInputs.tsx
 'use client';
 
-import { Calculator } from 'lucide-react';
+import { Calculator, Percent, PoundSterling } from 'lucide-react';
 import { useId, useState } from 'react';
+import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { formatCurrency } from '@/lib/utils';
 
@@ -30,19 +31,6 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       value: numValue,
       currentSalary,
     });
-  };
-
-  const getPlaceholder = () => {
-    switch (mode) {
-      case 'percentage':
-        return '10';
-      case 'amount':
-        return '5,000';
-      case 'total':
-        return '45,000';
-      default:
-        return '';
-    }
   };
 
   const getLabel = () => {
@@ -73,7 +61,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       <CardContent className='space-y-4'>
         {/* Mode Selection */}
         <div className='space-y-3'>
-          <Label>Comparison Type</Label>
+          <FieldLabel>Comparison Type</FieldLabel>
           <div className='grid gap-2 sm:grid-cols-3'>
             <button
               type='button'
@@ -114,30 +102,30 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           </div>
         </div>
 
-        {/* Value Input */}
-        <div className='space-y-2'>
-          <Label htmlFor='comparison-value'>{getLabel()}</Label>
-          <div className='relative'>
-            {mode === 'percentage' && (
-              <span className='-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground'>
-                %
-              </span>
+        {/* Value Input - Using InputGroup with £/% indicators */}
+        <Field>
+          <FieldLabel htmlFor={inputId}>{getLabel()}</FieldLabel>
+          <InputGroup>
+            {mode !== 'percentage' && (
+              <InputGroupAddon align='inline-start'>
+                <PoundSterling className='size-4' />
+              </InputGroupAddon>
             )}
-            {(mode === 'amount' || mode === 'total') && (
-              <span className='-translate-y-1/2 absolute top-1/2 left-3 text-muted-foreground'>
-                £
-              </span>
-            )}
-            <Input
+            <NumberInput
               id={inputId}
-              type='number'
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={getPlaceholder()}
-              className={mode !== 'percentage' ? 'pl-8' : 'pr-8'}
+              value={parseFloat(value) || 0}
+              onChange={(v) => setValue(String(v))}
+              decimals={2}
+              clearOnFocus={true}
+              className='border-0 bg-transparent'
             />
-          </div>
-        </div>
+            {mode === 'percentage' && (
+              <InputGroupAddon align='inline-end'>
+                <Percent className='size-4' />
+              </InputGroupAddon>
+            )}
+          </InputGroup>
+        </Field>
 
         {/* Compare Button */}
         <Button onClick={handleCompare} className='w-full' disabled={!value}>

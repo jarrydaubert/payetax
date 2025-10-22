@@ -1,12 +1,14 @@
 // src/components/organisms/CalculatorInputs/WhatIfInputs.tsx
 'use client';
 
-import { RotateCcw, Wand2 } from 'lucide-react';
+import { Percent, PoundSterling, RotateCcw, Wand2 } from 'lucide-react';
 import { useId } from 'react';
 import { toast } from 'sonner';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
@@ -61,20 +63,6 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
     }
   };
 
-  // Get placeholder for input based on type
-  const getPlaceholder = () => {
-    switch (whatIf.type) {
-      case 'percentage':
-        return 'e.g., 10 for 10% increase';
-      case 'amount':
-        return 'e.g., 5000 for £5k raise';
-      case 'total':
-        return 'e.g., 45000 for £45k total';
-      default:
-        return 'Enter value';
-    }
-  };
-
   return (
     <div className='space-y-4 rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10'>
       {/* Header */}
@@ -86,10 +74,8 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
       {/* Inputs Grid */}
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* Change Type Dropdown */}
-        <div>
-          <label htmlFor='what-if-type' className='mb-2 block font-medium text-foreground text-sm'>
-            Change Type
-          </label>
+        <Field>
+          <FieldLabel htmlFor={typeSelectId}>Change Type</FieldLabel>
           <InputTooltip fieldName='whatIfType'>
             <Select
               value={whatIf.type}
@@ -105,25 +91,35 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
               </SelectContent>
             </Select>
           </InputTooltip>
-        </div>
+        </Field>
 
-        {/* Value Input */}
-        <div>
-          <label htmlFor={valueInputId} className='mb-2 block font-medium text-foreground text-sm'>
-            {getInputLabel()}
-          </label>
+        {/* Value Input with InputGroup */}
+        <Field>
+          <FieldLabel htmlFor={valueInputId}>{getInputLabel()}</FieldLabel>
           <InputTooltip fieldName='whatIfValue'>
-            <NumberInput
-              id={valueInputId}
-              value={whatIf.value}
-              onChange={setWhatIfValue}
-              prefix={whatIf.type !== 'percentage' ? '£' : undefined}
-              suffix={whatIf.type === 'percentage' ? '%' : undefined}
-              placeholder={getPlaceholder()}
-              data-testid='what-if-value-input'
-            />
+            <InputGroup>
+              {whatIf.type !== 'percentage' && (
+                <InputGroupAddon align='inline-start'>
+                  <PoundSterling className='size-4' />
+                </InputGroupAddon>
+              )}
+              <NumberInput
+                id={valueInputId}
+                value={whatIf.value || 0}
+                onChange={setWhatIfValue}
+                decimals={2}
+                clearOnFocus={true}
+                data-testid='what-if-value-input'
+                className='border-0 bg-transparent'
+              />
+              {whatIf.type === 'percentage' && (
+                <InputGroupAddon align='inline-end'>
+                  <Percent className='size-4' />
+                </InputGroupAddon>
+              )}
+            </InputGroup>
           </InputTooltip>
-        </div>
+        </Field>
       </div>
 
       {/* Buttons */}
