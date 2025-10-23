@@ -47,7 +47,7 @@ export function ResultTableRow({
       >
         <div className={`flex items-center gap-2 ${isSubRow ? 'pl-6 sm:pl-8' : ''}`}>
           <Icon className='h-4 w-4 flex-shrink-0' aria-hidden='true' />
-          <span className='text-xs sm:text-sm'>{category}</span>
+          <span className='whitespace-nowrap text-xs sm:text-sm'>{category}</span>
         </div>
       </TableCell>
       <TableCell

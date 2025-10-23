@@ -72,7 +72,7 @@ export function IncomeSourceList() {
                     updateIncomeSource(source.id, { type })
                   }
                 >
-                  <SelectTrigger className="h-9 text-sm">
+                  <SelectTrigger className="h-9 border-input text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -113,7 +113,7 @@ export function IncomeSourceList() {
                 value={source.period}
                 onValueChange={(period) => updateIncomeSource(source.id, { period: period as typeof source.period })}
               >
-                <SelectTrigger className="h-9 w-[110px] text-sm">
+                <SelectTrigger className="h-9 w-[110px] border-input text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

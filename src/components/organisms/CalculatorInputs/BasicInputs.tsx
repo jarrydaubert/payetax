@@ -112,7 +112,7 @@ export function BasicInputs() {
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger id={payPeriodId} className='w-[140px]'>
+            <SelectTrigger id={payPeriodId} className='w-[140px] border-input'>
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -169,7 +169,7 @@ export function BasicInputs() {
           </Label>
         </div>
         <Select value={input.region} onValueChange={setRegion}>
-          <SelectTrigger id={regionId} className='w-[175px]'>
+          <SelectTrigger id={regionId} className='w-[175px] border-input'>
             <SelectValue placeholder='Select region' />
           </SelectTrigger>
           <SelectContent>
@@ -256,7 +256,7 @@ export function BasicInputs() {
             else setAge(76); // Gets £3,960 age allowance, auto-exempt from NI
           }}
         >
-          <SelectTrigger id={ageId} className='w-[120px]' data-testid='age-select'>
+          <SelectTrigger id={ageId} className='w-[120px] border-input' data-testid='age-select'>
             <SelectValue placeholder='Select age range' />
           </SelectTrigger>
           <SelectContent>
@@ -276,7 +276,7 @@ export function BasicInputs() {
           </Label>
         </div>
         <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
-          <SelectTrigger id={studentLoanId} className='w-[160px]'>
+          <SelectTrigger id={studentLoanId} className='w-[160px] border-input'>
             <SelectValue placeholder='Select student loan' />
           </SelectTrigger>
           <SelectContent>
@@ -320,7 +320,7 @@ export function BasicInputs() {
         <div className='flex flex-1 gap-1.5'>
           {/* Type selector with icons */}
           <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
-            <SelectTrigger id={pensionTypeId} className='w-[70px] shrink-0'>
+            <SelectTrigger id={pensionTypeId} className='w-[70px] shrink-0 border-input'>
               <SelectValue>
                 {input.pensionContributionType === 'percentage' ? (
                   <Percent className='size-4' />
