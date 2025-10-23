@@ -110,11 +110,11 @@ export function BasicInputs() {
               decimals={2}
               placeholder='0.00'
               min={0}
-              className='flex-1'
+              className='w-[160px]'
               data-testid='salary-input'
             />
             <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-              <SelectTrigger id={payPeriodId} className='w-[150px]'>
+              <SelectTrigger id={payPeriodId} className='w-[155px]'>
                 <SelectValue placeholder='Annually' />
               </SelectTrigger>
               <SelectContent>
@@ -140,7 +140,7 @@ export function BasicInputs() {
             value={input.taxYear}
             onChange={setTaxYear}
             label=''
-            className='w-[140px]'
+            className='w-[155px]'
           />
         </div>
 
@@ -171,7 +171,7 @@ export function BasicInputs() {
             </Label>
           </div>
           <Select value={input.region} onValueChange={setRegion}>
-            <SelectTrigger id={regionId} className='w-[185px]'>
+            <SelectTrigger id={regionId} className='w-[175px]'>
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
             <SelectContent>
@@ -324,7 +324,7 @@ export function BasicInputs() {
               value={input.pensionContributionType}
               onValueChange={setPensionContributionType}
             >
-              <SelectTrigger id={pensionTypeId} className='w-[60px] shrink-0'>
+              <SelectTrigger id={pensionTypeId} className='w-[70px] shrink-0'>
                 <SelectValue>
                   {input.pensionContributionType === 'percentage' ? (
                     <Percent className='size-4' />
