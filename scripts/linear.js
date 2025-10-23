@@ -65,7 +65,7 @@ function formatPriority(priority) {
 // Commands
 
 /**
- * List all issues for the team
+ * List all issues (project or team)
  */
 async function listIssues(options = {}) {
   try {
@@ -85,26 +85,65 @@ async function listIssues(options = {}) {
       return;
     }
 
-    // Fetch issues with filters
-    const filters = {
-      team: { key: { eq: TEAM_KEY } },
-    };
+    let issues;
 
-    if (options.assignedToMe) {
-      filters.assignee = { id: { eq: me.id } };
+    // If projectName specified, fetch project issues only
+    if (options.projectName) {
+      const projects = await team.projects();
+      const project = projects.nodes.find(
+        (p) => p.name.toLowerCase() === options.projectName.toLowerCase()
+      );
+
+      if (!project) {
+        log(`❌ Project "${options.projectName}" not found`, 'red');
+        return;
+      }
+
+      issues = await project.issues();
+      log(`\n✨ Found ${issues.nodes.length} issues in project "${project.name}":\n`, 'green');
+    } else {
+      // Fetch all team issues with filters
+      const filters = {
+        team: { key: { eq: TEAM_KEY } },
+      };
+
+      if (options.assignedToMe) {
+        filters.assignee = { id: { eq: me.id } };
+      }
+
+      if (options.state) {
+        filters.state = { name: { eq: options.state } };
+      }
+
+      // Filter to only show issues WITHOUT a project (team-level issues)
+      if (options.teamOnly) {
+        filters.project = { null: true };
+      }
+
+      issues = await linear.issues(filters);
+
+      // If team-only, manually filter out issues with projects (API filter doesn't work reliably)
+      if (options.teamOnly) {
+        const filteredIssues = [];
+        for (const issue of issues.nodes) {
+          const project = await issue.project;
+          if (!project) {
+            filteredIssues.push(issue);
+          }
+        }
+        issues.nodes = filteredIssues;
+        log(
+          `\n✨ Found ${issues.nodes.length} team-level issues (no project assigned):\n`,
+          'green'
+        );
+      } else {
+        log(`\n✨ Found ${issues.nodes.length} issues in ${team.name}:\n`, 'green');
+      }
     }
-
-    if (options.state) {
-      filters.state = { name: { eq: options.state } };
-    }
-
-    const issues = await linear.issues(filters);
-
-    log(`\n✨ Found ${issues.nodes.length} issues in ${team.name}:\n`, 'green');
 
     if (issues.nodes.length === 0) {
       log('  No issues found. Create one with: npm run linear:create', 'dim');
-      return;
+      return issues.nodes;
     }
 
     for (const issue of issues.nodes) {
@@ -271,6 +310,74 @@ async function updateIssueParent(identifier, parentIdentifier) {
 
     log(`✅ ${identifier} is now a sub-issue of ${parentIdentifier}`, 'green');
     return true;
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    return false;
+  }
+}
+
+/**
+ * Assign issue(s) to a project by name
+ */
+async function assignToProject(identifiers, projectName) {
+  try {
+    log(`\n📂 Assigning issue(s) to project "${projectName}"...`, 'cyan');
+
+    // Get team and projects
+    const me = await linear.viewer;
+    const teams = await me.teams();
+    const team = teams.nodes.find((t) => t.key === TEAM_KEY);
+
+    if (!team) {
+      log(`❌ Team with key "${TEAM_KEY}" not found`, 'red');
+      return false;
+    }
+
+    const projects = await team.projects();
+    const project = projects.nodes.find((p) => p.name.toLowerCase() === projectName.toLowerCase());
+
+    if (!project) {
+      log(`❌ Project "${projectName}" not found`, 'red');
+      log('Available projects:', 'yellow');
+      for (const p of projects.nodes) {
+        log(`  - ${p.name}`, 'dim');
+      }
+      return false;
+    }
+
+    // Get issues
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    let success = 0;
+    let failed = 0;
+
+    for (const identifier of identifiers) {
+      const issue = issues.nodes.find((i) => i.identifier === identifier);
+
+      if (!issue) {
+        log(`  ❌ ${identifier} not found`, 'red');
+        failed++;
+        continue;
+      }
+
+      try {
+        await issue.update({
+          projectId: project.id,
+        });
+        log(`  ✅ ${identifier} assigned to ${project.name}`, 'green');
+        success++;
+      } catch (error) {
+        log(`  ❌ ${identifier} failed: ${error.message}`, 'red');
+        failed++;
+      }
+    }
+
+    log(`\n✨ Summary: ${success} assigned, ${failed} failed`, success > 0 ? 'green' : 'red');
+    return success > 0;
   } catch (error) {
     log(`❌ Error: ${error.message}`, 'red');
     return false;
@@ -530,9 +637,24 @@ async function main() {
   try {
     switch (command) {
       case 'list':
-      case 'ls':
-        await listIssues({ assignedToMe: args.includes('--me') });
+      case 'ls': {
+        const listOptions = {
+          assignedToMe: args.includes('--me'),
+          teamOnly: args.includes('--team-only'),
+        };
+
+        // Check for --project flag
+        if (args.includes('--project')) {
+          const projectIndex = args.indexOf('--project');
+          const projectName = args[projectIndex + 1];
+          if (projectName) {
+            listOptions.projectName = projectName;
+          }
+        }
+
+        await listIssues(listOptions);
         break;
+      }
 
       case 'create':
       case 'new':
@@ -617,24 +739,45 @@ async function main() {
         }
         break;
 
+      case 'assign-to-project':
+      case 'add-to-project':
+        if (args.length < 3) {
+          log('❌ Please specify project name and issue identifier(s)', 'red');
+          log('Example: npm run linear assign-to-project PayeTax PAYTAX-1', 'dim');
+          log(
+            'Example: npm run linear assign-to-project PayeTax PAYTAX-1 PAYTAX-2 PAYTAX-3',
+            'dim'
+          );
+        } else {
+          const projectName = args[1];
+          const identifiers = args.slice(2);
+          await assignToProject(identifiers, projectName);
+        }
+        break;
+
       default:
         log('\n📊 Linear Helper for PayeTax\n', 'bright');
         log('Usage: npm run linear:<command> [options]\n', 'cyan');
         log('Commands:', 'bright');
-        log('  list, ls          List all issues', 'dim');
-        log('  list --me         List issues assigned to you', 'dim');
-        log('  create, new       Create new issue (interactive)', 'dim');
-        log('  create "title"    Create issue with title', 'dim');
-        log('    --parent ID     Create as sub-issue (e.g., --parent PAYTAX-123)', 'dim');
-        log('  delete, rm        Delete issue(s) by identifier', 'dim');
-        log('  cycles            List cycles/sprints', 'dim');
-        log('  projects          List projects', 'dim');
-        log('  info              Show workspace info', 'dim');
-        log('  help              Show this help', 'dim');
+        log('  list, ls                List all issues', 'dim');
+        log('    --me                  List issues assigned to you', 'dim');
+        log('    --project NAME        List issues in specific project', 'dim');
+        log('    --team-only           List only team issues (no project)', 'dim');
+        log('  create, new             Create new issue (interactive)', 'dim');
+        log('  create "title"          Create issue with title', 'dim');
+        log('    --parent ID           Create as sub-issue (e.g., --parent PAYTAX-123)', 'dim');
+        log('  assign-to-project       Assign issue(s) to project', 'dim');
+        log('  delete, rm              Delete issue(s) by identifier', 'dim');
+        log('  cycles                  List cycles/sprints', 'dim');
+        log('  projects                List projects', 'dim');
+        log('  info                    Show workspace info', 'dim');
+        log('  help                    Show this help', 'dim');
         log('\nExamples:', 'bright');
         log('  npm run linear:list', 'cyan');
+        log('  npm run linear list --project PayeTax', 'cyan');
+        log('  npm run linear list --team-only', 'cyan');
         log('  npm run linear:create', 'cyan');
-        log('  npm run linear:cycles', 'cyan');
+        log('  npm run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
         log('\nEnvironment:', 'bright');
         log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');
         log('  LINEAR_TEAM_KEY    Team identifier [default: PAYETAX]', 'dim');
@@ -664,4 +807,5 @@ module.exports = {
   listCycles,
   listProjects,
   showInfo,
+  assignToProject,
 };
