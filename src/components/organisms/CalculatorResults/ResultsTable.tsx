@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import {
   Building,
   Calculator,
+  ChevronDown,
   Coins,
   CreditCard,
   GraduationCap,
@@ -372,7 +373,7 @@ export function ResultsTable({
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='min-w-[80px] text-right font-semibold sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'
+                          className='min-w-[80px] text-right font-semibold sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[120px] 2xl:min-w-[130px]'
                         >
                           {period}
                         </TableHead>
@@ -383,10 +384,10 @@ export function ResultsTable({
                     <TableHead className='sticky left-0 z-20 bg-card py-1' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[115px] 2xl:min-w-[120px]'>
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[115px] 2xl:min-w-[120px]'>
                           What If
                         </TableHead>
                       </React.Fragment>
@@ -416,12 +417,40 @@ export function ResultsTable({
         </Card>
       </div>
 
-      {/* Swipe hint for mobile */}
+      {/* Scroll hints */}
       <div className='mt-4 flex flex-col items-center gap-2'>
         {showRightIndicator && (
-          <div className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'>
-            <span>👈 Swipe to see all periods</span>
-          </div>
+          <>
+            {/* Mobile hint */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'
+            >
+              <span>👈 Swipe to see all periods</span>
+            </motion.div>
+            {/* Desktop hint with animated arrow */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className='hidden items-center gap-2 rounded-full bg-primary/5 px-4 py-2 font-medium text-muted-foreground text-sm md:flex'
+            >
+              <span>Scroll horizontally to see all periods</span>
+              <motion.div
+                animate={{ x: [0, 8, 0] }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Number.POSITIVE_INFINITY,
+                  repeatDelay: 0.5,
+                  ease: 'easeInOut',
+                }}
+              >
+                <ChevronDown className='size-4 rotate-[-90deg]' />
+              </motion.div>
+            </motion.div>
+          </>
         )}
       </div>
 
