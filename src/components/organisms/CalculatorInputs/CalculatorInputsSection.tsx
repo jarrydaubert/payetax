@@ -53,12 +53,11 @@ export function CalculatorInputsSection({
   };
 
   return (
-    <div className='flex flex-col items-center space-y-4'>
+    <div className='space-y-4'>
       <BasicInputs />
 
       {/* Calculate and Reset buttons */}
-      <div className='w-full max-w-2xl'>
-        <div className='flex gap-2'>
+      <div className='flex gap-2'>
           <Button
             onClick={handleCalculate}
             disabled={isCalculating}
@@ -83,12 +82,10 @@ export function CalculatorInputsSection({
             <RotateCcw className='mr-2 size-5' />
             Reset
           </Button>
-        </div>
       </div>
 
       {/* What If Collapsible Section */}
-      <div className='w-full max-w-2xl'>
-        <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
+      <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
           <CollapsibleTrigger asChild>
             <Button
               variant='outline'
@@ -110,7 +107,6 @@ export function CalculatorInputsSection({
             </div>
           </CollapsibleContent>
         </Collapsible>
-      </div>
     </div>
   );
 }

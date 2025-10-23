@@ -86,13 +86,10 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='flex flex-col items-center space-y-3'
+      className='space-y-3'
     >
       {/* Heading */}
       <h3 className='font-semibold text-foreground text-lg'>Enter Income Tax Details</h3>
-
-      {/* Centered Form Container */}
-      <div className='w-full max-w-2xl space-y-3'>
         {/* Salary and Pay Period on one line */}
         <div className='flex items-center gap-3'>
           <div className='flex items-center gap-1.5'>
@@ -362,7 +359,6 @@ export function BasicInputs() {
             />
           </div>
         </div>
-      </div>
     </motion.div>
   );
 }
