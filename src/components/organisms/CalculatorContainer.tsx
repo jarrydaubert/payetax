@@ -30,6 +30,8 @@ export function CalculatorContainer() {
     'Yearly',
     'Monthly',
     'Weekly',
+    'Daily',
+    'Hourly',
   ]);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = React.useState(false);
@@ -162,7 +164,7 @@ export function CalculatorContainer() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className='order-1 text-center lg:col-span-2'
+        className='order-1 py-6 text-center lg:col-span-2 lg:py-8'
       >
         <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
