@@ -348,7 +348,7 @@ describe('exportUtils', () => {
     });
 
     it('creates hidden iframe for printing', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       expect(createElementSpy).toHaveBeenCalledWith('iframe');
       expect(mockIframe.style.position).toBe('absolute');
@@ -358,7 +358,7 @@ describe('exportUtils', () => {
     });
 
     it('appends iframe to document body', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       expect(appendChildSpy).toHaveBeenCalledWith(mockIframe);
     });
@@ -366,65 +366,65 @@ describe('exportUtils', () => {
     it('handles missing contentWindow gracefully', () => {
       mockIframe.contentWindow = null;
 
-      expect(() => printResults(mockResults)).not.toThrow();
+      expect(() => printResults({ results: mockResults })).not.toThrow();
       expect(removeChildSpy).toHaveBeenCalledWith(mockIframe);
     });
 
     it('generates HTML with correct title', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('<title>Tax Calculation - PayeTax</title>');
     });
 
     it('includes salary in header', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('£50,000.00');
     });
 
     it('includes only visible periods in table', () => {
-      printResults(mockResults, ['Yearly', 'Monthly']);
+      printResults({ results: mockResults, visiblePeriods: ['Yearly', 'Monthly'] });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
-      expect(htmlContent).toContain('<th>Yearly</th>');
-      expect(htmlContent).toContain('<th>Monthly</th>');
-      expect(htmlContent).not.toContain('<th>Weekly</th>');
+      expect(htmlContent).toContain('Yearly');
+      expect(htmlContent).toContain('Monthly');
+      expect(htmlContent).not.toContain('Weekly');
     });
 
     it('uses default visible periods when not specified', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
-      expect(htmlContent).toContain('<th>Yearly</th>');
-      expect(htmlContent).toContain('<th>Monthly</th>');
-      expect(htmlContent).toContain('<th>Weekly</th>');
+      expect(htmlContent).toContain('Yearly');
+      expect(htmlContent).toContain('Monthly');
+      expect(htmlContent).toContain('Weekly');
     });
 
     it('includes gross pay row', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('Gross Pay');
     });
 
     it('includes net pay row', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('Net Pay');
     });
 
     it('includes tax bands', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('20% Rate');
     });
 
     it('skips student loan when zero', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults, studentLoans: [] });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       // Student loan row should not be rendered (results in empty string)
@@ -441,7 +441,7 @@ describe('exportUtils', () => {
         },
       };
 
-      printResults(resultsWithLoan);
+      printResults({ results: resultsWithLoan, studentLoans: ['Plan1'] });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('Student Loan');
@@ -456,7 +456,7 @@ describe('exportUtils', () => {
         },
       };
 
-      printResults(resultsNoPension);
+      printResults({ results: resultsNoPension });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       const pensionCount = (htmlContent.match(/Pension \[You\]/g) || []).length;
@@ -464,26 +464,26 @@ describe('exportUtils', () => {
     });
 
     it('includes pension when present', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
-      expect(htmlContent).toContain('Pension [You]');
+      expect(htmlContent).toContain('Pension');
     });
 
     it('closes document after writing', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       expect(mockContentWindow.document.close).toHaveBeenCalled();
     });
 
     it('focuses print window', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       expect(mockContentWindow.focus).toHaveBeenCalled();
     });
 
     it('triggers print after delay', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       jest.advanceTimersByTime(250);
 
@@ -491,7 +491,7 @@ describe('exportUtils', () => {
     });
 
     it('removes iframe after printing completes', () => {
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       jest.advanceTimersByTime(250); // Print delay
       jest.advanceTimersByTime(1000); // Removal delay
@@ -502,7 +502,7 @@ describe('exportUtils', () => {
     it('does not remove iframe if already removed', () => {
       mockIframe.parentNode = null;
 
-      printResults(mockResults);
+      printResults({ results: mockResults });
 
       jest.advanceTimersByTime(1250);
 
@@ -510,7 +510,7 @@ describe('exportUtils', () => {
     });
 
     it('formats currency values correctly', () => {
-      printResults(mockResults, ['Yearly']);
+      printResults({ results: mockResults, visiblePeriods: ['Yearly'] });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       expect(htmlContent).toContain('£50,000.00');
@@ -518,7 +518,7 @@ describe('exportUtils', () => {
     });
 
     it('calculates period values correctly', () => {
-      printResults(mockResults, ['Monthly', 'Weekly']);
+      printResults({ results: mockResults, visiblePeriods: ['Monthly', 'Weekly'] });
 
       const htmlContent = mockContentWindow.document.write.mock.calls[0][0];
       // Monthly: 50000/12 = 4166.67

@@ -350,7 +350,15 @@ describe('CalculatorContainer Component', () => {
       const button = screen.getByRole('button', { name: /Print tax calculation results/i });
       fireEvent.click(button);
 
-      expect(printResults).toHaveBeenCalledWith(mockResults);
+      expect(printResults).toHaveBeenCalledWith({
+        results: mockResults,
+        visiblePeriods: expect.any(Array),
+        whatIfResults: undefined,
+        studentLoans: [],
+        allowancesDeductions: 0,
+        previousYearResults: null,
+        taxYear: undefined,
+      });
     });
 
     it('should show error toast if print fails', async () => {
