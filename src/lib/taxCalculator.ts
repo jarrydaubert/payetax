@@ -50,6 +50,7 @@ import {
   TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
+import type { IncomeSource } from '@/store/calculatorStore';
 import { convertPeriodToAnnual } from './periodCalculator';
 
 /**
@@ -103,6 +104,8 @@ export interface TaxCalculationInput {
   niCategory: NICategory;
   /** Hours worked per week (for hourly calculations) */
   hoursPerWeek: number;
+  /** Additional income sources beyond primary employment */
+  incomeSources?: IncomeSource[];
 }
 
 /**
@@ -137,6 +140,12 @@ export interface TaxCalculationResults {
     rate: number;
     amount: number;
   }>;
+  /** Breakdown of income by source (if multiple income sources exist) */
+  incomeBreakdown?: {
+    employment: number;
+    nonEmployment: number;
+    total: number;
+  };
 }
 
 /**
@@ -260,8 +269,36 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     input.hoursPerWeek
   );
 
-  // Then derive monthly gross from annual (this ensures consistency)
-  const monthlyGrossSalary = annualGrossSalary / 12;
+  // ---------------
+  // 2.5. Calculate additional income from other sources
+  // ---------------
+  let additionalIncome = 0;
+  let employmentIncome = annualGrossSalary; // Primary salary
+
+  if (input.incomeSources && input.incomeSources.length > 0) {
+    for (const source of input.incomeSources) {
+      const sourceAnnual = convertPeriodToAnnual(
+        source.amount,
+        source.period,
+        input.hoursPerWeek
+      );
+
+      if (source.type === 'employment') {
+        // Additional employment income - subject to NI if under SPA
+        employmentIncome += sourceAnnual;
+      } else {
+        // Other income (pensions, rental, etc.) - taxable but no NI
+        additionalIncome += sourceAnnual;
+      }
+    }
+  }
+
+  // Total gross income for tax purposes
+  const totalGrossIncome = employmentIncome + additionalIncome;
+
+  // Then derive monthly amounts from annual (this ensures consistency)
+  const monthlyGrossSalary = totalGrossIncome / 12;
+  const monthlyEmploymentIncome = employmentIncome / 12;
 
   // ---------------
   // 3. Calculate tax-free allowance (annual and monthly)
@@ -608,19 +645,22 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const monthlyPrimaryThreshold = niRates.primary.threshold / 12;
     const monthlyUpperThreshold = niRates.upper.threshold / 12;
 
-    // NI is based on the same taxable adjusted salary as income tax
+    // NI is ONLY calculated on employment income (not pensions, rental, etc.)
+    // Use employment income adjusted for pension contributions
+    const monthlyTaxableAdjustedEmploymentIncome = monthlyEmploymentIncome - monthlyPensionContribution;
+
     // Primary threshold (lower rate)
-    if (monthlyTaxableAdjustedSalary > monthlyPrimaryThreshold) {
+    if (monthlyTaxableAdjustedEmploymentIncome > monthlyPrimaryThreshold) {
       const lowerAmount = Math.min(
-        monthlyTaxableAdjustedSalary - monthlyPrimaryThreshold,
+        monthlyTaxableAdjustedEmploymentIncome - monthlyPrimaryThreshold,
         monthlyUpperThreshold - monthlyPrimaryThreshold
       );
       monthlyNationalInsurance += (lowerAmount * niRates.primary.rate) / 100;
     }
 
     // Upper threshold (higher rate)
-    if (monthlyTaxableAdjustedSalary > monthlyUpperThreshold) {
-      const upperAmount = monthlyTaxableAdjustedSalary - monthlyUpperThreshold;
+    if (monthlyTaxableAdjustedEmploymentIncome > monthlyUpperThreshold) {
+      const upperAmount = monthlyTaxableAdjustedEmploymentIncome - monthlyUpperThreshold;
       monthlyNationalInsurance += (upperAmount * niRates.upper.rate) / 100;
     }
   }
@@ -823,7 +863,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 12. Return results
   // ---------------
 
-  const results = {
+  const results: TaxCalculationResults = {
     grossSalary,
     taxFreeAmount: annualTaxFreeAmount,
     taxableIncome: annualTaxableIncome,
@@ -834,6 +874,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     employerNI: annualEmployerNI,
     netPay,
     taxBands,
+    // Add income breakdown if multiple income sources exist
+    incomeBreakdown: input.incomeSources && input.incomeSources.length > 0 ? {
+      employment: employmentIncome,
+      nonEmployment: additionalIncome,
+      total: totalGrossIncome,
+    } : undefined,
   };
 
   return results;

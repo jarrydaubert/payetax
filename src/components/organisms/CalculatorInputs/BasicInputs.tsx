@@ -7,6 +7,7 @@ import { useId } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
+import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -357,6 +358,9 @@ export function BasicInputs() {
           />
         </div>
       </div>
+
+      {/* Additional Income Sources */}
+      <IncomeSourceList />
     </motion.div>
   );
 }

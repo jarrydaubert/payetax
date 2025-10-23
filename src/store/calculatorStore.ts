@@ -78,7 +78,38 @@ interface CalculatorInput {
   hoursPerWeek: number;
   /** Additional allowances or deductions (annual) */
   allowancesDeductions: number;
+  /** Additional income sources (pensions, rental, etc.) */
+  incomeSources: IncomeSource[];
 }
+
+/**
+ * Represents an additional income source beyond primary employment
+ * Used for pensioners and those with multiple income streams
+ */
+interface IncomeSource {
+  /** Unique identifier for React keys and list management */
+  id: string;
+  /** Type of income (determines NI treatment) */
+  type: 'employment' | 'pension' | 'statePension' | 'rental' | 'investment' | 'other';
+  /** Optional user-friendly label (e.g., "Pension from Previous Job") */
+  label?: string;
+  /** Amount of income */
+  amount: number;
+  /** How often this income is received */
+  period: PayPeriod;
+}
+
+/**
+ * Human-readable labels for income types
+ */
+const INCOME_TYPE_LABELS: Record<IncomeSource['type'], string> = {
+  employment: 'Employment Income',
+  pension: 'Private Pension',
+  statePension: 'State Pension',
+  rental: 'Rental Income',
+  investment: 'Investment Income',
+  other: 'Other Income',
+};
 
 // Interface for tax rates that can be updated
 interface TaxRatesState {
@@ -142,6 +173,11 @@ interface CalculatorState {
   setHoursPerWeek: (hours: number) => void;
   setAllowancesDeductions: (amount: number) => void;
 
+  // Income Sources Management
+  addIncomeSource: () => void;
+  updateIncomeSource: (id: string, updates: Partial<IncomeSource>) => void;
+  removeIncomeSource: (id: string) => void;
+
   // Tax rate actions
   updateTaxRates: (rates: Partial<TaxRatesState>) => void;
   updateScottishRates: (bands: TaxBand[]) => void;
@@ -202,6 +238,7 @@ const defaultInput: CalculatorInput = {
   niCategory: 'A',
   hoursPerWeek: 40,
   allowancesDeductions: 0,
+  incomeSources: [],
 };
 
 // Create the calculator store
@@ -270,6 +307,44 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, hoursPerWeek } })),
         setAllowancesDeductions: (allowancesDeductions) =>
           set((state) => ({ input: { ...state.input, allowancesDeductions } })),
+
+        // Income Sources Management
+        addIncomeSource: () => {
+          set((state) => ({
+            input: {
+              ...state.input,
+              incomeSources: [
+                ...state.input.incomeSources,
+                {
+                  id: crypto.randomUUID(),
+                  type: 'pension',
+                  amount: 0,
+                  period: PERIODS.ANNUALLY,
+                },
+              ],
+            },
+          }));
+        },
+
+        updateIncomeSource: (id, updates) => {
+          set((state) => ({
+            input: {
+              ...state.input,
+              incomeSources: state.input.incomeSources.map((source) =>
+                source.id === id ? { ...source, ...updates } : source
+              ),
+            },
+          }));
+        },
+
+        removeIncomeSource: (id) => {
+          set((state) => ({
+            input: {
+              ...state.input,
+              incomeSources: state.input.incomeSources.filter((source) => source.id !== id),
+            },
+          }));
+        },
 
         // Tax rate actions
         updateTaxRates: (updatedRates) =>
@@ -480,6 +555,9 @@ export const useCalculatorActions = () =>
       setNiCategory: state.setNiCategory,
       setHoursPerWeek: state.setHoursPerWeek,
       setAllowancesDeductions: state.setAllowancesDeductions,
+      addIncomeSource: state.addIncomeSource,
+      updateIncomeSource: state.updateIncomeSource,
+      removeIncomeSource: state.removeIncomeSource,
       updateTaxRates: state.updateTaxRates,
       updateScottishRates: state.updateScottishRates,
       updateNIRates: state.updateNIRates,
@@ -499,3 +577,7 @@ export const useWhatIf = () => useCalculatorStore((state) => state.whatIf);
 
 // Selector for What If results
 export const useWhatIfResults = () => useCalculatorStore((state) => state.whatIfResults);
+
+// Export types and constants
+export type { IncomeSource };
+export { INCOME_TYPE_LABELS };

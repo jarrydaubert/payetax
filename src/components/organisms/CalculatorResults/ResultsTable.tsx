@@ -182,6 +182,29 @@ export function ResultsTable({
       color: 'text-foreground',
       isHighlight: false,
     },
+    // Add income breakdown if multiple sources exist
+    ...(results.incomeBreakdown ? [
+      {
+        category: 'Employment Income',
+        icon: Building,
+        annual: results.incomeBreakdown.employment,
+        whatIfAnnual: whatIfResults?.incomeBreakdown?.employment,
+        percentage: calculatePercentage(results.incomeBreakdown.employment, grossAnnual),
+        color: 'text-muted-foreground',
+        isHighlight: false,
+        isSubRow: true,
+      },
+      ...(results.incomeBreakdown.nonEmployment > 0 ? [{
+        category: 'Other Income (No NI)',
+        icon: Coins,
+        annual: results.incomeBreakdown.nonEmployment,
+        whatIfAnnual: whatIfResults?.incomeBreakdown?.nonEmployment,
+        percentage: calculatePercentage(results.incomeBreakdown.nonEmployment, grossAnnual),
+        color: 'text-muted-foreground',
+        isHighlight: false,
+        isSubRow: true,
+      }] : []),
+    ] : []),
     {
       category: 'Tax-Free Allowance',
       icon: Shield,
