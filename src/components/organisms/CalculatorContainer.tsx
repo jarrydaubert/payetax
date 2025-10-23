@@ -227,7 +227,7 @@ export function CalculatorContainer() {
       </AnimatePresence>
 
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
-      <Card className='order-2 border-primary/20 p-3 sm:p-4 md:p-6 lg:sticky lg:top-4 lg:order-3 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto'>
+      <Card className='order-2 border-primary/20 p-3 sm:p-4 md:p-6 lg:sticky lg:top-4 lg:order-3 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto lg:overflow-x-hidden'>
         <CalculatorInputsSection
           onCalculate={handleCalculate}
           onWhatIfCalculate={handleWhatIfCalculate}
