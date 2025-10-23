@@ -66,12 +66,15 @@ export function CalculatorContainer() {
     calculatePreviousYear();
     setShowResults(true);
 
-    // Scroll to results after calculation completes
+    // Only scroll to results on mobile (desktop has everything visible)
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      if (window.innerWidth < 1024) {
+        // lg breakpoint
+        resultsRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     }, 600); // Wait for loading state + render
   };
 
@@ -112,7 +115,15 @@ export function CalculatorContainer() {
   const handlePrint = () => {
     if (!results) return;
     try {
-      printResults(results);
+      printResults({
+        results,
+        visiblePeriods,
+        whatIfResults,
+        studentLoans: input.studentLoanPlan !== 'none' ? [input.studentLoanPlan] : [],
+        allowancesDeductions: input.allowancesDeductions,
+        previousYearResults,
+        taxYear: input.taxYear,
+      });
     } catch {
       toast.error('Failed to open print dialog');
     }
@@ -184,7 +195,7 @@ export function CalculatorContainer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className='order-4 lg:order-2 lg:col-span-2'
+            className='order-4 scroll-mt-6 lg:order-2 lg:col-span-2'
           >
             {/* Scroll Indicator - Shows when results extend below viewport */}
             <AnimatePresence>
