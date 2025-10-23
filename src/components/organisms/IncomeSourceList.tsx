@@ -58,34 +58,47 @@ export function IncomeSourceList() {
         )}
 
         {incomeSources.map((source, index) => (
-          <div key={source.id} className="flex items-center gap-2 rounded-lg border p-3">
-            <Badge variant="outline" className="shrink-0">
-              {index + 1}
-            </Badge>
+          <div key={source.id} className="flex flex-col gap-2 rounded-lg border p-2.5">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="shrink-0 text-xs">
+                {index + 1}
+              </Badge>
 
-            {/* Income Type */}
-            <div className="flex-1">
-              <Select
-                value={source.type}
-                onValueChange={(type: IncomeSource['type']) =>
-                  updateIncomeSource(source.id, { type })
-                }
+              {/* Income Type */}
+              <div className="flex-1 min-w-0">
+                <Select
+                  value={source.type}
+                  onValueChange={(type: IncomeSource['type']) =>
+                    updateIncomeSource(source.id, { type })
+                  }
+                >
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Remove Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0"
+                onClick={() => removeIncomeSource(source.id)}
+                aria-label="Remove income source"
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
 
-            {/* Amount */}
-            <div className="w-32">
+            {/* Amount and Period Row */}
+            <div className="flex items-center gap-2">
               <NumberInput
                 value={source.amount}
                 onChange={(amount) => updateIncomeSource(source.id, { amount })}
@@ -93,16 +106,14 @@ export function IncomeSourceList() {
                 decimals={2}
                 placeholder="0.00"
                 min={0}
+                className="flex-1 h-9 text-sm"
               />
-            </div>
 
-            {/* Period */}
-            <div className="w-32">
               <Select
                 value={source.period}
                 onValueChange={(period) => updateIncomeSource(source.id, { period: period as typeof source.period })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9 w-[110px] text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,16 +125,6 @@ export function IncomeSourceList() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Remove Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeIncomeSource(source.id)}
-              aria-label="Remove income source"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
         ))}
 
