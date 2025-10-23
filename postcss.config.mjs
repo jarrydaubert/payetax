@@ -7,5 +7,6 @@
 export default {
   plugins: {
     '@tailwindcss/postcss': {},
+    autoprefixer: {}, // Adds vendor prefixes for better browser support (logical properties, etc.)
   },
 };

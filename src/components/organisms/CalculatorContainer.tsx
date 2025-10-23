@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorContainer.tsx
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { ArrowUp, ChevronDown, FileDown, Printer, Sparkles } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
@@ -41,26 +41,32 @@ export function CalculatorContainer() {
   // Derive showResults from results state
   const showResults = !!results;
 
-  // Scroll detection with buffer for proactive indicator display
+  // Use Intersection Observer for scroll indicator (more performant than scroll listener)
+  const isResultsInView = useInView(resultsRef, {
+    margin: '-20% 0px', // Trigger when results are 20% outside viewport
+    once: false,
+  });
+
+  // Lightweight scroll listener only for scroll-to-top button
   React.useEffect(() => {
     const handleScroll = () => {
-      // Show scroll-to-top button when scrolled down past threshold
       setShowScrollTop(window.scrollY > SCROLL_THRESHOLDS.TOP_BUTTON);
-
-      // Check if results extend below viewport (with buffer for large screens)
-      if (resultsRef.current && results) {
-        const rect = resultsRef.current.getBoundingClientRect();
-        const buffer = window.innerHeight * SCROLL_THRESHOLDS.INDICATOR_BUFFER;
-        const isExtended = rect.bottom > window.innerHeight - buffer;
-        setShowScrollIndicator(isExtended && window.scrollY < SCROLL_THRESHOLDS.INDICATOR);
-      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check on mount
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [results]);
+  }, []);
+
+  // Update scroll indicator based on Intersection Observer + scroll position
+  React.useEffect(() => {
+    if (results) {
+      setShowScrollIndicator(!isResultsInView && window.scrollY < SCROLL_THRESHOLDS.INDICATOR);
+    } else {
+      setShowScrollIndicator(false);
+    }
+  }, [isResultsInView, results]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
