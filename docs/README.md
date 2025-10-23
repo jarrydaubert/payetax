@@ -1,8 +1,8 @@
 # 📚 PayeTax Documentation
 
-**Last Updated:** October 16, 2025
-**Status:** Cleaned and organized (22 files total)
-**Recent Cleanup:** Removed 5 outdated/completed docs
+**Last Updated:** October 23, 2025
+**Status:** Cleaned and organized (evergreen docs only)
+**Recent Cleanup:** Moved 3 non-evergreen docs to archived
 
 ---
 
@@ -153,6 +153,25 @@ Outdated or completed documentation (historical reference only):
 ---
 
 ## 🔄 Recent Changes
+
+### ✅ Oct 23, 2025 - Evergreen Documentation Policy Enforcement
+
+**Archived** (3 files - violation of evergreen policy):
+- `COMPONENT_AUDIT_REPORT.md` → `/archived/` - One-off audit snapshot from Oct 22
+- `LINEAR_STATUS_SUMMARY.md` → `/archived/` - Temporary Linear status from Oct 21
+- `CICD_OPTIMIZATION_NOTES.md` → `/archived/` - One-off optimization notes from Oct 20
+
+**Updated**:
+- `CHANGELOG.md` - Added v3.7.3 release with print export enhancements
+- `docs/README.md` - Updated to reflect evergreen-only documentation
+
+**Policy Reminder:**
+- ❌ No one-off issue/incident docs in root or docs/ folder
+- ❌ No temporary analysis documents
+- ✅ Only permanent, evergreen guides belong in docs/
+- ✅ All action items tracked in Linear, not docs
+
+**Result**: Clean documentation structure following CONTRIBUTING.md guidelines
 
 ### ✅ Oct 16, 2025 - Documentation Cleanup
 

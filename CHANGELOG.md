@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.3] - 2025-10-23
+
+### Added
+- Enhanced print export to mirror results table exactly with What If scenario support
+- User-selected visible periods from period selector now respected in print output
+- Percentage column and all table rows in print (tax bands, student loans, NI, pension, allowances, employer NI, year change)
+- Color-coded headers for Current vs What If columns in print layout
+- Professional print layout: landscape A4, centered, max-width 1200px
+
+### Changed
+- Calculate button scroll behavior now mobile-only, preserves desktop view
+- Print function signature updated to object-based parameters for better flexibility
+- Results section now has scroll-mt-6 for proper spacing when scrolling into view
+
+### Fixed
+- Desktop view no longer disrupted when clicking Calculate button
+- Print output now includes complete table data matching user's view
+- All tests updated to match new print function signature (1872 tests passing)
+
 ## [3.6.0] - 2025-10-21
 
 ### Added
