@@ -18,6 +18,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CategoryFilter } from '@/components/molecules/CategoryFilter';
+import { IMAGE_SIZES } from '@/lib/constants/images';
 import { Button } from '@/components/ui/button';
 import CallToAction from '@/components/ui/CallToAction';
 import {
@@ -210,7 +211,7 @@ export function BlogPageClient({
                         src={featuredPost.image}
                         alt={featuredPost.imageAlt || featuredPost.title}
                         fill
-                        sizes='(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1120px'
+                        sizes={IMAGE_SIZES.BLOG_HERO}
                         className='object-cover transition-transform duration-700 group-hover:scale-110'
                       />
                       <div className='absolute inset-0 bg-gradient-to-t from-black/50 to-transparent' />
@@ -238,7 +239,7 @@ export function BlogPageClient({
                             src={post.image}
                             alt={post.imageAlt || post.title}
                             fill
-                            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                            sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
                             className='object-cover transition-transform duration-500 group-hover:scale-110'
                           />
                           <div className='absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent' />

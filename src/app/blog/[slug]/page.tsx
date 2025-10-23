@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
+import { IMAGE_SIZES } from '@/lib/constants/images';
 
 // Enable ISR - revalidate every 24 hours for fresh tax content
 export const revalidate = 86400;
@@ -144,7 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   src={post.image}
                   alt={post.imageAlt || post.title}
                   fill
-                  sizes='(max-width: 1024px) 100vw, 896px'
+                  sizes={IMAGE_SIZES.POST_HERO}
                   className='object-cover'
                   priority
                 />

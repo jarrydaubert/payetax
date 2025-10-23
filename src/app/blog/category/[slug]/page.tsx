@@ -11,6 +11,7 @@ import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
+import { IMAGE_SIZES } from '@/lib/constants/images';
 import { categoryContent } from '@/lib/categoryContent';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
@@ -209,7 +210,7 @@ export default async function CategoryPage({
                       alt={post.imageAlt || post.title}
                       fill
                       className='object-cover transition-transform duration-300 hover:scale-105'
-                      sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                      sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
                     />
                   </Link>
                 )}

@@ -11,14 +11,15 @@
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
   --radius: 0.625rem;
 
-  /* Fluid Typography for Blog Content */
-  --font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem);
-  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --font-size-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
-  --font-size-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
-  --font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
-  --font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
+  /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
+  /* Use these CSS vars only in blog content for optimal readability */
+  --blog-font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem);
+  --blog-font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --blog-font-size-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --blog-font-size-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --blog-font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+  --blog-font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
+  --blog-font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
 
   /* Brand Colors - Maintain identity across themes */
   --brand-primary: oklch(0.55 0.22 264);        /* Indigo-blue */
@@ -250,9 +251,10 @@
   }
 }
 
-/* Tablet and laptop optimizations (641px - 1440px) */
-@media (min-width: 641px) and (max-width: 1440px) {
-  /* Add extra padding for calculator container on smaller laptops */
+/* Tablet and laptop optimizations (768px - 1279px) */
+/* Using Tailwind breakpoints: md (768px) through xl-1 (1279px) */
+@media (min-width: 768px) and (max-width: 1279px) {
+  /* Add extra padding for calculator container on tablets and small laptops */
   [data-testid="calculator-section"] {
     padding-left: clamp(1rem, 2vw, 2rem);
     padding-right: clamp(1rem, 2vw, 2rem);
