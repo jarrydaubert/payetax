@@ -145,7 +145,7 @@ export function printResults({
       .map((period) => {
         const divisor = periodDivisors[period] || 1;
         const currentValue = annually / divisor;
-        
+
         if (whatIfResults && whatIfAnnual !== undefined) {
           const whatIfValue = whatIfAnnual / divisor;
           return `
@@ -153,7 +153,7 @@ export function printResults({
             <td class="whatif-col">${formatter.format(whatIfValue)}</td>
           `;
         }
-        
+
         return `<td>${formatter.format(currentValue)}</td>`;
       })
       .join('');
@@ -433,7 +433,7 @@ export function printResults({
                 'green-text'
               )}
               ${row(
-                "Employers NI",
+                'Employers NI',
                 results.employerNI,
                 calculatePercentage(results.employerNI, grossAnnual),
                 whatIfResults?.employerNI,

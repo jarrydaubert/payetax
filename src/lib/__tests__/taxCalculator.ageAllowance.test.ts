@@ -193,7 +193,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 65);
       input.payNoNI = false; // Explicitly test automatic detection
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBeGreaterThan(0);
       expect(result.taxFreeAmount).toBe(12570 + 3660); // Gets age allowance
     });
@@ -202,7 +202,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 66);
       input.payNoNI = false; // Don't use manual override
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0); // Employee: £0
       expect(result.employerNI).toBeGreaterThan(0); // Employer still pays
       expect(result.taxFreeAmount).toBe(12570 + 3660);
@@ -212,7 +212,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 70);
       input.payNoNI = false;
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0);
       expect(result.employerNI).toBeGreaterThan(0);
       expect(result.taxFreeAmount).toBe(12570 + 3660);
@@ -222,7 +222,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 76);
       input.payNoNI = false;
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0);
       expect(result.employerNI).toBeGreaterThan(0);
       expect(result.taxFreeAmount).toBe(12570 + 3960); // Higher allowance
@@ -232,7 +232,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 50);
       input.payNoNI = true; // Manual override
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0);
     });
 
@@ -240,7 +240,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(30000, 50);
       input.niCategory = 'C';
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0);
     });
 
@@ -248,7 +248,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       const input = createTestInput(100000, 68);
       input.payNoNI = false;
       const result = calculateTax(input);
-      
+
       expect(result.nationalInsurance.annually).toBe(0);
       expect(result.employerNI).toBeGreaterThan(0);
     });

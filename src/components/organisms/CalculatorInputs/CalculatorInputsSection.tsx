@@ -58,55 +58,55 @@ export function CalculatorInputsSection({
 
       {/* Calculate and Reset buttons */}
       <div className='flex gap-2'>
-          <Button
-            onClick={handleCalculate}
-            disabled={isCalculating}
-            size='lg'
-            className='flex-1'
-            data-testid='calculate-button'
-          >
-            {isCalculating ? (
-              <>
-                <Spinner className='mr-2 size-5' />
-                Calculating...
-              </>
-            ) : (
-              <>
-                <Calculator className='mr-2 size-5' />
-                Calculate
-              </>
-            )}
-          </Button>
+        <Button
+          onClick={handleCalculate}
+          disabled={isCalculating}
+          size='lg'
+          className='flex-1'
+          data-testid='calculate-button'
+        >
+          {isCalculating ? (
+            <>
+              <Spinner className='mr-2 size-5' />
+              Calculating...
+            </>
+          ) : (
+            <>
+              <Calculator className='mr-2 size-5' />
+              Calculate
+            </>
+          )}
+        </Button>
 
-          <Button onClick={handleReset} variant='outline' size='lg'>
-            <RotateCcw className='mr-2 size-5' />
-            Reset
-          </Button>
+        <Button onClick={handleReset} variant='outline' size='lg'>
+          <RotateCcw className='mr-2 size-5' />
+          Reset
+        </Button>
       </div>
 
       {/* What If Collapsible Section */}
       <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant='outline'
-              size='lg'
-              className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
-              data-testid='what-if-trigger'
-            >
-              <div className='flex w-full items-center justify-center gap-2'>
-                <span>Compare Scenarios</span>
-                <ChevronDown
-                  className={`size-5 transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`}
-                />
-              </div>
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className='pt-4'>
-              <WhatIfInputs onCompare={onWhatIfCalculate} />
+        <CollapsibleTrigger asChild>
+          <Button
+            variant='outline'
+            size='lg'
+            className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
+            data-testid='what-if-trigger'
+          >
+            <div className='flex w-full items-center justify-center gap-2'>
+              <span>Compare Scenarios</span>
+              <ChevronDown
+                className={`size-5 transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`}
+              />
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className='pt-4'>
+            <WhatIfInputs onCompare={onWhatIfCalculate} />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }
