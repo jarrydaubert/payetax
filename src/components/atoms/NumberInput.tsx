@@ -272,7 +272,7 @@ function NumberInput({
           'disabled:cursor-not-allowed disabled:opacity-50',
           'placeholder:text-foreground/50',
           'transition-all duration-200',
-          'bg-glass-deep text-foreground text-center',
+          'bg-glass-deep text-foreground',
           prefix && 'pl-7',
           suffix && 'pr-7',
           showControls && 'pr-16',
