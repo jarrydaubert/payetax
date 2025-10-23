@@ -329,7 +329,7 @@ export function CalculatorContainer() {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={scrollToTop}
-            className='fixed right-6 bottom-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:right-8 md:bottom-8'
+            className='safe-bottom safe-right fixed z-50 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
             aria-label='Scroll to top'
           >
             <ArrowUp className='size-6' />

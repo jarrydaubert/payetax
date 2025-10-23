@@ -113,6 +113,11 @@
   html {
     overflow-x: hidden;
     max-width: 100vw;
+    /* Safe area support for notched devices (iPhone X+, iPad Pro) */
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
   }
 
   body {
@@ -134,6 +139,19 @@
     -webkit-text-fill-color: transparent;
     /* Add shadow for better contrast */
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+
+  /* Safe area utilities for fixed/sticky elements */
+  .safe-bottom {
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+
+  .safe-left {
+    left: calc(1rem + env(safe-area-inset-left));
+  }
+
+  .safe-right {
+    right: calc(1.5rem + env(safe-area-inset-right));
   }
 }
 
@@ -202,6 +220,18 @@
   }
 }
 
+/* View Transitions API - Smooth page navigation (Chrome 111+) */
+@view-transition {
+  navigation: auto; /* Enable for all navigations */
+}
+
+/* Customize view transition animations */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -211,6 +241,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Disable view transitions for reduced motion */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }
 
@@ -225,6 +261,76 @@
   .glass-card {
     background: oklch(0 0 0 / 0.9);
     border: 2px solid oklch(1 0 0);
+  }
+}
+
+/* Reduced Data Mode - Save bandwidth on slow connections */
+@media (prefers-reduced-data: reduce) {
+  /* Lazy load images and reduce quality */
+  img {
+    content-visibility: auto;
+  }
+
+  /* Disable non-essential animations */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Reduce animation complexity for Framer Motion */
+  [data-framer-motion] {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Skip loading web fonts, use system fonts */
+  @font-face {
+    font-display: optional;
+  }
+}
+
+/* Container Queries - Component-level responsiveness (cutting-edge!) */
+/* More responsive than media queries for reusable components */
+.results-container {
+  container-type: inline-size;
+  container-name: results;
+}
+
+.summary-cards-container {
+  container-type: inline-size;
+  container-name: summary;
+}
+
+/* Results table adapts to its container width, not viewport */
+@container results (min-width: 600px) {
+  .results-table-responsive {
+    font-size: 0.9375rem; /* Slightly larger on wider containers */
+  }
+}
+
+@container results (min-width: 900px) {
+  .results-table-responsive {
+    font-size: 1rem; /* Full size on large containers */
+  }
+}
+
+/* Summary cards adapt to their container */
+@container summary (min-width: 500px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns in medium containers */
+  }
+}
+
+@container summary (min-width: 800px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns in large containers */
+  }
+}
+
+@container summary (min-width: 1100px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns in xl containers */
   }
 }
 
