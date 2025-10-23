@@ -25,7 +25,7 @@ import {
 } from '@/store/calculatorStore';
 
 export function IncomeSourceList() {
-  const incomeSources = useCalculatorStore((state) => state.input.incomeSources);
+  const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
   const { addIncomeSource, updateIncomeSource, removeIncomeSource } = useCalculatorActions();
 
   const payPeriodOptions = [
