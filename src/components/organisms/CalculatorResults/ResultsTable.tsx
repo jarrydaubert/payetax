@@ -339,7 +339,7 @@ export function ResultsTable({
           {/* biome-ignore lint/a11y/useSemanticElements: div needed for ref and scroll functionality */}
           <div
             ref={containerRef}
-            className='w-full touch-pan-x overflow-x-auto scroll-smooth'
+            className='w-full touch-pan-x overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
