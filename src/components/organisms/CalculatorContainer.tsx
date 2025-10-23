@@ -7,6 +7,7 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/lib/constants/ui';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
 import {
   useCalculatorActions,
@@ -25,7 +26,7 @@ export function CalculatorContainer() {
   const input = useCalculatorStore((state) => state.input);
   const { calculate, calculatePreviousYear, setPensionContribution, setPensionContributionType } =
     useCalculatorActions();
-  const [showResults, setShowResults] = React.useState(false);
+  const [_isPending, startTransition] = React.useTransition();
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
     'Monthly',
@@ -37,17 +38,21 @@ export function CalculatorContainer() {
   const [showScrollIndicator, setShowScrollIndicator] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
 
-  // Scroll detection
+  // Derive showResults from results state
+  const showResults = !!results;
+
+  // Scroll detection with buffer for proactive indicator display
   React.useEffect(() => {
     const handleScroll = () => {
-      // Show scroll-to-top button when scrolled down 300px
-      setShowScrollTop(window.scrollY > 300);
+      // Show scroll-to-top button when scrolled down past threshold
+      setShowScrollTop(window.scrollY > SCROLL_THRESHOLDS.TOP_BUTTON);
 
-      // Check if results extend below viewport
+      // Check if results extend below viewport (with buffer for large screens)
       if (resultsRef.current && results) {
         const rect = resultsRef.current.getBoundingClientRect();
-        const isExtended = rect.bottom > window.innerHeight;
-        setShowScrollIndicator(isExtended && window.scrollY < 100);
+        const buffer = window.innerHeight * SCROLL_THRESHOLDS.INDICATOR_BUFFER;
+        const isExtended = rect.bottom > window.innerHeight - buffer;
+        setShowScrollIndicator(isExtended && window.scrollY < SCROLL_THRESHOLDS.INDICATOR);
       }
     };
 
@@ -62,20 +67,22 @@ export function CalculatorContainer() {
   };
 
   const handleCalculate = () => {
-    calculate();
-    calculatePreviousYear();
-    setShowResults(true);
+    // Use React 18's useTransition to mark calculations as non-urgent
+    // This keeps the UI responsive during heavy computations
+    startTransition(() => {
+      calculate();
+      calculatePreviousYear();
+    });
 
     // Only scroll to results on mobile (desktop has everything visible)
     setTimeout(() => {
-      if (window.innerWidth < 1024) {
-        // lg breakpoint
+      if (window.innerWidth < BREAKPOINTS.LG) {
         resultsRef.current?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
       }
-    }, 600); // Wait for loading state + render
+    }, TIMERS.CALC_SCROLL);
   };
 
   const handleWhatIfCalculate = () => {
@@ -87,20 +94,14 @@ export function CalculatorContainer() {
       });
       toast.success('Scenarios compared!', {
         description: 'Check the results table to see your comparison',
-        duration: 3000,
+        duration: TIMERS.TOAST_SUCCESS,
       });
-    }, 100);
+    }, TIMERS.WHAT_IF_SCROLL);
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
     setVisiblePeriods(periods);
   };
-
-  React.useEffect(() => {
-    if (results) {
-      setShowResults(true);
-    }
-  }, [results]);
 
   const handleExport = () => {
     if (!results) return;
@@ -196,6 +197,9 @@ export function CalculatorContainer() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
             className='order-4 scroll-mt-6 lg:order-2 lg:col-span-2'
+            role='region'
+            aria-live='polite'
+            aria-label='Tax calculation results summary'
           >
             {/* Scroll Indicator - Shows when results extend below viewport */}
             <AnimatePresence>

@@ -1,13 +1,10 @@
 'use client';
 
 import { ChevronRight, Plus, Trash2 } from 'lucide-react';
+import NumberInput from '@/components/atoms/NumberInput';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Select,
   SelectContent,
@@ -15,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import NumberInput from '@/components/atoms/NumberInput';
 import { PERIODS } from '@/constants/taxRates';
 import {
   INCOME_TYPE_LABELS,
@@ -38,41 +34,44 @@ export function IncomeSourceList() {
 
   return (
     <Collapsible defaultOpen={false}>
-      <div className="flex items-center justify-between">
-        <CollapsibleTrigger className="group flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
-          <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]:rotate-90" />
+      <div className='flex items-center justify-between'>
+        <CollapsibleTrigger className='group flex items-center gap-2 font-medium text-sm transition-colors hover:text-primary'>
+          <ChevronRight className='h-4 w-4 transition-transform group-data-[state=open]:rotate-90' />
           <span>Additional Income Sources</span>
           {incomeSources.length > 0 && (
-            <Badge variant="secondary" className="ml-2">
+            <Badge variant='secondary' className='ml-2'>
               {incomeSources.length}
             </Badge>
           )}
         </CollapsibleTrigger>
       </div>
 
-      <CollapsibleContent className="space-y-3 pt-3">
+      <CollapsibleContent className='space-y-3 pt-3'>
         {incomeSources.length === 0 && (
-          <p className="text-muted-foreground text-sm">
+          <p className='text-muted-foreground text-sm'>
             Add pension income, rental income, or other sources
           </p>
         )}
 
         {incomeSources.map((source, index) => (
-          <div key={source.id} className="flex flex-col gap-2 rounded-lg border border-input p-2.5">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0 text-xs">
+          <div key={source.id} className='flex flex-col gap-2 rounded-lg border border-input p-2.5'>
+            <div className='flex items-center gap-2'>
+              <Badge
+                variant='outline'
+                className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0 text-xs'
+              >
                 {index + 1}
               </Badge>
 
               {/* Income Type */}
-              <div className="flex-1 min-w-0">
+              <div className='min-w-0 flex-1'>
                 <Select
                   value={source.type}
                   onValueChange={(type: IncomeSource['type']) =>
                     updateIncomeSource(source.id, { type })
                   }
                 >
-                  <SelectTrigger className="h-9 border-input text-sm">
+                  <SelectTrigger className='h-9 border-input text-sm'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -87,33 +86,35 @@ export function IncomeSourceList() {
 
               {/* Remove Button */}
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 shrink-0"
+                variant='ghost'
+                size='icon'
+                className='h-9 w-9 shrink-0'
                 onClick={() => removeIncomeSource(source.id)}
-                aria-label="Remove income source"
+                aria-label='Remove income source'
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className='h-4 w-4' />
               </Button>
             </div>
 
             {/* Amount and Period Row */}
-            <div className="flex items-center gap-2">
+            <div className='flex items-center gap-2'>
               <NumberInput
                 value={source.amount}
                 onChange={(amount) => updateIncomeSource(source.id, { amount })}
-                prefix="£"
+                prefix='£'
                 decimals={2}
-                placeholder="0.00"
+                placeholder='0.00'
                 min={0}
-                className="flex-1 h-9 text-sm"
+                className='h-9 flex-1 text-sm'
               />
 
               <Select
                 value={source.period}
-                onValueChange={(period) => updateIncomeSource(source.id, { period: period as typeof source.period })}
+                onValueChange={(period) =>
+                  updateIncomeSource(source.id, { period: period as typeof source.period })
+                }
               >
-                <SelectTrigger className="h-9 w-[110px] border-input text-sm">
+                <SelectTrigger className='h-9 w-[110px] border-input text-sm'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,19 +131,17 @@ export function IncomeSourceList() {
 
         {/* Add Button */}
         <Button
-          variant="outline"
+          variant='outline'
           onClick={addIncomeSource}
-          className="w-full"
+          className='w-full'
           disabled={incomeSources.length >= 10} // Reasonable limit
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className='mr-2 h-4 w-4' />
           Add Income Source
         </Button>
 
         {incomeSources.length >= 10 && (
-          <p className="text-muted-foreground text-xs">
-            Maximum 10 income sources reached
-          </p>
+          <p className='text-muted-foreground text-xs'>Maximum 10 income sources reached</p>
         )}
       </CollapsibleContent>
     </Collapsible>

@@ -277,11 +277,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   if (input.incomeSources && input.incomeSources.length > 0) {
     for (const source of input.incomeSources) {
-      const sourceAnnual = convertPeriodToAnnual(
-        source.amount,
-        source.period,
-        input.hoursPerWeek
-      );
+      const sourceAnnual = convertPeriodToAnnual(source.amount, source.period, input.hoursPerWeek);
 
       if (source.type === 'employment') {
         // Additional employment income - subject to NI if under SPA
@@ -647,7 +643,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
     // NI is ONLY calculated on employment income (not pensions, rental, etc.)
     // Use employment income adjusted for pension contributions
-    const monthlyTaxableAdjustedEmploymentIncome = monthlyEmploymentIncome - monthlyPensionContribution;
+    const monthlyTaxableAdjustedEmploymentIncome =
+      monthlyEmploymentIncome - monthlyPensionContribution;
 
     // Primary threshold (lower rate)
     if (monthlyTaxableAdjustedEmploymentIncome > monthlyPrimaryThreshold) {
@@ -875,11 +872,14 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     netPay,
     taxBands,
     // Add income breakdown if multiple income sources exist
-    incomeBreakdown: input.incomeSources && input.incomeSources.length > 0 ? {
-      employment: employmentIncome,
-      nonEmployment: additionalIncome,
-      total: totalGrossIncome,
-    } : undefined,
+    incomeBreakdown:
+      input.incomeSources && input.incomeSources.length > 0
+        ? {
+            employment: employmentIncome,
+            nonEmployment: additionalIncome,
+            total: totalGrossIncome,
+          }
+        : undefined,
   };
 
   return results;

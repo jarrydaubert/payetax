@@ -341,7 +341,9 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({
             input: {
               ...state.input,
-              incomeSources: state.input.incomeSources.filter((source: IncomeSource) => source.id !== id),
+              incomeSources: state.input.incomeSources.filter(
+                (source: IncomeSource) => source.id !== id
+              ),
             },
           }));
         },

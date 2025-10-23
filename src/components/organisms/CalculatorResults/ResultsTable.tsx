@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorResults/ResultsTable.tsx
 'use client';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Building,
   Calculator,
@@ -26,6 +26,7 @@ import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
@@ -80,11 +81,17 @@ export function ResultsTable({
   partnerGrossWage = 0,
   taxCode = '1257L',
 }: ResultsTableProps) {
+  // Generate unique ID for accessibility
+  const scrollHintId = React.useId();
+
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef, [
     visiblePeriods,
   ]);
+
+  // Enable mouse drag scrolling for better UX
+  useMouseDragScroll(containerRef);
 
   // Tax trap detection - pass current pension to check if trap is already avoided
   const taxTrapOptimization = React.useMemo(() => {
@@ -184,28 +191,37 @@ export function ResultsTable({
       isHighlight: false,
     },
     // Add income breakdown if multiple sources exist
-    ...(results.incomeBreakdown ? [
-      {
-        category: 'Employment Income',
-        icon: Building,
-        annual: results.incomeBreakdown.employment,
-        whatIfAnnual: whatIfResults?.incomeBreakdown?.employment,
-        percentage: calculatePercentage(results.incomeBreakdown.employment, grossAnnual),
-        color: 'text-muted-foreground',
-        isHighlight: false,
-        isSubRow: true,
-      },
-      ...(results.incomeBreakdown.nonEmployment > 0 ? [{
-        category: 'Other Income (No NI)',
-        icon: Coins,
-        annual: results.incomeBreakdown.nonEmployment,
-        whatIfAnnual: whatIfResults?.incomeBreakdown?.nonEmployment,
-        percentage: calculatePercentage(results.incomeBreakdown.nonEmployment, grossAnnual),
-        color: 'text-muted-foreground',
-        isHighlight: false,
-        isSubRow: true,
-      }] : []),
-    ] : []),
+    ...(results.incomeBreakdown
+      ? [
+          {
+            category: 'Employment Income',
+            icon: Building,
+            annual: results.incomeBreakdown.employment,
+            whatIfAnnual: whatIfResults?.incomeBreakdown?.employment,
+            percentage: calculatePercentage(results.incomeBreakdown.employment, grossAnnual),
+            color: 'text-muted-foreground',
+            isHighlight: false,
+            isSubRow: true,
+          },
+          ...(results.incomeBreakdown.nonEmployment > 0
+            ? [
+                {
+                  category: 'Other Income (No NI)',
+                  icon: Coins,
+                  annual: results.incomeBreakdown.nonEmployment,
+                  whatIfAnnual: whatIfResults?.incomeBreakdown?.nonEmployment,
+                  percentage: calculatePercentage(
+                    results.incomeBreakdown.nonEmployment,
+                    grossAnnual
+                  ),
+                  color: 'text-muted-foreground',
+                  isHighlight: false,
+                  isSubRow: true,
+                },
+              ]
+            : []),
+        ]
+      : []),
     {
       category: 'Tax-Free Allowance',
       icon: Shield,
@@ -339,7 +355,7 @@ export function ResultsTable({
           {/* biome-ignore lint/a11y/useSemanticElements: div needed for ref and scroll functionality */}
           <div
             ref={containerRef}
-            className='w-full touch-pan-x overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing'
+            className='w-full cursor-grab touch-pan-x overflow-x-auto scroll-smooth active:cursor-grabbing'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
@@ -349,7 +365,8 @@ export function ResultsTable({
               overflowY: 'auto',
             }}
             role='region'
-            aria-label='Tax calculation results table'
+            aria-label='Tax calculation results table - scrollable'
+            aria-describedby={scrollHintId}
           >
             <Table data-testid='results-table' className='w-full min-w-full'>
               <TableHeader>
@@ -417,42 +434,75 @@ export function ResultsTable({
         </Card>
       </div>
 
-      {/* Scroll hints */}
-      <div className='mt-4 flex flex-col items-center gap-2'>
-        {showRightIndicator && (
-          <>
-            {/* Mobile hint */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'
-            >
-              <span>👈 Swipe to see all periods</span>
-            </motion.div>
-            {/* Desktop hint with animated arrow */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className='hidden items-center gap-2 rounded-full bg-primary/5 px-4 py-2 font-medium text-muted-foreground text-sm md:flex'
-            >
-              <span>Scroll horizontally to see all periods</span>
-              <motion.div
-                animate={{ x: [0, 8, 0] }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Number.POSITIVE_INFINITY,
-                  repeatDelay: 0.5,
-                  ease: 'easeInOut',
-                }}
-              >
-                <ChevronDown className='size-4 rotate-[-90deg]' />
-              </motion.div>
-            </motion.div>
-          </>
+      {/* Scroll hints - BELOW TABLE */}
+      <AnimatePresence>
+        {(showLeftIndicator || showRightIndicator) && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className='mt-4 flex flex-col items-center gap-2'
+          >
+            {/* Mobile hint - swipe gesture */}
+            <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 px-4 py-2.5 font-medium text-foreground text-sm shadow-sm md:hidden'>
+              {showLeftIndicator && (
+                <motion.div
+                  animate={{ x: [4, -4, 4] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <span className='text-lg'>👈</span>
+                </motion.div>
+              )}
+              <span>Swipe to see all periods</span>
+              {showRightIndicator && (
+                <motion.div
+                  animate={{ x: [-4, 4, -4] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <span className='text-lg'>👉</span>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Desktop hint - drag and scroll */}
+            <div className='hidden items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 px-5 py-3 font-medium text-foreground text-sm shadow-sm md:flex'>
+              {showLeftIndicator && (
+                <motion.div
+                  animate={{ x: [4, -4, 4] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronDown className='-rotate-90 size-5 text-primary' />
+                </motion.div>
+              )}
+              <span>🖱️ Drag or scroll horizontally to see all periods</span>
+              {showRightIndicator && (
+                <motion.div
+                  animate={{ x: [-4, 4, -4] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronDown className='size-5 rotate-90 text-primary' />
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       {/* Tax Trap Inline Alert */}
       {taxTrapOptimization && onApplyPensionOptimization && (
