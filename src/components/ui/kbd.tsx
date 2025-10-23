@@ -1,3 +1,35 @@
+// src/components/ui/kbd.tsx
+
+/**
+ * Keyboard shortcut display component
+ *
+ * USAGE PLAN: Reserved for PAYTAX-43 - Table of Contents Component for Blog
+ * https://linear.app/payetax/issue/PAYTAX-43/table-of-contents-component-for-blog
+ *
+ * When implementing the blog TOC feature, this component will be used to display
+ * keyboard shortcuts for navigation, such as:
+ * - ⌘K or Ctrl+K to open TOC
+ * - Arrow keys to navigate sections
+ * - Enter to jump to section
+ * - Esc to close TOC
+ *
+ * Example usage in TOC:
+ * ```tsx
+ * <Kbd>⌘</Kbd>
+ * <Kbd>K</Kbd>
+ * // or grouped:
+ * <KbdGroup>
+ *   <Kbd>⌘</Kbd>
+ *   <Kbd>K</Kbd>
+ * </KbdGroup>
+ * ```
+ *
+ * May also be useful for:
+ * - PAYTAX-41: Add Keyboard Shortcuts Documentation
+ * - Calculator keyboard shortcuts (Tab navigation tips)
+ * - Help modal with keyboard commands
+ */
+
 import { cn } from '@/lib/utils';
 
 function Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {
