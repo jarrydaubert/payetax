@@ -96,12 +96,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!salary) return {};
 
   const formattedSalary = salary.toLocaleString('en-GB');
-  const monthlyTakeHome = Math.round((salary * 0.75) / 12); // Rough estimate for meta
-  const formattedMonthly = monthlyTakeHome.toLocaleString('en-GB');
 
   return generateMetadataHelper({
     title: `£${formattedSalary} After Tax UK 2025-26 | PayeTax`,
-    description: `Calculate exact take-home pay from a £${formattedSalary} salary in the UK. After tax and NI, you'll take home approximately £${formattedMonthly} per month. Free HMRC-compliant calculator with student loans and pension options.`,
+    description: `Calculate exact take-home pay from a £${formattedSalary} salary in the UK for 2025-26. See income tax, National Insurance, and net pay breakdown instantly.`,
     keywords: `${salary} after tax, ${salary} take home pay, ${salary} salary UK, ${salary} net pay, ${salary} salary calculator, £${formattedSalary} after tax UK`,
     pathname: `/calculator/${salaryParam}`,
   });

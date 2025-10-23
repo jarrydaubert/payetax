@@ -112,7 +112,7 @@ export default async function CategoryPage({
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           headline: `${category.name} - PayeTax Blog`,
-          description: `Articles and guides about ${category.name.toLowerCase()} in UK taxation.`,
+          description: `Expert guides on ${category.name.toLowerCase()} for UK taxpayers. Official HMRC rates, practical examples, and tax planning for 2025-26.`,
           url: `https://payetax.co.uk/blog/category/${slug}`,
           author: {
             '@type': 'Organization',
