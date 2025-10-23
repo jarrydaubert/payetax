@@ -246,12 +246,13 @@ export function BasicInputs() {
                   : '75-plus'
             }
             onValueChange={(value) => {
-              // Set representative age for each bracket (affects NI calculations)
+              // Set representative age for each bracket
+              // Age affects personal allowance and NI calculations
               if (value === 'under-65')
-                setAge(undefined); // Use default (working age)
+                setAge(undefined); // Working age (no age allowance)
               else if (value === '65-74')
-                setAge(70); // Over state pension age (no NI)
-              else setAge(76); // 75+ (no NI)
+                setAge(70); // Gets £3,660 age allowance, auto-exempt from NI if 66+
+              else setAge(76); // Gets £3,960 age allowance, auto-exempt from NI
             }}
           >
             <SelectTrigger id={ageId} className='w-[120px]' data-testid='age-select'>

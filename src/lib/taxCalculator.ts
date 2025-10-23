@@ -591,10 +591,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   let monthlyNationalInsurance = 0;
 
-  // Only calculate NI if not exempt
-  // payNoNI = true for people over State Pension age or other exemptions
-  // niCategory 'C' = employees over State Pension age (no employee NI but employer still pays)
-  if (!input.payNoNI && input.niCategory !== 'C') {
+  // Auto-detect state pension age for NI exemption
+  // State Pension Age: 66 (current), rising to 67 by 2028
+  // Source: https://www.gov.uk/state-pension-age
+  const isOverStatePensionAge = input.age !== undefined && input.age >= 66;
+
+  // Only calculate employee NI if not exempt
+  // Exemptions:
+  // - payNoNI flag: Manual override (e.g., other exemption reasons)
+  // - NI Category 'C': Employees over State Pension age (employer still pays)
+  // - Age >= 66: Automatic exemption at State Pension Age
+  if (!input.payNoNI && input.niCategory !== 'C' && !isOverStatePensionAge) {
     const niRates = standardRates.nationalInsurance.employee[input.niCategory];
 
     // Convert annual thresholds to monthly
