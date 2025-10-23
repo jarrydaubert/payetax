@@ -330,7 +330,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({
             input: {
               ...state.input,
-              incomeSources: state.input.incomeSources.map((source) =>
+              incomeSources: state.input.incomeSources.map((source: IncomeSource) =>
                 source.id === id ? { ...source, ...updates } : source
               ),
             },
@@ -341,7 +341,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({
             input: {
               ...state.input,
-              incomeSources: state.input.incomeSources.filter((source) => source.id !== id),
+              incomeSources: state.input.incomeSources.filter((source: IncomeSource) => source.id !== id),
             },
           }));
         },
@@ -517,6 +517,18 @@ export const useCalculatorStore = create<CalculatorState>()(
           input: state.input,
           // Don't persist calculation results
         }),
+        merge: (persistedState: any, currentState: CalculatorState) => {
+          // Merge persisted state with defaults for new fields
+          return {
+            ...currentState,
+            input: {
+              ...currentState.input,
+              ...persistedState?.input,
+              // Ensure new fields have defaults if missing in persisted state
+              incomeSources: persistedState?.input?.incomeSources ?? [],
+            },
+          };
+        },
       }
     )
   )
