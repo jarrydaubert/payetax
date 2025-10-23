@@ -330,7 +330,7 @@ export function ResultsTable({
             <Table data-testid='results-table' className='w-full min-w-full'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pt-3 pr-4 pb-2 font-semibold text-lg'>
+                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pt-3 pr-4 pb-2 font-semibold text-foreground text-lg'>
                     Payslip
                   </TableHead>
                   <TableHead className='min-w-[50px] text-right font-semibold'>%</TableHead>
