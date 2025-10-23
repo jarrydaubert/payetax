@@ -43,7 +43,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       return (
         <h1
           className='group mt-8 mb-4 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-12 md:mb-6'
-          style={{ fontSize: 'var(--font-size-4xl)' }}
+          style={{ fontSize: 'var(--blog-font-size-4xl)' }}
           id={id}
           {...props}
         >
@@ -64,7 +64,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       return (
         <h2
           className='group mt-6 mb-3 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-10 md:mb-5'
-          style={{ fontSize: 'var(--font-size-3xl)' }}
+          style={{ fontSize: 'var(--blog-font-size-3xl)' }}
           id={id}
           {...props}
         >
@@ -85,7 +85,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       return (
         <h3
           className='group mt-5 mb-2 flex scroll-mt-20 items-center gap-2 font-bold text-foreground md:mt-8 md:mb-4'
-          style={{ fontSize: 'var(--font-size-2xl)' }}
+          style={{ fontSize: 'var(--blog-font-size-2xl)' }}
           id={id}
           {...props}
         >
@@ -103,7 +103,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
       <h4
         className='mt-4 mb-2 font-semibold text-foreground md:mt-6 md:mb-3'
-        style={{ fontSize: 'var(--font-size-xl)' }}
+        style={{ fontSize: 'var(--blog-font-size-xl)' }}
         {...props}
       >
         {children}
@@ -112,7 +112,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
       <h5
         className='mt-5 mb-2 font-semibold text-foreground'
-        style={{ fontSize: 'var(--font-size-lg)' }}
+        style={{ fontSize: 'var(--blog-font-size-lg)' }}
         {...props}
       >
         {children}
@@ -121,7 +121,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     h6: ({ children, ...props }: React.ComponentPropsWithoutRef<'h6'>) => (
       <h6
         className='mt-4 mb-2 font-semibold text-foreground'
-        style={{ fontSize: 'var(--font-size-base)' }}
+        style={{ fontSize: 'var(--blog-font-size-base)' }}
         {...props}
       >
         {children}
@@ -132,7 +132,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
       <p
         className='mb-6 text-foreground/90 leading-relaxed'
-        style={{ fontSize: 'var(--font-size-base)' }}
+        style={{ fontSize: 'var(--blog-font-size-base)' }}
         {...props}
       >
         {children}
@@ -213,7 +213,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
             <pre className='glass-card-inner overflow-x-auto rounded-b-lg border border-foreground/10 p-4'>
               <code
                 className='font-mono text-foreground'
-                style={{ fontSize: 'var(--font-size-sm)' }}
+                style={{ fontSize: 'var(--blog-font-size-sm)' }}
                 {...props}
               >
                 {children}
@@ -227,7 +227,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
       return (
         <code
           className='rounded border border-foreground/20 bg-foreground/10 px-1.5 py-0.5 font-mono text-foreground'
-          style={{ fontSize: 'var(--font-size-sm)' }}
+          style={{ fontSize: 'var(--blog-font-size-sm)' }}
           {...props}
         >
           {children}
@@ -271,7 +271,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
       <th
         className='px-6 py-3 text-left font-semibold text-foreground uppercase tracking-wider'
-        style={{ fontSize: 'var(--font-size-sm)' }}
+        style={{ fontSize: 'var(--blog-font-size-sm)' }}
         {...props}
       >
         {children}
@@ -280,7 +280,7 @@ const BlogContent: React.FC<BlogContentProps> = ({ body }) => {
     td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
       <td
         className='px-6 py-4 text-foreground/90'
-        style={{ fontSize: 'var(--font-size-sm)' }}
+        style={{ fontSize: 'var(--blog-font-size-sm)' }}
         {...props}
       >
         {children}
