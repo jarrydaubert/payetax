@@ -137,7 +137,7 @@ function paginatePosts(posts: BlogPost[], page: number, pageSize: number): BlogP
  * Get blog posts with optional filtering and pagination
  */
 export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise<BlogPost[]> {
-  const { page = 1, pageSize = BLOG_CONFIG.postsPerPage } = options;
+  const { page = 1, pageSize = BLOG_CONFIG.postsPerPage, sortBy = 'date-desc' } = options;
 
   try {
     // Get all posts from Contentlayer
@@ -147,7 +147,7 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
     const filteredPosts = filterPosts(allContentPosts, options);
 
     // Sort posts (default: newest first)
-    const sortedPosts = sortPosts(filteredPosts, 'date-desc');
+    const sortedPosts = sortPosts(filteredPosts, sortBy);
 
     // Apply pagination
     const paginatedPosts = paginatePosts(sortedPosts, page, pageSize);

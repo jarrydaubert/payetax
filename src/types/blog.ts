@@ -65,6 +65,7 @@ export interface BlogPaginationOptions {
   tag?: string;
   featured?: boolean;
   searchQuery?: string;
+  sortBy?: BlogSortOption;
 }
 
 /**
