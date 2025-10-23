@@ -320,8 +320,9 @@ export function ResultsTable({
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
-              // Ensure smooth scrolling on all devices
               scrollBehavior: 'smooth',
+              maxHeight: '70vh',
+              overflowY: 'auto',
             }}
             role='region'
             aria-label='Tax calculation results table'
@@ -329,7 +330,7 @@ export function ResultsTable({
             <Table data-testid='results-table' className='w-full min-w-full'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pr-4 font-semibold'>
+                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pt-3 pr-4 pb-2 font-semibold text-lg'>
                     Payslip
                   </TableHead>
                   <TableHead className='min-w-[50px] text-right font-semibold'>%</TableHead>
@@ -352,13 +353,13 @@ export function ResultsTable({
                 </TableRow>
                 {whatIfResults && (
                   <TableRow className='bg-card hover:bg-card'>
-                    <TableHead className='sticky left-0 z-20 bg-card' colSpan={2} />
+                    <TableHead className='sticky left-0 z-20 bg-card py-1' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[80px] bg-blue-500/10 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[80px] bg-purple-500/10 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
                           What If
                         </TableHead>
                       </React.Fragment>
