@@ -337,7 +337,11 @@ export function ResultsTable({
                   {whatIfResults
                     ? // Two-row header for What If comparison
                       visiblePeriods.map((period) => (
-                        <TableHead key={period} className='text-center font-semibold' colSpan={2}>
+                        <TableHead
+                          key={period}
+                          className='text-center font-semibold text-sm'
+                          colSpan={2}
+                        >
                           {period}
                         </TableHead>
                       ))
@@ -356,10 +360,10 @@ export function ResultsTable({
                     <TableHead className='sticky left-0 z-20 bg-card py-1' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-right font-medium text-xs sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
+                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px]'>
                           What If
                         </TableHead>
                       </React.Fragment>
