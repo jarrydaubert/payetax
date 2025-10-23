@@ -107,11 +107,11 @@ export function BasicInputs() {
               decimals={2}
               placeholder='0.00'
               min={0}
-              className='w-[160px]'
+              className='flex-1'
               data-testid='salary-input'
             />
             <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-              <SelectTrigger id={payPeriodId} className='w-[155px]'>
+              <SelectTrigger id={payPeriodId} className='w-[140px]'>
                 <SelectValue placeholder='Annually' />
               </SelectTrigger>
               <SelectContent>
