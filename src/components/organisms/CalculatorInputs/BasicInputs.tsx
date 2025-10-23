@@ -114,7 +114,7 @@ export function BasicInputs() {
               data-testid='salary-input'
             />
             <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-              <SelectTrigger id={payPeriodId} className='w-[140px]'>
+              <SelectTrigger id={payPeriodId} className='w-[150px]'>
                 <SelectValue placeholder='Annually' />
               </SelectTrigger>
               <SelectContent>
@@ -140,7 +140,7 @@ export function BasicInputs() {
             value={input.taxYear}
             onChange={setTaxYear}
             label=''
-            className='flex-1'
+            className='w-[140px]'
           />
         </div>
 
@@ -158,7 +158,7 @@ export function BasicInputs() {
             value={input.taxCode}
             onChange={(e) => setTaxCode(e.target.value.toUpperCase())}
             placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-            className='flex-1 uppercase'
+            className='w-[100px] uppercase'
           />
         </div>
 
@@ -171,7 +171,7 @@ export function BasicInputs() {
             </Label>
           </div>
           <Select value={input.region} onValueChange={setRegion}>
-            <SelectTrigger id={regionId} className='flex-1'>
+            <SelectTrigger id={regionId} className='w-[185px]'>
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
             <SelectContent>
@@ -257,7 +257,7 @@ export function BasicInputs() {
               else setAge(76); // 75+ (no NI)
             }}
           >
-            <SelectTrigger id={ageId} className='flex-1' data-testid='age-select'>
+            <SelectTrigger id={ageId} className='w-[120px]' data-testid='age-select'>
               <SelectValue placeholder='Select age range' />
             </SelectTrigger>
             <SelectContent>
@@ -277,7 +277,7 @@ export function BasicInputs() {
             </Label>
           </div>
           <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
-            <SelectTrigger id={studentLoanId} className='flex-1'>
+            <SelectTrigger id={studentLoanId} className='w-[160px]'>
               <SelectValue placeholder='Select student loan' />
             </SelectTrigger>
             <SelectContent>
