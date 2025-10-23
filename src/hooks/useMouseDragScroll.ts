@@ -2,7 +2,8 @@
 import * as React from 'react';
 
 /**
- * Custom hook to enable mouse drag scrolling on a container element
+ * Custom hook to enable mouse/touch/pen drag scrolling on a container element
+ * Uses modern Pointer Events API for unified input handling
  * Allows users to click and drag to scroll horizontally/vertically
  *
  * @param ref - React ref to the scrollable container element
@@ -26,74 +27,79 @@ import * as React from 'react';
 export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
   ref: React.RefObject<T | null>
 ) {
-  const isMouseDownRef = React.useRef(false);
-  const startXRef = React.useRef(0);
-  const startYRef = React.useRef(0);
-  const scrollLeftRef = React.useRef(0);
-  const scrollTopRef = React.useRef(0);
+  const isDraggingRef = React.useRef(false);
+  const startPosRef = React.useRef({ x: 0, y: 0 });
+  const scrollPosRef = React.useRef({ left: 0, top: 0 });
+  const DRAG_THRESHOLD = 5; // pixels - prevents accidental drags
 
   React.useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
-    const handleMouseDown = (e: MouseEvent) => {
+    let hasMoved = false;
+
+    const handlePointerDown = (e: PointerEvent) => {
       // Ignore if clicking on interactive elements (buttons, links, inputs)
       const target = e.target as HTMLElement;
       if (
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A' ||
-        target.tagName === 'INPUT' ||
-        target.tagName === 'SELECT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.closest('button') ||
-        target.closest('a') ||
-        target.closest('input') ||
-        target.closest('select')
+        ['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) ||
+        target.closest('button, a, input, select, textarea')
       ) {
         return;
       }
 
-      isMouseDownRef.current = true;
-      startXRef.current = e.pageX - element.offsetLeft;
-      startYRef.current = e.pageY - element.offsetTop;
-      scrollLeftRef.current = element.scrollLeft;
-      scrollTopRef.current = element.scrollTop;
+      e.preventDefault();
+      element.setPointerCapture(e.pointerId); // Capture pointer for smooth tracking
+      isDraggingRef.current = true;
+      hasMoved = false;
+      startPosRef.current = { x: e.pageX, y: e.pageY };
+      scrollPosRef.current = { left: element.scrollLeft, top: element.scrollTop };
 
       // Prevent text selection while dragging
       element.style.userSelect = 'none';
+      element.style.cursor = 'grabbing';
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isMouseDownRef.current) return;
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDraggingRef.current) return;
 
       e.preventDefault();
 
-      const x = e.pageX - element.offsetLeft;
-      const y = e.pageY - element.offsetTop;
-      const walkX = (x - startXRef.current) * 2; // Multiplier for scroll speed
-      const walkY = (y - startYRef.current) * 2;
+      const deltaX = e.pageX - startPosRef.current.x;
+      const deltaY = e.pageY - startPosRef.current.y;
 
-      element.scrollLeft = scrollLeftRef.current - walkX;
-      element.scrollTop = scrollTopRef.current - walkY;
+      // Only start dragging if threshold is met (prevents accidental drags)
+      if (!hasMoved && Math.abs(deltaX) < DRAG_THRESHOLD && Math.abs(deltaY) < DRAG_THRESHOLD) {
+        return;
+      }
+
+      hasMoved = true;
+
+      // Scroll with 2x multiplier for natural feel
+      element.scrollLeft = scrollPosRef.current.left - deltaX * 2;
+      element.scrollTop = scrollPosRef.current.top - deltaY * 2;
     };
 
-    const handleMouseUpOrLeave = () => {
-      isMouseDownRef.current = false;
+    const handlePointerUp = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      hasMoved = false;
       element.style.userSelect = '';
+      element.style.cursor = 'grab';
     };
 
-    // Add event listeners
-    element.addEventListener('mousedown', handleMouseDown);
-    element.addEventListener('mousemove', handleMouseMove);
-    element.addEventListener('mouseup', handleMouseUpOrLeave);
-    element.addEventListener('mouseleave', handleMouseUpOrLeave);
+    // Use Pointer Events for unified mouse/touch/pen support
+    element.addEventListener('pointerdown', handlePointerDown);
+    element.addEventListener('pointermove', handlePointerMove, { passive: false }); // passive:false needed for preventDefault
+    element.addEventListener('pointerup', handlePointerUp);
+    element.addEventListener('pointercancel', handlePointerUp); // Handle cancelled pointers
 
     // Cleanup
     return () => {
-      element.removeEventListener('mousedown', handleMouseDown);
-      element.removeEventListener('mousemove', handleMouseMove);
-      element.removeEventListener('mouseup', handleMouseUpOrLeave);
-      element.removeEventListener('mouseleave', handleMouseUpOrLeave);
+      element.removeEventListener('pointerdown', handlePointerDown);
+      element.removeEventListener('pointermove', handlePointerMove);
+      element.removeEventListener('pointerup', handlePointerUp);
+      element.removeEventListener('pointercancel', handlePointerUp);
     };
   }, [ref]);
 }
