@@ -75,9 +75,9 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
 
       hasMoved = true;
 
-      // Scroll with 2x multiplier for natural feel
-      element.scrollLeft = scrollPosRef.current.left - deltaX * 2;
-      element.scrollTop = scrollPosRef.current.top - deltaY * 2;
+      // Scroll with 1.5x multiplier for natural feel (reduced from 2x for better control)
+      element.scrollLeft = scrollPosRef.current.left - deltaX * 1.5;
+      element.scrollTop = scrollPosRef.current.top - deltaY * 1.5;
     };
 
     const handlePointerUp = () => {

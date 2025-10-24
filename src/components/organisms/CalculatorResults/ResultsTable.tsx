@@ -390,7 +390,7 @@ export function ResultsTable({
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='min-w-[80px] text-right font-semibold sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[120px] 2xl:min-w-[130px]'
+                          className='min-w-[100px] text-right font-semibold sm:min-w-[110px] md:min-w-[120px] lg:min-w-[130px] xl:min-w-[140px] 2xl:min-w-[150px]'
                         >
                           {period}
                         </TableHead>
@@ -401,10 +401,10 @@ export function ResultsTable({
                     <TableHead className='sticky left-0 z-20 bg-card py-1' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[80px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[115px] 2xl:min-w-[120px]'>
+                        <TableHead className='min-w-[110px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[120px] md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px]'>
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[80px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[90px] md:min-w-[100px] lg:min-w-[110px] xl:min-w-[115px] 2xl:min-w-[120px]'>
+                        <TableHead className='min-w-[110px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[120px] md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px]'>
                           What If
                         </TableHead>
                       </React.Fragment>

@@ -66,14 +66,14 @@ export function ResultTableRow({
           return (
             <React.Fragment key={period}>
               <TableCell
-                className={`bg-blue-500/10 text-right font-mono text-xs sm:text-sm ${color} ${
+                className={`min-w-[110px] bg-blue-500/10 text-right font-mono text-xs sm:min-w-[120px] sm:text-sm md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px] ${color} ${
                   isHighlight ? 'font-bold' : ''
                 }`}
               >
                 {formatCurrency(currentValue)}
               </TableCell>
               <TableCell
-                className={`bg-purple-500/10 text-right font-mono text-xs sm:text-sm ${color} ${
+                className={`min-w-[110px] bg-purple-500/10 text-right font-mono text-xs sm:min-w-[120px] sm:text-sm md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px] ${color} ${
                   isHighlight ? 'font-bold' : ''
                 }`}
               >
@@ -87,7 +87,7 @@ export function ResultTableRow({
         return (
           <TableCell
             key={period}
-            className={`text-right font-mono text-xs sm:text-sm ${color} ${
+            className={`min-w-[100px] text-right font-mono text-xs sm:min-w-[110px] sm:text-sm md:min-w-[120px] lg:min-w-[130px] xl:min-w-[140px] 2xl:min-w-[150px] ${color} ${
               isHighlight ? 'font-bold' : ''
             }`}
           >
