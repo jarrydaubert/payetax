@@ -11,8 +11,8 @@ import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
-import { IMAGE_SIZES } from '@/lib/constants/images';
 import { categoryContent } from '@/lib/categoryContent';
+import { IMAGE_SIZES } from '@/lib/constants/images';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
 // Enable ISR - revalidate every hour for category pages

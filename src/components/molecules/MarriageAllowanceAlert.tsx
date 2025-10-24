@@ -32,13 +32,32 @@ interface MarriageAllowanceAlertProps {
 /**
  * Alert component suggesting Marriage Allowance claim when eligible
  * Only shows if user qualifies but hasn't updated tax code
+ *
+ * Eligibility requirements:
+ * - User must be basic rate taxpayer (£12,570 - £50,270)
+ * - Partner must earn less than Personal Allowance (£12,570)
+ * - User must not already have M code in their tax code
  */
 export function MarriageAllowanceAlert({
+  userSalary,
   partnerSalary,
   hasMarriageCode,
 }: MarriageAllowanceAlertProps) {
   // Don't show if they already have the M code
   if (hasMarriageCode) {
+    return null;
+  }
+
+  // User must be a basic rate taxpayer (between PA and higher rate threshold)
+  const personalAllowance = 12570;
+  const higherRateThreshold = 50270;
+
+  if (userSalary <= personalAllowance || userSalary > higherRateThreshold) {
+    return null;
+  }
+
+  // Partner must earn less than Personal Allowance
+  if (partnerSalary >= personalAllowance) {
     return null;
   }
 

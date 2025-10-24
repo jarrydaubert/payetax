@@ -3,7 +3,7 @@
 /**
  * Image responsive sizing constants for Next.js Image component
  * All breakpoints align with Tailwind's standard breakpoints
- * 
+ *
  * Tailwind Breakpoints:
  * - sm: 640px
  * - md: 768px

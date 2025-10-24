@@ -28,6 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
@@ -79,6 +80,9 @@ export function WhatIfComparisonDisplay({
   const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef, [
     visiblePeriods,
   ]);
+
+  // Enable mouse drag scrolling for better UX
+  useMouseDragScroll(containerRef);
 
   const handlePeriodToggle = (period: string) => {
     const newPeriods = visiblePeriods.includes(period)
@@ -238,25 +242,34 @@ export function WhatIfComparisonDisplay({
         <Card className='overflow-hidden border-primary/20'>
           <section
             ref={containerRef}
-            className='touch-pan-x overflow-x-auto scroll-smooth'
+            className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth active:cursor-grabbing'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
-            aria-label='What If comparison table'
+            aria-label='What If comparison table - scrollable horizontally'
           >
-            <Table>
+            <Table aria-label='What If comparison results'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'>
+                  <TableHead
+                    scope='col'
+                    className='sticky left-0 top-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'
+                  >
                     Category
                   </TableHead>
-                  <TableHead className='min-w-[50px] text-right font-semibold'>%</TableHead>
+                  <TableHead
+                    scope='col'
+                    className='sticky top-0 z-10 min-w-[50px] bg-card text-right font-semibold'
+                  >
+                    %
+                  </TableHead>
                   {visiblePeriods.map((period) => (
                     <TableHead
                       key={period}
-                      className='min-w-[180px] text-center font-semibold sm:min-w-[200px]'
+                      scope='col'
+                      className='sticky top-0 z-10 min-w-[180px] bg-card text-center font-semibold sm:min-w-[200px]'
                       colSpan={2}
                     >
                       {period}
@@ -264,13 +277,19 @@ export function WhatIfComparisonDisplay({
                   ))}
                 </TableRow>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 bg-card' colSpan={2} />
+                  <TableHead className='sticky left-0 top-0 z-20 bg-card' colSpan={2} />
                   {visiblePeriods.map((period) => (
                     <React.Fragment key={period}>
-                      <TableHead className='min-w-[90px] bg-blue-500/10 text-right font-medium text-xs sm:min-w-[100px]'>
+                      <TableHead
+                        scope='col'
+                        className='sticky top-0 z-10 min-w-[90px] bg-blue-500/10 text-right font-medium text-xs sm:min-w-[100px]'
+                      >
                         Current
                       </TableHead>
-                      <TableHead className='min-w-[90px] bg-purple-500/10 text-right font-medium text-xs sm:min-w-[100px]'>
+                      <TableHead
+                        scope='col'
+                        className='sticky top-0 z-10 min-w-[90px] bg-purple-500/10 text-right font-medium text-xs sm:min-w-[100px]'
+                      >
                         What If
                       </TableHead>
                     </React.Fragment>

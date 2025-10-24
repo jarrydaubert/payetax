@@ -18,7 +18,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CategoryFilter } from '@/components/molecules/CategoryFilter';
-import { IMAGE_SIZES } from '@/lib/constants/images';
 import { Button } from '@/components/ui/button';
 import CallToAction from '@/components/ui/CallToAction';
 import {
@@ -28,6 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import { IMAGE_SIZES } from '@/lib/constants/images';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
 interface BlogPageClientProps {

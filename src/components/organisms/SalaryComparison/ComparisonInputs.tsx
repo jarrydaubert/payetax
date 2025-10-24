@@ -75,42 +75,60 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
         <div className='space-y-3'>
           <Label>Comparison Type</Label>
           <div className='grid gap-2 sm:grid-cols-3'>
-            <button
-              type='button'
-              onClick={() => setMode('percentage')}
-              className={`rounded-lg border-2 p-3 text-sm transition-colors ${
+            <label
+              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
                 mode === 'percentage'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
               }`}
             >
+              <input
+                type='radio'
+                name='comparison-mode'
+                value='percentage'
+                checked={mode === 'percentage'}
+                onChange={() => setMode('percentage')}
+                className='sr-only'
+              />
               Percentage
               <span className='block text-muted-foreground text-xs'>e.g., 10%</span>
-            </button>
-            <button
-              type='button'
-              onClick={() => setMode('amount')}
-              className={`rounded-lg border-2 p-3 text-sm transition-colors ${
+            </label>
+            <label
+              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
                 mode === 'amount'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
               }`}
             >
+              <input
+                type='radio'
+                name='comparison-mode'
+                value='amount'
+                checked={mode === 'amount'}
+                onChange={() => setMode('amount')}
+                className='sr-only'
+              />
               £ Amount
               <span className='block text-muted-foreground text-xs'>e.g., +£5k</span>
-            </button>
-            <button
-              type='button'
-              onClick={() => setMode('total')}
-              className={`rounded-lg border-2 p-3 text-sm transition-colors ${
+            </label>
+            <label
+              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
                 mode === 'total'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
               }`}
             >
+              <input
+                type='radio'
+                name='comparison-mode'
+                value='total'
+                checked={mode === 'total'}
+                onChange={() => setMode('total')}
+                className='sr-only'
+              />
               New Total
               <span className='block text-muted-foreground text-xs'>e.g., £45k</span>
-            </button>
+            </label>
           </div>
         </div>
 

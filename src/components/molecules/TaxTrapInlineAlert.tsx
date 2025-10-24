@@ -3,6 +3,7 @@
  *
  * Single-line compact alert displayed below the results table when user is in the £100k-£125k tax trap.
  * Shows the scenario they're in and suggests pension optimization with a clear call-to-action.
+ * Can be dismissed by user - preference is saved to localStorage.
  *
  * @example
  * ```tsx
@@ -15,7 +16,8 @@
  */
 'use client';
 
-import { AlertTriangle, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ArrowRight, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
@@ -32,12 +34,28 @@ interface TaxTrapInlineAlertProps {
 /**
  * Compact single-line tax trap alert using shadcn Alert component
  * Highlights the user's situation and provides quick optimization action
+ * Dismissible - preference saved to localStorage
  */
 export function TaxTrapInlineAlert({
   salary,
   suggestedPension,
   onApplyPension,
 }: TaxTrapInlineAlertProps) {
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Check localStorage on mount
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem('taxTrapAlertDismissed');
+      if (dismissed === 'true') {
+        setIsDismissed(true);
+      }
+    } catch (error) {
+      // localStorage might not be available (SSR, private browsing)
+      console.warn('[TaxTrapInlineAlert] localStorage unavailable:', error);
+    }
+  }, []);
+
   // Calculate excess over 100k for contextual messaging
   const excessOver100k = salary - 100000;
   const allowanceLost = Math.min(excessOver100k / 2, 12570);
@@ -48,10 +66,36 @@ export function TaxTrapInlineAlert({
     }
   };
 
+  const handleDismiss = () => {
+    try {
+      localStorage.setItem('taxTrapAlertDismissed', 'true');
+      setIsDismissed(true);
+    } catch (error) {
+      console.warn('[TaxTrapInlineAlert] Failed to save dismissal:', error);
+      setIsDismissed(true); // Still dismiss in UI even if localStorage fails
+    }
+  };
+
+  // Don't render if dismissed
+  if (isDismissed) {
+    return null;
+  }
+
   return (
-    <Alert variant='warning' className='border-2'>
+    <Alert variant='warning' className='relative border-2'>
       <AlertTriangle className='size-5' />
-      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+
+      {/* Close button */}
+      <button
+        type='button'
+        onClick={handleDismiss}
+        className='absolute top-3 right-3 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+        aria-label='Dismiss tax trap alert'
+      >
+        <X className='size-4' />
+      </button>
+
+      <div className='flex flex-col gap-3 pr-8 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex-1'>
           <AlertTitle>Tax Trap Alert</AlertTitle>
           <AlertDescription>

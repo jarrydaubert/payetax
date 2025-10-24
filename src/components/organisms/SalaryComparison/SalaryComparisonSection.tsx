@@ -3,7 +3,8 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeftRight, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   type ComparisonInput,
@@ -27,12 +28,22 @@ export function SalaryComparisonSection({
   currentResults,
   className,
 }: SalaryComparisonSectionProps) {
+  const contentId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [comparisonResults, setComparisonResults] = useState<ComparisonResults | null>(null);
 
   const handleCompare = (comparisonInput: ComparisonInput) => {
-    const results = calculateComparison(currentInput, comparisonInput);
-    setComparisonResults(results);
+    try {
+      const results = calculateComparison(currentInput, comparisonInput);
+      if (!results) {
+        toast.error('Comparison failed: Invalid input values');
+        return;
+      }
+      setComparisonResults(results);
+    } catch (error) {
+      console.error('[SalaryComparisonSection] Comparison error:', error);
+      toast.error('Comparison failed: Please check your input values');
+    }
   };
 
   return (
@@ -42,6 +53,9 @@ export function SalaryComparisonSection({
         variant='outline'
         className='w-full justify-between'
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        disabled={!currentResults}
       >
         <span className='flex items-center gap-2'>
           <ArrowLeftRight className='size-4' />
@@ -56,6 +70,7 @@ export function SalaryComparisonSection({
       <AnimatePresence mode='wait'>
         {isOpen && (
           <motion.div
+            id={contentId}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}

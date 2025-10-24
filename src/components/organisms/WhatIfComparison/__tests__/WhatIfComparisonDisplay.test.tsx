@@ -24,6 +24,11 @@ jest.mock('@/hooks/useHorizontalScrollIndicator', () => ({
   }),
 }));
 
+// Mock mouse drag scroll hook
+jest.mock('@/hooks/useMouseDragScroll', () => ({
+  useMouseDragScroll: jest.fn(),
+}));
+
 const mockCurrentResults: TaxCalculationResults = {
   grossSalary: {
     annually: 50000,
@@ -200,7 +205,7 @@ describe('WhatIfComparisonDisplay', () => {
         />
       );
 
-      expect(screen.getByLabelText('What If comparison table')).toBeInTheDocument();
+      expect(screen.getByLabelText(/What If comparison table/i)).toBeInTheDocument();
     });
 
     it('should display all category rows', () => {
@@ -377,7 +382,7 @@ describe('WhatIfComparisonDisplay', () => {
         />
       );
 
-      const table = screen.getByLabelText('What If comparison table');
+      const table = screen.getByLabelText(/What If comparison table/i);
       expect(table).toBeInTheDocument();
     });
 
