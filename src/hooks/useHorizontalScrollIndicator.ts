@@ -55,11 +55,11 @@ export function useHorizontalScrollIndicator<T extends HTMLElement = HTMLDivElem
 
     const container = containerRef.current;
     if (container) {
-      // Initial check
-      checkScrollPosition();
+      // Initial check via RAF for post-layout accuracy
+      const rafId = requestAnimationFrame(checkScrollPosition);
 
-      // Recheck after a short delay to ensure DOM is fully rendered
-      const timeoutId = setTimeout(checkScrollPosition, 100);
+      // Immediate recheck after first frame settles
+      const timeoutId = setTimeout(checkScrollPosition, 0);
 
       // Set up event listeners
       container.addEventListener('scroll', checkScrollPosition);
@@ -72,6 +72,7 @@ export function useHorizontalScrollIndicator<T extends HTMLElement = HTMLDivElem
       resizeObserver.observe(container);
 
       return () => {
+        cancelAnimationFrame(rafId);
         clearTimeout(timeoutId);
         container.removeEventListener('scroll', checkScrollPosition);
         window.removeEventListener('resize', checkScrollPosition);

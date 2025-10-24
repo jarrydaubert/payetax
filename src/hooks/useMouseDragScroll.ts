@@ -48,7 +48,12 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
         return;
       }
 
-      // Don't prevent default immediately - let the browser handle the initial click
+      // Blur any active focus to avoid input conflicts
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+
+      // Don't prevent default immediately - let browser handle the initial click
       // We'll prevent default on move to stop text selection
       // e.preventDefault();
       element.setPointerCapture(e.pointerId); // Capture pointer for smooth tracking
