@@ -363,12 +363,17 @@ export function ResultsTable({
               scrollBehavior: 'smooth',
               maxHeight: '70vh',
               overflowY: 'auto',
+              userSelect: 'none',
             }}
             role='region'
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
+            onPointerDown={(e) => {
+              // Prevent text selection when starting drag
+              e.currentTarget.style.userSelect = 'none';
+            }}
           >
-            <Table data-testid='results-table' className='w-full min-w-full'>
+            <Table data-testid='results-table' className='w-full min-w-full select-none'>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
                   <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pt-3 pr-4 pb-2 font-semibold text-foreground text-lg'>
