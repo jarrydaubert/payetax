@@ -1,8 +1,8 @@
 // src/components/organisms/CalculatorContainer.tsx
 'use client';
 
-import { AnimatePresence, motion, useInView } from 'framer-motion';
-import { ArrowUp, ChevronDown, FileDown, Printer, Sparkles } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -35,17 +35,10 @@ export function CalculatorContainer() {
     'Hourly',
   ]);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
-  const [showScrollIndicator, setShowScrollIndicator] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
 
   // Derive showResults from results state
   const showResults = !!results;
-
-  // Use Intersection Observer for scroll indicator (more performant than scroll listener)
-  const isResultsInView = useInView(resultsRef, {
-    margin: '-20% 0px', // Trigger when results are 20% outside viewport
-    once: false,
-  });
 
   // Lightweight scroll listener only for scroll-to-top button
   React.useEffect(() => {
@@ -58,15 +51,6 @@ export function CalculatorContainer() {
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Update scroll indicator based on Intersection Observer + scroll position
-  React.useEffect(() => {
-    if (results) {
-      setShowScrollIndicator(!isResultsInView && window.scrollY < SCROLL_THRESHOLDS.INDICATOR);
-    } else {
-      setShowScrollIndicator(false);
-    }
-  }, [isResultsInView, results]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -207,30 +191,6 @@ export function CalculatorContainer() {
             aria-live='polite'
             aria-label='Tax calculation results summary'
           >
-            {/* Scroll Indicator - Shows when results extend below viewport */}
-            <AnimatePresence>
-              {showScrollIndicator && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className='mb-4 flex flex-col items-center justify-center rounded-lg bg-gradient-to-b from-primary/10 to-transparent py-3'
-                >
-                  <motion.div
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    <ChevronDown className='size-6 text-primary' />
-                  </motion.div>
-                  <span className='mt-1 text-muted-foreground text-xs'>More results below</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             <ResultsSummaryCards results={results} />
           </motion.div>
         )}
