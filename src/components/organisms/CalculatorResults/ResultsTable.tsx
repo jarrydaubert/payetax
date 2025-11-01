@@ -377,8 +377,8 @@ export function ResultsTable({
             ref={containerRef}
             className='w-full cursor-grab overflow-x-auto scroll-smooth active:cursor-grabbing'
             style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
+              scrollbarWidth: 'auto', // Changed from 'thin' to 'auto' for better visibility
+              scrollbarColor: 'hsl(var(--muted-foreground)) hsl(var(--muted))',
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',
             }}
