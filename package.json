@@ -5,7 +5,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "contentlayer2 build && next build",
+    "postinstall": "contentlayer2 build",
     "build:analyze": "ANALYZE=true next build",
     "bundle:analyze": "node scripts/bundle-analyzer.js",
     "bundle:monitor": "npm run build && npm run bundle:analyze",
