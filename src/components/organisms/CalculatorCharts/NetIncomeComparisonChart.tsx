@@ -18,7 +18,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useChartColors } from '@/hooks/useChartColors';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -41,7 +40,6 @@ interface NetIncomeComparisonChartProps {
  */
 export function NetIncomeComparisonChart({ results, className }: NetIncomeComparisonChartProps) {
   const currentSalary = results.grossSalary.annually;
-  const chartColors = useChartColors();
 
   // Calculate data points for different salary levels
   const salaryBands = React.useMemo(() => {
@@ -115,8 +113,9 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
                 fontSize={11}
                 tickLine={false}
                 axisLine={false}
-                stroke={chartColors.mutedForeground}
-                tick={{ fill: chartColors.mutedForeground }}
+                stroke='currentColor'
+                tick={{ fill: 'currentColor' }}
+                className='text-muted-foreground'
               />
 
               <YAxis
@@ -125,8 +124,9 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
                 tickLine={false}
                 axisLine={false}
                 width={45}
-                stroke={chartColors.mutedForeground}
-                tick={{ fill: chartColors.mutedForeground }}
+                stroke='currentColor'
+                tick={{ fill: 'currentColor' }}
+                className='text-muted-foreground'
               />
 
               <ChartTooltip
@@ -154,13 +154,14 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
 
               {/* Net income bars (foreground) */}
               <Bar dataKey='net' name='Take Home' fill='hsl(var(--chart-6))' radius={[4, 4, 0, 0]}>
-                {/* Show effective rate on top of bars - uses CSS variable for theme-aware color */}
+                {/* Show effective rate on top of bars - theme-aware with currentColor */}
                 <LabelList
                   dataKey='effectiveRate'
                   position='top'
                   fontSize={10}
-                  fill={chartColors.foreground}
+                  fill='currentColor'
                   fontWeight={600}
+                  className='fill-foreground'
                 />
               </Bar>
 
