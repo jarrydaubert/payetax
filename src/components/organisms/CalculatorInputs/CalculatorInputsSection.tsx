@@ -35,12 +35,19 @@ export function CalculatorInputsSection({
   };
 
   const handleCalculate = () => {
-    // Validate salary is entered
+    // Validate salary is entered and reasonable
     if (salary <= 0) {
       toast.error('Please enter a salary', {
         description: 'Enter your gross salary to calculate your tax breakdown',
       });
       return;
+    }
+
+    // Warn about very low salary (less than minimum wage equivalent)
+    if (salary < 100) {
+      toast.warning('Very low salary', {
+        description: 'Salary below £100/year may show unusual percentages',
+      });
     }
 
     setIsCalculating(true);

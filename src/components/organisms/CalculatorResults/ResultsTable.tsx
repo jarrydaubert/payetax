@@ -161,7 +161,11 @@ export function ResultsTable({
 
   const calculatePercentage = (amount: number, total: number): string => {
     if (total === 0) return '0.0%';
-    return `${Math.abs((amount / total) * 100).toFixed(1)}%`;
+    const percentage = Math.abs((amount / total) * 100);
+    // Cap percentage display at 999.9% for readability
+    // (e.g., Tax-Free Allowance of £12,570 on £1 salary would be 1,257,000%)
+    const cappedPercentage = Math.min(percentage, 999.9);
+    return `${cappedPercentage.toFixed(1)}%`;
   };
 
   // Use total gross income (employment + other income) for percentage calculations
