@@ -27,6 +27,16 @@
   --brand-gradient-start: oklch(0.50 0.20 264);
   --brand-gradient-end: oklch(0.60 0.24 250);
 
+  /* Chart Colors - High contrast for both light and dark modes */
+  --chart-1: 210 100% 42%;    /* Blue - Employment income (darker) */
+  --chart-2: 280 70% 52%;     /* Purple - Other income / Pension (darker) */
+  --chart-3: 0 80% 48%;       /* Red - Income Tax (darker, more saturated) */
+  --chart-4: 38 95% 47%;      /* Amber - National Insurance (darker) */
+  --chart-5: 33 100% 47%;     /* Orange - Student Loan (darker) */
+  --chart-6: 142 75% 40%;     /* Green - Net Pay (darker) */
+  --chart-7: 200 85% 47%;     /* Cyan - Gross salary bars (darker) */
+  --chart-8: 320 65% 50%;     /* Pink - Additional data */
+
   /* Shadcn Official Light Theme (OKLCH) */
   --background: oklch(0.98 0 0);                /* Softer white */
   --foreground: oklch(0.145 0 0);
@@ -56,6 +66,16 @@
   --brand-accent: oklch(0.70 0.26 240);
   --brand-gradient-start: oklch(0.55 0.22 264);
   --brand-gradient-end: oklch(0.65 0.25 250);
+
+  /* Chart Colors - Brighter for dark mode visibility */
+  --chart-1: 210 100% 68%;    /* Much brighter blue */
+  --chart-2: 280 70% 73%;     /* Much lighter purple */
+  --chart-3: 0 80% 68%;       /* Much brighter red */
+  --chart-4: 38 95% 68%;      /* Much brighter amber */
+  --chart-5: 33 100% 68%;     /* Much brighter orange */
+  --chart-6: 142 75% 62%;     /* Much brighter green */
+  --chart-7: 200 85% 68%;     /* Much brighter cyan - CRITICAL for gross bars */
+  --chart-8: 320 65% 70%;     /* Brighter pink */
 
   --background: oklch(0.18 0.02 260);           /* Warm dark slate - easier on eyes */
   --foreground: oklch(0.985 0 0);

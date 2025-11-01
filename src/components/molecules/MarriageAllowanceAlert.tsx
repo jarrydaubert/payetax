@@ -18,6 +18,7 @@
 import { ExternalLink, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { formatCurrency } from '@/lib/utils';
 
 interface MarriageAllowanceAlertProps {
@@ -27,6 +28,8 @@ interface MarriageAllowanceAlertProps {
   partnerSalary: number;
   /** Whether user already has M code in tax code */
   hasMarriageCode: boolean;
+  /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
+  taxYear?: TaxYear;
 }
 
 /**
@@ -42,16 +45,21 @@ export function MarriageAllowanceAlert({
   userSalary,
   partnerSalary,
   hasMarriageCode,
+  taxYear = TAX_YEARS[0],
 }: MarriageAllowanceAlertProps) {
   // Don't show if they already have the M code
   if (hasMarriageCode) {
     return null;
   }
 
-  // User must be a basic rate taxpayer (between PA and higher rate threshold)
-  const personalAllowance = 12570;
-  const higherRateThreshold = 50270;
+  // Get tax rates for the specified tax year
+  const taxRates = TAX_RATES[taxYear];
+  const personalAllowance = taxRates.personalAllowance;
+  const higherRateThreshold = personalAllowance + taxRates.bands[0].threshold;
+  const marriageAllowanceTransfer = taxRates.marriageAllowance;
+  const basicRate = taxRates.bands[0].rate;
 
+  // User must be a basic rate taxpayer (between PA and higher rate threshold)
   if (userSalary <= personalAllowance || userSalary > higherRateThreshold) {
     return null;
   }
@@ -61,9 +69,9 @@ export function MarriageAllowanceAlert({
     return null;
   }
 
-  // Calculate potential annual saving (£1,260 × 20% basic rate)
-  const annualSaving = 252;
-  const monthlySaving = 21; // £252 / 12
+  // Calculate potential annual saving (marriage allowance × basic rate)
+  const annualSaving = (marriageAllowanceTransfer * basicRate) / 100;
+  const monthlySaving = annualSaving / 12;
 
   return (
     <Alert

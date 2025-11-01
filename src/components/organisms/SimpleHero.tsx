@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { GlowButton } from '@/components/ui/GlowButton';
 import { cn } from '@/lib/utils';
 
 interface SimpleHeroProps {
@@ -36,25 +36,19 @@ export default function SimpleHero({ className, onScrollToCalculator }: SimpleHe
           loans, and pension contributions.
         </p>
 
-        {/* CTA Button */}
+        {/* CTA Button with Premium Glow Effect */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
           className='inline-block'
         >
-          <div className='rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end p-[1px]'>
-            <Button
-              size='lg'
-              onClick={onScrollToCalculator}
-              className='group gap-2 rounded-lg bg-background px-8 text-foreground hover:bg-card'
-            >
+          <GlowButton onClick={onScrollToCalculator} glowColor='primary'>
+            <span className='flex items-center gap-2'>
               Calculate My Salary
               <ArrowRight className='size-4 transition-transform group-hover:translate-x-1' />
-            </Button>
-          </div>
+            </span>
+          </GlowButton>
         </motion.div>
 
         {/* Features */}

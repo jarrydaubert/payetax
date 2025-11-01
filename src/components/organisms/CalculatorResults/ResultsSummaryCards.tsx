@@ -3,28 +3,38 @@
 
 import { Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { ResultCard } from '@/components/molecules/ResultCard';
+import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
 interface ResultsSummaryCardsProps {
   results: TaxCalculationResults;
+  /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
+  taxYear?: TaxYear;
 }
 
-export function ResultsSummaryCards({ results }: ResultsSummaryCardsProps) {
+export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: ResultsSummaryCardsProps) {
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
   const effectiveRate =
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
+
+  // Get tax rates for the specified tax year
+  const taxRates = TAX_RATES[taxYear];
+  const personalAllowance = taxRates.personalAllowance;
+  const basicRateThreshold = personalAllowance + taxRates.bands[0].threshold; // £50,270
+  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
+  const higherRateThreshold = personalAllowance + taxRates.bands[1].threshold; // £125,140
 
   // Calculate marginal tax rate: for every extra £1, how much do you keep?
   // This shows which tax band you're in
   const calculateMarginalRate = (): number => {
     const salary = results.grossSalary.annually;
 
-    // Tax bands for England/Wales (2025-26)
-    if (salary <= 12570) return 0; // No tax
-    if (salary <= 50270) return 67.25; // 20% tax + 8% NI + 4.75% pension relief = keep 67.25%
-    if (salary <= 100000) return 57.25; // 40% tax + 2% NI = keep 57.25%
-    if (salary <= 125140) return 37.25; // 60% effective (allowance taper) + 2% NI = keep 37.25%
+    // Tax bands for England/Wales (2025-26) - using constants from taxRates.ts
+    if (salary <= personalAllowance) return 0; // No tax
+    if (salary <= basicRateThreshold) return 67.25; // 20% tax + 8% NI + 4.75% pension relief = keep 67.25%
+    if (salary <= paReductionThreshold) return 57.25; // 40% tax + 2% NI = keep 57.25%
+    if (salary <= higherRateThreshold) return 37.25; // 60% effective (allowance taper) + 2% NI = keep 37.25%
     return 52.75; // 45% additional rate + 2% NI = keep 52.75%
   };
 

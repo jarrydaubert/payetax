@@ -60,12 +60,13 @@ describe('theme', () => {
       expect(screen.getByText('Test Child')).toBeInTheDocument();
     });
 
-    it('initializes with system theme by default', () => {
+    it('initializes with dark theme by default', () => {
       const { result } = renderHook(() => useTheme(), {
         wrapper: ThemeProvider,
       });
 
-      expect(result.current.theme).toBe('system');
+      // Updated: Default theme is now 'dark' instead of 'system'
+      expect(result.current.theme).toBe('dark');
     });
 
     it('loads theme from localStorage if available', async () => {
@@ -99,7 +100,8 @@ describe('theme', () => {
       });
     });
 
-    it('applies light theme to document when system prefers light', async () => {
+    it('applies dark theme to document by default (not system light)', async () => {
+      // System prefers light, but our default is dark theme
       mockMatchMedia.mockReturnValue({
         matches: false,
         media: '(prefers-color-scheme: dark)',
@@ -112,9 +114,10 @@ describe('theme', () => {
       });
 
       await waitFor(() => {
-        expect(document.documentElement.classList.contains('light')).toBe(true);
-        expect(document.documentElement.style.colorScheme).toBe('light');
-        expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+        // Updated: Since default theme is 'dark' (not 'system'), it should be dark
+        expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
+        expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
       });
     });
   });
@@ -272,17 +275,18 @@ describe('theme', () => {
   });
 
   describe('cycleTheme', () => {
-    it('cycles from system to light', async () => {
+    it('cycles from dark to system (new default is dark)', async () => {
       const { result } = renderHook(() => useTheme(), {
         wrapper: ThemeProvider,
       });
 
+      // Default is now 'dark', cycling should go dark → system
       act(() => {
         result.current.cycleTheme();
       });
 
       await waitFor(() => {
-        expect(result.current.theme).toBe('light');
+        expect(result.current.theme).toBe('system');
       });
     });
 
@@ -345,7 +349,10 @@ describe('theme', () => {
       });
     });
 
-    it('detects light system preference', async () => {
+    it('detects light system preference only when theme is system', async () => {
+      // Set localStorage to use 'system' theme
+      mockLocalStorage.theme = 'system';
+
       mockMatchMedia.mockReturnValue({
         matches: false,
         media: '(prefers-color-scheme: dark)',
@@ -358,11 +365,16 @@ describe('theme', () => {
       });
 
       await waitFor(() => {
+        // Now it should respect system preference since theme is 'system'
+        expect(result.current.theme).toBe('system');
         expect(result.current.resolvedTheme).toBe('light');
       });
     });
 
-    it('listens for system theme changes', async () => {
+    it('listens for system theme changes when theme is system', async () => {
+      // Set localStorage to use 'system' theme
+      mockLocalStorage.theme = 'system';
+
       let mediaQueryListener: ((e: { matches: boolean }) => void) | null = null;
       const addEventListenerMock = jest.fn((event, handler) => {
         if (event === 'change') {
@@ -382,6 +394,7 @@ describe('theme', () => {
       });
 
       await waitFor(() => {
+        expect(result.current.theme).toBe('system');
         expect(result.current.resolvedTheme).toBe('light');
       });
 

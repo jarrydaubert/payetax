@@ -2,23 +2,27 @@
 /**
  * Pension Optimization Calculator for £100k Tax Trap
  *
- * Calculates optimal pension contributions for high earners (£100k-£125k)
- * to avoid the 60% effective tax rate zone caused by personal allowance tapering.
+ * Calculates optimal pension contributions for high earners in the tax trap zone
+ * to avoid the 60% effective tax rate caused by personal allowance tapering.
  *
  * How the £100k Tax Trap Works:
- * - For every £2 earned over £100k, you lose £1 of personal allowance
+ * - For every £2 earned over the PA reduction threshold, you lose £1 of personal allowance
  * - This creates an effective 60% tax rate (40% income tax + 20% from lost allowance)
- * - The personal allowance (£12,570) is fully lost at £125,140
+ * - The personal allowance is fully lost at higher rate threshold
  *
  * Optimization Strategy:
- * - Contribute to pension to reduce taxable income below £100k
+ * - Contribute to pension to reduce taxable income below PA reduction threshold
  * - Each £1 contributed saves 60p in tax
  * - Pension contributions get 25% tax relief on top
+ *
+ * Note: Thresholds are fetched from TAX_RATES constants and vary by tax year
  *
  * @module lib/pensionOptimizer
  * @since 1.0.0
  * @see {@link https://www.gov.uk/guidance/adjusted-net-income} HMRC guidance
  */
+
+import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 
 export interface PensionOptimization {
   /** Suggested pension contribution to drop below £100k */
@@ -63,7 +67,8 @@ export interface PensionOptimization {
  */
 export function calculateOptimalPension(
   salary: number,
-  currentPension = 0
+  currentPension = 0,
+  taxYear: TaxYear = TAX_YEARS[0]
 ): PensionOptimization | null {
   // Validate inputs
   try {
@@ -81,21 +86,28 @@ export function calculateOptimalPension(
     return null;
   }
 
+  // Get tax rates for the specified tax year
+  const taxRates = TAX_RATES[taxYear];
+  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
+  const personalAllowance = taxRates.personalAllowance; // £12,570
+  // Calculate point where PA is fully tapered to zero: threshold + (PA × 2)
+  const fullTaperPoint = paReductionThreshold + personalAllowance * 2; // £125,140
+
   // Calculate adjusted income (what HMRC uses for personal allowance tapering)
   const adjustedIncome = salary - currentPension;
 
-  // Only applies to £100k-£125k range (exclusive of £100k, inclusive until £125,140)
+  // Only applies to PA reduction zone (exclusive of threshold, inclusive until full taper)
   // Check ADJUSTED income, not gross salary - pension contributions reduce this
-  if (adjustedIncome <= 100000 || adjustedIncome > 125140) {
+  if (adjustedIncome <= paReductionThreshold || adjustedIncome > fullTaperPoint) {
     return null;
   }
 
-  // Calculate excess over £100k threshold (using adjusted income)
-  const excessOver100k = adjustedIncome - 100000;
+  // Calculate excess over PA reduction threshold (using adjusted income)
+  const excessOver100k = adjustedIncome - paReductionThreshold;
 
-  // Personal allowance reduction: £1 lost for every £2 earned over £100k
-  // Capped at full personal allowance (£12,570)
-  const allowanceLost = Math.min(excessOver100k / 2, 12570);
+  // Personal allowance reduction: £1 lost for every £2 earned over threshold
+  // Capped at full personal allowance
+  const allowanceLost = Math.min(excessOver100k / 2, personalAllowance);
 
   // Effective rate is always 60% in this zone
   // (40% income tax + 20% from losing personal allowance)
@@ -111,8 +123,8 @@ export function calculateOptimalPension(
   // Plus 25% tax relief on pension contribution
   const savingsFromOptimizing = suggested * 0.6;
 
-  // Optimization is beneficial if adjusted income is above £100k
-  const shouldOptimize = adjustedIncome > 100000;
+  // Optimization is beneficial if adjusted income is above PA reduction threshold
+  const shouldOptimize = adjustedIncome > paReductionThreshold;
 
   return {
     suggested,
@@ -173,12 +185,16 @@ export function compareWithOptimization(
     return null;
   }
 
+  // Get tax rates for calculations
+  const taxRates = TAX_RATES[TAX_YEARS[0]];
+  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold;
+
   // NOTE: Simplified calculation for comparison display only
   // For precise calculations, use the full taxCalculator.ts engine
   // Current: lose allowance, pay 60% on excess
-  const excessOver100k = salary - 100000;
+  const excessOver100k = salary - paReductionThreshold;
   const trapTax = excessOver100k * 0.6;
-  const baseTax = 100000 * 0.3; // Approx effective rate up to £100k (simplified)
+  const baseTax = paReductionThreshold * 0.3; // Approx effective rate up to threshold (simplified)
   const currentTax = baseTax + trapTax;
   const currentTakeHome = salary - currentTax;
 

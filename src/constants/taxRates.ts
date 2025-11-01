@@ -1,5 +1,19 @@
 // src/constants/taxRates.ts
 // Tax rates and thresholds for UK PAYE calculations
+//
+// ⚠️ CRITICAL: SINGLE SOURCE OF TRUTH FOR TAX CALCULATIONS ⚠️
+//
+// This file is the ONLY place where tax rates, thresholds, and allowances should be defined.
+// When HMRC announces tax changes, update ONLY this file - all calculations across the entire
+// application will automatically use the updated values.
+//
+// DO NOT hardcode tax values (£12,570, £50,270, etc.) anywhere else in the codebase!
+// Always import from this file: import { TAX_RATES } from '@/constants/taxRates'
+//
+// If you find hardcoded tax values elsewhere, that's a bug - please refactor to use this file.
+//
+// Updated: 2025-04-06 for tax year 2025-2026
+// Source: https://www.gov.uk/income-tax-rates
 
 // Default tax code
 export const DEFAULT_TAX_CODE = '1257L';
@@ -53,6 +67,10 @@ export const TAX_RATES: Record<
     bands: TaxBand[];
     marriageAllowance: number;
     blindPersonsAllowance: number;
+    // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
+    ageAllowance65to74: number;
+    ageAllowance75plus: number;
+    ageAllowanceTaperThreshold: number;
     nationalInsurance: {
       employee: Record<
         NICategory,
@@ -88,6 +106,10 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
+    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -166,6 +188,10 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
+    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -240,6 +266,10 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026
+    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -318,6 +348,10 @@ export const SCOTTISH_TAX_RATES: Record<
     bands: TaxBand[];
     marriageAllowance: number;
     blindPersonsAllowance: number;
+    // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
+    ageAllowance65to74: number;
+    ageAllowance75plus: number;
+    ageAllowanceTaperThreshold: number;
   }
 > = {
   '2023-2024': {
@@ -337,6 +371,9 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
   },
   '2024-2025': {
     personalAllowance: 12570,
@@ -356,6 +393,9 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
   },
   '2025-2026': {
     personalAllowance: 12570,
@@ -375,5 +415,8 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
   },
 };

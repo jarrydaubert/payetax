@@ -122,8 +122,10 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      const categoryCell = container.querySelector('.pl-6');
+      // Updated to match responsive padding classes (pl-4 sm:pl-6)
+      const categoryCell = container.querySelector('.pl-4');
       expect(categoryCell).toBeInTheDocument();
+      expect(categoryCell).toHaveClass('sm:pl-6');
     });
 
     it('should not apply sub-row indentation when isSubRow is false', () => {
@@ -131,9 +133,10 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      // When isSubRow is false, the pl-6 class should NOT be applied to the div
-      const iconContainer = container.querySelector('.flex.items-center.gap-2');
-      expect(iconContainer).not.toHaveClass('pl-6');
+      // When isSubRow is false, the pl-4 class should NOT be applied to the div
+      const iconContainer = container.querySelector('.flex.items-center.gap-1\\.5');
+      expect(iconContainer).not.toHaveClass('pl-4');
+      expect(iconContainer).not.toHaveClass('sm:pl-6');
     });
 
     it('should have hover styles', () => {

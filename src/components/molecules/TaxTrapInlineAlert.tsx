@@ -20,6 +20,7 @@ import { AlertTriangle, ArrowRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { formatCurrency } from '@/lib/utils';
 
 interface TaxTrapInlineAlertProps {
@@ -29,6 +30,8 @@ interface TaxTrapInlineAlertProps {
   suggestedPension: number;
   /** Callback when user clicks optimize button - receives the suggested pension amount */
   onApplyPension?: (amount: number) => void;
+  /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
+  taxYear?: TaxYear;
 }
 
 /**
@@ -40,6 +43,7 @@ export function TaxTrapInlineAlert({
   salary,
   suggestedPension,
   onApplyPension,
+  taxYear = TAX_YEARS[0],
 }: TaxTrapInlineAlertProps) {
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -56,9 +60,14 @@ export function TaxTrapInlineAlert({
     }
   }, []);
 
-  // Calculate excess over 100k for contextual messaging
-  const excessOver100k = salary - 100000;
-  const allowanceLost = Math.min(excessOver100k / 2, 12570);
+  // Get tax rates for the specified tax year
+  const taxRates = TAX_RATES[taxYear];
+  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
+  const personalAllowance = taxRates.personalAllowance; // £12,570
+
+  // Calculate excess over £100k for contextual messaging
+  const excessOver100k = salary - paReductionThreshold;
+  const allowanceLost = Math.min(excessOver100k / 2, personalAllowance);
 
   const handleApplyPension = () => {
     if (onApplyPension) {

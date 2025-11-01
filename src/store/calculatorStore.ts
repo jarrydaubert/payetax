@@ -519,15 +519,19 @@ export const useCalculatorStore = create<CalculatorState>()(
           input: state.input,
           // Don't persist calculation results
         }),
-        merge: (persistedState: any, currentState: CalculatorState) => {
+        merge: (
+          persistedState: Partial<CalculatorState> | unknown,
+          currentState: CalculatorState
+        ) => {
           // Merge persisted state with defaults for new fields
+          const state = persistedState as Partial<CalculatorState> | undefined;
           return {
             ...currentState,
             input: {
               ...currentState.input,
-              ...persistedState?.input,
+              ...state?.input,
               // Ensure new fields have defaults if missing in persisted state
-              incomeSources: persistedState?.input?.incomeSources ?? [],
+              incomeSources: state?.input?.incomeSources ?? [],
             },
           };
         },

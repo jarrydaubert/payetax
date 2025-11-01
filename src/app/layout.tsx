@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 function getTheme() {
                   const stored = localStorage.getItem('theme');
                   if (stored) return stored;
-                  return 'system';
+                  return 'dark';
                 }
 
                 function applyTheme(theme) {

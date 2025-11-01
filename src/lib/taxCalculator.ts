@@ -366,22 +366,21 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Age-Related Personal Allowances (LEGACY - applies only to those born before 6 April 1938)
   // NOTE: Age allowances were frozen in April 2016 and are being phased out
   // Most people aged 65+ now use the standard personal allowance
-  // However, for those who were already receiving it, it continues:
-  // For 2024-25: Age 65-74: +£3,660, Age 75+: +£3,960
-  // Tapers down by £1 for every £2 of income over £34,600
+  // However, for those who were already receiving it, it continues
+  // These values are frozen across all tax years
   // In practice, very few users will be affected by this
   if (input.age && input.age >= 65) {
     let ageAllowance = 0;
 
-    // Determine base age allowance
+    // Determine base age allowance from tax rates constants
     if (input.age >= 75) {
-      ageAllowance = 3960; // Higher allowance for 75+
+      ageAllowance = taxRates.ageAllowance75plus; // Higher allowance for 75+
     } else if (input.age >= 65) {
-      ageAllowance = 3660; // Standard age allowance for 65-74
+      ageAllowance = taxRates.ageAllowance65to74; // Standard age allowance for 65-74
     }
 
-    // Apply income taper for high earners (over £34,600)
-    const ageTaperThreshold = 34600;
+    // Apply income taper for high earners
+    const ageTaperThreshold = taxRates.ageAllowanceTaperThreshold;
     if (annualGrossSalary > ageTaperThreshold && ageAllowance > 0) {
       const excessIncome = annualGrossSalary - ageTaperThreshold;
       const taperReduction = Math.floor(excessIncome / 2);
@@ -404,7 +403,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const basicRateThreshold =
       higherRateBandIndex > 0
         ? taxRates.bands[higherRateBandIndex - 1].threshold
-        : taxRates.bands[0]?.threshold || 37700;
+        : (taxRates.bands[0]?.threshold ?? taxRates.bands[0].threshold);
     const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
 
     // Check if USER can RECEIVE marriage allowance from their partner:

@@ -35,7 +35,7 @@ const log = (msg, color = 'reset') => console.log(`${colors[color]}${msg}${color
 function getAllFiles(dir, fileList = []) {
   const files = fs.readdirSync(dir);
 
-  files.forEach((file) => {
+  for (const file of files) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
 
@@ -44,7 +44,7 @@ function getAllFiles(dir, fileList = []) {
     } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
       fileList.push(filePath);
     }
-  });
+  }
 
   return fileList;
 }
@@ -93,24 +93,23 @@ function analyzeComponents() {
 
   // 2. Component categorization
   const categories = {};
-  sourceFiles.forEach((file) => {
+  for (const file of sourceFiles) {
     const category = file.split('/src/components/')[1]?.split('/')[0] || 'root';
     categories[category] = (categories[category] || 0) + 1;
-  });
+  }
 
   log('\n📁 BY CATEGORY', 'bold');
-  Object.entries(categories)
-    .sort(([, a], [, b]) => b - a)
-    .forEach(([cat, count]) => {
-      log(`  ${cat.padEnd(15)} ${count.toString().padStart(3)} files`);
-    });
+  const sortedCategories = Object.entries(categories).sort(([, a], [, b]) => b - a);
+  for (const [cat, count] of sortedCategories) {
+    log(`  ${cat.padEnd(15)} ${count.toString().padStart(3)} files`);
+  }
 
   // 3. Find unused components
   log('\n🔍 USAGE ANALYSIS', 'bold');
   log('Analyzing imports across codebase...\n');
 
   const usage = {};
-  sourceFiles.forEach((file) => {
+  for (const file of sourceFiles) {
     const imports = findImports(file, [SRC_DIR, APP_DIR]);
     const fileName = path.basename(file);
     usage[fileName] = {
@@ -118,15 +117,15 @@ function analyzeComponents() {
       imports: imports.length,
       importedBy: imports,
     };
-  });
+  }
 
   // Unused components
   const unused = Object.entries(usage).filter(([, data]) => data.imports === 0);
   if (unused.length > 0) {
     log(`❌ POTENTIALLY UNUSED (${unused.length} files):`, 'red');
-    unused.forEach(([name, data]) => {
+    for (const [name, data] of unused) {
       log(`  • ${name.padEnd(35)} ${data.path}`, 'red');
-    });
+    }
   } else {
     log('✅ All components are used!', 'green');
   }
@@ -138,9 +137,9 @@ function analyzeComponents() {
 
   if (highlyUsed.length > 0) {
     log(`\n⭐ HIGHLY USED (${highlyUsed.length} components with 5+ imports):`, 'green');
-    highlyUsed.forEach(([name, data]) => {
+    for (const [name, data] of highlyUsed) {
       log(`  • ${name.padEnd(35)} ${String(data.imports).padStart(2)} imports`);
-    });
+    }
   }
 
   // 4. Test coverage
@@ -162,10 +161,10 @@ function analyzeComponents() {
 
   if (untestedSource.length > 0) {
     log('\n⚠️  FILES WITHOUT TESTS:', 'yellow');
-    untestedSource.forEach((f) => {
+    for (const f of untestedSource) {
       const rel = f.replace(COMPONENTS_DIR, '');
       log(`  • ${rel}`, 'yellow');
-    });
+    }
   }
 
   // 5. UI component usage
@@ -174,19 +173,18 @@ function analyzeComponents() {
   log(`Total UI components: ${uiComponents.length}`);
 
   const uiUsage = {};
-  uiComponents.forEach((file) => {
+  for (const file of uiComponents) {
     const name = path.basename(file, path.extname(file));
     const imports = findImports(file, [SRC_DIR, APP_DIR]);
     uiUsage[name] = imports.length;
-  });
+  }
 
   log('\nUI Component Usage:');
-  Object.entries(uiUsage)
-    .sort(([, a], [, b]) => b - a)
-    .forEach(([name, count]) => {
-      const indicator = count === 0 ? '❌' : count < 3 ? '⚠️ ' : '✅';
-      log(`  ${indicator} ${name.padEnd(25)} ${String(count).padStart(2)} imports`);
-    });
+  const sortedUiUsage = Object.entries(uiUsage).sort(([, a], [, b]) => b - a);
+  for (const [name, count] of sortedUiUsage) {
+    const indicator = count === 0 ? '❌' : count < 3 ? '⚠️ ' : '✅';
+    log(`  ${indicator} ${name.padEnd(25)} ${String(count).padStart(2)} imports`);
+  }
 
   log(`\n${'='.repeat(80)}`, 'cyan');
   log('✅ Audit complete!\n', 'green');

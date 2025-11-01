@@ -43,17 +43,17 @@ export function ResultTableRow({
       }`}
     >
       <TableCell
-        className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 bg-background`}
+        className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5`}
       >
-        <div className={`flex items-center gap-2 ${isSubRow ? 'pl-6 sm:pl-8' : ''}`}>
-          <Icon className='h-4 w-4 flex-shrink-0' aria-hidden='true' />
-          <span className='whitespace-nowrap text-xs sm:text-sm'>{category}</span>
+        <div className={`flex items-center gap-1.5 ${isSubRow ? 'pl-4 sm:pl-6' : ''}`}>
+          <Icon className='h-3.5 w-3.5 flex-shrink-0' aria-hidden='true' />
+          <span className='whitespace-nowrap text-sm'>{category}</span>
         </div>
       </TableCell>
       <TableCell
-        className={`text-right font-mono text-xs sm:text-sm ${color} ${
+        className={`text-right font-mono text-sm ${color} ${
           isHighlight ? 'font-bold' : ''
-        }`}
+        } w-[55px] px-2 py-2.5`}
       >
         {percentage}
       </TableCell>
@@ -62,20 +62,20 @@ export function ResultTableRow({
         const whatIfValue = whatIfAnnual ? whatIfAnnual / periodOptions[period] : undefined;
 
         if (hasWhatIf && whatIfValue !== undefined) {
-          // Render Current and What If columns
+          // Render Current and What If columns with min-width to prevent overlap
           return (
             <React.Fragment key={period}>
               <TableCell
-                className={`min-w-[110px] bg-blue-500/10 text-right font-mono text-xs sm:min-w-[120px] sm:text-sm md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px] ${color} ${
+                className={`min-w-[100px] bg-blue-500/10 text-right font-mono text-sm ${color} ${
                   isHighlight ? 'font-bold' : ''
-                }`}
+                } whitespace-nowrap px-2 py-2.5`}
               >
                 {formatCurrency(currentValue)}
               </TableCell>
               <TableCell
-                className={`min-w-[110px] bg-purple-500/10 text-right font-mono text-xs sm:min-w-[120px] sm:text-sm md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px] ${color} ${
+                className={`min-w-[100px] bg-purple-500/10 text-right font-mono text-sm ${color} ${
                   isHighlight ? 'font-bold' : ''
-                }`}
+                } whitespace-nowrap px-2 py-2.5`}
               >
                 {formatCurrency(whatIfValue)}
               </TableCell>
@@ -83,13 +83,13 @@ export function ResultTableRow({
           );
         }
 
-        // Render single column (normal view)
+        // Render single column (normal view) with min-width
         return (
           <TableCell
             key={period}
-            className={`min-w-[100px] text-right font-mono text-xs sm:min-w-[110px] sm:text-sm md:min-w-[120px] lg:min-w-[130px] xl:min-w-[140px] 2xl:min-w-[150px] ${color} ${
+            className={`min-w-[100px] text-right font-mono text-sm ${color} ${
               isHighlight ? 'font-bold' : ''
-            }`}
+            } whitespace-nowrap px-2 py-2.5`}
           >
             {formatCurrency(currentValue)}
           </TableCell>

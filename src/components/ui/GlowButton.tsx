@@ -25,12 +25,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { Route } from 'next';
 import Link from 'next/link';
 import type React from 'react';
 
 interface GlowButtonProps {
   children: React.ReactNode;
-  href?: string;
+  href?: Route | (string & {});
   onClick?: () => void;
   className?: string;
   glowColor?: 'primary' | 'accent' | 'success';
@@ -81,7 +82,7 @@ export function GlowButton({
     }
 
     return (
-      <Link href={href} className='inline-block'>
+      <Link href={href as Route} className='inline-block'>
         {linkContent}
       </Link>
     );

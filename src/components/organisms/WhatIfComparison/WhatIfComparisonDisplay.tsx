@@ -255,7 +255,7 @@ export function WhatIfComparisonDisplay({
                 <TableRow className='bg-card hover:bg-card'>
                   <TableHead
                     scope='col'
-                    className='sticky left-0 top-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'
+                    className='sticky top-0 left-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'
                   >
                     Category
                   </TableHead>
@@ -277,7 +277,7 @@ export function WhatIfComparisonDisplay({
                   ))}
                 </TableRow>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 top-0 z-20 bg-card' colSpan={2} />
+                  <TableHead className='sticky top-0 left-0 z-20 bg-card' colSpan={2} />
                   {visiblePeriods.map((period) => (
                     <React.Fragment key={period}>
                       <TableHead

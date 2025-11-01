@@ -75,19 +75,45 @@ export function IncomeBreakdownChart({ results, className }: IncomeBreakdownChar
                 innerRadius='60%'
                 outerRadius='80%'
                 paddingAngle={2}
-                label={(props) => {
+                label={(props: {
+                  cx?: number | string;
+                  cy?: number | string;
+                  midAngle?: number;
+                  innerRadius?: number | string;
+                  outerRadius?: number | string;
+                  percentage?: number;
+                }) => {
                   const { cx, cy, midAngle, innerRadius, outerRadius, percentage } = props;
+                  if (
+                    cx === undefined ||
+                    cy === undefined ||
+                    midAngle === undefined ||
+                    innerRadius === undefined ||
+                    outerRadius === undefined ||
+                    percentage === undefined
+                  ) {
+                    return null;
+                  }
+
+                  // Convert to numbers if needed
+                  const cxNum = typeof cx === 'string' ? Number.parseFloat(cx) : cx;
+                  const cyNum = typeof cy === 'string' ? Number.parseFloat(cy) : cy;
+                  const innerRadiusNum =
+                    typeof innerRadius === 'string' ? Number.parseFloat(innerRadius) : innerRadius;
+                  const outerRadiusNum =
+                    typeof outerRadius === 'string' ? Number.parseFloat(outerRadius) : outerRadius;
+
                   const RADIAN = Math.PI / 180;
-                  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                  const radius = innerRadiusNum + (outerRadiusNum - innerRadiusNum) * 0.5;
+                  const x = cxNum + radius * Math.cos(-midAngle * RADIAN);
+                  const y = cyNum + radius * Math.sin(-midAngle * RADIAN);
 
                   return (
                     <text
                       x={x}
                       y={y}
                       fill={chartColors.foreground}
-                      textAnchor={x > cx ? 'start' : 'end'}
+                      textAnchor={x > cxNum ? 'start' : 'end'}
                       dominantBaseline='central'
                       fontSize={12}
                       fontWeight={600}
