@@ -388,7 +388,7 @@ export function ResultsTable({
             <table
               data-testid='results-table'
               className='table-drag-scroll w-full caption-bottom text-sm'
-              style={{ tableLayout: 'fixed' }}
+              style={{ tableLayout: 'auto', minWidth: '100%' }}
             >
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
