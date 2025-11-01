@@ -15,8 +15,10 @@ import { categoryContent } from '@/lib/categoryContent';
 import { IMAGE_SIZES } from '@/lib/constants/images';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
-// Enable ISR - revalidate every hour for category pages
-export const revalidate = 3600;
+// Next.js 16: Route segment config for optimized category pages
+export const dynamic = 'force-static'; // Pre-render all category pages at build time
+export const dynamicParams = true; // Allow new categories to be created at runtime
+export const revalidate = 3600; // ISR: Revalidate every hour for new posts in categories
 
 export async function generateStaticParams() {
   const categories = await getBlogCategories();

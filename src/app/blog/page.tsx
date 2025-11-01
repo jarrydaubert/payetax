@@ -4,8 +4,9 @@ import type { Metadata } from 'next';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
 import { BlogPageClient } from './BlogPageClient';
 
-// Enable ISR - revalidate every hour for blog listing page
-export const revalidate = 3600;
+// Next.js 16: Route segment config for optimized blog listing
+export const dynamic = 'force-static'; // Pre-render blog listing at build time
+export const revalidate = 3600; // ISR: Revalidate every hour for new posts
 
 export const metadata: Metadata = {
   title: 'TaxInsights by PayeTax | UK Tax Guidance',

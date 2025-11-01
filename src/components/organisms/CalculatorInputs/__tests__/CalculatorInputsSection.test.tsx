@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorInputs/__tests__/CalculatorInputsSection.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
-import { useCalculatorActions } from '@/store/calculatorStore';
+import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { CalculatorInputsSection } from '../CalculatorInputsSection';
 
 // Mock dependencies
@@ -13,6 +13,7 @@ jest.mock('sonner', () => ({
 
 jest.mock('@/store/calculatorStore', () => ({
   useCalculatorActions: jest.fn(),
+  useCalculatorStore: jest.fn(),
 }));
 
 jest.mock('../BasicInputs', () => ({
@@ -28,6 +29,8 @@ describe('CalculatorInputsSection Component', () => {
     (useCalculatorActions as jest.Mock).mockReturnValue({
       reset: mockReset,
     });
+    // Mock useCalculatorStore to return a default salary
+    (useCalculatorStore as jest.Mock).mockReturnValue(50000);
   });
 
   describe('Rendering', () => {
