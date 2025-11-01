@@ -8,6 +8,7 @@
  */
 
 import { HelpCircle } from 'lucide-react';
+import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getTooltipContent, type TooltipContent as TooltipData } from '@/config/inputTooltips';
 
@@ -41,6 +42,8 @@ function formatTooltipText(content: TooltipData): React.ReactNode {
 /**
  * LabelTooltip - Shows help icon next to label
  *
+ * Performance: Memoized with React 19 - static content, no need to re-render
+ *
  * @example
  * ```tsx
  * <div className="flex items-center gap-1.5">
@@ -49,7 +52,10 @@ function formatTooltipText(content: TooltipData): React.ReactNode {
  * </div>
  * ```
  */
-export function LabelTooltip({ fieldName, customContent }: LabelTooltipProps) {
+export const LabelTooltip = memo(function LabelTooltip({
+  fieldName,
+  customContent,
+}: LabelTooltipProps) {
   // Get tooltip content from config or use custom
   const tooltipContent = customContent || getTooltipContent(fieldName);
 
@@ -85,4 +91,4 @@ export function LabelTooltip({ fieldName, customContent }: LabelTooltipProps) {
       </Tooltip>
     </TooltipProvider>
   );
-}
+});

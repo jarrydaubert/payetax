@@ -3,6 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { memo } from 'react';
 
 interface ScrollIndicatorProps {
   direction: 'left' | 'right';
@@ -13,8 +14,13 @@ interface ScrollIndicatorProps {
  * Scroll indicator component that shows when table content can be scrolled.
  * Displays animated chevron icon with gradient background.
  * Follows atomic design pattern - single responsibility for scroll indication.
+ *
+ * Performance: Memoized with React 19 to prevent re-renders during scroll events
  */
-export function ScrollIndicator({ direction, visible }: ScrollIndicatorProps) {
+export const ScrollIndicator = memo(function ScrollIndicator({
+  direction,
+  visible,
+}: ScrollIndicatorProps) {
   const Icon = direction === 'left' ? ChevronLeft : ChevronRight;
   const positionClass = direction === 'left' ? 'left-0 justify-start' : 'right-0 justify-end';
   const gradientClass = direction === 'left' ? 'bg-gradient-to-r' : 'bg-gradient-to-l';
@@ -53,4 +59,4 @@ export function ScrollIndicator({ direction, visible }: ScrollIndicatorProps) {
       </div>
     </motion.div>
   );
-}
+});

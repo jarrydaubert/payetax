@@ -28,13 +28,13 @@ interface IncomeBreakdownChartProps {
  * - Other income (dividends, rental, etc - no NI)
  *
  * Only displays if multiple income sources exist.
- * 
+ *
  * Performance: Memoized with React 19, recharts 3.x optimizations
  * Accessibility: Enhanced ARIA labels and keyboard navigation (recharts 3.x)
  */
-export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({ 
-  results, 
-  className 
+export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
+  results,
+  className,
 }: IncomeBreakdownChartProps) {
   const data = getIncomeBreakdownData(results);
   const chartConfig = getChartConfig('income');

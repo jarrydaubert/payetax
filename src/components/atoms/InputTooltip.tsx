@@ -15,6 +15,7 @@
 
 import { HelpCircle } from 'lucide-react';
 import type * as React from 'react';
+import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getTooltipContent, type TooltipContent as TooltipData } from '@/config/inputTooltips';
 
@@ -52,6 +53,8 @@ function formatTooltipText(content: TooltipData): React.ReactNode {
 /**
  * InputTooltip - Wraps input fields with helpful HMRC-style tooltips
  *
+ * Performance: Memoized with React 19 to prevent re-renders during form updates
+ *
  * @example
  * ```tsx
  * <InputTooltip fieldName="salary">
@@ -63,7 +66,12 @@ function formatTooltipText(content: TooltipData): React.ReactNode {
  * </InputTooltip>
  * ```
  */
-export function InputTooltip({ fieldName, children, customContent, className }: InputTooltipProps) {
+export const InputTooltip = memo(function InputTooltip({
+  fieldName,
+  children,
+  customContent,
+  className,
+}: InputTooltipProps) {
   // Get tooltip content from config or use custom
   const tooltipContent = customContent || getTooltipContent(fieldName);
 
@@ -105,4 +113,4 @@ export function InputTooltip({ fieldName, children, customContent, className }: 
       </Tooltip>
     </TooltipProvider>
   );
-}
+});

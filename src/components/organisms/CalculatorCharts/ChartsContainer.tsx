@@ -34,7 +34,7 @@ interface ChartsContainerProps {
  * - Responsive: stack vertically on mobile/tablet
  *
  * Auto-hides charts that don't have data to display.
- * 
+ *
  * Performance: Memoized to prevent unnecessary re-renders with React 19
  */
 export const ChartsContainer = memo(function ChartsContainer({

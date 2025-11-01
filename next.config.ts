@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
     // Enable for memory-intensive builds (recommended for large apps)
     webpackMemoryOptimizations: true,
     // Note: instrumentationHook is now enabled by default in Next.js 15.5+
-    
+
     // NEW: Next.js 16 - Fine-grained stale time control for ISR
     // Default stale time for pages with revalidate
     staleTimes: {

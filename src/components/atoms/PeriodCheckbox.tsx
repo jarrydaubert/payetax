@@ -1,6 +1,7 @@
 // src/components/atoms/PeriodCheckbox.tsx
 'use client';
 
+import { memo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
@@ -13,8 +14,14 @@ interface PeriodCheckboxProps {
 /**
  * Checkbox component for selecting display periods in the results table.
  * Follows atomic design pattern - single responsibility for period selection UI.
+ *
+ * Performance: Memoized with React 19 - simple component, cheap to memoize
  */
-export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheckboxProps) {
+export const PeriodCheckbox = memo(function PeriodCheckbox({
+  period,
+  checked,
+  onCheckedChange,
+}: PeriodCheckboxProps) {
   const checkboxId = `period-${period}`;
 
   return (
@@ -34,4 +41,4 @@ export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheck
       </Label>
     </div>
   );
-}
+});

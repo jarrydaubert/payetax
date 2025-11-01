@@ -13,7 +13,7 @@
  */
 
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { cn, formatNumber, parseFormattedValue } from '@/lib/utils';
 
 /**
@@ -42,10 +42,12 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
  * Enhanced number input component with formatting and controls
  * Supports currency, percentage, and standard number inputs with accessibility features
  *
+ * Performance: Memoized with React 19, uses useCallback/useMemo for optimal re-render prevention
+ *
  * @param props - Component props including value, onChange, and formatting options
  * @returns A numeric input field with formatting and optional controls
  */
-function NumberInput({
+const NumberInput = memo(function NumberInput({
   value,
   onChange,
   decimals = 0,
@@ -368,7 +370,7 @@ function NumberInput({
       )}
     </div>
   );
-}
+});
 
 // Set display name for better debugging in React DevTools
 NumberInput.displayName = 'NumberInput';

@@ -10,7 +10,7 @@ import {
 } from '@headlessui/react';
 import { Calendar, Check, ChevronDown } from 'lucide-react';
 import type React from 'react';
-import { Fragment, useId } from 'react';
+import { Fragment, memo, useId } from 'react';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 
@@ -34,8 +34,10 @@ interface TaxYearSelectProps {
 /**
  * Tax Year Select component
  * Enhanced dropdown for selecting the tax year with improved accessibility and glassmorphic styling
+ *
+ * Performance: Memoized with React 19 - static most of the time, only re-renders on value change
  */
-const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
+const TaxYearSelect: React.FC<TaxYearSelectProps> = memo(function TaxYearSelect({
   value,
   onChange,
   id,
@@ -43,7 +45,7 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
   disabled = false,
   label = 'Tax Year',
   hideLabel = false,
-}) => {
+}) {
   // Generate unique IDs for accessibility
   const uniqueId = useId();
   const selectId = id || `tax-year-select-${uniqueId}`;
@@ -151,6 +153,6 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = ({
       </Listbox>
     </div>
   );
-};
+});
 
 export default TaxYearSelect;
