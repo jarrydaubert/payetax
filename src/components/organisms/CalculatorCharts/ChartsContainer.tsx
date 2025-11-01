@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { IncomeBreakdownChart } from './IncomeBreakdownChart';
 import { NetIncomeComparisonChart } from './NetIncomeComparisonChart';
@@ -33,8 +34,10 @@ interface ChartsContainerProps {
  * - Responsive: stack vertically on mobile/tablet
  *
  * Auto-hides charts that don't have data to display.
+ * 
+ * Performance: Memoized to prevent unnecessary re-renders with React 19
  */
-export function ChartsContainer({
+export const ChartsContainer = memo(function ChartsContainer({
   results,
   whatIfResults,
   layout = 'full-width',
@@ -69,4 +72,4 @@ export function ChartsContainer({
       <NetIncomeComparisonChart results={results} />
     </div>
   );
-}
+});

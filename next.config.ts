@@ -32,10 +32,18 @@ const nextConfig: NextConfig = {
       'zod',
       'react-markdown',
       '@mdx-js/react',
+      'recharts', // NEW: Next.js 16 - optimize recharts 3.x imports
     ],
     // Enable for memory-intensive builds (recommended for large apps)
     webpackMemoryOptimizations: true,
     // Note: instrumentationHook is now enabled by default in Next.js 15.5+
+    
+    // NEW: Next.js 16 - Fine-grained stale time control for ISR
+    // Default stale time for pages with revalidate
+    staleTimes: {
+      dynamic: 30, // Dynamic routes stay fresh for 30s
+      static: 180, // Static routes stay fresh for 3 minutes
+    },
   },
 
   // Turbopack configuration (stable for dev, alpha for prod)

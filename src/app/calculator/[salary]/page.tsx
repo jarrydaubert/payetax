@@ -7,6 +7,11 @@ import { notFound } from 'next/navigation';
 import { SalaryCalculatorPage } from '@/components/salary/SalaryCalculatorPage';
 import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
 
+// Next.js 16: Optimize route segment config
+export const dynamic = 'force-static'; // Pre-render all params at build time
+export const dynamicParams = true; // Allow other salaries at runtime (fallback to SSR)
+export const revalidate = 86400; // Revalidate daily (24 hours)
+
 // Common UK salary searches based on keyword research
 // const SALARY_RANGES = [
 //   20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000,

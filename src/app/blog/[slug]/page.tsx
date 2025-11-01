@@ -12,8 +12,10 @@ import PageContainer from '@/components/ui/PageContainer';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { IMAGE_SIZES } from '@/lib/constants/images';
 
-// Enable ISR - revalidate every 24 hours for fresh tax content
-export const revalidate = 86400;
+// Next.js 16: Route segment config for optimized blog posts
+export const dynamic = 'force-static'; // Pre-render all blog posts at build time
+export const dynamicParams = true; // Allow new posts to be created at runtime
+export const revalidate = 86400; // ISR: Revalidate every 24 hours for fresh tax content
 
 // Generate static params for all blog posts at build time
 export async function generateStaticParams() {

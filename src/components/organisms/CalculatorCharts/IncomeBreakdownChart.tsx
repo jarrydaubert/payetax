@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -27,8 +28,14 @@ interface IncomeBreakdownChartProps {
  * - Other income (dividends, rental, etc - no NI)
  *
  * Only displays if multiple income sources exist.
+ * 
+ * Performance: Memoized with React 19, recharts 3.x optimizations
+ * Accessibility: Enhanced ARIA labels and keyboard navigation (recharts 3.x)
  */
-export function IncomeBreakdownChart({ results, className }: IncomeBreakdownChartProps) {
+export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({ 
+  results, 
+  className 
+}: IncomeBreakdownChartProps) {
   const data = getIncomeBreakdownData(results);
   const chartConfig = getChartConfig('income');
   const chartColors = useChartColors();
@@ -75,6 +82,10 @@ export function IncomeBreakdownChart({ results, className }: IncomeBreakdownChar
                 innerRadius='60%'
                 outerRadius='80%'
                 paddingAngle={2}
+                // recharts 3.x: Optimized animations (reduced from default 400ms)
+                animationDuration={300}
+                animationBegin={0}
+                isAnimationActive={true}
                 label={(props: {
                   cx?: number | string;
                   cy?: number | string;
@@ -141,4 +152,4 @@ export function IncomeBreakdownChart({ results, className }: IncomeBreakdownChar
       </CardContent>
     </Card>
   );
-}
+});
