@@ -1,11 +1,10 @@
 // src/components/organisms/CalculatorResults/ResultsTable.tsx
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Building,
   Calculator,
-  ChevronDown,
   Coins,
   CreditCard,
   GraduationCap,
@@ -24,7 +23,8 @@ import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
@@ -109,18 +109,21 @@ export function ResultsTable({
     const hasMarriageCode = taxCode.toUpperCase().includes('M');
     if (hasMarriageCode) return false;
 
-    // Partner must earn less than Personal Allowance (£12,570)
-    const personalAllowance = 12570;
+    // Get tax constants for the current year
+    const taxConstants = TAX_RATES[(taxYear || '2025-2026') as TaxYear];
+    const personalAllowance = taxConstants.personalAllowance;
+    const basicRateUpper = personalAllowance + taxConstants.bands[0].threshold;
+
+    // Partner must earn less than Personal Allowance
     if (partnerGrossWage >= personalAllowance) return false;
 
     // User must be a basic rate taxpayer
-    // Basic rate threshold: £12,570 - £50,270
     const userSalary = results.grossSalary.annually;
-    if (userSalary <= personalAllowance || userSalary > 50270) return false;
+    if (userSalary <= personalAllowance || userSalary > basicRateUpper) return false;
 
     // User is eligible!
     return true;
-  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually]);
+  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually, taxYear]);
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   // Default to current tax year if not provided
@@ -161,7 +164,9 @@ export function ResultsTable({
     return `${Math.abs((amount / total) * 100).toFixed(1)}%`;
   };
 
-  const grossAnnual = results.grossSalary.annually;
+  // Use total gross income (employment + other income) for percentage calculations
+  // If incomeBreakdown exists, use the total field; otherwise fall back to grossSalary
+  const grossAnnual = results.incomeBreakdown?.total || results.grossSalary.annually;
   const taxFreeAllowance = results.taxFreeAmount;
   const taxableIncome = results.taxableIncome;
   const allowancesAmount = allowancesDeductions;
@@ -185,7 +190,7 @@ export function ResultsTable({
       category: 'Gross Pay',
       icon: PoundSterling,
       annual: grossAnnual,
-      whatIfAnnual: whatIfResults?.grossSalary.annually,
+      whatIfAnnual: whatIfResults?.incomeBreakdown?.total || whatIfResults?.grossSalary.annually,
       percentage: '100%',
       color: 'text-foreground',
       isHighlight: false,
@@ -352,8 +357,23 @@ export function ResultsTable({
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
         <Card className='relative w-full overflow-hidden border-primary/20'>
-          {/* biome-ignore lint/a11y/useSemanticElements: div needed for ref and scroll functionality */}
-          <div
+          {/* Screen reader hint for scrollable region */}
+          <div id={scrollHintId} className='sr-only'>
+            Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate
+            through the table to see yearly, monthly, weekly, and other breakdowns.
+          </div>
+
+          {/* 
+            IMPORTANT: This container has scroll-behavior: smooth for regular scrolling UX
+            The useMouseDragScroll hook handles this correctly by using scrollTo({ behavior: 'instant' })
+            during drag operations. If drag scroll breaks, check the hook implementation - it MUST use
+            scrollTo() method, NOT direct scrollLeft assignment! See useMouseDragScroll.ts for details.
+            
+            Note: Using div instead of section here because we need the ref for scroll functionality
+            and the combination of ref + scroll behavior works better with div. The role='region'
+            and aria-label provide the necessary semantic meaning for screen readers.
+          */}
+          <section
             ref={containerRef}
             className='w-full cursor-grab overflow-x-auto scroll-smooth active:cursor-grabbing'
             style={{
@@ -361,26 +381,29 @@ export function ResultsTable({
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',
-              maxHeight: '70vh',
-              overflowY: 'auto',
             }}
-            role='region'
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
           >
-            <Table data-testid='results-table' className='table-drag-scroll w-full min-w-full'>
+            <table
+              data-testid='results-table'
+              className='table-drag-scroll w-full caption-bottom text-sm'
+              style={{ tableLayout: 'fixed' }}
+            >
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 w-auto whitespace-nowrap bg-card pt-3 pr-4 pb-2 font-semibold text-foreground text-lg'>
+                  <TableHead className='sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-base text-foreground'>
                     Payslip
                   </TableHead>
-                  <TableHead className='min-w-[50px] text-right font-semibold'>%</TableHead>
+                  <TableHead className='w-[55px] px-2 py-2.5 text-right font-semibold text-sm'>
+                    %
+                  </TableHead>
                   {whatIfResults
-                    ? // Two-row header for What If comparison
+                    ? // Two-row header for What If comparison - wider columns needed for Current/What If
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='text-center font-semibold text-sm'
+                          className='min-w-[200px] px-2 py-2.5 text-center font-semibold text-sm'
                           colSpan={2}
                         >
                           {period}
@@ -390,7 +413,7 @@ export function ResultsTable({
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='min-w-[100px] text-right font-semibold sm:min-w-[110px] md:min-w-[120px] lg:min-w-[130px] xl:min-w-[140px] 2xl:min-w-[150px]'
+                          className='min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-semibold text-sm'
                         >
                           {period}
                         </TableHead>
@@ -398,13 +421,13 @@ export function ResultsTable({
                 </TableRow>
                 {whatIfResults && (
                   <TableRow className='bg-card hover:bg-card'>
-                    <TableHead className='sticky left-0 z-20 bg-card py-1' colSpan={2} />
+                    <TableHead className='sticky left-0 z-20 bg-card px-2 py-1.5' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[110px] bg-blue-500/10 py-1 text-center font-medium text-sm sm:min-w-[120px] md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px]'>
+                        <TableHead className='min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2 text-center font-medium text-sm'>
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[110px] bg-purple-500/10 py-1 text-center font-medium text-sm sm:min-w-[120px] md:min-w-[130px] lg:min-w-[140px] xl:min-w-[150px] 2xl:min-w-[160px]'>
+                        <TableHead className='min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2 text-center font-medium text-sm'>
                           What If
                         </TableHead>
                       </React.Fragment>
@@ -429,80 +452,10 @@ export function ResultsTable({
                   />
                 ))}
               </TableBody>
-            </Table>
-          </div>
+            </table>
+          </section>
         </Card>
       </div>
-
-      {/* Scroll hints - BELOW TABLE */}
-      <AnimatePresence>
-        {(showLeftIndicator || showRightIndicator) && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className='mt-4 flex flex-col items-center gap-2'
-          >
-            {/* Mobile hint - swipe gesture */}
-            <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 px-4 py-2.5 font-medium text-foreground text-sm shadow-sm md:hidden'>
-              {showLeftIndicator && (
-                <motion.div
-                  animate={{ x: [4, -4, 4] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <span className='text-lg'>👈</span>
-                </motion.div>
-              )}
-              <span>Swipe to see all periods</span>
-              {showRightIndicator && (
-                <motion.div
-                  animate={{ x: [-4, 4, -4] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <span className='text-lg'>👉</span>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Desktop hint - drag and scroll */}
-            <div className='hidden items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 px-5 py-3 font-medium text-foreground text-sm shadow-sm md:flex'>
-              {showLeftIndicator && (
-                <motion.div
-                  animate={{ x: [4, -4, 4] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <ChevronDown className='-rotate-90 size-5 text-primary' />
-                </motion.div>
-              )}
-              <span>🖱️ Drag or scroll horizontally to see all periods</span>
-              {showRightIndicator && (
-                <motion.div
-                  animate={{ x: [-4, 4, -4] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <ChevronDown className='size-5 rotate-90 text-primary' />
-                </motion.div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Tax Trap Inline Alert */}
       {taxTrapOptimization && onApplyPensionOptimization && (
@@ -511,6 +464,7 @@ export function ResultsTable({
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
             onApplyPension={onApplyPensionOptimization}
+            taxYear={taxYear as TaxYear}
           />
         </div>
       )}
@@ -522,6 +476,7 @@ export function ResultsTable({
             userSalary={results.grossSalary.annually}
             partnerSalary={partnerGrossWage}
             hasMarriageCode={false}
+            taxYear={taxYear as TaxYear}
           />
         </div>
       )}

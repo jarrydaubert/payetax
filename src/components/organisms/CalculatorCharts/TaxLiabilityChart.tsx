@@ -1,0 +1,143 @@
+'use client';
+
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { useChartColors } from '@/hooks/useChartColors';
+import { getChartConfig, getTaxLiabilityData } from '@/lib/chartUtils';
+import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { formatCurrency } from '@/lib/utils';
+
+interface TaxLiabilityChartProps {
+  results: TaxCalculationResults;
+  whatIfResults?: TaxCalculationResults | null;
+  className?: string;
+}
+
+/**
+ * Tax Liability Stacked Bar Chart
+ *
+ * Shows where gross income goes:
+ * - Income Tax (red)
+ * - National Insurance (amber)
+ * - Student Loan (orange, if applicable)
+ * - Pension (purple)
+ * - Net Pay (green)
+ *
+ * When What If results exist, shows two bars for comparison.
+ */
+export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiabilityChartProps) {
+  const { current, whatIf } = getTaxLiabilityData(results, whatIfResults);
+  const chartConfig = getChartConfig('liability');
+  const chartColors = useChartColors();
+
+  // Prepare data for stacked bar chart
+  const chartData = whatIf
+    ? [
+        { scenario: 'Current', ...Object.fromEntries(current.map((d) => [d.category, d.amount])) },
+        { scenario: 'What If', ...Object.fromEntries(whatIf.map((d) => [d.category, d.amount])) },
+      ]
+    : [
+        {
+          scenario: 'Breakdown',
+          ...Object.fromEntries(current.map((d) => [d.category, d.amount])),
+        },
+      ];
+
+  return (
+    <Card className={`border-primary/20 ${className || ''}`}>
+      <CardHeader className='pb-3'>
+        <CardTitle className='font-semibold text-lg'>Tax Breakdown</CardTitle>
+        <CardDescription className='text-sm'>
+          {whatIf ? 'Current vs What If comparison' : 'Where your income goes'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className='h-[250px] w-full'>
+          <ResponsiveContainer width='100%' height='100%'>
+            <BarChart
+              data={chartData}
+              layout='vertical'
+              margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray='3 3' horizontal={false} stroke='hsl(var(--border))' />
+              <XAxis type='number' hide />
+              <YAxis
+                type='category'
+                dataKey='scenario'
+                width={60}
+                fontSize={12}
+                stroke={chartColors.mutedForeground}
+                tick={{ fill: chartColors.mutedForeground }}
+              />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    formatter={(value, name) => (
+                      <div className='flex items-center gap-2'>
+                        <span className='font-medium'>{name}:</span>
+                        <span className='font-mono'>{formatCurrency(Number(value))}</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
+
+              {/* Stack bars in order: Tax, NI, Student Loan, Pension, Net Pay */}
+              <Bar
+                dataKey='Income Tax'
+                stackId='a'
+                fill='hsl(var(--chart-3))'
+                radius={[0, 0, 0, 0]}
+              />
+              <Bar
+                dataKey='National Insurance'
+                stackId='a'
+                fill='hsl(var(--chart-4))'
+                radius={[0, 0, 0, 0]}
+              />
+              {current.some((d) => d.category === 'Student Loan') && (
+                <Bar
+                  dataKey='Student Loan'
+                  stackId='a'
+                  fill='hsl(var(--chart-5))'
+                  radius={[0, 0, 0, 0]}
+                />
+              )}
+              <Bar dataKey='Pension' stackId='a' fill='hsl(var(--chart-2))' radius={[0, 0, 0, 0]} />
+              <Bar dataKey='Net Pay' stackId='a' fill='hsl(var(--chart-6))' radius={[0, 4, 4, 0]} />
+
+              <ChartLegend content={<ChartLegendContent />} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        {/* Summary stats */}
+        <div className='mt-2 flex justify-between text-sm'>
+          <div>
+            <p className='text-muted-foreground'>Total Deductions</p>
+            <p className='font-medium font-mono text-red-600 dark:text-red-400'>
+              {formatCurrency(
+                current
+                  .filter((d) => d.category !== 'Net Pay')
+                  .reduce((sum, d) => sum + d.amount, 0)
+              )}
+            </p>
+          </div>
+          <div className='text-right'>
+            <p className='text-muted-foreground'>Take Home</p>
+            <p className='font-medium font-mono text-green-600 dark:text-green-400'>
+              {formatCurrency(current.find((d) => d.category === 'Net Pay')?.amount || 0)}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
