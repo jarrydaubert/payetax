@@ -21,6 +21,7 @@ export function CalculatorInputsSection({
   onWhatIfCalculate,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
+  const salary = useCalculatorStore((state) => state.input.salary);
   const [isCalculating, setIsCalculating] = React.useState(false);
   const [whatIfOpen, setWhatIfOpen] = React.useState(false);
 
@@ -34,6 +35,14 @@ export function CalculatorInputsSection({
   };
 
   const handleCalculate = () => {
+    // Validate salary is entered
+    if (salary <= 0) {
+      toast.error('Please enter a salary', {
+        description: 'Enter your gross salary to calculate your tax breakdown',
+      });
+      return;
+    }
+
     setIsCalculating(true);
     try {
       onCalculate();
