@@ -49,6 +49,8 @@ export function CalculatorInputsSection({
 
   const handleReset = () => {
     reset();
+    // Close What If section when resetting
+    setWhatIfOpen(false);
     // Reset is visually obvious - no toast needed
   };
 

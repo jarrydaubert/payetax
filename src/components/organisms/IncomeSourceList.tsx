@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight, Plus, Trash2 } from 'lucide-react';
+import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,14 @@ import {
 export function IncomeSourceList() {
   const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
   const { addIncomeSource, updateIncomeSource, removeIncomeSource } = useCalculatorActions();
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  // Close the collapsible when income sources are cleared (e.g., on reset)
+  React.useEffect(() => {
+    if (incomeSources.length === 0) {
+      setIsOpen(false);
+    }
+  }, [incomeSources.length]);
 
   const payPeriodOptions = [
     { value: PERIODS.ANNUALLY, label: 'Annually' },
@@ -33,7 +42,7 @@ export function IncomeSourceList() {
   ];
 
   return (
-    <Collapsible defaultOpen={false}>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className='flex items-center justify-between'>
         <CollapsibleTrigger className='group flex items-center gap-2 font-medium text-sm transition-colors hover:text-primary'>
           <ChevronRight className='h-4 w-4 transition-transform group-data-[state=open]:rotate-90' />
