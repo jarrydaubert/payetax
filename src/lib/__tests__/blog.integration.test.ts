@@ -2,7 +2,7 @@
 /**
  * Integration tests for blog system
  * Tests pagination, category filtering, and search functionality
- * Uses actual Contentlayer data
+ * Uses actual MDX blog posts from content/blog directory
  *
  * Linear: PAYTAX-34
  */

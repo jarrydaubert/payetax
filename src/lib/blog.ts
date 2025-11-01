@@ -1,13 +1,13 @@
 // src/lib/blog.ts
 /**
- * Blog library for managing local MDX blog posts using Contentlayer
- * Uses Contentlayer2 for MDX compilation and type-safe blog posts
- * OPTIMIZED: Direct Contentlayer integration instead of manual parsing
+ * Blog library for managing local MDX blog posts
+ * Native Next.js 16 implementation with direct file-system access
+ * OPTIMIZED: Server-side caching with unstable_cache
  */
 
-import { allPosts, type Post } from 'contentlayer/generated';
 import { unstable_cache } from 'next/cache';
 import { BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
+import { getPostBySlug as getMDXPostBySlug, getAllPosts as getMDXPosts } from '@/lib/mdx';
 import type {
   BlogCategory,
   BlogPaginationOptions,
@@ -20,47 +20,48 @@ import type {
 export { BlogError } from '@/types/blog';
 
 /**
- * Convert Contentlayer Post to BlogPost type
+ * Convert MDX post to BlogPost type
  */
-function convertContentlayerPost(post: Post): BlogPost {
+function convertMDXPost(post: ReturnType<typeof getMDXPosts>[0]): BlogPost {
   const categoryData = getCategoryBySlug(post.category);
 
   return {
-    id: post._id,
+    id: post.slug,
     title: post.title,
-    slug: post.slugAsParams, // Use slugAsParams which strips the "blog/" prefix
+    slug: post.slug,
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
     category: post.category,
-    content: post.body.raw, // Keep for compatibility
-    body: post.body, // Add the MDX body for rendering
+    content: '', // Will be loaded separately if needed
     categoryData,
 
     // Optional fields
     updatedAt: post.updatedAt || post.publishedAt,
     featured: post.featured,
-    published: post.published !== false, // Default to true if not specified
-    author: post.author,
+    published: true, // All posts in /content/blog are published
+    author: post.author || 'PayeTax Team',
     readTime: `${post.readingTime} min read`,
-    tags: post.keywords || [],
+    tags: post.tags || post.seoKeywords || [],
     image: post.image,
     imageAlt: post.imageAlt,
+    readingTime: post.readingTime,
+    wordCount: post.wordCount,
 
     // SEO fields
     seoTitle: post.seoTitle || post.title,
     seoDescription: post.seoDescription || post.excerpt,
-    seoKeywords: post.keywords || [],
+    seoKeywords: post.seoKeywords || post.tags || [],
   };
 }
 
 /**
- * Get all published posts from Contentlayer (cached)
+ * Get all published posts (cached)
  */
-const getAllContentlayerPosts = unstable_cache(
+const getAllCachedPosts = unstable_cache(
   (): Promise<BlogPost[]> => {
-    return Promise.resolve(
-      allPosts.filter((post) => post.published !== false).map(convertContentlayerPost)
-    );
+    const posts = getMDXPosts();
+    // All posts in /content/blog are published
+    return Promise.resolve(posts.map(convertMDXPost));
   },
   ['blog-all-posts'],
   { revalidate: 3600, tags: ['blog'] }
@@ -99,9 +100,8 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
 
   // Filter by tag
   if (options.tag) {
-    filtered = filtered.filter((post) =>
-      post.tags?.some((tag) => tag.toLowerCase() === options.tag?.toLowerCase())
-    );
+    const tag = options.tag;
+    filtered = filtered.filter((post) => post.tags?.includes(tag));
   }
 
   // Filter by featured status
@@ -109,15 +109,12 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
     filtered = filtered.filter((post) => post.featured === options.featured);
   }
 
-  // Filter by search query
+  // Filter by search query (title or excerpt)
   if (options.searchQuery) {
     const query = options.searchQuery.toLowerCase();
     filtered = filtered.filter(
       (post) =>
-        post.title.toLowerCase().includes(query) ||
-        post.excerpt.toLowerCase().includes(query) ||
-        post.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
-        post.content.toLowerCase().includes(query)
+        post.title.toLowerCase().includes(query) || post.excerpt.toLowerCase().includes(query)
     );
   }
 
@@ -125,97 +122,164 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
 }
 
 /**
- * Get paginated posts
+ * Paginate an array of posts
  */
-function paginatePosts(posts: BlogPost[], page: number, pageSize: number): BlogPost[] {
+function paginatePosts(posts: BlogPost[], page: number, pageSize: number) {
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
   return posts.slice(start, end);
 }
 
 /**
- * Get blog posts with optional filtering and pagination
+ * Get blog posts with optional filtering, sorting, and pagination
+ * Can return either paginated response or simple array based on usage
  */
-export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise<BlogPost[]> {
-  const { page = 1, pageSize = BLOG_CONFIG.postsPerPage, sortBy = 'date-desc' } = options;
+export async function getBlogPosts(options?: BlogPaginationOptions): Promise<BlogPost[]>;
+export async function getBlogPosts(options: BlogPaginationOptions & { paginated: true }): Promise<{
+  posts: BlogPost[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+  };
+}>;
+export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise<
+  | BlogPost[]
+  | {
+      posts: BlogPost[];
+      pagination: { page: number; pageSize: number; total: number; pageCount: number };
+    }
+> {
+  const {
+    page = 1,
+    pageSize = BLOG_CONFIG.postsPerPage,
+    sortBy = 'date-desc',
+    ...filterOptions
+  } = options;
 
-  try {
-    // Get all posts from Contentlayer
-    const allContentPosts = await getAllContentlayerPosts();
+  // Get all posts
+  const allPosts = await getAllCachedPosts();
 
-    // Apply filters
-    const filteredPosts = filterPosts(allContentPosts, options);
+  // Filter posts
+  let posts = filterPosts(allPosts, filterOptions);
 
-    // Sort posts (default: newest first)
-    const sortedPosts = sortPosts(filteredPosts, sortBy);
+  // Sort posts
+  posts = sortPosts(posts, sortBy);
 
-    // Apply pagination
-    const paginatedPosts = paginatePosts(sortedPosts, page, pageSize);
+  // Calculate pagination
+  const total = posts.length;
+  const pageCount = Math.ceil(total / pageSize);
 
+  // Paginate posts
+  const paginatedPosts = paginatePosts(posts, page, pageSize);
+
+  // Return simple array if not explicitly requesting pagination
+  if (!('paginated' in options)) {
     return paginatedPosts;
-  } catch (error) {
-    console.error('Error getting blog posts:', error);
-    return [];
   }
+
+  return {
+    posts: paginatedPosts,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      pageCount,
+    },
+  };
 }
 
 /**
- * Get total count of posts (with optional category filter, cached)
- * Cache revalidates every hour for performance
+ * Get a single blog post by slug
  */
-export const getBlogPostsCount = unstable_cache(
-  async (category?: string): Promise<number> => {
-    try {
-      const allContentPosts = await getAllContentlayerPosts();
+export function getBlogPostBySlug(slug: string): BlogPost | null {
+  const post = getMDXPostBySlug(slug);
 
-      if (category) {
-        return allContentPosts.filter((post) => post.category === category).length;
-      }
-
-      return allContentPosts.length;
-    } catch {
-      return 0;
-    }
-  },
-  ['blog-posts-count'],
-  { revalidate: 3600, tags: ['blog'] }
-);
-
-/**
- * Get a blog post by slug
- */
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  try {
-    const allContentPosts = await getAllContentlayerPosts();
-    const post = allContentPosts.find((p) => p.slug === slug);
-    return post || null;
-  } catch (error) {
-    console.error(`Error getting blog post by slug ${slug}:`, error);
+  if (!post) {
     return null;
   }
+
+  const categoryData = getCategoryBySlug(post.category);
+
+  return {
+    id: post.slug,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    category: post.category,
+    content: post.content,
+    categoryData,
+    updatedAt: post.updatedAt || post.publishedAt,
+    featured: post.featured,
+    published: true, // All posts in /content/blog are published
+    author: post.author || 'PayeTax Team',
+    readTime: `${post.readingTime} min read`,
+    tags: post.tags || post.seoKeywords || [],
+    image: post.image,
+    imageAlt: post.imageAlt,
+    readingTime: post.readingTime,
+    wordCount: post.wordCount,
+    seoTitle: post.seoTitle || post.title,
+    seoDescription: post.seoDescription || post.excerpt,
+    seoKeywords: post.seoKeywords || post.tags || [],
+  };
 }
 
 /**
- * Get featured blog posts
+ * Get all unique categories from published posts
  */
-export async function getFeaturedPosts(): Promise<BlogPost[]> {
-  const posts = await getBlogPosts({
-    featured: true,
-    pageSize: BLOG_CONFIG.featuredPostsCount,
-  });
+export async function getBlogCategories(): Promise<BlogCategory[]> {
+  const allPosts = await getAllCachedPosts();
+  const categoryMap = new Map<string, number>();
 
-  // If no featured posts, return the latest posts
-  if (posts.length === 0) {
-    return getBlogPosts({
-      pageSize: BLOG_CONFIG.featuredPostsCount,
-    });
+  // Count posts per category
+  for (const post of allPosts) {
+    categoryMap.set(post.category, (categoryMap.get(post.category) || 0) + 1);
   }
 
-  return posts;
+  // Map to category objects
+  return Array.from(categoryMap.entries()).map(([slug, count]) => {
+    const categoryData = getCategoryBySlug(slug);
+    return {
+      name: categoryData?.name || slug,
+      slug: categoryData?.slug || slug,
+      description: categoryData?.description,
+      count,
+    };
+  });
 }
 
 /**
- * Get the featured blog post (single)
+ * Get posts count for a category
+ */
+export async function getBlogPostsCount(category?: string): Promise<number> {
+  const allPosts = await getAllCachedPosts();
+
+  if (!category) {
+    return allPosts.length;
+  }
+
+  return allPosts.filter((post) => post.category === category).length;
+}
+
+/**
+ * Get featured blog posts (array)
+ */
+export async function getFeaturedPosts(): Promise<BlogPost[]> {
+  const allPosts = await getAllCachedPosts();
+  const featuredPosts = allPosts.filter((post) => post.featured === true);
+
+  if (featuredPosts.length === 0) {
+    return allPosts.slice(0, BLOG_CONFIG.featuredPostsCount);
+  }
+
+  return featuredPosts.slice(0, BLOG_CONFIG.featuredPostsCount);
+}
+
+/**
+ * Get featured blog post (single)
  */
 export async function getFeaturedPost(): Promise<BlogPost | null> {
   const featuredPosts = await getFeaturedPosts();
@@ -223,109 +287,42 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
 }
 
 /**
- * Get related posts for a given post with intelligent scoring
- * Algorithm:
- * - Same category = +10 points
- * - Matching tags = +5 points per tag
- * - Featured post = +2 points
- * - Recent post (< 30 days) = +1 point
+ * Get related posts based on category and tags
  */
 export async function getRelatedPosts(
-  postId: string,
-  categorySlug?: string,
-  count: number = BLOG_CONFIG.relatedPostsCount
+  currentPost: BlogPost,
+  limit: number = BLOG_CONFIG.relatedPostsCount
 ): Promise<RelatedPost[]> {
-  try {
-    const allPosts = await getBlogPosts();
+  const allPosts = await getAllCachedPosts();
 
-    // Find current post to get its tags
-    const currentPost = allPosts.find((post) => post.id === postId);
-
-    // Filter out the current post
-    const otherPosts = allPosts.filter((post) => post.id !== postId);
-
-    // Calculate relevance score for each post
-    const scoredPosts = otherPosts.map((post) => {
+  // Score posts by relevance
+  const scoredPosts = allPosts
+    .filter((post) => post.slug !== currentPost.slug) // Exclude current post
+    .map((post) => {
       let score = 0;
 
-      // Same category = +10 points
-      if (categorySlug && post.category === categorySlug) {
+      // Same category: +10 points
+      if (post.category === currentPost.category) {
         score += 10;
       }
 
-      // Matching tags = +5 points per match
-      if (currentPost?.tags && post.tags) {
-        const matchingTags = post.tags.filter((tag) => currentPost.tags?.includes(tag));
-        score += matchingTags.length * 5;
-      }
-
-      // Featured post = +2 points
-      if (post.featured) {
-        score += 2;
-      }
-
-      // Recency bonus (newer posts < 30 days old)
-      const daysSincePublish = Math.floor(
-        (Date.now() - new Date(post.publishedAt).getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (daysSincePublish < 30) {
-        score += 1;
-      }
+      // Shared tags: +1 point per tag
+      const sharedTags = post.tags?.filter((tag) => currentPost.tags?.includes(tag)) || [];
+      score += sharedTags.length;
 
       return { post, score };
-    });
+    })
+    .filter((item) => item.score > 0) // Only include posts with some relevance
+    .sort((a, b) => b.score - a.score) // Sort by score
+    .slice(0, limit);
 
-    // Sort by score desc, then by date desc
-    const sortedPosts = scoredPosts.sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime();
-    });
-
-    // Return top N posts in RelatedPost format
-    return sortedPosts.slice(0, count).map((item) => ({
-      title: item.post.title,
-      slug: item.post.slug,
-      excerpt: item.post.excerpt,
-      publishedAt: item.post.publishedAt,
-      readTime: item.post.readTime,
-      category: item.post.category,
-    }));
-  } catch (error) {
-    console.error(`Error getting related posts for ${postId}:`, error);
-    return [];
-  }
+  // Convert to RelatedPost format
+  return scoredPosts.map(({ post }) => ({
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    readTime: post.readTime,
+    category: post.category,
+  }));
 }
-
-/**
- * Get all available blog categories with post counts (cached)
- * Cache revalidates every hour to improve build performance
- */
-export const getBlogCategories = unstable_cache(
-  async (): Promise<BlogCategory[]> => {
-    try {
-      const allContentPosts = await getAllContentlayerPosts();
-
-      // Count posts per category
-      const categoryCounts = allContentPosts.reduce(
-        (counts, post) => {
-          counts[post.category] = (counts[post.category] || 0) + 1;
-          return counts;
-        },
-        {} as Record<string, number>
-      );
-
-      // Return categories with counts
-      return BLOG_CONFIG.categories.map((category) => ({
-        ...category,
-        count: categoryCounts[category.slug] || 0,
-      }));
-    } catch (error) {
-      console.error('Error getting blog categories:', error);
-      return BLOG_CONFIG.categories;
-    }
-  },
-  ['blog-categories'],
-  { revalidate: 3600, tags: ['blog'] }
-);

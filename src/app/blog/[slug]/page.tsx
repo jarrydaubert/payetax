@@ -5,12 +5,12 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import BlogContent from '@/components/blog/BlogContent';
 import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { IMAGE_SIZES } from '@/lib/constants/images';
+import { compileMDXContent } from '@/lib/mdx';
 
 // Next.js 16: Route segment config for optimized blog posts
 export const dynamic = 'force-static'; // Pre-render all blog posts at build time
@@ -82,8 +82,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
+  // Compile MDX content (returns React component)
+  const MDXComponent = await compileMDXContent(post.content);
+
   // Get related posts
-  const relatedPosts = await getRelatedPosts(post.id, post.category, 3);
+  const relatedPosts = await getRelatedPosts(post, 3);
 
   return (
     <div className='pt-16 md:pt-20'>
@@ -157,7 +160,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Article Content */}
           <ContentSection glass className='mb-6 md:mb-8'>
-            {post.body && <BlogContent body={post.body} />}
+            <div className='prose prose-lg max-w-none'>{MDXComponent}</div>
           </ContentSection>
 
           {/* Article Footer */}

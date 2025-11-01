@@ -1,14 +1,15 @@
 // src/lib/__tests__/blog.test.ts
-// SKIPPED: Contentlayer mocking is complex in Jest
-// See LINEAR_SETUP.md - will address with E2E tests instead
+// SKIPPED: MDX compilation and file-system mocking is complex in Jest
+// See integration tests (blog.integration.test.ts) for actual blog functionality testing
+// E2E tests cover complete blog flows
 
 describe.skip('blog', () => {
-  it.skip('skipped due to Contentlayer mocking complexity', () => {
+  it.skip('skipped - see integration and E2E tests instead', () => {
     expect(true).toBe(true);
   });
 });
 
-/* Contentlayer mocking code preserved for future reference
+/* Legacy test code preserved for future reference (from previous architecture)
 // Mock config and dependencies
 jest.mock('@/config/blog.config', () => ({
   BLOG_CONFIG: {

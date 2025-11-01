@@ -1,10 +1,10 @@
 // src/types/blog.ts
 /**
  * Types for the custom blog system
- * Replaces the Strapi-based types with local MDX-based blog types
+ * Native Next.js 16 MDX-based blog types
  */
 
-import type { MDX } from 'contentlayer2/core';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 /**
  * Frontmatter structure for MDX blog posts
@@ -40,9 +40,11 @@ export interface BlogPostFrontmatter {
 export interface BlogPost extends BlogPostFrontmatter {
   id: string; // generated from filename
   content: string; // MDX content (raw)
-  body?: MDX; // Contentlayer MDX body with code for rendering
+  mdxContent?: MDXRemoteSerializeResult; // Compiled MDX for rendering
   categoryData?: BlogCategory; // populated category info
   published?: boolean; // publication status
+  readingTime?: number; // calculated reading time in minutes
+  wordCount?: number; // word count
 }
 
 /**

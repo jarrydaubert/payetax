@@ -2,7 +2,6 @@
 
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
-import { withContentlayer } from 'next-contentlayer2';
 // FIXED: Import webpack directly for plugins
 import webpack from 'webpack';
 
@@ -199,7 +198,7 @@ const nextConfig: NextConfig = {
 };
 
 // Wrap config with Sentry for error monitoring
-const configWithSentry = withSentryConfig(withContentlayer(withBundleAnalyzer(nextConfig)), {
+const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
   // Sentry configuration options
   org: 'payetax',
   project: 'javascript-nextjs',
