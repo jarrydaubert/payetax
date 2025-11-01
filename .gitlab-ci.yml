@@ -5,6 +5,7 @@
 stages:
   - prepare
   - security
+  - test
   - validate
 
 # Shared cache configuration
@@ -39,8 +40,13 @@ install_dependencies:
 # ──────────────────────────────────────────────────────────
 
 # Built-in secret detection using Gitleaks
+# Note: This template expects a 'test' stage, so we add it to our stages list
 include:
   - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+# Override the secret_detection job to use our 'security' stage instead of 'test'
+secret_detection:
+  stage: security
 
 # Dependency vulnerability scanning (high/critical only)
 dependency_audit:
