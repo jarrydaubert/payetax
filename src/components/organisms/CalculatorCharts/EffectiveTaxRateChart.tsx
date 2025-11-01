@@ -19,7 +19,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useChartColors } from '@/hooks/useChartColors';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -48,7 +47,6 @@ export function EffectiveTaxRateChart({
   const currentSalary = results.grossSalary.annually;
   const data = getEffectiveTaxRateData(currentSalary, results, isScottish);
   const chartConfig = getChartConfig('rate');
-  const chartColors = useChartColors();
 
   // Generate unique IDs for gradients to avoid conflicts when component is rendered multiple times
   const effectiveGradientId = React.useId();
@@ -92,8 +90,9 @@ export function EffectiveTaxRateChart({
                 domain={['dataMin', 'dataMax']}
                 tickFormatter={(value) => `£${(value / 1000).toFixed(0)}k`}
                 fontSize={10}
-                stroke={chartColors.mutedForeground}
-                tick={{ fill: chartColors.mutedForeground }}
+                stroke='currentColor'
+                tick={{ fill: 'currentColor' }}
+                className='text-muted-foreground'
               />
 
               <YAxis
@@ -101,8 +100,9 @@ export function EffectiveTaxRateChart({
                 tickFormatter={(value) => `${value}%`}
                 fontSize={10}
                 width={35}
-                stroke={chartColors.mutedForeground}
-                tick={{ fill: chartColors.mutedForeground }}
+                stroke='currentColor'
+                tick={{ fill: 'currentColor' }}
+                className='text-muted-foreground'
               />
 
               <ChartTooltip
@@ -122,13 +122,13 @@ export function EffectiveTaxRateChart({
               {/* Current salary indicator */}
               <ReferenceLine
                 x={currentSalary}
-                stroke={chartColors.primary}
+                stroke='hsl(var(--primary))'
                 strokeDasharray='3 3'
                 label={{
                   value: 'You',
                   position: 'top',
                   fontSize: 10,
-                  fill: chartColors.primary,
+                  fill: 'hsl(var(--primary))',
                 }}
               />
 

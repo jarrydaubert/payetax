@@ -9,7 +9,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useChartColors } from '@/hooks/useChartColors';
 import { getChartConfig, getTaxLiabilityData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -35,7 +34,6 @@ interface TaxLiabilityChartProps {
 export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiabilityChartProps) {
   const { current, whatIf } = getTaxLiabilityData(results, whatIfResults);
   const chartConfig = getChartConfig('liability');
-  const chartColors = useChartColors();
 
   // Prepare data for stacked bar chart
   const chartData = whatIf
@@ -73,8 +71,9 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
                 dataKey='scenario'
                 width={60}
                 fontSize={12}
-                stroke={chartColors.mutedForeground}
-                tick={{ fill: chartColors.mutedForeground }}
+                stroke='currentColor'
+                tick={{ fill: 'currentColor' }}
+                className='text-muted-foreground'
               />
               <ChartTooltip
                 content={

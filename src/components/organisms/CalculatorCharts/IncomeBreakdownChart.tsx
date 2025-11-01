@@ -10,7 +10,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useChartColors } from '@/hooks/useChartColors';
 import { getChartConfig, getIncomeBreakdownData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -38,7 +37,6 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
 }: IncomeBreakdownChartProps) {
   const data = getIncomeBreakdownData(results);
   const chartConfig = getChartConfig('income');
-  const chartColors = useChartColors();
 
   // Don't render if only one income source
   if (!data || data.length < 2) {
@@ -123,7 +121,8 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
                     <text
                       x={x}
                       y={y}
-                      fill={chartColors.foreground}
+                      fill='currentColor'
+                      className='fill-foreground'
                       textAnchor={x > cxNum ? 'start' : 'end'}
                       dominantBaseline='central'
                       fontSize={12}
