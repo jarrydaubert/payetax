@@ -53,7 +53,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className='h-[250px] w-full'>
-          <ResponsiveContainer width='100%' height='100%'>
+          <ResponsiveContainer width='100%' height='100%' minHeight={250}>
             <PieChart>
               <ChartTooltip
                 content={
