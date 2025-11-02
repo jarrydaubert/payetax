@@ -28,7 +28,7 @@ const config = {
     '<rootDir>/src/lib/__tests__/__mocks__/',
     '<rootDir>/.contentlayer/',
   ],
-  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?|next-mdx-remote)/)'],
   moduleNameMapper: {
     // Mock Contentlayer generated files (must be first to catch before other patterns)
     '^contentlayer/generated$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
@@ -42,6 +42,8 @@ const config = {
     '^@contentlayer2/client$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
     '^contentlayer2/dist/client/index.js$':
       '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
+    // Mock next-mdx-remote to avoid ESM parsing issues
+    '^next-mdx-remote/rsc$': '<rootDir>/src/lib/__tests__/__mocks__/next-mdx-remote.mock.tsx',
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
