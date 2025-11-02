@@ -34,7 +34,7 @@ export function CategoryFilter({
   };
 
   return (
-    <div className='mb-12 md:mb-20'>
+    <div className='relative z-20 mb-12 md:mb-20'>
       <div className='mb-8 flex items-center justify-center gap-2 text-center'>
         <Tag className='size-5 text-purple-400' />
         <h2 className='font-semibold text-foreground text-xl'>Browse Topics</h2>
