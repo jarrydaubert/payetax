@@ -1,5 +1,4 @@
 // src/app/about/page.tsx
-'use client';
 
 import {
   AlertTriangle,
@@ -18,78 +17,104 @@ import {
   Target,
   Zap,
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 
+export const metadata: Metadata = {
+  title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
+  description:
+    'Learn about PayeTax - the UK tax calculator that respects your privacy, delivers instant accuracy, and costs nothing. Built with Next.js 15, featuring client-side calculations and zero data storage.',
+  keywords:
+    'about payetax, uk tax calculator, privacy-first tax calculator, free paye calculator, open source tax tool, hmrc rates calculator',
+  alternates: {
+    canonical: 'https://payetax.co.uk/about',
+  },
+  openGraph: {
+    title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
+    description:
+      'The UK tax calculator that respects your privacy, delivers instant accuracy, and costs nothing. No compromises.',
+    url: 'https://payetax.co.uk/about',
+    type: 'website',
+    siteName: 'PayeTax',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About PayeTax',
+    description: 'Free UK tax calculator built for privacy. No data collection, instant results.',
+  },
+};
+
+// Static data moved outside component (no longer needs to be in state)
+const stats = [
+  { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-blue-500 to-cyan-500' },
+  { icon: Lock, value: '0', label: 'Data Stored', color: 'from-green-500 to-emerald-500' },
+  {
+    icon: Award,
+    value: 'HMRC',
+    label: 'Official Rates',
+    color: 'from-purple-500 to-pink-500',
+  },
+  { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-orange-500 to-red-500' },
+];
+
+const values = [
+  {
+    icon: Shield,
+    title: 'Privacy is Sacred',
+    description:
+      "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    iconGradient: 'from-green-500 to-emerald-500',
+  },
+  {
+    icon: Eye,
+    title: 'Radical Transparency',
+    description:
+      'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
+    gradient: 'from-blue-500/20 to-cyan-500/20',
+    iconGradient: 'from-blue-500 to-cyan-500',
+  },
+  {
+    icon: Target,
+    title: 'Accuracy First',
+    description:
+      'Official HMRC rates updated within 24 hours of changes. Comprehensive testing for Scottish rates, student loans, pensions, and edge cases.',
+    gradient: 'from-purple-500/20 to-pink-500/20',
+    iconGradient: 'from-purple-500 to-pink-500',
+  },
+  {
+    icon: Heart,
+    title: 'Genuinely Free',
+    description:
+      'No premium tiers, no paywalls, no "upgrade to see more". Every feature is free for everyone, forever. Tax calculations should be accessible to all.',
+    gradient: 'from-red-500/20 to-orange-500/20',
+    iconGradient: 'from-red-500 to-orange-500',
+  },
+];
+
+const techFeatures = [
+  {
+    icon: Rocket,
+    title: 'Blazing Fast',
+    metric: '<1.5s',
+    description: 'Sub-second page loads, instant calculations, 60fps animations',
+  },
+  {
+    icon: Code,
+    title: 'Modern Stack',
+    metric: 'Next.js 15',
+    description: 'React 19, TypeScript, Tailwind CSS v4, cutting-edge architecture',
+  },
+  {
+    icon: Sparkles,
+    title: 'Lighthouse Score',
+    metric: '95+',
+    description: 'Performance, accessibility, SEO, and best practices',
+  },
+];
+
 export default function AboutPage() {
-  const stats = [
-    { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-blue-500 to-cyan-500' },
-    { icon: Lock, value: '0', label: 'Data Stored', color: 'from-green-500 to-emerald-500' },
-    {
-      icon: Award,
-      value: 'HMRC',
-      label: 'Official Rates',
-      color: 'from-purple-500 to-pink-500',
-    },
-    { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-orange-500 to-red-500' },
-  ];
-
-  const values = [
-    {
-      icon: Shield,
-      title: 'Privacy is Sacred',
-      description:
-        "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
-      gradient: 'from-green-500/20 to-emerald-500/20',
-      iconGradient: 'from-green-500 to-emerald-500',
-    },
-    {
-      icon: Eye,
-      title: 'Radical Transparency',
-      description:
-        'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
-      gradient: 'from-blue-500/20 to-cyan-500/20',
-      iconGradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: Target,
-      title: 'Accuracy First',
-      description:
-        'Official HMRC rates updated within 24 hours of changes. Comprehensive testing for Scottish rates, student loans, pensions, and edge cases.',
-      gradient: 'from-purple-500/20 to-pink-500/20',
-      iconGradient: 'from-purple-500 to-pink-500',
-    },
-    {
-      icon: Heart,
-      title: 'Genuinely Free',
-      description:
-        'No premium tiers, no paywalls, no "upgrade to see more". Every feature is free for everyone, forever. Tax calculations should be accessible to all.',
-      gradient: 'from-red-500/20 to-orange-500/20',
-      iconGradient: 'from-red-500 to-orange-500',
-    },
-  ];
-
-  const techFeatures = [
-    {
-      icon: Rocket,
-      title: 'Blazing Fast',
-      metric: '<1.5s',
-      description: 'Sub-second page loads, instant calculations, 60fps animations',
-    },
-    {
-      icon: Code,
-      title: 'Modern Stack',
-      metric: 'Next.js 15',
-      description: 'React 19, TypeScript, Tailwind CSS v4, cutting-edge architecture',
-    },
-    {
-      icon: Sparkles,
-      title: 'Lighthouse Score',
-      metric: '95+',
-      description: 'Performance, accessibility, SEO, and best practices',
-    },
-  ];
-
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}

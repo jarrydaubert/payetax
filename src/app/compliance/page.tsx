@@ -1,5 +1,4 @@
 // src/app/compliance/page.tsx
-'use client';
 
 import {
   AlertTriangle,
@@ -12,9 +11,28 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+  title: 'HMRC Compliance & Data Sources | PayeTax',
+  description:
+    'PayeTax uses official HMRC tax rates and thresholds. Learn about our compliance standards, data sources, and accuracy verification process for UK tax calculations.',
+  keywords:
+    'hmrc compliance, tax rate verification, official tax rates, uk tax accuracy, paye compliance, hmrc data sources',
+  alternates: {
+    canonical: 'https://payetax.co.uk/compliance',
+  },
+  openGraph: {
+    title: 'HMRC Compliance & Data Sources | PayeTax',
+    description:
+      'Official HMRC tax rates and thresholds. Verified accuracy for UK tax calculations.',
+    url: 'https://payetax.co.uk/compliance',
+    type: 'website',
+  },
+};
 
 // HMRC compliance features and certifications
 const COMPLIANCE_FEATURES = [

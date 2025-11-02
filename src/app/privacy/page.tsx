@@ -1,5 +1,4 @@
 // src/app/privacy/page.tsx
-'use client';
 
 import {
   Calendar,
@@ -15,63 +14,81 @@ import {
   UserX,
   X,
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 
+export const metadata: Metadata = {
+  title: 'Privacy Policy | PayeTax - Client-Side Tax Calculations',
+  description:
+    'PayeTax privacy policy: All tax calculations run in your browser with zero server-side data storage. Learn how we protect your financial privacy.',
+  keywords:
+    'privacy policy, data privacy, client-side calculations, zero data storage, uk tax calculator privacy',
+  alternates: {
+    canonical: 'https://payetax.co.uk/privacy',
+  },
+  openGraph: {
+    title: 'Privacy Policy | PayeTax',
+    description: 'All tax calculations run in your browser. Zero server-side data storage.',
+    url: 'https://payetax.co.uk/privacy',
+    type: 'website',
+  },
+};
+
+const privacyPrinciples = [
+  {
+    icon: Lock,
+    title: 'Client-Side Calculations',
+    description:
+      'All tax calculations run in your browser using JavaScript. Your salary, tax code, and personal details never leave your device.',
+    color: 'from-blue-500/20 to-cyan-500/20',
+    iconColor: 'from-blue-500 to-cyan-500',
+  },
+  {
+    icon: Database,
+    title: 'Zero Server Storage',
+    description:
+      "We don't store your tax data on our servers. Calculations happen locally, results display instantly, nothing gets saved remotely.",
+    color: 'from-green-500/20 to-emerald-500/20',
+    iconColor: 'from-green-500 to-emerald-500',
+  },
+  {
+    icon: Eye,
+    title: 'Optional Analytics',
+    description:
+      'Anonymous usage data (page views, device type) only with your consent. You can decline entirely - the calculator works exactly the same.',
+    color: 'from-purple-500/20 to-pink-500/20',
+    iconColor: 'from-purple-500 to-pink-500',
+  },
+  {
+    icon: Shield,
+    title: 'Privacy by Design',
+    description:
+      "Your privacy isn't a feature we added - it's built into the architecture. We literally cannot see your tax calculations.",
+    color: 'from-orange-500/20 to-red-500/20',
+    iconColor: 'from-orange-500 to-red-500',
+  },
+];
+
+const dontDo = [
+  'Store your tax calculations on servers',
+  'Sell, share, or monetize your data',
+  'Track you across other websites',
+  'Require accounts or personal info',
+  'Use invasive advertising pixels',
+  'Share data with third parties',
+];
+
+const doDo = [
+  'Provide completely free calculations',
+  'Use anonymous analytics (with consent)',
+  'Save preferences locally on your device',
+  'Keep this policy simple and honest',
+  'Respect your choice to decline tracking',
+  'Update you on any policy changes',
+];
+
 export default function PrivacyPolicyPage() {
-  const privacyPrinciples = [
-    {
-      icon: Lock,
-      title: 'Client-Side Calculations',
-      description:
-        'All tax calculations run in your browser using JavaScript. Your salary, tax code, and personal details never leave your device.',
-      color: 'from-blue-500/20 to-cyan-500/20',
-      iconColor: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: Database,
-      title: 'Zero Server Storage',
-      description:
-        "We don't store your tax data on our servers. Calculations happen locally, results display instantly, nothing gets saved remotely.",
-      color: 'from-green-500/20 to-emerald-500/20',
-      iconColor: 'from-green-500 to-emerald-500',
-    },
-    {
-      icon: Eye,
-      title: 'Optional Analytics',
-      description:
-        'Anonymous usage data (page views, device type) only with your consent. You can decline entirely - the calculator works exactly the same.',
-      color: 'from-purple-500/20 to-pink-500/20',
-      iconColor: 'from-purple-500 to-pink-500',
-    },
-    {
-      icon: Shield,
-      title: 'Privacy by Design',
-      description:
-        'Not just policy - architectural impossibility to see your data. We built privacy into the foundation, not added it later.',
-      color: 'from-orange-500/20 to-red-500/20',
-      iconColor: 'from-orange-500 to-red-500',
-    },
-  ];
-
-  const dontDo = [
-    'Store your tax calculations on servers',
-    'Sell, share, or monetize your data',
-    'Track you across other websites',
-    'Require accounts or personal info',
-    'Use invasive advertising pixels',
-    'Share data with third parties',
-  ];
-
-  const doDo = [
-    'Provide completely free calculations',
-    'Use anonymous analytics (with consent)',
-    'Save preferences locally on your device',
-    'Keep this policy simple and honest',
-    'Respect your choice to decline tracking',
-    'Update you on any policy changes',
-  ];
-
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}
