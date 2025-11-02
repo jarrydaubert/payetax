@@ -285,7 +285,7 @@ export function BlogPageClient({
 
             {/* Pagination - Neon Style */}
             {totalPages > 1 && (
-              <div className='mb-20'>
+              <div className='relative z-20 mb-20'>
                 <div className='mb-8 flex items-center justify-center gap-4'>
                   {currentPage > 1 && (
                     <Link
