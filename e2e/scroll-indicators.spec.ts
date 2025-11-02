@@ -43,13 +43,16 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
     });
 
     test('should show scroll indicators when all 7 periods selected', async ({ page }) => {
-      // Enable all periods
+      // Enable all periods - check state first due to localStorage persistence
       const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
 
       for (const period of periods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
       }
 
       // Wait for table to re-render
@@ -73,8 +76,11 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
       for (const period of periods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
       }
 
       await page.waitForTimeout(500);
@@ -94,13 +100,16 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
     test.use({ viewport: { width: 1366, height: 768 } });
 
     test('should show scroll with all 7 periods on laptop', async ({ page }) => {
-      // Enable all periods
+      // Enable all periods - check state first
       const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
 
       for (const period of periods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
       }
 
       await page.waitForTimeout(500);
@@ -151,13 +160,16 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
     });
 
     test('should show swipe hint on mobile when overflow', async ({ page }) => {
-      // Enable multiple periods to force overflow
+      // Enable multiple periods to force overflow - check state first
       const periods = ['4-Weekly', 'Daily', 'Hourly'];
 
       for (const period of periods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
       }
 
       await page.waitForTimeout(500);
@@ -225,8 +237,11 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
 
       for (const period of periodsToAdd) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
 
         await page.waitForTimeout(300);
 
@@ -237,12 +252,15 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
     });
 
     test('should hide indicators when removing periods to fit viewport', async ({ page }) => {
-      // First add all periods
+      // First ensure all periods are checked
       const allPeriods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
       for (const period of allPeriods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (!isChecked) {
+          await checkbox.click();
+          await expect(checkbox).toBeChecked({ timeout: 3000 });
+        }
       }
 
       await page.waitForTimeout(500);
@@ -250,8 +268,11 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
       // Then remove them to reduce width
       for (const period of allPeriods) {
         const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-        await checkbox.click();
-        await expect(checkbox).not.toBeChecked({ timeout: 3000 });
+        const isChecked = await checkbox.isChecked();
+        if (isChecked) {
+          await checkbox.click();
+          await expect(checkbox).not.toBeChecked({ timeout: 3000 });
+        }
 
         await page.waitForTimeout(300);
 
@@ -334,14 +355,14 @@ test.describe('Results Table Scroll Indicators E2E Tests', () => {
   test.describe('Container Width Tests', () => {
     test.use({ viewport: { width: 1920, height: 1080 } });
 
-    test('should use max-width 1600px container', async ({ page }) => {
+    test('should use max-width 1800px container', async ({ page }) => {
       const calculatorSection = page.locator('[data-testid="calculator-section"]');
       await expect(calculatorSection).toBeVisible();
 
       const maxWidth = await calculatorSection.evaluate((el) => {
         return window.getComputedStyle(el).maxWidth;
       });
-      expect(maxWidth).toBe('1600px');
+      expect(maxWidth).toBe('1800px');
     });
 
     test('should have proper grid layout on desktop', async ({ page }) => {
