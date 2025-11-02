@@ -42,6 +42,7 @@ export default function Loading() {
         {/* Article content skeleton */}
         <div className='glass-card mb-6 rounded-xl p-8 md:mb-8'>
           <div className='space-y-4'>
+            {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
             {[...Array(8)].map((_, i) => (
               <div key={`skeleton-content-${i}`} className='space-y-2'>
                 <div className='h-4 w-full animate-pulse rounded bg-muted/50' />

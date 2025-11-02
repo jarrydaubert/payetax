@@ -17,6 +17,7 @@ export default function Loading() {
         <div className='mx-auto mb-4 h-12 w-2/3 animate-pulse rounded bg-muted' />
         <div className='mx-auto mb-6 h-6 w-1/2 animate-pulse rounded bg-muted' />
         <div className='flex justify-center gap-2'>
+          {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
           {[...Array(4)].map((_, i) => (
             <div
               key={`header-badge-${i}`}
@@ -32,6 +33,7 @@ export default function Loading() {
           <div className='h-6 w-32 animate-pulse rounded bg-muted' />
         </div>
         <div className='flex flex-wrap justify-center gap-3'>
+          {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
           {[...Array(6)].map((_, i) => (
             <div
               key={`category-filter-${i}`}
@@ -43,6 +45,7 @@ export default function Loading() {
 
       {/* Posts grid skeleton */}
       <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+        {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
         {[...Array(6)].map((_, i) => (
           <div
             key={`post-card-${i}`}
