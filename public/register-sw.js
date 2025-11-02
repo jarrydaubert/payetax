@@ -99,19 +99,13 @@
       o.remove();
     }, 3e3);
   }
-  let _l;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    t('[PWA] Install prompt triggered');
-    e.preventDefault();
-    _l = e;
-    c();
+  // Allow browser/OS to show native install prompt
+  window.addEventListener('beforeinstallprompt', () => {
+    t('[PWA] Install prompt triggered - browser will show native UI');
+    // Don't prevent default - let browser handle the install prompt
   });
-  function c() {
-    t('[PWA] App can be installed');
-  }
   window.addEventListener('appinstalled', () => {
     t('[PWA] App was installed');
-    _l = null;
     if (typeof gtag !== 'undefined')
       gtag('event', 'pwa_install', { event_category: 'PWA', event_label: 'App Installed' });
   });
