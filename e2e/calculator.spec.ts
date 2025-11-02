@@ -54,8 +54,8 @@ test.describe('Tax Calculator E2E Tests', () => {
     await salaryInput.fill(testData.salary.toString());
     await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
-    // Select tax year (if available) - shadcn Select component
-    const taxYearSelect = page.getByLabel(/tax year/i);
+    // Select tax year (if available) - use role-based selector and .last() to skip tooltip
+    const taxYearSelect = page.getByRole('button', { name: /tax year/i }).last();
     if (await taxYearSelect.isVisible()) {
       await taxYearSelect.click();
       await page.getByRole('option', { name: '2024-2025' }).click();
@@ -114,7 +114,7 @@ test.describe('Tax Calculator E2E Tests', () => {
   });
 
   test('should validate salary input', async ({ page }) => {
-    const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
+    const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
 
     // Test negative value
@@ -231,12 +231,12 @@ test.describe('Tax Calculator E2E Tests', () => {
 
   test('should calculate student loan repayments correctly', async ({ page }) => {
     // Test Plan 2 student loan at £35,000 salary
-    const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
+    const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('35000');
 
-    // Add student loan Plan 2 - shadcn Select component
-    const studentLoanSelect = page.getByLabel(/student.*loan/i);
+    // Add student loan Plan 2 - use combobox role to avoid tooltip collision
+    const studentLoanSelect = page.getByRole('combobox', { name: /student loan plan/i });
     if (await studentLoanSelect.isVisible()) {
       await studentLoanSelect.click();
       await page.getByRole('option', { name: /plan 2/i }).click();
@@ -285,7 +285,7 @@ test.describe('Tax Calculator E2E Tests', () => {
 
   test('should toggle Scottish tax rates with different calculations', async ({ page }) => {
     // Fill basic details - £45,000 salary where Scottish rates differ
-    const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
+    const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('45000');
 
@@ -343,8 +343,8 @@ test.describe('Tax Calculator E2E Tests', () => {
     await salaryInput.fill(testData.salary.toString()); // Use testData like the working test
     await page.waitForTimeout(500); // Wait for auto-calculation debounce
 
-    // Select tax year (if available) - shadcn Select component
-    const taxYearSelect = page.getByLabel(/tax year/i);
+    // Select tax year (if available) - use role-based selector and .last() to skip tooltip
+    const taxYearSelect = page.getByRole('button', { name: /tax year/i }).last();
     if (await taxYearSelect.isVisible()) {
       await taxYearSelect.click();
       await page.getByRole('option', { name: '2024-2025' }).click();
@@ -415,7 +415,7 @@ test.describe('Tax Calculator E2E Tests', () => {
 
   test('should handle different period selections', async ({ page }) => {
     // Perform calculation
-    const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
+    const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('30000');
     await page.getByTestId('calculate-button').click();
@@ -447,7 +447,7 @@ test.describe('Tax Calculator E2E Tests', () => {
     ).toBeVisible();
 
     // Check form is usable
-    const salaryInput = page.getByLabel(/salary|gross.*salary/i).first();
+    const salaryInput = page.locator('[data-testid="salary-input"]');
     await expect(salaryInput).toBeVisible({ timeout: 5000 });
     await salaryInput.fill('25000');
     await page.getByTestId('calculate-button').click();
