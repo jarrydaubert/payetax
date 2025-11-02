@@ -353,7 +353,7 @@ test.describe('Accessibility - Interactive Elements', () => {
     await page.waitForLoadState('networkidle');
 
     // Check mobile menu if on mobile viewport
-    const isMobile = page.viewportSize()?.width && page.viewportSize()!.width < 768;
+    const isMobile = page.viewportSize()?.width && page.viewportSize()?.width < 768;
 
     if (isMobile) {
       // Open mobile menu
