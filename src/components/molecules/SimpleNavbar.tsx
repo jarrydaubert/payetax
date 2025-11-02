@@ -49,7 +49,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
       <nav
         className={cn(
-          'relative z-40 w-full py-4',
+          'relative z-50 w-full py-4',
           'border-border/30 border-b bg-background/50 backdrop-blur-md',
           className
         )}
