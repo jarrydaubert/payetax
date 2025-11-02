@@ -6,7 +6,7 @@
  */
 
 import { unstable_cache } from 'next/cache';
-import { BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
+import { BLOG_CATEGORIES, BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
 import { getPostBySlug as getMDXPostBySlug, getAllPosts as getMDXPosts } from '@/lib/mdx';
 import type {
   BlogCategory,
@@ -228,7 +228,8 @@ export function getBlogPostBySlug(slug: string): BlogPost | null {
 }
 
 /**
- * Get all unique categories from published posts
+ * Get all categories from config with post counts
+ * Returns ALL categories from BLOG_CATEGORIES, even if they have 0 posts
  */
 export async function getBlogCategories(): Promise<BlogCategory[]> {
   const allPosts = await getAllCachedPosts();
@@ -239,16 +240,11 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
     categoryMap.set(post.category, (categoryMap.get(post.category) || 0) + 1);
   }
 
-  // Map to category objects
-  return Array.from(categoryMap.entries()).map(([slug, count]) => {
-    const categoryData = getCategoryBySlug(slug);
-    return {
-      name: categoryData?.name || slug,
-      slug: categoryData?.slug || slug,
-      description: categoryData?.description,
-      count,
-    };
-  });
+  // Return ALL categories from config (not just ones with posts)
+  return BLOG_CATEGORIES.map((category) => ({
+    ...category,
+    count: categoryMap.get(category.slug) || 0,
+  }));
 }
 
 /**
