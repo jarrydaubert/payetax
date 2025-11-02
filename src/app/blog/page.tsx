@@ -5,7 +5,8 @@ import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } f
 import { BlogPageClient } from './BlogPageClient';
 
 // Next.js 16: Route segment config for optimized blog listing
-export const dynamic = 'force-static'; // Pre-render blog listing at build time
+// Changed to dynamic to support query params (category, page) in dev
+export const dynamic = 'force-dynamic'; // Dynamic rendering to respect search params
 export const revalidate = 3600; // ISR: Revalidate every hour for new posts
 
 export const metadata: Metadata = {

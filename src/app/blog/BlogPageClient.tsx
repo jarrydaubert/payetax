@@ -70,13 +70,13 @@ export function BlogPageClient({
   };
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-100 dark:from-slate-950 dark:via-purple-950/20 dark:to-slate-950'>
+    <div className='relative min-h-screen overflow-hidden bg-slate-950 light:bg-white md:bg-gradient-to-br light:md:from-slate-50 md:from-slate-950 light:md:via-purple-50/30 md:via-purple-950/20 light:md:to-slate-100 md:to-slate-950'>
       {/* Animated background grid */}
-      <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]' />
+      <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-50 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] md:opacity-100' />
 
-      {/* Gradient orbs */}
-      <div className='pointer-events-none absolute top-0 right-1/4 h-96 w-96 bg-purple-500/20 opacity-20 blur-[120px]' />
-      <div className='pointer-events-none absolute top-1/3 left-1/4 h-96 w-96 bg-cyan-500/20 opacity-20 blur-[120px]' />
+      {/* Gradient orbs - hidden on mobile for better contrast */}
+      <div className='pointer-events-none absolute top-0 right-1/4 hidden h-96 w-96 bg-purple-500/20 opacity-20 blur-[120px] md:block' />
+      <div className='pointer-events-none absolute top-1/3 left-1/4 hidden h-96 w-96 bg-cyan-500/20 opacity-20 blur-[120px] md:block' />
 
       {/* Hero Section */}
       <section className='relative pt-20 pb-10 md:pt-32 md:pb-20'>
@@ -98,7 +98,7 @@ export function BlogPageClient({
             </h1>
 
             {/* Subtitle */}
-            <p className='mx-auto mb-12 max-w-3xl text-foreground/70 text-lg leading-relaxed'>
+            <p className='mx-auto mb-12 max-w-3xl light:text-foreground/80 text-foreground/70 text-lg leading-relaxed light:md:text-foreground/70'>
               UK Tax Guidance & Financial Insights. No jargon, just insights.
             </p>
 
@@ -119,7 +119,7 @@ export function BlogPageClient({
 
       <div className='container relative z-10 mx-auto max-w-7xl px-4'>
         {/* Stats Bar - 3D Glass Cards */}
-        <div className='relative z-10 -mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
+        <div className='-mt-8 relative z-10 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
           {[
             {
               icon: FileText,
@@ -142,7 +142,7 @@ export function BlogPageClient({
           ].map((stat, _idx) => (
             <div
               key={stat.label}
-              className='group relative overflow-hidden rounded-2xl border border-border bg-card/50 p-8 text-center backdrop-blur-xl transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-border/60 md:hover:bg-card/70'
+              className='group relative overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card p-8 text-center backdrop-blur-xl transition-all duration-300 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:border-border/60 md:hover:bg-card/70'
             >
               <div
                 className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
@@ -176,7 +176,7 @@ export function BlogPageClient({
             </div>
 
             <Link href={`/blog/${featuredPost.slug}`} className='group block'>
-              <div className='relative overflow-hidden rounded-3xl border border-yellow-500/30 bg-gradient-to-br from-white/10 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-yellow-500/50 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] md:p-12 md:hover:scale-[1.02]'>
+              <div className='relative overflow-hidden rounded-3xl border border-yellow-500/40 bg-gradient-to-br from-white/10 light:from-yellow-50/90 light:to-orange-50/80 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-yellow-500/50 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] md:p-12 md:hover:scale-[1.02]'>
                 <div className='absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-orange-500/0 opacity-0 transition-opacity duration-500 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 group-hover:opacity-100' />
 
                 <div className='relative grid items-center gap-8 md:grid-cols-2'>
@@ -195,7 +195,7 @@ export function BlogPageClient({
                       {featuredPost.title}
                     </h2>
 
-                    <p className='mb-8 text-foreground/70 text-lg leading-relaxed'>
+                    <p className='mb-8 light:text-foreground/85 text-foreground/70 text-lg leading-relaxed light:md:text-foreground/70'>
                       {featuredPost.excerpt}
                     </p>
 
@@ -230,7 +230,7 @@ export function BlogPageClient({
               {posts.map((post) => (
                 <div key={post.slug}>
                   <Link href={`/blog/${post.slug}`} className='group block h-full'>
-                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-xl transition-all duration-300 hover:border-purple-500/50 active:scale-[1.02] md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]'>
+                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card backdrop-blur-xl transition-all duration-300 hover:border-purple-500/50 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]'>
                       <div className='absolute inset-0 bg-gradient-to-br from-purple-500/0 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:from-purple-500/10 group-hover:to-cyan-500/10 group-hover:opacity-100' />
 
                       {post.image && (
@@ -261,7 +261,7 @@ export function BlogPageClient({
                           {post.title}
                         </h3>
 
-                        <p className='mb-4 line-clamp-3 text-muted-foreground text-sm leading-relaxed'>
+                        <p className='mb-4 line-clamp-3 light:text-foreground/70 text-muted-foreground text-sm leading-relaxed light:md:text-muted-foreground'>
                           {post.excerpt}
                         </p>
 
@@ -290,7 +290,7 @@ export function BlogPageClient({
                   {currentPage > 1 && (
                     <Link
                       href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                      className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
+                      className='rounded-full border border-border bg-card/50 light:bg-card px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 light:md:bg-card/50 md:hover:bg-card/70'
                     >
                       ← Previous
                     </Link>
@@ -307,7 +307,7 @@ export function BlogPageClient({
                   {currentPage < totalPages && (
                     <Link
                       href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                      className='rounded-full border border-border bg-card/50 px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 hover:bg-card/70'
+                      className='rounded-full border border-border bg-card/50 light:bg-card px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 light:md:bg-card/50 md:hover:bg-card/70'
                     >
                       Next →
                     </Link>
@@ -346,7 +346,7 @@ export function BlogPageClient({
             )}
           </>
         ) : (
-          <Empty className='mb-20 border bg-card/50 backdrop-blur-xl'>
+          <Empty className='mb-20 border bg-card/50 light:bg-card backdrop-blur-xl light:md:bg-card/50'>
             <EmptyMedia variant='icon'>
               <Search />
             </EmptyMedia>
@@ -368,9 +368,9 @@ export function BlogPageClient({
 
         {/* Additional Content for Page 2+ (SEO) */}
         {currentPage > 1 && !selectedCategory && (
-          <div className='mb-12 rounded-2xl border border-border bg-card/50 p-8 backdrop-blur-xl'>
+          <div className='mb-12 rounded-2xl border border-border bg-card/50 light:bg-card p-8 backdrop-blur-xl light:md:bg-card/50'>
             <h2 className='mb-6 font-bold text-2xl text-foreground'>Browse Articles by Category</h2>
-            <p className='mb-6 text-foreground/70'>
+            <p className='mb-6 light:text-foreground/80 text-foreground/70 light:md:text-foreground/70'>
               Explore our comprehensive collection of UK tax guides organized by topic. From
               understanding basic tax concepts to advanced strategies for reducing your tax bill, we
               cover everything you need to know about UK taxation.
