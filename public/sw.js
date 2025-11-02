@@ -125,6 +125,7 @@ self.addEventListener('fetch', (event) => {
     'bmac-cdn.nyc3.digitaloceanspaces.com',
     'va.vercel-scripts.com',
     'vercel-insights.com',
+    'analytics.ahrefs.com', // Ahrefs analytics
   ];
 
   if (skipDomains.some((domain) => url.includes(domain))) {
