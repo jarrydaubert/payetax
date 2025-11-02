@@ -18,10 +18,17 @@
       e = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       t('[PWA] Service Worker registered successfully');
       e.addEventListener('updatefound', n);
+      // Check for updates every 5 minutes when page is visible
       if (document.visibilityState === 'visible')
         setInterval(() => {
           if (document.visibilityState === 'visible') e.update();
-        }, 36e5);
+        }, 3e5); // 5 minutes (300000ms)
+      // Also check for updates when tab becomes visible
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && e) {
+          e.update();
+        }
+      });
       navigator.serviceWorker.addEventListener('message', s);
       if ('Notification' in window && Notification.permission === 'default')
         document.addEventListener('click', d, { once: !0 });

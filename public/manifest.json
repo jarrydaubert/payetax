@@ -73,16 +73,16 @@
   ],
   "screenshots": [
     {
-      "src": "/images/pwa-screenshot-wide.png",
+      "src": "/images/pwa-screenshot-wide.webp",
       "sizes": "1280x720",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "wide",
       "label": "PayeTax Tax Calculator on Desktop"
     },
     {
-      "src": "/images/pwa-screenshot-narrow.png",
+      "src": "/images/pwa-screenshot-narrow.webp",
       "sizes": "640x1280",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "narrow",
       "label": "PayeTax Tax Calculator on Mobile"
     }
