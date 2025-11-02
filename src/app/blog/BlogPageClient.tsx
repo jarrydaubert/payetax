@@ -119,7 +119,7 @@ export function BlogPageClient({
 
       <div className='container relative z-10 mx-auto max-w-7xl px-4'>
         {/* Stats Bar - 3D Glass Cards */}
-        <div className='-mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
+        <div className='relative z-10 -mt-8 mx-auto mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
           {[
             {
               icon: FileText,
