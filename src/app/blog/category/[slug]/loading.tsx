@@ -17,12 +17,8 @@ export default function Loading() {
         <div className='mx-auto mb-4 h-12 w-2/3 animate-pulse rounded bg-muted' />
         <div className='mx-auto mb-6 h-6 w-1/2 animate-pulse rounded bg-muted' />
         <div className='flex justify-center gap-2'>
-          {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={`header-badge-${i}`}
-              className='h-8 w-24 animate-pulse rounded-full bg-muted'
-            />
+          {Array.from({ length: 4 }, (_, i) => `header-badge-${i}`).map((key) => (
+            <div key={key} className='h-8 w-24 animate-pulse rounded-full bg-muted' />
           ))}
         </div>
       </div>
@@ -33,24 +29,16 @@ export default function Loading() {
           <div className='h-6 w-32 animate-pulse rounded bg-muted' />
         </div>
         <div className='flex flex-wrap justify-center gap-3'>
-          {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={`category-filter-${i}`}
-              className='h-10 w-32 animate-pulse rounded-full bg-muted'
-            />
+          {Array.from({ length: 6 }, (_, i) => `category-filter-${i}`).map((key) => (
+            <div key={key} className='h-10 w-32 animate-pulse rounded-full bg-muted' />
           ))}
         </div>
       </div>
 
       {/* Posts grid skeleton */}
       <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-        {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={`post-card-${i}`}
-            className='overflow-hidden rounded-lg border border-border bg-card'
-          >
+        {Array.from({ length: 6 }, (_, i) => `post-card-${i}`).map((key) => (
+          <div key={key} className='overflow-hidden rounded-lg border border-border bg-card'>
             <div className='h-48 w-full animate-pulse bg-muted' />
             <div className='p-6'>
               <div className='mb-3 flex items-center justify-between'>

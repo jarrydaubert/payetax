@@ -17,9 +17,8 @@ export default function Loading() {
             {/* Input section */}
             <div className='space-y-6'>
               <div className='h-8 w-48 animate-pulse rounded bg-muted' />
-              {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-              {[...Array(5)].map((_, i) => (
-                <div key={`input-field-${i}`} className='space-y-2'>
+              {Array.from({ length: 5 }, (_, i) => `input-field-${i}`).map((key) => (
+                <div key={key} className='space-y-2'>
                   <div className='h-5 w-32 animate-pulse rounded bg-muted' />
                   <div className='h-12 w-full animate-pulse rounded-lg bg-muted' />
                 </div>
@@ -29,9 +28,8 @@ export default function Loading() {
             {/* Results section */}
             <div className='space-y-6'>
               <div className='h-8 w-48 animate-pulse rounded bg-muted' />
-              {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-              {[...Array(4)].map((_, i) => (
-                <div key={`result-card-${i}`} className='glass-card rounded-xl p-6'>
+              {Array.from({ length: 4 }, (_, i) => `result-card-${i}`).map((key) => (
+                <div key={key} className='glass-card rounded-xl p-6'>
                   <div className='mb-2 h-5 w-32 animate-pulse rounded bg-muted' />
                   <div className='h-10 w-48 animate-pulse rounded bg-muted' />
                 </div>
@@ -42,14 +40,12 @@ export default function Loading() {
 
         {/* Breakdown tables skeleton */}
         <div className='grid gap-8 md:grid-cols-2'>
-          {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-          {[...Array(2)].map((_, i) => (
-            <div key={`breakdown-table-${i}`} className='glass-card rounded-2xl p-8'>
+          {Array.from({ length: 2 }, (_, i) => `breakdown-table-${i}`).map((tableKey) => (
+            <div key={tableKey} className='glass-card rounded-2xl p-8'>
               <div className='mb-6 h-7 w-48 animate-pulse rounded bg-muted' />
               <div className='space-y-4'>
-                {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton loader */}
-                {[...Array(4)].map((_, j) => (
-                  <div key={`breakdown-row-${i}-${j}`} className='flex justify-between'>
+                {Array.from({ length: 4 }, (_, j) => `${tableKey}-row-${j}`).map((rowKey) => (
+                  <div key={rowKey} className='flex justify-between'>
                     <div className='h-5 w-32 animate-pulse rounded bg-muted' />
                     <div className='h-5 w-24 animate-pulse rounded bg-muted' />
                   </div>
