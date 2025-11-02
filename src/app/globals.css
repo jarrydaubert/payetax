@@ -88,7 +88,7 @@
   --secondary: oklch(0.26 0.02 260);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.26 0.02 260);
-  --muted-foreground: oklch(0.65 0 0);          /* Better readability */
+  --muted-foreground: oklch(0.72 0 0);          /* WCAG AA compliant (4.5:1 contrast) */
   --accent: oklch(0.32 0.02 260);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
