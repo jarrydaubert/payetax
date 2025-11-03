@@ -492,6 +492,36 @@ npm run linear:create
 # Create issue with title
 node scripts/linear.js create "feat: Add dark mode"
 
+# Update issue status
+node scripts/linear.js update-status PAYTAX-24 Done
+node scripts/linear.js update-status PAYTAX-34 "In Progress"
+
+# Update issue description (simple, one-line)
+node scripts/linear.js update-description PAYTAX-84 "New description"
+
+# Update issue description (complex, multiline with markdown)
+node -e "
+const { LinearClient } = require('@linear/sdk');
+const linear = new LinearClient({ apiKey: process.env.LINEAR_API_KEY });
+(async () => {
+  const issue = await linear.issue('PAYTAX-84');
+  await issue.update({
+    description: \`**AUDIT COMPLETE - 7 Issues Found**
+
+✅ GOOD PATTERNS:
+- Pattern 1 ✅
+- Pattern 2 ✅
+
+❌ ISSUES:
+1. Issue one
+2. Issue two
+
+Files audited: file.tsx (242 lines)\`
+  });
+  console.log('✅ Updated PAYTAX-84');
+})();
+"
+
 # Delete issue(s)
 node scripts/linear.js delete PAYTAX-123
 node scripts/linear.js delete PAYTAX-1 PAYTAX-2 PAYTAX-3

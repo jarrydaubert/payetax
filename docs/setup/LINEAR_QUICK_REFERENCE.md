@@ -18,6 +18,28 @@ npm run linear:create
 npm run linear update-status PAYTAX-24 Done
 node scripts/linear.js update-status PAYTAX-34 "In Progress"
 
+# Update issue description
+npm run linear update-description PAYTAX-84 "New description here"
+node scripts/linear.js update-description PAYTAX-84 "**Markdown** supported"
+
+# Update issue description with Linear SDK (for complex/multiline)
+node -e "
+const { LinearClient } = require('@linear/sdk');
+const linear = new LinearClient({ apiKey: process.env.LINEAR_API_KEY });
+(async () => {
+  const issue = await linear.issue('PAYTAX-84');
+  await issue.update({
+    description: \`**Your multiline description**
+    
+    With proper formatting
+    - Bullet points
+    - Code blocks
+    \`
+  });
+  console.log('✅ Updated');
+})();
+"
+
 # Delete issue(s)
 npm run linear:delete PAYTAX-123
 node scripts/linear.js delete PAYTAX-1 PAYTAX-2 PAYTAX-3

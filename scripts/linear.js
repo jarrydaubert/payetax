@@ -374,6 +374,40 @@ async function updateIssueStatus(identifier, statusName) {
 }
 
 /**
+ * Update an issue's description
+ */
+async function updateIssueDescription(identifier, description) {
+  try {
+    log(`\n🔄 Updating description for ${identifier}...`, 'cyan');
+
+    // Get the issue
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    const issue = issues.nodes.find((i) => i.identifier === identifier);
+
+    if (!issue) {
+      log(`❌ Issue ${identifier} not found`, 'red');
+      return false;
+    }
+
+    // Update the issue description
+    await issue.update({
+      description: description,
+    });
+
+    log(`✅ Updated ${identifier} description`, 'green');
+    return true;
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    return false;
+  }
+}
+
+/**
  * Assign issue(s) to a project by name
  */
 async function assignToProject(identifiers, projectName) {
@@ -806,6 +840,18 @@ async function main() {
           const identifier = args[1];
           const statusName = args.slice(2).join(' '); // Join in case status has spaces
           await updateIssueStatus(identifier, statusName);
+        }
+        break;
+
+      case 'update-description':
+      case 'set-description':
+        if (args.length < 3) {
+          log('❌ Please specify issue and description', 'red');
+          log('Example: npm run linear update-description PAYTAX-1 "New description"', 'dim');
+        } else {
+          const identifier = args[1];
+          const description = args.slice(2).join(' '); // Join description parts
+          await updateIssueDescription(identifier, description);
         }
         break;
 
