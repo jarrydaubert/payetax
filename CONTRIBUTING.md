@@ -786,8 +786,8 @@ npm install
 | Doc | Purpose |
 |-----|---------|
 | [README.md](./README.md) | Project overview |
-| [LINEAR_SOP.md](./docs/LINEAR_SOP.md) | Linear best practices |
-| [LINEAR_QUICK_REFERENCE.md](./docs/LINEAR_QUICK_REFERENCE.md) | Quick Linear commands |
+| [LINEAR_SOP.md](./docs/setup/LINEAR_SOP.md) | Linear best practices |
+| [LINEAR_QUICK_REFERENCE.md](./docs/setup/LINEAR_QUICK_REFERENCE.md) | Quick Linear commands |
 | [BLOG_GUIDE.md](./docs/guides/BLOG_GUIDE.md) | Blog writing guidelines |
 | [TECH_STACK.md](./docs/guides/TECH_STACK.md) | Technology overview |
 
