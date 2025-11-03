@@ -164,11 +164,11 @@ describe('IncomeSourceList Component', () => {
       // Verify there are 2 income source containers by counting remove buttons
       const removeButtons = screen.getAllByRole('button', { name: /remove income source/i });
       expect(removeButtons).toHaveLength(2);
-      
+
       // Verify numbered badge for first item exists
       const badge1 = screen.getByText('1');
       expect(badge1).toBeInTheDocument();
-      
+
       // For "2", there will be multiple: count badge + item badge
       const allTwos = screen.getAllByText('2');
       expect(allTwos.length).toBeGreaterThanOrEqual(1);
@@ -184,10 +184,10 @@ describe('IncomeSourceList Component', () => {
       // More robust test: verify by counting remove buttons = number of items
       const removeButtons = screen.getAllByRole('button', { name: /remove income source/i });
       expect(removeButtons).toHaveLength(2);
-      
+
       // Verify badge 1 exists
       expect(screen.getByText('1')).toBeInTheDocument();
-      
+
       // Verify "2" appears at least twice (count + item badge)
       const badge2Elements = screen.getAllByText('2');
       expect(badge2Elements.length).toBeGreaterThanOrEqual(2);
