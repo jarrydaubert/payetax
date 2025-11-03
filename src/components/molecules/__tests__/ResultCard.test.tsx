@@ -79,8 +79,7 @@ describe('ResultCard Component', () => {
       );
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('text-blue-600');
-      expect(icon).toHaveClass('dark:text-blue-400');
+      expect(icon).toHaveClass('text-primary');
     });
 
     it('should default to default variant when not specified', () => {

@@ -121,7 +121,7 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
         <div className='mt-2 flex justify-between text-sm'>
           <div>
             <p className='text-muted-foreground'>Total Deductions</p>
-            <p className='font-medium font-mono text-red-600 dark:text-red-400'>
+            <p className='font-medium font-mono text-destructive'>
               {formatCurrency(
                 current
                   .filter((d) => d.category !== 'Net Pay')

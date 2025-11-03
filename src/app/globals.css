@@ -83,15 +83,15 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.24 0.02 260);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.90 0 0);                   /* Lighter for better contrast */
+  --primary: oklch(0.86 0.12 240);              /* WCAG AA compliant - blue with ≥4.5:1 contrast */
   --primary-foreground: oklch(0.15 0 0);
   --secondary: oklch(0.26 0.02 260);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.26 0.02 260);
-  --muted-foreground: oklch(0.72 0 0);          /* WCAG AA compliant (4.5:1 contrast) */
+  --muted-foreground: oklch(0.84 0 0);          /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
   --accent: oklch(0.32 0.02 260);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --accent-foreground: oklch(0.93 0 0);         /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
+  --destructive: oklch(0.85 0.16 27);           /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.32 0.02 260);               /* Subtle but visible */
   --input: oklch(0.24 0.02 260);

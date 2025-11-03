@@ -33,7 +33,7 @@ const variantStyles = {
   },
   info: {
     card: '',
-    icon: 'text-blue-600 dark:text-blue-400',
+    icon: 'text-primary',
   },
 };
 

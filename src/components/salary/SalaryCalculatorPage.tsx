@@ -131,13 +131,13 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                         <span className='text-muted-foreground text-sm'>Gross Salary</span>
                         <span className='font-medium'>£{formattedSalary}</span>
                       </div>
-                      <div className='flex justify-between text-red-600'>
+                      <div className='flex justify-between text-destructive'>
                         <span className='text-sm'>Income Tax</span>
                         <span className='font-medium'>
                           -£{results.incomeTax.annually.toLocaleString('en-GB')}
                         </span>
                       </div>
-                      <div className='flex justify-between text-red-600'>
+                      <div className='flex justify-between text-destructive'>
                         <span className='text-sm'>National Insurance</span>
                         <span className='font-medium'>
                           -£{results.nationalInsurance.annually.toLocaleString('en-GB')}

@@ -146,7 +146,7 @@ export function WhatIfComparisonDisplay({
       currentAnnual: currentResults.incomeTax.annually,
       whatIfAnnual: whatIfResults.incomeTax.annually,
       percentage: calculatePercentage(currentResults.incomeTax.annually, currentGross),
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive',
     },
     // Tax Band Breakdown (Current)
     ...currentResults.taxBands.map((band, idx) => ({
@@ -155,7 +155,7 @@ export function WhatIfComparisonDisplay({
       currentAnnual: band.amount,
       whatIfAnnual: whatIfResults.taxBands[idx]?.amount || 0,
       percentage: calculatePercentage(band.amount, currentGross),
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive',
       isSubRow: true,
     })),
     // Student Loans
@@ -167,7 +167,7 @@ export function WhatIfComparisonDisplay({
             currentAnnual: currentResults.studentLoan.annually,
             whatIfAnnual: whatIfResults.studentLoan.annually,
             percentage: calculatePercentage(currentResults.studentLoan.annually, currentGross),
-            color: 'text-orange-600 dark:text-orange-400',
+            color: 'text-destructive',
           },
         ]
       : []),
@@ -185,7 +185,7 @@ export function WhatIfComparisonDisplay({
       currentAnnual: currentResults.pensionContribution.annually,
       whatIfAnnual: whatIfResults.pensionContribution.annually,
       percentage: calculatePercentage(currentResults.pensionContribution.annually, currentGross),
-      color: 'text-purple-600 dark:text-purple-400',
+      color: 'text-accent-foreground',
     },
     {
       category: 'Allowances/Deductions',

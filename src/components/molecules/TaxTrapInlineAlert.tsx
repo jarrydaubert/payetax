@@ -109,9 +109,7 @@ export function TaxTrapInlineAlert({
           <AlertTitle>Tax Trap Alert</AlertTitle>
           <AlertDescription>
             You're losing{' '}
-            <span className='font-bold text-red-600 dark:text-red-400'>
-              {formatCurrency(allowanceLost, 0)}
-            </span>{' '}
+            <span className='font-bold text-destructive'>{formatCurrency(allowanceLost, 0)}</span>{' '}
             in personal allowance due to the 60% tax trap (£100k-£125k zone).
             {onApplyPension && (
               <span className='mt-1 block'>

@@ -255,7 +255,7 @@ export function ResultsTable({
       annual: results.incomeTax.annually,
       whatIfAnnual: whatIfResults?.incomeTax.annually,
       percentage: calculatePercentage(results.incomeTax.annually, grossAnnual),
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive',
       isHighlight: false,
     },
     // Tax Band Breakdown
@@ -265,7 +265,7 @@ export function ResultsTable({
       annual: band.amount,
       whatIfAnnual: whatIfResults?.taxBands[idx]?.amount,
       percentage: calculatePercentage(band.amount, grossAnnual),
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive',
       isHighlight: false,
       isSubRow: true,
     })),
@@ -278,7 +278,7 @@ export function ResultsTable({
             annual: results.studentLoan.annually,
             whatIfAnnual: whatIfResults?.studentLoan.annually,
             percentage: calculatePercentage(results.studentLoan.annually, grossAnnual),
-            color: 'text-orange-600 dark:text-orange-400',
+            color: 'text-destructive',
             isHighlight: false,
           },
         ]
@@ -298,7 +298,7 @@ export function ResultsTable({
       annual: results.pensionContribution.annually,
       whatIfAnnual: whatIfResults?.pensionContribution.annually,
       percentage: calculatePercentage(results.pensionContribution.annually, grossAnnual),
-      color: 'text-purple-600 dark:text-purple-400',
+      color: 'text-accent-foreground',
       isHighlight: false,
     },
     {
@@ -334,8 +334,7 @@ export function ResultsTable({
       annual: yearChange,
       whatIfAnnual: whatIfYearChange,
       percentage: yearChangePercentage,
-      color:
-        yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
+      color: yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive',
       isHighlight: false,
     },
   ];

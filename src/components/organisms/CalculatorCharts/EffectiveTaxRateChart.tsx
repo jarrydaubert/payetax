@@ -162,9 +162,7 @@ export function EffectiveTaxRateChart({
         <div className='mt-2 flex justify-between text-sm'>
           <div>
             <p className='text-muted-foreground'>Your Effective Rate</p>
-            <p className='font-mono font-semibold text-red-600 dark:text-red-400'>
-              {currentEffectiveRate}%
-            </p>
+            <p className='font-mono font-semibold text-destructive'>{currentEffectiveRate}%</p>
           </div>
           <div className='text-right'>
             <p className='text-muted-foreground'>Your Take Home</p>

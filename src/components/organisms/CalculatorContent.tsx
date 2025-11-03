@@ -54,12 +54,12 @@ export function CalculatorContent() {
                 {
                   label: '£50,271 - £125,140',
                   value: '40%',
-                  colorClass: 'text-orange-600 dark:text-orange-400',
+                  colorClass: 'text-destructive',
                 },
                 {
                   label: '£125,140+',
                   value: '45%',
-                  colorClass: 'text-red-600 dark:text-red-400',
+                  colorClass: 'text-destructive',
                 },
               ]}
             />
@@ -95,12 +95,12 @@ export function CalculatorContent() {
                 {
                   label: '£30,000 salary',
                   value: '£23,894',
-                  colorClass: 'text-blue-600 dark:text-blue-400',
+                  colorClass: 'text-primary',
                 },
                 {
                   label: '£50,000 salary',
                   value: '£37,794',
-                  colorClass: 'text-purple-600 dark:text-purple-400',
+                  colorClass: 'text-accent-foreground',
                 },
               ]}
               footerNote='Annual take-home pay'
@@ -178,7 +178,7 @@ export function CalculatorContent() {
                             £{row.salary.toLocaleString()}
                           </Link>
                         </td>
-                        <td className='p-4 text-right text-red-600 dark:text-red-400'>
+                        <td className='p-4 text-right text-destructive'>
                           £{row.tax.toLocaleString()}
                         </td>
                         <td className='p-4 text-right text-amber-600 dark:text-amber-400'>

@@ -3,7 +3,7 @@ import { generateUniqueTestData } from './helpers/tax-test-helpers';
 
 /**
  * What-If Comparison E2E Tests
- * 
+ *
  * Tests the "What If" scenario comparison feature that allows users to:
  * - Compare current salary vs alternative scenarios
  * - Test percentage increases/decreases
@@ -35,7 +35,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     await expect(whatIfTrigger).toBeVisible({ timeout: 5000 });
     await whatIfTrigger.click();
     await page.waitForTimeout(500); // Allow collapsible animation to complete
-    
+
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('🔓 What-If section opened');
   });

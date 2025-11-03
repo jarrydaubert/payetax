@@ -285,7 +285,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       expect(nav).toHaveClass('relative');
-      expect(nav).toHaveClass('z-40');
+      expect(nav).toHaveClass('z-50');
     });
 
     it('should have container with max-width', () => {

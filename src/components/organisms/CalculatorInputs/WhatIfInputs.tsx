@@ -79,7 +79,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
     <div className='space-y-4 rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10'>
       {/* Header */}
       <div className='flex items-center gap-2 border-purple-500/20 border-b pb-2 dark:border-purple-400/20'>
-        <Wand2 className='size-5 text-purple-600 dark:text-purple-400' />
+        <Wand2 className='size-5 text-accent-foreground' />
         <h3 className='font-semibold text-foreground text-lg'>What If Scenario</h3>
       </div>
 
@@ -95,7 +95,12 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
               value={whatIf.type}
               onValueChange={(value: 'percentage' | 'amount' | 'total') => setWhatIfType(value)}
             >
-              <SelectTrigger id={typeSelectId} data-testid='what-if-type-select' className='w-full'>
+              <SelectTrigger
+                id={typeSelectId}
+                data-testid='what-if-type-select'
+                className='w-full'
+                aria-label='Select what-if calculation type'
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

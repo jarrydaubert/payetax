@@ -182,7 +182,7 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
               {formatCurrency(results.netPay.annually)}
             </span>{' '}
             (
-            <span className='font-semibold text-red-600 dark:text-red-400'>
+            <span className='font-semibold text-destructive'>
               {((1 - results.netPay.annually / currentSalary) * 100).toFixed(1)}% deducted
             </span>
             )
