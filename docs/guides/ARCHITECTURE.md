@@ -1,7 +1,7 @@
 # PayeTax Architecture Documentation
 
-**Last Updated:** November 2, 2025  
-**Version:** 2.0.3  
+**Last Updated:** November 3, 2025  
+**Version:** 4.1.1  
 **Status:** ✅ Production Ready
 
 ---
@@ -23,22 +23,22 @@
 
 ## 🎯 Overview
 
-PayeTax is a production-ready UK tax calculator built with **Next.js 15**, **React 19**, and **TypeScript**. The architecture follows modern best practices with emphasis on:
+PayeTax is a production-ready UK tax calculator built with **Next.js 16**, **React 19**, and **TypeScript**. The architecture follows modern best practices with emphasis on:
 
 - **Type Safety** - 100% TypeScript with strict mode
 - **Component Quality** - A+ grade (95/100) professional architecture
 - **Atomic Design** - Clear component hierarchy
 - **Performance** - Optimized rendering and bundle size
 - **Accessibility** - WCAG 2.2 AA compliant
-- **Testing** - 81.8% component coverage
+- **Testing** - 82.1% component coverage
 
 ### Key Metrics
 
 | Metric | Value | Status |
 |--------|-------|--------|
 | **Files** | 216 | ✅ All pass linting |
-| **Components** | 100 | 55 + 45 tests |
-| **Test Coverage** | 81.8% | ⭐⭐⭐⭐ |
+| **Components** | 100+ | 56 + 46 tests |
+| **Test Coverage** | 82.1% | ⭐⭐⭐⭐ |
 | **TypeScript Errors** | 0 | ✅ Perfect |
 | **Linting Errors** | 0 | ✅ Perfect |
 | **Build Warnings** | 0 | ✅ Perfect |
@@ -137,7 +137,7 @@ Each component has one clear purpose:
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js** | 15.5.4 | React framework with App Router |
+| **Next.js** | 16.0.1 | React framework with App Router |
 | **React** | 19.2.0 | UI library |
 | **TypeScript** | 5.9.3 | Type safety |
 | **Tailwind CSS** | 4.1.14 | Utility-first styling |
@@ -205,7 +205,7 @@ Simple composites of atoms.
 - Focused functionality
 - 90.0% test coverage
 
-#### **Organisms (11 components)**
+#### **Organisms (12 components)**
 
 Complex sections combining molecules and atoms.
 
@@ -214,12 +214,13 @@ Complex sections combining molecules and atoms.
 - `BasicInputs.tsx` - Complete input form
 - `ResultsTable.tsx` - Full results display
 - `WhatIfComparisonDisplay.tsx` - What-if scenarios
+- `IncomeSourceList.tsx` - Multiple income sources (87 tests)
 
 **Characteristics:**
 - Business logic integration
 - Complex interactions
 - Feature-complete sections
-- 54.5% test coverage (many have integration tests)
+- 58.3% test coverage (many have integration tests)
 
 #### **Templates & Pages (4 components)**
 
@@ -404,7 +405,7 @@ payetax/
 │   ├── components/            # Component library
 │   │   ├── atoms/            # 7 components (85.7% tested)
 │   │   ├── molecules/        # 10 components (90.0% tested)
-│   │   ├── organisms/        # 11 components (54.5% tested)
+│   │   ├── organisms/        # 12 components (58.3% tested) - includes IncomeSourceList
 │   │   ├── templates/        # 1 component (100% tested)
 │   │   ├── pages/            # 2 components (50% tested)
 │   │   ├── ui/               # 23 components (82.6% tested)
@@ -422,12 +423,20 @@ payetax/
 │   ├── store/                # State management
 │   │   └── calculatorStore.ts
 │   │
+│   ├── hooks/                # Custom React hooks
+│   │   └── [reusable hooks]
+│   │
+│   ├── constants/            # App constants
+│   │   └── seo.ts
+│   │
+│   ├── styles/               # Shared styles
+│   │   └── [style utilities]
+│   │
 │   ├── types/                # TypeScript definitions
 │   │   ├── calculator.ts
 │   │   └── blog.ts
 │   │
-│   └── constants/            # App constants
-│       └── seo.ts
+│   └── config/               # Configuration files
 │
 ├── content/blog/             # MDX blog posts
 ├── public/                   # Static assets
@@ -593,10 +602,10 @@ beforeSend(event) {
 |-------|-----------|--------|----------|-------|
 | **Atoms** | 7 | 6 | 85.7% | A |
 | **Molecules** | 10 | 9 | 90.0% | A+ |
-| **Organisms** | 11 | 6 | 54.5% | C+ |
+| **Organisms** | 12 | 7 | 58.3% | C+ |
 | **UI Library** | 23 | 19 | 82.6% | A |
 | **Templates/Pages** | 4 | 3 | 75.0% | B+ |
-| **Overall** | **55** | **45** | **81.8%** | **A-** |
+| **Overall** | **56** | **46** | **82.1%** | **A-** |
 
 ### Testing Pyramid
 
@@ -704,6 +713,6 @@ it('has no accessibility violations', async () => {
 
 ---
 
-**Last Updated:** November 2, 2025  
+**Last Updated:** November 3, 2025  
 **Maintained By:** PayeTax Team  
 **Next Review:** January 2026
