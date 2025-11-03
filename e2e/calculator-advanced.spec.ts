@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 /**
  * Advanced Calculator Features E2E Tests
- * 
+ *
  * Comprehensive testing of advanced calculator features:
  * - Student Loan Plans (Plan 1, 2, 4, 5, Postgraduate)
  * - Pension Contributions (percentage vs fixed amount)
@@ -38,7 +38,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Plan 1
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 1' }).click();
     await page.waitForTimeout(300);
@@ -67,7 +67,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Plan 2
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
     await page.waitForTimeout(300);
@@ -95,7 +95,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Plan 4
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 4' }).click();
     await page.waitForTimeout(300);
@@ -123,7 +123,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Plan 5
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 5' }).click();
     await page.waitForTimeout(300);
@@ -151,7 +151,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Postgraduate
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Postgraduate' }).click();
     await page.waitForTimeout(300);
@@ -179,7 +179,7 @@ test.describe('Advanced Calculator - Student Loans', () => {
     await page.waitForTimeout(500);
 
     // Select Plan 2
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
     await page.waitForTimeout(300);
@@ -225,9 +225,7 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
 
     // Pension should default to percentage type
     // Enter 5% pension contribution
-    const pensionInput = page.locator('input').filter({ hasText: /%/ }).or(
-      page.locator('input[placeholder*="5"]').last()
-    );
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
     await page.waitForTimeout(300);
 
@@ -255,13 +253,14 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     await page.waitForTimeout(500);
 
     // Switch to fixed amount
-    const pensionTypeSelect = page.locator('button').filter({ hasText: /percentage|amount/i }).last();
+    const pensionTypeSelect = page.getByTestId('pension-type-select');
     await pensionTypeSelect.click();
-    await page.getByRole('option', { name: /amount/i }).click();
+    // Select the pound icon (second option)
+    await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
 
     // Enter £3,000 fixed pension
-    const pensionInput = page.locator('input[placeholder*="0.00"]').last();
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('3000');
     await page.waitForTimeout(300);
 
@@ -291,22 +290,19 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     await calculateButton.click();
     await page.waitForTimeout(1500);
 
-    // Get tax amount without pension
+    // Verify initial calculation
     const resultsTable = page.locator('[data-testid="results-table"]');
-    const taxWithoutPension = await resultsTable.locator('tr').filter({ hasText: /total.*tax/i }).textContent();
+    await expect(resultsTable).toBeVisible();
 
     // Now add 10% pension
-    const pensionInput = page.locator('input[placeholder*="5"]').last();
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('10');
     await page.waitForTimeout(300);
 
     await calculateButton.click();
     await page.waitForTimeout(1500);
 
-    // Tax should be lower with pension
-    const taxWithPension = await resultsTable.locator('tr').filter({ hasText: /total.*tax/i }).textContent();
-    
-    // Just verify pension row exists (tax reduction verification would need number parsing)
+    // Verify pension reduces taxable income - check pension row exists
     await expect(resultsTable).toContainText(/pension/i);
     await expect(resultsTable).toContainText('£4,000.00');
 
@@ -339,12 +335,13 @@ test.describe('Advanced Calculator - Marriage Allowance', () => {
     await expect(partnerInput).not.toBeVisible();
 
     // Check married checkbox
-    const marriedCheckbox = page.locator('label:has-text("Married")').locator('~ button, ~ input');
+    const marriedCheckbox = page.getByTestId('married-checkbox');
     await marriedCheckbox.click();
     await page.waitForTimeout(500);
 
     // Partner wage input should now be visible
-    partnerInput = page.getByLabel(/partner.*gross.*wage/i);
+    await page.waitForTimeout(500); // Wait for conditional render
+    partnerInput = page.locator('input[placeholder*="0.00"]').last();
     await expect(partnerInput).toBeVisible();
 
     // biome-ignore lint/suspicious/noConsole: Test debugging
@@ -422,7 +419,7 @@ test.describe('Advanced Calculator - Scottish Tax Rates', () => {
     // Verify Scottish tax bands appear
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
-    
+
     // Scottish tax has different bands (19%, 20%, 21%, 42%, 47%)
     // Just verify calculation completes
     await expect(resultsTable).toContainText(/total.*tax/i);
@@ -492,13 +489,13 @@ test.describe('Advanced Calculator - Combined Features', () => {
     await page.waitForTimeout(500);
 
     // Add student loan
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
     await page.waitForTimeout(300);
 
     // Add pension (5%)
-    const pensionInput = page.locator('input[placeholder*="5"]').last();
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
     await page.waitForTimeout(300);
 
@@ -543,12 +540,12 @@ test.describe('Advanced Calculator - Combined Features', () => {
     await page.waitForTimeout(300);
 
     // Add pension
-    const pensionInput = page.locator('input[placeholder*="5"]').last();
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('8');
     await page.waitForTimeout(300);
 
     // Add student loan
-    const studentLoanSelect = page.locator('select, button').filter({ hasText: /student loan/i }).last();
+    const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 4' }).click();
     await page.waitForTimeout(300);

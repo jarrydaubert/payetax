@@ -197,7 +197,12 @@ export function BasicInputs() {
           <Label htmlFor={marriedId} className='text-sm'>
             Married
           </Label>
-          <Checkbox id={marriedId} checked={input.isMarried} onCheckedChange={setIsMarried} />
+          <Checkbox
+            id={marriedId}
+            checked={input.isMarried}
+            onCheckedChange={setIsMarried}
+            data-testid='married-checkbox'
+          />
         </div>
 
         <div className='flex items-center gap-1.5'>
@@ -293,6 +298,7 @@ export function BasicInputs() {
             id={studentLoanId}
             className='w-[160px] border-input'
             aria-label='Select student loan plan'
+            data-testid='student-loan-select'
           >
             <SelectValue placeholder='Select student loan' />
           </SelectTrigger>
@@ -341,6 +347,7 @@ export function BasicInputs() {
               id={pensionTypeId}
               className='w-[70px] shrink-0 border-input'
               aria-label='Select pension contribution type'
+              data-testid='pension-type-select'
             >
               <SelectValue>
                 {input.pensionContributionType === 'percentage' ? (
@@ -376,6 +383,7 @@ export function BasicInputs() {
             min={0}
             max={input.pensionContributionType === 'percentage' ? 100 : undefined}
             className='flex-1'
+            data-testid='pension-input'
           />
         </div>
       </div>
