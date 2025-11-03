@@ -317,6 +317,65 @@ async function updateIssueParent(identifier, parentIdentifier) {
 }
 
 /**
+ * Update an issue's status/workflow state
+ */
+async function updateIssueStatus(identifier, statusName) {
+  try {
+    log(`\n🔄 Updating status for ${identifier} to "${statusName}"...`, 'cyan');
+
+    // Get team and workflow states
+    const me = await linear.viewer;
+    const teams = await me.teams();
+    const team = teams.nodes.find((t) => t.key === TEAM_KEY);
+
+    if (!team) {
+      log(`❌ Team with key "${TEAM_KEY}" not found`, 'red');
+      return false;
+    }
+
+    // Get all workflow states for the team
+    const states = await team.states();
+    const targetState = states.nodes.find(
+      (s) => s.name.toLowerCase() === statusName.toLowerCase()
+    );
+
+    if (!targetState) {
+      log(`❌ Status "${statusName}" not found`, 'red');
+      log('Available statuses:', 'yellow');
+      for (const state of states.nodes) {
+        log(`  - ${state.name}`, 'dim');
+      }
+      return false;
+    }
+
+    // Get the issue
+    const issues = await linear.issues({
+      filter: {
+        team: { key: { eq: TEAM_KEY } },
+      },
+    });
+
+    const issue = issues.nodes.find((i) => i.identifier === identifier);
+
+    if (!issue) {
+      log(`❌ Issue ${identifier} not found`, 'red');
+      return false;
+    }
+
+    // Update the issue status
+    await issue.update({
+      stateId: targetState.id,
+    });
+
+    log(`✅ Updated ${identifier} status to "${targetState.name}"`, 'green');
+    return true;
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    return false;
+  }
+}
+
+/**
  * Assign issue(s) to a project by name
  */
 async function assignToProject(identifiers, projectName) {
@@ -739,6 +798,19 @@ async function main() {
         }
         break;
 
+      case 'update-status':
+      case 'set-status':
+        if (args.length < 3) {
+          log('❌ Please specify issue and status name', 'red');
+          log('Example: npm run linear update-status PAYTAX-1 Done', 'dim');
+          log('Common statuses: Todo, In Progress, Done, Canceled', 'dim');
+        } else {
+          const identifier = args[1];
+          const statusName = args.slice(2).join(' '); // Join in case status has spaces
+          await updateIssueStatus(identifier, statusName);
+        }
+        break;
+
       case 'assign-to-project':
       case 'add-to-project':
         if (args.length < 3) {
@@ -766,6 +838,7 @@ async function main() {
         log('  create, new             Create new issue (interactive)', 'dim');
         log('  create "title"          Create issue with title', 'dim');
         log('    --parent ID           Create as sub-issue (e.g., --parent PAYTAX-123)', 'dim');
+        log('  update-status ID STATUS Update issue workflow status', 'dim');
         log('  assign-to-project       Assign issue(s) to project', 'dim');
         log('  delete, rm              Delete issue(s) by identifier', 'dim');
         log('  cycles                  List cycles/sprints', 'dim');
@@ -777,6 +850,7 @@ async function main() {
         log('  npm run linear list --project PayeTax', 'cyan');
         log('  npm run linear list --team-only', 'cyan');
         log('  npm run linear:create', 'cyan');
+        log('  npm run linear update-status PAYTAX-24 Done', 'cyan');
         log('  npm run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
         log('\nEnvironment:', 'bright');
         log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');

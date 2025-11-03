@@ -14,6 +14,10 @@ npm run linear:me
 # Create new issue (interactive)
 npm run linear:create
 
+# Update issue status
+npm run linear update-status PAYTAX-24 Done
+node scripts/linear.js update-status PAYTAX-34 "In Progress"
+
 # Delete issue(s)
 npm run linear:delete PAYTAX-123
 node scripts/linear.js delete PAYTAX-1 PAYTAX-2 PAYTAX-3
