@@ -335,9 +335,7 @@ async function updateIssueStatus(identifier, statusName) {
 
     // Get all workflow states for the team
     const states = await team.states();
-    const targetState = states.nodes.find(
-      (s) => s.name.toLowerCase() === statusName.toLowerCase()
-    );
+    const targetState = states.nodes.find((s) => s.name.toLowerCase() === statusName.toLowerCase());
 
     if (!targetState) {
       log(`❌ Status "${statusName}" not found`, 'red');

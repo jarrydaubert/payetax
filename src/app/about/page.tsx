@@ -24,7 +24,7 @@ import { Card } from '@/components/ui/card';
 export const metadata: Metadata = {
   title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
   description:
-    'Learn about PayeTax - the UK tax calculator that respects your privacy, delivers instant accuracy, and costs nothing. Built with Next.js 15, featuring client-side calculations and zero data storage.',
+    'Free UK PAYE tax calculator with complete privacy. Client-side calculations, zero data storage, instant results using official HMRC rates for 2025-26.',
   keywords:
     'about payetax, uk tax calculator, privacy-first tax calculator, free paye calculator, open source tax tool, hmrc rates calculator',
   alternates: {

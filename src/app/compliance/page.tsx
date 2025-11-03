@@ -19,7 +19,7 @@ import { Card } from '@/components/ui/card';
 export const metadata: Metadata = {
   title: 'HMRC Compliance & Data Sources | PayeTax',
   description:
-    'PayeTax uses official HMRC tax rates and thresholds. Learn about our compliance standards, data sources, and accuracy verification process for UK tax calculations.',
+    'PayeTax uses official HMRC tax rates verified for accuracy. Learn about our compliance standards and data sources for UK tax calculations.',
   keywords:
     'hmrc compliance, tax rate verification, official tax rates, uk tax accuracy, paye compliance, hmrc data sources',
   alternates: {

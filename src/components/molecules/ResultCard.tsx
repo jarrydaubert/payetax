@@ -52,7 +52,7 @@ export function ResultCard({
     <Card className={cn('border-primary/20 p-4', tooltip && 'cursor-help', styles.card)}>
       <div className='space-y-2'>
         <div className='flex items-center justify-between'>
-          <p className='font-medium text-muted-foreground text-sm'>{label}</p>
+          <p className='font-medium text-foreground/80 text-sm'>{label}</p>
           {Icon && <Icon className={cn('size-4', styles.icon)} />}
         </div>
         <p className='font-bold text-2xl text-foreground'>{value}</p>

@@ -30,7 +30,7 @@ describe('ResultCard Component', () => {
       render(<ResultCard label='Label Text' value='Value' />);
 
       const label = screen.getByText('Label Text');
-      expect(label).toHaveClass('text-muted-foreground');
+      expect(label).toHaveClass('text-foreground/80'); // Updated for WCAG AA compliance
       expect(label).toHaveClass('text-sm');
     });
 
@@ -209,7 +209,7 @@ describe('ResultCard Component', () => {
       const label = screen.getByText('Label');
       const value = screen.getByText('Value');
 
-      expect(label).toHaveClass('text-muted-foreground');
+      expect(label).toHaveClass('text-foreground/80'); // Updated for WCAG AA compliance
       expect(value).toHaveClass('text-foreground');
     });
   });
