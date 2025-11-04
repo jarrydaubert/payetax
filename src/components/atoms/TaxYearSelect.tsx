@@ -1,16 +1,17 @@
 // src/components/atoms/TaxYearSelect.tsx
 // Modern select component for tax year selection with enhanced accessibility and glassmorphic styling
 
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Transition,
-} from '@headlessui/react';
-import { Calendar, Check, ChevronDown } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import type React from 'react';
-import { Fragment, memo, useId } from 'react';
+import { memo, useId } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 
@@ -58,99 +59,39 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = memo(function TaxYearSelect(
         <label
           id={labelId}
           htmlFor={selectId}
-          className={cn('mb-1 block font-medium text-foreground text-sm', hideLabel && 'sr-only')}
+          className={cn(
+            'mb-1 block font-medium text-foreground',
+            TYPOGRAPHY.TEXT_SM,
+            hideLabel && 'sr-only'
+          )}
         >
           {label}
         </label>
       )}
 
-      <Listbox value={value} onChange={onChange} disabled={disabled}>
-        {({ open }) => (
-          <div className='relative'>
-            <ListboxButton
-              id={selectId}
-              aria-labelledby={label ? labelId : undefined}
-              aria-haspopup='listbox'
-              aria-expanded={open}
-              aria-controls={listboxId}
-              className={cn(
-                'relative w-full rounded-md border border-input bg-secondary/80 py-2 pr-10 pl-3 text-left shadow-sm backdrop-blur-sm',
-                'focus:outline-none focus:ring-1 focus:ring-ring',
-                'cursor-default transition-colors duration-200',
-                'text-foreground text-sm',
-                'disabled:cursor-not-allowed disabled:opacity-50',
-                open && 'ring-1 ring-ring'
-              )}
-            >
-              <span className='flex items-center'>
-                <Calendar className='mr-2 size-4 text-foreground/70' aria-hidden='true' />
-                <span className='block truncate'>{value}</span>
-              </span>
-              <span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
-                <ChevronDown
-                  className={cn(
-                    'size-4 text-foreground/50 transition-transform duration-200',
-                    open && 'rotate-180 transform'
-                  )}
-                  aria-hidden='true'
-                />
-              </span>
-            </ListboxButton>
-
-            <Transition
-              as={Fragment}
-              show={open}
-              enter='transition ease-out duration-200'
-              enterFrom='opacity-0 translate-y-2'
-              enterTo='opacity-100 translate-y-0'
-              leave='transition ease-in duration-150'
-              leaveFrom='opacity-100 translate-y-0'
-              leaveTo='opacity-0 translate-y-2'
-            >
-              <ListboxOptions
-                id={listboxId}
-                className={cn(
-                  'absolute z-50 mt-1 w-full overflow-auto bg-popover',
-                  'max-h-60 rounded-md border border-input shadow-md',
-                  'py-1 text-popover-foreground text-sm focus:outline-none'
-                )}
-              >
-                {TAX_YEARS.map((taxYear) => (
-                  <ListboxOption
-                    key={taxYear}
-                    value={taxYear}
-                    className={({ active, selected }) =>
-                      cn(
-                        'relative cursor-default select-none py-2 pr-4 pl-10',
-                        'transition-colors duration-150',
-                        active && 'bg-accent text-accent-foreground',
-                        selected ? 'font-medium text-primary' : 'text-foreground',
-                        // Add focus styles for keyboard navigation
-                        'focus:bg-accent focus:text-accent-foreground focus:outline-none'
-                      )
-                    }
-                  >
-                    {({ selected }) => (
-                      <>
-                        <span
-                          className={cn('block truncate', selected ? 'font-medium' : 'font-normal')}
-                        >
-                          {taxYear}
-                        </span>
-                        {selected && (
-                          <span className='absolute inset-y-0 left-0 flex items-center pl-3 text-primary'>
-                            <Check className='size-4' aria-hidden='true' />
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </ListboxOption>
-                ))}
-              </ListboxOptions>
-            </Transition>
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger
+          id={selectId}
+          aria-labelledby={label ? labelId : undefined}
+          className='w-full'
+        >
+          {/* IMPORTANT: Use flex container with gap-2 (not mr-2 on icon)
+              This prevents icon/text wrapping issues. Using margin on the icon
+              can cause separation when flex wrapping occurs. Container-level
+              gap ensures reliable spacing in all flex scenarios. */}
+          <div className='flex items-center gap-2'>
+            <Calendar className={cn('text-foreground/70', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+            <SelectValue placeholder='Select tax year' />
           </div>
-        )}
-      </Listbox>
+        </SelectTrigger>
+        <SelectContent id={listboxId}>
+          {TAX_YEARS.map((taxYear) => (
+            <SelectItem key={taxYear} value={taxYear}>
+              {taxYear}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 });

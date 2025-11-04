@@ -4,6 +4,8 @@
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { memo } from 'react';
+import { ICON_SIZES } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 interface ScrollIndicatorProps {
   direction: 'left' | 'right';
@@ -51,11 +53,19 @@ export const ScrollIndicator = memo(function ScrollIndicator({
     <motion.div
       initial={{ opacity: 0, x: 0 }}
       animate={animationProps}
-      className={`pointer-events-none absolute inset-y-0 ${positionClass} z-30 flex w-16 items-center ${gradientClass} from-background via-background/90 to-transparent md:w-20`}
+      className={cn(
+        'pointer-events-none absolute inset-y-0 z-30 flex w-16 items-center md:w-20',
+        positionClass,
+        gradientClass,
+        'from-background via-background/90 to-transparent'
+      )}
       aria-hidden='true'
     >
       <div className='flex size-8 items-center justify-center rounded-full bg-primary/10 backdrop-blur-sm md:size-10'>
-        <Icon className='size-5 text-primary drop-shadow-lg md:size-6' strokeWidth={2.5} />
+        <Icon
+          className={cn(ICON_SIZES.SIZE_5, ICON_SIZES.SIZE_6, 'text-primary drop-shadow-lg')}
+          strokeWidth={2.5}
+        />
       </div>
     </motion.div>
   );

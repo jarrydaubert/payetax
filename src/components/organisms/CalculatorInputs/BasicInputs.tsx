@@ -112,11 +112,7 @@ export function BasicInputs() {
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger
-              id={payPeriodId}
-              className='w-[140px] border-input'
-              aria-label='Select pay period'
-            >
+            <SelectTrigger id={payPeriodId} className='w-[140px]' aria-label='Select pay period'>
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -130,10 +126,14 @@ export function BasicInputs() {
         </div>
       </div>
 
+      {/* IMPORTANT: Tax Year width must be 170px minimum
+          Calendar icon (16px) + gap (8px) + text "2025-2026" (~80px) + 
+          dropdown arrow (~20px) + padding (~24px) = ~148px required.
+          Using 170px provides comfortable spacing without text wrapping. */}
       <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+        <div className='flex items-center gap-1.5 whitespace-nowrap'>
           <LabelTooltip fieldName='taxYear' />
-          <Label htmlFor={taxYearId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={taxYearId} className='text-sm'>
             Tax Year
           </Label>
         </div>
@@ -142,7 +142,7 @@ export function BasicInputs() {
           value={input.taxYear}
           onChange={setTaxYear}
           label=''
-          className='w-[155px]'
+          className='w-[170px]'
         />
       </div>
 
@@ -173,11 +173,7 @@ export function BasicInputs() {
           </Label>
         </div>
         <Select value={input.region} onValueChange={setRegion}>
-          <SelectTrigger
-            id={regionId}
-            className='w-[175px] border-input'
-            aria-label='Select tax region'
-          >
+          <SelectTrigger id={regionId} className='w-[175px]' aria-label='Select tax region'>
             <SelectValue placeholder='Select region' />
           </SelectTrigger>
           <SelectContent>
@@ -271,7 +267,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className='w-[120px] border-input'
+            className='w-[120px]'
             data-testid='age-select'
             aria-label='Select age range'
           >
@@ -296,7 +292,7 @@ export function BasicInputs() {
         <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
           <SelectTrigger
             id={studentLoanId}
-            className='w-[160px] border-input'
+            className='w-[160px]'
             aria-label='Select student loan plan'
             data-testid='student-loan-select'
           >
@@ -345,7 +341,7 @@ export function BasicInputs() {
           <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
             <SelectTrigger
               id={pensionTypeId}
-              className='w-[70px] shrink-0 border-input'
+              className='w-[70px] shrink-0'
               aria-label='Select pension contribution type'
               data-testid='pension-type-select'
             >

@@ -196,7 +196,7 @@ describe('PeriodCheckbox', () => {
       );
 
       const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('flex', 'items-center', 'space-x-2');
+      expect(wrapper).toHaveClass('flex', 'items-center', 'gap-2');
     });
 
     it('applies correct font size to label', () => {

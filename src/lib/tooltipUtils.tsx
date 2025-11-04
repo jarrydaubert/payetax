@@ -1,0 +1,38 @@
+/**
+ * Shared Tooltip Utilities
+ *
+ * DRY principle - extract formatTooltipText() from InputTooltip and LabelTooltip
+ * to eliminate code duplication.
+ *
+ * @module lib/tooltipUtils
+ */
+
+import type * as React from 'react';
+import type { TooltipContent } from '@/config/inputTooltips';
+
+/**
+ * Formats tooltip content into readable React elements
+ *
+ * Displays:
+ * - Title (bold)
+ * - Description (small text)
+ * - HMRC guidance (if available, with border separator)
+ *
+ * @param content - Tooltip content object from config
+ * @returns Formatted React node for tooltip display
+ */
+export function formatTooltipText(content: TooltipContent): React.ReactNode {
+  return (
+    <div className='space-y-1'>
+      <div className='font-semibold'>{content.title}</div>
+      <div className='text-xs'>{content.description}</div>
+      {content.hmrc && (
+        <div className='border-primary-foreground/20 border-t pt-1 text-xs opacity-90'>
+          {content.hmrc.split('\n').map((line) => (
+            <div key={line}>{line}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

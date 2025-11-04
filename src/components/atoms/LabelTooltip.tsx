@@ -11,32 +11,14 @@ import { HelpCircle } from 'lucide-react';
 import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getTooltipContent, type TooltipContent as TooltipData } from '@/config/inputTooltips';
+import { COMPONENT_GUIDELINES } from '@/constants/designTokens';
+import { formatTooltipText } from '@/lib/tooltipUtils';
 
 interface LabelTooltipProps {
   /** The field name (matches key in INPUT_TOOLTIPS config) */
   fieldName: string;
   /** Optional custom tooltip content (overrides config) */
   customContent?: TooltipData;
-}
-
-/**
- * Formats tooltip content into readable text
- * @internal
- */
-function formatTooltipText(content: TooltipData): React.ReactNode {
-  return (
-    <div className='space-y-1'>
-      <div className='font-semibold'>{content.title}</div>
-      <div className='text-xs'>{content.description}</div>
-      {content.hmrc && (
-        <div className='border-primary-foreground/20 border-t pt-1 text-xs opacity-90'>
-          {content.hmrc.split('\n').map((line) => (
-            <div key={line}>{line}</div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
 
 /**
@@ -75,7 +57,7 @@ export const LabelTooltip = memo(function LabelTooltip({
             aria-label={`Help for ${tooltipContent.title}`}
             data-testid={`tooltip-trigger-${fieldName}`}
           >
-            <HelpCircle className='size-3.5' />
+            <HelpCircle className={COMPONENT_GUIDELINES.TOOLTIPS.iconCompact} />
           </button>
         </TooltipTrigger>
 

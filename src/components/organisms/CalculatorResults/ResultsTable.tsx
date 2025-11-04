@@ -395,7 +395,10 @@ export function ResultsTable({
             >
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  <TableHead className='sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-base text-foreground'>
+                  {/* IMPORTANT: Use text-lg to match other section headings
+                      ("Enter Income Tax Details" and "Display Periods" both use text-lg)
+                      This maintains consistent visual hierarchy across all main sections */}
+                  <TableHead className='sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-foreground text-lg'>
                     Payslip
                   </TableHead>
                   <TableHead className='w-[55px] px-2 py-2.5 text-right font-semibold text-sm'>

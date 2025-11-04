@@ -4,6 +4,8 @@
 import { memo } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 interface PeriodCheckboxProps {
   period: string;
@@ -25,7 +27,7 @@ export const PeriodCheckbox = memo(function PeriodCheckbox({
   const checkboxId = `period-${period}`;
 
   return (
-    <div className='flex items-center space-x-2'>
+    <div className={cn('flex items-center', SPACING.GAP_2)}>
       <Checkbox
         id={checkboxId}
         checked={checked}
@@ -36,7 +38,10 @@ export const PeriodCheckbox = memo(function PeriodCheckbox({
           }
         }}
       />
-      <Label htmlFor={checkboxId} className='cursor-pointer select-none font-normal text-sm'>
+      <Label
+        htmlFor={checkboxId}
+        className={cn('cursor-pointer select-none font-normal', TYPOGRAPHY.TEXT_SM)}
+      >
         {period}
       </Label>
     </div>

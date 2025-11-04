@@ -12,8 +12,10 @@
  * @module components/atoms/NumberInput
  */
 
+import { motion } from 'framer-motion';
 import type React from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn, formatNumber, parseFormattedValue } from '@/lib/utils';
 
 /**
@@ -274,7 +276,8 @@ const NumberInput = memo(function NumberInput({
           'disabled:cursor-not-allowed disabled:opacity-50',
           'placeholder:text-foreground/50',
           'transition-all duration-200',
-          'bg-glass-deep text-foreground text-sm',
+          'bg-glass-deep text-foreground',
+          TYPOGRAPHY.TEXT_SM,
           prefix && 'pl-7',
           suffix && 'pr-7',
           showControls && 'pr-16',
@@ -296,8 +299,11 @@ const NumberInput = memo(function NumberInput({
 
       {/* Increment/decrement controls */}
       {showControls && (
-        <fieldset
+        <motion.fieldset
           id={controlsId}
+          initial={{ opacity: 0, x: 4 }}
+          animate={{ opacity: disabled ? 0.3 : 1, x: 0 }}
+          transition={{ duration: 0.2 }}
           className={cn(
             'absolute inset-y-1 right-1 flex flex-col border-l',
             'border-glass',
@@ -308,12 +314,14 @@ const NumberInput = memo(function NumberInput({
           )}
           aria-label='Value controls'
         >
-          <button
+          <motion.button
             id={incrementId}
             type='button'
             tabIndex={-1}
             onClick={handleIncrement}
             disabled={disabled}
+            whileHover={{ scale: disabled ? 1 : 1.05 }}
+            whileTap={{ scale: disabled ? 1 : 0.95 }}
             className={cn(
               'flex flex-1 items-center justify-center px-2',
               'text-foreground transition-colors hover:bg-glass',
@@ -336,13 +344,15 @@ const NumberInput = memo(function NumberInput({
             >
               <path d='M18 15l-6-6-6 6' />
             </svg>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             id={decrementId}
             type='button'
             tabIndex={-1}
             onClick={handleDecrement}
             disabled={disabled}
+            whileHover={{ scale: disabled ? 1 : 1.05 }}
+            whileTap={{ scale: disabled ? 1 : 0.95 }}
             className={cn(
               'flex flex-1 items-center justify-center px-2',
               'text-foreground transition-colors hover:bg-glass',
@@ -365,8 +375,8 @@ const NumberInput = memo(function NumberInput({
             >
               <path d='M6 9l6 6 6-6' />
             </svg>
-          </button>
-        </fieldset>
+          </motion.button>
+        </motion.fieldset>
       )}
     </div>
   );
