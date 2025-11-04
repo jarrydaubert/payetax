@@ -18,7 +18,7 @@ export const BlogFrontmatterSchema = z.object({
   excerpt: z
     .string()
     .min(50, 'Excerpt must be at least 50 characters')
-    .max(200, 'Excerpt must not exceed 200 characters'),
+    .max(300, 'Excerpt must not exceed 300 characters'), // Increased for existing posts
   publishedAt: z.string().refine((date) => !Number.isNaN(Date.parse(date)), {
     message: 'Invalid date format - must be ISO 8601',
   }),
@@ -28,11 +28,11 @@ export const BlogFrontmatterSchema = z.object({
       message: 'Invalid date format - must be ISO 8601',
     })
     .optional(),
-  category: z.enum(['tax', 'paye', 'guide', 'update', 'calculator', 'compliance']),
+  category: z.string().min(1, 'Category is required'),
   tags: z.array(z.string()).optional(),
   author: z.string().optional().default('PayeTax Team'),
   featured: z.boolean().optional().default(false),
-  image: z.string().url('Image must be a valid URL').optional(),
+  image: z.string().optional(), // Allow both URLs and relative paths
   imageAlt: z.string().optional(),
   readTime: z.string().optional(),
 });
