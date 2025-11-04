@@ -2,11 +2,12 @@
 'use client';
 
 import { Calculator } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { formatCurrency } from '@/lib/utils';
 
@@ -21,7 +22,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
   const [value, setValue] = useState<string>('');
   const inputId = useId();
 
-  const handleCompare = () => {
+  const handleCompare = useCallback(() => {
     const numValue = parseFloat(value);
     if (Number.isNaN(numValue)) return;
 
@@ -30,9 +31,9 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       value: numValue,
       currentSalary,
     });
-  };
+  }, [value, mode, currentSalary, onCompare]);
 
-  const getPlaceholder = () => {
+  const getPlaceholder = useCallback(() => {
     switch (mode) {
       case 'percentage':
         return '10';
@@ -43,9 +44,9 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       default:
         return '';
     }
-  };
+  }, [mode]);
 
-  const getLabel = () => {
+  const getLabel = useCallback(() => {
     switch (mode) {
       case 'percentage':
         return 'Percentage Increase';
@@ -56,27 +57,27 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       default:
         return '';
     }
-  };
+  }, [mode]);
 
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <Calculator className='size-5' />
+        <CardTitle className={`flex items-center ${SPACING.GAP_2}`}>
+          <Calculator className={ICON_SIZES.SIZE_5} />
           Compare Salary Scenarios
         </CardTitle>
-        <CardDescription>
+        <CardDescription className={TYPOGRAPHY.TEXT_SM}>
           See how a raise affects your take-home pay. Current salary:{' '}
           {formatCurrency(currentSalary, 0)}
         </CardDescription>
       </CardHeader>
-      <CardContent className='space-y-4'>
+      <CardContent className={SPACING.SPACE_Y_4}>
         {/* Mode Selection */}
-        <div className='space-y-3'>
-          <Label>Comparison Type</Label>
-          <div className='grid gap-2 sm:grid-cols-3'>
+        <div className={SPACING.SPACE_Y_3}>
+          <Label className={TYPOGRAPHY.TEXT_SM}>Comparison Type</Label>
+          <div className={`grid ${SPACING.GAP_2} sm:grid-cols-3`}>
             <label
-              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'percentage'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
@@ -91,10 +92,10 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
                 className='sr-only'
               />
               Percentage
-              <span className='block text-muted-foreground text-xs'>e.g., 10%</span>
+              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>e.g., 10%</span>
             </label>
             <label
-              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'amount'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
@@ -109,10 +110,12 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
                 className='sr-only'
               />
               £ Amount
-              <span className='block text-muted-foreground text-xs'>e.g., +£5k</span>
+              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
+                e.g., +£5k
+              </span>
             </label>
             <label
-              className={`cursor-pointer rounded-lg border-2 p-3 text-sm transition-colors ${
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'total'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
@@ -127,14 +130,18 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
                 className='sr-only'
               />
               New Total
-              <span className='block text-muted-foreground text-xs'>e.g., £45k</span>
+              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
+                e.g., £45k
+              </span>
             </label>
           </div>
         </div>
 
         {/* Value Input */}
-        <div className='space-y-2'>
-          <Label htmlFor='comparison-value'>{getLabel()}</Label>
+        <div className={SPACING.SPACE_Y_2}>
+          <Label htmlFor='comparison-value' className={TYPOGRAPHY.TEXT_SM}>
+            {getLabel()}
+          </Label>
           <div className='relative'>
             {mode === 'percentage' && (
               <span className='-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground'>

@@ -10,6 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getIncomeBreakdownData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -48,8 +49,8 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
   return (
     <Card className={`border-primary/20 ${className || ''}`}>
       <CardHeader className='pb-3'>
-        <CardTitle className='font-semibold text-lg'>Income Sources</CardTitle>
-        <CardDescription className='text-sm'>Breakdown by income type</CardDescription>
+        <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Income Sources</CardTitle>
+        <CardDescription className={TYPOGRAPHY.TEXT_SM}>Breakdown by income type</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className='h-[250px] w-full'>
@@ -145,8 +146,10 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
 
         {/* Center label showing total */}
         <div className='mt-2 text-center'>
-          <p className='text-muted-foreground text-sm'>Total Gross Income</p>
-          <p className='font-mono font-semibold text-lg'>{formatCurrency(totalIncome)}</p>
+          <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>Total Gross Income</p>
+          <p className={`font-mono font-semibold ${TYPOGRAPHY.TEXT_LG}`}>
+            {formatCurrency(totalIncome)}
+          </p>
         </div>
       </CardContent>
     </Card>

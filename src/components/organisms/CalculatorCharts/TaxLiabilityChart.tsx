@@ -9,6 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getTaxLiabilityData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -51,8 +52,8 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
   return (
     <Card className={`border-primary/20 ${className || ''}`}>
       <CardHeader className='pb-3'>
-        <CardTitle className='font-semibold text-lg'>Tax Breakdown</CardTitle>
-        <CardDescription className='text-sm'>
+        <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Tax Breakdown</CardTitle>
+        <CardDescription className={TYPOGRAPHY.TEXT_SM}>
           {whatIf ? 'Current vs What If comparison' : 'Where your income goes'}
         </CardDescription>
       </CardHeader>
@@ -118,7 +119,7 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
         </ChartContainer>
 
         {/* Summary stats */}
-        <div className='mt-2 flex justify-between text-sm'>
+        <div className={`mt-2 flex justify-between ${TYPOGRAPHY.TEXT_SM}`}>
           <div>
             <p className='text-muted-foreground'>Total Deductions</p>
             <p className='font-medium font-mono text-destructive'>

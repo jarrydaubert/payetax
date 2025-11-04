@@ -19,6 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -64,8 +65,12 @@ export function EffectiveTaxRateChart({
   return (
     <Card className={className}>
       <CardHeader className='pb-2'>
-        <CardTitle className='font-semibold text-base'>Tax Rate Progression</CardTitle>
-        <CardDescription>Effective vs marginal rates across salary range</CardDescription>
+        <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_BASE}`}>
+          Tax Rate Progression
+        </CardTitle>
+        <CardDescription className={TYPOGRAPHY.TEXT_SM}>
+          Effective vs marginal rates across salary range
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className='h-[200px] w-full'>
@@ -159,7 +164,7 @@ export function EffectiveTaxRateChart({
         </ChartContainer>
 
         {/* Current stats */}
-        <div className='mt-2 flex justify-between text-sm'>
+        <div className={`mt-2 flex justify-between ${TYPOGRAPHY.TEXT_SM}`}>
           <div>
             <p className='text-muted-foreground'>Your Effective Rate</p>
             <p className='font-mono font-semibold text-destructive'>{currentEffectiveRate}%</p>

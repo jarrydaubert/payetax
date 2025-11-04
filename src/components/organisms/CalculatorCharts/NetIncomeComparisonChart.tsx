@@ -18,6 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -92,8 +93,8 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
   return (
     <Card className={`border-primary/20 ${className || ''}`}>
       <CardHeader className='pb-3'>
-        <CardTitle className='font-semibold text-lg'>Salary vs Take-Home</CardTitle>
-        <CardDescription className='text-sm'>
+        <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Salary vs Take-Home</CardTitle>
+        <CardDescription className={TYPOGRAPHY.TEXT_SM}>
           See the gap between gross and net across salary bands
         </CardDescription>
       </CardHeader>
@@ -172,7 +173,7 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
 
         {/* Current position indicator */}
         <div className='mt-2 text-center'>
-          <p className='text-muted-foreground text-xs'>
+          <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
             Your salary:{' '}
             <span className='font-mono font-semibold text-foreground'>
               {formatCurrency(currentSalary)}

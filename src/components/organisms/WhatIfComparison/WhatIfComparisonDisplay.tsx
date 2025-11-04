@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
@@ -69,7 +70,10 @@ export function WhatIfComparisonDisplay({
   whatIfResults,
   className,
 }: WhatIfComparisonDisplayProps) {
-  const input = useCalculatorStore((state) => state.input);
+  // Use granular selectors to avoid unnecessary re-renders
+  const studentLoanPlan = useCalculatorStore((state) => state.input.studentLoanPlan);
+  const allowancesDeductions = useCalculatorStore((state) => state.input.allowancesDeductions);
+
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
     'Monthly',
@@ -84,32 +88,34 @@ export function WhatIfComparisonDisplay({
   // Enable mouse drag scrolling for better UX
   useMouseDragScroll(containerRef);
 
-  const handlePeriodToggle = (period: string) => {
-    const newPeriods = visiblePeriods.includes(period)
-      ? visiblePeriods.filter((p) => p !== period)
-      : (() => {
-          const allPeriods = [
-            'Yearly',
-            'Monthly',
-            '4-Weekly',
-            'Fortnightly',
-            'Weekly',
-            'Daily',
-            'Hourly',
-          ];
-          const combined = [...visiblePeriods, period];
-          return allPeriods.filter((p) => combined.includes(p));
-        })();
-    setVisiblePeriods(newPeriods);
-  };
+  const handlePeriodToggle = React.useCallback(
+    (period: string) => {
+      const newPeriods = visiblePeriods.includes(period)
+        ? visiblePeriods.filter((p) => p !== period)
+        : (() => {
+            const allPeriods = [
+              'Yearly',
+              'Monthly',
+              '4-Weekly',
+              'Fortnightly',
+              'Weekly',
+              'Daily',
+              'Hourly',
+            ];
+            const combined = [...visiblePeriods, period];
+            return allPeriods.filter((p) => combined.includes(p));
+          })();
+      setVisiblePeriods(newPeriods);
+    },
+    [visiblePeriods]
+  );
 
-  const calculatePercentage = (amount: number, total: number): string => {
+  const calculatePercentage = React.useCallback((amount: number, total: number): string => {
     if (total === 0) return '0.0%';
     return `${Math.abs((amount / total) * 100).toFixed(1)}%`;
-  };
+  }, []);
 
-  const studentLoans = input.studentLoanPlan !== 'none' ? [input.studentLoanPlan] : [];
-  const allowancesDeductions = input.allowancesDeductions || 0;
+  const studentLoans = studentLoanPlan !== 'none' ? [studentLoanPlan] : [];
 
   const currentGross = currentResults.grossSalary.annually;
   const whatIfGross = whatIfResults.grossSalary.annually;
@@ -223,8 +229,10 @@ export function WhatIfComparisonDisplay({
     >
       {/* Header */}
       <div className='text-center'>
-        <h3 className='font-semibold text-lg'>Current vs What If Comparison</h3>
-        <p className='text-muted-foreground text-sm'>Side-by-side comparison of your scenarios</p>
+        <h3 className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Current vs What If Comparison</h3>
+        <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
+          Side-by-side comparison of your scenarios
+        </p>
       </div>
 
       {/* Period Selection */}
@@ -311,16 +319,21 @@ export function WhatIfComparisonDisplay({
                         className={`${row.color} ${row.isHighlight ? 'font-bold' : ''} sticky left-0 z-10 bg-background`}
                       >
                         <div
-                          className={`flex items-center gap-2 ${row.isSubRow ? 'pl-6 sm:pl-8' : ''}`}
+                          className={`flex items-center ${SPACING.GAP_2} ${row.isSubRow ? 'pl-6 sm:pl-8' : ''}`}
                         >
-                          <Icon className='h-4 w-4 flex-shrink-0' aria-hidden='true' />
-                          <span className='text-xs sm:text-sm'>{row.category}</span>
+                          <Icon
+                            className={`${ICON_SIZES.SIZE_4} flex-shrink-0`}
+                            aria-hidden='true'
+                          />
+                          <span className={`${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM}`}>
+                            {row.category}
+                          </span>
                         </div>
                       </TableCell>
 
                       {/* Percentage */}
                       <TableCell
-                        className={`text-right font-mono text-xs sm:text-sm ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                        className={`text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                       >
                         {row.percentage}
                       </TableCell>
@@ -334,14 +347,14 @@ export function WhatIfComparisonDisplay({
                           <React.Fragment key={period}>
                             {/* Current Value */}
                             <TableCell
-                              className={`bg-blue-500/5 text-right font-mono text-xs sm:text-sm ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                              className={`bg-blue-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
                               {formatCurrency(currentValue)}
                             </TableCell>
 
                             {/* What If Value */}
                             <TableCell
-                              className={`bg-purple-500/5 text-right font-mono text-xs sm:text-sm ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                              className={`bg-purple-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
                               {formatCurrency(whatIfValue)}
                             </TableCell>
@@ -358,12 +371,14 @@ export function WhatIfComparisonDisplay({
       </div>
 
       {/* Footer Notes */}
-      <div className='mt-4 flex flex-col items-center gap-2'>
-        <p className='text-center text-muted-foreground text-xs'>
+      <div className={`mt-4 flex flex-col items-center ${SPACING.GAP_2}`}>
+        <p className={`text-center text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
           *Blue columns show your current scenario. Purple columns show your "What If" scenario.
         </p>
         {showRightIndicator && (
-          <div className='flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground text-xs md:hidden'>
+          <div
+            className={`flex items-center ${SPACING.GAP_2} rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground ${TYPOGRAPHY.TEXT_XS} md:hidden`}
+          >
             <span>👈 Swipe to see all periods</span>
           </div>
         )}

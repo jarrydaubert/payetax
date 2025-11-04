@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { ComparisonResults } from '@/lib/salaryComparison';
@@ -39,14 +40,14 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
   const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef);
   useMouseDragScroll(containerRef);
 
-  const renderDiff = (diff: number, isPositive: boolean = diff > 0) => {
+  const renderDiff = React.useCallback((diff: number, isPositive: boolean = diff > 0) => {
     if (diff === 0) return <span className='text-muted-foreground'>—</span>;
 
     const isGain = isPositive;
     return (
       <div
         className={cn(
-          'flex items-center gap-1',
+          `flex items-center ${SPACING.GAP_1}`,
           isGain ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'
         )}
       >
@@ -57,7 +58,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
         </span>
       </div>
     );
-  };
+  }, []);
 
   return (
     <div className={cn('relative', className)}>
@@ -166,16 +167,24 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
                 {formatCurrency(newResults.netPay.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>
-                <div className='flex items-center justify-end gap-1'>
+                <div className={`flex items-center justify-end ${SPACING.GAP_1}`}>
                   {netDiff > 0 ? (
-                    <div className='flex items-center gap-1 text-green-600 dark:text-green-400'>
-                      <ArrowUp className='size-4' />
-                      <span className='font-bold text-lg'>+{formatCurrency(netDiff, 0)}</span>
+                    <div
+                      className={`flex items-center ${SPACING.GAP_1} text-green-600 dark:text-green-400`}
+                    >
+                      <ArrowUp className={ICON_SIZES.SIZE_4} />
+                      <span className={`font-bold ${TYPOGRAPHY.TEXT_LG}`}>
+                        +{formatCurrency(netDiff, 0)}
+                      </span>
                     </div>
                   ) : netDiff < 0 ? (
-                    <div className='flex items-center gap-1 text-amber-600 dark:text-amber-400'>
-                      <ArrowDown className='size-4' />
-                      <span className='font-bold text-lg'>{formatCurrency(netDiff, 0)}</span>
+                    <div
+                      className={`flex items-center ${SPACING.GAP_1} text-amber-600 dark:text-amber-400`}
+                    >
+                      <ArrowDown className={ICON_SIZES.SIZE_4} />
+                      <span className={`font-bold ${TYPOGRAPHY.TEXT_LG}`}>
+                        {formatCurrency(netDiff, 0)}
+                      </span>
                     </div>
                   ) : (
                     <span className='text-muted-foreground'>—</span>
