@@ -48,9 +48,9 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
 
     // Verify all cells show £0.00
     const currencyCells = Array.from(cells).slice(2); // Skip category and percentage cells
-    currencyCells.forEach((cell) => {
+    for (const cell of currencyCells) {
       expect(cell.textContent).toBe('£0.00');
-    });
+    }
   });
 
   it('should render What If columns for all 7 display periods when values are 0', () => {
@@ -179,9 +179,9 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
 
     // All currency cells should show £0.00
     const currencyCells = Array.from(cells).slice(2);
-    currencyCells.forEach((cell) => {
+    for (const cell of currencyCells) {
       expect(cell.textContent).toBe('£0.00');
-    });
+    }
   });
 
   it('should calculate period values correctly when whatIfAnnual is 0', () => {
@@ -209,8 +209,8 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
     const periodCells = Array.from(cells).slice(2);
 
     // All should show £0.00 regardless of period
-    periodCells.forEach((cell) => {
+    for (const cell of periodCells) {
       expect(cell.textContent).toBe('£0.00');
-    });
+    }
   });
 });
