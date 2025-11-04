@@ -24,6 +24,7 @@
  * - Persistence allows users to return to their previous calculation
  */
 
+import { z } from 'zod';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
@@ -281,7 +282,22 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         // Input actions
-        setSalary: (salary) => set((state) => ({ input: { ...state.input, salary } })),
+        setSalary: (salary) => {
+          // Validate salary input
+          const validated = z
+            .number()
+            .min(0, 'Salary must be positive')
+            .max(10_000_000, 'Salary exceeds maximum')
+            .finite('Salary must be a valid number')
+            .safeParse(salary);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid salary:', validated.error.issues[0].message);
+            return; // Don't update state with invalid value
+          }
+
+          set((state) => ({ input: { ...state.input, salary: validated.data } }));
+        },
         setPayPeriod: (payPeriod) => set((state) => ({ input: { ...state.input, payPeriod } })),
         setTaxYear: (taxYear) => set((state) => ({ input: { ...state.input, taxYear } })),
         setTaxCode: (taxCode) => set((state) => ({ input: { ...state.input, taxCode } })),
@@ -296,8 +312,24 @@ export const useCalculatorStore = create<CalculatorState>()(
         setIsBlind: (isBlind) => set((state) => ({ input: { ...state.input, isBlind } })),
         setAge: (age) => set((state) => ({ input: { ...state.input, age } })),
         setPayNoNI: (payNoNI) => set((state) => ({ input: { ...state.input, payNoNI } })),
-        setPensionContribution: (pensionContribution) =>
-          set((state) => ({ input: { ...state.input, pensionContribution } })),
+        setPensionContribution: (pensionContribution) => {
+          // Validate pension contribution
+          const validated = z
+            .number()
+            .min(0, 'Pension contribution must be positive')
+            .max(100, 'Pension contribution cannot exceed 100%')
+            .safeParse(pensionContribution);
+
+          if (!validated.success) {
+            console.warn(
+              '[Calculator] Invalid pension contribution:',
+              validated.error.issues[0].message
+            );
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, pensionContribution: validated.data } }));
+        },
         setPensionContributionType: (pensionContributionType) =>
           set((state) => ({ input: { ...state.input, pensionContributionType } })),
         setStudentLoanPlan: (studentLoanPlan) =>

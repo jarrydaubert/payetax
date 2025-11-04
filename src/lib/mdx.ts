@@ -15,6 +15,7 @@ import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import { mdxComponents } from '@/components/blog/mdx-components';
 import type { BlogPostFrontmatter } from '@/types/blog';
+import { BlogFrontmatterSchema, formatZodErrors } from './validation';
 
 const POSTS_DIRECTORY = path.join(process.cwd(), 'content/blog');
 
@@ -29,15 +30,25 @@ function getMDXFiles(): string[] {
 }
 
 /**
- * Read and parse a single MDX file
+ * Read and parse a single MDX file with validation
  */
 function readMDXFile(filename: string) {
   const filePath = path.join(POSTS_DIRECTORY, filename);
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(fileContents);
 
+  // Validate frontmatter with Zod
+  const result = BlogFrontmatterSchema.safeParse(data);
+
+  if (!result.success) {
+    const errors = formatZodErrors(result.error);
+    console.error(`[MDX Validation Error] File: ${filename}`);
+    console.error('Validation errors:', errors);
+    throw new Error(`Invalid frontmatter in ${filename}:\n${errors.join('\n')}`);
+  }
+
   return {
-    frontmatter: data as BlogPostFrontmatter,
+    frontmatter: { ...result.data, slug: filename.replace(/\.mdx$/, '') } as BlogPostFrontmatter,
     content,
     slug: filename.replace(/\.mdx$/, ''),
   };
