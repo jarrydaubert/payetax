@@ -718,33 +718,53 @@ npm run lighthouse
 
 ## 🎯 Linear Integration
 
+**New to Linear?** Read this first: **[`docs/setup/LINEAR.md`](./docs/setup/LINEAR.md)** - Complete guide from zero to expert in 5 minutes.
+
+### Quick Start (30 seconds)
+
+```bash
+# 1. Set up API key (one-time):
+export LINEAR_API_KEY="lin_api_xxx"  # Get from linear.app/settings/api
+
+# 2. Check your issues (use daily):
+npm run linear:me
+
+# 3. Create issue when needed:
+npm run linear:create
+```
+
 ### Daily Workflow
 
-**Morning:**
+**Morning routine:**
 ```bash
-# Check your issues
+# See your issues for the day
 npm run linear:me
+
+# Pick one, update status
+npm run linear update-status PAYTAX-123 "In Progress"
 ```
 
 **During work:**
-- Update issue status (Todo → In Progress → Done)
-- Check off completed tasks
-- Add comments on blockers
-- Link related PRs
+- Update status as you progress (Todo → In Progress → In Review → Done)
+- Reference issues in commits: `git commit -m "feat: Add feature - PAYTAX-123"`
+- Add details to issue description as you learn more
 
 **End of day:**
-- Move completed issues to Done
-- Update progress on in-progress issues
+```bash
+# Mark completed work as Done
+npm run linear update-status PAYTAX-123 Done
+```
 
-### Monthly Workflow
+### Essential Commands
 
-**First of month:**
-1. Archive previous month's recurring issues
-2. Create new recurring issues:
-   - Blog Content - [New Month] 2025
-   - X.com Publishing - [New Month] 2025
-3. Review Monthly Maintenance issue
-4. Update Package Dependencies issue
+```bash
+npm run linear:me              # Your issues (use daily!)
+npm run linear:create          # Create new issue
+npm run linear update-status   # Update issue status
+npm run linear:list            # View all issues
+```
+
+**Full command reference:** [`docs/setup/LINEAR.md`](./docs/setup/LINEAR.md)
 
 ---
 
@@ -786,10 +806,10 @@ npm install
 | Doc | Purpose |
 |-----|---------|
 | [README.md](./README.md) | Project overview |
-| [LINEAR_SOP.md](./docs/setup/LINEAR_SOP.md) | Linear best practices |
-| [LINEAR_QUICK_REFERENCE.md](./docs/setup/LINEAR_QUICK_REFERENCE.md) | Quick Linear commands |
+| [LINEAR.md](./docs/setup/LINEAR.md) | Complete Linear guide (5 min quickstart → full reference) |
 | [BLOG_GUIDE.md](./docs/guides/BLOG_GUIDE.md) | Blog writing guidelines |
 | [TECH_STACK.md](./docs/guides/TECH_STACK.md) | Technology overview |
+| [ARCHITECTURE.md](./docs/guides/ARCHITECTURE.md) | Codebase structure & audit status |
 
 ---
 
@@ -806,10 +826,11 @@ npm run test               # Unit tests with coverage
 npm run test:e2e           # E2E tests
 npm run test:all           # All tests
 
-# Linear
-npm run linear:me          # Your issues
+# Linear (see docs/setup/LINEAR.md for full guide)
+npm run linear:me          # Your issues (use daily!)
+npm run linear:create      # Create issue (interactive)
 npm run linear:list        # All issues
-npm run linear:create      # Create issue
+npm run linear update-status PAYTAX-X Done  # Update status
 
 # Quality
 npm run lint:fix           # Fix linting
