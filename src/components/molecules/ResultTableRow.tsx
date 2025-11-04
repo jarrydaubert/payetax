@@ -64,7 +64,8 @@ export function ResultTableRow({
       </TableCell>
       {visiblePeriods.map((period) => {
         const currentValue = annual / periodOptions[period];
-        const whatIfValue = whatIfAnnual ? whatIfAnnual / periodOptions[period] : undefined;
+        const whatIfValue =
+          whatIfAnnual !== undefined ? whatIfAnnual / periodOptions[period] : undefined;
 
         if (hasWhatIf && whatIfValue !== undefined) {
           // Render Current and What If columns with min-width to prevent overlap
