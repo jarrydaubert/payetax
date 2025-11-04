@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { GradientText } from '@/components/atoms/GradientText';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -49,7 +51,7 @@ const COMPLIANCE_FEATURES = [
     icon: FileText,
     lastUpdated: '2024-08-25',
     source: 'HMRC Gov.UK Publications',
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-primary to-accent',
   },
   {
     title: 'Formula Verification',
@@ -63,7 +65,7 @@ const COMPLIANCE_FEATURES = [
     icon: Users,
     lastUpdated: '2024-08-01',
     source: 'HMRC Example Calculations',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-accent to-primary',
   },
   {
     title: 'Regular Updates',
@@ -77,7 +79,7 @@ const COMPLIANCE_FEATURES = [
     icon: Calendar,
     lastUpdated: '2024-08-25',
     source: 'HMRC Announcements',
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-primary/80 to-accent/80',
   },
   {
     title: 'Quality Assurance',
@@ -92,7 +94,7 @@ const COMPLIANCE_FEATURES = [
     icon: Shield,
     lastUpdated: '2024-08-20',
     source: 'Internal QA Process',
-    color: 'from-orange-500 to-red-500',
+    color: 'from-accent/80 to-primary/80',
   },
 ];
 
@@ -167,15 +169,18 @@ export default function CompliancePage() {
       <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'>
-              <Shield className='size-5 text-primary' />
-              <span className='font-semibold text-foreground text-sm'>HMRC Compliance</span>
-            </div>
+            <Badge
+              variant='outline'
+              className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
+            >
+              <Shield className='size-5' />
+              <span>HMRC Compliance</span>
+            </Badge>
 
             <h1 className='mb-6 font-bold text-6xl leading-tight'>
-              <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
+              <GradientText variant='brand-full' as='span'>
                 Verified Accuracy
-              </span>
+              </GradientText>
               <br />
               <span className='text-foreground'>Official Compliance</span>
             </h1>
@@ -192,19 +197,19 @@ export default function CompliancePage() {
                   icon: Award,
                   value: '100%',
                   label: 'HMRC Rates',
-                  color: 'from-blue-500 to-cyan-500',
+                  color: 'from-primary to-accent',
                 },
                 {
                   icon: FileText,
                   value: 'Open',
                   label: 'Source',
-                  color: 'from-purple-500 to-pink-500',
+                  color: 'from-accent to-primary',
                 },
                 {
                   icon: Calendar,
                   value: '<24h',
                   label: 'Update Time',
-                  color: 'from-green-500 to-emerald-500',
+                  color: 'from-primary/80 to-accent/80',
                 },
                 {
                   icon: Shield,

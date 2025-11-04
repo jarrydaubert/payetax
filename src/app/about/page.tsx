@@ -19,7 +19,10 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { GradientText } from '@/components/atoms/GradientText';
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export const metadata: Metadata = {
   title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
@@ -47,15 +50,15 @@ export const metadata: Metadata = {
 
 // Static data moved outside component (no longer needs to be in state)
 const stats = [
-  { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-blue-500 to-cyan-500' },
-  { icon: Lock, value: '0', label: 'Data Stored', color: 'from-green-500 to-emerald-500' },
+  { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-primary to-accent' },
+  { icon: Lock, value: '0', label: 'Data Stored', color: 'from-primary/80 to-accent/80' },
   {
     icon: Award,
     value: 'HMRC',
     label: 'Official Rates',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-accent to-primary',
   },
-  { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-orange-500 to-red-500' },
+  { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-accent/80 to-primary/80' },
 ];
 
 const values = [
@@ -64,32 +67,32 @@ const values = [
     title: 'Privacy is Sacred',
     description:
       "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
-    gradient: 'from-green-500/20 to-emerald-500/20',
-    iconGradient: 'from-green-500 to-emerald-500',
+    gradient: 'from-primary/20 to-accent/20',
+    iconGradient: 'from-primary to-accent',
   },
   {
     icon: Eye,
     title: 'Radical Transparency',
     description:
       'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
-    gradient: 'from-blue-500/20 to-cyan-500/20',
-    iconGradient: 'from-blue-500 to-cyan-500',
+    gradient: 'from-accent/20 to-primary/20',
+    iconGradient: 'from-accent to-primary',
   },
   {
     icon: Target,
     title: 'Accuracy First',
     description:
       'Official HMRC rates updated within 24 hours of changes. Comprehensive testing for Scottish rates, student loans, pensions, and edge cases.',
-    gradient: 'from-purple-500/20 to-pink-500/20',
-    iconGradient: 'from-purple-500 to-pink-500',
+    gradient: 'from-primary/10 to-accent/10',
+    iconGradient: 'from-primary to-accent',
   },
   {
     icon: Heart,
     title: 'Genuinely Free',
     description:
       'No premium tiers, no paywalls, no "upgrade to see more". Every feature is free for everyone, forever. Tax calculations should be accessible to all.',
-    gradient: 'from-red-500/20 to-orange-500/20',
-    iconGradient: 'from-red-500 to-orange-500',
+    gradient: 'from-accent/10 to-primary/10',
+    iconGradient: 'from-accent to-primary',
   },
 ];
 
@@ -121,15 +124,18 @@ export default function AboutPage() {
       <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'>
-              <Sparkles className='size-5 text-primary' />
-              <span className='font-semibold text-foreground text-sm'>About PayeTax</span>
-            </div>
+            <Badge
+              variant='outline'
+              className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
+            >
+              <Sparkles className='size-5' />
+              <span>About PayeTax</span>
+            </Badge>
 
             <h1 className='mb-6 font-bold text-6xl leading-tight'>
-              <span className='bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text text-transparent'>
+              <GradientText variant='brand-full' as='span'>
                 Tax Calculations
-              </span>
+              </GradientText>
               <br />
               <span className='text-foreground'>Built for Privacy</span>
             </h1>
@@ -168,9 +174,9 @@ export default function AboutPage() {
         <div className='container mx-auto max-w-5xl px-4'>
           <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
             <Heart className='mx-auto mb-6 size-16 text-primary' />
-            <h2 className='mb-6 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <GradientText variant='brand' as='h2' className='mb-6 font-bold text-4xl'>
               Our Mission
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
               Every UK taxpayer deserves instant, accurate tax calculations without sacrificing
               privacy or paying a penny. We&apos;re building the most transparent, accessible, and
@@ -184,13 +190,20 @@ export default function AboutPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-6 py-2.5'>
-              <Sparkles className='size-5 text-amber-500' />
-              <span className='font-semibold text-amber-500 text-sm'>Unique Features</span>
-            </div>
-            <h2 className='mb-4 bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text font-bold text-4xl text-transparent'>
+            <Badge
+              variant='outline'
+              className='mb-6 gap-2 border-warning/50 bg-warning/20 px-6 py-2.5 text-warning'
+            >
+              <Sparkles className='size-5' />
+              <span>Unique Features</span>
+            </Badge>
+            <GradientText
+              variant='custom'
+              as='h2'
+              className='mb-4 bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-4xl'
+            >
               What Makes Us Different
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Features you won't find anywhere else - completely free
             </p>
@@ -275,9 +288,9 @@ export default function AboutPage() {
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
               What We Stand For
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Four principles that guide everything we build
             </p>
@@ -307,13 +320,20 @@ export default function AboutPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-6 py-2.5'>
-              <Code className='size-5 text-blue-500' />
-              <span className='font-semibold text-blue-500 text-sm'>Modern Technology</span>
-            </div>
-            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text font-bold text-4xl text-transparent'>
+            <Badge
+              variant='outline'
+              className='mb-6 gap-2 border-primary/50 bg-primary/20 px-6 py-2.5 text-primary'
+            >
+              <Code className='size-5' />
+              <span>Modern Technology</span>
+            </Badge>
+            <GradientText
+              variant='custom'
+              as='h2'
+              className='mb-4 bg-gradient-to-r from-primary to-accent font-bold text-4xl'
+            >
               Built for Performance
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Cutting-edge web technologies for exceptional speed, security, and experience
             </p>
@@ -365,9 +385,9 @@ export default function AboutPage() {
             <Card className='border-primary/20 p-12'>
               <div className='mb-8 text-center'>
                 <Lightbulb className='mx-auto mb-6 size-16 text-primary' />
-                <h2 className='mb-4 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+                <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
                   Why We Built PayeTax
-                </h2>
+                </GradientText>
               </div>
 
               <div className='space-y-6'>
@@ -413,7 +433,7 @@ export default function AboutPage() {
             </p>
             <Link
               href='/'
-              className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-lg text-white shadow-lg transition-all hover:shadow-xl active:scale-[1.02] md:hover:scale-105'
+              className='inline-block rounded-lg bg-primary px-8 py-4 font-bold text-lg text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl active:scale-[1.02] md:hover:scale-105'
             >
               Try the Calculator →
             </Link>
@@ -421,8 +441,10 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <Separator className='my-0' />
+
       {/* Contact Footer */}
-      <section className='border-border border-t py-16'>
+      <section className='py-16'>
         <div className='container mx-auto max-w-4xl px-4 text-center'>
           <h3 className='mb-4 font-bold text-2xl text-foreground'>Get in Touch</h3>
           <p className='mb-6 text-muted-foreground'>

@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { GradientText } from '@/components/atoms/GradientText';
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 export const metadata: Metadata = {
@@ -41,32 +43,32 @@ const privacyPrinciples = [
     title: 'Client-Side Calculations',
     description:
       'All tax calculations run in your browser using JavaScript. Your salary, tax code, and personal details never leave your device.',
-    color: 'from-blue-500/20 to-cyan-500/20',
-    iconColor: 'from-blue-500 to-cyan-500',
+    color: 'from-primary/20 to-accent/20',
+    iconColor: 'from-primary to-accent',
   },
   {
     icon: Database,
     title: 'Zero Server Storage',
     description:
       "We don't store your tax data on our servers. Calculations happen locally, results display instantly, nothing gets saved remotely.",
-    color: 'from-green-500/20 to-emerald-500/20',
-    iconColor: 'from-green-500 to-emerald-500',
+    color: 'from-accent/20 to-primary/20',
+    iconColor: 'from-accent to-primary',
   },
   {
     icon: Eye,
     title: 'Optional Analytics',
     description:
       'Anonymous usage data (page views, device type) only with your consent. You can decline entirely - the calculator works exactly the same.',
-    color: 'from-purple-500/20 to-pink-500/20',
-    iconColor: 'from-purple-500 to-pink-500',
+    color: 'from-primary/10 to-accent/10',
+    iconColor: 'from-primary to-accent',
   },
   {
     icon: Shield,
     title: 'Privacy by Design',
     description:
       "Your privacy isn't a feature we added - it's built into the architecture. We literally cannot see your tax calculations.",
-    color: 'from-orange-500/20 to-red-500/20',
-    iconColor: 'from-orange-500 to-red-500',
+    color: 'from-accent/10 to-primary/10',
+    iconColor: 'from-accent to-primary',
   },
 ];
 
@@ -92,18 +94,21 @@ export default function PrivacyPolicyPage() {
   return (
     <div className='min-h-screen'>
       {/* Hero Section */}
-      <section className='relative overflow-hidden bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 pt-20 pb-10 md:pt-32 md:pb-20'>
+      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='text-center'>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-6 py-2.5 backdrop-blur-sm'>
-              <Shield className='size-5 text-green-500' />
-              <span className='font-semibold text-green-500 text-sm'>Privacy Policy</span>
-            </div>
+            <Badge
+              variant='outline'
+              className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
+            >
+              <Shield className='size-5' />
+              <span>Privacy Policy</span>
+            </Badge>
 
             <h1 className='mb-6 font-bold text-5xl leading-tight md:text-7xl'>
-              <span className='bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent'>
+              <GradientText variant='brand-full' as='span'>
                 Your Privacy
-              </span>
+              </GradientText>
               <br />
               <span className='text-foreground'>Comes First</span>
             </h1>
@@ -125,42 +130,42 @@ export default function PrivacyPolicyPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-12 text-center'>
-            <CheckCircle className='mx-auto mb-4 size-16 text-green-500' />
-            <h2 className='mb-4 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text font-bold text-4xl text-transparent'>
+            <CheckCircle className='mx-auto mb-4 size-16 text-primary' />
+            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
               The 30-Second Version
-            </h2>
+            </GradientText>
             <p className='text-lg text-muted-foreground'>Everything you need to know at a glance</p>
           </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
-            <Card className='overflow-hidden border-red-500/30 bg-gradient-to-br from-red-500/5 to-red-500/10 p-8'>
+            <Card className='overflow-hidden border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10 p-8'>
               <div className='mb-6 flex items-center gap-3'>
-                <div className='flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg'>
-                  <X className='size-6 text-white' />
+                <div className='flex size-12 items-center justify-center rounded-xl bg-destructive shadow-lg'>
+                  <X className='size-6 text-destructive-foreground' />
                 </div>
                 <h3 className='font-bold text-2xl text-foreground'>What We DON'T Do</h3>
               </div>
               <ul className='space-y-3'>
                 {dontDo.map((item) => (
                   <li key={item} className='flex items-start gap-3 text-muted-foreground'>
-                    <UserX className='mt-0.5 size-5 flex-shrink-0 text-red-500' />
+                    <UserX className='mt-0.5 size-5 flex-shrink-0 text-destructive' />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </Card>
 
-            <Card className='overflow-hidden border-green-500/30 bg-gradient-to-br from-green-500/5 to-green-500/10 p-8'>
+            <Card className='overflow-hidden border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
               <div className='mb-6 flex items-center gap-3'>
-                <div className='flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 shadow-lg'>
-                  <CheckCircle className='size-6 text-white' />
+                <div className='flex size-12 items-center justify-center rounded-xl bg-primary shadow-lg'>
+                  <CheckCircle className='size-6 text-primary-foreground' />
                 </div>
                 <h3 className='font-bold text-2xl text-foreground'>What We DO</h3>
               </div>
               <ul className='space-y-3'>
                 {doDo.map((item) => (
                   <li key={item} className='flex items-start gap-3 text-muted-foreground'>
-                    <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-green-500' />
+                    <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-primary' />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -174,9 +179,9 @@ export default function PrivacyPolicyPage() {
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl md:text-5xl'>
               How We Protect Your Privacy
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Four architectural decisions that make your data truly private
             </p>
@@ -206,10 +211,10 @@ export default function PrivacyPolicyPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-16 text-center'>
-            <Lock className='mx-auto mb-6 size-16 text-blue-500' />
-            <h2 className='mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text font-bold text-4xl text-transparent'>
+            <Lock className='mx-auto mb-6 size-16 text-primary' />
+            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
               Where Your Tax Data Goes
-            </h2>
+            </GradientText>
             <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
               Spoiler: Nowhere. Here&apos;s the technical breakdown.
             </p>
@@ -218,8 +223,8 @@ export default function PrivacyPolicyPage() {
           <div className='grid gap-4 md:grid-cols-3 md:gap-8'>
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg'>
-                  <Database className='size-10 text-white' />
+                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-primary shadow-lg'>
+                  <Database className='size-10 text-primary-foreground' />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>Your Device</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -231,8 +236,8 @@ export default function PrivacyPolicyPage() {
 
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg'>
-                  <Server className='size-10 text-white' />
+                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-accent shadow-lg'>
+                  <Server className='size-10 text-accent-foreground' />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>Our Servers</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -244,8 +249,8 @@ export default function PrivacyPolicyPage() {
 
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg'>
-                  <FileText className='size-10 text-white' />
+                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-primary/80 shadow-lg'>
+                  <FileText className='size-10 text-primary-foreground' />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>localStorage</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -256,7 +261,7 @@ export default function PrivacyPolicyPage() {
             </div>
           </div>
 
-          <Card className='mt-8 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-blue-500/10 p-8'>
+          <Card className='mt-8 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
             <h4 className='mb-4 font-bold text-foreground text-xl'>Technical Explanation</h4>
             <p className='text-muted-foreground leading-relaxed'>
               We use client-side JavaScript to perform all tax calculations in your browser. The
@@ -274,14 +279,14 @@ export default function PrivacyPolicyPage() {
             {/* Analytics */}
             <div>
               <div className='mb-8 text-center'>
-                <Globe className='mx-auto mb-6 size-16 text-purple-500' />
-                <h2 className='mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text font-bold text-3xl text-transparent'>
+                <Globe className='mx-auto mb-6 size-16 text-accent' />
+                <GradientText variant='brand' as='h2' className='mb-4 font-bold text-3xl'>
                   Website Analytics
-                </h2>
+                </GradientText>
                 <p className='text-muted-foreground'>Anonymous usage data (completely optional)</p>
               </div>
 
-              <Card className='border-green-500/30 bg-gradient-to-br from-green-500/5 to-green-500/10 p-8'>
+              <Card className='border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
                 <h4 className='mb-4 font-semibold text-foreground text-lg'>
                   What We See (If You Consent)
                 </h4>
@@ -295,7 +300,7 @@ export default function PrivacyPolicyPage() {
                 </ul>
               </Card>
 
-              <Card className='mt-6 border-red-500/30 bg-gradient-to-br from-red-500/5 to-red-500/10 p-8'>
+              <Card className='mt-6 border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10 p-8'>
                 <h4 className='mb-4 font-semibold text-foreground text-lg'>What We Never See</h4>
                 <ul className='space-y-2 text-muted-foreground text-sm'>
                   <li>✗ Your tax calculations or results</li>
@@ -358,7 +363,7 @@ export default function PrivacyPolicyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-              <Globe className='mb-4 size-12 text-cyan-500' />
+              <Globe className='mb-4 size-12 text-accent' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>External Links</h3>
               <p className='text-muted-foreground leading-relaxed'>
                 We link to official sources like HMRC for tax information and rates. These external
@@ -367,7 +372,7 @@ export default function PrivacyPolicyPage() {
             </Card>
 
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-              <Calendar className='mb-4 size-12 text-green-500' />
+              <Calendar className='mb-4 size-12 text-primary' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>Policy Updates</h3>
               <p className='text-muted-foreground leading-relaxed'>
                 If we update this policy, we&apos;ll change the date at the top and add a notice on
@@ -379,7 +384,7 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* CTA Section */}
-      <section className='bg-gradient-to-br from-green-500/5 via-blue-500/5 to-purple-500/5 py-12 md:py-20'>
+      <section className='bg-gradient-to-br from-primary/5 via-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
             <Shield className='mx-auto mb-6 size-16 text-primary' />

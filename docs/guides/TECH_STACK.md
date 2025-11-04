@@ -1,8 +1,8 @@
 # PayeTax Technical Stack & Architecture
 
-**Last Updated:** October 20, 2025
+**Last Updated:** November 4, 2025
 **Status:** ✅ Production Ready
-**Version:** 3.1.0
+**Version:** 4.1.2
 
 ---
 
@@ -24,16 +24,16 @@
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js** | 15.5.6 | React framework with App Router |
+| **Next.js** | 16.0.1 | React framework with App Router |
 | **React** | 19.2.0 | UI library |
 | **TypeScript** | 5.9.3 | Type safety |
-| **Tailwind CSS** | 4.1.14 | Utility-first styling |
+| **Tailwind CSS** | 4.1.16 | Utility-first styling |
 | **Zustand** | 5.0.8 | State management |
 | **shadcn/ui** | Latest | Component library |
 | **Framer Motion** | 12.23.24 | Animations |
-| **Contentlayer2** | 0.5.8 | MDX blog processing |
-| **@linear/sdk** | 60.0.1 | Project management integration |
-| **Biome** | 2.2.6 | Linting & formatting |
+| **next-mdx-remote** | 5.0.0 | MDX blog processing |
+| **@linear/sdk** | 63.2.0 | Project management integration |
+| **Biome** | 2.3.3 | Linting & formatting |
 | **jest-axe** | 10.0.0 | Accessibility testing (WCAG) |
 
 ### Key Features
@@ -42,10 +42,10 @@
 ✅ **Strict TypeScript** - Zero errors, strict mode enabled  
 ✅ **Modern Styling** - Tailwind v4 with OKLCH colors  
 ✅ **Optimized State** - Granular Zustand selectors  
-✅ **100% Test Coverage** - 1,761 unit tests + 11 axe tests + E2E (atoms folder complete)  
+✅ **Comprehensive Testing** - 1,886 unit tests + E2E across 5 browsers  
 ✅ **A+ Grade** - Professional architecture (95/100 overall)  
 ✅ **Zero Warnings** - Clean build, lint, and test runs  
-✅ **ISR Enabled** - Blog posts revalidate every 24h  
+✅ **Zero Vulnerabilities** - npm audit shows 0 security issues  
 ✅ **WCAG 2.1 Compliant** - Accessibility verified with jest-axe
 
 ---
@@ -519,8 +519,8 @@ npm audit fix
 ### Unit Tests
 
 **Framework:** Jest + Testing Library
-**Coverage:** 90.46% (target 95%+)
-**Tests:** 1,723 passing / 1,748 total (98.6% pass rate)
+**Tests:** 1,886 passing / 1,892 total (99.7% pass rate, 6 skipped)
+**Test Suites:** 83 passed / 83 total
 
 ```bash
 npm test              # Run tests with coverage
@@ -607,7 +607,7 @@ Consider adopting:
 
 ---
 
-**Last Updated:** October 20, 2025
+**Last Updated:** November 4, 2025
 **Maintained By:** PayeTax Team
 **Review Cycle:** Quarterly
-**Latest Release:** v2.0.1 (SEO Improvements & IndexNow Integration)
+**Latest Release:** v4.1.2 (Complete audit coverage + dependency updates)

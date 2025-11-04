@@ -17,7 +17,9 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { GradientText } from '@/components/atoms/GradientText';
 import { CategoryFilter } from '@/components/molecules/CategoryFilter';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CallToAction from '@/components/ui/CallToAction';
 import {
@@ -75,27 +77,30 @@ export function BlogPageClient({
       <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-50 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] md:opacity-100' />
 
       {/* Gradient orbs - hidden on mobile for better contrast */}
-      <div className='pointer-events-none absolute top-0 right-1/4 hidden h-96 w-96 bg-purple-500/20 opacity-20 blur-[120px] md:block' />
-      <div className='pointer-events-none absolute top-1/3 left-1/4 hidden h-96 w-96 bg-cyan-500/20 opacity-20 blur-[120px] md:block' />
+      <div className='pointer-events-none absolute top-0 right-1/4 hidden h-96 w-96 bg-primary/20 opacity-20 blur-[120px] md:block' />
+      <div className='pointer-events-none absolute top-1/3 left-1/4 hidden h-96 w-96 bg-accent/20 opacity-20 blur-[120px] md:block' />
 
       {/* Hero Section */}
       <section className='relative pt-20 pb-10 md:pt-32 md:pb-20'>
         <div className='container relative z-10 mx-auto max-w-7xl px-4'>
           <div className='text-center'>
             {/* Badge */}
-            <div className='mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-6 py-2.5 backdrop-blur-xl'>
-              <Zap className='size-5 text-purple-400' />
-              <span className='bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text font-semibold text-sm text-transparent'>
-                by PayeTax
-              </span>
-            </div>
+            <Badge
+              variant='outline'
+              className='mb-8 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-xl'
+            >
+              <Zap className='size-5' />
+              <span>by PayeTax</span>
+            </Badge>
 
             {/* Main Heading */}
-            <h1 className='mb-6 font-bold text-6xl leading-tight'>
-              <span className='bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent'>
-                TaxInsights
-              </span>
-            </h1>
+            <GradientText
+              variant='brand-full'
+              as='h1'
+              className='mb-6 font-bold text-6xl leading-tight'
+            >
+              TaxInsights
+            </GradientText>
 
             {/* Subtitle */}
             <p className='mx-auto mb-12 max-w-3xl light:text-foreground/80 text-foreground/70 text-lg leading-relaxed light:md:text-foreground/70'>
@@ -104,14 +109,17 @@ export function BlogPageClient({
 
             {/* Category Badge */}
             {selectedCategory && (
-              <div className='inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 backdrop-blur-xl'>
-                <Tag className='size-4 text-cyan-400' />
-                <span className='text-foreground/70 text-sm'>Viewing: </span>
-                <span className='font-semibold text-cyan-400 text-sm'>
+              <Badge
+                variant='outline'
+                className='gap-2 border-primary/30 bg-primary/10 px-4 py-2 backdrop-blur-xl'
+              >
+                <Tag className='size-4' />
+                <span className='text-foreground/70'>Viewing: </span>
+                <span className='font-semibold'>
                   {categories.find((cat) => cat.slug === selectedCategory)?.name ||
                     selectedCategory}
                 </span>
-              </div>
+              </Badge>
             )}
           </div>
         </div>
@@ -125,19 +133,19 @@ export function BlogPageClient({
               icon: FileText,
               value: totalCount,
               label: 'Articles',
-              gradient: 'from-purple-500 to-pink-500',
+              gradient: 'from-primary to-accent',
             },
             {
               icon: TrendingUp,
               value: 'Weekly',
               label: 'Updates',
-              gradient: 'from-cyan-500 to-blue-500',
+              gradient: 'from-accent to-primary',
             },
             {
               icon: Star,
               value: 'Free',
               label: 'Always',
-              gradient: 'from-orange-500 to-yellow-500',
+              gradient: 'from-primary/80 to-accent/80',
             },
           ].map((stat, _idx) => (
             <div
@@ -147,7 +155,7 @@ export function BlogPageClient({
               <div
                 className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
               />
-              <stat.icon className='relative mx-auto mb-4 size-10 text-purple-400' />
+              <stat.icon className='relative mx-auto mb-4 size-10 text-primary' />
               <div className='relative mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
               <div className='relative text-muted-foreground text-sm'>{stat.label}</div>
             </div>
@@ -168,30 +176,30 @@ export function BlogPageClient({
         {featuredPost && !selectedCategory && currentPage === 1 && (
           <div className='mb-12 md:mb-20'>
             <div className='mb-8 flex items-center justify-center gap-3 text-center'>
-              <Sparkles className='size-6 text-yellow-400' />
-              <span className='bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text font-bold text-lg text-transparent'>
+              <Sparkles className='size-6 text-primary' />
+              <GradientText variant='brand' as='span' className='font-bold text-lg'>
                 Featured Article
-              </span>
-              <Sparkles className='size-6 text-yellow-400' />
+              </GradientText>
+              <Sparkles className='size-6 text-primary' />
             </div>
 
             <Link href={`/blog/${featuredPost.slug}`} className='group block'>
-              <div className='relative overflow-hidden rounded-3xl border border-yellow-500/40 bg-gradient-to-br from-white/10 light:from-yellow-50/90 light:to-orange-50/80 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-yellow-500/50 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] md:p-12 md:hover:scale-[1.02]'>
-                <div className='absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-orange-500/0 opacity-0 transition-opacity duration-500 group-hover:from-yellow-500/10 group-hover:to-orange-500/10 group-hover:opacity-100' />
+              <div className='relative overflow-hidden rounded-3xl border border-primary/40 bg-gradient-to-br from-white/10 light:from-primary/5 light:to-accent/5 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/50 hover:shadow-2xl md:p-12 md:hover:scale-[1.02]'>
+                <div className='absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/10 group-hover:to-accent/10 group-hover:opacity-100' />
 
                 <div className='relative grid items-center gap-8 md:grid-cols-2'>
                   <div>
                     <div className='mb-6 flex items-center gap-4'>
-                      <div className='rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 px-5 py-2 font-bold font-mono text-black text-sm shadow-lg'>
+                      <Badge className='gap-2 bg-primary px-5 py-2 font-bold font-mono shadow-lg'>
                         FEATURED
-                      </div>
+                      </Badge>
                       <div className='flex items-center gap-2 text-muted-foreground'>
                         <Calendar className='size-4' />
                         <span className='text-sm'>{formatDate(featuredPost.publishedAt)}</span>
                       </div>
                     </div>
 
-                    <h2 className='mb-6 font-bold text-4xl text-foreground leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-orange-400 group-hover:bg-clip-text group-hover:text-transparent'>
+                    <h2 className='mb-6 font-bold text-4xl text-foreground leading-tight'>
                       {featuredPost.title}
                     </h2>
 
@@ -199,7 +207,7 @@ export function BlogPageClient({
                       {featuredPost.excerpt}
                     </p>
 
-                    <div className='inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 px-8 py-4 font-semibold text-black shadow-lg transition-all duration-300 group-hover:gap-4 group-hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]'>
+                    <div className='inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-lg transition-all duration-300 group-hover:gap-4 group-hover:shadow-2xl'>
                       <span>Read Article</span>
                       <ArrowRight className='size-5 transition-transform group-hover:translate-x-1' />
                     </div>
@@ -230,8 +238,8 @@ export function BlogPageClient({
               {posts.map((post) => (
                 <div key={post.slug}>
                   <Link href={`/blog/${post.slug}`} className='group block h-full'>
-                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card backdrop-blur-xl transition-all duration-300 hover:border-purple-500/50 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]'>
-                      <div className='absolute inset-0 bg-gradient-to-br from-purple-500/0 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:from-purple-500/10 group-hover:to-cyan-500/10 group-hover:opacity-100' />
+                    <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card backdrop-blur-xl transition-all duration-300 hover:border-primary/50 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-2xl'>
+                      <div className='absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:from-primary/10 group-hover:to-accent/10 group-hover:opacity-100' />
 
                       {post.image && (
                         <div className='relative h-48 overflow-hidden'>
@@ -248,16 +256,19 @@ export function BlogPageClient({
 
                       <div className='relative p-4 md:p-6'>
                         <div className='mb-4 flex items-center justify-between'>
-                          <span className='rounded-full border border-purple-500/30 bg-purple-500/20 px-3 py-1 font-medium font-mono text-purple-300 text-xs'>
+                          <Badge
+                            variant='outline'
+                            className='border-primary/30 bg-primary/20 font-medium font-mono text-xs'
+                          >
                             {post.category}
-                          </span>
+                          </Badge>
                           <div className='flex items-center gap-2 text-muted-foreground text-sm'>
                             <Calendar className='size-3' />
                             <span className='text-xs'>{formatDate(post.publishedAt)}</span>
                           </div>
                         </div>
 
-                        <h3 className='mb-3 font-bold text-foreground text-xl leading-tight transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text group-hover:text-transparent'>
+                        <h3 className='mb-3 font-bold text-foreground text-xl leading-tight'>
                           {post.title}
                         </h3>
 
@@ -272,7 +283,7 @@ export function BlogPageClient({
                           </div>
                         )}
 
-                        <div className='inline-flex items-center gap-2 font-semibold text-purple-400 transition-all duration-300 group-hover:gap-3 group-hover:text-cyan-400'>
+                        <div className='inline-flex items-center gap-2 font-semibold text-primary transition-all duration-300 group-hover:gap-3'>
                           <span className='text-sm'>Read More</span>
                           <ArrowRight className='size-4' />
                         </div>
