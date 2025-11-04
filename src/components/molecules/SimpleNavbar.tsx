@@ -8,8 +8,17 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { FeedbackDialog } from '@/components/molecules/FeedbackDialog';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
+/**
+ * Simple navigation bar molecule
+ *
+ * IMPORTANT: Logo uses TEXT_3XL (largest in typography scale) for brand prominence
+ * Navigation links use TEXT_SM for compact header
+ * Desktop navigation uses GAP_8 for generous spacing between links
+ * Icon uses SIZE_5 for mobile menu buttons
+ */
 interface SimpleNavbarProps {
   className?: string;
 }
@@ -58,7 +67,10 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span
-              className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-3xl text-transparent'
+              className={cn(
+                'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+                TYPOGRAPHY.TEXT_3XL
+              )}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
@@ -67,7 +79,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className='hidden items-center gap-8 md:flex'>
+          <div className={cn('hidden items-center md:flex', SPACING.GAP_8)}>
             {links.map((link) => {
               const isActive =
                 pathname === link.href || (link.label === 'Calculator' && pathname === '/');
@@ -77,7 +89,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                   href={link.href}
                   onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
                   className={cn(
-                    'relative flex min-h-[44px] items-center px-4 py-2.5 font-medium text-sm transition-colors',
+                    'relative flex min-h-[44px] items-center px-4 py-2.5 font-medium transition-colors',
+                    TYPOGRAPHY.TEXT_SM,
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
@@ -95,7 +108,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           </div>
 
           {/* Desktop Utilities */}
-          <div className='hidden items-center gap-2 md:flex'>
+          <div className={cn('hidden items-center md:flex', SPACING.GAP_2)}>
             <FeedbackDialog />
           </div>
 
@@ -107,7 +120,11 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
-            {isMobileMenuOpen ? <X className='size-5' /> : <Menu className='size-5' />}
+            {isMobileMenuOpen ? (
+              <X className={ICON_SIZES.SIZE_5} />
+            ) : (
+              <Menu className={ICON_SIZES.SIZE_5} />
+            )}
           </Button>
         </div>
 
@@ -122,7 +139,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               style={{ originY: 0 }}
               className='overflow-hidden border-border/50 border-t md:hidden'
             >
-              <div className='container mx-auto max-w-7xl space-y-2 px-4 py-4'>
+              <div className={cn('container mx-auto max-w-7xl px-4 py-4', SPACING.SPACE_Y_2)}>
                 {links.map((link) => {
                   const isActive =
                     pathname === link.href || (link.label === 'Calculator' && pathname === '/');
@@ -136,7 +153,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
                           : () => setIsMobileMenuOpen(false)
                       }
                       className={cn(
-                        'block rounded-lg px-4 py-3 font-medium text-sm transition-colors',
+                        'block rounded-lg px-4 py-3 font-medium transition-colors',
+                        TYPOGRAPHY.TEXT_SM,
                         isActive
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:bg-accent hover:text-foreground'

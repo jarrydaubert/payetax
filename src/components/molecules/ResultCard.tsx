@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface ResultCardProps {
@@ -37,6 +38,10 @@ const variantStyles = {
   },
 };
 
+/**
+ * Result card molecule for displaying key metrics
+ * Uses design tokens: TEXT_SM for label, TEXT_2XL for value, SIZE_4 for icon, SPACE_Y_2 for spacing
+ */
 export function ResultCard({
   label,
   value,
@@ -50,12 +55,12 @@ export function ResultCard({
 
   const cardContent = (
     <Card className={cn('border-primary/20 p-4', tooltip && 'cursor-help', styles.card)}>
-      <div className='space-y-2'>
+      <div className={SPACING.SPACE_Y_2}>
         <div className='flex items-center justify-between'>
-          <p className='font-medium text-foreground/80 text-sm'>{label}</p>
-          {Icon && <Icon className={cn('size-4', styles.icon)} />}
+          <p className={cn('font-medium text-foreground/80', TYPOGRAPHY.TEXT_SM)}>{label}</p>
+          {Icon && <Icon className={cn(ICON_SIZES.SIZE_4, styles.icon)} />}
         </div>
-        <p className='font-bold text-2xl text-foreground'>{value}</p>
+        <p className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{value}</p>
       </div>
     </Card>
   );

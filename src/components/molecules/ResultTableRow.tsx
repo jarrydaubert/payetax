@@ -3,7 +3,8 @@
 
 import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { formatCurrency } from '@/lib/utils';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultTableRowProps {
   category: string;
@@ -22,6 +23,7 @@ interface ResultTableRowProps {
  * Table row component for displaying a single calculation result.
  * Handles icon, category name, percentage, and values across multiple time periods.
  * Follows atomic design pattern - molecule for consistent row rendering.
+ * Uses design tokens: SIZE_3_5 for compact table icons, TEXT_SM for all text, GAP_1_5 for tight spacing
  */
 export function ResultTableRow({
   category,
@@ -45,15 +47,18 @@ export function ResultTableRow({
       <TableCell
         className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5`}
       >
-        <div className={`flex items-center gap-1.5 ${isSubRow ? 'pl-4 sm:pl-6' : ''}`}>
-          <Icon className='h-3.5 w-3.5 flex-shrink-0' aria-hidden='true' />
-          <span className='whitespace-nowrap text-sm'>{category}</span>
+        <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
+          <Icon className={cn(ICON_SIZES.SIZE_3_5, 'flex-shrink-0')} aria-hidden='true' />
+          <span className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>{category}</span>
         </div>
       </TableCell>
       <TableCell
-        className={`text-right font-mono text-sm ${color} ${
-          isHighlight ? 'font-bold' : ''
-        } w-[55px] px-2 py-2.5`}
+        className={cn(
+          'w-[55px] px-2 py-2.5 text-right font-mono',
+          TYPOGRAPHY.TEXT_SM,
+          color,
+          isHighlight && 'font-bold'
+        )}
       >
         {percentage}
       </TableCell>
@@ -66,16 +71,22 @@ export function ResultTableRow({
           return (
             <React.Fragment key={period}>
               <TableCell
-                className={`min-w-[100px] bg-blue-500/10 text-right font-mono text-sm ${color} ${
-                  isHighlight ? 'font-bold' : ''
-                } whitespace-nowrap px-2 py-2.5`}
+                className={cn(
+                  'min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2.5 text-right font-mono',
+                  TYPOGRAPHY.TEXT_SM,
+                  color,
+                  isHighlight && 'font-bold'
+                )}
               >
                 {formatCurrency(currentValue)}
               </TableCell>
               <TableCell
-                className={`min-w-[100px] bg-purple-500/10 text-right font-mono text-sm ${color} ${
-                  isHighlight ? 'font-bold' : ''
-                } whitespace-nowrap px-2 py-2.5`}
+                className={cn(
+                  'min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2.5 text-right font-mono',
+                  TYPOGRAPHY.TEXT_SM,
+                  color,
+                  isHighlight && 'font-bold'
+                )}
               >
                 {formatCurrency(whatIfValue)}
               </TableCell>
@@ -87,9 +98,12 @@ export function ResultTableRow({
         return (
           <TableCell
             key={period}
-            className={`min-w-[100px] text-right font-mono text-sm ${color} ${
-              isHighlight ? 'font-bold' : ''
-            } whitespace-nowrap px-2 py-2.5`}
+            className={cn(
+              'min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-mono',
+              TYPOGRAPHY.TEXT_SM,
+              color,
+              isHighlight && 'font-bold'
+            )}
           >
             {formatCurrency(currentValue)}
           </TableCell>

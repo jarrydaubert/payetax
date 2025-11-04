@@ -5,6 +5,8 @@
  * Shows the scenario they're in and suggests pension optimization with a clear call-to-action.
  * Can be dismissed by user - preference is saved to localStorage.
  *
+ * Uses design tokens: SIZE_5 for alert icon, SIZE_4 for button icons
+ *
  * @example
  * ```tsx
  * <TaxTrapInlineAlert
@@ -20,8 +22,9 @@ import { AlertTriangle, ArrowRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface TaxTrapInlineAlertProps {
   /** Current annual gross salary */
@@ -92,7 +95,7 @@ export function TaxTrapInlineAlert({
 
   return (
     <Alert variant='warning' className='relative border-2'>
-      <AlertTriangle className='size-5' />
+      <AlertTriangle className={ICON_SIZES.SIZE_5} />
 
       {/* Close button */}
       <button
@@ -101,10 +104,15 @@ export function TaxTrapInlineAlert({
         className='absolute top-3 right-3 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
         aria-label='Dismiss tax trap alert'
       >
-        <X className='size-4' />
+        <X className={ICON_SIZES.SIZE_4} />
       </button>
 
-      <div className='flex flex-col gap-3 pr-8 sm:flex-row sm:items-center sm:justify-between'>
+      <div
+        className={cn(
+          'flex flex-col pr-8 sm:flex-row sm:items-center sm:justify-between',
+          SPACING.GAP_3
+        )}
+      >
         <div className='flex-1'>
           <AlertTitle>Tax Trap Alert</AlertTitle>
           <AlertDescription>
@@ -127,7 +135,7 @@ export function TaxTrapInlineAlert({
             className='w-full gap-2 whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto'
           >
             Add {formatCurrency(suggestedPension, 0)} to Pension
-            <ArrowRight className='size-4' />
+            <ArrowRight className={ICON_SIZES.SIZE_4} />
           </Button>
         )}
       </div>

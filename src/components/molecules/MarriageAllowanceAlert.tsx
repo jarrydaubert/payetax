@@ -4,6 +4,8 @@
  * Displayed when user qualifies for Marriage Allowance but doesn't have it in their tax code.
  * Shows below results table when eligible: partner earns < £12,570 AND user is basic rate taxpayer.
  *
+ * Uses design tokens: SIZE_5 for alert icon, SIZE_4 for button icon
+ *
  * @example
  * ```tsx
  * <MarriageAllowanceAlert
@@ -18,8 +20,9 @@
 import { ExternalLink, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface MarriageAllowanceAlertProps {
   /** Current annual gross salary */
@@ -78,7 +81,7 @@ export function MarriageAllowanceAlert({
       variant='default'
       className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'
     >
-      <Heart className='size-5 self-start text-pink-600 dark:text-pink-400' />
+      <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-pink-600 dark:text-pink-400')} />
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex-1'>
           <AlertTitle className='text-pink-900 dark:text-pink-100'>
@@ -106,7 +109,7 @@ export function MarriageAllowanceAlert({
         >
           <a href='https://www.gov.uk/marriage-allowance' target='_blank' rel='noopener noreferrer'>
             Check Eligibility on GOV.UK
-            <ExternalLink className='size-4' />
+            <ExternalLink className={ICON_SIZES.SIZE_4} />
           </a>
         </Button>
       </div>

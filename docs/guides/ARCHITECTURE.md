@@ -3,7 +3,7 @@
 **Last Updated:** November 4, 2025  
 **Version:** 4.1.2  
 **Status:** ✅ Production Ready  
-**Audit Status:** ✅ PAYTAX-62 Complete (Atoms audit, design tokens, consistency fixes)
+**Audit Status:** ✅ PAYTAX-63 Complete (Molecules audit, design tokens extended, 100% adoption)
 
 ---
 
@@ -200,21 +200,33 @@ All atoms now use centralized design tokens from `src/constants/designTokens.ts`
 - **Spacing**: `GAP_2` (8px), `GAP_1_5` (6px), `GAP_1` (4px)
 - **Icons**: `SIZE_4` (16px), `SIZE_3_5` (14px), `SIZE_5` (20px), `SIZE_6` (24px)
 
-#### **Molecules (10 components)**
+#### **Molecules (12 components) - ✅ PAYTAX-63 COMPLETE**
 
-Simple composites of atoms.
+Simple composites of atoms, now with 100% design token adoption.
 
 **Examples:**
-- `ResultCard.tsx` - Displays a single result
-- `ResultTableRow.tsx` - Table row component
-- `FAQItem.tsx` - Collapsible FAQ
-- `SimpleNavbar.tsx` - Navigation header
+- `ResultCard.tsx` - Displays a single result (design tokens applied)
+- `ResultTableRow.tsx` - Table row component (design tokens applied)
+- `FAQItem.tsx` - Collapsible FAQ (design tokens applied)
+- `SimpleNavbar.tsx` - Navigation header (design tokens applied)
+- `CategoryFilter.tsx` - Blog category filter (design tokens applied)
+- `FeedbackDialog.tsx` - User feedback form (Zod validation + design tokens)
+- `Footer.tsx` - Site footer (design tokens applied)
+- `MarriageAllowanceAlert.tsx` - Marriage allowance notification
+- `TaxTrapInlineAlert.tsx` - Tax trap warning
+- `TaxRateCard.tsx` - Tax rate information card
+- `HowToStepCard.tsx` - How-to guide step
+- `PeriodSelectorCard.tsx` - Period selection
 
 **Characteristics:**
 - Combine multiple atoms
 - Limited complexity
 - Focused functionality
-- 90.0% test coverage
+- **100% design token adoption (PAYTAX-63)**
+- Extended typography scale (TEXT_3XL → TEXT_XS)
+- Extended spacing scale (GAP_8 → GAP_1, SPACE_Y_*)
+- Zod validation for FeedbackDialog
+- 75.0% test coverage (9/12 components have tests)
 
 #### **Organisms (12 components)**
 

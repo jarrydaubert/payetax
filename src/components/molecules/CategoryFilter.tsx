@@ -3,6 +3,7 @@
 
 import { Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { BlogCategory } from '@/types/blog';
 
@@ -16,6 +17,11 @@ interface CategoryFilterProps {
 /**
  * Category filter component for blog posts
  * Uses shadcn Badge component with enhanced styling for active/inactive states
+ *
+ * IMPORTANT: Uses TEXT_XL for blog section headings to maintain hierarchy with page titles
+ * Button text uses TEXT_SM for standard button typography
+ * Icon uses SIZE_5 for emphasis in section heading
+ * Button spacing uses GAP_3 for comfortable button groups
  *
  * @param categories - Array of blog categories with counts
  * @param allPostsCount - Total number of posts across all categories
@@ -35,18 +41,20 @@ export function CategoryFilter({
 
   return (
     <div className='relative z-20 mb-12 md:mb-20'>
-      <div className='mb-8 flex items-center justify-center gap-2 text-center'>
-        <Tag className='size-5 text-purple-400' />
-        <h2 className='font-semibold text-foreground text-xl'>Browse Topics</h2>
+      <div className={cn('mb-8 flex items-center justify-center text-center', SPACING.GAP_2)}>
+        <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} />
+        <h2 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>Browse Topics</h2>
       </div>
       <div className='mx-auto max-w-5xl'>
-        <div className='flex flex-wrap items-center justify-center gap-3'>
+        <div className={cn('flex flex-wrap items-center justify-center', SPACING.GAP_3)}>
           {/* All Posts Button */}
           <button
             type='button'
             onClick={() => onCategoryClick()}
             className={cn(
-              'group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-5 py-2.5 font-medium text-sm transition-all duration-300',
+              'group relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 font-medium transition-all duration-300',
+              SPACING.GAP_2,
+              TYPOGRAPHY.TEXT_SM,
               isActive()
                 ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]'
                 : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
@@ -56,7 +64,8 @@ export function CategoryFilter({
             <Badge
               variant='secondary'
               className={cn(
-                'relative z-10 font-mono text-xs',
+                'relative z-10 font-mono',
+                TYPOGRAPHY.TEXT_XS,
                 isActive() && 'bg-white/20 text-white hover:bg-white/30'
               )}
             >
@@ -76,7 +85,9 @@ export function CategoryFilter({
                 type='button'
                 onClick={() => onCategoryClick(category.slug)}
                 className={cn(
-                  'group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-5 py-2.5 font-medium text-sm transition-all duration-300',
+                  'group relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 font-medium transition-all duration-300',
+                  SPACING.GAP_2,
+                  TYPOGRAPHY.TEXT_SM,
                   isActive(category.slug)
                     ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]'
                     : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
@@ -86,7 +97,8 @@ export function CategoryFilter({
                 <Badge
                   variant='secondary'
                   className={cn(
-                    'relative z-10 font-mono text-xs',
+                    'relative z-10 font-mono',
+                    TYPOGRAPHY.TEXT_XS,
                     isActive(category.slug) && 'bg-white/20 text-white hover:bg-white/30'
                   )}
                 >

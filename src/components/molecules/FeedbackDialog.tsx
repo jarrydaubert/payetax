@@ -17,7 +17,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
+import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
+/**
+ * Feedback dialog molecule for collecting user feedback
+ * Uses Zod validation for type-safe form validation
+ * Design tokens: TEXT_SM for labels/text, SIZE_4 for icons, SPACE_Y_4/SPACE_Y_2 for form spacing
+ */
 export function FeedbackDialog() {
   const emailId = useId();
   const messageId = useId();
@@ -36,27 +44,25 @@ export function FeedbackDialog() {
   const minLength = 10;
   const maxLength = 5000;
 
+  /**
+   * IMPORTANT: Zod validation replaces inline regex checks
+   * See moleculesValidation.ts for schema definition.
+   * This provides runtime type safety and consistent error messages.
+   */
   const validate = () => {
-    const newErrors = { email: '', message: '' };
-    let isValid = true;
+    const result = validateFeedbackForm(formData);
 
-    if (messageLength < minLength) {
-      newErrors.message = `Message must be at least ${minLength} characters (currently ${messageLength})`;
-      isValid = false;
+    if (!result.success) {
+      const zodErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        email: zodErrors.email?.[0] || '',
+        message: zodErrors.message?.[0] || '',
+      });
+      return false;
     }
 
-    if (messageLength > maxLength) {
-      newErrors.message = `Message is too long (max ${maxLength} characters)`;
-      isValid = false;
-    }
-
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
+    setErrors({ email: '', message: '' });
+    return true;
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -100,9 +106,13 @@ export function FeedbackDialog() {
       <DialogTrigger asChild>
         <button
           type='button'
-          className='flex min-h-[44px] items-center gap-2 px-4 py-2.5 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground'
+          className={cn(
+            'flex min-h-[44px] items-center px-4 py-2.5 font-medium text-muted-foreground transition-colors hover:text-foreground',
+            SPACING.GAP_2,
+            TYPOGRAPHY.TEXT_SM
+          )}
         >
-          <MessageSquare className='size-4' />
+          <MessageSquare className={ICON_SIZES.SIZE_4} />
           Feedback
         </button>
       </DialogTrigger>
@@ -113,8 +123,8 @@ export function FeedbackDialog() {
             Help us improve PayeTax. Your input directly shapes our development priorities.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className='space-y-4'>
-          <div className='space-y-2'>
+        <form onSubmit={onSubmit} className={SPACING.SPACE_Y_4}>
+          <div className={SPACING.SPACE_Y_2}>
             <Label htmlFor={emailId}>Email (optional)</Label>
             <Input
               id={emailId}
@@ -126,25 +136,30 @@ export function FeedbackDialog() {
               aria-describedby={errors.email ? `${emailId}-error` : undefined}
             />
             {errors.email && (
-              <p id={`${emailId}-error`} className='text-destructive text-sm' role='alert'>
+              <p
+                id={`${emailId}-error`}
+                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
+                role='alert'
+              >
                 {errors.email}
               </p>
             )}
           </div>
 
-          <div className='space-y-2'>
+          <div className={SPACING.SPACE_Y_2}>
             <div className='flex items-center justify-between'>
               <Label htmlFor={messageId}>
                 Message <span className='text-destructive'>*</span>
               </Label>
               <span
-                className={`text-xs ${
+                className={cn(
+                  TYPOGRAPHY.TEXT_XS,
                   messageLength < minLength
                     ? 'text-destructive'
                     : messageLength > maxLength - 100
                       ? 'text-amber-600 dark:text-amber-400'
                       : 'text-muted-foreground'
-                }`}
+                )}
                 aria-live='polite'
               >
                 {messageLength}/{maxLength}
@@ -162,11 +177,18 @@ export function FeedbackDialog() {
               aria-describedby={errors.message ? `${messageId}-error` : `${messageId}-hint`}
             />
             {errors.message ? (
-              <p id={`${messageId}-error`} className='text-destructive text-sm' role='alert'>
+              <p
+                id={`${messageId}-error`}
+                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
+                role='alert'
+              >
                 {errors.message}
               </p>
             ) : (
-              <p id={`${messageId}-hint`} className='text-muted-foreground text-xs'>
+              <p
+                id={`${messageId}-hint`}
+                className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}
+              >
                 {messageLength < minLength
                   ? `${minLength - messageLength} more character${minLength - messageLength === 1 ? '' : 's'} needed`
                   : 'Share your thoughts, ideas, or issues'}
@@ -178,12 +200,17 @@ export function FeedbackDialog() {
             <Button type='submit' className='w-full' disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <div className='mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                  <div
+                    className={cn(
+                      'mr-2 animate-spin rounded-full border-2 border-current border-t-transparent',
+                      ICON_SIZES.SIZE_4
+                    )}
+                  />
                   Sending...
                 </>
               ) : (
                 <>
-                  <Send className='mr-2 size-4' />
+                  <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} />
                   Send Feedback
                 </>
               )}
