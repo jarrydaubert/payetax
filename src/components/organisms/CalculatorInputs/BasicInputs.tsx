@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
+import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
 export function BasicInputs() {
@@ -87,19 +89,23 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-3'
+      className={SPACING.SPACE_Y_3}
     >
       {/* Heading */}
-      <h3 className='font-semibold text-foreground text-lg'>Enter Income Tax Details</h3>
+      {/* IMPORTANT: Uses TEXT_LG to match other section headings (ResultsTable, PeriodSelectorCard)
+          Ensures visual consistency across calculator interface */}
+      <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+        Enter Income Tax Details
+      </h3>
       {/* Salary and Pay Period on one line */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='salary' />
-          <Label htmlFor={salaryId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={salaryId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Salary
           </Label>
         </div>
-        <div className='flex flex-1 gap-2'>
+        <div className={cn('flex flex-1', SPACING.GAP_2)}>
           <NumberInput
             id={salaryId}
             value={input.salary}
@@ -130,10 +136,10 @@ export function BasicInputs() {
           Calendar icon (16px) + gap (8px) + text "2025-2026" (~80px) + 
           dropdown arrow (~20px) + padding (~24px) = ~148px required.
           Using 170px provides comfortable spacing without text wrapping. */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5 whitespace-nowrap'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center whitespace-nowrap', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='taxYear' />
-          <Label htmlFor={taxYearId} className='text-sm'>
+          <Label htmlFor={taxYearId} className={TYPOGRAPHY.TEXT_SM}>
             Tax Year
           </Label>
         </div>
@@ -147,10 +153,10 @@ export function BasicInputs() {
       </div>
 
       {/* Tax Code Input with Tooltip - defaults to 1257L (S1257L for Scotland) */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='taxCode' />
-          <Label htmlFor={taxCodeId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={taxCodeId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Tax Code
           </Label>
         </div>
@@ -165,10 +171,10 @@ export function BasicInputs() {
       </div>
 
       {/* Region Select with Tooltip */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='region' />
-          <Label htmlFor={regionId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={regionId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Region
           </Label>
         </div>
@@ -187,10 +193,10 @@ export function BasicInputs() {
       </div>
 
       {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
-      <div className='flex items-center gap-4'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_4)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='marriageAllowance' />
-          <Label htmlFor={marriedId} className='text-sm'>
+          <Label htmlFor={marriedId} className={TYPOGRAPHY.TEXT_SM}>
             Married
           </Label>
           <Checkbox
@@ -201,17 +207,17 @@ export function BasicInputs() {
           />
         </div>
 
-        <div className='flex items-center gap-1.5'>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='blindAllowance' />
-          <Label htmlFor={blindId} className='text-sm'>
+          <Label htmlFor={blindId} className={TYPOGRAPHY.TEXT_SM}>
             Blind
           </Label>
           <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
         </div>
 
-        <div className='flex items-center gap-1.5'>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='payNoNI' />
-          <Label htmlFor={payNoNIId} className='text-sm'>
+          <Label htmlFor={payNoNIId} className={TYPOGRAPHY.TEXT_SM}>
             I pay no NI
           </Label>
           <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
@@ -219,10 +225,10 @@ export function BasicInputs() {
       </div>
 
       {input.isMarried && (
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-1.5'>
+        <div className={cn('flex items-center', SPACING.GAP_3)}>
+          <div className={cn('flex items-center', SPACING.GAP_1_5)}>
             <LabelTooltip fieldName='partnerGrossWage' />
-            <Label htmlFor={partnerWageId} className='whitespace-nowrap text-sm'>
+            <Label htmlFor={partnerWageId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
               Partner's Gross Wage
             </Label>
           </div>
@@ -240,10 +246,10 @@ export function BasicInputs() {
       )}
 
       {/* Age - Dropdown for HMRC NI thresholds */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='age' />
-          <Label htmlFor={ageId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={ageId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Age
           </Label>
         </div>
@@ -282,10 +288,10 @@ export function BasicInputs() {
       </div>
 
       {/* Student Loan */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='studentLoanPlan' />
-          <Label htmlFor={studentLoanId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={studentLoanId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Student Loan
           </Label>
         </div>
@@ -309,10 +315,10 @@ export function BasicInputs() {
       </div>
 
       {/* Allowances/Deductions */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='allowancesDeductions' />
-          <Label htmlFor={allowancesId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={allowancesId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Allowances/Deductions
           </Label>
         </div>
@@ -329,14 +335,14 @@ export function BasicInputs() {
       </div>
 
       {/* Pension - Combined Type + Amount on 1 row */}
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
+      <div className={cn('flex items-center', SPACING.GAP_3)}>
+        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='pensionContribution' />
-          <Label htmlFor={pensionId} className='whitespace-nowrap text-sm'>
+          <Label htmlFor={pensionId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
             Pension
           </Label>
         </div>
-        <div className='flex flex-1 gap-1.5'>
+        <div className={cn('flex flex-1', SPACING.GAP_1_5)}>
           {/* Type selector with icons */}
           <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
             <SelectTrigger

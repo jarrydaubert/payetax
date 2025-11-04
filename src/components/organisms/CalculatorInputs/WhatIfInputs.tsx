@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
 
 interface WhatIfInputsProps {
@@ -76,18 +78,35 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   };
 
   return (
-    <div className='space-y-4 rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10'>
+    <div
+      className={cn(
+        'rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10',
+        SPACING.SPACE_Y_4
+      )}
+    >
       {/* Header */}
-      <div className='flex items-center gap-2 border-purple-500/20 border-b pb-2 dark:border-purple-400/20'>
-        <Wand2 className='size-5 text-accent-foreground' />
-        <h3 className='font-semibold text-foreground text-lg'>What If Scenario</h3>
+      <div
+        className={cn(
+          'flex items-center border-purple-500/20 border-b pb-2 dark:border-purple-400/20',
+          SPACING.GAP_2
+        )}
+      >
+        <Wand2 className={cn(ICON_SIZES.SIZE_5, 'text-accent-foreground')} />
+        {/* IMPORTANT: Uses TEXT_LG to match other section headings (BasicInputs, ResultsTable)
+            Ensures visual consistency across calculator interface */}
+        <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+          What If Scenario
+        </h3>
       </div>
 
       {/* Inputs Grid */}
-      <div className='grid gap-4 sm:grid-cols-2'>
+      <div className={cn('grid sm:grid-cols-2', SPACING.GAP_4)}>
         {/* Change Type Dropdown */}
         <div>
-          <label htmlFor='what-if-type' className='mb-2 block font-medium text-foreground text-sm'>
+          <label
+            htmlFor='what-if-type'
+            className={cn('mb-2 block font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}
+          >
             Change Type
           </label>
           <InputTooltip fieldName='whatIfType'>
@@ -114,7 +133,10 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
 
         {/* Value Input */}
         <div>
-          <label htmlFor={valueInputId} className='mb-2 block font-medium text-foreground text-sm'>
+          <label
+            htmlFor={valueInputId}
+            className={cn('mb-2 block font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}
+          >
             {getInputLabel()}
           </label>
           <InputTooltip fieldName='whatIfValue'>
@@ -132,14 +154,14 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
       </div>
 
       {/* Buttons */}
-      <div className='flex gap-2'>
+      <div className={cn('flex', SPACING.GAP_2)}>
         <Button
           onClick={handleCompare}
           size='lg'
           className='flex-1 justify-center border-purple-500 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:from-purple-600 hover:to-pink-600 dark:border-purple-400 dark:shadow-purple-400/50'
           data-testid='compare-button'
         >
-          <Wand2 className='mr-2 size-5' />
+          <Wand2 className={cn('mr-2', ICON_SIZES.SIZE_5)} />
           Compare Scenarios
         </Button>
 
@@ -156,7 +178,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
             data-testid='clear-what-if-button'
             aria-label='Clear What If scenario'
           >
-            <RotateCcw className='size-4' />
+            <RotateCcw className={ICON_SIZES.SIZE_4} />
           </Button>
         )}
       </div>

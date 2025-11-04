@@ -13,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
+import { cn } from '@/lib/utils';
 import {
   INCOME_TYPE_LABELS,
   type IncomeSource,
@@ -44,8 +46,19 @@ export function IncomeSourceList() {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className='flex items-center justify-between'>
-        <CollapsibleTrigger className='group flex items-center gap-2 font-medium text-sm transition-colors hover:text-primary'>
-          <ChevronRight className='h-4 w-4 transition-transform group-data-[state=open]:rotate-90' />
+        <CollapsibleTrigger
+          className={cn(
+            'group flex items-center font-medium transition-colors hover:text-primary',
+            SPACING.GAP_2,
+            TYPOGRAPHY.TEXT_SM
+          )}
+        >
+          <ChevronRight
+            className={cn(
+              ICON_SIZES.SIZE_4,
+              'transition-transform group-data-[state=open]:rotate-90'
+            )}
+          />
           <span>Additional Income Sources</span>
           {incomeSources.length > 0 && (
             <Badge variant='secondary' className='ml-2'>
@@ -55,19 +68,25 @@ export function IncomeSourceList() {
         </CollapsibleTrigger>
       </div>
 
-      <CollapsibleContent className='space-y-3 pt-3'>
+      <CollapsibleContent className={cn('pt-3', SPACING.SPACE_Y_3)}>
         {incomeSources.length === 0 && (
-          <p className='text-muted-foreground text-sm'>
+          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
             Add pension income, rental income, or other sources
           </p>
         )}
 
         {incomeSources.map((source, index) => (
-          <div key={source.id} className='flex flex-col gap-2 rounded-lg border border-input p-2.5'>
-            <div className='flex items-center gap-2'>
+          <div
+            key={source.id}
+            className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
+          >
+            <div className={cn('flex items-center', SPACING.GAP_2)}>
               <Badge
                 variant='outline'
-                className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0 text-xs'
+                className={cn(
+                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0',
+                  TYPOGRAPHY.TEXT_XS
+                )}
               >
                 {index + 1}
               </Badge>
@@ -81,7 +100,7 @@ export function IncomeSourceList() {
                   }
                 >
                   <SelectTrigger
-                    className='h-9 border-input text-sm'
+                    className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
                     aria-label='Select income type'
                   >
                     <SelectValue />
@@ -104,12 +123,12 @@ export function IncomeSourceList() {
                 onClick={() => removeIncomeSource(source.id)}
                 aria-label='Remove income source'
               >
-                <Trash2 className='h-4 w-4' />
+                <Trash2 className={ICON_SIZES.SIZE_4} />
               </Button>
             </div>
 
             {/* Amount and Period Row */}
-            <div className='flex items-center gap-2'>
+            <div className={cn('flex items-center', SPACING.GAP_2)}>
               <NumberInput
                 value={source.amount}
                 onChange={(amount) => updateIncomeSource(source.id, { amount })}
@@ -117,7 +136,7 @@ export function IncomeSourceList() {
                 decimals={2}
                 placeholder='0.00'
                 min={0}
-                className='h-9 flex-1 text-sm'
+                className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
               />
 
               <Select
@@ -127,7 +146,7 @@ export function IncomeSourceList() {
                 }
               >
                 <SelectTrigger
-                  className='h-9 w-[110px] border-input text-sm'
+                  className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
                   aria-label='Select pay period'
                 >
                   <SelectValue />
@@ -151,12 +170,14 @@ export function IncomeSourceList() {
           className='w-full'
           disabled={incomeSources.length >= 10} // Reasonable limit
         >
-          <Plus className='mr-2 h-4 w-4' />
+          <Plus className={cn('mr-2', ICON_SIZES.SIZE_4)} />
           Add Income Source
         </Button>
 
         {incomeSources.length >= 10 && (
-          <p className='text-muted-foreground text-xs'>Maximum 10 income sources reached</p>
+          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+            Maximum 10 income sources reached
+          </p>
         )}
       </CollapsibleContent>
     </Collapsible>

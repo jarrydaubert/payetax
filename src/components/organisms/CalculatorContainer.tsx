@@ -7,8 +7,10 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/lib/constants/ui';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
+import { cn } from '@/lib/utils';
 import {
   useCalculatorActions,
   useCalculatorResults,
@@ -172,7 +174,7 @@ export function CalculatorContainer() {
         <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
           UK Tax Calculator
         </h2>
-        <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
           Calculate your take-home pay with official HMRC rates. Fast, accurate, and completely
           free.
         </p>
@@ -253,9 +255,9 @@ export function CalculatorContainer() {
             className='order-6 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center lg:order-3'
           >
             <div>
-              <Sparkles className='mx-auto mb-4 size-12 text-muted-foreground' />
-              <h3 className='mb-2 font-semibold text-lg'>Ready to Calculate</h3>
-              <p className='text-muted-foreground text-sm'>
+              <Sparkles className={cn('mx-auto mb-4 text-muted-foreground', ICON_SIZES.SIZE_12)} />
+              <h3 className={cn('mb-2 font-semibold', TYPOGRAPHY.TEXT_LG)}>Ready to Calculate</h3>
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                 Enter your salary details and click Calculate to see your results
               </p>
             </div>
@@ -271,7 +273,7 @@ export function CalculatorContainer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
-            className='order-8 flex justify-center gap-2 md:gap-3 lg:col-span-2'
+            className={cn('order-8 flex justify-center md:gap-3 lg:col-span-2', SPACING.GAP_2)}
           >
             <Button
               variant='outline'
@@ -279,7 +281,7 @@ export function CalculatorContainer() {
               onClick={handlePrint}
               aria-label='Print tax calculation results'
             >
-              <Printer className='mr-2 size-4' />
+              <Printer className={cn('mr-2', ICON_SIZES.SIZE_4)} />
               Print
             </Button>
             <Button
@@ -288,7 +290,7 @@ export function CalculatorContainer() {
               onClick={handleExport}
               aria-label='Export results to CSV file'
             >
-              <FileDown className='mr-2 size-4' />
+              <FileDown className={cn('mr-2', ICON_SIZES.SIZE_4)} />
               Export CSV
             </Button>
           </motion.div>
@@ -304,10 +306,13 @@ export function CalculatorContainer() {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={scrollToTop}
-            className='safe-bottom safe-right fixed z-50 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+            className={cn(
+              'safe-bottom safe-right fixed z-50 flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              ICON_SIZES.SIZE_12
+            )}
             aria-label='Scroll to top'
           >
-            <ArrowUp className='size-6' />
+            <ArrowUp className={ICON_SIZES.SIZE_6} />
           </motion.button>
         )}
       </AnimatePresence>

@@ -1,7 +1,9 @@
 'use client';
 
 import { memo } from 'react';
+import { SPACING } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { cn } from '@/lib/utils';
 import { IncomeBreakdownChart } from './IncomeBreakdownChart';
 import { NetIncomeComparisonChart } from './NetIncomeComparisonChart';
 import { TaxLiabilityChart } from './TaxLiabilityChart';
@@ -50,7 +52,7 @@ export const ChartsContainer = memo(function ChartsContainer({
   if (layout === 'sidebar') {
     // Vertical stack for What If sidebar
     return (
-      <div className={`space-y-4 ${className || ''}`}>
+      <div className={cn(SPACING.SPACE_Y_4, className)}>
         {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}
 
         <TaxLiabilityChart results={results} whatIfResults={whatIfResults} />
@@ -63,7 +65,11 @@ export const ChartsContainer = memo(function ChartsContainer({
   // Full-width horizontal layout (below table)
   return (
     <div
-      className={`grid grid-cols-1 gap-4 lg:grid-cols-${showIncomeBreakdown ? '3' : '2'} ${className || ''}`}
+      className={cn(
+        `grid grid-cols-1 lg:grid-cols-${showIncomeBreakdown ? '3' : '2'}`,
+        SPACING.GAP_4,
+        className
+      )}
     >
       {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}
 

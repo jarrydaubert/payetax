@@ -174,8 +174,8 @@ describe('ScrollIndicator Component', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('size-5');
-      expect(icon).toHaveClass('md:size-6');
+      // After PAYTAX-64: Now uses SIZE_6 from design tokens (responsive sizing handled by parent)
+      expect(icon).toHaveClass('size-6');
     });
   });
 
