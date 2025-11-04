@@ -2,8 +2,9 @@
 'use client';
 
 import { RotateCcw, Wand2 } from 'lucide-react';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,29 @@ import {
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
+
+/**
+ * Zod validation schema for What If scenario inputs
+ */
+const whatIfValueSchema = z.object({
+  type: z.enum(['percentage', 'amount', 'total']),
+  value: z.number(),
+  percentage: z
+    .number()
+    .min(-100, 'Percentage cannot be less than -100%')
+    .max(1000, 'Percentage cannot exceed 1000%')
+    .optional(),
+  amount: z
+    .number()
+    .min(-10000000, 'Amount cannot be less than -£10M')
+    .max(10000000, 'Amount cannot exceed £10M')
+    .optional(),
+  total: z
+    .number()
+    .min(0, 'Total salary cannot be negative')
+    .max(10000000, 'Total salary cannot exceed £10M')
+    .optional(),
+});
 
 interface WhatIfInputsProps {
   onCompare?: () => void;
@@ -36,16 +60,61 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   const whatIf = useWhatIf();
   const whatIfResults = useWhatIfResults();
   const { setWhatIfType, setWhatIfValue, calculateWhatIf, clearWhatIf } = useCalculatorActions();
+  const [error, setError] = useState<string>('');
   const typeSelectId = useId();
   const valueInputId = useId();
 
   const handleCompare = () => {
-    // Enable What If mode and calculate
-    calculateWhatIf();
+    // Validate input before calculating
+    try {
+      const validationData: Record<string, unknown> = {
+        type: whatIf.type,
+        value: whatIf.value,
+      };
 
-    // Notify parent to scroll to results
-    if (onCompare) {
-      onCompare();
+      // Add type-specific validation
+      if (whatIf.type === 'percentage') {
+        validationData.percentage = whatIf.value;
+        if (whatIf.value < -100 || whatIf.value > 1000) {
+          setError('Percentage must be between -100% and 1000%');
+          toast.error('Invalid percentage value');
+          return;
+        }
+      } else if (whatIf.type === 'amount') {
+        validationData.amount = whatIf.value;
+        if (whatIf.value < -10000000 || whatIf.value > 10000000) {
+          setError('Amount must be between -£10M and £10M');
+          toast.error('Invalid amount value');
+          return;
+        }
+      } else if (whatIf.type === 'total') {
+        validationData.total = whatIf.value;
+        if (whatIf.value < 0 || whatIf.value > 10000000) {
+          setError('Total salary must be between £0 and £10M');
+          toast.error('Invalid total salary');
+          return;
+        }
+      }
+
+      // Validate with Zod
+      whatIfValueSchema.parse(validationData);
+
+      // Clear any previous errors
+      setError('');
+
+      // Enable What If mode and calculate
+      calculateWhatIf();
+
+      // Notify parent to scroll to results
+      if (onCompare) {
+        onCompare();
+      }
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const errorMessage = err.issues[0]?.message || 'Invalid input';
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -143,13 +212,28 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
             <NumberInput
               id={valueInputId}
               value={whatIf.value}
-              onChange={setWhatIfValue}
+              onChange={(val) => {
+                setWhatIfValue(val);
+                // Clear error when user changes value
+                if (error) setError('');
+              }}
               prefix={whatIf.type !== 'percentage' ? '£' : undefined}
               suffix={whatIf.type === 'percentage' ? '%' : undefined}
               placeholder={getPlaceholder()}
               data-testid='what-if-value-input'
+              aria-invalid={!!error}
+              aria-describedby={error ? `${valueInputId}-error` : undefined}
             />
           </InputTooltip>
+          {error && (
+            <p
+              id={`${valueInputId}-error`}
+              className={cn('mt-1 text-destructive', TYPOGRAPHY.TEXT_SM)}
+              role='alert'
+            >
+              {error}
+            </p>
+          )}
         </div>
       </div>
 

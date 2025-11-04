@@ -3,6 +3,7 @@
 
 import { Calculator } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,29 @@ import { Label } from '@/components/ui/label';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { formatCurrency } from '@/lib/utils';
+
+/**
+ * Zod validation schema for salary comparison inputs
+ */
+const comparisonValueSchema = z.object({
+  mode: z.enum(['percentage', 'amount', 'total']),
+  value: z.number().positive('Value must be positive'),
+  percentage: z
+    .number()
+    .min(0.01, 'Percentage must be at least 0.01%')
+    .max(1000, 'Percentage cannot exceed 1000%')
+    .optional(),
+  amount: z
+    .number()
+    .min(1, 'Amount must be at least £1')
+    .max(10000000, 'Amount cannot exceed £10M')
+    .optional(),
+  total: z
+    .number()
+    .min(1, 'Total salary must be at least £1')
+    .max(10000000, 'Total salary cannot exceed £10M')
+    .optional(),
+});
 
 interface ComparisonInputsProps {
   currentSalary: number;
@@ -20,17 +44,58 @@ interface ComparisonInputsProps {
 export function ComparisonInputs({ currentSalary, onCompare, className }: ComparisonInputsProps) {
   const [mode, setMode] = useState<ComparisonMode>('percentage');
   const [value, setValue] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const inputId = useId();
 
   const handleCompare = useCallback(() => {
     const numValue = parseFloat(value);
-    if (Number.isNaN(numValue)) return;
+    if (Number.isNaN(numValue)) {
+      setError('Please enter a valid number');
+      return;
+    }
 
-    onCompare({
-      mode,
-      value: numValue,
-      currentSalary,
-    });
+    // Validate based on mode
+    try {
+      const validationData: Record<string, unknown> = { mode, value: numValue };
+
+      // Add mode-specific validation
+      if (mode === 'percentage') {
+        validationData.percentage = numValue;
+        if (numValue < 0.01 || numValue > 1000) {
+          setError('Percentage must be between 0.01% and 1000%');
+          return;
+        }
+      } else if (mode === 'amount') {
+        validationData.amount = numValue;
+        if (numValue < 1 || numValue > 10000000) {
+          setError('Amount must be between £1 and £10M');
+          return;
+        }
+      } else if (mode === 'total') {
+        validationData.total = numValue;
+        if (numValue < 1 || numValue > 10000000) {
+          setError('Total salary must be between £1 and £10M');
+          return;
+        }
+      }
+
+      // Validate with Zod
+      comparisonValueSchema.parse(validationData);
+
+      // Clear any previous errors
+      setError('');
+
+      // Proceed with comparison
+      onCompare({
+        mode,
+        value: numValue,
+        currentSalary,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0]?.message || 'Invalid input');
+      }
+    }
   }, [value, mode, currentSalary, onCompare]);
 
   const getPlaceholder = useCallback(() => {
@@ -157,15 +222,30 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
               id={inputId}
               type='number'
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => {
+                setValue(e.target.value);
+                // Clear error when user types
+                if (error) setError('');
+              }}
               placeholder={getPlaceholder()}
               className={mode !== 'percentage' ? 'pl-8' : 'pr-8'}
+              aria-invalid={!!error}
+              aria-describedby={error ? `${inputId}-error` : undefined}
             />
           </div>
+          {error && (
+            <p
+              id={`${inputId}-error`}
+              className={`${TYPOGRAPHY.TEXT_SM} text-destructive`}
+              role='alert'
+            >
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Compare Button */}
-        <Button onClick={handleCompare} className='w-full' disabled={!value}>
+        <Button onClick={handleCompare} className='w-full' disabled={!value || !!error}>
           Compare Salaries
         </Button>
       </CardContent>

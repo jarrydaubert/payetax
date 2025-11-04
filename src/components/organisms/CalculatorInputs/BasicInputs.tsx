@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion';
 import { Percent, PoundSterling } from 'lucide-react';
 import { useId } from 'react';
+import { z } from 'zod';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
@@ -22,6 +23,17 @@ import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
+
+/**
+ * Zod validation schema for salary input
+ * Validates that salary is between £0 and £10M
+ *
+ * Future: Add schemas for partnerWage, pensionContribution, allowances
+ */
+const salarySchema = z
+  .number()
+  .min(0, 'Salary cannot be negative')
+  .max(10000000, 'Salary cannot exceed £10M');
 
 export function BasicInputs() {
   // Use optimized selectors - extract only input state and actions
@@ -109,11 +121,23 @@ export function BasicInputs() {
           <NumberInput
             id={salaryId}
             value={input.salary}
-            onChange={setSalary}
+            onChange={(value) => {
+              setSalary(value);
+              // Validate on change for immediate feedback
+              try {
+                salarySchema.parse(value);
+              } catch (err) {
+                // Validation happens silently - NumberInput has min/max constraints
+                if (err instanceof z.ZodError) {
+                  console.warn('Salary validation:', err.issues[0]?.message);
+                }
+              }
+            }}
             prefix='£'
             decimals={2}
             placeholder='0.00'
             min={0}
+            max={10000000}
             className='flex-1'
             data-testid='salary-input'
           />
