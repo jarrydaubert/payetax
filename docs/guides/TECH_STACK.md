@@ -33,8 +33,9 @@
 | **Framer Motion** | 12.23.24 | Animations |
 | **next-mdx-remote** | 5.0.0 | MDX blog processing |
 | **@linear/sdk** | 63.2.0 | Project management integration |
-| **Biome** | 2.3.3 | Linting & formatting |
+| **Biome** | 2.2.5 | Linting & formatting (10/10 strictness) |
 | **jest-axe** | 10.0.0 | Accessibility testing (WCAG) |
+| **Zod** | 4.1.11 | Runtime validation & type inference |
 
 ### Key Features
 
