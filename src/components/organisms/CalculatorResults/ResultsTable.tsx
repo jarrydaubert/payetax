@@ -24,6 +24,7 @@ import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
@@ -344,7 +345,7 @@ export function ResultsTable({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className='w-full space-y-4'
+      className={`w-full ${SPACING.SPACE_Y_4}`}
     >
       {/* Period Selection */}
       <PeriodSelectorCard
@@ -390,18 +391,22 @@ export function ResultsTable({
           >
             <table
               data-testid='results-table'
-              className='table-drag-scroll w-full caption-bottom text-sm'
+              className={`table-drag-scroll w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
               style={{ tableLayout: 'auto', minWidth: '100%' }}
             >
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
-                  {/* IMPORTANT: Use text-lg to match other section headings
-                      ("Enter Income Tax Details" and "Display Periods" both use text-lg)
+                  {/* IMPORTANT: Use TEXT_LG to match other section headings
+                      ("Enter Income Tax Details" and "Display Periods" both use TEXT_LG)
                       This maintains consistent visual hierarchy across all main sections */}
-                  <TableHead className='sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-foreground text-lg'>
+                  <TableHead
+                    className={`sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-foreground ${TYPOGRAPHY.TEXT_LG}`}
+                  >
                     Payslip
                   </TableHead>
-                  <TableHead className='w-[55px] px-2 py-2.5 text-right font-semibold text-sm'>
+                  <TableHead
+                    className={`w-[55px] px-2 py-2.5 text-right font-semibold ${TYPOGRAPHY.TEXT_SM}`}
+                  >
                     %
                   </TableHead>
                   {whatIfResults
@@ -409,7 +414,7 @@ export function ResultsTable({
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='min-w-[200px] px-2 py-2.5 text-center font-semibold text-sm'
+                          className={`min-w-[200px] px-2 py-2.5 text-center font-semibold ${TYPOGRAPHY.TEXT_SM}`}
                           colSpan={2}
                         >
                           {period}
@@ -419,7 +424,7 @@ export function ResultsTable({
                       visiblePeriods.map((period) => (
                         <TableHead
                           key={period}
-                          className='min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-semibold text-sm'
+                          className={`min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-semibold ${TYPOGRAPHY.TEXT_SM}`}
                         >
                           {period}
                         </TableHead>
@@ -430,10 +435,14 @@ export function ResultsTable({
                     <TableHead className='sticky left-0 z-20 bg-card px-2 py-1.5' colSpan={2} />
                     {visiblePeriods.map((period) => (
                       <React.Fragment key={period}>
-                        <TableHead className='min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2 text-center font-medium text-sm'>
+                        <TableHead
+                          className={`min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2 text-center font-medium ${TYPOGRAPHY.TEXT_SM}`}
+                        >
                           Current
                         </TableHead>
-                        <TableHead className='min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2 text-center font-medium text-sm'>
+                        <TableHead
+                          className={`min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2 text-center font-medium ${TYPOGRAPHY.TEXT_SM}`}
+                        >
                           What If
                         </TableHead>
                       </React.Fragment>

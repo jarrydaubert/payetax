@@ -10,6 +10,7 @@ import { FAQItem } from '@/components/molecules/FAQItem';
 import { HowToStepCard } from '@/components/molecules/HowToStepCard';
 import { TaxRateCard } from '@/components/molecules/TaxRateCard';
 import { Card } from '@/components/ui/card';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 
 /**
@@ -22,7 +23,7 @@ export function CalculatorContent() {
     useHorizontalScrollIndicator(comparisonTableRef);
 
   return (
-    <div className='space-y-16'>
+    <div className={SPACING.SPACE_Y_16}>
       {/* Quick Tax Facts Section */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
@@ -32,7 +33,9 @@ export function CalculatorContent() {
       >
         <div className='mx-auto max-w-7xl px-4'>
           <div className='mb-10 text-center'>
-            <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <h2
+              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+            >
               UK Tax Rates 2025-26
             </h2>
             <p className='text-muted-foreground'>
@@ -40,7 +43,7 @@ export function CalculatorContent() {
             </p>
           </div>
 
-          <div className='grid gap-6 md:grid-cols-3'>
+          <div className={`grid ${SPACING.GAP_6} md:grid-cols-3`}>
             <TaxRateCard
               icon={Wallet}
               title='Income Tax Bands'
@@ -119,10 +122,12 @@ export function CalculatorContent() {
       >
         <div className='mx-auto max-w-6xl px-4'>
           <div className='mb-10 text-center'>
-            <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <h2
+              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+            >
               Salary Take-Home Comparison
             </h2>
-            <p className='text-lg text-muted-foreground'>
+            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
               See exactly how much you&apos;ll take home at different salary levels
             </p>
           </div>
@@ -155,7 +160,7 @@ export function CalculatorContent() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className='text-sm'>
+                  <tbody className={TYPOGRAPHY.TEXT_SM}>
                     {[
                       { salary: 20000, tax: 1486, ni: 1220, annual: 17294, monthly: 1441 },
                       { salary: 25000, tax: 2486, ni: 1920, annual: 20594, monthly: 1716 },
@@ -199,7 +204,7 @@ export function CalculatorContent() {
           </div>
 
           <div className='mt-6 text-center'>
-            <p className='text-muted-foreground text-sm'>
+            <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
               Based on England/Wales/NI rates for 2025-26. Scottish rates differ.
             </p>
           </div>
@@ -216,20 +221,22 @@ export function CalculatorContent() {
       >
         <div className='mx-auto max-w-4xl px-4'>
           <div className='mb-10 text-center'>
-            <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <h2
+              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+            >
               Common Tax Questions
             </h2>
-            <p className='text-lg text-muted-foreground'>
+            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
               Quick answers to the most frequently asked tax questions
             </p>
           </div>
 
-          <div className='space-y-4'>
+          <div className={SPACING.SPACE_Y_4}>
             <FAQItem question='How much tax do I pay on £30,000 in UK 2025?'>
               <p>
                 <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for 2025-26:
               </p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
                   <strong>Income Tax</strong>: £3,486 (20% on £17,430 taxable income)
                 </li>
@@ -255,7 +262,7 @@ export function CalculatorContent() {
                 paying income tax.
               </p>
               <p className='font-medium'>Important notes:</p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>You pay 0% tax on the first £12,570 you earn</li>
                 <li>
                   The allowance reduces by £1 for every £2 earned over £100,000 (affecting higher
@@ -274,7 +281,7 @@ export function CalculatorContent() {
               <p>
                 PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
               </p>
-              <ol className='ml-6 list-decimal space-y-2'>
+              <ol className={`ml-6 list-decimal ${SPACING.SPACE_Y_2}`}>
                 <li>
                   <strong>Calculate taxable income</strong>: Gross salary - Personal allowance
                   (£12,570)
@@ -302,7 +309,7 @@ export function CalculatorContent() {
                 allowance (£12,570).
               </p>
               <p className='font-medium'>Key differences for 2025-26:</p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
                   <strong>Scotland</strong> has 5 tax bands (19%, 20%, 21%, 42%, 47%)
                 </li>
@@ -325,7 +332,7 @@ export function CalculatorContent() {
                 Student loan repayments are deducted automatically through PAYE if you earn above
                 the threshold for your plan type:
               </p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
                   <strong>Plan 1</strong>: 9% on earnings above £24,990
                 </li>
@@ -357,7 +364,7 @@ export function CalculatorContent() {
                 reducing your taxable income. This means you get tax relief automatically.
               </p>
               <p className='font-medium'>Example on £50,000 salary with 5% pension:</p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>Pension contribution: £2,500 (5% of £50,000)</li>
                 <li>Taxable income: £37,500 (£50,000 - £12,570 allowance)</li>
                 <li>Tax saved: £500 (20% of £2,500)</li>
@@ -371,7 +378,7 @@ export function CalculatorContent() {
                 The UK offers several tax reliefs that can reduce your tax bill. Here are the main
                 ones:
               </p>
-              <ul className='ml-6 list-disc space-y-1'>
+              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
                   <strong>Personal Allowance</strong>: £12,570 tax-free income (for most people)
                 </li>
@@ -399,7 +406,7 @@ export function CalculatorContent() {
           </div>
 
           <div className='mt-8 text-center'>
-            <p className='text-muted-foreground text-sm'>
+            <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
               Can&apos;t find your question?{' '}
               <Link href='/blog' className='text-primary'>
                 Read our tax guides
@@ -423,15 +430,17 @@ export function CalculatorContent() {
       >
         <div className='mx-auto max-w-5xl px-4'>
           <div className='mb-10 text-center'>
-            <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent'>
+            <h2
+              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+            >
               How to Use the Calculator
             </h2>
-            <p className='text-lg text-muted-foreground'>
+            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
               Calculate your take-home pay in 4 simple steps
             </p>
           </div>
 
-          <div className='grid gap-6 md:grid-cols-2'>
+          <div className={`grid ${SPACING.GAP_6} md:grid-cols-2`}>
             <HowToStepCard
               step={1}
               title='Enter Your Salary'
