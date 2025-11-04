@@ -3,7 +3,7 @@
 **Last Updated:** November 4, 2025  
 **Version:** 4.1.2  
 **Status:** ✅ Production Ready  
-**Audit Status:** ✅ PAYTAX-61 Complete (Component refactoring, Zod validation layer added)
+**Audit Status:** ✅ PAYTAX-62 Complete (Atoms audit, design tokens, consistency fixes)
 
 ---
 
@@ -178,17 +178,27 @@ Each component has one clear purpose:
 Basic building blocks that cannot be broken down further.
 
 **Examples:**
-- `NumberInput.tsx` - Enhanced number input with formatting
-- `TaxYearSelect.tsx` - Tax year dropdown
+- `NumberInput.tsx` - Enhanced number input with formatting + Framer Motion
+- `TaxYearSelect.tsx` - Tax year dropdown (Radix UI)
 - `PeriodCheckbox.tsx` - Period selection checkbox
 - `ScrollIndicator.tsx` - Scroll direction indicator
+- `InputTooltip.tsx` - Input wrapper with tooltips
+- `LabelTooltip.tsx` - Label tooltip icon
+- `GradientText.tsx` - Gradient text component
 
 **Characteristics:**
 - Self-contained
 - Highly reusable
 - Single purpose
 - No business logic
+- Use design tokens for consistency
 - 85.7% test coverage
+
+**Design Tokens (NEW):**
+All atoms now use centralized design tokens from `src/constants/designTokens.ts`:
+- **Typography**: `TEXT_SM` (14px), `TEXT_XS` (12px)
+- **Spacing**: `GAP_2` (8px), `GAP_1_5` (6px), `GAP_1` (4px)
+- **Icons**: `SIZE_4` (16px), `SIZE_3_5` (14px), `SIZE_5` (20px), `SIZE_6` (24px)
 
 #### **Molecules (10 components)**
 
