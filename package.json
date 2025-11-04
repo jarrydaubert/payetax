@@ -54,8 +54,6 @@
     "linear": "node scripts/linear.js",
     "linear:list": "node scripts/linear.js list --project PayeTax",
     "linear:me": "node scripts/linear.js list --me --project PayeTax",
-    "linear:team": "node scripts/linear.js list --team-only",
-    "linear:all": "node scripts/linear.js list",
     "linear:create": "node scripts/linear.js create",
     "linear:delete": "node scripts/linear.js delete",
     "linear:assign": "node scripts/linear.js assign-to-project",

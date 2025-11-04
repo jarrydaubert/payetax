@@ -27,6 +27,18 @@
 
 ---
 
+## 📌 Important: Project vs Team View
+
+**✅ Always use the Project view:** https://linear.app/payetax/project/payetax-3073e7b6c11d/issues
+
+**❌ Don't use the Team view:** https://linear.app/payetax/team/PAYTAX/active
+
+**Why?** All issues belong to the "PayeTax" project. The team view shows ALL issues across all projects (if we had multiple), making it harder to find what you need.
+
+**All CLI commands default to the PayeTax project** - you don't need to specify `--project PayeTax` manually!
+
+---
+
 ## ⚡ Quick Setup (30 seconds)
 
 ### 1. Get Your API Key
@@ -284,19 +296,13 @@ Users want visual representation of tax breakdown
 ### Viewing Issues
 
 ```bash
-# See issues assigned to you
+# See issues assigned to you (in PayeTax project)
 npm run linear:me
 
-# See all issues
+# See all issues (in PayeTax project)
 npm run linear:list
 
-# See issues in specific project
-npm run linear list --project PayeTax
-
-# See team issues only (no project)
-npm run linear list --team-only
-
-# View projects
+# View all projects
 npm run linear:projects
 
 # View cycles/sprints
@@ -305,6 +311,8 @@ npm run linear:cycles
 # View workspace info
 npm run linear:info
 ```
+
+**Note:** All list commands automatically filter to the PayeTax project. This is the recommended approach!
 
 ### Creating Issues
 
