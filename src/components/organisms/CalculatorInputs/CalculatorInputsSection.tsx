@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Spinner } from '@/components/ui/spinner';
+import { ICON_SIZES, SPACING } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
 import { WhatIfInputs } from './WhatIfInputs';
@@ -71,11 +73,11 @@ export function CalculatorInputsSection({
   };
 
   return (
-    <div className='space-y-4'>
+    <div className={SPACING.SPACE_Y_4}>
       <BasicInputs />
 
       {/* Calculate and Reset buttons */}
-      <div className='flex gap-2'>
+      <div className={cn('flex', SPACING.GAP_2)}>
         <Button
           onClick={handleCalculate}
           disabled={isCalculating}
@@ -85,19 +87,19 @@ export function CalculatorInputsSection({
         >
           {isCalculating ? (
             <>
-              <Spinner className='mr-2 size-5' />
+              <Spinner className={cn('mr-2', ICON_SIZES.SIZE_5)} />
               Calculating...
             </>
           ) : (
             <>
-              <Calculator className='mr-2 size-5' />
+              <Calculator className={cn('mr-2', ICON_SIZES.SIZE_5)} />
               Calculate
             </>
           )}
         </Button>
 
         <Button onClick={handleReset} variant='outline' size='lg'>
-          <RotateCcw className='mr-2 size-5' />
+          <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
           Reset
         </Button>
       </div>
@@ -111,10 +113,13 @@ export function CalculatorInputsSection({
             className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
             data-testid='what-if-trigger'
           >
-            <div className='flex w-full items-center justify-center gap-2'>
+            <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>
               <span>Compare Scenarios</span>
               <ChevronDown
-                className={`size-5 transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`}
+                className={cn(
+                  ICON_SIZES.SIZE_5,
+                  `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`
+                )}
               />
             </div>
           </Button>

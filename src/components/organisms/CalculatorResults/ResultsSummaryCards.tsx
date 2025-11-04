@@ -3,9 +3,10 @@
 
 import { Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { ResultCard } from '@/components/molecules/ResultCard';
+import { SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultsSummaryCardsProps {
   results: TaxCalculationResults;
@@ -42,7 +43,7 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
 
   return (
     <section
-      className='grid gap-4 md:grid-cols-2 lg:grid-cols-5'
+      className={cn('grid md:grid-cols-2 lg:grid-cols-5', SPACING.GAP_4)}
       aria-live='polite'
       aria-atomic='true'
       aria-label='Tax calculation summary results'

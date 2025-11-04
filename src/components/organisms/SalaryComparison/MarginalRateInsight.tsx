@@ -4,7 +4,8 @@
 import { TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/utils';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface MarginalRateInsightProps {
   increase: number;
@@ -24,14 +25,24 @@ export function MarginalRateInsight({
   return (
     <Card className={className}>
       <CardContent className='pt-6'>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-12 items-center justify-center rounded-full bg-primary/10'>
-              <TrendingUp className='size-6 text-primary' />
+        <div
+          className={cn(
+            'flex flex-col sm:flex-row sm:items-center sm:justify-between',
+            SPACING.GAP_4
+          )}
+        >
+          <div className={cn('flex items-center', SPACING.GAP_3)}>
+            <div
+              className={cn(
+                'flex items-center justify-center rounded-full bg-primary/10',
+                ICON_SIZES.SIZE_12
+              )}
+            >
+              <TrendingUp className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />
             </div>
             <div>
-              <h3 className='font-semibold text-lg'>Marginal Rate</h3>
-              <p className='text-muted-foreground text-sm'>
+              <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>Marginal Rate</h3>
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                 On your {formatCurrency(increase, 0)} increase
               </p>
             </div>
@@ -43,8 +54,8 @@ export function MarginalRateInsight({
         </div>
 
         {/* Visual Bar */}
-        <div className='mt-6 space-y-2'>
-          <div className='flex justify-between text-sm'>
+        <div className={cn('mt-6', SPACING.SPACE_Y_2)}>
+          <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
             <span className='text-muted-foreground'>You keep</span>
             <span className='font-semibold text-green-600 dark:text-green-400'>
               {formatCurrency(netDiff, 0)} ({marginalRate}%)
@@ -56,7 +67,7 @@ export function MarginalRateInsight({
               style={{ width: `${marginalRate}%` }}
             />
           </div>
-          <div className='flex justify-between text-sm'>
+          <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
             <span className='text-muted-foreground'>Lost to deductions</span>
             <span className='font-medium text-amber-600 dark:text-amber-400'>
               {formatCurrency(increase - netDiff, 0)} ({effectiveRate}%)
@@ -65,7 +76,7 @@ export function MarginalRateInsight({
         </div>
 
         {/* Explanation */}
-        <p className='mt-4 text-center text-muted-foreground text-xs'>
+        <p className={cn('mt-4 text-center text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
           You keep <strong>{marginalRate}%</strong> of the {formatCurrency(increase, 0)} increase.
           The remaining <strong>{effectiveRate}%</strong> goes to tax, NI, and deductions.
         </p>

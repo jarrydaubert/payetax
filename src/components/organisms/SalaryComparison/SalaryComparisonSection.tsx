@@ -6,6 +6,7 @@ import { ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useId, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import {
   type ComparisonInput,
   type ComparisonResults,
@@ -47,7 +48,7 @@ export function SalaryComparisonSection({
   };
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn(SPACING.SPACE_Y_4, className)}>
       {/* Toggle Button */}
       <Button
         variant='outline'
@@ -57,12 +58,16 @@ export function SalaryComparisonSection({
         aria-controls={contentId}
         disabled={!currentResults}
       >
-        <span className='flex items-center gap-2'>
-          <ArrowLeftRight className='size-4' />
+        <span className={cn('flex items-center', SPACING.GAP_2)}>
+          <ArrowLeftRight className={ICON_SIZES.SIZE_4} />
           Compare Salary Scenarios
         </span>
         <ChevronDown
-          className={cn('size-4 transition-transform duration-200', isOpen && 'rotate-180')}
+          className={cn(
+            ICON_SIZES.SIZE_4,
+            'transition-transform duration-200',
+            isOpen && 'rotate-180'
+          )}
         />
       </Button>
 
@@ -75,7 +80,7 @@ export function SalaryComparisonSection({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className='space-y-4 overflow-hidden'
+            className={cn('overflow-hidden', SPACING.SPACE_Y_4)}
           >
             {/* Comparison Inputs */}
             <ComparisonInputs
@@ -91,7 +96,7 @@ export function SalaryComparisonSection({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
-                  className='space-y-4'
+                  className={SPACING.SPACE_Y_4}
                 >
                   <MarginalRateInsight
                     increase={comparisonResults.increase}
