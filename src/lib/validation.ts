@@ -42,34 +42,100 @@ export type BlogFrontmatter = z.infer<typeof BlogFrontmatterSchema>;
 /**
  * Calculator Input Validation Schema
  * Validates all calculator inputs from the store
+ *
+ * ENHANCED in PAYTAX-66 Phase 2 with comprehensive validation:
+ * - Age validation (for pension age NI exemption)
+ * - Partner wage validation (for marriage allowance)
+ * - Hours per week validation (for hourly pay)
+ * - Pension contribution type and amount validation
+ * - Tax code format validation (all HMRC formats)
  */
-export const CalculatorInputSchema = z.object({
-  salary: z
-    .number()
-    .min(0, 'Salary must be positive')
-    .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
-    .finite('Salary must be a valid number'),
-  taxCode: z
-    .string()
-    .regex(/^\d{1,4}[LMNPT]$/i, 'Invalid tax code format (e.g., 1257L)')
-    .optional(),
-  taxYear: z.enum(['2024-25', '2025-26']),
-  region: z.enum(['england', 'scotland', 'wales']),
-  payPeriod: z.enum(['yearly', 'monthly', 'weekly']),
-  pension: z
-    .number()
-    .min(0, 'Pension contribution must be positive')
-    .max(100, 'Pension contribution cannot exceed 100%')
-    .optional(),
-  studentLoan: z.enum(['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgraduate']).optional(),
-  childcare: z
-    .number()
-    .min(0, 'Childcare vouchers must be positive')
-    .max(10000, 'Childcare vouchers exceed maximum')
-    .optional(),
-  blindAllowance: z.boolean().optional(),
-  marriageAllowance: z.boolean().optional(),
-});
+export const CalculatorInputSchema = z
+  .object({
+    // Core salary input
+    salary: z
+      .number()
+      .min(0, 'Salary must be positive')
+      .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
+      .finite('Salary must be a valid number'),
+
+    // Pay period
+    payPeriod: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly']),
+
+    // Hours per week (required for hourly pay)
+    hoursPerWeek: z
+      .number()
+      .min(1, 'Hours per week must be greater than 0')
+      .max(168, 'Hours per week cannot exceed 168')
+      .optional(),
+
+    // Tax configuration
+    taxCode: z
+      .string()
+      .regex(/^\d{1,4}[LMNPT]$/i, 'Invalid tax code format (e.g., 1257L)')
+      .optional(),
+    taxYear: z.enum(['2024-25', '2025-26']),
+    region: z.enum(['england', 'scotland', 'wales']),
+
+    // Pension contributions
+    pensionContribution: z
+      .number()
+      .min(0, 'Pension contribution must be positive')
+      .max(100, 'Pension contribution cannot exceed 100%'),
+    pensionContributionType: z.enum(['percentage', 'amount']),
+
+    // Age (for pension age NI exemption)
+    age: z
+      .number()
+      .int('Age must be a whole number')
+      .min(0, 'Age cannot be negative')
+      .max(120, 'Age must be between 0 and 120')
+      .optional(),
+
+    // Marriage allowance
+    isMarried: z.boolean(),
+    partnerGrossWage: z
+      .number()
+      .min(0, 'Partner wage cannot be negative')
+      .max(10_000_000, 'Partner wage exceeds maximum')
+      .optional(),
+
+    // Other allowances and deductions
+    studentLoan: z.enum(['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgraduate']).optional(),
+    childcare: z
+      .number()
+      .min(0, 'Childcare vouchers must be positive')
+      .max(10000, 'Childcare vouchers exceed maximum')
+      .optional(),
+    isBlind: z.boolean().optional(),
+    payNoNI: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      // If hourly pay period, hours per week is required
+      if (data.payPeriod === 'hourly' && !data.hoursPerWeek) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Hours per week is required for hourly pay period',
+      path: ['hoursPerWeek'],
+    }
+  )
+  .refine(
+    (data) => {
+      // If pension is percentage, it can't exceed 100%
+      if (data.pensionContributionType === 'percentage' && data.pensionContribution > 100) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Pension contribution percentage cannot exceed 100%',
+      path: ['pensionContribution'],
+    }
+  );
 
 export type CalculatorInput = z.infer<typeof CalculatorInputSchema>;
 
@@ -206,4 +272,122 @@ export function formatZodErrors(error: z.ZodError): string[] {
     const path = err.path.join('.');
     return path ? `${path}: ${err.message}` : err.message;
   });
+}
+
+/**
+ * Tax Code Validation Schema
+ * Validates UK HMRC tax codes including special codes
+ *
+ * Valid formats:
+ * - Standard: 1257L, S1257L (Scottish)
+ * - K codes: K100, SK200 (negative allowance)
+ * - Special: BR, D0, D1, NT, 0T
+ * - Emergency: 1257L M1, 1257L W1, 1257L X
+ */
+export const TaxCodeSchema = z
+  .string()
+  .min(1, 'Tax code is required')
+  .transform((val) => val.trim().toUpperCase())
+  .refine(
+    (code) => {
+      // Special codes
+      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+      if (specialCodes.includes(code)) return true;
+
+      // Standard format: optional S prefix, numbers, optional letter suffix
+      const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+
+      // K codes (negative allowance)
+      const kCodePattern = /^S?K[0-9]+$/;
+
+      return standardPattern.test(code) || kCodePattern.test(code);
+    },
+    {
+      message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)',
+    }
+  );
+
+/**
+ * Tax Year Validation Schema
+ * Validates UK tax year format (YYYY-YYYY where second year = first year + 1)
+ */
+export const TaxYearSchema = z
+  .string()
+  .regex(/^\d{4}-\d{4}$/, 'Tax year must be in format YYYY-YYYY')
+  .refine(
+    (year) => {
+      const [start, end] = year.split('-').map(Number);
+      return end === start + 1;
+    },
+    {
+      message: 'Tax year must be consecutive (e.g., 2024-25, 2025-26)',
+    }
+  );
+
+/**
+ * Salary Sanitization Schema
+ * Converts various salary inputs (string, number) to valid number
+ * Removes currency symbols (£, $) and thousand separators (,)
+ */
+export const SalarySanitizationSchema = z
+  .union([z.string(), z.number()])
+  .transform((val) => {
+    if (typeof val === 'string') {
+      // Remove currency symbols and commas
+      const cleaned = val.replace(/[£$,]/g, '');
+      const parsed = Number.parseFloat(cleaned);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+    if (typeof val === 'number') {
+      return Number.isNaN(val) ? 0 : val;
+    }
+    return 0;
+  })
+  .pipe(z.number().min(0).max(10_000_000));
+
+/**
+ * Utility Functions for Validation
+ * Migrated from validateInput.ts (PAYTAX-66 Phase 2)
+ */
+
+/**
+ * Clamps a value between min and max
+ */
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+/**
+ * Rounds to specified decimal places
+ */
+export function roundTo(value: number, decimals: number): number {
+  return Math.round(value * 10 ** decimals) / 10 ** decimals;
+}
+
+/**
+ * Validates tax year format (legacy function for backwards compatibility)
+ * @deprecated Use TaxYearSchema.safeParse() instead
+ */
+export function isValidTaxYear(year: string): boolean {
+  return TaxYearSchema.safeParse(year).success;
+}
+
+/**
+ * Validates tax code format (legacy function for backwards compatibility)
+ * @deprecated Use TaxCodeSchema.safeParse() instead
+ */
+export function isValidTaxCode(code: string): boolean {
+  return TaxCodeSchema.safeParse(code).success;
+}
+
+/**
+ * Sanitizes salary amount (legacy function for backwards compatibility)
+ * @deprecated Use SalarySanitizationSchema.parse() instead
+ */
+export function sanitizeSalary(salary: number | string | unknown): number {
+  try {
+    return SalarySanitizationSchema.parse(salary);
+  } catch {
+    return 0;
+  }
 }

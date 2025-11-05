@@ -10,9 +10,9 @@ import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { categoryContent } from '@/lib/categoryContent';
-import { IMAGE_SIZES } from '@/lib/constants/images';
 import { formatDate } from '@/lib/utils'; // Now imported from shared utils
 
 // Next.js 16: Route segment config for optimized category pages

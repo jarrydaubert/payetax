@@ -8,8 +8,8 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
+import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
-import { IMAGE_SIZES } from '@/lib/constants/images';
 import { compileMDXContent } from '@/lib/mdx';
 
 // Next.js 16: Route segment config for optimized blog posts

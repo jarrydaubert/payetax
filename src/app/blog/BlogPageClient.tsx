@@ -29,7 +29,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { IMAGE_SIZES } from '@/lib/constants/images';
+import { IMAGE_SIZES } from '@/constants/images';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
 interface BlogPageClientProps {

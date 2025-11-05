@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/lib/constants/ui';
+import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import {

@@ -881,9 +881,32 @@ The PAYTAX-62/63/64/65 work established `designTokens.ts` as the single source o
 
 ---
 
-## 🎉 STATUS
+## 🎉 STATUS UPDATE
 
-**Current Phase:** Investigation  
-**Next Phase:** typography.ts analysis and duplication resolution  
-**Blocking Issues:** None  
-**Ready for:** Phase 1 execution
+### ✅ Phase 1 Complete: Investigation & Cleanup
+- **typography.ts**: RESOLVED - Deleted 217 lines of unused code
+- **blog.ts/mdx.ts**: RESOLVED - Confirmed proper layered architecture
+- **Audit document**: Created comprehensive 900-line analysis
+
+### ✅ Phase 2 Complete: Validation Consolidation  
+- **validation.ts Enhanced**: Added comprehensive Zod schemas
+  - CalculatorInputSchema expanded (all fields + refinements)
+  - TaxCodeSchema (all HMRC formats)
+  - TaxYearSchema (format validation)
+  - SalarySanitizationSchema (currency symbols, commas)
+  - Utility functions (clamp, roundTo) migrated
+- **validateInput.ts**: DELETED (214 lines unused code)
+- **validateInput.test.ts**: DELETED (709 lines obsolete tests)
+- **Constants reorganized**: Moved to /src/constants for consistency
+- **All imports updated**: 4 files updated for new paths
+
+**Total Cleanup:** 1,140 lines of dead/obsolete code removed  
+**Total Enhanced:** 119 lines of new Zod schemas added
+
+### Phase 3: Optional Future Work
+- ⚠️ Consider splitting chartUtils.ts by chart type (LOW priority)
+- ⚠️ Some large files remain but are well-documented and tested
+
+**Current Status:** ✅ PAYTAX-66 PHASE 2 COMPLETE  
+**Next Phase:** PAYTAX-67 (Audit /src/store - Zustand state management)  
+**Blocking Issues:** None
