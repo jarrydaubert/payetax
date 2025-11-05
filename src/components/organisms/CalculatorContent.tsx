@@ -2,214 +2,25 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calculator, TrendingUp, Wallet } from 'lucide-react';
 import Link from 'next/link';
-import * as React from 'react';
-import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
+import { CalculatorHowToGuide } from '@/components/molecules/CalculatorHowToGuide';
 import { FAQItem } from '@/components/molecules/FAQItem';
-import { HowToStepCard } from '@/components/molecules/HowToStepCard';
-import { TaxRateCard } from '@/components/molecules/TaxRateCard';
-import { Card } from '@/components/ui/card';
+import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
+import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 
 /**
  * SEO-optimized content section below calculator
  * Includes FAQ, tax facts, and comparison tables for Answer Engine Optimization (AEO)
  */
 export function CalculatorContent() {
-  const comparisonTableRef = React.useRef<HTMLDivElement>(null);
-  const { showLeftIndicator, showRightIndicator } =
-    useHorizontalScrollIndicator(comparisonTableRef);
-
   return (
     <div className={SPACING.SPACE_Y_16}>
-      {/* Quick Tax Facts Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className='bg-gradient-to-br from-primary/5 to-accent/5 py-16'
-      >
-        <div className='mx-auto max-w-7xl px-4'>
-          <div className='mb-10 text-center'>
-            <h2
-              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
-            >
-              UK Tax Rates 2025-26
-            </h2>
-            <p className='text-muted-foreground'>
-              Quick reference for current tax year rates and thresholds
-            </p>
-          </div>
-
-          <div className={`grid ${SPACING.GAP_6} md:grid-cols-3`}>
-            <TaxRateCard
-              icon={Wallet}
-              title='Income Tax Bands'
-              items={[
-                { label: 'Personal Allowance', value: '0%' },
-                {
-                  label: '£12,571 - £50,270',
-                  value: '20%',
-                  colorClass: 'text-green-600 dark:text-green-400',
-                },
-                {
-                  label: '£50,271 - £125,140',
-                  value: '40%',
-                  colorClass: 'text-destructive',
-                },
-                {
-                  label: '£125,140+',
-                  value: '45%',
-                  colorClass: 'text-destructive',
-                },
-              ]}
-            />
-
-            <TaxRateCard
-              icon={TrendingUp}
-              title='National Insurance'
-              items={[
-                { label: '£0 - £12,570', value: '0%' },
-                {
-                  label: '£12,571 - £50,270',
-                  value: '12%',
-                  colorClass: 'text-amber-600 dark:text-amber-400',
-                },
-                {
-                  label: '£50,270+',
-                  value: '2%',
-                  colorClass: 'text-amber-600 dark:text-amber-400',
-                },
-              ]}
-              footerNote='Class 1 contributions for employees'
-            />
-
-            <TaxRateCard
-              icon={Calculator}
-              title='Quick Examples'
-              items={[
-                {
-                  label: '£20,000 salary',
-                  value: '£17,294',
-                  colorClass: 'text-green-600 dark:text-green-400',
-                },
-                {
-                  label: '£30,000 salary',
-                  value: '£23,894',
-                  colorClass: 'text-primary',
-                },
-                {
-                  label: '£50,000 salary',
-                  value: '£37,794',
-                  colorClass: 'text-accent-foreground',
-                },
-              ]}
-              footerNote='Annual take-home pay'
-            />
-          </div>
-        </div>
-      </motion.section>
+      {/* Tax Rates Overview */}
+      <TaxRatesOverview />
 
       {/* Salary Comparison Table */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
-      >
-        <div className='mx-auto max-w-6xl px-4'>
-          <div className='mb-10 text-center'>
-            <h2
-              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
-            >
-              Salary Take-Home Comparison
-            </h2>
-            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
-              See exactly how much you&apos;ll take home at different salary levels
-            </p>
-          </div>
-
-          <div className='relative'>
-            <ScrollIndicator direction='left' visible={showLeftIndicator} />
-            <ScrollIndicator direction='right' visible={showRightIndicator} />
-
-            <Card className='overflow-hidden border-primary/20'>
-              <div
-                ref={comparisonTableRef}
-                className='overflow-x-auto scroll-smooth'
-                style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
-                  WebkitOverflowScrolling: 'touch',
-                }}
-              >
-                <table className='w-full min-w-[640px] border-collapse'>
-                  <thead className='bg-gradient-to-r from-primary/10 to-accent/10'>
-                    <tr className='border-border/20 border-b'>
-                      <th className='p-4 text-left font-bold text-foreground'>Gross Salary</th>
-                      <th className='p-4 text-right font-bold text-foreground'>Income Tax</th>
-                      <th className='p-4 text-right font-bold text-foreground'>
-                        National Insurance
-                      </th>
-                      <th className='p-4 text-right font-bold text-foreground'>Annual Take-Home</th>
-                      <th className='p-4 text-right font-bold text-foreground'>
-                        Monthly Take-Home
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className={TYPOGRAPHY.TEXT_SM}>
-                    {[
-                      { salary: 20000, tax: 1486, ni: 1220, annual: 17294, monthly: 1441 },
-                      { salary: 25000, tax: 2486, ni: 1920, annual: 20594, monthly: 1716 },
-                      { salary: 30000, tax: 3486, ni: 2620, annual: 23894, monthly: 1991 },
-                      { salary: 40000, tax: 5486, ni: 3820, annual: 30694, monthly: 2558 },
-                      { salary: 50000, tax: 7486, ni: 4720, annual: 37794, monthly: 3150 },
-                      { salary: 60000, tax: 11432, ni: 5069, annual: 43499, monthly: 3625 },
-                      { salary: 80000, tax: 19432, ni: 5669, annual: 54899, monthly: 4575 },
-                      { salary: 100000, tax: 27432, ni: 6069, annual: 66499, monthly: 5542 },
-                    ].map((row, idx) => (
-                      <tr
-                        key={row.salary}
-                        className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
-                      >
-                        <td className='p-4'>
-                          <Link
-                            href={`/calculator/${row.salary}-after-tax`}
-                            className='font-semibold text-foreground hover:text-primary hover:underline'
-                          >
-                            £{row.salary.toLocaleString()}
-                          </Link>
-                        </td>
-                        <td className='p-4 text-right text-destructive'>
-                          £{row.tax.toLocaleString()}
-                        </td>
-                        <td className='p-4 text-right text-amber-600 dark:text-amber-400'>
-                          £{row.ni.toLocaleString()}
-                        </td>
-                        <td className='p-4 text-right font-bold text-green-600 dark:text-green-400'>
-                          £{row.annual.toLocaleString()}
-                        </td>
-                        <td className='p-4 text-right text-muted-foreground'>
-                          £{row.monthly.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </div>
-
-          <div className='mt-6 text-center'>
-            <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
-              Based on England/Wales/NI rates for 2025-26. Scottish rates differ.
-            </p>
-          </div>
-        </div>
-      </motion.section>
+      <SalaryComparisonTable />
 
       {/* FAQ Section with Schema */}
       <motion.section
@@ -420,53 +231,8 @@ export function CalculatorContent() {
         </div>
       </motion.section>
 
-      {/* How to Use Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
-        className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-16'
-      >
-        <div className='mx-auto max-w-5xl px-4'>
-          <div className='mb-10 text-center'>
-            <h2
-              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
-            >
-              How to Use the Calculator
-            </h2>
-            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
-              Calculate your take-home pay in 4 simple steps
-            </p>
-          </div>
-
-          <div className={`grid ${SPACING.GAP_6} md:grid-cols-2`}>
-            <HowToStepCard
-              step={1}
-              title='Enter Your Salary'
-              description='Input your gross annual, monthly, or weekly salary. Our calculator automatically formats numbers with commas for easy reading.'
-            />
-
-            <HowToStepCard
-              step={2}
-              title='Select Tax Year & Region'
-              description='Choose the tax year (2025-26 for current rates) and your region (England, Scotland, Wales, or Northern Ireland).'
-            />
-
-            <HowToStepCard
-              step={3}
-              title='Add Deductions (Optional)'
-              description='Include pension contributions, student loan plans, and other deductions for accurate results. Leave blank if not applicable.'
-            />
-
-            <HowToStepCard
-              step={4}
-              title='View & Export Results'
-              description='See your breakdown by income tax, National Insurance, and take-home pay across multiple periods. Export to CSV or print for your records.'
-            />
-          </div>
-        </div>
-      </motion.section>
+      {/* How to Use Guide */}
+      <CalculatorHowToGuide />
     </div>
   );
 }
