@@ -20,10 +20,11 @@ import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
+import { ResultsTableHeader } from '@/components/molecules/ResultsTableHeader';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
-import { TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableBody } from '@/components/ui/table';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
@@ -394,62 +395,10 @@ export function ResultsTable({
               className={`table-drag-scroll w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
               style={{ tableLayout: 'auto', minWidth: '100%' }}
             >
-              <TableHeader>
-                <TableRow className='bg-card hover:bg-card'>
-                  {/* IMPORTANT: Use TEXT_LG to match other section headings
-                      ("Enter Income Tax Details" and "Display Periods" both use TEXT_LG)
-                      This maintains consistent visual hierarchy across all main sections */}
-                  <TableHead
-                    className={`sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card px-2 py-2.5 font-semibold text-foreground ${TYPOGRAPHY.TEXT_LG}`}
-                  >
-                    Payslip
-                  </TableHead>
-                  <TableHead
-                    className={`w-[55px] px-2 py-2.5 text-right font-semibold ${TYPOGRAPHY.TEXT_SM}`}
-                  >
-                    %
-                  </TableHead>
-                  {whatIfResults
-                    ? // Two-row header for What If comparison - wider columns needed for Current/What If
-                      visiblePeriods.map((period) => (
-                        <TableHead
-                          key={period}
-                          className={`min-w-[200px] px-2 py-2.5 text-center font-semibold ${TYPOGRAPHY.TEXT_SM}`}
-                          colSpan={2}
-                        >
-                          {period}
-                        </TableHead>
-                      ))
-                    : // Single-row header for normal view
-                      visiblePeriods.map((period) => (
-                        <TableHead
-                          key={period}
-                          className={`min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-semibold ${TYPOGRAPHY.TEXT_SM}`}
-                        >
-                          {period}
-                        </TableHead>
-                      ))}
-                </TableRow>
-                {whatIfResults && (
-                  <TableRow className='bg-card hover:bg-card'>
-                    <TableHead className='sticky left-0 z-20 bg-card px-2 py-1.5' colSpan={2} />
-                    {visiblePeriods.map((period) => (
-                      <React.Fragment key={period}>
-                        <TableHead
-                          className={`min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2 text-center font-medium ${TYPOGRAPHY.TEXT_SM}`}
-                        >
-                          Current
-                        </TableHead>
-                        <TableHead
-                          className={`min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2 text-center font-medium ${TYPOGRAPHY.TEXT_SM}`}
-                        >
-                          What If
-                        </TableHead>
-                      </React.Fragment>
-                    ))}
-                  </TableRow>
-                )}
-              </TableHeader>
+              <ResultsTableHeader
+                visiblePeriods={visiblePeriods}
+                hasWhatIfResults={!!whatIfResults}
+              />
               <TableBody>
                 {tableRows.map((row, index) => (
                   <ResultTableRow
