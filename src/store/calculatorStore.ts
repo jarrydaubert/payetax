@@ -307,10 +307,40 @@ export const useCalculatorStore = create<CalculatorState>()(
           })),
         setIsScottish: (isScottish) => set((state) => ({ input: { ...state.input, isScottish } })),
         setIsMarried: (isMarried) => set((state) => ({ input: { ...state.input, isMarried } })),
-        setPartnerGrossWage: (partnerGrossWage) =>
-          set((state) => ({ input: { ...state.input, partnerGrossWage } })),
+        setPartnerGrossWage: (partnerGrossWage) => {
+          // Validate partner wage
+          const validated = z
+            .number()
+            .min(0, 'Partner wage cannot be negative')
+            .max(10_000_000, 'Partner wage exceeds maximum')
+            .finite('Partner wage must be a valid number')
+            .safeParse(partnerGrossWage);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid partner wage:', validated.error.issues[0].message);
+            return;
+          }
+          set((state) => ({ input: { ...state.input, partnerGrossWage: validated.data } }));
+        },
         setIsBlind: (isBlind) => set((state) => ({ input: { ...state.input, isBlind } })),
-        setAge: (age) => set((state) => ({ input: { ...state.input, age } })),
+        setAge: (age) => {
+          // Validate age if provided
+          if (age !== undefined) {
+            const validated = z
+              .number()
+              .int('Age must be a whole number')
+              .min(0, 'Age cannot be negative')
+              .max(120, 'Age must be between 0 and 120')
+              .safeParse(age);
+
+            if (!validated.success) {
+              console.warn('[Calculator] Invalid age:', validated.error.issues[0].message);
+              return;
+            }
+            age = validated.data;
+          }
+          set((state) => ({ input: { ...state.input, age } }));
+        },
         setPayNoNI: (payNoNI) => set((state) => ({ input: { ...state.input, payNoNI } })),
         setPensionContribution: (pensionContribution) => {
           // Validate pension contribution
@@ -335,10 +365,39 @@ export const useCalculatorStore = create<CalculatorState>()(
         setStudentLoanPlan: (studentLoanPlan) =>
           set((state) => ({ input: { ...state.input, studentLoanPlan } })),
         setNiCategory: (niCategory) => set((state) => ({ input: { ...state.input, niCategory } })),
-        setHoursPerWeek: (hoursPerWeek) =>
-          set((state) => ({ input: { ...state.input, hoursPerWeek } })),
-        setAllowancesDeductions: (allowancesDeductions) =>
-          set((state) => ({ input: { ...state.input, allowancesDeductions } })),
+        setHoursPerWeek: (hoursPerWeek) => {
+          // Validate hours per week
+          const validated = z
+            .number()
+            .min(1, 'Hours per week must be greater than 0')
+            .max(168, 'Hours per week cannot exceed 168')
+            .finite('Hours per week must be a valid number')
+            .safeParse(hoursPerWeek);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid hours per week:', validated.error.issues[0].message);
+            return;
+          }
+          set((state) => ({ input: { ...state.input, hoursPerWeek: validated.data } }));
+        },
+        setAllowancesDeductions: (allowancesDeductions) => {
+          // Validate allowances/deductions
+          const validated = z
+            .number()
+            .min(-1_000_000, 'Allowances/deductions cannot be less than -£1M')
+            .max(1_000_000, 'Allowances/deductions cannot exceed £1M')
+            .finite('Allowances/deductions must be a valid number')
+            .safeParse(allowancesDeductions);
+
+          if (!validated.success) {
+            console.warn(
+              '[Calculator] Invalid allowances/deductions:',
+              validated.error.issues[0].message
+            );
+            return;
+          }
+          set((state) => ({ input: { ...state.input, allowancesDeductions: validated.data } }));
+        },
 
         // Income Sources Management
         addIncomeSource: () => {
