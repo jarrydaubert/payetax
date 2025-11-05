@@ -3,14 +3,12 @@
 
 'use client';
 
-import { TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
+import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
-import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
 interface SalaryCalculatorPageProps {
@@ -58,6 +56,10 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
     { amount: salary + 10000, label: '£10k more' },
   ].filter((c) => c.amount >= 20000 && c.amount <= 500000);
 
+  if (!results) {
+    return <div className='min-h-screen bg-background'>Loading...</div>;
+  }
+
   return (
     <div className='min-h-screen bg-background'>
       {/* Hero Section with Instant Answer */}
@@ -84,183 +86,11 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
           </nav>
 
           <div className='grid gap-6 lg:grid-cols-2'>
-            {/* Instant Results Card */}
-            <div className='lg:sticky lg:top-24 lg:self-start'>
-              <h1 className='mb-2 font-bold text-2xl sm:text-3xl lg:text-4xl'>
-                £{formattedSalary} Salary After Tax
-              </h1>
-              <p className='mb-6 text-muted-foreground'>
-                UK take-home pay calculator for 2025-26 tax year
-              </p>
-
-              {results && (
-                <Card className='p-6 sm:p-8'>
-                  <div className='space-y-6'>
-                    {/* Main Take-Home */}
-                    <div className='text-center'>
-                      <p className='text-muted-foreground text-sm uppercase tracking-wide'>
-                        Monthly Take-Home Pay
-                      </p>
-                      <p className='mt-2 font-bold text-4xl text-primary'>
-                        £{results.netPay.monthly.toLocaleString('en-GB')}
-                      </p>
-                      <p className='mt-2 text-muted-foreground text-sm'>
-                        After tax and National Insurance
-                      </p>
-                    </div>
-
-                    {/* Quick Breakdown */}
-                    <div className='grid grid-cols-2 gap-4 border-t pt-4'>
-                      <div>
-                        <p className='text-muted-foreground text-xs'>Annual Take-Home</p>
-                        <p className='font-semibold text-xl'>
-                          £{results.netPay.annually.toLocaleString('en-GB')}
-                        </p>
-                      </div>
-                      <div>
-                        <p className='text-muted-foreground text-xs'>Weekly Take-Home</p>
-                        <p className='font-semibold text-xl'>
-                          £{results.netPay.weekly.toLocaleString('en-GB')}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Tax Breakdown */}
-                    <div className='space-y-3 border-t pt-4'>
-                      <div className='flex justify-between'>
-                        <span className='text-muted-foreground text-sm'>Gross Salary</span>
-                        <span className='font-medium'>£{formattedSalary}</span>
-                      </div>
-                      <div className='flex justify-between text-destructive'>
-                        <span className='text-sm'>Income Tax</span>
-                        <span className='font-medium'>
-                          -£{results.incomeTax.annually.toLocaleString('en-GB')}
-                        </span>
-                      </div>
-                      <div className='flex justify-between text-destructive'>
-                        <span className='text-sm'>National Insurance</span>
-                        <span className='font-medium'>
-                          -£{results.nationalInsurance.annually.toLocaleString('en-GB')}
-                        </span>
-                      </div>
-                      <div className='flex justify-between border-t pt-2 font-semibold'>
-                        <span>Net Pay (Annual)</span>
-                        <span className='text-primary'>
-                          £{results.netPay.annually.toLocaleString('en-GB')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Effective Tax Rate */}
-                    <div className='rounded-lg bg-muted/50 p-4'>
-                      <div className='flex items-center justify-between'>
-                        <span className='text-sm'>Effective Tax Rate</span>
-                        <Badge variant='secondary' className='font-mono'>
-                          {(
-                            ((results.incomeTax.annually + results.nationalInsurance.annually) /
-                              salary) *
-                            100
-                          ).toFixed(1)}
-                          %
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              )}
-
-              {/* Compare Salaries */}
-              <Card className='mt-4 p-4'>
-                <h3 className='mb-3 flex items-center gap-2 font-semibold'>
-                  <TrendingUp className='h-4 w-4' />
-                  Compare Similar Salaries
-                </h3>
-                <div className='grid grid-cols-2 gap-2'>
-                  {comparisons.map((comp) => (
-                    <Link
-                      key={comp.amount}
-                      href={`/calculator/${comp.amount}-after-tax`}
-                      className={cn(
-                        'rounded-md px-3 py-2 text-center text-sm',
-                        'border border-border hover:border-primary',
-                        'transition-colors hover:bg-primary/5'
-                      )}
-                    >
-                      <span className='text-muted-foreground text-xs'>{comp.label}</span>
-                      <br />£{comp.amount.toLocaleString('en-GB')}
-                    </Link>
-                  ))}
-                </div>
-              </Card>
-            </div>
+            {/* Quick Results Card */}
+            <SalaryQuickResults salary={salary} results={results} comparisons={comparisons} />
 
             {/* SEO Content */}
-            <div className='prose prose-sm max-w-none'>
-              <h2>£{formattedSalary} Salary Take-Home Pay Breakdown</h2>
-              <p>
-                With a gross annual salary of <strong>£{formattedSalary}</strong> in the UK for the
-                2025-26 tax year, your take-home pay will be approximately{' '}
-                <strong>£{results?.netPay.annually.toLocaleString('en-GB')}</strong> per year, or{' '}
-                <strong>£{results?.netPay.monthly.toLocaleString('en-GB')}</strong> per month.
-              </p>
-
-              {results && (
-                <>
-                  <h3>Tax and National Insurance Deductions</h3>
-                  <ul>
-                    <li>
-                      <strong>Income Tax:</strong> £
-                      {results.incomeTax.annually.toLocaleString('en-GB')} per year (
-                      {((results.incomeTax.annually / salary) * 100).toFixed(1)}% of gross)
-                    </li>
-                    <li>
-                      <strong>National Insurance:</strong> £
-                      {results.nationalInsurance.annually.toLocaleString('en-GB')} per year (
-                      {((results.nationalInsurance.annually / salary) * 100).toFixed(1)}% of gross)
-                    </li>
-                    <li>
-                      <strong>Total Deductions:</strong> £
-                      {(
-                        results.incomeTax.annually +
-                        results.nationalInsurance.annually +
-                        results.studentLoan.annually
-                      ).toLocaleString('en-GB')}{' '}
-                      per year (
-                      {(
-                        ((results.incomeTax.annually + results.nationalInsurance.annually) /
-                          salary) *
-                        100
-                      ).toFixed(1)}
-                      % effective rate)
-                    </li>
-                  </ul>
-
-                  <h3>Is £{formattedSalary} a Good Salary in 2025?</h3>
-                  <p>
-                    A £{formattedSalary} salary puts you{' '}
-                    {salary > 100000 && 'in the top 5% of UK earners'}
-                    {salary >= 70000 && salary <= 100000 && 'in the top 10% of UK earners'}
-                    {salary >= 50000 && salary < 70000 && 'well above the UK median salary'}
-                    {salary >= 30000 && salary < 50000 && 'around the UK median salary'}
-                    {salary < 30000 && 'below the UK median salary, but above minimum wage'}. The UK
-                    median full-time salary is approximately £35,000 (2025 data).
-                  </p>
-
-                  <h3>Customize Your Calculation</h3>
-                  <p>
-                    The calculation above uses standard assumptions (tax code 1257L, no student
-                    loan, no pension contributions). Use the full calculator below to:
-                  </p>
-                  <ul>
-                    <li>Add student loan repayments (Plans 1, 2, 4, 5, or Postgraduate)</li>
-                    <li>Include pension contributions (with tax relief)</li>
-                    <li>Apply Scottish tax rates if applicable</li>
-                    <li>Adjust your tax code</li>
-                    <li>Account for salary sacrifice schemes</li>
-                  </ul>
-                </>
-              )}
-            </div>
+            <SalarySEOContent salary={salary} results={results} />
           </div>
         </div>
       </section>
