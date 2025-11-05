@@ -25,10 +25,7 @@ import { z } from 'zod';
  */
 export const EmailInputSchema = z.object({
   /** Email address - optional (empty string) or valid email format */
-  value: z
-    .string()
-    .email('Invalid email address')
-    .or(z.literal('')), // Allow empty for optional fields
+  value: z.string().email('Invalid email address').or(z.literal('')), // Allow empty for optional fields
 });
 
 /**
@@ -74,11 +71,7 @@ export type NumberInputData = z.infer<typeof NumberInputSchema>;
  */
 export const TextInputSchema = z.object({
   /** Text value - trimmed, min 1 char, max 500 chars */
-  value: z
-    .string()
-    .trim()
-    .min(1, 'Required')
-    .max(500, 'Text too long (max 500 characters)'),
+  value: z.string().trim().min(1, 'Required').max(500, 'Text too long (max 500 characters)'),
 });
 
 /**
@@ -129,9 +122,7 @@ export type TextAreaData = z.infer<typeof TextAreaSchema>;
 export const SelectInputSchema = <T extends readonly [string, ...string[]]>(options: T) =>
   z.object({
     /** Selected value - must be one of the provided options */
-    value: z.enum(options, {
-      errorMap: () => ({ message: 'Please select a valid option' }),
-    }),
+    value: z.enum(options),
   });
 
 /**
@@ -155,19 +146,10 @@ export const CheckboxSchema = z
     /** Whether checkbox must be checked (e.g., terms acceptance) */
     required: z.boolean().optional(),
   })
-  .refine(
-    (data) => {
-      // If required is true, checked must also be true
-      if (data.required) {
-        return data.checked === true;
-      }
-      return true; // Optional checkboxes can be unchecked
-    },
-    {
-      message: 'This field must be checked',
-      path: ['checked'],
-    }
-  );
+  .refine((data) => !data.required || data.checked, {
+    message: 'This field must be checked',
+    path: ['checked'],
+  });
 
 /**
  * Type inferred from CheckboxSchema
@@ -190,9 +172,7 @@ export type CheckboxData = z.infer<typeof CheckboxSchema>;
  */
 export const CookieConsentSchema = z.object({
   /** Consent choice - must be 'accepted' or 'declined' */
-  consent: z.enum(['accepted', 'declined'], {
-    errorMap: () => ({ message: 'Invalid consent choice' }),
-  }),
+  consent: z.enum(['accepted', 'declined']),
   /** ISO 8601 timestamp of consent decision */
   timestamp: z.string().datetime('Invalid timestamp format'),
 });
@@ -258,12 +238,11 @@ export function validateTextInput(value: string, min = 1, max = 500) {
  * const result = validateSelect('2024-25', ['2024-25', '2025-26'] as const);
  * ```
  */
-export function validateSelect<T extends readonly [string, ...string[]]>(value: string, options: T) {
-  return z
-    .enum(options, {
-      errorMap: () => ({ message: 'Invalid option selected' }),
-    })
-    .safeParse(value);
+export function validateSelect<T extends readonly [string, ...string[]]>(
+  value: string,
+  options: T
+) {
+  return z.enum(options).safeParse(value);
 }
 
 /**

@@ -96,7 +96,9 @@ describe('TextInputSchema', () => {
 
 describe('TextAreaSchema', () => {
   it('should accept valid textarea content', () => {
-    const result = TextAreaSchema.safeParse({ value: 'This is a longer text with at least 10 characters' });
+    const result = TextAreaSchema.safeParse({
+      value: 'This is a longer text with at least 10 characters',
+    });
     expect(result.success).toBe(true);
   });
 

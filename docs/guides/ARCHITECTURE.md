@@ -1,9 +1,9 @@
 # PayeTax Architecture Documentation
 
 **Last Updated:** November 4, 2025  
-**Version:** 4.1.2  
+**Version:** 4.3.0  
 **Status:** ✅ Production Ready  
-**Audit Status:** ✅ PAYTAX-63 Complete (Molecules audit, design tokens extended, 100% adoption)
+**Audit Status:** ✅ PAYTAX-65 Complete (UI layer audit, design tokens + icons + skeleton + validation, 100% adoption)
 
 ---
 
