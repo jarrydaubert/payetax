@@ -1,7 +1,7 @@
-// src/components/ui/__tests__/gradient-heading.test.tsx
+// src/components/atoms/__tests__/GradientHeading.test.tsx
 
 import { render, screen } from '@testing-library/react';
-import { GradientHeading } from '../gradient-heading';
+import { GradientHeading } from '../GradientHeading';
 
 describe('GradientHeading', () => {
   describe('rendering', () => {
