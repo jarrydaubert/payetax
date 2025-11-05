@@ -1,5 +1,6 @@
 import type * as React from 'react';
 
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Table = ({
@@ -10,7 +11,11 @@ const Table = ({
   ref?: React.Ref<HTMLTableElement>;
 }) => (
   <div className='relative w-full overflow-auto'>
-    <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+    <table
+      ref={ref}
+      className={cn('w-full caption-bottom', TYPOGRAPHY.TEXT_SM, className)}
+      {...props}
+    />
   </div>
 );
 Table.displayName = 'Table';

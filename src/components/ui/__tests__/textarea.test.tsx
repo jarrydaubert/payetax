@@ -130,7 +130,7 @@ describe('Textarea Component', () => {
       const textarea = screen.getByRole('textbox');
 
       expect(textarea).toHaveClass('bg-transparent');
-      expect(textarea).toHaveClass('text-base');
+      expect(textarea).toHaveClass('text-sm'); // Updated to match design tokens (PAYTAX-65)
     });
 
     it('should have placeholder styling', () => {

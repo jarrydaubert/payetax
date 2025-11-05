@@ -1,6 +1,7 @@
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import type * as React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Select = SelectPrimitive.Root;
@@ -21,7 +22,8 @@ function SelectTrigger({ ref, className, children, ...props }: SelectTriggerProp
       className={cn(
         // IMPORTANT: Use border-border/40 for subtle appearance
         // Do NOT override with border-input in consumer components
-        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-border/40 bg-secondary/80 px-3 py-2 text-sm shadow-sm ring-offset-background backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-border/40 bg-secondary/80 px-3 py-2 shadow-sm ring-offset-background backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+        TYPOGRAPHY.TEXT_SM,
         className
       )}
       {...props}
@@ -124,7 +126,7 @@ function SelectLabel({ ref, className, ...props }: SelectLabelProps) {
   return (
     <SelectPrimitive.Label
       ref={ref}
-      className={cn('px-2 py-1.5 font-semibold text-sm', className)}
+      className={cn('px-2 py-1.5 font-semibold', TYPOGRAPHY.TEXT_SM, className)}
       {...props}
     />
   );
@@ -141,7 +143,8 @@ function SelectItem({ ref, className, children, ...props }: SelectItemProps) {
     <SelectPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex w-full cursor-default select-none items-center rounded-sm py-2 pr-8 pl-3 text-sm outline-none hover:bg-accent/50 focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'relative flex w-full cursor-default select-none items-center rounded-sm py-2 pr-8 pl-3 outline-none hover:bg-accent/50 focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        TYPOGRAPHY.TEXT_SM,
         className
       )}
       {...props}

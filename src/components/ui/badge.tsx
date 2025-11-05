@@ -2,10 +2,14 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  cn(
+    'inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+    TYPOGRAPHY.TEXT_XS
+  ),
   {
     variants: {
       variant: {

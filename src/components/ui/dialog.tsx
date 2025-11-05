@@ -1,6 +1,7 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import type * as React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Dialog = DialogPrimitive.Root;
@@ -79,7 +80,7 @@ const DialogTitle = ({
 }) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('font-semibold text-lg leading-none tracking-tight', className)}
+    className={cn('font-semibold leading-none tracking-tight', TYPOGRAPHY.TEXT_LG, className)}
     {...props}
   />
 );
@@ -94,7 +95,7 @@ const DialogDescription = ({
 }) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-muted-foreground text-sm', className)}
+    className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, className)}
     {...props}
   />
 );

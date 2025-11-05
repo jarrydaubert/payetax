@@ -1,5 +1,6 @@
 import type * as React from 'react';
 
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Card = ({
@@ -47,7 +48,13 @@ const CardDescription = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
-}) => <div ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />;
+}) => (
+  <div
+    ref={ref}
+    className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, className)}
+    {...props}
+  />
+);
 CardDescription.displayName = 'CardDescription';
 
 const CardContent = ({

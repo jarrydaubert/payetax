@@ -192,7 +192,7 @@ describe('Input Component', () => {
       const input = screen.getByRole('textbox');
 
       expect(input).toHaveClass('bg-transparent');
-      expect(input).toHaveClass('text-base');
+      expect(input).toHaveClass('text-sm'); // Updated to match design tokens (PAYTAX-65)
     });
 
     it('should have transition classes', () => {

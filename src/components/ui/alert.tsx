@@ -2,6 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
@@ -65,7 +66,13 @@ const AlertDescription = ({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement> & {
   ref?: React.Ref<HTMLParagraphElement>;
-}) => <div ref={ref} className={cn('text-sm [&_p]:leading-relaxed', className)} {...props} />;
+}) => (
+  <div
+    ref={ref}
+    className={cn(TYPOGRAPHY.TEXT_SM, '[&_p]:leading-relaxed', className)}
+    {...props}
+  />
+);
 AlertDescription.displayName = 'AlertDescription';
 
 export { Alert, AlertTitle, AlertDescription };
