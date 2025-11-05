@@ -4,7 +4,7 @@
 import type React from 'react';
 import { Suspense, useId } from 'react';
 import Footer from '@/components/molecules/Footer';
-import SimpleNavbar from '@/components/molecules/SimpleNavbar';
+import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 import CookieBanner from '@/components/ui/CookieBanner';
 import SustainabilityBadge from '@/components/ui/SustainabilityBadge';
 

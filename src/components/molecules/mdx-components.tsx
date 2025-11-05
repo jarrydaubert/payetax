@@ -1,4 +1,4 @@
-// src/components/blog/mdx-components.tsx
+// src/components/molecules/mdx-components.tsx
 /**
  * MDX components for blog post rendering
  * Server-side components for Next.js 16 native MDX

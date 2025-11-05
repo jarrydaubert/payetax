@@ -1,4 +1,4 @@
-// src/components/salary/SalaryCalculatorPage.tsx
+// src/components/pages/SalaryCalculatorPage.tsx
 // Main component for salary-specific landing pages
 
 'use client';

@@ -12,7 +12,7 @@ jest.mock('@/components/molecules/Footer', () => ({
   default: () => <footer data-testid='mock-footer'>Footer</footer>,
 }));
 
-jest.mock('@/components/molecules/SimpleNavbar', () => ({
+jest.mock('@/components/organisms/SimpleNavbar', () => ({
   __esModule: true,
   default: () => <nav data-testid='mock-navbar'>Navbar</nav>,
 }));

@@ -1,4 +1,4 @@
-// src/components/molecules/SimpleNavbar.tsx
+// src/components/organisms/SimpleNavbar.tsx
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -6,13 +6,13 @@ import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FeedbackDialog } from '@/components/molecules/FeedbackDialog';
+import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
- * Simple navigation bar molecule
+ * Simple navigation bar organism
  *
  * IMPORTANT: Logo uses TEXT_3XL (largest in typography scale) for brand prominence
  * Navigation links use TEXT_SM for compact header

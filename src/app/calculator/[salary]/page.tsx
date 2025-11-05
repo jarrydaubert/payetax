@@ -4,7 +4,7 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SalaryCalculatorPage } from '@/components/salary/SalaryCalculatorPage';
+import { SalaryCalculatorPage } from '@/components/pages/SalaryCalculatorPage';
 import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
 
 // Next.js 16: Optimize route segment config

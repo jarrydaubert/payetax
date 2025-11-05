@@ -18,7 +18,7 @@ jest.mock('@/components/organisms/CalculatorContent', () => ({
   CalculatorContent: () => <div data-testid='mock-calculator-content'>Calculator Content</div>,
 }));
 
-jest.mock('@/components/organisms/SimpleHero', () => ({
+jest.mock('@/components/molecules/SimpleHero', () => ({
   __esModule: true,
   default: ({ onScrollToCalculator }: any) => (
     <div data-testid='mock-simple-hero'>

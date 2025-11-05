@@ -1,4 +1,4 @@
-// src/components/organisms/SimpleHero.tsx
+// src/components/molecules/SimpleHero.tsx
 'use client';
 
 import { motion } from 'framer-motion';

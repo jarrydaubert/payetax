@@ -13,7 +13,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
-import { mdxComponents } from '@/components/blog/mdx-components';
+import { mdxComponents } from '@/components/molecules/mdx-components';
 import type { BlogPostFrontmatter } from '@/types/blog';
 import { BlogFrontmatterSchema, formatZodErrors } from './validation';
 

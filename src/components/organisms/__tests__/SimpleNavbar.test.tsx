@@ -1,4 +1,4 @@
-// src/components/molecules/__tests__/SimpleNavbar.test.tsx
+// src/components/organisms/__tests__/SimpleNavbar.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
 import { usePathname } from 'next/navigation';
 import SimpleNavbar from '../SimpleNavbar';
@@ -9,7 +9,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock FeedbackDialog
-jest.mock('@/components/molecules/FeedbackDialog', () => ({
+jest.mock('@/components/organisms/FeedbackDialog', () => ({
   FeedbackDialog: () => <div data-testid='feedback-dialog'>Feedback</div>,
 }));
 

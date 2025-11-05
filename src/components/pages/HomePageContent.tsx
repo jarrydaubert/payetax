@@ -4,9 +4,9 @@
 import { BookOpen, Calculator, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { memo, useEffect, useRef, useTransition } from 'react';
+import SimpleHero from '@/components/molecules/SimpleHero';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
-import SimpleHero from '@/components/organisms/SimpleHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';

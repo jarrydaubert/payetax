@@ -1,4 +1,4 @@
-// src/components/analytics/Analytics.tsx
+// src/components/organisms/Analytics.tsx
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';

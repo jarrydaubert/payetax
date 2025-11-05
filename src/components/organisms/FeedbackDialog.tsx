@@ -1,4 +1,4 @@
-// src/components/molecules/FeedbackDialog.tsx
+// src/components/organisms/FeedbackDialog.tsx
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
 /**
- * Feedback dialog molecule for collecting user feedback
+ * Feedback dialog organism for collecting user feedback
  * Uses Zod validation for type-safe form validation
  * Design tokens: TEXT_SM for labels/text, SIZE_4 for icons, SPACE_Y_4/SPACE_Y_2 for form spacing
  */

@@ -10,7 +10,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
-import Analytics from '@/components/analytics/Analytics';
+import Analytics from '@/components/organisms/Analytics';
 import Layout from '@/components/templates/Layout';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { ThemeProvider } from '@/lib/theme';
