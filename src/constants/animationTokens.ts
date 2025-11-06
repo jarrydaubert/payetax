@@ -1,9 +1,9 @@
 /**
  * Animation design tokens for consistent motion design
- * 
+ *
  * Centralized animation values for durations, easings, and common variants.
  * Ensures consistency across the application and aligns with design system.
- * 
+ *
  * @module constants/animationTokens
  */
 
@@ -224,11 +224,11 @@ export const ANIMATION_STAGGER = {
 
 /**
  * Helper to create transition with reduced motion support
- * 
+ *
  * @param shouldReduceMotion - Whether to reduce/disable animation
  * @param transition - The transition configuration to use
  * @returns Modified transition respecting motion preferences
- * 
+ *
  * @example
  * ```typescript
  * const transition = getAccessibleTransition(prefersReducedMotion, ANIMATION_TRANSITIONS.default);
@@ -246,10 +246,10 @@ export function getAccessibleTransition(
 
 /**
  * Helper to get accessible animation props
- * 
+ *
  * @param shouldReduceMotion - Whether to reduce/disable animation
  * @returns Empty object if motion should be reduced, otherwise undefined
- * 
+ *
  * @example
  * ```typescript
  * <motion.div

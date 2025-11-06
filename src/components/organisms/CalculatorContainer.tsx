@@ -10,8 +10,8 @@ import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
-import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
+import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import {
   useCalculatorActions,

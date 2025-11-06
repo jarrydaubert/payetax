@@ -1,6 +1,6 @@
 /**
  * Tests for useMotionPreference hook
- * 
+ *
  * @module hooks/__tests__/useMotionPreference
  */
 
@@ -109,7 +109,7 @@ describe('useMotionPreference', () => {
     // Remove matchMedia (simulates SSR environment)
     const originalMatchMedia = window.matchMedia;
     // @ts-expect-error - Testing SSR scenario
-    delete window.matchMedia;
+    window.matchMedia = undefined;
 
     const { result } = renderHook(() => useMotionPreference());
     expect(result.current).toBe(false);

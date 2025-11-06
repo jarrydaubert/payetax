@@ -1,6 +1,6 @@
 'use client';
 
-// Sentry removed as requested
+import * as Sentry from '@sentry/nextjs';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
@@ -42,11 +42,23 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error for debugging (Sentry removed)
+    // Log error for debugging
     console.error('ErrorBoundary caught an error:', error, errorInfo);
 
-    // Generate a simple error ID for tracking
-    const eventId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    // Capture exception in Sentry with additional context
+    const eventId = Sentry.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack,
+        },
+      },
+      tags: {
+        error_boundary: 'component',
+      },
+      level: 'error',
+    });
+
+    // Store Sentry event ID for user reference
     this.setState({ eventId });
   }
 
@@ -168,12 +180,37 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               </Link>
             </Button>
 
-            <Button asChild size='lg' className='bg-purple-600 hover:bg-purple-700'>
-              <a href='mailto:support@payetax.co.uk?subject=Error Report'>
+            {eventId && (
+              <Button
+                type='button'
+                onClick={() => {
+                  // Open Sentry user feedback dialog
+                  if (typeof window !== 'undefined' && eventId) {
+                    Sentry.showReportDialog({
+                      eventId,
+                      title: "It looks like we're having issues.",
+                      subtitle: 'Our team has been notified.',
+                      subtitle2: "If you'd like to help, tell us what happened below.",
+                      labelName: 'Name',
+                      labelEmail: 'Email',
+                      labelComments: 'What happened?',
+                      labelClose: 'Close',
+                      labelSubmit: 'Submit',
+                      errorGeneric:
+                        'An unknown error occurred while submitting your report. Please try again.',
+                      errorFormEntry:
+                        'Some fields were invalid. Please correct the errors and try again.',
+                      successMessage: 'Your feedback has been sent. Thank you!',
+                    });
+                  }
+                }}
+                size='lg'
+                className='bg-purple-600 hover:bg-purple-700'
+              >
                 <AlertTriangle className='mr-2 size-5' />
                 Report Issue
-              </a>
-            </Button>
+              </Button>
+            )}
           </div>
 
           {/* Help text */}

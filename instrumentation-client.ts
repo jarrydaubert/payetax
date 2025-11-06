@@ -6,28 +6,97 @@ export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1.0,
+  // Environment-specific configuration
+  environment: process.env.NODE_ENV,
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'development',
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+  // Performance monitoring with intelligent sampling
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0, // 20% in prod, 100% in dev
 
-  // Only enable replays in production
-  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0,
-  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
+  // Advanced traces sampling based on operation
+  tracesSampler: (samplingContext) => {
+    // Always sample errors
+    if (samplingContext.parentSampled === true) {
+      return 1.0;
+    }
 
+    // Sample critical transactions at higher rate
+    const transactionName = samplingContext.transactionContext?.name;
+    if (transactionName?.includes('/api/')) {
+      return 0.5; // 50% for API routes
+    }
+
+    // Sample calculator pages at higher rate (core functionality)
+    if (
+      transactionName?.includes('/calculator') ||
+      transactionName?.includes('/salary') ||
+      transactionName?.includes('/income')
+    ) {
+      return 0.4; // 40% for calculator pages
+    }
+
+    // Default sampling for other pages
+    return 0.2;
+  },
+
+  // Session Replay configuration
+  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0, // Capture 100% of errors
+  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0, // Sample 10% of sessions
+
+  // Integrations with enhanced configuration
   integrations:
     process.env.NODE_ENV === 'production'
       ? [
+          // Session Replay with privacy controls
           Sentry.replayIntegration({
             maskAllText: true,
             blockAllMedia: true,
-            // Don't block BMC widget
-            block: ['.sentry-block', '[data-sentry-block]'],
+            // Privacy-sensitive selectors to block
+            block: [
+              '.sentry-block',
+              '[data-sentry-block]',
+              '[data-private]',
+              'input[type="email"]',
+              'input[type="tel"]',
+            ],
+            // Allow specific iframes (BMC widget)
             ignore: ['iframe[src*="buymeacoffee"]'],
+            // Network request/response body recording
+            networkDetailAllowUrls: [window.location.origin],
+            networkRequestHeaders: ['User-Agent'],
+            networkResponseHeaders: ['Content-Type'],
+          }),
+          // Browser tracing for performance monitoring
+          Sentry.browserTracingIntegration({
+            // Enhanced instrumentation
+            enableLongTask: true,
+            enableInp: true, // Track Interaction to Next Paint (Core Web Vital)
+          }),
+          // User feedback widget
+          Sentry.feedbackIntegration({
+            colorScheme: 'system',
+            isNameRequired: false,
+            isEmailRequired: true,
+            showBranding: false,
+            triggerLabel: 'Report Bug',
+            formTitle: 'Report an Issue',
+            submitButtonLabel: 'Send Report',
+            messagePlaceholder: 'What happened? Please describe the issue...',
+            successMessageText: 'Thank you! We received your report.',
+          }),
+          // Breadcrumbs for better error context
+          Sentry.breadcrumbsIntegration({
+            console: false, // Don't track console.log
+            dom: true, // Track DOM events
+            fetch: true, // Track fetch requests
+            history: true, // Track navigation
+            xhr: true, // Track XHR requests
           }),
         ]
       : [],
+
+  // Enable debug mode in development
+  debug: process.env.NODE_ENV === 'development',
 
   // Ignore common non-critical errors
   ignoreErrors: [
@@ -35,23 +104,41 @@ Sentry.init({
     'top.GLOBALS',
     'ResizeObserver loop limit exceeded',
     'ResizeObserver loop completed with undelivered notifications',
-    // Network errors
+    // Network errors (transient)
     'Network request failed',
     'Failed to fetch',
     'NetworkError',
-    // Random plugins/extensions
+    'Load failed',
+    'TypeError: NetworkError when attempting to fetch resource',
+    // Cancelled requests (user navigation)
+    'AbortError',
+    'The operation was aborted',
+    // Browser quirks
     "Can't find variable: ZiteReader",
     'jigsaw is not defined',
     'CommentBackboneEnd',
     'atomicFindClose',
-    // Facebook
+    // Social media widgets
     'fb_xd_fragment',
-    // Other plugins
+    // Browser plugins/extensions
     'bmi_SafeAddOnload',
     'EBCallBackMessageReceived',
+    // Non-actionable errors
+    'Non-Error promise rejection captured',
   ],
 
-  beforeSend(event, _hint) {
+  // Ignore specific URLs (browser extensions, CDNs)
+  denyUrls: [
+    // Browser extensions
+    /extensions\//i,
+    /^chrome:\/\//i,
+    /^moz-extension:\/\//i,
+    // Third-party analytics/ads
+    /googletagmanager\.com/i,
+    /google-analytics\.com/i,
+  ],
+
+  beforeSend(event, hint) {
     // Filter out localhost errors in development
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       return null;
@@ -60,6 +147,20 @@ Sentry.init({
     // Don't send errors from development environment
     if (process.env.NODE_ENV === 'development') {
       return null;
+    }
+
+    // Enhance error context with user interaction data
+    const originalException = hint.originalException;
+    if (originalException instanceof Error) {
+      // Add component stack if available
+      if ('componentStack' in originalException) {
+        event.contexts = {
+          ...event.contexts,
+          react: {
+            componentStack: (originalException as { componentStack?: string }).componentStack,
+          },
+        };
+      }
     }
 
     // Remove query strings with potential PII
@@ -76,13 +177,57 @@ Sentry.init({
     if (event.request?.data && typeof event.request.data === 'object') {
       const sanitized = { ...event.request.data } as Record<string, unknown>;
       // Remove potentially sensitive fields
-      sanitized.email = undefined;
-      sanitized.name = undefined;
-      sanitized.phone = undefined;
-      sanitized.address = undefined;
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'ssn',
+        'nationalInsuranceNumber',
+        'taxCode',
+      ];
+      for (const field of sensitiveFields) {
+        sanitized[field] = undefined;
+      }
       event.request.data = sanitized;
     }
 
+    // Add browser and device context
+    if (typeof window !== 'undefined') {
+      event.contexts = {
+        ...event.contexts,
+        browser_info: {
+          viewport: `${window.innerWidth}x${window.innerHeight}`,
+          screen: `${window.screen.width}x${window.screen.height}`,
+          orientation: window.screen.orientation?.type,
+          online: navigator.onLine,
+          connection: (navigator as { connection?: { effectiveType?: string } }).connection
+            ?.effectiveType,
+        },
+      };
+    }
+
     return event;
+  },
+
+  // Breadcrumb filtering
+  beforeBreadcrumb(breadcrumb, _hint) {
+    // Skip console breadcrumbs (too noisy)
+    if (breadcrumb.category === 'console') {
+      return null;
+    }
+
+    // Sanitize URLs in breadcrumbs
+    if (breadcrumb.data?.url) {
+      try {
+        const url = new URL(breadcrumb.data.url);
+        breadcrumb.data.url = url.origin + url.pathname;
+      } catch {
+        // Invalid URL, keep as is
+      }
+    }
+
+    return breadcrumb;
   },
 });

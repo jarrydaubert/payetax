@@ -75,9 +75,7 @@ export default function SimpleHero({
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
           animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
           transition={
-            shouldReduceMotion
-              ? { duration: 0 }
-              : { ...ANIMATION_TRANSITIONS.default, delay: 0.2 }
+            shouldReduceMotion ? { duration: 0 } : { ...ANIMATION_TRANSITIONS.default, delay: 0.2 }
           }
           className='inline-block'
         >

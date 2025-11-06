@@ -44,10 +44,10 @@ const variantStyles = {
 
 /**
  * Result card molecule for displaying key metrics
- * 
+ *
  * Uses design tokens: TEXT_SM for label, TEXT_2XL for value, SIZE_4 for icon, SPACE_Y_2 for spacing
  * Supports both immediate and scroll-triggered reveal animations with accessibility support
- * 
+ *
  * @param label - The metric label/description
  * @param value - The formatted value to display
  * @param icon - Optional Lucide icon component

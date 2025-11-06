@@ -1,6 +1,6 @@
 /**
  * Tests for animation design tokens
- * 
+ *
  * @module constants/__tests__/animationTokens
  */
 
@@ -151,12 +151,8 @@ describe('Animation Tokens', () => {
     });
 
     it('should have increasing hover intensity', () => {
-      expect(ANIMATION_GESTURES.hoverGentle.scale).toBeLessThan(
-        ANIMATION_GESTURES.hover.scale
-      );
-      expect(ANIMATION_GESTURES.hover.scale).toBeLessThan(
-        ANIMATION_GESTURES.hoverStrong.scale
-      );
+      expect(ANIMATION_GESTURES.hoverGentle.scale).toBeLessThan(ANIMATION_GESTURES.hover.scale);
+      expect(ANIMATION_GESTURES.hover.scale).toBeLessThan(ANIMATION_GESTURES.hoverStrong.scale);
     });
   });
 

@@ -90,88 +90,88 @@ export function IncomeSourceList() {
               transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
               className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
             >
-            <div className={cn('flex items-center', SPACING.GAP_2)}>
-              <Badge
-                variant='outline'
-                className={cn(
-                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0',
-                  TYPOGRAPHY.TEXT_XS
-                )}
-              >
-                {index + 1}
-              </Badge>
+              <div className={cn('flex items-center', SPACING.GAP_2)}>
+                <Badge
+                  variant='outline'
+                  className={cn(
+                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0',
+                    TYPOGRAPHY.TEXT_XS
+                  )}
+                >
+                  {index + 1}
+                </Badge>
 
-              {/* Income Type */}
-              <div className='min-w-0 flex-1'>
+                {/* Income Type */}
+                <div className='min-w-0 flex-1'>
+                  <Select
+                    value={source.type}
+                    onValueChange={(type: IncomeSource['type']) =>
+                      updateIncomeSource(source.id, { type })
+                    }
+                  >
+                    <SelectTrigger
+                      className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
+                      aria-label='Select income type'
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Remove Button */}
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='h-9 w-9 shrink-0'
+                  onClick={() => removeIncomeSource(source.id)}
+                  aria-label='Remove income source'
+                >
+                  <Trash2 className={ICON_SIZES.SIZE_4} />
+                </Button>
+              </div>
+
+              {/* Amount and Period Row */}
+              <div className={cn('flex items-center', SPACING.GAP_2)}>
+                <NumberInput
+                  value={source.amount}
+                  onChange={(amount) => updateIncomeSource(source.id, { amount })}
+                  prefix='£'
+                  decimals={2}
+                  placeholder='0.00'
+                  min={0}
+                  className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
+                />
+
                 <Select
-                  value={source.type}
-                  onValueChange={(type: IncomeSource['type']) =>
-                    updateIncomeSource(source.id, { type })
+                  value={source.period}
+                  onValueChange={(period) =>
+                    updateIncomeSource(source.id, { period: period as typeof source.period })
                   }
                 >
                   <SelectTrigger
-                    className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
-                    aria-label='Select income type'
+                    className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
+                    aria-label='Select pay period'
                   >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
+                    {payPeriodOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Remove Button */}
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-9 w-9 shrink-0'
-                onClick={() => removeIncomeSource(source.id)}
-                aria-label='Remove income source'
-              >
-                <Trash2 className={ICON_SIZES.SIZE_4} />
-              </Button>
-            </div>
-
-            {/* Amount and Period Row */}
-            <div className={cn('flex items-center', SPACING.GAP_2)}>
-              <NumberInput
-                value={source.amount}
-                onChange={(amount) => updateIncomeSource(source.id, { amount })}
-                prefix='£'
-                decimals={2}
-                placeholder='0.00'
-                min={0}
-                className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
-              />
-
-              <Select
-                value={source.period}
-                onValueChange={(period) =>
-                  updateIncomeSource(source.id, { period: period as typeof source.period })
-                }
-              >
-                <SelectTrigger
-                  className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
-                  aria-label='Select pay period'
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {payPeriodOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
         </AnimatePresence>
 
         {/* Add Button */}

@@ -183,16 +183,16 @@ describe('ErrorBoundary Component', () => {
       expect(homeLink).toHaveAttribute('href', '/');
     });
 
-    it('should render Report Issue link', () => {
+    it('should render Report Issue button', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>
       );
 
-      const reportLink = screen.getByRole('link', { name: /Report Issue/i });
-      expect(reportLink).toBeInTheDocument();
-      expect(reportLink).toHaveAttribute('href', expect.stringContaining('mailto:'));
+      const reportButton = screen.getByRole('button', { name: /Report Issue/i });
+      expect(reportButton).toBeInTheDocument();
+      expect(reportButton).toHaveClass('bg-purple-600');
     });
   });
 

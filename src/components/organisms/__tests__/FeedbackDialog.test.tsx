@@ -1,7 +1,7 @@
 // src/components/molecules/__tests__/FeedbackDialog.test.tsx
 /**
  * FeedbackDialog Tests
- * 
+ *
  * Note: React 19's useActionState requires special handling in tests.
  * Some tests for submission behavior are simplified due to test environment limitations.
  */
