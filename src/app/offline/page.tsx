@@ -9,6 +9,7 @@
 import { CheckCircle, Wifi } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export default function OfflinePage() {
   return (
@@ -17,7 +18,7 @@ export default function OfflinePage() {
         <div className='glass-card p-8 md:p-16'>
           {/* Offline Icon */}
           <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
-            <Wifi className='h-10 w-10 text-amber-500' />
+            <Wifi className={`${ICON_SIZES.SIZE_10} text-amber-500`} aria-hidden='true' />
           </div>
 
           {/* Title */}
@@ -34,19 +35,19 @@ export default function OfflinePage() {
             <h2 className='mb-4 font-semibold text-foreground text-xl'>Available Offline:</h2>
             <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
+                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
                 <span className='text-muted-foreground'>Tax calculations</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
+                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
                 <span className='text-muted-foreground'>Cached tax rates</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
+                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
                 <span className='text-muted-foreground'>Previous results</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className='h-5 w-5 flex-shrink-0 text-green-500' />
+                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
                 <span className='text-muted-foreground'>Saved calculations</span>
               </div>
             </div>

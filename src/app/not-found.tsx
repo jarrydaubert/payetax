@@ -2,6 +2,7 @@
 
 import { ArrowRight, Calculator, Coffee, FileText, Home, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export default function NotFound() {
   return (
@@ -53,9 +54,9 @@ export default function NotFound() {
             got plenty more where that came from!
           </p>
           <div className='flex items-center justify-center gap-2 text-primary'>
-            <Sparkles className='h-5 w-5 animate-pulse' />
+            <Sparkles className={`${ICON_SIZES.SIZE_5} animate-pulse`} aria-hidden='true' />
             <span className='font-medium text-sm'>Let's get you back on track</span>
-            <Sparkles className='h-5 w-5 animate-pulse' />
+            <Sparkles className={`${ICON_SIZES.SIZE_5} animate-pulse`} aria-hidden='true' />
           </div>
         </div>
 
@@ -65,37 +66,37 @@ export default function NotFound() {
             href='/'
             className='group glass-card rounded-xl border border-primary/20 p-6 transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40'
           >
-            <Home className='mx-auto mb-4 h-8 w-8 text-primary transition-colors group-hover:text-primary/80' />
+            <Home className={`mx-auto mb-4 ${ICON_SIZES.SIZE_8} text-primary transition-colors group-hover:text-primary/80`} aria-hidden='true' />
             <h3 className='mb-2 font-semibold text-foreground'>Go Home</h3>
             <p className='text-muted-foreground text-sm'>Back to our main page</p>
-            <ArrowRight className='mx-auto mt-3 h-4 w-4 text-primary transition-transform group-hover:translate-x-1' />
+            <ArrowRight className={`mx-auto mt-3 ${ICON_SIZES.SIZE_4} text-primary transition-transform group-hover:translate-x-1`} aria-hidden='true' />
           </Link>
 
           <Link
             href='/#tax-calculator'
             className='group glass-card rounded-xl border border-cyan-500/20 p-6 transition-all duration-300 hover:border-cyan-500/40 active:scale-[1.02] md:hover:scale-105'
           >
-            <Calculator className='mx-auto mb-4 h-8 w-8 text-cyan-500 transition-colors group-hover:text-cyan-400' />
+            <Calculator className={`mx-auto mb-4 ${ICON_SIZES.SIZE_8} text-cyan-500 transition-colors group-hover:text-cyan-400`} aria-hidden='true' />
             <h3 className='mb-2 font-semibold text-foreground'>Tax Calculator</h3>
             <p className='text-muted-foreground text-sm'>Calculate your UK taxes</p>
-            <ArrowRight className='mx-auto mt-3 h-4 w-4 text-cyan-500 transition-transform group-hover:translate-x-1' />
+            <ArrowRight className={`mx-auto mt-3 ${ICON_SIZES.SIZE_4} text-cyan-500 transition-transform group-hover:translate-x-1`} aria-hidden='true' />
           </Link>
 
           <Link
             href='/blog'
             className='group glass-card rounded-xl border border-pink-500/20 p-6 transition-all duration-300 hover:border-pink-500/40 active:scale-[1.02] md:hover:scale-105'
           >
-            <FileText className='mx-auto mb-4 h-8 w-8 text-pink-500 transition-colors group-hover:text-pink-400' />
+            <FileText className={`mx-auto mb-4 ${ICON_SIZES.SIZE_8} text-pink-500 transition-colors group-hover:text-pink-400`} aria-hidden='true' />
             <h3 className='mb-2 font-semibold text-foreground'>Read Blog</h3>
             <p className='text-muted-foreground text-sm'>Tax tips and guides</p>
-            <ArrowRight className='mx-auto mt-3 h-4 w-4 text-pink-500 transition-transform group-hover:translate-x-1' />
+            <ArrowRight className={`mx-auto mt-3 ${ICON_SIZES.SIZE_4} text-pink-500 transition-transform group-hover:translate-x-1`} aria-hidden='true' />
           </Link>
         </div>
 
         {/* Fun facts section */}
         <div className='glass-card mb-8 rounded-xl border border-border p-8'>
           <h3 className='mb-4 flex items-center justify-center gap-2 font-semibold text-foreground text-xl'>
-            <Coffee className='h-5 w-5 text-yellow-500 dark:text-yellow-400' />
+            <Coffee className={`${ICON_SIZES.SIZE_5} text-yellow-500 dark:text-yellow-400`} aria-hidden='true' />
             Did You Know?
           </h3>
           <p className='text-base text-muted-foreground leading-relaxed'>

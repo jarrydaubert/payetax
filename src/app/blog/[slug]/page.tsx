@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
+import { ICON_SIZES } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent } from '@/lib/mdx';
@@ -97,7 +98,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             href='/blog'
             className='mb-6 inline-flex items-center text-primary transition-colors hover:text-primary/80'
           >
-            <ArrowLeft className='mr-2 h-4 w-4' />
+            <ArrowLeft className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
             Back to Blog
           </Link>
         </div>
@@ -127,18 +128,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             <div className='mb-8 flex items-center gap-6 text-foreground/90 text-sm'>
               <div className='flex items-center gap-2'>
-                <Calendar className='h-4 w-4' />
+                <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                 <span>{formatDate(post.publishedAt)}</span>
               </div>
               {post.readTime && (
                 <div className='flex items-center gap-2'>
-                  <Clock className='h-4 w-4' />
+                  <Clock className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                   <span>{post.readTime}</span>
                 </div>
               )}
               {post.author && (
                 <div className='flex items-center gap-2'>
-                  <User className='h-4 w-4' />
+                  <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                   <span>{post.author}</span>
                 </div>
               )}
@@ -178,7 +179,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Button asChild>
                   <Link href='/'>
                     Calculate Your Tax
-                    <ArrowLeft className='ml-2 h-4 w-4 rotate-180' />
+                    <ArrowLeft className={`ml-2 ${ICON_SIZES.SIZE_4} rotate-180`} aria-hidden='true' />
                   </Link>
                 </Button>
               </div>
@@ -208,7 +209,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     <div className='flex items-center gap-4 text-foreground/60 text-xs'>
                       {relatedPost.readTime && (
                         <div className='flex items-center gap-1'>
-                          <Clock className='h-3 w-3' />
+                          <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
                           <span>{relatedPost.readTime}</span>
                         </div>
                       )}
@@ -227,7 +228,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             href='/blog'
             className='inline-flex items-center font-medium text-primary hover:text-primary/80'
           >
-            <ArrowLeft className='mr-2 h-4 w-4' />
+            <ArrowLeft className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
             Back to All Posts
           </Link>
         </div>

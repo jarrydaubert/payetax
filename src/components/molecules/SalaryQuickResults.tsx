@@ -5,6 +5,7 @@ import { TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { ICON_SIZES } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 
@@ -102,7 +103,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
       {/* Compare Salaries */}
       <Card className='mt-4 p-4'>
         <h3 className='mb-3 flex items-center gap-2 font-semibold'>
-          <TrendingUp className='h-4 w-4' />
+          <TrendingUp className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           Compare Similar Salaries
         </h3>
         <div className='grid grid-cols-2 gap-2'>
