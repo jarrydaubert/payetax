@@ -191,40 +191,53 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
 }
 
 /**
- * Get a single blog post by slug
+ * Get a single blog post by slug (cached)
+ * PAYTAX-77: Added caching for individual post lookups
  */
-export function getBlogPostBySlug(slug: string): BlogPost | null {
-  const post = getMDXPostBySlug(slug);
+const getCachedBlogPostBySlug = unstable_cache(
+  async (slug: string): Promise<BlogPost | null> => {
+    const post = getMDXPostBySlug(slug);
 
-  if (!post) {
-    return null;
-  }
+    if (!post) {
+      return null;
+    }
 
-  const categoryData = getCategoryBySlug(post.category);
+    const categoryData = getCategoryBySlug(post.category);
 
-  return {
-    id: post.slug,
-    title: post.title,
-    slug: post.slug,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    category: post.category,
-    content: post.content,
-    categoryData,
-    updatedAt: post.updatedAt || post.publishedAt,
-    featured: post.featured,
-    published: true, // All posts in /content/blog are published
-    author: post.author || 'PayeTax Team',
-    readTime: `${post.readingTime} min read`,
-    tags: post.tags || post.seoKeywords || [],
-    image: post.image,
-    imageAlt: post.imageAlt,
-    readingTime: post.readingTime,
-    wordCount: post.wordCount,
-    seoTitle: post.seoTitle || post.title,
-    seoDescription: post.seoDescription || post.excerpt,
-    seoKeywords: post.seoKeywords || post.tags || [],
-  };
+    return {
+      id: post.slug,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      publishedAt: post.publishedAt,
+      category: post.category,
+      content: post.content,
+      categoryData,
+      updatedAt: post.updatedAt || post.publishedAt,
+      featured: post.featured,
+      published: true, // All posts in /content/blog are published
+      author: post.author || 'PayeTax Team',
+      readTime: `${post.readingTime} min read`,
+      tags: post.tags || post.seoKeywords || [],
+      image: post.image,
+      imageAlt: post.imageAlt,
+      readingTime: post.readingTime,
+      wordCount: post.wordCount,
+      seoTitle: post.seoTitle || post.title,
+      seoDescription: post.seoDescription || post.excerpt,
+      seoKeywords: post.seoKeywords || post.tags || [],
+    };
+  },
+  ['blog-post'],
+  { revalidate: 3600, tags: ['blog'] }
+);
+
+/**
+ * Get a single blog post by slug
+ * PAYTAX-77: Now uses cached implementation (async)
+ */
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  return await getCachedBlogPostBySlug(slug);
 }
 
 /**

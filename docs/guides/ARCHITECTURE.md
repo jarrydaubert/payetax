@@ -151,7 +151,7 @@ Each component has one clear purpose:
 |---------|---------|
 | **shadcn/ui** | Component library |
 | **Radix UI** | Headless UI primitives |
-| **next-mdx-remote** | MDX blog processing |
+| **next-mdx-remote** | MDX blog processing (✅ PAYTAX-77 optimized) |
 | **Biome** | Linting & formatting (v2.3.3) |
 | **Jest** | Unit testing (v30.2.0) |
 | **Playwright** | E2E testing (v1.56.1) |
@@ -758,7 +758,7 @@ it('has no accessibility violations', async () => {
 | Issue | Component | Lines | Grade | Status |
 |-------|-----------|-------|-------|--------|
 | PAYTAX-84 | Analytics | 242 | A- (8.4/10) | ✅ Production-ready |
-| PAYTAX-85 | MDX Components | 255 | B+ (7.6/10) | ⚠️ Exceeds limit |
+| PAYTAX-85 | MDX Components | 255 | B+ (7.6/10) | ✅ Optimized (PAYTAX-77) |
 | PAYTAX-86 | HomePage | 285 | A- (8.2/10) | ⚠️ Exceeds limit |
 | PAYTAX-87 | SalaryPage | 302 | C- (5.3/10) | 🔴 Critical (no tests) |
 | PAYTAX-88 | Layout | 51 | A- (8.8/10) | ✅ Best in batch |

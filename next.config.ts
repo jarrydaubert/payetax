@@ -31,7 +31,13 @@ const nextConfig: NextConfig = {
       'zod',
       'react-markdown',
       '@mdx-js/react',
+      '@mdx-js/loader', // PAYTAX-77: Optimize MDX loader imports
+      'next-mdx-remote', // PAYTAX-77: Optimize MDX remote imports
       'recharts', // NEW: Next.js 16 - optimize recharts 3.x imports
+      'rehype-pretty-code', // PAYTAX-77: Optimize syntax highlighting
+      'rehype-autolink-headings', // PAYTAX-77: Optimize rehype plugins
+      'rehype-slug', // PAYTAX-77: Optimize rehype plugins
+      'remark-gfm', // PAYTAX-77: Optimize remark plugins
     ],
     // Enable for memory-intensive builds (recommended for large apps)
     webpackMemoryOptimizations: true,
