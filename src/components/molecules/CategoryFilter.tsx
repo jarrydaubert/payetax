@@ -42,7 +42,7 @@ export function CategoryFilter({
   return (
     <div className='relative z-20 mb-12 md:mb-20'>
       <div className={cn('mb-8 flex items-center justify-center text-center', SPACING.GAP_2)}>
-        <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} />
+        <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} aria-hidden='true' />
         <h2 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>Browse Topics</h2>
       </div>
       <div className='mx-auto max-w-5xl'>

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import '@/types/gtag';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { ICON_SIZES } from '@/constants/designTokens';
 import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
 
 const CookieBanner: React.FC = () => {
@@ -101,7 +102,7 @@ const CookieBanner: React.FC = () => {
         <CardContent className='p-4 text-center sm:p-6'>
           <div className='mb-4 flex justify-center'>
             <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
-              <Cookie className='size-6 text-white' />
+              <Cookie className={`${ICON_SIZES.SIZE_6} text-white`} aria-hidden='true' />
             </div>
           </div>
           <h2 className='mb-2 font-semibold text-foreground text-lg'>Cookie preferences</h2>

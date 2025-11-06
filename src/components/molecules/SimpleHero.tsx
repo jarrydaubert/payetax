@@ -84,6 +84,7 @@ export default function SimpleHero({
               Calculate My Salary
               <ArrowRight
                 className={cn(ICON_SIZES.SIZE_4, 'transition-transform group-hover:translate-x-1')}
+                aria-hidden='true'
               />
             </span>
           </GlowButton>

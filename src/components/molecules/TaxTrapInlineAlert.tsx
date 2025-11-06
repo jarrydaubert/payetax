@@ -95,7 +95,7 @@ export function TaxTrapInlineAlert({
 
   return (
     <Alert variant='warning' className='relative border-2'>
-      <AlertTriangle className={ICON_SIZES.SIZE_5} />
+      <AlertTriangle className={ICON_SIZES.SIZE_5} aria-hidden='true' />
 
       {/* Close button */}
       <button
@@ -104,7 +104,7 @@ export function TaxTrapInlineAlert({
         className='absolute top-3 right-3 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
         aria-label='Dismiss tax trap alert'
       >
-        <X className={ICON_SIZES.SIZE_4} />
+        <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
       </button>
 
       <div
@@ -135,7 +135,7 @@ export function TaxTrapInlineAlert({
             className='w-full gap-2 whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto'
           >
             Add {formatCurrency(suggestedPension, 0)} to Pension
-            <ArrowRight className={ICON_SIZES.SIZE_4} />
+            <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           </Button>
         )}
       </div>

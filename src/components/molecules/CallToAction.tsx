@@ -74,7 +74,10 @@ export default function CallToAction({
 
   return (
     <div className={cn('glass-card my-16 p-8 text-center md:p-12', className)}>
-      <IconComponent className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`} aria-hidden='true' />
+      <IconComponent
+        className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`}
+        aria-hidden='true'
+      />
       <h2 className='mb-6 font-bold text-3xl text-foreground'>{config.title}</h2>
       <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-xl leading-relaxed'>
         {config.description}
