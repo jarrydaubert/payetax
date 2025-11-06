@@ -29,6 +29,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import { ICON_SIZES } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
@@ -89,7 +90,7 @@ export function BlogPageClient({
               variant='outline'
               className='mb-8 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-xl'
             >
-              <Zap className='size-5' />
+              <Zap className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>by PayeTax</span>
             </Badge>
 
@@ -113,7 +114,7 @@ export function BlogPageClient({
                 variant='outline'
                 className='gap-2 border-primary/30 bg-primary/10 px-4 py-2 backdrop-blur-xl'
               >
-                <Tag className='size-4' />
+                <Tag className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                 <span className='text-foreground/70'>Viewing: </span>
                 <span className='font-semibold'>
                   {categories.find((cat) => cat.slug === selectedCategory)?.name ||
@@ -176,11 +177,11 @@ export function BlogPageClient({
         {featuredPost && !selectedCategory && currentPage === 1 && (
           <div className='mb-12 md:mb-20'>
             <div className='mb-8 flex items-center justify-center gap-3 text-center'>
-              <Sparkles className='size-6 text-primary' />
+              <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
               <GradientText variant='brand' as='span' className='font-bold text-lg'>
                 Featured Article
               </GradientText>
-              <Sparkles className='size-6 text-primary' />
+              <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
             </div>
 
             <Link href={`/blog/${featuredPost.slug}`} className='group block'>
@@ -194,7 +195,7 @@ export function BlogPageClient({
                         FEATURED
                       </Badge>
                       <div className='flex items-center gap-2 text-muted-foreground'>
-                        <Calendar className='size-4' />
+                        <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                         <span className='text-sm'>{formatDate(featuredPost.publishedAt)}</span>
                       </div>
                     </div>
@@ -209,7 +210,7 @@ export function BlogPageClient({
 
                     <div className='inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-lg transition-all duration-300 group-hover:gap-4 group-hover:shadow-2xl'>
                       <span>Read Article</span>
-                      <ArrowRight className='size-5 transition-transform group-hover:translate-x-1' />
+                      <ArrowRight className={`${ICON_SIZES.SIZE_5} transition-transform group-hover:translate-x-1`} aria-hidden='true' />
                     </div>
                   </div>
 
@@ -263,7 +264,7 @@ export function BlogPageClient({
                             {post.category}
                           </Badge>
                           <div className='flex items-center gap-2 text-muted-foreground text-sm'>
-                            <Calendar className='size-3' />
+                            <Calendar className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
                             <span className='text-xs'>{formatDate(post.publishedAt)}</span>
                           </div>
                         </div>
@@ -278,14 +279,14 @@ export function BlogPageClient({
 
                         {post.readTime && (
                           <div className='mb-4 flex items-center gap-2 text-muted-foreground text-sm'>
-                            <Clock className='size-3' />
+                            <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
                             <span className='text-xs'>{post.readTime} read</span>
                           </div>
                         )}
 
                         <div className='inline-flex items-center gap-2 font-semibold text-primary transition-all duration-300 group-hover:gap-3'>
                           <span className='text-sm'>Read More</span>
-                          <ArrowRight className='size-4' />
+                          <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                         </div>
                       </div>
                     </article>
@@ -369,7 +370,7 @@ export function BlogPageClient({
             <EmptyContent>
               <Button asChild size='lg'>
                 <Link href='/blog'>
-                  <BookOpen className='mr-2 size-5' />
+                  <BookOpen className={`mr-2 ${ICON_SIZES.SIZE_5}`} aria-hidden='true' />
                   Browse All Posts
                 </Link>
               </Button>

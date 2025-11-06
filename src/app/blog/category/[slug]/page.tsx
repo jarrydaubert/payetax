@@ -3,6 +3,7 @@
  * Category-specific blog page using local MDX blog system
  */
 
+import { ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { ICON_SIZES } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { categoryContent } from '@/lib/categoryContent';
@@ -239,20 +241,7 @@ export default async function CategoryPage({
                       className='inline-flex items-center font-medium text-primary text-small hover:text-primary/80'
                     >
                       Read more
-                      <svg
-                        className='ml-1 h-3 w-3'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                        aria-hidden='true'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M9 5l7 7-7 7'
-                        />
-                      </svg>
+                      <ChevronRight className={`ml-1 ${ICON_SIZES.SIZE_3_5}`} aria-hidden='true' />
                     </Link>
                   </div>
                 </div>
