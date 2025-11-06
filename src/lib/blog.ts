@@ -195,6 +195,7 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
  * PAYTAX-77: Added caching for individual post lookups
  */
 const getCachedBlogPostBySlug = unstable_cache(
+  // biome-ignore lint/suspicious/useAwait: unstable_cache requires async function
   async (slug: string): Promise<BlogPost | null> => {
     const post = getMDXPostBySlug(slug);
 

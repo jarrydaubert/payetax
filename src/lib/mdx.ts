@@ -9,9 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { unstable_cache } from 'next/cache';
 import { compileMDX } from 'next-mdx-remote/rsc';
-import { cache as reactCache } from 'react';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
@@ -142,6 +140,7 @@ const REHYPE_PRETTY_CODE_OPTIONS = {
 /**
  * Internal MDX compilation function
  * Separated for better testability and caching
+ * Returns a function component that renders the MDX content
  */
 async function compileMDXInternal(content: string) {
   const result = await compileMDX({
@@ -168,37 +167,23 @@ async function compileMDXInternal(content: string) {
     },
   });
 
-  return result.content;
+  // Return a function component that renders the content
+  return () => result.content;
 }
 
 /**
- * Compile MDX content to React component with caching
+ * Compile MDX content to React component
  * Uses Next.js 16 native MDX compilation with rehype/remark plugins
  * Returns the compiled MDX component
  *
- * OPTIMIZED (PAYTAX-77):
- * - React.cache() for per-request deduplication
- * - unstable_cache() for cross-request caching (24hr revalidation)
- * - Optimized rehype-pretty-code config for better performance
- * - Performance monitoring in development
+ * NOTE: Caching disabled temporarily to fix serialization issues
+ * React elements cannot be cached with unstable_cache
  */
-export const compileMDXContent = reactCache(async (content: string) => {
+export async function compileMDXContent(content: string) {
   // Development: Performance monitoring
   const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
 
-  // Use Next.js cache for cross-request caching
-  const cachedCompile = unstable_cache(
-    async (mdxContent: string) => {
-      return await compileMDXInternal(mdxContent);
-    },
-    ['mdx-compile'],
-    {
-      revalidate: 86400, // 24 hours - blog posts rarely change
-      tags: ['mdx', 'blog'],
-    }
-  );
-
-  const result = await cachedCompile(content);
+  const result = await compileMDXInternal(content);
 
   // Development: Log performance metrics
   if (process.env.NODE_ENV === 'development' && startTime > 0) {
@@ -209,7 +194,7 @@ export const compileMDXContent = reactCache(async (content: string) => {
   }
 
   return result;
-});
+}
 
 /**
  * Get all unique categories from posts
