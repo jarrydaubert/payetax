@@ -25,11 +25,9 @@ import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
-import { ANIMATION_STAGGER, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
-import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
@@ -87,7 +85,6 @@ export function ResultsTable({
 }: ResultsTableProps) {
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
-  const shouldReduceMotion = useMotionPreference();
 
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);

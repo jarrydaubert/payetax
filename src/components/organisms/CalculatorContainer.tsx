@@ -7,9 +7,11 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 import {
   useCalculatorActions,
@@ -39,6 +41,7 @@ export function CalculatorContainer() {
   ]);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useMotionPreference();
 
   // Derive showResults from results state
   const showResults = !!results;
@@ -185,10 +188,11 @@ export function CalculatorContainer() {
         {showResults && results && (
           <motion.div
             ref={resultsRef}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
+            initial={shouldReduceMotion ? {} : 'initial'}
+            animate={shouldReduceMotion ? {} : 'animate'}
+            exit={shouldReduceMotion ? {} : 'exit'}
+            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
             className='order-4 scroll-mt-6 lg:order-2 lg:col-span-2'
             role='region'
             aria-live='polite'
@@ -211,10 +215,11 @@ export function CalculatorContainer() {
       <AnimatePresence mode='wait'>
         {showResults && results ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.scaleIn}
+            initial={shouldReduceMotion ? {} : 'initial'}
+            animate={shouldReduceMotion ? {} : 'animate'}
+            exit={shouldReduceMotion ? {} : 'exit'}
+            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
             className='order-6 lg:order-3'
             data-testid='tax-results'
           >
