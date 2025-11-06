@@ -23,6 +23,7 @@ import { GradientText } from '@/components/atoms/GradientText';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export const metadata: Metadata = {
   title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
@@ -128,7 +129,7 @@ export default function AboutPage() {
               variant='outline'
               className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
             >
-              <Sparkles className='size-5' />
+              <Sparkles className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>About PayeTax</span>
             </Badge>
 
@@ -159,7 +160,10 @@ export default function AboutPage() {
                   <div
                     className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
                   />
-                  <stat.icon className='mx-auto mb-4 size-10 text-primary' />
+                  <stat.icon
+                    className={`mx-auto mb-4 ${ICON_SIZES.SIZE_10} text-primary`}
+                    aria-hidden='true'
+                  />
                   <div className='mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
                   <div className='text-muted-foreground text-sm'>{stat.label}</div>
                 </Card>
@@ -173,7 +177,10 @@ export default function AboutPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-5xl px-4'>
           <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
-            <Heart className='mx-auto mb-6 size-16 text-primary' />
+            <Heart
+              className={`mx-auto mb-6 ${"size-16"} text-primary`}
+              aria-hidden='true'
+            />
             <GradientText variant='brand' as='h2' className='mb-6 font-bold text-4xl'>
               Our Mission
             </GradientText>
@@ -194,7 +201,7 @@ export default function AboutPage() {
               variant='outline'
               className='mb-6 gap-2 border-warning/50 bg-warning/20 px-6 py-2.5 text-warning'
             >
-              <Sparkles className='size-5' />
+              <Sparkles className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>Unique Features</span>
             </Badge>
             <GradientText
@@ -213,8 +220,10 @@ export default function AboutPage() {
             {/* Feature 1: Tax Trap Optimizer */}
             <div>
               <Card className='group h-full overflow-hidden border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-amber-500/50 md:hover:shadow-2xl'>
-                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
-                  <AlertTriangle className='size-8 text-white' />
+                <div
+                  className={`mb-6 inline-flex ${"size-16"} items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-4 shadow-lg transition-transform group-hover:scale-110`}
+                >
+                  <AlertTriangle className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
                   <span className='font-bold text-5xl text-foreground'>60%</span>
@@ -239,8 +248,13 @@ export default function AboutPage() {
             {/* Feature 2: Salary Comparison */}
             <div>
               <Card className='group h-full overflow-hidden border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-blue-500/50 md:hover:shadow-2xl'>
-                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
-                  <ArrowLeftRight className='size-8 text-white' />
+                <div
+                  className={`mb-6 inline-flex ${"size-16"} items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-4 shadow-lg transition-transform group-hover:scale-110`}
+                >
+                  <ArrowLeftRight
+                    className={`${ICON_SIZES.SIZE_8} text-white`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
                   <span className='font-bold text-5xl text-foreground'>3</span>
@@ -263,8 +277,10 @@ export default function AboutPage() {
             {/* Feature 3: Adaptive Theming */}
             <div>
               <Card className='group h-full overflow-hidden border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-pink-500/10 p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-purple-500/50 md:hover:shadow-2xl'>
-                <div className='mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-4 shadow-lg transition-transform group-hover:scale-110'>
-                  <Palette className='size-8 text-white' />
+                <div
+                  className={`mb-6 inline-flex ${"size-16"} items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-4 shadow-lg transition-transform group-hover:scale-110`}
+                >
+                  <Palette className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
                   <span className='font-bold text-5xl text-foreground'>3</span>
@@ -303,9 +319,9 @@ export default function AboutPage() {
                   className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${value.gradient} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-2xl`}
                 >
                   <div
-                    className={`mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br ${value.iconGradient} p-4 shadow-lg transition-transform group-hover:scale-110`}
+                    className={`mb-6 inline-flex ${"size-16"} items-center justify-center rounded-2xl bg-gradient-to-br ${value.iconGradient} p-4 shadow-lg transition-transform group-hover:scale-110`}
                   >
-                    <value.icon className='size-8 text-white' />
+                    <value.icon className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                   </div>
                   <h3 className='mb-4 font-bold text-2xl text-foreground'>{value.title}</h3>
                   <p className='text-muted-foreground leading-relaxed'>{value.description}</p>
@@ -324,7 +340,7 @@ export default function AboutPage() {
               variant='outline'
               className='mb-6 gap-2 border-primary/50 bg-primary/20 px-6 py-2.5 text-primary'
             >
-              <Code className='size-5' />
+              <Code className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>Modern Technology</span>
             </Badge>
             <GradientText
@@ -343,7 +359,10 @@ export default function AboutPage() {
             {techFeatures.map((feature) => (
               <div key={feature.title}>
                 <Card className='group h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-2xl'>
-                  <feature.icon className='mx-auto mb-4 size-12 text-primary' />
+                  <feature.icon
+                    className={`mx-auto mb-4 ${ICON_SIZES.SIZE_12} text-primary`}
+                    aria-hidden='true'
+                  />
                   <div className='mb-2 font-bold text-3xl text-foreground'>{feature.metric}</div>
                   <h3 className='mb-3 font-semibold text-foreground text-lg'>{feature.title}</h3>
                   <p className='text-muted-foreground text-sm'>{feature.description}</p>
@@ -384,7 +403,10 @@ export default function AboutPage() {
           <div>
             <Card className='border-primary/20 p-12'>
               <div className='mb-8 text-center'>
-                <Lightbulb className='mx-auto mb-6 size-16 text-primary' />
+                <Lightbulb
+                  className={`mx-auto mb-6 ${"size-16"} text-primary`}
+                  aria-hidden='true'
+                />
                 <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
                   Why We Built PayeTax
                 </GradientText>

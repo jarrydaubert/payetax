@@ -10,6 +10,7 @@ import { CalculatorContainer } from '@/components/organisms/CalculatorContainer'
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 const HomePageContent = memo(function HomePageContent() {
   const [_isPending, startTransition] = useTransition();
@@ -122,7 +123,7 @@ const HomePageContent = memo(function HomePageContent() {
             >
               <div className='mb-4 flex items-center gap-3'>
                 <div className='rounded-full bg-primary/10 p-3'>
-                  <Calculator className='size-6 text-primary' />
+                  <Calculator className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <h3 className='font-semibold text-lg group-hover:text-primary'>
                   UK Tax Calculator Guide
@@ -141,7 +142,7 @@ const HomePageContent = memo(function HomePageContent() {
             >
               <div className='mb-4 flex items-center gap-3'>
                 <div className='rounded-full bg-primary/10 p-3'>
-                  <FileText className='size-6 text-primary' />
+                  <FileText className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <h3 className='font-semibold text-lg group-hover:text-primary'>
                   How Much Tax Will I Pay?
@@ -160,7 +161,7 @@ const HomePageContent = memo(function HomePageContent() {
             >
               <div className='mb-4 flex items-center gap-3'>
                 <div className='rounded-full bg-primary/10 p-3'>
-                  <BookOpen className='size-6 text-primary' />
+                  <BookOpen className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <h3 className='font-semibold text-lg group-hover:text-primary'>
                   Understanding Tax Codes

@@ -17,6 +17,7 @@ import { GradientText } from '@/components/atoms/GradientText';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export const metadata: Metadata = {
   title: 'HMRC Compliance & Data Sources | PayeTax',
@@ -173,7 +174,7 @@ export default function CompliancePage() {
               variant='outline'
               className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
             >
-              <Shield className='size-5' />
+              <Shield className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>HMRC Compliance</span>
             </Badge>
 
@@ -225,7 +226,10 @@ export default function CompliancePage() {
                   <div
                     className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
                   />
-                  <stat.icon className='mx-auto mb-4 size-10 text-primary' />
+                  <stat.icon
+                    className={`mx-auto mb-4 ${ICON_SIZES.SIZE_10} text-primary`}
+                    aria-hidden='true'
+                  />
                   <div className='relative font-bold text-3xl text-foreground'>{stat.value}</div>
                   <div className='mt-2 text-muted-foreground text-sm'>{stat.label}</div>
                 </Card>
@@ -254,7 +258,10 @@ export default function CompliancePage() {
                       <div
                         className={`rounded-xl bg-gradient-to-br ${feature.color} p-3 shadow-lg`}
                       >
-                        <feature.icon className='size-6 text-white' />
+                        <feature.icon
+                          className={`${ICON_SIZES.SIZE_6} text-white`}
+                          aria-hidden='true'
+                        />
                       </div>
                       <div>
                         <h3 className='mb-1 font-bold text-foreground text-xl'>{feature.title}</h3>
@@ -270,7 +277,10 @@ export default function CompliancePage() {
                   <div className='space-y-3'>
                     {feature.details.map((detail) => (
                       <div key={detail} className='flex items-start gap-3'>
-                        <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-primary' />
+                        <CheckCircle
+                          className={`mt-0.5 ${ICON_SIZES.SIZE_5} flex-shrink-0 text-primary`}
+                          aria-hidden='true'
+                        />
                         <span className='text-muted-foreground text-sm'>{detail}</span>
                       </div>
                     ))}
@@ -278,7 +288,7 @@ export default function CompliancePage() {
 
                   <div className='mt-6 border-primary/10 border-t pt-4'>
                     <div className='flex items-center gap-2 text-muted-foreground text-sm'>
-                      <FileText className='size-4' />
+                      <FileText className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                       <span>Source: {feature.source}</span>
                     </div>
                   </div>
@@ -341,7 +351,10 @@ export default function CompliancePage() {
                 <Card className='group h-full border-primary/20 p-6 transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-xl'>
                   <div className='mb-4 flex items-start justify-between'>
                     <h3 className='font-bold text-foreground text-lg'>{source.source}</h3>
-                    <ExternalLink className='size-5 text-muted-foreground transition-colors group-hover:text-primary' />
+                    <ExternalLink
+                      className={`${ICON_SIZES.SIZE_5} text-muted-foreground transition-colors group-hover:text-primary`}
+                      aria-hidden='true'
+                    />
                   </div>
 
                   <p className='mb-6 text-muted-foreground text-sm leading-relaxed'>
@@ -383,7 +396,10 @@ export default function CompliancePage() {
             <Card className='border-yellow-500/30 p-8 md:p-12'>
               <div className='flex flex-col items-start gap-6 md:flex-row'>
                 <div className='rounded-xl bg-yellow-500/10 p-4'>
-                  <AlertTriangle className='size-8 text-yellow-500' />
+                  <AlertTriangle
+                    className={`${ICON_SIZES.SIZE_8} text-yellow-500`}
+                    aria-hidden='true'
+                  />
                 </div>
 
                 <div className='flex-1'>
@@ -410,7 +426,10 @@ export default function CompliancePage() {
                             key={item}
                             className='flex items-center gap-2 text-muted-foreground text-sm'
                           >
-                            <CheckCircle className='size-4 text-primary' />
+                            <CheckCircle
+                              className={`${ICON_SIZES.SIZE_4} text-primary`}
+                              aria-hidden='true'
+                            />
                             {item}
                           </li>
                         ))}
@@ -439,7 +458,10 @@ export default function CompliancePage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='text-center'>
-            <Sparkles className='mx-auto mb-6 size-12 text-primary' />
+            <Sparkles
+              className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`}
+              aria-hidden='true'
+            />
             <h2 className='mb-4 font-bold text-4xl text-foreground'>Questions About Compliance?</h2>
             <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
               We're committed to maintaining the highest standards of accuracy and compliance. If
@@ -450,7 +472,10 @@ export default function CompliancePage() {
               <Button asChild size='lg' className='group'>
                 <Link href='/'>
                   Try the Calculator
-                  <Sparkles className='ml-2 size-4 transition-transform group-hover:rotate-12' />
+                  <Sparkles
+                    className={`ml-2 ${ICON_SIZES.SIZE_4} transition-transform group-hover:rotate-12`}
+                    aria-hidden='true'
+                  />
                 </Link>
               </Button>
               <Button asChild variant='outline' size='lg'>

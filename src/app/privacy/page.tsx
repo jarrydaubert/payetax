@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | PayeTax - Client-Side Tax Calculations',
@@ -101,7 +102,7 @@ export default function PrivacyPolicyPage() {
               variant='outline'
               className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
             >
-              <Shield className='size-5' />
+              <Shield className={ICON_SIZES.SIZE_5} aria-hidden='true' />
               <span>Privacy Policy</span>
             </Badge>
 
@@ -119,7 +120,7 @@ export default function PrivacyPolicyPage() {
             </p>
 
             <div className='inline-flex items-center gap-2 text-muted-foreground'>
-              <Calendar className='size-4' />
+              <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
               <span className='text-sm'>Last updated: October 4, 2025</span>
             </div>
           </div>
@@ -130,7 +131,10 @@ export default function PrivacyPolicyPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-12 text-center'>
-            <CheckCircle className='mx-auto mb-4 size-16 text-primary' />
+            <CheckCircle
+              className={`mx-auto mb-4 ${"size-16"} text-primary`}
+              aria-hidden='true'
+            />
             <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
               The 30-Second Version
             </GradientText>
@@ -140,15 +144,23 @@ export default function PrivacyPolicyPage() {
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='overflow-hidden border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10 p-8'>
               <div className='mb-6 flex items-center gap-3'>
-                <div className='flex size-12 items-center justify-center rounded-xl bg-destructive shadow-lg'>
-                  <X className='size-6 text-destructive-foreground' />
+                <div
+                  className={`flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-xl bg-destructive shadow-lg`}
+                >
+                  <X
+                    className={`${ICON_SIZES.SIZE_6} text-destructive-foreground`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <h3 className='font-bold text-2xl text-foreground'>What We DON'T Do</h3>
               </div>
               <ul className='space-y-3'>
                 {dontDo.map((item) => (
                   <li key={item} className='flex items-start gap-3 text-muted-foreground'>
-                    <UserX className='mt-0.5 size-5 flex-shrink-0 text-destructive' />
+                    <UserX
+                      className={`mt-0.5 ${ICON_SIZES.SIZE_5} flex-shrink-0 text-destructive`}
+                      aria-hidden='true'
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -157,15 +169,23 @@ export default function PrivacyPolicyPage() {
 
             <Card className='overflow-hidden border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
               <div className='mb-6 flex items-center gap-3'>
-                <div className='flex size-12 items-center justify-center rounded-xl bg-primary shadow-lg'>
-                  <CheckCircle className='size-6 text-primary-foreground' />
+                <div
+                  className={`flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-xl bg-primary shadow-lg`}
+                >
+                  <CheckCircle
+                    className={`${ICON_SIZES.SIZE_6} text-primary-foreground`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <h3 className='font-bold text-2xl text-foreground'>What We DO</h3>
               </div>
               <ul className='space-y-3'>
                 {doDo.map((item) => (
                   <li key={item} className='flex items-start gap-3 text-muted-foreground'>
-                    <CheckCircle className='mt-0.5 size-5 flex-shrink-0 text-primary' />
+                    <CheckCircle
+                      className={`mt-0.5 ${ICON_SIZES.SIZE_5} flex-shrink-0 text-primary`}
+                      aria-hidden='true'
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -194,9 +214,12 @@ export default function PrivacyPolicyPage() {
                   className={`group h-full overflow-hidden border-primary/20 bg-gradient-to-br ${principle.color} p-8 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-2xl`}
                 >
                   <div
-                    className={`mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br ${principle.iconColor} p-4 shadow-lg transition-transform group-hover:scale-110`}
+                    className={`mb-6 inline-flex ${"size-16"} items-center justify-center rounded-2xl bg-gradient-to-br ${principle.iconColor} p-4 shadow-lg transition-transform group-hover:scale-110`}
                   >
-                    <principle.icon className='size-8 text-white' />
+                    <principle.icon
+                      className={`${ICON_SIZES.SIZE_8} text-white`}
+                      aria-hidden='true'
+                    />
                   </div>
                   <h3 className='mb-4 font-bold text-2xl text-foreground'>{principle.title}</h3>
                   <p className='text-muted-foreground leading-relaxed'>{principle.description}</p>
@@ -211,7 +234,10 @@ export default function PrivacyPolicyPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-16 text-center'>
-            <Lock className='mx-auto mb-6 size-16 text-primary' />
+            <Lock
+              className={`mx-auto mb-6 ${"size-16"} text-primary`}
+              aria-hidden='true'
+            />
             <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
               Where Your Tax Data Goes
             </GradientText>
@@ -223,8 +249,13 @@ export default function PrivacyPolicyPage() {
           <div className='grid gap-4 md:grid-cols-3 md:gap-8'>
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-primary shadow-lg'>
-                  <Database className='size-10 text-primary-foreground' />
+                <div
+                  className={`mx-auto mb-6 flex ${"size-20"} items-center justify-center rounded-2xl bg-primary shadow-lg`}
+                >
+                  <Database
+                    className={`${ICON_SIZES.SIZE_10} text-primary-foreground`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>Your Device</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -236,8 +267,13 @@ export default function PrivacyPolicyPage() {
 
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-accent shadow-lg'>
-                  <Server className='size-10 text-accent-foreground' />
+                <div
+                  className={`mx-auto mb-6 flex ${"size-20"} items-center justify-center rounded-2xl bg-accent shadow-lg`}
+                >
+                  <Server
+                    className={`${ICON_SIZES.SIZE_10} text-accent-foreground`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>Our Servers</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -249,8 +285,13 @@ export default function PrivacyPolicyPage() {
 
             <div>
               <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-                <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-primary/80 shadow-lg'>
-                  <FileText className='size-10 text-primary-foreground' />
+                <div
+                  className={`mx-auto mb-6 flex ${"size-20"} items-center justify-center rounded-2xl bg-primary/80 shadow-lg`}
+                >
+                  <FileText
+                    className={`${ICON_SIZES.SIZE_10} text-primary-foreground`}
+                    aria-hidden='true'
+                  />
                 </div>
                 <h3 className='mb-4 font-bold text-foreground text-xl'>localStorage</h3>
                 <p className='text-muted-foreground leading-relaxed'>
@@ -279,7 +320,10 @@ export default function PrivacyPolicyPage() {
             {/* Analytics */}
             <div>
               <div className='mb-8 text-center'>
-                <Globe className='mx-auto mb-6 size-16 text-accent' />
+                <Globe
+                  className={`mx-auto mb-6 ${"size-16"} text-accent`}
+                  aria-hidden='true'
+                />
                 <GradientText variant='brand' as='h2' className='mb-4 font-bold text-3xl'>
                   Website Analytics
                 </GradientText>
@@ -315,7 +359,10 @@ export default function PrivacyPolicyPage() {
             {/* Cookies */}
             <div>
               <div className='mb-8 text-center'>
-                <Cookie className='mx-auto mb-6 size-16 text-yellow-500' />
+                <Cookie
+                  className={`mx-auto mb-6 ${"size-16"} text-yellow-500`}
+                  aria-hidden='true'
+                />
                 <h2 className='mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-3xl text-transparent'>
                   Cookies We Use
                 </h2>
@@ -324,7 +371,9 @@ export default function PrivacyPolicyPage() {
 
               <Card className='border-red-500/30 bg-gradient-to-br from-red-500/5 to-red-500/10 p-8'>
                 <div className='mb-4 flex items-center gap-3'>
-                  <div className='flex size-8 items-center justify-center rounded-lg bg-red-500'>
+                  <div
+                    className={`flex ${ICON_SIZES.SIZE_8} items-center justify-center rounded-lg bg-red-500`}
+                  >
                     <span className='font-bold text-sm text-white'>!</span>
                   </div>
                   <h4 className='font-bold text-foreground text-lg'>Essential (Required)</h4>
@@ -340,7 +389,9 @@ export default function PrivacyPolicyPage() {
 
               <Card className='mt-6 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-blue-500/10 p-8'>
                 <div className='mb-4 flex items-center gap-3'>
-                  <div className='flex size-8 items-center justify-center rounded-lg bg-blue-500'>
+                  <div
+                    className={`flex ${ICON_SIZES.SIZE_8} items-center justify-center rounded-lg bg-blue-500`}
+                  >
                     <span className='font-bold text-sm text-white'>?</span>
                   </div>
                   <h4 className='font-bold text-foreground text-lg'>Analytics (Optional)</h4>
@@ -363,7 +414,7 @@ export default function PrivacyPolicyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-              <Globe className='mb-4 size-12 text-accent' />
+              <Globe className={`mb-4 ${ICON_SIZES.SIZE_12} text-accent`} aria-hidden='true' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>External Links</h3>
               <p className='text-muted-foreground leading-relaxed'>
                 We link to official sources like HMRC for tax information and rates. These external
@@ -372,7 +423,7 @@ export default function PrivacyPolicyPage() {
             </Card>
 
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
-              <Calendar className='mb-4 size-12 text-primary' />
+              <Calendar className={`mb-4 ${ICON_SIZES.SIZE_12} text-primary`} aria-hidden='true' />
               <h3 className='mb-4 font-bold text-foreground text-xl'>Policy Updates</h3>
               <p className='text-muted-foreground leading-relaxed'>
                 If we update this policy, we&apos;ll change the date at the top and add a notice on
@@ -387,7 +438,10 @@ export default function PrivacyPolicyPage() {
       <section className='bg-gradient-to-br from-primary/5 via-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
-            <Shield className='mx-auto mb-6 size-16 text-primary' />
+            <Shield
+              className={`mx-auto mb-6 ${"size-16"} text-primary`}
+              aria-hidden='true'
+            />
             <h2 className='mb-4 font-bold text-3xl text-foreground md:text-4xl'>
               Privacy-First Tax Calculations
             </h2>
