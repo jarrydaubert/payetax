@@ -18,7 +18,7 @@ const generateId = (text: string): string => {
 export const mdxComponents = {
   // Enhanced headings with anchor links
   h1: ({ children, ...props }: React.ComponentPropsWithoutRef<'h1'>) => {
-    const text = children?.toString() || '';
+    const text = typeof children === 'string' ? children : '';
     const id = generateId(text);
     return (
       <h1
@@ -33,13 +33,13 @@ export const mdxComponents = {
           className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
           aria-label='Link to this heading'
         >
-          <Hash className='size-6' />
+          <Hash className='size-6' aria-hidden='true' />
         </a>
       </h1>
     );
   },
   h2: ({ children, ...props }: React.ComponentPropsWithoutRef<'h2'>) => {
-    const text = children?.toString() || '';
+    const text = typeof children === 'string' ? children : '';
     const id = generateId(text);
     return (
       <h2
@@ -54,13 +54,13 @@ export const mdxComponents = {
           className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
           aria-label='Link to this heading'
         >
-          <Hash className='size-5' />
+          <Hash className='size-5' aria-hidden='true' />
         </a>
       </h2>
     );
   },
   h3: ({ children, ...props }: React.ComponentPropsWithoutRef<'h3'>) => {
-    const text = children?.toString() || '';
+    const text = typeof children === 'string' ? children : '';
     const id = generateId(text);
     return (
       <h3
@@ -75,7 +75,7 @@ export const mdxComponents = {
           className='text-primary opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100'
           aria-label='Link to this heading'
         >
-          <Hash className='size-4' />
+          <Hash className='size-4' aria-hidden='true' />
         </a>
       </h3>
     );
@@ -148,7 +148,7 @@ export const mdxComponents = {
         {...props}
       >
         {children}
-        {isExternal && <ExternalLink className='size-3' />}
+        {isExternal && <ExternalLink className='size-3' aria-hidden='true' />}
       </a>
     );
   },

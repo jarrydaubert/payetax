@@ -82,8 +82,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  // Compile MDX content (returns React component)
-  const MDXComponent = await compileMDXContent(post.content);
+  // Compile MDX content (returns React element)
+  const mdxContent = await compileMDXContent(post.content);
 
   // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3);
@@ -160,7 +160,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Article Content */}
           <ContentSection glass className='mb-6 md:mb-8'>
-            <div className='prose prose-lg max-w-none'>{MDXComponent}</div>
+            <div className='prose prose-lg max-w-none'>{mdxContent}</div>
           </ContentSection>
 
           {/* Article Footer */}
