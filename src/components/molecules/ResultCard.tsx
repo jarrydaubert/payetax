@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
 interface ResultCardProps {
@@ -17,6 +19,8 @@ interface ResultCardProps {
   delay?: number;
   /** Tooltip text to explain what this metric means */
   tooltip?: string;
+  /** Enable scroll-triggered reveal animation (default: false for backward compatibility) */
+  revealOnScroll?: boolean;
 }
 
 const variantStyles = {
@@ -40,7 +44,18 @@ const variantStyles = {
 
 /**
  * Result card molecule for displaying key metrics
+ * 
  * Uses design tokens: TEXT_SM for label, TEXT_2XL for value, SIZE_4 for icon, SPACE_Y_2 for spacing
+ * Supports both immediate and scroll-triggered reveal animations with accessibility support
+ * 
+ * @param label - The metric label/description
+ * @param value - The formatted value to display
+ * @param icon - Optional Lucide icon component
+ * @param variant - Visual style variant (default, success, warning, info)
+ * @param className - Additional CSS classes
+ * @param delay - Animation delay in seconds (only for immediate animations)
+ * @param tooltip - Optional tooltip text for metric explanation
+ * @param revealOnScroll - Enable scroll-triggered reveal (default: false for backward compatibility)
  */
 export function ResultCard({
   label,
@@ -50,8 +65,10 @@ export function ResultCard({
   className,
   delay = 0,
   tooltip,
+  revealOnScroll = false,
 }: ResultCardProps) {
   const styles = variantStyles[variant];
+  const shouldReduceMotion = useMotionPreference();
 
   const cardContent = (
     <Card className={cn('border-primary/20 p-4', tooltip && 'cursor-help', styles.card)}>
@@ -65,13 +82,34 @@ export function ResultCard({
     </Card>
   );
 
+  // Animation props based on reveal mode and motion preference
+  const animationProps = shouldReduceMotion
+    ? {} // No animation if user prefers reduced motion
+    : revealOnScroll
+      ? {
+          // Scroll-triggered reveal
+          initial: 'initial',
+          whileInView: 'animate',
+          viewport: { once: true, margin: '-50px' },
+          variants: ANIMATION_VARIANTS.fadeInUp,
+          transition: {
+            ...ANIMATION_TRANSITIONS.default,
+            delay,
+          },
+        }
+      : {
+          // Immediate reveal (legacy behavior)
+          initial: 'initial',
+          animate: 'animate',
+          variants: ANIMATION_VARIANTS.fadeInUp,
+          transition: {
+            ...ANIMATION_TRANSITIONS.default,
+            delay,
+          },
+        };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay }}
-      className={className}
-    >
+    <motion.div {...animationProps} className={className}>
       {tooltip ? (
         <TooltipProvider delayDuration={200}>
           <Tooltip>

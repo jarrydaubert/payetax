@@ -1,9 +1,12 @@
 // src/components/molecules/PeriodSelectorCard.tsx
 'use client';
 
+import { motion } from 'framer-motion';
 import { PeriodCheckbox } from '@/components/atoms/PeriodCheckbox';
 import { Card } from '@/components/ui/card';
+import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
 interface PeriodSelectorCardProps {
@@ -17,6 +20,9 @@ interface PeriodSelectorCardProps {
  * Composes multiple PeriodCheckbox atoms within a Card layout.
  * Follows atomic design pattern - molecule combining atoms with layout.
  *
+ * Features smooth layout animations when checkboxes are toggled using Framer Motion.
+ * Respects user motion preferences for accessibility.
+ *
  * IMPORTANT: Uses TEXT_LG for heading to match other section headings like "Enter Income Tax Details"
  * Base gap is GAP_2, with responsive overrides (sm:gap-3 md:gap-4) for larger screens
  */
@@ -25,6 +31,8 @@ export function PeriodSelectorCard({
   visiblePeriods,
   onPeriodToggle,
 }: PeriodSelectorCardProps) {
+  const shouldReduceMotion = useMotionPreference();
+
   return (
     <Card className='w-full border-primary/20 p-2 sm:p-3 md:p-4'>
       <p className={cn('mb-2 font-semibold text-foreground sm:mb-3', TYPOGRAPHY.TEXT_LG)}>
@@ -32,12 +40,17 @@ export function PeriodSelectorCard({
       </p>
       <div className={cn('flex flex-wrap sm:gap-3 md:gap-4', SPACING.GAP_2)}>
         {periods.map((period) => (
-          <PeriodCheckbox
+          <motion.div
             key={period}
-            period={period}
-            checked={visiblePeriods.includes(period)}
-            onCheckedChange={() => onPeriodToggle(period)}
-          />
+            layout={!shouldReduceMotion}
+            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
+          >
+            <PeriodCheckbox
+              period={period}
+              checked={visiblePeriods.includes(period)}
+              onCheckedChange={() => onPeriodToggle(period)}
+            />
+          </motion.div>
         ))}
       </div>
     </Card>

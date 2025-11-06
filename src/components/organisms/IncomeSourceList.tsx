@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
@@ -13,8 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 import {
   INCOME_TYPE_LABELS,
@@ -27,6 +30,7 @@ export function IncomeSourceList() {
   const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
   const { addIncomeSource, updateIncomeSource, removeIncomeSource } = useCalculatorActions();
   const [isOpen, setIsOpen] = React.useState(false);
+  const shouldReduceMotion = useMotionPreference();
 
   // Close the collapsible when income sources are cleared (e.g., on reset)
   React.useEffect(() => {
@@ -75,11 +79,17 @@ export function IncomeSourceList() {
           </p>
         )}
 
-        {incomeSources.map((source, index) => (
-          <div
-            key={source.id}
-            className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
-          >
+        <AnimatePresence mode='popLayout'>
+          {incomeSources.map((source, index) => (
+            <motion.div
+              key={source.id}
+              layout={!shouldReduceMotion}
+              initial={shouldReduceMotion ? {} : { opacity: 0, height: 0, scale: 0.8 }}
+              animate={shouldReduceMotion ? {} : { opacity: 1, height: 'auto', scale: 1 }}
+              exit={shouldReduceMotion ? {} : { opacity: 0, height: 0, scale: 0.8 }}
+              transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
+              className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
+            >
             <div className={cn('flex items-center', SPACING.GAP_2)}>
               <Badge
                 variant='outline'
@@ -160,8 +170,9 @@ export function IncomeSourceList() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </motion.div>
         ))}
+        </AnimatePresence>
 
         {/* Add Button */}
         <Button
