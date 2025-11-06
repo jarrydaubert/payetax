@@ -35,19 +35,31 @@ export default function OfflinePage() {
             <h2 className='mb-4 font-semibold text-foreground text-xl'>Available Offline:</h2>
             <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
               <div className='flex items-center gap-3'>
-                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
+                <CheckCircle
+                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                  aria-hidden='true'
+                />
                 <span className='text-muted-foreground'>Tax calculations</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
+                <CheckCircle
+                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                  aria-hidden='true'
+                />
                 <span className='text-muted-foreground'>Cached tax rates</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
+                <CheckCircle
+                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                  aria-hidden='true'
+                />
                 <span className='text-muted-foreground'>Previous results</span>
               </div>
               <div className='flex items-center gap-3'>
-                <CheckCircle className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`} aria-hidden='true' />
+                <CheckCircle
+                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                  aria-hidden='true'
+                />
                 <span className='text-muted-foreground'>Saved calculations</span>
               </div>
             </div>

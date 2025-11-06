@@ -3,6 +3,7 @@ import { Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 /**
  * Popular salary calculator links molecule
@@ -42,7 +43,7 @@ export function PopularSalaryLinks() {
             className='h-auto flex-col gap-2 p-4 transition-all hover:border-primary hover:shadow-md'
           >
             <Link href={`/calculator/${salary}-after-tax`}>
-              <Calculator className='size-5 text-primary' />
+              <Calculator className={`${ICON_SIZES.SIZE_5} text-primary`} aria-hidden='true' />
               <span className='font-semibold text-foreground'>{label} Salary</span>
               <span className='text-muted-foreground text-xs'>After Tax</span>
             </Link>

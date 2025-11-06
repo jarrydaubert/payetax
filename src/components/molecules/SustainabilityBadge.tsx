@@ -6,6 +6,7 @@ import { Leaf, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ICON_SIZES } from '@/constants/designTokens';
 
 export default function SustainabilityBadge() {
   const [showDetails, setShowDetails] = useState(false);
@@ -24,7 +25,7 @@ export default function SustainabilityBadge() {
           className='gap-2 rounded-full bg-green-600/90 text-sm backdrop-blur-sm hover:bg-green-600'
           aria-label='View eco-friendly information'
         >
-          <Leaf className='size-4' />
+          <Leaf className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           <span className='hidden sm:inline'>Eco-Friendly</span>
         </Button>
       </motion.div>
@@ -57,7 +58,7 @@ export default function SustainabilityBadge() {
                   {/* Header */}
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-2'>
-                      <Leaf className='size-6 text-green-400' />
+                      <Leaf className={`${ICON_SIZES.SIZE_6} text-green-400`} aria-hidden='true' />
                       <h3 className='font-semibold text-xl'>Eco-Friendly Calculator</h3>
                     </div>
                     <Button
@@ -67,7 +68,7 @@ export default function SustainabilityBadge() {
                       className='size-8'
                       aria-label='Close'
                     >
-                      <X className='size-4' />
+                      <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                     </Button>
                   </div>
 

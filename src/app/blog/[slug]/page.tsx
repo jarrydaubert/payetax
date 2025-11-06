@@ -179,7 +179,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Button asChild>
                   <Link href='/'>
                     Calculate Your Tax
-                    <ArrowLeft className={`ml-2 ${ICON_SIZES.SIZE_4} rotate-180`} aria-hidden='true' />
+                    <ArrowLeft
+                      className={`ml-2 ${ICON_SIZES.SIZE_4} rotate-180`}
+                      aria-hidden='true'
+                    />
                   </Link>
                 </Button>
               </div>

@@ -81,7 +81,7 @@ export function MarriageAllowanceAlert({
       variant='default'
       className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'
     >
-      <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-pink-600 dark:text-pink-400')} />
+      <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-pink-600 dark:text-pink-400')} aria-hidden='true' />
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex-1'>
           <AlertTitle className='text-pink-900 dark:text-pink-100'>
@@ -109,7 +109,7 @@ export function MarriageAllowanceAlert({
         >
           <a href='https://www.gov.uk/marriage-allowance' target='_blank' rel='noopener noreferrer'>
             Check Eligibility on GOV.UK
-            <ExternalLink className={ICON_SIZES.SIZE_4} />
+            <ExternalLink className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           </a>
         </Button>
       </div>

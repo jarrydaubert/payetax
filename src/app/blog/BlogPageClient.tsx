@@ -210,7 +210,10 @@ export function BlogPageClient({
 
                     <div className='inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-lg transition-all duration-300 group-hover:gap-4 group-hover:shadow-2xl'>
                       <span>Read Article</span>
-                      <ArrowRight className={`${ICON_SIZES.SIZE_5} transition-transform group-hover:translate-x-1`} aria-hidden='true' />
+                      <ArrowRight
+                        className={`${ICON_SIZES.SIZE_5} transition-transform group-hover:translate-x-1`}
+                        aria-hidden='true'
+                      />
                     </div>
                   </div>
 
