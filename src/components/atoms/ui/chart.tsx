@@ -32,23 +32,26 @@ function useChart() {
 interface ChartContainerProps extends React.ComponentProps<'div'> {
   config: Record<string, { label: string; color?: string; icon?: React.ComponentType }>;
   children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
-  ({ className, config, children, ...props }, ref) => {
-    return (
-      <ChartContext.Provider value={{ config }}>
-        <div
-          ref={ref}
-          className={cn('flex aspect-auto h-[250px] w-full justify-center text-xs', className)}
-          {...props}
-        >
-          {children}
-        </div>
-      </ChartContext.Provider>
-    );
-  }
-);
+/**
+ * Chart container component with React 19 ref-as-prop pattern
+ * No forwardRef needed - ref is passed as a regular prop in React 19
+ */
+function ChartContainer({ className, config, children, ref, ...props }: ChartContainerProps) {
+  return (
+    <ChartContext.Provider value={{ config }}>
+      <div
+        ref={ref}
+        className={cn('flex aspect-auto h-[250px] w-full justify-center text-xs', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </ChartContext.Provider>
+  );
+}
 ChartContainer.displayName = 'ChartContainer';
 
 // Tooltip Components
@@ -81,110 +84,111 @@ interface ChartTooltipContentProps {
     payload: unknown[]
   ) => React.ReactNode;
   color?: string;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const ChartTooltipContent = React.forwardRef<HTMLDivElement, ChartTooltipContentProps>(
-  (
-    {
-      active,
-      payload,
-      className,
-      indicator = 'dot',
-      hideLabel = false,
-      hideIndicator = false,
-      label,
-      labelFormatter,
-      labelClassName,
-      formatter,
-      color,
-      nameKey,
-      labelKey,
-    },
-    ref
-  ) => {
-    const { config } = useChart();
+/**
+ * Chart tooltip content component with React 19 ref-as-prop pattern
+ * No forwardRef needed - ref is passed as a regular prop in React 19
+ */
+function ChartTooltipContent({
+  active,
+  payload,
+  className,
+  indicator = 'dot',
+  hideLabel = false,
+  hideIndicator = false,
+  label,
+  labelFormatter,
+  labelClassName,
+  formatter,
+  color,
+  nameKey,
+  labelKey,
+  ref,
+}: ChartTooltipContentProps) {
+  const { config } = useChart();
 
-    const tooltipLabel = React.useMemo(() => {
-      if (hideLabel || !payload?.length) {
-        return null;
-      }
-
-      const [item] = payload;
-      const key = `${labelKey || item.dataKey || item.name || 'value'}`;
-      const itemConfig = config[key];
-      const value =
-        !labelKey && typeof label === 'string'
-          ? config[label]?.label || label
-          : itemConfig?.label || item.name;
-
-      if (labelFormatter) {
-        return (
-          <div className={cn('font-medium', labelClassName)}>{labelFormatter(value, payload)}</div>
-        );
-      }
-
-      if (!value) {
-        return null;
-      }
-
-      return <div className={cn('font-medium', labelClassName)}>{value}</div>;
-    }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
-
-    if (!(active && payload?.length)) {
+  const tooltipLabel = React.useMemo(() => {
+    if (hideLabel || !payload?.length) {
       return null;
     }
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
-          className
-        )}
-      >
-        {tooltipLabel}
-        <div className='grid gap-1.5'>
-          {payload.map((item, index) => {
-            const key = `${nameKey || item.name || item.dataKey || 'value'}`;
-            const itemConfig = config[key];
-            const indicatorColor =
-              color ||
-              (item.payload && 'fill' in item.payload ? item.payload.fill : undefined) ||
-              item.color;
+    const [item] = payload;
+    const key = `${labelKey || item.dataKey || item.name || 'value'}`;
+    const itemConfig = config[key];
+    const value =
+      !labelKey && typeof label === 'string'
+        ? config[label]?.label || label
+        : itemConfig?.label || item.name;
 
-            return (
-              <div
-                key={`${item.dataKey}-${index}`}
-                className='flex w-full items-center gap-2 text-xs'
-              >
-                {!hideIndicator && (
-                  <div
-                    className={cn(
-                      'h-2.5 w-2.5 shrink-0 rounded-[2px]',
-                      indicator === 'dot' && 'rounded-full',
-                      indicator === 'line' && 'w-1'
-                    )}
-                    style={{
-                      backgroundColor: indicatorColor as string | undefined,
-                    }}
-                  />
-                )}
-                <div className='flex flex-1 justify-between gap-2 leading-none'>
-                  <span className='text-muted-foreground'>{itemConfig?.label || item.name}</span>
-                  <span className='font-medium font-mono text-foreground tabular-nums'>
-                    {formatter
-                      ? formatter(item.value || 0, item.name || '', item, index, payload)
-                      : item.value}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
+    if (labelFormatter) {
+      return (
+        <div className={cn('font-medium', labelClassName)}>{labelFormatter(value, payload)}</div>
+      );
+    }
+
+    if (!value) {
+      return null;
+    }
+
+    return <div className={cn('font-medium', labelClassName)}>{value}</div>;
+  }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
+
+  if (!(active && payload?.length)) {
+    return null;
   }
-);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
+        className
+      )}
+    >
+      {tooltipLabel}
+      <div className='grid gap-1.5'>
+        {payload.map((item, index) => {
+          const key = `${nameKey || item.name || item.dataKey || 'value'}`;
+          const itemConfig = config[key];
+          const indicatorColor =
+            color ||
+            (item.payload && 'fill' in item.payload ? item.payload.fill : undefined) ||
+            item.color;
+
+          return (
+            <div
+              key={`${item.dataKey}-${index}`}
+              className='flex w-full items-center gap-2 text-xs'
+            >
+              {!hideIndicator && (
+                <div
+                  className={cn(
+                    'h-2.5 w-2.5 shrink-0 rounded-[2px]',
+                    indicator === 'dot' && 'rounded-full',
+                    indicator === 'line' && 'w-1'
+                  )}
+                  style={{
+                    backgroundColor: indicatorColor as string | undefined,
+                  }}
+                />
+              )}
+              <div className='flex flex-1 justify-between gap-2 leading-none'>
+                <span className='text-muted-foreground'>{itemConfig?.label || item.name}</span>
+                <span className='font-medium font-mono text-foreground tabular-nums'>
+                  {formatter
+                    ? formatter(item.value || 0, item.name || '', item, index, payload)
+                    : item.value}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 ChartTooltipContent.displayName = 'ChartTooltipContent';
 
 // Legend Components
@@ -194,46 +198,55 @@ interface ChartLegendContentProps extends React.ComponentProps<'div'> {
   payload?: Array<{ value: string; type?: string; color?: string }>;
   nameKey?: string;
   hideIcon?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const ChartLegendContent = React.forwardRef<HTMLDivElement, ChartLegendContentProps>(
-  ({ className, hideIcon = false, payload, nameKey }, ref) => {
-    const { config } = useChart();
+/**
+ * Chart legend content component with React 19 ref-as-prop pattern
+ * No forwardRef needed - ref is passed as a regular prop in React 19
+ */
+function ChartLegendContent({
+  className,
+  hideIcon = false,
+  payload,
+  nameKey,
+  ref,
+}: ChartLegendContentProps) {
+  const { config } = useChart();
 
-    if (!payload?.length) {
-      return null;
-    }
-
-    return (
-      <div ref={ref} className={cn('flex items-center justify-center gap-4 text-xs', className)}>
-        {payload.map((item) => {
-          // Type assertion for payload items from recharts library
-          const dataKey = 'dataKey' in item ? (item.dataKey as string) : undefined;
-          const key = `${nameKey || item.value || dataKey || 'value'}`;
-          const itemConfig = config[key];
-
-          return (
-            <div
-              key={item.value}
-              className='flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
-            >
-              {!hideIcon && (
-                <div
-                  className='h-2 w-2 shrink-0 rounded-[2px]'
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
-              {itemConfig?.icon && <itemConfig.icon />}
-              <span className='text-muted-foreground'>{itemConfig?.label || item.value}</span>
-            </div>
-          );
-        })}
-      </div>
-    );
+  if (!payload?.length) {
+    return null;
   }
-);
+
+  return (
+    <div ref={ref} className={cn('flex items-center justify-center gap-4 text-xs', className)}>
+      {payload.map((item) => {
+        // Type assertion for payload items from recharts library
+        const dataKey = 'dataKey' in item ? (item.dataKey as string) : undefined;
+        const key = `${nameKey || item.value || dataKey || 'value'}`;
+        const itemConfig = config[key];
+
+        return (
+          <div
+            key={item.value}
+            className='flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
+          >
+            {!hideIcon && (
+              <div
+                className='h-2 w-2 shrink-0 rounded-[2px]'
+                style={{
+                  backgroundColor: item.color,
+                }}
+              />
+            )}
+            {itemConfig?.icon && <itemConfig.icon />}
+            <span className='text-muted-foreground'>{itemConfig?.label || item.value}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 ChartLegendContent.displayName = 'ChartLegendContent';
 
 export {

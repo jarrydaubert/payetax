@@ -2,8 +2,9 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useActionState, useEffect, useId, useState } from 'react';
 import { toast } from 'sonner';
+import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -23,6 +24,7 @@ import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
 /**
  * Feedback dialog organism for collecting user feedback
+ * React 19 features: useActionState for server action integration
  * Uses Zod validation for type-safe form validation
  * Design tokens: TEXT_SM for labels/text, SIZE_4 for icons, SPACE_Y_4/SPACE_Y_2 for form spacing
  */
@@ -30,7 +32,6 @@ export function FeedbackDialog() {
   const emailId = useId();
   const messageId = useId();
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     message: '',
@@ -39,6 +40,24 @@ export function FeedbackDialog() {
     email: '',
     message: '',
   });
+
+  // React 19: useActionState hook for server action state management
+  const [state, formAction, isPending] = useActionState<FeedbackFormState, FormData>(
+    submitFeedback,
+    { success: false }
+  );
+
+  // Handle server action response
+  useEffect(() => {
+    if (state.success) {
+      toast.success(state.message || 'Feedback sent successfully!');
+      setFormData({ email: '', message: '' });
+      setErrors({ email: '', message: '' });
+      setOpen(false);
+    } else if (state.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
 
   const messageLength = formData.message.trim().length;
   const minLength = 10;
@@ -65,40 +84,30 @@ export function FeedbackDialog() {
     return true;
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
+  /**
+   * React 19: Form submission with server action
+   * Uses FormData API for progressive enhancement
+   */
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Client-side validation first
     if (!validate()) {
       return;
     }
 
-    setIsSubmitting(true);
+    // Create FormData with all necessary fields
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('email', formData.email);
+    formDataToSubmit.append('message', formData.message);
+    formDataToSubmit.append('url', window.location.href);
+    formDataToSubmit.append('userAgent', navigator.userAgent);
+    formDataToSubmit.append('timestamp', new Date().toISOString());
+    // Note: IP address will be extracted server-side from request headers
+    formDataToSubmit.append('ipAddress', 'client'); // Placeholder, extracted server-side
 
-    try {
-      const res = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString(),
-        }),
-      });
-
-      if (res.ok) {
-        toast.success('Thanks! Your feedback has been sent to the team.');
-        setFormData({ email: '', message: '' });
-        setOpen(false);
-      } else {
-        const data = await res.json().catch(() => ({ error: 'Unknown error occurred' }));
-        toast.error(data.error || 'Failed to send feedback. Please try again.');
-      }
-    } catch (_error) {
-      toast.error('Network error. Please check your connection and try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Call server action
+    formAction(formDataToSubmit);
   };
 
   return (
@@ -197,8 +206,9 @@ export function FeedbackDialog() {
           </div>
 
           <DialogFooter>
-            <Button type='submit' className='w-full' disabled={isSubmitting}>
-              {isSubmitting ? (
+            {/* React 19: useActionState provides isPending state */}
+            <Button type='submit' className='w-full' disabled={isPending}>
+              {isPending ? (
                 <>
                   <div
                     className={cn(
