@@ -27,8 +27,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -73,6 +75,7 @@ export function WhatIfComparisonDisplay({
   // Use granular selectors to avoid unnecessary re-renders
   const studentLoanPlan = useCalculatorStore((state) => state.input.studentLoanPlan);
   const allowancesDeductions = useCalculatorStore((state) => state.input.allowancesDeductions);
+  const shouldReduceMotion = useMotionPreference();
 
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
@@ -222,9 +225,10 @@ export function WhatIfComparisonDisplay({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      layout={!shouldReduceMotion}
+      initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+      animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
+      transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
       className={`space-y-4 ${className || ''}`}
     >
       {/* Header */}
