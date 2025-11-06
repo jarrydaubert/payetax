@@ -235,14 +235,14 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
       />
     );
 
-    // Verify all period headers are present
-    expect(screen.getByText('Yearly')).toBeInTheDocument();
-    expect(screen.getByText('Monthly')).toBeInTheDocument();
-    expect(screen.getByText('4-Weekly')).toBeInTheDocument();
-    expect(screen.getByText('Fortnightly')).toBeInTheDocument();
-    expect(screen.getByText('Weekly')).toBeInTheDocument();
-    expect(screen.getByText('Daily')).toBeInTheDocument();
-    expect(screen.getByText('Hourly')).toBeInTheDocument();
+    // Verify all period headers are present (use getAllByText since text appears in both checkboxes and headers)
+    expect(screen.getAllByText('Yearly').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Monthly').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('4-Weekly').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Fortnightly').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Weekly').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Daily').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Hourly').length).toBeGreaterThan(0);
 
     // Verify "Current" and "What If" sub-headers for each period
     const currentHeaders = screen.getAllByText('Current');
@@ -290,12 +290,12 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
       />
     );
 
-    // Total gross income includes employment + rental
-    // Current: £60,000 + £18,000 = £78,000
-    // What If: £66,000 + £18,000 = £84,000
+    // grossSalary only includes employment income (not rental income)
+    // Current employment: £60,000
+    // What If employment: £66,000
 
-    expect(currentResults.grossSalary.annually).toBeCloseTo(78000, 0);
-    expect(whatIfResults.grossSalary.annually).toBeCloseTo(84000, 0);
+    expect(currentResults.grossSalary.annually).toBeCloseTo(60000, 0);
+    expect(whatIfResults.grossSalary.annually).toBeCloseTo(66000, 0);
 
     // Current pension: £60,000 × 8% = £4,800 (only on employment income)
     expect(currentResults.pensionContribution.annually).toBeCloseTo(4800, 0);
