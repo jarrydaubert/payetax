@@ -65,7 +65,11 @@ export function GlowButton({
     if (scope.current) {
       const runAnimation = async () => {
         await animate(scope.current, { scale: 0.95 }, { duration: 0.1 });
-        await animate(scope.current, { scale: 1.05 }, { duration: 0.15, type: 'spring', stiffness: 400 });
+        await animate(
+          scope.current,
+          { scale: 1.05 },
+          { duration: 0.15, type: 'spring', stiffness: 400 }
+        );
         await animate(scope.current, { scale: 1 }, { duration: 0.2, type: 'spring', damping: 15 });
       };
       runAnimation();

@@ -4,10 +4,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { ResultCard } from '@/components/molecules/ResultCard';
-import {
-  ANIMATION_CONTAINER_VARIANTS,
-  ANIMATION_VARIANTS,
-} from '@/constants/animationTokens';
+import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
@@ -62,52 +59,52 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
       <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
         <ResultCard
           label='Annual Take-Home'
-        value={formatCurrency(results.netPay.annually)}
-        icon={Wallet}
-        variant='success'
-        delay={0}
-        tooltip='Your total yearly salary after income tax, National Insurance, and other deductions have been taken out.'
+          value={formatCurrency(results.netPay.annually)}
+          icon={Wallet}
+          variant='success'
+          delay={0}
+          tooltip='Your total yearly salary after income tax, National Insurance, and other deductions have been taken out.'
         />
       </motion.div>
       <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
         <ResultCard
           label='Monthly Take-Home'
-        value={formatCurrency(results.netPay.monthly)}
-        icon={Calendar}
-        variant='info'
-        delay={0.05}
-        tooltip='The amount you receive in your bank account each month. This is your annual take-home divided by 12.'
+          value={formatCurrency(results.netPay.monthly)}
+          icon={Calendar}
+          variant='info'
+          delay={0.05}
+          tooltip='The amount you receive in your bank account each month. This is your annual take-home divided by 12.'
         />
       </motion.div>
       <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
         <ResultCard
           label='Total Tax & NI'
-        value={formatCurrency(totalTax)}
-        icon={TrendingDown}
-        variant='warning'
-        delay={0.1}
-        tooltip='The combined total of income tax and National Insurance contributions you pay annually. This money funds public services like the NHS and state pension.'
+          value={formatCurrency(totalTax)}
+          icon={TrendingDown}
+          variant='warning'
+          delay={0.1}
+          tooltip='The combined total of income tax and National Insurance contributions you pay annually. This money funds public services like the NHS and state pension.'
         />
       </motion.div>
       <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
         <ResultCard
           label='Effective Tax Rate'
-        value={`${effectiveRate.toFixed(1)}%`}
-        icon={Percent}
-        variant='default'
-        delay={0.15}
-        tooltip='The overall percentage of your gross salary that goes to tax and NI. This is your total tax divided by your gross salary.'
+          value={`${effectiveRate.toFixed(1)}%`}
+          icon={Percent}
+          variant='default'
+          delay={0.15}
+          tooltip='The overall percentage of your gross salary that goes to tax and NI. This is your total tax divided by your gross salary.'
         />
       </motion.div>
       <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
         <ResultCard
           label='Marginal Tax Rate'
-        value={`${(100 - marginalRate).toFixed(1)}%`}
-        icon={TrendingUp}
-        variant='info'
-        delay={0.2}
-        className='md:col-span-2 lg:col-span-1'
-        tooltip='The percentage of tax you pay on each additional £1 you earn. This depends on which tax band you are in and helps you understand the value of pay rises or bonuses.'
+          value={`${(100 - marginalRate).toFixed(1)}%`}
+          icon={TrendingUp}
+          variant='info'
+          delay={0.2}
+          className='md:col-span-2 lg:col-span-1'
+          tooltip='The percentage of tax you pay on each additional £1 you earn. This depends on which tax band you are in and helps you understand the value of pay rises or bonuses.'
         />
       </motion.div>
     </motion.section>
