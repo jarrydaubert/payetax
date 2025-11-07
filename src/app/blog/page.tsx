@@ -5,9 +5,9 @@ import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } f
 import { BlogPageClient } from './BlogPageClient';
 
 // Next.js 16: Route segment config for optimized blog listing
-// Changed to dynamic to support query params (category, page) in dev
-export const dynamic = 'force-dynamic'; // Dynamic rendering to respect search params
+// Use ISR with revalidation to support dynamic params while maintaining performance
 export const revalidate = 3600; // ISR: Revalidate every hour for new posts
+export const dynamicParams = true; // Allow dynamic search params
 
 export const metadata: Metadata = {
   title: 'TaxInsights by PayeTax | UK Tax Guidance',
