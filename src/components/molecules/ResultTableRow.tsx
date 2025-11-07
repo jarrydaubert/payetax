@@ -1,9 +1,12 @@
 // src/components/molecules/ResultTableRow.tsx
 'use client';
 
+import { motion } from 'framer-motion';
 import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultTableRowProps {
@@ -24,6 +27,7 @@ interface ResultTableRowProps {
  * Handles icon, category name, percentage, and values across multiple time periods.
  * Follows atomic design pattern - molecule for consistent row rendering.
  * Uses design tokens: SIZE_3_5 for compact table icons, TEXT_SM for all text, GAP_1_5 for tight spacing
+ * Enhanced with layout animations (PAYTAX-75 Phase 3: Framer Motion Maximization)
  */
 export function ResultTableRow({
   category,
@@ -37,12 +41,19 @@ export function ResultTableRow({
   visiblePeriods,
   periodOptions,
 }: ResultTableRowProps) {
+  const shouldReduceMotion = useMotionPreference();
   const hasWhatIf = whatIfAnnual !== undefined;
+
+  // Layout animation: smooth transitions when periods change or what-if toggles
+  const MotionTableRow = shouldReduceMotion ? TableRow : motion(TableRow);
+
   return (
-    <TableRow
+    <MotionTableRow
       className={`border-b transition-colors hover:bg-muted/50 ${
         isHighlight ? 'border-t border-t-border bg-primary/5' : ''
       }`}
+      layout={!shouldReduceMotion}
+      transition={!shouldReduceMotion ? ANIMATION_TRANSITIONS.layout : undefined}
     >
       <TableCell
         className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5`}
@@ -110,6 +121,6 @@ export function ResultTableRow({
           </TableCell>
         );
       })}
-    </TableRow>
+    </MotionTableRow>
   );
 }
