@@ -55,7 +55,7 @@ export function GlowButton({
   const [scope, animate] = useAnimate();
 
   // Satisfying click animation sequence
-  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = useCallback(() => {
     // Call onClick immediately for functionality
     if (onClick) {
       onClick();

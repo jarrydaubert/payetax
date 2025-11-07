@@ -6,6 +6,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_GESTURES } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
@@ -30,12 +31,14 @@ export interface TaxRateCardProps {
  */
 export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCardProps) {
   const shouldReduceMotion = useMotionPreference();
+  const isMobile = useIsMobile();
 
   // Gesture animations (PAYTAX-75: Framer Motion Maximization)
+  // Mobile-optimized: smaller scale to prevent layout issues on small screens
   const gestureProps = shouldReduceMotion
     ? {}
     : {
-        whileHover: ANIMATION_GESTURES.hover,
+        whileHover: isMobile ? ANIMATION_GESTURES.hoverGentle : ANIMATION_GESTURES.hover,
         whileTap: ANIMATION_GESTURES.tapGentle,
       };
 
