@@ -1,0 +1,113 @@
+# GitLab CI/CD Pipeline for PayeTax
+# Balanced approach: Basic best practices + Vercel handles production
+# Target: ~200-300 minutes/month (well within 400 minute free tier)
+
+stages:
+  - prepare
+  - security
+  - test
+  - validate
+
+# Shared cache configuration
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .npm/
+
+# ──────────────────────────────────────────────────────────
+# STAGE: PREPARE - Install dependencies once, reuse everywhere
+# ──────────────────────────────────────────────────────────
+
+install_dependencies:
+  stage: prepare
+  image: node:20-alpine
+  script:
+    - echo "📦 Installing dependencies..."
+    - npm ci --cache .npm --prefer-offline
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+  cache:
+    paths:
+      - .npm/
+  only:
+    - merge_requests
+    - main
+
+# ──────────────────────────────────────────────────────────
+# STAGE: SECURITY - GitLab's built-in scanning (fast & reliable)
+# ──────────────────────────────────────────────────────────
+
+# Built-in secret detection using Gitleaks
+# Note: This template expects a 'test' stage, so we add it to our stages list
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+# Override the secret_detection job to use our 'security' stage instead of 'test'
+secret_detection:
+  stage: security
+
+# Dependency vulnerability scanning (high/critical only)
+dependency_audit:
+  stage: security
+  image: node:20-alpine
+  dependencies:
+    - install_dependencies
+  script:
+    - echo "🔍 Checking for vulnerable dependencies..."
+    - npm audit --audit-level=high --production
+  allow_failure: true  # Don't block on medium/low vulnerabilities
+  only:
+    - main
+    - merge_requests
+
+# ──────────────────────────────────────────────────────────
+# STAGE: VALIDATE - Quick quality checks (MRs only)
+# ──────────────────────────────────────────────────────────
+
+# Fast validation: TypeScript + Linting (no tests, Vercel catches build issues)
+quick_validation:
+  stage: validate
+  image: node:20-alpine
+  dependencies:
+    - install_dependencies
+  needs: ["install_dependencies"]
+  script:
+    - echo "⚡ Running quick validation..."
+    - npm run typecheck          # TypeScript (~30-60 sec)
+    - npx biome check .          # Linting (~20-30 sec)
+  only:
+    - merge_requests  # NOT on main (Vercel validates on deploy)
+  timeout: 5 minutes
+
+# ──────────────────────────────────────────────────────────
+# WHAT THIS PIPELINE DOES:
+# ──────────────────────────────────────────────────────────
+# ✅ Security: Secret detection + dependency scanning
+# ✅ Quality gate: Quick typecheck + linting on MRs
+# ✅ Efficiency: Single npm ci, reused by all jobs
+# ✅ Fast feedback: ~2-3 min on MRs, ~1 min on main
+#
+# WHAT VERCEL HANDLES (automatic, free):
+# ✅ Build validation on every push
+# ✅ Unit/integration tests (via build process)
+# ✅ Deployment previews for MRs
+# ✅ Production deployments (main branch)
+#
+# WHAT RUNS LOCALLY (Husky hooks):
+# ✅ Pre-commit: Linting + typecheck + unit tests
+# ✅ Pre-push: Full test suite + build validation (PAYTAX-24)
+# ──────────────────────────────────────────────────────────
+
+# ⏱️  ESTIMATED MONTHLY USAGE (FREE TIER: 400 MIN)
+# ──────────────────────────────────────────────────────────
+# Main pushes (88x/month):
+#   - install + security: ~1.5 min × 88 = 132 min
+# 
+# Merge requests (25x/month):
+#   - install + security + validate: ~3 min × 25 = 75 min
+#
+# Total: ~207 minutes/month ✅
+# Buffer: 193 minutes remaining for spikes
+# ──────────────────────────────────────────────────────────
