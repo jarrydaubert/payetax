@@ -5,10 +5,28 @@
 **Assignee:** Factory Droid  
 **Priority:** Medium
 
+## ⚠️ CRITICAL CONTEXT UPDATE (2025-11-07)
+
+**This audit must align with PAYTAX-58 parent issue: TECH STACK MAXIMIZATION**
+
+- **PAYTAX-58**: "Maximize quality, consistency, and tech stack **utilization**"
+- **PAYTAX-75**: "Framer Motion 12.23.24 **MAXIMIZATION**" (embrace, don't replace!)
+- **Current bundle**: 252kB (target <300kB) ✅ **ALREADY PASSING**
+
+**Strategy Correction:**
+- ❌ **DO NOT** replace Framer Motion with CSS (contradicts maximization goal)
+- ✅ **DO** embrace Framer Motion 12.23.24 features (useAnimate, gestures, springs)
+- ✅ **DO** optimize via dynamic imports, lazy loading, tree-shaking
+- ✅ **DO** keep Phase 1.1 win: 571KB Recharts dynamic import
+
+**Phase 1.2A Reverted:**
+- Incorrectly replaced Framer Motion with CSS animations
+- Restored in commit c7ddfa1
+
 ## Objective
 
 Conduct comprehensive performance audit and implement optimizations to:
-- ✅ Reduce bundle sizes
+- ✅ Reduce bundle sizes (WITHOUT removing core dependencies)
 - ✅ Improve page load times
 - ✅ Optimize Time to Interactive (TTI)
 - ✅ Enhance Core Web Vitals scores
@@ -73,23 +91,23 @@ Conduct comprehensive performance audit and implement optimizations to:
 - ✅ Lazy load charts below the fold
 - ✅ Consider code splitting by chart type
 
-#### Issue #2: Large Framer Motion Bundle (480KB)
-**Impact:** Animation library loaded for all pages  
+#### Issue #2: Framer Motion Bundle (480KB) - ⚠️ KEEP & MAXIMIZE
+**Impact:** Animation library is a core dependency (PAYTAX-75)  
 **Location:** 21 files using Framer Motion  
 **Files Using Framer Motion:**
 - Multiple organisms, molecules, atoms
 - `globals.css` (global animation config)
 - `animationTokens.ts` (animation constants)
 
-**Problem:**
-- Framer Motion loaded synchronously
-- Used across many components (21 files)
-- Heavy library for relatively simple animations
+**Status:** ✅ **NOT A PROBLEM** - This is an intentional dependency  
+**PAYTAX-75 Goal:** MAXIMIZE Framer Motion 12.23.24 features
 
-**Solution:**
-- ✅ Dynamic import Motion components
-- ⚠️ Consider replacing simple animations with CSS
-- ✅ Tree-shake unused Motion features
+**Optimization Strategy (without removing):**
+- ✅ Use tree-shaking for unused features
+- ✅ Leverage `optimizePackageImports` in next.config
+- ✅ Use consistent animation patterns via animationTokens
+- ✅ Ensure proper motion preferences (prefers-reduced-motion)
+- ❌ **DO NOT** replace with CSS animations (contradicts PAYTAX-58/75)
 
 #### Issue #3: Framework Bundle Size (369KB)
 **Impact:** Baseline JavaScript cost  
