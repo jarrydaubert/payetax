@@ -97,9 +97,9 @@ const CookieBanner: React.FC = () => {
   }
 
   return (
-    <div className='fixed inset-x-0 bottom-0 z-50 flex justify-center p-2 sm:p-4'>
-      <Card className='w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
-        <CardContent className='p-4 text-center sm:p-6'>
+    <div className='pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center p-2 sm:p-4'>
+      <Card className='pointer-events-auto w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
+        <CardContent className='pointer-events-auto p-4 text-center sm:p-6'>
           <div className='mb-4 flex justify-center'>
             <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
               <Cookie className={`${ICON_SIZES.SIZE_6} text-white`} aria-hidden='true' />
