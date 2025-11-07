@@ -718,53 +718,51 @@ npm run lighthouse
 
 ## 🎯 Linear Integration
 
-**New to Linear?** Read this first: **[`docs/setup/LINEAR.md`](./docs/setup/LINEAR.md)** - Complete guide from zero to expert in 5 minutes.
-
-### Quick Start (30 seconds)
+**Quick Start (30 seconds):**
 
 ```bash
 # 1. Set up API key (one-time):
 export LINEAR_API_KEY="lin_api_xxx"  # Get from linear.app/settings/api
 
-# 2. Check your issues (use daily):
+# 2. View your assigned issues:
 npm run linear:me
 
-# 3. Create issue when needed:
+# 3. Mark issue done:
+npm run linear:done PAYTAX-80 Done
+
+# 4. Create new issue:
 npm run linear:create
 ```
 
-### Daily Workflow
+**That's it!** Everything else is available via `npm run linear` (shows full help).
 
-**Morning routine:**
+### Daily Use
+
 ```bash
-# See your issues for the day
+# Morning: See what's assigned to you
 npm run linear:me
 
-# Pick one, update status
-npm run linear update-status PAYTAX-123 "In Progress"
+# During work: Mark as done
+npm run linear:done PAYTAX-123 Done
+
+# When needed: Create issue/sub-issue
+npm run linear:create
 ```
 
-**During work:**
-- Update status as you progress (Todo → In Progress → In Review → Done)
-- Reference issues in commits: `git commit -m "feat: Add feature - PAYTAX-123"`
-- Add details to issue description as you learn more
-
-**End of day:**
-```bash
-# Mark completed work as Done
-npm run linear update-status PAYTAX-123 Done
-```
-
-### Essential Commands
+### All Available Commands
 
 ```bash
-npm run linear:me              # Your issues (use daily!)
-npm run linear:create          # Create new issue
-npm run linear update-status   # Update issue status
-npm run linear:list            # View all issues
+npm run linear  # Shows full help with all commands
+
+# Common commands:
+npm run linear list --project PayeTax
+npm run linear update-description PAYTAX-123 "Details"
+npm run linear create "Title" --parent PAYTAX-123
+npm run linear update-priority PAYTAX-123 1
+npm run linear delete PAYTAX-123
 ```
 
-**Full command reference:** [`docs/setup/LINEAR.md`](./docs/setup/LINEAR.md)
+**Pro tip:** Run `npm run linear` anytime to see all options.
 
 ---
 
