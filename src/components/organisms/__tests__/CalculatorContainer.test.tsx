@@ -56,7 +56,7 @@ jest.mock('next/dynamic', () => {
   });
 });
 
-// Mock the ChartsContainer component  
+// Mock the ChartsContainer component
 jest.mock('../CalculatorCharts', () => ({
   ChartsContainer: ({ results }: { results: unknown }) =>
     results ? <div data-testid='charts-container-mock'>Charts</div> : null,
