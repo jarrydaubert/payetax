@@ -129,6 +129,67 @@ export const ANIMATION_VARIANTS = {
 } as const;
 
 /**
+ * Stagger configurations for sequential animations
+ */
+export const ANIMATION_STAGGER = {
+  /** Fast stagger - 50ms between items */
+  fast: {
+    staggerChildren: 0.05,
+    delayChildren: 0,
+  },
+
+  /** Normal stagger - 100ms between items */
+  normal: {
+    staggerChildren: 0.1,
+    delayChildren: 0,
+  },
+
+  /** Slow stagger - 150ms between items */
+  slow: {
+    staggerChildren: 0.15,
+    delayChildren: 0,
+  },
+} as const;
+
+/**
+ * Container variants for staggered children animations
+ * Apply to parent container, children will animate sequentially
+ *
+ * @example
+ * ```typescript
+ * <motion.div variants={ANIMATION_CONTAINER_VARIANTS.staggerFast} initial="hidden" animate="show">
+ *   <motion.div variants={ANIMATION_VARIANTS.fadeInUp}>Child 1</motion.div>
+ *   <motion.div variants={ANIMATION_VARIANTS.fadeInUp}>Child 2</motion.div>
+ * </motion.div>
+ * ```
+ */
+export const ANIMATION_CONTAINER_VARIANTS = {
+  /** Fast stagger - 50ms between children */
+  staggerFast: {
+    hidden: {},
+    show: {
+      transition: ANIMATION_STAGGER.fast,
+    },
+  } satisfies Variants,
+
+  /** Normal stagger - 100ms between children */
+  staggerNormal: {
+    hidden: {},
+    show: {
+      transition: ANIMATION_STAGGER.normal,
+    },
+  } satisfies Variants,
+
+  /** Slow stagger - 150ms between children */
+  staggerSlow: {
+    hidden: {},
+    show: {
+      transition: ANIMATION_STAGGER.slow,
+    },
+  } satisfies Variants,
+} as const;
+
+/**
  * Standard gesture animations for interactive elements
  */
 export const ANIMATION_GESTURES = {
@@ -197,29 +258,6 @@ export const ANIMATION_TRANSITIONS = {
     ease: ANIMATION_EASINGS.SMOOTH,
     layout: true,
   } satisfies Transition & { layout: boolean },
-} as const;
-
-/**
- * Stagger configurations for sequential animations
- */
-export const ANIMATION_STAGGER = {
-  /** Fast stagger - 50ms between items */
-  fast: {
-    staggerChildren: 0.05,
-    delayChildren: 0,
-  },
-
-  /** Normal stagger - 100ms between items */
-  normal: {
-    staggerChildren: 0.1,
-    delayChildren: 0,
-  },
-
-  /** Slow stagger - 150ms between items */
-  slow: {
-    staggerChildren: 0.15,
-    delayChildren: 0,
-  },
 } as const;
 
 /**

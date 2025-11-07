@@ -5,7 +5,11 @@ import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
+import {
+  ANIMATION_GESTURES,
+  ANIMATION_TRANSITIONS,
+  ANIMATION_VARIANTS,
+} from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
@@ -108,8 +112,16 @@ export function ResultCard({
           },
         };
 
+  // Gesture animations (PAYTAX-75: Framer Motion Maximization)
+  const gestureProps = shouldReduceMotion
+    ? {}
+    : {
+        whileHover: ANIMATION_GESTURES.hoverGentle,
+        whileTap: ANIMATION_GESTURES.tapGentle,
+      };
+
   return (
-    <motion.div {...animationProps} className={className}>
+    <motion.div {...animationProps} {...gestureProps} className={className}>
       {tooltip ? (
         <TooltipProvider delayDuration={200}>
           <Tooltip>
