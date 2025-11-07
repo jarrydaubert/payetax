@@ -33,11 +33,28 @@ interface ChartContainerProps extends React.ComponentProps<'div'> {
   config: Record<string, { label: string; color?: string; icon?: React.ComponentType }>;
   children: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
+  /**
+   * ARIA label describing the chart for screen readers
+   * @example "Bar chart comparing gross salary versus net take-home pay"
+   */
+  'aria-label'?: string;
+  /**
+   * ARIA role for the chart container
+   * @default undefined (inherits from div)
+   */
+  role?: string;
+  /**
+   * ID of element that describes the chart in detail
+   * @example "chart-description"
+   */
+  'aria-describedby'?: string;
 }
 
 /**
  * Chart container component with React 19 ref-as-prop pattern
  * No forwardRef needed - ref is passed as a regular prop in React 19
+ *
+ * Accessibility: Supports role="img" and aria-label for screen reader announcements
  */
 function ChartContainer({ className, config, children, ref, ...props }: ChartContainerProps) {
   return (

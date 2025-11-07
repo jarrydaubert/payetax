@@ -53,7 +53,12 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
         <CardDescription className={TYPOGRAPHY.TEXT_SM}>Breakdown by income type</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className='h-[250px] w-full'>
+        <ChartContainer
+          config={chartConfig}
+          className='h-[250px] w-full'
+          role='img'
+          aria-label='Pie chart showing breakdown of income sources between employment income and other income types'
+        >
           <ResponsiveContainer width='100%' height={250}>
             <PieChart>
               <ChartTooltip

@@ -73,7 +73,12 @@ export function EffectiveTaxRateChart({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className='h-[200px] w-full'>
+        <ChartContainer
+          config={chartConfig}
+          className='h-[200px] w-full'
+          role='img'
+          aria-label='Area chart showing effective and marginal tax rates across salary range with current position highlighted'
+        >
           <ResponsiveContainer width='100%' height={200}>
             <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
               <defs>

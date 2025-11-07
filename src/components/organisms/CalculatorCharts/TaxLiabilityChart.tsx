@@ -58,7 +58,16 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className='h-[250px] w-full'>
+        <ChartContainer
+          config={chartConfig}
+          className='h-[250px] w-full'
+          role='img'
+          aria-label={
+            whatIf
+              ? 'Stacked bar chart comparing current versus what-if tax breakdown including income tax, national insurance, student loan, pension, and net pay'
+              : 'Stacked bar chart showing tax breakdown including income tax, national insurance, student loan, pension, and net pay'
+          }
+        >
           <ResponsiveContainer width='100%' height={250}>
             <BarChart
               data={chartData}

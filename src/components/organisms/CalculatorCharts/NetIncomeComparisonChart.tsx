@@ -99,7 +99,12 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className='h-[250px] w-full'>
+        <ChartContainer
+          config={chartConfig}
+          className='h-[250px] w-full'
+          role='img'
+          aria-label='Bar chart comparing gross salary versus net take-home pay across salary bands from £20,000 to £150,000, showing the impact of progressive taxation'
+        >
           <ResponsiveContainer width='100%' height={250}>
             <BarChart data={salaryBands} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
               <CartesianGrid
