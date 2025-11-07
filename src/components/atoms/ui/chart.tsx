@@ -74,16 +74,22 @@ ChartContainer.displayName = 'ChartContainer';
 // Tooltip Components
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+/**
+ * Recharts Tooltip Payload Item
+ * Based on recharts internal types with additional properties
+ */
+interface TooltipPayloadItem {
+  value?: number | string;
+  name?: string;
+  dataKey?: string;
+  color?: string;
+  payload?: Record<string, unknown>;
+  fill?: string;
+}
+
 interface ChartTooltipContentProps {
   active?: boolean;
-  payload?: Array<{
-    value?: number | string;
-    name?: string;
-    dataKey?: string;
-    color?: string;
-    payload?: Record<string, unknown>;
-    fill?: string;
-  }>;
+  payload?: TooltipPayloadItem[];
   label?: string | number;
   hideLabel?: boolean;
   hideIndicator?: boolean;
@@ -92,13 +98,13 @@ interface ChartTooltipContentProps {
   labelKey?: string;
   className?: string;
   labelClassName?: string;
-  labelFormatter?: (value: unknown, payload: unknown[]) => React.ReactNode;
+  labelFormatter?: (value: unknown, payload: TooltipPayloadItem[]) => React.ReactNode;
   formatter?: (
     value: number | string,
     name: string,
-    item: unknown,
+    item: TooltipPayloadItem,
     index: number,
-    payload: unknown[]
+    payload: TooltipPayloadItem[]
   ) => React.ReactNode;
   color?: string;
   ref?: React.Ref<HTMLDivElement>;
@@ -211,8 +217,20 @@ ChartTooltipContent.displayName = 'ChartTooltipContent';
 // Legend Components
 const ChartLegend = RechartsPrimitive.Legend;
 
+/**
+ * Recharts Legend Payload Item
+ * Based on recharts internal legend types
+ */
+interface LegendPayloadItem {
+  value: string;
+  type?: string;
+  color?: string;
+  dataKey?: string;
+  id?: string;
+}
+
 interface ChartLegendContentProps extends React.ComponentProps<'div'> {
-  payload?: Array<{ value: string; type?: string; color?: string }>;
+  payload?: LegendPayloadItem[];
   nameKey?: string;
   hideIcon?: boolean;
   ref?: React.Ref<HTMLDivElement>;

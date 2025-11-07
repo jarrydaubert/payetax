@@ -11,6 +11,9 @@ import { formatCurrency } from './utils';
 /**
  * Income Breakdown Chart Data
  * Shows proportion of income from different sources (Employment vs Other)
+ *
+ * Note: Index signature required by Recharts ChartDataInput type
+ * Recharts needs this to allow flexible data property access
  */
 export interface IncomeBreakdownData {
   name: string;
@@ -18,7 +21,7 @@ export interface IncomeBreakdownData {
   percentage: number;
   color: string;
   label: string;
-  [key: string]: string | number; // Index signature for recharts 3.x compatibility
+  [key: string]: string | number;
 }
 
 export function getIncomeBreakdownData(
