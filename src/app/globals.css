@@ -240,6 +240,49 @@
   }
 }
 
+/* Fade up animation (replaces Framer Motion fadeInUp variant - PAYTAX-80) */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base fade-up animation */
+.animate-fade-up {
+  animation: fadeUp 0.5s ease-out;
+}
+
+/* Fade-up with delays (for staggered animations) */
+.animate-fade-up-delay-1 {
+  animation: fadeUp 0.5s ease-out 0.1s;
+  animation-fill-mode: both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fadeUp 0.5s ease-out 0.2s;
+  animation-fill-mode: both;
+}
+
+.animate-fade-up-delay-3 {
+  animation: fadeUp 0.5s ease-out 0.3s;
+  animation-fill-mode: both;
+}
+
+.animate-fade-up-delay-4 {
+  animation: fadeUp 0.5s ease-out 0.4s;
+  animation-fill-mode: both;
+}
+
+.animate-fade-up-delay-5 {
+  animation: fadeUp 0.5s ease-out 0.5s;
+  animation-fill-mode: both;
+}
+
 /* View Transitions API - Smooth page navigation (Chrome 111+) */
 @view-transition {
   navigation: auto; /* Enable for all navigations */
