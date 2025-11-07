@@ -46,6 +46,27 @@ jest.mock('../CalculatorResults/ResultsTable', () => ({
   ResultsTable: () => <div data-testid='results-table-mock'>Results Table</div>,
 }));
 
+// Mock next/dynamic to bypass lazy loading in tests
+// Returns the mocked component directly instead of wrapping in dynamic loader
+jest.mock('next/dynamic', () => {
+  return jest.fn(() => {
+    // Return the ChartsContainer mock from below
+    return ({ results }: { results: unknown }) =>
+      results ? <div data-testid='charts-container-mock'>Charts</div> : null;
+  });
+});
+
+// Mock the ChartsContainer component  
+jest.mock('../CalculatorCharts', () => ({
+  ChartsContainer: ({ results }: { results: unknown }) =>
+    results ? <div data-testid='charts-container-mock'>Charts</div> : null,
+}));
+
+// Mock ChartsSkeleton
+jest.mock('../CalculatorCharts/ChartsSkeleton', () => ({
+  ChartsSkeleton: () => <div data-testid='charts-skeleton-mock'>Loading charts...</div>,
+}));
+
 describe('CalculatorContainer Component', () => {
   const mockResults: TaxCalculationResults = {
     grossSalary: {

@@ -3,6 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -18,10 +19,21 @@ import {
   useCalculatorResults,
   useCalculatorStore,
 } from '@/store/calculatorStore';
-import { ChartsContainer } from './CalculatorCharts';
+import { ChartsSkeleton } from './CalculatorCharts/ChartsSkeleton';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
+
+// Dynamic import for Recharts components to reduce initial bundle size (-571KB)
+// Lazy loads visualization library only when charts are needed
+// Reference: PAYTAX-80 Performance Optimization
+const ChartsContainer = dynamic(
+  () => import('./CalculatorCharts').then((mod) => ({ default: mod.ChartsContainer })),
+  {
+    loading: () => <ChartsSkeleton />,
+    ssr: false, // Charts not needed for SEO, reduces SSR payload
+  }
+);
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
