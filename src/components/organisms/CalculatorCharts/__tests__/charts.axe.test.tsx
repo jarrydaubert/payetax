@@ -345,10 +345,10 @@ describe('Calculator Charts - Accessibility', () => {
       expect(uniqueLabels.size).toBe(ariaLabels.length);
 
       // All labels should be descriptive (not empty)
-      ariaLabels.forEach((label) => {
+      for (const label of ariaLabels) {
         expect(label).toBeTruthy();
         expect(label?.length).toBeGreaterThan(20); // Should be descriptive
-      });
+      }
     });
   });
 

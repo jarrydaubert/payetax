@@ -44,13 +44,13 @@ describe('Animation Tokens', () => {
     });
 
     it('should have valid cubic-bezier values', () => {
-      Object.values(ANIMATION_EASINGS).forEach((easing) => {
+      for (const easing of Object.values(ANIMATION_EASINGS)) {
         expect(easing).toHaveLength(4);
-        easing.forEach((value) => {
+        for (const value of easing) {
           expect(value).toBeGreaterThanOrEqual(0);
           expect(value).toBeLessThanOrEqual(1);
-        });
-      });
+        }
+      }
     });
   });
 
@@ -79,11 +79,11 @@ describe('Animation Tokens', () => {
     });
 
     it('should have valid spring values', () => {
-      Object.values(ANIMATION_SPRINGS).forEach((spring) => {
+      for (const spring of Object.values(ANIMATION_SPRINGS)) {
         expect(spring.type).toBe('spring');
         expect(spring.stiffness).toBeGreaterThan(0);
         expect(spring.damping).toBeGreaterThan(0);
-      });
+      }
     });
   });
 
@@ -99,11 +99,11 @@ describe('Animation Tokens', () => {
     });
 
     it('should have initial, animate, and exit states', () => {
-      Object.values(ANIMATION_VARIANTS).forEach((variant) => {
+      for (const variant of Object.values(ANIMATION_VARIANTS)) {
         expect(variant.initial).toBeDefined();
         expect(variant.animate).toBeDefined();
         expect(variant.exit).toBeDefined();
-      });
+      }
     });
 
     it('fadeIn should only animate opacity', () => {
