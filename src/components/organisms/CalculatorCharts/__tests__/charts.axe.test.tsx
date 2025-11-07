@@ -347,7 +347,7 @@ describe('Calculator Charts - Accessibility', () => {
       // All labels should be descriptive (not empty)
       ariaLabels.forEach((label) => {
         expect(label).toBeTruthy();
-        expect(label!.length).toBeGreaterThan(20); // Should be descriptive
+        expect(label?.length).toBeGreaterThan(20); // Should be descriptive
       });
     });
   });
