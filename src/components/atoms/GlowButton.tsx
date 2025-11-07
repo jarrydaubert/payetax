@@ -24,10 +24,11 @@
  */
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useAnimate } from 'framer-motion';
 import type { Route } from 'next';
 import Link from 'next/link';
 import type React from 'react';
+import { useCallback } from 'react';
 
 interface GlowButtonProps {
   children: React.ReactNode;
@@ -50,6 +51,26 @@ export function GlowButton({
   className = '',
   glowColor = 'primary',
 }: GlowButtonProps) {
+  // PAYTAX-75 Phase 2: useAnimate() for imperative click animation
+  const [scope, animate] = useAnimate();
+
+  // Satisfying click animation sequence
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    // Call onClick immediately for functionality
+    if (onClick) {
+      onClick();
+    }
+
+    // Then run satisfying animation in background (non-blocking)
+    if (scope.current) {
+      const runAnimation = async () => {
+        await animate(scope.current, { scale: 0.95 }, { duration: 0.1 });
+        await animate(scope.current, { scale: 1.05 }, { duration: 0.15, type: 'spring', stiffness: 400 });
+        await animate(scope.current, { scale: 1 }, { duration: 0.2, type: 'spring', damping: 15 });
+      };
+      runAnimation();
+    }
+  }, [onClick, animate, scope]);
   // Handle link rendering
   if (href) {
     const isExternal = href.startsWith('http') || href.startsWith('mailto:');
@@ -95,14 +116,14 @@ export function GlowButton({
         className={`-inset-1 absolute rounded-lg bg-gradient-to-r ${glowColorMap[glowColor]} opacity-75 blur transition duration-500 group-hover:opacity-100`}
       />
 
-      {/* Button with motion animations */}
+      {/* Button with motion animations + useAnimate() sequence */}
       <motion.button
+        ref={scope}
         type='button'
-        onClick={onClick}
+        onClick={handleClick}
         className={`relative flex items-center justify-center gap-2 rounded-lg bg-background px-5 py-2.5 font-medium text-foreground text-sm transition-all duration-300 ${className}
         `}
         whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
       >
         {children}
