@@ -28,7 +28,6 @@ import { z } from 'zod';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-// Sentry removed as requested
 import {
   type NICategory,
   type PayPeriod,
@@ -38,6 +37,13 @@ import {
   type TaxBand,
   type TaxYear,
 } from '@/constants/taxRates';
+import {
+  addBreadcrumb,
+  captureCalculatorError,
+  captureValidationError,
+  setContext,
+  startPerformanceTransaction,
+} from '@/lib/sentry';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 
 /**
@@ -293,8 +299,22 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid salary:', validated.error.issues[0].message);
+            // Track validation error in Sentry
+            captureValidationError(validated.error, {
+              field: 'salary',
+              errorMessage: validated.error.issues[0]?.message || 'Unknown validation error',
+              attemptedValue: salary,
+              location: 'calculatorStore.setSalary',
+            });
             return; // Don't update state with invalid value
           }
+
+          // Add breadcrumb for debugging
+          addBreadcrumb('calculator-input', {
+            message: 'Salary updated',
+            level: 'info',
+            data: { salary: validated.data },
+          });
 
           set((state) => ({ input: { ...state.input, salary: validated.data } }));
         },
@@ -455,8 +475,33 @@ export const useCalculatorStore = create<CalculatorState>()(
 
         // Calculation actions
         calculate: () => {
+          const transaction = startPerformanceTransaction('calculate-tax', {
+            operation: 'tax_calculation',
+          });
+
           try {
             const { input } = get();
+
+            // Set context for error tracking
+            setContext('calculator_input', {
+              salary: input.salary,
+              taxYear: input.taxYear,
+              region: input.region,
+              taxCode: input.taxCode || 'default',
+              studentLoanPlan: input.studentLoanPlan,
+              pensionContribution: input.pensionContribution,
+            });
+
+            // Add breadcrumb
+            addBreadcrumb('calculator', {
+              message: 'Starting tax calculation',
+              level: 'info',
+              data: {
+                salary: input.salary,
+                taxYear: input.taxYear,
+                region: input.region,
+              },
+            });
 
             // Allow calculations with £0 salary for demonstration purposes
             if (input.salary < 0) {
@@ -473,13 +518,37 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             const results = calculateTax(inputWithDefaults);
             set({ results });
+
+            // Track successful calculation
+            addBreadcrumb('calculator', {
+              message: 'Tax calculation completed',
+              level: 'info',
+              data: {
+                netPay: results.netPay.annually,
+                incomeTax: results.incomeTax.annually,
+              },
+            });
           } catch (error) {
             // Log calculation errors for debugging
             console.error('Tax calculation error:', error);
 
+            // Track error in Sentry
+            const { input } = get();
+            captureCalculatorError(error, {
+              salary: input.salary,
+              taxYear: input.taxYear,
+              region: input.region,
+              taxCode: input.taxCode,
+              studentLoanPlan: input.studentLoanPlan,
+              pensionContribution: input.pensionContribution,
+              isMarried: input.isMarried,
+            });
+
             // Reset results on error
             set({ results: null });
             throw error; // Re-throw to let UI handle it
+          } finally {
+            transaction?.end();
           }
         },
         calculatePreviousYear: () => {

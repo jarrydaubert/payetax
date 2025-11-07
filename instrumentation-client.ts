@@ -72,18 +72,7 @@ Sentry.init({
             enableLongTask: true,
             enableInp: true, // Track Interaction to Next Paint (Core Web Vital)
           }),
-          // User feedback widget
-          Sentry.feedbackIntegration({
-            colorScheme: 'system',
-            isNameRequired: false,
-            isEmailRequired: true,
-            showBranding: false,
-            triggerLabel: 'Report Bug',
-            formTitle: 'Report an Issue',
-            submitButtonLabel: 'Send Report',
-            messagePlaceholder: 'What happened? Please describe the issue...',
-            successMessageText: 'Thank you! We received your report.',
-          }),
+
           // Breadcrumbs for better error context
           Sentry.breadcrumbsIntegration({
             console: false, // Don't track console.log

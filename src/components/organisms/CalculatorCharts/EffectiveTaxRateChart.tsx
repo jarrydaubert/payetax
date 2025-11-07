@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useId, useMemo } from 'react';
 import {
   Area,
   AreaChart,
@@ -23,7 +23,6 @@ import { TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
-import { useId, useMemo } from 'react';
 
 interface EffectiveTaxRateChartProps {
   results: TaxCalculationResults;

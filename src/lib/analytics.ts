@@ -6,6 +6,8 @@
  * @module lib/analytics
  */
 
+import { addBreadcrumb } from '@/lib/sentry';
+
 // Types for analytics events
 export type SEOActionType =
   | 'external_link'
@@ -56,6 +58,18 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
       console.log('🔍 SEO Analytics:', action, enhancedData);
     }
 
+    // Add breadcrumb for Sentry error tracking
+    addBreadcrumb('analytics', {
+      message: `SEO action: ${action}`,
+      level: 'info',
+      data: {
+        action,
+        source: data.source,
+        target: data.target,
+        page_path: enhancedData.page_path,
+      },
+    });
+
     // Track with Google Analytics if available
     if (window?.gtag) {
       window.gtag('event', action, {
@@ -83,6 +97,18 @@ export function trackEvent(event: AnalyticsEvent): void {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📊 Analytics Event:', event);
     }
+
+    // Add breadcrumb for Sentry error tracking
+    addBreadcrumb('analytics', {
+      message: `Analytics event: ${event.action}`,
+      level: 'info',
+      data: {
+        action: event.action,
+        category: event.category,
+        label: event.label,
+        value: event.value,
+      },
+    });
 
     // Track with Google Analytics if available
     if (window?.gtag) {

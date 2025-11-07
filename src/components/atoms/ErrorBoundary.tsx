@@ -179,38 +179,6 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 Go Home
               </Link>
             </Button>
-
-            {eventId && (
-              <Button
-                type='button'
-                onClick={() => {
-                  // Open Sentry user feedback dialog
-                  if (typeof window !== 'undefined' && eventId) {
-                    Sentry.showReportDialog({
-                      eventId,
-                      title: "It looks like we're having issues.",
-                      subtitle: 'Our team has been notified.',
-                      subtitle2: "If you'd like to help, tell us what happened below.",
-                      labelName: 'Name',
-                      labelEmail: 'Email',
-                      labelComments: 'What happened?',
-                      labelClose: 'Close',
-                      labelSubmit: 'Submit',
-                      errorGeneric:
-                        'An unknown error occurred while submitting your report. Please try again.',
-                      errorFormEntry:
-                        'Some fields were invalid. Please correct the errors and try again.',
-                      successMessage: 'Your feedback has been sent. Thank you!',
-                    });
-                  }
-                }}
-                size='lg'
-                className='bg-purple-600 hover:bg-purple-700'
-              >
-                <AlertTriangle className='mr-2 size-5' />
-                Report Issue
-              </Button>
-            )}
           </div>
 
           {/* Help text */}
