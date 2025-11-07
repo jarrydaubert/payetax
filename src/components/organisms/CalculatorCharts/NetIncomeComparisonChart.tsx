@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { memo, useMemo } from 'react';
 import {
   Bar,
   BarChart,
@@ -38,12 +38,17 @@ interface NetIncomeComparisonChartProps {
  * - Gap between them shows total deductions
  *
  * More exciting than an effective rate line chart!
+ *
+ * Performance: Memoized with React.memo to prevent unnecessary re-renders
  */
-export function NetIncomeComparisonChart({ results, className }: NetIncomeComparisonChartProps) {
+export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
+  results,
+  className,
+}: NetIncomeComparisonChartProps) {
   const currentSalary = results.grossSalary.annually;
 
   // Calculate data points for different salary levels
-  const salaryBands = React.useMemo(() => {
+  const salaryBands = useMemo(() => {
     const bands = [20000, 30000, 40000, 50000, 75000, 100000, 150000];
 
     return bands.map((salary) => {
@@ -197,4 +202,4 @@ export function NetIncomeComparisonChart({ results, className }: NetIncomeCompar
       </CardContent>
     </Card>
   );
-}
+});

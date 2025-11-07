@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { memo } from 'react';
 import {
   Area,
   AreaChart,
@@ -23,6 +23,7 @@ import { TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
+import { useId, useMemo } from 'react';
 
 interface EffectiveTaxRateChartProps {
   results: TaxCalculationResults;
@@ -39,8 +40,10 @@ interface EffectiveTaxRateChartProps {
  * - Current salary position highlighted
  *
  * Helps users understand progressive taxation and optimal salary points.
+ *
+ * Performance: Memoized with React.memo to prevent unnecessary re-renders
  */
-export function EffectiveTaxRateChart({
+export const EffectiveTaxRateChart = memo(function EffectiveTaxRateChart({
   results,
   isScottish = false,
   className,
@@ -50,11 +53,11 @@ export function EffectiveTaxRateChart({
   const chartConfig = getChartConfig('rate');
 
   // Generate unique IDs for gradients to avoid conflicts when component is rendered multiple times
-  const effectiveGradientId = React.useId();
-  const marginalGradientId = React.useId();
+  const effectiveGradientId = useId();
+  const marginalGradientId = useId();
 
   // Calculate current effective rate for display
-  const currentEffectiveRate = React.useMemo(() => {
+  const currentEffectiveRate = useMemo(() => {
     const totalDeductions =
       results.incomeTax.annually +
       results.nationalInsurance.annually +
@@ -184,4 +187,4 @@ export function EffectiveTaxRateChart({
       </CardContent>
     </Card>
   );
-}
+});

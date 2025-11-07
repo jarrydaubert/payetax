@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -31,8 +32,14 @@ interface TaxLiabilityChartProps {
  * - Net Pay (green)
  *
  * When What If results exist, shows two bars for comparison.
+ *
+ * Performance: Memoized with React.memo to prevent unnecessary re-renders
  */
-export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiabilityChartProps) {
+export const TaxLiabilityChart = memo(function TaxLiabilityChart({
+  results,
+  whatIfResults,
+  className,
+}: TaxLiabilityChartProps) {
   const { current, whatIf } = getTaxLiabilityData(results, whatIfResults);
   const chartConfig = getChartConfig('liability');
 
@@ -149,4 +156,4 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
       </CardContent>
     </Card>
   );
-}
+});
