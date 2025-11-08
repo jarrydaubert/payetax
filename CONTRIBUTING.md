@@ -396,6 +396,347 @@ git push origin main --follow-tags
 
 ---
 
+## 🎨 Icon Usage Guidelines
+
+### Lucide React Icons
+
+**Current Version:** `lucide-react@^0.552.0`
+
+**Package:** Lucide React provides 1000+ open-source icons with excellent tree-shaking support.
+
+**Status:** ✅ Optimized for Turbopack (Nov 2025) - see `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md`
+
+---
+
+### ✅ Best Practices
+
+#### 1. Import Pattern (Turbopack-Compatible)
+
+**For components with FEW icons (1-7):**
+```typescript
+// ✅ GOOD - Named imports for small icon usage
+import { Calculator, PoundSterling, TrendingUp } from 'lucide-react';
+
+export function ResultCard() {
+  return (
+    <div>
+      <Calculator className={ICON_SIZES.SIZE_4} />
+      <PoundSterling className={ICON_SIZES.SIZE_4} />
+    </div>
+  );
+}
+```
+
+**For components with MANY icons (8+):**
+```typescript
+// ✅ BEST - Direct ESM imports (Turbopack-optimized, faster builds)
+import Calculator from 'lucide-react/dist/esm/icons/calculator.js';
+import PoundSterling from 'lucide-react/dist/esm/icons/pound-sterling.js';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up.js';
+// ... 5+ more icons
+
+export function HeavyComponent() {
+  return (
+    <div>
+      <Calculator className={ICON_SIZES.SIZE_4} />
+      <PoundSterling className={ICON_SIZES.SIZE_4} />
+    </div>
+  );
+}
+```
+
+**Why?** Turbopack's tree-shaking struggles with large barrel imports during code-splitting. Direct ESM imports fix navigation failures and reduce bundle size. See `docs/TURBOPACK-LUCIDE-FIX.md`.
+
+**❌ NEVER DO:**
+```typescript
+// ❌ BAD - Wildcard imports (breaks tree-shaking)
+import * as LucideIcons from 'lucide-react';
+
+// ❌ BAD - Default import (imports entire library)
+import Lucide from 'lucide-react';
+```
+
+---
+
+#### 2. Icon Sizing - ALWAYS Use Design Tokens
+
+**Always use centralized sizing from `@/constants/designTokens`:**
+
+```typescript
+import { ICON_SIZES } from '@/constants/designTokens';
+
+// ✅ GOOD - Using design tokens
+<Icon className={ICON_SIZES.SIZE_4} />        // 1rem / 16px (standard)
+<Icon className={ICON_SIZES.SIZE_5} />        // 1.25rem / 20px (large)
+<Icon className={ICON_SIZES.SIZE_6} />        // 1.5rem / 24px (desktop)
+
+// ✅ GOOD - Responsive sizing
+<Icon className={cn(ICON_SIZES.SIZE_5, 'md:size-6')} />
+
+// ❌ BAD - Hardcoded sizes
+<Icon className="h-4 w-4" />
+<Icon className="size-4" />
+```
+
+**Available sizes:**
+```typescript
+export const ICON_SIZES = {
+  SIZE_3: 'size-3',  // 0.75rem / 12px - Inline indicators, external links
+  SIZE_4: 'size-4',  // 1rem / 16px - Standard UI icons (MOST COMMON)
+  SIZE_5: 'size-5',  // 1.25rem / 20px - Mobile menu, scroll indicators
+  SIZE_6: 'size-6',  // 1.5rem / 24px - Desktop enhancements, headings
+  SIZE_8: 'size-8',  // 2rem / 32px - Feature highlights, error pages
+} as const;
+```
+
+**Why design tokens?**
+- ✅ Centralized consistency
+- ✅ Easy to update globally
+- ✅ Type-safe
+- ✅ Self-documenting
+
+---
+
+#### 3. Accessibility - ARIA Labels Required
+
+**Rule: Every icon must have ARIA consideration.**
+
+##### Decorative Icons (next to visible text)
+
+```typescript
+// ✅ GOOD - Decorative icon hidden from screen readers
+<Button>
+  <Calculator className={ICON_SIZES.SIZE_4} aria-hidden="true" />
+  Calculate Tax
+</Button>
+
+// ✅ GOOD - Hash icon for heading anchors
+<h2 id="section">
+  <Hash className={ICON_SIZES.SIZE_6} aria-hidden="true" />
+  Section Title
+</h2>
+
+// ❌ BAD - Missing aria-hidden (screen reader announces icon unnecessarily)
+<Button>
+  <Calculator className={ICON_SIZES.SIZE_4} />
+  Calculate Tax
+</Button>
+```
+
+##### Interactive Icons (icon-only buttons/links)
+
+```typescript
+// ✅ GOOD - Icon-only button with aria-label
+<Button aria-label="Close menu">
+  <X className={ICON_SIZES.SIZE_4} />
+</Button>
+
+// ✅ GOOD - Icon with screen-reader-only text
+<Button>
+  <Trash2 className={ICON_SIZES.SIZE_4} />
+  <span className="sr-only">Delete income source</span>
+</Button>
+
+// ❌ BAD - Icon-only button without label
+<Button>
+  <X className={ICON_SIZES.SIZE_4} />
+</Button>
+```
+
+##### Icons with State Changes
+
+```typescript
+// ✅ GOOD - Dynamic aria-label and aria-pressed
+<Button
+  aria-label={`Switch to ${label} mode`}
+  aria-pressed={theme === value}
+>
+  {theme === 'dark' ? <Moon /> : <Sun />}
+  <span className="sr-only">{label} mode</span>
+</Button>
+```
+
+**Quick checklist:**
+- [ ] Decorative icons have `aria-hidden="true"`
+- [ ] Interactive icons have `aria-label` or `<span className="sr-only">`
+- [ ] Icon-only buttons describe the action, not the icon ("Close menu", not "X icon")
+- [ ] State changes update ARIA attributes dynamically
+
+---
+
+#### 4. Color & Theming
+
+**Always use semantic color tokens from Tailwind theme:**
+
+```typescript
+// ✅ GOOD - Semantic theme colors
+<Icon className="text-primary" />               // Brand color
+<Icon className="text-muted-foreground" />      // Secondary UI
+<Icon className="text-foreground" />            // Standard text
+<Icon className="text-destructive" />           // Errors, delete
+
+// ✅ GOOD - Conditional theming
+<Icon className={cn(
+  isActive ? 'text-foreground' : 'text-muted-foreground'
+)} />
+
+// ✅ GOOD - Hover states
+<Icon className="text-primary hover:text-primary/80 transition-colors" />
+
+// ⚠️ ACCEPTABLE - Feature-specific colors (document why)
+<Icon className="text-green-600 dark:text-green-400" /> // Success state
+
+// ❌ BAD - Hardcoded colors without dark mode
+<Icon className="text-blue-500" />
+```
+
+**Common color patterns:**
+- `text-primary` - Interactive elements, links, CTAs
+- `text-muted-foreground` - Secondary UI, labels, placeholders
+- `text-foreground` - Standard text, active states
+- `text-destructive` - Errors, warnings, delete actions
+- `text-green-600 dark:text-green-400` - Success states (when semantic token doesn't exist)
+
+---
+
+#### 5. Performance - Tree-Shaking
+
+**Our tree-shaking is optimal.** Only 53 icons imported vs. 1000+ available.
+
+**To maintain this:**
+
+1. **Use named imports** (Turbopack: only if <8 icons per file)
+2. **Use direct ESM imports** (Turbopack: required if 8+ icons per file)
+3. **Never import unused icons**
+4. **Don't create icon wrappers** (adds abstraction without benefit)
+
+**Check bundle impact when adding icons:**
+```bash
+# Build and check bundle size
+npm run build
+
+# Analyze bundle (if needed)
+npm run bundle:analyze
+```
+
+---
+
+#### 6. Component Patterns
+
+##### Pattern 1: Direct Icon Usage (Most Common)
+
+```typescript
+import { Calculator } from 'lucide-react';
+import { ICON_SIZES } from '@/constants/designTokens';
+
+export function TaxCard() {
+  return (
+    <Card>
+      <Calculator className={ICON_SIZES.SIZE_4} aria-hidden="true" />
+      <h3>Calculate Tax</h3>
+    </Card>
+  );
+}
+```
+
+##### Pattern 2: Icon as Component Prop (Type-Safe)
+
+```typescript
+import type { LucideIcon } from 'lucide-react';
+import { ICON_SIZES } from '@/constants/designTokens';
+
+interface ResultCardProps {
+  icon?: LucideIcon;
+  title: string;
+}
+
+export function ResultCard({ icon: Icon, title }: ResultCardProps) {
+  return (
+    <Card>
+      {Icon && <Icon className={ICON_SIZES.SIZE_4} aria-hidden="true" />}
+      <h3>{title}</h3>
+    </Card>
+  );
+}
+
+// Usage
+<ResultCard icon={Calculator} title="Total Tax" />
+```
+
+##### Pattern 3: Conditional Icon Rendering
+
+```typescript
+import { Sun, Moon, Monitor } from 'lucide-react';
+
+export function ThemeToggle() {
+  const getIcon = () => {
+    switch (theme) {
+      case 'light': return Sun;
+      case 'dark': return Moon;
+      default: return Monitor;
+    }
+  };
+  
+  const Icon = getIcon();
+  return <Icon className={ICON_SIZES.SIZE_4} />;
+}
+```
+
+---
+
+### 🔍 Icon Discovery & Selection
+
+**Finding the right icon:**
+
+1. **Browse Lucide icons:** https://lucide.dev/icons
+2. **Search by keyword:** https://lucide.dev/icons?search=calculator
+3. **Check existing usage:**
+   ```bash
+   # Find all icon imports in codebase
+   grep -r "from 'lucide-react'" src/
+   ```
+
+**Current icon inventory (53 icons used):**
+- Navigation: Menu, X, ChevronLeft/Right/Up/Down, ArrowLeft/Right, Home
+- Actions: Plus, Trash2, Check, CheckCircle, Send, Printer, FileDown, RefreshCw
+- UI: AlertCircle, AlertTriangle, HelpCircle, Clock, Calendar, Loader2Icon, Hash
+- Financial: Calculator, Wallet, PoundSterling, TrendingUp/Down, Percent, PiggyBank
+- Theme: Sun, Moon, Monitor, Cookie, User, MessageSquare
+- Content: FileText, BookOpen, Twitter, Mail, Coffee, Leaf, Heart
+
+See `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md` for complete icon inventory.
+
+---
+
+### 📚 Reference
+
+**Key files:**
+- Icon sizes: `src/constants/designTokens.ts` (`ICON_SIZES`)
+- Complete audit: `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md`
+- Turbopack fix: `docs/TURBOPACK-LUCIDE-FIX.md`
+
+**Quick commands:**
+```bash
+# Find all icon usage
+grep -r "from 'lucide-react'" src/
+
+# Check bundle size
+npm run build
+
+# Verify tree-shaking
+npm run bundle:analyze
+```
+
+**For new icons:**
+1. ✅ Check if similar icon already exists
+2. ✅ Use design tokens for sizing
+3. ✅ Add ARIA labels (decorative or interactive)
+4. ✅ Use semantic colors
+5. ✅ Test with screen reader (VoiceOver/NVDA)
+6. ✅ Choose correct import pattern (named vs. direct ESM)
+
+---
+
 ## 📝 Git Commit Guidelines
 
 ### Commit Message Format
