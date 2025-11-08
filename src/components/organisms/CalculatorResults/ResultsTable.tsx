@@ -387,6 +387,8 @@ export function ResultsTable({
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',
             }}
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement
+            tabIndex={0}
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
           >

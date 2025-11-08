@@ -87,9 +87,9 @@ describe('HomePageContent Component', () => {
   it('should render main element with proper structure', () => {
     const { container } = render(<HomePageContent />);
 
-    const main = container.querySelector('main');
-    expect(main).toBeInTheDocument();
-    expect(main).toHaveClass('flex', 'min-h-screen', 'flex-col');
+    const mainDiv = container.querySelector('div.flex.min-h-screen');
+    expect(mainDiv).toBeInTheDocument();
+    expect(mainDiv).toHaveClass('flex', 'min-h-screen', 'flex-col');
   });
 
   it('should render calculator section with padding', () => {

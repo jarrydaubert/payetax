@@ -64,6 +64,10 @@ export function SalaryComparisonTable() {
                 scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
                 WebkitOverflowScrolling: 'touch',
               }}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement
+              // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label provides screen reader context for scrollable region
+              tabIndex={0}
+              aria-label='Salary comparison table - scrollable'
             >
               <table className='w-full min-w-[640px] border-collapse'>
                 <thead className='bg-gradient-to-r from-primary/10 to-accent/10'>

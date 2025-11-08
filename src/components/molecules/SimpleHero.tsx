@@ -36,9 +36,7 @@ export default function SimpleHero({
   const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
 
   return (
-    // biome-ignore lint/correctness/useUniqueElementIds: Accessibility landmark for skip-to-content link
     <section
-      id='main-content'
       ref={sectionRef}
       className={cn(
         'relative flex items-center justify-center py-16 md:min-h-screen md:py-20',

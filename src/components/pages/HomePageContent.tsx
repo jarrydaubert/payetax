@@ -34,7 +34,7 @@ const HomePageContent = memo(function HomePageContent() {
   };
 
   return (
-    <main className='flex min-h-screen flex-col'>
+    <div className='flex min-h-screen flex-col'>
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
       {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator */}
@@ -125,9 +125,9 @@ const HomePageContent = memo(function HomePageContent() {
                 <div className='rounded-full bg-primary/10 p-3'>
                   <Calculator className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
-                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                <p className='font-semibold text-lg group-hover:text-primary'>
                   UK Tax Calculator Guide
-                </h3>
+                </p>
               </div>
               <p className='text-muted-foreground text-sm'>
                 Complete guide to using our tax calculator for accurate PAYE calculations with
@@ -144,9 +144,9 @@ const HomePageContent = memo(function HomePageContent() {
                 <div className='rounded-full bg-primary/10 p-3'>
                   <FileText className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
-                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                <p className='font-semibold text-lg group-hover:text-primary'>
                   How Much Tax Will I Pay?
-                </h3>
+                </p>
               </div>
               <p className='text-muted-foreground text-sm'>
                 Real salary examples showing exact tax calculations for £20k, £30k, £50k, and £100k+
@@ -163,9 +163,9 @@ const HomePageContent = memo(function HomePageContent() {
                 <div className='rounded-full bg-primary/10 p-3'>
                   <BookOpen className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
-                <h3 className='font-semibold text-lg group-hover:text-primary'>
+                <p className='font-semibold text-lg group-hover:text-primary'>
                   Understanding Tax Codes
-                </h3>
+                </p>
               </div>
               <p className='text-muted-foreground text-sm'>
                 Learn what your tax code means and how it affects your take-home pay. Decode 1257L,
@@ -223,9 +223,9 @@ const HomePageContent = memo(function HomePageContent() {
               href={`/blog/category/${category.slug}`}
               className='group block rounded-lg border bg-card p-5 transition-all hover:border-primary hover:shadow-md'
             >
-              <h3 className='mb-2 font-semibold text-foreground text-lg group-hover:text-primary'>
+              <p className='mb-2 font-semibold text-foreground text-lg group-hover:text-primary'>
                 {category.name}
-              </h3>
+              </p>
               <p className='text-muted-foreground text-sm'>{category.description}</p>
             </Link>
           ))}
@@ -236,7 +236,7 @@ const HomePageContent = memo(function HomePageContent() {
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 });
 

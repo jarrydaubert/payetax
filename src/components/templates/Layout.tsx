@@ -2,7 +2,7 @@
 'use client';
 
 import type React from 'react';
-import { Suspense, useId } from 'react';
+import { Suspense } from 'react';
 import Footer from '@/components/molecules/Footer';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 import CookieBanner from '@/components/ui/CookieBanner';
@@ -13,12 +13,10 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
-  const mainContentId = useId();
-
   return (
     <div className='flex min-h-screen flex-col'>
       {/* Skip to main content for screen readers */}
-      <a href={`#${mainContentId}`} className='skip-link'>
+      <a href='#main-content' className='skip-link'>
         Skip to main content
       </a>
 
@@ -28,14 +26,13 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       </header>
 
       {/* Main content with proper spacing for fixed navbar */}
-      <main id={mainContentId} className='relative flex-1' aria-label='Main Content'>
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for skip-link accessibility */}
+      <main id='main-content' className='relative flex-1' aria-label='Main Content'>
         {children}
       </main>
 
       {/* Footer */}
-      <footer>
-        <Footer />
-      </footer>
+      <Footer />
 
       {/* Cookie Banner - GDPR Compliance */}
       <Suspense fallback={null}>

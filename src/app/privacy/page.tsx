@@ -297,7 +297,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <Card className='mt-8 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
-            <h4 className='mb-4 font-bold text-foreground text-xl'>Technical Explanation</h4>
+            <h3 className='mb-4 font-bold text-foreground text-xl'>Technical Explanation</h3>
             <p className='text-muted-foreground leading-relaxed'>
               We use client-side JavaScript to perform all tax calculations in your browser. The
               calculation engine runs entirely on your device - we literally cannot see your tax
@@ -322,9 +322,9 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <Card className='border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
-                <h4 className='mb-4 font-semibold text-foreground text-lg'>
+                <h3 className='mb-4 font-semibold text-foreground text-lg'>
                   What We See (If You Consent)
-                </h4>
+                </h3>
                 <ul className='space-y-2 text-muted-foreground text-sm'>
                   <li>✓ Which pages are most popular</li>
                   <li>✓ General location (city level, not address)</li>
@@ -336,7 +336,7 @@ export default function PrivacyPolicyPage() {
               </Card>
 
               <Card className='mt-6 border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10 p-8'>
-                <h4 className='mb-4 font-semibold text-foreground text-lg'>What We Never See</h4>
+                <h3 className='mb-4 font-semibold text-foreground text-lg'>What We Never See</h3>
                 <ul className='space-y-2 text-muted-foreground text-sm'>
                   <li>✗ Your tax calculations or results</li>
                   <li>✗ Personal information you enter</li>
@@ -367,7 +367,7 @@ export default function PrivacyPolicyPage() {
                   >
                     <span className='font-bold text-sm text-white'>!</span>
                   </div>
-                  <h4 className='font-bold text-foreground text-lg'>Essential (Required)</h4>
+                  <h3 className='font-bold text-foreground text-lg'>Essential (Required)</h3>
                 </div>
                 <p className='mb-3 text-muted-foreground text-sm'>
                   Necessary for the website to function. Remember your cookie preferences and keep
@@ -385,7 +385,7 @@ export default function PrivacyPolicyPage() {
                   >
                     <span className='font-bold text-sm text-white'>?</span>
                   </div>
-                  <h4 className='font-bold text-foreground text-lg'>Analytics (Optional)</h4>
+                  <h3 className='font-bold text-foreground text-lg'>Analytics (Optional)</h3>
                 </div>
                 <p className='mb-3 text-muted-foreground text-sm'>
                   Google Analytics helps us improve. You can decline these completely - the

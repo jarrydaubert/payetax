@@ -101,10 +101,10 @@ describe('SimpleHero Component', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have section with id main-content', () => {
+    it('should have section element', () => {
       render(<SimpleHero />);
 
-      const section = document.querySelector('#main-content');
+      const section = document.querySelector('section');
       expect(section).toBeInTheDocument();
     });
 

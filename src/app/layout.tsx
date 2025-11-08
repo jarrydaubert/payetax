@@ -28,7 +28,7 @@ export const metadata: Metadata = metadataGenerator({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 2,
+  maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
   userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
