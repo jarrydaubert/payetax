@@ -66,6 +66,8 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
       <ScrollIndicator direction='left' visible={showLeftIndicator} />
       <ScrollIndicator direction='right' visible={showRightIndicator} />
 
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement */}
+      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label provides screen reader context for scrollable region */}
       <div
         ref={containerRef}
         className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border active:cursor-grabbing'
@@ -74,8 +76,6 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
           scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
           WebkitOverflowScrolling: 'touch',
         }}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement
-        // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label provides screen reader context for scrollable region
         tabIndex={0}
         aria-label='Salary comparison results - scrollable'
       >
