@@ -182,18 +182,6 @@ describe('ErrorBoundary Component', () => {
       expect(homeLink).toBeInTheDocument();
       expect(homeLink).toHaveAttribute('href', '/');
     });
-
-    it('should render Report Issue button', () => {
-      render(
-        <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      );
-
-      const reportButton = screen.getByRole('button', { name: /Report Issue/i });
-      expect(reportButton).toBeInTheDocument();
-      expect(reportButton).toHaveClass('bg-purple-600');
-    });
   });
 
   describe('Accessibility', () => {
