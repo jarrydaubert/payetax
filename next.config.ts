@@ -53,6 +53,7 @@ const nextConfig: NextConfig = {
 
   // Turbopack configuration (stable for dev, alpha for prod)
   // Note: Custom webpack plugins may not apply in Turbopack prod (alpha)
+  // RE-ENABLED: Fixed with optimized Lucide imports (direct paths vs barrel exports)
   turbopack: {
     rules: {
       '*.svg': ['@svgr/webpack'],

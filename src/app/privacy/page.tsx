@@ -1,19 +1,19 @@
 // src/app/privacy/page.tsx
 
-import {
-  Calendar,
-  CheckCircle,
-  Cookie,
-  Database,
-  Eye,
-  FileText,
-  Globe,
-  Lock,
-  Server,
-  Shield,
-  UserX,
-  X,
-} from 'lucide-react';
+// Optimized Lucide imports (bypasses Turbopack tree-shaking issue)
+// Generated via: bash scripts/optimize-lucide-pages.sh
+import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
+import Cookie from 'lucide-react/dist/esm/icons/cookie.js';
+import Database from 'lucide-react/dist/esm/icons/database.js';
+import Eye from 'lucide-react/dist/esm/icons/eye.js';
+import FileText from 'lucide-react/dist/esm/icons/file-text.js';
+import Globe from 'lucide-react/dist/esm/icons/globe.js';
+import Lock from 'lucide-react/dist/esm/icons/lock.js';
+import Server from 'lucide-react/dist/esm/icons/server.js';
+import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import UserX from 'lucide-react/dist/esm/icons/user-x.js';
+import X from 'lucide-react/dist/esm/icons/x.js';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';

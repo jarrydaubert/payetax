@@ -1,19 +1,19 @@
 // src/app/blog/BlogPageClient.tsx
 'use client';
 
-import {
-  ArrowRight,
-  BookOpen,
-  Calendar,
-  Clock,
-  FileText,
-  Search,
-  Sparkles,
-  Star,
-  Tag,
-  TrendingUp,
-  Zap,
-} from 'lucide-react';
+// Optimized Lucide imports (bypasses Turbopack tree-shaking issue with barrel exports)
+// Generated via: node scripts/gen-lucide-imports.js
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right.js';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open.js';
+import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
+import Clock from 'lucide-react/dist/esm/icons/clock.js';
+import FileText from 'lucide-react/dist/esm/icons/file-text.js';
+import Search from 'lucide-react/dist/esm/icons/search.js';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
+import Star from 'lucide-react/dist/esm/icons/star.js';
+import Tag from 'lucide-react/dist/esm/icons/tag.js';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up.js';
+import Zap from 'lucide-react/dist/esm/icons/zap.js';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

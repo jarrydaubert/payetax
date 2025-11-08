@@ -1,16 +1,16 @@
 // src/app/compliance/page.tsx
 
-import {
-  AlertTriangle,
-  Award,
-  Calendar,
-  CheckCircle,
-  ExternalLink,
-  FileText,
-  Shield,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+// Optimized Lucide imports (bypasses Turbopack tree-shaking issue)
+// Generated via: bash scripts/optimize-lucide-pages.sh
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
+import Award from 'lucide-react/dist/esm/icons/award.js';
+import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
+import ExternalLink from 'lucide-react/dist/esm/icons/external-link.js';
+import FileText from 'lucide-react/dist/esm/icons/file-text.js';
+import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
+import Users from 'lucide-react/dist/esm/icons/users.js';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';

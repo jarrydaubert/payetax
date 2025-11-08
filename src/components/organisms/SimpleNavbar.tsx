@@ -82,7 +82,9 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           <div className={cn('hidden items-center md:flex', SPACING.GAP_8)}>
             {links.map((link) => {
               const isActive =
-                pathname === link.href || (link.label === 'Calculator' && pathname === '/');
+                pathname === link.href ||
+                (link.label === 'Calculator' && pathname === '/') ||
+                (link.label === 'TaxInsights' && pathname.startsWith('/blog'));
               return (
                 <Link
                   key={link.href}
@@ -142,7 +144,9 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               <div className={cn('container mx-auto max-w-7xl px-4 py-4', SPACING.SPACE_Y_2)}>
                 {links.map((link) => {
                   const isActive =
-                    pathname === link.href || (link.label === 'Calculator' && pathname === '/');
+                    pathname === link.href ||
+                    (link.label === 'Calculator' && pathname === '/') ||
+                    (link.label === 'TaxInsights' && pathname.startsWith('/blog'));
                   return (
                     <Link
                       key={link.href}

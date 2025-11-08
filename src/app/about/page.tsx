@@ -1,22 +1,22 @@
 // src/app/about/page.tsx
 
-import {
-  AlertTriangle,
-  ArrowLeftRight,
-  Award,
-  Calculator,
-  Code,
-  Eye,
-  Heart,
-  Lightbulb,
-  Lock,
-  Palette,
-  Rocket,
-  Shield,
-  Sparkles,
-  Target,
-  Zap,
-} from 'lucide-react';
+// Optimized Lucide imports (bypasses Turbopack tree-shaking issue)
+// Generated via: bash scripts/optimize-lucide-pages.sh
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
+import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.js';
+import Award from 'lucide-react/dist/esm/icons/award.js';
+import Calculator from 'lucide-react/dist/esm/icons/calculator.js';
+import Code from 'lucide-react/dist/esm/icons/code.js';
+import Eye from 'lucide-react/dist/esm/icons/eye.js';
+import Heart from 'lucide-react/dist/esm/icons/heart.js';
+import Lightbulb from 'lucide-react/dist/esm/icons/lightbulb.js';
+import Lock from 'lucide-react/dist/esm/icons/lock.js';
+import Palette from 'lucide-react/dist/esm/icons/palette.js';
+import Rocket from 'lucide-react/dist/esm/icons/rocket.js';
+import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
+import Target from 'lucide-react/dist/esm/icons/target.js';
+import Zap from 'lucide-react/dist/esm/icons/zap.js';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
