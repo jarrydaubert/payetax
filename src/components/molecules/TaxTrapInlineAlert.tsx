@@ -101,7 +101,7 @@ export function TaxTrapInlineAlert({
       <button
         type='button'
         onClick={handleDismiss}
-        className='absolute top-3 right-3 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+        className='absolute top-3 right-3 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
         aria-label='Dismiss tax trap alert'
       >
         <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
