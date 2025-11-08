@@ -40,10 +40,10 @@ export function CategoryFilter({
   };
 
   return (
-    <div className='relative z-20 mb-12 md:mb-20'>
+    <section className='relative z-20 mb-12 md:mb-20' aria-labelledby='category-filter-heading'>
       <div className={cn('mb-8 flex items-center justify-center text-center', SPACING.GAP_2)}>
         <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} aria-hidden='true' />
-        <h2 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>Browse Topics</h2>
+        <h2 id='category-filter-heading' className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>Browse Topics</h2>
       </div>
       <div className='mx-auto max-w-5xl'>
         <div className={cn('flex flex-wrap items-center justify-center', SPACING.GAP_3)}>
@@ -111,6 +111,6 @@ export function CategoryFilter({
             ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
