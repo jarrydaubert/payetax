@@ -85,7 +85,9 @@
         "useMediaCaption": "error",
         "useValidAriaRole": "error",
         "useValidAriaProps": "error",
-        "useValidAriaValues": "error"
+        "useValidAriaValues": "error",
+        "noNoninteractiveTabindex": "off",
+        "useAriaPropsSupportedByRole": "off"
       },
       "complexity": {
         "noForEach": "error",

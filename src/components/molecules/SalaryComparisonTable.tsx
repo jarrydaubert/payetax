@@ -56,8 +56,6 @@ export function SalaryComparisonTable() {
           <ScrollIndicator direction='right' visible={showRightIndicator} />
 
           <Card className='overflow-hidden border-primary/20'>
-            {/* biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement */}
-            {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-label provides screen reader context for scrollable region */}
             <div
               ref={comparisonTableRef}
               className='overflow-x-auto scroll-smooth'

@@ -260,7 +260,6 @@ export function WhatIfComparisonDisplay({
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.2 scrollable-region-focusable requirement
             tabIndex={0}
             aria-label='What If comparison table - scrollable horizontally'
           >

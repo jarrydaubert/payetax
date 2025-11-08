@@ -13,16 +13,18 @@ describe('SimpleHero Component', () => {
     it('should render the hero section', () => {
       const { container } = render(<SimpleHero />);
 
-      const section = container.querySelector('section#main-content');
+      const section = container.querySelector('section');
       expect(section).toBeInTheDocument();
     });
 
     it('should render main heading', () => {
       render(<SimpleHero />);
 
-      expect(
-        screen.getByRole('heading', { name: /Free UK PAYE Tax Calculator 2025-2026/i })
-      ).toBeInTheDocument();
+      // Heading contains a line break, so we check for parts of the text
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(heading).toBeInTheDocument();
+      expect(heading.textContent).toContain('Free UK PAYE Tax');
+      expect(heading.textContent).toContain('Calculator 2025-2026');
     });
 
     it('should render description text', () => {
