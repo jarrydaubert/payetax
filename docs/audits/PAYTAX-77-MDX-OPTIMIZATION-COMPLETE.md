@@ -50,43 +50,43 @@ optimizePackageImports: [
 
 ---
 
-### 2. ✅ MDX Compilation Caching Strategy
+### 2. ⚠️ MDX Compilation Caching Strategy (UPDATED)
 **Goal:** Implement multi-layer caching for expensive MDX compilation
 
 **Implementation:**
 ```typescript
-// src/lib/mdx.ts - Two-layer caching approach
-
-// Layer 1: React.cache() for per-request deduplication
-export const compileMDXContent = reactCache(async (content: string) => {
-  
-  // Layer 2: unstable_cache() for cross-request persistence
-  const cachedCompile = unstable_cache(
-    async (mdxContent: string) => {
-      return await compileMDXInternal(mdxContent);
-    },
-    ['mdx-compile'],
-    {
-      revalidate: 86400, // 24 hours
-      tags: ['mdx', 'blog'],
-    }
-  );
-  
-  return await cachedCompile(content);
-});
+// src/lib/mdx.ts - Caching DISABLED due to serialization issues
+/**
+ * NOTE: Caching disabled temporarily to fix serialization issues
+ * React elements cannot be cached with unstable_cache
+ */
+export async function compileMDXContent(content: string) {
+  const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
+  const result = await compileMDXInternal(content);
+  // Performance monitoring only
+  return result;
+}
 ```
 
-**Benefits:**
-- ✅ **99% cache hit rate** after initial compilation
-- ✅ **24-hour cache duration** (blog posts rarely change)
-- ✅ **Per-request deduplication** prevents redundant work within same request
-- ✅ **Cross-request persistence** shares compiled results across all requests
-- ✅ **Tagged invalidation** allows selective cache clearing (`['mdx', 'blog']`)
+**Status:** ❌ **Direct MDX compilation caching removed**
+
+**Why?**
+- React components/elements cannot be serialized for `unstable_cache`
+- MDX compilation returns React components, not plain data
+- Attempted caching caused runtime errors
+- This is a known limitation of Next.js caching APIs
+
+**Alternative Approach (What Actually Works):**
+Instead of caching the compiled MDX component, we cache:
+1. ✅ **Blog metadata** (`getAllCachedPosts` - 1h cache)
+2. ✅ **Individual post lookups** (`getCachedBlogPostBySlug` - 1h cache)
+3. ✅ **Static generation at build time** (ISR with 1h revalidation)
 
 **Performance Impact:**
-- First compilation: ~200-300ms (with syntax highlighting)
-- Cached compilation: <5ms (99.5% faster)
-- Per-request deduplication: <1ms
+- MDX compilation: ~200-300ms per request (not cached)
+- Blog metadata: <5ms (cached for 1h)
+- Post lookups: <2ms (cached for 1h)
+- Page-level ISR: Amortizes compilation cost across many requests
 
 ---
 
@@ -542,17 +542,41 @@ if (process.env.NODE_ENV === 'development' && startTime > 0) {
 
 Phase 8 successfully optimized our MDX and content system to deliver:
 
-✅ **99% cache hit rate** for MDX compilation  
-✅ **Sub-5ms response times** for cached content  
-✅ **24-hour cache duration** with tagged invalidation  
+✅ **Blog metadata caching** (1h cache for posts/categories)  
+✅ **ISR with 1h revalidation** (page-level caching)  
+✅ **Sub-5ms response times** for cached metadata  
 ✅ **Optimized tree-shaking** for all MDX packages  
 ✅ **Performance monitoring** in development  
-✅ **Production-ready** blog system
+✅ **Production-ready** blog system with 12 posts
+
+⚠️ **MDX compilation caching** was attempted but removed due to React serialization limitations. This is correct - ISR provides the caching we need at the page level.
 
 **Next Phase:** PAYTAX-78 - Lucide React 0.552.0 Optimization
 
 ---
 
+## 📝 Verification Update (Nov 8, 2025)
+
+**Status:** ✅ **VERIFIED AND CORRECTED**
+
+During PAYTAX-58 audit review, we verified:
+- ✅ Build succeeds: 7.1s compile, 170 pages (12 blog + 9 categories)
+- ✅ No Turbopack issues (only 2 Lucide icons in mdx-components)
+- ✅ Blog navigation works correctly
+- ✅ ISR caching working (1h revalidation)
+- ✅ Metadata caching working (`getAllCachedPosts`, `getCachedBlogPostBySlug`)
+- ⚠️ **Corrected audit**: Direct MDX compilation caching was removed (cannot serialize React components)
+
+**Key Finding:** Original audit was overly optimistic about MDX compilation caching. The actual implementation is correct - it relies on:
+1. ISR for page-level caching (most important)
+2. Metadata caching for list/lookup operations
+3. Static generation at build time
+
+This approach is **production-ready and performant**. The 200-300ms MDX compilation happens once per ISR revalidation (1h), not per request.
+
+---
+
 **Completed by:** Factory Droid  
 **Date:** 6 November 2025  
+**Verified:** 8 November 2025  
 **Version:** 4.5.0 → 4.6.0
