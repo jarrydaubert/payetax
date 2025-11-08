@@ -388,21 +388,34 @@ test.describe('WCAG 2.2 AA - Touch Targets (2.5.8)', () => {
     for (const element of interactiveElements) {
       const box = await element.boundingBox();
       if (box) {
+        // WCAG 2.5.8: Both width AND height must be ≥24px (with exceptions)
+        // We check if EITHER dimension is <24px
         const minSize = Math.min(box.width, box.height);
         if (minSize < 24) {
           const elementInfo = await element.evaluate((el) => ({
             tag: el.tagName,
             id: el.id,
             class: el.className,
+            text: el.textContent?.substring(0, 30),
           }));
-          tooSmall.push(`${elementInfo.tag}#${elementInfo.id || 'no-id'}: ${minSize}px`);
+          tooSmall.push(
+            `${elementInfo.tag}#${elementInfo.id || 'no-id'}.${elementInfo.class}: ${box.width.toFixed(0)}×${box.height.toFixed(0)}px (min: ${minSize.toFixed(0)}px) "${elementInfo.text}"`
+          );
         }
       }
     }
 
     if (tooSmall.length > 0) {
       // biome-ignore lint/suspicious/noConsole: Test output
-      console.log('❌ Touch targets too small (<24px):', tooSmall);
+      console.log(`❌ Touch targets too small (<24px): ${tooSmall.length} elements found`);
+      for (const item of tooSmall.slice(0, 10)) {
+        // biome-ignore lint/suspicious/noConsole: Test output
+        console.log(`   - ${item}`);
+      }
+      if (tooSmall.length > 10) {
+        // biome-ignore lint/suspicious/noConsole: Test output
+        console.log(`   ... and ${tooSmall.length - 10} more`);
+      }
     }
 
     expect(tooSmall).toEqual([]);
