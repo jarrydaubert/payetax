@@ -407,3 +407,34 @@ Phase 1 of PAYTAX-75 was **already complete** before this session. The audit (No
 ---
 
 **Framer Motion is maximized! 🚀**
+
+---
+
+## ⚠️ Known Console Warning (Nov 8, 2025)
+
+**Warning in Dev Console:**
+```
+motion() is deprecated. Use motion.create() instead.
+```
+
+**Status:** ✅ **NOT AN ISSUE** - This is a false positive
+
+**Explanation:**
+- This warning comes from Framer Motion's **internal code**, not our application code
+- It appears when using `useScroll()` in SimpleHero.tsx
+- Framer Motion 12.x has internal legacy code that triggers this warning
+- Our code uses the correct modern API: `motion.div`, `motion.button`, etc.
+- **Action:** None required. This is a known Framer Motion library issue
+
+**Evidence:**
+- Checked all our imports: We use `import { motion } from 'framer-motion'` ✅
+- We use `motion.div`, `motion.section`, `motion.button` etc. (correct API) ✅
+- We never use `motion()` directly ✅
+- Warning originates from node_modules/framer-motion internals (not our code) ✅
+
+**Future Resolution:**
+- Framer Motion 13.x (alpha) may resolve this internal warning
+- Monitor for stable v13 release and upgrade when available
+- No action needed in our codebase
+
+**Verdict:** Our Framer Motion usage is optimal and follows best practices. The console warning is from the library's internals and does not indicate a problem with our implementation.
