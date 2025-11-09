@@ -1,14 +1,16 @@
 // src/components/organisms/SimpleNavbar.tsx
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { NavbarLinks } from '@/components/molecules/NavbarLinks';
+import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -49,6 +51,15 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
     // Otherwise, let the link navigate normally (it will scroll to #tax-calculator)
   };
 
+  const handleMobileLinkClick = (label: string) => {
+    if (label === 'Calculator') {
+      // Let handleCalculatorClick handle it via the href
+      setIsMobileMenuOpen(false);
+    } else {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   return (
     <>
       {/* Skip to main content */}
@@ -78,39 +89,15 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             </motion.span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className={cn('hidden items-center md:flex', SPACING.GAP_8)}>
-            {links.map((link) => {
-              const isActive =
-                pathname === link.href ||
-                (link.label === 'Calculator' && pathname === '/') ||
-                (link.label === 'TaxInsights' && pathname.startsWith('/blog'));
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-                  className={cn(
-                    'relative flex min-h-[44px] items-center px-4 py-2.5 font-medium transition-colors',
-                    TYPOGRAPHY.TEXT_SM,
-                    isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId='navbar-indicator'
-                      className='absolute right-0 bottom-0 left-0 h-0.5 bg-primary'
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {/* Desktop Navigation - Uses NavbarLinks molecule */}
+          <NavbarLinks
+            links={links}
+            pathname={pathname}
+            onCalculatorClick={handleCalculatorClick}
+          />
 
           {/* Desktop Utilities */}
-          <div className={cn('hidden items-center md:flex', SPACING.GAP_2)}>
+          <div className='hidden items-center gap-2 md:flex'>
             <FeedbackDialog />
           </div>
 
@@ -130,69 +117,16 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           </Button>
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.nav
-              initial={{ opacity: 0, scaleY: 0 }}
-              animate={{ opacity: 1, scaleY: 1 }}
-              exit={{ opacity: 0, scaleY: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              style={{ originY: 0 }}
-              className='overflow-hidden border-border/50 border-t md:hidden'
-              aria-label='Mobile navigation menu'
-            >
-              <div className={cn('container mx-auto max-w-7xl px-4 py-4', SPACING.SPACE_Y_2)}>
-                {links.map((link) => {
-                  const isActive =
-                    pathname === link.href ||
-                    (link.label === 'Calculator' && pathname === '/') ||
-                    (link.label === 'TaxInsights' && pathname.startsWith('/blog'));
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={
-                        link.label === 'Calculator'
-                          ? handleCalculatorClick
-                          : () => setIsMobileMenuOpen(false)
-                      }
-                      className={cn(
-                        'block rounded-lg px-4 py-3 font-medium transition-colors',
-                        TYPOGRAPHY.TEXT_SM,
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-
-                {/* Mobile Utilities */}
-                <div className='mt-4'>
-                  <FeedbackDialog />
-                </div>
-              </div>
-            </motion.nav>
-          )}
-        </AnimatePresence>
+        {/* Mobile Menu - Uses NavbarMobileMenu molecule */}
+        <NavbarMobileMenu
+          isOpen={isMobileMenuOpen}
+          links={links}
+          pathname={pathname}
+          onLinkClick={handleMobileLinkClick}
+          onBackdropClick={() => setIsMobileMenuOpen(false)}
+          utilities={<FeedbackDialog />}
+        />
       </nav>
-
-      {/* Mobile Menu Backdrop */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className='fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden'
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 };
