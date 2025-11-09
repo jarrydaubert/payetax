@@ -24,7 +24,7 @@ export interface PageHeroBadge {
   /** Badge text content */
   text: string;
   /** Badge variant styling */
-  variant?: 'default' | 'warning' | 'success' | 'outline';
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
 /**
