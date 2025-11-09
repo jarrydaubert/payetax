@@ -461,7 +461,7 @@ const HOW_TO_DATA: HowToSchema = {
     {
       '@type': 'HowToStep',
       name: 'Export or Print Results',
-      text: 'Use the export options to download your calculations as Excel spreadsheet or print a professional payslip summary.',
+      text: 'Use the export options to download your calculations as CSV file or print a professional payslip summary.',
     },
   ],
 };
