@@ -2,8 +2,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
 import type { Route } from 'next';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';

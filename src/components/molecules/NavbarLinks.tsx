@@ -2,8 +2,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import type { Route } from 'next';
+import Link from 'next/link';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
