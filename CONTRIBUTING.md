@@ -46,6 +46,12 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
 - Built with: Next.js, React, TypeScript, Tailwind CSS
 - See `package.json` for current dependency versions
 
+**📖 Required Reading:**
+- **`docs/guides/ARCHITECTURE.md`** - Complete architecture guide
+  - **Read Section 0** (`ls -la` Principle) before building ANY component
+  - Prevents duplication, ensures proper component usage
+  - Shows how to discover existing components/schemas/constants
+
 **Key Concepts:**
 - PAYE: UK's tax withholding system
 - Tax codes (e.g., "1257L") determine personal allowance

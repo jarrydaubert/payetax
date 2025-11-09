@@ -1,9 +1,10 @@
 # PayeTax Architecture Documentation
 
-**Last Updated:** November 4, 2025  
-**Version:** 4.3.0  
+**Last Updated:** November 9, 2025  
+**Version:** 4.6.0  
 **Status:** ✅ Production Ready  
-**Audit Status:** ✅ PAYTAX-65 Complete (UI layer audit, design tokens + icons + skeleton + validation, 100% adoption)
+**Atomic Design Score:** 9.7/10  
+**Architecture Audit:** ✅ PAYTAX-58/90/109 (Component library + proper usage patterns established)
 
 ---
 
@@ -48,6 +49,72 @@ PayeTax is a production-ready UK tax calculator built with **Next.js 16**, **Rea
 ---
 
 ## 🏗️ Architectural Principles
+
+### 0. Component Discovery First (`ls -la` Principle) 🔍
+
+**CRITICAL: Always check what exists before building anything new!**
+
+Before creating any component, validation schema, or data constant:
+
+```bash
+# 1. List what already exists in the target directory
+ls -la src/components/molecules/
+ls -la src/components/atoms/
+ls -la src/lib/validation/
+ls -la src/constants/
+
+# 2. Search for similar patterns
+grep -r "Hero\|Stats\|Grid\|Feature" src/components --include="*.tsx"
+grep -r "Schema\|Validation" src/lib/validation --include="*.ts"
+
+# 3. Check usage of existing components
+grep -r "import.*CallToAction" src/app --include="*.tsx"
+grep -r "import.*ContentSection" src/app --include="*.tsx"
+```
+
+**Why this matters:**
+
+**✅ Good Example (Following ls -la):**
+```typescript
+// Developer runs: ls -la src/components/molecules/
+// Sees: CallToAction.tsx already exists with 3 variants
+
+// Uses existing component ✅
+import { CallToAction } from '@/components/molecules/CallToAction';
+
+<CallToAction variant="calculator" />
+```
+
+**❌ Bad Example (Skipping ls -la):**
+```typescript
+// Developer doesn't check, creates duplicate
+
+// Creates CTASection.tsx ❌ (CallToAction already exists!)
+export function CTASection() {
+  // Duplicates 119 lines of existing code
+}
+```
+
+**Duplication Prevention Checklist:**
+
+Before creating new components:
+- [ ] `ls -la` target directory
+- [ ] `grep -r` for similar patterns
+- [ ] Check existing validation schemas
+- [ ] Check existing constants/data files
+- [ ] Review component tests for usage examples
+
+**When you find existing components:**
+1. **Use them** if they fit your needs
+2. **Extend them** if they're close but need variants
+3. **Only create new** if truly unique functionality needed
+
+**This principle saved ~500 lines of duplicated code in Nov 2025 when we discovered:**
+- CallToAction.tsx existed but wasn't being used
+- ContentSection.tsx existed but pages built their own
+- 14 validation schemas existed but pages created inline validation
+
+---
 
 ### 1. Separation of Concerns
 
