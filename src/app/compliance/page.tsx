@@ -9,12 +9,12 @@ import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
 import ExternalLink from 'lucide-react/dist/esm/icons/external-link.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
-import Users from 'lucide-react/dist/esm/icons/users.js';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { Badge } from '@/components/ui/badge';
+import { ContactFooter } from '@/components/molecules/ContactFooter';
+import { PageHero } from '@/components/molecules/PageHero';
+import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES } from '@/constants/designTokens';
@@ -63,7 +63,7 @@ const COMPLIANCE_FEATURES = [
       'Edge cases validated against gov.uk guidance',
       'Open source for professional review and verification',
     ],
-    icon: Users,
+    icon: Shield,
     lastUpdated: '2024-08-01',
     source: 'HMRC Example Calculations',
     color: 'from-accent to-primary',
@@ -166,88 +166,48 @@ const DATA_SOURCES = [
 export default function CompliancePage() {
   return (
     <div className='min-h-screen'>
-      {/* Hero Section */}
-      <section className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-transparent pt-20 pb-10 md:pt-32 md:pb-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
-          <div className='text-center'>
-            <Badge
-              variant='outline'
-              className='mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm'
-            >
-              <Shield className={ICON_SIZES.SIZE_5} aria-hidden='true' />
-              <span>HMRC Compliance</span>
-            </Badge>
+      {/* Hero Section - Using PageHero */}
+      <PageHero
+        badge={{ icon: Shield, text: 'HMRC Compliance' }}
+        title={
+          <>
+            <GradientText variant='brand-full' as='span'>
+              Verified Accuracy
+            </GradientText>
+            <br />
+            <span className='text-foreground'>Official Compliance</span>
+          </>
+        }
+        subtitle='Every calculation verified against official HMRC rates and examples. Transparent formulas. Updated within 24 hours of changes.'
+      />
 
-            <h1 className='mb-6 font-bold text-6xl leading-tight'>
-              <GradientText variant='brand-full' as='span'>
-                Verified Accuracy
-              </GradientText>
-              <br />
-              <span className='text-foreground'>Official Compliance</span>
-            </h1>
-
-            <p className='mx-auto mb-12 max-w-3xl text-lg text-muted-foreground leading-relaxed'>
-              Every calculation verified against official HMRC rates and examples. Transparent
-              formulas. Updated within 24 hours of changes.
-            </p>
-
-            {/* Trust Stats */}
-            <div className='grid gap-6 md:grid-cols-4'>
-              {[
-                {
-                  icon: Award,
-                  value: '100%',
-                  label: 'HMRC Rates',
-                  color: 'from-primary to-accent',
-                },
-                {
-                  icon: FileText,
-                  value: 'Open',
-                  label: 'Source',
-                  color: 'from-accent to-primary',
-                },
-                {
-                  icon: Calendar,
-                  value: '<24h',
-                  label: 'Update Time',
-                  color: 'from-primary/80 to-accent/80',
-                },
-                {
-                  icon: Shield,
-                  value: '2025',
-                  label: 'Tax Year',
-                  color: 'from-orange-500 to-red-500',
-                },
-              ].map((stat, _idx) => (
-                <Card
-                  key={stat.label}
-                  className='group relative overflow-hidden border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:scale-105 md:hover:border-primary/40 md:hover:shadow-2xl'
-                >
-                  <div
-                    className={`absolute top-0 right-0 h-24 w-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`}
-                  />
-                  <stat.icon
-                    className={`mx-auto mb-4 ${ICON_SIZES.SIZE_10} text-primary`}
-                    aria-hidden='true'
-                  />
-                  <div className='relative font-bold text-3xl text-foreground'>{stat.value}</div>
-                  <div className='mt-2 text-muted-foreground text-sm'>{stat.label}</div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Trust Stats - Using StatsGrid */}
+      <section className='container mx-auto max-w-7xl px-4 py-12'>
+        <StatsGrid
+          stats={[
+            { icon: Award, value: '100%', label: 'HMRC Rates', color: 'from-primary to-accent' },
+            { icon: FileText, value: 'Open', label: 'Source', color: 'from-accent to-primary' },
+            {
+              icon: Calendar,
+              value: '<24h',
+              label: 'Update Time',
+              color: 'from-primary/80 to-accent/80',
+            },
+            { icon: Shield, value: '2025', label: 'Tax Year', color: 'from-orange-500 to-red-500' },
+          ]}
+          columns={4}
+          variant='elevated'
+        />
       </section>
 
       {/* Compliance Features */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <div className='mb-16 text-center'>
-            <h2 className='mb-4 font-bold text-4xl text-foreground'>Professional Standards</h2>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
-              Multi-layer verification ensures every calculation meets HMRC standards
-            </p>
-          </div>
+          <SectionHeading
+            title='Professional Standards'
+            subtitle='Multi-layer verification ensures every calculation meets HMRC standards'
+            align='center'
+          />
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             {COMPLIANCE_FEATURES.map((feature) => (
@@ -302,12 +262,11 @@ export default function CompliancePage() {
       {/* Compliance Statements */}
       <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <div className='mb-16 text-center'>
-            <h2 className='mb-4 font-bold text-4xl text-foreground'>Official Compliance</h2>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
-              Legal verification and regulatory compliance statements
-            </p>
-          </div>
+          <SectionHeading
+            title='Official Compliance'
+            subtitle='Legal verification and regulatory compliance statements'
+            align='center'
+          />
 
           <div className='space-y-6'>
             {COMPLIANCE_STATEMENTS.map((item) => (
@@ -338,12 +297,11 @@ export default function CompliancePage() {
       {/* Data Sources */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
-          <div className='mb-16 text-center'>
-            <h2 className='mb-4 font-bold text-4xl text-foreground'>Official Sources</h2>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
-              All data sourced from government authorities and professional bodies
-            </p>
-          </div>
+          <SectionHeading
+            title='Official Sources'
+            subtitle='All data sourced from government authorities and professional bodies'
+            align='center'
+          />
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-6'>
             {DATA_SOURCES.map((source) => (
@@ -454,39 +412,19 @@ export default function CompliancePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
-          <div className='text-center'>
-            <Sparkles
-              className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`}
-              aria-hidden='true'
-            />
-            <h2 className='mb-4 font-bold text-4xl text-foreground'>Questions About Compliance?</h2>
-            <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
-              We're committed to maintaining the highest standards of accuracy and compliance. If
-              you have questions about our methodology or sources, we're here to help.
-            </p>
-
-            <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-              <Button asChild size='lg' className='group'>
-                <Link href='/'>
-                  Try the Calculator
-                  <Sparkles
-                    className={`ml-2 ${ICON_SIZES.SIZE_4} transition-transform group-hover:rotate-12`}
-                    aria-hidden='true'
-                  />
-                </Link>
-              </Button>
-              <Button asChild variant='outline' size='lg'>
-                <a href='mailto:support@payetax.co.uk?subject=Compliance Issue Report'>
-                  Report an Issue
-                </a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* CTA Section - Using ContactFooter */}
+      <ContactFooter
+        title='Questions About Compliance?'
+        description="We're committed to maintaining the highest standards of accuracy and compliance. If you have questions about our methodology or sources, we're here to help."
+        links={[
+          { text: 'Try the Calculator', href: '/', type: 'link' },
+          {
+            text: 'support@payetax.co.uk',
+            href: 'mailto:support@payetax.co.uk?subject=Compliance Issue Report',
+            type: 'email',
+          },
+        ]}
+      />
     </div>
   );
 }

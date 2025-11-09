@@ -115,8 +115,7 @@ function StatCard({ stat, variant }: StatCardProps) {
         <div
           className={cn(
             TYPOGRAPHY.TEXT_3XL,
-            TYPOGRAPHY.FONT_BOLD,
-            'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent'
+            'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-transparent'
           )}
           aria-label={`${value}`}
         >
@@ -124,7 +123,7 @@ function StatCard({ stat, variant }: StatCardProps) {
         </div>
 
         {/* Label */}
-        <div className={cn(TYPOGRAPHY.TEXT_LG, TYPOGRAPHY.FONT_SEMIBOLD, 'mb-2 text-foreground')}>
+        <div className={cn(TYPOGRAPHY.TEXT_LG, 'mb-2 text-foreground font-semibold')}>
           {label}
         </div>
 
