@@ -11,6 +11,9 @@ import { cn } from '@/lib/utils';
 /**
  * Footer molecule component
  *
+ * IMPORTANT: This is a MOLECULE - it does NOT own the <footer> semantic tag.
+ * The parent TEMPLATE (Layout.tsx) must wrap this in <footer></footer>.
+ *
  * Uses design tokens: TEXT_BASE for brand, TEXT_SM for links, TEXT_XS for meta info
  * Icon uses SIZE_4 for Twitter icon
  * Spacing uses GAP_4 and GAP_6 for link groups and sections
@@ -24,7 +27,7 @@ export function Footer({ className }: FooterProps) {
   const currentYear = 2025;
 
   return (
-    <footer
+    <div
       className={cn('mt-auto min-h-[140px] md:min-h-[120px]', className)}
       style={{ contain: 'layout' }}
     >
@@ -201,7 +204,7 @@ export function Footer({ className }: FooterProps) {
           </div>
         </div>
       </div>
-    </footer>
+    </div>
   );
 }
 

@@ -14,11 +14,14 @@ jest.mock('@/lib/theme', () => ({
 
 describe('Footer Component', () => {
   describe('Rendering', () => {
-    it('should render footer element', () => {
+    it('should render footer content in a div (molecule pattern)', () => {
       const { container } = render(<Footer />);
 
-      const footer = container.querySelector('footer');
-      expect(footer).toBeInTheDocument();
+      // Footer is a MOLECULE - it uses <div>, not <footer>
+      // The parent template (Layout.tsx) wraps it in <footer>
+      const footerDiv = container.firstChild;
+      expect(footerDiv).toBeInTheDocument();
+      expect(footerDiv).toHaveClass('mt-auto');
     });
 
     it('should render brand name', () => {
@@ -114,18 +117,18 @@ describe('Footer Component', () => {
   });
 
   describe('Styling', () => {
-    it('should apply custom className', () => {
+    it('should apply custom className to root div', () => {
       const { container } = render(<Footer className='custom-class' />);
 
-      const footer = container.querySelector('footer');
-      expect(footer).toHaveClass('custom-class');
+      const footerDiv = container.firstChild as HTMLElement;
+      expect(footerDiv).toHaveClass('custom-class');
     });
 
     it('should have mt-auto class for flexbox layout', () => {
       const { container } = render(<Footer />);
 
-      const footer = container.querySelector('footer');
-      expect(footer).toHaveClass('mt-auto');
+      const footerDiv = container.firstChild as HTMLElement;
+      expect(footerDiv).toHaveClass('mt-auto');
     });
 
     it('should have glass effect on content', () => {
@@ -160,11 +163,12 @@ describe('Footer Component', () => {
   });
 
   describe('Accessibility', () => {
-    it('should use footer semantic element', () => {
+    it('should use div element (molecule pattern - template owns <footer>)', () => {
       const { container } = render(<Footer />);
 
-      const footer = container.querySelector('footer');
-      expect(footer).toBeInTheDocument();
+      // Molecule uses <div>, template wraps in <footer>
+      const footerDiv = container.firstChild as HTMLElement;
+      expect(footerDiv.tagName).toBe('DIV');
     });
 
     it('should have aria-label on X link', () => {

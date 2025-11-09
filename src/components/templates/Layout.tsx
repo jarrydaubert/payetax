@@ -31,8 +31,10 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
         {children}
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer - Template owns semantic <footer> tag */}
+      <footer>
+        <Footer />
+      </footer>
 
       {/* Cookie Banner - GDPR Compliance */}
       <Suspense fallback={null}>

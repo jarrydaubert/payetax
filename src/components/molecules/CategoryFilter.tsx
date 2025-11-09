@@ -19,7 +19,10 @@ interface CategoryFilterProps {
  * Category filter component for blog posts
  * Uses shadcn Badge component with enhanced styling for active/inactive states
  *
- * IMPORTANT: Uses TEXT_XL for blog section headings to maintain hierarchy with page titles
+ * IMPORTANT: This is a MOLECULE - it does NOT own semantic tags like <section>.
+ * The parent page/organism should wrap this in appropriate semantic HTML.
+ *
+ * Uses TEXT_XL for blog section headings to maintain hierarchy with page titles
  * Button text uses TEXT_SM for standard button typography
  * Icon uses SIZE_5 for emphasis in section heading
  * Button spacing uses GAP_3 for comfortable button groups
@@ -43,7 +46,7 @@ export function CategoryFilter({
   };
 
   return (
-    <section className='relative z-20 mb-12 md:mb-20' aria-labelledby={headingId}>
+    <div className='relative z-20 mb-12 md:mb-20' aria-labelledby={headingId}>
       <div className={cn('mb-8 flex items-center justify-center text-center', SPACING.GAP_2)}>
         <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} aria-hidden='true' />
         <h2 id={headingId} className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
@@ -116,6 +119,6 @@ export function CategoryFilter({
             ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
