@@ -114,3 +114,28 @@ export type FeatureData = z.infer<typeof FeatureSchema>;
 export function validateFeatures(data: unknown) {
   return z.array(FeatureSchema).safeParse(data);
 }
+
+/**
+ * Section Heading Badge validation schema
+ *
+ * Used for optional badges in section headings.
+ *
+ * @example
+ * ```typescript
+ * const badge = {
+ *   text: 'New Feature',
+ *   variant: 'default',
+ * } satisfies z.infer<typeof SectionBadgeSchema>;
+ * ```
+ */
+export const SectionBadgeSchema = z.object({
+  /** Badge text content */
+  text: z.string().min(1, 'Badge text is required').max(50, 'Badge text too long'),
+  /** Badge variant */
+  variant: z.enum(['default', 'secondary', 'destructive', 'outline']).optional(),
+});
+
+/**
+ * Type inferred from SectionBadgeSchema
+ */
+export type SectionBadgeData = z.infer<typeof SectionBadgeSchema>;

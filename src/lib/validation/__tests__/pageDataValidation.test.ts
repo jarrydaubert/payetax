@@ -8,6 +8,8 @@ import { Award, Calculator, Lock, Rocket, Shield, Zap } from 'lucide-react';
 import {
   type FeatureData,
   FeatureSchema,
+  type SectionBadgeData,
+  SectionBadgeSchema,
   type StatData,
   StatSchema,
   validateFeatures,
@@ -330,6 +332,74 @@ describe('pageDataValidation', () => {
       ];
 
       const result = validateFeatures(features);
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('SectionBadgeSchema', () => {
+    it('should validate a complete badge object', () => {
+      const badge: SectionBadgeData = {
+        text: 'New Feature',
+        variant: 'default',
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate a minimal badge (no variant)', () => {
+      const badge = {
+        text: 'Important',
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate all badge variants', () => {
+      const variants = ['default', 'secondary', 'destructive', 'outline'] as const;
+
+      variants.forEach((variant) => {
+        const badge = { text: 'Test', variant };
+        const result = SectionBadgeSchema.safeParse(badge);
+        expect(result.success).toBe(true);
+      });
+    });
+
+    it('should reject empty text', () => {
+      const badge = {
+        text: '',
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject text over 50 chars', () => {
+      const badge = {
+        text: 'a'.repeat(51),
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject invalid variant', () => {
+      const badge = {
+        text: 'Test',
+        variant: 'invalid' as any,
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject missing text', () => {
+      const badge = {
+        variant: 'default',
+      };
+
+      const result = SectionBadgeSchema.safeParse(badge);
       expect(result.success).toBe(false);
     });
   });
