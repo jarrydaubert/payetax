@@ -23,7 +23,8 @@ import { GradientText } from '@/components/atoms/GradientText';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
@@ -133,7 +134,7 @@ export default function AboutPage() {
               <span>About PayeTax</span>
             </Badge>
 
-            <h1 className='mb-6 font-bold text-6xl leading-tight'>
+            <h1 className={cn('mb-6 font-bold leading-tight', TYPOGRAPHY.TEXT_6XL)}>
               <GradientText variant='brand-full' as='span'>
                 Tax Calculations
               </GradientText>
@@ -141,12 +142,17 @@ export default function AboutPage() {
               <span className='text-foreground'>Built for Privacy</span>
             </h1>
 
-            <p className='mx-auto mb-4 max-w-3xl text-lg text-muted-foreground leading-relaxed'>
+            <p
+              className={cn(
+                'mx-auto mb-4 max-w-3xl text-muted-foreground leading-relaxed',
+                TYPOGRAPHY.TEXT_LG
+              )}
+            >
               The UK tax calculator that respects your privacy, delivers instant accuracy, and costs
               nothing. No compromises.
             </p>
 
-            <p className='mx-auto mb-12 max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto mb-12 max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               With intelligent tax trap detection, salary comparisons, and adaptive theming.
             </p>
 
@@ -164,8 +170,12 @@ export default function AboutPage() {
                     className={`mx-auto mb-4 ${ICON_SIZES.SIZE_10} text-primary`}
                     aria-hidden='true'
                   />
-                  <div className='mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
-                  <div className='text-muted-foreground text-sm'>{stat.label}</div>
+                  <div className={cn('mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>
+                    {stat.value}
+                  </div>
+                  <div className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    {stat.label}
+                  </div>
                 </Card>
               ))}
             </div>
@@ -178,10 +188,19 @@ export default function AboutPage() {
         <div className='container mx-auto max-w-5xl px-4'>
           <Card className='border-primary/30 border-l-8 bg-gradient-to-br from-primary/5 to-accent/5 p-12 text-center'>
             <Heart className={`mx-auto mb-6 ${'size-16'} text-primary`} aria-hidden='true' />
-            <GradientText variant='brand' as='h2' className='mb-6 font-bold text-4xl'>
+            <GradientText
+              variant='brand'
+              as='h2'
+              className={cn('mb-6 font-bold', TYPOGRAPHY.TEXT_4XL)}
+            >
               Our Mission
             </GradientText>
-            <p className='mx-auto max-w-3xl text-muted-foreground text-xl leading-relaxed'>
+            <p
+              className={cn(
+                'mx-auto max-w-3xl text-muted-foreground leading-relaxed',
+                TYPOGRAPHY.TEXT_XL
+              )}
+            >
               Every UK taxpayer deserves instant, accurate tax calculations without sacrificing
               privacy or paying a penny. We&apos;re building the most transparent, accessible, and
               trustworthy tax calculator in the UK.
@@ -204,11 +223,14 @@ export default function AboutPage() {
             <GradientText
               variant='custom'
               as='h2'
-              className='mb-4 bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-4xl'
+              className={cn(
+                'mb-4 bg-gradient-to-r from-amber-500 to-orange-500 font-bold',
+                TYPOGRAPHY.TEXT_4XL
+              )}
             >
               What Makes Us Different
             </GradientText>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Features you won't find anywhere else - completely free
             </p>
           </div>
@@ -223,10 +245,12 @@ export default function AboutPage() {
                   <AlertTriangle className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
-                  <span className='font-bold text-5xl text-foreground'>60%</span>
-                  <span className='text-muted-foreground text-sm'>tax trap detected</span>
+                  <span className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_5XL)}>60%</span>
+                  <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    tax trap detected
+                  </span>
                 </div>
-                <h3 className='mb-4 font-bold text-2xl text-foreground'>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
                   £100k Tax Trap Optimizer
                 </h3>
                 <p className='mb-6 text-muted-foreground leading-relaxed'>
@@ -254,10 +278,14 @@ export default function AboutPage() {
                   />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
-                  <span className='font-bold text-5xl text-foreground'>3</span>
-                  <span className='text-muted-foreground text-sm'>comparison modes</span>
+                  <span className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_5XL)}>3</span>
+                  <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    comparison modes
+                  </span>
                 </div>
-                <h3 className='mb-4 font-bold text-2xl text-foreground'>Salary Comparison</h3>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+                  Salary Comparison
+                </h3>
                 <p className='mb-6 text-muted-foreground leading-relaxed'>
                   Compare job offers or raises with 3 input modes (%, £ amount, total). See marginal
                   rates and exactly what you keep from every increase.
@@ -280,10 +308,14 @@ export default function AboutPage() {
                   <Palette className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                 </div>
                 <div className='mb-4 flex items-baseline gap-2'>
-                  <span className='font-bold text-5xl text-foreground'>3</span>
-                  <span className='text-muted-foreground text-sm'>theme options</span>
+                  <span className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_5XL)}>3</span>
+                  <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    theme options
+                  </span>
                 </div>
-                <h3 className='mb-4 font-bold text-2xl text-foreground'>Adaptive Theming</h3>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+                  Adaptive Theming
+                </h3>
                 <p className='mb-6 text-muted-foreground leading-relaxed'>
                   Light, dark, or system-matched themes. Your calculator, your eyes, your choice.
                   Smooth transitions, zero flash, perfect accessibility.
@@ -301,10 +333,14 @@ export default function AboutPage() {
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
+            <GradientText
+              variant='brand'
+              as='h2'
+              className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_4XL)}
+            >
               What We Stand For
             </GradientText>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Four principles that guide everything we build
             </p>
           </div>
@@ -320,7 +356,9 @@ export default function AboutPage() {
                   >
                     <value.icon className={`${ICON_SIZES.SIZE_8} text-white`} aria-hidden='true' />
                   </div>
-                  <h3 className='mb-4 font-bold text-2xl text-foreground'>{value.title}</h3>
+                  <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+                    {value.title}
+                  </h3>
                   <p className='text-muted-foreground leading-relaxed'>{value.description}</p>
                 </Card>
               </div>
@@ -343,11 +381,14 @@ export default function AboutPage() {
             <GradientText
               variant='custom'
               as='h2'
-              className='mb-4 bg-gradient-to-r from-primary to-accent font-bold text-4xl'
+              className={cn(
+                'mb-4 bg-gradient-to-r from-primary to-accent font-bold',
+                TYPOGRAPHY.TEXT_4XL
+              )}
             >
               Built for Performance
             </GradientText>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Cutting-edge web technologies for exceptional speed, security, and experience
             </p>
           </div>
@@ -360,9 +401,15 @@ export default function AboutPage() {
                     className={`mx-auto mb-4 ${ICON_SIZES.SIZE_12} text-primary`}
                     aria-hidden='true'
                   />
-                  <div className='mb-2 font-bold text-3xl text-foreground'>{feature.metric}</div>
-                  <h3 className='mb-3 font-semibold text-foreground text-lg'>{feature.title}</h3>
-                  <p className='text-muted-foreground text-sm'>{feature.description}</p>
+                  <div className={cn('mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>
+                    {feature.metric}
+                  </div>
+                  <h3 className={cn('mb-3 font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+                    {feature.title}
+                  </h3>
+                  <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    {feature.description}
+                  </p>
                 </Card>
               </div>
             ))}
@@ -370,7 +417,9 @@ export default function AboutPage() {
 
           {/* Tech Stack */}
           <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-8'>
-            <h3 className='mb-6 text-center font-bold text-foreground text-xl'>Powered By</h3>
+            <h3 className={cn('mb-6 text-center font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+              Powered By
+            </h3>
             <div className='flex flex-wrap justify-center gap-3'>
               {[
                 'Next.js 15',
@@ -384,7 +433,10 @@ export default function AboutPage() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className='rounded-full border border-primary/30 bg-background px-5 py-2.5 font-medium text-foreground text-sm transition-all hover:border-primary hover:shadow-lg active:scale-[1.02] md:hover:scale-105'
+                  className={cn(
+                    'rounded-full border border-primary/30 bg-background px-5 py-2.5 font-medium text-foreground transition-all hover:border-primary hover:shadow-lg active:scale-[1.02] md:hover:scale-105',
+                    TYPOGRAPHY.TEXT_SM
+                  )}
                 >
                   {tech}
                 </span>
@@ -404,32 +456,36 @@ export default function AboutPage() {
                   className={`mx-auto mb-6 ${'size-16'} text-primary`}
                   aria-hidden='true'
                 />
-                <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
+                <GradientText
+                  variant='brand'
+                  as='h2'
+                  className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_4XL)}
+                >
                   Why We Built PayeTax
                 </GradientText>
               </div>
 
               <div className='space-y-6'>
-                <p className='text-lg text-muted-foreground leading-relaxed'>
+                <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
                   As UK taxpayers and software engineers, we were frustrated by online tax
                   calculators. They were slow, cluttered with ads, required personal information, or
                   hid features behind paywalls.
                 </p>
-                <p className='text-lg text-muted-foreground leading-relaxed'>
+                <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
                   We knew it didn&apos;t have to be this way. Tax calculations should be instant,
                   accurate, and completely private. No accounts, no tracking, no compromises.
                 </p>
-                <p className='text-lg text-muted-foreground leading-relaxed'>
+                <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
                   Today, PayeTax helps thousands of people across the UK understand their take-home
                   pay, plan salary negotiations, compare job offers, and make informed financial
                   decisions - all while respecting their privacy.
                 </p>
-                <p className='text-lg text-muted-foreground leading-relaxed'>
+                <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
                   In v2.0.0, we added intelligent tax trap detection and salary comparison tools -
                   features that would cost £50+/month elsewhere, completely free for everyone.
                   Because we believe tax planning should be accessible to all.
                 </p>
-                <p className='text-lg text-muted-foreground leading-relaxed'>
+                <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
                   We're continuously improving based on your feedback. Every feature request
                   matters, every bug report helps, and every suggestion makes PayeTax better for
                   everyone.
@@ -444,15 +500,18 @@ export default function AboutPage() {
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
-            <h2 className='mb-4 font-bold text-3xl text-foreground'>
+            <h2 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>
               Ready to Calculate Your Take-Home Pay?
             </h2>
-            <p className='mb-8 text-lg text-muted-foreground'>
+            <p className={cn('mb-8 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Free, fast, and completely private. No sign-up required.
             </p>
             <Link
               href='/'
-              className='inline-block rounded-lg bg-primary px-8 py-4 font-bold text-lg text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl active:scale-[1.02] md:hover:scale-105'
+              className={cn(
+                'inline-block rounded-lg bg-primary px-8 py-4 font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl active:scale-[1.02] md:hover:scale-105',
+                TYPOGRAPHY.TEXT_LG
+              )}
             >
               Try the Calculator →
             </Link>
@@ -465,7 +524,9 @@ export default function AboutPage() {
       {/* Contact Footer */}
       <section className='py-16'>
         <div className='container mx-auto max-w-4xl px-4 text-center'>
-          <h3 className='mb-4 font-bold text-2xl text-foreground'>Get in Touch</h3>
+          <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+            Get in Touch
+          </h3>
           <p className='mb-6 text-muted-foreground'>
             Questions, feedback, or suggestions? We&apos;d love to hear from you.
           </p>

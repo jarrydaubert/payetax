@@ -19,7 +19,8 @@ import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | PayeTax - Client-Side Tax Calculations',
@@ -106,7 +107,7 @@ export default function PrivacyPolicyPage() {
               <span>Privacy Policy</span>
             </Badge>
 
-            <h1 className='mb-6 font-bold text-5xl leading-tight md:text-7xl'>
+            <h1 className={cn('mb-6 font-bold leading-tight md:text-7xl', TYPOGRAPHY.TEXT_5XL)}>
               <GradientText variant='brand-full' as='span'>
                 Your Privacy
               </GradientText>
@@ -114,14 +115,19 @@ export default function PrivacyPolicyPage() {
               <span className='text-foreground'>Comes First</span>
             </h1>
 
-            <p className='mx-auto mb-8 max-w-3xl text-muted-foreground text-xl leading-relaxed md:text-2xl'>
+            <p
+              className={cn(
+                'mx-auto mb-8 max-w-3xl text-muted-foreground leading-relaxed md:text-2xl',
+                TYPOGRAPHY.TEXT_XL
+              )}
+            >
               Radical transparency about your data. Here&apos;s exactly what we do and don&apos;t do
               with your information.
             </p>
 
             <div className='inline-flex items-center gap-2 text-muted-foreground'>
               <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-              <span className='text-sm'>Last updated: October 4, 2025</span>
+              <span className={TYPOGRAPHY.TEXT_SM}>Last updated: October 4, 2025</span>
             </div>
           </div>
         </div>
@@ -132,10 +138,16 @@ export default function PrivacyPolicyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-12 text-center'>
             <CheckCircle className={`mx-auto mb-4 ${'size-16'} text-primary`} aria-hidden='true' />
-            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
+            <GradientText
+              variant='brand'
+              as='h2'
+              className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_4XL)}
+            >
               The 30-Second Version
             </GradientText>
-            <p className='text-lg text-muted-foreground'>Everything you need to know at a glance</p>
+            <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+              Everything you need to know at a glance
+            </p>
           </div>
 
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
@@ -149,7 +161,9 @@ export default function PrivacyPolicyPage() {
                     aria-hidden='true'
                   />
                 </div>
-                <h3 className='font-bold text-2xl text-foreground'>What We DON'T Do</h3>
+                <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+                  What We DON'T Do
+                </h3>
               </div>
               <ul className='space-y-3'>
                 {dontDo.map((item) => (
@@ -174,7 +188,7 @@ export default function PrivacyPolicyPage() {
                     aria-hidden='true'
                   />
                 </div>
-                <h3 className='font-bold text-2xl text-foreground'>What We DO</h3>
+                <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>What We DO</h3>
               </div>
               <ul className='space-y-3'>
                 {doDo.map((item) => (
@@ -196,10 +210,14 @@ export default function PrivacyPolicyPage() {
       <section className='bg-gradient-to-br from-accent/5 via-primary/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <div className='mb-16 text-center'>
-            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl md:text-5xl'>
+            <GradientText
+              variant='brand'
+              as='h2'
+              className={cn('mb-4 font-bold md:text-5xl', TYPOGRAPHY.TEXT_4XL)}
+            >
               How We Protect Your Privacy
             </GradientText>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Four architectural decisions that make your data truly private
             </p>
           </div>
@@ -218,7 +236,9 @@ export default function PrivacyPolicyPage() {
                       aria-hidden='true'
                     />
                   </div>
-                  <h3 className='mb-4 font-bold text-2xl text-foreground'>{principle.title}</h3>
+                  <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+                    {principle.title}
+                  </h3>
                   <p className='text-muted-foreground leading-relaxed'>{principle.description}</p>
                 </Card>
               </div>
@@ -232,10 +252,14 @@ export default function PrivacyPolicyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <div className='mb-16 text-center'>
             <Lock className={`mx-auto mb-6 ${'size-16'} text-primary`} aria-hidden='true' />
-            <GradientText variant='brand' as='h2' className='mb-4 font-bold text-4xl'>
+            <GradientText
+              variant='brand'
+              as='h2'
+              className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_4XL)}
+            >
               Where Your Tax Data Goes
             </GradientText>
-            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+            <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Spoiler: Nowhere. Here&apos;s the technical breakdown.
             </p>
           </div>
@@ -251,7 +275,9 @@ export default function PrivacyPolicyPage() {
                     aria-hidden='true'
                   />
                 </div>
-                <h3 className='mb-4 font-bold text-foreground text-xl'>Your Device</h3>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                  Your Device
+                </h3>
                 <p className='text-muted-foreground leading-relaxed'>
                   All calculations happen here in your browser. Your salary, tax code, and personal
                   details never leave this device.
@@ -269,7 +295,9 @@ export default function PrivacyPolicyPage() {
                     aria-hidden='true'
                   />
                 </div>
-                <h3 className='mb-4 font-bold text-foreground text-xl'>Our Servers</h3>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                  Our Servers
+                </h3>
                 <p className='text-muted-foreground leading-relaxed'>
                   Only serve the website code (HTML, CSS, JS). No tax data, no personal information,
                   no calculation results stored.
@@ -287,7 +315,9 @@ export default function PrivacyPolicyPage() {
                     aria-hidden='true'
                   />
                 </div>
-                <h3 className='mb-4 font-bold text-foreground text-xl'>localStorage</h3>
+                <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                  localStorage
+                </h3>
                 <p className='text-muted-foreground leading-relaxed'>
                   We save your inputs locally for convenience. This data stays on your device and
                   can be cleared anytime.
@@ -297,7 +327,9 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <Card className='mt-8 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
-            <h3 className='mb-4 font-bold text-foreground text-xl'>Technical Explanation</h3>
+            <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+              Technical Explanation
+            </h3>
             <p className='text-muted-foreground leading-relaxed'>
               We use client-side JavaScript to perform all tax calculations in your browser. The
               calculation engine runs entirely on your device - we literally cannot see your tax
@@ -315,14 +347,18 @@ export default function PrivacyPolicyPage() {
             <div>
               <div className='mb-8 text-center'>
                 <Globe className={`mx-auto mb-6 ${'size-16'} text-accent`} aria-hidden='true' />
-                <GradientText variant='brand' as='h2' className='mb-4 font-bold text-3xl'>
+                <GradientText
+                  variant='brand'
+                  as='h2'
+                  className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_3XL)}
+                >
                   Website Analytics
                 </GradientText>
                 <p className='text-muted-foreground'>Anonymous usage data (completely optional)</p>
               </div>
 
               <Card className='border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-8'>
-                <h3 className='mb-4 font-semibold text-foreground text-lg'>
+                <h3 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
                   What We See (If You Consent)
                 </h3>
                 <ul className='space-y-2 text-muted-foreground text-sm'>
@@ -336,7 +372,9 @@ export default function PrivacyPolicyPage() {
               </Card>
 
               <Card className='mt-6 border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10 p-8'>
-                <h3 className='mb-4 font-semibold text-foreground text-lg'>What We Never See</h3>
+                <h3 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+                  What We Never See
+                </h3>
                 <ul className='space-y-2 text-muted-foreground text-sm'>
                   <li>✗ Your tax calculations or results</li>
                   <li>✗ Personal information you enter</li>
@@ -354,7 +392,12 @@ export default function PrivacyPolicyPage() {
                   className={`mx-auto mb-6 ${'size-16'} text-yellow-500`}
                   aria-hidden='true'
                 />
-                <h2 className='mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-3xl text-transparent'>
+                <h2
+                  className={cn(
+                    'mb-4 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text font-bold text-transparent',
+                    TYPOGRAPHY.TEXT_3XL
+                  )}
+                >
                   Cookies We Use
                 </h2>
                 <p className='text-muted-foreground'>Minimal, transparent, under your control</p>
@@ -367,13 +410,15 @@ export default function PrivacyPolicyPage() {
                   >
                     <span className='font-bold text-sm text-white'>!</span>
                   </div>
-                  <h3 className='font-bold text-foreground text-lg'>Essential (Required)</h3>
+                  <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+                    Essential (Required)
+                  </h3>
                 </div>
-                <p className='mb-3 text-muted-foreground text-sm'>
+                <p className={cn('mb-3 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                   Necessary for the website to function. Remember your cookie preferences and keep
                   the site working.
                 </p>
-                <div className='text-muted-foreground text-xs'>
+                <div className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
                   Examples: Cookie consent, theme preference
                 </div>
               </Card>
@@ -385,13 +430,15 @@ export default function PrivacyPolicyPage() {
                   >
                     <span className='font-bold text-sm text-white'>?</span>
                   </div>
-                  <h3 className='font-bold text-foreground text-lg'>Analytics (Optional)</h3>
+                  <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+                    Analytics (Optional)
+                  </h3>
                 </div>
-                <p className='mb-3 text-muted-foreground text-sm'>
+                <p className={cn('mb-3 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                   Google Analytics helps us improve. You can decline these completely - the
                   calculator works the same.
                 </p>
-                <div className='text-muted-foreground text-xs'>
+                <div className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
                   Examples: Page views, session duration, anonymized patterns
                 </div>
               </Card>
@@ -406,7 +453,9 @@ export default function PrivacyPolicyPage() {
           <div className='grid gap-4 md:grid-cols-2 md:gap-8'>
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
               <Globe className={`mb-4 ${ICON_SIZES.SIZE_12} text-accent`} aria-hidden='true' />
-              <h3 className='mb-4 font-bold text-foreground text-xl'>External Links</h3>
+              <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                External Links
+              </h3>
               <p className='text-muted-foreground leading-relaxed'>
                 We link to official sources like HMRC for tax information and rates. These external
                 sites have their own privacy policies that we don&apos;t control.
@@ -415,7 +464,9 @@ export default function PrivacyPolicyPage() {
 
             <Card className='border-primary/20 p-8 transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
               <Calendar className={`mb-4 ${ICON_SIZES.SIZE_12} text-primary`} aria-hidden='true' />
-              <h3 className='mb-4 font-bold text-foreground text-xl'>Policy Updates</h3>
+              <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                Policy Updates
+              </h3>
               <p className='text-muted-foreground leading-relaxed'>
                 If we update this policy, we&apos;ll change the date at the top and add a notice on
                 the site. We&apos;ll never make changes that compromise your privacy.
@@ -430,15 +481,18 @@ export default function PrivacyPolicyPage() {
         <div className='container mx-auto max-w-4xl px-4'>
           <Card className='border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-12 text-center'>
             <Shield className={`mx-auto mb-6 ${'size-16'} text-primary`} aria-hidden='true' />
-            <h2 className='mb-4 font-bold text-3xl text-foreground md:text-4xl'>
+            <h2 className={cn('mb-4 font-bold text-foreground md:text-4xl', TYPOGRAPHY.TEXT_3XL)}>
               Privacy-First Tax Calculations
             </h2>
-            <p className='mb-8 text-lg text-muted-foreground'>
+            <p className={cn('mb-8 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               Experience the UK&apos;s most private tax calculator. No compromises on your data.
             </p>
             <Link
               href='/'
-              className='inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-lg text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+              className={cn(
+                'inline-block rounded-lg bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-8 py-4 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl',
+                TYPOGRAPHY.TEXT_LG
+              )}
             >
               Try the Calculator →
             </Link>
@@ -449,7 +503,9 @@ export default function PrivacyPolicyPage() {
       {/* Contact Footer */}
       <section className='border-border border-t py-16'>
         <div className='container mx-auto max-w-4xl px-4 text-center'>
-          <h3 className='mb-4 font-bold text-2xl text-foreground'>Questions About Privacy?</h3>
+          <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+            Questions About Privacy?
+          </h3>
           <p className='mb-6 text-muted-foreground'>
             We&apos;re happy to answer any questions about how we protect your data.
           </p>
