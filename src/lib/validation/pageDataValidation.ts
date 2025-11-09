@@ -139,3 +139,37 @@ export const SectionBadgeSchema = z.object({
  * Type inferred from SectionBadgeSchema
  */
 export type SectionBadgeData = z.infer<typeof SectionBadgeSchema>;
+
+/**
+ * Contact Link validation schema
+ *
+ * Used for contact footer links (email, feedback forms, etc).
+ *
+ * @example
+ * ```typescript
+ * const links = [
+ *   { text: 'support@example.com', href: 'mailto:support@example.com', type: 'email' },
+ *   { text: 'Feedback Form', href: '/feedback' },
+ * ] satisfies z.infer<typeof ContactLinkSchema>[];
+ * ```
+ */
+export const ContactLinkSchema = z.object({
+  /** Link text to display */
+  text: z.string().min(1, 'Link text is required').max(100, 'Link text too long'),
+  /** Link href (URL or path) */
+  href: z.string().url('Invalid URL').or(z.string().startsWith('/', 'Must be URL or path')),
+  /** Optional link type for styling */
+  type: z.enum(['email', 'link']).optional(),
+});
+
+/**
+ * Type inferred from ContactLinkSchema
+ */
+export type ContactLinkData = z.infer<typeof ContactLinkSchema>;
+
+/**
+ * Helper to validate an array of contact links
+ */
+export function validateContactLinks(data: unknown) {
+  return z.array(ContactLinkSchema).safeParse(data);
+}

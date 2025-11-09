@@ -6,12 +6,15 @@
 
 import { Award, Calculator, Lock, Rocket, Shield, Zap } from 'lucide-react';
 import {
+  type ContactLinkData,
+  ContactLinkSchema,
   type FeatureData,
   FeatureSchema,
   type SectionBadgeData,
   SectionBadgeSchema,
   type StatData,
   StatSchema,
+  validateContactLinks,
   validateFeatures,
   validateStats,
 } from '../pageDataValidation';
@@ -400,6 +403,152 @@ describe('pageDataValidation', () => {
       };
 
       const result = SectionBadgeSchema.safeParse(badge);
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('ContactLinkSchema', () => {
+    it('should validate a complete contact link object', () => {
+      const link: ContactLinkData = {
+        text: 'support@example.com',
+        href: 'mailto:support@example.com',
+        type: 'email',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate a minimal contact link (no type)', () => {
+      const link = {
+        text: 'Contact Us',
+        href: '/contact',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate email type', () => {
+      const link = {
+        text: 'Email',
+        href: 'mailto:test@example.com',
+        type: 'email' as const,
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate link type', () => {
+      const link = {
+        text: 'Feedback',
+        href: '/feedback',
+        type: 'link' as const,
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate URL href', () => {
+      const link = {
+        text: 'Website',
+        href: 'https://example.com',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate path href', () => {
+      const link = {
+        text: 'Support',
+        href: '/support',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject empty text', () => {
+      const link = {
+        text: '',
+        href: '/test',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject text over 100 chars', () => {
+      const link = {
+        text: 'a'.repeat(101),
+        href: '/test',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject invalid href', () => {
+      const link = {
+        text: 'Test',
+        href: 'not-a-valid-url',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject missing text', () => {
+      const link = {
+        href: '/test',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject missing href', () => {
+      const link = {
+        text: 'Test',
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject invalid type', () => {
+      const link = {
+        text: 'Test',
+        href: '/test',
+        type: 'invalid' as any,
+      };
+
+      const result = ContactLinkSchema.safeParse(link);
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('validateContactLinks', () => {
+    it('should validate an array of contact links', () => {
+      const links = [
+        { text: 'Email', href: 'mailto:test@example.com', type: 'email' as const },
+        { text: 'Feedback', href: '/feedback', type: 'link' as const },
+      ];
+
+      const result = validateContactLinks(links);
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject invalid item in array', () => {
+      const links = [
+        { text: 'Valid', href: '/valid' },
+        { text: '', href: '/invalid' }, // Empty text
+      ];
+
+      const result = validateContactLinks(links);
       expect(result.success).toBe(false);
     });
   });
