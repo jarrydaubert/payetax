@@ -1,7 +1,7 @@
 // src/app/about/page.tsx
+'use client';
 
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
-import type { Metadata } from 'next';
 import { GradientText } from '@/components/atoms/GradientText';
 import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
@@ -9,7 +9,7 @@ import { PageHero } from '@/components/molecules/PageHero';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   ABOUT_STATS,
   ABOUT_TECH_STACK,
@@ -18,7 +18,8 @@ import {
 } from '@/constants/pages/aboutPageData';
 import { cn } from '@/lib/utils';
 
-export const metadata: Metadata = {
+// Metadata moved to layout.tsx since this is a client component
+export const _metadata = {
   title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
   description:
     'Free UK PAYE tax calculator with complete privacy. Client-side calculations, zero data storage, instant results using official HMRC rates for 2025-26.',
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className='min-h-screen'>
+    <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'About PayeTax' }}
@@ -64,15 +65,15 @@ export default function AboutPage() {
       />
 
       {/* Stats Section */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER}>
           <StatsGrid stats={ABOUT_STATS} columns={4} variant='elevated' />
         </div>
       </section>
 
       {/* Values Section */}
-      <section className='bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
+        <div className={LAYOUT.CONTAINER}>
           <FeatureGrid
             heading={{
               badge: { icon: Shield, text: 'Our Values' },
@@ -88,8 +89,8 @@ export default function AboutPage() {
       </section>
 
       {/* Unique Features Section */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER}>
           <FeatureGrid
             heading={{
               title: 'What Makes Us Different',
@@ -104,8 +105,8 @@ export default function AboutPage() {
       </section>
 
       {/* Tech Stack Section */}
-      <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
+        <div className={LAYOUT.CONTAINER}>
           <FeatureGrid
             heading={{
               title: 'Built with Modern Technology',
@@ -120,16 +121,18 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-4xl px-4'>
-          <div className='text-center'>
-            <Badge variant='outline' className={cn('mb-6', ICON_SIZES.SIZE_4)}>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_SM}>
+          <div className={LAYOUT.TEXT_CENTER}>
+            <Badge variant='outline' className={cn(SPACING.MB_6, ICON_SIZES.SIZE_4)}>
               The Team
             </Badge>
-            <h2 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
+            <h2 className={cn(SPACING.MB_4, 'font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
               Built by One Person
             </h2>
-            <div className='mx-auto max-w-2xl space-y-4 text-muted-foreground'>
+            <div
+              className={cn(LAYOUT.CENTERED_CONTENT, SPACING.SPACE_Y_4, 'text-muted-foreground')}
+            >
               <p className={TYPOGRAPHY.TEXT_LG}>
                 PayeTax is a solo project built with care by a developer who got tired of
                 complicated, data-hungry tax calculators.
@@ -141,8 +144,15 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <Card className='mx-auto mt-12 max-w-2xl border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-8'>
-            <div className='space-y-4 text-center'>
+          <Card
+            className={cn(
+              LAYOUT.CENTERED_CONTENT,
+              SPACING.MT_12,
+              SURFACES.CARD_LARGE,
+              SURFACES.BG_GRADIENT_PRIMARY
+            )}
+          >
+            <div className={cn(SPACING.SPACE_Y_4, LAYOUT.TEXT_CENTER)}>
               <p className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
                 Why build this?
               </p>
