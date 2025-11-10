@@ -15,13 +15,14 @@ import { DataFlowCards } from '@/components/molecules/DataFlowCards';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, SPACING } from '@/constants/designTokens';
 import {
   PRIVACY_DATA_FLOW,
   PRIVACY_DO_DO,
   PRIVACY_DONT_DO,
   PRIVACY_PRINCIPLES,
 } from '@/constants/pages/privacyPageData';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | PayeTax - Client-Side Tax Calculations',
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className='min-h-screen'>
+    <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'Privacy Policy' }}
@@ -59,7 +60,7 @@ export default function PrivacyPage() {
       />
 
       {/* Last Updated */}
-      <section className='container mx-auto max-w-7xl px-4 py-4'>
+      <section className={cn(LAYOUT.CONTAINER, SPACING.PY_4)}>
         <div className='flex items-center justify-center gap-2 text-muted-foreground text-sm'>
           <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           <span>Last updated: October 4, 2025</span>
@@ -67,8 +68,8 @@ export default function PrivacyPage() {
       </section>
 
       {/* Quick Summary */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-6xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_MD}>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Quick Summary' }}
             title={<GradientText variant='brand'>The 30-Second Version</GradientText>}
@@ -94,8 +95,8 @@ export default function PrivacyPage() {
       </section>
 
       {/* Privacy Principles */}
-      <section className='bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
+        <div className={LAYOUT.CONTAINER}>
           <FeatureGrid
             heading={{
               title: 'How We Protect Your Privacy',
@@ -110,8 +111,8 @@ export default function PrivacyPage() {
       </section>
 
       {/* Data Flow */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-6xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_MD}>
           <SectionHeading
             badge={{ icon: Lock, text: 'Data Flow' }}
             title={<GradientText variant='brand'>Where Your Tax Data Goes</GradientText>}
@@ -124,8 +125,8 @@ export default function PrivacyPage() {
       </section>
 
       {/* Analytics Section */}
-      <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
-        <div className='container mx-auto max-w-6xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
+        <div className={LAYOUT.CONTAINER_MD}>
           <FeatureGrid
             heading={{
               badge: { icon: Eye, text: 'Analytics' },

@@ -13,12 +13,13 @@ import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, SPACING, SURFACES } from '@/constants/designTokens';
 import {
   COMPLIANCE_FEATURES,
   COMPLIANCE_STATEMENTS,
   DATA_SOURCES,
 } from '@/constants/pages/compliancePageData';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'HMRC Compliance & Data Sources | PayeTax',
@@ -65,7 +66,7 @@ const complianceStats = [
 
 export default function CompliancePage() {
   return (
-    <div className='min-h-screen'>
+    <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero */}
       <PageHero
         badge={{ icon: Shield, text: 'Compliance' }}
@@ -82,15 +83,15 @@ export default function CompliancePage() {
       />
 
       {/* Stats */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER}>
           <StatsGrid stats={complianceStats} columns={3} variant='elevated' />
         </div>
       </section>
 
       {/* Compliance Features */}
-      <section className='bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
+        <div className={LAYOUT.CONTAINER}>
           <SectionHeading
             title='HMRC Compliance Standards'
             subtitle='How we ensure calculation accuracy'
@@ -103,7 +104,13 @@ export default function CompliancePage() {
               return (
                 <Card
                   key={index}
-                  className={`border-primary/20 bg-gradient-to-br ${feature.color} p-8 backdrop-blur-sm`}
+                  className={cn(
+                    SURFACES.BORDER_PRIMARY,
+                    'bg-gradient-to-br',
+                    feature.color,
+                    SPACING.P_8,
+                    'backdrop-blur-sm'
+                  )}
                 >
                   <div className='mb-6 flex items-start gap-4'>
                     <div className='flex size-12 items-center justify-center rounded-xl bg-primary/10'>
@@ -137,8 +144,8 @@ export default function CompliancePage() {
       </section>
 
       {/* Compliance Statements */}
-      <section className='py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER}>
           <SectionHeading
             badge={{ icon: AlertTriangle, text: 'Legal Compliance' }}
             title='Official Compliance Statements'
@@ -146,9 +153,9 @@ export default function CompliancePage() {
             align='center'
           />
 
-          <div className='grid gap-6 md:grid-cols-2'>
+          <div className={LAYOUT.GRID_2}>
             {COMPLIANCE_STATEMENTS.map((statement, index) => (
-              <Card key={index} className='border-primary/20 p-6'>
+              <Card key={index} className={SURFACES.CARD_STANDARD}>
                 <h3 className='mb-3 font-semibold text-foreground'>{statement.category}</h3>
                 <p className='mb-4 text-muted-foreground text-sm'>{statement.statement}</p>
                 <div className='space-y-2 border-t border-primary/10 pt-4 text-xs text-muted-foreground'>
@@ -162,8 +169,8 @@ export default function CompliancePage() {
       </section>
 
       {/* Data Sources */}
-      <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
-        <div className='container mx-auto max-w-7xl px-4'>
+      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
+        <div className={LAYOUT.CONTAINER}>
           <SectionHeading
             badge={{ icon: Award, text: 'Data Sources' }}
             title='Official Government Sources'
@@ -171,9 +178,9 @@ export default function CompliancePage() {
             align='center'
           />
 
-          <div className='grid gap-6 md:grid-cols-2'>
+          <div className={LAYOUT.GRID_2}>
             {DATA_SOURCES.map((source, index) => (
-              <Card key={index} className='border-primary/20 p-6'>
+              <Card key={index} className={SURFACES.CARD_STANDARD}>
                 <div className='mb-4 flex items-start justify-between'>
                   <div>
                     <h3 className='mb-2 font-bold text-foreground'>{source.source}</h3>
