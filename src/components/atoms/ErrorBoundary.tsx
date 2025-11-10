@@ -5,6 +5,8 @@ import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 interface Props {
   children: React.ReactNode;
@@ -102,14 +104,14 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
-      {/* Animated background */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900'>
+      {/* Animated background - dark gradient for both themes */}
+      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 dark:from-slate-950 dark:via-red-950 dark:to-slate-950'>
         <div className='absolute inset-0'>
           {/* Floating error particles */}
           {particles.map((particle) => (
             <div
               key={`error-particle-${particle.id}`}
-              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20'
+              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20 dark:bg-red-500 dark:opacity-10'
               style={{
                 left: `${particle.left}%`,
                 top: `${particle.top}%`,
@@ -121,30 +123,87 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className='relative z-10 mx-4 w-full max-w-4xl'>
-        <div className='glass-card border border-red-400/20 p-8 text-center md:p-12'>
+      {/* Main content - responsive padding */}
+      <div className={cn('relative z-10 w-full max-w-4xl', SPACING.PX_4)}>
+        <div
+          className={cn(
+            'glass-card text-center',
+            'border border-red-400/20',
+            SPACING.P_6,
+            'md:p-12',
+            SHADOWS.XXL
+          )}
+        >
           {/* Error icon with animation */}
-          <div className='relative mb-8 inline-block'>
-            <div className='mb-4 inline-flex size-20 items-center justify-center rounded-full border border-red-400/30 bg-red-500/20'>
-              <AlertTriangle className='size-10 animate-pulse text-red-400' />
+          <div className={cn('relative inline-block', SPACING.MB_8)}>
+            <div
+              className={cn(
+                'inline-flex items-center justify-center rounded-full',
+                'border border-red-400/30 bg-red-500/20',
+                SPACING.MB_4,
+                ICON_SIZES.SIZE_12,
+                'md:size-20'
+              )}
+            >
+              <AlertTriangle
+                className={cn('animate-pulse text-red-400', ICON_SIZES.SIZE_8, 'md:size-10')}
+              />
             </div>
             <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20' />
           </div>
 
-          <h1 className='mb-6 font-bold text-3xl text-foreground md:text-4xl'>
+          {/* Heading - responsive typography */}
+          <h1
+            className={cn(
+              'font-bold text-foreground',
+              TYPOGRAPHY.TEXT_3XL,
+              'md:text-4xl',
+              SPACING.MB_6
+            )}
+          >
             Oops! Something Went Wrong
           </h1>
 
-          <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-xl leading-relaxed'>
+          {/* Description - responsive typography */}
+          <p
+            className={cn(
+              'mx-auto max-w-2xl leading-relaxed',
+              'text-muted-foreground',
+              TYPOGRAPHY.TEXT_LG,
+              'md:text-xl',
+              SPACING.MB_8
+            )}
+          >
             Don't worry - even the best tax calculators have their off days! We've automatically
             logged this error and our team will investigate.
           </p>
 
           {/* What happened section */}
-          <div className='glass-card mb-8 border border-yellow-400/20 bg-yellow-500/5 p-6'>
-            <h3 className='mb-3 font-semibold text-lg text-yellow-500'>What can you do?</h3>
-            <ul className='mx-auto max-w-md space-y-2 text-left text-muted-foreground'>
+          <div
+            className={cn(
+              'glass-card',
+              'border border-yellow-400/20 bg-yellow-500/5',
+              SPACING.P_6,
+              SPACING.MB_8
+            )}
+          >
+            <h3
+              className={cn(
+                'font-semibold text-yellow-500 dark:text-yellow-400',
+                TYPOGRAPHY.TEXT_LG,
+                SPACING.MB_3
+              )}
+            >
+              What can you do?
+            </h3>
+            <ul
+              className={cn(
+                'mx-auto max-w-md text-left',
+                'text-muted-foreground',
+                TYPOGRAPHY.TEXT_SM,
+                SPACING.SPACE_Y_2
+              )}
+            >
               <li>• Try refreshing the page or clicking "Try Again"</li>
               <li>• Clear your browser cache and cookies</li>
               <li>• Try using a different browser</li>
@@ -152,37 +211,61 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             </ul>
           </div>
 
+          {/* Event ID display */}
           {eventId && (
-            <div className='mx-auto mb-8 max-w-md rounded-lg border border-white/10 bg-black/20 p-4 text-sm text-white/70'>
-              <strong className='text-white'>Error Reference:</strong>
+            <div
+              className={cn(
+                'mx-auto max-w-md rounded-lg',
+                'border border-white/10 bg-black/20',
+                'text-white/70 dark:border-white/5 dark:bg-black/40',
+                TYPOGRAPHY.TEXT_SM,
+                SPACING.P_4,
+                SPACING.MB_8
+              )}
+            >
+              <strong className='text-white dark:text-white/90'>Error Reference:</strong>
               <br />
-              <code className='break-all font-mono text-purple-300 text-xs'>{eventId}</code>
-              <p className='mt-2 text-white/50 text-xs'>Share this ID when reporting the issue</p>
+              <code
+                className={cn(
+                  'break-all font-mono',
+                  'text-purple-300 dark:text-purple-400',
+                  TYPOGRAPHY.TEXT_XS
+                )}
+              >
+                {eventId}
+              </code>
+              <p
+                className={cn('text-white/50 dark:text-white/40', TYPOGRAPHY.TEXT_XS, SPACING.MT_2)}
+              >
+                Share this ID when reporting the issue
+              </p>
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className='mb-8 flex flex-col justify-center gap-4 sm:flex-row'>
+          {/* Action buttons - responsive layout */}
+          <div
+            className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4, SPACING.MB_8)}
+          >
             <Button
               type='button'
               onClick={resetError}
               size='lg'
-              className='bg-blue-600 hover:bg-blue-700'
+              className='bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
             >
-              <RefreshCw className='mr-2 size-5' />
+              <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
               Try Again
             </Button>
 
             <Button asChild variant='outline' size='lg'>
               <Link href='/'>
-                <Home className='mr-2 size-5' />
+                <Home className={cn('mr-2', ICON_SIZES.SIZE_5)} />
                 Go Home
               </Link>
             </Button>
           </div>
 
           {/* Help text */}
-          <p className='mb-6 text-muted-foreground text-sm'>
+          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_6)}>
             This error has been automatically logged with reference{' '}
             {eventId ? `#${eventId.slice(-8)}` : 'N/A'}
           </p>
@@ -190,15 +273,53 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           {/* Development mode error details */}
           {process.env.NODE_ENV === 'development' && error && (
             <details className='mx-auto max-w-4xl text-left'>
-              <summary className='mb-4 cursor-pointer font-semibold text-lg text-yellow-300 transition-colors hover:text-yellow-200'>
+              <summary
+                className={cn(
+                  'cursor-pointer font-semibold',
+                  'text-yellow-300 dark:text-yellow-400',
+                  'transition-colors hover:text-yellow-200 dark:hover:text-yellow-300',
+                  TYPOGRAPHY.TEXT_LG,
+                  SPACING.MB_4
+                )}
+              >
                 🔧 Developer Debug Info (Dev Mode Only)
               </summary>
-              <div className='glass-card border border-yellow-400/30 bg-yellow-500/5 p-4'>
-                <h4 className='mb-2 font-semibold text-yellow-300'>Error Message:</h4>
-                <p className='mb-4 font-mono text-red-300 text-sm'>{error.message}</p>
+              <div
+                className={cn(
+                  'glass-card',
+                  'border border-yellow-400/30 bg-yellow-500/5',
+                  SPACING.P_4
+                )}
+              >
+                <h4
+                  className={cn('font-semibold text-yellow-300 dark:text-yellow-400', SPACING.MB_2)}
+                >
+                  Error Message:
+                </h4>
+                <p
+                  className={cn(
+                    'font-mono text-red-300 dark:text-red-400',
+                    TYPOGRAPHY.TEXT_SM,
+                    SPACING.MB_4
+                  )}
+                >
+                  {error.message}
+                </p>
 
-                <h4 className='mb-2 font-semibold text-yellow-300'>Stack Trace:</h4>
-                <pre className='max-h-64 overflow-auto whitespace-pre-wrap rounded border border-red-400/20 bg-black/40 p-4 font-mono text-red-300 text-xs'>
+                <h4
+                  className={cn('font-semibold text-yellow-300 dark:text-yellow-400', SPACING.MB_2)}
+                >
+                  Stack Trace:
+                </h4>
+                <pre
+                  className={cn(
+                    'max-h-64 overflow-auto whitespace-pre-wrap rounded',
+                    'border border-red-400/20 bg-black/40 dark:bg-black/60',
+                    'font-mono text-red-300 dark:text-red-400',
+                    TYPOGRAPHY.TEXT_XS,
+                    SPACING.P_4
+                  )}
+                >
                   {error.stack}
                 </pre>
               </div>

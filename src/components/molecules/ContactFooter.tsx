@@ -84,7 +84,7 @@ export function ContactFooter({
     <section className={containerClasses}>
       <div className={contentClasses}>
         {/* Title */}
-        <h3 className={cn('mb-4 text-foreground font-bold', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
+        <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
 
         {/* Description */}
         {description && (

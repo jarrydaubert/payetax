@@ -48,6 +48,7 @@ export const TYPOGRAPHY = {
  * Complete scale from 4px to 80px for all layout needs
  * EXTENDED IN PAYTAX-64 for organism components (major page sections, hero spacing)
  * EXTENDED IN PAYTAX-109 for page-level spacing patterns
+ * EXTENDED IN PAYTAX-58 (Nov 2025) for missing responsive patterns
  */
 export const SPACING = {
   // Gap utilities
@@ -65,6 +66,8 @@ export const SPACING = {
   GAP_1_5: 'gap-1.5',
   /** Smaller gap for inline elements (0.25rem / 4px) */
   GAP_1: 'gap-1',
+  /** Minimal gap for very tight spacing (0.125rem / 2px) */
+  GAP_0_5: 'gap-0.5',
 
   // Vertical spacing utilities
   /** Extra large vertical spacing for major page sections (4rem / 64px) */
@@ -89,16 +92,30 @@ export const SPACING = {
   P_6: 'p-6',
   /** Standard card padding (1rem / 16px) */
   P_4: 'p-4',
+  /** Compact padding (0.75rem / 12px) */
+  P_3: 'p-3',
+  /** Small padding (0.5rem / 8px) */
+  P_2: 'p-2',
 
   /** Container horizontal padding (1rem / 16px) - standard for max-w containers */
   PX_4: 'px-4',
+  /** Medium horizontal padding (1.5rem / 24px) */
+  PX_6: 'px-6',
   /** Large horizontal padding (2rem / 32px) */
   PX_8: 'px-8',
+  /** Small horizontal padding (0.5rem / 8px) */
+  PX_2: 'px-2',
+  /** Responsive horizontal padding - mobile to desktop (1rem → 1.5rem → 2rem) */
+  PX_RESPONSIVE: 'px-4 sm:px-6 lg:px-8',
 
   /** Section vertical padding responsive (3rem on mobile, 5rem on desktop) */
   PY_SECTION: 'py-12 md:py-20',
+  /** Large section vertical padding responsive (4rem → 5rem → 6rem) */
+  PY_SECTION_LG: 'py-16 md:py-20 lg:py-24',
   /** Large section vertical padding (5rem / 80px) */
   PY_20: 'py-20',
+  /** Medium-large vertical padding (4rem / 64px) - ADDED IN PAYTAX-58 */
+  PY_16: 'py-16',
   /** Standard section vertical padding (3rem / 48px) */
   PY_12: 'py-12',
   /** Medium vertical padding (2rem / 32px) */
@@ -107,19 +124,31 @@ export const SPACING = {
   PY_6: 'py-6',
   /** Compact vertical padding (1rem / 16px) */
   PY_4: 'py-4',
+  /** Minimal vertical padding (0.5rem / 8px) */
+  PY_2: 'py-2',
 
   // Margin utilities
   /** Extra large top margin for major sections (3rem / 48px) */
   MT_12: 'mt-12',
+  /** Extra-extra large top margin (2.5rem / 40px) */
+  MT_10: 'mt-10',
   /** Large top margin (2rem / 32px) */
   MT_8: 'mt-8',
   /** Medium top margin (1.5rem / 24px) */
   MT_6: 'mt-6',
   /** Standard top margin (1rem / 16px) */
   MT_4: 'mt-4',
+  /** Small top margin (0.75rem / 12px) */
+  MT_3: 'mt-3',
   /** Small top margin (0.5rem / 8px) */
   MT_2: 'mt-2',
+  /** Minimal top margin (0.25rem / 4px) */
+  MT_1: 'mt-1',
 
+  /** Extra large bottom margin (3rem / 48px) */
+  MB_12: 'mb-12',
+  /** Large-medium bottom margin (2rem / 32px) */
+  MB_8: 'mb-8',
   /** Large bottom margin (1.5rem / 24px) */
   MB_6: 'mb-6',
   /** Standard bottom margin (1rem / 16px) */
@@ -132,6 +161,8 @@ export const SPACING = {
   // Special spacing for borders/dividers
   /** Top padding for sections with borders (1rem / 16px) */
   PT_4: 'pt-4',
+  /** Bottom padding for sections with borders (1rem / 16px) */
+  PB_4: 'pb-4',
   /** Small top offset (0.125rem / 2px) */
   MT_0_5: 'mt-0.5',
 } as const;
@@ -214,6 +245,56 @@ export const SURFACES = {
   CARD_STANDARD: 'border-primary/20 p-6',
   /** Large card with more padding */
   CARD_LARGE: 'border-primary/20 p-8',
+} as const;
+
+/**
+ * Semantic color utilities for success/warning/info states
+ * ADDED IN PAYTAX-58 (Nov 2025) to standardize colored text patterns
+ * Ensures consistent colors in both light and dark modes
+ */
+export const COLORS = {
+  /** Success state text - green with dark mode support */
+  SUCCESS: 'text-green-600 dark:text-green-400',
+  /** Warning state text - amber with dark mode support */
+  WARNING: 'text-amber-600 dark:text-amber-400',
+  /** Alternative warning - yellow with dark mode support */
+  WARNING_ALT: 'text-yellow-600 dark:text-yellow-400',
+  /** Error/destructive state text - uses theme destructive color */
+  DESTRUCTIVE: 'text-destructive',
+  /** Info state text - blue with dark mode support */
+  INFO: 'text-blue-600 dark:text-blue-400',
+  /** Special purpose - pink for marriage allowance alerts */
+  ACCENT_PINK: 'text-pink-600 dark:text-pink-400',
+  /** Special purpose - purple for categories/features */
+  ACCENT_PURPLE: 'text-purple-400',
+} as const;
+
+/**
+ * Shadow utilities for elevation and focus effects
+ * ADDED IN PAYTAX-58 (Nov 2025) to standardize shadow patterns
+ */
+export const SHADOWS = {
+  /** Subtle elevation - input hover states, small cards */
+  SM: 'shadow-sm',
+  /** Standard elevation - cards, dropdowns, default interactive elements */
+  MD: 'shadow-md',
+  /** High elevation - modals, popovers, emphasized content */
+  LG: 'shadow-lg',
+  /** Maximum elevation - hero sections, marketing elements */
+  XL: 'shadow-xl',
+  /** Extra large elevation - special hero sections */
+  XXL: 'shadow-2xl',
+
+  // Glow effects for special UI elements
+  /** Primary brand glow - for featured CTAs */
+  GLOW_PRIMARY: 'shadow-lg shadow-primary/30',
+  /** Purple glow - for what-if comparisons and special features */
+  GLOW_PURPLE: 'shadow-lg shadow-purple-500/50',
+  /** Success glow - for positive actions */
+  GLOW_SUCCESS: 'shadow-lg shadow-green-500/40',
+  /** Custom category filter glow */
+  GLOW_ACCENT: 'shadow-[0_0_20px_rgba(168,85,247,0.4)]',
+  GLOW_ACCENT_HOVER: 'shadow-[0_0_30px_rgba(168,85,247,0.6)]',
 } as const;
 
 /**

@@ -108,7 +108,7 @@ export default function CompliancePage() {
                       </li>
                     ))}
                   </ul>
-                  <div className='mt-6 flex items-center justify-between border-t border-primary/10 pt-4 text-xs text-muted-foreground'>
+                  <div className='mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground text-xs'>
                     <span>Last updated: {feature.lastUpdated}</span>
                     <span className='font-medium'>{feature.source}</span>
                   </div>
@@ -134,7 +134,7 @@ export default function CompliancePage() {
               <Card key={index} className={SURFACES.CARD_STANDARD}>
                 <h3 className='mb-3 font-semibold text-foreground'>{statement.category}</h3>
                 <p className='mb-4 text-muted-foreground text-sm'>{statement.statement}</p>
-                <div className='space-y-2 border-t border-primary/10 pt-4 text-xs text-muted-foreground'>
+                <div className='space-y-2 border-primary/10 border-t pt-4 text-muted-foreground text-xs'>
                   <p className='font-medium'>{statement.verification}</p>
                   <p>Last verified: {statement.lastVerified}</p>
                 </div>
@@ -175,7 +175,7 @@ export default function CompliancePage() {
                       <ExternalLink className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                     </a>
                   </Button>
-                  <div className='flex items-center justify-between text-xs text-muted-foreground'>
+                  <div className='flex items-center justify-between text-muted-foreground text-xs'>
                     <span className='font-medium text-primary'>{source.reliability}</span>
                     <span>Last accessed: {source.lastAccessed}</span>
                   </div>

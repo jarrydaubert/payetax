@@ -161,6 +161,34 @@
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
 
+  /**
+   * Brand text gradient utilities - PAYTAX-96
+   * Common patterns for gradient text (used 12+ times across components)
+   */
+  .bg-brand-text {
+    @apply bg-brand-text bg-clip-text text-transparent;
+  }
+
+  .bg-brand-emphasis {
+    @apply bg-brand-emphasis bg-clip-text text-transparent;
+  }
+
+  /**
+   * Glass morphism effects
+   * Used for cards and overlays with backdrop blur
+   */
+  .glass {
+    @apply backdrop-blur-sm bg-card/80 border border-border/50;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-sm bg-card/95 border border-border/50 shadow-xl;
+  }
+
+  .glass-card-inner {
+    @apply backdrop-blur-sm bg-card/50;
+  }
+
   /* Safe area utilities for fixed/sticky elements */
   .safe-bottom {
     bottom: calc(1.5rem + env(safe-area-inset-bottom));

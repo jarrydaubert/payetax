@@ -123,7 +123,7 @@ function StatCard({ stat, variant }: StatCardProps) {
         </div>
 
         {/* Label */}
-        <div className={cn(TYPOGRAPHY.TEXT_LG, 'mb-2 text-foreground font-semibold')}>{label}</div>
+        <div className={cn(TYPOGRAPHY.TEXT_LG, 'mb-2 font-semibold text-foreground')}>{label}</div>
 
         {/* Optional Description */}
         {description && (

@@ -5,6 +5,56 @@ const config: Config = {
   content: ['./src/components/**/*.{js,ts,jsx,tsx,mdx}', './src/app/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      /**
+       * Background gradient utilities - PAYTAX-96
+       * Standardized gradient patterns extracted from 33+ unique instances
+       * Use these instead of inline gradient classes for consistency
+       */
+      backgroundImage: {
+        // Brand gradients (24 uses across components)
+        'brand-text':
+          'linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-gradient-end))',
+        'brand-emphasis':
+          'linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-accent), var(--color-brand-gradient-end))',
+        'brand-surface':
+          'linear-gradient(to bottom right, var(--color-brand-gradient-start), var(--color-brand-gradient-end))',
+
+        // Accent backgrounds (18 uses - subtle tinted sections)
+        'accent-subtle':
+          'linear-gradient(to bottom right, hsl(var(--color-primary) / 0.05), hsl(var(--color-accent) / 0.05))',
+        'accent-subtle-reverse':
+          'linear-gradient(to bottom right, hsl(var(--color-accent) / 0.05), hsl(var(--color-primary) / 0.05))',
+        'accent-hero':
+          'linear-gradient(to bottom right, hsl(var(--color-primary) / 0.1), hsl(var(--color-accent) / 0.05), transparent)',
+
+        // Action gradients (10 uses - purple/cyan buttons and CTAs)
+        'action-primary': 'linear-gradient(to right, #9333ea, #06b6d4)',
+        'action-primary-hover': 'linear-gradient(to right, #7e22ce, #0891b2)',
+
+        // Special purpose gradients (21 uses total)
+        'marriage-alert': 'linear-gradient(to right, #db2777, #9333ea)',
+        'marriage-alert-bg':
+          'linear-gradient(to right, rgb(251 207 232 / 0.5), rgb(243 232 255 / 0.5))',
+        'marriage-alert-dark':
+          'linear-gradient(to right, rgb(157 23 77 / 0.2), rgb(107 33 168 / 0.2))',
+        'tax-trap-alert': 'linear-gradient(to right, #d97706, #ea580c)',
+        'tax-trap-alert-hover': 'linear-gradient(to right, #b45309, #c2410c)',
+        'success-bar': 'linear-gradient(to right, #10b981, #059669)',
+
+        // What-If comparison (4 uses)
+        'whatif-border':
+          'linear-gradient(to bottom right, rgb(168 85 247 / 0.05), rgb(236 72 153 / 0.05))',
+        'whatif-border-dark':
+          'linear-gradient(to bottom right, rgb(192 132 252 / 0.1), rgb(244 114 182 / 0.1))',
+        'whatif-button': 'linear-gradient(to right, #a855f7, #ec4899)',
+        'whatif-button-hover': 'linear-gradient(to right, #9333ea, #db2777)',
+
+        // Separators (2 uses - subtle divider lines)
+        'separator-horizontal':
+          'linear-gradient(to right, transparent, hsl(var(--color-border)), transparent)',
+        'separator-foreground':
+          'linear-gradient(to right, transparent, hsl(var(--color-foreground) / 0.3), transparent)',
+      },
       colors: {
         // Brand colors - maintain identity across themes
         brand: {

@@ -77,7 +77,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
   const cardClasses = cn(
     'h-full transition-all duration-300',
     {
-      'hover:shadow-lg hover:border-primary/50': variant === 'showcase',
+      'hover:border-primary/50 hover:shadow-lg': variant === 'showcase',
       'bg-card/50 backdrop-blur-sm': variant === 'default',
       'border-none shadow-none': variant === 'simple',
     },

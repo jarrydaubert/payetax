@@ -38,7 +38,7 @@ export default function NotFound() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Animated background particles */}
-      <div className='fixed inset-0 -z-10 overflow-hidden'>
+      <div className='-z-10 fixed inset-0 overflow-hidden'>
         <div className='absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background'>
           {[...Array(20)].map((_, i) => {
             const left = (i * 137.5) % 100;

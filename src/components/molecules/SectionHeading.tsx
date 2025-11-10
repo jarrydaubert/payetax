@@ -93,7 +93,7 @@ export function SectionHeading({
   const HeadingTag = level;
 
   const titleClasses = cn(
-    'mb-4 text-foreground font-bold',
+    'mb-4 font-bold text-foreground',
     level === 'h2' ? TYPOGRAPHY.TEXT_4XL : TYPOGRAPHY.TEXT_3XL,
     alignClass
   );
