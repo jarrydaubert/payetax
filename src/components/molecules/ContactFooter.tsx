@@ -10,6 +10,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { ContactLinkData } from '@/lib/validation/pageDataValidation';
@@ -122,7 +123,7 @@ function ContactLinkItem({ link, showSeparator }: ContactLinkItemProps) {
 
   const content = (
     <>
-      <Link href={link.href as string} className={linkClasses}>
+      <Link href={link.href as Route} className={linkClasses}>
         {link.text}
       </Link>
       {showSeparator && (

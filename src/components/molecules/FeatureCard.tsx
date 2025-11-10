@@ -12,6 +12,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import type { Route } from 'next';
 import { Card, CardContent, CardHeader } from '@/components/atoms/ui/card';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -124,7 +125,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
         {/* Optional Link */}
         {link && (
           <Link
-            href={link.href as string}
+            href={link.href as Route}
             className={cn(
               'group inline-flex items-center gap-2 font-semibold text-primary transition-colors hover:text-primary/80',
               TYPOGRAPHY.TEXT_SM

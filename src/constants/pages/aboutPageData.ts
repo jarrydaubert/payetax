@@ -26,7 +26,7 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
 import Target from 'lucide-react/dist/esm/icons/target.js';
 import Zap from 'lucide-react/dist/esm/icons/zap.js';
 import type { z } from 'zod';
-import type { StatSchema, FeatureSchema } from '@/lib/validation/pageDataValidation';
+import type { FeatureSchema, StatSchema } from '@/lib/validation/pageDataValidation';
 
 /**
  * About page statistics

@@ -1,14 +1,9 @@
 // src/app/privacy/page.tsx
 
-// Optimized Lucide imports (bypasses Turbopack tree-shaking issue)
-// Generated via: bash scripts/optimize-lucide-pages.sh
 import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
 import Cookie from 'lucide-react/dist/esm/icons/cookie.js';
-import Database from 'lucide-react/dist/esm/icons/database.js';
 import Eye from 'lucide-react/dist/esm/icons/eye.js';
-import FileText from 'lucide-react/dist/esm/icons/file-text.js';
-import Globe from 'lucide-react/dist/esm/icons/globe.js';
 import Lock from 'lucide-react/dist/esm/icons/lock.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 import X from 'lucide-react/dist/esm/icons/x.js';
@@ -21,6 +16,12 @@ import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { ICON_SIZES } from '@/constants/designTokens';
+import {
+  PRIVACY_DATA_FLOW,
+  PRIVACY_DO_DO,
+  PRIVACY_DONT_DO,
+  PRIVACY_PRINCIPLES,
+} from '@/constants/pages/privacyPageData';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | PayeTax - Client-Side Tax Calculations',
@@ -39,99 +40,10 @@ export const metadata: Metadata = {
   },
 };
 
-const privacyPrinciples = [
-  {
-    icon: Lock,
-    title: 'Client-Side Calculations',
-    description:
-      'All tax calculations run in your browser using JavaScript. Your salary, tax code, and personal details never leave your device.',
-    gradient: {
-      bg: 'from-primary/20 to-accent/20',
-      icon: 'text-primary',
-      border: 'border-primary/20',
-    },
-  },
-  {
-    icon: Database,
-    title: 'Zero Server Storage',
-    description:
-      "We don't store your tax data on our servers. Calculations happen locally, results display instantly, nothing gets saved remotely.",
-    gradient: {
-      bg: 'from-accent/20 to-primary/20',
-      icon: 'text-accent',
-      border: 'border-accent/20',
-    },
-  },
-  {
-    icon: Eye,
-    title: 'Optional Analytics',
-    description:
-      'Anonymous usage data (page views, device type) only with your consent. You can decline entirely - the calculator works exactly the same.',
-    gradient: {
-      bg: 'from-primary/10 to-accent/10',
-      icon: 'text-primary',
-      border: 'border-primary/10',
-    },
-  },
-  {
-    icon: Shield,
-    title: 'Privacy by Design',
-    description:
-      "Your privacy isn't a feature we added - it's built into the architecture. We literally cannot see your tax calculations.",
-    gradient: {
-      bg: 'from-accent/10 to-primary/10',
-      icon: 'text-accent',
-      border: 'border-accent/10',
-    },
-  },
-];
-
-const dontDo = [
-  'Store your tax calculations on servers',
-  'Sell, share, or monetize your data',
-  'Track you across other websites',
-  'Require account creation or login',
-  'Use third-party advertising networks',
-  'Employ dark patterns or deceptive practices',
-];
-
-const doDo = [
-  'Calculate everything in your browser',
-  'Use privacy-focused analytics (Umami)',
-  'Respect Do Not Track settings',
-  'Provide complete transparency',
-  'Keep the site forever free',
-  'Maintain open-source code',
-];
-
-const dataFlowCards = [
-  {
-    icon: Database,
-    iconColor: 'bg-primary',
-    title: 'Your Device',
-    description:
-      'All calculations happen here in your browser. Your salary, tax code, and personal details never leave this device.',
-  },
-  {
-    icon: Globe,
-    iconColor: 'bg-primary/80',
-    title: 'Our Servers',
-    description:
-      'Only serve the website code (HTML, CSS, JS). No tax data, no personal information, no calculation results stored.',
-  },
-  {
-    icon: FileText,
-    iconColor: 'bg-primary/60',
-    title: 'Analytics (Optional)',
-    description:
-      'Privacy-focused Umami analytics tracks anonymous page views only if you consent. No personal data, no cross-site tracking.',
-  },
-];
-
 export default function PrivacyPage() {
   return (
     <div className='min-h-screen'>
-      {/* Hero Section - Using PageHero */}
+      {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'Privacy Policy' }}
         title={
@@ -154,7 +66,7 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      {/* Quick Summary - Using ComparisonCards */}
+      {/* Quick Summary */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <SectionHeading
@@ -168,20 +80,20 @@ export default function PrivacyPage() {
             left={{
               icon: X,
               title: "What We DON'T Do",
-              items: dontDo,
+              items: PRIVACY_DONT_DO,
               variant: 'negative',
             }}
             right={{
               icon: CheckCircle,
               title: 'What We DO',
-              items: doDo,
+              items: PRIVACY_DO_DO,
               variant: 'positive',
             }}
           />
         </div>
       </section>
 
-      {/* Privacy Principles - Using FeatureGrid */}
+      {/* Privacy Principles */}
       <section className='bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4'>
           <FeatureGrid
@@ -190,14 +102,14 @@ export default function PrivacyPage() {
               subtitle: 'Four architectural decisions that make your data truly private',
               align: 'center',
             }}
-            features={privacyPrinciples}
+            features={PRIVACY_PRINCIPLES}
             columns={2}
             variant='showcase'
           />
         </div>
       </section>
 
-      {/* Data Flow - Using DataFlowCards */}
+      {/* Data Flow */}
       <section className='py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <SectionHeading
@@ -207,11 +119,11 @@ export default function PrivacyPage() {
             align='center'
           />
 
-          <DataFlowCards cards={dataFlowCards} columns={3} />
+          <DataFlowCards cards={PRIVACY_DATA_FLOW} columns={3} />
         </div>
       </section>
 
-      {/* Analytics Section - Using FeatureGrid */}
+      {/* Analytics Section */}
       <section className='bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20'>
         <div className='container mx-auto max-w-6xl px-4'>
           <FeatureGrid
@@ -247,7 +159,7 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      {/* Contact Footer - Using ContactFooter */}
+      {/* Contact Footer */}
       <ContactFooter
         title='Privacy Questions?'
         description="We're committed to transparency. If you have questions about how we handle your data, we're here to answer."
