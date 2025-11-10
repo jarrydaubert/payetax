@@ -132,7 +132,7 @@ export default function NotFound() {
                   </p>
                   <div
                     className={cn(
-                      SPACING.MT_3,
+                      'mt-3',
                       'mx-auto h-1 w-8 rounded-full bg-gradient-to-r transition-all group-hover:w-12',
                       link.color
                     )}
