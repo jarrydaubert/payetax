@@ -11,8 +11,8 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import type { Route } from 'next';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/atoms/ui/card';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';

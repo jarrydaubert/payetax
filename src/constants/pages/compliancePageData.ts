@@ -11,6 +11,8 @@
  * @created PAYTAX-109 Phase 4 - Data Extraction
  */
 
+'use client';
+
 import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';

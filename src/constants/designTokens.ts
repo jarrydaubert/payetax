@@ -45,10 +45,12 @@ export const TYPOGRAPHY = {
 
 /**
  * Spacing scales for gaps, padding, and margins
- * Complete scale from 4px to 64px for all layout needs
+ * Complete scale from 4px to 80px for all layout needs
  * EXTENDED IN PAYTAX-64 for organism components (major page sections, hero spacing)
+ * EXTENDED IN PAYTAX-109 for page-level spacing patterns
  */
 export const SPACING = {
+  // Gap utilities
   /** Major section spacing for navigation, large gaps (2rem / 32px) */
   GAP_8: 'gap-8',
   /** Large section spacing between major content areas (1.5rem / 24px) */
@@ -63,6 +65,8 @@ export const SPACING = {
   GAP_1_5: 'gap-1.5',
   /** Smaller gap for inline elements (0.25rem / 4px) */
   GAP_1: 'gap-1',
+
+  // Vertical spacing utilities
   /** Extra large vertical spacing for major page sections (4rem / 64px) */
   SPACE_Y_16: 'space-y-16',
   /** Large vertical spacing for page sections (2rem / 32px) */
@@ -77,6 +81,59 @@ export const SPACING = {
   SPACE_Y_2: 'space-y-2',
   /** Vertical spacing for very compact lists (0.25rem / 4px) */
   SPACE_Y_1: 'space-y-1',
+
+  // Padding utilities (PAYTAX-109 additions)
+  /** Extra large card/section padding (2rem / 32px) */
+  P_8: 'p-8',
+  /** Large card padding (1.5rem / 24px) */
+  P_6: 'p-6',
+  /** Standard card padding (1rem / 16px) */
+  P_4: 'p-4',
+
+  /** Container horizontal padding (1rem / 16px) - standard for max-w containers */
+  PX_4: 'px-4',
+  /** Large horizontal padding (2rem / 32px) */
+  PX_8: 'px-8',
+
+  /** Section vertical padding responsive (3rem on mobile, 5rem on desktop) */
+  PY_SECTION: 'py-12 md:py-20',
+  /** Large section vertical padding (5rem / 80px) */
+  PY_20: 'py-20',
+  /** Standard section vertical padding (3rem / 48px) */
+  PY_12: 'py-12',
+  /** Medium vertical padding (2rem / 32px) */
+  PY_8: 'py-8',
+  /** Small vertical padding (1.5rem / 24px) */
+  PY_6: 'py-6',
+  /** Compact vertical padding (1rem / 16px) */
+  PY_4: 'py-4',
+
+  // Margin utilities
+  /** Extra large top margin for major sections (3rem / 48px) */
+  MT_12: 'mt-12',
+  /** Large top margin (2rem / 32px) */
+  MT_8: 'mt-8',
+  /** Medium top margin (1.5rem / 24px) */
+  MT_6: 'mt-6',
+  /** Standard top margin (1rem / 16px) */
+  MT_4: 'mt-4',
+  /** Small top margin (0.5rem / 8px) */
+  MT_2: 'mt-2',
+
+  /** Large bottom margin (1.5rem / 24px) */
+  MB_6: 'mb-6',
+  /** Standard bottom margin (1rem / 16px) */
+  MB_4: 'mb-4',
+  /** Medium bottom margin (0.75rem / 12px) */
+  MB_3: 'mb-3',
+  /** Small bottom margin (0.5rem / 8px) */
+  MB_2: 'mb-2',
+
+  // Special spacing for borders/dividers
+  /** Top padding for sections with borders (1rem / 16px) */
+  PT_4: 'pt-4',
+  /** Small top offset (0.125rem / 2px) */
+  MT_0_5: 'mt-0.5',
 } as const;
 
 /**
@@ -100,6 +157,63 @@ export const ICON_SIZES = {
   SIZE_3_5: 'size-3.5',
   /** Responsive desktop icon size (1.5rem / 24px) */
   MD_SIZE_6: 'md:size-6',
+} as const;
+
+/**
+ * Layout utilities for consistent page structure
+ * ADDED IN PAYTAX-109 for standardized containers and sections
+ */
+export const LAYOUT = {
+  /** Standard container: centered with max-width and horizontal padding */
+  CONTAINER: 'container mx-auto max-w-7xl px-4',
+  /** Medium container for focused content */
+  CONTAINER_MD: 'container mx-auto max-w-6xl px-4',
+  /** Small container for narrow content (forms, articles) */
+  CONTAINER_SM: 'container mx-auto max-w-4xl px-4',
+  /** Extra small container for very focused content */
+  CONTAINER_XS: 'container mx-auto max-w-2xl px-4',
+
+  /** Full-height page wrapper */
+  PAGE_WRAPPER: 'min-h-screen',
+  /** Standard section spacing (responsive) */
+  SECTION: 'py-12 md:py-20',
+  /** Section with light primary background */
+  SECTION_TINTED_PRIMARY: 'bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20',
+  /** Section with light accent background */
+  SECTION_TINTED_ACCENT: 'bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20',
+
+  /** 2-column grid with gap */
+  GRID_2: 'grid gap-6 md:grid-cols-2',
+  /** 3-column grid with gap */
+  GRID_3: 'grid gap-6 md:grid-cols-3',
+  /** 4-column grid with gap */
+  GRID_4: 'grid gap-6 md:grid-cols-4',
+
+  /** Centered text content */
+  TEXT_CENTER: 'text-center',
+  /** Centered content with max-width */
+  CENTERED_CONTENT: 'mx-auto max-w-2xl',
+} as const;
+
+/**
+ * Border and surface utilities
+ * ADDED IN PAYTAX-109 for consistent card/surface styling
+ */
+export const SURFACES = {
+  /** Standard card border with subtle primary tint */
+  BORDER_PRIMARY: 'border-primary/20',
+  /** Border with top separator */
+  BORDER_TOP_DIVIDER: 'border-t border-primary/10',
+
+  /** Light primary gradient background */
+  BG_GRADIENT_PRIMARY: 'bg-gradient-to-br from-primary/5 to-accent/5',
+  /** Light accent gradient background */
+  BG_GRADIENT_ACCENT: 'bg-gradient-to-br from-accent/5 to-transparent',
+
+  /** Card with padding and border */
+  CARD_STANDARD: 'border-primary/20 p-6',
+  /** Large card with more padding */
+  CARD_LARGE: 'border-primary/20 p-8',
 } as const;
 
 /**

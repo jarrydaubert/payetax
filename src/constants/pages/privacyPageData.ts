@@ -10,6 +10,8 @@
  * @created PAYTAX-109 Phase 4 - Data Extraction
  */
 
+'use client';
+
 import Database from 'lucide-react/dist/esm/icons/database.js';
 import Eye from 'lucide-react/dist/esm/icons/eye.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';

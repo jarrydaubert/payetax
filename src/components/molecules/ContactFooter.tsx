@@ -9,8 +9,8 @@
 
 'use client';
 
-import Link from 'next/link';
 import type { Route } from 'next';
+import Link from 'next/link';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { ContactLinkData } from '@/lib/validation/pageDataValidation';
