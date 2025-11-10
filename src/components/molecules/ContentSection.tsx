@@ -10,6 +10,7 @@
 'use client';
 
 import type React from 'react';
+import { COLORS } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -79,7 +80,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       {title && (
         <div className='mb-4 flex items-start'>
           {/* Optional icon using CSS variables for gradient colors */}
-          {icon && <div className='mr-3 flex-shrink-0 text-purple-400'>{icon}</div>}
+          {icon && <div className={cn('mr-3 flex-shrink-0', COLORS.ACCENT_PURPLE)}>{icon}</div>}
 
           <div>
             {/* Title with proper heading level for accessibility */}

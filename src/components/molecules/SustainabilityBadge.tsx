@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export default function SustainabilityBadge() {
   const [showDetails, setShowDetails] = useState(false);
@@ -58,7 +59,10 @@ export default function SustainabilityBadge() {
                   {/* Header */}
                   <div className='mb-6 flex items-start justify-between'>
                     <div className='flex items-center gap-2'>
-                      <Leaf className={`${ICON_SIZES.SIZE_6} text-green-400`} aria-hidden='true' />
+                      <Leaf
+                        className={cn(ICON_SIZES.SIZE_6, 'text-green-600 dark:text-green-400')}
+                        aria-hidden='true'
+                      />
                       <h3 className='font-semibold text-xl'>Eco-Friendly Calculator</h3>
                     </div>
                     <Button
@@ -81,28 +85,28 @@ export default function SustainabilityBadge() {
                       </h4>
                       <ul className='space-y-2 text-sm'>
                         <li className='flex gap-2'>
-                          <span className='text-green-400'>•</span>
+                          <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Low Carbon:</strong> Estimated ~0.2g
                             CO₂ per page visit (avg. web page: 1.76g)
                           </span>
                         </li>
                         <li className='flex gap-2'>
-                          <span className='text-green-400'>•</span>
+                          <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Efficient Code:</strong> 309KB
                             initial bundle, optimized for minimal energy
                           </span>
                         </li>
                         <li className='flex gap-2'>
-                          <span className='text-green-400'>•</span>
+                          <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Green Hosting:</strong> Deployed on
                             Vercel's carbon-neutral infrastructure
                           </span>
                         </li>
                         <li className='flex gap-2'>
-                          <span className='text-green-400'>•</span>
+                          <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Offline Ready:</strong> PWA reduces
                             repeat network requests
@@ -118,21 +122,21 @@ export default function SustainabilityBadge() {
                       </h4>
                       <ul className='space-y-2 text-sm'>
                         <li className='flex gap-2'>
-                          <span className='text-blue-400'>•</span>
+                          <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Fast Loading:</strong> Static
                             generation with ISR
                           </span>
                         </li>
                         <li className='flex gap-2'>
-                          <span className='text-blue-400'>•</span>
+                          <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Edge Caching:</strong> Content
                             served from nearest location
                           </span>
                         </li>
                         <li className='flex gap-2'>
-                          <span className='text-blue-400'>•</span>
+                          <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Client-Side Calculations:</strong>{' '}
                             No server requests needed
@@ -148,7 +152,7 @@ export default function SustainabilityBadge() {
                         href='https://www.websitecarbon.com/'
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='inline-flex items-center gap-1 text-green-400 hover:underline'
+                        className='inline-flex items-center gap-1 text-green-600 hover:underline dark:text-green-400'
                       >
                         Learn more about web sustainability →
                       </a>

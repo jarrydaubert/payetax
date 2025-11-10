@@ -266,7 +266,7 @@ export const COLORS = {
   /** Special purpose - pink for marriage allowance alerts */
   ACCENT_PINK: 'text-pink-600 dark:text-pink-400',
   /** Special purpose - purple for categories/features */
-  ACCENT_PURPLE: 'text-purple-400',
+  ACCENT_PURPLE: 'text-purple-600 dark:text-purple-400',
 } as const;
 
 /**

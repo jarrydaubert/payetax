@@ -4,7 +4,7 @@
 import { Tag } from 'lucide-react';
 import { useId } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { COLORS, ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { BlogCategory } from '@/types/blog';
 
@@ -48,7 +48,7 @@ export function CategoryFilter({
   return (
     <div className='relative z-20 mb-12 md:mb-20' aria-labelledby={headingId}>
       <div className={cn('mb-8 flex items-center justify-center text-center', SPACING.GAP_2)}>
-        <Tag className={cn(ICON_SIZES.SIZE_5, 'text-purple-400')} aria-hidden='true' />
+        <Tag className={cn(ICON_SIZES.SIZE_5, COLORS.ACCENT_PURPLE)} aria-hidden='true' />
         <h2 id={headingId} className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
           Browse Topics
         </h2>
@@ -64,8 +64,8 @@ export function CategoryFilter({
               SPACING.GAP_2,
               TYPOGRAPHY.TEXT_SM,
               isActive()
-                ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]'
-                : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
+                ? `scale-110 bg-action-primary text-white hover:opacity-95 ${SHADOWS.GLOW_ACCENT} hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]`
+                : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-primary/50 hover:bg-card/70 hover:text-foreground'
             )}
           >
             <span className='relative z-10'>All Posts</span>
@@ -74,13 +74,14 @@ export function CategoryFilter({
               className={cn(
                 'relative z-10 font-mono',
                 TYPOGRAPHY.TEXT_XS,
-                isActive() && 'bg-white/20 text-white hover:bg-white/30'
+                isActive() &&
+                  'bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30'
               )}
             >
               {allPostsCount}
             </Badge>
             {isActive() && (
-              <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 blur transition-opacity group-hover:opacity-100' />
+              <div className='absolute inset-0 bg-action-primary opacity-0 blur transition-opacity group-hover:opacity-100' />
             )}
           </button>
 
@@ -97,8 +98,8 @@ export function CategoryFilter({
                   SPACING.GAP_2,
                   TYPOGRAPHY.TEXT_SM,
                   isActive(category.slug)
-                    ? 'scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]'
-                    : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-purple-500/50 hover:bg-card/70 hover:text-foreground'
+                    ? `scale-110 bg-action-primary text-white hover:opacity-95 ${SHADOWS.GLOW_ACCENT} hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]`
+                    : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-primary/50 hover:bg-card/70 hover:text-foreground'
                 )}
               >
                 <span className='relative z-10'>{category.name}</span>
@@ -107,13 +108,14 @@ export function CategoryFilter({
                   className={cn(
                     'relative z-10 font-mono',
                     TYPOGRAPHY.TEXT_XS,
-                    isActive(category.slug) && 'bg-white/20 text-white hover:bg-white/30'
+                    isActive(category.slug) &&
+                      'bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30'
                   )}
                 >
                   {category.count}
                 </Badge>
                 {isActive(category.slug) && (
-                  <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 blur transition-opacity group-hover:opacity-100' />
+                  <div className='absolute inset-0 bg-action-primary opacity-0 blur transition-opacity group-hover:opacity-100' />
                 )}
               </button>
             ))}
