@@ -10,7 +10,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { CheckCircle, UserX, X } from 'lucide-react';
+import { CheckCircle, UserX } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
