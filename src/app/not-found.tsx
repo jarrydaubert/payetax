@@ -145,7 +145,7 @@ export default function NotFound() {
           {/* Fun Fact Card */}
           <Card
             className={cn(
-              SPACING.MB_8,
+              'mb-8',
               SURFACES.CARD_LARGE,
               'border-border',
               SURFACES.BG_GRADIENT_PRIMARY
