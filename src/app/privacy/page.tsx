@@ -10,17 +10,16 @@ import Eye from 'lucide-react/dist/esm/icons/eye.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Globe from 'lucide-react/dist/esm/icons/globe.js';
 import Lock from 'lucide-react/dist/esm/icons/lock.js';
-import Server from 'lucide-react/dist/esm/icons/server.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 import X from 'lucide-react/dist/esm/icons/x.js';
 import type { Metadata } from 'next';
 import { GradientText } from '@/components/atoms/GradientText';
+import { ComparisonCards } from '@/components/molecules/ComparisonCards';
+import { ContactFooter } from '@/components/molecules/ContactFooter';
+import { DataFlowCards } from '@/components/molecules/DataFlowCards';
+import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { ComparisonCards } from '@/components/molecules/ComparisonCards';
-import { FeatureGrid } from '@/components/molecules/FeatureGrid';
-import { DataFlowCards } from '@/components/molecules/DataFlowCards';
-import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { ICON_SIZES } from '@/constants/designTokens';
 
 export const metadata: Metadata = {
@@ -160,11 +159,7 @@ export default function PrivacyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Quick Summary' }}
-            title={
-              <GradientText variant='brand'>
-                The 30-Second Version
-              </GradientText>
-            }
+            title={<GradientText variant='brand'>The 30-Second Version</GradientText>}
             subtitle='Everything you need to know at a glance'
             align='center'
           />
@@ -207,11 +202,7 @@ export default function PrivacyPage() {
         <div className='container mx-auto max-w-6xl px-4'>
           <SectionHeading
             badge={{ icon: Lock, text: 'Data Flow' }}
-            title={
-              <GradientText variant='brand'>
-                Where Your Tax Data Goes
-              </GradientText>
-            }
+            title={<GradientText variant='brand'>Where Your Tax Data Goes</GradientText>}
             subtitle="Spoiler: Nowhere. Here's the technical breakdown."
             align='center'
           />
