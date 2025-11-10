@@ -67,3 +67,9 @@ next-env.d.ts
 lighthouse-report.html
 security-audit-history.json
 /bundle-history.json
+
+# Mac OS clutter
+.DS_Store
+
+# TypeScript build artifacts
+tsconfig.tsbuildinfo

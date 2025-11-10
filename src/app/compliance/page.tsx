@@ -17,6 +17,7 @@ import { ICON_SIZES, LAYOUT, SPACING, SURFACES } from '@/constants/designTokens'
 import {
   COMPLIANCE_FEATURES,
   COMPLIANCE_STATEMENTS,
+  complianceStats,
   DATA_SOURCES,
 } from '@/constants/pages/compliancePageData';
 import { cn } from '@/lib/utils';
@@ -38,31 +39,6 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
-
-// Stats for compliance page
-const complianceStats = [
-  {
-    icon: CheckCircle,
-    value: '100%',
-    label: 'HMRC Rates',
-    description: 'All rates sourced from official publications',
-    color: 'from-primary to-accent',
-  },
-  {
-    icon: Shield,
-    value: '24hrs',
-    label: 'Update Time',
-    description: 'New rates applied within 24 hours of announcement',
-    color: 'from-accent to-primary',
-  },
-  {
-    icon: Award,
-    value: '4+',
-    label: 'Official Sources',
-    description: 'HMRC, Revenue Scotland, SLC, ONS',
-    color: 'from-primary/80 to-accent/80',
-  },
-];
 
 export default function CompliancePage() {
   return (

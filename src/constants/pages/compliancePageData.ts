@@ -13,7 +13,9 @@
 
 'use client';
 
+import Award from 'lucide-react/dist/esm/icons/award.js';
 import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 
@@ -55,7 +57,7 @@ interface DataSource {
  * HMRC compliance features and certifications
  * Displayed as feature cards on compliance page
  */
-export const COMPLIANCE_FEATURES: ComplianceFeature[] = [
+const COMPLIANCE_FEATURES: ComplianceFeature[] = [
   {
     title: 'Official HMRC Tax Tables',
     description:
@@ -120,7 +122,7 @@ export const COMPLIANCE_FEATURES: ComplianceFeature[] = [
  * Specific HMRC compliance statements
  * Legal/regulatory compliance declarations
  */
-export const COMPLIANCE_STATEMENTS: ComplianceStatement[] = [
+const COMPLIANCE_STATEMENTS: ComplianceStatement[] = [
   {
     category: 'Tax Rate Accuracy',
     statement:
@@ -155,7 +157,7 @@ export const COMPLIANCE_STATEMENTS: ComplianceStatement[] = [
  * Data sources and references
  * Official sources used for calculations
  */
-export const DATA_SOURCES: DataSource[] = [
+const DATA_SOURCES: DataSource[] = [
   {
     source: 'HM Revenue & Customs',
     description: 'Official UK tax authority providing tax rates, allowances, and guidance',
@@ -185,3 +187,33 @@ export const DATA_SOURCES: DataSource[] = [
     reliability: 'Official Government Source',
   },
 ];
+
+/**
+ * Compliance stats for StatsGrid component
+ * Shows key compliance metrics
+ */
+const complianceStats = [
+  {
+    icon: CheckCircle,
+    value: '100%',
+    label: 'HMRC Rates',
+    description: 'All rates sourced from official publications',
+    color: 'from-primary to-accent',
+  },
+  {
+    icon: Shield,
+    value: '24hrs',
+    label: 'Update Time',
+    description: 'New rates applied within 24 hours of announcement',
+    color: 'from-accent to-primary',
+  },
+  {
+    icon: Award,
+    value: '4+',
+    label: 'Years Data',
+    description: 'Historical rates back to 2020/21 tax year',
+    color: 'from-primary to-accent',
+  },
+];
+
+export { complianceStats, COMPLIANCE_FEATURES, COMPLIANCE_STATEMENTS, DATA_SOURCES };
