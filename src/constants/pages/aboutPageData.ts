@@ -1,0 +1,170 @@
+/**
+ * About Page Data
+ *
+ * Static content data for the about page, extracted from inline definitions
+ * for better maintainability, i18n readiness, and build-time validation.
+ *
+ * All data is validated via Zod schemas at build time using the `satisfies` pattern.
+ *
+ * @module constants/pages/aboutPageData
+ * @created PAYTAX-109 Phase 4 - Data Extraction
+ */
+
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
+import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.js';
+import Award from 'lucide-react/dist/esm/icons/award.js';
+import Calculator from 'lucide-react/dist/esm/icons/calculator.js';
+import Code from 'lucide-react/dist/esm/icons/code.js';
+import Eye from 'lucide-react/dist/esm/icons/eye.js';
+import Heart from 'lucide-react/dist/esm/icons/heart.js';
+import Lightbulb from 'lucide-react/dist/esm/icons/lightbulb.js';
+import Lock from 'lucide-react/dist/esm/icons/lock.js';
+import Palette from 'lucide-react/dist/esm/icons/palette.js';
+import Rocket from 'lucide-react/dist/esm/icons/rocket.js';
+import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
+import Target from 'lucide-react/dist/esm/icons/target.js';
+import Zap from 'lucide-react/dist/esm/icons/zap.js';
+import type { z } from 'zod';
+import type { StatSchema, FeatureSchema } from '@/lib/validation/pageDataValidation';
+
+/**
+ * About page statistics
+ * Displayed in StatsGrid component (4 columns)
+ */
+export const ABOUT_STATS = [
+  { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-primary to-accent' },
+  { icon: Lock, value: '0', label: 'Data Stored', color: 'from-primary/80 to-accent/80' },
+  {
+    icon: Award,
+    value: 'HMRC',
+    label: 'Official Rates',
+    color: 'from-accent to-primary',
+  },
+  { icon: Zap, value: '<300kB', label: 'Bundle Size', color: 'from-accent/80 to-primary/80' },
+] satisfies z.infer<typeof StatSchema>[];
+
+/**
+ * Core values/principles
+ * Displayed in FeatureGrid component (2 columns)
+ */
+export const ABOUT_VALUES = [
+  {
+    icon: Shield,
+    title: 'Privacy is Sacred',
+    description:
+      "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
+    gradient: {
+      bg: 'from-primary/20 to-accent/20',
+      icon: 'text-primary',
+      border: 'border-primary/20',
+    },
+  },
+  {
+    icon: Eye,
+    title: 'Radical Transparency',
+    description:
+      'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
+    gradient: {
+      bg: 'from-accent/20 to-primary/20',
+      icon: 'text-accent',
+      border: 'border-accent/20',
+    },
+  },
+  {
+    icon: Target,
+    title: 'Accuracy First',
+    description:
+      'Official HMRC rates updated within 24 hours of changes. Comprehensive testing for Scottish rates, student loans, pensions, and edge cases.',
+    gradient: {
+      bg: 'from-primary/10 to-accent/10',
+      icon: 'text-primary',
+      border: 'border-primary/10',
+    },
+  },
+  {
+    icon: Heart,
+    title: 'Genuinely Free',
+    description:
+      'No premium tiers, no paywalls, no "upgrade to see more". Every feature is free for everyone, forever. Tax calculations should be accessible to all.',
+    gradient: {
+      bg: 'from-accent/10 to-primary/10',
+      icon: 'text-accent',
+      border: 'border-accent/10',
+    },
+  },
+] satisfies z.infer<typeof FeatureSchema>[];
+
+/**
+ * Unique differentiating features
+ * Displayed in FeatureGrid component (3 columns)
+ */
+export const ABOUT_UNIQUE_FEATURES = [
+  {
+    icon: AlertTriangle,
+    title: '£100k Tax Trap Optimizer',
+    description:
+      "Automatically detects when you're in the 60% effective tax rate zone (£100k-£125k) and calculates optimal pension contributions to save thousands.",
+    metric: '60%',
+    gradient: {
+      bg: 'from-amber-500/10 to-orange-500/10',
+      icon: 'text-amber-500',
+      border: 'border-amber-500/30',
+    },
+  },
+  {
+    icon: ArrowLeftRight,
+    title: 'Salary Comparison',
+    description:
+      'Compare job offers or raises with 3 input modes (%, £ amount, total). See marginal rates and exactly what you keep from every increase.',
+    metric: '3 modes',
+    gradient: {
+      bg: 'from-cyan-500/10 to-blue-500/10',
+      icon: 'text-cyan-500',
+      border: 'border-cyan-500/30',
+    },
+  },
+  {
+    icon: Palette,
+    title: 'Adaptive Theming',
+    description:
+      'Light, dark, or system-matched themes. Your calculator, your eyes, your choice. Smooth transitions, zero flash, perfect accessibility.',
+    metric: '3 themes',
+    gradient: {
+      bg: 'from-purple-500/10 to-pink-500/10',
+      icon: 'text-purple-500',
+      border: 'border-purple-500/30',
+    },
+  },
+] satisfies z.infer<typeof FeatureSchema>[];
+
+/**
+ * Tech stack features
+ * Displayed in FeatureGrid component (3 columns)
+ */
+export const ABOUT_TECH_STACK = [
+  {
+    icon: Rocket,
+    title: 'Next.js 15 & React 19',
+    description:
+      'Server Components, React Compiler, async request APIs. Built with the latest tech for maximum performance and developer experience.',
+  },
+  {
+    icon: Code,
+    title: 'TypeScript Strict Mode',
+    description:
+      '100% type coverage with strict mode enabled. Every calculation is type-safe. Runtime errors are nearly impossible with our validation layers.',
+  },
+  {
+    icon: Sparkles,
+    title: 'Modern Development',
+    description:
+      'Biome for linting/formatting (10/10 strictness), Playwright for E2E testing, Sentry for error monitoring. Professional tooling for a free service.',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Zod Validation',
+    description:
+      'Every input validated at runtime with comprehensive schemas. Type safety meets runtime safety for bulletproof calculations.',
+  },
+] satisfies z.infer<typeof FeatureSchema>[];
