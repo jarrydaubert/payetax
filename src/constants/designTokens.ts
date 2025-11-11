@@ -337,3 +337,38 @@ export const COMPONENT_GUIDELINES = {
     responsive: `${ICON_SIZES.SIZE_5} ${ICON_SIZES.SIZE_6}`,
   },
 } as const;
+
+// ============================================================================
+// TypeScript Types for Type-Safe Token Usage
+// ============================================================================
+
+/**
+ * Type-safe typography token keys
+ * @example type MyComponent = { size: TypographyToken } // Enforces valid tokens
+ */
+export type TypographyToken = keyof typeof TYPOGRAPHY;
+
+/**
+ * Type-safe spacing token keys
+ */
+export type SpacingToken = keyof typeof SPACING;
+
+/**
+ * Type-safe icon size token keys
+ */
+export type IconSizeToken = keyof typeof ICON_SIZES;
+
+/**
+ * Type-safe layout token keys
+ */
+export type LayoutToken = keyof typeof LAYOUT;
+
+/**
+ * Type-safe color token keys
+ */
+export type ColorToken = keyof typeof COLORS;
+
+/**
+ * Type-safe shadow token keys
+ */
+export type ShadowToken = keyof typeof SHADOWS;

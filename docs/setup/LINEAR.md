@@ -39,6 +39,50 @@
 
 ---
 
+## 🚀 Creating Sub-Issues (Bulk Operations)
+
+**For audit work like PAYTAX-108 with many sub-issues:**
+
+### Best Approach: Bash Script
+
+Create a script like `scripts/create-audit-subissues.sh`:
+
+```bash
+#!/bin/bash
+PARENT="PAYTAX-108"
+PROJECT="PayeTax"
+
+# Create issue
+node scripts/linear.js create "System: Task Description"
+
+# Link as sub-issue
+node scripts/linear.js set-parent PAYTAX-XXX $PARENT
+
+# Assign to project
+node scripts/linear.js assign-to-project $PROJECT PAYTAX-XXX
+```
+
+**Run it:**
+```bash
+chmod +x scripts/create-audit-subissues.sh
+bash scripts/create-audit-subissues.sh
+```
+
+### Commands for Sub-Issues
+
+```bash
+# Create sub-issue (method 1: after creation)
+node scripts/linear.js create "Title here"
+node scripts/linear.js set-parent PAYTAX-XXX PAYTAX-108
+
+# View sub-issues
+npm run linear list --project PayeTax | grep "PAYTAX-10[8-9]\|PAYTAX-1[1-9][0-9]"
+```
+
+**Pro Tip:** The `--parent` flag doesn't work reliably due to API caching. Use `set-parent` after creation instead.
+
+---
+
 ## ⚡ Quick Setup (30 seconds)
 
 ### 1. Get Your API Key

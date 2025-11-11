@@ -12,6 +12,7 @@
  * ```
  */
 
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export interface CurrencyDisplayProps {
@@ -47,8 +48,8 @@ export function CurrencyDisplay({
 
   const variantClasses = {
     default: 'text-foreground',
-    large: 'font-bold text-2xl text-foreground',
-    small: 'text-sm text-foreground',
+    large: cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL),
+    small: cn('text-foreground', TYPOGRAPHY.TEXT_SM),
     muted: 'text-muted-foreground',
   };
 

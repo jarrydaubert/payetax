@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
@@ -29,8 +30,8 @@ function FieldLegend({
       data-variant={variant}
       className={cn(
         'mb-3 font-medium',
-        'data-[variant=legend]:text-base',
-        'data-[variant=label]:text-sm',
+        `data-[variant=legend]:${TYPOGRAPHY.TEXT_BASE}`,
+        `data-[variant=label]:${TYPOGRAPHY.TEXT_SM}`,
         className
       )}
       {...props}
@@ -209,7 +210,7 @@ function FieldError({
     <div
       role='alert'
       data-slot='field-error'
-      className={cn('font-normal text-destructive text-sm', className)}
+      className={cn('font-normal text-destructive', TYPOGRAPHY.TEXT_SM, className)}
       {...props}
     >
       {content}

@@ -9,7 +9,8 @@
 import { CheckCircle, Wifi } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export default function OfflinePage() {
   return (
@@ -22,17 +23,21 @@ export default function OfflinePage() {
           </div>
 
           {/* Title */}
-          <h1 className='mb-4 font-bold text-4xl text-foreground'>You're Offline</h1>
+          <h1 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
+            You're Offline
+          </h1>
 
           {/* Description */}
-          <p className='mb-8 text-lg text-muted-foreground leading-relaxed'>
+          <p className={cn('mb-8 text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
             It looks like you're not connected to the internet. Don't worry - PayeTax works offline
             too! Your previous calculations are still available.
           </p>
 
           {/* Features Available Offline */}
           <div className='mb-8 rounded-lg border border-border bg-secondary/50 p-6'>
-            <h2 className='mb-4 font-semibold text-foreground text-xl'>Available Offline:</h2>
+            <h2 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+              Available Offline:
+            </h2>
             <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
               <div className='flex items-center gap-3'>
                 <CheckCircle
@@ -83,7 +88,7 @@ export default function OfflinePage() {
 
           {/* Connection Status */}
           <div className='mt-8 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4'>
-            <p className='text-blue-500 text-sm'>
+            <p className={cn('text-blue-500', TYPOGRAPHY.TEXT_SM)}>
               💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
               show the latest tax rates.
             </p>

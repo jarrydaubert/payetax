@@ -33,7 +33,7 @@ import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicat
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
 interface WhatIfComparisonDisplayProps {
@@ -295,13 +295,19 @@ export function WhatIfComparisonDisplay({
                     <React.Fragment key={period}>
                       <TableHead
                         scope='col'
-                        className='sticky top-0 z-10 min-w-[90px] bg-blue-500/10 text-right font-medium text-xs sm:min-w-[100px]'
+                        className={cn(
+                          'sticky top-0 z-10 min-w-[90px] bg-blue-500/10 text-right font-medium sm:min-w-[100px]',
+                          TYPOGRAPHY.TEXT_XS
+                        )}
                       >
                         Current
                       </TableHead>
                       <TableHead
                         scope='col'
-                        className='sticky top-0 z-10 min-w-[90px] bg-purple-500/10 text-right font-medium text-xs sm:min-w-[100px]'
+                        className={cn(
+                          'sticky top-0 z-10 min-w-[90px] bg-purple-500/10 text-right font-medium sm:min-w-[100px]',
+                          TYPOGRAPHY.TEXT_XS
+                        )}
                       >
                         What If
                       </TableHead>

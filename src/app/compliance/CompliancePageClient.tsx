@@ -13,7 +13,7 @@ import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, LAYOUT, SPACING, SURFACES } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   COMPLIANCE_FEATURES,
   COMPLIANCE_STATEMENTS,
@@ -75,15 +75,22 @@ export function CompliancePageClient() {
                       <Icon className={ICON_SIZES.SIZE_6} aria-hidden='true' />
                     </div>
                     <div>
-                      <h3 className='mb-2 font-bold text-foreground text-xl'>{feature.title}</h3>
-                      <p className='text-muted-foreground text-sm'>{feature.description}</p>
+                      <h3 className={cn('mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                        {feature.title}
+                      </h3>
+                      <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                        {feature.description}
+                      </p>
                     </div>
                   </div>
                   <ul className='space-y-2'>
                     {feature.details.map((detail) => (
                       <li
                         key={detail}
-                        className='flex items-start gap-2 text-muted-foreground text-sm'
+                        className={cn(
+                          'flex items-start gap-2 text-muted-foreground',
+                          TYPOGRAPHY.TEXT_SM
+                        )}
                       >
                         <CheckCircle
                           className='mt-0.5 size-4 flex-shrink-0 text-primary'
@@ -93,7 +100,12 @@ export function CompliancePageClient() {
                       </li>
                     ))}
                   </ul>
-                  <div className='mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground text-xs'>
+                  <div
+                    className={cn(
+                      'mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground',
+                      TYPOGRAPHY.TEXT_XS
+                    )}
+                  >
                     <span>Last updated: {feature.lastUpdated}</span>
                     <span className='font-medium'>{feature.source}</span>
                   </div>
@@ -118,8 +130,15 @@ export function CompliancePageClient() {
             {COMPLIANCE_STATEMENTS.map((statement) => (
               <Card key={statement.category} className={SURFACES.CARD_STANDARD}>
                 <h3 className='mb-3 font-semibold text-foreground'>{statement.category}</h3>
-                <p className='mb-4 text-muted-foreground text-sm'>{statement.statement}</p>
-                <div className='space-y-2 border-primary/10 border-t pt-4 text-muted-foreground text-xs'>
+                <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                  {statement.statement}
+                </p>
+                <div
+                  className={cn(
+                    'space-y-2 border-primary/10 border-t pt-4 text-muted-foreground',
+                    TYPOGRAPHY.TEXT_XS
+                  )}
+                >
                   <p className='font-medium'>{statement.verification}</p>
                   <p>Last verified: {statement.lastVerified}</p>
                 </div>
@@ -145,7 +164,9 @@ export function CompliancePageClient() {
                 <div className='mb-4 flex items-start justify-between'>
                   <div>
                     <h3 className='mb-2 font-bold text-foreground'>{source.source}</h3>
-                    <p className='text-muted-foreground text-sm'>{source.description}</p>
+                    <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                      {source.description}
+                    </p>
                   </div>
                 </div>
                 <div className='space-y-3'>
@@ -160,7 +181,12 @@ export function CompliancePageClient() {
                       <ExternalLink className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                     </a>
                   </Button>
-                  <div className='flex items-center justify-between text-muted-foreground text-xs'>
+                  <div
+                    className={cn(
+                      'flex items-center justify-between text-muted-foreground',
+                      TYPOGRAPHY.TEXT_XS
+                    )}
+                  >
                     <span className='font-medium text-primary'>{source.reliability}</span>
                     <span>Last accessed: {source.lastAccessed}</span>
                   </div>

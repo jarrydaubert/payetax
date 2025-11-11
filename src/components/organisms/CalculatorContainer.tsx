@@ -186,7 +186,13 @@ export function CalculatorContainer() {
         transition={{ duration: 0.5 }}
         className='order-1 py-6 text-center lg:col-span-2 lg:py-8'
       >
-        <h2 className='mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-4xl text-transparent md:text-5xl'>
+        <h2
+          className={cn(
+            'mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
+            TYPOGRAPHY.TEXT_4XL,
+            `md:${TYPOGRAPHY.TEXT_5XL}`
+          )}
+        >
           UK Tax Calculator
         </h2>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>

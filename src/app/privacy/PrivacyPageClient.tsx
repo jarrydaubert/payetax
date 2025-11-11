@@ -14,13 +14,14 @@ import { DataFlowCards } from '@/components/molecules/DataFlowCards';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { ICON_SIZES, LAYOUT } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   PRIVACY_DATA_FLOW,
   PRIVACY_DO_DO,
   PRIVACY_DONT_DO,
   PRIVACY_PRINCIPLES,
 } from '@/constants/pages/privacyPageData';
+import { cn } from '@/lib/utils';
 
 export function PrivacyPageClient() {
   return (
@@ -42,7 +43,12 @@ export function PrivacyPageClient() {
 
       {/* Last Updated */}
       <section className={LAYOUT.SECTION}>
-        <div className='flex items-center justify-center gap-2 text-muted-foreground text-sm'>
+        <div
+          className={cn(
+            'flex items-center justify-center gap-2 text-muted-foreground',
+            TYPOGRAPHY.TEXT_SM
+          )}
+        >
           <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           <span>Last updated: October 4, 2025</span>
         </div>

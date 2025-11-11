@@ -2,6 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import type React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const gradientHeadingVariants = cva(
@@ -9,10 +10,10 @@ const gradientHeadingVariants = cva(
   {
     variants: {
       level: {
-        h1: 'text-4xl sm:text-5xl md:text-6xl',
-        h2: 'text-4xl md:text-5xl',
-        h3: 'text-3xl md:text-4xl',
-        h4: 'text-2xl md:text-3xl',
+        h1: cn(TYPOGRAPHY.TEXT_4XL, `sm:${TYPOGRAPHY.TEXT_5XL}`, `md:${TYPOGRAPHY.TEXT_6XL}`),
+        h2: cn(TYPOGRAPHY.TEXT_4XL, `md:${TYPOGRAPHY.TEXT_5XL}`),
+        h3: cn(TYPOGRAPHY.TEXT_3XL, `md:${TYPOGRAPHY.TEXT_4XL}`),
+        h4: cn(TYPOGRAPHY.TEXT_2XL, `md:${TYPOGRAPHY.TEXT_3XL}`),
       },
       gradient: {
         default: 'from-brand-gradient-start to-brand-gradient-end',

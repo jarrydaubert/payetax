@@ -6,7 +6,7 @@ import { Leaf, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export default function SustainabilityBadge() {
@@ -23,7 +23,10 @@ export default function SustainabilityBadge() {
         <Button
           onClick={() => setShowDetails(true)}
           size='default'
-          className='gap-2 rounded-full bg-green-600/90 text-sm backdrop-blur-sm hover:bg-green-600'
+          className={cn(
+            'gap-2 rounded-full bg-green-600/90 backdrop-blur-sm hover:bg-green-600',
+            TYPOGRAPHY.TEXT_SM
+          )}
           aria-label='View eco-friendly information'
         >
           <Leaf className={ICON_SIZES.SIZE_4} aria-hidden='true' />
@@ -63,7 +66,9 @@ export default function SustainabilityBadge() {
                         className={cn(ICON_SIZES.SIZE_6, 'text-green-600 dark:text-green-400')}
                         aria-hidden='true'
                       />
-                      <h3 className='font-semibold text-xl'>Eco-Friendly Calculator</h3>
+                      <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
+                        Eco-Friendly Calculator
+                      </h3>
                     </div>
                     <Button
                       variant='ghost'
@@ -77,13 +82,18 @@ export default function SustainabilityBadge() {
                   </div>
 
                   {/* Content */}
-                  <div className='space-y-5 text-muted-foreground text-sm'>
+                  <div className={cn('space-y-5 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                     {/* Environmental Impact */}
                     <div>
-                      <h4 className='mb-3 flex items-center gap-2 font-medium text-base text-foreground'>
+                      <h4
+                        className={cn(
+                          'mb-3 flex items-center gap-2 font-medium text-foreground',
+                          TYPOGRAPHY.TEXT_BASE
+                        )}
+                      >
                         🌱 Environmental Impact
                       </h4>
-                      <ul className='space-y-2 text-sm'>
+                      <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
                         <li className='flex gap-2'>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
@@ -117,10 +127,15 @@ export default function SustainabilityBadge() {
 
                     {/* Performance Benefits */}
                     <div>
-                      <h4 className='mb-3 flex items-center gap-2 font-medium text-base text-foreground'>
+                      <h4
+                        className={cn(
+                          'mb-3 flex items-center gap-2 font-medium text-foreground',
+                          TYPOGRAPHY.TEXT_BASE
+                        )}
+                      >
                         ⚡ Performance Benefits
                       </h4>
-                      <ul className='space-y-2 text-sm'>
+                      <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
                         <li className='flex gap-2'>
                           <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
@@ -146,7 +161,7 @@ export default function SustainabilityBadge() {
                     </div>
 
                     {/* Footer */}
-                    <div className='border-border border-t pt-4 text-sm'>
+                    <div className={cn('border-border border-t pt-4', TYPOGRAPHY.TEXT_SM)}>
                       <p className='mb-2'>Making tax calculations sustainable for everyone.</p>
                       <a
                         href='https://www.websitecarbon.com/'

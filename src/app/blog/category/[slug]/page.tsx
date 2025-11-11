@@ -11,11 +11,11 @@ import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { categoryContent } from '@/lib/categoryContent';
-import { formatDate } from '@/lib/utils'; // Now imported from shared utils
+import { cn, formatDate } from '@/lib/utils'; // Now imported from shared utils
 
 // Next.js 16: Route segment config for optimized category pages
 export const dynamic = 'force-static'; // Pre-render all category pages at build time
@@ -128,7 +128,10 @@ export default async function CategoryPage({
       </Script>
 
       {/* Breadcrumbs */}
-      <nav aria-label='Breadcrumbs' className='mb-8 text-muted-foreground text-small'>
+      <nav
+        aria-label='Breadcrumbs'
+        className={cn('mb-8 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}
+      >
         <ol className='flex items-center space-x-2'>
           <li>
             <Link href='/' className='hover:text-primary'>
@@ -148,24 +151,40 @@ export default async function CategoryPage({
 
       {/* Header with Category Description */}
       <div className='mb-12'>
-        <h1 className='mb-4 text-center font-bold text-title md:text-display'>
+        <h1
+          className={cn(
+            'mb-4 text-center font-bold',
+            TYPOGRAPHY.TEXT_3XL,
+            `md:${TYPOGRAPHY.TEXT_4XL}`
+          )}
+        >
           {categoryContent[slug]?.title || `${category.name} Insights`}
         </h1>
         {categoryContent[slug] ? (
           <div className='mx-auto max-w-3xl'>
-            <p className='mb-6 text-center text-foreground/90 text-lg leading-relaxed'>
+            <p
+              className={cn(
+                'mb-6 text-center text-foreground/90 leading-relaxed',
+                TYPOGRAPHY.TEXT_LG
+              )}
+            >
               {categoryContent[slug].description}
             </p>
             <div className='flex flex-wrap justify-center gap-2'>
               {categoryContent[slug].keywords.map((keyword) => (
-                <Badge key={keyword} variant='outline' className='text-sm'>
+                <Badge key={keyword} variant='outline' className={TYPOGRAPHY.TEXT_SM}>
                   {keyword}
                 </Badge>
               ))}
             </div>
           </div>
         ) : (
-          <p className='mx-auto max-w-3xl text-center text-large text-muted-foreground'>
+          <p
+            className={cn(
+              'mx-auto max-w-3xl text-center text-muted-foreground',
+              TYPOGRAPHY.TEXT_LG
+            )}
+          >
             Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
             guidance, and practical advice.
           </p>
@@ -174,7 +193,7 @@ export default async function CategoryPage({
 
       {/* Categories */}
       <div className='mb-12'>
-        <h2 className='mb-6 font-bold text-subheading'>Categories</h2>
+        <h2 className={cn('mb-6 font-bold', TYPOGRAPHY.TEXT_2XL)}>Categories</h2>
         <div className='flex flex-wrap gap-3'>
           <Link
             href='/blog'
@@ -219,13 +238,18 @@ export default async function CategoryPage({
                   </Link>
                 )}
                 <div className='p-6'>
-                  <div className='mb-3 flex items-center justify-between text-muted-foreground text-small'>
+                  <div
+                    className={cn(
+                      'mb-3 flex items-center justify-between text-muted-foreground',
+                      TYPOGRAPHY.TEXT_SM
+                    )}
+                  >
                     <span className='font-medium text-primary'>
                       {post.categoryData?.name || post.category}
                     </span>
                     <span>{formatDate(post.publishedAt)}</span>
                   </div>
-                  <h3 className='mb-3 font-bold text-xl'>
+                  <h3 className={cn('mb-3 font-bold', TYPOGRAPHY.TEXT_XL)}>
                     <Link
                       href={`/blog/${post.slug}`}
                       className='text-foreground transition-colors hover:text-primary'
@@ -235,10 +259,15 @@ export default async function CategoryPage({
                   </h3>
                   <p className='mb-4 line-clamp-3 text-muted-foreground'>{post.excerpt}</p>
                   <div className='flex items-center justify-between'>
-                    <span className='text-muted-foreground text-small'>{post.readTime}</span>
+                    <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                      {post.readTime}
+                    </span>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className='inline-flex items-center font-medium text-primary text-small hover:text-primary/80'
+                      className={cn(
+                        'inline-flex items-center font-medium text-primary hover:text-primary/80',
+                        TYPOGRAPHY.TEXT_SM
+                      )}
                     >
                       Read more
                       <ChevronRight className={`ml-1 ${ICON_SIZES.SIZE_3_5}`} aria-hidden='true' />
@@ -250,7 +279,7 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className='py-16 text-center'>
-            <p className='text-large text-muted-foreground'>
+            <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
               No articles found in this category. Check back soon!
             </p>
           </div>
@@ -297,7 +326,7 @@ export default async function CategoryPage({
       {/* Additional SEO Content Section */}
       {categoryContent[slug] && posts.length > 0 && (
         <div className='mt-12 rounded-lg border border-border bg-card p-8'>
-          <h2 className='mb-6 font-bold text-2xl'>About {category.name}</h2>
+          <h2 className={cn('mb-6 font-bold', TYPOGRAPHY.TEXT_2XL)}>About {category.name}</h2>
           <div className='prose prose-slate dark:prose-invert max-w-none'>
             <p className='mb-4 text-foreground/80 leading-relaxed'>
               Our {category.name.toLowerCase()} articles are written by tax experts and updated
@@ -320,7 +349,7 @@ export default async function CategoryPage({
 
           {/* Related Topics */}
           <div className='mt-8'>
-            <h3 className='mb-4 font-bold text-xl'>Related Topics</h3>
+            <h3 className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_XL)}>Related Topics</h3>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               {categories
                 .filter((cat) => cat.slug !== slug)
@@ -332,7 +361,7 @@ export default async function CategoryPage({
                     className='rounded-lg border border-border bg-secondary p-4 transition-colors hover:bg-accent'
                   >
                     <h4 className='mb-2 font-semibold text-foreground'>{cat.name}</h4>
-                    <p className='text-muted-foreground text-sm'>
+                    <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                       {cat.count} {cat.count === 1 ? 'article' : 'articles'}
                     </p>
                   </Link>
@@ -344,7 +373,7 @@ export default async function CategoryPage({
 
       {/* CTA */}
       <div className='glass mt-12 rounded-lg p-6'>
-        <h2 className='mb-3 font-bold text-xl'>Calculate Your UK Tax Now</h2>
+        <h2 className={cn('mb-3 font-bold', TYPOGRAPHY.TEXT_XL)}>Calculate Your UK Tax Now</h2>
         <p className='mb-4'>
           Use our free PAYE tax calculator to determine your take-home pay and plan your finances
           better. Includes all {new Date().getFullYear()}/{new Date().getFullYear() + 1} tax rates,

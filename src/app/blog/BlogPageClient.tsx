@@ -29,8 +29,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
+import { cn } from '@/lib/utils';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
 interface BlogPageClientProps {
@@ -98,13 +99,18 @@ export function BlogPageClient({
             <GradientText
               variant='brand-full'
               as='h1'
-              className='mb-6 font-bold text-6xl leading-tight'
+              className={cn('mb-6 font-bold leading-tight', TYPOGRAPHY.TEXT_6XL)}
             >
               TaxInsights
             </GradientText>
 
             {/* Subtitle */}
-            <p className='mx-auto mb-12 max-w-3xl light:text-foreground/80 text-foreground/70 text-lg leading-relaxed light:md:text-foreground/70'>
+            <p
+              className={cn(
+                'mx-auto mb-12 max-w-3xl light:text-foreground/80 text-foreground/70 leading-relaxed light:md:text-foreground/70',
+                TYPOGRAPHY.TEXT_LG
+              )}
+            >
               UK Tax Guidance & Financial Insights. No jargon, just insights.
             </p>
 
@@ -157,8 +163,12 @@ export function BlogPageClient({
                 className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
               />
               <stat.icon className='relative mx-auto mb-4 size-10 text-primary' />
-              <div className='relative mb-2 font-bold text-3xl text-foreground'>{stat.value}</div>
-              <div className='relative text-muted-foreground text-sm'>{stat.label}</div>
+              <div className={cn('relative mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>
+                {stat.value}
+              </div>
+              <div className={cn('relative text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
@@ -178,7 +188,11 @@ export function BlogPageClient({
           <div className='mb-12 md:mb-20'>
             <div className='mb-8 flex items-center justify-center gap-3 text-center'>
               <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
-              <GradientText variant='brand' as='span' className='font-bold text-lg'>
+              <GradientText
+                variant='brand'
+                as='span'
+                className={cn('font-bold', TYPOGRAPHY.TEXT_LG)}
+              >
                 Featured Article
               </GradientText>
               <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
@@ -196,15 +210,27 @@ export function BlogPageClient({
                       </Badge>
                       <div className='flex items-center gap-2 text-muted-foreground'>
                         <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                        <span className='text-sm'>{formatDate(featuredPost.publishedAt)}</span>
+                        <span className={TYPOGRAPHY.TEXT_SM}>
+                          {formatDate(featuredPost.publishedAt)}
+                        </span>
                       </div>
                     </div>
 
-                    <h2 className='mb-6 font-bold text-4xl text-foreground leading-tight'>
+                    <h2
+                      className={cn(
+                        'mb-6 font-bold text-foreground leading-tight',
+                        TYPOGRAPHY.TEXT_4XL
+                      )}
+                    >
                       {featuredPost.title}
                     </h2>
 
-                    <p className='mb-8 light:text-foreground/85 text-foreground/70 text-lg leading-relaxed light:md:text-foreground/70'>
+                    <p
+                      className={cn(
+                        'mb-8 light:text-foreground/85 text-foreground/70 leading-relaxed light:md:text-foreground/70',
+                        TYPOGRAPHY.TEXT_LG
+                      )}
+                    >
                       {featuredPost.excerpt}
                     </p>
 
@@ -262,33 +288,58 @@ export function BlogPageClient({
                         <div className='mb-4 flex items-center justify-between'>
                           <Badge
                             variant='outline'
-                            className='border-primary/30 bg-primary/20 font-medium font-mono text-xs'
+                            className={cn(
+                              'border-primary/30 bg-primary/20 font-medium font-mono',
+                              TYPOGRAPHY.TEXT_XS
+                            )}
                           >
                             {post.category}
                           </Badge>
-                          <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+                          <div
+                            className={cn(
+                              'flex items-center gap-2 text-muted-foreground',
+                              TYPOGRAPHY.TEXT_SM
+                            )}
+                          >
                             <Calendar className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
-                            <span className='text-xs'>{formatDate(post.publishedAt)}</span>
+                            <span className={TYPOGRAPHY.TEXT_XS}>
+                              {formatDate(post.publishedAt)}
+                            </span>
                           </div>
                         </div>
 
-                        <h3 className='mb-3 font-bold text-foreground text-xl leading-tight'>
+                        <h3
+                          className={cn(
+                            'mb-3 font-bold text-foreground leading-tight',
+                            TYPOGRAPHY.TEXT_XL
+                          )}
+                        >
                           {post.title}
                         </h3>
 
-                        <p className='mb-4 line-clamp-3 light:text-foreground/70 text-muted-foreground text-sm leading-relaxed light:md:text-muted-foreground'>
+                        <p
+                          className={cn(
+                            'mb-4 line-clamp-3 light:text-foreground/70 text-muted-foreground leading-relaxed light:md:text-muted-foreground',
+                            TYPOGRAPHY.TEXT_SM
+                          )}
+                        >
                           {post.excerpt}
                         </p>
 
                         {post.readTime && (
-                          <div className='mb-4 flex items-center gap-2 text-muted-foreground text-sm'>
+                          <div
+                            className={cn(
+                              'mb-4 flex items-center gap-2 text-muted-foreground',
+                              TYPOGRAPHY.TEXT_SM
+                            )}
+                          >
                             <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
-                            <span className='text-xs'>{post.readTime} read</span>
+                            <span className={TYPOGRAPHY.TEXT_XS}>{post.readTime} read</span>
                           </div>
                         )}
 
                         <div className='inline-flex items-center gap-2 font-semibold text-primary transition-all duration-300 group-hover:gap-3'>
-                          <span className='text-sm'>Read More</span>
+                          <span className={TYPOGRAPHY.TEXT_SM}>Read More</span>
                           <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                         </div>
                       </div>
@@ -330,7 +381,12 @@ export function BlogPageClient({
                 </div>
 
                 {/* Additional Navigation Links for SEO */}
-                <div className='flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm'>
+                <div
+                  className={cn(
+                    'flex flex-wrap items-center justify-center gap-4 text-muted-foreground',
+                    TYPOGRAPHY.TEXT_SM
+                  )}
+                >
                   <Link href='/' className='transition-colors hover:text-purple-400'>
                     ← Back to Calculator
                   </Link>
@@ -384,7 +440,9 @@ export function BlogPageClient({
         {/* Additional Content for Page 2+ (SEO) */}
         {currentPage > 1 && !selectedCategory && (
           <div className='mb-12 rounded-2xl border border-border bg-card/50 light:bg-card p-8 backdrop-blur-xl light:md:bg-card/50'>
-            <h2 className='mb-6 font-bold text-2xl text-foreground'>Browse Articles by Category</h2>
+            <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+              Browse Articles by Category
+            </h2>
             <p className='mb-6 light:text-foreground/80 text-foreground/70 light:md:text-foreground/70'>
               Explore our comprehensive collection of UK tax guides organized by topic. From
               understanding basic tax concepts to advanced strategies for reducing your tax bill, we
@@ -400,7 +458,7 @@ export function BlogPageClient({
                   <h3 className='mb-2 font-bold text-foreground transition-colors group-hover:text-purple-400'>
                     {cat.name}
                   </h3>
-                  <p className='text-muted-foreground text-sm'>
+                  <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                     {cat.count} {cat.count === 1 ? 'article' : 'articles'}
                   </p>
                 </Link>

@@ -5,7 +5,7 @@ import { Calculator, Coffee, Mail, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
@@ -78,8 +78,13 @@ export default function CallToAction({
         className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`}
         aria-hidden='true'
       />
-      <h2 className='mb-6 font-bold text-3xl text-foreground'>{config.title}</h2>
-      <p className='mx-auto mb-8 max-w-2xl text-muted-foreground text-xl leading-relaxed'>
+      <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>{config.title}</h2>
+      <p
+        className={cn(
+          'mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed',
+          TYPOGRAPHY.TEXT_XL
+        )}
+      >
         {config.description}
       </p>
 

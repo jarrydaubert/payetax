@@ -53,8 +53,10 @@ export default function SimpleHero({
             Maintains responsive scaling while using design token base size */}
         <h1
           className={cn(
-            'mx-auto mb-6 max-w-4xl font-bold text-foreground tracking-tight sm:text-5xl md:text-6xl',
-            TYPOGRAPHY.TEXT_4XL
+            'mx-auto mb-6 max-w-4xl font-bold text-foreground tracking-tight',
+            TYPOGRAPHY.TEXT_4XL,
+            `sm:${TYPOGRAPHY.TEXT_5XL}`,
+            `md:${TYPOGRAPHY.TEXT_6XL}`
           )}
         >
           Free UK PAYE Tax

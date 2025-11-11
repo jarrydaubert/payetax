@@ -12,6 +12,7 @@
  * ```
  */
 
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export interface RateLabelProps {
@@ -54,8 +55,10 @@ export function RateLabel({
 
   return (
     <div className={cn(containerClass, className)}>
-      <span className={cn('font-medium text-sm', variantClasses[variant])}>{label}:</span>
-      <span className={cn('font-mono font-semibold text-sm', variantClasses[variant])}>
+      <span className={cn('font-medium', TYPOGRAPHY.TEXT_SM, variantClasses[variant])}>
+        {label}:
+      </span>
+      <span className={cn('font-mono font-semibold', TYPOGRAPHY.TEXT_SM, variantClasses[variant])}>
         {formattedRate}%
       </span>
     </div>

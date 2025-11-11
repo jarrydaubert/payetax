@@ -2,7 +2,8 @@
 
 > Best practices and guidelines for maintaining high-quality code
 
-**Last Updated:** 20 October 2025
+**Last Updated:** 11 November 2025  
+**Current Focus:** 🔍 PAYTAX-108 - Comprehensive Codebase Audit v2
 
 ---
 
@@ -12,28 +13,115 @@
 
 When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do this:
 
-1. **Check the actual date** (run `date` command - we're in UK, BST/GMT)
-2. **Read this entire CONTRIBUTING.md file** (yes, all of it!)
-3. **Check Linear for assigned issues:**
-   ```bash
-   npm run linear:me
-   ```
-4. **Review recent commits for context:**
-   ```bash
-   git log --oneline -10
-   ```
-5. **Check git status:**
-   ```bash
-   git status
-   ```
-6. **Report back:** 
-   - Current date
-   - Summary of any Linear issues assigned
-   - Brief overview of recent work from commits
-   - Any uncommitted changes
-   - Ask: "What would you like to work on?"
+### Step 1: Basic Context (30 seconds)
+```bash
+# Check date (UK timezone)
+date
 
-**That's it!** This ensures you have full context before starting any work.
+# Check git status
+git status
+
+# Review recent commits
+git log --oneline -10
+```
+
+### Step 2: Current Work Context (1 minute)
+
+**We are currently doing: COMPREHENSIVE CODEBASE AUDIT (PAYTAX-108)**
+
+**Read these audit docs FIRST:**
+1. **`docs/audits/audit-v2-2025-11-11/README.md`** - Quick overview
+2. **`docs/audits/audit-v2-2025-11-11/AUDIT-FRAMEWORK.md`** - 10 systems being audited
+3. **`docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md`** - React 19, Next.js 16 features guide
+
+**Audit Philosophy:**
+- ✅ Independent assessment (not comparing to old audit)
+- ✅ Each system evaluated on its own merits
+- ✅ Benchmarked against best practices & latest tech stack features
+- ✅ Testing mandatory for EVERY sub-issue (90%+ coverage)
+
+**10 Systems Being Audited:**
+1. 🎨 Theme System (dark mode, colors)
+2. 📝 Design Tokens (typography, spacing, icons)
+3. ✅ Zod Validation (props, config, API)
+4. 🏗️ Atomic Design (component organization)
+5. 🧪 Testing Coverage (unit, integration, E2E)
+6. 📱 Responsive Design (mobile-first)
+7. ♿ Accessibility (WCAG 2.2 AA)
+8. 🚀 Performance (bundle, Core Web Vitals)
+9. 🔐 Type Safety (TypeScript strict)
+10. 🛠️ Tech Stack Maximization (React 19, Next.js 16)
+
+### Step 3: Check Linear Issues (30 seconds)
+```bash
+# Check your assigned issues
+npm run linear:me
+
+# Check audit sub-issues (PAYTAX-108+)
+npm run linear list --project PayeTax | grep "PAYTAX-10[8-9]\|PAYTAX-1[1-9][0-9]"
+```
+
+### Step 4: Report Back
+
+Summarize:
+- ✅ Current date
+- ✅ Current audit system (if working on one)
+- ✅ Any assigned issues
+- ✅ Recent commit context
+- ✅ Git status (clean/uncommitted changes)
+- ❓ **Ask: "Which audit system should we work on?"**
+
+**Example Response:**
+> "It's November 11, 2025. We're in the middle of PAYTAX-108 (Codebase Audit v2). Recent commits show theme system fixes. Working tree is clean. 
+>
+> **10 audit systems available:**
+> 1. Theme System
+> 2. Design Tokens
+> 3. Zod Validation
+> ... (etc)
+>
+> Which system should we audit next?"
+
+---
+
+## 🔍 Quick Reference: Audit Work (PAYTAX-108)
+
+**Current Phase:** System-by-system independent assessment
+
+### Audit Resources
+| Resource | Purpose | Location |
+|----------|---------|----------|
+| **Audit Framework** | 10 systems, sub-issue structure | `docs/audits/audit-v2-2025-11-11/AUDIT-FRAMEWORK.md` |
+| **Tech Stack Guide** | React 19, Next.js 16 features | `docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md` |
+| **Executive Summary** | Overview & philosophy | `docs/audits/audit-v2-2025-11-11/PAYTAX-108-AUDIT-V2-EXECUTIVE-SUMMARY.md` |
+| **Architecture Doc** | Current state reference | `docs/guides/ARCHITECTURE.md` |
+| **Tech Stack Doc** | Versions & features | `docs/guides/TECH_STACK.md` |
+
+### Every Sub-Issue Must Include
+```markdown
+## ✅ Testing Checklist (MANDATORY)
+- [ ] Unit tests written/updated (90%+ coverage)
+- [ ] Accessibility tests pass (axe)
+- [ ] Visual regression tests pass (Playwright)
+- [ ] Performance tests pass (no regressions)
+- [ ] Integration tests pass (if applicable)
+```
+
+**⚠️ NO sub-issue can be marked "Done" without passing ALL tests!**
+
+### Tech Stack Versions (Latest Everything!)
+- **React:** 19.2.0 ✅
+- **Next.js:** 16.0.1 ✅
+- **Tailwind CSS:** 4.1.14 ✅ (v4!)
+- **Zod:** 4.1.11 ✅ (v4!)
+- **TypeScript:** 5.9.3 ✅
+
+### Key Opportunities Identified
+- ❌ `useOptimistic` (React 19) - Not used yet
+- ❌ `useActionState` (React 19) - Not used yet
+- ❌ `after()` (Next.js 16) - Not used yet
+- ❌ Zod validation - Only 10% coverage (target 100%)
+- ⚠️ Design tokens - Partial adoption (target 95%+)
 
 ---
 
@@ -43,7 +131,7 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
 - UK PAYE (Pay As You Earn) tax calculator
 - Helps users calculate income tax, National Insurance, take-home pay
 - Covers England, Scotland, Wales tax systems
-- Built with: Next.js, React, TypeScript, Tailwind CSS
+- Built with: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS 4
 - See `package.json` for current dependency versions
 
 **📖 Required Reading:**
@@ -51,6 +139,7 @@ When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do t
   - **Read Section 0** (`ls -la` Principle) before building ANY component
   - Prevents duplication, ensures proper component usage
   - Shows how to discover existing components/schemas/constants
+- **`docs/audits/audit-v2-2025-11-11/`** - Current audit documentation
 
 **Key Concepts:**
 - PAYE: UK's tax withholding system

@@ -5,7 +5,7 @@ import { TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +24,14 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
 
   return (
     <div className='lg:sticky lg:top-24 lg:self-start'>
-      <h1 className='mb-2 font-bold text-2xl sm:text-3xl lg:text-4xl'>
+      <h1
+        className={cn(
+          'mb-2 font-bold',
+          TYPOGRAPHY.TEXT_2XL,
+          `sm:${TYPOGRAPHY.TEXT_3XL}`,
+          `lg:${TYPOGRAPHY.TEXT_4XL}`
+        )}
+      >
         £{formattedSalary} Salary After Tax
       </h1>
       <p className='mb-6 text-muted-foreground'>UK take-home pay calculator for 2025-26 tax year</p>
@@ -33,26 +40,28 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
         <div className='space-y-6'>
           {/* Main Take-Home */}
           <div className='text-center'>
-            <p className='text-muted-foreground text-sm uppercase tracking-wide'>
+            <p className={cn('text-muted-foreground uppercase tracking-wide', TYPOGRAPHY.TEXT_SM)}>
               Monthly Take-Home Pay
             </p>
-            <p className='mt-2 font-bold text-4xl text-primary'>
+            <p className={cn('mt-2 font-bold text-primary', TYPOGRAPHY.TEXT_4XL)}>
               £{results.netPay.monthly.toLocaleString('en-GB')}
             </p>
-            <p className='mt-2 text-muted-foreground text-sm'>After tax and National Insurance</p>
+            <p className={cn('mt-2 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+              After tax and National Insurance
+            </p>
           </div>
 
           {/* Quick Breakdown */}
           <div className='grid grid-cols-2 gap-4 border-t pt-4'>
             <div>
-              <p className='text-muted-foreground text-xs'>Annual Take-Home</p>
-              <p className='font-semibold text-xl'>
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>Annual Take-Home</p>
+              <p className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
                 £{results.netPay.annually.toLocaleString('en-GB')}
               </p>
             </div>
             <div>
-              <p className='text-muted-foreground text-xs'>Weekly Take-Home</p>
-              <p className='font-semibold text-xl'>
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>Weekly Take-Home</p>
+              <p className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
                 £{results.netPay.weekly.toLocaleString('en-GB')}
               </p>
             </div>
@@ -61,17 +70,17 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           {/* Tax Breakdown */}
           <div className='space-y-3 border-t pt-4'>
             <div className='flex justify-between'>
-              <span className='text-muted-foreground text-sm'>Gross Salary</span>
+              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>Gross Salary</span>
               <span className='font-medium'>£{formattedSalary}</span>
             </div>
             <div className='flex justify-between text-destructive'>
-              <span className='text-sm'>Income Tax</span>
+              <span className={TYPOGRAPHY.TEXT_SM}>Income Tax</span>
               <span className='font-medium'>
                 -£{results.incomeTax.annually.toLocaleString('en-GB')}
               </span>
             </div>
             <div className='flex justify-between text-destructive'>
-              <span className='text-sm'>National Insurance</span>
+              <span className={TYPOGRAPHY.TEXT_SM}>National Insurance</span>
               <span className='font-medium'>
                 -£{results.nationalInsurance.annually.toLocaleString('en-GB')}
               </span>
@@ -87,7 +96,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           {/* Effective Tax Rate */}
           <div className='rounded-lg bg-muted/50 p-4'>
             <div className='flex items-center justify-between'>
-              <span className='text-sm'>Effective Tax Rate</span>
+              <span className={TYPOGRAPHY.TEXT_SM}>Effective Tax Rate</span>
               <Badge variant='secondary' className='font-mono'>
                 {(
                   ((results.incomeTax.annually + results.nationalInsurance.annually) / salary) *
@@ -112,12 +121,13 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
               key={comp.amount}
               href={`/calculator/${comp.amount}-after-tax`}
               className={cn(
-                'rounded-md px-3 py-2 text-center text-sm',
+                'rounded-md px-3 py-2 text-center',
+                TYPOGRAPHY.TEXT_SM,
                 'border border-border hover:border-primary',
                 'transition-colors hover:bg-primary/5'
               )}
             >
-              <span className='text-muted-foreground text-xs'>{comp.label}</span>
+              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>{comp.label}</span>
               <br />£{comp.amount.toLocaleString('en-GB')}
             </Link>
           ))}

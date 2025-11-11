@@ -8,10 +8,11 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import ContentSection from '@/components/ui/ContentSection';
 import PageContainer from '@/components/ui/PageContainer';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent } from '@/lib/mdx';
+import { cn } from '@/lib/utils';
 
 // Next.js 16: Route segment config for optimized blog posts
 export const dynamic = 'force-static'; // Pre-render all blog posts at build time
@@ -107,7 +108,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <article>
           <header className='mb-6 md:mb-8'>
             <div className='mb-4 flex items-center gap-2'>
-              <span className='rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-xs'>
+              <span
+                className={cn(
+                  'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
+                  TYPOGRAPHY.TEXT_XS
+                )}
+              >
                 {post.categoryData?.name || post.category}
               </span>
               {post.tags &&
@@ -115,18 +121,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 post.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className='glass rounded-full px-2 py-1 text-foreground/90 text-xs'
+                    className={cn(
+                      'glass rounded-full px-2 py-1 text-foreground/90',
+                      TYPOGRAPHY.TEXT_XS
+                    )}
                   >
                     {tag}
                   </span>
                 ))}
             </div>
 
-            <h1 className='mb-6 font-bold text-4xl text-foreground leading-tight'>{post.title}</h1>
+            <h1 className={cn('mb-6 font-bold text-foreground leading-tight', TYPOGRAPHY.TEXT_4XL)}>
+              {post.title}
+            </h1>
 
-            <p className='mb-6 text-foreground/90 text-xl leading-relaxed'>{post.excerpt}</p>
+            <p className={cn('mb-6 text-foreground/90 leading-relaxed', TYPOGRAPHY.TEXT_XL)}>
+              {post.excerpt}
+            </p>
 
-            <div className='mb-8 flex items-center gap-6 text-foreground/90 text-sm'>
+            <div
+              className={cn('mb-8 flex items-center gap-6 text-foreground/90', TYPOGRAPHY.TEXT_SM)}
+            >
               <div className='flex items-center gap-2'>
                 <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                 <span>{formatDate(post.publishedAt)}</span>
@@ -172,7 +187,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
                   <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>
-                  <p className='text-foreground text-sm'>
+                  <p className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
                     Try our free UK tax calculator to see how much you'll take home.
                   </p>
                 </div>
@@ -193,7 +208,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <div className='mb-12'>
-            <h2 className='mb-6 font-bold text-2xl text-foreground'>Related Articles</h2>
+            <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+              Related Articles
+            </h2>
             <div className='grid gap-4 md:grid-cols-3 md:gap-6'>
               {relatedPosts.map((relatedPost) => (
                 <Link
@@ -202,14 +219,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   className='glass-card group border border-foreground/10 transition-all active:scale-[1.02] md:hover:border-primary/50'
                 >
                   <div className='glass-card-inner p-6'>
-                    <div className='mb-2 text-primary text-sm'>{relatedPost.category}</div>
-                    <h3 className='mb-3 font-semibold text-foreground text-xl group-hover:text-primary'>
+                    <div className={cn('mb-2 text-primary', TYPOGRAPHY.TEXT_SM)}>
+                      {relatedPost.category}
+                    </div>
+                    <h3
+                      className={cn(
+                        'mb-3 font-semibold text-foreground group-hover:text-primary',
+                        TYPOGRAPHY.TEXT_XL
+                      )}
+                    >
                       {relatedPost.title}
                     </h3>
-                    <p className='mb-4 line-clamp-2 text-foreground/80 text-sm'>
+                    <p className={cn('mb-4 line-clamp-2 text-foreground/80', TYPOGRAPHY.TEXT_SM)}>
                       {relatedPost.excerpt}
                     </p>
-                    <div className='flex items-center gap-4 text-foreground/60 text-xs'>
+                    <div
+                      className={cn(
+                        'flex items-center gap-4 text-foreground/60',
+                        TYPOGRAPHY.TEXT_XS
+                      )}
+                    >
                       {relatedPost.readTime && (
                         <div className='flex items-center gap-1'>
                           <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />

@@ -1,8 +1,9 @@
 # PayeTax Technical Stack & Architecture
 
-**Last Updated:** November 4, 2025
+**Last Updated:** November 11, 2025
 **Status:** ✅ Production Ready
-**Version:** 4.1.2
+**Version:** 4.6.0
+**Current Audit:** 🟡 PAYTAX-108 (Tech Stack Maximization In Progress)
 
 ---
 
@@ -586,29 +587,54 @@ npm run test:dev      # Chrome only (faster)
 
 ## 🚀 Future Enhancements
 
-### Partial Prerendering (PPR)
+### Next.js 16 Features - Adoption Target
 
-**Status:** Disabled (requires Next.js canary)
+**Status:** 🟡 Currently evaluating for PAYTAX-108 audit
 
-```ts
-// Enable when upgrading to Next.js 16 stable
-experimental: {
-  ppr: 'incremental',
-}
-```
+**We have Next.js 16.0.1 ✅** - Can adopt these features now:
 
-**Expected Impact:** 20-30% faster page loads
+**Opportunities identified:**
+- ❌ `after()` API - NOT USED (target: all analytics tracking)
+- ✅ Server Actions - PARTIAL (used in feedback.ts, expand to all forms)
+- ❌ Parallel Routes - NOT USED (target: modals as routes)
+- ❌ Partial Prerendering - NOT ENABLED (experimental, evaluate benefits)
 
-### React 19 Hooks
+**Where to adopt:**
+- `after()`: Analytics.tsx, page view tracking (non-blocking)
+- Server Actions: Newsletter signup, contact forms, cookie consent
+- Parallel Routes: FeedbackDialog, SustainabilityBadge modals
 
-Consider adopting:
-- `useActionState` for form handling
-- `useOptimistic` for calculator updates
-- `useEffectEvent` for analytics tracking (requires eslint-plugin-react-hooks v6.1.0)
+**Reference:** See `docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md` for complete adoption guide
+
+### React 19 Hooks - Adoption Target
+
+**Status:** 🟡 Currently evaluating for PAYTAX-108 audit
+
+**Opportunities identified:**
+- ❌ `useOptimistic` - NOT USED (target: calculator inputs for instant feedback)
+- ❌ `useActionState` - NOT USED (target: all forms - feedback, newsletter, etc.)
+- ❌ `use()` - NOT USED (target: async data fetching in blog/MDX)
+- ⚠️ Server Components - PARTIAL (72 files use "use client", target <50%)
+
+**Where to adopt:**
+- `useOptimistic`: SalaryCalculatorPage, BasicInputs, WhatIfInputs
+- `useActionState`: FeedbackDialog, CallToAction, CookieBanner
+- Server Components: Convert static pages to Server Components
+
+**Reference:** See `docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md` for complete adoption guide
 
 ---
 
-**Last Updated:** November 4, 2025
+**Last Updated:** November 11, 2025
 **Maintained By:** PayeTax Team
 **Review Cycle:** Quarterly
-**Latest Release:** v4.1.2 (Complete audit coverage + dependency updates)
+**Latest Release:** v4.6.0
+**Current Audit:** PAYTAX-108 (Comprehensive tech stack maximization)
+
+---
+
+## 📚 Related Documentation
+
+- **[TECH-STACK-MAXIMIZATION.md](../audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md)** - Complete React 19 & Next.js 16 feature adoption guide
+- **[AUDIT-FRAMEWORK.md](../audits/audit-v2-2025-11-11/AUDIT-FRAMEWORK.md)** - Current audit structure
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Component architecture & patterns

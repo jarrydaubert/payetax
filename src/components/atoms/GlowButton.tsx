@@ -1,6 +1,9 @@
 /**
  * Glow Button Component
  *
+ * ⚠️ CRITICAL COMPONENT - DO NOT MODIFY STYLING WITHOUT THOROUGH TESTING
+ * Complex animation setup with precise timing - changes may break CTA functionality
+ *
  * Premium button with gradient glow effect inspired by Vercel's design.
  * Features:
  * - Background blur gradient that intensifies on hover (opacity-75 to opacity-100)

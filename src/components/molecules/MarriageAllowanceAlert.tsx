@@ -20,7 +20,7 @@
 import { ExternalLink, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -97,7 +97,7 @@ export function MarriageAllowanceAlert({
               {formatCurrency(annualSaving, 0)} per year
             </span>{' '}
             ({formatCurrency(monthlySaving, 0)}/month) in tax.
-            <span className='mt-2 block text-sm'>
+            <span className={cn('mt-2 block', TYPOGRAPHY.TEXT_SM)}>
               Your partner can transfer 10% of their Personal Allowance (£1,260) to you, which would
               update your tax code to include an 'M' suffix.
             </span>

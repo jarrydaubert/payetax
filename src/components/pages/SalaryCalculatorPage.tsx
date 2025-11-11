@@ -8,7 +8,9 @@ import { useEffect, useState } from 'react';
 import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
 import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
+import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
 interface SalaryCalculatorPageProps {
@@ -68,7 +70,12 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
         <div className='container relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           {/* Breadcrumbs */}
           <nav className='mb-4' aria-label='Breadcrumb'>
-            <ol className='flex items-center space-x-2 text-muted-foreground text-sm'>
+            <ol
+              className={cn(
+                'flex items-center space-x-2 text-muted-foreground',
+                TYPOGRAPHY.TEXT_SM
+              )}
+            >
               <li>
                 <Link href='/' className='hover:text-primary'>
                   Home
@@ -99,7 +106,9 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       <section className='bg-muted/30 py-8 sm:py-12'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='mb-8 text-center'>
-            <h2 className='mb-2 font-bold text-2xl'>Customize Your Calculation</h2>
+            <h2 className={cn('mb-2 font-bold', TYPOGRAPHY.TEXT_2XL)}>
+              Customize Your Calculation
+            </h2>
             <p className='text-muted-foreground'>
               Add student loans, pension contributions, and more for a precise calculation
             </p>
@@ -111,7 +120,9 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       {/* Related Searches (SEO) */}
       <section className='py-8 sm:py-12'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <h2 className='mb-4 font-semibold text-xl'>Related Salary Calculations</h2>
+          <h2 className={cn('mb-4 font-semibold', TYPOGRAPHY.TEXT_XL)}>
+            Related Salary Calculations
+          </h2>
           <div className='flex flex-wrap gap-2'>
             {[25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 90000, 100000]
               .filter((s) => Math.abs(s - salary) > 5000 && Math.abs(s - salary) <= 30000)
@@ -119,7 +130,10 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                 <Link
                   key={relatedSalary}
                   href={`/calculator/${relatedSalary}-after-tax`}
-                  className='rounded-md bg-muted px-4 py-2 text-sm transition-colors hover:bg-muted/80'
+                  className={cn(
+                    'rounded-md bg-muted px-4 py-2 transition-colors hover:bg-muted/80',
+                    TYPOGRAPHY.TEXT_SM
+                  )}
                 >
                   £{relatedSalary.toLocaleString('en-GB')} salary
                 </Link>

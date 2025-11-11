@@ -3,6 +3,7 @@
   "version": "4.6.0",
   "private": true,
   "license": "UNLICENSED",
+  "packageManager": "npm@10.9.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,7 +20,7 @@
     "test:all": "npm run test && npm run test:e2e",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
-    "fix-all": "npm run format && biome check --write . && npm run typecheck",
+    "fix-all": "biome check --write . && npm run typecheck",
     "clean": "rm -rf .next coverage audit-outputs/playwright-report audit-outputs/test-results *.tsbuildinfo || true",
     "clean:reports": "rm -rf audit-outputs/playwright-report audit-outputs/test-results audit-outputs/coverage || true",
     "clean:cache": "rm -rf .next .swc node_modules/.cache || true",

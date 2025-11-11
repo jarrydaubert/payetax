@@ -157,7 +157,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             className={cn(
               'font-bold text-foreground',
               TYPOGRAPHY.TEXT_3XL,
-              'md:text-4xl',
+              `md:${TYPOGRAPHY.TEXT_4XL}`,
               SPACING.MB_6
             )}
           >
@@ -170,7 +170,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               'mx-auto max-w-2xl leading-relaxed',
               'text-muted-foreground',
               TYPOGRAPHY.TEXT_LG,
-              'md:text-xl',
+              `md:${TYPOGRAPHY.TEXT_XL}`,
               SPACING.MB_8
             )}
           >

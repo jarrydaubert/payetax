@@ -7,6 +7,8 @@
 import { ExternalLink, Hash } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
+import { TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 const generateId = (text: string): string => {
   return text
@@ -185,7 +187,7 @@ export const mdxComponents = {
       className='glass-card-inner my-8 rounded-r-lg border-primary/50 border-l-4 py-4 pl-6'
       {...props}
     >
-      <div className='text-foreground/90 text-lg italic'>{children}</div>
+      <div className={cn('text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>{children}</div>
     </blockquote>
   ),
 
@@ -249,7 +251,11 @@ export const mdxComponents = {
         height={400}
         className='w-full rounded-lg border border-foreground/20 shadow-lg'
       />
-      {alt && <p className='mt-2 text-center text-muted-foreground text-sm italic'>{alt}</p>}
+      {alt && (
+        <p className={cn('mt-2 text-center text-muted-foreground italic', TYPOGRAPHY.TEXT_SM)}>
+          {alt}
+        </p>
+      )}
     </div>
   ),
 };

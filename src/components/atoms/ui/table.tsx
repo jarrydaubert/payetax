@@ -121,7 +121,11 @@ const TableCaption = ({
 }: React.HTMLAttributes<HTMLTableCaptionElement> & {
   ref?: React.Ref<HTMLTableCaptionElement>;
 }) => (
-  <caption ref={ref} className={cn('mt-4 text-muted-foreground text-sm', className)} {...props} />
+  <caption
+    ref={ref}
+    className={cn('mt-4 text-muted-foreground', TYPOGRAPHY.TEXT_SM, className)}
+    {...props}
+  />
 );
 TableCaption.displayName = 'TableCaption';
 

@@ -4,7 +4,9 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/ui/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata } from '@/lib/metadata';
+import { cn } from '@/lib/utils';
 
 // Import the client-side HomePageContent component
 // We'll use Suspense to handle the loading state
@@ -50,7 +52,9 @@ export default function HomePage() {
           <div className='flex min-h-[400px] items-center justify-center p-8'>
             <div className='flex flex-col items-center gap-3'>
               <Spinner className='size-8' />
-              <p className='text-muted-foreground text-sm'>Loading calculator...</p>
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                Loading calculator...
+              </p>
             </div>
           </div>
         }

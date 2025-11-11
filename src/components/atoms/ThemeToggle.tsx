@@ -4,6 +4,7 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +40,7 @@ export function ThemeToggle() {
                 <span className='sr-only'>{label} mode</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side='bottom' className='text-xs'>
+            <TooltipContent side='bottom' className={TYPOGRAPHY.TEXT_XS}>
               <p>{label}</p>
             </TooltipContent>
           </Tooltip>

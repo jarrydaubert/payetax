@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 
+import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 // Chart color system matching our tax calculator theme
@@ -62,7 +63,8 @@ function ChartContainer({ className, config, children, ref, ...props }: ChartCon
       <div
         ref={ref}
         className={cn(
-          'flex aspect-auto h-[250px] w-full justify-center text-xs',
+          'flex aspect-auto h-[250px] w-full justify-center',
+          TYPOGRAPHY.TEXT_XS,
           // Landscape optimization: taller charts on mobile landscape
           'landscape:max-md:h-[350px]',
           className
@@ -171,7 +173,8 @@ function ChartTooltipContent({
     <div
       ref={ref}
       className={cn(
-        'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
+        'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 shadow-xl',
+        TYPOGRAPHY.TEXT_XS,
         className
       )}
     >
@@ -188,7 +191,7 @@ function ChartTooltipContent({
           return (
             <div
               key={`${item.dataKey}-${index}`}
-              className='flex w-full items-center gap-2 text-xs'
+              className={cn('flex w-full items-center gap-2', TYPOGRAPHY.TEXT_XS)}
             >
               {!hideIndicator && (
                 <div
@@ -259,7 +262,10 @@ function ChartLegendContent({
   }
 
   return (
-    <div ref={ref} className={cn('flex items-center justify-center gap-4 text-xs', className)}>
+    <div
+      ref={ref}
+      className={cn('flex items-center justify-center gap-4', TYPOGRAPHY.TEXT_XS, className)}
+    >
       {payload.map((item) => {
         // Type assertion for payload items from recharts library
         const dataKey = 'dataKey' in item ? (item.dataKey as string) : undefined;

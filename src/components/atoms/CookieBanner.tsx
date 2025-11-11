@@ -7,8 +7,9 @@ import { useCallback, useEffect, useState } from 'react';
 import '@/types/gtag';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
+import { cn } from '@/lib/utils';
 
 const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
@@ -105,8 +106,10 @@ const CookieBanner: React.FC = () => {
               <Cookie className={`${ICON_SIZES.SIZE_6} text-white`} aria-hidden='true' />
             </div>
           </div>
-          <h2 className='mb-2 font-semibold text-foreground text-lg'>Cookie preferences</h2>
-          <p className='text-muted-foreground text-sm leading-relaxed'>
+          <h2 className={cn('mb-2 font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+            Cookie preferences
+          </h2>
+          <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_SM)}>
             We use analytics cookies to understand how visitors use our site and improve your
             experience. Essential cookies (to remember your choice) are always active. See our{' '}
             <Link

@@ -10,7 +10,7 @@
 'use client';
 
 import type React from 'react';
-import { COLORS } from '@/constants/designTokens';
+import { COLORS, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -87,7 +87,8 @@ const ContentSection: React.FC<ContentSectionProps> = ({
             <h2
               id={title ? `${id || ''}-title` : undefined}
               className={cn(
-                'mb-2 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text font-bold text-2xl text-transparent',
+                'mb-2 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text font-bold text-transparent',
+                TYPOGRAPHY.TEXT_2XL,
                 titleClassName
               )}
             >
