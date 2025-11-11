@@ -7,7 +7,7 @@
 import { ExternalLink, Hash } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const generateId = (text: string): string => {
@@ -24,7 +24,13 @@ export const mdxComponents = {
     const id = generateId(text);
     return (
       <h1
-        className='group mt-8 mb-4 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-12 md:mb-6'
+        className={cn(
+          'group flex scroll-mt-20 items-center font-bold text-foreground',
+          SPACING.MT_8,
+          SPACING.MB_4,
+          SPACING.GAP_3,
+          'md:mt-12 md:mb-6'
+        )}
         style={{ fontSize: 'var(--blog-font-size-4xl)' }}
         id={id}
         {...props}
@@ -45,7 +51,13 @@ export const mdxComponents = {
     const id = generateId(text);
     return (
       <h2
-        className='group mt-6 mb-3 flex scroll-mt-20 items-center gap-3 font-bold text-foreground md:mt-10 md:mb-5'
+        className={cn(
+          'group flex scroll-mt-20 items-center font-bold text-foreground',
+          SPACING.MT_6,
+          SPACING.MB_3,
+          SPACING.GAP_3,
+          'md:mt-10 md:mb-5'
+        )}
         style={{ fontSize: 'var(--blog-font-size-3xl)' }}
         id={id}
         {...props}
@@ -66,7 +78,13 @@ export const mdxComponents = {
     const id = generateId(text);
     return (
       <h3
-        className='group mt-5 mb-2 flex scroll-mt-20 items-center gap-2 font-bold text-foreground md:mt-8 md:mb-4'
+        className={cn(
+          'group flex scroll-mt-20 items-center font-bold text-foreground',
+          'mt-5',
+          SPACING.MB_2,
+          SPACING.GAP_2,
+          'md:mt-8 md:mb-4'
+        )}
         style={{ fontSize: 'var(--blog-font-size-2xl)' }}
         id={id}
         {...props}
@@ -84,7 +102,7 @@ export const mdxComponents = {
   },
   h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
     <h4
-      className='mt-4 mb-2 font-semibold text-foreground md:mt-6 md:mb-3'
+      className={cn('font-semibold text-foreground', SPACING.MT_4, SPACING.MB_2, 'md:mt-6 md:mb-3')}
       style={{ fontSize: 'var(--blog-font-size-xl)' }}
       {...props}
     >
@@ -93,7 +111,7 @@ export const mdxComponents = {
   ),
   h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
     <h5
-      className='mt-5 mb-2 font-semibold text-foreground'
+      className={cn('font-semibold text-foreground', 'mt-5', SPACING.MB_2)}
       style={{ fontSize: 'var(--blog-font-size-lg)' }}
       {...props}
     >
@@ -102,7 +120,7 @@ export const mdxComponents = {
   ),
   h6: ({ children, ...props }: React.ComponentPropsWithoutRef<'h6'>) => (
     <h6
-      className='mt-4 mb-2 font-semibold text-foreground'
+      className={cn('font-semibold text-foreground', SPACING.MT_4, SPACING.MB_2)}
       style={{ fontSize: 'var(--blog-font-size-base)' }}
       {...props}
     >
@@ -113,7 +131,7 @@ export const mdxComponents = {
   // Enhanced paragraphs
   p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
     <p
-      className='mb-6 text-foreground/90 leading-relaxed'
+      className={cn('text-foreground/90 leading-relaxed', SPACING.MB_6)}
       style={{ fontSize: 'var(--blog-font-size-base)' }}
       {...props}
     >
@@ -123,12 +141,18 @@ export const mdxComponents = {
 
   // Enhanced lists
   ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => (
-    <ul className='mb-6 list-disc space-y-2 pl-6 text-foreground/90' {...props}>
+    <ul
+      className={cn('list-disc pl-6 text-foreground/90', SPACING.MB_6, SPACING.SPACE_Y_2)}
+      {...props}
+    >
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => (
-    <ol className='mb-6 list-decimal space-y-2 pl-6 text-foreground/90' {...props}>
+    <ol
+      className={cn('list-decimal pl-6 text-foreground/90', SPACING.MB_6, SPACING.SPACE_Y_2)}
+      {...props}
+    >
       {children}
     </ol>
   ),
@@ -144,7 +168,10 @@ export const mdxComponents = {
     return (
       <a
         href={href}
-        className='inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80'
+        className={cn(
+          'inline-flex items-center font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80',
+          SPACING.GAP_1
+        )}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
         {...props}
@@ -184,7 +211,11 @@ export const mdxComponents = {
   // Enhanced blockquotes
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
-      className='glass-card-inner my-8 rounded-r-lg border-primary/50 border-l-4 py-4 pl-6'
+      className={cn(
+        'glass-card-inner rounded-r-lg border-primary/50 border-l-4 pl-6',
+        'my-8',
+        SPACING.PY_4
+      )}
       {...props}
     >
       <div className={cn('text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>{children}</div>
@@ -216,7 +247,11 @@ export const mdxComponents = {
   ),
   th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
     <th
-      className='px-6 py-3 text-left font-semibold text-foreground uppercase tracking-wider'
+      className={cn(
+        'text-left font-semibold text-foreground uppercase tracking-wider',
+        SPACING.PX_6,
+        'py-3'
+      )}
       style={{ fontSize: 'var(--blog-font-size-sm)' }}
       {...props}
     >
@@ -225,7 +260,7 @@ export const mdxComponents = {
   ),
   td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
     <td
-      className='px-6 py-4 text-foreground/90'
+      className={cn('text-foreground/90', SPACING.PX_6, SPACING.PY_4)}
       style={{ fontSize: 'var(--blog-font-size-sm)' }}
       {...props}
     >

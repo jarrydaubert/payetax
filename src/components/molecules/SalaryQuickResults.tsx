@@ -5,7 +5,7 @@ import { TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 
@@ -34,10 +34,12 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
       >
         £{formattedSalary} Salary After Tax
       </h1>
-      <p className='mb-6 text-muted-foreground'>UK take-home pay calculator for 2025-26 tax year</p>
+      <p className={cn('text-muted-foreground', SPACING.MB_6)}>
+        UK take-home pay calculator for 2025-26 tax year
+      </p>
 
-      <Card className='p-6 sm:p-8'>
-        <div className='space-y-6'>
+      <Card className={cn(SPACING.P_6, 'sm:p-8')}>
+        <div className={SPACING.SPACE_Y_6}>
           {/* Main Take-Home */}
           <div className='text-center'>
             <p className={cn('text-muted-foreground uppercase tracking-wide', TYPOGRAPHY.TEXT_SM)}>
@@ -52,7 +54,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           </div>
 
           {/* Quick Breakdown */}
-          <div className='grid grid-cols-2 gap-4 border-t pt-4'>
+          <div className={cn('grid grid-cols-2 border-t', SPACING.GAP_4, SPACING.PT_4)}>
             <div>
               <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>Annual Take-Home</p>
               <p className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
@@ -68,7 +70,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           </div>
 
           {/* Tax Breakdown */}
-          <div className='space-y-3 border-t pt-4'>
+          <div className={cn('border-t', SPACING.SPACE_Y_3, SPACING.PT_4)}>
             <div className='flex justify-between'>
               <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>Gross Salary</span>
               <span className='font-medium'>£{formattedSalary}</span>
@@ -94,7 +96,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           </div>
 
           {/* Effective Tax Rate */}
-          <div className='rounded-lg bg-muted/50 p-4'>
+          <div className={cn('rounded-lg bg-muted/50', SPACING.P_4)}>
             <div className='flex items-center justify-between'>
               <span className={TYPOGRAPHY.TEXT_SM}>Effective Tax Rate</span>
               <Badge variant='secondary' className='font-mono'>
@@ -110,12 +112,12 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
       </Card>
 
       {/* Compare Salaries */}
-      <Card className='mt-4 p-4'>
-        <h2 className='mb-3 flex items-center gap-2 font-semibold'>
+      <Card className={cn(SPACING.MT_4, SPACING.P_4)}>
+        <h2 className={cn('flex items-center font-semibold', SPACING.MB_3, SPACING.GAP_2)}>
           <TrendingUp className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           Compare Similar Salaries
         </h2>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className={cn('grid grid-cols-2', SPACING.GAP_2)}>
           {comparisons.map((comp) => (
             <Link
               key={comp.amount}

@@ -85,7 +85,7 @@ export const SPACING = {
   /** Vertical spacing for very compact lists (0.25rem / 4px) */
   SPACE_Y_1: 'space-y-1',
 
-  // Padding utilities (PAYTAX-109 additions)
+  // Padding utilities (PAYTAX-109 additions, PAYTAX-114 extensions)
   /** Extra large card/section padding (2rem / 32px) */
   P_8: 'p-8',
   /** Large card padding (1.5rem / 24px) */
@@ -96,6 +96,10 @@ export const SPACING = {
   P_3: 'p-3',
   /** Small padding (0.5rem / 8px) */
   P_2: 'p-2',
+  /** Minimal padding (0.25rem / 4px) - ADDED IN PAYTAX-114 */
+  P_1: 'p-1',
+  /** No padding (utility for overrides) - ADDED IN PAYTAX-114 */
+  P_0: 'p-0',
 
   /** Container horizontal padding (1rem / 16px) - standard for max-w containers */
   PX_4: 'px-4',
@@ -105,6 +109,8 @@ export const SPACING = {
   PX_8: 'px-8',
   /** Small horizontal padding (0.5rem / 8px) */
   PX_2: 'px-2',
+  /** Compact horizontal padding (0.75rem / 12px) - ADDED IN PAYTAX-114 */
+  PX_3: 'px-3',
   /** Responsive horizontal padding - mobile to desktop (1rem → 1.5rem → 2rem) */
   PX_RESPONSIVE: 'px-4 sm:px-6 lg:px-8',
 

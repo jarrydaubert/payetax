@@ -6,7 +6,7 @@ import { Leaf, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export default function SustainabilityBadge() {
@@ -49,7 +49,7 @@ export default function SustainabilityBadge() {
             />
 
             {/* Modal */}
-            <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+            <div className={cn('fixed inset-0 z-50 flex items-center justify-center', SPACING.P_4)}>
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -58,10 +58,10 @@ export default function SustainabilityBadge() {
                 className='relative w-full max-w-md'
                 onClick={(e) => e.stopPropagation()}
               >
-                <Card className='border-0 bg-card/95 p-6 backdrop-blur-xl'>
+                <Card className={cn('border-0 bg-card/95 backdrop-blur-xl', SPACING.P_6)}>
                   {/* Header */}
-                  <div className='mb-6 flex items-start justify-between'>
-                    <div className='flex items-center gap-2'>
+                  <div className={cn('flex items-start justify-between', SPACING.MB_6)}>
+                    <div className={cn('flex items-center', SPACING.GAP_2)}>
                       <Leaf
                         className={cn(ICON_SIZES.SIZE_6, 'text-green-600 dark:text-green-400')}
                         aria-hidden='true'
@@ -94,28 +94,28 @@ export default function SustainabilityBadge() {
                         🌱 Environmental Impact
                       </h4>
                       <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Low Carbon:</strong> Estimated ~0.2g
                             CO₂ per page visit (avg. web page: 1.76g)
                           </span>
                         </li>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Efficient Code:</strong> 309KB
                             initial bundle, optimized for minimal energy
                           </span>
                         </li>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Green Hosting:</strong> Deployed on
                             Vercel's carbon-neutral infrastructure
                           </span>
                         </li>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Offline Ready:</strong> PWA reduces
@@ -136,21 +136,21 @@ export default function SustainabilityBadge() {
                         ⚡ Performance Benefits
                       </h4>
                       <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Fast Loading:</strong> Static
                             generation with ISR
                           </span>
                         </li>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Edge Caching:</strong> Content
                             served from nearest location
                           </span>
                         </li>
-                        <li className='flex gap-2'>
+                        <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>
                             <strong className='text-foreground'>Client-Side Calculations:</strong>{' '}
@@ -162,12 +162,17 @@ export default function SustainabilityBadge() {
 
                     {/* Footer */}
                     <div className={cn('border-border border-t pt-4', TYPOGRAPHY.TEXT_SM)}>
-                      <p className='mb-2'>Making tax calculations sustainable for everyone.</p>
+                      <p className={SPACING.MB_2}>
+                        Making tax calculations sustainable for everyone.
+                      </p>
                       <a
                         href='https://www.websitecarbon.com/'
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='inline-flex items-center gap-1 text-green-600 hover:underline dark:text-green-400'
+                        className={cn(
+                          'inline-flex items-center text-green-600 hover:underline dark:text-green-400',
+                          SPACING.GAP_1
+                        )}
                       >
                         Learn more about web sustainability →
                       </a>
