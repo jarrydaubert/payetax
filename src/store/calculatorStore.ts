@@ -29,6 +29,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import {
+  DEFAULT_TAX_CODE,
   type NICategory,
   type PayPeriod,
   PERIODS,
@@ -228,10 +229,10 @@ const currentYearRates = TAX_RATES[defaultTaxYear];
 // UK minimum wage (April 2024 - March 2025): £11.44 per hour
 // Default inputs
 const defaultInput: CalculatorInput = {
-  salary: 0, // Empty by default - show as placeholder
+  salary: 0, // £0.00 by default
   payPeriod: PERIODS.ANNUALLY,
   taxYear: defaultTaxYear,
-  taxCode: '', // Empty by default - use standard allowance
+  taxCode: DEFAULT_TAX_CODE, // Standard tax code (1257L for 2025-26)
   region: 'England',
   isScottish: false,
   isMarried: false,
