@@ -6,8 +6,9 @@ import Link from 'next/link';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { Card } from '@/components/ui/card';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { cn } from '@/lib/utils';
 
 /**
  * Salary comparison table molecule
@@ -37,12 +38,16 @@ export function SalaryComparisonTable() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.5 }}
-      className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
+      className={cn('bg-gradient-to-br from-accent/5 to-primary/5', 'py-16')}
     >
-      <div className='mx-auto max-w-6xl px-4'>
-        <div className='mb-10 text-center'>
+      <div className={cn('mx-auto max-w-6xl', SPACING.PX_4)}>
+        <div className={cn('text-center', SPACING.MB_10)}>
           <h2
-            className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+            className={cn(
+              'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+              SPACING.MB_3,
+              TYPOGRAPHY.TEXT_4XL
+            )}
           >
             Salary Take-Home Comparison
           </h2>
@@ -70,11 +75,21 @@ export function SalaryComparisonTable() {
               <table className='w-full min-w-[640px] border-collapse'>
                 <thead className='bg-gradient-to-r from-primary/10 to-accent/10'>
                   <tr className='border-border/20 border-b'>
-                    <th className='p-4 text-left font-bold text-foreground'>Gross Salary</th>
-                    <th className='p-4 text-right font-bold text-foreground'>Income Tax</th>
-                    <th className='p-4 text-right font-bold text-foreground'>National Insurance</th>
-                    <th className='p-4 text-right font-bold text-foreground'>Annual Take-Home</th>
-                    <th className='p-4 text-right font-bold text-foreground'>Monthly Take-Home</th>
+                    <th className={cn('text-left font-bold text-foreground', SPACING.P_4)}>
+                      Gross Salary
+                    </th>
+                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                      Income Tax
+                    </th>
+                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                      National Insurance
+                    </th>
+                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                      Annual Take-Home
+                    </th>
+                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                      Monthly Take-Home
+                    </th>
                   </tr>
                 </thead>
                 <tbody className={TYPOGRAPHY.TEXT_SM}>
@@ -83,7 +98,7 @@ export function SalaryComparisonTable() {
                       key={row.salary}
                       className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
                     >
-                      <td className='p-4'>
+                      <td className={SPACING.P_4}>
                         <Link
                           href={`/calculator/${row.salary}-after-tax`}
                           className='font-semibold text-foreground hover:text-primary hover:underline'
@@ -91,16 +106,23 @@ export function SalaryComparisonTable() {
                           £{row.salary.toLocaleString()}
                         </Link>
                       </td>
-                      <td className='p-4 text-right text-destructive'>
+                      <td className={cn('text-right text-destructive', SPACING.P_4)}>
                         £{row.tax.toLocaleString()}
                       </td>
-                      <td className='p-4 text-right text-amber-600 dark:text-amber-400'>
+                      <td
+                        className={cn('text-right text-amber-600 dark:text-amber-400', SPACING.P_4)}
+                      >
                         £{row.ni.toLocaleString()}
                       </td>
-                      <td className='p-4 text-right font-bold text-green-600 dark:text-green-400'>
+                      <td
+                        className={cn(
+                          'text-right font-bold text-green-600 dark:text-green-400',
+                          SPACING.P_4
+                        )}
+                      >
                         £{row.annual.toLocaleString()}
                       </td>
-                      <td className='p-4 text-right text-muted-foreground'>
+                      <td className={cn('text-right text-muted-foreground', SPACING.P_4)}>
                         £{row.monthly.toLocaleString()}
                       </td>
                     </tr>

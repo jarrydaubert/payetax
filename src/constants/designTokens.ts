@@ -153,6 +153,8 @@ export const SPACING = {
 
   /** Extra large bottom margin (3rem / 48px) */
   MB_12: 'mb-12',
+  /** Extra-extra large bottom margin (2.5rem / 40px) - ADDED IN PAYTAX-114 */
+  MB_10: 'mb-10',
   /** Large-medium bottom margin (2rem / 32px) */
   MB_8: 'mb-8',
   /** Large bottom margin (1.5rem / 24px) */

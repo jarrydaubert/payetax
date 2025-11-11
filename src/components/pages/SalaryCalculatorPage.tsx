@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
 import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
@@ -65,11 +65,13 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
   return (
     <div className='min-h-screen bg-background'>
       {/* Hero Section with Instant Answer */}
-      <section className='relative overflow-hidden py-8 sm:py-12'>
+      <section className={cn('relative overflow-hidden', 'py-8 sm:py-12')}>
         <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent' />
-        <div className='container relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div
+          className={cn('container relative mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}
+        >
           {/* Breadcrumbs */}
-          <nav className='mb-4' aria-label='Breadcrumb'>
+          <nav className={SPACING.MB_4} aria-label='Breadcrumb'>
             <ol
               className={cn(
                 'flex items-center space-x-2 text-muted-foreground',
@@ -92,7 +94,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
             </ol>
           </nav>
 
-          <div className='grid gap-6 lg:grid-cols-2'>
+          <div className={cn('grid lg:grid-cols-2', SPACING.GAP_6)}>
             {/* Quick Results Card */}
             <SalaryQuickResults salary={salary} results={results} comparisons={comparisons} />
 
@@ -103,10 +105,10 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       </section>
 
       {/* Full Calculator Section */}
-      <section className='bg-muted/30 py-8 sm:py-12'>
-        <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='mb-8 text-center'>
-            <h2 className={cn('mb-2 font-bold', TYPOGRAPHY.TEXT_2XL)}>
+      <section className={cn('bg-muted/30', 'py-8 sm:py-12')}>
+        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}>
+          <div className={cn('text-center', SPACING.MB_8)}>
+            <h2 className={cn('font-bold', SPACING.MB_2, TYPOGRAPHY.TEXT_2XL)}>
               Customize Your Calculation
             </h2>
             <p className='text-muted-foreground'>
@@ -119,11 +121,11 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
 
       {/* Related Searches (SEO) */}
       <section className='py-8 sm:py-12'>
-        <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <h2 className={cn('mb-4 font-semibold', TYPOGRAPHY.TEXT_XL)}>
+        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}>
+          <h2 className={cn('font-semibold', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>
             Related Salary Calculations
           </h2>
-          <div className='flex flex-wrap gap-2'>
+          <div className={cn('flex flex-wrap', SPACING.GAP_2)}>
             {[25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 90000, 100000]
               .filter((s) => Math.abs(s - salary) > 5000 && Math.abs(s - salary) <= 30000)
               .map((relatedSalary) => (
@@ -131,7 +133,9 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
                   key={relatedSalary}
                   href={`/calculator/${relatedSalary}-after-tax`}
                   className={cn(
-                    'rounded-md bg-muted px-4 py-2 transition-colors hover:bg-muted/80',
+                    'rounded-md bg-muted transition-colors hover:bg-muted/80',
+                    SPACING.PX_4,
+                    SPACING.PY_2,
                     TYPOGRAPHY.TEXT_SM
                   )}
                 >
