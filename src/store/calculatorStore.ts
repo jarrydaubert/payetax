@@ -275,16 +275,11 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         whatIfResults: null,
 
-        // Initialize with example calculation on first load
-        // This is called after store creation to show £0 example
+        // Initialize store - no auto-calculation, user must click Calculate
+        // This ensures initial load matches the reset state
         init: () => {
-          const { calculate } = get();
-          try {
-            calculate();
-          } catch (error) {
-            // Silently handle initialization errors
-            console.warn('Failed to initialize example calculation:', error);
-          }
+          // No-op: Just ensure store is initialized
+          // User must click Calculate button to see results
         },
 
         // Input actions
