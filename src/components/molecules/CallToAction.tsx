@@ -5,7 +5,7 @@ import { Calculator, Coffee, Mail, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
@@ -73,12 +73,14 @@ export default function CallToAction({
   const SecondaryIcon = config.secondaryAction.icon;
 
   return (
-    <div className={cn('glass-card my-16 p-8 text-center md:p-12', className)}>
+    <div className={cn('glass-card my-16 text-center', SPACING.P_8, 'md:p-12', className)}>
       <IconComponent
-        className={`mx-auto mb-6 ${ICON_SIZES.SIZE_12} text-primary`}
+        className={cn('mx-auto text-primary', SPACING.MB_6, ICON_SIZES.SIZE_12)}
         aria-hidden='true'
       />
-      <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>{config.title}</h2>
+      <h2 className={cn('font-bold text-foreground', SPACING.MB_6, TYPOGRAPHY.TEXT_3XL)}>
+        {config.title}
+      </h2>
       <p
         className={cn(
           'mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed',
@@ -88,7 +90,7 @@ export default function CallToAction({
         {config.description}
       </p>
 
-      <div className='flex flex-col justify-center gap-4 sm:flex-row'>
+      <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
         <Button
           asChild
           size='lg'

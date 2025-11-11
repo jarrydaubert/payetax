@@ -3,7 +3,7 @@ import { Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -25,8 +25,15 @@ export function PopularSalaryLinks() {
   ];
 
   return (
-    <section className='container mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16 lg:py-20'>
-      <div className='mb-12 text-center'>
+    <section
+      className={cn(
+        'container mx-auto max-w-7xl',
+        SPACING.PX_4,
+        SPACING.PY_12,
+        'md:px-6 md:py-16 lg:py-20'
+      )}
+    >
+      <div className={cn('text-center', SPACING.MB_12)}>
         <h2
           className={cn(
             'mb-3 font-bold tracking-tight',
@@ -41,13 +48,23 @@ export function PopularSalaryLinks() {
           Calculate exact take-home pay for common UK salaries
         </p>
       </div>
-      <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5'>
+      <div
+        className={cn(
+          'grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
+          SPACING.GAP_4,
+          'md:gap-6'
+        )}
+      >
         {salaries.map(({ salary, label }) => (
           <Button
             key={salary}
             asChild
             variant='outline'
-            className='h-auto flex-col gap-2 p-4 transition-all hover:border-primary hover:shadow-md'
+            className={cn(
+              'h-auto flex-col transition-all hover:border-primary hover:shadow-md',
+              SPACING.GAP_2,
+              SPACING.P_4
+            )}
           >
             <Link href={`/calculator/${salary}-after-tax`}>
               <Calculator className={`${ICON_SIZES.SIZE_5} text-primary`} aria-hidden='true' />
