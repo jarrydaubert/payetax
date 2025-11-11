@@ -49,14 +49,39 @@ describe('CalculatorStore', () => {
     useCalculatorStore.getState().reset();
   });
 
-  it('should initialize with default values', () => {
-    const state = useCalculatorStore.getState();
+  describe('Initial State', () => {
+    it('should initialize with default values', () => {
+      const state = useCalculatorStore.getState();
 
-    expect(state.input.salary).toBe(0);
-    expect(state.input.payPeriod).toBe('annually');
-    expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
-    expect(state.input.isScottish).toBe(false);
-    expect(state.results).toBeNull();
+      expect(state.input.salary).toBe(0);
+      expect(state.input.payPeriod).toBe('annually');
+      expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
+      expect(state.input.isScottish).toBe(false);
+      expect(state.results).toBeNull();
+    });
+
+    it('should NOT auto-calculate on init', () => {
+      const { init } = useCalculatorStore.getState();
+
+      // Call init (simulates page load)
+      init();
+
+      const state = useCalculatorStore.getState();
+      // Results should still be null - no auto-calculation
+      expect(state.results).toBeNull();
+      expect(state.previousYearResults).toBeNull();
+      expect(state.whatIfResults).toBeNull();
+    });
+
+    it('should have empty results state after init', () => {
+      const { init } = useCalculatorStore.getState();
+
+      init();
+
+      const state = useCalculatorStore.getState();
+      expect(state.results).toBeNull();
+      expect(state.previousYearResults).toBeNull();
+    });
   });
 
   it('should update salary', () => {
@@ -97,41 +122,82 @@ describe('CalculatorStore', () => {
     expect(state.results?.grossSalary.annually).toBe(50000);
   });
 
-  it('should reset state', () => {
-    const { setSalary, setTaxCode, reset } = useCalculatorStore.getState();
+  describe('Reset Functionality', () => {
+    it('should reset state to defaults', () => {
+      const { setSalary, setTaxCode, reset } = useCalculatorStore.getState();
 
-    // Set some values
-    setSalary(50000);
-    setTaxCode('1250L');
+      // Set some values
+      setSalary(50000);
+      setTaxCode('1250L');
 
-    // Reset
-    reset();
+      // Reset
+      reset();
 
-    const state = useCalculatorStore.getState();
-    expect(state.input.salary).toBe(0);
-    expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
-    expect(state.results).toBeNull();
-  });
+      const state = useCalculatorStore.getState();
+      expect(state.input.salary).toBe(0);
+      expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
+      expect(state.results).toBeNull();
+    });
 
-  it('should clear previousYearResults on reset', () => {
-    const { setSalary, calculate, calculatePreviousYear, reset } = useCalculatorStore.getState();
+    it('should match initial state after reset', () => {
+      const { setSalary, setTaxCode, calculate, reset } = useCalculatorStore.getState();
 
-    // Set up calculation
-    setSalary(50000);
-    calculate();
-    calculatePreviousYear();
+      // Capture initial state
+      const initialState = useCalculatorStore.getState();
 
-    // Verify both results exist
-    let state = useCalculatorStore.getState();
-    expect(state.results).not.toBeNull();
-    expect(state.previousYearResults).not.toBeNull();
+      // Make changes
+      setSalary(50000);
+      setTaxCode('1250L');
+      calculate();
 
-    // Reset
-    reset();
+      // Reset
+      reset();
 
-    // Verify both are cleared
-    state = useCalculatorStore.getState();
-    expect(state.results).toBeNull();
-    expect(state.previousYearResults).toBeNull();
+      // State after reset should match initial state
+      const resetState = useCalculatorStore.getState();
+      expect(resetState.input).toEqual(initialState.input);
+      expect(resetState.results).toBe(null);
+      expect(resetState.previousYearResults).toBe(null);
+      expect(resetState.whatIfResults).toBe(null);
+    });
+
+    it('should clear all calculated results on reset', () => {
+      const { setSalary, calculate, calculatePreviousYear, reset } = useCalculatorStore.getState();
+
+      // Set up calculation
+      setSalary(50000);
+      calculate();
+      calculatePreviousYear();
+
+      // Verify results exist
+      let state = useCalculatorStore.getState();
+      expect(state.results).not.toBeNull();
+      expect(state.previousYearResults).not.toBeNull();
+
+      // Reset
+      reset();
+
+      // Verify all results are cleared
+      state = useCalculatorStore.getState();
+      expect(state.results).toBeNull();
+      expect(state.previousYearResults).toBeNull();
+      expect(state.whatIfResults).toBeNull();
+    });
+
+    it('should reset What If scenario state', () => {
+      const { toggleWhatIf, setWhatIfValue, reset } = useCalculatorStore.getState();
+
+      // Enable What If and set custom value
+      toggleWhatIf();
+      setWhatIfValue(15);
+
+      // Reset
+      reset();
+
+      const state = useCalculatorStore.getState();
+      expect(state.whatIf.enabled).toBe(false);
+      expect(state.whatIf.value).toBe(10); // Default value
+      expect(state.whatIfResults).toBeNull();
+    });
   });
 });
