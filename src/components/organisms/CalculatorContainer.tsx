@@ -176,7 +176,13 @@ export function CalculatorContainer() {
 
   return (
     <div
-      className='mx-auto flex w-full max-w-[1800px] flex-col gap-3 px-2 py-4 sm:px-4 md:gap-6 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] lg:gap-4 xl:grid-cols-[390px_minmax(0,1fr)] xl:gap-6 xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]'
+      className={cn(
+        'mx-auto flex w-full max-w-[1800px] flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        SPACING.GAP_3,
+        SPACING.PX_2,
+        SPACING.PY_4,
+        'md:gap-6 lg:gap-4 xl:gap-6'
+      )}
       data-testid='calculator-section'
     >
       {/* Header */}
@@ -184,7 +190,7 @@ export function CalculatorContainer() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className='order-1 py-6 text-center lg:col-span-2 lg:py-8'
+        className={cn('order-1 text-center lg:col-span-2', 'py-6 lg:py-8')}
       >
         <h2
           className={cn(
@@ -222,7 +228,13 @@ export function CalculatorContainer() {
       </AnimatePresence>
 
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
-      <Card className='order-2 border-primary/20 p-3 sm:p-4 md:p-6 lg:sticky lg:top-4 lg:order-3 lg:self-start'>
+      <Card
+        className={cn(
+          'order-2 border-primary/20 lg:sticky lg:top-4 lg:order-3 lg:self-start',
+          SPACING.P_3,
+          'sm:p-4 md:p-6'
+        )}
+      >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
           onWhatIfCalculate={handleWhatIfCalculate}
@@ -275,11 +287,18 @@ export function CalculatorContainer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='order-6 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed p-12 text-center lg:order-3'
+            className={cn(
+              'order-6 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed text-center lg:order-3',
+              'p-12'
+            )}
           >
             <div>
-              <Sparkles className={cn('mx-auto mb-4 text-muted-foreground', ICON_SIZES.SIZE_12)} />
-              <h3 className={cn('mb-2 font-semibold', TYPOGRAPHY.TEXT_LG)}>Ready to Calculate</h3>
+              <Sparkles
+                className={cn('mx-auto text-muted-foreground', SPACING.MB_4, ICON_SIZES.SIZE_12)}
+              />
+              <h3 className={cn('font-semibold', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}>
+                Ready to Calculate
+              </h3>
               <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                 Enter your salary details and click Calculate to see your results
               </p>

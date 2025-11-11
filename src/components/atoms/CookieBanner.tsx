@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import '@/types/gtag';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
 import { cn } from '@/lib/utils';
 
@@ -98,15 +98,21 @@ const CookieBanner: React.FC = () => {
   }
 
   return (
-    <div className='pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center p-2 sm:p-4'>
+    <div
+      className={cn(
+        'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center',
+        SPACING.P_2,
+        'sm:p-4'
+      )}
+    >
       <Card className='pointer-events-auto w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
-        <CardContent className='pointer-events-auto p-4 text-center sm:p-6'>
-          <div className='mb-4 flex justify-center'>
+        <CardContent className={cn('pointer-events-auto text-center', SPACING.P_4, 'sm:p-6')}>
+          <div className={cn('flex justify-center', SPACING.MB_4)}>
             <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
               <Cookie className={`${ICON_SIZES.SIZE_6} text-white`} aria-hidden='true' />
             </div>
           </div>
-          <h2 className={cn('mb-2 font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+          <h2 className={cn('font-semibold text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}>
             Cookie preferences
           </h2>
           <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_SM)}>
@@ -122,7 +128,14 @@ const CookieBanner: React.FC = () => {
           </p>
         </CardContent>
 
-        <CardFooter className='flex flex-col justify-center gap-2 p-4 pt-0 sm:flex-row sm:gap-3 sm:p-6'>
+        <CardFooter
+          className={cn(
+            'flex flex-col justify-center pt-0 sm:flex-row sm:p-6',
+            SPACING.GAP_2,
+            SPACING.P_4,
+            'sm:gap-3'
+          )}
+        >
           <Button onClick={declineCookies} variant='outline' size='sm' className='min-w-[140px]'>
             Essential Only
           </Button>
