@@ -10,7 +10,8 @@ import { CalculatorContainer } from '@/components/organisms/CalculatorContainer'
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 const HomePageContent = memo(function HomePageContent() {
   const [_isPending, startTransition] = useTransition();
@@ -38,19 +39,30 @@ const HomePageContent = memo(function HomePageContent() {
       <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
 
       {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator */}
-      <section id='tax-calculator' ref={calculatorRef} className='py-12 md:py-16 lg:py-20'>
+      <section
+        id='tax-calculator'
+        ref={calculatorRef}
+        className={cn(SPACING.PY_12, 'md:py-16 lg:py-20')}
+      >
         <CalculatorContainer />
       </section>
 
       {/* SEO-optimized content for Answer Engine Optimization */}
-      <section className='container mx-auto px-4 pb-12 md:px-6 md:pb-16'>
+      <section className={cn('container mx-auto pb-12 md:pb-16', SPACING.PX_4, 'md:px-6')}>
         <CalculatorContent />
       </section>
 
       {/* UK Tax System Overview - SEO Enhancement with semantic keywords */}
-      <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
-        <div className='container mx-auto max-w-4xl px-4 md:px-6'>
-          <h2 className='mb-6 text-center font-bold text-3xl tracking-tight md:text-4xl'>
+      <section className={cn('bg-muted/30', SPACING.PY_12, 'md:py-16 lg:py-20')}>
+        <div className={cn('container mx-auto max-w-4xl', SPACING.PX_4, 'md:px-6')}>
+          <h2
+            className={cn(
+              'text-center font-bold tracking-tight',
+              SPACING.MB_6,
+              TYPOGRAPHY.TEXT_3XL,
+              `md:${TYPOGRAPHY.TEXT_4XL}`
+            )}
+          >
             Understanding the UK Tax System
           </h2>
           <div className='prose prose-lg dark:prose-invert mx-auto'>
@@ -68,14 +80,16 @@ const HomePageContent = memo(function HomePageContent() {
           </div>
 
           {/* Tax Rates Quick Reference */}
-          <div className='mt-10 grid gap-4 md:grid-cols-3 md:gap-6'>
+          <div className={cn('grid md:grid-cols-3', 'mt-10', SPACING.GAP_4, 'md:gap-6')}>
             <Card className='text-center'>
               <CardHeader>
                 <CardTitle className='text-lg'>Personal Allowance</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className='font-bold text-3xl text-primary'>£12,570</p>
-                <CardDescription className='mt-2'>Tax-free earnings for 2025/26</CardDescription>
+                <CardDescription className={SPACING.MT_2}>
+                  Tax-free earnings for 2025/26
+                </CardDescription>
               </CardContent>
             </Card>
             <Card className='text-center'>
@@ -84,7 +98,9 @@ const HomePageContent = memo(function HomePageContent() {
               </CardHeader>
               <CardContent>
                 <p className='font-bold text-3xl text-primary'>20%</p>
-                <CardDescription className='mt-2'>On income £12,571 - £50,270</CardDescription>
+                <CardDescription className={SPACING.MT_2}>
+                  On income £12,571 - £50,270
+                </CardDescription>
               </CardContent>
             </Card>
             <Card className='text-center'>
@@ -93,7 +109,9 @@ const HomePageContent = memo(function HomePageContent() {
               </CardHeader>
               <CardContent>
                 <p className='font-bold text-3xl text-primary'>40%</p>
-                <CardDescription className='mt-2'>On income £50,271 - £125,140</CardDescription>
+                <CardDescription className={SPACING.MT_2}>
+                  On income £50,271 - £125,140
+                </CardDescription>
               </CardContent>
             </Card>
           </div>
@@ -104,10 +122,17 @@ const HomePageContent = memo(function HomePageContent() {
       <PopularSalaryLinks />
 
       {/* Featured Tax Resources - Internal linking for SEO */}
-      <section className='bg-muted/30 py-12 md:py-16 lg:py-20'>
-        <div className='container mx-auto max-w-7xl px-4 md:px-6'>
-          <div className='mb-12 text-center'>
-            <h2 className='mb-3 font-bold text-3xl tracking-tight md:text-4xl'>
+      <section className={cn('bg-muted/30', SPACING.PY_12, 'md:py-16 lg:py-20')}>
+        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'md:px-6')}>
+          <div className={cn('text-center', SPACING.MB_12)}>
+            <h2
+              className={cn(
+                'font-bold tracking-tight',
+                SPACING.MB_3,
+                TYPOGRAPHY.TEXT_3XL,
+                `md:${TYPOGRAPHY.TEXT_4XL}`
+              )}
+            >
               Popular Tax Guides
             </h2>
             <Separator className='mx-auto my-4 w-24' />
@@ -115,14 +140,17 @@ const HomePageContent = memo(function HomePageContent() {
               Expert guides to help you understand UK tax calculations
             </p>
           </div>
-          <div className='grid gap-4 md:grid-cols-3 md:gap-6'>
+          <div className={cn('grid md:grid-cols-3', SPACING.GAP_4, 'md:gap-6')}>
             {/* Calculator Guide */}
             <Link
               href='/blog/uk-tax-calculator-2025-complete-guide'
-              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+              className={cn(
+                'group block rounded-lg border bg-card transition-all hover:shadow-lg',
+                SPACING.P_6
+              )}
             >
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='rounded-full bg-primary/10 p-3'>
+              <div className={cn('flex items-center', SPACING.MB_4, SPACING.GAP_3)}>
+                <div className={cn('rounded-full bg-primary/10', SPACING.P_3)}>
                   <Calculator className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <p className='font-semibold text-lg group-hover:text-primary'>
@@ -138,10 +166,13 @@ const HomePageContent = memo(function HomePageContent() {
             {/* Tax Examples */}
             <Link
               href='/blog/how-much-tax-will-i-pay-uk-2025'
-              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+              className={cn(
+                'group block rounded-lg border bg-card transition-all hover:shadow-lg',
+                SPACING.P_6
+              )}
             >
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='rounded-full bg-primary/10 p-3'>
+              <div className={cn('flex items-center', SPACING.MB_4, SPACING.GAP_3)}>
+                <div className={cn('rounded-full bg-primary/10', SPACING.P_3)}>
                   <FileText className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <p className='font-semibold text-lg group-hover:text-primary'>
@@ -185,7 +216,7 @@ const HomePageContent = memo(function HomePageContent() {
             Explore our comprehensive guides organized by topic
           </p>
         </div>
-        <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6'>
+        <div className={cn('grid sm:grid-cols-2 md:grid-cols-3', SPACING.GAP_4, 'md:gap-6')}>
           {[
             {
               slug: 'tax-basics',
@@ -221,16 +252,25 @@ const HomePageContent = memo(function HomePageContent() {
             <Link
               key={category.slug}
               href={`/blog/category/${category.slug}`}
-              className='group block rounded-lg border bg-card p-5 transition-all hover:border-primary hover:shadow-md'
+              className={cn(
+                'group block rounded-lg border bg-card transition-all hover:border-primary hover:shadow-md',
+                'p-5'
+              )}
             >
-              <p className='mb-2 font-semibold text-foreground text-lg group-hover:text-primary'>
+              <p
+                className={cn(
+                  'font-semibold text-foreground group-hover:text-primary',
+                  SPACING.MB_2,
+                  TYPOGRAPHY.TEXT_LG
+                )}
+              >
                 {category.name}
               </p>
               <p className='text-muted-foreground text-sm'>{category.description}</p>
             </Link>
           ))}
         </div>
-        <div className='mt-6 text-center'>
+        <div className={cn('text-center', SPACING.MT_6)}>
           <Link href='/blog' className='text-primary hover:underline'>
             View all articles →
           </Link>
