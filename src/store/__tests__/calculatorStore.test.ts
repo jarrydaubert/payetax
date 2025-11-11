@@ -54,7 +54,7 @@ describe('CalculatorStore', () => {
 
     expect(state.input.salary).toBe(0);
     expect(state.input.payPeriod).toBe('annually');
-    expect(state.input.taxCode).toBe('1257L'); // Uses standard tax code (DEFAULT_TAX_CODE)
+    expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
     expect(state.input.isScottish).toBe(false);
     expect(state.results).toBeNull();
   });
@@ -109,7 +109,7 @@ describe('CalculatorStore', () => {
 
     const state = useCalculatorStore.getState();
     expect(state.input.salary).toBe(0);
-    expect(state.input.taxCode).toBe('1257L'); // Uses standard tax code (DEFAULT_TAX_CODE)
+    expect(state.input.taxCode).toBe(''); // Empty by default - uses standard allowance
     expect(state.results).toBeNull();
   });
 
