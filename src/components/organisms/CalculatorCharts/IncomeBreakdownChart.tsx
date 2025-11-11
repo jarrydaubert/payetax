@@ -60,7 +60,14 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
           aria-label='Pie chart showing breakdown of income sources between employment income and other income types'
         >
           <ResponsiveContainer width='100%' height={250}>
-            <PieChart>
+            <PieChart
+              style={{
+                width: '100%',
+                height: '100%',
+                maxWidth: '500px',
+                margin: '0 auto',
+              }}
+            >
               <ChartTooltip
                 content={
                   <ChartTooltipContent
@@ -76,6 +83,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
                     )}
                   />
                 }
+                wrapperStyle={{ zIndex: 1000 }}
               />
               <Pie
                 data={data}
@@ -90,6 +98,8 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
                 animationDuration={300}
                 animationBegin={0}
                 isAnimationActive={true}
+                // Better defaults for responsiveness
+                minAngle={5}
                 label={(props: {
                   cx?: number | string;
                   cy?: number | string;
@@ -144,7 +154,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
                   <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Pie>
-              <ChartLegend content={<ChartLegendContent />} />
+              <ChartLegend content={<ChartLegendContent />} wrapperStyle={{ zIndex: 100 }} />
             </PieChart>
           </ResponsiveContainer>
         </ChartContainer>

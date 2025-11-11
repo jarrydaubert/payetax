@@ -76,19 +76,19 @@ describe('StatsGrid', () => {
   describe('Columns', () => {
     it('should apply 2 column grid classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} columns={2} />);
-      const grid = container.querySelector('[role="list"]');
+      const grid = container.querySelector('ul');
       expect(grid).toHaveClass('md:grid-cols-2');
     });
 
     it('should apply 3 column grid classes (default)', () => {
       const { container } = render(<StatsGrid stats={mockStats} />);
-      const grid = container.querySelector('[role="list"]');
+      const grid = container.querySelector('ul');
       expect(grid).toHaveClass('lg:grid-cols-3');
     });
 
     it('should apply 4 column grid classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} columns={4} />);
-      const grid = container.querySelector('[role="list"]');
+      const grid = container.querySelector('ul');
       expect(grid).toHaveClass('lg:grid-cols-4');
     });
   });
@@ -116,7 +116,7 @@ describe('StatsGrid', () => {
   describe('Custom Classes', () => {
     it('should accept and apply custom className', () => {
       const { container } = render(<StatsGrid stats={mockStats} className='custom-class' />);
-      const grid = container.querySelector('[role="list"]');
+      const grid = container.querySelector('ul');
       expect(grid).toHaveClass('custom-class');
     });
 
@@ -124,23 +124,23 @@ describe('StatsGrid', () => {
       const { container } = render(
         <StatsGrid stats={mockStats} columns={3} className='custom-class' />
       );
-      const grid = container.querySelector('[role="list"]');
+      const grid = container.querySelector('ul');
       expect(grid).toHaveClass('custom-class', 'lg:grid-cols-3');
     });
   });
 
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(<StatsGrid stats={mockStats} />);
+      const { container } = render(<StatsGrid stats={mockStats} />);
 
-      const list = screen.getByRole('list', { name: 'Statistics' });
+      const list = container.querySelector('ul[aria-label="Statistics"]');
       expect(list).toBeInTheDocument();
     });
 
     it('should render cards as list items', () => {
-      render(<StatsGrid stats={mockStats} />);
+      const { container } = render(<StatsGrid stats={mockStats} />);
 
-      const listItems = screen.getAllByRole('listitem');
+      const listItems = container.querySelectorAll('li');
       expect(listItems).toHaveLength(3);
     });
 

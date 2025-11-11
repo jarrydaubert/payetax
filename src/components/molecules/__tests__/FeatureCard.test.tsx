@@ -103,7 +103,7 @@ describe('FeatureCard', () => {
           href: '/blog',
         },
       };
-      const { container } = render(<FeatureCard feature={featureWithLink} />);
+      render(<FeatureCard feature={featureWithLink} />);
       const link = screen.getByRole('link');
       const arrow = link.querySelector('svg');
       expect(arrow).toBeInTheDocument();
@@ -202,7 +202,7 @@ describe('FeatureCard', () => {
     });
 
     it('should use correct typography for description', () => {
-      const { container } = render(<FeatureCard feature={mockFeature} />);
+      render(<FeatureCard feature={mockFeature} />);
       const description = screen.getByText(/Sub-second page loads/);
       expect(description).toHaveClass('text-base', 'text-muted-foreground');
     });
@@ -285,12 +285,12 @@ describe('FeatureCard', () => {
     it('should handle different icons', () => {
       const icons = [Rocket, Shield, Zap];
 
-      icons.forEach((icon) => {
+      for (const icon of icons) {
         const feature: Feature = { ...mockFeature, icon };
         const { unmount } = render(<FeatureCard feature={feature} />);
         expect(screen.getByText('Blazing Fast')).toBeInTheDocument();
         unmount();
-      });
+      }
     });
   });
 });

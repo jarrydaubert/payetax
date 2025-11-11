@@ -152,6 +152,7 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
                     )}
                   />
                 }
+                wrapperStyle={{ zIndex: 1000 }}
               />
 
               {/* Gross salary bars (background) */}
@@ -176,7 +177,7 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
                 />
               </Bar>
 
-              <ChartLegend content={<ChartLegendContent />} />
+              <ChartLegend content={<ChartLegendContent />} wrapperStyle={{ zIndex: 100 }} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>

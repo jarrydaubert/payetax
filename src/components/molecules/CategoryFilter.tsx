@@ -70,12 +70,11 @@ export function CategoryFilter({
           >
             <span className='relative z-10'>All Posts</span>
             <Badge
-              variant='secondary'
+              variant={isActive() ? 'default' : 'secondary'}
               className={cn(
                 'relative z-10 font-mono',
                 TYPOGRAPHY.TEXT_XS,
-                isActive() &&
-                  'bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30'
+                isActive() && 'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
               )}
             >
               {allPostsCount}
@@ -104,12 +103,12 @@ export function CategoryFilter({
               >
                 <span className='relative z-10'>{category.name}</span>
                 <Badge
-                  variant='secondary'
+                  variant={isActive(category.slug) ? 'default' : 'secondary'}
                   className={cn(
                     'relative z-10 font-mono',
                     TYPOGRAPHY.TEXT_XS,
                     isActive(category.slug) &&
-                      'bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30'
+                      'bg-primary-foreground text-primary hover:bg-primary-foreground/90'
                   )}
                 >
                   {category.count}

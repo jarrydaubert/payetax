@@ -234,18 +234,18 @@ describe('ContactFooter', () => {
       const { container } = render(<ContactFooter links={mockLinks} centered={true} />);
 
       const separators = container.querySelectorAll('[aria-hidden="true"]');
-      separators.forEach((separator) => {
+      for (const separator of separators) {
         expect(separator).toHaveAttribute('aria-hidden', 'true');
-      });
+      }
     });
 
     it('should have accessible links', () => {
       render(<ContactFooter links={mockLinks} />);
 
       const links = screen.getAllByRole('link');
-      links.forEach((link) => {
+      for (const link of links) {
         expect(link).toHaveAccessibleName();
-      });
+      }
     });
   });
 

@@ -40,14 +40,14 @@ export default function NotFound() {
       {/* Animated background particles */}
       <div className='-z-10 fixed inset-0 overflow-hidden'>
         <div className='absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background'>
-          {[...Array(20)].map((_, i) => {
+          {Array.from({ length: 20 }, (_, i) => {
             const left = (i * 137.5) % 100;
             const top = (i * 37.5) % 100;
             const delay = (i * 0.15) % 3;
             const duration = 2 + (i % 4);
             return (
               <div
-                key={`particle-${i}`}
+                key={`particle-${left}-${top}`}
                 className='absolute h-2 w-2 animate-pulse rounded-full bg-primary opacity-20'
                 style={{
                   left: `${left}%`,

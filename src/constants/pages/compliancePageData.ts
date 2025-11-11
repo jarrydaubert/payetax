@@ -11,8 +11,7 @@
  * @created PAYTAX-109 Phase 4 - Data Extraction
  */
 
-'use client';
-
+import type { LucideIcon } from 'lucide-react';
 import Award from 'lucide-react/dist/esm/icons/award.js';
 import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
@@ -26,7 +25,7 @@ interface ComplianceFeature {
   title: string;
   description: string;
   details: string[];
-  icon: any;
+  icon: LucideIcon;
   lastUpdated: string;
   source: string;
   color: string;

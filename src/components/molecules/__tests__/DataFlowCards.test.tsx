@@ -135,9 +135,9 @@ describe('DataFlowCards', () => {
       render(<DataFlowCards cards={mockCards} />);
 
       const titles = screen.getAllByRole('heading', { level: 3 });
-      titles.forEach((title) => {
+      for (const title of titles) {
         expect(title).toHaveClass('text-xl', 'font-bold');
-      });
+      }
     });
 
     it('should apply muted color to descriptions', () => {

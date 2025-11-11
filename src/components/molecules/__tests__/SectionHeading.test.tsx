@@ -79,15 +79,13 @@ describe('SectionHeading', () => {
     });
 
     it('should apply badge variant', () => {
-      const { container } = render(
-        <SectionHeading title='Title' badge={{ text: 'Test', variant: 'secondary' }} />
-      );
+      render(<SectionHeading title='Title' badge={{ text: 'Test', variant: 'secondary' }} />);
       const badge = screen.getByText('Test').closest('div');
       expect(badge).toHaveClass('bg-secondary');
     });
 
     it('should use outline variant by default', () => {
-      const { container } = render(<SectionHeading title='Title' badge={{ text: 'Test' }} />);
+      render(<SectionHeading title='Title' badge={{ text: 'Test' }} />);
       const badge = screen.getByText('Test').closest('div');
       // Outline variant doesn't have bg-primary class
       expect(badge).not.toHaveClass('bg-primary');
@@ -96,29 +94,25 @@ describe('SectionHeading', () => {
 
   describe('Alignment', () => {
     it('should align left by default', () => {
-      const { container } = render(<SectionHeading title='Title' />);
+      render(<SectionHeading title='Title' />);
       const heading = screen.getByText('Title');
       expect(heading).toHaveClass('text-left');
     });
 
     it('should align center when specified', () => {
-      const { container } = render(<SectionHeading title='Title' align='center' />);
+      render(<SectionHeading title='Title' align='center' />);
       const heading = screen.getByText('Title');
       expect(heading).toHaveClass('text-center');
     });
 
     it('should center subtitle when align is center', () => {
-      const { container } = render(
-        <SectionHeading title='Title' subtitle='Subtitle' align='center' />
-      );
+      render(<SectionHeading title='Title' subtitle='Subtitle' align='center' />);
       const subtitle = screen.getByText('Subtitle');
       expect(subtitle).toHaveClass('text-center', 'mx-auto');
     });
 
     it('should center badge when align is center', () => {
-      const { container } = render(
-        <SectionHeading title='Title' badge={{ text: 'Badge' }} align='center' />
-      );
+      render(<SectionHeading title='Title' badge={{ text: 'Badge' }} align='center' />);
       const badgeContainer = screen.getByText('Badge').closest('div')?.parentElement;
       expect(badgeContainer).toHaveClass('justify-center');
     });
@@ -126,17 +120,18 @@ describe('SectionHeading', () => {
 
   describe('ID Attribute', () => {
     it('should apply id when provided', () => {
-      const { container } = render(<SectionHeading title='Title' id='test-section' />);
-      const section = container.querySelector('#test-section');
+      const testId = `test-section-${Date.now()}`;
+      const { container } = render(<SectionHeading title='Title' id={testId} />);
+      const section = container.querySelector(`#${testId}`);
       expect(section).toBeInTheDocument();
     });
 
     it('should not have id when not provided', () => {
       const { container } = render(<SectionHeading title='Title' />);
       const divs = container.querySelectorAll('div');
-      divs.forEach((div) => {
+      for (const div of divs) {
         expect(div).not.toHaveAttribute('id');
-      });
+      }
     });
   });
 
@@ -182,9 +177,7 @@ describe('SectionHeading', () => {
 
   describe('Design Tokens', () => {
     it('should use design tokens for spacing', () => {
-      const { container } = render(
-        <SectionHeading title='Title' badge={{ icon: Rocket, text: 'Test' }} />
-      );
+      render(<SectionHeading title='Title' badge={{ icon: Rocket, text: 'Test' }} />);
       const badge = screen.getByText('Test').closest('div');
       expect(badge).toHaveClass('gap-2');
     });
@@ -246,13 +239,13 @@ describe('SectionHeading', () => {
     it('should handle badge with all variants', () => {
       const variants = ['default', 'secondary', 'destructive', 'outline'] as const;
 
-      variants.forEach((variant) => {
+      for (const variant of variants) {
         const { unmount } = render(
           <SectionHeading title='Title' badge={{ text: variant, variant }} />
         );
         expect(screen.getByText(variant)).toBeInTheDocument();
         unmount();
-      });
+      }
     });
   });
 });

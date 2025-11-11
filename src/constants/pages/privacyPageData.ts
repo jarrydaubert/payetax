@@ -12,6 +12,7 @@
 
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
 import Database from 'lucide-react/dist/esm/icons/database.js';
 import Eye from 'lucide-react/dist/esm/icons/eye.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
@@ -23,7 +24,7 @@ import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 // Note: DataFlowCard doesn't have a schema yet, but iconColor is a custom field
 interface DataFlowCard {
-  icon: any;
+  icon: LucideIcon;
   iconColor?: string;
   title: string;
   description: string;

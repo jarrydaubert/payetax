@@ -129,6 +129,7 @@ export const EffectiveTaxRateChart = memo(function EffectiveTaxRateChart({
                     )}
                   />
                 }
+                wrapperStyle={{ zIndex: 1000 }}
               />
 
               {/* Current salary indicator */}
@@ -165,7 +166,7 @@ export const EffectiveTaxRateChart = memo(function EffectiveTaxRateChart({
                 dot={false}
               />
 
-              <ChartLegend content={<ChartLegendContent />} />
+              <ChartLegend content={<ChartLegendContent />} wrapperStyle={{ zIndex: 100 }} />
             </AreaChart>
           </ResponsiveContainer>
         </ChartContainer>

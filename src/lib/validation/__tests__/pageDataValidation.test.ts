@@ -362,11 +362,11 @@ describe('pageDataValidation', () => {
     it('should validate all badge variants', () => {
       const variants = ['default', 'secondary', 'destructive', 'outline'] as const;
 
-      variants.forEach((variant) => {
+      for (const variant of variants) {
         const badge = { text: 'Test', variant };
         const result = SectionBadgeSchema.safeParse(badge);
         expect(result.success).toBe(true);
-      });
+      }
     });
 
     it('should reject empty text', () => {

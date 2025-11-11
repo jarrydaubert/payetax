@@ -99,9 +99,9 @@ describe('ComparisonCards', () => {
       render(<ComparisonCards left={mockLeft} right={mockRight} />);
 
       const titles = screen.getAllByRole('heading', { level: 3 });
-      titles.forEach((title) => {
+      for (const title of titles) {
         expect(title).toHaveClass('text-2xl', 'font-bold');
-      });
+      }
     });
   });
 
@@ -129,9 +129,9 @@ describe('ComparisonCards', () => {
       const { container } = render(<ComparisonCards left={emptyLeft} right={emptyRight} />);
 
       const lists = container.querySelectorAll('ul');
-      lists.forEach((list) => {
+      for (const list of lists) {
         expect(list).toBeEmptyDOMElement();
-      });
+      }
     });
 
     it('should handle single item', () => {

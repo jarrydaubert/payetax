@@ -318,15 +318,138 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           set((state) => ({ input: { ...state.input, salary: validated.data } }));
         },
-        setPayPeriod: (payPeriod) => set((state) => ({ input: { ...state.input, payPeriod } })),
-        setTaxYear: (taxYear) => set((state) => ({ input: { ...state.input, taxYear } })),
-        setTaxCode: (taxCode) => set((state) => ({ input: { ...state.input, taxCode } })),
-        setRegion: (region) =>
+        setPayPeriod: (payPeriod) => {
+          // Validate pay period
+          const validated = z
+            .enum(['annually', 'monthly', 'fortnightly', 'weekly', 'daily', 'hourly'])
+            .safeParse(payPeriod);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid pay period:', validated.error.issues[0].message);
+            captureValidationError(validated.error, {
+              field: 'payPeriod',
+              errorMessage: validated.error.issues[0]?.message || 'Invalid pay period',
+              attemptedValue: payPeriod,
+              location: 'calculatorStore.setPayPeriod',
+            });
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
+        },
+        setTaxYear: (taxYear) => {
+          // Validate tax year format
+          const validated = z
+            .string()
+            .regex(/^\d{4}-\d{2}$/, 'Tax year must be in format YYYY-YY')
+            .refine(
+              (year) => {
+                const [start, end] = year.split('-').map((s, i) => (i === 0 ? s : `20${s}`));
+                return Number.parseInt(end, 10) === Number.parseInt(start, 10) + 1;
+              },
+              { message: 'Tax year must be consecutive (e.g., 2024-25)' }
+            )
+            .safeParse(taxYear);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid tax year:', validated.error.issues[0].message);
+            captureValidationError(validated.error, {
+              field: 'taxYear',
+              errorMessage: validated.error.issues[0]?.message || 'Invalid tax year',
+              attemptedValue: taxYear,
+              location: 'calculatorStore.setTaxYear',
+            });
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
+        },
+        setTaxCode: (taxCode) => {
+          // Validate tax code format (allow empty for default)
+          if (taxCode.trim() === '') {
+            set((state) => ({ input: { ...state.input, taxCode: '' } }));
+            return;
+          }
+
+          const validated = z
+            .string()
+            .min(1)
+            .transform((val) => val.trim().toUpperCase())
+            .refine(
+              (code) => {
+                // Special codes
+                const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+                if (specialCodes.includes(code)) return true;
+
+                // Standard format or K codes
+                const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+                const kCodePattern = /^S?K[0-9]+$/;
+                return standardPattern.test(code) || kCodePattern.test(code);
+              },
+              { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' }
+            )
+            .safeParse(taxCode);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid tax code:', validated.error.issues[0].message);
+            captureValidationError(validated.error, {
+              field: 'taxCode',
+              errorMessage: validated.error.issues[0]?.message || 'Invalid tax code',
+              attemptedValue: taxCode,
+              location: 'calculatorStore.setTaxCode',
+            });
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
+        },
+        setRegion: (region) => {
+          // Validate region
+          const validated = z
+            .enum(['England', 'Scotland', 'Wales', 'Northern Ireland'])
+            .safeParse(region);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid region:', validated.error.issues[0].message);
+            captureValidationError(validated.error, {
+              field: 'region',
+              errorMessage: validated.error.issues[0]?.message || 'Invalid region',
+              attemptedValue: region,
+              location: 'calculatorStore.setRegion',
+            });
+            return;
+          }
+
           set((state) => ({
-            input: { ...state.input, region, isScottish: region === 'Scotland' },
-          })),
-        setIsScottish: (isScottish) => set((state) => ({ input: { ...state.input, isScottish } })),
-        setIsMarried: (isMarried) => set((state) => ({ input: { ...state.input, isMarried } })),
+            input: {
+              ...state.input,
+              region: validated.data,
+              isScottish: validated.data === 'Scotland',
+            },
+          }));
+        },
+        setIsScottish: (isScottish) => {
+          // Validate boolean
+          const validated = z.boolean().safeParse(isScottish);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid isScottish:', validated.error.issues[0].message);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, isScottish: validated.data } }));
+        },
+        setIsMarried: (isMarried) => {
+          // Validate boolean
+          const validated = z.boolean().safeParse(isMarried);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid isMarried:', validated.error.issues[0].message);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, isMarried: validated.data } }));
+        },
         setPartnerGrossWage: (partnerGrossWage) => {
           // Validate partner wage
           const validated = z
@@ -342,7 +465,17 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
           set((state) => ({ input: { ...state.input, partnerGrossWage: validated.data } }));
         },
-        setIsBlind: (isBlind) => set((state) => ({ input: { ...state.input, isBlind } })),
+        setIsBlind: (isBlind) => {
+          // Validate boolean
+          const validated = z.boolean().safeParse(isBlind);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid isBlind:', validated.error.issues[0].message);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, isBlind: validated.data } }));
+        },
         setAge: (age) => {
           // Validate age if provided
           if (age !== undefined) {
@@ -361,7 +494,17 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
           set((state) => ({ input: { ...state.input, age } }));
         },
-        setPayNoNI: (payNoNI) => set((state) => ({ input: { ...state.input, payNoNI } })),
+        setPayNoNI: (payNoNI) => {
+          // Validate boolean
+          const validated = z.boolean().safeParse(payNoNI);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid payNoNI:', validated.error.issues[0].message);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, payNoNI: validated.data } }));
+        },
         setPensionContribution: (pensionContribution) => {
           // Validate pension contribution
           const validated = z
@@ -380,11 +523,47 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           set((state) => ({ input: { ...state.input, pensionContribution: validated.data } }));
         },
-        setPensionContributionType: (pensionContributionType) =>
-          set((state) => ({ input: { ...state.input, pensionContributionType } })),
-        setStudentLoanPlan: (studentLoanPlan) =>
-          set((state) => ({ input: { ...state.input, studentLoanPlan } })),
-        setNiCategory: (niCategory) => set((state) => ({ input: { ...state.input, niCategory } })),
+        setPensionContributionType: (pensionContributionType) => {
+          // Validate pension type
+          const validated = z.enum(['percentage', 'amount']).safeParse(pensionContributionType);
+
+          if (!validated.success) {
+            console.warn(
+              '[Calculator] Invalid pension contribution type:',
+              validated.error.issues[0].message
+            );
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, pensionContributionType: validated.data } }));
+        },
+        setStudentLoanPlan: (studentLoanPlan) => {
+          // Validate student loan plan
+          const validated = z
+            .enum(['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgrad'])
+            .safeParse(studentLoanPlan);
+
+          if (!validated.success) {
+            console.warn(
+              '[Calculator] Invalid student loan plan:',
+              validated.error.issues[0].message
+            );
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, studentLoanPlan: validated.data } }));
+        },
+        setNiCategory: (niCategory) => {
+          // Validate NI category
+          const validated = z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']).safeParse(niCategory);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid NI category:', validated.error.issues[0].message);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, niCategory: validated.data } }));
+        },
         setHoursPerWeek: (hoursPerWeek) => {
           // Validate hours per week
           const validated = z
@@ -597,15 +776,34 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         setWhatIfType: (type) => {
+          // Validate what-if type
+          const validated = z.enum(['percentage', 'amount', 'total']).safeParse(type);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid what-if type:', validated.error.issues[0].message);
+            return;
+          }
+
           set((state) => ({
-            whatIf: { ...state.whatIf, type },
+            whatIf: { ...state.whatIf, type: validated.data },
           }));
           // Don't auto-calculate - let user click Compare button
         },
 
         setWhatIfValue: (value) => {
+          // Validate what-if value
+          const validated = z
+            .number()
+            .finite('What-if value must be a valid number')
+            .safeParse(value);
+
+          if (!validated.success) {
+            console.warn('[Calculator] Invalid what-if value:', validated.error.issues[0].message);
+            return;
+          }
+
           set((state) => ({
-            whatIf: { ...state.whatIf, value },
+            whatIf: { ...state.whatIf, value: validated.data },
           }));
           // Don't auto-calculate - let user click Compare button
         },

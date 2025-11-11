@@ -2,7 +2,7 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
-import { useActionState, useEffect, useId, useState } from 'react';
+import { useActionState, useEffect, useId, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,9 @@ export function FeedbackDialog() {
     { success: false }
   );
 
+  // React 19: useTransition for wrapping async actions
+  const [_isTransitioning, startTransition] = useTransition();
+
   // Handle server action response
   useEffect(() => {
     if (state.success) {
@@ -87,6 +90,7 @@ export function FeedbackDialog() {
   /**
    * React 19: Form submission with server action
    * Uses FormData API for progressive enhancement
+   * Wraps formAction in startTransition to properly update isPending state
    */
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -106,8 +110,11 @@ export function FeedbackDialog() {
     // Note: IP address will be extracted server-side from request headers
     formDataToSubmit.append('ipAddress', 'client'); // Placeholder, extracted server-side
 
-    // Call server action
-    formAction(formDataToSubmit);
+    // Call server action inside startTransition to properly update isPending
+    // This ensures React tracks the async operation and isPending updates correctly
+    startTransition(() => {
+      formAction(formDataToSubmit);
+    });
   };
 
   return (

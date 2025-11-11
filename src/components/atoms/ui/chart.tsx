@@ -61,7 +61,12 @@ function ChartContainer({ className, config, children, ref, ...props }: ChartCon
     <ChartContext.Provider value={{ config }}>
       <div
         ref={ref}
-        className={cn('flex aspect-auto h-[250px] w-full justify-center text-xs', className)}
+        className={cn(
+          'flex aspect-auto h-[250px] w-full justify-center text-xs',
+          // Landscape optimization: taller charts on mobile landscape
+          'landscape:max-md:h-[350px]',
+          className
+        )}
         {...props}
       >
         {children}

@@ -103,6 +103,7 @@ export const TaxLiabilityChart = memo(function TaxLiabilityChart({
                     )}
                   />
                 }
+                wrapperStyle={{ zIndex: 1000 }}
               />
 
               {/* Stack bars in order: Tax, NI, Student Loan, Pension, Net Pay */}
@@ -129,7 +130,7 @@ export const TaxLiabilityChart = memo(function TaxLiabilityChart({
               <Bar dataKey='Pension' stackId='a' fill='hsl(var(--chart-2))' radius={[0, 0, 0, 0]} />
               <Bar dataKey='Net Pay' stackId='a' fill='hsl(var(--chart-6))' radius={[0, 4, 4, 0]} />
 
-              <ChartLegend content={<ChartLegendContent />} />
+              <ChartLegend content={<ChartLegendContent />} wrapperStyle={{ zIndex: 100 }} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
