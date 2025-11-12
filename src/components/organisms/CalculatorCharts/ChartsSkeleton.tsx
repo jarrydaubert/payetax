@@ -5,8 +5,8 @@
  * Maintains layout to prevent CLS (Cumulative Layout Shift).
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/atoms/Skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
