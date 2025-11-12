@@ -188,10 +188,13 @@ const HomePageContent = memo(function HomePageContent() {
             {/* Tax Codes */}
             <Link
               href='/blog/understanding-uk-tax-codes'
-              className='group block rounded-lg border bg-card p-6 transition-all hover:shadow-lg'
+              className={cn(
+                'group block rounded-lg border bg-card transition-all hover:shadow-lg',
+                SPACING.P_6
+              )}
             >
-              <div className='mb-4 flex items-center gap-3'>
-                <div className='rounded-full bg-primary/10 p-3'>
+              <div className={cn('flex items-center', SPACING.MB_4, SPACING.GAP_3)}>
+                <div className={cn('rounded-full bg-primary/10', SPACING.P_3)}>
                   <BookOpen className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
                 </div>
                 <p className='font-semibold text-lg group-hover:text-primary'>
@@ -208,9 +211,25 @@ const HomePageContent = memo(function HomePageContent() {
       </section>
 
       {/* Browse Tax Topics - Internal linking to blog categories */}
-      <section className='container mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16 lg:py-20'>
-        <div className='mb-12 text-center'>
-          <h2 className='mb-3 font-bold text-3xl tracking-tight md:text-4xl'>Browse Tax Topics</h2>
+      <section
+        className={cn(
+          'container mx-auto max-w-7xl',
+          SPACING.PX_4,
+          SPACING.PY_12,
+          'md:px-6 md:py-16 lg:py-20'
+        )}
+      >
+        <div className={cn('text-center', SPACING.MB_12)}>
+          <h2
+            className={cn(
+              'font-bold tracking-tight',
+              SPACING.MB_3,
+              TYPOGRAPHY.TEXT_3XL,
+              `md:${TYPOGRAPHY.TEXT_4XL}`
+            )}
+          >
+            Browse Tax Topics
+          </h2>
           <Separator className='mx-auto my-4 w-24' />
           <p className='text-muted-foreground md:text-lg'>
             Explore our comprehensive guides organized by topic
