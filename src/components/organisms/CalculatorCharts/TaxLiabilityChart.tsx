@@ -137,7 +137,7 @@ export const TaxLiabilityChart = memo(function TaxLiabilityChart({
         </ChartContainer>
 
         {/* Summary stats */}
-        <div className={`mt-2 flex justify-between ${TYPOGRAPHY.TEXT_SM}`}>
+        <div className={cn('flex justify-between', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
           <div>
             <p className='text-muted-foreground'>Total Deductions</p>
             <p className='font-medium font-mono text-destructive'>

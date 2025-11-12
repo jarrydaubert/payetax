@@ -424,7 +424,7 @@ export function ResultsTable({
 
       {/* Tax Trap Inline Alert */}
       {taxTrapOptimization && onApplyPensionOptimization && (
-        <div className='mt-4'>
+        <div className={SPACING.MT_4}>
           <TaxTrapInlineAlert
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
@@ -436,7 +436,7 @@ export function ResultsTable({
 
       {/* Marriage Allowance Alert */}
       {marriageAllowanceEligible && (
-        <div className='mt-4'>
+        <div className={SPACING.MT_4}>
           <MarriageAllowanceAlert
             userSalary={results.grossSalary.annually}
             partnerSalary={partnerGrossWage}

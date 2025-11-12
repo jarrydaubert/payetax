@@ -20,6 +20,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -172,7 +173,7 @@ export const EffectiveTaxRateChart = memo(function EffectiveTaxRateChart({
         </ChartContainer>
 
         {/* Current stats */}
-        <div className={`mt-2 flex justify-between ${TYPOGRAPHY.TEXT_SM}`}>
+        <div className={cn('flex justify-between', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
           <div>
             <p className='text-muted-foreground'>Your Effective Rate</p>
             <p className='font-mono font-semibold text-destructive'>{currentEffectiveRate}%</p>
