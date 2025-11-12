@@ -82,7 +82,9 @@ export default function SustainabilityBadge() {
                   </div>
 
                   {/* Content */}
-                  <div className={cn('space-y-5 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                  <div
+                    className={cn('text-muted-foreground', SPACING.SPACE_Y_6, TYPOGRAPHY.TEXT_SM)}
+                  >
                     {/* Environmental Impact */}
                     <div>
                       <h4
@@ -93,7 +95,7 @@ export default function SustainabilityBadge() {
                       >
                         🌱 Environmental Impact
                       </h4>
-                      <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
+                      <ul className={cn(SPACING.SPACE_Y_2, TYPOGRAPHY.TEXT_SM)}>
                         <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-green-600 dark:text-green-400'>•</span>
                           <span>
@@ -135,7 +137,7 @@ export default function SustainabilityBadge() {
                       >
                         ⚡ Performance Benefits
                       </h4>
-                      <ul className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
+                      <ul className={cn(SPACING.SPACE_Y_2, TYPOGRAPHY.TEXT_SM)}>
                         <li className={cn('flex', SPACING.GAP_2)}>
                           <span className='text-blue-600 dark:text-blue-400'>•</span>
                           <span>

@@ -14,7 +14,12 @@ export interface FAQItemProps {
  */
 export function FAQItem({ question, children }: FAQItemProps) {
   return (
-    <details className='group overflow-hidden rounded-xl border-2 border-border/20 bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg'>
+    <details
+      className={cn(
+        'group overflow-hidden rounded-xl border-2 border-border/20 bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg',
+        SPACING.P_6
+      )}
+    >
       <summary
         className={cn(
           'cursor-pointer font-bold text-foreground transition-colors hover:text-primary',
