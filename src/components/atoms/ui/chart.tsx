@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 // Chart color system matching our tax calculator theme
@@ -179,7 +179,7 @@ function ChartTooltipContent({
       )}
     >
       {tooltipLabel}
-      <div className='grid gap-1.5'>
+      <div className={cn('grid', SPACING.GAP_1_5)}>
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || 'value'}`;
           const itemConfig = config[key];
@@ -191,7 +191,7 @@ function ChartTooltipContent({
           return (
             <div
               key={`${item.dataKey}-${index}`}
-              className={cn('flex w-full items-center gap-2', TYPOGRAPHY.TEXT_XS)}
+              className={cn('flex w-full items-center', SPACING.GAP_2, TYPOGRAPHY.TEXT_XS)}
             >
               {!hideIndicator && (
                 <div
@@ -205,7 +205,7 @@ function ChartTooltipContent({
                   }}
                 />
               )}
-              <div className='flex flex-1 justify-between gap-2 leading-none'>
+              <div className={cn('flex flex-1 justify-between leading-none', SPACING.GAP_2)}>
                 <span className='text-muted-foreground'>{itemConfig?.label || item.name}</span>
                 <span className='font-medium font-mono text-foreground tabular-nums'>
                   {formatter
@@ -264,7 +264,12 @@ function ChartLegendContent({
   return (
     <div
       ref={ref}
-      className={cn('flex items-center justify-center gap-4', TYPOGRAPHY.TEXT_XS, className)}
+      className={cn(
+        'flex items-center justify-center',
+        SPACING.GAP_4,
+        TYPOGRAPHY.TEXT_XS,
+        className
+      )}
     >
       {payload.map((item) => {
         // Type assertion for payload items from recharts library
@@ -275,7 +280,10 @@ function ChartLegendContent({
         return (
           <div
             key={item.value}
-            className='flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
+            className={cn(
+              'flex items-center [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground',
+              SPACING.GAP_1_5
+            )}
           >
             {!hideIcon && (
               <div
