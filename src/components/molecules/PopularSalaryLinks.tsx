@@ -74,7 +74,7 @@ export function PopularSalaryLinks() {
           </Button>
         ))}
       </div>
-      <div className='mt-6 text-center'>
+      <div className={cn('text-center', SPACING.MT_6)}>
         <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
           View detailed breakdowns including income tax, National Insurance, and monthly take-home
           pay

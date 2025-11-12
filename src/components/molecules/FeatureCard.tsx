@@ -14,7 +14,7 @@ import { ArrowRight } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/atoms/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { FeatureData } from '@/lib/validation/pageDataValidation';
 
@@ -101,7 +101,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
         </div>
 
         {/* Title with optional metric */}
-        <div className='flex items-start justify-between gap-4'>
+        <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
           <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
           {metric && (
             <span
@@ -118,7 +118,13 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
 
       <CardContent>
         {/* Description */}
-        <p className={cn('mb-4 text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_BASE)}>
+        <p
+          className={cn(
+            'text-muted-foreground leading-relaxed',
+            SPACING.MB_4,
+            TYPOGRAPHY.TEXT_BASE
+          )}
+        >
           {description}
         </p>
 

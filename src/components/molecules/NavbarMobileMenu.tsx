@@ -83,7 +83,7 @@ export function NavbarMobileMenu({
               })}
 
               {/* Mobile Utilities */}
-              {utilities && <div className='mt-4'>{utilities}</div>}
+              {utilities && <div className={SPACING.MT_4}>{utilities}</div>}
             </div>
           </motion.nav>
         )}

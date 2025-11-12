@@ -11,7 +11,7 @@
 
 import type { Route } from 'next';
 import Link from 'next/link';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { ContactLinkData } from '@/lib/validation/pageDataValidation';
 
@@ -84,11 +84,15 @@ export function ContactFooter({
     <section className={containerClasses}>
       <div className={contentClasses}>
         {/* Title */}
-        <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
+        <h3 className={cn('font-bold text-foreground', SPACING.MB_4, TYPOGRAPHY.TEXT_2XL)}>
+          {title}
+        </h3>
 
         {/* Description */}
         {description && (
-          <p className={cn('mb-6 text-muted-foreground', TYPOGRAPHY.TEXT_BASE)}>{description}</p>
+          <p className={cn('text-muted-foreground', SPACING.MB_6, TYPOGRAPHY.TEXT_BASE)}>
+            {description}
+          </p>
         )}
 
         {/* Contact Links */}

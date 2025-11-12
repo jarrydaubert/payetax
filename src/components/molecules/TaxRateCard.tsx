@@ -44,7 +44,7 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
 
   return (
     <motion.div {...gestureProps}>
-      <Card className='group overflow-hidden border-primary/20 p-6'>
+      <Card className={cn('group overflow-hidden border-primary/20', SPACING.P_6)}>
         <div className={cn('mb-4 flex items-center', SPACING.GAP_3)}>
           <div className='flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
             <Icon className={cn(ICON_SIZES.SIZE_5, 'text-white')} />
@@ -55,7 +55,11 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
           {items.map((item) => (
             <li
               key={item.label}
-              className={cn('flex justify-between rounded-md bg-muted/30 p-2', TYPOGRAPHY.TEXT_SM)}
+              className={cn(
+                'flex justify-between rounded-md bg-muted/30',
+                SPACING.P_2,
+                TYPOGRAPHY.TEXT_SM
+              )}
             >
               <span className='text-muted-foreground'>{item.label}</span>
               <strong className={item.colorClass || 'text-foreground'}>{item.value}</strong>

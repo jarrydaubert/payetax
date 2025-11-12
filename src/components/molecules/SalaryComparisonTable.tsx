@@ -133,7 +133,7 @@ export function SalaryComparisonTable() {
           </Card>
         </div>
 
-        <div className='mt-6 text-center'>
+        <div className={cn('text-center', SPACING.MT_6)}>
           <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
             Based on England/Wales/NI rates for 2025-26. Scottish rates differ.
           </p>
