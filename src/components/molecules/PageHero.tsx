@@ -104,7 +104,7 @@ export function PageHero({
         className
       )}
     >
-      <div className='container mx-auto max-w-7xl px-4'>
+      <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4)}>
         <div className={alignClass}>
           {/* Badge */}
           {badge && (
@@ -121,7 +121,9 @@ export function PageHero({
           )}
 
           {/* Title */}
-          <h1 className={cn('mb-6 font-bold leading-tight', TYPOGRAPHY.TEXT_6XL)}>{title}</h1>
+          <h1 className={cn('font-bold leading-tight', SPACING.MB_6, TYPOGRAPHY.TEXT_6XL)}>
+            {title}
+          </h1>
 
           {/* Subtitle(s) */}
           {subtitles.length > 0 && (

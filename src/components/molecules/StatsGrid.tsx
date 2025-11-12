@@ -11,7 +11,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/atoms/ui/card';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { StatData } from '@/lib/validation/pageDataValidation';
 
@@ -107,7 +107,7 @@ function StatCard({ stat, variant }: StatCardProps) {
 
   return (
     <Card className={cardClasses} role='listitem'>
-      <CardContent className='flex flex-col items-center p-6 text-center'>
+      <CardContent className={cn('flex flex-col items-center text-center', SPACING.P_6)}>
         {/* Icon */}
         <div className={iconClasses} aria-hidden='true'>
           <Icon className='h-6 w-6 text-white' />
@@ -125,7 +125,9 @@ function StatCard({ stat, variant }: StatCardProps) {
         </div>
 
         {/* Label */}
-        <div className={cn(TYPOGRAPHY.TEXT_LG, 'mb-2 font-semibold text-foreground')}>{label}</div>
+        <div className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold text-foreground', SPACING.MB_2)}>
+          {label}
+        </div>
 
         {/* Optional Description */}
         {description && (
