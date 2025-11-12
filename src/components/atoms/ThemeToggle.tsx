@@ -4,7 +4,7 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
@@ -19,7 +19,13 @@ export function ThemeToggle() {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className='inline-flex gap-0.5 rounded-lg border border-border bg-muted p-1'>
+      <div
+        className={cn(
+          'inline-flex rounded-lg border border-border bg-muted',
+          'gap-0.5',
+          SPACING.P_1
+        )}
+      >
         {options.map(({ value, icon: Icon, label }) => (
           <Tooltip key={value}>
             <TooltipTrigger asChild>

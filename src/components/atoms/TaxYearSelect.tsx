@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 
@@ -79,7 +79,7 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = memo(function TaxYearSelect(
               This prevents icon/text wrapping issues. Using margin on the icon
               can cause separation when flex wrapping occurs. Container-level
               gap ensures reliable spacing in all flex scenarios. */}
-          <div className='flex items-center gap-2'>
+          <div className={cn('flex items-center', SPACING.GAP_2)}>
             <Calendar className={cn('text-foreground/70', ICON_SIZES.SIZE_4)} aria-hidden='true' />
             <SelectValue placeholder='Select tax year' />
           </div>

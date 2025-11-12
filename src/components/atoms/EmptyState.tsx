@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 function Empty({ className, ...props }: React.ComponentProps<'div'>) {
@@ -20,7 +20,7 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='empty-header'
-      className={cn('flex max-w-sm flex-col items-center gap-2 text-center', className)}
+      className={cn('flex max-w-sm flex-col items-center text-center', SPACING.GAP_2, className)}
       {...props}
     />
   );
