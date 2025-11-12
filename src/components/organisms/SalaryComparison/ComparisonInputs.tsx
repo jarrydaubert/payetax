@@ -142,11 +142,11 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           <Label className={TYPOGRAPHY.TEXT_SM}>Comparison Type</Label>
           <div className={`grid ${SPACING.GAP_2} sm:grid-cols-3`}>
             <label
-              className={cn('cursor-pointer rounded-lg border-2 transition-colors', SPACING.P_3, TYPOGRAPHY.TEXT_SM,
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'percentage'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
-              })
+              }`}
             >
               <input
                 type='radio'
@@ -160,11 +160,11 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
               <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>e.g., 10%</span>
             </label>
             <label
-              className={cn('cursor-pointer rounded-lg border-2 transition-colors', SPACING.P_3, TYPOGRAPHY.TEXT_SM,
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'amount'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
-              })
+              }`}
             >
               <input
                 type='radio'
@@ -180,11 +180,11 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
               </span>
             </label>
             <label
-              className={cn('cursor-pointer rounded-lg border-2 transition-colors', SPACING.P_3, TYPOGRAPHY.TEXT_SM,
+              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
                 mode === 'total'
                   ? 'border-primary bg-primary/5 font-medium'
                   : 'border-border hover:border-primary/50'
-              })
+              }`}
             >
               <input
                 type='radio'
@@ -235,8 +235,8 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           </div>
           {error && (
             <p
-              id={`${inputId}-error)
-              className={`${TYPOGRAPHY.TEXT_SM} text-destructive)
+              id={`${inputId}-error`}
+              className={`${TYPOGRAPHY.TEXT_SM} text-destructive`}
               role='alert'
             >
               {error}
