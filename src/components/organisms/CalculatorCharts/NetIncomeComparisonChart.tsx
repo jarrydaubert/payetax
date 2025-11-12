@@ -18,7 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -145,7 +146,7 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
                   <ChartTooltipContent
                     labelFormatter={(value) => `Salary: ${value}`}
                     formatter={(value, name) => (
-                      <div className='flex items-center gap-2'>
+                      <div className={cn('flex items-center', SPACING.GAP_2)}>
                         <span className='font-medium'>{name}:</span>
                         <span className='font-mono'>{formatCurrency(Number(value))}</span>
                       </div>
@@ -183,7 +184,7 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
         </ChartContainer>
 
         {/* Current position indicator */}
-        <div className='mt-2 text-center'>
+        <div className={cn('text-center', SPACING.MT_2)}>
           <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
             Your salary:{' '}
             <span className='font-mono font-semibold text-foreground'>

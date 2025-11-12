@@ -97,7 +97,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           />
 
           {/* Desktop Utilities */}
-          <div className='hidden items-center gap-2 md:flex'>
+          <div className={cn('hidden items-center md:flex', SPACING.GAP_2)}>
             <FeedbackDialog />
           </div>
 

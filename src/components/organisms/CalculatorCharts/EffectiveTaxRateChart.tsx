@@ -19,7 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -122,7 +122,7 @@ export const EffectiveTaxRateChart = memo(function EffectiveTaxRateChart({
                   <ChartTooltipContent
                     labelFormatter={(value) => formatCurrency(Number(value))}
                     formatter={(value, name) => (
-                      <div className='flex items-center gap-2'>
+                      <div className={cn('flex items-center', SPACING.GAP_2)}>
                         <span className='font-medium'>{name}:</span>
                         <span className='font-mono'>{value}%</span>
                       </div>

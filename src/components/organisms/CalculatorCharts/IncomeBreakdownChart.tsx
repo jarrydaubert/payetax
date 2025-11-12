@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getChartConfig, getIncomeBreakdownData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
@@ -73,7 +73,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
                   <ChartTooltipContent
                     hideLabel
                     formatter={(value, name) => (
-                      <div className='flex items-center gap-2'>
+                      <div className={cn('flex items-center', SPACING.GAP_2)}>
                         <span className='font-medium'>{name}:</span>
                         <span className='font-mono'>{formatCurrency(Number(value))}</span>
                         <span className='text-muted-foreground'>
@@ -160,7 +160,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
         </ChartContainer>
 
         {/* Center label showing total */}
-        <div className='mt-2 text-center'>
+        <div className={cn('text-center', SPACING.MT_2)}>
           <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>Total Gross Income</p>
           <p className={`font-mono font-semibold ${TYPOGRAPHY.TEXT_LG}`}>
             {formatCurrency(totalIncome)}
