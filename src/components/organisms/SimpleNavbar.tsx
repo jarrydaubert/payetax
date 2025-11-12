@@ -10,9 +10,7 @@ import { NavbarLinks } from '@/components/molecules/NavbarLinks';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
-import { SPACING } from '@/constants/designTokens';
-
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -76,7 +74,13 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           className
         )}
       >
-        <div className={cn('container mx-auto flex max-w-7xl items-center justify-between', SPACING.PX_2, 'sm:px-4')}>
+        <div
+          className={cn(
+            'container mx-auto flex max-w-7xl items-center justify-between',
+            SPACING.PX_2,
+            'sm:px-4'
+          )}
+        >
           {/* Logo */}
           <Link href='/' className='group'>
             <motion.span

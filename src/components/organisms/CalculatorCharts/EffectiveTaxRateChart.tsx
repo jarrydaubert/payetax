@@ -20,10 +20,9 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { cn } from '@/lib/utils';
 import { getChartConfig, getEffectiveTaxRateData } from '@/lib/chartUtils';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface EffectiveTaxRateChartProps {
   results: TaxCalculationResults;

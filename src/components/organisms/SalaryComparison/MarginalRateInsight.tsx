@@ -48,7 +48,10 @@ export function MarginalRateInsight({
             </div>
           </div>
 
-          <Badge variant='default' className={cn('h-12 sm:ml-auto', SPACING.PX_6, TYPOGRAPHY.TEXT_XL)}>
+          <Badge
+            variant='default'
+            className={cn('h-12 sm:ml-auto', SPACING.PX_6, TYPOGRAPHY.TEXT_XL)}
+          >
             {marginalRate}%
           </Badge>
         </div>
