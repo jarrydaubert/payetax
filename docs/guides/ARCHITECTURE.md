@@ -261,11 +261,12 @@ Basic building blocks that cannot be broken down further.
 - Use design tokens for consistency
 - 85.7% test coverage
 
-**Design Tokens (NEW):**
-All atoms now use centralized design tokens from `src/constants/designTokens.ts`:
-- **Typography**: `TEXT_SM` (14px), `TEXT_XS` (12px)
-- **Spacing**: `GAP_2` (8px), `GAP_1_5` (6px), `GAP_1` (4px)
-- **Icons**: `SIZE_4` (16px), `SIZE_3_5` (14px), `SIZE_5` (20px), `SIZE_6` (24px)
+**Design Tokens:**
+All components use centralized design tokens from `src/constants/designTokens.ts`:
+- ✅ **Typography**: `TYPOGRAPHY.*` - 100% adoption (PAYTAX-113 Complete)
+- ✅ **Spacing**: `SPACING.*` - 96% adoption (PAYTAX-114 Complete - 326/338)
+- ✅ **Icons**: `ICON_SIZES.*` - High adoption across components
+- ✅ **Colors**: `COLORS.*` - Gradient and theme color consistency
 
 #### **Molecules (35+ components)**
 
