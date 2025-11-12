@@ -1,6 +1,6 @@
 import type * as React from 'react';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Table = ({
@@ -123,7 +123,7 @@ const TableCaption = ({
 }) => (
   <caption
     ref={ref}
-    className={cn('mt-4 text-muted-foreground', TYPOGRAPHY.TEXT_SM, className)}
+    className={cn('text-muted-foreground', SPACING.MT_4, TYPOGRAPHY.TEXT_SM, className)}
     {...props}
   />
 );

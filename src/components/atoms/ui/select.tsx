@@ -46,7 +46,7 @@ function SelectScrollUpButton({ ref, className, ...props }: SelectScrollUpButton
   return (
     <SelectPrimitive.ScrollUpButton
       ref={ref}
-      className={cn('flex cursor-default items-center justify-center py-1', className)}
+      className={cn('flex cursor-default items-center justify-center', 'py-1', className)}
       {...props}
     >
       <ChevronUp className='size-4' />
@@ -64,7 +64,7 @@ function SelectScrollDownButton({ ref, className, ...props }: SelectScrollDownBu
   return (
     <SelectPrimitive.ScrollDownButton
       ref={ref}
-      className={cn('flex cursor-default items-center justify-center py-1', className)}
+      className={cn('flex cursor-default items-center justify-center', 'py-1', className)}
       {...props}
     >
       <ChevronDown className='size-4' />

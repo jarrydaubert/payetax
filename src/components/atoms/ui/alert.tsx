@@ -2,7 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
@@ -54,7 +54,7 @@ const AlertTitle = ({
 }) => (
   <h5
     ref={ref}
-    className={cn('mb-1 font-medium leading-none tracking-tight', className)}
+    className={cn('font-medium leading-none tracking-tight', SPACING.MB_1, className)}
     {...props}
   />
 );
