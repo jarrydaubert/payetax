@@ -45,10 +45,10 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
             <p className={cn('text-muted-foreground uppercase tracking-wide', TYPOGRAPHY.TEXT_SM)}>
               Monthly Take-Home Pay
             </p>
-            <p className={cn('mt-2 font-bold text-primary', TYPOGRAPHY.TEXT_4XL)}>
+            <p className={cn('font-bold text-primary', SPACING.MT_2, TYPOGRAPHY.TEXT_4XL)}>
               £{results.netPay.monthly.toLocaleString('en-GB')}
             </p>
-            <p className={cn('mt-2 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+            <p className={cn('text-muted-foreground', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
               After tax and National Insurance
             </p>
           </div>
