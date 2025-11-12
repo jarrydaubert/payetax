@@ -6,7 +6,7 @@
  */
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/atoms/Skeleton';
 import { SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 

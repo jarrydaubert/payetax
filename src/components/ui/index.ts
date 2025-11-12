@@ -52,7 +52,7 @@ export { default as ErrorBoundary } from '../atoms/ErrorBoundary';
 export * from '../atoms/Field';
 export { GlowButton } from '../atoms/GlowButton';
 export { GradientHeading } from '../atoms/GradientHeading';
-export { Skeleton, Skeleton } from '../atoms/Skeleton';
+export { Skeleton } from '../atoms/Skeleton';
 export { Spinner } from '../atoms/Spinner';
 export { ThemeToggle } from '../atoms/ThemeToggle';
 
