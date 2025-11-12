@@ -10,7 +10,7 @@
 'use client';
 
 import type React from 'react';
-import { COLORS, TYPOGRAPHY } from '@/constants/designTokens';
+import { COLORS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -73,12 +73,12 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   return (
     <section
       id={id}
-      className={cn('mb-8', glass ? 'glass-card' : '', animationClass, className)}
+      className={cn(SPACING.MB_8, glass ? 'glass-card' : '', animationClass, className)}
       aria-labelledby={title ? `${id || ''}-title` : undefined}
     >
       {/* Section header if title is provided */}
       {title && (
-        <div className='mb-4 flex items-start'>
+        <div className={cn('flex items-start', SPACING.MB_4)}>
           {/* Optional icon using CSS variables for gradient colors */}
           {icon && <div className={cn('mr-3 flex-shrink-0', COLORS.ACCENT_PURPLE)}>{icon}</div>}
 
@@ -106,7 +106,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       )}
 
       {/* Content container */}
-      <div className={cn('space-y-4', contentClassName)}>{children}</div>
+      <div className={cn(SPACING.SPACE_Y_4, contentClassName)}>{children}</div>
     </section>
   );
 };
