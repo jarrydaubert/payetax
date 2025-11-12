@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion';
 import { HowToStepCard } from '@/components/molecules/HowToStepCard';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 /**
  * How-to guide molecule for calculator usage
@@ -19,8 +20,8 @@ export function CalculatorHowToGuide() {
       transition={{ duration: 0.5 }}
       className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-16'
     >
-      <div className='mx-auto max-w-5xl px-4'>
-        <div className='mb-10 text-center'>
+      <div className={cn('mx-auto max-w-5xl', SPACING.PX_4)}>
+        <div className={cn('text-center', SPACING.MB_10)}>
           <h2
             className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
           >

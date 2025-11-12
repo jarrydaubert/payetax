@@ -174,7 +174,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
         <div>
           <label
             htmlFor='what-if-type'
-            className={cn('mb-2 block font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}
+            className={cn('block font-medium text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_SM)}
           >
             Change Type
           </label>
@@ -204,7 +204,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
         <div>
           <label
             htmlFor={valueInputId}
-            className={cn('mb-2 block font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}
+            className={cn('block font-medium text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_SM)}
           >
             {getInputLabel()}
           </label>
@@ -228,7 +228,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
           {error && (
             <p
               id={`${valueInputId}-error`}
-              className={cn('mt-1 text-destructive', TYPOGRAPHY.TEXT_SM)}
+              className={cn('text-destructive', SPACING.MT_1, TYPOGRAPHY.TEXT_SM)}
               role='alert'
             >
               {error}

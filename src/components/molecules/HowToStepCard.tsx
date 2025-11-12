@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export interface HowToStepCardProps {
@@ -14,7 +14,12 @@ export interface HowToStepCardProps {
  */
 export function HowToStepCard({ step, title, description }: HowToStepCardProps) {
   return (
-    <Card className='group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl'>
+    <Card
+      className={cn(
+        'group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl',
+        SPACING.P_6
+      )}
+    >
       <div className='absolute top-4 right-4 font-bold text-[80px] text-primary/10'>{step}</div>
       <div className='relative'>
         <div
@@ -25,7 +30,9 @@ export function HowToStepCard({ step, title, description }: HowToStepCardProps) 
         >
           {step}
         </div>
-        <h3 className={cn('mb-3 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>{title}</h3>
+        <h3 className={cn('font-bold text-foreground', SPACING.MB_3, TYPOGRAPHY.TEXT_XL)}>
+          {title}
+        </h3>
         <p className='text-muted-foreground leading-relaxed'>{description}</p>
       </div>
     </Card>

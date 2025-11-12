@@ -101,7 +101,10 @@ export function TaxTrapInlineAlert({
       <button
         type='button'
         onClick={handleDismiss}
-        className='absolute top-3 right-3 rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+        className={cn(
+          'absolute top-3 right-3 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          SPACING.P_2
+        )}
         aria-label='Dismiss tax trap alert'
       >
         <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
@@ -120,7 +123,7 @@ export function TaxTrapInlineAlert({
             <span className='font-bold text-destructive'>{formatCurrency(allowanceLost, 0)}</span>{' '}
             in personal allowance due to the 60% tax trap (£100k-£125k zone).
             {onApplyPension && (
-              <span className='mt-1 block'>
+              <span className={cn('block', SPACING.MT_1)}>
                 Add {formatCurrency(suggestedPension, 0)} to your pension to avoid this trap?
               </span>
             )}
@@ -132,7 +135,10 @@ export function TaxTrapInlineAlert({
           <Button
             onClick={handleApplyPension}
             size='sm'
-            className='w-full gap-2 whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto'
+            className={cn(
+              'w-full whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto',
+              SPACING.GAP_2
+            )}
           >
             Add {formatCurrency(suggestedPension, 0)} to Pension
             <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
