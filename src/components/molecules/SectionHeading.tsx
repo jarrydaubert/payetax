@@ -105,10 +105,10 @@ export function SectionHeading({
   );
 
   return (
-    <div className={cn('mb-8', className)} id={id}>
+    <div className={cn(SPACING.MB_8, className)} id={id}>
       {/* Badge */}
       {badge && (
-        <div className={cn('mb-4', align === 'center' ? 'flex justify-center' : '')}>
+        <div className={cn(SPACING.MB_4, align === 'center' ? 'flex justify-center' : '')}>
           <Badge
             variant={badge.variant || 'outline'}
             className={cn('px-4 py-1.5', SPACING.GAP_2, badge.icon && 'gap-2')}
@@ -124,7 +124,14 @@ export function SectionHeading({
 
       {/* Subtitle */}
       {subtitle && (
-        <p className={cn('mt-4 max-w-3xl', align === 'center' && 'mx-auto', subtitleClasses)}>
+        <p
+          className={cn(
+            'max-w-3xl',
+            SPACING.MT_4,
+            align === 'center' && 'mx-auto',
+            subtitleClasses
+          )}
+        >
           {subtitle}
         </p>
       )}

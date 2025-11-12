@@ -1,7 +1,7 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import type * as React from 'react';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Select = SelectPrimitive.Root;
@@ -126,7 +126,7 @@ function SelectLabel({ ref, className, ...props }: SelectLabelProps) {
   return (
     <SelectPrimitive.Label
       ref={ref}
-      className={cn('px-2 py-1.5 font-semibold', TYPOGRAPHY.TEXT_SM, className)}
+      className={cn('font-semibold', SPACING.PX_2, 'py-1.5', TYPOGRAPHY.TEXT_SM, className)}
       {...props}
     />
   );
