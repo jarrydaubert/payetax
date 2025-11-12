@@ -48,7 +48,7 @@ export function MarginalRateInsight({
             </div>
           </div>
 
-          <Badge variant='default' className={cn('h-12 px-6 sm:ml-auto', TYPOGRAPHY.TEXT_XL)}>
+          <Badge variant='default' className={cn('h-12 sm:ml-auto', SPACING.PX_6, TYPOGRAPHY.TEXT_XL)}>
             {marginalRate}%
           </Badge>
         </div>
@@ -76,7 +76,7 @@ export function MarginalRateInsight({
         </div>
 
         {/* Explanation */}
-        <p className={cn('mt-4 text-center text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+        <p className={cn('text-center text-muted-foreground', SPACING.MT_4, TYPOGRAPHY.TEXT_XS)}>
           You keep <strong>{marginalRate}%</strong> of the {formatCurrency(increase, 0)} increase.
           The remaining <strong>{effectiveRate}%</strong> goes to tax, NI, and deductions.
         </p>

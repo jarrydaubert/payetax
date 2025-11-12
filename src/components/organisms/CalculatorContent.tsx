@@ -34,7 +34,7 @@ export function CalculatorContent() {
         <div className={cn('mx-auto max-w-4xl', SPACING.PX_4)}>
           <div className='mb-10 text-center'>
             <h2
-              className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
+              className={cn('bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent', SPACING.MB_3, TYPOGRAPHY.TEXT_4XL)}
             >
               Common Tax Questions
             </h2>
