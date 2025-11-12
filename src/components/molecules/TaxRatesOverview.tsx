@@ -8,6 +8,7 @@ import { TaxRateCard } from '@/components/molecules/TaxRateCard';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
+import { cn } from '@/lib/utils';
 
 /**
  * Tax rates overview molecule
@@ -25,7 +26,7 @@ export function TaxRatesOverview() {
       transition={{ duration: 0.5, delay: 0.2 }}
       className='bg-gradient-to-br from-primary/5 to-accent/5 py-16'
     >
-      <div className='mx-auto max-w-7xl px-4'>
+      <div className={cn('mx-auto max-w-7xl', SPACING.PX_4)}>
         <div className='mb-10 text-center'>
           <h2
             className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
@@ -115,10 +116,10 @@ export function TaxRatesOverview() {
           </motion.div>
         </motion.div>
 
-        <div className='mt-8 text-center'>
+        <div className={cn('text-center', SPACING.MT_8)}>
           <Link
             href='/blog/scottish-vs-english-tax-rates-2025-comparison'
-            className='inline-flex items-center gap-2 text-primary hover:underline'
+            className={cn('inline-flex items-center text-primary hover:underline', SPACING.GAP_2)}
           >
             Scottish taxpayers: See rate differences →
           </Link>

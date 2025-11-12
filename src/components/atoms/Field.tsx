@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
@@ -92,7 +92,11 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='field-content'
-      className={cn('group/field-content flex flex-1 flex-col gap-1.5 leading-snug', className)}
+      className={cn(
+        'group/field-content flex flex-1 flex-col leading-snug',
+        SPACING.GAP_1_5,
+        className
+      )}
       {...props}
     />
   );
@@ -161,7 +165,10 @@ function FieldSeparator({
       <Separator className='absolute inset-0 top-1/2' />
       {children && (
         <span
-          className='relative mx-auto block w-fit bg-background px-2 text-muted-foreground'
+          className={cn(
+            'relative mx-auto block w-fit bg-background text-muted-foreground',
+            SPACING.PX_2
+          )}
           data-slot='field-separator-content'
         >
           {children}
@@ -193,7 +200,7 @@ function FieldError({
     }
 
     return (
-      <ul className='ml-4 flex list-disc flex-col gap-1'>
+      <ul className={cn('ml-4 flex list-disc flex-col', SPACING.GAP_1)}>
         {errors.map(
           (error, index) =>
             error?.message && <li key={`error-${error.message}-${index}`}>{error.message}</li>

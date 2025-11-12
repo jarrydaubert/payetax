@@ -8,6 +8,7 @@ import { FAQItem } from '@/components/molecules/FAQItem';
 import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
 import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 /**
  * SEO-optimized content section below calculator
@@ -30,7 +31,7 @@ export function CalculatorContent() {
         transition={{ duration: 0.5 }}
         className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
       >
-        <div className='mx-auto max-w-4xl px-4'>
+        <div className={cn('mx-auto max-w-4xl', SPACING.PX_4)}>
           <div className='mb-10 text-center'>
             <h2
               className={`mb-3 bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold ${TYPOGRAPHY.TEXT_4XL} text-transparent`}
@@ -216,7 +217,7 @@ export function CalculatorContent() {
             </FAQItem>
           </div>
 
-          <div className='mt-8 text-center'>
+          <div className={cn('text-center', SPACING.MT_8)}>
             <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
               Can&apos;t find your question?{' '}
               <Link href='/blog' className='text-primary'>
