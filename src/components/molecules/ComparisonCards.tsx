@@ -12,7 +12,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { CheckCircle, UserX } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -66,7 +66,7 @@ export interface ComparisonCardsProps {
  */
 export function ComparisonCards({ left, right, className }: ComparisonCardsProps) {
   return (
-    <div className={cn('grid gap-4 md:grid-cols-2 md:gap-8', className)}>
+    <div className={cn('grid md:grid-cols-2', SPACING.GAP_4, 'md:gap-8', className)}>
       <ComparisonCard item={left} />
       <ComparisonCard item={right} />
     </div>
@@ -111,7 +111,7 @@ function ComparisonCard({ item }: ComparisonCardProps) {
   return (
     <Card className={cardClasses}>
       {/* Header */}
-      <div className='mb-6 flex items-center gap-3'>
+      <div className={cn('flex items-center', SPACING.MB_6, SPACING.GAP_3)}>
         <div className={iconContainerClasses}>
           <Icon className={iconClasses} aria-hidden='true' />
         </div>
@@ -119,9 +119,9 @@ function ComparisonCard({ item }: ComparisonCardProps) {
       </div>
 
       {/* List */}
-      <ul className='space-y-3'>
+      <ul className={SPACING.SPACE_Y_3}>
         {items.map((text) => (
-          <li key={text} className='flex items-start gap-3 text-muted-foreground'>
+          <li key={text} className={cn('flex items-start text-muted-foreground', SPACING.GAP_3)}>
             <ListIcon className={listIconClasses} aria-hidden='true' />
             <span>{text}</span>
           </li>

@@ -7,10 +7,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SPACING } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export function ChartsSkeleton() {
   return (
-    <div className='mt-6 grid gap-6 md:grid-cols-2'>
+    <div className={cn('grid md:grid-cols-2', SPACING.MT_6, SPACING.GAP_6)}>
       {/* Chart Skeleton 1 */}
       <Card className='border-primary/20'>
         <CardHeader className='pb-3'>
@@ -23,7 +25,7 @@ export function ChartsSkeleton() {
         </CardHeader>
         <CardContent>
           <Skeleton className='h-[250px] w-full' />
-          <div className='mt-2 space-y-2'>
+          <div className={cn(SPACING.MT_2, SPACING.SPACE_Y_2)}>
             <Skeleton className='h-4 w-full' />
           </div>
         </CardContent>
@@ -41,7 +43,7 @@ export function ChartsSkeleton() {
         </CardHeader>
         <CardContent>
           <Skeleton className='h-[250px] w-full' />
-          <div className='mt-2 space-y-2'>
+          <div className={cn(SPACING.MT_2, SPACING.SPACE_Y_2)}>
             <Skeleton className='h-4 w-full' />
           </div>
         </CardContent>
@@ -59,7 +61,7 @@ export function ChartsSkeleton() {
         </CardHeader>
         <CardContent>
           <Skeleton className='h-[250px] w-full' />
-          <div className='mt-2 flex justify-between'>
+          <div className={cn('flex justify-between', SPACING.MT_2)}>
             <Skeleton className='h-4 w-32' />
             <Skeleton className='h-4 w-32' />
           </div>
@@ -78,7 +80,7 @@ export function ChartsSkeleton() {
         </CardHeader>
         <CardContent>
           <Skeleton className='h-[200px] w-full' />
-          <div className='mt-2 flex justify-between'>
+          <div className={cn('flex justify-between', SPACING.MT_2)}>
             <Skeleton className='h-4 w-28' />
             <Skeleton className='h-4 w-28' />
           </div>
