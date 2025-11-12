@@ -34,8 +34,10 @@ export function PeriodSelectorCard({
   const shouldReduceMotion = useMotionPreference();
 
   return (
-    <Card className='w-full border-primary/20 p-2 sm:p-3 md:p-4'>
-      <p className={cn('mb-2 font-semibold text-foreground sm:mb-3', TYPOGRAPHY.TEXT_LG)}>
+    <Card className={cn('w-full border-primary/20', SPACING.P_2, 'sm:p-3 md:p-4')}>
+      <p
+        className={cn('font-semibold text-foreground', SPACING.MB_2, 'sm:mb-3', TYPOGRAPHY.TEXT_LG)}
+      >
         Display Periods
       </p>
       <div className={cn('flex flex-wrap sm:gap-3 md:gap-4', SPACING.GAP_2)}>

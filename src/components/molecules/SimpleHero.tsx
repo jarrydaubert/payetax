@@ -46,7 +46,7 @@ export default function SimpleHero({
       {/* Content with parallax effect */}
       <motion.div
         style={shouldReduceMotion || !enableParallax ? {} : { y, opacity }}
-        className='relative z-10 mx-auto max-w-5xl px-2 text-center sm:px-4'
+        className={cn('relative z-10 mx-auto max-w-5xl text-center', SPACING.PX_2, 'sm:px-4')}
       >
         {/* Heading - No animation for LCP optimization */}
         {/* IMPORTANT: Uses TEXT_4XL for hero headline (responsive: text-4xl sm:text-5xl md:text-6xl)

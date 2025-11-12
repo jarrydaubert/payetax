@@ -38,7 +38,7 @@ export function Footer({ className }: FooterProps) {
       <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
 
       {/* Main footer content */}
-      <div className={cn('glass', 'py-8')}>
+      <div className='glass py-8'>
         <div className={cn('container mx-auto max-w-7xl', SPACING.PX_2, 'sm:px-4')}>
           <div className={cn('flex flex-col items-center text-center md:text-left', SPACING.GAP_6)}>
             {/* Top row: Brand and resources - Uses sub-molecules */}

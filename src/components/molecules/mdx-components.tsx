@@ -287,7 +287,13 @@ export const mdxComponents = {
         className='w-full rounded-lg border border-foreground/20 shadow-lg'
       />
       {alt && (
-        <p className={cn('mt-2 text-center text-muted-foreground italic', TYPOGRAPHY.TEXT_SM)}>
+        <p
+          className={cn(
+            'text-center text-muted-foreground italic',
+            SPACING.MT_2,
+            TYPOGRAPHY.TEXT_SM
+          )}
+        >
           {alt}
         </p>
       )}

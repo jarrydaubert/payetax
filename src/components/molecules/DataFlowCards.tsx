@@ -11,7 +11,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -97,7 +97,12 @@ function DataFlowCardItem({ card }: DataFlowCardItemProps) {
   const { icon: Icon, iconColor = 'bg-primary', title, description } = card;
 
   return (
-    <Card className='h-full border-primary/20 p-8 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl'>
+    <Card
+      className={cn(
+        'h-full border-primary/20 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl',
+        SPACING.P_8
+      )}
+    >
       {/* Icon */}
       <div
         className={cn(
@@ -109,7 +114,7 @@ function DataFlowCardItem({ card }: DataFlowCardItemProps) {
       </div>
 
       {/* Title */}
-      <h3 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>{title}</h3>
+      <h3 className={cn('font-bold text-foreground', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>{title}</h3>
 
       {/* Description */}
       <p className='text-muted-foreground leading-relaxed'>{description}</p>
