@@ -279,6 +279,7 @@ export function BlogPageClient({
                             alt={post.imageAlt || post.title}
                             fill
                             sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
+                            loading="lazy"
                             className='object-cover transition-transform duration-500 group-hover:scale-110'
                           />
                           <div className='absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent' />
