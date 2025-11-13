@@ -28,10 +28,10 @@ describe('TYPOGRAPHY Design Tokens', () => {
         'TEXT_XS',
       ];
 
-      expectedTokens.forEach((token) => {
+      for (const token of expectedTokens) {
         expect(TYPOGRAPHY[token]).toBeDefined();
         expect(typeof TYPOGRAPHY[token]).toBe('string');
-      });
+      }
     });
 
     it('should have exactly 10 typography tokens', () => {
@@ -90,15 +90,15 @@ describe('TYPOGRAPHY Design Tokens', () => {
 
   describe('Token Naming Convention', () => {
     it('should follow TEXT_* naming pattern', () => {
-      Object.keys(TYPOGRAPHY).forEach((key) => {
+      for (const key of Object.keys(TYPOGRAPHY)) {
         expect(key).toMatch(/^TEXT_/);
-      });
+      }
     });
 
     it('should use uppercase for token names', () => {
-      Object.keys(TYPOGRAPHY).forEach((key) => {
+      for (const key of Object.keys(TYPOGRAPHY)) {
         expect(key).toBe(key.toUpperCase());
-      });
+      }
     });
   });
 
@@ -137,9 +137,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
         'TEXT_6XL', // 3.75rem / 60px
       ];
 
-      sizeOrder.forEach((token) => {
+      for (const token of sizeOrder) {
         expect(TYPOGRAPHY[token as TypographyToken]).toBeDefined();
-      });
+      }
     });
 
     it('should include base size for body text', () => {
@@ -189,11 +189,11 @@ describe('TYPOGRAPHY Design Tokens', () => {
 
     it('should maintain consistent token structure', () => {
       // All tokens should be string values matching pattern
-      Object.entries(TYPOGRAPHY).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(TYPOGRAPHY)) {
         expect(typeof key).toBe('string');
         expect(typeof value).toBe('string');
         expect(value).toMatch(/^text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl)$/);
-      });
+      }
     });
   });
 
@@ -240,9 +240,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
         'TEXT_BASE', // Body text
       ];
 
-      criticalTokens.forEach((token) => {
+      for (const token of criticalTokens) {
         expect(TYPOGRAPHY[token as TypographyToken]).toBeDefined();
-      });
+      }
     });
 
     it('should not allow accidental modifications', () => {

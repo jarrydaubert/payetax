@@ -4,10 +4,15 @@ import type { Metadata } from 'next';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
 import { BlogPageClient } from './BlogPageClient';
 
-// Next.js 16: Route segment config for optimized blog listing
-// Use ISR with revalidation to support dynamic params while maintaining performance
+// ⚠️ CRITICAL: DO NOT CHANGE THIS CONFIGURATION WITHOUT TESTING
+// This config has been carefully tuned for Next.js 15/16 compatibility
+// History: force-static broke query params, force-dynamic caused hydration issues
+// Current config (dynamicParams: true + revalidate) is the ONLY working solution
+// See: BLOG-NAVIGATION-FIX.md for full explanation and testing requirements
+// Last verified working: November 13, 2025
+// Tests to run before changing: npx playwright test e2e/blog-filtering-pagination.spec.ts
 export const revalidate = 3600; // ISR: Revalidate every hour for new posts
-export const dynamicParams = true; // Allow dynamic search params
+export const dynamicParams = true; // Allow dynamic search params - REQUIRED for filtering/pagination
 
 export const metadata: Metadata = {
   title: 'TaxInsights by PayeTax | UK Tax Guidance',
