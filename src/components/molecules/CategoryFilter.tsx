@@ -80,7 +80,7 @@ export function CategoryFilter({
               {allPostsCount}
             </Badge>
             {isActive() && (
-              <div className='absolute inset-0 bg-action-primary opacity-0 blur transition-opacity group-hover:opacity-100' />
+              <div className='-z-10 pointer-events-none absolute inset-0 bg-action-primary opacity-0 blur-md transition-opacity group-hover:opacity-50' />
             )}
           </button>
 
@@ -114,7 +114,7 @@ export function CategoryFilter({
                   {category.count}
                 </Badge>
                 {isActive(category.slug) && (
-                  <div className='absolute inset-0 bg-action-primary opacity-0 blur transition-opacity group-hover:opacity-100' />
+                  <div className='-z-10 pointer-events-none absolute inset-0 bg-action-primary opacity-0 blur-md transition-opacity group-hover:opacity-50' />
                 )}
               </button>
             ))}
