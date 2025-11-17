@@ -251,7 +251,7 @@ export function WhatIfComparisonDisplay({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='overflow-hidden border-primary/20'>
+        <Card className='overflow-hidden'>
           <section
             ref={containerRef}
             className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth active:cursor-grabbing'

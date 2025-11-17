@@ -230,7 +230,7 @@ export function CalculatorContainer() {
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card
         className={cn(
-          'order-2 border-primary/20 lg:sticky lg:top-4 lg:order-3 lg:self-start',
+          'order-2 lg:sticky lg:top-4 lg:order-3 lg:self-start',
           SPACING.P_3,
           'sm:p-4 md:p-6'
         )}
@@ -288,7 +288,7 @@ export function CalculatorContainer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'order-6 flex h-full items-center justify-center rounded-lg border border-primary/20 border-dashed text-center lg:order-3',
+              'order-6 flex h-full items-center justify-center rounded-lg border border-dashed text-center lg:order-3',
               'p-12'
             )}
           >

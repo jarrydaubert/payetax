@@ -14,7 +14,7 @@ export function ChartsSkeleton() {
   return (
     <div className={cn('grid md:grid-cols-2', SPACING.MT_6, SPACING.GAP_6)}>
       {/* Chart Skeleton 1 */}
-      <Card className='border-primary/20'>
+      <Card>
         <CardHeader className='pb-3'>
           <CardTitle>
             <Skeleton className='h-6 w-48' />
@@ -32,7 +32,7 @@ export function ChartsSkeleton() {
       </Card>
 
       {/* Chart Skeleton 2 */}
-      <Card className='border-primary/20'>
+      <Card>
         <CardHeader className='pb-3'>
           <CardTitle>
             <Skeleton className='h-6 w-40' />
@@ -50,7 +50,7 @@ export function ChartsSkeleton() {
       </Card>
 
       {/* Chart Skeleton 3 */}
-      <Card className='border-primary/20'>
+      <Card>
         <CardHeader className='pb-3'>
           <CardTitle>
             <Skeleton className='h-6 w-44' />
@@ -69,7 +69,7 @@ export function ChartsSkeleton() {
       </Card>
 
       {/* Chart Skeleton 4 */}
-      <Card className='border-primary/20'>
+      <Card>
         <CardHeader className='pb-3'>
           <CardTitle>
             <Skeleton className='h-6 w-52' />

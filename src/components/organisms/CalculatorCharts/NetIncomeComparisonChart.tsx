@@ -96,7 +96,7 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
   };
 
   return (
-    <Card className={`border-primary/20 ${className || ''}`}>
+    <Card className={className || ''}>
       <CardHeader className='pb-3'>
         <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Salary vs Take-Home</CardTitle>
         <CardDescription className={TYPOGRAPHY.TEXT_SM}>

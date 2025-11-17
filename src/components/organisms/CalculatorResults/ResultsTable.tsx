@@ -361,7 +361,7 @@ export function ResultsTable({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='relative w-full overflow-hidden border-primary/20'>
+        <Card className='relative w-full overflow-hidden'>
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
             Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate

@@ -160,7 +160,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             )}
 
             {/* Net Pay (highlighted) */}
-            <TableRow className='border-primary/20 border-t-2 bg-muted/30'>
+            <TableRow className='border-t-2 bg-muted/30'>
               <TableCell className='font-bold'>Take-Home Pay</TableCell>
               <TableCell className='text-right font-semibold'>
                 {formatCurrency(currentResults.netPay.annually, 0)}

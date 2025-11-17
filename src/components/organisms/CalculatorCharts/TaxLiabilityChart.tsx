@@ -57,7 +57,7 @@ export const TaxLiabilityChart = memo(function TaxLiabilityChart({
       ];
 
   return (
-    <Card className={`border-primary/20 ${className || ''}`}>
+    <Card className={className || ''}>
       <CardHeader className='pb-3'>
         <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Tax Breakdown</CardTitle>
         <CardDescription className={TYPOGRAPHY.TEXT_SM}>

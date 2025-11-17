@@ -47,7 +47,7 @@ export const IncomeBreakdownChart = memo(function IncomeBreakdownChart({
   const totalIncome = results.grossSalary.annually;
 
   return (
-    <Card className={`border-primary/20 ${className || ''}`}>
+    <Card className={className || ''}>
       <CardHeader className='pb-3'>
         <CardTitle className={`font-semibold ${TYPOGRAPHY.TEXT_LG}`}>Income Sources</CardTitle>
         <CardDescription className={TYPOGRAPHY.TEXT_SM}>Breakdown by income type</CardDescription>
