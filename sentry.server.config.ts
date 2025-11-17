@@ -52,8 +52,8 @@ Sentry.init({
     }),
   ],
 
-  // Enable debug mode in development
-  debug: process.env.NODE_ENV === 'development',
+  // Disable debug mode (too verbose in console)
+  debug: false,
 
   // Server-specific ignored errors
   ignoreErrors: [
