@@ -17,6 +17,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import * as React from 'react';
+import { LandscapePrompt } from '@/components/atoms/LandscapePrompt';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
@@ -348,6 +349,9 @@ export function ResultsTable({
       transition={{ duration: 0.3, delay: 0.2 }}
       className={`w-full ${SPACING.SPACE_Y_4}`}
     >
+      {/* Landscape Prompt - Shows on mobile portrait to encourage rotation for better table viewing */}
+      <LandscapePrompt />
+
       {/* Period Selection */}
       <PeriodSelectorCard
         periods={Object.keys(periodOptions)}

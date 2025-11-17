@@ -2,17 +2,19 @@
  * Landscape Prompt Component
  *
  * Displays an animated prompt on mobile devices encouraging users to rotate
- * their device to landscape orientation for optimal chart viewing.
+ * their device to landscape orientation for optimal viewing of results tables
+ * and charts.
  *
  * Features:
  * - Only shows on mobile devices (< md breakpoint)
  * - Only shows in portrait orientation
  * - Animated phone rotation icon
- * - Dismissible
+ * - Dismissible (persists via localStorage)
  * - Theme-aware (dark mode support)
  * - Accessible with ARIA labels
  *
  * PAYTAX-58: recharts 3.4.1 optimization - landscape viewing
+ * Updated: Added to ResultsTable for better mobile UX on payslip data
  */
 
 'use client';
@@ -37,7 +39,7 @@ interface LandscapePromptProps {
  * Landscape Prompt Component
  *
  * Shows a friendly animated prompt on mobile portrait mode suggesting
- * users rotate their device for better chart viewing experience.
+ * users rotate their device for better viewing of results tables and charts.
  *
  * @example
  * ```tsx
@@ -108,7 +110,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
         className
       )}
       aria-live='polite'
-      aria-label='Rotate device for better chart viewing'
+      aria-label='Rotate device for better viewing of results'
     >
       <div
         className={cn(
@@ -135,7 +137,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
             Rotate for Better View
           </p>
           <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS, SPACING.MT_1)}>
-            Turn your device sideways to see charts in full detail
+            Turn your device sideways for easier viewing
           </p>
         </div>
 
