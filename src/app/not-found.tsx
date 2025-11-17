@@ -70,12 +70,19 @@ export default function NotFound() {
               <h1
                 className={cn(
                   'bg-gradient-to-r from-primary via-purple-400 to-cyan-400 bg-clip-text font-black text-transparent',
-                  'text-7xl md:text-9xl'
+                  TYPOGRAPHY.TEXT_7XL,
+                  `md:${TYPOGRAPHY.TEXT_9XL}`
                 )}
               >
                 404
               </h1>
-              <div className='-z-10 absolute inset-0 animate-pulse font-black text-7xl text-primary/10 md:text-9xl'>
+              <div
+                className={cn(
+                  '-z-10 absolute inset-0 animate-pulse font-black text-primary/10',
+                  TYPOGRAPHY.TEXT_7XL,
+                  `md:${TYPOGRAPHY.TEXT_9XL}`
+                )}
+              >
                 404
               </div>
             </div>

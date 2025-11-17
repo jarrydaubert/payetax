@@ -34,9 +34,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
       }
     });
 
-    it('should have 31 typography tokens (sizes + weights + leading + tracking)', () => {
+    it('should have 33 typography tokens (sizes + weights + leading + tracking)', () => {
       const tokenCount = Object.keys(TYPOGRAPHY).length;
-      expect(tokenCount).toBe(31);
+      expect(tokenCount).toBe(33);
     });
 
     it('should have unique token values', () => {

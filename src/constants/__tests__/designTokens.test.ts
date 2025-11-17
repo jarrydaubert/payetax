@@ -27,8 +27,8 @@ describe('Design Tokens Constants', () => {
       }
     });
 
-    it('should have 31 typography tokens total (sizes + weights + leading + tracking)', () => {
-      expect(Object.keys(TYPOGRAPHY).length).toBe(31);
+    it('should have 33 typography tokens total (sizes + weights + leading + tracking)', () => {
+      expect(Object.keys(TYPOGRAPHY).length).toBe(33);
     });
   });
 

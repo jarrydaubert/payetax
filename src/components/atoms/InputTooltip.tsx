@@ -18,7 +18,7 @@ import type * as React from 'react';
 import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getTooltipContent, type TooltipContent as TooltipData } from '@/config/inputTooltips';
-import { COMPONENT_GUIDELINES } from '@/constants/designTokens';
+import { COMPONENT_GUIDELINES, SURFACES } from '@/constants/designTokens';
 import { formatTooltipText } from '@/lib/tooltipUtils';
 import { cn } from '@/lib/utils';
 
@@ -77,7 +77,7 @@ export const InputTooltip = memo(function InputTooltip({
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='flex-shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
+              className={cn('flex-shrink-0 text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1', SURFACES.SHAPE_CIRCLE)}
               aria-label={`Help for ${tooltipContent.title}`}
               data-testid={`tooltip-trigger-${fieldName}`}
             >

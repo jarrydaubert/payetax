@@ -1,5 +1,7 @@
 // src/app/blog/category/[slug]/loading.tsx
 
+import { SURFACES } from '@/constants/designTokens';
+
 export default function Loading() {
   return (
     <div className='container mx-auto px-4 py-12'>
@@ -18,7 +20,7 @@ export default function Loading() {
         <div className='mx-auto mb-6 h-6 w-1/2 animate-pulse rounded bg-muted' />
         <div className='flex justify-center gap-2'>
           {Array.from({ length: 4 }, (_, i) => `header-badge-${i}`).map((key) => (
-            <div key={key} className='h-8 w-24 animate-pulse rounded-full bg-muted' />
+            <div key={key} className={`h-8 w-24 animate-pulse bg-muted ${SURFACES.SHAPE_CIRCLE}`} />
           ))}
         </div>
       </div>
@@ -30,7 +32,7 @@ export default function Loading() {
         </div>
         <div className='flex flex-wrap justify-center gap-3'>
           {Array.from({ length: 6 }, (_, i) => `category-filter-${i}`).map((key) => (
-            <div key={key} className='h-10 w-32 animate-pulse rounded-full bg-muted' />
+            <div key={key} className={`h-10 w-32 animate-pulse bg-muted ${SURFACES.SHAPE_CIRCLE}`} />
           ))}
         </div>
       </div>

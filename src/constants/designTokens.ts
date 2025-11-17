@@ -6,12 +6,13 @@
  *
  * ## Audit Results (2025-11-17) - COMPREHENSIVE EXPANSION
  * - **Files scanned**: 196
- * - **Violations**: 583 (down from 756 - 23% reduction!)
+ * - **Violations**: 586 (down from 756 - 22.5% reduction!)
  * - **Token coverage**: ~95% (industry-leading)
- * - **Typography tokens**: 31 (expanded from 16 - +94%!)
+ * - **Typography tokens**: 33 (expanded from 16 - +106%!)
  * - **Total design tokens**: 150+ comprehensive utilities
  *
  * ### What Was Added (2025 Expansion)
+ * ✅ Font sizes: TEXT_9XL, TEXT_7XL (for 404/error pages)
  * ✅ Font weights: FONT_NORMAL, FONT_MEDIUM, FONT_BLACK
  * ✅ Line height: LEADING_TIGHT, LEADING_SNUG, LEADING_NORMAL, LEADING_RELAXED, LEADING_LOOSE, LEADING_NONE
  * ✅ Letter spacing: TRACKING_TIGHTER, TRACKING_TIGHT, TRACKING_NORMAL, TRACKING_WIDE, TRACKING_WIDER, TRACKING_WIDEST
@@ -36,6 +37,10 @@
  * EXTENDED IN 2025 for font weight variants and semantic combinations
  */
 export const TYPOGRAPHY = {
+  /** Massive 404 error text (8rem / 128px) */
+  TEXT_9XL: 'text-9xl',
+  /** Ultra-large decorative text (4.5rem / 72px) */
+  TEXT_7XL: 'text-7xl',
   /** Hero headlines, very large text (3.75rem / 60px) */
   TEXT_6XL: 'text-6xl',
   /** Extra large headlines (3rem / 48px) */
