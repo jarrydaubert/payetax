@@ -48,6 +48,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       data-view-transition='enabled'
     >
       <head>
+        {/* PWA Manifest */}
+        <link rel='manifest' href='/manifest.json' />
+
+        {/* Apple Touch Icons for iOS Home Screen */}
+        <link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png' />
+        <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
+
+        {/* Font Preload for Performance - Reduce FOUT */}
+        <link
+          rel='preload'
+          href='/fonts/inter-var.woff2'
+          as='font'
+          type='font/woff2'
+          crossOrigin='anonymous'
+        />
+
         {/* DNS Prefetch and Preconnect for Performance */}
         <link rel='dns-prefetch' href='https://vercel.live' />
         <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
@@ -150,7 +167,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={cn(inter.variable, 'font-sans antialiased', 'min-h-screen text-foreground')}>
+      <body
+        className={cn(
+          inter.variable,
+          'font-sans antialiased',
+          'min-h-screen bg-background text-foreground'
+        )}
+      >
         {/* Ahrefs Web Analytics - Privacy-first analytics without cookies */}
         <Script
           src='https://analytics.ahrefs.com/analytics.js'
@@ -165,7 +188,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ErrorBoundary>
             <Layout>{children}</Layout>
           </ErrorBoundary>
-          <Toaster position='top-right' richColors expand={true} closeButton />
+          <ErrorBoundary>
+            <Toaster position='top-right' richColors expand={true} closeButton />
+          </ErrorBoundary>
           {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
           <VercelAnalytics />
           <SpeedInsights />
