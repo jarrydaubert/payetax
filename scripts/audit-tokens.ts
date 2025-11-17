@@ -63,6 +63,22 @@ const tailwindPatterns = [
   /\b(?:rounded|shadow|border)-(?:none|sm|md|lg|xl|2xl|3xl|full)?\b/g,
   // Layout
   /\b(?:max-w|min-h)-(?:xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|full|screen|min|max|fit)\b/g,
+  // Arbitrary values (e.g., text-[clamp(...)])
+  /\b(?:text|bg|p|m|gap|w|h|min-|max-)-\[.*?\]/g,
+];
+
+// Responsive prefixes to strip when checking tokens
+const responsivePrefixes = [
+  'sm:',
+  'md:',
+  'lg:',
+  'xl:',
+  '2xl:',
+  'hover:',
+  'focus:',
+  'active:',
+  'group-hover:',
+  'dark:',
 ];
 
 // Files/directories to exclude from audit
@@ -221,12 +237,19 @@ function formatViolations(violations: Violation[]): string {
 
 // Main audit function
 async function audit() {
-  console.log('🔍 Auditing codebase for design token violations...\n');
+  const args = process.argv.slice(2);
+  const jsonOutput = args.includes('--json');
+
+  if (!jsonOutput) {
+    console.log('🔍 Auditing codebase for design token violations...\n');
+  }
 
   const srcDir = path.join(__dirname, '../src');
   const files = walkDirectory(srcDir);
 
-  console.log(`📊 Scanning ${files.length} files...\n`);
+  if (!jsonOutput) {
+    console.log(`📊 Scanning ${files.length} files...\n`);
+  }
 
   const allViolations: Violation[] = [];
 
@@ -239,6 +262,29 @@ async function audit() {
   const hardcodedCount = allViolations.filter((v) => v.type === 'hardcoded-class').length;
   const inlineStyleCount = allViolations.filter((v) => v.type === 'inline-style').length;
 
+  // JSON output for CI/CD
+  if (jsonOutput) {
+    const output = {
+      summary: {
+        filesScanned: files.length,
+        hardcodedClasses: hardcodedCount,
+        inlineStyles: inlineStyleCount,
+        totalViolations: allViolations.length,
+        clean: allViolations.length === 0,
+      },
+      violations: allViolations.map((v) => ({
+        file: path.relative(process.cwd(), v.file),
+        line: v.line,
+        type: v.type,
+        match: v.match,
+        suggestion: v.suggestion,
+      })),
+    };
+    console.log(JSON.stringify(output, null, 2));
+    process.exit(allViolations.length === 0 ? 0 : 1);
+  }
+
+  // Human-readable output
   console.log('═══════════════════════════════════════════════════════════');
   console.log('                    AUDIT SUMMARY                          ');
   console.log('═══════════════════════════════════════════════════════════');
