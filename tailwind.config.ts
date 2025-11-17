@@ -28,26 +28,34 @@ const config: Config = {
           'linear-gradient(to bottom right, hsl(var(--color-primary) / 0.1), hsl(var(--color-accent) / 0.05), transparent)',
 
         // Action gradients (10 uses - purple/cyan buttons and CTAs)
-        'action-primary': 'linear-gradient(to right, #9333ea, #06b6d4)',
-        'action-primary-hover': 'linear-gradient(to right, #7e22ce, #0891b2)',
+        // NOTE: Not used in v4 - kept for reference. Use bg-gradient-to-r from-purple-600 to-cyan-500 instead
+        'action-primary':
+          'linear-gradient(to right, var(--color-purple-600), var(--color-cyan-500))',
+        'action-primary-hover':
+          'linear-gradient(to right, var(--color-purple-700), var(--color-cyan-600))',
 
         // Special purpose gradients (21 uses total)
-        'marriage-alert': 'linear-gradient(to right, #db2777, #9333ea)',
+        'marriage-alert':
+          'linear-gradient(to right, var(--color-pink-600), var(--color-purple-600))',
         'marriage-alert-bg':
           'linear-gradient(to right, rgb(251 207 232 / 0.5), rgb(243 232 255 / 0.5))',
         'marriage-alert-dark':
           'linear-gradient(to right, rgb(157 23 77 / 0.2), rgb(107 33 168 / 0.2))',
-        'tax-trap-alert': 'linear-gradient(to right, #d97706, #ea580c)',
-        'tax-trap-alert-hover': 'linear-gradient(to right, #b45309, #c2410c)',
-        'success-bar': 'linear-gradient(to right, #10b981, #059669)',
+        'tax-trap-alert':
+          'linear-gradient(to right, var(--color-amber-600), var(--color-orange-600))',
+        'tax-trap-alert-hover':
+          'linear-gradient(to right, var(--color-amber-700), var(--color-orange-700))',
+        'success-bar': 'linear-gradient(to right, var(--color-green-500), var(--color-green-600))',
 
         // What-If comparison (4 uses)
         'whatif-border':
           'linear-gradient(to bottom right, rgb(168 85 247 / 0.05), rgb(236 72 153 / 0.05))',
         'whatif-border-dark':
           'linear-gradient(to bottom right, rgb(192 132 252 / 0.1), rgb(244 114 182 / 0.1))',
-        'whatif-button': 'linear-gradient(to right, #a855f7, #ec4899)',
-        'whatif-button-hover': 'linear-gradient(to right, #9333ea, #db2777)',
+        'whatif-button':
+          'linear-gradient(to right, var(--color-purple-400), var(--color-pink-500))',
+        'whatif-button-hover':
+          'linear-gradient(to right, var(--color-purple-600), var(--color-pink-600))',
 
         // Separators (2 uses - subtle divider lines)
         'separator-horizontal':
@@ -150,9 +158,14 @@ const config: Config = {
         ],
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
+        none: '0',
         sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 2px)',
+        lg: 'var(--radius)',
+        xl: 'var(--radius-xl, 0.75rem)', // For larger components like modals
+        '2xl': 'var(--radius-2xl, 1rem)', // For hero sections and large cards
+        '3xl': 'var(--radius-3xl, 1.5rem)', // For feature cards
+        full: '9999px', // For pills and circular avatars
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
@@ -208,13 +221,18 @@ const config: Config = {
         },
       },
       spacing: {
-        18: '4.5rem',
-        88: '22rem',
-        128: '32rem',
+        0.5: '0.125rem', // 2px - micro-adjustments for pixel-perfect layouts
+        18: '4.5rem', // 72px
+        88: '22rem', // 352px
+        128: '32rem', // 512px
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Typography plugin for prose styling in MDX blog posts
+    // Provides beautiful default styles for headings, paragraphs, lists, code blocks, etc.
+    require('@tailwindcss/typography'),
+  ],
 };
 
 export default config;
