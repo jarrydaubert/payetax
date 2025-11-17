@@ -4,6 +4,10 @@
 import { motion } from 'framer-motion';
 import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
+
+// Create motion component once at module level (Framer Motion best practice)
+const MotionTableRow = motion.create(TableRow);
+
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
@@ -44,11 +48,11 @@ export function ResultTableRow({
   const shouldReduceMotion = useMotionPreference();
   const hasWhatIf = whatIfAnnual !== undefined;
 
-  // Layout animation: smooth transitions when periods change or what-if toggles
-  const MotionTableRow = shouldReduceMotion ? TableRow : motion(TableRow);
+  // Use static TableRow if motion is reduced, otherwise use animated version
+  const RowComponent = shouldReduceMotion ? TableRow : MotionTableRow;
 
   return (
-    <MotionTableRow
+    <RowComponent
       className={`border-b transition-colors hover:bg-muted/50 ${
         isHighlight ? 'border-t border-t-border bg-primary/5' : ''
       }`}
@@ -121,6 +125,6 @@ export function ResultTableRow({
           </TableCell>
         );
       })}
-    </MotionTableRow>
+    </RowComponent>
   );
 }
