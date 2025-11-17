@@ -237,9 +237,12 @@ export const LAYOUT = {
 /**
  * Border and surface utilities
  * ADDED IN PAYTAX-109 for consistent card/surface styling
+ * UPDATED 2025-11-17: Standardized all borders to use border-primary/20 for consistent darker borders
  */
 export const SURFACES = {
-  /** Standard card border with subtle primary tint */
+  /** Standard border for all surfaces - darker, consistent with calculator section */
+  BORDER_STANDARD: 'border border-primary/20',
+  /** Standard card border with subtle primary tint (DEPRECATED: use BORDER_STANDARD) */
   BORDER_PRIMARY: 'border-primary/20',
   /** Border with top separator */
   BORDER_TOP_DIVIDER: 'border-t border-primary/10',
