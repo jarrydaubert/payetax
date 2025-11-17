@@ -19,6 +19,7 @@
  * Typography scales for text elements
  * Complete hierarchy from 12px to 60px covering all component needs
  * EXTENDED IN PAYTAX-64 for organism components (hero headlines, major headings)
+ * EXTENDED IN 2025 for font weight variants and semantic combinations
  */
 export const TYPOGRAPHY = {
   /** Hero headlines, very large text (3.75rem / 60px) */
@@ -41,6 +42,20 @@ export const TYPOGRAPHY = {
   TEXT_SM: 'text-sm',
   /** Extra small text for descriptions, helper text, tooltips (0.75rem / 12px) */
   TEXT_XS: 'text-xs',
+
+  // Font weight variants for semantic emphasis
+  /** Base text with semibold weight - for emphasized body text */
+  TEXT_BASE_SEMIBOLD: 'text-base font-semibold',
+  /** Base text with bold weight - for strong emphasis */
+  TEXT_BASE_BOLD: 'text-base font-bold',
+  /** Small text with semibold weight - for labels and form controls */
+  TEXT_SM_SEMIBOLD: 'text-sm font-semibold',
+  /** Small text with medium weight - for subtle emphasis */
+  TEXT_SM_MEDIUM: 'text-sm font-medium',
+  /** Large text with semibold weight - for section headings */
+  TEXT_LG_SEMIBOLD: 'text-lg font-semibold',
+  /** Extra large text with bold weight - for major headings */
+  TEXT_XL_BOLD: 'text-xl font-bold',
 } as const;
 
 /**
@@ -113,6 +128,16 @@ export const SPACING = {
   PX_3: 'px-3',
   /** Responsive horizontal padding - mobile to desktop (1rem → 1.5rem → 2rem) */
   PX_RESPONSIVE: 'px-4 sm:px-6 lg:px-8',
+
+  // Negative margins for advanced layouts (2025 additions)
+  /** Negative margin for overlapping elements (-1rem / -16px) */
+  M_4_NEG: '-m-4',
+  /** Negative margin for subtle overlaps (-0.5rem / -8px) */
+  M_2_NEG: '-m-2',
+  /** Negative top margin for overlapping sections (-2rem / -32px) */
+  MT_8_NEG: '-mt-8',
+  /** Negative top margin for card overlaps (-1rem / -16px) */
+  MT_4_NEG: '-mt-4',
 
   /** Section vertical padding responsive (3rem on mobile, 5rem on desktop) */
   PY_SECTION: 'py-12 md:py-20',
@@ -256,11 +281,16 @@ export const SURFACES = {
   CARD_STANDARD: 'border-primary/20 p-6',
   /** Large card with more padding */
   CARD_LARGE: 'border-primary/20 p-8',
+  /** Card with rounded corners and standard padding */
+  CARD_ROUNDED: 'border border-primary/20 p-6 rounded-lg',
+  /** Card with glassmorphism effect */
+  CARD_GLASS: 'bg-card/80 backdrop-blur-sm border border-border/50 p-6 rounded-lg',
 } as const;
 
 /**
  * Semantic color utilities for success/warning/info states
  * ADDED IN PAYTAX-58 (Nov 2025) to standardize colored text patterns
+ * EXTENDED IN 2025 with alpha/opacity variants for overlays and backgrounds
  * Ensures consistent colors in both light and dark modes
  */
 export const COLORS = {
@@ -278,6 +308,16 @@ export const COLORS = {
   ACCENT_PINK: 'text-pink-600 dark:text-pink-400',
   /** Special purpose - purple for categories/features */
   ACCENT_PURPLE: 'text-purple-600 dark:text-purple-400',
+
+  // Alpha/opacity variants for backgrounds and overlays (2025 additions)
+  /** Success background with subtle opacity */
+  SUCCESS_BG: 'bg-green-500/10 dark:bg-green-500/20',
+  /** Warning background with subtle opacity */
+  WARNING_BG: 'bg-amber-500/10 dark:bg-amber-500/20',
+  /** Error background with subtle opacity */
+  DESTRUCTIVE_BG: 'bg-red-500/10 dark:bg-red-500/20',
+  /** Info background with subtle opacity */
+  INFO_BG: 'bg-blue-500/10 dark:bg-blue-500/20',
 } as const;
 
 /**
@@ -383,3 +423,41 @@ export type ColorToken = keyof typeof COLORS;
  * Type-safe shadow token keys
  */
 export type ShadowToken = keyof typeof SHADOWS;
+
+/**
+ * Union type for all design tokens
+ * Enables type-safe usage across all token categories
+ */
+export type DesignToken =
+  | TypographyToken
+  | SpacingToken
+  | IconSizeToken
+  | LayoutToken
+  | ColorToken
+  | ShadowToken;
+
+/**
+ * CSS Custom Properties for dynamic theming
+ * Export key CSS vars for JavaScript integration
+ */
+export const CSS_VARS = {
+  // Brand colors
+  PRIMARY: 'var(--color-primary)',
+  PRIMARY_FOREGROUND: 'var(--color-primary-foreground)',
+  SECONDARY: 'var(--color-secondary)',
+  ACCENT: 'var(--color-accent)',
+  DESTRUCTIVE: 'var(--color-destructive)',
+
+  // Backgrounds and surfaces
+  BACKGROUND: 'var(--color-background)',
+  FOREGROUND: 'var(--color-foreground)',
+  CARD: 'var(--color-card)',
+  BORDER: 'var(--color-border)',
+
+  // Spacing and layout
+  RADIUS: 'var(--radius)',
+
+  // Brand gradients
+  BRAND_GRADIENT_START: 'var(--color-brand-gradient-start)',
+  BRAND_GRADIENT_END: 'var(--color-brand-gradient-end)',
+} as const;

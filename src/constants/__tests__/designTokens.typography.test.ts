@@ -34,9 +34,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
       }
     });
 
-    it('should have exactly 10 typography tokens', () => {
+    it('should have 16 typography tokens (10 sizes + 6 weight variants)', () => {
       const tokenCount = Object.keys(TYPOGRAPHY).length;
-      expect(tokenCount).toBe(10);
+      expect(tokenCount).toBe(16);
     });
 
     it('should have unique token values', () => {
@@ -188,11 +188,14 @@ describe('TYPOGRAPHY Design Tokens', () => {
     });
 
     it('should maintain consistent token structure', () => {
-      // All tokens should be string values matching pattern
+      // All tokens should be string values matching pattern (size only or size + weight)
       for (const [key, value] of Object.entries(TYPOGRAPHY)) {
         expect(typeof key).toBe('string');
         expect(typeof value).toBe('string');
-        expect(value).toMatch(/^text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl)$/);
+        // Allow both simple sizes and size+weight combinations
+        expect(value).toMatch(
+          /^text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl)(\s+font-(medium|semibold|bold))?$/
+        );
       }
     });
   });

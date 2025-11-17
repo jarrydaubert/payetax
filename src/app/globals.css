@@ -6,9 +6,10 @@
 @import "tw-animate-css";
 
 :root {
-  /* Typography */
+  /* Typography - Variable fonts with fluid base size */
   --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* Fluid base for app-wide consistency */
   --radius: 0.625rem;
 
   /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
@@ -133,6 +134,8 @@
   html {
     overflow-x: hidden;
     max-width: 100vw;
+    /* Smooth color-scheme transition for dark mode toggle (2025 enhancement) */
+    transition: color-scheme 0.2s ease;
     /* Safe area support for notched devices (iPhone X+, iPad Pro) */
     padding-top: env(safe-area-inset-top);
     padding-right: env(safe-area-inset-right);
@@ -144,6 +147,7 @@
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
+    font-size: var(--font-size-base); /* Fluid base typography */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -179,11 +183,19 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    transition: filter 0.2s ease;
+  }
+
+  /* Hover enhancement for text gradients (2025 addition) */
+  .text-gradient-brand:hover,
+  .text-gradient-brand-emphasis:hover {
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.15));
   }
 
   /**
    * Glass morphism effects
    * Used for cards and overlays with backdrop blur
+   * Enhanced with OKLCH alpha support for better color consistency (2025)
    */
   .glass {
     @apply backdrop-blur-sm bg-card/80 border border-border/50;
@@ -195,6 +207,16 @@
 
   .glass-card-inner {
     @apply backdrop-blur-sm bg-card/50;
+  }
+
+  /* Glass overlay with OKLCH alpha for overlays */
+  .glass-overlay {
+    background: oklch(0.18 0.02 260 / 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .dark .glass-overlay {
+    background: oklch(0.18 0.02 260 / 0.85);
   }
 
   /* Safe area utilities for fixed/sticky elements */
@@ -286,6 +308,14 @@
 ::view-transition-new(root) {
   animation-duration: 0.3s;
   animation-timing-function: ease-in-out;
+}
+
+/* Fallback for browsers without View Transitions support (2025 addition) */
+@supports not (view-transition-name: root) {
+  /* Simple fade fallback for page transitions */
+  body {
+    animation: fadeIn 0.3s ease-in-out;
+  }
 }
 
 /* Accessibility */

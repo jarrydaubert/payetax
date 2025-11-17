@@ -27,8 +27,8 @@ describe('Design Tokens Constants', () => {
       }
     });
 
-    it('should have 10 typography levels total', () => {
-      expect(Object.keys(TYPOGRAPHY).length).toBe(10);
+    it('should have 16 typography tokens total (10 sizes + 6 weight variants)', () => {
+      expect(Object.keys(TYPOGRAPHY).length).toBe(16);
     });
   });
 
