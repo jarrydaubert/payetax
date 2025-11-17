@@ -4,7 +4,7 @@
 import { Tag } from 'lucide-react';
 import { useId } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { COLORS, ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { COLORS, ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { BlogCategory } from '@/types/blog';
 
@@ -64,7 +64,7 @@ export function CategoryFilter({
               SPACING.GAP_2,
               TYPOGRAPHY.TEXT_SM,
               isActive()
-                ? `scale-110 bg-action-primary text-white hover:opacity-95 ${SHADOWS.GLOW_ACCENT} hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]`
+                ? `scale-110 bg-action-primary text-white shadow-[0_0_25px_rgba(168,85,247,0.6)] hover:opacity-95 hover:shadow-[0_0_35px_rgba(168,85,247,0.8)]`
                 : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-primary/50 hover:bg-card/70 hover:text-foreground'
             )}
           >
@@ -97,7 +97,7 @@ export function CategoryFilter({
                   SPACING.GAP_2,
                   TYPOGRAPHY.TEXT_SM,
                   isActive(category.slug)
-                    ? `scale-110 bg-action-primary text-white hover:opacity-95 ${SHADOWS.GLOW_ACCENT} hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]`
+                    ? `scale-110 bg-action-primary text-white shadow-[0_0_25px_rgba(168,85,247,0.6)] hover:opacity-95 hover:shadow-[0_0_35px_rgba(168,85,247,0.8)]`
                     : 'border border-border bg-card/50 text-foreground/70 backdrop-blur-xl hover:scale-105 hover:border-primary/50 hover:bg-card/70 hover:text-foreground'
                 )}
               >
