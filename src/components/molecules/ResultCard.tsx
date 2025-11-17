@@ -75,7 +75,7 @@ export function ResultCard({
   const shouldReduceMotion = useMotionPreference();
 
   const cardContent = (
-    <Card className={cn('border-primary/20', SPACING.P_4, tooltip && 'cursor-help', styles.card)}>
+    <Card className={cn(SPACING.P_4, tooltip && 'cursor-help', styles.card)}>
       <div className={SPACING.SPACE_Y_2}>
         <div className='flex items-center justify-between'>
           <p className={cn('font-medium text-foreground/80', TYPOGRAPHY.TEXT_SM)}>{label}</p>

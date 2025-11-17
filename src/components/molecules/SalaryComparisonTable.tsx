@@ -60,7 +60,7 @@ export function SalaryComparisonTable() {
           <ScrollIndicator direction='left' visible={showLeftIndicator} />
           <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-          <Card className='overflow-hidden border-primary/20'>
+          <Card className='overflow-hidden'>
             <div
               ref={comparisonTableRef}
               className='overflow-x-auto scroll-smooth'

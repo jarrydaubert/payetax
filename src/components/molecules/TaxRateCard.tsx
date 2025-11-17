@@ -44,7 +44,7 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
 
   return (
     <motion.div {...gestureProps}>
-      <Card className={cn('group overflow-hidden border-primary/20', SPACING.P_6)}>
+      <Card className={cn('group overflow-hidden', SPACING.P_6)}>
         <div className={cn('mb-4 flex items-center', SPACING.GAP_3)}>
           <div className='flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
             <Icon className={cn(ICON_SIZES.SIZE_5, 'text-white')} />
