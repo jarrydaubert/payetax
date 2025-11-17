@@ -67,20 +67,6 @@ const tailwindPatterns = [
   /\b(?:text|bg|p|m|gap|w|h|min-|max-)-\[.*?\]/g,
 ];
 
-// Responsive prefixes to strip when checking tokens
-const responsivePrefixes = [
-  'sm:',
-  'md:',
-  'lg:',
-  'xl:',
-  '2xl:',
-  'hover:',
-  'focus:',
-  'active:',
-  'group-hover:',
-  'dark:',
-];
-
 // Files/directories to exclude from audit
 const excludePatterns = [
   'node_modules',
@@ -215,7 +201,10 @@ function formatViolations(violations: Violation[]): string {
     if (!grouped.has(violation.file)) {
       grouped.set(violation.file, []);
     }
-    grouped.get(violation.file)!.push(violation);
+    const fileViolations = grouped.get(violation.file);
+    if (fileViolations) {
+      fileViolations.push(violation);
+    }
   }
 
   let output = '';

@@ -34,9 +34,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
       }
     });
 
-    it('should have 16 typography tokens (10 sizes + 6 weight variants)', () => {
+    it('should have 31 typography tokens (sizes + weights + leading + tracking)', () => {
       const tokenCount = Object.keys(TYPOGRAPHY).length;
-      expect(tokenCount).toBe(16);
+      expect(tokenCount).toBe(31);
     });
 
     it('should have unique token values', () => {
@@ -89,9 +89,9 @@ describe('TYPOGRAPHY Design Tokens', () => {
   });
 
   describe('Token Naming Convention', () => {
-    it('should follow TEXT_* naming pattern', () => {
+    it('should follow TEXT_* | FONT_* | LEADING_* | TRACKING_* naming pattern', () => {
       for (const key of Object.keys(TYPOGRAPHY)) {
-        expect(key).toMatch(/^TEXT_/);
+        expect(key).toMatch(/^(TEXT_|FONT_|LEADING_|TRACKING_)/);
       }
     });
 
@@ -188,13 +188,13 @@ describe('TYPOGRAPHY Design Tokens', () => {
     });
 
     it('should maintain consistent token structure', () => {
-      // All tokens should be string values matching pattern (size only or size + weight)
+      // All tokens should be string values matching typography patterns
       for (const [key, value] of Object.entries(TYPOGRAPHY)) {
         expect(typeof key).toBe('string');
         expect(typeof value).toBe('string');
-        // Allow both simple sizes and size+weight combinations
+        // Allow text sizes, font weights, leading, and tracking utilities
         expect(value).toMatch(
-          /^text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl)(\s+font-(medium|semibold|bold))?$/
+          /^(text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|9xl|\[\d+px\])(\s+font-(medium|semibold|bold))?|font-(normal|medium|semibold|bold|black)|leading-(none|tight|snug|normal|relaxed|loose)|tracking-(tighter|tight|normal|wide|wider|widest))$/
         );
       }
     });
