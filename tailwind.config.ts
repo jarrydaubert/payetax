@@ -27,8 +27,7 @@ const config: Config = {
         'accent-hero':
           'linear-gradient(to bottom right, hsl(var(--color-primary) / 0.1), hsl(var(--color-accent) / 0.05), transparent)',
 
-        // Action gradients (10 uses - purple/cyan buttons and CTAs)
-        // NOTE: Not used in v4 - kept for reference. Use bg-gradient-to-r from-purple-600 to-cyan-500 instead
+        // Action gradients (used in CategoryFilter glow effect)
         'action-primary':
           'linear-gradient(to right, var(--color-purple-600), var(--color-cyan-500))',
         'action-primary-hover':
