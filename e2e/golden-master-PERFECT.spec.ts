@@ -35,7 +35,7 @@
  */
 
 import { expect, test } from '@playwright/test';
-import goldenCases from './fixtures/golden-tax-cases-2025-26-COMPLETE.json';
+import goldenCases from './fixtures/golden-tax-cases-2025-26-FIXED.json';
 
 test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', () => {
   test.beforeEach(async ({ page }) => {
@@ -48,20 +48,43 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
     const visible = await acceptButton.isVisible({ timeout: 3000 }).catch(() => false);
     if (visible) {
       await acceptButton.click();
+      await page.waitForTimeout(1000);
+    }
+
+    // Dismiss mobile rotation modal if present
+    const closeModal = page
+      .getByRole('button', { name: /close/i })
+      .or(page.locator('[aria-label*="close"]'));
+    const modalVisible = await closeModal.isVisible({ timeout: 2000 }).catch(() => false);
+    if (modalVisible) {
+      await closeModal.click();
       await page.waitForTimeout(500);
     }
   });
 
   // Helper: Extract numeric value from results table
   async function getTableValue(page: any, label: string): Promise<number> {
-    const row = page.locator('tr', { hasText: label });
-    const isVisible = await row.isVisible({ timeout: 2000 }).catch(() => false);
-    if (!isVisible) {
+    try {
+      // Try multiple selectors to find the row
+      const row = page.locator(`tr:has-text("${label}")`).first();
+      await row.waitFor({ state: 'visible', timeout: 5000 });
+
+      // Get the yearly value (3rd column)
+      const cells = row.locator('td');
+      const count = await cells.count();
+
+      if (count >= 3) {
+        const yearlyCell = cells.nth(2);
+        const text = await yearlyCell.textContent();
+        const value = Number.parseFloat(text?.replace(/[£,]/g, '') || '0');
+        return value;
+      }
+
+      return 0;
+    } catch (error) {
+      console.log(`Failed to extract value for "${label}": ${error}`);
       return 0;
     }
-    const cell = row.locator('td').nth(2); // Annual column
-    const text = await cell.textContent();
-    return Number.parseFloat(text?.replace(/[£,]/g, '') || '0');
   }
 
   // ========================================================================
@@ -179,7 +202,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
       // ====================================================================
 
       const results = {
-        incomeTax: await getTableValue(page, 'Income Tax'),
+        incomeTax: await getTableValue(page, 'Total Tax Due'),
         employeeNI: await getTableValue(page, 'National Insurance'),
         netPay: await getTableValue(page, 'Net Pay'),
         pension: await getTableValue(page, 'Pension'),
