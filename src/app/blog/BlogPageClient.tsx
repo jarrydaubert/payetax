@@ -198,7 +198,7 @@ export function BlogPageClient({
               <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
             </div>
 
-            <Link href={`/blog/${featuredPost.slug}`} className='group block'>
+            <div className='group'>
               <div className='relative overflow-hidden rounded-3xl border border-primary/40 bg-gradient-to-br from-white/10 light:from-primary/5 light:to-accent/5 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/50 hover:shadow-2xl md:p-12 md:hover:scale-[1.02]'>
                 <div className='absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/10 group-hover:to-accent/10 group-hover:opacity-100' />
 
@@ -267,7 +267,7 @@ export function BlogPageClient({
                   )}
                 </div>
               </div>
-            </Link>
+            </div>
           </div>
         )}
 
