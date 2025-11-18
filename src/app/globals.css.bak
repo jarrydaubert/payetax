@@ -1,0 +1,449 @@
+/**
+ * PayeTax - Minimalist Design System
+ * Tailwind v4 + Shadcn + Framer Motion + Fluid Typography
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  /* Typography - Variable fonts with fluid base size */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* Fluid base for app-wide consistency */
+  --radius: 0.625rem;
+
+  /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
+  /* Use these CSS vars only in blog content for optimal readability */
+  --blog-font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem);
+  --blog-font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --blog-font-size-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --blog-font-size-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --blog-font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+  --blog-font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
+  --blog-font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
+
+  /* Brand Colors - Maintain identity across themes */
+  --brand-primary: oklch(0.55 0.22 264);        /* Indigo-blue */
+  --brand-accent: oklch(0.65 0.25 240);         /* Lighter blue */
+  --brand-gradient-start: oklch(0.50 0.20 264);
+  --brand-gradient-end: oklch(0.60 0.24 250);
+
+  /* Chart Colors - High contrast for both light and dark modes */
+  --chart-1: 210 100% 42%;    /* Blue - Employment income (darker) */
+  --chart-2: 280 70% 52%;     /* Purple - Other income / Pension (darker) */
+  --chart-3: 0 80% 48%;       /* Red - Income Tax (darker, more saturated) */
+  --chart-4: 38 95% 47%;      /* Amber - National Insurance (darker) */
+  --chart-5: 33 100% 47%;     /* Orange - Student Loan (darker) */
+  --chart-6: 142 75% 40%;     /* Green - Net Pay (darker) */
+  --chart-7: 200 85% 47%;     /* Cyan - Gross salary bars (darker) */
+  --chart-8: 320 65% 50%;     /* Pink - Additional data */
+
+  /* Shadcn Official Light Theme (OKLCH) */
+  --background: oklch(0.98 0 0);                /* Softer white */
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.45 0 0);          /* Darkened for WCAG AA (4.5:1+) */
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+/* Dark Mode Theme (Updated March 12, 2025) */
+.dark {
+  /* Brand colors stay consistent in dark mode */
+  --brand-primary: oklch(0.60 0.24 264);        /* Slightly lighter for contrast */
+  --brand-accent: oklch(0.70 0.26 240);
+  --brand-gradient-start: oklch(0.55 0.22 264);
+  --brand-gradient-end: oklch(0.65 0.25 250);
+
+  /* Chart Colors - Brighter for dark mode visibility */
+  --chart-1: 210 100% 68%;    /* Much brighter blue */
+  --chart-2: 280 70% 73%;     /* Much lighter purple */
+  --chart-3: 0 80% 68%;       /* Much brighter red */
+  --chart-4: 38 95% 68%;      /* Much brighter amber */
+  --chart-5: 33 100% 68%;     /* Much brighter orange */
+  --chart-6: 142 75% 62%;     /* Much brighter green */
+  --chart-7: 200 85% 68%;     /* Much brighter cyan - CRITICAL for gross bars */
+  --chart-8: 320 65% 70%;     /* Brighter pink */
+
+  --background: oklch(0.18 0.02 260);           /* Warm dark slate - easier on eyes */
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.22 0.02 260);                 /* Slightly elevated card */
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.24 0.02 260);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.86 0.12 240);              /* WCAG AA compliant - blue with ≥4.5:1 contrast */
+  --primary-foreground: oklch(0.15 0 0);
+  --secondary: oklch(0.26 0.02 260);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.26 0.02 260);
+  --muted-foreground: oklch(0.84 0 0);          /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
+  --accent: oklch(0.32 0.02 260);
+  --accent-foreground: oklch(0.93 0 0);         /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
+  --destructive: oklch(0.85 0.16 27);           /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.32 0.02 260);               /* Subtle but visible */
+  --input: oklch(0.24 0.02 260);
+  --ring: oklch(0.556 0 0);
+}
+
+/* Tailwind v4 Theme Directive */
+@theme inline {
+  /* Brand colors */
+  --color-brand: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-gradient-start: var(--brand-gradient-start);
+  --color-brand-gradient-end: var(--brand-gradient-end);
+
+  /* Semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius: var(--radius);
+}
+
+@layer base {
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
+    /* Smooth color-scheme transition for dark mode toggle (2025 enhancement) */
+    transition: color-scheme 0.2s ease;
+    /* Safe area support for notched devices (iPhone X+, iPad Pro) */
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base); /* Fluid base typography */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+  }
+
+  /* Text gradient utility using brand colors */
+  .text-gradient {
+    background: linear-gradient(to right, var(--brand-gradient-start), var(--brand-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Add shadow for better contrast */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+
+  /**
+   * Brand text gradient utilities - PAYTAX-96
+   * Common patterns for gradient text (used 12+ times across components)
+   */
+  .text-gradient-brand {
+    background: linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+
+  .text-gradient-brand-emphasis {
+    background: linear-gradient(135deg, var(--color-brand-gradient-start), var(--color-brand-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    transition: filter 0.2s ease;
+  }
+
+  /* Hover enhancement for text gradients (2025 addition) */
+  .text-gradient-brand:hover,
+  .text-gradient-brand-emphasis:hover {
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.15));
+  }
+
+  /**
+   * Glass morphism effects
+   * Used for cards and overlays with backdrop blur
+   * Enhanced with OKLCH alpha support for better color consistency (2025)
+   */
+  .glass {
+    @apply backdrop-blur-sm bg-card/80 border border-border/50;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-sm bg-card/95 border border-border/50 shadow-xl;
+  }
+
+  .glass-card-inner {
+    @apply backdrop-blur-sm bg-card/50;
+  }
+
+  /* Glass overlay with OKLCH alpha for overlays */
+  .glass-overlay {
+    background: oklch(0.18 0.02 260 / 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .dark .glass-overlay {
+    background: oklch(0.18 0.02 260 / 0.85);
+  }
+
+  /* Safe area utilities for fixed/sticky elements */
+  .safe-bottom {
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+
+  .safe-left {
+    left: calc(1rem + env(safe-area-inset-left));
+  }
+
+  .safe-right {
+    right: calc(1.5rem + env(safe-area-inset-right));
+  }
+}
+
+
+/* Skip Link - Completely hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 100;
+  /* Increased padding for WCAG 2.2 AA touch target size (44x44px min) */
+  padding: 12px 20px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skip-link:focus {
+  top: 8px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Screen Reader Only - Hidden visually but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus States */
+*:focus-visible {
+  outline: 2px solid oklch(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* View Transitions API - Smooth page navigation (Chrome 111+) */
+@view-transition {
+  navigation: auto; /* Enable for all navigations */
+}
+
+/* Customize view transition animations */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
+/* Fallback for browsers without View Transitions support (2025 addition) */
+@supports not (view-transition-name: root) {
+  /* Simple fade fallback for page transitions */
+  body {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable view transitions for reduced motion */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --background: 0 0 0;
+    --foreground: 1 0 0;
+  }
+}
+
+/* Reduced Data Mode - Save bandwidth on slow connections */
+@media (prefers-reduced-data: reduce) {
+  /* Lazy load images and reduce quality */
+  img {
+    content-visibility: auto;
+  }
+
+  /* Disable non-essential animations */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Reduce animation complexity for Framer Motion */
+  [data-framer-motion] {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Skip loading web fonts, use system fonts */
+  @font-face {
+    font-display: optional;
+  }
+}
+
+/* Container Queries - Component-level responsiveness (cutting-edge!) */
+/* More responsive than media queries for reusable components */
+.results-container {
+  container-type: inline-size;
+  container-name: results;
+}
+
+.summary-cards-container {
+  container-type: inline-size;
+  container-name: summary;
+}
+
+/* Results table adapts to its container width, not viewport */
+@container results (min-width: 600px) {
+  .results-table-responsive {
+    font-size: 0.9375rem; /* Slightly larger on wider containers */
+  }
+}
+
+@container results (min-width: 900px) {
+  .results-table-responsive {
+    font-size: 1rem; /* Full size on large containers */
+  }
+}
+
+/* Summary cards adapt to their container */
+@container summary (min-width: 500px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns in medium containers */
+  }
+}
+
+@container summary (min-width: 800px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns in large containers */
+  }
+}
+
+@container summary (min-width: 1100px) {
+  .summary-card-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns in xl containers */
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Ensure tables can scroll horizontally on mobile */
+  table {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+  }
+
+  /* Better touch scrolling for iOS */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: none; /* Allow free scrolling */
+  }
+
+  /* Enhance touch-pan-x for horizontal scrolling */
+  .touch-pan-x {
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
+  }
+}
+
+/* Tablet and laptop optimizations (768px - 1279px) */
+/* Using Tailwind breakpoints: md (768px) through xl-1 (1279px) */
+@media (min-width: 768px) and (max-width: 1279px) {
+  /* Add extra padding for calculator container on tablets and small laptops */
+  [data-testid="calculator-section"] {
+    padding-left: clamp(1rem, 2vw, 2rem);
+    padding-right: clamp(1rem, 2vw, 2rem);
+  }
+}
+

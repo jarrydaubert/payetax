@@ -92,7 +92,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className='pt-16 md:pt-20'>
-      <PageContainer maxWidth='4xl' includeNavbarSpacing={false}>
+      <PageContainer maxWidth='6xl' includeNavbarSpacing={false}>
         {/* Header */}
         <div className='mb-6 md:mb-8'>
           <Link
