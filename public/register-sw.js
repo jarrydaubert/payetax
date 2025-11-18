@@ -6,9 +6,11 @@
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return;
   }
-  const t = (_e, ..._o) => {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return; // No console logging in production
+  const isDev =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const log = (message, ...args) => {
+    if (isDev) {
+      console.log(`[PWA] ${message}`, ...args);
     }
   };
   let e,
@@ -16,7 +18,7 @@
   window.addEventListener('load', async () => {
     try {
       e = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-      t('[PWA] Service Worker registered successfully');
+      log('Service Worker registered successfully');
       e.addEventListener('updatefound', n);
       // Check for updates every 5 minutes when page is visible
       if (document.visibilityState === 'visible')
@@ -71,23 +73,23 @@
   }
   function s(e) {
     const { data: o } = e;
-    if (o?.type === 'VERSION_INFO') t('[PWA] Service Worker version:', o.version);
+    if (o?.type === 'VERSION_INFO') log('[PWA] Service Worker version:', o.version);
   }
   async function d() {
     if (!('Notification' in window)) return;
     try {
       const e = await Notification.requestPermission();
-      t('[PWA] Notification permission:', e);
+      log('[PWA] Notification permission:', e);
     } catch (e) {
-      t('[PWA] Notification permission request failed:', e);
+      log('[PWA] Notification permission request failed:', e);
     }
   }
   window.addEventListener('online', () => {
-    t('[PWA] Back online');
+    log('[PWA] Back online');
     r('online');
   });
   window.addEventListener('offline', () => {
-    t('[PWA] Gone offline');
+    log('[PWA] Gone offline');
     r('offline');
   });
   function r(e) {
@@ -101,11 +103,11 @@
   }
   // Allow browser/OS to show native install prompt
   window.addEventListener('beforeinstallprompt', () => {
-    t('[PWA] Install prompt triggered - browser will show native UI');
+    log('[PWA] Install prompt triggered - browser will show native UI');
     // Don't prevent default - let browser handle the install prompt
   });
   window.addEventListener('appinstalled', () => {
-    t('[PWA] App was installed');
+    log('[PWA] App was installed');
     if (typeof gtag !== 'undefined')
       gtag('event', 'pwa_install', { event_category: 'PWA', event_label: 'App Installed' });
   });

@@ -7,12 +7,14 @@ const API_CACHE_NAME = 'payetax-api-v2025.1.2.2';
 
 // Helper function to log only in development
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
-const devLog = (..._args) => {
+const devLog = (...args) => {
   if (isDev) {
+    console.log('[SW]', ...args);
   }
 };
 
 // Assets to cache immediately on install
+// Only truly critical static assets (not frequently changing pages)
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
@@ -20,12 +22,8 @@ const PRECACHE_ASSETS = [
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
-  // Core pages
-  '/blog',
-  '/about',
-  '/privacy',
-  '/compliance',
-  // Critical CSS and JS will be added dynamically
+  // Note: /blog, /about, /privacy, /compliance are cached on first visit (stale-while-revalidate)
+  // This keeps precache small and fast
 ];
 
 // Assets to cache on first access
@@ -77,7 +75,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  devLog(`[SW] Activating service worker ${CACHE_NAME}`);
+  devLog(`Activating service worker ${CACHE_NAME}`);
 
   event.waitUntil(
     (async () => {
@@ -91,16 +89,26 @@ self.addEventListener('activate', (event) => {
 
       await Promise.all(
         oldCaches.map((cacheName) => {
-          devLog('[SW] Deleting old cache:', cacheName);
+          devLog('Deleting old cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
 
-      devLog(`[SW] Cleaned up ${oldCaches.length} old cache(s)`);
+      devLog(`Cleaned up ${oldCaches.length} old cache(s)`);
+
+      // Enable navigation preload for faster perceived load
+      if (self.registration.navigationPreload) {
+        await self.registration.navigationPreload.enable();
+        devLog('Navigation preload enabled');
+      }
+
+      // Enforce cache size limits (prevent iOS quota issues)
+      await enforceMaxCacheSize(CACHE_NAME, 50 * 1024 * 1024); // 50 MB
+      await enforceMaxCacheSize(STATIC_CACHE_NAME, 25 * 1024 * 1024); // 25 MB
 
       // Take control of all open clients
       await self.clients.claim();
-      devLog('[SW] Service worker activated and controlling all clients');
+      devLog('Service worker activated and controlling all clients');
     })()
   );
 });
@@ -135,7 +143,7 @@ self.addEventListener('fetch', (event) => {
 
   // Determine caching strategy based on URL
   if (shouldUseNetworkFirst(url)) {
-    event.respondWith(networkFirstStrategy(request));
+    event.respondWith(networkFirstStrategy(request, event));
   } else if (shouldUseCacheFirst(url)) {
     event.respondWith(cacheFirstStrategy(request));
   } else if (isAPIEndpoint(url)) {
@@ -146,8 +154,22 @@ self.addEventListener('fetch', (event) => {
 });
 
 // Network-first strategy (for dynamic content)
-async function networkFirstStrategy(request) {
+async function networkFirstStrategy(request, event) {
   try {
+    // Try to use navigation preload if available (faster perceived load)
+    if (event?.preloadResponse) {
+      const preloadResponse = await event.preloadResponse;
+      if (preloadResponse) {
+        devLog('Using navigation preload for:', request.url);
+
+        // Still cache the preloaded response
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, preloadResponse.clone());
+
+        return preloadResponse;
+      }
+    }
+
     const networkResponse = await fetch(request);
 
     // Cache successful responses
@@ -158,7 +180,7 @@ async function networkFirstStrategy(request) {
 
     return networkResponse;
   } catch (error) {
-    devLog('[SW] Network failed, trying cache:', request.url);
+    devLog('Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
 
     if (cachedResponse) {
@@ -236,6 +258,55 @@ async function apiCacheStrategy(request) {
       return cachedResponse;
     }
     throw error;
+  }
+}
+
+// Cache size management - prevent quota issues on iOS
+async function enforceMaxCacheSize(cacheName, maxSize) {
+  try {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+
+    let totalSize = 0;
+    const entries = [];
+
+    // Calculate total size and collect entries with timestamps
+    for (const request of keys) {
+      const response = await cache.match(request);
+      if (response) {
+        const blob = await response.blob();
+        const size = blob.size;
+        totalSize += size;
+
+        // Get last-modified or use current time
+        const lastModified = response.headers.get('last-modified')
+          ? new Date(response.headers.get('last-modified')).getTime()
+          : Date.now();
+
+        entries.push({ request, size, lastModified });
+      }
+    }
+
+    // If over limit, delete oldest entries
+    if (totalSize > maxSize) {
+      // Sort by oldest first
+      entries.sort((a, b) => a.lastModified - b.lastModified);
+
+      let deletedSize = 0;
+      for (const entry of entries) {
+        if (totalSize - deletedSize <= maxSize) break;
+
+        await cache.delete(entry.request);
+        deletedSize += entry.size;
+        devLog(`Deleted ${entry.request.url} (${(entry.size / 1024).toFixed(1)} KB)`);
+      }
+
+      devLog(
+        `Cache cleanup: removed ${(deletedSize / 1024 / 1024).toFixed(1)} MB from ${cacheName}`
+      );
+    }
+  } catch (error) {
+    devLog('Cache size enforcement failed:', error);
   }
 }
 
