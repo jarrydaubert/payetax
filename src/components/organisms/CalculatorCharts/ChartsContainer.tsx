@@ -1,7 +1,6 @@
 'use client';
 
 import { memo } from 'react';
-import { LandscapePrompt } from '@/components/atoms/LandscapePrompt';
 import { SPACING } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
@@ -53,36 +52,11 @@ export const ChartsContainer = memo(function ChartsContainer({
   if (layout === 'sidebar') {
     // Vertical stack for What If sidebar
     return (
-      <>
-        <LandscapePrompt />
-        <div
-          className={cn(
-            SPACING.SPACE_Y_4,
-            // Landscape optimization: increase chart height
-            'landscape:space-y-6',
-            className
-          )}
-        >
-          {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}
-
-          <TaxLiabilityChart results={results} whatIfResults={whatIfResults} />
-
-          <NetIncomeComparisonChart results={results} />
-        </div>
-      </>
-    );
-  }
-
-  // Full-width horizontal layout (below table)
-  return (
-    <>
-      <LandscapePrompt />
       <div
         className={cn(
-          `grid grid-cols-1 lg:grid-cols-${showIncomeBreakdown ? '3' : '2'}`,
-          SPACING.GAP_4,
-          // Landscape optimization: full-width charts on mobile landscape
-          'landscape:max-md:grid-cols-1 landscape:max-md:gap-6',
+          SPACING.SPACE_Y_4,
+          // Landscape optimization: increase chart height
+          'landscape:space-y-6',
           className
         )}
       >
@@ -92,6 +66,25 @@ export const ChartsContainer = memo(function ChartsContainer({
 
         <NetIncomeComparisonChart results={results} />
       </div>
-    </>
+    );
+  }
+
+  // Full-width horizontal layout (below table)
+  return (
+    <div
+      className={cn(
+        `grid grid-cols-1 lg:grid-cols-${showIncomeBreakdown ? '3' : '2'}`,
+        SPACING.GAP_4,
+        // Landscape optimization: full-width charts on mobile landscape
+        'landscape:max-md:grid-cols-1 landscape:max-md:gap-6',
+        className
+      )}
+    >
+      {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}
+
+      <TaxLiabilityChart results={results} whatIfResults={whatIfResults} />
+
+      <NetIncomeComparisonChart results={results} />
+    </div>
   );
 });

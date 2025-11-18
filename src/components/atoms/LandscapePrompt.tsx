@@ -1,20 +1,22 @@
 /**
  * Landscape Prompt Component
  *
- * Displays an animated prompt on mobile devices encouraging users to rotate
+ * Displays a centered animated prompt on mobile devices encouraging users to rotate
  * their device to landscape orientation for optimal viewing of results tables
  * and charts.
  *
  * Features:
  * - Only shows on mobile devices (< md breakpoint)
  * - Only shows in portrait orientation
+ * - Centered on screen (not blocking scroll-to-top button)
  * - Animated phone rotation icon
  * - Dismissible (persists via localStorage)
  * - Theme-aware (dark mode support)
  * - Accessible with ARIA labels
+ * - Click-through overlay (only card is interactive)
  *
  * PAYTAX-58: recharts 3.4.1 optimization - landscape viewing
- * Updated: Added to ResultsTable for better mobile UX on payslip data
+ * Updated: Centered positioning to avoid UI conflicts with fixed buttons
  */
 
 'use client';
@@ -105,8 +107,9 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
   return (
     <output
       className={cn(
-        'fixed right-4 bottom-4 left-4 z-50 md:hidden',
-        'slide-in-from-bottom-5 fade-in animate-in duration-500',
+        'fixed inset-0 z-40 flex items-center justify-center md:hidden',
+        'fade-in animate-in duration-500',
+        'pointer-events-none', // Allow clicks through to content
         className
       )}
       aria-live='polite'
@@ -114,7 +117,8 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
     >
       <div
         className={cn(
-          'glass-card relative flex items-center gap-3 p-4',
+          'glass-card relative mx-4 flex max-w-sm items-center gap-3 p-4',
+          'pointer-events-auto', // Enable clicks on the card itself
           'border-primary/20 bg-primary/5 backdrop-blur-lg',
           'shadow-lg dark:bg-primary/10'
         )}
