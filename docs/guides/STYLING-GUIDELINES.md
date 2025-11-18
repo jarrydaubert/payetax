@@ -140,14 +140,17 @@ export const CHART_TAX_COLOR = 'text-red-500'; // No!
 ### 3. Arbitrary Values
 
 ```tsx
-// ✅ CORRECT - Radix UI CSS variables
-<Select className="w-[var(--radix-select-trigger-width)]" />
+// ✅ CORRECT - Use inline styles for CSS variables (not Tailwind arbitrary values)
+<SelectViewport 
+  className="p-1"
+  style={{ width: 'var(--radix-select-trigger-width)' }}
+/>
 
 // ✅ CORRECT - Specific component width
 <div className="w-[640px]" /> // Only used here
 
 // ❌ WRONG - Tokenizing edge cases
-export const RADIX_WIDTH = 'w-[var(--radix-select-trigger-width)]';
+export const RADIX_WIDTH = 'w-[640px]'; // Don't tokenize one-off widths
 ```
 
 ---

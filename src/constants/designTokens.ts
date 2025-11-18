@@ -23,7 +23,7 @@
  * ### Intentional Non-Tokens (Documented Exceptions)
  * - **`border-*`** (212 uses): Framework utilities like `border-2`, `border-t` - NOT tokenized by design
  * - **Chart colors** (~150): Component-specific for Recharts data visualization
- * - **Arbitrary values** (~50): Edge cases like `w-[var(--radix-select-trigger-width)]`
+ * - **Arbitrary values** (~50): Edge cases like Radix UI CSS variables (use inline styles instead)
  * - **Inline styles** (46): Email templates requiring inline CSS
  *
  * @module constants/designTokens

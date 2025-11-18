@@ -93,7 +93,7 @@ The STYLING-GUIDELINES.md document represents a **paradigm shift from violation-
 |----------------|-------|-----------|-----------|
 | `border-*` utilities | 195 | ❌ Don't tokenize | Tailwind syntax, not patterns |
 | Chart colors (`hsl(var(--chart-3))`) | ~150 | ❌ Don't tokenize | Recharts integration specific |
-| Arbitrary values (`w-[var(--radix-*)]`) | ~50 | ❌ Don't tokenize | Radix UI CSS variables |
+| Arbitrary CSS variables | ~50 | ❌ Don't tokenize | Radix UI CSS variables (use inline styles) |
 | Email inline styles | 44 | ❌ Don't tokenize | Email client requirements |
 | Particles/skeletons | ~94 | ❌ Don't tokenize | One-off decorations |
 
