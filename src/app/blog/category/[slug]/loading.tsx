@@ -32,7 +32,10 @@ export default function Loading() {
         </div>
         <div className='flex flex-wrap justify-center gap-3'>
           {Array.from({ length: 6 }, (_, i) => `category-filter-${i}`).map((key) => (
-            <div key={key} className={`h-10 w-32 animate-pulse bg-muted ${SURFACES.SHAPE_CIRCLE}`} />
+            <div
+              key={key}
+              className={`h-10 w-32 animate-pulse bg-muted ${SURFACES.SHAPE_CIRCLE}`}
+            />
           ))}
         </div>
       </div>

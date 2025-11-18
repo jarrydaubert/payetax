@@ -234,13 +234,22 @@ export function BlogPageClient({
                       {featuredPost.excerpt}
                     </p>
 
-                    <div className='inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground shadow-lg transition-all duration-300 group-hover:gap-4 group-hover:shadow-2xl'>
-                      <span>Read Article</span>
-                      <ArrowRight
-                        className={`${ICON_SIZES.SIZE_5} transition-transform group-hover:translate-x-1`}
-                        aria-hidden='true'
-                      />
-                    </div>
+                    <Button
+                      size='lg'
+                      className='gap-3 rounded-full shadow-lg transition-all hover:gap-4 hover:shadow-2xl'
+                      asChild
+                    >
+                      <Link href={`/blog/${featuredPost.slug}`}>
+                        Read Article
+                        <ArrowRight
+                          className={cn(
+                            ICON_SIZES.SIZE_5,
+                            'transition-transform group-hover:translate-x-1'
+                          )}
+                          aria-hidden='true'
+                        />
+                      </Link>
+                    </Button>
                   </div>
 
                   {featuredPost.image && (
@@ -355,12 +364,18 @@ export function BlogPageClient({
               <div className='relative z-20 mb-20'>
                 <div className='mb-8 flex items-center justify-center gap-4'>
                   {currentPage > 1 && (
-                    <Link
-                      href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                      className='rounded-full border border-border bg-card/50 light:bg-card px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 light:md:bg-card/50 md:hover:bg-card/70'
+                    <Button
+                      variant='outline'
+                      size='lg'
+                      className='rounded-full backdrop-blur-xl'
+                      asChild
                     >
-                      ← Previous
-                    </Link>
+                      <Link
+                        href={`/blog?page=${currentPage - 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                      >
+                        ← Previous
+                      </Link>
+                    </Button>
                   )}
 
                   <div className='flex items-center gap-3'>
@@ -372,12 +387,18 @@ export function BlogPageClient({
                   </div>
 
                   {currentPage < totalPages && (
-                    <Link
-                      href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
-                      className='rounded-full border border-border bg-card/50 light:bg-card px-6 py-3 font-medium text-foreground backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-500/50 light:md:bg-card/50 md:hover:bg-card/70'
+                    <Button
+                      variant='outline'
+                      size='lg'
+                      className='rounded-full backdrop-blur-xl'
+                      asChild
                     >
-                      Next →
-                    </Link>
+                      <Link
+                        href={`/blog?page=${currentPage + 1}${selectedCategory ? `&category=${selectedCategory}` : ''}`}
+                      >
+                        Next →
+                      </Link>
+                    </Button>
                   )}
                 </div>
 

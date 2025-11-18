@@ -85,6 +85,12 @@ const excludePatterns = [
   '/api/indexnow',
   'email',
   'mail',
+  // shadcn/ui base components - these are framework, not app code
+  'components/atoms/ui/badge.tsx',
+  'components/atoms/ui/button.tsx',
+  'components/atoms/ui/chart.tsx',
+  'components/atoms/ui/input.tsx',
+  'components/atoms/ui/alert.tsx',
 ];
 
 interface Violation {
