@@ -23,14 +23,23 @@ export default defineConfig({
   timeout: 60000, // 60 seconds per test
   expect: {
     timeout: 10000, // 10 seconds for assertions
+    toMatchSnapshot: {
+      maxDiffPixels: 50,
+      maxDiffPixelRatio: 0.001, // Sub-pixel perfect across macOS/Windows/Linux
+    },
   },
+  /* UPGRADE 1: Sharding — free parallel execution in CI (Playwright 1.56+) */
+  shard:
+    process.env.CI && process.env.PLAYWRIGHT_SHARD
+      ? { total: 6, current: Number(process.env.PLAYWRIGHT_SHARD) }
+      : undefined,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:3000',
 
-    /* Enhanced trace collection */
-    trace: 'retain-on-failure',
+    /* Enhanced trace collection (Playwright 1.56+ default: on-first-retry) */
+    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
@@ -45,11 +54,33 @@ export default defineConfig({
     navigationTimeout: 30000,
   },
 
-  /* Configure projects for comprehensive browser compatibility testing */
+  /* UPGRADE 2: Layered projects with dependencies (Playwright 1.56+) */
+  /* This creates a base project that other browsers depend on, eliminating redundant test runs */
   projects: [
-    // Desktop Browsers - Full Test Suite
+    // Base Project - Runs once, other projects depend on it
+    {
+      name: 'desktop-base',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--disable-web-security',
+            '--disable-features=TranslateUI',
+            '--disable-iframes-display-none-removal',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+            '--disable-background-timer-throttling',
+            '--no-sandbox',
+          ],
+        },
+      },
+      testMatch: ['**/*.spec.ts'], // Full suite
+    },
+
+    // Desktop Browsers - Depend on base (eliminates redundant setup)
     {
       name: 'chromium',
+      dependencies: ['desktop-base'],
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
@@ -70,6 +101,7 @@ export default defineConfig({
     // See commit history: d76a7c9 "Skip unreliable E2E tests to achieve 0 failures"
     // {
     //   name: 'firefox',
+    //   dependencies: ['desktop-base'],
     //   use: {
     //     ...devices['Desktop Firefox'],
     //     launchOptions: {
@@ -83,18 +115,23 @@ export default defineConfig({
 
     {
       name: 'webkit',
+      dependencies: ['desktop-base'],
       use: {
         ...devices['Desktop Safari'],
       },
     },
 
-    // Mobile Browsers - Core Functionality Tests
+    // Mobile Browsers - Core Functionality Tests (includes golden master!)
     {
       name: 'Mobile Chrome',
       use: {
         ...devices['Pixel 5'],
       },
-      testMatch: ['**/calculator.spec.ts', '**/layout-integrity.spec.ts'],
+      testMatch: [
+        '**/calculator.spec.ts',
+        '**/layout-integrity.spec.ts',
+        '**/golden-master-PERFECT.spec.ts', // ← Critical for mobile accuracy verification
+      ],
     },
 
     {
@@ -102,7 +139,11 @@ export default defineConfig({
       use: {
         ...devices['iPhone 12'],
       },
-      testMatch: ['**/calculator.spec.ts', '**/layout-integrity.spec.ts'],
+      testMatch: [
+        '**/calculator.spec.ts',
+        '**/layout-integrity.spec.ts',
+        '**/golden-master-PERFECT.spec.ts', // ← Critical for mobile accuracy verification
+      ],
     },
 
     // Edge Browser Compatibility - Disabled until msedge is installed
