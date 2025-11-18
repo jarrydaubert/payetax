@@ -56,14 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
         <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
 
-        {/* Font Preload for Performance - Reduce FOUT */}
-        <link
-          rel='preload'
-          href='/fonts/inter-var.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
+        {/* Font loaded via Next.js Font Optimization - see fonts.ts */}
 
         {/* DNS Prefetch and Preconnect for Performance */}
         <link rel='dns-prefetch' href='https://vercel.live' />

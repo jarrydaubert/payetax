@@ -63,7 +63,7 @@ function ChartContainer({ className, config, children, ref, ...props }: ChartCon
       <div
         ref={ref}
         className={cn(
-          'flex aspect-auto h-[250px] w-full justify-center',
+          'relative flex aspect-auto h-[250px] w-full justify-center',
           TYPOGRAPHY.TEXT_XS,
           // Landscape optimization: taller charts on mobile landscape
           'landscape:max-md:h-[350px]',
