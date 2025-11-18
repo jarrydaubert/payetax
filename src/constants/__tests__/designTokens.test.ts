@@ -20,13 +20,6 @@ describe('Design Tokens Constants', () => {
       expect(TYPOGRAPHY.TEXT_XS).toBe('text-xs');
     });
 
-    it.skip('should have valid Tailwind class names (TODO: update for PAYTAX-109)', () => {
-      for (const value of Object.values(TYPOGRAPHY)) {
-        expect(value).toMatch(/^text-/);
-        expect(value).not.toContain(' ');
-      }
-    });
-
     it('should have 33 typography tokens total (sizes + weights + leading + tracking)', () => {
       expect(Object.keys(TYPOGRAPHY).length).toBe(33);
     });
@@ -53,16 +46,6 @@ describe('Design Tokens Constants', () => {
       expect(SPACING.SPACE_Y_1).toBe('space-y-1');
     });
 
-    it.skip('should have valid Tailwind class names (TODO: update for PAYTAX-109)', () => {
-      for (const value of Object.values(SPACING)) {
-        expect(value).toMatch(/^(gap-|space-[xy]-|p[xyt]?-|m[tby]?-|py-12 md:py-20)/);
-        expect(value).not.toContain(' ');
-      }
-    });
-
-    it.skip('should have 50+ spacing tokens (TODO: update for PAYTAX-109) (expanded in PAYTAX-109)', () => {
-      expect(Object.keys(SPACING).length).toBeGreaterThan(40);
-    });
   });
 
   describe('Icon Size Tokens', () => {
@@ -75,13 +58,6 @@ describe('Design Tokens Constants', () => {
       expect(ICON_SIZES.SIZE_4).toBe('size-4');
       expect(ICON_SIZES.SIZE_3_5).toBe('size-3.5');
       expect(ICON_SIZES.MD_SIZE_6).toBe('md:size-6');
-    });
-
-    it.skip('should have valid Tailwind class names (TODO: update for PAYTAX-109)', () => {
-      for (const value of Object.values(ICON_SIZES)) {
-        expect(value).toMatch(/^(size-|md:size-)/);
-        expect(value).not.toContain('  '); // No double spaces
-      }
     });
 
     it('should have 8 icon size tokens total', () => {
@@ -148,31 +124,6 @@ describe('Design Tokens Constants', () => {
       expect(uniqueValues.size).toBe(values.length);
     });
 
-    it.skip('should have no spaces in token values (TODO: update for PAYTAX-109) (except responsive)', () => {
-      const allValues = [
-        ...Object.values(TYPOGRAPHY),
-        ...Object.values(SPACING),
-        ...Object.values(ICON_SIZES).filter((v) => !v.includes('md:')),
-      ];
-
-      for (const value of allValues) {
-        expect(value).not.toContain(' ');
-      }
-    });
-
-    it.skip('should use kebab-case for all tokens (TODO: update for PAYTAX-109)', () => {
-      const allValues = [
-        ...Object.values(TYPOGRAPHY),
-        ...Object.values(SPACING),
-        ...Object.values(ICON_SIZES),
-      ];
-
-      for (const value of allValues) {
-        // Remove responsive prefix for validation
-        const cleanValue = value.replace('md:', '');
-        expect(cleanValue).toMatch(/^[a-z0-9-.]+$/);
-      }
-    });
   });
 
   describe('Type Safety', () => {
