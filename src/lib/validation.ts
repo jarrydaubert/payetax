@@ -25,7 +25,8 @@ export const SalaryBrand = z
   .nonnegative('Salary cannot be negative')
   .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
   .finite('Salary must be a valid number')
-  .brand<'Salary'>();
+  .brand<'Salary'>()
+  .describe('Annual gross salary in GBP — branded to prevent mixing with pension/gross/net values');
 
 export type Salary = z.infer<typeof SalaryBrand>;
 
@@ -37,7 +38,10 @@ export const PensionAmountBrand = z
   .nonnegative('Pension amount cannot be negative')
   .max(1_000_000, 'Pension amount exceeds maximum (£1,000,000)')
   .finite('Pension amount must be a valid number')
-  .brand<'PensionAmount'>();
+  .brand<'PensionAmount'>()
+  .describe(
+    'Pension contribution amount in GBP — type-safe to prevent accidental salary/income mixing'
+  );
 
 export type PensionAmount = z.infer<typeof PensionAmountBrand>;
 
@@ -49,7 +53,8 @@ export const GrossIncomeBrand = z
   .nonnegative('Gross income cannot be negative')
   .max(10_000_000, 'Gross income exceeds maximum (£10,000,000)')
   .finite('Gross income must be a valid number')
-  .brand<'GrossIncome'>();
+  .brand<'GrossIncome'>()
+  .describe('Total gross income before tax/NI deductions — branded for compile-time safety');
 
 export type GrossIncome = z.infer<typeof GrossIncomeBrand>;
 
@@ -61,7 +66,10 @@ export const NetIncomeBrand = z
   .nonnegative('Net income cannot be negative')
   .max(10_000_000, 'Net income exceeds maximum (£10,000,000)')
   .finite('Net income must be a valid number')
-  .brand<'NetIncome'>();
+  .brand<'NetIncome'>()
+  .describe(
+    'Net income after tax, NI, pension, and student loan deductions — type-safe branded value'
+  );
 
 export type NetIncome = z.infer<typeof NetIncomeBrand>;
 
@@ -171,14 +179,18 @@ export const OtherIncomeSchema = z.object({
  * }
  * ```
  */
-export const IncomeSourceSchema = z.discriminatedUnion('type', [
-  EmploymentIncomeSchema,
-  PrivatePensionIncomeSchema,
-  StatePensionIncomeSchema,
-  RentalIncomeSchema,
-  InvestmentIncomeSchema,
-  OtherIncomeSchema,
-]);
+export const IncomeSourceSchema = z
+  .discriminatedUnion('type', [
+    EmploymentIncomeSchema,
+    PrivatePensionIncomeSchema,
+    StatePensionIncomeSchema,
+    RentalIncomeSchema,
+    InvestmentIncomeSchema,
+    OtherIncomeSchema,
+  ])
+  .describe(
+    'Tax-aware income source with type-specific fields and UK tax/NI handling — uses discriminated union for compile-time type narrowing'
+  );
 
 export type IncomeSource = z.infer<typeof IncomeSourceSchema>;
 
@@ -371,7 +383,8 @@ export const SalaryParamSchema = z.coerce
   .number()
   .int('Salary must be a whole number')
   .nonnegative('Salary cannot be negative')
-  .max(10_000_000, 'Salary exceeds maximum (£10,000,000)');
+  .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
+  .describe('URL parameter for salary — auto-coerced from string to number using Zod 4 .coerce');
 
 // Blog slug parameter (e.g., /blog/uk-tax-guide)
 export const BlogSlugSchema = z

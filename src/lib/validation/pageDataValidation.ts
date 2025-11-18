@@ -29,7 +29,7 @@ export const StatSchema = z.object({
     (val) => typeof val === 'function' || (typeof val === 'object' && val !== null),
     {
       message: 'Icon must be a valid React component',
-    },
+    }
   ),
   /** Stat value - number or string (e.g., "100%", "0", "<300kB") */
   value: z.string().or(z.number()),
@@ -88,7 +88,7 @@ export const FeatureSchema = z.object({
     (val) => typeof val === 'function' || (typeof val === 'object' && val !== null),
     {
       message: 'Icon must be a valid React component',
-    },
+    }
   ),
   /** Feature title */
   title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
