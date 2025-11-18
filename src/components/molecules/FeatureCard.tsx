@@ -13,6 +13,7 @@ import type { LucideIcon } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
+import { Badge } from '@/components/atoms/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/atoms/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -104,14 +105,9 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
         <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
           <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
           {metric && (
-            <span
-              className={cn(
-                'shrink-0 rounded-full bg-primary/10 px-3 py-1 font-mono font-semibold text-primary',
-                TYPOGRAPHY.TEXT_SM
-              )}
-            >
+            <Badge variant="secondary" className="shrink-0 font-mono font-semibold">
               {metric}
-            </span>
+            </Badge>
           )}
         </div>
       </CardHeader>
