@@ -45,6 +45,12 @@ import {
   startPerformanceTransaction,
 } from '@/lib/sentry';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
+import {
+  BooleanSchema,
+  NICategorySchema,
+  PensionContributionTypeSchema,
+  WhatIfTypeSchema,
+} from '@/lib/validation';
 
 /**
  * Interface defining all inputs required for tax calculations
@@ -424,8 +430,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           }));
         },
         setIsScottish: (isScottish) => {
-          // Validate boolean
-          const validated = z.boolean().safeParse(isScottish);
+          // Validate boolean using extracted schema
+          const validated = BooleanSchema.safeParse(isScottish);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid isScottish:', validated.error.issues[0].message);
@@ -435,8 +441,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, isScottish: validated.data } }));
         },
         setIsMarried: (isMarried) => {
-          // Validate boolean
-          const validated = z.boolean().safeParse(isMarried);
+          // Validate boolean using extracted schema
+          const validated = BooleanSchema.safeParse(isMarried);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid isMarried:', validated.error.issues[0].message);
@@ -461,8 +467,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, partnerGrossWage: validated.data } }));
         },
         setIsBlind: (isBlind) => {
-          // Validate boolean
-          const validated = z.boolean().safeParse(isBlind);
+          // Validate boolean using extracted schema
+          const validated = BooleanSchema.safeParse(isBlind);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid isBlind:', validated.error.issues[0].message);
@@ -490,8 +496,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, age } }));
         },
         setPayNoNI: (payNoNI) => {
-          // Validate boolean
-          const validated = z.boolean().safeParse(payNoNI);
+          // Validate boolean using extracted schema
+          const validated = BooleanSchema.safeParse(payNoNI);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid payNoNI:', validated.error.issues[0].message);
@@ -519,8 +525,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, pensionContribution: validated.data } }));
         },
         setPensionContributionType: (pensionContributionType) => {
-          // Validate pension type
-          const validated = z.enum(['percentage', 'amount']).safeParse(pensionContributionType);
+          // Validate pension type using extracted schema
+          const validated = PensionContributionTypeSchema.safeParse(pensionContributionType);
 
           if (!validated.success) {
             console.warn(
@@ -549,8 +555,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, studentLoanPlan: validated.data } }));
         },
         setNiCategory: (niCategory) => {
-          // Validate NI category
-          const validated = z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']).safeParse(niCategory);
+          // Validate NI category using extracted schema
+          const validated = NICategorySchema.safeParse(niCategory);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid NI category:', validated.error.issues[0].message);
@@ -771,8 +777,8 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         setWhatIfType: (type) => {
-          // Validate what-if type
-          const validated = z.enum(['percentage', 'amount', 'total']).safeParse(type);
+          // Validate what-if type using extracted schema
+          const validated = WhatIfTypeSchema.safeParse(type);
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid what-if type:', validated.error.issues[0].message);

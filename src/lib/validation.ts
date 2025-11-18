@@ -3,6 +3,228 @@
 import { z } from 'zod';
 
 /**
+ * ============================================================================
+ * BRANDED TYPES (Zod 4 Feature - Nominal Typing)
+ * ============================================================================
+ *
+ * Branded types prevent accidentally mixing similar types (e.g., salary with pension).
+ * TypeScript will catch these errors at compile time.
+ *
+ * @example
+ * ```typescript
+ * const salary: Salary = 50000 as Salary;
+ * const pension: PensionAmount = salary; // ❌ Type error!
+ * ```
+ */
+
+/**
+ * Branded Salary type - ensures values can't be mixed with other numbers
+ */
+export const SalaryBrand = z
+  .number()
+  .nonnegative('Salary cannot be negative')
+  .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
+  .finite('Salary must be a valid number')
+  .brand<'Salary'>();
+
+export type Salary = z.infer<typeof SalaryBrand>;
+
+/**
+ * Branded Pension Amount type - separate from salary to prevent mixing
+ */
+export const PensionAmountBrand = z
+  .number()
+  .nonnegative('Pension amount cannot be negative')
+  .max(1_000_000, 'Pension amount exceeds maximum (£1,000,000)')
+  .finite('Pension amount must be a valid number')
+  .brand<'PensionAmount'>();
+
+export type PensionAmount = z.infer<typeof PensionAmountBrand>;
+
+/**
+ * Branded Gross Income type - total income before deductions
+ */
+export const GrossIncomeBrand = z
+  .number()
+  .nonnegative('Gross income cannot be negative')
+  .max(10_000_000, 'Gross income exceeds maximum (£10,000,000)')
+  .finite('Gross income must be a valid number')
+  .brand<'GrossIncome'>();
+
+export type GrossIncome = z.infer<typeof GrossIncomeBrand>;
+
+/**
+ * Branded Net Income type - income after all deductions
+ */
+export const NetIncomeBrand = z
+  .number()
+  .nonnegative('Net income cannot be negative')
+  .max(10_000_000, 'Net income exceeds maximum (£10,000,000)')
+  .finite('Net income must be a valid number')
+  .brand<'NetIncome'>();
+
+export type NetIncome = z.infer<typeof NetIncomeBrand>;
+
+/**
+ * ============================================================================
+ * INCOME SOURCE VALIDATION (Discriminated Union)
+ * ============================================================================
+ *
+ * Using Zod 4's discriminatedUnion for type-safe income sources.
+ * Each income type has different required fields based on the discriminator.
+ */
+
+/**
+ * Employment Income Schema
+ * Includes NI category as employment pays National Insurance
+ */
+export const EmploymentIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('employment'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
+  amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  // Employment-specific: NI category
+  niCategory: z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z'] as const).optional(),
+});
+
+/**
+ * Private Pension Income Schema
+ * May have separate tax code, no NI
+ */
+export const PrivatePensionIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('pension'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
+  amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  // Pension-specific: optional separate tax code
+  taxCode: z
+    .string()
+    .regex(/^S?[0-9]+[LMNPTX]?$/)
+    .optional(),
+});
+
+/**
+ * State Pension Income Schema
+ * Simple structure, no NI
+ */
+export const StatePensionIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('statePension'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
+  amount: z.number().positive('Amount must be positive').max(1_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+});
+
+/**
+ * Rental Income Schema
+ * No NI, may have expenses
+ */
+export const RentalIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('rental'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
+  amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  // Rental-specific: optional expenses
+  expenses: z.number().nonnegative('Expenses cannot be negative').optional(),
+});
+
+/**
+ * Investment Income Schema
+ * Dividends, interest, etc. - different tax treatment
+ */
+export const InvestmentIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('investment'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
+  amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  // Investment-specific: whether it's dividend income (has allowance)
+  isDividend: z.boolean().catch(false),
+});
+
+/**
+ * Other Income Schema
+ * Catch-all for miscellaneous income
+ */
+export const OtherIncomeSchema = z.object({
+  id: z.string().uuid('Invalid income source ID'),
+  type: z.literal('other'),
+  label: z.string().min(1, 'Label is required').max(100, 'Label too long'),
+  amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
+  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  description: z.string().max(500, 'Description too long').optional(),
+});
+
+/**
+ * Discriminated Union of all Income Source types
+ * TypeScript will narrow the type based on the 'type' discriminator
+ *
+ * @example
+ * ```typescript
+ * const income: IncomeSource = { type: 'employment', ... };
+ * if (income.type === 'employment') {
+ *   // TypeScript knows income.niCategory exists here
+ *   console.log(income.niCategory);
+ * }
+ * ```
+ */
+export const IncomeSourceSchema = z.discriminatedUnion('type', [
+  EmploymentIncomeSchema,
+  PrivatePensionIncomeSchema,
+  StatePensionIncomeSchema,
+  RentalIncomeSchema,
+  InvestmentIncomeSchema,
+  OtherIncomeSchema,
+]);
+
+export type IncomeSource = z.infer<typeof IncomeSourceSchema>;
+
+// Export individual types for use in forms/components
+export type EmploymentIncome = z.infer<typeof EmploymentIncomeSchema>;
+export type PrivatePensionIncome = z.infer<typeof PrivatePensionIncomeSchema>;
+export type StatePensionIncome = z.infer<typeof StatePensionIncomeSchema>;
+export type RentalIncome = z.infer<typeof RentalIncomeSchema>;
+export type InvestmentIncome = z.infer<typeof InvestmentIncomeSchema>;
+export type OtherIncome = z.infer<typeof OtherIncomeSchema>;
+
+/**
+ * ============================================================================
+ * COMMON VALIDATION SCHEMAS (For reuse across codebase)
+ * ============================================================================
+ */
+
+/**
+ * Simple boolean validation schema
+ * Reusable in store setters and form inputs
+ */
+export const BooleanSchema = z.boolean();
+
+/**
+ * NI Category validation schema
+ * Reusable for employment income and calculator inputs
+ */
+export const NICategorySchema = z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']);
+
+/**
+ * Pension contribution type validation schema
+ */
+export const PensionContributionTypeSchema = z.enum(['percentage', 'amount']);
+
+/**
+ * What-If scenario type validation schema
+ */
+export const WhatIfTypeSchema = z.enum(['percentage', 'amount', 'total']);
+
+/**
+ * ============================================================================
+ * BLOG & CONTENT VALIDATION
+ * ============================================================================
+ */
+
+/**
  * Blog Frontmatter Validation Schema
  * Validates all required and optional fields in blog post frontmatter
  */
@@ -29,12 +251,12 @@ export const BlogFrontmatterSchema = z.object({
     })
     .optional(),
   category: z.string().min(1, 'Category is required'),
-  tags: z.array(z.string()).optional(),
-  author: z.string().optional().default('PayeTax Team'),
-  featured: z.boolean().optional().default(false),
+  tags: z.array(z.string()).catch([]), // Zod 4: fallback to empty array on parse error
+  author: z.string().catch('PayeTax Team'), // Zod 4: fallback to default on parse error
+  featured: z.boolean().catch(false), // Zod 4: fallback to false on parse error
   image: z.string().optional(), // Allow both URLs and relative paths
   imageAlt: z.string().optional(),
-  readTime: z.string().optional(),
+  readTime: z.string().catch('5 min read'), // Zod 4: fallback if missing or invalid
 });
 
 export type BlogFrontmatter = z.infer<typeof BlogFrontmatterSchema>;
@@ -144,13 +366,12 @@ export type CalculatorInput = z.infer<typeof CalculatorInputSchema>;
  */
 
 // Salary URL parameter (e.g., /calculator/50000)
-export const SalaryParamSchema = z
-  .string()
-  .regex(/^\d+$/, 'Salary must be a number')
-  .transform((val) => Number.parseInt(val, 10))
-  .refine((val) => val >= 0 && val <= 10_000_000, {
-    message: 'Salary out of valid range (0-10,000,000)',
-  });
+// Using Zod 4's .coerce for automatic string → number conversion
+export const SalaryParamSchema = z.coerce
+  .number()
+  .int('Salary must be a whole number')
+  .nonnegative('Salary cannot be negative')
+  .max(10_000_000, 'Salary exceeds maximum (£10,000,000)');
 
 // Blog slug parameter (e.g., /blog/uk-tax-guide)
 export const BlogSlugSchema = z
