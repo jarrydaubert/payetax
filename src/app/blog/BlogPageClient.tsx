@@ -380,9 +380,9 @@ export function BlogPageClient({
 
                   <div className='flex items-center gap-3'>
                     <span className='text-muted-foreground'>Page</span>
-                    <span className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono text-foreground shadow-lg'>
+                    <Badge className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono shadow-lg'>
                       {currentPage}
-                    </span>
+                    </Badge>
                     <span className='text-muted-foreground'>of {totalPages}</span>
                   </div>
 

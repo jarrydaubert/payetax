@@ -105,7 +105,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
         <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
           <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
           {metric && (
-            <Badge variant="secondary" className="shrink-0 font-mono font-semibold">
+            <Badge variant='secondary' className='shrink-0 font-mono font-semibold'>
               {metric}
             </Badge>
           )}
