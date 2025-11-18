@@ -232,6 +232,56 @@ export const WhatIfTypeSchema = z.enum(['percentage', 'amount', 'total']);
 
 /**
  * ============================================================================
+ * TAX CODE VALIDATION (Must be declared before CalculatorInputSchema)
+ * ============================================================================
+ */
+
+/**
+ * Tax Code Validation Schema
+ * Validates UK HMRC tax codes with comprehensive format support
+ *
+ * Valid formats:
+ * - Standard: 1257L, S1257L (Scottish)
+ * - K codes: K100, SK200 (negative allowance)
+ * - Special: BR, D0, D1, NT, 0T
+ * - Emergency: 1257L M1, 1257L W1, 1257L X
+ *
+ * Handles:
+ * - Case insensitive (auto-converted to uppercase)
+ * - Whitespace trimming
+ * - Emergency codes with/without spaces (1257L W1 or 1257LW1)
+ */
+export const TaxCodeSchema = z
+  .string()
+  .min(1, 'Tax code is required')
+  .transform((val) => val.trim().toUpperCase())
+  .refine(
+    (code) => {
+      // Special codes
+      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+      if (specialCodes.includes(code)) return true;
+
+      // Remove emergency suffix (W1, M1, X) with optional space before validation
+      const codeWithoutEmergency = code.replace(/\s*(W1|M1|X)$/, '');
+
+      // Standard format: optional S prefix, numbers, optional letter suffix
+      const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+
+      // K codes (negative allowance)
+      const kCodePattern = /^S?K[0-9]+$/;
+
+      return standardPattern.test(codeWithoutEmergency) || kCodePattern.test(codeWithoutEmergency);
+    },
+    {
+      message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100, 1257L W1)',
+    }
+  )
+  .describe(
+    'UK HMRC tax code with full support for Scottish, K codes, emergency codes, and special rates'
+  );
+
+/**
+ * ============================================================================
  * BLOG & CONTENT VALIDATION
  * ============================================================================
  */
@@ -303,11 +353,8 @@ export const CalculatorInputSchema = z
       .max(168, 'Hours per week cannot exceed 168')
       .optional(),
 
-    // Tax configuration
-    taxCode: z
-      .string()
-      .regex(/^\d{1,4}[LMNPT]$/i, 'Invalid tax code format (e.g., 1257L)')
-      .optional(),
+    // Tax configuration - using comprehensive TaxCodeSchema
+    taxCode: TaxCodeSchema.optional(),
     taxYear: z.enum(['2024-25', '2025-26']),
     region: z.enum(['england', 'scotland', 'wales']),
 
@@ -315,7 +362,11 @@ export const CalculatorInputSchema = z
     pensionContribution: z
       .number()
       .min(0, 'Pension contribution must be positive')
-      .max(100, 'Pension contribution cannot exceed 100%'),
+      .max(100, 'Pension contribution cannot exceed 100%')
+      .refine((val) => val <= 80, {
+        message:
+          'Pension contribution over 80% may indicate an error - most UK pension schemes cap at 60-80%',
+      }),
     pensionContributionType: z.enum(['percentage', 'amount']),
 
     // Age (for pension age NI exemption)
@@ -507,39 +558,6 @@ export function formatZodErrors(error: z.ZodError): string[] {
     return path ? `${path}: ${err.message}` : err.message;
   });
 }
-
-/**
- * Tax Code Validation Schema
- * Validates UK HMRC tax codes including special codes
- *
- * Valid formats:
- * - Standard: 1257L, S1257L (Scottish)
- * - K codes: K100, SK200 (negative allowance)
- * - Special: BR, D0, D1, NT, 0T
- * - Emergency: 1257L M1, 1257L W1, 1257L X
- */
-export const TaxCodeSchema = z
-  .string()
-  .min(1, 'Tax code is required')
-  .transform((val) => val.trim().toUpperCase())
-  .refine(
-    (code) => {
-      // Special codes
-      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-      if (specialCodes.includes(code)) return true;
-
-      // Standard format: optional S prefix, numbers, optional letter suffix
-      const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
-
-      // K codes (negative allowance)
-      const kCodePattern = /^S?K[0-9]+$/;
-
-      return standardPattern.test(code) || kCodePattern.test(code);
-    },
-    {
-      message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)',
-    }
-  );
 
 /**
  * Tax Year Validation Schema

@@ -2,7 +2,12 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
+import { AlertTriangle, Home, RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
+import { cn } from '@/lib/utils';
 
 export default function GlobalError({
   error,
@@ -11,7 +16,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const errorId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+  const errorId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 
   // Auto-report error to Sentry and email
   useEffect(() => {
@@ -46,329 +51,170 @@ export default function GlobalError({
 
   return (
     <html lang='en'>
-      <body style={{ margin: 0, padding: 0 }}>
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #0f172a 0%, #991b1b 50%, #0f172a 100%)',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-          }}
-        >
-          {/* Background particles */}
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-            {[...Array(10)].map((_, i) => (
-              <div
-                key={`particle-${i}-${Math.random()}`}
-                style={{
-                  position: 'absolute',
-                  width: '8px',
-                  height: '8px',
-                  backgroundColor: '#ef4444',
-                  borderRadius: '50%',
-                  opacity: 0.2,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animation: `pulse 2s infinite ${Math.random() * 3}s`,
-                }}
-              />
-            ))}
+      <body className='m-0 p-0'>
+        <div className={cn(LAYOUT.PAGE_WRAPPER, 'relative min-h-screen overflow-hidden')}>
+          {/* Animated background particles */}
+          <div className='-z-10 pointer-events-none fixed inset-0'>
+            <div className='absolute inset-0 bg-gradient-to-br from-background via-destructive/5 to-background'>
+              {Array.from({ length: 20 }, (_, i) => {
+                const left = (i * 137.5) % 100;
+                const top = (i * 37.5) % 100;
+                const delay = (i * 0.15) % 3;
+                const duration = 2 + (i % 4);
+                return (
+                  <div
+                    key={`particle-${left}-${top}`}
+                    className='absolute h-2 w-2 animate-pulse rounded-full bg-destructive opacity-20'
+                    style={{
+                      left: `${left}%`,
+                      top: `${top}%`,
+                      animationDelay: `${delay}s`,
+                      animationDuration: `${duration}s`,
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
 
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 10,
-              maxWidth: '48rem',
-              width: '100%',
-              margin: '0 1rem',
-              textAlign: 'center',
-              padding: '3rem 2rem',
-              backgroundColor: 'rgba(15, 23, 42, 0.8)',
-              borderRadius: '1rem',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            {/* Error icon */}
-            <div
-              style={{
-                width: '80px',
-                height: '80px',
-                margin: '0 auto 2rem',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                border: '2px solid rgba(239, 68, 68, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <svg
-                width='40'
-                height='40'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='#ef4444'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                role='img'
-                aria-label='Error warning icon'
-              >
-                <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z' />
-                <line x1='12' y1='9' x2='12' y2='13' />
-                <line x1='12' y1='17' x2='12.01' y2='17' />
-              </svg>
-            </div>
-
-            <h1
-              style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                color: 'white',
-                marginBottom: '1.5rem',
-                lineHeight: '1.2',
-              }}
-            >
-              Critical System Error
-            </h1>
-
-            <p
-              style={{
-                fontSize: '1.25rem',
-                color: '#d1d5db',
-                marginBottom: '2rem',
-                lineHeight: '1.6',
-                maxWidth: '32rem',
-                margin: '0 auto 2rem',
-              }}
-            >
-              A critical error occurred that prevented the application from loading. This has been
-              automatically logged for investigation.
-            </p>
-
-            {/* Error details */}
-            <div
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                padding: '1rem',
-                borderRadius: '0.5rem',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                marginBottom: '2rem',
-                maxWidth: '24rem',
-                margin: '0 auto 2rem',
-              }}
-            >
-              <strong style={{ color: 'white', fontSize: '0.875rem' }}>Error Reference:</strong>
-              <br />
-              <code
-                style={{
-                  color: '#a855f7',
-                  fontFamily: 'Monaco, Consolas, monospace',
-                  fontSize: '0.75rem',
-                  wordBreak: 'break-all',
-                }}
-              >
-                #{errorId}
-              </code>
-            </div>
-
-            {/* Action buttons */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-                alignItems: 'center',
-                marginBottom: '2rem',
-              }}
-            >
-              <button
-                type='button'
-                onClick={() => reset()}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 2rem',
-                  backgroundColor: '#2563eb',
-                  color: 'white',
-                  borderRadius: '0.75rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  transition: 'all 0.2s',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#1d4ed8';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.backgroundColor = '#1d4ed8';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                <svg
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  role='img'
-                  aria-label='Refresh page'
-                >
-                  <polyline points='23 4 23 10 17 10' />
-                  <path d='M20.49 15a9 9 0 1 1-2.12-9.36L23 10' />
-                </svg>
-                Restart Application
-              </button>
-
-              <a
-                href='/'
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 2rem',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'white',
-                  borderRadius: '0.75rem',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  transition: 'all 0.2s',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                <svg
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  role='img'
-                  aria-label='Go to home page'
-                >
-                  <path d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' />
-                  <polyline points='9,22 9,12 15,12 15,22' />
-                </svg>
-                Go to Homepage
-              </a>
-            </div>
-
-            {/* Help text */}
-            <p
-              style={{
-                color: '#6b7280',
-                fontSize: '0.875rem',
-                marginBottom: process.env.NODE_ENV === 'development' ? '1.5rem' : '0',
-              }}
-            >
-              If this error persists, please contact support with reference #{errorId.slice(-8)}
-            </p>
-
-            {/* Development details */}
-            {process.env.NODE_ENV === 'development' && error && (
-              <details
-                style={{
-                  textAlign: 'left',
-                  marginTop: '2rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                  padding: '1rem',
-                  borderRadius: '0.5rem',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                }}
-              >
-                <summary
-                  style={{
-                    color: '#facc15',
-                    cursor: 'pointer',
-                    marginBottom: '1rem',
-                    fontWeight: '600',
-                  }}
-                >
-                  🔧 Developer Debug Info (Dev Mode Only)
-                </summary>
-                <div>
-                  <h4 style={{ color: '#facc15', marginBottom: '0.5rem' }}>Error Message:</h4>
-                  <p
-                    style={{
-                      color: '#fca5a5',
-                      fontFamily: 'Monaco, Consolas, monospace',
-                      fontSize: '0.875rem',
-                      marginBottom: '1rem',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    {error.message}
-                  </p>
-
-                  <h4 style={{ color: '#facc15', marginBottom: '0.5rem' }}>Stack Trace:</h4>
-                  <pre
-                    style={{
-                      color: '#fca5a5',
-                      fontFamily: 'Monaco, Consolas, monospace',
-                      fontSize: '0.75rem',
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      padding: '1rem',
-                      borderRadius: '0.25rem',
-                      border: '1px solid rgba(239, 68, 68, 0.2)',
-                      overflow: 'auto',
-                      maxHeight: '16rem',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    {error.stack}
-                  </pre>
+          {/* Error Content */}
+          <section className={cn(LAYOUT.SECTION, LAYOUT.TEXT_CENTER)}>
+            <div className={LAYOUT.CONTAINER_SM}>
+              {/* Error Icon */}
+              <div className={SPACING.MB_6}>
+                <div className='relative mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-destructive/30 bg-destructive/20'>
+                  <AlertTriangle
+                    className={cn('text-destructive', ICON_SIZES.SIZE_10)}
+                    aria-label='Critical error icon'
+                  />
+                  <div className='-z-10 absolute inset-0 animate-ping rounded-full border-2 border-destructive opacity-20' />
                 </div>
-              </details>
-            )}
-          </div>
+              </div>
 
-          {/* Add keyframes for pulse animation */}
-          <style>{`
-            @keyframes pulse {
-              0%, 100% { opacity: 0.2; transform: scale(1); }
-              50% { opacity: 0.4; transform: scale(1.1); }
-            }
-          `}</style>
+              {/* Error Title */}
+              <div className={SPACING.MB_6}>
+                <h1 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_4XL, SPACING.MB_4)}>
+                  Critical System Error
+                </h1>
+                <p
+                  className={cn(
+                    'text-muted-foreground',
+                    TYPOGRAPHY.TEXT_LG,
+                    LAYOUT.CENTERED_CONTENT
+                  )}
+                >
+                  A critical error occurred that prevented the application from loading. This has
+                  been automatically logged for investigation.
+                </p>
+              </div>
+
+              {/* Error Reference Card */}
+              <Card
+                className={cn(
+                  SURFACES.CARD_LARGE,
+                  'mx-auto max-w-md border-destructive/20',
+                  SPACING.MB_8
+                )}
+              >
+                <Badge variant='destructive' className={SPACING.MB_2}>
+                  Error Reference
+                </Badge>
+                <code className='font-mono text-primary text-sm'>#{errorId}</code>
+              </Card>
+
+              {/* Action Buttons */}
+              <div
+                className={cn(
+                  'flex flex-col items-center gap-4',
+                  SPACING.MB_8,
+                  'sm:flex-row sm:justify-center'
+                )}
+              >
+                <button
+                  type='button'
+                  onClick={() => reset()}
+                  className={cn(
+                    'group inline-flex items-center gap-2 rounded-xl px-8 py-3',
+                    'bg-primary font-semibold text-primary-foreground',
+                    'transition-all duration-300',
+                    'hover:scale-105 hover:bg-primary/90',
+                    'active:scale-100',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                  )}
+                >
+                  <RefreshCcw
+                    className={cn(
+                      ICON_SIZES.SIZE_5,
+                      'transition-transform duration-500 group-hover:rotate-180'
+                    )}
+                    aria-hidden='true'
+                  />
+                  Restart Application
+                </button>
+
+                <a
+                  href='/'
+                  className={cn(
+                    'group inline-flex items-center gap-2 rounded-xl px-8 py-3',
+                    'border border-border bg-background/50 font-semibold text-foreground',
+                    'transition-all duration-300',
+                    'hover:scale-105 hover:bg-accent',
+                    'active:scale-100',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                  )}
+                >
+                  <Home
+                    className={cn(ICON_SIZES.SIZE_5, 'transition-transform group-hover:scale-110')}
+                    aria-hidden='true'
+                  />
+                  Go to Homepage
+                </a>
+              </div>
+
+              {/* Help Text */}
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_6)}>
+                If this error persists, please contact support with reference{' '}
+                <span className='font-mono text-primary'>#{errorId.slice(-8)}</span>
+              </p>
+
+              {/* Development Debug Info */}
+              {process.env.NODE_ENV === 'development' && error && (
+                <Card
+                  className={cn(
+                    SURFACES.CARD_LARGE,
+                    'border-yellow-500/30 bg-yellow-500/5',
+                    'text-left'
+                  )}
+                >
+                  <details>
+                    <summary className='mb-4 cursor-pointer font-semibold text-yellow-500 transition-colors hover:text-yellow-400'>
+                      🔧 Developer Debug Info (Dev Mode Only)
+                    </summary>
+
+                    <div className='space-y-4'>
+                      {/* Error Message */}
+                      <div>
+                        <h4 className='mb-2 font-semibold text-sm text-yellow-500'>
+                          Error Message:
+                        </h4>
+                        <p className='break-words rounded-lg border border-destructive/20 bg-background/50 p-3 font-mono text-destructive text-sm'>
+                          {error.message}
+                        </p>
+                      </div>
+
+                      {/* Stack Trace */}
+                      <div>
+                        <h4 className='mb-2 font-semibold text-sm text-yellow-500'>Stack Trace:</h4>
+                        <pre className='max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-destructive/20 bg-background/50 p-4 font-mono text-destructive text-xs'>
+                          {error.stack}
+                        </pre>
+                      </div>
+                    </div>
+                  </details>
+                </Card>
+              )}
+            </div>
+          </section>
         </div>
       </body>
     </html>
