@@ -26,8 +26,13 @@ describe('EmailInputSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should accept empty string for optional emails', () => {
-    const result = EmailInputSchema.safeParse({ value: '' });
+  it('should accept undefined for optional emails', () => {
+    const result = EmailInputSchema.safeParse({ value: undefined });
+    expect(result.success).toBe(true);
+  });
+
+  it('should accept missing value for optional emails', () => {
+    const result = EmailInputSchema.safeParse({});
     expect(result.success).toBe(true);
   });
 

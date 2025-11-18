@@ -24,8 +24,13 @@ import { z } from 'zod';
  * ```
  */
 export const StatSchema = z.object({
-  /** Lucide icon component */
-  icon: z.any(), // LucideIcon type (function component)
+  /** Lucide icon component - using z.custom for type safety */
+  icon: z.custom<React.ComponentType>(
+    (val) => typeof val === 'function' || (typeof val === 'object' && val !== null),
+    {
+      message: 'Icon must be a valid React component',
+    },
+  ),
   /** Stat value - number or string (e.g., "100%", "0", "<300kB") */
   value: z.string().or(z.number()),
   /** Label/description for the stat */
@@ -78,8 +83,13 @@ export function validateStats(data: unknown) {
  * ```
  */
 export const FeatureSchema = z.object({
-  /** Lucide icon component */
-  icon: z.any(),
+  /** Lucide icon component - using z.custom for type safety */
+  icon: z.custom<React.ComponentType>(
+    (val) => typeof val === 'function' || (typeof val === 'object' && val !== null),
+    {
+      message: 'Icon must be a valid React component',
+    },
+  ),
   /** Feature title */
   title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
   /** Feature description */

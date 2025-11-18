@@ -24,8 +24,8 @@ import { z } from 'zod';
  * ```
  */
 export const EmailInputSchema = z.object({
-  /** Email address - optional (empty string) or valid email format */
-  value: z.string().email('Invalid email address').or(z.literal('')), // Allow empty for optional fields
+  /** Email address - optional or valid email format */
+  value: z.string().email('Invalid email address').optional(), // Zod 4 idiomatic: .optional() instead of .or(z.literal(''))
 });
 
 /**
@@ -201,6 +201,10 @@ export type CookieConsentData = z.infer<typeof CookieConsentSchema>;
  * ```
  */
 export function validateEmail(email: string) {
+  // Allow empty string for optional emails, undefined for missing
+  if (email === '') {
+    return { success: true, data: undefined } as const;
+  }
   return EmailInputSchema.shape.value.safeParse(email);
 }
 

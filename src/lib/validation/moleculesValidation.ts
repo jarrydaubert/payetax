@@ -29,7 +29,7 @@ import { z } from 'zod';
  */
 export const FeedbackFormSchema = z.object({
   /** Optional email address, must be valid format if provided */
-  email: z.string().email('Invalid email address').optional().or(z.literal('')), // Allow empty string for optional email
+  email: z.string().email('Invalid email address').optional(), // Zod 4 idiomatic: .optional() instead of .or(z.literal(''))
   /** Required message, 10-5000 characters after trimming */
   message: z
     .string()
