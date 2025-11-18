@@ -45,7 +45,6 @@ describe('Design Tokens Constants', () => {
       expect(SPACING.SPACE_Y_2).toBe('space-y-2');
       expect(SPACING.SPACE_Y_1).toBe('space-y-1');
     });
-
   });
 
   describe('Icon Size Tokens', () => {
@@ -123,7 +122,6 @@ describe('Design Tokens Constants', () => {
       const uniqueValues = new Set(values);
       expect(uniqueValues.size).toBe(values.length);
     });
-
   });
 
   describe('Type Safety', () => {
