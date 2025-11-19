@@ -39,7 +39,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
-    studentLoanPlan: 'none',
+    studentLoanPlans: 'none',
     niCategory: 'A',
     hoursPerWeek: 37.5,
     ...overrides,
@@ -326,7 +326,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 35000,
           isMarried: true,
           partnerGrossWage: 10000,
-          studentLoanPlan: 'plan2',
+          studentLoanPlans: ['plan2'],
         })
       );
 
@@ -341,7 +341,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       const result = calculateTax(
         createInput({
           salary: 40000,
-          studentLoanPlan: 'plan1',
+          studentLoanPlans: ['plan1'],
         })
       );
 
@@ -353,7 +353,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       const result = calculateTax(
         createInput({
           salary: 100000,
-          studentLoanPlan: 'postgrad',
+          studentLoanPlans: ['postgrad'],
         })
       );
 

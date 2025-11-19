@@ -1,6 +1,6 @@
 {
   "version": "2025-2026",
-  "generatedAt": "2025-11-19T16:29:32.438Z",
+  "generatedAt": "2025-11-19T16:43:03.406Z",
   "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
   "metadata": {
     "personalAllowance": 12570,
@@ -21,7 +21,7 @@
         "employeeNI": 1394.4,
         "netPay": 25119.6
       },
-      "generatedAt": "2025-11-19T16:29:32.437Z",
+      "generatedAt": "2025-11-19T16:43:03.404Z",
       "taxYear": "2025-2026"
     },
     {
@@ -37,7 +37,7 @@
         "employeeNI": 2594.4,
         "netPay": 35919.6
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -53,7 +53,7 @@
         "employeeNI": 3110.64,
         "netPay": 42457.36
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -69,7 +69,7 @@
         "employeeNI": 0,
         "netPay": 12570
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -85,7 +85,7 @@
         "employeeNI": 3015.96,
         "netPay": 39714.08
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -101,7 +101,7 @@
         "employeeNI": 4010.64,
         "netPay": 68557.36
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -117,7 +117,7 @@
         "employeeNI": 4210.56,
         "netPay": 72357.44
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -133,7 +133,7 @@
         "employeeNI": 4513.44,
         "netPay": 78110.56
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.405Z",
       "taxYear": "2025-2026"
     },
     {
@@ -149,7 +149,7 @@
         "employeeNI": 5010.6,
         "netPay": 91286.4
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -165,7 +165,7 @@
         "employeeNI": 2594.4,
         "netPay": 35491.8
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -181,7 +181,7 @@
         "employeeNI": 6010.56,
         "netPay": 109946.24
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -197,7 +197,7 @@
         "employeeNI": 994.44,
         "netPay": 21519.52
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -213,7 +213,7 @@
         "employeeNI": 2194.44,
         "netPay": 29745.52
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -229,7 +229,7 @@
         "employeeNI": 1874.4,
         "netPay": 29439.6
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -239,14 +239,14 @@
         "salary": 25000,
         "region": "England",
         "taxCode": "1257L",
-        "studentLoan": "plan1"
+        "studentLoan": ["plan1"]
       },
       "expected": {
         "incomeTax": 2486.04,
         "employeeNI": 994.44,
         "netPay": 21519.52
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -256,7 +256,7 @@
         "salary": 40000,
         "region": "England",
         "taxCode": "1257L",
-        "studentLoan": "plan2"
+        "studentLoan": ["plan2"]
       },
       "expected": {
         "incomeTax": 5486.04,
@@ -264,7 +264,7 @@
         "studentLoanRepayment": 1037.76,
         "netPay": 31281.76
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -282,7 +282,7 @@
         "pensionContribution": 5000,
         "netPay": 35919.6
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -300,7 +300,7 @@
         "pensionContribution": 24000,
         "netPay": 29439.6
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -317,7 +317,7 @@
         "employeeNI": 194.4,
         "netPay": 14319.6
       },
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     },
     {
@@ -327,16 +327,15 @@
         "salary": 50000,
         "region": "England",
         "taxCode": "1257L",
-        "studentLoan": "plan2-postgrad"
+        "studentLoan": ["plan2", "postgrad"]
       },
       "expected": {
         "incomeTax": 7485.96,
         "employeeNI": 2994.36,
-        "studentLoanRepayment": 3677.7,
-        "netPay": 35841.98
+        "studentLoanRepayment": 3783.45,
+        "netPay": 35736.23
       },
-      "knownIssue": "🐛 BUG: Calculator UI does not support selecting multiple student loans. Only applies one loan instead of both. This test will FAIL until the calculator is fixed to support Plan 2 + Postgraduate simultaneously.",
-      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
     }
   ]

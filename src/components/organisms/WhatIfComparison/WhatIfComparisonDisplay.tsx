@@ -73,7 +73,7 @@ export function WhatIfComparisonDisplay({
   className,
 }: WhatIfComparisonDisplayProps) {
   // Use granular selectors to avoid unnecessary re-renders
-  const studentLoanPlan = useCalculatorStore((state) => state.input.studentLoanPlan);
+  const studentLoanPlans = useCalculatorStore((state) => state.input.studentLoanPlans);
   const allowancesDeductions = useCalculatorStore((state) => state.input.allowancesDeductions);
   const shouldReduceMotion = useMotionPreference();
 
@@ -118,7 +118,7 @@ export function WhatIfComparisonDisplay({
     return `${Math.abs((amount / total) * 100).toFixed(1)}%`;
   }, []);
 
-  const studentLoans = studentLoanPlan !== 'none' ? [studentLoanPlan] : [];
+  const studentLoans = studentLoanPlans !== 'none' ? studentLoanPlans : [];
 
   const currentGross = currentResults.grossSalary.annually;
   const whatIfGross = whatIfResults.grossSalary.annually;

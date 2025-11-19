@@ -33,6 +33,7 @@ import {
   type PayPeriod,
   PERIODS,
   type StudentLoanPlan,
+  type StudentLoanSelection,
   TAX_RATES,
   type TaxBand,
   type TaxYear,
@@ -79,8 +80,8 @@ interface CalculatorInput {
   age?: number;
   /** Whether paying no National Insurance (e.g., over state pension age) */
   payNoNI: boolean;
-  /** Student loan plan (single selection or none) */
-  studentLoanPlan: StudentLoanPlan | 'none';
+  /** Student loan plans (can select multiple, or 'none') */
+  studentLoanPlans: StudentLoanSelection;
   /** Pension contribution amount */
   pensionContribution: number;
   /** Whether pension contribution is a percentage or fixed amount */
@@ -179,7 +180,8 @@ interface CalculatorState {
   setIsBlind: (isBlind: boolean) => void;
   setAge: (age: number | undefined) => void;
   setPayNoNI: (payNoNI: boolean) => void;
-  setStudentLoanPlan: (plan: StudentLoanPlan | 'none') => void;
+  setStudentLoanPlans: (plans: StudentLoanSelection) => void;
+  toggleStudentLoan: (plan: StudentLoanPlan) => void;
   setPensionContribution: (amount: number) => void;
   setPensionContributionType: (type: 'percentage' | 'amount') => void;
   setNiCategory: (category: NICategory) => void;
@@ -245,7 +247,7 @@ const defaultInput: CalculatorInput = {
   isBlind: false,
   age: undefined,
   payNoNI: false,
-  studentLoanPlan: 'none',
+  studentLoanPlans: 'none',
   pensionContribution: 0,
   pensionContributionType: 'percentage',
   niCategory: 'A',
@@ -538,21 +540,79 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           set((state) => ({ input: { ...state.input, pensionContributionType: validated.data } }));
         },
-        setStudentLoanPlan: (studentLoanPlan) => {
-          // Validate student loan plan
+        setStudentLoanPlans: (studentLoanPlans) => {
+          // Validate student loan plans - either 'none' or array of valid plans
+          const planEnum = z.enum(['plan1', 'plan2', 'plan4', 'plan5', 'postgrad']);
           const validated = z
-            .enum(['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgrad'])
-            .safeParse(studentLoanPlan);
+            .union([z.literal('none'), z.array(planEnum).max(2, 'Maximum 2 student loans allowed')])
+            .safeParse(studentLoanPlans);
 
           if (!validated.success) {
             console.warn(
-              '[Calculator] Invalid student loan plan:',
+              '[Calculator] Invalid student loan plans:',
               validated.error.issues[0].message
             );
             return;
           }
 
-          set((state) => ({ input: { ...state.input, studentLoanPlan: validated.data } }));
+          // Check for duplicates if array
+          if (Array.isArray(validated.data)) {
+            const unique = new Set(validated.data);
+            if (unique.size !== validated.data.length) {
+              console.warn('[Calculator] Duplicate student loan plans not allowed');
+              return;
+            }
+          }
+
+          set((state) => ({ input: { ...state.input, studentLoanPlans: validated.data } }));
+        },
+        toggleStudentLoan: (plan) => {
+          // Validate plan
+          const planValidated = z
+            .enum(['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'])
+            .safeParse(plan);
+
+          if (!planValidated.success) {
+            console.warn(
+              '[Calculator] Invalid student loan plan:',
+              planValidated.error.issues[0].message
+            );
+            return;
+          }
+
+          set((state) => {
+            const currentPlans = state.input.studentLoanPlans;
+
+            // If 'none', initialize with this plan
+            if (currentPlans === 'none') {
+              return { input: { ...state.input, studentLoanPlans: [planValidated.data] } };
+            }
+
+            // Toggle plan in array
+            const plansArray = currentPlans as StudentLoanPlan[];
+            const hasplan = plansArray.includes(planValidated.data);
+
+            if (hasplan) {
+              // Remove plan
+              const newPlans = plansArray.filter((p) => p !== planValidated.data);
+              return {
+                input: {
+                  ...state.input,
+                  studentLoanPlans: newPlans.length === 0 ? 'none' : newPlans,
+                },
+              };
+            }
+
+            // Add plan (max 2)
+            if (plansArray.length >= 2) {
+              console.warn('[Calculator] Maximum 2 student loans allowed');
+              return state;
+            }
+
+            return {
+              input: { ...state.input, studentLoanPlans: [...plansArray, planValidated.data] },
+            };
+          });
         },
         setNiCategory: (niCategory) => {
           // Validate NI category using extracted schema
@@ -668,7 +728,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               taxYear: input.taxYear,
               region: input.region,
               taxCode: input.taxCode || 'default',
-              studentLoanPlan: input.studentLoanPlan,
+              studentLoanPlans: input.studentLoanPlans,
               pensionContribution: input.pensionContribution,
             });
 
@@ -719,7 +779,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               taxYear: input.taxYear,
               region: input.region,
               taxCode: input.taxCode,
-              studentLoanPlan: input.studentLoanPlan,
+              studentLoanPlans: input.studentLoanPlans,
               pensionContribution: input.pensionContribution,
               isMarried: input.isMarried,
             });
@@ -926,7 +986,8 @@ export const useCalculatorActions = () =>
       setIsBlind: state.setIsBlind,
       setAge: state.setAge,
       setPayNoNI: state.setPayNoNI,
-      setStudentLoanPlan: state.setStudentLoanPlan,
+      setStudentLoanPlans: state.setStudentLoanPlans,
+      toggleStudentLoan: state.toggleStudentLoan,
       setPensionContribution: state.setPensionContribution,
       setPensionContributionType: state.setPensionContributionType,
       setNiCategory: state.setNiCategory,

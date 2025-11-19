@@ -81,7 +81,7 @@ const createBasicInput = (
   payNoNI: false,
   pensionContribution: 0,
   pensionContributionType: 'percentage',
-  studentLoanPlan: 'none',
+  studentLoanPlans: 'none',
   niCategory: 'A',
   hoursPerWeek: 37.5,
   ...overrides,
@@ -387,7 +387,7 @@ describe('Tax Calculator', () => {
      * National Insurance, creating a triple deduction effect.
      */
     it('calculates Plan 2 student loan repayments', () => {
-      const input = createBasicInput(35000, { studentLoanPlan: 'plan2' });
+      const input = createBasicInput(35000, { studentLoanPlans: ['plan2'] });
       const result = calculateTax(input);
 
       // Should calculate student loan repayment (above £27,295 threshold)
@@ -418,7 +418,7 @@ describe('Tax Calculator', () => {
      * low earners from repayment obligations that would cause hardship.
      */
     it('does not calculate student loan for low income', () => {
-      const input = createBasicInput(20000, { studentLoanPlan: 'plan2' });
+      const input = createBasicInput(20000, { studentLoanPlans: ['plan2'] });
       const result = calculateTax(input);
 
       // No repayment below threshold
@@ -442,7 +442,7 @@ describe('Tax Calculator', () => {
      * compared to undergraduate Plan 2 (9% above £27,295).
      */
     it('handles postgraduate student loan', () => {
-      const input = createBasicInput(40000, { studentLoanPlan: 'postgrad' });
+      const input = createBasicInput(40000, { studentLoanPlans: ['postgrad'] });
       const result = calculateTax(input);
 
       // Should calculate repayments for postgraduate loan

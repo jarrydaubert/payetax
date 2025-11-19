@@ -317,7 +317,7 @@ describe('Calculator Store - What If Feature', () => {
     it('should handle student loan in What If calculation', () => {
       const {
         setSalary,
-        setStudentLoanPlan,
+        setStudentLoanPlans,
         calculate,
         setWhatIfType,
         setWhatIfValue,
@@ -325,7 +325,7 @@ describe('Calculator Store - What If Feature', () => {
       } = useCalculatorStore.getState();
 
       setSalary(30000);
-      setStudentLoanPlan('plan2'); // Use lowercase plan name
+      setStudentLoanPlans(['plan2']); // Use array format
       calculate();
 
       const { results } = useCalculatorStore.getState();

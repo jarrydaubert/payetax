@@ -19,7 +19,7 @@ describe('Salary Comparison', () => {
     isBlind: false,
     age: 30,
     payNoNI: false,
-    studentLoanPlan: 'none',
+    studentLoanPlans: 'none',
     pensionContribution: 0,
     pensionContributionType: 'percentage',
     niCategory: 'A',

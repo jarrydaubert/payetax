@@ -25,7 +25,7 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
-    studentLoanPlan: 'none',
+    studentLoanPlans: 'none',
     niCategory: 'A',
     hoursPerWeek: 37.5,
   });

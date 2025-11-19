@@ -156,22 +156,21 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         }
       }
 
-      // 5. Student Loan (if specified)
+      // 5. Student Loans (if specified) - now supports multiple via checkboxes
       if (input.studentLoan && input.studentLoan !== 'none') {
-        try {
-          // Use combobox role to avoid tooltip collision
-          const studentLoanSelect = page.getByRole('combobox', { name: /student loan/i });
-          await studentLoanSelect.click({ timeout: 2000 });
-          await page.waitForTimeout(300);
+        const loans = Array.isArray(input.studentLoan) ? input.studentLoan : [input.studentLoan];
 
-          // Handle dual loans (Plan 2 + Postgrad) - match exact option text
-          const optionName = input.studentLoan.includes('postgrad')
-            ? /postgraduate/i
-            : new RegExp(input.studentLoan.replace('plan', 'Plan '), 'i');
+        for (const loan of loans) {
+          const testId = `student-loan-${loan}`;
+          const checkbox = page.getByTestId(testId);
 
-          await page.getByRole('option', { name: optionName }).click();
-          await page.waitForTimeout(300);
-        } catch (_error) {}
+          try {
+            await checkbox.check({ timeout: 2000 });
+            await page.waitForTimeout(300);
+          } catch (_error) {
+            console.log(`⚠️  Could not check ${loan} checkbox`);
+          }
+        }
       }
 
       // 6. Marriage Allowance (if specified)

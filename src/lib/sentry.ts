@@ -36,8 +36,8 @@ export interface CalculatorErrorContext {
   region: string;
   /** Tax code if provided */
   taxCode?: string;
-  /** Student loan plan if applicable */
-  studentLoanPlan?: string;
+  /** Student loan plans if applicable */
+  studentLoanPlans?: string | string[];
   /** Pension contribution amount */
   pensionContribution?: number;
   /** Whether married/civil partnership */
@@ -108,7 +108,8 @@ export function captureCalculatorError(
       error_type: 'calculator',
       tax_year: context.taxYear,
       region: context.region,
-      has_student_loan: context.studentLoanPlan ? 'yes' : 'no',
+      has_student_loan:
+        context.studentLoanPlans && context.studentLoanPlans !== 'none' ? 'yes' : 'no',
       has_pension: context.pensionContribution ? 'yes' : 'no',
       is_married: context.isMarried ? 'yes' : 'no',
     },
@@ -116,7 +117,7 @@ export function captureCalculatorError(
       calculator: {
         salary: context.salary,
         taxCode: context.taxCode || 'default',
-        studentLoanPlan: context.studentLoanPlan || 'none',
+        studentLoanPlans: context.studentLoanPlans || 'none',
         pensionContribution: context.pensionContribution || 0,
       },
     },

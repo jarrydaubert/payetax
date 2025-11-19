@@ -28,7 +28,7 @@ describe('BasicInputs - Regression Tests', () => {
     isBlind: false,
     age: undefined,
     payNoNI: false,
-    studentLoanPlan: 'none' as const,
+    studentLoanPlans: 'none' as const,
     allowancesDeductions: 0,
     pensionContribution: 5.5,
     pensionContributionType: 'percentage' as const,

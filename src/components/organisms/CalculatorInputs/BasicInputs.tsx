@@ -49,7 +49,7 @@ export function BasicInputs() {
     setIsBlind,
     setAge,
     setPayNoNI,
-    setStudentLoanPlan,
+    toggleStudentLoan,
     setPensionContribution,
     setPensionContributionType,
     setAllowancesDeductions,
@@ -65,7 +65,6 @@ export function BasicInputs() {
   const blindId = useId();
   const ageId = useId();
   const payNoNIId = useId();
-  const studentLoanId = useId();
   const allowancesId = useId();
   const pensionTypeId = useId();
   const pensionId = useId();
@@ -88,12 +87,11 @@ export function BasicInputs() {
   ];
 
   const studentLoanOptions = [
-    { value: 'none' as const, label: 'No' },
-    { value: 'plan1' as const, label: 'Plan 1' },
-    { value: 'plan2' as const, label: 'Plan 2' },
-    { value: 'plan4' as const, label: 'Plan 4' },
-    { value: 'plan5' as const, label: 'Plan 5' },
-    { value: 'postgrad' as const, label: 'Postgraduate' },
+    { value: 'plan1' as const, label: 'Plan 1 (pre-Sept 2012)', description: 'Older loans' },
+    { value: 'plan2' as const, label: 'Plan 2 (Sept 2012+)', description: 'Most common' },
+    { value: 'plan4' as const, label: 'Plan 4 (Scotland)', description: 'Scottish students' },
+    { value: 'plan5' as const, label: 'Plan 5 (2023+)', description: 'New loans' },
+    { value: 'postgrad' as const, label: 'Postgraduate Loan', description: 'Masters/PhD' },
   ];
 
   return (
@@ -311,31 +309,39 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      {/* Student Loan */}
-      <div className={cn('flex items-center', SPACING.GAP_3)}>
+      {/* Student Loans - Multi-select */}
+      <div className={cn('flex flex-col', SPACING.GAP_2)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='studentLoanPlan' />
-          <Label htmlFor={studentLoanId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
-            Student Loan
+          <Label className={cn('font-medium', TYPOGRAPHY.TEXT_SM)}>
+            Student Loans{' '}
+            <span className='text-muted-foreground'>(select all that apply, max 2)</span>
           </Label>
         </div>
-        <Select value={input.studentLoanPlan} onValueChange={setStudentLoanPlan}>
-          <SelectTrigger
-            id={studentLoanId}
-            className='w-[160px]'
-            aria-label='Select student loan plan'
-            data-testid='student-loan-select'
-          >
-            <SelectValue placeholder='Select student loan' />
-          </SelectTrigger>
-          <SelectContent>
-            {studentLoanOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className={cn('flex flex-col', SPACING.GAP_2, 'pl-6')}>
+          {studentLoanOptions.map((option) => {
+            const isChecked =
+              Array.isArray(input.studentLoanPlans) &&
+              input.studentLoanPlans.includes(option.value);
+
+            return (
+              <div key={option.value} className={cn('flex items-center', SPACING.GAP_2)}>
+                <Checkbox
+                  id={`loan-${option.value}`}
+                  checked={isChecked}
+                  onCheckedChange={() => toggleStudentLoan(option.value)}
+                  data-testid={`student-loan-${option.value}`}
+                />
+                <Label
+                  htmlFor={`loan-${option.value}`}
+                  className={cn('cursor-pointer', TYPOGRAPHY.TEXT_SM)}
+                >
+                  {option.label}
+                </Label>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Allowances/Deductions */}

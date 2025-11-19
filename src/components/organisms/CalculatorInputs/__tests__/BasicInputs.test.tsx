@@ -33,7 +33,7 @@ describe('BasicInputs Component', () => {
     isBlind: false,
     age: undefined,
     payNoNI: false,
-    studentLoanPlan: 'none' as const,
+    studentLoanPlans: 'none' as const,
     allowancesDeductions: 0,
     pensionContribution: 0,
     pensionContributionType: 'percentage' as const,
@@ -112,9 +112,13 @@ describe('BasicInputs Component', () => {
       expect(screen.getByTestId('age-select')).toBeInTheDocument();
     });
 
-    it('should render student loan select', () => {
+    it('should render student loan checkboxes', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Student Loan')).toBeInTheDocument();
+      expect(screen.getByText(/Student Loans/i)).toBeInTheDocument();
+      // Check that checkboxes exist
+      expect(screen.getByTestId('student-loan-plan1')).toBeInTheDocument();
+      expect(screen.getByTestId('student-loan-plan2')).toBeInTheDocument();
+      expect(screen.getByTestId('student-loan-postgrad')).toBeInTheDocument();
     });
 
     it('should render allowances/deductions input', () => {

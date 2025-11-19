@@ -29,7 +29,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
     isBlind: false,
     age: undefined,
     payNoNI: false,
-    studentLoanPlan: 'none' as const,
+    studentLoanPlans: 'none' as const,
     pensionContribution: 0,
     pensionContributionType: 'percentage' as const,
     niCategory: 'A' as const,

@@ -347,23 +347,32 @@ describe('Calculator Store Validation', () => {
     });
   });
 
-  describe('setStudentLoanPlan', () => {
+  describe('setStudentLoanPlans', () => {
     it('should accept valid student loan plans', () => {
-      const { setStudentLoanPlan } = useCalculatorStore.getState();
-      const validPlans = ['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
+      const { setStudentLoanPlans } = useCalculatorStore.getState();
 
+      // Test 'none'
+      setStudentLoanPlans('none');
+      expect(useCalculatorStore.getState().input.studentLoanPlans).toBe('none');
+
+      // Test single loan arrays
+      const validPlans = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
       for (const plan of validPlans) {
-        setStudentLoanPlan(plan);
-        expect(useCalculatorStore.getState().input.studentLoanPlan).toBe(plan);
+        setStudentLoanPlans([plan]);
+        expect(useCalculatorStore.getState().input.studentLoanPlans).toEqual([plan]);
       }
+
+      // Test dual loans
+      setStudentLoanPlans(['plan2', 'postgrad']);
+      expect(useCalculatorStore.getState().input.studentLoanPlans).toEqual(['plan2', 'postgrad']);
     });
 
     it('should reject invalid student loan plan', () => {
-      const { setStudentLoanPlan } = useCalculatorStore.getState();
+      const { setStudentLoanPlans } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       // @ts-expect-error Testing invalid input
-      setStudentLoanPlan('plan3');
+      setStudentLoanPlans('plan3');
 
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();

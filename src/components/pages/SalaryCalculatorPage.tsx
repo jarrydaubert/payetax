@@ -35,7 +35,7 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
       partnerGrossWage: 0,
       isBlind: false,
       payNoNI: false,
-      studentLoanPlan: 'none',
+      studentLoanPlans: 'none',
       pensionContribution: 0,
       pensionContributionType: 'percentage',
       niCategory: 'A',

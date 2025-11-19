@@ -158,7 +158,7 @@ const mockInput = {
   taxYear: '2025-26',
   pensionContribution: 0,
   pensionType: 'percentage',
-  studentLoanPlan: 'none',
+  studentLoanPlans: 'none',
   allowancesDeductions: 0,
   isBlind: false,
   isOver65: false,
@@ -297,7 +297,7 @@ describe('WhatIfComparisonDisplay', () => {
     it('should display student loan row when student loan exists', () => {
       const mockInputWithLoan = {
         ...mockInput,
-        studentLoanPlan: 'plan1' as const,
+        studentLoanPlans: ['plan1'] as const,
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>

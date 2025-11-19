@@ -20,7 +20,7 @@ const mockCurrentInput: TaxCalculationInput = {
   taxYear: '2025-26',
   pensionContribution: 0,
   pensionType: 'percentage',
-  studentLoanPlan: 'none',
+  studentLoanPlans: 'none',
   allowancesDeductions: 0,
   isBlind: false,
   isOver65: false,

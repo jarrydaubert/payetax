@@ -32,7 +32,7 @@ function createInput(overrides: Partial<TaxCalculationInput>): TaxCalculationInp
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage' as const,
-    studentLoanPlan: 'none' as const,
+    studentLoanPlans: 'none' as const,
     niCategory: 'A' as const,
     hoursPerWeek: 40,
     ...overrides,
@@ -127,12 +127,12 @@ const scenarios: Array<{ id: string; description: string; input: TaxCalculationI
   {
     id: 'plan1-threshold',
     description: 'Plan 1 student loan £25k (just above £26,065)',
-    input: createInput({ salary: 25000, studentLoanPlan: 'plan1' }),
+    input: createInput({ salary: 25000, studentLoanPlans: ['plan1'] }),
   },
   {
     id: 'plan2-student-40k',
     description: 'Plan 2 student loan £40k',
-    input: createInput({ salary: 40000, studentLoanPlan: 'plan2' }),
+    input: createInput({ salary: 40000, studentLoanPlans: ['plan2'] }),
   },
 
   // Pension
@@ -195,7 +195,7 @@ const generated = scenarios.map(({ id, description, input }) => {
         region: input.isScottish ? 'Scotland' : 'England',
         taxCode: input.taxCode,
         ...(input.pensionContribution > 0 && { pensionPercent: input.pensionContribution }),
-        ...(input.studentLoanPlan !== 'none' && { studentLoan: input.studentLoanPlan }),
+        ...(input.studentLoanPlans !== 'none' && { studentLoan: input.studentLoanPlans }),
         ...(input.isMarried && { partnerGrossWage: input.partnerGrossWage }),
       },
       expected: {
@@ -231,6 +231,7 @@ const output = {
 };
 
 // Add the dual-student-loans scenario with known issue (calculator doesn't support multiple loans yet)
+// biome-ignore lint/suspicious/noExplicitAny: Intentionally tracking a known bug with invalid type
 (generated as any).push({
   id: 'dual-student-loans',
   description: 'Plan 2 + Postgrad loans £50k (47% marginal!)',
@@ -238,7 +239,8 @@ const output = {
     salary: 50000,
     region: 'England',
     taxCode: '1257L',
-    studentLoan: 'plan2-postgrad' as any, // Not a valid StudentLoanPlan - this is the known bug
+    // biome-ignore lint/suspicious/noExplicitAny: plan2-postgrad is not a valid StudentLoanPlan - this is the known bug we're tracking
+    studentLoan: 'plan2-postgrad' as any,
   },
   expected: {
     incomeTax: 7485.96,

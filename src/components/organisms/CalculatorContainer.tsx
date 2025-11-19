@@ -128,7 +128,7 @@ export function CalculatorContainer() {
         results,
         visiblePeriods,
         whatIfResults,
-        studentLoans: input.studentLoanPlan !== 'none' ? [input.studentLoanPlan] : [],
+        studentLoans: input.studentLoanPlans !== 'none' ? input.studentLoanPlans : [],
         allowancesDeductions: input.allowancesDeductions,
         previousYearResults,
         taxYear: input.taxYear,
@@ -255,7 +255,7 @@ export function CalculatorContainer() {
           >
             <ResultsTable
               results={results}
-              studentLoans={input.studentLoanPlan !== 'none' ? [input.studentLoanPlan] : []}
+              studentLoans={input.studentLoanPlans !== 'none' ? input.studentLoanPlans : []}
               allowancesDeductions={input.allowancesDeductions}
               previousYearResults={previousYearResults}
               whatIfResults={whatIfResults}

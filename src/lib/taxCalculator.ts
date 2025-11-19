@@ -46,7 +46,7 @@ import {
   PERIODS,
   SCOTTISH_PREFIX,
   SCOTTISH_TAX_RATES,
-  type StudentLoanPlan,
+  type StudentLoanSelection,
   TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
@@ -98,8 +98,8 @@ export interface TaxCalculationInput {
   pensionContribution: number;
   /** Type of pension contribution (percentage or fixed amount) */
   pensionContributionType: 'percentage' | 'amount';
-  /** Student loan plan that applies */
-  studentLoanPlan: StudentLoanPlan | 'none';
+  /** Student loan plans that apply (can be multiple) */
+  studentLoanPlans: StudentLoanSelection;
   /** National Insurance category */
   niCategory: NICategory;
   /** Hours worked per week (for hourly calculations) */
@@ -693,17 +693,20 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   let monthlyStudentLoan = 0;
 
-  // Only calculate if student loan plan is selected
-  if (input.studentLoanPlan && input.studentLoanPlan !== 'none') {
-    const loanRates = standardRates.studentLoan[input.studentLoanPlan];
+  // Calculate repayments for multiple student loans if selected
+  // Each loan is calculated independently and summed (HMRC rules)
+  if (Array.isArray(input.studentLoanPlans) && input.studentLoanPlans.length > 0) {
+    for (const plan of input.studentLoanPlans) {
+      const loanRates = standardRates.studentLoan[plan];
 
-    // Convert annual threshold to monthly
-    const monthlyLoanThreshold = loanRates.threshold / 12;
+      // Convert annual threshold to monthly
+      const monthlyLoanThreshold = loanRates.threshold / 12;
 
-    // Student loan is calculated on gross salary, not adjusted salary
-    // This matches how student loan is calculated on payslips
-    if (monthlyGrossSalary > monthlyLoanThreshold) {
-      monthlyStudentLoan = ((monthlyGrossSalary - monthlyLoanThreshold) * loanRates.rate) / 100;
+      // Student loan is calculated on gross salary, not adjusted salary
+      // This matches how student loan is calculated on payslips
+      if (monthlyGrossSalary > monthlyLoanThreshold) {
+        monthlyStudentLoan += ((monthlyGrossSalary - monthlyLoanThreshold) * loanRates.rate) / 100;
+      }
     }
   }
 

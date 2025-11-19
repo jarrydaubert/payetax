@@ -25,7 +25,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
     payNoNI: age ? age >= 66 : false, // State pension age
     pensionContribution: 0,
     pensionContributionType: 'percentage',
-    studentLoanPlan: 'none',
+    studentLoanPlans: 'none',
     niCategory: 'A',
     hoursPerWeek: 37.5,
   });

@@ -146,7 +146,7 @@ describe('CalculatorContainer Component', () => {
       selector({
         previousYearResults: null,
         input: {
-          studentLoanPlan: 'none',
+          studentLoanPlans: 'none',
           allowancesDeductions: 0,
         },
       })

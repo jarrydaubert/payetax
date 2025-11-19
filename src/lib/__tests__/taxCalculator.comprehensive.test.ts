@@ -26,7 +26,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
-    studentLoanPlan: 'none',
+    studentLoanPlans: 'none',
     niCategory: 'A',
     hoursPerWeek: 37.5,
     ...overrides,
@@ -214,15 +214,15 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
   describe('All Student Loan Plans', () => {
     const plans: Array<{
-      plan: TaxCalculationInput['studentLoanPlan'];
+      plan: TaxCalculationInput['studentLoanPlans'];
       threshold: number;
       rate: number;
     }> = [
-      { plan: 'plan1', threshold: 26065, rate: 9 },
-      { plan: 'plan2', threshold: 28470, rate: 9 },
-      { plan: 'plan4', threshold: 31395, rate: 9 },
-      { plan: 'plan5', threshold: 25000, rate: 9 },
-      { plan: 'postgrad', threshold: 21000, rate: 6 },
+      { plan: ['plan1'], threshold: 26065, rate: 9 },
+      { plan: ['plan2'], threshold: 28470, rate: 9 },
+      { plan: ['plan4'], threshold: 31395, rate: 9 },
+      { plan: ['plan5'], threshold: 25000, rate: 9 },
+      { plan: ['postgrad'], threshold: 21000, rate: 6 },
     ];
 
     // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
@@ -232,7 +232,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         const result = calculateTax(
           createInput({
             salary,
-            studentLoanPlan: plan,
+            studentLoanPlans: plan,
           })
         );
 
@@ -245,7 +245,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const result = calculateTax(
         createInput({
           salary: 20000,
-          studentLoanPlan: 'plan2', // Threshold £28,470
+          studentLoanPlans: ['plan2'], // Threshold £28,470
         })
       );
       expect(result.studentLoan.annually).toBe(0);
@@ -255,7 +255,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const result = calculateTax(
         createInput({
           salary: 100000,
-          studentLoanPlan: 'postgrad',
+          studentLoanPlans: ['postgrad'],
         })
       );
       // (£100,000 - £21,000) × 6% = £4,740
@@ -443,7 +443,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           isBlind: true,
           isMarried: true,
           partnerGrossWage: 10000,
-          studentLoanPlan: 'plan2',
+          studentLoanPlans: ['plan2'],
           pensionContribution: 10,
           pensionContributionType: 'percentage',
         })
@@ -467,7 +467,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           partnerGrossWage: 10000,
           age: 70,
           isBlind: true,
-          studentLoanPlan: 'plan4', // Scottish plan
+          studentLoanPlans: ['plan4'], // Scottish plan
           niCategory: 'A',
           pensionContribution: 5,
           pensionContributionType: 'percentage',
@@ -487,7 +487,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 22000,
           age: 19,
           niCategory: 'M', // Under 21
-          studentLoanPlan: 'plan1',
+          studentLoanPlans: ['plan1'],
         })
       );
 
@@ -503,7 +503,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 12,
           payPeriod: 'hourly',
           hoursPerWeek: 20, // Part-time
-          studentLoanPlan: 'plan2',
+          studentLoanPlans: ['plan2'],
           pensionContribution: 3,
           pensionContributionType: 'percentage',
         })
@@ -626,7 +626,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const result = calculateTax(
         createInput({
           salary: 35000,
-          studentLoanPlan: 'plan2',
+          studentLoanPlans: ['plan2'],
           pensionContribution: 5,
           pensionContributionType: 'percentage',
         })
