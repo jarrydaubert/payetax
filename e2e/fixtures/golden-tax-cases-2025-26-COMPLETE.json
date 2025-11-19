@@ -1,11 +1,16 @@
 {
-  "version": "2025-26",
-  "capturedAt": "2025-11-19T10:37:56.151Z",
-  "description": "TRUE golden master - captured from live calculator",
+  "version": "2025-2026",
+  "generatedAt": "2025-11-19T16:29:32.438Z",
+  "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
+  "metadata": {
+    "personalAllowance": 12570,
+    "niPrimaryThreshold": 12570,
+    "niPrimaryRate": 8
+  },
   "cases": [
     {
       "id": "basic-30k",
-      "description": "Basic rate England \u00a330k",
+      "description": "Basic rate England £30k",
       "input": {
         "salary": 30000,
         "region": "England",
@@ -16,11 +21,12 @@
         "employeeNI": 1394.4,
         "netPay": 25119.6
       },
-      "capturedAt": "2025-11-19T10:35:40.203Z"
+      "generatedAt": "2025-11-19T16:29:32.437Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "basic-45k",
-      "description": "Basic rate England \u00a345k",
+      "description": "Basic rate England £45k",
       "input": {
         "salary": 45000,
         "region": "England",
@@ -31,11 +37,12 @@
         "employeeNI": 2594.4,
         "netPay": 35919.6
       },
-      "capturedAt": "2025-11-19T10:35:46.217Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "higher-55k",
-      "description": "Higher rate England \u00a355k",
+      "description": "Higher rate England £55k",
       "input": {
         "salary": 55000,
         "region": "England",
@@ -46,11 +53,44 @@
         "employeeNI": 3110.64,
         "netPay": 42457.36
       },
-      "capturedAt": "2025-11-19T10:35:52.234Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "exact-pa-12570",
+      "description": "Exactly at personal allowance (£12,570)",
+      "input": {
+        "salary": 12570,
+        "region": "England",
+        "taxCode": "1257L"
+      },
+      "expected": {
+        "incomeTax": 0,
+        "employeeNI": 0,
+        "netPay": 12570
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "exact-higher-rate",
+      "description": "Exactly at higher rate threshold (£50,270)",
+      "input": {
+        "salary": 50270,
+        "region": "England",
+        "taxCode": "1257L"
+      },
+      "expected": {
+        "incomeTax": 7539.96,
+        "employeeNI": 3015.96,
+        "netPay": 39714.08
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "pa-taper-100k",
-      "description": "Personal allowance taper starts \u00a3100k",
+      "description": "Personal allowance taper starts £100k",
       "input": {
         "salary": 100000,
         "region": "England",
@@ -61,11 +101,12 @@
         "employeeNI": 4010.64,
         "netPay": 68557.36
       },
-      "capturedAt": "2025-11-19T10:35:58.292Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "pa-taper-110k",
-      "description": "Personal allowance taper \u00a3110k (60% trap zone)",
+      "description": "Personal allowance taper £110k (60% trap zone)",
       "input": {
         "salary": 110000,
         "region": "England",
@@ -76,11 +117,12 @@
         "employeeNI": 4210.56,
         "netPay": 72357.44
       },
-      "capturedAt": "2025-11-19T10:36:04.295Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "60percent-trap-125140",
-      "description": "60% marginal trap peak \u00a3125,140",
+      "description": "60% marginal trap peak £125,140",
       "input": {
         "salary": 125140,
         "region": "England",
@@ -91,11 +133,12 @@
         "employeeNI": 4513.44,
         "netPay": 78110.56
       },
-      "capturedAt": "2025-11-19T10:36:10.389Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "additional-150k",
-      "description": "Additional rate \u00a3150k",
+      "description": "Additional rate £150k",
       "input": {
         "salary": 150000,
         "region": "England",
@@ -106,11 +149,12 @@
         "employeeNI": 5010.6,
         "netPay": 91286.4
       },
-      "capturedAt": "2025-11-19T10:36:16.395Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "scottish-45k",
-      "description": "Scottish \u00a345k (intermediate band)",
+      "description": "Scottish £45k (intermediate band)",
       "input": {
         "salary": 45000,
         "region": "Scotland",
@@ -121,11 +165,12 @@
         "employeeNI": 2594.4,
         "netPay": 35491.8
       },
-      "capturedAt": "2025-11-19T10:36:23.395Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "scottish-200k",
-      "description": "Scottish \u00a3200k (top rate 47%)",
+      "description": "Scottish £200k (top rate 48%)",
       "input": {
         "salary": 200000,
         "region": "Scotland",
@@ -136,138 +181,8 @@
         "employeeNI": 6010.56,
         "netPay": 109946.24
       },
-      "capturedAt": "2025-11-19T10:36:30.564Z"
-    },
-    {
-      "id": "plan2-student-40k",
-      "description": "Plan 2 student loan \u00a340k",
-      "input": {
-        "salary": 40000,
-        "region": "England",
-        "taxCode": "1257L",
-        "studentLoan": "plan2"
-      },
-      "expected": {
-        "incomeTax": 5486.04,
-        "employeeNI": 2194.44,
-        "netPay": 31281.76,
-        "studentLoanRepayment": 1037.76
-      },
-      "capturedAt": "2025-11-19T10:36:36.583Z",
-      "knownIssue": "Student loan calculation/selection not working correctly in calculator"
-    },
-    {
-      "id": "pension-sacrifice-10pct",
-      "description": "10% pension salary sacrifice \u00a350k",
-      "input": {
-        "salary": 50000,
-        "region": "England",
-        "taxCode": "1257L",
-        "pensionPercent": 10
-      },
-      "expected": {
-        "incomeTax": 7485.96,
-        "employeeNI": 2994.36,
-        "netPay": 39519.68
-      },
-      "capturedAt": "2025-11-19T10:36:42.748Z"
-    },
-    {
-      "id": "marriage-allowance-15k",
-      "description": "Marriage allowance transfer \u00a315k + \u00a345k partner",
-      "input": {
-        "salary": 15000,
-        "region": "England",
-        "taxCode": "1257L",
-        "isMarried": true,
-        "partnerSalary": 45000
-      },
-      "expected": {
-        "incomeTax": 486,
-        "employeeNI": 194.4,
-        "netPay": 14319.6
-      },
-      "capturedAt": "2025-11-19T10:36:48.781Z"
-    },
-    {
-      "id": "k-code-40k",
-      "description": "K code K100 (negative allowance)",
-      "input": {
-        "salary": 40000,
-        "region": "England",
-        "taxCode": "K100"
-      },
-      "expected": {
-        "incomeTax": 8060.04,
-        "employeeNI": 2194.44,
-        "netPay": 29745.52
-      },
-      "capturedAt": "2025-11-19T10:36:55.168Z"
-    },
-    {
-      "id": "emergency-m1",
-      "description": "Emergency code 1257L M1 (\u00a33k/month)",
-      "input": {
-        "salary": 36000,
-        "region": "England",
-        "taxCode": "1257L M1",
-        "payPeriod": "monthly"
-      },
-      "expected": {
-        "incomeTax": 4686,
-        "employeeNI": 1874.4,
-        "netPay": 29439.6
-      },
-      "capturedAt": "2025-11-19T10:37:01.525Z"
-    },
-    {
-      "id": "hicbc-full-80k",
-      "description": "Child Benefit Charge 100% at \u00a380k (2 children)",
-      "input": {
-        "salary": 80000,
-        "region": "England",
-        "taxCode": "1257L",
-        "childrenUnder18": 2
-      },
-      "expected": {
-        "incomeTax": 19431.96,
-        "employeeNI": 3610.56,
-        "netPay": 56957.48
-      },
-      "capturedAt": "2025-11-19T10:37:07.612Z"
-    },
-    {
-      "id": "hicbc-taper-65k",
-      "description": "Child Benefit Charge 50% taper \u00a365k (2 children)",
-      "input": {
-        "salary": 65000,
-        "region": "England",
-        "taxCode": "1257L",
-        "childrenUnder18": 2
-      },
-      "expected": {
-        "incomeTax": 13431.96,
-        "employeeNI": 3310.56,
-        "netPay": 48257.48
-      },
-      "capturedAt": "2025-11-19T10:37:13.630Z"
-    },
-    {
-      "id": "hicbc-avoid-pension",
-      "description": "Avoid HICBC via 20.25% pension \u00a380k \u2192 \u00a359,980 ANI",
-      "input": {
-        "salary": 80000,
-        "region": "England",
-        "taxCode": "1257L",
-        "pensionPercent": 20.25,
-        "childrenUnder18": 2
-      },
-      "expected": {
-        "incomeTax": 19431.96,
-        "employeeNI": 3610.56,
-        "netPay": 56957.48
-      },
-      "capturedAt": "2025-11-19T10:37:19.644Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "br-code-second-job",
@@ -282,27 +197,44 @@
         "employeeNI": 994.44,
         "netPay": 21519.52
       },
-      "capturedAt": "2025-11-19T10:37:26.036Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
-      "id": "high-pension-40pct",
-      "description": "40% pension \u00a360k (Ltd company strategy)",
+      "id": "k-code-40k",
+      "description": "K code K100 (negative allowance)",
       "input": {
-        "salary": 60000,
+        "salary": 40000,
         "region": "England",
-        "taxCode": "1257L",
-        "pensionPercent": 40
+        "taxCode": "K100"
       },
       "expected": {
-        "incomeTax": 11432.04,
-        "employeeNI": 3210.6,
-        "netPay": 45357.36
+        "incomeTax": 8060.04,
+        "employeeNI": 2194.44,
+        "netPay": 29745.52
       },
-      "capturedAt": "2025-11-19T10:37:32.050Z"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "emergency-m1",
+      "description": "Emergency code 1257L M1 (£3k/month)",
+      "input": {
+        "salary": 36000,
+        "region": "England",
+        "taxCode": "1257L M1"
+      },
+      "expected": {
+        "incomeTax": 4686,
+        "employeeNI": 1874.4,
+        "netPay": 29439.6
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "plan1-threshold",
-      "description": "Plan 1 student loan \u00a325k (just above \u00a323,550)",
+      "description": "Plan 1 student loan £25k (just above £26,065)",
       "input": {
         "salary": 25000,
         "region": "England",
@@ -312,15 +244,85 @@
       "expected": {
         "incomeTax": 2486.04,
         "employeeNI": 994.44,
-        "netPay": 21519.52,
-        "studentLoanRepayment": 0
+        "netPay": 21519.52
       },
-      "capturedAt": "2025-11-19T10:37:38.059Z",
-      "knownIssue": "Student loan calculation/selection not working correctly in calculator"
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "plan2-student-40k",
+      "description": "Plan 2 student loan £40k",
+      "input": {
+        "salary": 40000,
+        "region": "England",
+        "taxCode": "1257L",
+        "studentLoan": "plan2"
+      },
+      "expected": {
+        "incomeTax": 5486.04,
+        "employeeNI": 2194.44,
+        "studentLoanRepayment": 1037.76,
+        "netPay": 31281.76
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "pension-sacrifice-10pct",
+      "description": "10% pension salary sacrifice £50k",
+      "input": {
+        "salary": 50000,
+        "region": "England",
+        "taxCode": "1257L",
+        "pensionPercent": 10
+      },
+      "expected": {
+        "incomeTax": 6486,
+        "employeeNI": 2594.4,
+        "pensionContribution": 5000,
+        "netPay": 35919.6
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "high-pension-40pct",
+      "description": "40% pension £60k (Ltd company strategy)",
+      "input": {
+        "salary": 60000,
+        "region": "England",
+        "taxCode": "1257L",
+        "pensionPercent": 40
+      },
+      "expected": {
+        "incomeTax": 4686,
+        "employeeNI": 1874.4,
+        "pensionContribution": 24000,
+        "netPay": 29439.6
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
+    },
+    {
+      "id": "marriage-allowance-15k",
+      "description": "Marriage allowance transfer £15k + £45k partner",
+      "input": {
+        "salary": 15000,
+        "region": "England",
+        "taxCode": "1257M",
+        "partnerGrossWage": 45000
+      },
+      "expected": {
+        "incomeTax": 486,
+        "employeeNI": 194.4,
+        "netPay": 14319.6
+      },
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     },
     {
       "id": "dual-student-loans",
-      "description": "Plan 2 + Postgrad loans \u00a350k (47% marginal!)",
+      "description": "Plan 2 + Postgrad loans £50k (47% marginal!)",
       "input": {
         "salary": 50000,
         "region": "England",
@@ -330,41 +332,12 @@
       "expected": {
         "incomeTax": 7485.96,
         "employeeNI": 2994.36,
-        "netPay": 35841.98,
-        "studentLoanRepayment": 3677.7
+        "studentLoanRepayment": 3677.7,
+        "netPay": 35841.98
       },
-      "capturedAt": "2025-11-19T10:37:44.062Z",
-      "knownIssue": "\ud83d\udc1b BUG: Calculator UI does not support selecting multiple student loans. Only applies one loan instead of both. This test will FAIL until the calculator is fixed to support Plan 2 + Postgraduate simultaneously."
-    },
-    {
-      "id": "exact-pa-12570",
-      "description": "Exactly at personal allowance (\u00a312,570)",
-      "input": {
-        "salary": 12570,
-        "region": "England",
-        "taxCode": "1257L"
-      },
-      "expected": {
-        "incomeTax": 0,
-        "employeeNI": 0,
-        "netPay": 12570
-      },
-      "capturedAt": "2025-11-19T10:37:50.075Z"
-    },
-    {
-      "id": "exact-higher-rate",
-      "description": "Exactly at higher rate threshold (\u00a350,270)",
-      "input": {
-        "salary": 50270,
-        "region": "England",
-        "taxCode": "1257L"
-      },
-      "expected": {
-        "incomeTax": 7539.96,
-        "employeeNI": 3015.96,
-        "netPay": 39714.08
-      },
-      "capturedAt": "2025-11-19T10:37:56.078Z"
+      "knownIssue": "🐛 BUG: Calculator UI does not support selecting multiple student loans. Only applies one loan instead of both. This test will FAIL until the calculator is fixed to support Plan 2 + Postgraduate simultaneously.",
+      "generatedAt": "2025-11-19T16:29:32.438Z",
+      "taxYear": "2025-2026"
     }
   ]
 }

@@ -253,12 +253,14 @@ const output = {
 });
 
 // Write directly to COMPLETE.json - no duplicates!
-const outputPath = path.join(__dirname, `../fixtures/golden-tax-cases-${TAX_YEAR}-COMPLETE.json`);
+// Use the correct filename format: 2025-26 (not 2025-2026)
+const filename = TAX_YEAR.replace('-20', '-'); // "2025-2026" -> "2025-26"
+const outputPath = path.join(__dirname, `../fixtures/golden-tax-cases-${filename}-COMPLETE.json`);
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
 
 console.log('✅ Golden master generated successfully!');
 console.log('');
-console.log(`📄 Output: golden-tax-cases-${TAX_YEAR}-COMPLETE.json`);
+console.log(`📄 Output: golden-tax-cases-${filename}-COMPLETE.json`);
 console.log(
   `📊 Scenarios: ${generated.length} (${generated.length - 1} auto-generated + 1 manual)`
 );
