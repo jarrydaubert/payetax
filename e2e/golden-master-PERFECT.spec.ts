@@ -159,6 +159,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
       // 5. Student Loans (if specified) - now supports multiple via checkboxes
       if (input.studentLoan && input.studentLoan !== 'none') {
         const loans = Array.isArray(input.studentLoan) ? input.studentLoan : [input.studentLoan];
+        console.log(`📋 Checking ${loans.length} student loan(s):`, loans);
 
         for (const loan of loans) {
           const testId = `student-loan-${loan}`;
@@ -166,11 +167,15 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
 
           try {
             await checkbox.check({ timeout: 2000 });
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(500); // Increased wait for state to update
+            console.log(`  ✅ Checked ${loan}`);
           } catch (_error) {
-            console.log(`⚠️  Could not check ${loan} checkbox`);
+            console.log(`  ⚠️  Could not check ${loan} checkbox`);
           }
         }
+
+        // Extra wait after all checkboxes to ensure state updates
+        await page.waitForTimeout(500);
       }
 
       // 6. Marriage Allowance (if specified)
