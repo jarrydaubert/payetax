@@ -52,12 +52,13 @@
     "dev:turbo": "next dev --turbo",
     "release": "npm run clean && npm run fix-all && npm run test && npm run build:analyze && npm run audit:deps",
     "monitor-all": "npm run audit:security && npm run bundle:analyze && npm run monitor:performance",
-    "deploy": "npm run clean && npm run release && echo '✅ Ready for deployment!'",
+    "deploy": "npm run clean && npm run release && echo '\u2705 Ready for deployment!'",
     "debug": "npm run clean && npm run typecheck && npm run build",
     "linear": "node scripts/linear.js",
     "linear:me": "node scripts/linear.js list --me --project PayeTax",
     "linear:create": "node scripts/linear.js create",
-    "linear:done": "node scripts/linear.js update-status"
+    "linear:done": "node scripts/linear.js update-status",
+    "golden:generate": "tsx e2e/scripts/generate-golden-master.ts"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",

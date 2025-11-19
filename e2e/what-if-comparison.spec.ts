@@ -25,7 +25,6 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('🍪 Cookie banner dismissed');
     }
@@ -34,7 +33,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await expect(whatIfTrigger).toBeVisible({ timeout: 5000 });
     await whatIfTrigger.click();
-    await page.waitForTimeout(500); // Allow collapsible animation to complete
+    // Collapsible opens instantly - no wait needed to complete
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('🔓 What-If section opened');
@@ -78,7 +77,6 @@ test.describe('What-If Comparison - Core Functionality', () => {
 
     // Select "Amount"
     await page.getByRole('option', { name: 'Amount' }).click();
-    await page.waitForTimeout(300);
 
     // Verify selection changed
     await expect(typeSelect).toContainText(/amount/i);
@@ -94,12 +92,10 @@ test.describe('What-If Comparison - Core Functionality', () => {
     // Enter a salary first
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(500);
 
     // Enter What-If value
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -116,7 +112,6 @@ test.describe('What-If Comparison - Core Functionality', () => {
 
     // Click clear
     await clearButton.click();
-    await page.waitForTimeout(500);
 
     // Comparison heading should no longer be visible
     await expect(comparisonHeading).not.toBeVisible();
@@ -137,13 +132,11 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should calculate 10% salary increase correctly', async ({ page }) => {
@@ -155,7 +148,6 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill(testData.salary.toString());
-    await page.waitForTimeout(1000);
 
     // Wait for initial calculation
     const resultsTable = page.locator('[data-testid="results-table"]');
@@ -168,7 +160,6 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     // Enter 10% increase
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -190,12 +181,10 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
-    await page.waitForTimeout(1000);
 
     // Enter -5% decrease
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('-5');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -222,13 +211,11 @@ test.describe('What-If Comparison - Amount Changes', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should calculate £5,000 raise correctly', async ({ page }) => {
@@ -238,18 +225,15 @@ test.describe('What-If Comparison - Amount Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Amount' }).click();
-    await page.waitForTimeout(300);
 
     // Enter £5,000
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('5000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -271,18 +255,15 @@ test.describe('What-If Comparison - Amount Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('60000');
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Amount' }).click();
-    await page.waitForTimeout(300);
 
     // Enter -£10,000
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('-10000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -309,13 +290,11 @@ test.describe('What-If Comparison - New Total Salary', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should compare current £40k vs new £50k salary', async ({ page }) => {
@@ -325,18 +304,15 @@ test.describe('What-If Comparison - New Total Salary', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Total' }).click();
-    await page.waitForTimeout(300);
 
     // Enter £50,000
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('50000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -358,18 +334,15 @@ test.describe('What-If Comparison - New Total Salary', () => {
     // Enter starting salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('30000');
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Total' }).click();
-    await page.waitForTimeout(300);
 
     // Enter target salary
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('60000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -396,13 +369,11 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should show tax trap comparison for £95k to £110k increase', async ({ page }) => {
@@ -412,18 +383,15 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     // Enter £95k salary (just below trap)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('95000');
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Total' }).click();
-    await page.waitForTimeout(300);
 
     // Enter £110k (deep in trap zone)
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('110000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -449,18 +417,15 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     // Enter £100k salary (trap starts)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('100000');
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Total' }).click();
-    await page.waitForTimeout(300);
 
     // Enter £125k (trap ends)
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('125000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -482,18 +447,15 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     // Enter £125k salary (trap ends)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('125000');
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Total' }).click();
-    await page.waitForTimeout(300);
 
     // Enter £130k (past trap, normal rates resume)
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('130000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -520,13 +482,11 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should show impact of £5k salary sacrifice', async ({ page }) => {
@@ -536,18 +496,15 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('45000');
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Amount' }).click();
-    await page.waitForTimeout(300);
 
     // Enter -£5,000 (sacrificing to pension)
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('-5000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -569,18 +526,15 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     // Enter £105k salary (in trap zone)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('105000');
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
     await page.getByRole('option', { name: 'Amount' }).click();
-    await page.waitForTimeout(300);
 
     // Sacrifice £6k to get below £100k trap threshold
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('-6000');
-    await page.waitForTimeout(300);
 
     // Click compare
     const compareButton = page.locator('[data-testid="compare-button"]');
@@ -607,13 +561,11 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
 
     // Open What-If section
     const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
     await whatIfTrigger.click();
-    await page.waitForTimeout(500);
   });
 
   test('should display side-by-side comparison table correctly', async ({ page }) => {
@@ -623,11 +575,9 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     // Enter base salary and create comparison
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');
-    await page.waitForTimeout(300);
 
     const compareButton = page.locator('[data-testid="compare-button"]');
     await compareButton.click();
@@ -654,11 +604,9 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     // Create comparison
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('15');
-    await page.waitForTimeout(300);
 
     const compareButton = page.locator('[data-testid="compare-button"]');
     await compareButton.click();
@@ -679,11 +627,9 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     // Create comparison
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('5');
-    await page.waitForTimeout(300);
 
     const compareButton = page.locator('[data-testid="compare-button"]');
     await compareButton.click();

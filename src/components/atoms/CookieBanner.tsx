@@ -143,6 +143,7 @@ const CookieBanner: React.FC = () => {
             onClick={acceptCookies}
             size='sm'
             className='min-w-[140px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
+            data-testid='cookie-accept-all'
           >
             Accept All
           </Button>

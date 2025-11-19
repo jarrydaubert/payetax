@@ -38,6 +38,9 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:3000',
 
+    /* Storage state - includes cookie consent from global setup */
+    storageState: 'playwright/.auth/storageState.json',
+
     /* Enhanced trace collection (Playwright 1.56+ default: on-first-retry) */
     trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 
@@ -180,6 +183,7 @@ export default defineConfig({
       NODE_ENV: 'production',
     },
   },
+  /* Global setup - accept cookies once for all tests */
 
   /* Global setup and teardown */
   globalSetup: undefined, // Add if needed

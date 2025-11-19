@@ -49,6 +49,7 @@ export function NavbarLinks({ links, pathname, onCalculatorClick, className }: N
               TYPOGRAPHY.TEXT_SM,
               isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
             )}
+            data-testid={link.label === 'TaxInsights' ? 'nav-blog' : undefined}
           >
             {link.label}
             {isActive && (

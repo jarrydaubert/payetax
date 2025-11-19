@@ -394,6 +394,7 @@ export function ResultsTable({
             tabIndex={0}
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
+            data-testid='results-table-container'
           >
             <table
               data-testid='results-table'

@@ -63,7 +63,6 @@ async function dismissCookieBanner(page: Page): Promise<void> {
     const banner = page.locator('button:has-text("Accept All")');
     if (await banner.isVisible({ timeout: 2000 })) {
       await banner.click();
-      await page.waitForTimeout(500);
     }
   } catch {
     // Banner not found or already dismissed
@@ -97,7 +96,6 @@ async function setTheme(page: Page, theme: 'light' | 'dark'): Promise<void> {
 
     if (await themeToggle.isVisible({ timeout: 1000 })) {
       await themeToggle.click();
-      await page.waitForTimeout(500); // Wait for theme transition
     }
   }
 }
@@ -251,7 +249,6 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
         const checkbox = page.locator('input[type="checkbox"]').first();
         if (await checkbox.isVisible({ timeout: 1000 })) {
           await checkbox.click();
-          await page.waitForTimeout(300);
         }
 
         await runAxeScan(page, {
@@ -279,7 +276,6 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
         const menuButton = page.locator('button[aria-label*="menu" i]').first();
         if (await menuButton.isVisible({ timeout: 1000 })) {
           await menuButton.click();
-          await page.waitForTimeout(500);
         }
 
         await runAxeScan(page, {
@@ -535,7 +531,6 @@ test.describe('WCAG 2.2 AA - Blog Content', () => {
 
     if (await categoryButton.isVisible({ timeout: 2000 })) {
       await categoryButton.click();
-      await page.waitForTimeout(500);
 
       await runAxeScan(page, {
         pageName: 'blog-filtered',

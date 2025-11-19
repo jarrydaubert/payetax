@@ -93,7 +93,6 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // If already checked, uncheck it first to test the check action
       if (initiallyChecked) {
         await hourlyCheckbox.click();
-        await page.waitForTimeout(200);
       }
 
       // Now it should be unchecked
@@ -161,7 +160,6 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // If already checked, uncheck first
       if (initiallyChecked) {
         await hourlyLabel.click();
-        await page.waitForTimeout(200);
       }
 
       // Verify now unchecked
@@ -183,7 +181,6 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       if (await hourlyCheckbox.isChecked()) await hourlyCheckbox.click();
       if (await fortnightlyCheckbox.isChecked()) await fortnightlyCheckbox.click();
       if (await fourWeeklyCheckbox.isChecked()) await fourWeeklyCheckbox.click();
-      await page.waitForTimeout(300);
 
       // Check all three
       await hourlyCheckbox.click();
@@ -618,7 +615,6 @@ test.describe('Display Periods Checkbox Component E2E Tests', () => {
       // Toggle 10 times rapidly
       for (let i = 0; i < 10; i++) {
         await dailyCheckbox.click();
-        await page.waitForTimeout(50);
       }
 
       const endTime = Date.now();

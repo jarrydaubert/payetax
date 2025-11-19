@@ -24,7 +24,6 @@ test.describe('Advanced Calculator - Student Loans', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
   });
 
@@ -35,13 +34,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary above Plan 1 threshold (£22,015)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('30000');
-    await page.waitForTimeout(500);
 
     // Select Plan 1
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 1' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -64,13 +61,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary above Plan 2 threshold (£27,295)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
-    await page.waitForTimeout(500);
 
     // Select Plan 2
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -92,13 +87,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary above Plan 4 threshold (£31,395)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(500);
 
     // Select Plan 4
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 4' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -120,13 +113,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary above Plan 5 threshold (£25,000)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
-    await page.waitForTimeout(500);
 
     // Select Plan 5
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 5' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -148,13 +139,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary above Postgrad threshold (£21,000)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('30000');
-    await page.waitForTimeout(500);
 
     // Select Postgraduate
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Postgraduate' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -176,13 +165,11 @@ test.describe('Advanced Calculator - Student Loans', () => {
     // Enter salary below all thresholds
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('20000');
-    await page.waitForTimeout(500);
 
     // Select Plan 2
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -210,7 +197,6 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
   });
 
@@ -221,13 +207,11 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(500);
 
     // Pension should default to percentage type
     // Enter 5% pension contribution
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -250,19 +234,16 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
-    await page.waitForTimeout(500);
 
     // Switch to fixed amount
     const pensionTypeSelect = page.getByTestId('pension-type-select');
     await pensionTypeSelect.click();
     // Select the pound icon (second option)
     await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
 
     // Enter £3,000 fixed pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('3000');
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -284,7 +265,6 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Calculate without pension first
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
-    await page.waitForTimeout(500);
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
@@ -297,7 +277,6 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Now add 10% pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('10');
-    await page.waitForTimeout(300);
 
     await calculateButton.click();
     await page.waitForTimeout(1500);
@@ -322,7 +301,6 @@ test.describe('Advanced Calculator - Marriage Allowance', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
   });
 
@@ -337,7 +315,6 @@ test.describe('Advanced Calculator - Marriage Allowance', () => {
     // Check married checkbox
     const marriedCheckbox = page.getByTestId('married-checkbox');
     await marriedCheckbox.click();
-    await page.waitForTimeout(500);
 
     // Partner wage input should now be visible
     await page.waitForTimeout(500); // Wait for conditional render
@@ -355,17 +332,14 @@ test.describe('Advanced Calculator - Marriage Allowance', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('30000');
-    await page.waitForTimeout(500);
 
     // Check married
     const marriedCheckbox = page.locator('label:has-text("Married")').locator('~ button, ~ input');
     await marriedCheckbox.click();
-    await page.waitForTimeout(500);
 
     // Enter partner's wage (low earner can transfer)
     const partnerInput = page.locator('input[placeholder*="0.00"]').last();
     await partnerInput.fill('10000');
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -392,7 +366,6 @@ test.describe('Advanced Calculator - Scottish Tax Rates', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
   });
 
@@ -403,13 +376,11 @@ test.describe('Advanced Calculator - Scottish Tax Rates', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('45000');
-    await page.waitForTimeout(500);
 
     // Select Scotland
     const regionSelect = page.locator('button').filter({ hasText: /england|scotland|wales/i });
     await regionSelect.click();
     await page.getByRole('option', { name: 'Scotland' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -435,7 +406,6 @@ test.describe('Advanced Calculator - Scottish Tax Rates', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
-    await page.waitForTimeout(500);
 
     // Calculate with England (default)
     const calculateButton = page.getByTestId('calculate-button');
@@ -450,7 +420,6 @@ test.describe('Advanced Calculator - Scottish Tax Rates', () => {
     const regionSelect = page.locator('button').filter({ hasText: /england|scotland|wales/i });
     await regionSelect.click();
     await page.getByRole('option', { name: 'Scotland' }).click();
-    await page.waitForTimeout(300);
 
     // Recalculate
     await calculateButton.click();
@@ -475,7 +444,6 @@ test.describe('Advanced Calculator - Combined Features', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
     }
   });
 
@@ -486,28 +454,23 @@ test.describe('Advanced Calculator - Combined Features', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('45000');
-    await page.waitForTimeout(500);
 
     // Add student loan
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 2' }).click();
-    await page.waitForTimeout(300);
 
     // Add pension (5%)
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
-    await page.waitForTimeout(300);
 
     // Enable married
     const marriedCheckbox = page.locator('label:has-text("Married")').locator('~ button, ~ input');
     await marriedCheckbox.click();
-    await page.waitForTimeout(500);
 
     // Enter partner wage
     const partnerInput = page.locator('input[placeholder*="0.00"]').last();
     await partnerInput.fill('8000');
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -531,24 +494,20 @@ test.describe('Advanced Calculator - Combined Features', () => {
     // Enter salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('55000');
-    await page.waitForTimeout(500);
 
     // Select Scotland
     const regionSelect = page.locator('button').filter({ hasText: /england|scotland|wales/i });
     await regionSelect.click();
     await page.getByRole('option', { name: 'Scotland' }).click();
-    await page.waitForTimeout(300);
 
     // Add pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('8');
-    await page.waitForTimeout(300);
 
     // Add student loan
     const studentLoanSelect = page.getByTestId('student-loan-select');
     await studentLoanSelect.click();
     await page.getByRole('option', { name: 'Plan 4' }).click();
-    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');

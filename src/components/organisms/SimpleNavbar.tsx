@@ -82,7 +82,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           )}
         >
           {/* Logo */}
-          <Link href='/' className='group'>
+          <Link href='/' className='group' data-testid='nav-logo'>
             <motion.span
               className={cn(
                 'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
@@ -114,6 +114,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             className='md:hidden'
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            data-testid='mobile-menu-button'
           >
             {isMobileMenuOpen ? (
               <X className={ICON_SIZES.SIZE_5} />

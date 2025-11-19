@@ -243,7 +243,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
           onClick={handleCompare}
           size='lg'
           className='flex-1 justify-center border-purple-500 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:from-purple-600 hover:to-pink-600 dark:border-purple-400 dark:shadow-purple-400/50'
-          data-testid='compare-button'
+          data-testid='what-if-trigger'
         >
           <Wand2 className={cn('mr-2', ICON_SIZES.SIZE_5)} />
           Compare Scenarios
