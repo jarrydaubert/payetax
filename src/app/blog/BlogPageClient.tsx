@@ -17,11 +17,6 @@ import Zap from 'lucide-react/dist/esm/icons/zap.js';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GradientText } from '@/components/atoms/GradientText';
-import CallToAction from '@/components/molecules/CallToAction';
-import { CategoryFilter } from '@/components/molecules/CategoryFilter';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Empty,
   EmptyContent,
@@ -29,6 +24,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/atoms/EmptyState';
+import { GradientText } from '@/components/atoms/GradientText';
+import CallToAction from '@/components/molecules/CallToAction';
+import { CategoryFilter } from '@/components/molecules/CategoryFilter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { cn } from '@/lib/utils';

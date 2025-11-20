@@ -87,9 +87,7 @@ describe('TaxTrapInlineAlert', () => {
     it('should NOT show pension suggestion when no callback provided', () => {
       render(<TaxTrapInlineAlert salary={110000} suggestedPension={10000} />);
 
-      expect(
-        screen.queryByRole('button', { name: /Add.*to Pension/i })
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Add.*to Pension/i })).not.toBeInTheDocument();
       expect(screen.queryByText(/Add.*to your pension/)).not.toBeInTheDocument();
     });
   });
@@ -289,13 +287,7 @@ describe('TaxTrapInlineAlert', () => {
     });
 
     it('should support custom tax year', () => {
-      render(
-        <TaxTrapInlineAlert
-          salary={110000}
-          suggestedPension={10000}
-          taxYear="2024-2025"
-        />
-      );
+      render(<TaxTrapInlineAlert salary={110000} suggestedPension={10000} taxYear='2024-2025' />);
 
       // Should still render correctly
       expect(screen.getByText('Tax Trap Alert')).toBeInTheDocument();
@@ -306,11 +298,7 @@ describe('TaxTrapInlineAlert', () => {
     it('should handle £0 suggested pension', () => {
       const mockCallback = jest.fn();
       render(
-        <TaxTrapInlineAlert
-          salary={110000}
-          suggestedPension={0}
-          onApplyPension={mockCallback}
-        />
+        <TaxTrapInlineAlert salary={110000} suggestedPension={0} onApplyPension={mockCallback} />
       );
 
       expect(screen.getByRole('button', { name: /Add £0 to Pension/i })).toBeInTheDocument();
