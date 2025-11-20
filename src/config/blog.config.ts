@@ -2,9 +2,49 @@
 /**
  * Blog configuration file
  * Defines categories, settings, and other blog-related configuration
+ *
+ * Uses Zod for runtime validation to ensure configuration integrity (PAYTAX-128)
  */
 
+import { z } from 'zod';
 import type { BlogCategory, BlogConfig } from '@/types/blog';
+
+/**
+ * Zod Schema for Blog Brand
+ * Validates the blog identity configuration
+ */
+export const BlogBrandSchema = z.object({
+  name: z.string().min(1, 'Brand name is required'),
+  fullName: z.string().min(1, 'Full brand name is required'),
+  tagline: z.string().min(1, 'Tagline is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  author: z.string().min(1, 'Author is required'),
+  publisher: z.string().min(1, 'Publisher is required'),
+  url: z.string().url('Must be a valid URL'),
+  logo: z.string().min(1, 'Logo path is required'),
+  socialImage: z.string().min(1, 'Social image path is required'),
+});
+
+/**
+ * Zod Schema for Blog Category
+ * Validates category structure and slug format
+ */
+export const BlogCategorySchema = z.object({
+  name: z.string().min(1, 'Category name is required'),
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase kebab-case'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+});
+
+/**
+ * Zod Schema for Blog Configuration
+ * Validates the main blog config structure
+ */
+export const BlogConfigSchema = z.object({
+  postsPerPage: z.number().int().min(1).max(50, 'Posts per page must be between 1 and 50'),
+  featuredPostsCount: z.number().int().min(1).max(10, 'Featured posts must be between 1 and 10'),
+  relatedPostsCount: z.number().int().min(1).max(10, 'Related posts must be between 1 and 10'),
+  categories: z.array(BlogCategorySchema).min(1, 'At least one category is required'),
+});
 
 /**
  * Blog brand identity
@@ -127,3 +167,32 @@ export const BLOG_SEO_DEFAULTS = {
     'Read our latest article on %s. Expert UK tax advice and financial guidance from TaxInsights.',
   keywords: ['UK tax', 'PAYE', 'tax calculator', 'financial advice', 'tax tips', 'TaxInsights'],
 };
+
+/**
+ * Runtime Validation (PAYTAX-128)
+ * Validates configuration on module load to catch errors early
+ */
+if (process.env.NODE_ENV !== 'test') {
+  // Validate blog brand
+  const brandResult = BlogBrandSchema.safeParse(BLOG_BRAND);
+  if (!brandResult.success) {
+    console.error('❌ Blog brand configuration is invalid:', brandResult.error.issues);
+    throw new Error('Invalid blog brand configuration');
+  }
+
+  // Validate blog config
+  const configResult = BlogConfigSchema.safeParse(BLOG_CONFIG);
+  if (!configResult.success) {
+    console.error('❌ Blog configuration is invalid:', configResult.error.issues);
+    throw new Error('Invalid blog configuration');
+  }
+
+  // Validate all categories
+  for (const category of BLOG_CATEGORIES) {
+    const categoryResult = BlogCategorySchema.safeParse(category);
+    if (!categoryResult.success) {
+      console.error(`❌ Blog category "${category.name}" is invalid:`, categoryResult.error.issues);
+      throw new Error(`Invalid blog category: ${category.name}`);
+    }
+  }
+}

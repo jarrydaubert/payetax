@@ -10,8 +10,22 @@
  * - description: What this input is for
  * - hmrc: Official HMRC guidance or additional context
  *
+ * Uses Zod for runtime validation to ensure tooltip integrity (PAYTAX-128)
+ *
  * @module config/inputTooltips
  */
+
+import { z } from 'zod';
+
+/**
+ * Zod Schema for Tooltip Content
+ * Validates tooltip structure and content requirements
+ */
+export const TooltipContentSchema = z.object({
+  title: z.string().min(1, 'Tooltip title is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  hmrc: z.string().min(10, 'HMRC guidance must be at least 10 characters').optional(),
+});
 
 export interface TooltipContent {
   /** Short title for the tooltip */
@@ -154,4 +168,18 @@ export function getTooltipContent(fieldName: string): TooltipContent | undefined
  */
 export function hasTooltip(fieldName: string): boolean {
   return fieldName in INPUT_TOOLTIPS;
+}
+
+/**
+ * Runtime Validation (PAYTAX-128)
+ * Validates all tooltips on module load to catch content errors early
+ */
+if (process.env.NODE_ENV !== 'test') {
+  for (const [fieldName, tooltip] of Object.entries(INPUT_TOOLTIPS)) {
+    const result = TooltipContentSchema.safeParse(tooltip);
+    if (!result.success) {
+      console.error(`❌ Tooltip "${fieldName}" is invalid:`, result.error.issues);
+      throw new Error(`Invalid tooltip content for field: ${fieldName}`);
+    }
+  }
 }

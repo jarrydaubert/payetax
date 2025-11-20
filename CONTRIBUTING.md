@@ -125,6 +125,111 @@ Summarize:
 
 ---
 
+## ⚠️ CRITICAL: The `ls -la` Principle (Prevent Duplication)
+
+**ALWAYS check what exists BEFORE creating anything new!**
+
+This principle comes from Section 0 of ARCHITECTURE.md and is **MANDATORY** for all development work.
+
+### **Why This Matters**
+
+In November 2025, we discovered ~500 lines of duplicated code because developers didn't check existing files first. This creates:
+- ❌ Maintenance nightmares (updating same logic in multiple places)
+- ❌ Inconsistent behavior (different versions of same functionality)
+- ❌ Wasted time (re-implementing what already exists)
+- ❌ Harder debugging (which version is correct?)
+
+### **How to Apply `ls -la` Principle**
+
+**Before creating ANY new:**
+- Component
+- Schema/validation
+- Constant
+- Utility function
+- Test file
+- Config file
+
+**Run these commands:**
+
+```bash
+# 1. LIST the directory you're about to work in
+ls -la src/components/atoms/    # See what atoms exist
+ls -la src/lib/validation/      # See what schemas exist
+ls -la src/constants/           # See what constants exist
+ls -la src/config/              # See what configs exist
+
+# 2. GREP for similar functionality
+grep -r "validateSalary\|salaryValidation" src/ --include="*.ts"
+grep -r "TOOLTIP\|tooltip.*content" src/ --include="*.ts"
+grep -r "schema.*button\|button.*schema" src/ --include="*.ts" -i
+
+# 3. CHECK test files too
+ls -la src/lib/__tests__/                    # See what tests exist
+grep -r "test.*validation" src/ --include="*.test.ts*"
+```
+
+### **Real Examples Where `ls -la` Prevented Duplication**
+
+**Example 1: PAYTAX-127 (Calculator Validation)**
+```bash
+# BEFORE creating inline schema in WhatIfInputs.tsx:
+$ ls -la src/lib/validation/
+# Found: validation.ts already exists! ✅
+# Result: Moved schema to centralized location instead of inline
+```
+
+**Example 2: PAYTAX-128 (Config Validation)**  
+```bash
+# BEFORE creating blog.config.validation.test.ts:
+$ ls -la src/config/__tests__/
+# Found: blog.config.test.ts already exists! ⚠️
+# Result: Checked for overlap - tests were complementary, not duplicate ✅
+```
+
+**Example 3: Adding a Button Component**
+```bash
+# BEFORE creating src/components/atoms/Button.tsx:
+$ ls -la src/components/atoms/
+$ grep -r "Button" src/components/ --include="*.tsx"
+# Found: src/components/ui/button.tsx already exists! ❌
+# Result: Use existing component instead of creating duplicate
+```
+
+### **The `ls -la` Checklist**
+
+Before creating anything new:
+
+- [ ] **`ls -la`** in the target directory
+- [ ] **`grep -r`** for similar names/functionality
+- [ ] **Check imports** in existing files (see what they use)
+- [ ] **Read ARCHITECTURE.md** Section 0 if unsure
+- [ ] **Ask yourself**: "Does something like this already exist?"
+
+### **Special Cases**
+
+**When duplication IS acceptable:**
+- ✅ Test files with different purposes (functional tests vs. validation tests)
+- ✅ Complementary schemas (type definition vs. runtime validation)
+- ✅ Clearly documented reasons (add comment explaining why)
+
+**When duplication is NOT acceptable:**
+- ❌ Inline schemas when centralized validation.ts exists
+- ❌ Copied utility functions instead of importing
+- ❌ Re-implemented components without checking shadcn/ui
+- ❌ Duplicate constants across files
+
+### **Recovery: Found Duplication? Fix It!**
+
+If you discover duplication:
+1. ✅ Create a Linear issue documenting it
+2. ✅ Consolidate to single source of truth
+3. ✅ Update all imports to use centralized version
+4. ✅ Add tests to prevent regression
+5. ✅ Delete duplicate code
+6. ✅ Document in commit message
+
+---
+
 ## 📌 Project Context
 
 **What is PayeTax?**
