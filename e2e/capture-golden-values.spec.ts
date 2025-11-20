@@ -55,7 +55,7 @@ test.describe('CAPTURE: TRUE Golden Master', () => {
 
         // Pension
         if (scenario.input.pensionContribution) {
-          const pensionInput = page.getByLabel(/pension.*contribution/i);
+          const pensionInput = page.getByTestId('pension-input');
           await pensionInput.clear();
           await pensionInput.fill(scenario.input.pensionContribution.toString());
           await page.waitForTimeout(300);

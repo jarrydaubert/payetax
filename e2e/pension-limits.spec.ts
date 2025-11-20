@@ -39,7 +39,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('80000');
 
     // Add £60k pension contribution
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('60000');
 
     await page.getByTestId('calculate-button').click();
@@ -60,7 +60,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('100000');
 
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('65000');
 
     await page.getByTestId('calculate-button').click();
@@ -78,7 +78,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('280000');
 
     // Try to contribute £60k (will breach tapered allowance)
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('60000');
 
     await page.getByTestId('calculate-button').click();
@@ -94,7 +94,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('400000');
 
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('10000'); // Exactly at minimum allowance
 
     await page.getByTestId('calculate-button').click();
@@ -108,7 +108,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('50000');
 
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('20000');
 
     await page.getByTestId('calculate-button').click();
