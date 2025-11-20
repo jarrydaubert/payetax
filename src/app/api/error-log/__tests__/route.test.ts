@@ -1,5 +1,6 @@
 /**
  * @jest-environment node
+ * @jest-isolateModules
  */
 // src/app/api/error-log/__tests__/route.test.ts
 
@@ -132,11 +133,7 @@ describe('Error Log API Route', () => {
   });
 
   describe('Server Configuration', () => {
-    // SKIP: This test causes module cache pollution that breaks subsequent tests
-    // The jest.resetModules() call invalidates the top-level POST import, causing
-    // all following tests to use a stale module reference with resend=null
-    // Production has RESEND_API_KEY set, so this edge case doesn't affect real usage
-    it.skip('should return 500 if Resend API key not configured', async () => {
+    it('should return 500 if Resend API key not configured', async () => {
       // Temporarily remove the API key (must delete, undefined is not the same)
       // biome-ignore lint/performance/noDelete: Must actually delete env var to test missing key scenario
       delete process.env.RESEND_API_KEY;
