@@ -36,7 +36,7 @@ test.describe('Navbar Navigation - Critical Links', () => {
 
       // Verify calculator page loaded
       await expect(page).toHaveURL(/\/(calculator)?/);
-      await expect(page.locator('input[type="number"]')).toBeVisible();
+      await expect(page.getByTestId('salary-input')).toBeVisible();
     }
   });
 

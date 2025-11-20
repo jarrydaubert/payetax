@@ -37,15 +37,15 @@ test.describe('Core User Journeys', () => {
         fullPage: true,
       });
 
-      // Enter salary - use the first number input (salary field)
-      const salaryInput = page.locator('input[type="number"]').first();
+      // Enter salary - use test ID (salary input is type="text" with inputmode="decimal")
+      const salaryInput = page.getByTestId('salary-input');
       await expect(salaryInput).toBeVisible();
       await salaryInput.click();
       await salaryInput.fill('45000');
       await salaryInput.blur(); // Trigger any onBlur handlers
 
-      // ASSERT: Input accepted
-      await expect(salaryInput).toHaveValue('45000');
+      // ASSERT: Input accepted (formatted with commas)
+      await expect(salaryInput).toHaveValue('45,000');
 
       // Wait for results table to appear (debounced calculation ~500ms)
       const resultsTable = page.getByTestId('results-table');
@@ -84,7 +84,7 @@ test.describe('Core User Journeys', () => {
     test('should update results when salary changes', async ({ page }) => {
       await page.goto('/');
 
-      const salaryInput = page.locator('input[type="number"]').first();
+      const salaryInput = page.getByTestId('salary-input');
 
       // Enter initial salary
       await salaryInput.click();
