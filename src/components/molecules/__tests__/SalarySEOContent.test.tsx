@@ -4,11 +4,13 @@
 // src/components/molecules/__tests__/SalarySEOContent.test.tsx
 
 import { render, screen } from '@testing-library/react';
-import { SalarySEOContent } from '../SalarySEOContent';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { SalarySEOContent } from '../SalarySEOContent';
 
 describe('SalarySEOContent', () => {
-  const createMockResults = (overrides: Partial<TaxCalculationResults> = {}): TaxCalculationResults => ({
+  const createMockResults = (
+    overrides: Partial<TaxCalculationResults> = {}
+  ): TaxCalculationResults => ({
     grossSalary: 30000,
     incomeTax: {
       annually: 3486,
@@ -72,14 +74,18 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByRole('heading', { level: 2, name: '£30,000 Salary Take-Home Pay Breakdown' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 2, name: '£30,000 Salary Take-Home Pay Breakdown' })
+      ).toBeInTheDocument();
     });
 
     it('should format large salaries with commas in heading', () => {
       const mockResults = createMockResults({ grossSalary: 125000 });
       render(<SalarySEOContent salary={125000} results={mockResults} />);
 
-      expect(screen.getByRole('heading', { level: 2, name: '£125,000 Salary Take-Home Pay Breakdown' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 2, name: '£125,000 Salary Take-Home Pay Breakdown' })
+      ).toBeInTheDocument();
     });
 
     it('should display gross salary in intro paragraph', () => {
@@ -113,7 +119,9 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByRole('heading', { level: 3, name: 'Tax and National Insurance Deductions' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Tax and National Insurance Deductions' })
+      ).toBeInTheDocument();
     });
 
     it('should display income tax amount and percentage', () => {
@@ -185,7 +193,9 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByRole('heading', { level: 3, name: /Is £30,000 a Good Salary in 2025/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 3, name: /Is £30,000 a Good Salary in 2025/i })
+      ).toBeInTheDocument();
     });
 
     // CRITICAL: These tests verify the conditional salary bracket logic
@@ -256,21 +266,27 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults({ grossSalary: 25000 });
       render(<SalarySEOContent salary={25000} results={mockResults} />);
 
-      expect(screen.getByText(/below the UK median salary, but above minimum wage/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/below the UK median salary, but above minimum wage/)
+      ).toBeInTheDocument();
     });
 
     it('should show "below the UK median" at boundary £29,999', () => {
       const mockResults = createMockResults({ grossSalary: 29999 });
       render(<SalarySEOContent salary={29999} results={mockResults} />);
 
-      expect(screen.getByText(/below the UK median salary, but above minimum wage/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/below the UK median salary, but above minimum wage/)
+      ).toBeInTheDocument();
     });
 
     it('should always mention UK median salary reference', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/UK median full-time salary is approximately £35,000/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/UK median full-time salary is approximately £35,000/)
+      ).toBeInTheDocument();
     });
   });
 
@@ -279,14 +295,18 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByRole('heading', { level: 3, name: 'Customize Your Calculation' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Customize Your Calculation' })
+      ).toBeInTheDocument();
     });
 
     it('should explain standard assumptions', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/tax code 1257L, no student loan, no pension contributions/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/tax code 1257L, no student loan, no pension contributions/)
+      ).toBeInTheDocument();
     });
 
     it('should list student loan customization options', () => {
@@ -301,7 +321,9 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/Include pension contributions.*with tax relief/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Include pension contributions.*with tax relief/)
+      ).toBeInTheDocument();
     });
 
     it('should mention Scottish tax rates option', () => {

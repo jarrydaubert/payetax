@@ -20,27 +20,54 @@ import { cn } from '@/lib/utils';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
 
 /**
- * Zod validation schema for What If scenario inputs
+ * Zod 4.x validation schema for What If scenario inputs
+ * Uses .superRefine() for type-specific validation (more powerful than .refine())
  */
-const whatIfValueSchema = z.object({
-  type: z.enum(['percentage', 'amount', 'total']),
-  value: z.number(),
-  percentage: z
-    .number()
-    .min(-100, 'Percentage cannot be less than -100%')
-    .max(1000, 'Percentage cannot exceed 1000%')
-    .optional(),
-  amount: z
-    .number()
-    .min(-10000000, 'Amount cannot be less than -£10M')
-    .max(10000000, 'Amount cannot exceed £10M')
-    .optional(),
-  total: z
-    .number()
-    .min(0, 'Total salary cannot be negative')
-    .max(10000000, 'Total salary cannot exceed £10M')
-    .optional(),
-});
+const whatIfValueSchema = z
+  .object({
+    type: z.enum(['percentage', 'amount', 'total']),
+    value: z.number().finite('Value must be a valid number'),
+  })
+  .superRefine((data, ctx) => {
+    // Type-specific validation using Zod 4.x superRefine
+    if (data.type === 'percentage') {
+      if (data.value < -100 || data.value > 1000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Percentage must be between -100% and 1000%',
+          path: ['value'],
+        });
+      }
+    } else if (data.type === 'amount') {
+      if (data.value < -10000000 || data.value > 10000000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Amount must be between -£10M and £10M',
+          path: ['value'],
+        });
+      }
+    } else if (data.type === 'total') {
+      if (data.value < 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.too_small,
+          minimum: 0,
+          type: 'number',
+          inclusive: true,
+          message: 'Total salary cannot be negative',
+          path: ['value'],
+        });
+      } else if (data.value > 10000000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.too_big,
+          maximum: 10000000,
+          type: 'number',
+          inclusive: true,
+          message: 'Total salary cannot exceed £10M',
+          path: ['value'],
+        });
+      }
+    }
+  });
 
 interface WhatIfInputsProps {
   onCompare?: () => void;
@@ -65,56 +92,29 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   const valueInputId = useId();
 
   const handleCompare = () => {
-    // Validate input before calculating
-    try {
-      const validationData: Record<string, unknown> = {
-        type: whatIf.type,
-        value: whatIf.value,
-      };
+    // Validate using Zod 4.x .safeParse() pattern (consistent with store)
+    const validated = whatIfValueSchema.safeParse({
+      type: whatIf.type,
+      value: whatIf.value,
+    });
 
-      // Add type-specific validation
-      if (whatIf.type === 'percentage') {
-        validationData.percentage = whatIf.value;
-        if (whatIf.value < -100 || whatIf.value > 1000) {
-          setError('Percentage must be between -100% and 1000%');
-          toast.error('Invalid percentage value');
-          return;
-        }
-      } else if (whatIf.type === 'amount') {
-        validationData.amount = whatIf.value;
-        if (whatIf.value < -10000000 || whatIf.value > 10000000) {
-          setError('Amount must be between -£10M and £10M');
-          toast.error('Invalid amount value');
-          return;
-        }
-      } else if (whatIf.type === 'total') {
-        validationData.total = whatIf.value;
-        if (whatIf.value < 0 || whatIf.value > 10000000) {
-          setError('Total salary must be between £0 and £10M');
-          toast.error('Invalid total salary');
-          return;
-        }
-      }
+    if (!validated.success) {
+      // Extract Zod's error message (now type-aware from superRefine)
+      const errorMessage = validated.error.issues[0]?.message || 'Invalid input';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return;
+    }
 
-      // Validate with Zod
-      whatIfValueSchema.parse(validationData);
+    // Clear any previous errors
+    setError('');
 
-      // Clear any previous errors
-      setError('');
+    // Enable What If mode and calculate
+    calculateWhatIf();
 
-      // Enable What If mode and calculate
-      calculateWhatIf();
-
-      // Notify parent to scroll to results
-      if (onCompare) {
-        onCompare();
-      }
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const errorMessage = err.issues[0]?.message || 'Invalid input';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      }
+    // Notify parent to scroll to results
+    if (onCompare) {
+      onCompare();
     }
   };
 
