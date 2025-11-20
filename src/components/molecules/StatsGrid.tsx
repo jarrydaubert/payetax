@@ -106,7 +106,7 @@ function StatCard({ stat, variant }: StatCardProps) {
   );
 
   return (
-    <Card className={cardClasses} role='listitem'>
+    <Card className={cardClasses}>
       <CardContent className={cn('flex flex-col items-center text-center', SPACING.P_6)}>
         {/* Icon */}
         <div className={iconClasses} aria-hidden='true'>

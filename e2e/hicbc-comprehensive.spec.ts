@@ -89,8 +89,8 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
 
     await page.getByTestId('salary-input').fill('65000');
 
-    // Add pension contribution
-    const pensionInput = page.getByLabel(/pension.*contribution/i);
+    // Add pension contribution (use testId to avoid matching tooltip button)
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5000');
 
     await page.getByTestId('calculate-button').click();
