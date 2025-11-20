@@ -184,8 +184,8 @@ export default defineConfig({
     },
   },
   /* Global setup - accept cookies once for all tests */
+  globalSetup: './e2e/global-setup.ts',
 
   /* Global setup and teardown */
-  globalSetup: undefined, // Add if needed
   globalTeardown: undefined, // Add if needed
 });

@@ -34,6 +34,7 @@
     "test:full": "npm run test && npm run test:e2e",
     "test:ci": "jest --coverage --ci --maxWorkers=2",
     "test:e2e:ci": "playwright test --reporter=html",
+    "test:e2e:clear": "rm -rf audit-outputs/playwright-report audit-outputs/test-results playwright/.auth/storageState.json && echo '✅ E2E test artifacts cleared'",
     "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./audit-outputs/lighthouse-report.html --view",
     "lighthouse:ci": "lhci autorun",
     "monitor:performance": "node scripts/performance-monitor.js",
