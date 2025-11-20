@@ -21,21 +21,29 @@ async function globalSetup(config: FullConfig) {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1500);
 
-    // Accept cookies using the new data-testid
+    // Accept cookies using the data-testid
     const acceptButton = page.getByTestId('cookie-accept-all');
     if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await acceptButton.click();
       await page.waitForTimeout(500);
 
-      // Verify cookie consent was saved
+      // Verify cookie consent was saved to localStorage
       const consent = await page.evaluate(() => localStorage.getItem('cookie-consent'));
       if (consent === 'accepted') {
+        // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
+        console.log('✅ Cookie consent accepted and saved to localStorage');
       } else {
         console.warn('⚠️  Cookie consent not saved (might be okay for some tests)');
       }
     } else {
+      // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
+      console.log('ℹ️  Cookie banner not visible (already accepted or not rendered)');
     }
+
+    // Save storage state (includes localStorage with cookie consent)
     await context.storageState({ path: 'playwright/.auth/storageState.json' });
+    // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
+    console.log('✅ Storage state saved to playwright/.auth/storageState.json');
   } catch (error) {
     console.error('❌ Global setup failed:', error);
     throw error;
