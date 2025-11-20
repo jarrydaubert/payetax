@@ -194,7 +194,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
             await page.waitForTimeout(300);
           }
         } catch (_error) {
-          console.log(`⚠️  Could not set student loan: ${loans.join(', ')}`);
+          // Failed to set student loan - test will fail on assertion
         }
       }
 

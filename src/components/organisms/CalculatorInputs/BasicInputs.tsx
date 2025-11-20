@@ -118,6 +118,7 @@ export function BasicInputs() {
       setStudentLoanPlans(['postgrad']);
     } else {
       // Undergraduate loan - check if we need to add postgrad
+      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan selection
       const newPlans = hasPostgraduateAddOn ? [value as any, 'postgrad'] : [value as any];
       setStudentLoanPlans(newPlans);
     }
@@ -127,8 +128,10 @@ export function BasicInputs() {
     if (undergraduateLoan === 'none' || undergraduateLoan === 'postgrad') return;
 
     if (checked) {
+      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
       setStudentLoanPlans([undergraduateLoan as any, 'postgrad']);
     } else {
+      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
       setStudentLoanPlans([undergraduateLoan as any]);
     }
   };

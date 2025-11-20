@@ -84,8 +84,8 @@ describe('WhatIfInputs', () => {
     it('should render the Compare Scenarios button', () => {
       render(<WhatIfInputs />);
 
-      expect(screen.getByTestId('compare-button')).toBeInTheDocument();
-      expect(screen.getByTestId('compare-button')).toHaveTextContent('Compare Scenarios');
+      expect(screen.getByTestId('what-if-trigger')).toBeInTheDocument();
+      expect(screen.getByTestId('what-if-trigger')).toHaveTextContent('Compare Scenarios');
     });
 
     it('should not render Clear button when no What If results', () => {
@@ -162,7 +162,7 @@ describe('WhatIfInputs', () => {
       const user = userEvent.setup();
       render(<WhatIfInputs />);
 
-      const compareButton = screen.getByTestId('compare-button');
+      const compareButton = screen.getByTestId('what-if-trigger');
       await user.click(compareButton);
 
       expect(mockActions.calculateWhatIf).toHaveBeenCalled();
@@ -173,7 +173,7 @@ describe('WhatIfInputs', () => {
       const mockOnCompare = jest.fn();
       render(<WhatIfInputs onCompare={mockOnCompare} />);
 
-      const compareButton = screen.getByTestId('compare-button');
+      const compareButton = screen.getByTestId('what-if-trigger');
       await user.click(compareButton);
 
       expect(mockOnCompare).toHaveBeenCalled();
@@ -221,7 +221,7 @@ describe('WhatIfInputs', () => {
     it('should apply gradient styling to Compare button', () => {
       render(<WhatIfInputs />);
 
-      const button = screen.getByTestId('compare-button');
+      const button = screen.getByTestId('what-if-trigger');
       expect(button).toHaveClass('from-purple-500');
       expect(button).toHaveClass('to-pink-500');
     });
