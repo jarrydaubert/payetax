@@ -435,9 +435,9 @@ describe('SalaryQuickResults', () => {
 
       const links = screen.getAllByRole('link');
       expect(links.length).toBe(4);
-      links.forEach((link) => {
+      for (const link of links) {
         expect(link.tagName).toBe('A');
-      });
+      }
     });
   });
 });

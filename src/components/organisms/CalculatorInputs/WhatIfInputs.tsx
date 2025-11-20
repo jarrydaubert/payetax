@@ -53,6 +53,7 @@ const whatIfValueSchema = z
           minimum: 0,
           type: 'number',
           inclusive: true,
+          origin: 'number',
           message: 'Total salary cannot be negative',
           path: ['value'],
         });
@@ -62,6 +63,7 @@ const whatIfValueSchema = z
           maximum: 10000000,
           type: 'number',
           inclusive: true,
+          origin: 'number',
           message: 'Total salary cannot exceed £10M',
           path: ['value'],
         });
