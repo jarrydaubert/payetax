@@ -3,6 +3,9 @@
  */
 // src/app/api/error-log/__tests__/route.test.ts
 
+// CRITICAL: Set env var BEFORE any imports to ensure route initializes correctly
+process.env.RESEND_API_KEY = 'test-api-key-for-jest';
+
 // Mock Resend before imports
 jest.mock('resend', () => ({
   Resend: jest.fn().mockImplementation(() => ({
@@ -34,11 +37,6 @@ describe('Error Log API Route', () => {
 
   // Store original env var value to restore after all tests
   const originalResendKey = process.env.RESEND_API_KEY;
-
-  beforeAll(() => {
-    // Set API key once for all tests in this suite
-    process.env.RESEND_API_KEY = 'test-api-key-for-jest';
-  });
 
   afterAll(() => {
     // Restore original value after all tests
