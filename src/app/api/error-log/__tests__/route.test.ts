@@ -32,16 +32,30 @@ describe('Error Log API Route', () => {
     return request as unknown as NextRequest;
   };
 
+  // Store original env var value to restore after all tests
+  const originalResendKey = process.env.RESEND_API_KEY;
+
+  beforeAll(() => {
+    // Set API key once for all tests in this suite
+    process.env.RESEND_API_KEY = 'test-api-key-for-jest';
+  });
+
+  afterAll(() => {
+    // Restore original value after all tests
+    if (originalResendKey !== undefined) {
+      process.env.RESEND_API_KEY = originalResendKey;
+    } else {
+      delete process.env.RESEND_API_KEY;
+    }
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     // Clear rate limits between tests
     clearAllRateLimits();
-    // Mock Resend API key
-    process.env.RESEND_API_KEY = 'test-api-key';
   });
 
   afterEach(() => {
-    process.env.RESEND_API_KEY = undefined;
     // Clean up rate limits after tests
     clearAllRateLimits();
   });
@@ -119,17 +133,12 @@ describe('Error Log API Route', () => {
   });
 
   describe('Server Configuration', () => {
-    // SKIP: Environment-specific test - RESEND_API_KEY is set in test environment
-    // This test expects missing API key to return 500, but the key is present in CI/CD
-    it.skip('should return 500 if Resend API key not configured', async () => {
-      // Store the original value
-      const originalKey = process.env.RESEND_API_KEY;
+    it('should return 500 if Resend API key not configured', async () => {
+      // Temporarily remove the API key
+      delete process.env.RESEND_API_KEY;
 
-      // Reset modules first, then delete the env var
+      // Reset modules and re-import the route without API key
       jest.resetModules();
-      process.env.RESEND_API_KEY = undefined;
-
-      // Re-import the route with no API key
       const { POST: POSTWithoutKey } = await import('../route');
 
       const req = mockRequest({
@@ -142,10 +151,11 @@ describe('Error Log API Route', () => {
       expect(response.status).toBe(500);
       expect(data.error).toContain('configuration error');
 
-      // Restore the original value
-      if (originalKey) {
-        process.env.RESEND_API_KEY = originalKey;
-      }
+      // Restore the API key for other tests
+      process.env.RESEND_API_KEY = 'test-api-key-for-jest';
+      
+      // Reset modules again to reload with the key
+      jest.resetModules();
     });
   });
 

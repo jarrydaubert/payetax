@@ -179,6 +179,12 @@ if (typeof window !== 'undefined') {
       dispatchEvent: jest.fn(),
     })),
   });
+
+  // Mock window.scrollTo (not available in jsdom, used by motion-dom animations)
+  Object.defineProperty(window, 'scrollTo', {
+    writable: true,
+    value: jest.fn(),
+  });
 }
 
 // Mock console methods in tests to avoid noise
