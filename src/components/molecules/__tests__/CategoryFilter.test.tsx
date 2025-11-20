@@ -4,8 +4,8 @@
 // src/components/molecules/__tests__/CategoryFilter.test.tsx
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { CategoryFilter } from '../CategoryFilter';
 import type { BlogCategory } from '@/types/blog';
+import { CategoryFilter } from '../CategoryFilter';
 
 describe('CategoryFilter', () => {
   const mockCategories: BlogCategory[] = [
@@ -141,7 +141,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
@@ -157,7 +157,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
@@ -172,7 +172,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
@@ -241,7 +241,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
@@ -258,13 +258,7 @@ describe('CategoryFilter', () => {
 
   describe('Empty States', () => {
     it('should render when no categories provided', () => {
-      render(
-        <CategoryFilter
-          categories={[]}
-          allPostsCount={10}
-          onCategoryClick={mockCallback}
-        />
-      );
+      render(<CategoryFilter categories={[]} allPostsCount={10} onCategoryClick={mockCallback} />);
 
       expect(screen.getByText('Browse Topics')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /All Posts 10/i })).toBeInTheDocument();
@@ -304,9 +298,7 @@ describe('CategoryFilter', () => {
 
   describe('Large Numbers', () => {
     it('should handle large post counts', () => {
-      const largeCategories: BlogCategory[] = [
-        { slug: 'popular', name: 'Popular', count: 999 },
-      ];
+      const largeCategories: BlogCategory[] = [{ slug: 'popular', name: 'Popular', count: 999 }];
 
       render(
         <CategoryFilter
@@ -417,7 +409,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
@@ -433,7 +425,7 @@ describe('CategoryFilter', () => {
         <CategoryFilter
           categories={mockCategories}
           allPostsCount={10}
-          selectedCategory="tax-basics"
+          selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
         />
       );
