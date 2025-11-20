@@ -3,10 +3,10 @@
 
 import type React from 'react';
 import { Suspense } from 'react';
+import CookieBanner from '@/components/atoms/CookieBanner';
 import Footer from '@/components/molecules/Footer';
+import SustainabilityBadge from '@/components/molecules/SustainabilityBadge';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
-import CookieBanner from '@/components/ui/CookieBanner';
-import SustainabilityBadge from '@/components/ui/SustainabilityBadge';
 
 interface LayoutProps {
   children: React.ReactNode;

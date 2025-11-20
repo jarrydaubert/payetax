@@ -2,7 +2,7 @@
 
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { StructuredData } from '@/components/ui/StructuredData';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata } from '@/lib/metadata';

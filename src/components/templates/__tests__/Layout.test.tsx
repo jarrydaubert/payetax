@@ -17,12 +17,12 @@ jest.mock('@/components/organisms/SimpleNavbar', () => ({
   default: () => <nav data-testid='mock-navbar'>Navbar</nav>,
 }));
 
-jest.mock('@/components/ui/CookieBanner', () => ({
+jest.mock('@/components/atoms/CookieBanner', () => ({
   __esModule: true,
   default: () => <div data-testid='mock-cookie-banner'>Cookie Banner</div>,
 }));
 
-jest.mock('@/components/ui/SustainabilityBadge', () => ({
+jest.mock('@/components/molecules/SustainabilityBadge', () => ({
   __esModule: true,
   default: () => <div data-testid='mock-sustainability-badge'>Sustainability Badge</div>,
 }));

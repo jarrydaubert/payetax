@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
 
 // Mock ThemeToggle
-jest.mock('@/components/ui/ThemeToggle', () => ({
+jest.mock('@/components/atoms/ThemeToggle', () => ({
   ThemeToggle: () => <div data-testid='theme-toggle'>Theme Toggle</div>,
 }));
 

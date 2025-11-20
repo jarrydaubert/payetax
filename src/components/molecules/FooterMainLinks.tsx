@@ -4,7 +4,7 @@
 import { Twitter } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { ThemeToggle } from '@/components/atoms/ThemeToggle';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 

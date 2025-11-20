@@ -18,17 +18,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GradientText } from '@/components/atoms/GradientText';
+import CallToAction from '@/components/molecules/CallToAction';
 import { CategoryFilter } from '@/components/molecules/CategoryFilter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import CallToAction from '@/components/ui/CallToAction';
 import {
   Empty,
   EmptyContent,
   EmptyDescription,
   EmptyMedia,
   EmptyTitle,
-} from '@/components/ui/empty';
+} from '@/components/atoms/EmptyState';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
 import { cn } from '@/lib/utils';
