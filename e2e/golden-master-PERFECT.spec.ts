@@ -46,26 +46,17 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
     // CRITICAL: Wait longer for page to fully load
     await page.waitForTimeout(1500);
 
-    // Dismiss cookie banner if it appears - try multiple times
-    for (let i = 0; i < 3; i++) {
-      const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-      const cookieBannerVisible = await acceptCookiesButton
-        .isVisible({ timeout: 2000 })
-        .catch(() => false);
-      if (cookieBannerVisible) {
-        await acceptCookiesButton.click();
-        await page.waitForTimeout(1000);
-
-        // Verify it's actually gone
-        const stillVisible = await acceptCookiesButton
-          .isVisible({ timeout: 500 })
-          .catch(() => false);
-        if (!stillVisible) {
-          break;
-        }
-      } else {
-        break;
-      }
+    // Dismiss cookie banner if it appears - using test ID (consistent with global-setup)
+    // NOTE: Global setup should handle this, but we check anyway for reliability
+    const acceptCookiesButton = page.getByTestId('cookie-accept-all');
+    const cookieBannerVisible = await acceptCookiesButton
+      .isVisible({ timeout: 2000 })
+      .catch(() => false);
+    if (cookieBannerVisible) {
+      await acceptCookiesButton.click();
+      await page.waitForTimeout(500);
+      // biome-ignore lint/suspicious/noConsole: Test debugging output
+      console.log('🍪 Cookie banner dismissed in golden master test');
     }
   });
 
