@@ -45,6 +45,7 @@ describe('Error Log API Route', () => {
     if (originalResendKey !== undefined) {
       process.env.RESEND_API_KEY = originalResendKey;
     } else {
+      // biome-ignore lint/performance/noDelete: Must actually delete env var, undefined is not the same
       delete process.env.RESEND_API_KEY;
     }
   });
@@ -134,7 +135,8 @@ describe('Error Log API Route', () => {
 
   describe('Server Configuration', () => {
     it('should return 500 if Resend API key not configured', async () => {
-      // Temporarily remove the API key
+      // Temporarily remove the API key (must delete, undefined is not the same)
+      // biome-ignore lint/performance/noDelete: Must actually delete env var to test missing key scenario
       delete process.env.RESEND_API_KEY;
 
       // Reset modules and re-import the route without API key
@@ -153,7 +155,7 @@ describe('Error Log API Route', () => {
 
       // Restore the API key for other tests
       process.env.RESEND_API_KEY = 'test-api-key-for-jest';
-      
+
       // Reset modules again to reload with the key
       jest.resetModules();
     });
