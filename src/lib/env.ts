@@ -1,0 +1,215 @@
+/**
+ * Environment Variables Validation
+ * PAYTAX-129 (Environment & External Data Validation)
+ *
+ * Validates environment variables at runtime using Zod.
+ * Provides type-safe access to env vars with clear error messages.
+ *
+ * Why This Matters:
+ * - Catches missing env vars early (at build/runtime startup)
+ * - Provides clear error messages (better than undefined)
+ * - Type-safe access to validated env vars
+ * - Self-documenting (schema shows what's required vs optional)
+ *
+ * @module lib/env
+ */
+
+import { z } from 'zod';
+
+/**
+ * Zod Schema for Public Environment Variables
+ * These are exposed to the browser (NEXT_PUBLIC_* prefix)
+ */
+export const PublicEnvSchema = z.object({
+  // Analytics
+  NEXT_PUBLIC_GA_ID: z
+    .string()
+    .regex(/^G-[A-Z0-9]{10}$/i, 'Google Analytics ID must be in format G-XXXXXXXXXX')
+    .optional(),
+
+  // Error Monitoring
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url('Sentry DSN must be a valid URL').optional(),
+
+  // Site Configuration
+  NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL').optional(),
+
+  // Feature Flags
+  NEXT_PUBLIC_ENABLE_PWA: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
+
+  NEXT_PUBLIC_ENABLE_ANALYTICS: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
+});
+
+/**
+ * Zod Schema for Server-Only Environment Variables
+ * These are only available on the server (never exposed to browser)
+ */
+export const ServerEnvSchema = z.object({
+  // Email Service
+  RESEND_API_KEY: z
+    .string()
+    .min(1, 'Resend API key is required for email functionality')
+    .optional(),
+
+  // Sentry Build Configuration
+  SENTRY_AUTH_TOKEN: z.string().optional(),
+  SENTRY_ORG: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
+
+  // Vercel Deployment
+  VERCEL_TOKEN: z.string().optional(),
+  VERCEL_ORG_ID: z.string().optional(),
+  VERCEL_PROJECT_ID: z.string().optional(),
+
+  // IndexNow API
+  INDEXNOW_KEY: z
+    .string()
+    .uuid('IndexNow key must be a valid UUID')
+    .optional()
+    .or(z.literal('').transform(() => undefined)), // Allow empty string
+
+  // Build Configuration
+  ANALYZE: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
+
+  NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
+});
+
+/**
+ * Combined Environment Schema
+ * Validates both public and server environment variables
+ */
+export const EnvSchema = z.object({
+  public: PublicEnvSchema,
+  server: ServerEnvSchema,
+});
+
+export type PublicEnv = z.infer<typeof PublicEnvSchema>;
+export type ServerEnv = z.infer<typeof ServerEnvSchema>;
+export type Env = z.infer<typeof EnvSchema>;
+
+/**
+ * Validates public environment variables (safe to use in browser)
+ * @returns Validated public environment variables
+ * @throws Error if validation fails
+ */
+export function validatePublicEnv(): PublicEnv {
+  const result = PublicEnvSchema.safeParse({
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_ENABLE_PWA: process.env.NEXT_PUBLIC_ENABLE_PWA,
+    NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
+  });
+
+  if (!result.success) {
+    console.error('❌ Public environment validation failed:', result.error.issues);
+    throw new Error(
+      `Invalid public environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`
+    );
+  }
+
+  return result.data;
+}
+
+/**
+ * Validates server-only environment variables
+ * @returns Validated server environment variables
+ * @throws Error if validation fails
+ */
+export function validateServerEnv(): ServerEnv {
+  const result = ServerEnvSchema.safeParse({
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    SENTRY_ORG: process.env.SENTRY_ORG,
+    SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+    VERCEL_TOKEN: process.env.VERCEL_TOKEN,
+    VERCEL_ORG_ID: process.env.VERCEL_ORG_ID,
+    VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
+    INDEXNOW_KEY: process.env.INDEXNOW_KEY,
+    ANALYZE: process.env.ANALYZE,
+    NODE_ENV: process.env.NODE_ENV,
+  });
+
+  if (!result.success) {
+    console.error('❌ Server environment validation failed:', result.error.issues);
+    throw new Error(
+      `Invalid server environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`
+    );
+  }
+
+  return result.data;
+}
+
+/**
+ * Validates all environment variables
+ * @returns Validated environment variables (public + server)
+ * @throws Error if validation fails
+ */
+export function validateEnv(): Env {
+  return {
+    public: validatePublicEnv(),
+    server: validateServerEnv(),
+  };
+}
+
+/**
+ * Safe helper to get a specific public env var
+ * @param key - The environment variable key
+ * @returns The validated value or undefined if not set
+ */
+export function getPublicEnv<K extends keyof PublicEnv>(key: K): PublicEnv[K] {
+  const env = validatePublicEnv();
+  return env[key];
+}
+
+/**
+ * Safe helper to get a specific server env var
+ * @param key - The environment variable key
+ * @returns The validated value or undefined if not set
+ */
+export function getServerEnv<K extends keyof ServerEnv>(key: K): ServerEnv[K] {
+  const env = validateServerEnv();
+  return env[key];
+}
+
+/**
+ * Check if a specific feature is enabled
+ * @param feature - The feature flag to check
+ * @returns True if the feature is enabled
+ */
+export function isFeatureEnabled(feature: 'PWA' | 'ANALYTICS'): boolean {
+  const env = validatePublicEnv();
+  switch (feature) {
+    case 'PWA':
+      return env.NEXT_PUBLIC_ENABLE_PWA === true;
+    case 'ANALYTICS':
+      return env.NEXT_PUBLIC_ENABLE_ANALYTICS === true;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Runtime Validation (Optional - only in production)
+ * Validates critical environment variables on module load
+ *
+ * Disabled in test mode to avoid breaking tests
+ */
+if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+  // Server-side validation only in production
+  try {
+    validateEnv();
+  } catch (error) {
+    console.error('❌ Environment validation failed at startup:', error);
+    // Don't throw - allow app to start but log the error
+    // This prevents deployment failures due to optional env vars
+  }
+}
