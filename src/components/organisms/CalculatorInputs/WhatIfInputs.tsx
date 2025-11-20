@@ -4,7 +4,6 @@
 import { RotateCcw, Wand2 } from 'lucide-react';
 import { useId, useState } from 'react';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
@@ -17,59 +16,8 @@ import {
 } from '@/components/ui/select';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
+import { WhatIfValueSchema } from '@/lib/validation';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
-
-/**
- * Zod 4.x validation schema for What If scenario inputs
- * Uses .superRefine() for type-specific validation (more powerful than .refine())
- */
-const whatIfValueSchema = z
-  .object({
-    type: z.enum(['percentage', 'amount', 'total']),
-    value: z.number().finite('Value must be a valid number'),
-  })
-  .superRefine((data, ctx) => {
-    // Type-specific validation using Zod 4.x superRefine
-    if (data.type === 'percentage') {
-      if (data.value < -100 || data.value > 1000) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Percentage must be between -100% and 1000%',
-          path: ['value'],
-        });
-      }
-    } else if (data.type === 'amount') {
-      if (data.value < -10000000 || data.value > 10000000) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Amount must be between -£10M and £10M',
-          path: ['value'],
-        });
-      }
-    } else if (data.type === 'total') {
-      if (data.value < 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.too_small,
-          minimum: 0,
-          type: 'number',
-          inclusive: true,
-          origin: 'number',
-          message: 'Total salary cannot be negative',
-          path: ['value'],
-        });
-      } else if (data.value > 10000000) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.too_big,
-          maximum: 10000000,
-          type: 'number',
-          inclusive: true,
-          origin: 'number',
-          message: 'Total salary cannot exceed £10M',
-          path: ['value'],
-        });
-      }
-    }
-  });
 
 interface WhatIfInputsProps {
   onCompare?: () => void;
@@ -95,7 +43,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
 
   const handleCompare = () => {
     // Validate using Zod 4.x .safeParse() pattern (consistent with store)
-    const validated = whatIfValueSchema.safeParse({
+    const validated = WhatIfValueSchema.safeParse({
       type: whatIf.type,
       value: whatIf.value,
     });

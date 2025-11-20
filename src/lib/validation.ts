@@ -598,6 +598,162 @@ export const SalarySanitizationSchema = z
   .pipe(z.number().min(0).max(10_000_000));
 
 /**
+ * ============================================================================
+ * CALCULATOR INPUT VALIDATION (What If & Comparison)
+ * ============================================================================
+ *
+ * Schemas for calculator UI input validation.
+ * Moved from inline component definitions (PAYTAX-127).
+ */
+
+/**
+ * What If Scenario Value Schema
+ *
+ * Validates What If scenario inputs with type-specific rules:
+ * - percentage: -100% to 1000% (allows decreases and large increases)
+ * - amount: -£10M to £10M (allows salary reductions)
+ * - total: £0 to £10M (new total salary must be non-negative)
+ *
+ * Uses Zod 4.x .superRefine() for powerful type-specific validation.
+ *
+ * @example
+ * ```typescript
+ * // Valid percentage change
+ * WhatIfValueSchema.safeParse({ type: 'percentage', value: 10 }); // +10%
+ *
+ * // Valid amount change
+ * WhatIfValueSchema.safeParse({ type: 'amount', value: -5000 }); // -£5k
+ *
+ * // Valid new total
+ * WhatIfValueSchema.safeParse({ type: 'total', value: 55000 }); // £55k
+ * ```
+ */
+export const WhatIfValueSchema = z
+  .object({
+    type: z.enum(['percentage', 'amount', 'total']),
+    value: z.number().finite('Value must be a valid number'),
+  })
+  .superRefine((data, ctx) => {
+    // Type-specific validation using Zod 4.x superRefine
+    if (data.type === 'percentage') {
+      if (data.value < -100 || data.value > 1000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Percentage must be between -100% and 1000%',
+          path: ['value'],
+        });
+      }
+    } else if (data.type === 'amount') {
+      if (data.value < -10000000 || data.value > 10000000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Amount must be between -£10M and £10M',
+          path: ['value'],
+        });
+      }
+    } else if (data.type === 'total') {
+      if (data.value < 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.too_small,
+          minimum: 0,
+          type: 'number',
+          inclusive: true,
+          origin: 'number',
+          message: 'Total salary cannot be negative',
+          path: ['value'],
+        });
+      } else if (data.value > 10000000) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.too_big,
+          maximum: 10000000,
+          type: 'number',
+          inclusive: true,
+          origin: 'number',
+          message: 'Total salary cannot exceed £10M',
+          path: ['value'],
+        });
+      }
+    }
+  });
+
+export type WhatIfValue = z.infer<typeof WhatIfValueSchema>;
+
+/**
+ * Salary Comparison Value Schema
+ *
+ * Validates salary comparison inputs with mode-specific rules:
+ * - percentage: 0.01% to 1000% (positive increases only)
+ * - amount: £1 to £10M (positive amounts only)
+ * - total: £1 to £10M (new total salary)
+ *
+ * @example
+ * ```typescript
+ * // Valid percentage increase
+ * ComparisonValueSchema.safeParse({
+ *   mode: 'percentage',
+ *   value: 5,
+ *   percentage: 5
+ * }); // +5%
+ *
+ * // Valid amount increase
+ * ComparisonValueSchema.safeParse({
+ *   mode: 'amount',
+ *   value: 5000,
+ *   amount: 5000
+ * }); // +£5k
+ * ```
+ */
+export const ComparisonValueSchema = z.object({
+  mode: z.enum(['percentage', 'amount', 'total']),
+  value: z.number().positive('Value must be positive'),
+  percentage: z
+    .number()
+    .min(0.01, 'Percentage must be at least 0.01%')
+    .max(1000, 'Percentage cannot exceed 1000%')
+    .optional(),
+  amount: z
+    .number()
+    .min(1, 'Amount must be at least £1')
+    .max(10000000, 'Amount cannot exceed £10M')
+    .optional(),
+  total: z
+    .number()
+    .min(1, 'Total salary must be at least £1')
+    .max(10000000, 'Total salary cannot exceed £10M')
+    .optional(),
+});
+
+export type ComparisonValue = z.infer<typeof ComparisonValueSchema>;
+
+/**
+ * Helper function to validate What If scenario inputs
+ * @param type - The type of What If scenario
+ * @param value - The value to validate
+ * @returns Validation result with success flag and data/error
+ */
+export function validateWhatIfValue(type: 'percentage' | 'amount' | 'total', value: number) {
+  return WhatIfValueSchema.safeParse({ type, value });
+}
+
+/**
+ * Helper function to validate salary comparison inputs
+ * @param mode - The comparison mode
+ * @param value - The value to validate
+ * @returns Validation result with success flag and data/error
+ */
+export function validateComparisonValue(
+  mode: 'percentage' | 'amount' | 'total',
+  value: number,
+  modeValue?: number
+) {
+  const data: Record<string, unknown> = { mode, value };
+  if (mode === 'percentage' && modeValue !== undefined) data.percentage = modeValue;
+  if (mode === 'amount' && modeValue !== undefined) data.amount = modeValue;
+  if (mode === 'total' && modeValue !== undefined) data.total = modeValue;
+  return ComparisonValueSchema.safeParse(data);
+}
+
+/**
  * Utility Functions for Validation
  * Migrated from validateInput.ts (PAYTAX-66 Phase 2)
  */

@@ -11,29 +11,7 @@ import { Label } from '@/components/ui/label';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { formatCurrency } from '@/lib/utils';
-
-/**
- * Zod validation schema for salary comparison inputs
- */
-const comparisonValueSchema = z.object({
-  mode: z.enum(['percentage', 'amount', 'total']),
-  value: z.number().positive('Value must be positive'),
-  percentage: z
-    .number()
-    .min(0.01, 'Percentage must be at least 0.01%')
-    .max(1000, 'Percentage cannot exceed 1000%')
-    .optional(),
-  amount: z
-    .number()
-    .min(1, 'Amount must be at least £1')
-    .max(10000000, 'Amount cannot exceed £10M')
-    .optional(),
-  total: z
-    .number()
-    .min(1, 'Total salary must be at least £1')
-    .max(10000000, 'Total salary cannot exceed £10M')
-    .optional(),
-});
+import { ComparisonValueSchema } from '@/lib/validation';
 
 interface ComparisonInputsProps {
   currentSalary: number;
@@ -80,7 +58,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       }
 
       // Validate with Zod
-      comparisonValueSchema.parse(validationData);
+      ComparisonValueSchema.parse(validationData);
 
       // Clear any previous errors
       setError('');
