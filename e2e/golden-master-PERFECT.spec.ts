@@ -156,26 +156,46 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         }
       }
 
-      // 5. Student Loans (if specified) - now supports multiple via checkboxes
+      // 5. Student Loan (if specified) - Select + optional postgraduate checkbox
       if (input.studentLoan && input.studentLoan !== 'none') {
         const loans = Array.isArray(input.studentLoan) ? input.studentLoan : [input.studentLoan];
-        console.log(`📋 Checking ${loans.length} student loan(s):`, loans);
 
-        for (const loan of loans) {
-          const testId = `student-loan-${loan}`;
-          const checkbox = page.getByTestId(testId);
+        // Determine undergraduate loan (first non-postgrad, or 'postgrad' if only postgrad)
+        const undergraduateLoan =
+          loans.includes('postgrad') && loans.length === 1
+            ? 'postgrad'
+            : loans.find((l) => l !== 'postgrad') || loans[0];
 
-          try {
-            await checkbox.check({ timeout: 2000 });
-            await page.waitForTimeout(500); // Increased wait for state to update
-            console.log(`  ✅ Checked ${loan}`);
-          } catch (_error) {
-            console.log(`  ⚠️  Could not check ${loan} checkbox`);
+        const hasPostgrad = loans.includes('postgrad') && loans.length === 2;
+
+        try {
+          // Select undergraduate loan from dropdown
+          const studentLoanSelect = page.getByTestId('student-loan-select');
+          await studentLoanSelect.click({ timeout: 2000 });
+          await page.waitForTimeout(300);
+
+          // Map loan to option text
+          const optionMap: Record<string, RegExp> = {
+            plan1: /Plan 1.*pre-Sept 2012/i,
+            plan2: /Plan 2.*Sept 2012/i,
+            plan4: /Plan 4.*Scotland/i,
+            plan5: /Plan 5.*2023/i,
+            postgrad: /Postgraduate only/i,
+          };
+
+          const optionPattern = optionMap[undergraduateLoan] || new RegExp(undergraduateLoan, 'i');
+          await page.getByRole('option', { name: optionPattern }).click();
+          await page.waitForTimeout(300);
+
+          // If has postgraduate add-on, check the checkbox
+          if (hasPostgrad) {
+            const postgraduateCheckbox = page.getByTestId('postgraduate-addon-checkbox');
+            await postgraduateCheckbox.check({ timeout: 2000 });
+            await page.waitForTimeout(300);
           }
+        } catch (_error) {
+          console.log(`⚠️  Could not set student loan: ${loans.join(', ')}`);
         }
-
-        // Extra wait after all checkboxes to ensure state updates
-        await page.waitForTimeout(500);
       }
 
       // 6. Marriage Allowance (if specified)

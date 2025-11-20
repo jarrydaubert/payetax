@@ -49,7 +49,7 @@ export function BasicInputs() {
     setIsBlind,
     setAge,
     setPayNoNI,
-    toggleStudentLoan,
+    setStudentLoanPlans,
     setPensionContribution,
     setPensionContributionType,
     setAllowancesDeductions,
@@ -65,6 +65,8 @@ export function BasicInputs() {
   const blindId = useId();
   const ageId = useId();
   const payNoNIId = useId();
+  const studentLoanId = useId();
+  const postgraduateAddonId = useId();
   const allowancesId = useId();
   const pensionTypeId = useId();
   const pensionId = useId();
@@ -87,12 +89,49 @@ export function BasicInputs() {
   ];
 
   const studentLoanOptions = [
-    { value: 'plan1' as const, label: 'Plan 1 (pre-Sept 2012)', description: 'Older loans' },
-    { value: 'plan2' as const, label: 'Plan 2 (Sept 2012+)', description: 'Most common' },
-    { value: 'plan4' as const, label: 'Plan 4 (Scotland)', description: 'Scottish students' },
-    { value: 'plan5' as const, label: 'Plan 5 (2023+)', description: 'New loans' },
-    { value: 'postgrad' as const, label: 'Postgraduate Loan', description: 'Masters/PhD' },
+    { value: 'none' as const, label: 'No student loan' },
+    { value: 'plan1' as const, label: 'Plan 1 (pre-Sept 2012)' },
+    { value: 'plan2' as const, label: 'Plan 2 (Sept 2012+)' },
+    { value: 'plan4' as const, label: 'Plan 4 (Scotland)' },
+    { value: 'plan5' as const, label: 'Plan 5 (2023+)' },
+    { value: 'postgrad' as const, label: 'Postgraduate only' },
   ];
+
+  // Determine undergraduate loan from store
+  const undergraduateLoan =
+    input.studentLoanPlans === 'none' || !Array.isArray(input.studentLoanPlans)
+      ? 'none'
+      : input.studentLoanPlans.includes('postgrad') && input.studentLoanPlans.length === 1
+        ? 'postgrad'
+        : input.studentLoanPlans.find((p) => p !== 'postgrad') || 'none';
+
+  // Check if has postgraduate in addition to undergrad
+  const hasPostgraduateAddOn =
+    Array.isArray(input.studentLoanPlans) &&
+    input.studentLoanPlans.includes('postgrad') &&
+    input.studentLoanPlans.length === 2;
+
+  const handleUndergraduateLoanChange = (value: string) => {
+    if (value === 'none') {
+      setStudentLoanPlans('none');
+    } else if (value === 'postgrad') {
+      setStudentLoanPlans(['postgrad']);
+    } else {
+      // Undergraduate loan - check if we need to add postgrad
+      const newPlans = hasPostgraduateAddOn ? [value as any, 'postgrad'] : [value as any];
+      setStudentLoanPlans(newPlans);
+    }
+  };
+
+  const handlePostgraduateToggle = (checked: boolean) => {
+    if (undergraduateLoan === 'none' || undergraduateLoan === 'postgrad') return;
+
+    if (checked) {
+      setStudentLoanPlans([undergraduateLoan as any, 'postgrad']);
+    } else {
+      setStudentLoanPlans([undergraduateLoan as any]);
+    }
+  };
 
   return (
     <motion.div
@@ -309,39 +348,51 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      {/* Student Loans - Multi-select */}
+      {/* Student Loan - Select + Conditional */}
       <div className={cn('flex flex-col', SPACING.GAP_2)}>
-        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
-          <LabelTooltip fieldName='studentLoanPlan' />
-          <Label className={cn('font-medium', TYPOGRAPHY.TEXT_SM)}>
-            Student Loans{' '}
-            <span className='text-muted-foreground'>(select all that apply, max 2)</span>
-          </Label>
-        </div>
-        <div className={cn('flex flex-col', SPACING.GAP_2, 'pl-6')}>
-          {studentLoanOptions.map((option) => {
-            const isChecked =
-              Array.isArray(input.studentLoanPlans) &&
-              input.studentLoanPlans.includes(option.value);
-
-            return (
-              <div key={option.value} className={cn('flex items-center', SPACING.GAP_2)}>
-                <Checkbox
-                  id={`loan-${option.value}`}
-                  checked={isChecked}
-                  onCheckedChange={() => toggleStudentLoan(option.value)}
-                  data-testid={`student-loan-${option.value}`}
-                />
-                <Label
-                  htmlFor={`loan-${option.value}`}
-                  className={cn('cursor-pointer', TYPOGRAPHY.TEXT_SM)}
-                >
+        <div className={cn('flex items-center', SPACING.GAP_3)}>
+          <div className={cn('flex items-center', SPACING.GAP_1_5)}>
+            <LabelTooltip fieldName='studentLoanPlan' />
+            <Label htmlFor={studentLoanId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+              Student Loan
+            </Label>
+          </div>
+          <Select value={undergraduateLoan} onValueChange={handleUndergraduateLoanChange}>
+            <SelectTrigger
+              id={studentLoanId}
+              className='w-[200px]'
+              aria-label='Select student loan plan'
+              data-testid='student-loan-select'
+            >
+              <SelectValue placeholder='Select student loan' />
+            </SelectTrigger>
+            <SelectContent>
+              {studentLoanOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
                   {option.label}
-                </Label>
-              </div>
-            );
-          })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Conditional: Show postgraduate add-on if undergraduate loan selected */}
+        {undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad' && (
+          <div className={cn('flex items-center', SPACING.GAP_2, 'pl-6')}>
+            <Checkbox
+              id={postgraduateAddonId}
+              checked={hasPostgraduateAddOn}
+              onCheckedChange={handlePostgraduateToggle}
+              data-testid='postgraduate-addon-checkbox'
+            />
+            <Label
+              htmlFor={postgraduateAddonId}
+              className={cn('cursor-pointer', TYPOGRAPHY.TEXT_SM)}
+            >
+              I also have a Postgraduate Loan
+            </Label>
+          </div>
+        )}
       </div>
 
       {/* Allowances/Deductions */}

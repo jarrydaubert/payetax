@@ -112,13 +112,12 @@ describe('BasicInputs Component', () => {
       expect(screen.getByTestId('age-select')).toBeInTheDocument();
     });
 
-    it('should render student loan checkboxes', () => {
+    it('should render student loan select', () => {
       render(<BasicInputs />);
-      expect(screen.getByText(/Student Loans/i)).toBeInTheDocument();
-      // Check that checkboxes exist
-      expect(screen.getByTestId('student-loan-plan1')).toBeInTheDocument();
-      expect(screen.getByTestId('student-loan-plan2')).toBeInTheDocument();
-      expect(screen.getByTestId('student-loan-postgrad')).toBeInTheDocument();
+      // Check for the select element specifically
+      expect(screen.getByTestId('student-loan-select')).toBeInTheDocument();
+      // Postgraduate checkbox should not be visible initially
+      expect(screen.queryByTestId('postgraduate-addon-checkbox')).not.toBeInTheDocument();
     });
 
     it('should render allowances/deductions input', () => {
