@@ -140,6 +140,25 @@ describe('SimpleHero Component', () => {
     });
   });
 
+  describe('Parallax Feature', () => {
+    it('should render with parallax enabled by default', () => {
+      const { container } = render(<SimpleHero />);
+      // Component renders with default enableParallax=true
+      expect(container.querySelector('section')).toBeInTheDocument();
+    });
+
+    it('should render with parallax explicitly disabled', () => {
+      const { container } = render(<SimpleHero enableParallax={false} />);
+      // Component still renders when parallax is disabled
+      expect(container.querySelector('section')).toBeInTheDocument();
+    });
+
+    it('should render with parallax explicitly enabled', () => {
+      const { container } = render(<SimpleHero enableParallax={true} />);
+      expect(container.querySelector('section')).toBeInTheDocument();
+    });
+  });
+
   describe('Content', () => {
     it('should display correct year in heading', () => {
       render(<SimpleHero />);
