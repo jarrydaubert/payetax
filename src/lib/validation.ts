@@ -254,30 +254,35 @@ export const WhatIfTypeSchema = z.enum(['percentage', 'amount', 'total']);
 export const TaxCodeSchema = z
   .string()
   .min(1, 'Tax code is required')
-  .transform((val) => val.trim().toUpperCase())
-  .refine(
-    (code) => {
-      // Special codes
-      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-      if (specialCodes.includes(code)) return true;
+  .trim()
+  .toUpperCase()
+  .pipe(
+    z.string().refine(
+      (code) => {
+        // Special codes
+        const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+        if (specialCodes.includes(code)) return true;
 
-      // Remove emergency suffix (W1, M1, X) with optional space before validation
-      const codeWithoutEmergency = code.replace(/\s*(W1|M1|X)$/, '');
+        // Remove emergency suffix (W1, M1, X) with optional space before validation
+        const codeWithoutEmergency = code.replace(/\s*(W1|M1|X)$/, '');
 
-      // Standard format: optional S prefix, numbers, optional letter suffix
-      const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+        // Standard format: optional S prefix, numbers, optional letter suffix
+        const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
 
-      // K codes (negative allowance)
-      const kCodePattern = /^S?K[0-9]+$/;
+        // K codes (negative allowance)
+        const kCodePattern = /^S?K[0-9]+$/;
 
-      return standardPattern.test(codeWithoutEmergency) || kCodePattern.test(codeWithoutEmergency);
-    },
-    {
-      message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100, 1257L W1)',
-    }
+        return (
+          standardPattern.test(codeWithoutEmergency) || kCodePattern.test(codeWithoutEmergency)
+        );
+      },
+      {
+        message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100, 1257L W1)',
+      }
+    )
   )
   .describe(
-    'UK HMRC tax code with full support for Scottish, K codes, emergency codes, and special rates'
+    'UK HMRC tax code with full support for Scottish, K codes, emergency codes, and special rates — ✅ Zod v4 .pipe() pattern'
   );
 
 /**
@@ -487,7 +492,7 @@ export type Env = z.infer<typeof EnvSchema>;
  * Used in /api/feedback endpoint
  */
 export const FeedbackSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().trim().toLowerCase().pipe(z.string().email('Invalid email address')),
   message: z
     .string()
     .min(10, 'Message must be at least 10 characters')
@@ -508,9 +513,11 @@ export const SearchQuerySchema = z.object({
     .string()
     .regex(/^\d+$/, 'Page must be a number')
     .transform((val) => Number.parseInt(val, 10))
-    .refine((val) => val > 0 && val <= 1000, {
-      message: 'Page out of valid range (1-1000)',
-    })
+    .pipe(
+      z.number().refine((val) => val > 0 && val <= 1000, {
+        message: 'Page out of valid range (1-1000)',
+      })
+    )
     .optional(),
 });
 
