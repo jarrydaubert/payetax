@@ -59,7 +59,7 @@ test.describe('Scottish Tax - All 6 Tax Bands', () => {
     // Total: £1,462.75
 
     await page.getByTestId('salary-input').fill('20000');
-    await expect(page.getByTestId('salary-input')).toHaveValue('20,000.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('20,000');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();
@@ -80,7 +80,7 @@ test.describe('Scottish Tax - All 6 Tax Bands', () => {
     await page.getByTestId('salary-input').fill('35000');
 
     // Wait for salary to be accepted
-    await expect(page.getByTestId('salary-input')).toHaveValue('35,000.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('35,000');
 
     // Select Scotland region
     await page.getByRole('combobox', { name: /tax region/i }).click();
@@ -105,7 +105,7 @@ test.describe('Scottish Tax - All 6 Tax Bands', () => {
     // Testing £60k for higher rate
 
     await page.getByTestId('salary-input').fill('60000');
-    await expect(page.getByTestId('salary-input')).toHaveValue('60,000.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('60,000');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();
@@ -120,7 +120,7 @@ test.describe('Scottish Tax - All 6 Tax Bands', () => {
     // Advanced rate kicks in after £75k
 
     await page.getByTestId('salary-input').fill('100000');
-    await expect(page.getByTestId('salary-input')).toHaveValue('100,000.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('100,000');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();
@@ -136,7 +136,7 @@ test.describe('Scottish Tax - All 6 Tax Bands', () => {
     // Top rate: 48% (vs 45% in England = 3% more!)
 
     await page.getByTestId('salary-input').fill('200000');
-    await expect(page.getByTestId('salary-input')).toHaveValue('200,000.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('200,000');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();
@@ -228,7 +228,7 @@ test.describe('Scottish Tax - Edge Cases', () => {
   test('Exactly at band boundaries', async ({ page }) => {
     // Test exactly at £14,876 (top of starter band)
     await page.getByTestId('salary-input').fill('14876');
-    await expect(page.getByTestId('salary-input')).toHaveValue('14,876.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('14,876');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();
@@ -242,7 +242,7 @@ test.describe('Scottish Tax - Edge Cases', () => {
   test('£1 over band boundary triggers next rate', async ({ page }) => {
     // £14,877 triggers basic rate on that £1
     await page.getByTestId('salary-input').fill('14877');
-    await expect(page.getByTestId('salary-input')).toHaveValue('14,877.00');
+    await expect(page.getByTestId('salary-input')).toHaveValue('14,877');
 
     await page.getByRole('combobox', { name: /tax region/i }).click();
     await page.getByRole('option', { name: /scotland/i }).click();

@@ -55,8 +55,8 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const valueInput = page.locator('[data-testid="what-if-value-input"]');
     await expect(valueInput).toBeVisible();
 
-    // What-If trigger button should be present (not "compare-button")
-    const whatIfTrigger = page.getByTestId('what-if-trigger');
+    // What-If trigger button should be present (use .first() due to 2 instances)
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await expect(whatIfTrigger).toBeVisible();
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output

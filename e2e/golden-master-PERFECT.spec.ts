@@ -147,20 +147,19 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         if (pensionTypeVisible) {
           // Click to open dropdown
           await pensionTypeSelect.click();
-          await page.waitForTimeout(300);
+          await page.waitForTimeout(500);
 
-          // Select percentage option by value (icon-only options, no text)
-          const percentOption = page
-            .getByRole('option')
-            .filter({ has: page.locator('svg') })
-            .first();
-          await percentOption.click();
-          await page.waitForTimeout(200);
+          // Select percentage option (value="percentage", first option with Percent icon)
+          // Use keyboard navigation to be more reliable
+          await page.keyboard.press('Home'); // Go to first option
+          await page.keyboard.press('Enter'); // Select it
+          await page.waitForTimeout(300);
 
           // Now fill the pension percentage
           const pensionInput = page.getByTestId('pension-input');
+          await pensionInput.clear();
           await pensionInput.fill(input.pensionPercent.toString());
-          await page.waitForTimeout(300);
+          await page.waitForTimeout(500);
         }
       }
 
