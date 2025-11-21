@@ -153,6 +153,10 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill(testData.salary.toString());
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Wait for initial calculation
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible({ timeout: 5000 });
@@ -185,6 +189,10 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     // Enter -5% decrease
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
@@ -230,6 +238,10 @@ test.describe('What-If Comparison - Amount Changes', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
@@ -259,6 +271,10 @@ test.describe('What-If Comparison - Amount Changes', () => {
     // Enter base salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('60000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -309,6 +325,10 @@ test.describe('What-If Comparison - New Total Salary', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
@@ -338,6 +358,10 @@ test.describe('What-If Comparison - New Total Salary', () => {
     // Enter starting salary
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('30000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -388,6 +412,10 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('95000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
@@ -422,6 +450,10 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('100000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
@@ -451,6 +483,10 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     // Enter £125k salary (trap ends)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('125000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -501,6 +537,10 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('45000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
     await typeSelect.click();
@@ -530,6 +570,10 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     // Enter £105k salary (in trap zone)
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('105000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -580,6 +624,10 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');
 
@@ -609,6 +657,10 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('35000');
 
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('15');
 
@@ -631,6 +683,10 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     // Create comparison
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('50000');
+
+    // Calculate baseline
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('5');
