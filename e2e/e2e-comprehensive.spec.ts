@@ -317,7 +317,7 @@ test.describe('Core User Journeys', () => {
 
       // Enter value with keyboard
       await page.keyboard.type('45000');
-      await expect(salaryInput).toHaveValue('45000');
+      await expect(salaryInput).toHaveValue('45,000');
 
       // Tab to next input (tax code)
       await page.keyboard.press('Tab');
