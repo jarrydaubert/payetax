@@ -58,6 +58,7 @@ test.describe('CAPTURE: TRUE Golden Master', () => {
           const pensionInput = page.getByTestId('pension-input');
           await pensionInput.clear();
           await pensionInput.fill(scenario.input.pensionContribution.toString());
+          await pensionInput.blur();
           await page.waitForTimeout(300);
         }
 

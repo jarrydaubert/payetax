@@ -40,7 +40,12 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     // Add £60k pension contribution
     const pensionInput = page.getByTestId('pension-input');
+    await page.getByTestId('pension-type-select').click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
     await pensionInput.fill('60000');
+    await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
@@ -61,7 +66,12 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('100000');
 
     const pensionInput = page.getByTestId('pension-input');
+    await page.getByTestId('pension-type-select').click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
     await pensionInput.fill('65000');
+    await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
@@ -79,7 +89,12 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     // Try to contribute £60k (will breach tapered allowance)
     const pensionInput = page.getByTestId('pension-input');
+    await page.getByTestId('pension-type-select').click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
     await pensionInput.fill('60000');
+    await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
@@ -95,7 +110,12 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('400000');
 
     const pensionInput = page.getByTestId('pension-input');
+    await page.getByTestId('pension-type-select').click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
     await pensionInput.fill('10000'); // Exactly at minimum allowance
+    await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
@@ -109,7 +129,12 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('50000');
 
     const pensionInput = page.getByTestId('pension-input');
+    await page.getByTestId('pension-type-select').click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
     await pensionInput.fill('20000');
+    await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
