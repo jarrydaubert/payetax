@@ -94,6 +94,11 @@ test.describe('Core User Journeys', () => {
       await salaryInput.click();
       await salaryInput.fill('30000');
       await salaryInput.blur();
+
+      // Calculate
+      const calculateButton = page.getByTestId('calculate-button');
+      await calculateButton.click();
+
       await expect(page.getByTestId('results-table')).toBeVisible({ timeout: 5000 });
 
       // Get initial page state

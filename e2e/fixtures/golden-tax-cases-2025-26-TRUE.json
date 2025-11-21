@@ -1,6 +1,6 @@
 {
   "version": "2025-26",
-  "capturedAt": "2025-11-21T11:19:08.954Z",
+  "capturedAt": "2025-11-21T13:22:10.674Z",
   "description": "TRUE golden master - captured from live calculator",
   "cases": [
     {
@@ -16,7 +16,7 @@
         "employeeNI": 1394.4,
         "netPay": 25119.6
       },
-      "capturedAt": "2025-11-21T11:17:29.544Z"
+      "capturedAt": "2025-11-21T13:20:30.940Z"
     },
     {
       "id": "basic-45k",
@@ -31,7 +31,7 @@
         "employeeNI": 2594.4,
         "netPay": 35919.6
       },
-      "capturedAt": "2025-11-21T11:17:34.669Z"
+      "capturedAt": "2025-11-21T13:20:36.076Z"
     },
     {
       "id": "higher-55k",
@@ -46,7 +46,7 @@
         "employeeNI": 3110.64,
         "netPay": 42457.36
       },
-      "capturedAt": "2025-11-21T11:17:40.048Z"
+      "capturedAt": "2025-11-21T13:20:41.366Z"
     },
     {
       "id": "exact-pa-12570",
@@ -61,7 +61,7 @@
         "employeeNI": 0,
         "netPay": 12570
       },
-      "capturedAt": "2025-11-21T11:17:45.114Z"
+      "capturedAt": "2025-11-21T13:20:46.663Z"
     },
     {
       "id": "exact-higher-rate",
@@ -76,7 +76,7 @@
         "employeeNI": 3015.96,
         "netPay": 39714.08
       },
-      "capturedAt": "2025-11-21T11:17:50.122Z"
+      "capturedAt": "2025-11-21T13:20:51.688Z"
     },
     {
       "id": "pa-taper-100k",
@@ -91,7 +91,7 @@
         "employeeNI": 4010.64,
         "netPay": 68557.36
       },
-      "capturedAt": "2025-11-21T11:17:55.184Z"
+      "capturedAt": "2025-11-21T13:20:56.746Z"
     },
     {
       "id": "pa-taper-110k",
@@ -106,7 +106,7 @@
         "employeeNI": 4210.56,
         "netPay": 72357.44
       },
-      "capturedAt": "2025-11-21T11:18:00.179Z"
+      "capturedAt": "2025-11-21T13:21:01.786Z"
     },
     {
       "id": "60percent-trap-125140",
@@ -121,7 +121,7 @@
         "employeeNI": 4513.44,
         "netPay": 78110.56
       },
-      "capturedAt": "2025-11-21T11:18:05.186Z"
+      "capturedAt": "2025-11-21T13:21:06.828Z"
     },
     {
       "id": "additional-150k",
@@ -136,7 +136,7 @@
         "employeeNI": 5010.6,
         "netPay": 91286.4
       },
-      "capturedAt": "2025-11-21T11:18:10.180Z"
+      "capturedAt": "2025-11-21T13:21:11.813Z"
     },
     {
       "id": "scottish-45k",
@@ -151,7 +151,7 @@
         "employeeNI": 2594.4,
         "netPay": 35491.8
       },
-      "capturedAt": "2025-11-21T11:18:16.131Z"
+      "capturedAt": "2025-11-21T13:21:17.779Z"
     },
     {
       "id": "scottish-200k",
@@ -166,7 +166,7 @@
         "employeeNI": 6010.56,
         "netPay": 109946.24
       },
-      "capturedAt": "2025-11-21T11:18:22.094Z"
+      "capturedAt": "2025-11-21T13:21:23.724Z"
     },
     {
       "id": "br-code-second-job",
@@ -181,7 +181,7 @@
         "employeeNI": 994.44,
         "netPay": 21519.52
       },
-      "capturedAt": "2025-11-21T11:18:27.429Z"
+      "capturedAt": "2025-11-21T13:21:29.096Z"
     },
     {
       "id": "k-code-40k",
@@ -196,7 +196,7 @@
         "employeeNI": 2194.44,
         "netPay": 29745.52
       },
-      "capturedAt": "2025-11-21T11:18:32.773Z"
+      "capturedAt": "2025-11-21T13:21:34.406Z"
     },
     {
       "id": "emergency-m1",
@@ -211,7 +211,7 @@
         "employeeNI": 1874.4,
         "netPay": 29439.6
       },
-      "capturedAt": "2025-11-21T11:18:38.098Z"
+      "capturedAt": "2025-11-21T13:21:39.731Z"
     },
     {
       "id": "plan1-threshold",
@@ -227,7 +227,7 @@
         "employeeNI": 994.44,
         "netPay": 21519.52
       },
-      "capturedAt": "2025-11-21T11:18:43.225Z"
+      "capturedAt": "2025-11-21T13:21:44.797Z"
     },
     {
       "id": "plan2-student-40k",
@@ -243,7 +243,7 @@
         "employeeNI": 2194.44,
         "netPay": 32319.52
       },
-      "capturedAt": "2025-11-21T11:18:48.249Z"
+      "capturedAt": "2025-11-21T13:21:49.805Z"
     },
     {
       "id": "pension-sacrifice-10pct",
@@ -259,7 +259,7 @@
         "employeeNI": 2994.36,
         "netPay": 39519.68
       },
-      "capturedAt": "2025-11-21T11:18:53.352Z"
+      "capturedAt": "2025-11-21T13:21:54.950Z"
     },
     {
       "id": "high-pension-40pct",
@@ -275,7 +275,7 @@
         "employeeNI": 3210.6,
         "netPay": 45357.36
       },
-      "capturedAt": "2025-11-21T11:18:58.371Z"
+      "capturedAt": "2025-11-21T13:22:00.012Z"
     },
     {
       "id": "marriage-allowance-15k",
@@ -291,7 +291,7 @@
         "employeeNI": 194.4,
         "netPay": 14319.6
       },
-      "capturedAt": "2025-11-21T11:19:03.743Z"
+      "capturedAt": "2025-11-21T13:22:05.448Z"
     },
     {
       "id": "dual-student-loans",
@@ -307,7 +307,7 @@
         "employeeNI": 2994.36,
         "netPay": 39519.68
       },
-      "capturedAt": "2025-11-21T11:19:08.851Z"
+      "capturedAt": "2025-11-21T13:22:10.585Z"
     }
   ]
 }

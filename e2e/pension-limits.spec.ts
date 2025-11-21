@@ -38,12 +38,13 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('80000');
 
-    // Add £60k pension contribution
-    const pensionInput = page.getByTestId('pension-input');
+    // Add £60k pension contribution - switch to amount type first
     await page.getByTestId('pension-type-select').click();
     await page.waitForTimeout(300);
     await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
+
+    const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('60000');
     await pensionInput.blur();
 
@@ -65,8 +66,9 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('100000');
 
-    const pensionInput = page.getByTestId('pension-input');
     await page.getByTestId('pension-type-select').click();
+
+    const pensionInput = page.getByTestId('pension-input');
     await page.waitForTimeout(300);
     await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
@@ -88,8 +90,9 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('280000');
 
     // Try to contribute £60k (will breach tapered allowance)
-    const pensionInput = page.getByTestId('pension-input');
     await page.getByTestId('pension-type-select').click();
+
+    const pensionInput = page.getByTestId('pension-input');
     await page.waitForTimeout(300);
     await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
@@ -109,8 +112,9 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('400000');
 
-    const pensionInput = page.getByTestId('pension-input');
     await page.getByTestId('pension-type-select').click();
+
+    const pensionInput = page.getByTestId('pension-input');
     await page.waitForTimeout(300);
     await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
@@ -128,8 +132,9 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('50000');
 
-    const pensionInput = page.getByTestId('pension-input');
     await page.getByTestId('pension-type-select').click();
+
+    const pensionInput = page.getByTestId('pension-input');
     await page.waitForTimeout(300);
     await page.getByRole('option').nth(1).click();
     await page.waitForTimeout(300);
