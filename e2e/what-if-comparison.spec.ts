@@ -93,6 +93,10 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const salaryInput = page.locator('[data-testid="salary-input"]');
     await salaryInput.fill('40000');
 
+    // Calculate baseline first
+    await page.getByTestId('calculate-button').click();
+    await page.waitForTimeout(1000);
+
     // Enter What-If value
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');

@@ -44,8 +44,8 @@ test.describe('Core User Journeys', () => {
       await salaryInput.fill('45000');
       await salaryInput.blur(); // Trigger any onBlur handlers
 
-      // ASSERT: Input accepted (formatted with commas)
-      await expect(salaryInput).toHaveValue('45,000');
+      // ASSERT: Input accepted (formatted with commas and .00 after blur)
+      await expect(salaryInput).toHaveValue('45,000.00');
 
       // Click calculate button to trigger calculation
       const calculateButton = page.getByTestId('calculate-button');
