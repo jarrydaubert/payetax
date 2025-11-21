@@ -44,8 +44,8 @@ test.describe('Core User Journeys', () => {
       await salaryInput.fill('45000');
       await salaryInput.blur(); // Trigger any onBlur handlers
 
-      // ASSERT: Input accepted (formatted with commas)
-      await expect(salaryInput).toHaveValue('45,000');
+      // ASSERT: Input accepted (formatted with commas and decimals)
+      await expect(salaryInput).toHaveValue('45,000.00');
 
       // Wait for results table to appear (debounced calculation ~500ms)
       const resultsTable = page.getByTestId('results-table');
@@ -317,7 +317,7 @@ test.describe('Core User Journeys', () => {
 
       // Enter value with keyboard
       await page.keyboard.type('45000');
-      await expect(salaryInput).toHaveValue('45,000');
+      await expect(salaryInput).toHaveValue('45,000.00');
 
       // Tab to next input (tax code)
       await page.keyboard.press('Tab');
