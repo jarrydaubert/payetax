@@ -52,25 +52,140 @@ describe('PageContainer Component', () => {
     });
   });
 
-  describe('Layout Variations', () => {
-    it('should handle full-width layout', () => {
-      render(
-        <PageContainer fullWidth>
-          <div>Full width content</div>
+  describe('MaxWidth Variations', () => {
+    it('should apply sm max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='sm'>
+          <div>Small content</div>
         </PageContainer>
       );
-
-      expect(screen.getByText('Full width content')).toBeInTheDocument();
+      expect(container.firstChild).toHaveClass('max-w-sm');
     });
 
-    it('should handle narrow layout', () => {
-      render(
-        <PageContainer narrow>
-          <div>Narrow content</div>
+    it('should apply md max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='md'>
+          <div>Medium content</div>
         </PageContainer>
       );
+      expect(container.firstChild).toHaveClass('max-w-md');
+    });
 
-      expect(screen.getByText('Narrow content')).toBeInTheDocument();
+    it('should apply lg max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='lg'>
+          <div>Large content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-lg');
+    });
+
+    it('should apply xl max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='xl'>
+          <div>XL content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-xl');
+    });
+
+    it('should apply 2xl max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='2xl'>
+          <div>2XL content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-2xl');
+    });
+
+    it('should apply 4xl max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='4xl'>
+          <div>4XL content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-4xl');
+    });
+
+    it('should apply 5xl max-width by default', () => {
+      const { container } = render(
+        <PageContainer>
+          <div>Default content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-5xl');
+    });
+
+    it('should apply 6xl max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='6xl'>
+          <div>6XL content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-6xl');
+    });
+
+    it('should apply 7xl max-width', () => {
+      const { container } = render(
+        <PageContainer maxWidth='7xl'>
+          <div>7XL content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('max-w-7xl');
+    });
+  });
+
+  describe('Glass Styling', () => {
+    it('should render with glass styling by default', () => {
+      const { container } = render(
+        <PageContainer>
+          <div>Glass content</div>
+        </PageContainer>
+      );
+      expect(container.querySelector('.glass-card')).toBeInTheDocument();
+      expect(container.querySelector('.glass-card-inner')).toBeInTheDocument();
+    });
+
+    it('should render without glass styling when glass=false', () => {
+      const { container } = render(
+        <PageContainer glass={false}>
+          <div>Non-glass content</div>
+        </PageContainer>
+      );
+      expect(container.querySelector('.glass-card')).not.toBeInTheDocument();
+      expect(screen.getByText('Non-glass content')).toBeInTheDocument();
+    });
+  });
+
+  describe('Navbar Spacing', () => {
+    it('should include navbar spacing by default', () => {
+      const { container } = render(
+        <PageContainer>
+          <div>Spaced content</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('pt-24');
+    });
+
+    it('should exclude navbar spacing when includeNavbarSpacing=false', () => {
+      const { container } = render(
+        <PageContainer includeNavbarSpacing={false}>
+          <div>No navbar spacing</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveClass('py-8');
+      expect(container.firstChild).not.toHaveClass('pt-24');
+    });
+  });
+
+  describe('ID Prop', () => {
+    it('should apply id when provided', () => {
+      const { container } = render(
+        <PageContainer id='main-content'>
+          <div>Content with ID</div>
+        </PageContainer>
+      );
+      expect(container.firstChild).toHaveAttribute('id', 'main-content');
     });
   });
 
