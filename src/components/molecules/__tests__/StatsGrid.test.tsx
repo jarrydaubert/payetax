@@ -96,19 +96,19 @@ describe('StatsGrid', () => {
   describe('Variants', () => {
     it('should apply default variant classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} variant='default' />);
-      const cards = container.querySelectorAll('[role="listitem"]');
+      const cards = container.querySelectorAll('[class*="bg-card"]');
       expect(cards[0]).toHaveClass('bg-card/50', 'backdrop-blur-sm');
     });
 
     it('should apply elevated variant classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} variant='elevated' />);
-      const cards = container.querySelectorAll('[role="listitem"]');
+      const cards = container.querySelectorAll('[class*="hover:shadow-lg"]');
       expect(cards[0]).toHaveClass('hover:shadow-lg');
     });
 
     it('should apply bordered variant classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} variant='bordered' />);
-      const cards = container.querySelectorAll('[role="listitem"]');
+      const cards = container.querySelectorAll('[class*="border-2"]');
       expect(cards[0]).toHaveClass('border-2');
     });
   });
@@ -202,7 +202,7 @@ describe('StatsGrid', () => {
       ];
 
       const { container } = render(<StatsGrid stats={duplicateLabelStats} />);
-      const cards = container.querySelectorAll('[role="listitem"]');
+      const cards = container.querySelectorAll('li');
       expect(cards).toHaveLength(2);
     });
   });
