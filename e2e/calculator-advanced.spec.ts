@@ -212,6 +212,7 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Enter 5% pension contribution
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
+    await pensionInput.blur();
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -238,12 +239,16 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Switch to fixed amount
     const pensionTypeSelect = page.getByTestId('pension-type-select');
     await pensionTypeSelect.click();
+    await page.waitForTimeout(300);
     // Select the pound icon (second option)
     await page.getByRole('option').nth(1).click();
+    await page.waitForTimeout(300);
 
     // Enter £3,000 fixed pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('3000');
+    await pensionInput.blur();
+    await page.waitForTimeout(300);
 
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
@@ -277,6 +282,7 @@ test.describe('Advanced Calculator - Pension Contributions', () => {
     // Now add 10% pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('10');
+    await pensionInput.blur();
 
     await calculateButton.click();
     await page.waitForTimeout(1500);
@@ -463,6 +469,7 @@ test.describe('Advanced Calculator - Combined Features', () => {
     // Add pension (5%)
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5');
+    await pensionInput.blur();
 
     // Enable married
     const marriedCheckbox = page.locator('label:has-text("Married")').locator('~ button, ~ input');
@@ -503,6 +510,7 @@ test.describe('Advanced Calculator - Combined Features', () => {
     // Add pension
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('8');
+    await pensionInput.blur();
 
     // Add student loan
     const studentLoanSelect = page.getByTestId('student-loan-select');

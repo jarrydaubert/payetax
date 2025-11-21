@@ -30,7 +30,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     }
 
     // Open What-If collapsible section (required for all tests)
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await expect(whatIfTrigger).toBeVisible({ timeout: 5000 });
     await whatIfTrigger.click();
     // Collapsible opens instantly - no wait needed to complete
@@ -98,7 +98,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     await whatIfInput.fill('10');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -135,7 +135,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -162,7 +162,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await whatIfInput.fill('10');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -187,7 +187,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await whatIfInput.fill('-5');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -214,7 +214,7 @@ test.describe('What-If Comparison - Amount Changes', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -236,7 +236,7 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await whatIfInput.fill('5000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -266,7 +266,7 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await whatIfInput.fill('-10000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -293,7 +293,7 @@ test.describe('What-If Comparison - New Total Salary', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -315,7 +315,7 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await whatIfInput.fill('50000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -345,7 +345,7 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await whatIfInput.fill('60000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -372,7 +372,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -394,7 +394,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await whatIfInput.fill('110000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -428,7 +428,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await whatIfInput.fill('125000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -458,7 +458,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await whatIfInput.fill('130000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -485,7 +485,7 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -507,7 +507,7 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await whatIfInput.fill('-5000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -537,7 +537,7 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await whatIfInput.fill('-6000');
 
     // Click compare
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -564,7 +564,7 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     }
 
     // Open What-If section
-    const whatIfTrigger = page.locator('[data-testid="what-if-trigger"]');
+    const whatIfTrigger = page.getByTestId('what-if-trigger').first();
     await whatIfTrigger.click();
   });
 
@@ -579,7 +579,7 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('10');
 
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -608,7 +608,7 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('15');
 
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 
@@ -631,7 +631,7 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await whatIfInput.fill('5');
 
-    const compareButton = page.locator('[data-testid="compare-button"]');
+    const compareButton = page.getByTestId('what-if-trigger').first();
     await compareButton.click();
     await page.waitForTimeout(1500);
 

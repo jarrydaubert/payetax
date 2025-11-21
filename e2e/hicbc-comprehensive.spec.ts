@@ -90,8 +90,17 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await page.getByTestId('salary-input').fill('65000');
 
     // Add pension contribution (use testId to avoid matching tooltip button)
+    // NOTE: Default type is 'percentage' so we need to switch to 'amount' first!
+    const pensionTypeSelect = page.getByTestId('pension-type-select');
+    await pensionTypeSelect.click();
+    await page.waitForTimeout(300);
+    await page.getByRole('option').nth(1).click(); // Select amount (£)
+    await page.waitForTimeout(300);
+
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5000');
+    await pensionInput.blur();
+    await page.waitForTimeout(300);
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
