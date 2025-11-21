@@ -139,9 +139,18 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
 
       // 4. Pension (if specified)
       if (input.pensionPercent && input.pensionPercent > 0) {
-        const pensionInput = page.getByLabel(/pension.*%/i);
-        const exists = await pensionInput.isVisible({ timeout: 2000 }).catch(() => false);
-        if (exists) {
+        // First, ensure pension type is set to percentage
+        const pensionTypeSelect = page.getByTestId('pension-type-select');
+        const pensionTypeVisible = await pensionTypeSelect
+          .isVisible({ timeout: 2000 })
+          .catch(() => false);
+        if (pensionTypeVisible) {
+          await pensionTypeSelect.click();
+          await page.getByRole('option', { name: /percent/i }).click();
+          await page.waitForTimeout(200);
+
+          // Now fill the pension percentage
+          const pensionInput = page.getByTestId('pension-input');
           await pensionInput.fill(input.pensionPercent.toString());
           await page.waitForTimeout(300);
         }
