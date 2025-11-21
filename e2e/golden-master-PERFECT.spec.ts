@@ -144,10 +144,13 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         const pensionVisible = await pensionInput.isVisible({ timeout: 2000 }).catch(() => false);
         if (pensionVisible) {
           await pensionInput.click();
+          await page.waitForTimeout(200);
           await pensionInput.clear();
+          await page.waitForTimeout(200);
           await pensionInput.fill(input.pensionPercent.toString());
+          await page.waitForTimeout(200);
           await pensionInput.blur(); // Trigger onChange
-          await page.waitForTimeout(500);
+          await page.waitForTimeout(800); // Extra wait for state to update
         }
       }
 
