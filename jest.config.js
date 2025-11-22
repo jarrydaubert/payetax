@@ -114,7 +114,6 @@ const config = {
       functions: 0,
       lines: 30,
     },
-
   },
 };
 

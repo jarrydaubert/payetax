@@ -57,9 +57,9 @@ describe('CalculatorCharts Index Exports', () => {
       };
 
       expect(Object.keys(exports)).toHaveLength(5);
-      Object.values(exports).forEach((exp) => {
+      for (const exp of Object.values(exports)) {
         expect(exp).toBeDefined();
-      });
+      }
     });
 
     it('ChartsSkeleton should be a regular function component', () => {

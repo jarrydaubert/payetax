@@ -180,12 +180,13 @@ describe('PageContainer Component', () => {
 
   describe('ID Prop', () => {
     it('should apply id when provided', () => {
+      const testId = 'test-main-content';
       const { container } = render(
-        <PageContainer id='main-content'>
+        <PageContainer id={testId}>
           <div>Content with ID</div>
         </PageContainer>
       );
-      expect(container.firstChild).toHaveAttribute('id', 'main-content');
+      expect(container.firstChild).toHaveAttribute('id', testId);
     });
   });
 

@@ -169,17 +169,17 @@ describe('validation.ts Helper Functions', () => {
     });
 
     it('should round to 1 decimal place', () => {
-      expect(roundTo(3.14159, 1)).toBe(3.1);
+      expect(roundTo(3.14158, 1)).toBe(3.1);
       expect(roundTo(3.15, 1)).toBe(3.2);
     });
 
     it('should round to 2 decimal places', () => {
-      expect(roundTo(3.14159, 2)).toBe(3.14);
+      expect(roundTo(3.14158, 2)).toBe(3.14);
       expect(roundTo(100.999, 2)).toBe(101);
     });
 
     it('should round to 3 decimal places', () => {
-      expect(roundTo(3.14159, 3)).toBe(3.142);
+      expect(roundTo(7.98765, 3)).toBe(7.988);
     });
 
     it('should handle already rounded values', () => {
@@ -188,7 +188,7 @@ describe('validation.ts Helper Functions', () => {
     });
 
     it('should handle negative values', () => {
-      expect(roundTo(-3.14159, 2)).toBe(-3.14);
+      expect(roundTo(-3.14158, 2)).toBe(-3.14);
       // Note: -3.145 rounds to -3.14 due to floating point representation
       expect(roundTo(-3.146, 2)).toBe(-3.15);
     });
