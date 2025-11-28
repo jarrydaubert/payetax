@@ -54,7 +54,7 @@ export function NavbarMobileMenu({
             exit={{ opacity: 0, scaleY: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             style={{ originY: 0 }}
-            className='overflow-hidden border-border/50 border-t md:hidden'
+            className='relative z-40 overflow-hidden border-border/50 border-t md:hidden'
             aria-label='Mobile navigation menu'
           >
             <div className={cn('container mx-auto max-w-7xl px-4 py-4', SPACING.SPACE_Y_2)}>

@@ -157,17 +157,21 @@ self.addEventListener('fetch', (event) => {
 async function networkFirstStrategy(request, event) {
   try {
     // Try to use navigation preload if available (faster perceived load)
-    if (event?.preloadResponse) {
-      const preloadResponse = await event.preloadResponse;
-      if (preloadResponse) {
-        devLog('Using navigation preload for:', request.url);
+    // FIXED: Properly handle preloadResponse to prevent cancellation warning
+    const preloadResponse = event?.preloadResponse ? await event.preloadResponse : null;
 
-        // Still cache the preloaded response
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(request, preloadResponse.clone());
+    if (preloadResponse) {
+      devLog('Using navigation preload for:', request.url);
 
-        return preloadResponse;
-      }
+      // Cache the preloaded response asynchronously (don't block return)
+      // Using event.waitUntil ensures the cache operation completes even after response is returned
+      event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, preloadResponse.clone());
+        })
+      );
+
+      return preloadResponse;
     }
 
     const networkResponse = await fetch(request);
