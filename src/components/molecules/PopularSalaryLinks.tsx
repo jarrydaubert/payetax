@@ -13,15 +13,25 @@ import { cn } from '@/lib/utils';
 export function PopularSalaryLinks() {
   const salaries = [
     { salary: 30000, label: '£30k' },
+    { salary: 35000, label: '£35k' },
     { salary: 40000, label: '£40k' },
+    { salary: 45000, label: '£45k' },
     { salary: 50000, label: '£50k' },
+    { salary: 55000, label: '£55k' },
     { salary: 60000, label: '£60k' },
+    { salary: 65000, label: '£65k' },
     { salary: 70000, label: '£70k' },
+    { salary: 75000, label: '£75k' },
     { salary: 80000, label: '£80k' },
+    { salary: 85000, label: '£85k' },
     { salary: 90000, label: '£90k' },
+    { salary: 95000, label: '£95k' },
     { salary: 100000, label: '£100k' },
+    { salary: 105000, label: '£105k' },
     { salary: 110000, label: '£110k' },
+    { salary: 115000, label: '£115k' },
     { salary: 120000, label: '£120k' },
+    { salary: 125000, label: '£125k' },
   ];
 
   return (
