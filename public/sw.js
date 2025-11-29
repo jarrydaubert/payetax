@@ -1,9 +1,9 @@
 // Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
-const CACHE_NAME = 'payetax-v2025.1.2.2';
-const STATIC_CACHE_NAME = 'payetax-static-v2025.1.2.2';
-const API_CACHE_NAME = 'payetax-api-v2025.1.2.2';
+const CACHE_NAME = 'payetax-v4.6.0';
+const STATIC_CACHE_NAME = 'payetax-static-v4.6.0';
+const API_CACHE_NAME = 'payetax-api-v4.6.0';
 
 // Helper function to log only in development
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
