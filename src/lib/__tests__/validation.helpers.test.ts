@@ -229,8 +229,9 @@ describe('validation.ts Helper Functions', () => {
 
       it('should reject invalid format', () => {
         expect(isValidTaxYear('2024')).toBe(false);
-        expect(isValidTaxYear('2024-25')).toBe(false);
         expect(isValidTaxYear('24-25')).toBe(false);
+        expect(isValidTaxYear('2024-202')).toBe(false); // Incomplete
+        expect(isValidTaxYear('2024-20255')).toBe(false); // Too long
       });
 
       it('should reject empty string', () => {

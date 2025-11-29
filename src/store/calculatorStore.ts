@@ -341,14 +341,40 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
         },
         setTaxYear: (taxYear) => {
-          // Validate tax year format
+          // Validate tax year format - accept both YYYY-YY and YYYY-YYYY
           const validated = z
             .string()
-            .regex(/^\d{4}-\d{2}$/, 'Tax year must be in format YYYY-YY')
             .refine(
               (year) => {
-                const [start, end] = year.split('-').map((s, i) => (i === 0 ? s : `20${s}`));
-                return Number.parseInt(end, 10) === Number.parseInt(start, 10) + 1;
+                // Accept both YYYY-YY and YYYY-YYYY formats
+                const shortFormat = /^\d{4}-\d{2}$/;
+                const longFormat = /^\d{4}-\d{4}$/;
+                return shortFormat.test(year) || longFormat.test(year);
+              },
+              {
+                message:
+                  'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
+              }
+            )
+            .refine(
+              (year) => {
+                const parts = year.split('-');
+                if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
+
+                const start = Number.parseInt(parts[0], 10);
+                const endStr = parts[1];
+
+                if (Number.isNaN(start)) return false;
+
+                // Handle both 2-digit and 4-digit year formats
+                const end =
+                  endStr.length === 2
+                    ? Number.parseInt(`20${endStr}`, 10)
+                    : Number.parseInt(endStr, 10);
+
+                if (Number.isNaN(end)) return false;
+
+                return end === start + 1;
               },
               { message: 'Tax year must be consecutive (e.g., 2024-25)' }
             )
@@ -356,15 +382,20 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           if (!validated.success) {
             console.warn('[Calculator] Invalid tax year:', validated.error.issues[0].message);
+            console.warn('[Calculator] Attempted value:', taxYear);
+            console.warn('[Calculator] All errors:', validated.error.issues);
             captureValidationError(validated.error, {
               field: 'taxYear',
               errorMessage: validated.error.issues[0]?.message || 'Invalid tax year',
               attemptedValue: taxYear,
               location: 'calculatorStore.setTaxYear',
+              zodError: validated.error,
+              expectedFormat: 'YYYY-YY (e.g., 2024-25, 2025-26)',
             });
             return;
           }
 
+          console.log('[Calculator] Tax year validation PASSED:', validated.data);
           set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
         },
         setTaxCode: (taxCode) => {
@@ -377,17 +408,23 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = z
             .string()
             .min(1)
-            .transform((val) => val.trim().toUpperCase())
+            .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase()) // Remove ALL spaces, trim, uppercase
             .refine(
               (code) => {
                 // Special codes
                 const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
                 if (specialCodes.includes(code)) return true;
 
+                // Remove emergency suffix (W1, M1, X) before validation
+                const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
+
                 // Standard format or K codes
                 const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
                 const kCodePattern = /^S?K[0-9]+$/;
-                return standardPattern.test(code) || kCodePattern.test(code);
+                return (
+                  standardPattern.test(codeWithoutEmergency) ||
+                  kCodePattern.test(codeWithoutEmergency)
+                );
               },
               { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' }
             )
@@ -400,6 +437,9 @@ export const useCalculatorStore = create<CalculatorState>()(
               errorMessage: validated.error.issues[0]?.message || 'Invalid tax code',
               attemptedValue: taxCode,
               location: 'calculatorStore.setTaxCode',
+              zodError: validated.error,
+              expectedFormat:
+                'Standard (1257L), Scottish (S1257L), K codes (K100), Special (BR, D0, NT), Emergency (1257L W1)',
             });
             return;
           }

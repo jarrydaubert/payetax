@@ -53,6 +53,10 @@ export interface ValidationErrorContext {
   attemptedValue: unknown;
   /** Component or module where validation occurred */
   location: string;
+  /** Full Zod error object (optional, for detailed debugging) */
+  zodError?: unknown;
+  /** Expected value or format (optional) */
+  expectedFormat?: string;
 }
 
 export interface APIErrorContext {
@@ -147,12 +151,17 @@ export function captureValidationError(
   context: ValidationErrorContext,
   severity: ErrorSeverity = 'warning'
 ): string | undefined {
+  // Extract detailed Zod error information if available
+  const zodDetails = extractZodErrorDetails(error);
+
   return Sentry.captureException(error, {
     level: severity as SeverityLevel,
     tags: {
       error_type: 'validation',
       field: context.field,
       location: context.location,
+      error_count: zodDetails.issueCount.toString(),
+      validation_type: zodDetails.validationType || 'unknown',
     },
     contexts: {
       validation: {
@@ -162,10 +171,85 @@ export function captureValidationError(
           typeof context.attemptedValue === 'object'
             ? JSON.stringify(context.attemptedValue)
             : String(context.attemptedValue),
+        expectedFormat: context.expectedFormat,
+        // Full Zod error details for debugging
+        allIssues: zodDetails.allIssues,
+        errorCodes: zodDetails.errorCodes,
+        paths: zodDetails.paths,
       },
     },
     fingerprint: ['validation-error', context.location, context.field],
   });
+}
+
+/**
+ * Extract detailed information from Zod errors for better debugging
+ * @internal
+ */
+function extractZodErrorDetails(error: unknown): {
+  issueCount: number;
+  allIssues: string[];
+  errorCodes: string[];
+  paths: string[];
+  validationType: string | null;
+} {
+  // Check if it's a Zod error with issues array
+  if (
+    error &&
+    typeof error === 'object' &&
+    'issues' in error &&
+    Array.isArray((error as { issues: unknown[] }).issues)
+  ) {
+    const zodError = error as {
+      issues: Array<{
+        message: string;
+        code?: string;
+        path?: (string | number)[];
+        expected?: unknown;
+        received?: unknown;
+      }>;
+    };
+
+    const allIssues = zodError.issues.map((issue, index) => {
+      const pathStr = issue.path?.join('.') || 'root';
+      let issueDetail = `[${index + 1}] ${pathStr}: ${issue.message}`;
+
+      // Add type mismatch info if available
+      if (issue.expected && issue.received) {
+        issueDetail += ` (expected: ${String(issue.expected)}, got: ${String(issue.received)})`;
+      }
+
+      return issueDetail;
+    });
+
+    const errorCodes = zodError.issues
+      .map((issue) => issue.code)
+      .filter((code): code is string => code !== undefined);
+
+    const paths = zodError.issues
+      .map((issue) => issue.path?.join('.'))
+      .filter((path): path is string => path !== undefined);
+
+    // Determine validation type from first error code
+    const validationType = errorCodes[0] || null;
+
+    return {
+      issueCount: zodError.issues.length,
+      allIssues,
+      errorCodes,
+      paths,
+      validationType,
+    };
+  }
+
+  // Not a Zod error or no issues
+  return {
+    issueCount: 1,
+    allIssues: [String(error)],
+    errorCodes: [],
+    paths: [],
+    validationType: null,
+  };
 }
 
 /**

@@ -131,12 +131,23 @@ describe('Calculator Store Validation', () => {
       }
     });
 
+    it('should accept both YYYY-YY and YYYY-YYYY formats', () => {
+      const { setTaxYear } = useCalculatorStore.getState();
+
+      // Both formats should be valid
+      setTaxYear('2024-25' as TaxYear);
+      expect(useCalculatorStore.getState().input.taxYear).toBe('2024-25');
+
+      setTaxYear('2024-2025' as TaxYear);
+      expect(useCalculatorStore.getState().input.taxYear).toBe('2024-2025');
+    });
+
     it('should reject invalid tax year format', () => {
       const { setTaxYear } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       // @ts-expect-error Testing invalid input
-      setTaxYear('2024-2025');
+      setTaxYear('2024'); // Missing second part
 
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -147,7 +158,7 @@ describe('Calculator Store Validation', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       // @ts-expect-error Testing invalid input
-      setTaxYear('2024-26');
+      setTaxYear('2024-26'); // Skips a year
 
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();

@@ -568,14 +568,53 @@ export function formatZodErrors(error: z.ZodError): string[] {
 
 /**
  * Tax Year Validation Schema
- * Validates UK tax year format (YYYY-YYYY where second year = first year + 1)
+ * Validates UK tax year format (YYYY-YY where last 2 digits = first year + 1)
+ * Supports both YYYY-YY (2024-25) and YYYY-YYYY (2024-2025) formats
  */
 export const TaxYearSchema = z
   .string()
-  .regex(/^\d{4}-\d{4}$/, 'Tax year must be in format YYYY-YYYY')
   .refine(
     (year) => {
-      const [start, end] = year.split('-').map(Number);
+      // Accept both YYYY-YY and YYYY-YYYY formats
+      const shortFormat = /^\d{4}-\d{2}$/;
+      const longFormat = /^\d{4}-\d{4}$/;
+
+      if (!(shortFormat.test(year) || longFormat.test(year))) {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message: 'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
+    }
+  )
+  .refine(
+    (year) => {
+      const parts = year.split('-');
+
+      // Ensure we have exactly 2 parts after split
+      if (parts.length !== 2 || !parts[0] || !parts[1]) {
+        return false;
+      }
+
+      const start = Number.parseInt(parts[0], 10);
+      const endStr = parts[1];
+
+      // Check for invalid numbers
+      if (Number.isNaN(start)) {
+        return false;
+      }
+
+      // Handle both 2-digit and 4-digit year formats
+      const end =
+        endStr.length === 2 ? Number.parseInt(`20${endStr}`, 10) : Number.parseInt(endStr, 10);
+
+      // Check for invalid end year
+      if (Number.isNaN(end)) {
+        return false;
+      }
+
       return end === start + 1;
     },
     {
