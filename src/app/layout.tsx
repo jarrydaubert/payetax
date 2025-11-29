@@ -62,12 +62,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel='dns-prefetch' href='https://vercel.live' />
         <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
 
-        {/* Flash Prevention Script - Loads theme before paint */}
+        {/* Flash Prevention Script - Loads theme AND prevents FOUC */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for flash prevention
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                // Apply minimal critical styles immediately to prevent FOUC
+                const style = document.createElement('style');
+                style.textContent = 'html{visibility:hidden;opacity:0}html.hydrated{visibility:visible;opacity:1;transition:opacity 0.1s}';
+                document.head.appendChild(style);
+                
                 function getTheme() {
                   const stored = localStorage.getItem('theme');
                   if (stored) return stored;
@@ -94,6 +99,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   document.documentElement.classList.add('dark');
                   document.documentElement.style.colorScheme = 'dark';
                   document.documentElement.setAttribute('data-theme', 'dark');
+                }
+                
+                // Remove FOUC prevention after CSS loads
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', function() {
+                    document.documentElement.classList.add('hydrated');
+                  });
+                } else {
+                  document.documentElement.classList.add('hydrated');
                 }
               })();
             `,
