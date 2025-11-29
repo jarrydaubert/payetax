@@ -395,7 +395,6 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          console.log('[Calculator] Tax year validation PASSED:', validated.data);
           set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
         },
         setTaxCode: (taxCode) => {
