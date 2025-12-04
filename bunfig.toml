@@ -1,0 +1,29 @@
+# Bun configuration file
+# https://bun.sh/docs/runtime/bunfig
+
+[install]
+# Speed up installs by caching dependencies
+cache = true
+
+# Use exact versions from lockfile for consistency
+exact = true
+
+# Auto-install peer dependencies
+auto = true
+
+# Registry configuration
+registry = "https://registry.npmjs.org/"
+
+[install.scopes]
+# Add custom registries for scoped packages if needed
+# "@myorg" = "https://custom-registry.example.com"
+
+[test]
+# Test configuration (if using bun:test in future)
+# preload = ["./test/setup.ts"]
+# coverage = true
+
+[run]
+# Disable bun's built-in package manager for npm scripts to use system binaries
+# This ensures compatibility with tools that expect npm/npx
+shell = "/bin/bash"
