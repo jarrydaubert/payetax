@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# bun
+bun.lockb
+
 # testing (legacy, now in audit-outputs)
 /coverage
 /test-results
