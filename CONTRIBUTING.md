@@ -55,10 +55,10 @@ git log --oneline -10
 ### Step 3: Check Linear Issues (30 seconds)
 ```bash
 # Check your assigned issues
-npm run linear:me
+bun run linear:me
 
 # Check audit sub-issues (PAYTAX-108+)
-npm run linear list --project PayeTax | grep "PAYTAX-10[8-9]\|PAYTAX-1[1-9][0-9]"
+bun run linear list --project PayeTax | grep "PAYTAX-10[8-9]\|PAYTAX-1[1-9][0-9]"
 ```
 
 ### Step 4: Report Back
@@ -260,8 +260,8 @@ If you discover duplication:
 ## 📋 Quick Workflow Reminder
 
 **Every commit should:**
-- [ ] Run `npm run fix-all` before committing
-- [ ] Ensure tests pass (`npm run test`)
+- [ ] Run `bun run fix-all` before committing
+- [ ] Ensure tests pass (`bun run test`)
 - [ ] Have descriptive commit message with Linear issue ID
 - [ ] Include co-authorship footer
 - [ ] **Push directly to main** (no feature branches unless discussed)
@@ -351,13 +351,13 @@ if (grossSalary > 100000 && grossSalary <= 125140) {
 
 **Always run before committing:**
 ```bash
-npm run fix-all
+bun run fix-all
 ```
 
 This runs:
-1. `npm run format` - Biome code formatting
+1. `bun run format` - Biome code formatting
 2. `biome check --write .` - Linting with auto-fix
-3. `npm run typecheck` - TypeScript type checking
+3. `bun run typecheck` - TypeScript type checking
 
 **Rules:**
 - Never commit without running `fix-all`
@@ -424,12 +424,12 @@ describe('calculatePAYE', () => {
 
 **Run tests before committing:**
 ```bash
-npm run test              # Unit tests with coverage (~10s)
-npm run test:no-coverage  # Faster: Skip coverage (~6s)
-npm run test:changed      # Fastest: Only changed files
-npm run test:watch        # Watch mode for development
-npm run test:e2e          # E2E tests
-npm run test:all          # Everything
+bun run test              # Unit tests with coverage (~10s)
+bun run test:no-coverage  # Faster: Skip coverage (~6s)
+bun run test:changed      # Fastest: Only changed files
+bun run test:watch        # Watch mode for development
+bun run test:e2e          # E2E tests
+bun run test:all          # Everything
 ```
 
 **Performance tips:**
@@ -474,7 +474,7 @@ TaxCalculator/
 1. **Check Linear for your issue**
    ```bash
    # View your assigned issues
-   npm run linear:me
+   bun run linear:me
    ```
 
 2. **Work directly on main branch**
@@ -502,8 +502,8 @@ TaxCalculator/
 
 2. **Run quality checks frequently**
    ```bash
-   npm run fix-all    # Format, lint, typecheck
-   npm run test       # Run tests
+   bun run fix-all    # Format, lint, typecheck
+   bun run test       # Run tests
    ```
 
 3. **Keep Linear issue updated**
@@ -516,10 +516,10 @@ TaxCalculator/
 **The Pre-Commit Checklist:**
 ```bash
 # 1. Format and fix
-npm run fix-all
+bun run fix-all
 
 # 2. Run tests
-npm run test
+bun run test
 
 # 3. Check for console.logs
 grep -r "console.log" src/
@@ -541,8 +541,8 @@ git commit -m "feat: Add feature (PAYTAX-XX)"
 **Pre-push hook (✅ NOW CONFIGURED - PAYTAX-24):**
 ```bash
 # Runs automatically before every push
-npm run test:no-coverage  # Full test suite (fast, no coverage report)
-npm run build             # Verify production build works
+bun run test:no-coverage  # Full test suite (fast, no coverage report)
+bun run build             # Verify production build works
 ```
 
 **What it prevents:**
@@ -813,10 +813,10 @@ export const ICON_SIZES = {
 **Check bundle impact when adding icons:**
 ```bash
 # Build and check bundle size
-npm run build
+bun run build
 
 # Analyze bundle (if needed)
-npm run bundle:analyze
+bun run bundle:analyze
 ```
 
 ---
@@ -921,10 +921,10 @@ See `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md` for complete icon inventory.
 grep -r "from 'lucide-react'" src/
 
 # Check bundle size
-npm run build
+bun run build
 
 # Verify tree-shaking
-npm run bundle:analyze
+bun run bundle:analyze
 ```
 
 **For new icons:**
@@ -1007,7 +1007,7 @@ Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.g
 
 **View current coverage:**
 ```bash
-npm run test        # Generates coverage report
+bun run test        # Generates coverage report
 # Opens: audit-outputs/coverage/lcov-report/index.html
 ```
 
@@ -1028,7 +1028,7 @@ npm run test        # Generates coverage report
 
 **Test accessibility:**
 ```bash
-npm run audit:a11y
+bun run audit:a11y
 ```
 
 ### Mobile-First Design
@@ -1062,10 +1062,10 @@ xl: 1280px  // Desktops
 **Process:**
 ```bash
 # 1. Install
-npm install package-name
+bun add package-name
 
 # 2. Check bundle impact
-npm run bundle:analyze
+bun run bundle:analyze
 
 # 3. Document why it's needed (in PR/commit)
 ```
@@ -1075,22 +1075,22 @@ npm run bundle:analyze
 **Monthly maintenance (see Linear recurring issue):**
 ```bash
 # Check for updates
-npm outdated
+bun outdated
 
 # Update (carefully!)
-npm update
+bun update
 
 # Run full test suite
-npm run test:all
+bun run test:all
 
 # Check for breaking changes
-git diff package-lock.json
+git diff bun.lockb
 ```
 
 **Security updates (immediate):**
 ```bash
-npm audit
-npm audit fix
+bun pm audit
+bun pm audit --fix
 ```
 
 ---
@@ -1149,7 +1149,7 @@ node scripts/audit-meta-descriptions.js
 
 **Check performance:**
 ```bash
-npm run lighthouse
+bun run lighthouse
 ```
 
 **Target metrics:**
@@ -1266,44 +1266,44 @@ npm run lighthouse
 export LINEAR_API_KEY="lin_api_xxx"  # Get from linear.app/settings/api
 
 # 2. View your assigned issues:
-npm run linear:me
+bun run linear:me
 
 # 3. Mark issue done:
-npm run linear:done PAYTAX-80 Done
+bun run linear:done PAYTAX-80 Done
 
 # 4. Create new issue:
-npm run linear:create
+bun run linear:create
 ```
 
-**That's it!** Everything else is available via `npm run linear` (shows full help).
+**That's it!** Everything else is available via `bun run linear` (shows full help).
 
 ### Daily Use
 
 ```bash
 # Morning: See what's assigned to you
-npm run linear:me
+bun run linear:me
 
 # During work: Mark as done
-npm run linear:done PAYTAX-123 Done
+bun run linear:done PAYTAX-123 Done
 
 # When needed: Create issue/sub-issue
-npm run linear:create
+bun run linear:create
 ```
 
 ### All Available Commands
 
 ```bash
-npm run linear  # Shows full help with all commands
+bun run linear  # Shows full help with all commands
 
 # Common commands:
-npm run linear list --project PayeTax
-npm run linear update-description PAYTAX-123 "Details"
-npm run linear create "Title" --parent PAYTAX-123
-npm run linear update-priority PAYTAX-123 1
-npm run linear delete PAYTAX-123
+bun run linear list --project PayeTax
+bun run linear update-description PAYTAX-123 "Details"
+bun run linear create "Title" --parent PAYTAX-123
+bun run linear update-priority PAYTAX-123 1
+bun run linear delete PAYTAX-123
 ```
 
-**Pro tip:** Run `npm run linear` anytime to see all options.
+**Pro tip:** Run `bun run linear` anytime to see all options.
 
 ---
 
@@ -1314,28 +1314,28 @@ npm run linear delete PAYTAX-123
 **TypeScript errors:**
 ```bash
 # Clear build cache
-npm run clean
+bun run clean
 
 # Rebuild
-npm run dev
+bun run dev
 ```
 
 **Test failures:**
 ```bash
 # Run specific test
-npm test -- TaxCalculator.test.tsx
+bun test TaxCalculator.test.tsx
 
 # Update snapshots (if needed)
-npm test -- -u
+bun test -- -u
 ```
 
 **Build errors:**
 ```bash
 # Clean everything
-npm run clean:all
+bun run clean:all
 
 # Fresh install
-npm install
+bun install
 ```
 
 ---
@@ -1356,29 +1356,29 @@ npm install
 
 ```bash
 # Development
-npm run dev                 # Start dev server
-npm run build              # Production build
-npm run fix-all            # Format, lint, typecheck
+bun run dev                 # Start dev server
+bun run build              # Production build
+bun run fix-all            # Format, lint, typecheck
 
 # Testing
-npm run test               # Unit tests with coverage
-npm run test:e2e           # E2E tests
-npm run test:all           # All tests
+bun run test               # Unit tests with coverage
+bun run test:e2e           # E2E tests
+bun run test:all           # All tests
 
 # Linear (see docs/setup/LINEAR.md for full guide)
-npm run linear:me          # Your issues (use daily!)
-npm run linear:create      # Create issue (interactive)
-npm run linear:list        # All issues
-npm run linear update-status PAYTAX-X Done  # Update status
+bun run linear:me          # Your issues (use daily!)
+bun run linear:create      # Create issue (interactive)
+bun run linear:list        # All issues
+bun run linear update-status PAYTAX-X Done  # Update status
 
 # Quality
-npm run lint:fix           # Fix linting
-npm run typecheck          # Type check
-npm run audit:deps         # Security audit
+bun run lint:fix           # Fix linting
+bun run typecheck          # Type check
+bun run audit:deps         # Security audit
 
 # Performance
-npm run lighthouse         # Performance audit
-npm run bundle:analyze     # Bundle size
+bun run lighthouse         # Performance audit
+bun run bundle:analyze     # Bundle size
 
 # Git
 git commit --no-verify     # Bypass pre-commit (use sparingly!)

@@ -22,8 +22,3 @@ registry = "https://registry.npmjs.org/"
 # Test configuration (if using bun:test in future)
 # preload = ["./test/setup.ts"]
 # coverage = true
-
-[run]
-# Disable bun's built-in package manager for npm scripts to use system binaries
-# This ensures compatibility with tools that expect npm/npx
-shell = "/bin/bash"
