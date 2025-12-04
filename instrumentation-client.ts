@@ -10,6 +10,9 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'development',
 
+  // Enable structured logs (5GB/month free tier)
+  enableLogs: true,
+
   // Performance monitoring with intelligent sampling
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0, // 20% in prod, 100% in dev
 
@@ -47,6 +50,11 @@ Sentry.init({
   integrations:
     process.env.NODE_ENV === 'production'
       ? [
+          // Console logging integration - capture console.warn and console.error
+          Sentry.consoleLoggingIntegration({
+            levels: ['warn', 'error'], // Only capture warnings and errors (not log/debug)
+          }),
+
           // Session Replay with privacy controls
           Sentry.replayIntegration({
             maskAllText: true,
@@ -218,5 +226,43 @@ Sentry.init({
     }
 
     return breadcrumb;
+  },
+
+  // Filter logs before sending to Sentry
+  beforeSendLog(log) {
+    // Don't send logs from development or localhost
+    if (
+      process.env.NODE_ENV === 'development' ||
+      (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+    ) {
+      return null;
+    }
+
+    // Filter out info/debug logs to conserve quota (only warn/error/fatal)
+    if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
+      return null;
+    }
+
+    // Scrub potential PII from log attributes
+    if (log.attributes) {
+      const sanitized = { ...log.attributes };
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'nationalInsuranceNumber',
+        'taxCode',
+      ];
+      for (const field of sensitiveFields) {
+        if (field in sanitized) {
+          sanitized[field] = '[Filtered]';
+        }
+      }
+      log.attributes = sanitized;
+    }
+
+    return log;
   },
 });

@@ -7,6 +7,9 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.VERCEL_GIT_COMMIT_SHA || 'development',
 
+  // Enable structured logs (5GB/month free tier)
+  enableLogs: true,
+
   // Performance monitoring - Edge runtime is lightweight, sample more
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.5 : 1.0, // 50% in prod, 100% in dev
 
@@ -35,6 +38,10 @@ Sentry.init({
 
   // Edge-specific integrations
   integrations: [
+    // Console logging integration - capture console.warn and console.error
+    Sentry.consoleLoggingIntegration({
+      levels: ['warn', 'error'], // Only capture warnings and errors
+    }),
     // Extra error data for better debugging
     Sentry.extraErrorDataIntegration({
       depth: 5, // Lighter depth for edge runtime
@@ -146,5 +153,20 @@ Sentry.init({
     }
 
     return breadcrumb;
+  },
+
+  // Filter logs before sending to Sentry
+  beforeSendLog(log) {
+    // Don't send logs from development
+    if (process.env.NODE_ENV === 'development') {
+      return null;
+    }
+
+    // Filter out info/debug logs to conserve quota (only warn/error/fatal)
+    if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
+      return null;
+    }
+
+    return log;
   },
 });
