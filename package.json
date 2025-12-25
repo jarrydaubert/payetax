@@ -48,7 +48,7 @@
     "audit:perf:ci": "bun run build && bun run monitor:performance",
     "update-deps": "bun update && bun run test",
     "ci": "bun run fix-all && bun run build && bun run test:all",
-    "prepare": "husky install || true",
+
     "dev-setup": "bun run clean:all && bun run fix-all && bun run dev",
     "dev:turbo": "next dev --turbo",
     "release": "bun run clean && bun run fix-all && bun run test && bun run build:analyze && bun run audit:deps",
@@ -115,7 +115,10 @@
   "overrides": {
     "tmp": "^0.2.5",
     "inquirer": "^12.9.4",
-    "external-editor": "^3.1.0"
+    "external-editor": "^3.1.0",
+    "@opentelemetry/resources": "2.2.0",
+    "@opentelemetry/core": "2.2.0",
+    "@opentelemetry/sdk-trace-base": "2.2.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.0",
