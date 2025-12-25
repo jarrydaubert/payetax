@@ -124,22 +124,24 @@ export default function AboutPage() {
       <section className={LAYOUT.SECTION}>
         <div className={LAYOUT.CONTAINER_SM}>
           <div className={LAYOUT.TEXT_CENTER}>
-            <Badge variant='outline' className={cn(SPACING.MB_6, ICON_SIZES.SIZE_4)}>
-              The Team
+            <Badge variant='outline' className={SPACING.MB_6}>
+              <Shield className={cn(ICON_SIZES.SIZE_3_5, 'mr-1.5')} />
+              The Creator
             </Badge>
             <h2 className={cn(SPACING.MB_4, 'font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
-              Built by One Person
+              Hey, I&apos;m Jarryd
             </h2>
             <div
               className={cn(LAYOUT.CENTERED_CONTENT, SPACING.SPACE_Y_4, 'text-muted-foreground')}
             >
               <p className={TYPOGRAPHY.TEXT_LG}>
-                PayeTax is a solo project built with care by a developer who got tired of
-                complicated, data-hungry tax calculators.
+                I built PayeTax because I was frustrated with existing tax calculators &mdash; they
+                were either riddled with ads, demanded my email, or felt stuck in 2010.
               </p>
               <p>
-                Every line of code, every design decision, every privacy guarantee comes from a
-                single person who believes tax calculations should be private, accurate, and free.
+                So I created the calculator I actually wanted to use: fast, private, accurate, and
+                genuinely free. Every feature exists because it solves a real problem I encountered
+                when trying to understand UK taxes.
               </p>
             </div>
           </div>
@@ -154,16 +156,17 @@ export default function AboutPage() {
           >
             <div className={cn(SPACING.SPACE_Y_4, LAYOUT.TEXT_CENTER)}>
               <p className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
-                Why build this?
+                Why this matters
               </p>
               <p className='text-muted-foreground'>
-                Because understanding your take-home pay shouldn&apos;t require sacrificing your
-                privacy or paying subscription fees. Tax calculations are a basic utility that
-                should be accessible, accurate, and respect your data.
+                Understanding your take-home pay shouldn&apos;t require sacrificing your privacy or
+                navigating subscription walls. Whether you&apos;re negotiating a raise, comparing
+                job offers, or just curious about your tax breakdown &mdash; you deserve a tool that
+                respects your time and data.
               </p>
               <p className='text-muted-foreground'>
-                No VC funding. No premium tiers. No data harvesting. Just a useful tool built
-                because it needed to exist.
+                No VC funding. No premium tiers. No data harvesting. Just a useful tool built with
+                care, because it needed to exist.
               </p>
             </div>
           </Card>

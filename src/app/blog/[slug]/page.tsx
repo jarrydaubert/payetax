@@ -5,8 +5,9 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import ContentSection from '@/components/molecules/ContentSection';
-import PageContainer from '@/components/templates/PageContainer';
+
+import { ReadingProgress } from '@/components/molecules/ReadingProgress';
+import { TableOfContents } from '@/components/molecules/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
@@ -91,77 +92,100 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const relatedPosts = await getRelatedPosts(post, 3);
 
   return (
-    <div className='pt-16 md:pt-20'>
-      <PageContainer maxWidth='6xl' includeNavbarSpacing={false}>
-        {/* Header */}
-        <div className='mb-6 md:mb-8'>
-          <Link
-            href='/blog'
-            className='mb-6 inline-flex items-center text-primary transition-colors hover:text-primary/80'
-          >
-            <ArrowLeft className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-            Back to Blog
-          </Link>
-        </div>
+    <>
+      <ReadingProgress />
+      <div className='min-h-screen pt-20 md:pt-24'>
+        {/* Clean, seamless container - wider on xl for sidebar TOC */}
+        <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:px-8 xl:max-w-6xl'>
+          {/* Back Navigation */}
+          <nav className='mb-8'>
+            <Link
+              href='/blog'
+              className='inline-flex items-center text-primary transition-colors hover:text-primary/80'
+            >
+              <ArrowLeft className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+              Back to Blog
+            </Link>
+          </nav>
 
-        {/* Article Header */}
-        <article>
-          <header className='mb-6 md:mb-8'>
-            <div className='mb-4 flex items-center gap-2'>
-              <span
-                className={cn(
-                  'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
-                  TYPOGRAPHY.TEXT_XS
-                )}
-              >
-                {post.categoryData?.name || post.category}
-              </span>
-              {post.tags &&
-                post.tags.length > 0 &&
-                post.tags.slice(0, 3).map((tag) => (
+          {/* Article */}
+          <article>
+            {/* Header */}
+            <header className='mb-8 md:mb-12'>
+              {/* Category & Tags */}
+              <div className='mb-4 flex flex-wrap items-center gap-2'>
+                <span
+                  className={cn(
+                    'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
+                    TYPOGRAPHY.TEXT_XS
+                  )}
+                >
+                  {post.categoryData?.name || post.category}
+                </span>
+                {post.tags?.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
                     className={cn(
-                      'glass rounded-full px-2 py-1 text-foreground/90',
+                      'rounded-full bg-foreground/5 px-2.5 py-1 text-foreground/70',
                       TYPOGRAPHY.TEXT_XS
                     )}
                   >
                     {tag}
                   </span>
                 ))}
-            </div>
-
-            <h1 className={cn('mb-6 font-bold text-foreground leading-tight', TYPOGRAPHY.TEXT_4XL)}>
-              {post.title}
-            </h1>
-
-            <p className={cn('mb-6 text-foreground/90 leading-relaxed', TYPOGRAPHY.TEXT_XL)}>
-              {post.excerpt}
-            </p>
-
-            <div
-              className={cn('mb-8 flex items-center gap-6 text-foreground/90', TYPOGRAPHY.TEXT_SM)}
-            >
-              <div className='flex items-center gap-2'>
-                <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                <span>{formatDate(post.publishedAt)}</span>
               </div>
-              {post.readTime && (
-                <div className='flex items-center gap-2'>
-                  <Clock className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                  <span>{post.readTime}</span>
-                </div>
-              )}
-              {post.author && (
-                <div className='flex items-center gap-2'>
-                  <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                  <span>{post.author}</span>
-                </div>
-              )}
-            </div>
 
+              {/* Title */}
+              <h1
+                className={cn(
+                  'mb-4 font-bold text-foreground leading-tight md:mb-6',
+                  TYPOGRAPHY.TEXT_4XL,
+                  'md:text-5xl'
+                )}
+              >
+                {post.title}
+              </h1>
+
+              {/* Excerpt */}
+              <p
+                className={cn(
+                  'mb-6 text-foreground/80 leading-relaxed md:mb-8',
+                  TYPOGRAPHY.TEXT_LG,
+                  'md:text-xl'
+                )}
+              >
+                {post.excerpt}
+              </p>
+
+              {/* Meta Info */}
+              <div
+                className={cn(
+                  'flex flex-wrap items-center gap-4 text-foreground/60 md:gap-6',
+                  TYPOGRAPHY.TEXT_SM
+                )}
+              >
+                <div className='flex items-center gap-2'>
+                  <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                  <time>{formatDate(post.publishedAt)}</time>
+                </div>
+                {post.readTime && (
+                  <div className='flex items-center gap-2'>
+                    <Clock className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                    <span>{post.readTime}</span>
+                  </div>
+                )}
+                {post.author && (
+                  <div className='flex items-center gap-2'>
+                    <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                    <span>{post.author}</span>
+                  </div>
+                )}
+              </div>
+            </header>
+
+            {/* Hero Image */}
             {post.image && (
-              <div className='relative mb-6 h-64 overflow-hidden rounded-xl md:mb-8 md:h-96'>
+              <div className='relative -mx-4 mb-8 aspect-video overflow-hidden md:-mx-6 md:mb-12 md:rounded-xl lg:-mx-8'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -172,70 +196,85 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 />
               </div>
             )}
-          </header>
 
-          {/* Article Content */}
-          <ContentSection glass className='mb-6 md:mb-8'>
-            <div className='prose prose-lg max-w-none'>
-              <MDXContent />
+            {/* Content with sidebar TOC on desktop */}
+            <div className='relative xl:flex xl:gap-12'>
+              {/* Table of Contents - sticky sidebar on xl screens */}
+              <TableOfContents content={post.content} className='w-56 shrink-0' />
+
+              {/* Article Content - clean prose styling */}
+              <div
+                className={cn(
+                  'prose prose-lg dark:prose-invert min-w-0 max-w-none flex-1',
+                  // Improved typography for desktop readability
+                  'prose-headings:font-bold prose-headings:text-foreground',
+                  'prose-p:text-foreground/90 prose-p:leading-relaxed',
+                  'prose-a:text-primary prose-a:no-underline hover:prose-a:underline',
+                  'prose-strong:font-semibold prose-strong:text-foreground',
+                  'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
+                  'prose-li:marker:text-primary/60',
+                  'prose-blockquote:border-primary/30 prose-blockquote:text-foreground/80',
+                  'prose-code:rounded prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none',
+                  'prose-pre:border prose-pre:border-foreground/10 prose-pre:bg-foreground/5',
+                  'md:prose-xl'
+                )}
+              >
+                <MDXContent />
+              </div>
             </div>
-          </ContentSection>
 
-          {/* Article Footer */}
-          <div className='glass-card mb-8 border border-foreground/10'>
-            <div className='glass-card-inner p-6'>
+            {/* CTA Section */}
+            <div className='mt-12 rounded-xl border border-primary/20 bg-primary/5 p-6 md:mt-16 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
                   <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>
-                  <p className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
-                    Try our free UK tax calculator to see how much you'll take home.
+                  <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
+                    Try our free UK tax calculator to see how much you&apos;ll take home.
                   </p>
                 </div>
-                <Button asChild>
+                <Button asChild className='shrink-0'>
                   <Link href='/'>
                     Calculate Your Tax
                     <ArrowLeft
-                      className={`ml-2 ${ICON_SIZES.SIZE_4} rotate-180`}
+                      className={cn('ml-2 rotate-180', ICON_SIZES.SIZE_4)}
                       aria-hidden='true'
                     />
                   </Link>
                 </Button>
               </div>
             </div>
-          </div>
-        </article>
+          </article>
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
-          <div className='mb-12'>
-            <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
-              Related Articles
-            </h2>
-            <div className='grid gap-4 md:grid-cols-3 md:gap-6'>
-              {relatedPosts.map((relatedPost) => (
-                <Link
-                  key={relatedPost.slug}
-                  href={`/blog/${relatedPost.slug}`}
-                  className='glass-card group border border-foreground/10 transition-all active:scale-[1.02] md:hover:border-primary/50'
-                >
-                  <div className='glass-card-inner p-6'>
+          {/* Related Posts */}
+          {relatedPosts.length > 0 && (
+            <section className='mt-12 border-foreground/10 border-t pt-12 md:mt-16 md:pt-16'>
+              <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
+                Related Articles
+              </h2>
+              <div className='grid gap-6 md:grid-cols-3'>
+                {relatedPosts.map((relatedPost) => (
+                  <Link
+                    key={relatedPost.slug}
+                    href={`/blog/${relatedPost.slug}`}
+                    className='group rounded-lg border border-foreground/10 p-5 transition-all hover:border-primary/30 hover:bg-primary/5'
+                  >
                     <div className={cn('mb-2 text-primary', TYPOGRAPHY.TEXT_SM)}>
                       {relatedPost.category}
                     </div>
                     <h3
                       className={cn(
-                        'mb-3 font-semibold text-foreground group-hover:text-primary',
-                        TYPOGRAPHY.TEXT_XL
+                        'mb-2 font-semibold text-foreground transition-colors group-hover:text-primary',
+                        TYPOGRAPHY.TEXT_BASE
                       )}
                     >
                       {relatedPost.title}
                     </h3>
-                    <p className={cn('mb-4 line-clamp-2 text-foreground/80', TYPOGRAPHY.TEXT_SM)}>
+                    <p className={cn('mb-3 line-clamp-2 text-foreground/60', TYPOGRAPHY.TEXT_SM)}>
                       {relatedPost.excerpt}
                     </p>
                     <div
                       className={cn(
-                        'flex items-center gap-4 text-foreground/60',
+                        'flex items-center gap-3 text-foreground/50',
                         TYPOGRAPHY.TEXT_XS
                       )}
                     >
@@ -247,24 +286,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       )}
                       <time>{formatDate(relatedPost.publishedAt)}</time>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
 
-        {/* Footer Navigation */}
-        <div className='flex justify-center border-foreground/10 border-t pt-8'>
-          <Link
-            href='/blog'
-            className='inline-flex items-center font-medium text-primary hover:text-primary/80'
-          >
-            <ArrowLeft className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-            Back to All Posts
-          </Link>
+          {/* Footer Navigation */}
+          <div className='mt-12 flex justify-center border-foreground/10 border-t pt-8'>
+            <Link
+              href='/blog'
+              className='inline-flex items-center font-medium text-primary transition-colors hover:text-primary/80'
+            >
+              <ArrowLeft className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+              Back to All Posts
+            </Link>
+          </div>
         </div>
-      </PageContainer>
-    </div>
+      </div>
+    </>
   );
 }

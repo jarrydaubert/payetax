@@ -360,7 +360,7 @@ export function ResultsTable({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='-mx-2 relative w-full sm:mx-0'>
+      <div className='relative -mx-2 w-full sm:mx-0'>
         {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />

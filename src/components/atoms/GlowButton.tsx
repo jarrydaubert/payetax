@@ -85,7 +85,7 @@ export function GlowButton({
       <div className='group relative'>
         {/* Background glow - blur effect that intensifies on hover */}
         <div
-          className={`-inset-1 absolute rounded-lg bg-gradient-to-r ${glowColorMap[glowColor]} opacity-75 blur transition duration-500 group-hover:opacity-100`}
+          className={`absolute -inset-1 rounded-lg bg-gradient-to-r ${glowColorMap[glowColor]} opacity-75 blur transition duration-500 group-hover:opacity-100`}
         />
 
         {/* Button with motion animations */}
@@ -120,7 +120,7 @@ export function GlowButton({
     <div className='group relative inline-block'>
       {/* Background glow - blur effect that intensifies on hover */}
       <div
-        className={`-inset-1 absolute rounded-lg bg-gradient-to-r ${glowColorMap[glowColor]} opacity-75 blur transition duration-500 group-hover:opacity-100`}
+        className={`absolute -inset-1 rounded-lg bg-gradient-to-r ${glowColorMap[glowColor]} opacity-75 blur transition duration-500 group-hover:opacity-100`}
       />
 
       {/* Button with motion animations + useAnimate() sequence */}

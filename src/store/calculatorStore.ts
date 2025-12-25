@@ -41,7 +41,6 @@ import {
 import {
   addBreadcrumb,
   captureCalculatorError,
-  captureValidationError,
   setContext,
   startPerformanceTransaction,
 } from '@/lib/sentry';
@@ -293,109 +292,110 @@ export const useCalculatorStore = create<CalculatorState>()(
         // Input actions
         setSalary: (salary) => {
           // Validate salary input
-          const validated = z
-            .number()
-            .min(0, 'Salary must be positive')
-            .max(10_000_000, 'Salary exceeds maximum')
-            .finite('Salary must be a valid number')
-            .safeParse(salary);
+          try {
+            const validated = z
+              .number()
+              .min(0, 'Salary must be positive')
+              .max(10_000_000, 'Salary exceeds maximum')
+              .finite('Salary must be a valid number')
+              .safeParse(salary);
 
-          if (!validated.success) {
-            console.warn('[Calculator] Invalid salary:', validated.error.issues[0].message);
-            // Track validation error in Sentry
-            captureValidationError(validated.error, {
-              field: 'salary',
-              errorMessage: validated.error.issues[0]?.message || 'Unknown validation error',
-              attemptedValue: salary,
-              location: 'calculatorStore.setSalary',
+            if (!validated.success) {
+              console.warn('[Calculator] Invalid salary:', validated.error.issues[0].message);
+              return; // Don't update state with invalid value
+            }
+
+            // Add breadcrumb for debugging
+            addBreadcrumb('calculator-input', {
+              message: 'Salary updated',
+              level: 'info',
+              data: { salary: validated.data },
             });
-            return; // Don't update state with invalid value
+
+            set((state) => ({ input: { ...state.input, salary: validated.data } }));
+          } catch (error) {
+            // Zod v4 can throw in some edge cases even with safeParse
+            console.warn('[Calculator] Salary validation error:', error);
           }
-
-          // Add breadcrumb for debugging
-          addBreadcrumb('calculator-input', {
-            message: 'Salary updated',
-            level: 'info',
-            data: { salary: validated.data },
-          });
-
-          set((state) => ({ input: { ...state.input, salary: validated.data } }));
         },
         setPayPeriod: (payPeriod) => {
-          // Validate pay period
-          const validated = z
-            .enum(['annually', 'monthly', 'fortnightly', 'weekly', 'daily', 'hourly'])
-            .safeParse(payPeriod);
+          // Validate pay period - include all valid periods from PERIODS constant
+          try {
+            const validated = z
+              .enum([
+                'annually',
+                'monthly',
+                'fourWeekly',
+                'fortnightly',
+                'weekly',
+                'daily',
+                'hourly',
+              ])
+              .safeParse(payPeriod);
 
-          if (!validated.success) {
-            console.warn('[Calculator] Invalid pay period:', validated.error.issues[0].message);
-            captureValidationError(validated.error, {
-              field: 'payPeriod',
-              errorMessage: validated.error.issues[0]?.message || 'Invalid pay period',
-              attemptedValue: payPeriod,
-              location: 'calculatorStore.setPayPeriod',
-            });
-            return;
+            if (!validated.success) {
+              // Invalid pay period - just log and don't update state
+              console.warn('[Calculator] Invalid pay period:', validated.error.issues[0].message);
+              return;
+            }
+
+            set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
+          } catch (error) {
+            // Zod v4 can throw in some edge cases even with safeParse
+            console.warn('[Calculator] Pay period validation error:', error);
           }
-
-          set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
         },
         setTaxYear: (taxYear) => {
           // Validate tax year format - accept both YYYY-YY and YYYY-YYYY
-          const validated = z
-            .string()
-            .refine(
-              (year) => {
-                // Accept both YYYY-YY and YYYY-YYYY formats
-                const shortFormat = /^\d{4}-\d{2}$/;
-                const longFormat = /^\d{4}-\d{4}$/;
-                return shortFormat.test(year) || longFormat.test(year);
-              },
-              {
-                message:
-                  'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
-              }
-            )
-            .refine(
-              (year) => {
-                const parts = year.split('-');
-                if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
+          try {
+            const validated = z
+              .string()
+              .refine(
+                (year) => {
+                  // Accept both YYYY-YY and YYYY-YYYY formats
+                  const shortFormat = /^\d{4}-\d{2}$/;
+                  const longFormat = /^\d{4}-\d{4}$/;
+                  return shortFormat.test(year) || longFormat.test(year);
+                },
+                {
+                  message:
+                    'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
+                }
+              )
+              .refine(
+                (year) => {
+                  const parts = year.split('-');
+                  if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
 
-                const start = Number.parseInt(parts[0], 10);
-                const endStr = parts[1];
+                  const start = Number.parseInt(parts[0], 10);
+                  const endStr = parts[1];
 
-                if (Number.isNaN(start)) return false;
+                  if (Number.isNaN(start)) return false;
 
-                // Handle both 2-digit and 4-digit year formats
-                const end =
-                  endStr.length === 2
-                    ? Number.parseInt(`20${endStr}`, 10)
-                    : Number.parseInt(endStr, 10);
+                  // Handle both 2-digit and 4-digit year formats
+                  const end =
+                    endStr.length === 2
+                      ? Number.parseInt(`20${endStr}`, 10)
+                      : Number.parseInt(endStr, 10);
 
-                if (Number.isNaN(end)) return false;
+                  if (Number.isNaN(end)) return false;
 
-                return end === start + 1;
-              },
-              { message: 'Tax year must be consecutive (e.g., 2024-25)' }
-            )
-            .safeParse(taxYear);
+                  return end === start + 1;
+                },
+                { message: 'Tax year must be consecutive (e.g., 2024-25)' }
+              )
+              .safeParse(taxYear);
 
-          if (!validated.success) {
-            console.warn('[Calculator] Invalid tax year:', validated.error.issues[0].message);
-            console.warn('[Calculator] Attempted value:', taxYear);
-            console.warn('[Calculator] All errors:', validated.error.issues);
-            captureValidationError(validated.error, {
-              field: 'taxYear',
-              errorMessage: validated.error.issues[0]?.message || 'Invalid tax year',
-              attemptedValue: taxYear,
-              location: 'calculatorStore.setTaxYear',
-              zodError: validated.error,
-              expectedFormat: 'YYYY-YY (e.g., 2024-25, 2025-26)',
-            });
-            return;
+            if (!validated.success) {
+              console.warn('[Calculator] Invalid tax year:', validated.error.issues[0].message);
+              return;
+            }
+
+            set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
+          } catch (error) {
+            // Zod v4 can throw in some edge cases even with safeParse
+            console.warn('[Calculator] Tax year validation error:', error);
           }
-
-          set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
         },
         setTaxCode: (taxCode) => {
           // Validate tax code format (allow empty for default)
@@ -404,71 +404,69 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          const validated = z
-            .string()
-            .min(1)
-            .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase()) // Remove ALL spaces, trim, uppercase
-            .refine(
-              (code) => {
-                // Special codes
-                const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-                if (specialCodes.includes(code)) return true;
+          try {
+            const validated = z
+              .string()
+              .min(1)
+              .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase()) // Remove ALL spaces, trim, uppercase
+              .refine(
+                (code) => {
+                  // Special codes
+                  const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+                  if (specialCodes.includes(code)) return true;
 
-                // Remove emergency suffix (W1, M1, X) before validation
-                const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
+                  // Remove emergency suffix (W1, M1, X) before validation
+                  const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
 
-                // Standard format or K codes
-                const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
-                const kCodePattern = /^S?K[0-9]+$/;
-                return (
-                  standardPattern.test(codeWithoutEmergency) ||
-                  kCodePattern.test(codeWithoutEmergency)
-                );
-              },
-              { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' }
-            )
-            .safeParse(taxCode);
+                  // Standard format or K codes
+                  const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+                  const kCodePattern = /^S?K[0-9]+$/;
+                  return (
+                    standardPattern.test(codeWithoutEmergency) ||
+                    kCodePattern.test(codeWithoutEmergency)
+                  );
+                },
+                { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' }
+              )
+              .safeParse(taxCode);
 
-          if (!validated.success) {
-            console.warn('[Calculator] Invalid tax code:', validated.error.issues[0].message);
-            captureValidationError(validated.error, {
-              field: 'taxCode',
-              errorMessage: validated.error.issues[0]?.message || 'Invalid tax code',
-              attemptedValue: taxCode,
-              location: 'calculatorStore.setTaxCode',
-              zodError: validated.error,
-              expectedFormat:
-                'Standard (1257L), Scottish (S1257L), K codes (K100), Special (BR, D0, NT), Emergency (1257L W1)',
-            });
-            return;
+            if (!validated.success) {
+              // Invalid tax code - just log and don't update state
+              // This is expected user behavior, not an error
+              console.warn('[Calculator] Invalid tax code:', validated.error.issues[0].message);
+              return;
+            }
+
+            set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
+          } catch (error) {
+            // Zod v4 can throw in some edge cases even with safeParse
+            // This is expected user input validation, not an application error
+            console.warn('[Calculator] Tax code validation error:', error);
           }
-
-          set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
         },
         setRegion: (region) => {
           // Validate region
-          const validated = z
-            .enum(['England', 'Scotland', 'Wales', 'Northern Ireland'])
-            .safeParse(region);
+          try {
+            const validated = z
+              .enum(['England', 'Scotland', 'Wales', 'Northern Ireland'])
+              .safeParse(region);
 
-          if (!validated.success) {
-            console.warn('[Calculator] Invalid region:', validated.error.issues[0].message);
-            captureValidationError(validated.error, {
-              field: 'region',
-              errorMessage: validated.error.issues[0]?.message || 'Invalid region',
-              attemptedValue: region,
-              location: 'calculatorStore.setRegion',
-            });
-            return;
+            if (!validated.success) {
+              console.warn('[Calculator] Invalid region:', validated.error.issues[0].message);
+              return;
+            }
+
+            set((state) => ({
+              input: {
+                ...state.input,
+                region: validated.data,
+                isScottish: validated.data === 'Scotland',
+              },
+            }));
+          } catch (error) {
+            // Zod v4 can throw in some edge cases even with safeParse
+            console.warn('[Calculator] Region validation error:', error);
           }
-
-          set((state) => ({
-            input: {
-              ...state.input,
-              region: validated.data,
-              isScottish: validated.data === 'Scotland',
-            },
-          }));
         },
         setIsScottish: (isScottish) => {
           // Validate boolean using extracted schema

@@ -38,7 +38,7 @@ export default function NotFound() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Animated background particles */}
-      <div className='-z-10 fixed inset-0 overflow-hidden'>
+      <div className='fixed inset-0 -z-10 overflow-hidden'>
         <div className='absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background'>
           {Array.from({ length: 20 }, (_, i) => {
             const left = (i * 137.5) % 100;
@@ -78,7 +78,7 @@ export default function NotFound() {
               </h1>
               <div
                 className={cn(
-                  '-z-10 absolute inset-0 animate-pulse font-black text-primary/10',
+                  'absolute inset-0 -z-10 animate-pulse font-black text-primary/10',
                   TYPOGRAPHY.TEXT_7XL,
                   `md:${TYPOGRAPHY.TEXT_9XL}`
                 )}

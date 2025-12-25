@@ -14,7 +14,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
   const formattedSalary = salary.toLocaleString('en-GB');
 
   return (
-    <div className='prose prose-sm max-w-none'>
+    <div className='prose prose-sm dark:prose-invert max-w-none'>
       <h2>£{formattedSalary} Salary Take-Home Pay Breakdown</h2>
       <p>
         With a gross annual salary of <strong>£{formattedSalary}</strong> in the UK for the 2025-26

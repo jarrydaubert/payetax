@@ -54,7 +54,7 @@ export default function GlobalError({
       <body className='m-0 p-0'>
         <div className={cn(LAYOUT.PAGE_WRAPPER, 'relative min-h-screen overflow-hidden')}>
           {/* Animated background particles */}
-          <div className='-z-10 pointer-events-none fixed inset-0'>
+          <div className='pointer-events-none fixed inset-0 -z-10'>
             <div className='absolute inset-0 bg-gradient-to-br from-background via-destructive/5 to-background'>
               {Array.from({ length: 20 }, (_, i) => {
                 const left = (i * 137.5) % 100;
@@ -87,7 +87,7 @@ export default function GlobalError({
                     className={cn('text-destructive', ICON_SIZES.SIZE_10)}
                     aria-label='Critical error icon'
                   />
-                  <div className='-z-10 absolute inset-0 animate-ping rounded-full border-2 border-destructive opacity-20' />
+                  <div className='absolute inset-0 -z-10 animate-ping rounded-full border-2 border-destructive opacity-20' />
                 </div>
               </div>
 

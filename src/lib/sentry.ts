@@ -130,8 +130,11 @@ export function captureCalculatorError(
 }
 
 /**
- * Capture a validation error with field-specific context
- * Use this for input validation failures
+ * Log a validation error as a breadcrumb (NOT as an exception)
+ *
+ * User input validation failures are expected behavior, not errors.
+ * We log them as breadcrumbs so they provide context if a real error occurs later,
+ * but we don't report them as exceptions to avoid noise in Sentry.
  *
  * @example
  * ```typescript
@@ -149,37 +152,31 @@ export function captureCalculatorError(
 export function captureValidationError(
   error: unknown,
   context: ValidationErrorContext,
-  severity: ErrorSeverity = 'warning'
+  _severity: ErrorSeverity = 'warning'
 ): string | undefined {
   // Extract detailed Zod error information if available
   const zodDetails = extractZodErrorDetails(error);
 
-  return Sentry.captureException(error, {
-    level: severity as SeverityLevel,
-    tags: {
-      error_type: 'validation',
+  // Log as breadcrumb instead of exception - validation errors are expected user behavior
+  Sentry.addBreadcrumb({
+    category: 'validation',
+    message: `Validation failed for ${context.field}: ${context.errorMessage}`,
+    level: 'warning',
+    data: {
       field: context.field,
       location: context.location,
-      error_count: zodDetails.issueCount.toString(),
-      validation_type: zodDetails.validationType || 'unknown',
+      attemptedValue:
+        typeof context.attemptedValue === 'object'
+          ? JSON.stringify(context.attemptedValue)
+          : String(context.attemptedValue),
+      expectedFormat: context.expectedFormat,
+      errorCount: zodDetails.issueCount,
+      errorCodes: zodDetails.errorCodes,
     },
-    contexts: {
-      validation: {
-        field: context.field,
-        errorMessage: context.errorMessage,
-        attemptedValue:
-          typeof context.attemptedValue === 'object'
-            ? JSON.stringify(context.attemptedValue)
-            : String(context.attemptedValue),
-        expectedFormat: context.expectedFormat,
-        // Full Zod error details for debugging
-        allIssues: zodDetails.allIssues,
-        errorCodes: zodDetails.errorCodes,
-        paths: zodDetails.paths,
-      },
-    },
-    fingerprint: ['validation-error', context.location, context.field],
   });
+
+  // Return undefined since we're not capturing an exception
+  return undefined;
 }
 
 /**

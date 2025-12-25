@@ -1,7 +1,7 @@
 // src/app/blog/page.tsx
 
 import type { Metadata } from 'next';
-import { getBlogCategories, getBlogPosts, getBlogPostsCount, getFeaturedPost } from '@/lib/blog';
+import { getBlogCategories, getBlogPosts, getFeaturedPost } from '@/lib/blog';
 import { BlogPageClient } from './BlogPageClient';
 
 // ⚠️ CRITICAL: DO NOT CHANGE THIS CONFIGURATION WITHOUT TESTING
@@ -41,42 +41,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = await searchParams;
-  const currentPage = params.page
-    ? Number.parseInt(Array.isArray(params.page) ? params.page[0] : params.page, 10)
-    : 1;
-  const selectedCategory = params.category
-    ? Array.isArray(params.category)
-      ? params.category[0]
-      : params.category
-    : undefined;
-
-  const [posts, featuredPost, categories, totalCount, allPostsCount] = await Promise.all([
-    getBlogPosts({
-      page: currentPage,
-      pageSize: 9,
-      category: selectedCategory,
-    }),
+export default async function BlogPage() {
+  // Fetch all data in parallel - client handles filtering/pagination
+  const [featuredPost, categories, allPosts] = await Promise.all([
     getFeaturedPost(),
     getBlogCategories(),
-    getBlogPostsCount(selectedCategory),
-    getBlogPostsCount(),
+    getBlogPosts({ pageSize: 1000 }),
   ]);
 
-  return (
-    <BlogPageClient
-      posts={posts}
-      featuredPost={featuredPost}
-      categories={categories}
-      totalCount={totalCount}
-      allPostsCount={allPostsCount}
-      currentPage={currentPage}
-      selectedCategory={selectedCategory}
-    />
-  );
+  return <BlogPageClient featuredPost={featuredPost} categories={categories} allPosts={allPosts} />;
 }

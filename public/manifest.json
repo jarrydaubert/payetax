@@ -47,22 +47,7 @@
       "url": "/blog"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop-calculator.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "PayeTax Calculator Desktop View"
-    },
-    {
-      "src": "/screenshots/mobile-calculator.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "PayeTax Calculator Mobile View"
-    }
-  ],
+  "screenshots": [],
   "share_target": {
     "action": "/",
     "method": "GET",

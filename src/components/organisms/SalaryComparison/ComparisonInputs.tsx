@@ -187,12 +187,12 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           </Label>
           <div className='relative'>
             {mode === 'percentage' && (
-              <span className='-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground'>
+              <span className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'>
                 %
               </span>
             )}
             {(mode === 'amount' || mode === 'total') && (
-              <span className='-translate-y-1/2 absolute top-1/2 left-3 text-muted-foreground'>
+              <span className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
                 £
               </span>
             )}

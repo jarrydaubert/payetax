@@ -247,7 +247,7 @@ export function WhatIfComparisonDisplay({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='-mx-2 relative sm:mx-0'>
+      <div className='relative -mx-2 sm:mx-0'>
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 

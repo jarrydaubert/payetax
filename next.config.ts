@@ -177,8 +177,8 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value:
               process.env.NODE_ENV === 'development'
-                ? "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com; worker-src 'self' blob:; child-src 'self';"
-                : "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com; worker-src 'self' blob:; child-src 'self';",
+                ? "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';"
+                : "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';",
           },
         ],
       },
@@ -221,8 +221,12 @@ const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
   // Route browser requests to Sentry through a Next.js rewrite
   tunnelRoute: '/monitoring',
 
-  // Automatically tree-shake Sentry logger statements
-  disableLogger: true,
+  // Automatically tree-shake Sentry logger statements (replaces deprecated disableLogger)
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    excludeReplayShadowDom: true,
+    excludeReplayIframe: true,
+  },
 });
 
 export default configWithSentry;

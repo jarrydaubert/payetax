@@ -21,7 +21,7 @@ import Eye from 'lucide-react/dist/esm/icons/eye.js';
 import Heart from 'lucide-react/dist/esm/icons/heart.js';
 import Lightbulb from 'lucide-react/dist/esm/icons/lightbulb.js';
 import Lock from 'lucide-react/dist/esm/icons/lock.js';
-import Palette from 'lucide-react/dist/esm/icons/palette.js';
+
 import Rocket from 'lucide-react/dist/esm/icons/rocket.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
@@ -104,9 +104,9 @@ export const ABOUT_VALUES = [
 export const ABOUT_UNIQUE_FEATURES = [
   {
     icon: AlertTriangle,
-    title: '£100k Tax Trap Optimizer',
+    title: '£100k Tax Trap Detector',
     description:
-      "Automatically detects when you're in the 60% effective tax rate zone (£100k-£125k) and calculates optimal pension contributions to save thousands.",
+      "Automatically warns when you're in the 60% effective tax rate zone (£100k-£125k) and shows optimal pension contributions to legally reduce your tax bill.",
     metric: '60%',
     gradient: {
       bg: 'from-amber-500/10 to-orange-500/10',
@@ -116,10 +116,10 @@ export const ABOUT_UNIQUE_FEATURES = [
   },
   {
     icon: ArrowLeftRight,
-    title: 'Salary Comparison',
+    title: 'What-If Comparisons',
     description:
-      'Compare job offers or raises with 3 input modes (%, £ amount, total). See marginal rates and exactly what you keep from every increase.',
-    metric: '3 modes',
+      'Compare job offers, raises, or "what if I earned X more?" scenarios instantly. See exactly how much of every extra pound you actually keep.',
+    metric: 'Instant',
     gradient: {
       bg: 'from-cyan-500/10 to-blue-500/10',
       icon: 'text-cyan-500',
@@ -127,11 +127,11 @@ export const ABOUT_UNIQUE_FEATURES = [
     },
   },
   {
-    icon: Palette,
-    title: 'Adaptive Theming',
+    icon: Calculator,
+    title: 'Every Deduction Covered',
     description:
-      'Light, dark, or system-matched themes. Your calculator, your eyes, your choice. Smooth transitions, zero flash, perfect accessibility.',
-    metric: '3 themes',
+      'Student loans (all plans), Scottish tax, pension contributions, marriage allowance, blind allowance — all calculated correctly, all in one place.',
+    metric: 'Complete',
     gradient: {
       bg: 'from-purple-500/10 to-pink-500/10',
       icon: 'text-purple-500',

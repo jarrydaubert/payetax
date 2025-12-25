@@ -108,7 +108,7 @@ export function CategoryFilter({
                   {category.count}
                 </Badge>
                 {isActive(category.slug) && (
-                  <div className='-z-10 pointer-events-none absolute inset-0 bg-action-primary opacity-0 blur-md transition-opacity group-hover:opacity-50' />
+                  <div className='pointer-events-none absolute inset-0 -z-10 bg-action-primary opacity-0 blur-md transition-opacity group-hover:opacity-50' />
                 )}
               </button>
             ))}

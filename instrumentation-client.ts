@@ -107,6 +107,10 @@ Sentry.init({
     'NetworkError',
     'Load failed',
     'TypeError: NetworkError when attempting to fetch resource',
+    // Service worker / navigation preload errors (browser-level, not actionable)
+    'invalid origin',
+    'Failed to update a ServiceWorker',
+    'An unknown error occurred when fetching the script',
     // Cancelled requests (user navigation)
     'AbortError',
     'The operation was aborted',
