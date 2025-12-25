@@ -78,6 +78,11 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     description: 'Practical advice to optimize your tax situation',
   },
   {
+    name: 'Tax Planning',
+    slug: 'tax-planning',
+    description: 'Strategic guides for reducing tax and maximising allowances',
+  },
+  {
     name: 'Tax Changes',
     slug: 'tax-changes',
     description: 'Latest updates and changes in UK tax legislation',

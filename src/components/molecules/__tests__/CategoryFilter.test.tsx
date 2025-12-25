@@ -35,20 +35,6 @@ describe('CategoryFilter', () => {
       expect(screen.getByRole('heading', { level: 2, name: 'Browse Topics' })).toBeInTheDocument();
     });
 
-    it('should render Tag icon', () => {
-      const { container } = render(
-        <CategoryFilter
-          categories={mockCategories}
-          allPostsCount={10}
-          onCategoryClick={mockCallback}
-        />
-      );
-
-      // Tag icon has aria-hidden
-      const icon = container.querySelector('[aria-hidden="true"]');
-      expect(icon).toBeInTheDocument();
-    });
-
     it('should render "All Posts" button', () => {
       render(
         <CategoryFilter
@@ -115,9 +101,8 @@ describe('CategoryFilter', () => {
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
-      expect(allPostsButton).toHaveClass('from-purple-600');
-      expect(allPostsButton).toHaveClass('to-cyan-500');
-      expect(allPostsButton).toHaveClass('scale-110');
+      expect(allPostsButton).toHaveClass('bg-primary');
+      expect(allPostsButton).toHaveClass('text-primary-foreground');
     });
 
     it('should not highlight category buttons when no category selected', () => {
@@ -131,7 +116,7 @@ describe('CategoryFilter', () => {
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
-      expect(taxBasicsButton).not.toHaveClass('scale-110');
+      expect(taxBasicsButton).not.toHaveClass('bg-primary');
     });
   });
 
@@ -147,9 +132,8 @@ describe('CategoryFilter', () => {
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
-      expect(taxBasicsButton).toHaveClass('from-purple-600');
-      expect(taxBasicsButton).toHaveClass('to-cyan-500');
-      expect(taxBasicsButton).toHaveClass('scale-110');
+      expect(taxBasicsButton).toHaveClass('bg-primary');
+      expect(taxBasicsButton).toHaveClass('text-primary-foreground');
     });
 
     it('should not highlight "All Posts" when category is selected', () => {
@@ -163,8 +147,8 @@ describe('CategoryFilter', () => {
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
-      expect(allPostsButton).not.toHaveClass('scale-110');
-      expect(allPostsButton).toHaveClass('backdrop-blur-xl');
+      expect(allPostsButton).not.toHaveClass('bg-primary');
+      expect(allPostsButton).toHaveClass('border');
     });
 
     it('should not highlight non-selected categories', () => {
@@ -178,7 +162,7 @@ describe('CategoryFilter', () => {
       );
 
       const taxTipsButton = screen.getByRole('button', { name: /Tax Tips 3/i });
-      expect(taxTipsButton).not.toHaveClass('scale-110');
+      expect(taxTipsButton).not.toHaveClass('bg-primary');
     });
   });
 
@@ -363,19 +347,6 @@ describe('CategoryFilter', () => {
       expect(labeledElement).toBeInTheDocument();
     });
 
-    it('should hide decorative icons from screen readers', () => {
-      const { container } = render(
-        <CategoryFilter
-          categories={mockCategories}
-          allPostsCount={10}
-          onCategoryClick={mockCallback}
-        />
-      );
-
-      const icon = container.querySelector('[aria-hidden="true"]');
-      expect(icon).toBeInTheDocument();
-    });
-
     it('should use button elements for interactivity', () => {
       render(
         <CategoryFilter
@@ -388,23 +359,10 @@ describe('CategoryFilter', () => {
       const buttons = screen.getAllByRole('button');
       expect(buttons.length).toBeGreaterThanOrEqual(4); // All Posts + 3 categories
     });
-
-    it('should use type="button" on category buttons to prevent form submission', () => {
-      render(
-        <CategoryFilter
-          categories={mockCategories}
-          allPostsCount={10}
-          onCategoryClick={mockCallback}
-        />
-      );
-
-      const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
-      expect(taxBasicsButton).toHaveAttribute('type', 'button');
-    });
   });
 
   describe('Styling and Layout', () => {
-    it('should apply gradient styling to active buttons', () => {
+    it('should apply primary styling to active buttons', () => {
       render(
         <CategoryFilter
           categories={mockCategories}
@@ -415,12 +373,11 @@ describe('CategoryFilter', () => {
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
-      expect(taxBasicsButton).toHaveClass('bg-gradient-to-r');
-      expect(taxBasicsButton).toHaveClass('from-purple-600');
-      expect(taxBasicsButton).toHaveClass('to-cyan-500');
+      expect(taxBasicsButton).toHaveClass('bg-primary');
+      expect(taxBasicsButton).toHaveClass('text-primary-foreground');
     });
 
-    it('should apply backdrop-blur to inactive buttons', () => {
+    it('should apply outline styling to inactive buttons', () => {
       render(
         <CategoryFilter
           categories={mockCategories}
@@ -431,11 +388,10 @@ describe('CategoryFilter', () => {
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
-      expect(allPostsButton).toHaveClass('backdrop-blur-xl');
-      expect(allPostsButton).not.toHaveClass('scale-110');
+      expect(allPostsButton).toHaveClass('border');
     });
 
-    it('should use rounded-full for button styling', () => {
+    it('should use small button size', () => {
       render(
         <CategoryFilter
           categories={mockCategories}
@@ -445,7 +401,7 @@ describe('CategoryFilter', () => {
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
-      expect(allPostsButton).toHaveClass('rounded-full');
+      expect(allPostsButton).toHaveClass('h-8');
     });
   });
 

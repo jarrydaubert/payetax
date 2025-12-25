@@ -3,17 +3,8 @@
 
 // Optimized Lucide imports (bypasses Turbopack tree-shaking issue with barrel exports)
 // Generated via: node scripts/gen-lucide-imports.js
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right.js';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open.js';
-import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
-import Clock from 'lucide-react/dist/esm/icons/clock.js';
-import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Search from 'lucide-react/dist/esm/icons/search.js';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
-import Star from 'lucide-react/dist/esm/icons/star.js';
-import Tag from 'lucide-react/dist/esm/icons/tag.js';
-import TrendingUp from 'lucide-react/dist/esm/icons/trending-up.js';
-import Zap from 'lucide-react/dist/esm/icons/zap.js';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
@@ -24,7 +15,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/atoms/EmptyState';
-import { GradientText } from '@/components/atoms/GradientText';
 import { BlogSearch } from '@/components/molecules/BlogSearch';
 import CallToAction from '@/components/molecules/CallToAction';
 import { CategoryFilter } from '@/components/molecules/CategoryFilter';
@@ -81,110 +71,51 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
   };
 
   return (
-    <div className='relative min-h-screen overflow-hidden bg-slate-950 light:bg-white md:bg-gradient-to-br light:md:from-slate-50 md:from-slate-950 light:md:via-purple-50/30 md:via-purple-950/20 light:md:to-slate-100 md:to-slate-950'>
-      {/* Animated background grid */}
-      <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f15_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f15_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-50 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] md:opacity-100' />
-
-      {/* Gradient orbs - hidden on mobile for better contrast */}
-      <div className='pointer-events-none absolute top-0 right-1/4 hidden h-96 w-96 bg-primary/20 opacity-20 blur-[120px] md:block' />
-      <div className='pointer-events-none absolute top-1/3 left-1/4 hidden h-96 w-96 bg-accent/20 opacity-20 blur-[120px] md:block' />
-
+    <div className='min-h-screen'>
       {/* Hero Section */}
-      <section className='relative z-20 pt-20 pb-10 md:pt-32 md:pb-20'>
-        <div className='container relative mx-auto max-w-7xl px-4'>
-          <div className='text-center'>
-            {/* Badge */}
-            <Badge
-              variant='outline'
-              className='mb-8 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-xl'
-            >
-              <Zap className={ICON_SIZES.SIZE_5} aria-hidden='true' />
-              <span>by PayeTax</span>
-            </Badge>
-
-            {/* Main Heading */}
-            <GradientText
-              variant='brand-full'
-              as='h1'
-              className={cn('mb-6 font-bold leading-tight', TYPOGRAPHY.TEXT_6XL)}
-            >
-              TaxInsights
-            </GradientText>
-
-            {/* Subtitle */}
-            <p
-              className={cn(
-                'mx-auto mb-8 max-w-3xl light:text-foreground/80 text-foreground/70 leading-relaxed light:md:text-foreground/70',
-                TYPOGRAPHY.TEXT_LG
-              )}
-            >
-              UK Tax Guidance & Financial Insights. No jargon, just insights.
-            </p>
-
-            {/* Search */}
-            <div className='relative z-50 mx-auto mb-8 max-w-md'>
-              <BlogSearch posts={allPosts} />
-            </div>
-
-            {/* Category Badge */}
-            {selectedCategory && (
-              <Badge
-                variant='outline'
-                className='gap-2 border-primary/30 bg-primary/10 px-4 py-2 backdrop-blur-xl'
-              >
-                <Tag className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                <span className='text-foreground/70'>Viewing: </span>
-                <span className='font-semibold'>
-                  {categories.find((cat) => cat.slug === selectedCategory)?.name ||
-                    selectedCategory}
-                </span>
-              </Badge>
+      <section className='relative flex items-center justify-center py-16 md:py-20'>
+        <div className='relative z-10 mx-auto max-w-5xl px-4 text-center'>
+          {/* Main Heading */}
+          <h1
+            className={cn(
+              'mx-auto mb-6 max-w-4xl font-bold text-foreground tracking-tight',
+              TYPOGRAPHY.TEXT_4XL,
+              'sm:text-5xl md:text-6xl'
             )}
+          >
+            TaxInsights
+            <br />
+            <span className='text-gradient'>by PayeTax</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className={cn('mx-auto mb-10 max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+            UK Tax Guidance & Financial Insights. No jargon, just insights.
+          </p>
+
+          {/* Search */}
+          <div className='relative z-50 mx-auto mb-8 max-w-md'>
+            <BlogSearch posts={allPosts} />
+          </div>
+
+          {/* Features */}
+          <div
+            className={cn(
+              'mt-8 flex flex-wrap items-center justify-center gap-8 text-muted-foreground',
+              TYPOGRAPHY.TEXT_SM
+            )}
+          >
+            {[`${totalCount} Articles`, 'Weekly Updates', 'Always Free'].map((feature) => (
+              <div key={feature} className='flex items-center gap-2'>
+                <div className='h-1.5 w-1.5 rounded-full bg-primary' />
+                <span>{feature}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <div className='container relative z-10 mx-auto max-w-7xl px-4'>
-        {/* Stats Bar - 3D Glass Cards */}
-        <div className='relative z-10 mx-auto -mt-8 mb-12 grid max-w-4xl grid-cols-1 gap-3 md:mb-20 md:grid-cols-3 md:gap-6'>
-          {[
-            {
-              icon: FileText,
-              value: totalCount,
-              label: 'Articles',
-              gradient: 'from-primary to-accent',
-            },
-            {
-              icon: TrendingUp,
-              value: 'Weekly',
-              label: 'Updates',
-              gradient: 'from-accent to-primary',
-            },
-            {
-              icon: Star,
-              value: 'Free',
-              label: 'Always',
-              gradient: 'from-primary/80 to-accent/80',
-            },
-          ].map((stat, _idx) => (
-            <div
-              key={stat.label}
-              className='group relative overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card p-8 text-center backdrop-blur-xl transition-all duration-300 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:border-border/60 md:hover:bg-card/70'
-            >
-              <div
-                className={`absolute top-0 right-0 h-32 w-32 bg-gradient-to-br ${stat.gradient} opacity-20 blur-3xl transition-opacity group-hover:opacity-30`}
-              />
-              <stat.icon className='relative mx-auto mb-4 size-10 text-primary' />
-              <div className={cn('relative mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_3XL)}>
-                {stat.value}
-              </div>
-              <div className={cn('relative text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
+      <div className='container mx-auto max-w-7xl px-4'>
         {/* Categories Filter */}
         {categories.length > 0 && (
           <CategoryFilter
@@ -195,257 +126,143 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
           />
         )}
 
-        {/* Featured Post - Hero Card */}
+        {/* Featured Post */}
         {featuredPost && !selectedCategory && currentPage === 1 && (
-          <div className='mb-12 md:mb-20'>
-            <div className='mb-8 flex items-center justify-center gap-3 text-center'>
-              <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
-              <GradientText
-                variant='brand'
-                as='span'
-                className={cn('font-bold', TYPOGRAPHY.TEXT_LG)}
-              >
-                Featured Article
-              </GradientText>
-              <Sparkles className={`${ICON_SIZES.SIZE_6} text-primary`} aria-hidden='true' />
-            </div>
+          <div className='mb-12 md:mb-16'>
+            <h2
+              className={cn('mb-6 text-center font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}
+            >
+              Featured Article
+            </h2>
 
-            <div className='group'>
-              <div className='relative overflow-hidden rounded-3xl border border-primary/40 bg-gradient-to-br from-white/10 light:from-primary/5 light:to-accent/5 to-white/5 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/50 hover:shadow-2xl md:p-12 md:hover:scale-[1.02]'>
-                <div className='absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/10 group-hover:to-accent/10 group-hover:opacity-100' />
-
-                <div className='relative grid items-center gap-8 md:grid-cols-2'>
-                  <div>
-                    <div className='mb-6 flex items-center gap-4'>
-                      <Badge className='gap-2 bg-primary px-5 py-2 font-bold font-mono shadow-lg'>
-                        FEATURED
-                      </Badge>
-                      <div className='flex items-center gap-2 text-muted-foreground'>
-                        <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                        <span className={TYPOGRAPHY.TEXT_SM}>
-                          {formatDate(featuredPost.publishedAt)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <h2
-                      className={cn(
-                        'mb-6 font-bold text-foreground leading-tight',
-                        TYPOGRAPHY.TEXT_4XL
-                      )}
-                    >
-                      {featuredPost.title}
-                    </h2>
-
-                    <p
-                      className={cn(
-                        'mb-8 light:text-foreground/85 text-foreground/70 leading-relaxed light:md:text-foreground/70',
-                        TYPOGRAPHY.TEXT_LG
-                      )}
-                    >
-                      {featuredPost.excerpt}
-                    </p>
-
-                    <Button
-                      size='lg'
-                      className='gap-3 rounded-full shadow-lg transition-all hover:gap-4 hover:shadow-2xl'
-                      asChild
-                    >
-                      <Link href={`/blog/${featuredPost.slug}`}>
-                        Read Article
-                        <ArrowRight
-                          className={cn(
-                            ICON_SIZES.SIZE_5,
-                            'transition-transform group-hover:translate-x-1'
-                          )}
-                          aria-hidden='true'
-                        />
-                      </Link>
-                    </Button>
-                  </div>
-
+            <Link href={`/blog/${featuredPost.slug}`} className='group block'>
+              <div className='overflow-hidden rounded-xl border-2 border-primary/30 bg-card transition-colors hover:border-primary/50'>
+                <div className='grid items-center gap-6 md:grid-cols-2'>
                   {featuredPost.image && (
-                    <div className='relative h-80 overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10'>
+                    <div className='relative h-64 overflow-hidden md:h-80'>
                       <Image
                         src={featuredPost.image}
                         alt={featuredPost.imageAlt || featuredPost.title}
                         fill
                         sizes={IMAGE_SIZES.BLOG_HERO}
                         priority={true}
-                        className='object-cover transition-transform duration-700 group-hover:scale-110'
+                        className='object-cover'
                       />
-                      <div className='absolute inset-0 bg-gradient-to-t from-black/50 to-transparent' />
                     </div>
                   )}
+                  <div className='p-6'>
+                    <div className='mb-3 flex items-center gap-3 text-muted-foreground'>
+                      <Badge variant='secondary' className='font-mono'>
+                        {featuredPost.categoryData?.name || featuredPost.category}
+                      </Badge>
+                      <span className={TYPOGRAPHY.TEXT_SM}>
+                        {formatDate(featuredPost.publishedAt)}
+                      </span>
+                    </div>
+                    <h3
+                      className={cn(
+                        'mb-3 font-bold text-foreground group-hover:text-primary',
+                        TYPOGRAPHY.TEXT_2XL
+                      )}
+                    >
+                      {featuredPost.title}
+                    </h3>
+                    <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_BASE)}>
+                      {featuredPost.excerpt}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         )}
 
-        {/* Posts Grid - Glassmorphism Cards */}
+        {/* Posts Grid */}
         <div id={postsSectionId}>
           {filteredPosts.length > 0 ? (
             <>
-              <div className='mb-12 grid gap-4 md:mb-20 md:grid-cols-2 md:gap-8 lg:grid-cols-3'>
+              <div className='mb-12 grid gap-6 md:mb-16 md:grid-cols-2 lg:grid-cols-3'>
                 {filteredPosts.map((post) => (
-                  <div key={post.slug}>
-                    <Link href={`/blog/${post.slug}`} className='group block h-full'>
-                      <article className='group relative h-full overflow-hidden rounded-2xl border border-border bg-card/50 light:bg-card backdrop-blur-xl transition-all duration-300 hover:border-primary/50 active:scale-[1.02] light:md:bg-card/50 md:hover:scale-105 md:hover:bg-card/70 md:hover:shadow-2xl'>
-                        <div className='absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:from-primary/10 group-hover:to-accent/10 group-hover:opacity-100' />
-
-                        {post.image && (
-                          <div className='relative h-48 overflow-hidden'>
-                            <Image
-                              src={post.image}
-                              alt={post.imageAlt || post.title}
-                              fill
-                              sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
-                              loading='lazy'
-                              className='object-cover transition-transform duration-500 group-hover:scale-110'
-                            />
-                            <div className='absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent' />
-                          </div>
-                        )}
-
-                        <div className='relative p-4 md:p-6'>
-                          <div className='mb-4 flex items-center justify-between'>
-                            <Badge
-                              variant='outline'
-                              className={cn(
-                                'border-primary/30 bg-primary/20 font-medium font-mono',
-                                TYPOGRAPHY.TEXT_XS
-                              )}
-                            >
-                              {post.category}
-                            </Badge>
-                            <div
-                              className={cn(
-                                'flex items-center gap-2 text-muted-foreground',
-                                TYPOGRAPHY.TEXT_SM
-                              )}
-                            >
-                              <Calendar className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
-                              <span className={TYPOGRAPHY.TEXT_XS}>
-                                {formatDate(post.publishedAt)}
-                              </span>
-                            </div>
-                          </div>
-
-                          <h3
-                            className={cn(
-                              'mb-3 font-bold text-foreground leading-tight',
-                              TYPOGRAPHY.TEXT_XL
-                            )}
-                          >
-                            {post.title}
-                          </h3>
-
-                          <p
-                            className={cn(
-                              'mb-4 line-clamp-3 light:text-foreground/70 text-muted-foreground leading-relaxed light:md:text-muted-foreground',
-                              TYPOGRAPHY.TEXT_SM
-                            )}
-                          >
-                            {post.excerpt}
-                          </p>
-
-                          {post.readTime && (
-                            <div
-                              className={cn(
-                                'mb-4 flex items-center gap-2 text-muted-foreground',
-                                TYPOGRAPHY.TEXT_SM
-                              )}
-                            >
-                              <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
-                              <span className={TYPOGRAPHY.TEXT_XS}>{post.readTime} read</span>
-                            </div>
-                          )}
-
-                          <div className='inline-flex items-center gap-2 font-semibold text-primary transition-all duration-300 group-hover:gap-3'>
-                            <span className={TYPOGRAPHY.TEXT_SM}>Read More</span>
-                            <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                          </div>
+                  <Link key={post.slug} href={`/blog/${post.slug}`} className='group block'>
+                    <article className='h-full overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/50'>
+                      {post.image && (
+                        <div className='relative h-48 overflow-hidden'>
+                          <Image
+                            src={post.image}
+                            alt={post.imageAlt || post.title}
+                            fill
+                            sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
+                            loading='lazy'
+                            className='object-cover'
+                          />
                         </div>
-                      </article>
-                    </Link>
-                  </div>
+                      )}
+
+                      <div className='p-5'>
+                        <div className='mb-3 flex items-center justify-between'>
+                          <Badge
+                            variant='secondary'
+                            className={cn('font-mono', TYPOGRAPHY.TEXT_XS)}
+                          >
+                            {post.category}
+                          </Badge>
+                          <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                            {formatDate(post.publishedAt)}
+                          </span>
+                        </div>
+
+                        <h3
+                          className={cn(
+                            'mb-2 font-bold text-foreground group-hover:text-primary',
+                            TYPOGRAPHY.TEXT_LG
+                          )}
+                        >
+                          {post.title}
+                        </h3>
+
+                        <p
+                          className={cn(
+                            'mb-3 line-clamp-2 text-muted-foreground',
+                            TYPOGRAPHY.TEXT_SM
+                          )}
+                        >
+                          {post.excerpt}
+                        </p>
+
+                        {post.readTime && (
+                          <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                            {post.readTime}
+                          </span>
+                        )}
+                      </div>
+                    </article>
+                  </Link>
                 ))}
               </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className='relative z-20 mb-20'>
-                  <div className='mb-8 flex items-center justify-center gap-4'>
-                    {currentPage > 1 && (
-                      <Button
-                        variant='outline'
-                        size='lg'
-                        className='rounded-full backdrop-blur-xl'
-                        onClick={() => handlePageChange(currentPage - 1)}
-                      >
-                        ← Previous
-                      </Button>
-                    )}
+                <div className='mb-16 flex items-center justify-center gap-4'>
+                  {currentPage > 1 && (
+                    <Button variant='outline' onClick={() => handlePageChange(currentPage - 1)}>
+                      Previous
+                    </Button>
+                  )}
 
-                    <div className='flex items-center gap-3'>
-                      <span className='text-muted-foreground'>Page</span>
-                      <Badge className='rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 px-5 py-2 font-bold font-mono shadow-lg'>
-                        {currentPage}
-                      </Badge>
-                      <span className='text-muted-foreground'>of {totalPages}</span>
-                    </div>
+                  <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                    Page {currentPage} of {totalPages}
+                  </span>
 
-                    {currentPage < totalPages && (
-                      <Button
-                        variant='outline'
-                        size='lg'
-                        className='rounded-full backdrop-blur-xl'
-                        onClick={() => handlePageChange(currentPage + 1)}
-                      >
-                        Next →
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Additional Navigation Links for SEO */}
-                  <div
-                    className={cn(
-                      'flex flex-wrap items-center justify-center gap-4 text-muted-foreground',
-                      TYPOGRAPHY.TEXT_SM
-                    )}
-                  >
-                    <Link href='/' className='transition-colors hover:text-purple-400'>
-                      ← Back to Calculator
-                    </Link>
-                    <span>•</span>
-                    <Link href='/blog' className='transition-colors hover:text-purple-400'>
-                      All Articles
-                    </Link>
-                    <span>•</span>
-                    <Link
-                      href='/blog/category/tax-basics'
-                      className='transition-colors hover:text-purple-400'
-                    >
-                      Tax Basics
-                    </Link>
-                    <span>•</span>
-                    <Link
-                      href='/blog/category/tax-tips'
-                      className='transition-colors hover:text-purple-400'
-                    >
-                      Tax Tips
-                    </Link>
-                    <span>•</span>
-                    <Link href='/about' className='transition-colors hover:text-purple-400'>
-                      About Us
-                    </Link>
-                  </div>
+                  {currentPage < totalPages && (
+                    <Button variant='outline' onClick={() => handlePageChange(currentPage + 1)}>
+                      Next
+                    </Button>
+                  )}
                 </div>
               )}
             </>
           ) : (
-            <Empty className='mb-20 border bg-card/50 light:bg-card backdrop-blur-xl light:md:bg-card/50'>
+            <Empty className='mb-16 border bg-card'>
               <EmptyMedia variant='icon'>
                 <Search />
               </EmptyMedia>
@@ -455,7 +272,7 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
                 selecting a different category.
               </EmptyDescription>
               <EmptyContent>
-                <Button size='lg' onClick={() => handleCategoryClick(undefined)}>
+                <Button onClick={() => handleCategoryClick(undefined)}>
                   <BookOpen className={`mr-2 ${ICON_SIZES.SIZE_5}`} aria-hidden='true' />
                   Browse All Posts
                 </Button>
@@ -464,38 +281,8 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
           )}
         </div>
 
-        {/* Additional Content for Page 2+ (SEO) */}
-        {currentPage > 1 && !selectedCategory && (
-          <div className='mb-12 rounded-2xl border border-border bg-card/50 light:bg-card p-8 backdrop-blur-xl light:md:bg-card/50'>
-            <h2 className={cn('mb-6 font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
-              Browse Articles by Category
-            </h2>
-            <p className='mb-6 light:text-foreground/80 text-foreground/70 light:md:text-foreground/70'>
-              Explore our comprehensive collection of UK tax guides organized by topic. From
-              understanding basic tax concepts to advanced strategies for reducing your tax bill, we
-              cover everything you need to know about UK taxation.
-            </p>
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-              {categories.slice(0, 6).map((cat) => (
-                <Link
-                  key={cat.slug}
-                  href={`/blog/category/${cat.slug}`}
-                  className='group rounded-lg border border-border bg-secondary p-6 transition-all duration-300 hover:border-purple-500/50 hover:bg-card/70 hover:shadow-lg'
-                >
-                  <h3 className='mb-2 font-bold text-foreground transition-colors group-hover:text-purple-400'>
-                    {cat.name}
-                  </h3>
-                  <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                    {cat.count} {cat.count === 1 ? 'article' : 'articles'}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Newsletter CTA */}
-        <div className='mb-20'>
+        <div className='mb-16'>
           <CallToAction variant='newsletter' />
         </div>
       </div>

@@ -144,14 +144,15 @@ describe('Blog Configuration', () => {
 
   describe('Blog Categories', () => {
     describe('data structure', () => {
-      it('should have all 9 categories', () => {
-        expect(BLOG_CATEGORIES).toHaveLength(9);
+      it('should have all 10 categories', () => {
+        expect(BLOG_CATEGORIES).toHaveLength(10);
       });
 
       it('should have expected category slugs', () => {
         const expectedSlugs = [
           'tax-basics',
           'tax-tips',
+          'tax-planning',
           'tax-changes',
           'tax-tools',
           'tax-comparison',
@@ -347,7 +348,7 @@ describe('Blog Configuration', () => {
 
       it('should reference BLOG_CATEGORIES', () => {
         expect(BLOG_CONFIG.categories).toBe(BLOG_CATEGORIES);
-        expect(BLOG_CONFIG.categories).toHaveLength(9);
+        expect(BLOG_CONFIG.categories).toHaveLength(10);
       });
     });
 
