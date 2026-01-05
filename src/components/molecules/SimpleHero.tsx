@@ -1,56 +1,26 @@
 // src/components/molecules/SimpleHero.tsx
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { useRef } from 'react';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
 interface SimpleHeroProps {
   className?: string;
   onScrollToCalculator?: () => void;
-  /** Enable subtle parallax effect on scroll (default: true) */
-  enableParallax?: boolean;
 }
 
-export default function SimpleHero({
-  className,
-  onScrollToCalculator,
-  enableParallax = true,
-}: SimpleHeroProps) {
-  const shouldReduceMotion = useMotionPreference();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Parallax effect: Content moves up slightly as user scrolls down
-  // Only active if motion is enabled and parallax is requested
-  const { scrollY } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start'],
-  });
-
-  const y = useTransform(scrollY, [0, 500], [0, shouldReduceMotion || !enableParallax ? 0 : -50]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
-
+export default function SimpleHero({ className, onScrollToCalculator }: SimpleHeroProps) {
   return (
     <section
-      ref={sectionRef}
       className={cn(
         'relative flex items-center justify-center overflow-hidden py-16 md:min-h-screen md:py-20',
         className
       )}
     >
-      {/* Content with parallax effect */}
-      <motion.div
-        style={shouldReduceMotion || !enableParallax ? {} : { y, opacity }}
-        className={cn('relative z-10 mx-auto max-w-5xl text-center', SPACING.PX_2, 'sm:px-4')}
-      >
-        {/* Heading - No animation for LCP optimization */}
-        {/* IMPORTANT: Uses TEXT_4XL for hero headline (responsive: text-4xl sm:text-5xl md:text-6xl)
-            Maintains responsive scaling while using design token base size */}
+      <div className={cn('relative z-10 mx-auto max-w-5xl text-center', SPACING.PX_2, 'sm:px-4')}>
+        {/* Heading - Renders immediately for fast LCP */}
         <h1
           className={cn(
             'mx-auto mb-6 max-w-4xl font-bold text-foreground tracking-tight',
@@ -70,15 +40,8 @@ export default function SimpleHero({
           loans, and pension contributions.
         </p>
 
-        {/* CTA Button with Premium Glow Effect */}
-        <motion.div
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
-          animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-          transition={
-            shouldReduceMotion ? { duration: 0 } : { ...ANIMATION_TRANSITIONS.default, delay: 0.2 }
-          }
-          className='inline-block'
-        >
+        {/* CTA Button - CSS animation instead of framer-motion */}
+        <div className='fade-in slide-in-from-bottom-2 inline-block animate-in delay-200 duration-500'>
           <GlowButton onClick={onScrollToCalculator} glowColor='primary'>
             <span className={cn('flex items-center', SPACING.GAP_2)}>
               Calculate My Salary
@@ -88,7 +51,7 @@ export default function SimpleHero({
               />
             </span>
           </GlowButton>
-        </motion.div>
+        </div>
 
         {/* Features */}
         <div
@@ -110,7 +73,7 @@ export default function SimpleHero({
             </div>
           ))}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
