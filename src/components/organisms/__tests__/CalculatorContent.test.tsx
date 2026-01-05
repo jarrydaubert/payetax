@@ -287,7 +287,7 @@ describe('CalculatorContent Component', () => {
       const link = screen.getByRole('link', {
         name: /Read full Scottish vs English comparison →/i,
       });
-      expect(link).toHaveAttribute('href', '/blog/scottish-vs-english-tax-rates-2025-comparison');
+      expect(link).toHaveAttribute('href', '/blog/scottish-vs-english-tax-rates-2026-comparison');
     });
 
     it('should list student loan plan thresholds', () => {

@@ -136,7 +136,7 @@ export function CalculatorContent() {
                 <li>The difference increases significantly above £50,000</li>
               </ul>
               <Link
-                href='/blog/scottish-vs-english-tax-rates-2025-comparison'
+                href='/blog/scottish-vs-english-tax-rates-2026-comparison'
                 className='inline-block text-primary'
               >
                 Read full Scottish vs English comparison →

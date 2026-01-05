@@ -142,7 +142,7 @@ describe('TaxRatesOverview', () => {
     it('should link to Scottish comparison blog post', () => {
       render(<TaxRatesOverview />);
       const link = screen.getByRole('link', { name: /scottish taxpayers/i });
-      expect(link).toHaveAttribute('href', '/blog/scottish-vs-english-tax-rates-2025-comparison');
+      expect(link).toHaveAttribute('href', '/blog/scottish-vs-english-tax-rates-2026-comparison');
     });
   });
 

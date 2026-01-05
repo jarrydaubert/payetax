@@ -10,6 +10,11 @@
       ],
       "destination": "https://payetax.co.uk/:path*",
       "permanent": true
+    },
+    {
+      "source": "/blog/scottish-vs-english-tax-rates-2025-comparison",
+      "destination": "/blog/scottish-vs-english-tax-rates-2026-comparison",
+      "permanent": true
     }
   ],
   "headers": [

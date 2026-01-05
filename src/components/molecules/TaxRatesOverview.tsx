@@ -122,7 +122,7 @@ export function TaxRatesOverview() {
 
         <div className={cn('text-center', SPACING.MT_8)}>
           <Link
-            href='/blog/scottish-vs-english-tax-rates-2025-comparison'
+            href='/blog/scottish-vs-english-tax-rates-2026-comparison'
             className={cn('inline-flex items-center text-primary hover:underline', SPACING.GAP_2)}
           >
             Scottish taxpayers: See rate differences →
