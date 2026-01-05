@@ -161,7 +161,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>
         {/* Clean, seamless container - wider on xl for sidebar TOC */}
-        <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:px-8 xl:max-w-6xl'>
+        <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:max-w-5xl lg:px-8 xl:max-w-6xl 2xl:max-w-7xl'>
           {/* Breadcrumb Navigation */}
           <nav aria-label='Breadcrumb' className={cn('mb-8', TYPOGRAPHY.TEXT_SM)}>
             <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>

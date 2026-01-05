@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <div className='pt-16 md:pt-20' aria-busy='true'>
       <span className='sr-only'>Loading article...</span>
-      <div className='container mx-auto max-w-4xl px-4'>
+      <div className='container mx-auto max-w-4xl px-4 lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl'>
         {/* Back button skeleton */}
         <div className='mb-6 h-6 w-32 animate-pulse rounded bg-muted md:mb-8' />
 
