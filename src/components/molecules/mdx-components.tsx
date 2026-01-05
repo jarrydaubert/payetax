@@ -212,13 +212,15 @@ export const mdxComponents = {
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
       className={cn(
-        'glass-card-inner rounded-r-lg border-primary/50 border-l-4 pl-6',
+        'glass-card-inner rounded-lg border-primary/50 border-l-4 px-6',
         'my-8',
         SPACING.PY_4
       )}
       {...props}
     >
-      <div className={cn('text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>{children}</div>
+      <div className={cn('text-foreground/90 italic text-center', TYPOGRAPHY.TEXT_LG)}>
+        {children}
+      </div>
     </blockquote>
   ),
 
