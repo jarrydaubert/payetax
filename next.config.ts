@@ -29,15 +29,17 @@ const nextConfig: NextConfig = {
       'zustand',
       'react-hook-form',
       'zod',
+      'framer-motion', // Tree-shake animation library
       'react-markdown',
       '@mdx-js/react',
-      '@mdx-js/loader', // PAYTAX-77: Optimize MDX loader imports
-      'next-mdx-remote', // PAYTAX-77: Optimize MDX remote imports
-      'recharts', // NEW: Next.js 16 - optimize recharts 3.x imports
-      'rehype-pretty-code', // PAYTAX-77: Optimize syntax highlighting
-      'rehype-autolink-headings', // PAYTAX-77: Optimize rehype plugins
-      'rehype-slug', // PAYTAX-77: Optimize rehype plugins
-      'remark-gfm', // PAYTAX-77: Optimize remark plugins
+      '@mdx-js/loader',
+      'next-mdx-remote',
+      'recharts',
+      'rehype-pretty-code',
+      'rehype-autolink-headings',
+      'rehype-slug',
+      'remark-gfm',
+      '@sentry/nextjs', // Tree-shake Sentry
     ],
     // Enable for memory-intensive builds (recommended for large apps)
     webpackMemoryOptimizations: true,
@@ -77,8 +79,9 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Enable source maps for debugging (Best Practices requirement)
-  productionBrowserSourceMaps: true,
+  // Disable source maps in production for better performance
+  // Enable temporarily when debugging production issues
+  productionBrowserSourceMaps: false,
 
   // Advanced webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
