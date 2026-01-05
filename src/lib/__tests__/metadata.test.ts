@@ -256,16 +256,16 @@ describe('Metadata Module', () => {
   });
 
   describe('generateViewport', () => {
-    test('should generate viewport configuration', () => {
+    test('should generate viewport configuration (dark mode only)', () => {
       const viewport = generateViewport();
 
       expect(viewport).toEqual({
-        themeColor: '#1D4ED8',
+        themeColor: '#252525',
         width: 'device-width',
         initialScale: 1,
         maximumScale: 2,
         userScalable: true,
-        colorScheme: 'dark light',
+        colorScheme: 'dark',
         viewportFit: 'cover',
       });
     });

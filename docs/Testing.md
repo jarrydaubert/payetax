@@ -1,62 +1,39 @@
 # Testing Guide
 
-**Last Updated:** December 25, 2025
+---
+
+## Test Philosophy
+
+> **"What bug will this test find?"**
+
+Every test should:
+- Catch real bugs in production code
+- Not test implementation details
+- Not test TypeScript types at runtime
+- Not test configuration values
 
 ---
 
-## HMRC Official Test Data
+## Test Structure
 
-HMRC publishes official payroll test data for software developers to verify calculations:
-
-**Source:** [gov.uk/government/publications/software-developers-payroll-test-data-2025-to-2026](https://www.gov.uk/government/publications/software-developers-payroll-test-data-2025-to-2026)
-
-### Available Resources
-
-| Resource | Format | Purpose |
-|----------|--------|---------|
-| PAYE Tax test data | ZIP | Tax calculation scenarios from April 2025 |
-| National Insurance test data | ZIP | NI calculation scenarios |
-| Student Loan thresholds | ODS | SL repayment thresholds |
-
-### Integration Approach
-
-1. **Download** the test packs from HMRC
-2. **Extract** scenarios (salaries, tax codes, pay periods)
-3. **Run** through PayeTax calculator
-4. **Assert** results match HMRC expected outcomes
-
-### Implementation Options
-
-**Unit Tests:**
-```typescript
-// Use HMRC scenarios as test fixtures
-describe('HMRC PAYE Test Data 2025-26', () => {
-  test.each(hmrcTestCases)('$description', ({ input, expected }) => {
-    const result = calculatePAYE(input);
-    expect(result.tax).toBeCloseTo(expected.tax, 2);
-  });
-});
 ```
+src/
+├── **/__tests__/           # Unit tests (Jest)
+│   └── *.test.ts(x)
 
-**E2E Tests:**
-```typescript
-// Playwright test using HMRC data
-test('HMRC Scenario 1: Basic Rate Taxpayer', async ({ page }) => {
-  await page.goto('/');
-  await page.fill('[data-testid="salary"]', '35000');
-  // Assert against HMRC expected values
-});
+e2e/
+├── smoke.spec.ts           # Page loads, navigation
+├── golden-master-PERFECT.spec.ts  # HMRC calculation accuracy
+├── tax-code-validation.spec.ts    # Input validation
+├── what-if-comparison.spec.ts     # What-if feature
+├── hicbc-comprehensive.spec.ts    # Child benefit
+├── pension-limits.spec.ts         # Annual allowance
+├── accessibility-wcag22.spec.ts   # WCAG compliance
+├── seo-blog.spec.ts               # Meta tags
+├── blog.spec.ts                   # Blog functionality
+├── display-periods.spec.ts        # Period toggles
+└── scroll-indicators.spec.ts      # Mobile scroll
 ```
-
----
-
-## Current Test Coverage
-
-| Type | Count | Command |
-|------|-------|---------|
-| Unit Tests | 3,349+ | `bun test` |
-| E2E Tests | 157 | `bun test:e2e` |
-| Browsers | 5 | Chrome, Firefox, Safari, Mobile Chrome, Mobile Safari |
 
 ---
 
@@ -66,8 +43,8 @@ test('HMRC Scenario 1: Basic Rate Taxpayer', async ({ page }) => {
 # Unit tests
 bun test
 
-# Unit tests with coverage
-bun test --coverage
+# Unit tests (no coverage report)
+bun test:no-coverage
 
 # E2E tests (all browsers)
 bun test:e2e
@@ -80,7 +57,22 @@ bun typecheck
 
 # Linting
 bun lint
+
+# All checks
+bun fix-all
 ```
+
+---
+
+## HMRC Verification
+
+The **golden-master-PERFECT.spec.ts** is the authoritative source for calculation accuracy.
+
+- Tests 20 scenarios against HMRC-verified values
+- Penny-accurate assertions
+- Data-driven from JSON fixture
+
+**Fixture:** `e2e/fixtures/golden-tax-cases-2025-26-COMPLETE.json`
 
 ---
 
@@ -92,6 +84,6 @@ Before merging:
 - No linting errors
 - Build succeeds
 
----
-
-*This represents the gold standard for verification in payroll software.*
+```bash
+bun run fix-all && bun run build && bun run test
+```

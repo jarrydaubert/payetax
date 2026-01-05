@@ -30,11 +30,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
   userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#252525' },
-  ],
-  colorScheme: 'dark light',
+  themeColor: '#252525', // Dark mode only
+  colorScheme: 'dark',
   viewportFit: 'cover', // For notched devices
   interactiveWidget: 'resizes-visual', // Better keyboard handling on iOS PWAs
 };
@@ -62,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel='dns-prefetch' href='https://vercel.live' />
         <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
 
-        {/* Flash Prevention Script - Loads theme AND prevents FOUC */}
+        {/* Flash Prevention Script - Dark mode only */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for flash prevention
           dangerouslySetInnerHTML={{
@@ -73,33 +70,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 style.textContent = 'html{visibility:hidden;opacity:0}html.hydrated{visibility:visible;opacity:1;transition:opacity 0.1s}';
                 document.head.appendChild(style);
                 
-                function getTheme() {
-                  const stored = localStorage.getItem('theme');
-                  if (stored) return stored;
-                  return 'dark';
-                }
-
-                function applyTheme(theme) {
-                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-                    ? 'dark'
-                    : 'light';
-                  const resolved = theme === 'system' ? systemTheme : theme;
-
-                  document.documentElement.classList.remove('light', 'dark');
-                  document.documentElement.classList.add(resolved);
-                  document.documentElement.style.colorScheme = resolved;
-                  document.documentElement.setAttribute('data-theme', resolved);
-                }
-
-                try {
-                  const theme = getTheme();
-                  applyTheme(theme);
-                } catch (e) {
-                  // Fallback to dark if error
-                  document.documentElement.classList.add('dark');
-                  document.documentElement.style.colorScheme = 'dark';
-                  document.documentElement.setAttribute('data-theme', 'dark');
-                }
+                // Always use dark mode
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+                document.documentElement.style.colorScheme = 'dark';
+                document.documentElement.setAttribute('data-theme', 'dark');
                 
                 // Remove FOUC prevention after CSS loads
                 if (document.readyState === 'loading') {

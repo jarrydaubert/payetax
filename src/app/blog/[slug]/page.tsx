@@ -1,10 +1,11 @@
 // src/app/blog/[slug]/page.tsx
 
-import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar, ChevronRight, Clock, User } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
 import { TableOfContents } from '@/components/molecules/TableOfContents';
@@ -91,21 +92,99 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3);
 
+  // Generate Article structured data for SEO
+  const articleStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.seoDescription || post.excerpt,
+    image: post.image ? `https://payetax.co.uk${post.image}` : undefined,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    author: {
+      '@type': 'Organization',
+      name: 'PayeTax',
+      url: 'https://payetax.co.uk',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayeTax',
+      url: 'https://payetax.co.uk',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://payetax.co.uk/logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://payetax.co.uk/blog/${post.slug}`,
+    },
+    keywords: post.seoKeywords?.join(', '),
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://payetax.co.uk',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: 'https://payetax.co.uk/blog',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `https://payetax.co.uk/blog/${post.slug}`,
+      },
+    ],
+  };
+
   return (
     <>
+      {/* Structured Data */}
+      <Script type='application/ld+json' strategy='afterInteractive'>
+        {JSON.stringify(articleStructuredData)}
+      </Script>
+      <Script type='application/ld+json' strategy='afterInteractive'>
+        {JSON.stringify(breadcrumbStructuredData)}
+      </Script>
+
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>
         {/* Clean, seamless container - wider on xl for sidebar TOC */}
         <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:px-8 xl:max-w-6xl'>
-          {/* Back Navigation */}
-          <nav className='mb-8'>
-            <Link
-              href='/blog'
-              className='inline-flex items-center text-primary transition-colors hover:text-primary/80'
-            >
-              <ArrowLeft className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
-              Back to Blog
-            </Link>
+          {/* Breadcrumb Navigation */}
+          <nav aria-label='Breadcrumb' className={cn('mb-8', TYPOGRAPHY.TEXT_SM)}>
+            <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>
+              <li>
+                <Link href='/' className='hover:text-primary'>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+              </li>
+              <li>
+                <Link href='/blog' className='hover:text-primary'>
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+              </li>
+              <li className='truncate text-foreground' aria-current='page'>
+                {post.title.length > 50 ? `${post.title.substring(0, 50)}...` : post.title}
+              </li>
+            </ol>
           </nav>
 
           {/* Article */}

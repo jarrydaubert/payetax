@@ -1,6 +1,7 @@
 // src/app/page.tsx
 
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
@@ -8,14 +9,8 @@ import { TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
-// Import the client-side HomePageContent component
-// We'll use Suspense to handle the loading state
-const HomePageClientWrapper = () => {
-  // Using an inline dynamic import with Suspense
-  // This approach avoids SSR issues with client components
-  const HomePageContent = require('@/components/pages/HomePageContent').default;
-  return <HomePageContent />;
-};
+// Dynamic import for client component with loading state handled by Suspense
+const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'));
 
 /**
  * Enhanced metadata for the homepage with tax calculator
@@ -31,22 +26,20 @@ export const metadata: Metadata = generateMetadata({
 
 /**
  * Home page component with enhanced SEO
- * All structured data now consolidated in StructuredData component
+ * Structured data rendered server-side for crawlers
  */
 export default function HomePage() {
   return (
     <>
-      {/* Enhanced structured data for Answer Engine Optimization (AEO) */}
+      {/* Structured data for SEO and AEO (rendered server-side) */}
       <StructuredData type='organization' />
       <StructuredData type='website' />
       <StructuredData type='financialservice' />
-
-      {/* AEO-optimized schema markup for AI search engines */}
       <StructuredData type='calculator' />
       <StructuredData type='howto' />
       <StructuredData type='dataset' />
 
-      {/* Main content with Suspense for client components */}
+      {/* Main content with Suspense for client component */}
       <Suspense
         fallback={
           <div className='flex min-h-[400px] items-center justify-center p-8'>
@@ -59,14 +52,8 @@ export default function HomePage() {
           </div>
         }
       >
-        <HomePageClientWrapper />
+        <HomePageContent />
       </Suspense>
-
-      {/* Breadcrumb structured data */}
-      <StructuredData
-        type='breadcrumb'
-        breadcrumbs={[{ name: 'Home', url: 'https://payetax.co.uk/' }]}
-      />
     </>
   );
 }

@@ -1,19 +1,16 @@
 // src/components/molecules/FooterMainLinks.tsx
-'use client';
 
 import { Twitter } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/atoms/ThemeToggle';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
  * Footer main navigation links molecule
  *
- * Displays primary footer links including internal pages,
- * external links (support, social), and theme toggle.
- * Responsive horizontal layout with flexible wrapping.
+ * Displays primary footer links including internal pages and
+ * external links (support, social). Responsive horizontal layout.
  */
 export function FooterMainLinks() {
   return (
@@ -89,7 +86,6 @@ export function FooterMainLinks() {
         <Twitter className={ICON_SIZES.SIZE_4} />
         @PayeTaxUK
       </a>
-      <ThemeToggle />
     </div>
   );
 }

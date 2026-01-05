@@ -2,7 +2,6 @@
 
 > **Complete guide to Linear for PayeTax - from zero to expert**
 
-**Last Updated:** November 3, 2025  
 **Time to read:** 5 min quickstart, 20 min full guide
 
 ---

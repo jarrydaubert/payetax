@@ -1,7 +1,5 @@
 # PayeTax Documentation
 
-**Last Updated:** December 25, 2025  
-**Version:** 4.7.0  
 **Status:** Evergreen docs only
 
 ---
@@ -102,6 +100,4 @@ docs/
 - **Contributing:** [`../CONTRIBUTING.md`](../CONTRIBUTING.md)
 - **Environment:** [`../.env.template`](../.env.template)
 
----
 
-*Last reviewed: December 25, 2025*

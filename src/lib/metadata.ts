@@ -238,12 +238,12 @@ export function generateMetadata({
  */
 export function generateViewport(): Viewport {
   return {
-    themeColor: '#1D4ED8',
+    themeColor: '#252525', // Dark mode only
     width: 'device-width',
     initialScale: 1,
     maximumScale: 2,
     userScalable: true,
-    colorScheme: 'dark light',
+    colorScheme: 'dark',
     viewportFit: 'cover', // For notched devices like iPhone X and newer
   };
 }

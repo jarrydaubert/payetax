@@ -33,14 +33,16 @@ describe('moleculesValidation', () => {
         expect(result.success).toBe(true);
       });
 
-      it('should accept empty string email (treated as missing)', () => {
+      it('should accept empty string email (treated as optional/undefined)', () => {
         const result = FeedbackFormSchema.safeParse({
           email: '',
           message: 'Feedback without email provided',
         });
-        // Empty string fails email validation but email is optional
-        // This depends on implementation - let's test actual behavior
-        expect(result.success).toBe(false); // Empty string is not a valid email
+        // Empty string is transformed to undefined, making it valid (email is optional)
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.email).toBeUndefined();
+        }
       });
 
       it('should accept minimum length message (10 chars)', () => {
@@ -162,6 +164,110 @@ describe('moleculesValidation', () => {
             message: 'Valid test message',
           });
           expect(result.success).toBe(false);
+        }
+      });
+
+      it('should accept undefined email', () => {
+        const result = FeedbackFormSchema.safeParse({
+          email: undefined,
+          message: 'Valid test message',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.email).toBeUndefined();
+        }
+      });
+
+      it('should transform empty string email to undefined', () => {
+        const result = FeedbackFormSchema.safeParse({
+          email: '',
+          message: 'Valid test message',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          // Empty string should be transformed to undefined
+          expect(result.data.email).toBeUndefined();
+        }
+      });
+
+      it('should accept omitted email field', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: 'Valid test message',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should treat whitespace-only email as empty (valid)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          email: '   ',
+          message: 'Valid test message',
+        });
+        // Whitespace-only is trimmed to empty string, then transformed to undefined (valid)
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.email).toBeUndefined();
+        }
+      });
+    });
+
+    describe('message boundary tests', () => {
+      it('should reject 9 character message (below minimum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: '123456789', // 9 characters
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should accept 10 character message (exact minimum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: '1234567890', // 10 characters
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept 11 character message (above minimum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: '12345678901', // 11 characters
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept 4999 character message (below maximum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: 'a'.repeat(4999),
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept 5000 character message (exact maximum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: 'a'.repeat(5000),
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should reject 5001 character message (above maximum)', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: 'a'.repeat(5001),
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should count trimmed length, not raw length', () => {
+        // 8 characters + 4 spaces = 12 raw, but 8 trimmed (below minimum)
+        const result = FeedbackFormSchema.safeParse({
+          message: '  12345678  ',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should accept message that is exactly 10 chars after trimming', () => {
+        const result = FeedbackFormSchema.safeParse({
+          message: '  1234567890  ', // 10 chars after trim
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.message).toBe('1234567890');
         }
       });
     });

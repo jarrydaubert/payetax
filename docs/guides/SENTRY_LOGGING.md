@@ -1,6 +1,5 @@
 # Sentry Structured Logging Guide
 
-**Last Updated:** December 4, 2024  
 **Sentry SDK Version:** 10.28.0  
 **Free Tier Quota:** 5GB logs/month
 

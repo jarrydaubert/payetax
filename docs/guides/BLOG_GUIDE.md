@@ -1,7 +1,6 @@
 # PayeTax Blog Guide
 **The Complete Content Strategy & Writing Guide**
 
-Last Updated: October 2025
 
 ---
 
@@ -469,7 +468,6 @@ Every post must include:
 > This article provides general guidance on UK tax for informational purposes only. Tax rules change frequently and individual circumstances vary. For official tax calculations or advice on your specific situation, consult HMRC or a qualified tax advisor.
 
 ✅ **Date stamp** (at top):
-> Last Updated: [Month Year] | Reviewed for [Tax Year]
 
 ✅ **Source citations** (linked):
 - HMRC guidance pages

@@ -4,7 +4,8 @@ import { SURFACES } from '@/constants/designTokens';
 
 export default function Loading() {
   return (
-    <div className='container mx-auto px-4 py-12'>
+    <div className='container mx-auto px-4 py-12' aria-busy='true'>
+      <span className='sr-only'>Loading category articles...</span>
       {/* Breadcrumbs skeleton */}
       <div className='mb-8 flex items-center space-x-2'>
         <div className='h-4 w-16 animate-pulse rounded bg-muted' />

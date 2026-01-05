@@ -2,16 +2,6 @@
 import { render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
 
-// Mock ThemeToggle
-jest.mock('@/components/atoms/ThemeToggle', () => ({
-  ThemeToggle: () => <div data-testid='theme-toggle'>Theme Toggle</div>,
-}));
-
-// Mock theme hook
-jest.mock('@/lib/theme', () => ({
-  useTheme: () => ({ theme: 'light', setTheme: jest.fn() }),
-}));
-
 describe('Footer Component', () => {
   describe('Rendering', () => {
     it('should render footer content in a div (molecule pattern)', () => {
@@ -34,12 +24,6 @@ describe('Footer Component', () => {
       render(<Footer />);
 
       expect(screen.getByText(/© 2025 PayeTax/i)).toBeInTheDocument();
-    });
-
-    it('should render theme toggle', () => {
-      render(<Footer />);
-
-      expect(screen.getByTestId('theme-toggle')).toBeInTheDocument();
     });
   });
 

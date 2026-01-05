@@ -109,9 +109,35 @@ export default async function CategoryPage({
     return notFound();
   }
 
+  // Breadcrumb structured data
+  const breadcrumbStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://payetax.co.uk',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: 'https://payetax.co.uk/blog',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: category.name,
+        item: `https://payetax.co.uk/blog/category/${slug}`,
+      },
+    ],
+  };
+
   return (
     <div className='container mx-auto px-4 py-12'>
-      {/* Structured Data Script */}
+      {/* Structured Data Scripts */}
       <Script type='application/ld+json' strategy='afterInteractive'>
         {JSON.stringify({
           '@context': 'https://schema.org',
@@ -125,6 +151,9 @@ export default async function CategoryPage({
             url: 'https://payetax.co.uk',
           },
         })}
+      </Script>
+      <Script type='application/ld+json' strategy='afterInteractive'>
+        {JSON.stringify(breadcrumbStructuredData)}
       </Script>
 
       {/* Breadcrumbs */}

@@ -1,8 +1,46 @@
 // src/app/llms.txt/route.ts
 // LLMs.txt - AI Search Engine Optimization (AEO)
 // Helps ChatGPT, Claude, Perplexity, and other AI search tools understand your site
+// Dynamic: Automatically includes all blog posts grouped by category
 
-export function GET() {
+import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+
+// Revalidate every hour (same as blog)
+export const revalidate = 3600;
+
+export async function GET() {
+  // Fetch all blog posts and categories dynamically
+  const [posts, categories] = await Promise.all([
+    getBlogPosts({ pageSize: 1000 }),
+    getBlogCategories(),
+  ]);
+
+  // Group posts by category
+  const postsByCategory = new Map<string, typeof posts>();
+  for (const post of posts) {
+    const categoryPosts = postsByCategory.get(post.category) || [];
+    categoryPosts.push(post);
+    postsByCategory.set(post.category, categoryPosts);
+  }
+
+  // Build blog posts sections dynamically
+  const blogSections = categories
+    .map((category) => {
+      const categoryPosts = postsByCategory.get(category.slug) || [];
+      if (categoryPosts.length === 0) return '';
+
+      const postLinks = categoryPosts
+        .map(
+          (post) =>
+            `- [${post.title}](https://payetax.co.uk/blog/${post.slug}): ${post.excerpt.slice(0, 150)}${post.excerpt.length > 150 ? '...' : ''}`
+        )
+        .join('\n');
+
+      return `## Blog Posts - ${category.name}\n\n${postLinks}`;
+    })
+    .filter(Boolean)
+    .join('\n\n');
+
   const llmsTxt = `# PayeTax
 
 > Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with all calculations running client-side.
@@ -14,7 +52,7 @@ All calculations are performed entirely in your browser with zero data collectio
 ## Main Pages
 
 - [Calculator](https://payetax.co.uk): Main PAYE tax calculator with real-time calculations for income tax, NI, student loans, pensions, and take-home pay
-- [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides, HMRC updates, and financial advice covering tax basics, changes, student loans, and calculators
+- [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides, HMRC updates, and financial advice with ${posts.length} articles across ${categories.length} categories
 - [About](https://payetax.co.uk/about): Mission, values, and technology behind PayeTax with focus on privacy-first, open-source philosophy
 - [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy explaining client-side calculations with zero server-side data storage
 - [Compliance](https://payetax.co.uk/compliance): HMRC compliance, tax rate verification, and data sources
@@ -48,28 +86,11 @@ All calculations are performed entirely in your browser with zero data collectio
 - Plan 5: £25,000 (9%)
 - Postgraduate: £21,000 (6%)
 
-## Blog Posts - Tax Basics
-
-- [Understanding UK Tax Codes 2025](https://payetax.co.uk/blog/understanding-uk-tax-codes): Comprehensive guide to UK tax codes including 1257L, K codes, emergency codes, BR, D0, D1, 0T, NT, and Scottish codes
-- [Complete Beginner's Guide to UK Taxation 2025](https://payetax.co.uk/blog/beginners-guide-to-uk-taxation): Everything newcomers need to know about UK Income Tax, National Insurance, PAYE, and allowances
-
-## Blog Posts - Tax Changes
-
-- [UK Tax Changes 2025-2026: Complete Guide](https://payetax.co.uk/blog/uk-tax-changes-2025-complete-guide): All HMRC tax rate changes for 2025-2026 including thresholds, allowances, and new rules
-- [Student Loan Repayment Changes 2025-26](https://payetax.co.uk/blog/student-loan-repayment-changes-2025-26): Updated student loan thresholds, interest rates, and Plan 5 forgiveness period reduction
-
-## Blog Posts - Regional Differences
-
-- [Scottish vs English Tax Rates 2025: Complete Comparison](https://payetax.co.uk/blog/scottish-vs-english-tax-rates-2025-comparison): Side-by-side comparison of Scottish and rest-of-UK tax systems with salary examples
-
-## Blog Posts - Calculators & Tools
-
-- [UK Tax Calculator 2025: Complete Guide](https://payetax.co.uk/blog/uk-tax-calculator-2025-complete-guide): How to use PayeTax calculator for accurate PAYE, NI, and student loan calculations
-- [How Much Tax Will I Pay in UK 2025?](https://payetax.co.uk/blog/how-much-tax-will-i-pay-uk-2025): Real salary examples showing exact tax calculations for £20k, £30k, £50k, £100k+ earners
+${blogSections}
 
 ## Technical Details
 
-- Framework: Next.js 15, React 19, TypeScript
+- Framework: Next.js 16, React 19, TypeScript
 - Hosting: Vercel Edge Network
 - Performance: Lighthouse 95+ (mobile), 100 (desktop)
 - Privacy: Client-side calculations only, zero data collection
@@ -94,7 +115,7 @@ All calculations are performed entirely in your browser with zero data collectio
   return new Response(llmsTxt, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=86400, s-maxage=86400', // Cache for 24 hours
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600', // Cache for 1 hour (matches revalidate)
     },
   });
 }

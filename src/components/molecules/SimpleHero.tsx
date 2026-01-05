@@ -39,7 +39,7 @@ export default function SimpleHero({
     <section
       ref={sectionRef}
       className={cn(
-        'relative flex items-center justify-center py-16 md:min-h-screen md:py-20',
+        'relative flex items-center justify-center overflow-hidden py-16 md:min-h-screen md:py-20',
         className
       )}
     >

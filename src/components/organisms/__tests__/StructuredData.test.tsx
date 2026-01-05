@@ -167,14 +167,16 @@ describe('StructuredData Component', () => {
       expect(container).toBeInTheDocument();
     });
 
-    it('should generate unique script IDs', () => {
+    it('should render script tags without IDs (SSR-friendly)', () => {
       const { container: container1 } = render(<StructuredData type='organization' />);
       const { container: container2 } = render(<StructuredData type='website' />);
 
-      const script1 = container1.querySelector('script');
-      const script2 = container2.querySelector('script');
+      const script1 = container1.querySelector('script[type="application/ld+json"]');
+      const script2 = container2.querySelector('script[type="application/ld+json"]');
 
-      expect(script1?.id).not.toBe(script2?.id);
+      // Scripts render without IDs for cleaner SSR output
+      expect(script1).toBeInTheDocument();
+      expect(script2).toBeInTheDocument();
     });
   });
 

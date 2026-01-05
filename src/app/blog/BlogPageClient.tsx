@@ -7,7 +7,7 @@ import BookOpen from 'lucide-react/dist/esm/icons/book-open.js';
 import Search from 'lucide-react/dist/esm/icons/search.js';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useId, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 import {
   Empty,
   EmptyContent,
@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { IMAGE_SIZES } from '@/constants/images';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
@@ -48,27 +49,82 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
   const postsSectionId = useId();
 
   // Filter and paginate posts client-side
-  const { filteredPosts, totalCount, totalPages } = useMemo(() => {
+  const { filteredPosts, totalPages } = useMemo(() => {
     const filtered = selectedCategory
       ? allPosts.filter((post) => post.category === selectedCategory)
       : allPosts;
     return {
       filteredPosts: filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-      totalCount: filtered.length,
       totalPages: Math.ceil(filtered.length / PAGE_SIZE),
     };
   }, [allPosts, selectedCategory, currentPage]);
 
-  const handleCategoryClick = (categorySlug?: string) => {
-    setSelectedCategory(categorySlug);
-    setCurrentPage(1); // Reset to page 1 when changing category
-  };
+  const handleCategoryClick = useCallback(
+    (categorySlug?: string) => {
+      setSelectedCategory(categorySlug);
+      setCurrentPage(1);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Scroll to posts section smoothly
-    document.getElementById(postsSectionId)?.scrollIntoView({ behavior: 'smooth' });
-  };
+      // Track category filter usage
+      trackEvent({
+        action: 'blog_category_filter',
+        category: 'blog',
+        label: categorySlug || 'all',
+        custom_data: {
+          previous_category: selectedCategory || 'all',
+          new_category: categorySlug || 'all',
+        },
+      });
+    },
+    [selectedCategory]
+  );
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      document.getElementById(postsSectionId)?.scrollIntoView({ behavior: 'smooth' });
+
+      // Track pagination usage
+      trackEvent({
+        action: 'blog_pagination',
+        category: 'blog',
+        label: `page_${page}`,
+        value: page,
+        custom_data: {
+          previous_page: currentPage,
+          new_page: page,
+          total_pages: totalPages,
+          category_filter: selectedCategory || 'all',
+        },
+      });
+    },
+    [currentPage, totalPages, selectedCategory, postsSectionId]
+  );
+
+  const handlePostClick = useCallback((post: BlogPost) => {
+    trackEvent({
+      action: 'blog_post_click',
+      category: 'blog',
+      label: post.slug,
+      custom_data: {
+        post_title: post.title,
+        post_category: post.category,
+        is_featured: false,
+      },
+    });
+  }, []);
+
+  const handleFeaturedPostClick = useCallback((post: BlogPost) => {
+    trackEvent({
+      action: 'blog_post_click',
+      category: 'blog',
+      label: post.slug,
+      custom_data: {
+        post_title: post.title,
+        post_category: post.category,
+        is_featured: true,
+      },
+    });
+  }, []);
 
   return (
     <div className='min-h-screen'>
@@ -105,7 +161,7 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
               TYPOGRAPHY.TEXT_SM
             )}
           >
-            {[`${totalCount} Articles`, 'Weekly Updates', 'Always Free'].map((feature) => (
+            {[`${allPosts.length} Articles`, 'Weekly Updates', 'Always Free'].map((feature) => (
               <div key={feature} className='flex items-center gap-2'>
                 <div className='h-1.5 w-1.5 rounded-full bg-primary' />
                 <span>{feature}</span>
@@ -135,7 +191,11 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
               Featured Article
             </h2>
 
-            <Link href={`/blog/${featuredPost.slug}`} className='group block'>
+            <Link
+              href={`/blog/${featuredPost.slug}`}
+              className='group block'
+              onClick={() => handleFeaturedPostClick(featuredPost)}
+            >
               <div className='overflow-hidden rounded-xl border-2 border-primary/30 bg-card transition-colors hover:border-primary/50'>
                 <div className='grid items-center gap-6 md:grid-cols-2'>
                   {featuredPost.image && (
@@ -183,7 +243,12 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
             <>
               <div className='mb-12 grid gap-6 md:mb-16 md:grid-cols-2 lg:grid-cols-3'>
                 {filteredPosts.map((post) => (
-                  <Link key={post.slug} href={`/blog/${post.slug}`} className='group block'>
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className='group block'
+                    onClick={() => handlePostClick(post)}
+                  >
                     <article className='h-full overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/50'>
                       {post.image && (
                         <div className='relative h-48 overflow-hidden'>

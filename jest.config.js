@@ -88,7 +88,7 @@ const config = {
       lines: 60,
     },
     // Very lenient for layout components (many conditional rendering branches)
-    './src/components/ui/PageContainer.tsx': {
+    './src/components/templates/PageContainer.tsx': {
       statements: 60,
       branches: 15,
       functions: 60,

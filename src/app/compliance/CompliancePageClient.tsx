@@ -207,11 +207,6 @@ export function CompliancePageClient() {
             href: 'mailto:compliance@payetax.co.uk?subject=Compliance Question',
             type: 'email',
           },
-          {
-            text: 'View Tax Rate Source Code',
-            href: 'https://github.com/jarryddev/payetax',
-            type: 'link',
-          },
         ]}
       />
     </div>

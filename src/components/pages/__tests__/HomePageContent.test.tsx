@@ -32,11 +32,8 @@ jest.mock('@/components/molecules/SimpleHero', () => ({
 // Mock calculator store
 const mockInit = jest.fn();
 jest.mock('@/store/calculatorStore', () => ({
-  useCalculatorStore: {
-    getState: () => ({
-      init: mockInit,
-    }),
-  },
+  useCalculatorStore: (selector: (state: { init: jest.Mock }) => jest.Mock) =>
+    selector({ init: mockInit }),
 }));
 
 describe('HomePageContent Component', () => {

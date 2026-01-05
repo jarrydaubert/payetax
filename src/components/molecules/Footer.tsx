@@ -1,7 +1,5 @@
 // src/components/molecules/Footer.tsx
 
-'use client';
-
 import { FooterBrand } from '@/components/molecules/FooterBrand';
 import { FooterMainLinks } from '@/components/molecules/FooterMainLinks';
 import { FooterResourceLinks } from '@/components/molecules/FooterResourceLinks';
@@ -17,7 +15,7 @@ import { cn } from '@/lib/utils';
  * Composition:
  * - FooterBrand: Brand name and copyright
  * - FooterResourceLinks: External resources (HMRC, guides)
- * - FooterMainLinks: Primary nav links, social, theme toggle
+ * - FooterMainLinks: Primary nav links, social
  *
  * This component orchestrates layout only.
  */
@@ -52,7 +50,7 @@ export function Footer({ className }: FooterProps) {
               <FooterResourceLinks />
             </div>
 
-            {/* Quick links and theme toggle - Uses sub-molecule */}
+            {/* Quick links and social - Uses sub-molecule */}
             <FooterMainLinks />
           </div>
         </div>

@@ -1,16 +1,15 @@
-// src/components/ui/StructuredData.tsx
+// src/components/organisms/StructuredData.tsx
 /**
  * Type-safe structured data component for SEO
- * Adds JSON-LD schema markup to pages using next/script
+ * Adds JSON-LD schema markup to pages for search engines and AI crawlers
  *
- * This component improves SEO by providing search engines with structured data
- * about the website content, enabling rich snippets and enhanced search results.
+ * IMPORTANT: Uses a regular <script> tag (not next/script) to ensure
+ * structured data is present in the initial HTML for crawlers.
  *
  * @see https://schema.org/docs/schemas.html
  * @see https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data
  */
 
-import Script from 'next/script';
 import type React from 'react';
 
 // Define typed interfaces for each schema type
@@ -631,11 +630,13 @@ export interface StructuredDataProps {
 
 /**
  * Structured Data Component
- * Adds SEO-optimized schema.org markup using next/script
- * Uses next/script to avoid dangerouslySetInnerHTML and XSS risks
+ * Adds SEO-optimized schema.org markup for search engines and AI crawlers
+ *
+ * Uses a regular <script> tag to ensure structured data is in the initial HTML.
+ * This is critical for SEO - crawlers need to see this data server-side.
  *
  * @param props - Component props with schema type and data
- * @returns Script component with JSON-LD structured data
+ * @returns Script element with JSON-LD structured data
  */
 export function StructuredData({
   type,
@@ -647,9 +648,6 @@ export function StructuredData({
   review,
   service,
 }: StructuredDataProps): React.ReactNode {
-  // Return null during SSR
-  if (typeof window === 'undefined') return null;
-
   // Determine the data to include based on the type
   let schemaData: SchemaType | null = null;
 
@@ -827,17 +825,13 @@ export function StructuredData({
   // If we couldn't build valid schema data, return null
   if (!schemaData) return null;
 
-  // Convert schema to JSON string
-  const schemaString = JSON.stringify(schemaData);
-
-  // Generate unique ID for the script
-  const scriptId = `structured-data-${type}-${Math.random().toString(36).substring(2, 9)}`;
-
-  // Use Next.js Script component for proper script loading
+  // Render as regular script tag for SSR (critical for SEO)
   return (
-    <Script id={scriptId} type='application/ld+json' strategy='afterInteractive'>
-      {schemaString}
-    </Script>
+    <script
+      type='application/ld+json'
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - we control the JSON schema data, not user input
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+    />
   );
 }
 

@@ -1,6 +1,5 @@
 # PayeTax Technical Stack & Architecture
 
-**Last Updated:** December 25, 2025
 **Status:** ✅ Production Ready
 **Version:** 4.7.0
 **Node.js:** 24.x (latest stable)
@@ -24,7 +23,6 @@
 
 ### Core Stack
 
-| Technology | Version | Purpose | Last Updated |
 |------------|---------|---------|--------------|
 | **Node.js** | 24.11.1 | Runtime (latest stable) | Nov 18, 2025 |
 | **Next.js** | 16.1.1 | React framework with App Router | Dec 25, 2025 |
@@ -660,7 +658,6 @@ npm run test:dev      # Chrome only (faster)
 
 ---
 
-**Last Updated:** November 11, 2025
 **Maintained By:** PayeTax Team
 **Review Cycle:** Quarterly
 **Latest Release:** v4.6.0

@@ -48,7 +48,6 @@
     "audit:perf:ci": "bun run build && bun run monitor:performance",
     "update-deps": "bun update && bun run test",
     "ci": "bun run fix-all && bun run build && bun run test:all",
-
     "dev-setup": "bun run clean:all && bun run fix-all && bun run dev",
     "dev:turbo": "next dev --turbo",
     "release": "bun run clean && bun run fix-all && bun run test && bun run build:analyze && bun run audit:deps",

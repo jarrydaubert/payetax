@@ -183,7 +183,6 @@ export default function AboutPage() {
             href: 'mailto:feedback@payetax.co.uk?subject=Feedback',
             type: 'email',
           },
-          { text: 'View Source Code', href: 'https://github.com/jarryddev/payetax', type: 'link' },
         ]}
       />
     </div>

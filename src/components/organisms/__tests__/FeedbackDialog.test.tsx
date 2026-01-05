@@ -175,12 +175,60 @@ describe('FeedbackDialog Component', () => {
       });
     });
 
-    it.skip('should accept valid email', async () => {
-      // Skipped - React 19 server actions don't use global.fetch
+    it('should NOT show error for empty email (email is optional)', async () => {
+      render(<FeedbackDialog />);
+
+      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      });
+
+      // Leave email empty
+      const emailInput = screen.getByLabelText(/email/i);
+      expect(emailInput).toHaveValue('');
+
+      // Fill in valid message
+      const messageInput = screen.getByLabelText(/message/i);
+      fireEvent.change(messageInput, {
+        target: { value: 'This is a valid message with enough characters' },
+      });
+
+      const submitButton = screen.getByRole('button', { name: /send feedback/i });
+      const form = submitButton.closest('form');
+      if (form) fireEvent.submit(form);
+
+      // Should NOT show email error - empty email is valid
+      await waitFor(() => {
+        expect(screen.queryByText(/Invalid email address/i)).not.toBeInTheDocument();
+      });
     });
 
-    it.skip('should allow submission without email', async () => {
-      // Skipped - React 19 server actions don't use global.fetch
+    it('should NOT show error for whitespace-only email (treated as empty)', async () => {
+      render(<FeedbackDialog />);
+
+      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      });
+
+      const emailInput = screen.getByLabelText(/email/i);
+      fireEvent.change(emailInput, { target: { value: '   ' } });
+
+      const messageInput = screen.getByLabelText(/message/i);
+      fireEvent.change(messageInput, {
+        target: { value: 'This is a valid message with enough characters' },
+      });
+
+      const submitButton = screen.getByRole('button', { name: /send feedback/i });
+      const form = submitButton.closest('form');
+      if (form) fireEvent.submit(form);
+
+      // Whitespace-only email is trimmed to empty, which is valid (email is optional)
+      await waitFor(() => {
+        expect(screen.queryByText(/Invalid email address/i)).not.toBeInTheDocument();
+      });
     });
   });
 

@@ -11,17 +11,26 @@ import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { TAX_RATES } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
+import { useCalculatorStore } from '@/store/calculatorStore';
+
+// Current tax year rates (single source of truth from constants)
+const CURRENT_RATES = TAX_RATES['2025-2026'];
+const PERSONAL_ALLOWANCE = CURRENT_RATES.personalAllowance;
+const BASIC_RATE = CURRENT_RATES.bands[0].rate;
+const HIGHER_RATE = CURRENT_RATES.bands[1].rate;
+const BASIC_RATE_THRESHOLD = CURRENT_RATES.bands[0].threshold + PERSONAL_ALLOWANCE;
+const HIGHER_RATE_THRESHOLD = CURRENT_RATES.bands[1].threshold;
 
 const HomePageContent = memo(function HomePageContent() {
-  const [_isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const calculatorRef = useRef<HTMLElement>(null);
+  const init = useCalculatorStore((state) => state.init);
 
   useEffect(() => {
-    // Initialize calculator store on mount
-    const { init } = require('@/store/calculatorStore').useCalculatorStore.getState();
     init();
-  }, []);
+  }, [init]);
 
   const handleScrollToCalculator = () => {
     startTransition(() => {
@@ -86,7 +95,9 @@ const HomePageContent = memo(function HomePageContent() {
                 <CardTitle className='text-lg'>Personal Allowance</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='font-bold text-3xl text-primary'>£12,570</p>
+                <p className='font-bold text-3xl text-primary'>
+                  £{PERSONAL_ALLOWANCE.toLocaleString()}
+                </p>
                 <CardDescription className={SPACING.MT_2}>
                   Tax-free earnings for 2025/26
                 </CardDescription>
@@ -97,9 +108,10 @@ const HomePageContent = memo(function HomePageContent() {
                 <CardTitle className='text-lg'>Basic Rate</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='font-bold text-3xl text-primary'>20%</p>
+                <p className='font-bold text-3xl text-primary'>{BASIC_RATE}%</p>
                 <CardDescription className={SPACING.MT_2}>
-                  On income £12,571 - £50,270
+                  On income £{(PERSONAL_ALLOWANCE + 1).toLocaleString()} - £
+                  {BASIC_RATE_THRESHOLD.toLocaleString()}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -108,9 +120,10 @@ const HomePageContent = memo(function HomePageContent() {
                 <CardTitle className='text-lg'>Higher Rate</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='font-bold text-3xl text-primary'>40%</p>
+                <p className='font-bold text-3xl text-primary'>{HIGHER_RATE}%</p>
                 <CardDescription className={SPACING.MT_2}>
-                  On income £50,271 - £125,140
+                  On income £{(BASIC_RATE_THRESHOLD + 1).toLocaleString()} - £
+                  {HIGHER_RATE_THRESHOLD.toLocaleString()}
                 </CardDescription>
               </CardContent>
             </Card>

@@ -1,6 +1,7 @@
 // src/app/blog/page.tsx
 
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { getBlogCategories, getBlogPosts, getFeaturedPost } from '@/lib/blog';
 import { BlogPageClient } from './BlogPageClient';
 
@@ -49,5 +50,43 @@ export default async function BlogPage() {
     getBlogPosts({ pageSize: 1000 }),
   ]);
 
-  return <BlogPageClient featuredPost={featuredPost} categories={categories} allPosts={allPosts} />;
+  // Generate structured data for blog index
+  const blogStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'TaxInsights by PayeTax',
+    description:
+      'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights.',
+    url: 'https://payetax.co.uk/blog',
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayeTax',
+      url: 'https://payetax.co.uk',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://payetax.co.uk/logo.png',
+      },
+    },
+    blogPost: allPosts.slice(0, 10).map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.excerpt,
+      url: `https://payetax.co.uk/blog/${post.slug}`,
+      datePublished: post.publishedAt,
+      dateModified: post.updatedAt || post.publishedAt,
+      author: {
+        '@type': 'Organization',
+        name: 'PayeTax',
+      },
+    })),
+  };
+
+  return (
+    <>
+      <Script type='application/ld+json' strategy='afterInteractive'>
+        {JSON.stringify(blogStructuredData)}
+      </Script>
+      <BlogPageClient featuredPost={featuredPost} categories={categories} allPosts={allPosts} />
+    </>
+  );
 }

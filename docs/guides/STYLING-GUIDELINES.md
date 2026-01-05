@@ -1,6 +1,5 @@
 # PayeTax Styling Guidelines
 
-**Last Updated:** November 18, 2025  
 **Status:** ✅ ENFORCED - No interpretation allowed
 
 ---
