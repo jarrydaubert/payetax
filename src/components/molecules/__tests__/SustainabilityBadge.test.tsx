@@ -53,9 +53,9 @@ describe('SustainabilityBadge Component', () => {
       fireEvent.click(button);
 
       expect(screen.getByText(/Performance Benefits/i)).toBeInTheDocument();
-      expect(screen.getByText(/Fast Loading/i)).toBeInTheDocument();
+      expect(screen.getByText(/Static Generation/i)).toBeInTheDocument();
       expect(screen.getByText(/Edge Caching/i)).toBeInTheDocument();
-      expect(screen.getByText(/Client-Side Calculations/i)).toBeInTheDocument();
+      expect(screen.getByText(/Client Calculations/i)).toBeInTheDocument();
     });
 
     it('should close modal when X button clicked', async () => {
@@ -64,8 +64,10 @@ describe('SustainabilityBadge Component', () => {
       const openButton = screen.getByRole('button', { name: /view eco-friendly information/i });
       fireEvent.click(openButton);
 
-      const closeButton = screen.getByRole('button', { name: /close/i });
-      fireEvent.click(closeButton);
+      // Find the close button inside the modal (there's also the backdrop button)
+      const closeButtons = screen.getAllByRole('button', { name: /close/i });
+      const closeButton = closeButtons.find((btn) => btn.querySelector('svg'));
+      fireEvent.click(closeButton!);
 
       await waitFor(() => {
         expect(screen.queryByText(/Environmental Impact/i)).not.toBeInTheDocument();
@@ -86,9 +88,9 @@ describe('SustainabilityBadge Component', () => {
       const button = screen.getByRole('button', { name: /view eco-friendly information/i });
       fireEvent.click(button);
 
-      const link = screen.getByRole('link', { name: /learn more about web sustainability/i });
+      const link = screen.getByRole('link', { name: /check our carbon score/i });
       expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', 'https://www.websitecarbon.com/');
+      expect(link).toHaveAttribute('href', 'https://www.websitecarbon.com/website/payetax-co-uk/');
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -108,8 +110,9 @@ describe('SustainabilityBadge Component', () => {
       const openButton = screen.getByRole('button', { name: /view eco-friendly information/i });
       fireEvent.click(openButton);
 
-      const closeButton = screen.getByRole('button', { name: /close/i });
-      expect(closeButton).toBeInTheDocument();
+      // There are multiple close buttons (backdrop + X button)
+      const closeButtons = screen.getAllByRole('button', { name: /close/i });
+      expect(closeButtons.length).toBeGreaterThanOrEqual(1);
     });
   });
 

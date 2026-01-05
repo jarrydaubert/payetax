@@ -140,9 +140,12 @@ Sentry.init({
   ],
 
   beforeSend(event, hint) {
-    // Filter out localhost errors in development
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      return null;
+    // Filter out localhost/local errors
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')) {
+        return null;
+      }
     }
 
     // Don't send errors from development environment
@@ -235,15 +238,31 @@ Sentry.init({
   // Filter logs before sending to Sentry
   beforeSendLog(log) {
     // Don't send logs from development or localhost
-    if (
-      process.env.NODE_ENV === 'development' ||
-      (typeof window !== 'undefined' && window.location.hostname === 'localhost')
-    ) {
+    if (process.env.NODE_ENV === 'development') {
       return null;
+    }
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')) {
+        return null;
+      }
     }
 
     // Filter out info/debug logs to conserve quota (only warn/error/fatal)
     if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
+      return null;
+    }
+
+    // Filter out PWA/ServiceWorker logs, deprecation warnings, and Sentry Replay errors
+    const msg = typeof log.message === 'string' ? log.message : '';
+    if (
+      msg.includes('[PWA]') ||
+      msg.includes('[SW]') ||
+      msg.includes('DeprecationWarning') ||
+      msg.includes('[DEP0') ||
+      msg.includes('cross-origin stylesheet') ||
+      msg.includes('Failed to load chunk')
+    ) {
       return null;
     }
 

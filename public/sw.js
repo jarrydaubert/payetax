@@ -67,7 +67,7 @@ self.addEventListener('install', (event) => {
         // Skip waiting to activate immediately
         await self.skipWaiting();
       } catch (error) {
-        console.error('[SW] Precache failed:', error);
+        devLog('Precache failed:', error);
       }
     })()
   );
@@ -218,7 +218,7 @@ async function cacheFirstStrategy(request) {
 
     return networkResponse;
   } catch (error) {
-    console.error('[SW] Cache-first failed:', error);
+    devLog('Cache-first failed:', error);
     throw error;
   }
 }
@@ -351,7 +351,7 @@ async function syncFeedback() {
     devLog('[SW] Syncing offline feedback submissions');
     // Implementation would go here
   } catch (error) {
-    console.error('[SW] Background sync failed:', error);
+    devLog('Background sync failed:', error);
   }
 }
 
@@ -431,16 +431,23 @@ async function updateCriticalAssets() {
 
     devLog('[SW] Critical assets updated');
   } catch (error) {
-    console.error('[SW] Periodic sync failed:', error);
+    devLog('Periodic sync failed:', error);
   }
 }
 
 // Handle messages from the main thread
 self.addEventListener('message', (event) => {
-  if (event.data?.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
-  } else if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+  try {
+    if (event.data?.type === 'GET_VERSION') {
+      if (event.ports?.[0]) {
+        event.ports[0].postMessage({ version: CACHE_NAME });
+      }
+    } else if (event.data?.type === 'SKIP_WAITING') {
+      self.skipWaiting();
+    }
+  } catch (err) {
+    // Silently fail - some browsers block postMessage
+    devLog('[SW] Message handling failed:', err);
   }
 });
 

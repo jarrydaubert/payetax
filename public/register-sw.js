@@ -1,13 +1,13 @@
 (() => {
-  if (!('serviceWorker' in navigator)) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      return;
-  }
+  // Skip SW on localhost
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return;
   }
-  const isDev =
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // Skip if SW not supported
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+  const isDev = false;
   const log = (message, ...args) => {
     if (isDev) {
       console.log(`[PWA] ${message}`, ...args);
@@ -34,8 +34,9 @@
       navigator.serviceWorker.addEventListener('message', s);
       if ('Notification' in window && Notification.permission === 'default')
         document.addEventListener('click', d, { once: !0 });
-    } catch (i) {
-      console.error('[PWA] Service Worker registration failed:', i);
+    } catch {
+      // SW registration can fail in incognito mode, with ad blockers, or privacy settings
+      // This is expected and not actionable - don't log to Sentry
     }
   });
   function n() {
@@ -64,7 +65,14 @@
   }
   function a() {
     if (!e?.waiting) return;
-    e.waiting.postMessage({ type: 'SKIP_WAITING' });
+    try {
+      e.waiting.postMessage({ type: 'SKIP_WAITING' });
+    } catch (err) {
+      // Silently fail - some browsers block postMessage (e.g., DuckDuckGo)
+      log('postMessage failed:', err);
+      window.location.reload();
+      return;
+    }
     if (o) return;
     o = !0;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

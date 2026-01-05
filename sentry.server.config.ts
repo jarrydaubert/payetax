@@ -78,8 +78,8 @@ Sentry.init({
   ],
 
   beforeSend(event, _hint) {
-    // Don't send errors from development
-    if (process.env.NODE_ENV === 'development') {
+    // Don't send errors from development or local builds
+    if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
       return null;
     }
 
@@ -195,13 +195,25 @@ Sentry.init({
 
   // Filter logs before sending to Sentry
   beforeSendLog(log) {
-    // Don't send logs from development
-    if (process.env.NODE_ENV === 'development') {
+    // Don't send logs from development or local builds
+    if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
       return null;
     }
 
     // Filter out info/debug logs to conserve quota (only warn/error/fatal)
     if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
+      return null;
+    }
+
+    // Filter out noisy logs (deprecation warnings, SW errors, chunk failures)
+    const msg = typeof log.message === 'string' ? log.message : '';
+    if (
+      msg.includes('DeprecationWarning') ||
+      msg.includes('[DEP0') ||
+      msg.includes('[PWA]') ||
+      msg.includes('[SW]') ||
+      msg.includes('Failed to load chunk')
+    ) {
       return null;
     }
 

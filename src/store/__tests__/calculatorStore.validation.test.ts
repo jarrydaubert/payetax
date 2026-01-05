@@ -59,41 +59,33 @@ describe('Calculator Store Validation', () => {
 
     it('should reject negative salary', () => {
       const { setSalary } = useCalculatorStore.getState();
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const initialSalary = useCalculatorStore.getState().input.salary;
 
       setSalary(-1000);
 
-      // Should not update state
+      // Should not update state for invalid input
       expect(useCalculatorStore.getState().input.salary).not.toBe(-1000);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[Calculator] Invalid salary:',
-        'Salary must be positive'
-      );
-
-      consoleSpy.mockRestore();
+      expect(useCalculatorStore.getState().input.salary).toBe(initialSalary);
     });
 
     it('should reject salary exceeding maximum', () => {
       const { setSalary } = useCalculatorStore.getState();
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const initialSalary = useCalculatorStore.getState().input.salary;
 
       setSalary(11_000_000);
 
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      // State should not change for invalid input
+      expect(useCalculatorStore.getState().input.salary).toBe(initialSalary);
     });
 
     it('should reject Infinity', () => {
       const { setSalary } = useCalculatorStore.getState();
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const initialSalary = useCalculatorStore.getState().input.salary;
 
       setSalary(Number.POSITIVE_INFINITY);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[Calculator] Invalid salary:',
-        'Invalid input: expected number, received number'
-      );
-      consoleSpy.mockRestore();
+      // State should not change for invalid input
+      expect(useCalculatorStore.getState().input.salary).toBe(initialSalary);
     });
   });
 

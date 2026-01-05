@@ -301,8 +301,8 @@ export const useCalculatorStore = create<CalculatorState>()(
               .safeParse(salary);
 
             if (!validated.success) {
-              console.warn('[Calculator] Invalid salary:', validated.error.issues[0].message);
-              return; // Don't update state with invalid value
+              // Expected user behavior - don't log as warning (Sentry captures console.warn)
+              return;
             }
 
             // Add breadcrumb for debugging
@@ -313,9 +313,8 @@ export const useCalculatorStore = create<CalculatorState>()(
             });
 
             set((state) => ({ input: { ...state.input, salary: validated.data } }));
-          } catch (error) {
-            // Zod v4 can throw in some edge cases even with safeParse
-            console.warn('[Calculator] Salary validation error:', error);
+          } catch {
+            // Zod v4 can throw in edge cases - silently ignore
           }
         },
         setPayPeriod: (payPeriod) => {
