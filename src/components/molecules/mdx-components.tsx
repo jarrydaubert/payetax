@@ -213,7 +213,7 @@ export const mdxComponents = {
     <blockquote
       className={cn(
         'glass-card-inner rounded-lg border-primary/50 border-l-4 px-6',
-        'my-8 flex items-center',
+        'my-8 flex items-center [&_p]:mb-0',
         SPACING.PY_4
       )}
       {...props}
