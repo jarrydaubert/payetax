@@ -2,10 +2,15 @@
  * Sentry Webhook Handler → Linear Issue Creation
  * 
  * Automatically creates Linear issues when new Sentry errors occur.
- * Configure in Sentry: Settings → Integrations → Webhooks
- * URL: https://payetax.co.uk/api/sentry-webhook
+ * 
+ * Setup:
+ * 1. Sentry → Settings → Developer Settings → Create Internal Integration
+ * 2. Webhook URL: https://payetax.co.uk/api/sentry-webhook
+ * 3. Enable: Issue webhooks
+ * 4. Copy Client Secret → Add to Vercel as SENTRY_WEBHOOK_SECRET
  */
 
+import { createHmac } from 'crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -16,7 +21,7 @@ const LINEAR_TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYTAX';
 interface SentryWebhookPayload {
   action: string;
   data: {
-    issue: {
+    issue?: {
       id: string;
       title: string;
       culprit: string;
@@ -61,11 +66,33 @@ interface SentryWebhookPayload {
   };
 }
 
+/**
+ * Verify Sentry webhook signature using HMAC-SHA256
+ */
+function verifySignature(rawBody: string, signature: string, secret: string): boolean {
+  const hmac = createHmac('sha256', secret);
+  hmac.update(rawBody, 'utf8');
+  const digest = hmac.digest('hex');
+  return digest === signature;
+}
+
 export async function POST(request: NextRequest) {
-  // Verify webhook secret
-  const sentrySignature = request.headers.get('sentry-hook-signature');
-  if (SENTRY_WEBHOOK_SECRET && sentrySignature !== SENTRY_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  // Get raw body for signature verification
+  const rawBody = await request.text();
+  
+  // Verify webhook signature if secret is configured
+  if (SENTRY_WEBHOOK_SECRET) {
+    const sentrySignature = request.headers.get('sentry-hook-signature');
+    if (!sentrySignature || !verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET)) {
+      console.error('Invalid Sentry webhook signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+  }
+  
+  // Check resource type
+  const resource = request.headers.get('sentry-hook-resource');
+  if (resource !== 'issue') {
+    return NextResponse.json({ status: 'ignored', reason: `Resource: ${resource}` });
   }
 
   if (!LINEAR_API_KEY) {
@@ -74,7 +101,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const payload: SentryWebhookPayload = await request.json();
+    const payload: SentryWebhookPayload = JSON.parse(rawBody);
     
     // Only create issues for new errors (not resolved, ignored, etc.)
     if (payload.action !== 'created' && payload.action !== 'triggered') {
@@ -82,6 +109,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { issue, event } = payload.data;
+    
+    if (!issue) {
+      return NextResponse.json({ status: 'ignored', reason: 'No issue data' });
+    }
     
     // Build issue title
     const title = `🐛 Sentry: ${issue.title.slice(0, 100)}`;
