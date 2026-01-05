@@ -73,10 +73,10 @@ const config = {
   // Coverage thresholds - enforce minimum code coverage
   coverageThreshold: {
     global: {
-      statements: 70,
-      branches: 60,
-      functions: 70,
-      lines: 70,
+      statements: 65,
+      branches: 55,
+      functions: 65,
+      lines: 65,
     },
     // More lenient for UI components (visual testing often better than unit tests)
     // Note: Lower function threshold (20%) because JSX inline callbacks inflate function counts

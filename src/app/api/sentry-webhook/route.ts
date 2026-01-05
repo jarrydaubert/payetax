@@ -1,8 +1,8 @@
 /**
  * Sentry Webhook Handler → Linear Issue Creation
- * 
+ *
  * Automatically creates Linear issues when new Sentry errors occur.
- * 
+ *
  * Setup:
  * 1. Sentry → Settings → Developer Settings → Create Internal Integration
  * 2. Webhook URL: https://payetax.co.uk/api/sentry-webhook
@@ -10,7 +10,7 @@
  * 4. Copy Client Secret → Add to Vercel as SENTRY_WEBHOOK_SECRET
  */
 
-import { createHmac } from 'crypto';
+import { createHmac } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -79,16 +79,16 @@ function verifySignature(rawBody: string, signature: string, secret: string): bo
 export async function POST(request: NextRequest) {
   // Get raw body for signature verification
   const rawBody = await request.text();
-  
+
   // Verify webhook signature if secret is configured
   if (SENTRY_WEBHOOK_SECRET) {
     const sentrySignature = request.headers.get('sentry-hook-signature');
-    if (!sentrySignature || !verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET)) {
+    if (!(sentrySignature && verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET))) {
       console.error('Invalid Sentry webhook signature');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
   }
-  
+
   // Check resource type
   const resource = request.headers.get('sentry-hook-resource');
   if (resource !== 'issue') {
@@ -102,31 +102,31 @@ export async function POST(request: NextRequest) {
 
   try {
     const payload: SentryWebhookPayload = JSON.parse(rawBody);
-    
+
     // Only create issues for new errors (not resolved, ignored, etc.)
     if (payload.action !== 'created' && payload.action !== 'triggered') {
       return NextResponse.json({ status: 'ignored', reason: `Action: ${payload.action}` });
     }
 
     const { issue, event } = payload.data;
-    
+
     if (!issue) {
       return NextResponse.json({ status: 'ignored', reason: 'No issue data' });
     }
-    
+
     // Build issue title
     const title = `🐛 Sentry: ${issue.title.slice(0, 100)}`;
-    
+
     // Build issue description with all relevant details
     const description = buildDescription(issue, event);
 
     // Create Linear issue
     const linear = new LinearClient({ apiKey: LINEAR_API_KEY });
-    
+
     // Get team ID
     const teams = await linear.teams();
     const team = teams.nodes.find((t) => t.key === LINEAR_TEAM_KEY);
-    
+
     if (!team) {
       console.error(`Team ${LINEAR_TEAM_KEY} not found`);
       return NextResponse.json({ error: 'Team not found' }, { status: 500 });
@@ -145,8 +145,6 @@ export async function POST(request: NextRequest) {
     }
 
     const linearIssue = await createdIssue.issue;
-    
-    console.log(`Created Linear issue ${linearIssue?.identifier} from Sentry ${issue.shortId}`);
 
     return NextResponse.json({
       status: 'created',
@@ -155,10 +153,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Sentry webhook error:', error);
-    return NextResponse.json(
-      { error: 'Failed to process webhook' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process webhook' }, { status: 500 });
   }
 }
 
@@ -232,7 +227,7 @@ function getPriority(level: string, count: number): number {
   // Linear priorities: 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low
   if (level === 'fatal' || level === 'error') {
     if (count >= 100) return 1; // Urgent
-    if (count >= 10) return 2;  // High
+    if (count >= 10) return 2; // High
     return 3; // Medium
   }
   if (level === 'warning') {
@@ -242,9 +237,9 @@ function getPriority(level: string, count: number): number {
 }
 
 // Allow GET for health checks
-export async function GET() {
-  return NextResponse.json({ 
-    status: 'ok', 
+export function GET() {
+  return NextResponse.json({
+    status: 'ok',
     service: 'sentry-webhook',
     linearConfigured: !!LINEAR_API_KEY,
   });
