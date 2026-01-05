@@ -2,1357 +2,308 @@
 
 > Best practices and guidelines for maintaining high-quality code
 
-**Last Updated:** 25 December 2025  
-**Current Focus:** ✅ Production Ready - Blog Redesign Complete
+**Last Updated:** January 2026
 
 ---
 
-## 🚀 START HERE (Every New Session)
+## START HERE (Every New Session)
 
 **For Factory.ai Droid / Claude Code:**
 
-When the user says **"Go read CONTRIBUTING.md"** at the start of a session, do this:
-
-### Step 1: Basic Context (30 seconds)
+### Step 1: Get Context (30 seconds)
 ```bash
-# Check date (UK timezone)
-date
-
-# Check git status
-git status
-
-# Review recent commits
-git log --oneline -10
+git status                    # Check for uncommitted changes
+git log --oneline -10         # Recent commits
+bun run linear:me             # Your assigned issues
 ```
 
-### Step 2: Current Work Context (1 minute)
-
-**We are currently doing: COMPREHENSIVE CODEBASE AUDIT (PAYTAX-108)**
-
-**Read these audit docs FIRST:**
-1. **`docs/audits/audit-v2-2025-11-11/README.md`** - Quick overview
-2. **`docs/audits/audit-v2-2025-11-11/AUDIT-FRAMEWORK.md`** - 10 systems being audited
-3. **`docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md`** - React 19, Next.js 16 features guide
-
-**Audit Philosophy:**
-- ✅ Independent assessment (not comparing to old audit)
-- ✅ Each system evaluated on its own merits
-- ✅ Benchmarked against best practices & latest tech stack features
-- ✅ Testing mandatory for EVERY sub-issue (90%+ coverage)
-
-**10 Systems Being Audited:**
-1. 🎨 Theme System (dark mode, colors)
-2. 📝 Design Tokens (typography, spacing, icons)
-3. ✅ Zod Validation (props, config, API)
-4. 🏗️ Atomic Design (component organization)
-5. 🧪 Testing Coverage (unit, integration, E2E)
-6. 📱 Responsive Design (mobile-first)
-7. ♿ Accessibility (WCAG 2.2 AA)
-8. 🚀 Performance (bundle, Core Web Vitals)
-9. 🔐 Type Safety (TypeScript strict)
-10. 🛠️ Tech Stack Maximization (React 19, Next.js 16)
-
-### Step 3: Check Linear Issues (30 seconds)
+### Step 2: Verify Environment
 ```bash
-# Check your assigned issues
-bun run linear:me
-
-# Check audit sub-issues (PAYTAX-108+)
-bun run linear list --project PayeTax | grep "PAYTAX-10[8-9]\|PAYTAX-1[1-9][0-9]"
+bun run fix-all              # Lint, format, typecheck
+bun run test:no-coverage     # Quick test run (~6s)
 ```
 
-### Step 4: Report Back
-
-Summarize:
-- ✅ Current date
-- ✅ Current audit system (if working on one)
-- ✅ Any assigned issues
-- ✅ Recent commit context
-- ✅ Git status (clean/uncommitted changes)
-- ❓ **Ask: "Which audit system should we work on?"**
-
-**Example Response:**
-> "It's November 11, 2025. We're in the middle of PAYTAX-108 (Codebase Audit v2). Recent commits show theme system fixes. Working tree is clean. 
->
-> **10 audit systems available:**
-> 1. Theme System
-> 2. Design Tokens
-> 3. Zod Validation
-> ... (etc)
->
-> Which system should we audit next?"
+### Step 3: Ask What to Work On
+Summarize git status, recent commits, and ask: **"What should I work on?"**
 
 ---
 
-## 🔍 Quick Reference: Audit Work (PAYTAX-108)
+## Project Overview
 
-**Current Phase:** System-by-system independent assessment
+**PayeTax** is a UK PAYE tax calculator helping users calculate income tax, National Insurance, and take-home pay.
 
-### Audit Resources
-| Resource | Purpose | Location |
-|----------|---------|----------|
-| **Audit Framework** | 10 systems, sub-issue structure | `docs/audits/audit-v2-2025-11-11/AUDIT-FRAMEWORK.md` |
-| **Tech Stack Guide** | React 19, Next.js 16 features | `docs/audits/audit-v2-2025-11-11/TECH-STACK-MAXIMIZATION.md` |
-| **Executive Summary** | Overview & philosophy | `docs/audits/audit-v2-2025-11-11/PAYTAX-108-AUDIT-V2-EXECUTIVE-SUMMARY.md` |
-| **Architecture Doc** | Current state reference | `docs/guides/ARCHITECTURE.md` |
-| **Tech Stack Doc** | Versions & features | `docs/guides/TECH_STACK.md` |
-
-### Every Sub-Issue Must Include
-```markdown
-## ✅ Testing Checklist (MANDATORY)
-- [ ] Unit tests written/updated (90%+ coverage)
-- [ ] Accessibility tests pass (axe)
-- [ ] Visual regression tests pass (Playwright)
-- [ ] Performance tests pass (no regressions)
-- [ ] Integration tests pass (if applicable)
-```
-
-**⚠️ NO sub-issue can be marked "Done" without passing ALL tests!**
-
-### Tech Stack Versions (Latest Everything!)
-- **React:** 19.2.0 ✅
-- **Next.js:** 16.0.1 ✅
-- **Tailwind CSS:** 4.1.14 ✅ (v4!)
-- **Zod:** 4.1.11 ✅ (v4!)
-- **TypeScript:** 5.9.3 ✅
-
-### Key Opportunities Identified
-- ❌ `useOptimistic` (React 19) - Not used yet
-- ❌ `useActionState` (React 19) - Not used yet
-- ❌ `after()` (Next.js 16) - Not used yet
-- ❌ Zod validation - Only 10% coverage (target 100%)
-- ⚠️ Design tokens - Partial adoption (target 95%+)
-
----
-
-## ⚠️ CRITICAL: The `ls -la` Principle (Prevent Duplication)
-
-**ALWAYS check what exists BEFORE creating anything new!**
-
-This principle comes from Section 0 of ARCHITECTURE.md and is **MANDATORY** for all development work.
-
-### **Why This Matters**
-
-In November 2025, we discovered ~500 lines of duplicated code because developers didn't check existing files first. This creates:
-- ❌ Maintenance nightmares (updating same logic in multiple places)
-- ❌ Inconsistent behavior (different versions of same functionality)
-- ❌ Wasted time (re-implementing what already exists)
-- ❌ Harder debugging (which version is correct?)
-
-### **How to Apply `ls -la` Principle**
-
-**Before creating ANY new:**
-- Component
-- Schema/validation
-- Constant
-- Utility function
-- Test file
-- Config file
-
-**Run these commands:**
-
-```bash
-# 1. LIST the directory you're about to work in
-ls -la src/components/atoms/    # See what atoms exist
-ls -la src/lib/validation/      # See what schemas exist
-ls -la src/constants/           # See what constants exist
-ls -la src/config/              # See what configs exist
-
-# 2. GREP for similar functionality
-grep -r "validateSalary\|salaryValidation" src/ --include="*.ts"
-grep -r "TOOLTIP\|tooltip.*content" src/ --include="*.ts"
-grep -r "schema.*button\|button.*schema" src/ --include="*.ts" -i
-
-# 3. CHECK test files too
-ls -la src/lib/__tests__/                    # See what tests exist
-grep -r "test.*validation" src/ --include="*.test.ts*"
-```
-
-### **Real Examples Where `ls -la` Prevented Duplication**
-
-**Example 1: PAYTAX-127 (Calculator Validation)**
-```bash
-# BEFORE creating inline schema in WhatIfInputs.tsx:
-$ ls -la src/lib/validation/
-# Found: validation.ts already exists! ✅
-# Result: Moved schema to centralized location instead of inline
-```
-
-**Example 2: PAYTAX-128 (Config Validation)**  
-```bash
-# BEFORE creating blog.config.validation.test.ts:
-$ ls -la src/config/__tests__/
-# Found: blog.config.test.ts already exists! ⚠️
-# Result: Checked for overlap - tests were complementary, not duplicate ✅
-```
-
-**Example 3: Adding a Button Component**
-```bash
-# BEFORE creating src/components/atoms/Button.tsx:
-$ ls -la src/components/atoms/
-$ grep -r "Button" src/components/ --include="*.tsx"
-# Found: src/components/ui/button.tsx already exists! ❌
-# Result: Use existing component instead of creating duplicate
-```
-
-### **The `ls -la` Checklist**
-
-Before creating anything new:
-
-- [ ] **`ls -la`** in the target directory
-- [ ] **`grep -r`** for similar names/functionality
-- [ ] **Check imports** in existing files (see what they use)
-- [ ] **Read ARCHITECTURE.md** Section 0 if unsure
-- [ ] **Ask yourself**: "Does something like this already exist?"
-
-### **Special Cases**
-
-**When duplication IS acceptable:**
-- ✅ Test files with different purposes (functional tests vs. validation tests)
-- ✅ Complementary schemas (type definition vs. runtime validation)
-- ✅ Clearly documented reasons (add comment explaining why)
-
-**When duplication is NOT acceptable:**
-- ❌ Inline schemas when centralized validation.ts exists
-- ❌ Copied utility functions instead of importing
-- ❌ Re-implemented components without checking shadcn/ui
-- ❌ Duplicate constants across files
-
-### **Recovery: Found Duplication? Fix It!**
-
-If you discover duplication:
-1. ✅ Create a Linear issue documenting it
-2. ✅ Consolidate to single source of truth
-3. ✅ Update all imports to use centralized version
-4. ✅ Add tests to prevent regression
-5. ✅ Delete duplicate code
-6. ✅ Document in commit message
-
----
-
-## 📌 Project Context
-
-**What is PayeTax?**
-- UK PAYE (Pay As You Earn) tax calculator
-- Helps users calculate income tax, National Insurance, take-home pay
-- Covers England, Scotland, Wales tax systems
-- Built with: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS 4
-- See `package.json` for current dependency versions
-
-**📖 Required Reading:**
-- **`docs/guides/ARCHITECTURE.md`** - Complete architecture guide
-  - **Read Section 0** (`ls -la` Principle) before building ANY component
-  - Prevents duplication, ensures proper component usage
-  - Shows how to discover existing components/schemas/constants
-- **`docs/audits/audit-v2-2025-11-11/`** - Current audit documentation
+**Tech Stack:**
+- **Next.js 16** with Turbopack
+- **React 19** 
+- **TypeScript 5.9** (strict mode)
+- **Tailwind CSS 4**
+- **Zod 4** for validation
+- **Bun** as package manager
 
 **Key Concepts:**
 - PAYE: UK's tax withholding system
 - Tax codes (e.g., "1257L") determine personal allowance
 - National Insurance (NI): Social security contributions
-- Tax bands: Basic rate (20%), Higher rate (40%), Additional rate (45%)
+- Tax bands: Basic (20%), Higher (40%), Additional (45%)
 - £100k-£125k "tax trap": Effective 60% rate due to allowance taper
 
-**Current version:** Run `grep '"version"' package.json` to check
+**Key Docs:**
+- `docs/guides/ARCHITECTURE.md` - Codebase structure
+- `docs/guides/TECH_STACK.md` - Technology overview
 
 ---
 
-## 📋 Quick Workflow Reminder
+## Testing Philosophy
 
-**Every commit should:**
-- [ ] Run `bun run fix-all` before committing
-- [ ] Ensure tests pass (`bun run test`)
-- [ ] Have descriptive commit message with Linear issue ID
-- [ ] Include co-authorship footer
-- [ ] **Push directly to main** (no feature branches unless discussed)
-- [ ] **Tag with version number** using semantic versioning
-- [ ] Push with: `git push origin main --follow-tags`
+**Our Mantra:** Test behavior, not implementation.
+
+### Best Practices
+
+```typescript
+// GOOD: Test what users see
+expect(screen.getByRole('heading')).toHaveTextContent('Total Tax');
+expect(container.textContent).toContain('£34,302');
+
+// BAD: Test implementation details
+expect(wrapper.find('.tax-result-class')).toHaveLength(1);
+expect(component.state.taxAmount).toBe(34302);
+```
+
+### What to Test
+- User-visible behavior and interactions
+- Business logic outcomes
+- Edge cases (£0 salary, £1M salary)
+- Accessibility (keyboard nav, screen readers)
+
+### What NOT to Test
+- CSS class names
+- Internal component state
+- Third-party library internals
+
+### Test Commands
+```bash
+bun run test              # Full tests with coverage
+bun run test:no-coverage  # Faster: Skip coverage (~40% faster)
+bun run test:changed      # Fastest: Only changed files
+bun run test:watch        # Watch mode for development
+bun run test:e2e          # E2E tests (Playwright)
+```
+
+### Coverage Targets
+- **Overall:** 65%+ (realistic minimum)
+- **Business Logic:** 90%+
+- **New Code:** 80%+
 
 ---
 
-## 🏆 Code Quality Standards
+## Code Quality Standards
 
 ### TypeScript Strict Mode
 
-**Always use strict TypeScript:**
 ```typescript
-// ✅ Good - Explicit types
-interface CalculationResult {
+// GOOD: Explicit types
+interface TaxResult {
   grossSalary: number;
   taxableIncome: number;
   totalTax: number;
 }
 
-function calculateTax(salary: number): CalculationResult {
-  // ...
-}
+function calculateTax(salary: number): TaxResult { ... }
 
-// ❌ Bad - Any types
-function calculateTax(salary: any): any {
-  // ...
-}
+// BAD: Any types
+function calculateTax(salary: any): any { ... }
 ```
 
-**Rules:**
-- No `any` types unless absolutely necessary (document why)
-- All function parameters typed
-- All return types explicit
-- Use proper interfaces/types, not inline object types
+### JSDoc Comments
 
----
-
-### Code Comments & Documentation
-
-**Every function needs JSDoc comments:**
 ```typescript
 /**
- * Calculates PAYE tax for UK taxpayer based on 2025/26 rates
+ * Calculates PAYE tax for UK taxpayer
  * 
  * @param grossSalary - Annual gross salary in GBP
  * @param taxCode - HMRC tax code (e.g., "1257L")
- * @param region - UK region for tax calculation ('england' | 'scotland' | 'wales')
- * @returns Detailed tax breakdown including NI, student loans, take-home
- * 
- * @example
- * ```typescript
- * const result = calculatePAYE(45000, '1257L', 'england');
- * console.log(result.takeHomePay); // £34,123
- * ```
+ * @param region - UK region ('england' | 'scotland' | 'wales')
+ * @returns Tax breakdown with NI, student loans, take-home
  */
 export function calculatePAYE(
   grossSalary: number,
   taxCode: string,
   region: Region
-): TaxCalculation {
-  // Implementation
-}
+): TaxCalculation { ... }
 ```
 
-**Comment complex logic:**
+### The `ls -la` Principle
+
+**ALWAYS check what exists BEFORE creating anything new:**
+
+```bash
+# Before creating a component
+ls -la src/components/atoms/
+grep -r "Button" src/components/ --include="*.tsx"
+
+# Before creating a schema
+ls -la src/lib/validation/
+grep -r "salaryValidation" src/ --include="*.ts"
+```
+
+This prevents duplicate code and ensures you use existing utilities.
+
+---
+
+## Performance Guidelines
+
+### Bundle Size
+- **Target:** <3MB total chunks
+- Keep `productionBrowserSourceMaps: false` in next.config.ts
+- Use `optimizePackageImports` for large packages
+
+### Core Web Vitals Targets
+| Metric | Target | Current |
+|--------|--------|---------|
+| LCP | <2.5s | ~6.3s (needs work) |
+| FCP | <1.8s | 1.7s |
+| CLS | <0.1 | 0 |
+| TBT | <200ms | ~70ms |
+
+### framer-motion Usage
+Components using `initial={{ opacity: 0 }}` block server-side content painting. For critical above-the-fold content, prefer CSS animations:
+
+```tsx
+// GOOD: CSS animation (SSR-friendly)
+<div className="animate-in fade-in duration-500">
+  <h1>Content</h1>
+</div>
+
+// AVOID for above-fold content
+<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+  <h1>Content</h1>
+</motion.div>
+```
+
+### Lighthouse Testing
+```bash
+bunx lighthouse https://payetax.co.uk --output=json --quiet --chrome-flags="--headless" | jq '{
+  performance: (.categories.performance.score * 100),
+  lcp: .audits["largest-contentful-paint"].displayValue,
+  fcp: .audits["first-contentful-paint"].displayValue
+}'
+```
+
+---
+
+## Icon Usage (Lucide React)
+
+### Import Patterns
+
+**Few icons (1-7):** Named imports
 ```typescript
-// Calculate marginal rate in the £100k-£125k trap zone
-// Personal allowance tapers by £1 for every £2 earned over £100k
-// This creates an effective 60% tax rate in this band
-if (grossSalary > 100000 && grossSalary <= 125140) {
-  const taperedAllowance = Math.max(0, personalAllowance - ((grossSalary - 100000) / 2));
-  // ...
-}
+import { Calculator, PoundSterling } from 'lucide-react';
 ```
 
-**Rules:**
-- JSDoc for all exported functions
-- Inline comments for complex business logic
-- Explain **WHY**, not just WHAT
-- Keep comments up-to-date when code changes
-
----
-
-### Code Formatting & Linting
-
-**Always run before committing:**
-```bash
-bun run fix-all
-```
-
-This runs:
-1. `bun run format` - Biome code formatting
-2. `biome check --write .` - Linting with auto-fix
-3. `bun run typecheck` - TypeScript type checking
-
-**Rules:**
-- Never commit without running `fix-all`
-- Fix all linting warnings (zero tolerance)
-- Fix all TypeScript errors
-- Use Biome's formatting (don't fight it)
-
----
-
-### Testing Requirements
-
-**Minimum coverage for new code:**
-- **Unit tests:** 80%+ coverage for new functions
-- **Integration tests:** All critical user flows
-- **E2E tests:** Major features only
-
-**Test structure:**
+**Many icons (8+):** Direct ESM imports (Turbopack-optimized)
 ```typescript
-describe('calculatePAYE', () => {
-  describe('for England taxpayers', () => {
-    it('should calculate correct tax for £45k salary', () => {
-      const result = calculatePAYE(45000, '1257L', 'england');
-      
-      expect(result.incomeTax).toBeCloseTo(6486, 2);
-      expect(result.nationalInsurance).toBeCloseTo(4212, 2);
-      expect(result.takeHomePay).toBeCloseTo(34302, 2);
-    });
-
-    it('should handle £100k tax trap correctly', () => {
-      // Test the 60% marginal rate zone
-      const result = calculatePAYE(110000, '1257L', 'england');
-      expect(result.marginalTaxRate).toBeCloseTo(0.60, 2);
-    });
-  });
-
-  describe('edge cases', () => {
-    it('should handle £0 salary', () => {
-      const result = calculatePAYE(0, '1257L', 'england');
-      expect(result.takeHomePay).toBe(0);
-    });
-
-    it('should handle very high salary (£1M)', () => {
-      const result = calculatePAYE(1000000, '1257L', 'england');
-      expect(result.incomeTax).toBeGreaterThan(0);
-    });
-  });
-});
-```
-
-**Rules:**
-- Test happy path AND edge cases
-- Test boundary conditions
-- Use descriptive test names
-- Group related tests with `describe()`
-- No skipped tests (`it.skip`) without explanation
-
-**Test assertions - Best practices:**
-- ✅ Test **behavior**, not implementation (avoid testing class names, internal state)
-- ✅ Use semantic queries: `getByRole`, `getByLabelText`, `getByTestId` (stable)
-- ✅ Use `container.textContent` for text split across elements
-- ✅ Test what users see and interact with
-- ❌ Don't test markup details (specific HTML structure, CSS classes)
-- ❌ Avoid brittle selectors like `.className` unless testing visual behavior
-
-**Run tests before committing:**
-```bash
-bun run test              # Unit tests with coverage (~10s)
-bun run test:no-coverage  # Faster: Skip coverage (~6s)
-bun run test:changed      # Fastest: Only changed files
-bun run test:watch        # Watch mode for development
-bun run test:e2e          # E2E tests
-bun run test:all          # Everything
-```
-
-**Performance tips:**
-- Use `test:no-coverage` during development (40% faster)
-- Use `test:changed` when working on specific files
-- Full `test` with coverage before committing
-
----
-
-### File Organization
-
-**Component structure:**
-```
-src/components/
-├── atoms/          # Smallest reusable pieces (Button, Input)
-├── molecules/      # Combinations of atoms (SearchBar, Card)
-├── organisms/      # Complex components (Header, Calculator)
-└── templates/      # Page layouts
-```
-
-**Naming conventions:**
-- Components: PascalCase (`TaxCalculator.tsx`)
-- Utilities: camelCase (`formatCurrency.ts`)
-- Types/Interfaces: PascalCase (`TaxCalculation`)
-- Constants: UPPER_SNAKE_CASE (`MAX_SALARY`)
-
-**File naming:**
-```
-TaxCalculator/
-├── index.tsx                    # Component
-├── TaxCalculator.test.tsx       # Tests
-├── TaxCalculator.stories.tsx    # Storybook (future)
-└── types.ts                     # Component-specific types
-```
-
----
-
-## 🔧 Development Workflow
-
-### Starting New Work
-
-1. **Check Linear for your issue**
-   ```bash
-   # View your assigned issues
-   bun run linear:me
-   ```
-
-2. **Work directly on main branch**
-   - We push directly to main for most changes
-   - Feature branches only for complex multi-day work (rare)
-   - This keeps workflow simple and fast
-
-3. **Read the issue description carefully**
-   - Understand acceptance criteria
-   - Review any linked docs
-   - Ask questions if unclear
-
-### During Development
-
-1. **Make small, focused commits**
-   ```bash
-   git commit -m "feat: Add blog search tests (PAYTAX-34)
-   
-   - Test search functionality
-   - Test pagination
-   - Test category filtering
-   
-   Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
-   ```
-
-2. **Run quality checks frequently**
-   ```bash
-   bun run fix-all    # Format, lint, typecheck
-   bun run test       # Run tests
-   ```
-
-3. **Keep Linear issue updated**
-   - Add comments on progress
-   - Update checkboxes as you complete tasks
-   - Flag blockers immediately
-
-### Before Committing
-
-**The Pre-Commit Checklist:**
-```bash
-# 1. Format and fix
-bun run fix-all
-
-# 2. Run tests
-bun run test
-
-# 3. Check for console.logs
-grep -r "console.log" src/
-
-# 4. Review your changes
-git diff
-
-# 5. Commit with descriptive message
-git commit -m "feat: Add feature (PAYTAX-XX)"
-```
-
-**Pre-commit hook (already configured):**
-- Runs `fix-all` automatically
-- Blocks commit if linting fails
-- Can bypass with `--no-verify` (use sparingly!)
-
-### Before Pushing
-
-**Pre-push hook (✅ NOW CONFIGURED - PAYTAX-24):**
-```bash
-# Runs automatically before every push
-bun run test:no-coverage  # Full test suite (fast, no coverage report)
-bun run build             # Verify production build works
-```
-
-**What it prevents:**
-- ❌ Pushing code with failing tests
-- ❌ Pushing code that doesn't build
-- ❌ Breaking production deployments
-
-**Can bypass with:** `git push --no-verify` (use sparingly! Only for docs/emergency fixes)
-
-**Manual pre-push checklist (if bypassing hook):**
-- [ ] All tests passing
-- [ ] No TypeScript errors
-- [ ] No linting warnings
-- [ ] Updated Linear issue
-- [ ] Reviewed all changes
-
-### Always Push to Main & Tag Versions
-
-**IMPORTANT:** For Factory.ai sessions, always:
-
-1. **Push directly to main** (no feature branches unless complex multi-day work)
-2. **Tag every significant change** with semantic versioning
-
-**Version numbering (Semantic Versioning):**
-- **Major (vX.0.0)** - Breaking changes, major features
-- **Minor (vX.Y.0)** - New features, non-breaking changes
-- **Patch (vX.Y.Z)** - Bug fixes, small improvements
-
-**Example workflow:**
-```bash
-# After making changes
-git add -A
-git commit -m "feat: Description
-
-Details...
-
-Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
-
-# Tag the version (increment appropriately from current version)
-git tag -a vX.Y.Z -m "vX.Y.Z - Brief summary"
-
-# Push both commit and tag at once
-git push origin main --follow-tags
-```
-
-**When to increment versions:**
-- **Every session that makes changes** should get a version bump
-- Check current version: `grep '"version"' package.json`
-- Increment appropriately based on change type
-- Document what's new in the tag message
-
----
-
-## 🎨 Icon Usage Guidelines
-
-### Lucide React Icons
-
-**Current Version:** `lucide-react@^0.552.0`
-
-**Package:** Lucide React provides 1000+ open-source icons with excellent tree-shaking support.
-
-**Status:** ✅ Optimized for Turbopack (Nov 2025) - see `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md`
-
----
-
-### ✅ Best Practices
-
-#### 1. Import Pattern (Turbopack-Compatible)
-
-**For components with FEW icons (1-7):**
-```typescript
-// ✅ GOOD - Named imports for small icon usage
-import { Calculator, PoundSterling, TrendingUp } from 'lucide-react';
-
-export function ResultCard() {
-  return (
-    <div>
-      <Calculator className={ICON_SIZES.SIZE_4} />
-      <PoundSterling className={ICON_SIZES.SIZE_4} />
-    </div>
-  );
-}
-```
-
-**For components with MANY icons (8+):**
-```typescript
-// ✅ BEST - Direct ESM imports (Turbopack-optimized, faster builds)
 import Calculator from 'lucide-react/dist/esm/icons/calculator.js';
-import PoundSterling from 'lucide-react/dist/esm/icons/pound-sterling.js';
-import TrendingUp from 'lucide-react/dist/esm/icons/trending-up.js';
-// ... 5+ more icons
-
-export function HeavyComponent() {
-  return (
-    <div>
-      <Calculator className={ICON_SIZES.SIZE_4} />
-      <PoundSterling className={ICON_SIZES.SIZE_4} />
-    </div>
-  );
-}
 ```
 
-**Why?** Turbopack's tree-shaking struggles with large barrel imports during code-splitting. Direct ESM imports fix navigation failures and reduce bundle size. See `docs/TURBOPACK-LUCIDE-FIX.md`.
-
-**❌ NEVER DO:**
-```typescript
-// ❌ BAD - Wildcard imports (breaks tree-shaking)
-import * as LucideIcons from 'lucide-react';
-
-// ❌ BAD - Default import (imports entire library)
-import Lucide from 'lucide-react';
-```
-
----
-
-#### 2. Icon Sizing - ALWAYS Use Design Tokens
-
-**Always use centralized sizing from `@/constants/designTokens`:**
-
+### Always Use Design Tokens
 ```typescript
 import { ICON_SIZES } from '@/constants/designTokens';
 
-// ✅ GOOD - Using design tokens
-<Icon className={ICON_SIZES.SIZE_4} />        // 1rem / 16px (standard)
-<Icon className={ICON_SIZES.SIZE_5} />        // 1.25rem / 20px (large)
-<Icon className={ICON_SIZES.SIZE_6} />        // 1.5rem / 24px (desktop)
-
-// ✅ GOOD - Responsive sizing
-<Icon className={cn(ICON_SIZES.SIZE_5, 'md:size-6')} />
-
-// ❌ BAD - Hardcoded sizes
-<Icon className="h-4 w-4" />
-<Icon className="size-4" />
+<Icon className={ICON_SIZES.SIZE_4} />  // 16px standard
+<Icon className={ICON_SIZES.SIZE_5} />  // 20px large
+<Icon className={ICON_SIZES.SIZE_6} />  // 24px desktop
 ```
 
-**Available sizes:**
+### Accessibility
 ```typescript
-export const ICON_SIZES = {
-  SIZE_3: 'size-3',  // 0.75rem / 12px - Inline indicators, external links
-  SIZE_4: 'size-4',  // 1rem / 16px - Standard UI icons (MOST COMMON)
-  SIZE_5: 'size-5',  // 1.25rem / 20px - Mobile menu, scroll indicators
-  SIZE_6: 'size-6',  // 1.5rem / 24px - Desktop enhancements, headings
-  SIZE_8: 'size-8',  // 2rem / 32px - Feature highlights, error pages
-} as const;
-```
+// Decorative (next to text)
+<Calculator aria-hidden="true" />
 
-**Why design tokens?**
-- ✅ Centralized consistency
-- ✅ Easy to update globally
-- ✅ Type-safe
-- ✅ Self-documenting
-
----
-
-#### 3. Accessibility - ARIA Labels Required
-
-**Rule: Every icon must have ARIA consideration.**
-
-##### Decorative Icons (next to visible text)
-
-```typescript
-// ✅ GOOD - Decorative icon hidden from screen readers
-<Button>
-  <Calculator className={ICON_SIZES.SIZE_4} aria-hidden="true" />
-  Calculate Tax
-</Button>
-
-// ✅ GOOD - Hash icon for heading anchors
-<h2 id="section">
-  <Hash className={ICON_SIZES.SIZE_6} aria-hidden="true" />
-  Section Title
-</h2>
-
-// ❌ BAD - Missing aria-hidden (screen reader announces icon unnecessarily)
-<Button>
-  <Calculator className={ICON_SIZES.SIZE_4} />
-  Calculate Tax
-</Button>
-```
-
-##### Interactive Icons (icon-only buttons/links)
-
-```typescript
-// ✅ GOOD - Icon-only button with aria-label
+// Interactive (icon-only button)
 <Button aria-label="Close menu">
-  <X className={ICON_SIZES.SIZE_4} />
-</Button>
-
-// ✅ GOOD - Icon with screen-reader-only text
-<Button>
-  <Trash2 className={ICON_SIZES.SIZE_4} />
-  <span className="sr-only">Delete income source</span>
-</Button>
-
-// ❌ BAD - Icon-only button without label
-<Button>
-  <X className={ICON_SIZES.SIZE_4} />
+  <X />
 </Button>
 ```
 
-##### Icons with State Changes
-
-```typescript
-// ✅ GOOD - Dynamic aria-label and aria-pressed
-<Button
-  aria-label={`Switch to ${label} mode`}
-  aria-pressed={theme === value}
->
-  {theme === 'dark' ? <Moon /> : <Sun />}
-  <span className="sr-only">{label} mode</span>
-</Button>
-```
-
-**Quick checklist:**
-- [ ] Decorative icons have `aria-hidden="true"`
-- [ ] Interactive icons have `aria-label` or `<span className="sr-only">`
-- [ ] Icon-only buttons describe the action, not the icon ("Close menu", not "X icon")
-- [ ] State changes update ARIA attributes dynamically
-
 ---
 
-#### 4. Color & Theming
+## Git Workflow
 
-**Always use semantic color tokens from Tailwind theme:**
-
-```typescript
-// ✅ GOOD - Semantic theme colors
-<Icon className="text-primary" />               // Brand color
-<Icon className="text-muted-foreground" />      // Secondary UI
-<Icon className="text-foreground" />            // Standard text
-<Icon className="text-destructive" />           // Errors, delete
-
-// ✅ GOOD - Conditional theming
-<Icon className={cn(
-  isActive ? 'text-foreground' : 'text-muted-foreground'
-)} />
-
-// ✅ GOOD - Hover states
-<Icon className="text-primary hover:text-primary/80 transition-colors" />
-
-// ⚠️ ACCEPTABLE - Feature-specific colors (document why)
-<Icon className="text-green-600 dark:text-green-400" /> // Success state
-
-// ❌ BAD - Hardcoded colors without dark mode
-<Icon className="text-blue-500" />
+### Commit Format
 ```
-
-**Common color patterns:**
-- `text-primary` - Interactive elements, links, CTAs
-- `text-muted-foreground` - Secondary UI, labels, placeholders
-- `text-foreground` - Standard text, active states
-- `text-destructive` - Errors, warnings, delete actions
-- `text-green-600 dark:text-green-400` - Success states (when semantic token doesn't exist)
-
----
-
-#### 5. Performance - Tree-Shaking
-
-**Our tree-shaking is optimal.** Only 53 icons imported vs. 1000+ available.
-
-**To maintain this:**
-
-1. **Use named imports** (Turbopack: only if <8 icons per file)
-2. **Use direct ESM imports** (Turbopack: required if 8+ icons per file)
-3. **Never import unused icons**
-4. **Don't create icon wrappers** (adds abstraction without benefit)
-
-**Check bundle impact when adding icons:**
-```bash
-# Build and check bundle size
-bun run build
-
-# Analyze bundle (if needed)
-bun run bundle:analyze
-```
-
----
-
-#### 6. Component Patterns
-
-##### Pattern 1: Direct Icon Usage (Most Common)
-
-```typescript
-import { Calculator } from 'lucide-react';
-import { ICON_SIZES } from '@/constants/designTokens';
-
-export function TaxCard() {
-  return (
-    <Card>
-      <Calculator className={ICON_SIZES.SIZE_4} aria-hidden="true" />
-      <h3>Calculate Tax</h3>
-    </Card>
-  );
-}
-```
-
-##### Pattern 2: Icon as Component Prop (Type-Safe)
-
-```typescript
-import type { LucideIcon } from 'lucide-react';
-import { ICON_SIZES } from '@/constants/designTokens';
-
-interface ResultCardProps {
-  icon?: LucideIcon;
-  title: string;
-}
-
-export function ResultCard({ icon: Icon, title }: ResultCardProps) {
-  return (
-    <Card>
-      {Icon && <Icon className={ICON_SIZES.SIZE_4} aria-hidden="true" />}
-      <h3>{title}</h3>
-    </Card>
-  );
-}
-
-// Usage
-<ResultCard icon={Calculator} title="Total Tax" />
-```
-
-##### Pattern 3: Conditional Icon Rendering
-
-```typescript
-import { Sun, Moon, Monitor } from 'lucide-react';
-
-export function ThemeToggle() {
-  const getIcon = () => {
-    switch (theme) {
-      case 'light': return Sun;
-      case 'dark': return Moon;
-      default: return Monitor;
-    }
-  };
-  
-  const Icon = getIcon();
-  return <Icon className={ICON_SIZES.SIZE_4} />;
-}
-```
-
----
-
-### 🔍 Icon Discovery & Selection
-
-**Finding the right icon:**
-
-1. **Browse Lucide icons:** https://lucide.dev/icons
-2. **Search by keyword:** https://lucide.dev/icons?search=calculator
-3. **Check existing usage:**
-   ```bash
-   # Find all icon imports in codebase
-   grep -r "from 'lucide-react'" src/
-   ```
-
-**Current icon inventory (53 icons used):**
-- Navigation: Menu, X, ChevronLeft/Right/Up/Down, ArrowLeft/Right, Home
-- Actions: Plus, Trash2, Check, CheckCircle, Send, Printer, FileDown, RefreshCw
-- UI: AlertCircle, AlertTriangle, HelpCircle, Clock, Calendar, Loader2Icon, Hash
-- Financial: Calculator, Wallet, PoundSterling, TrendingUp/Down, Percent, PiggyBank
-- Theme: Sun, Moon, Monitor, Cookie, User, MessageSquare
-- Content: FileText, BookOpen, Twitter, Mail, Coffee, Leaf, Heart
-
-See `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md` for complete icon inventory.
-
----
-
-### 📚 Reference
-
-**Key files:**
-- Icon sizes: `src/constants/designTokens.ts` (`ICON_SIZES`)
-- Complete audit: `docs/audits/PAYTAX-78-LUCIDE-AUDIT.md`
-- Turbopack fix: `docs/TURBOPACK-LUCIDE-FIX.md`
-
-**Quick commands:**
-```bash
-# Find all icon usage
-grep -r "from 'lucide-react'" src/
-
-# Check bundle size
-bun run build
-
-# Verify tree-shaking
-bun run bundle:analyze
-```
-
-**For new icons:**
-1. ✅ Check if similar icon already exists
-2. ✅ Use design tokens for sizing
-3. ✅ Add ARIA labels (decorative or interactive)
-4. ✅ Use semantic colors
-5. ✅ Test with screen reader (VoiceOver/NVDA)
-6. ✅ Choose correct import pattern (named vs. direct ESM)
-
----
-
-## 📝 Git Commit Guidelines
-
-### Commit Message Format
-
-```
-<type>: <subject> (<issue-id>)
+<type>: <subject> (PAYTAX-XX)
 
 <body>
 
-<footer>
+Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>
 ```
 
-**Types:**
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation only
-- `style:` - Formatting (no code change)
-- `refactor:` - Code restructuring
-- `test:` - Adding tests
-- `chore:` - Maintenance
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`
 
-**Examples:**
+### Pre-Commit Checklist
 ```bash
-# Good commits
-git commit -m "feat: Add marginal tax rate display (PAYTAX-22)"
-git commit -m "fix: Correct Scottish tax band calculation (PAYTAX-32)"
-git commit -m "docs: Update CONTRIBUTING.md with testing guidelines"
-git commit -m "test: Add blog search pagination tests (PAYTAX-34)"
-
-# Bad commits
-git commit -m "updates"
-git commit -m "fix bug"
-git commit -m "wip"
+bun run fix-all              # Format, lint, typecheck
+bun run test:no-coverage     # Run tests
+git diff                     # Review changes
 ```
 
-**Always include co-authorship:**
+### Push Directly to Main
+We push directly to main for most changes. Feature branches only for complex multi-day work.
+
 ```bash
-git commit -m "feat: Add feature
+git add -A
+git commit -m "feat: Description (PAYTAX-XX)
 
 Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.github.com>"
+git push origin main
 ```
 
 ---
 
-## 🧪 Testing Guidelines
-
-### What to Test
-
-**Always test:**
-- ✅ Business logic (tax calculations, formulas)
-- ✅ User interactions (button clicks, form submissions)
-- ✅ Edge cases (£0 salary, £1M salary, invalid input)
-- ✅ Error handling (API failures, network errors)
-- ✅ Accessibility (keyboard navigation, screen readers)
-
-**Don't need to test:**
-- ❌ Third-party libraries
-- ❌ Simple getters/setters
-- ❌ UI styling (unless accessibility-critical)
-
-### Test Coverage Goals
-
-**Targets:**
-- Overall: 90%+
-- Business Logic: 99%+
-- Components: 80%+
-- Utilities: 95%+
-
-**View current coverage:**
-```bash
-bun run test        # Generates coverage report
-# Opens: audit-outputs/coverage/lcov-report/index.html
-```
-
-**Coverage reports are saved to `audit-outputs/coverage/` after running tests.**
-
----
-
-## 🎨 UI/UX Guidelines
-
-### Accessibility First
-
-**Every interactive element must:**
-- Have ARIA labels where needed
-- Support keyboard navigation
-- Work with screen readers
-- Have 44x44px touch targets (mobile)
-- Pass color contrast checks (WCAG AA)
-
-**Test accessibility:**
-```bash
-bun run audit:a11y
-```
-
-### Mobile-First Design
-
-**Always test:**
-1. Mobile (320px - 767px)
-2. Tablet (768px - 1023px)
-3. Desktop (1024px+)
-
-**Responsive breakpoints:**
-```typescript
-// Tailwind breakpoints
-sm: 640px   // Small tablets
-md: 768px   // Tablets
-lg: 1024px  // Laptops
-xl: 1280px  // Desktops
-```
-
----
-
-## 📦 Dependencies
-
-### Adding New Dependencies
-
-**Before adding a package:**
-1. Check if functionality already exists
-2. Verify package is actively maintained
-3. Check bundle size impact
-4. Review security advisories
-
-**Process:**
-```bash
-# 1. Install
-bun add package-name
-
-# 2. Check bundle impact
-bun run bundle:analyze
-
-# 3. Document why it's needed (in PR/commit)
-```
-
-### Updating Dependencies
-
-**Monthly maintenance (see Linear recurring issue):**
-```bash
-# Check for updates
-bun outdated
-
-# Update (carefully!)
-bun update
-
-# Run full test suite
-bun run test:all
-
-# Check for breaking changes
-git diff bun.lockb
-```
-
-**Security updates (immediate):**
-```bash
-bun pm audit
-bun pm audit --fix
-```
-
----
-
-## 🚀 SEO & Performance
-
-### SEO Checklist for New Pages
-
-- [ ] Meta title (50-60 chars)
-- [ ] **Meta description (150-158 chars) - CRITICAL**
-- [ ] H1 tag (one per page)
-- [ ] Internal links (3+ per page)
-- [ ] Alt text on images
-- [ ] Semantic HTML
-- [ ] Schema markup (where applicable)
-
-**Meta Description Guidelines:**
-```typescript
-// ✅ GOOD - 155 characters, clear value, includes year
-description: "Calculate UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-26. Scottish rates, student loans included."
-
-// ❌ BAD - 198 characters (too long, will be truncated)
-description: "Calculate your exact UK take-home pay with our free PAYE calculator using official HMRC rates for 2025-2026. Includes Scottish tax rates, student loans, pension contributions and marriage allowance."
-
-// ❌ BAD - 87 characters (too short, not compelling)
-description: "All calculations use official HMRC tax rates and thresholds published"
-```
-
-**Formula:** `[What] + [Key Benefit] + [Credibility] + [Tax Year]`
-
-**Must Include:**
-- Primary keyword naturally
-- Tax year (2025, 2025-26, etc.)
-- Clear benefit/value proposition
-- Call to action (implicit or explicit)
-
-**Target:** 150-158 characters (Google's mobile + desktop sweet spot)
-
-**Audit Tools:**
-```bash
-# Check all meta descriptions
-node scripts/audit-meta-descriptions.js
-
-# Look for: missing, too long (>160), too short (<120)
-# Note: SEMrush only flags "missing" and "duplicate"
-# Character length optimization is our own best practice
-```
-
-### Performance Checklist
-
-- [ ] Images optimized (<100KB each)
-- [ ] Lazy loading images
-- [ ] Code splitting for large components
-- [ ] Minimize bundle size
-- [ ] No console.log in production
-
-**Check performance:**
-```bash
-bun run lighthouse
-```
-
-**Target metrics:**
-- **LCP** (Largest Contentful Paint): <2.5s
-- **FID** (First Input Delay): <100ms
-- **CLS** (Cumulative Layout Shift): <0.1
-
----
-
-## 📚 Documentation
-
-### ⚠️ EVERGREEN DOCUMENTATION POLICY
-
-**CRITICAL: Only create evergreen documentation that stays relevant.**
-
-**Rules:**
-1. ❌ **NEVER create docs for one-off issues/incidents** (e.g., "January Worker Crisis")
-2. ❌ **NEVER create temporary analysis documents in root folder**
-3. ✅ **UPDATE existing docs** instead of creating new ones
-4. ✅ **Create new docs ONLY for permanent features/guides**
-5. ✅ **All permanent docs belong in `docs/` folder** (organized by category)
-
-**Examples:**
-
-**❌ BAD - Temporary, issue-specific docs:**
-- `GITLAB_WORKER_CAPACITY_ANALYSIS.md` (one-off problem analysis)
-- `CICD_OPTIMIZATION_SUMMARY.md` (specific incident summary)
-- `LINEAR_SETUP_SUMMARY.md` (setup notes, should be in docs/)
-- `DATABASE_MIGRATION_NOTES.md` (temporary notes)
-
-**✅ GOOD - Evergreen docs:**
-- `CONTRIBUTING.md` (always relevant, updated over time)
-- `README.md` (project overview, always needed)
-- `docs/infrastructure/CICD.md` (permanent CI/CD guide)
-- `docs/guides/BLOG_GUIDE.md` (permanent feature guide)
-- `CHANGELOG.md` (historical record, always updated)
-
-**When you fix an issue:**
-1. ✅ Update existing relevant docs (e.g., update CI/CD section in existing doc)
-2. ✅ Add learnings to CONTRIBUTING.md if generally applicable
-3. ✅ Document in Linear issue for historical context
-4. ❌ Don't create `ISSUE_NAME_ANALYSIS.md` in root folder
-
-**Root folder should only contain:**
-- `README.md` - Project overview
-- `CONTRIBUTING.md` - Development guidelines (this file)
-- `CHANGELOG.md` - Version history
-- `SECURITY.md` - Security policy
-- `LICENSE` - License file
-- Config files (package.json, tsconfig.json, etc.)
-
-**Everything else goes in `docs/` organized by:**
-- `docs/guides/` - Feature guides
-- `docs/infrastructure/` - CI/CD, deployment, monitoring
-- `docs/setup/` - Setup and installation
-- `docs/reference/` - API references, schemas
-
----
-
-### When to Update Docs
-
-**Update docs when you:**
-- Add new features
-- Change APIs
-- Add new dependencies
-- Change build process
-- Fix complex bugs (update relevant guide, don't create new doc!)
-
-### Where to Document
-
-| What | Where |
-|------|-------|
-| API changes | Code JSDoc comments |
-| Features | README.md overview + docs/guides/ for details |
-| Setup | docs/setup/ |
-| Architecture | docs/guides/ARCHITECTURE.md |
-| Best practices | This file (CONTRIBUTING.md) |
-| CI/CD | docs/infrastructure/CICD.md |
-| Deployment | docs/infrastructure/DEPLOYMENT.md |
-
----
-
-## 🔍 Code Review Guidelines (For Humans)
-
-### What to Look For
-
-**Code quality:**
-- [ ] Follows TypeScript strict mode
-- [ ] Has JSDoc comments
-- [ ] Tests included
-- [ ] No console.log statements
-- [ ] Passes linting
-
-**Functionality:**
-- [ ] Meets acceptance criteria
-- [ ] Handles edge cases
-- [ ] No regressions
-- [ ] Accessible (keyboard, screen reader)
-- [ ] Mobile responsive
-
-**Performance:**
-- [ ] No unnecessary re-renders
-- [ ] Images optimized
-- [ ] No bundle bloat
-
----
-
-## 🎯 Linear Integration
-
-**Quick Start (30 seconds):**
+## Linear Integration
 
 ```bash
-# 1. Set up API key (one-time):
-export LINEAR_API_KEY="lin_api_xxx"  # Get from linear.app/settings/api
-
-# 2. View your assigned issues:
+# View your issues
 bun run linear:me
 
-# 3. Mark issue done:
-bun run linear:done PAYTAX-80 Done
+# Create issue
+bun run linear:create "Title"
 
-# 4. Create new issue:
-bun run linear:create
+# Update status
+bun run linear update-status PAYTAX-XX Done
+
+# Full help
+bun run linear
 ```
 
-**That's it!** Everything else is available via `bun run linear` (shows full help).
-
-### Daily Use
-
-```bash
-# Morning: See what's assigned to you
-bun run linear:me
-
-# During work: Mark as done
-bun run linear:done PAYTAX-123 Done
-
-# When needed: Create issue/sub-issue
-bun run linear:create
-```
-
-### All Available Commands
-
-```bash
-bun run linear  # Shows full help with all commands
-
-# Common commands:
-bun run linear list --project PayeTax
-bun run linear update-description PAYTAX-123 "Details"
-bun run linear create "Title" --parent PAYTAX-123
-bun run linear update-priority PAYTAX-123 1
-bun run linear delete PAYTAX-123
-```
-
-**Pro tip:** Run `bun run linear` anytime to see all options.
+**API Key:** Set `LINEAR_API_KEY` environment variable (get from linear.app/settings/api)
 
 ---
 
-## 🐛 Debugging Tips
+## File Organization
 
-### Common Issues
-
-**TypeScript errors:**
-```bash
-# Clear build cache
-bun run clean
-
-# Rebuild
-bun run dev
+```
+src/
+├── components/
+│   ├── atoms/       # Button, Input, etc.
+│   ├── molecules/   # SearchBar, Card, etc.
+│   ├── organisms/   # Header, Calculator, etc.
+│   └── templates/   # Page layouts
+├── lib/
+│   ├── validation/  # Zod schemas
+│   └── utils/       # Helper functions
+├── constants/       # Design tokens, tax rates
+└── store/           # Zustand stores
 ```
 
-**Test failures:**
-```bash
-# Run specific test
-bun test TaxCalculator.test.tsx
-
-# Update snapshots (if needed)
-bun test -- -u
-```
-
-**Build errors:**
-```bash
-# Clean everything
-bun run clean:all
-
-# Fresh install
-bun install
-```
+**Naming:**
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Constants: `UPPER_SNAKE_CASE`
 
 ---
 
-## 📖 Key Reference Docs
-
-| Doc | Purpose |
-|-----|---------|
-| [README.md](./README.md) | Project overview |
-| [LINEAR.md](./docs/setup/LINEAR.md) | Complete Linear guide (5 min quickstart → full reference) |
-| [BLOG_GUIDE.md](./docs/guides/BLOG_GUIDE.md) | Blog writing guidelines |
-| [TECH_STACK.md](./docs/guides/TECH_STACK.md) | Technology overview |
-| [ARCHITECTURE.md](./docs/guides/ARCHITECTURE.md) | Codebase structure & audit status |
-
----
-
-## ⚡ Quick Commands Reference
+## Quick Commands
 
 ```bash
 # Development
@@ -1361,60 +312,56 @@ bun run build              # Production build
 bun run fix-all            # Format, lint, typecheck
 
 # Testing
-bun run test               # Unit tests with coverage
-bun run test:e2e           # E2E tests
-bun run test:all           # All tests
-
-# Linear (see docs/setup/LINEAR.md for full guide)
-bun run linear:me          # Your issues (use daily!)
-bun run linear:create      # Create issue (interactive)
-bun run linear:list        # All issues
-bun run linear update-status PAYTAX-X Done  # Update status
+bun run test               # Tests with coverage
+bun run test:no-coverage   # Fast tests
+bun run test:e2e           # Playwright E2E
 
 # Quality
 bun run lint:fix           # Fix linting
 bun run typecheck          # Type check
-bun run audit:deps         # Security audit
+bun run bundle:analyze     # Bundle analysis
 
-# Performance
-bun run lighthouse         # Performance audit
-bun run bundle:analyze     # Bundle size
-
-# Git
-git commit --no-verify     # Bypass pre-commit (use sparingly!)
+# Linear
+bun run linear:me          # Your issues
+bun run linear:create      # New issue
 ```
 
 ---
 
-## 🤝 Getting Help
+## Sentry & Error Handling
 
-**Stuck? Try these in order:**
+### Log Filtering
+Noisy logs are filtered in `instrumentation-client.ts` and `sentry.server.config.ts`:
+- PWA/ServiceWorker errors
+- Deprecation warnings
+- Chunk loading failures
 
-1. **Check the docs** - `docs/` folder
-2. **Check Linear issue comments** - Others may have same question
-3. **Review recent commits** - See how similar issues were solved
-4. **Check test files** - Often show usage examples
-5. **Ask in issue comments** - Tag relevant people
+### Local Development
+Sentry only runs in Vercel deployments (`process.env.VERCEL`), not local builds.
 
 ---
 
-## 🎉 Remember
+## Documentation Policy
 
-> "Code is read more than it's written. Make it clear, not clever."
+**Only create evergreen documentation:**
+- Update existing docs instead of creating new ones
+- No one-off incident analysis docs in root folder
+- All permanent docs in `docs/` folder
 
-**Priorities (in order):**
+**Root folder contains only:**
+- README.md, CONTRIBUTING.md, CHANGELOG.md
+- Config files (package.json, tsconfig.json, etc.)
+
+---
+
+## Remember
+
+> "Test behavior, not implementation. Code is read more than written."
+
+**Priorities:**
 1. **Correctness** - Does it work?
 2. **Clarity** - Can others understand it?
 3. **Maintainability** - Can it be easily changed?
 4. **Performance** - Is it fast enough?
 
-**When in doubt:**
-- Write tests
-- Add comments
-- Ask questions
-- Keep it simple
-
----
-
-**Questions about this guide?**
-Create a Linear issue: `docs: [Your question about CONTRIBUTING.md]`
+**When in doubt:** Write tests, add comments, keep it simple.
