@@ -13,8 +13,8 @@ Sentry.init({
   // Enable structured logs (5GB/month free tier)
   enableLogs: true,
 
-  // Performance monitoring with intelligent sampling
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0, // 20% in prod, 100% in dev
+  // Performance monitoring - optimized for free tier (10k transactions/month)
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 10% in prod, 100% in dev
 
   // Advanced traces sampling based on operation
   tracesSampler: (samplingContext) => {
@@ -23,28 +23,28 @@ Sentry.init({
       return 1.0;
     }
 
-    // Sample critical transactions at higher rate
+    // Sample critical transactions - keep low for free tier
     const transactionName = samplingContext.transactionContext?.name;
     if (transactionName?.includes('/api/')) {
-      return 0.5; // 50% for API routes
+      return 0.1; // 10% for API routes
     }
 
-    // Sample calculator pages at higher rate (core functionality)
+    // Sample calculator pages (core functionality)
     if (
       transactionName?.includes('/calculator') ||
       transactionName?.includes('/salary') ||
       transactionName?.includes('/income')
     ) {
-      return 0.4; // 40% for calculator pages
+      return 0.15; // 15% for calculator pages
     }
 
     // Default sampling for other pages
-    return 0.2;
+    return 0.05;
   },
 
-  // Session Replay configuration
+  // Session Replay - optimized for free tier (50 replays/month)
   replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0, // Capture 100% of errors
-  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0, // Sample 10% of sessions
+  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.01 : 0, // Sample 1% of sessions
 
   // Integrations with enhanced configuration
   integrations:

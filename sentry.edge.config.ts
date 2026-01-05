@@ -10,8 +10,8 @@ Sentry.init({
   // Enable structured logs (5GB/month free tier)
   enableLogs: true,
 
-  // Performance monitoring - Edge runtime is lightweight, sample more
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.5 : 1.0, // 50% in prod, 100% in dev
+  // Performance monitoring - optimized for free tier
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 10% in prod, 100% in dev
 
   // Advanced traces sampling for edge runtime
   tracesSampler: (samplingContext) => {
@@ -22,18 +22,18 @@ Sentry.init({
 
     const transactionName = samplingContext.transactionContext?.name;
 
-    // Edge API routes - sample highly
+    // Edge API routes - keep low
     if (transactionName?.includes('/api/')) {
-      return 0.7;
+      return 0.1;
     }
 
-    // Middleware - critical path, sample highly
+    // Middleware - sample sparingly
     if (transactionName?.includes('middleware')) {
-      return 0.8;
+      return 0.05;
     }
 
     // Default sampling for edge runtime
-    return 0.5;
+    return 0.05;
   },
 
   // Edge-specific integrations

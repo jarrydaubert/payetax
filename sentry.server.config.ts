@@ -10,8 +10,8 @@ Sentry.init({
   // Enable structured logs (5GB/month free tier)
   enableLogs: true,
 
-  // Performance monitoring with intelligent sampling
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.3 : 1.0, // 30% in prod, 100% in dev
+  // Performance monitoring - optimized for free tier (10k transactions/month)
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 10% in prod, 100% in dev
 
   // Advanced traces sampling for server-side operations
   tracesSampler: (samplingContext) => {
@@ -22,27 +22,27 @@ Sentry.init({
 
     const transactionName = samplingContext.transactionContext?.name;
 
-    // Sample API routes at higher rate
+    // Sample API routes - keep low for free tier
     if (transactionName?.includes('/api/')) {
-      // Critical API routes - 80% sampling
+      // Critical API routes - 20% sampling
       if (
         transactionName?.includes('/api/calculate') ||
         transactionName?.includes('/api/tax') ||
         transactionName?.includes('/api/salary')
       ) {
-        return 0.8;
+        return 0.2;
       }
-      // Other API routes - 50% sampling
-      return 0.5;
+      // Other API routes - 10% sampling
+      return 0.1;
     }
 
     // Sample server actions and route handlers
     if (transactionName?.includes('action') || transactionName?.includes('route')) {
-      return 0.5;
+      return 0.1;
     }
 
     // Default sampling for server-side rendering
-    return 0.3;
+    return 0.05;
   },
 
   // Server-specific integrations
