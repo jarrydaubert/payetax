@@ -22,11 +22,6 @@ jest.mock('@/components/atoms/CookieBanner', () => ({
   default: () => <div data-testid='mock-cookie-banner'>Cookie Banner</div>,
 }));
 
-jest.mock('@/components/molecules/SustainabilityBadge', () => ({
-  __esModule: true,
-  default: () => <div data-testid='mock-sustainability-badge'>Sustainability Badge</div>,
-}));
-
 describe('Layout Component', () => {
   it('should render children content', () => {
     render(
@@ -71,16 +66,6 @@ describe('Layout Component', () => {
     );
 
     expect(screen.getByTestId('mock-cookie-banner')).toBeInTheDocument();
-  });
-
-  it('should render sustainability badge', () => {
-    render(
-      <Layout>
-        <div>Content</div>
-      </Layout>
-    );
-
-    expect(screen.getByTestId('mock-sustainability-badge')).toBeInTheDocument();
   });
 
   it('should have skip-to-content link for accessibility', () => {
@@ -158,7 +143,7 @@ describe('Layout Component', () => {
     const wrapper = container.firstChild as HTMLElement;
     const children = Array.from(wrapper.children);
 
-    // Order: skip link, header (navbar), main (content), footer, suspense (cookie banner), sustainability badge
+    // Order: skip link, header (navbar), main (content), footer, suspense (cookie banner)
     expect(children[0].tagName).toBe('A'); // Skip link
     expect(children[1].tagName).toBe('HEADER'); // Navbar
     expect(children[2].tagName).toBe('MAIN'); // Main content

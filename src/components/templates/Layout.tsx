@@ -5,7 +5,6 @@ import type React from 'react';
 import { Suspense } from 'react';
 import CookieBanner from '@/components/atoms/CookieBanner';
 import Footer from '@/components/molecules/Footer';
-import SustainabilityBadge from '@/components/molecules/SustainabilityBadge';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 
 interface LayoutProps {
@@ -40,9 +39,6 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       <Suspense fallback={null}>
         <CookieBanner />
       </Suspense>
-
-      {/* Sustainability Badge */}
-      <SustainabilityBadge />
     </div>
   );
 }
