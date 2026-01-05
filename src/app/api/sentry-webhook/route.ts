@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 }
 
 function buildDescription(
-  issue: SentryWebhookPayload['data']['issue'],
+  issue: NonNullable<SentryWebhookPayload['data']['issue']>,
   event?: SentryWebhookPayload['data']['event']
 ): string {
   const lines: string[] = [];
