@@ -6,7 +6,7 @@ const readline = require('node:readline');
 
 // Configuration
 const LINEAR_API_KEY = process.env.LINEAR_API_KEY;
-const TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYETAX'; // Team identifier
+const TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYTAX'; // Team identifier
 
 if (!LINEAR_API_KEY) {
   console.error('❌ Error: LINEAR_API_KEY environment variable not set');

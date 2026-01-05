@@ -77,3 +77,4 @@ security-audit-history.json
 # TypeScript build artifacts
 tsconfig.tsbuildinfo
 playwright/.auth/
+.env*.local
