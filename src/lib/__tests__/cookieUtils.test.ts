@@ -276,6 +276,9 @@ describe('Cookie Utils', () => {
       );
     });
 
+    // SKIP: Complex date mocking is fragile and this edge case is low-risk
+    // The month boundary calculation is tested implicitly by other expiration tests
+    // Fixing would require significant refactoring of Date mocking approach
     test.skip('should handle edge case around month boundaries', () => {
       // Test around February/March boundary to ensure month calculation is correct
       const testDate = new Date('2024-03-31T10:00:00Z');

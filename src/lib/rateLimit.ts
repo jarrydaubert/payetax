@@ -1,8 +1,16 @@
 // src/lib/rateLimit.ts
+/**
+ * In-memory rate limiter using LRU cache.
+ * Stores IP addresses and request counts with automatic expiration.
+ *
+ * SECURITY NOTE: This rate limiter uses x-forwarded-for header for IP identification.
+ * On Vercel (our deployment platform), x-forwarded-for is securely set by the edge network
+ * and cannot be spoofed by clients. Direct server access is not possible on Vercel.
+ * If deploying elsewhere, ensure your reverse proxy/CDN sanitizes this header.
+ *
+ * @see https://vercel.com/docs/concepts/edge-network/headers#x-forwarded-for
+ */
 import { LRUCache } from 'lru-cache';
-
-// In-memory rate limiter using LRU cache
-// Stores IP addresses and request counts with automatic expiration
 
 interface RateLimitConfig {
   max: number; // Maximum requests allowed

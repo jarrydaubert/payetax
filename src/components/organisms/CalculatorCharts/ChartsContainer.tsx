@@ -73,7 +73,8 @@ export const ChartsContainer = memo(function ChartsContainer({
   return (
     <div
       className={cn(
-        `grid grid-cols-1 lg:grid-cols-${showIncomeBreakdown ? '3' : '2'}`,
+        'grid grid-cols-1',
+        showIncomeBreakdown ? 'lg:grid-cols-3' : 'lg:grid-cols-2',
         SPACING.GAP_4,
         // Landscape optimization: full-width charts on mobile landscape
         'landscape:max-md:grid-cols-1 landscape:max-md:gap-6',

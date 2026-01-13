@@ -128,12 +128,9 @@ self.addEventListener('fetch', (event) => {
   const skipDomains = [
     'googletagmanager.com',
     'google-analytics.com',
-    'buymeacoffee.com',
-    'cdnjs.buymeacoffee.com',
-    'bmac-cdn.nyc3.digitaloceanspaces.com',
     'va.vercel-scripts.com',
     'vercel-insights.com',
-    'analytics.ahrefs.com', // Ahrefs analytics
+    'analytics.ahrefs.com',
   ];
 
   if (skipDomains.some((domain) => url.includes(domain))) {

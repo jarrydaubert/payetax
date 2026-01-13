@@ -6,6 +6,35 @@ import { addBreadcrumb, captureAPIError, setContext } from '@/lib/sentry';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+/**
+ * Anonymize IP address for GDPR compliance by masking the last octet.
+ * IPv4: 192.168.1.100 -> 192.168.1.xxx
+ * IPv6: 2001:db8::1 -> 2001:db8::xxx
+ */
+function anonymizeIp(ip: string): string {
+  if (ip === 'unknown') return ip;
+
+  // IPv4: mask last octet
+  if (ip.includes('.')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      parts[3] = 'xxx';
+      return parts.join('.');
+    }
+  }
+
+  // IPv6: mask last segment
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    if (parts.length > 0) {
+      parts[parts.length - 1] = 'xxx';
+      return parts.join(':');
+    }
+  }
+
+  return ip;
+}
+
 interface ErrorData {
   message: string;
   stack?: string;
@@ -23,11 +52,14 @@ export async function POST(request: NextRequest) {
     request.headers.get('x-real-ip') ||
     'unknown';
 
-  // Add breadcrumb for error log request
+  // Anonymize IP for logging/display (GDPR compliance)
+  const anonymizedIp = anonymizeIp(ipAddress);
+
+  // Add breadcrumb for error log request (use anonymized IP)
   addBreadcrumb('api', {
     message: 'Error log API request received',
     level: 'info',
-    data: { ipAddress },
+    data: { ipAddress: anonymizedIp },
   });
 
   // Check rate limit (10 requests per minute per IP)
@@ -35,7 +67,7 @@ export async function POST(request: NextRequest) {
     addBreadcrumb('api', {
       message: 'Rate limit exceeded for error logging',
       level: 'warning',
-      data: { ipAddress },
+      data: { ipAddress: anonymizedIp },
     });
     return NextResponse.json(
       { error: 'Too many requests. Please try again in a minute.' },
@@ -112,7 +144,7 @@ export async function POST(request: NextRequest) {
             <p style="margin: 0 0 10px 0;"><strong>⏰ Timestamp:</strong> ${timestamp || new Date().toLocaleString()}</p>
             <p style="margin: 0 0 10px 0;"><strong>🌐 Page URL:</strong> ${safeUrl}</p>
             <p style="margin: 0 0 10px 0;"><strong>🔑 Error Digest:</strong> ${safeDigest}</p>
-            <p style="margin: 0;"><strong>🖥️ IP Address:</strong> ${ipAddress}</p>
+            <p style="margin: 0;"><strong>🖥️ IP Address:</strong> ${anonymizedIp}</p>
           </div>
 
           ${
@@ -166,7 +198,7 @@ Error: ${message}
 Timestamp: ${timestamp || new Date().toLocaleString()}
 Page URL: ${url || 'N/A'}
 Error Digest: ${digest || 'N/A'}
-IP Address: ${ipAddress}
+IP Address: ${anonymizedIp}
 
 ${stack ? `\nStack Trace:\n${stack}\n` : ''}
 ${componentStack ? `\nComponent Stack:\n${componentStack}\n` : ''}

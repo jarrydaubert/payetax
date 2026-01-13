@@ -112,16 +112,19 @@ describe('Salary Comparison', () => {
       expect(result?.increasePercentage).toBe(25);
     });
 
-    it('should calculate differences', () => {
+    it('should calculate differences with specific expected values', () => {
       const result = calculateComparison(mockCurrentInput, {
         mode: 'amount',
         value: 10000,
         currentSalary: 40000,
       });
 
+      // £40k → £50k: Additional £10k taxed at 20% + 8% NI = £2,800 deductions
+      // Net increase: £10,000 - £2,800 = £7,200
       expect(result?.grossDiff).toBe(10000);
-      expect(result?.netDiff).toBeGreaterThan(0);
-      expect(result?.netDiff).toBeLessThan(10000); // Some goes to tax
+      expect(result?.netDiff).toBeCloseTo(7200, 0);
+      expect(result?.taxDiff).toBeCloseTo(2000, 0); // £10k × 20%
+      expect(result?.niDiff).toBeCloseTo(800, 0); // £10k × 8%
     });
 
     it('should return null for invalid input', () => {

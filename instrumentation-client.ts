@@ -67,8 +67,6 @@ Sentry.init({
               'input[type="email"]',
               'input[type="tel"]',
             ],
-            // Allow specific iframes (BMC widget)
-            ignore: ['iframe[src*="buymeacoffee"]'],
             // Network request/response body recording
             networkDetailAllowUrls: [window.location.origin],
             networkRequestHeaders: ['User-Agent'],
