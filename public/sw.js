@@ -1,9 +1,9 @@
 // Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
-const CACHE_NAME = 'payetax-v4.9.5';
-const STATIC_CACHE_NAME = 'payetax-static-v4.9.5';
-const API_CACHE_NAME = 'payetax-api-v4.9.5';
+const CACHE_NAME = 'payetax-v4.9.6';
+const STATIC_CACHE_NAME = 'payetax-static-v4.9.6';
+const API_CACHE_NAME = 'payetax-api-v4.9.6';
 
 // Helper function to log only in development
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -153,22 +153,27 @@ self.addEventListener('fetch', (event) => {
 // Network-first strategy (for dynamic content)
 async function networkFirstStrategy(request, event) {
   try {
-    // Try to use navigation preload if available (faster perceived load)
-    // FIXED: Properly handle preloadResponse to prevent cancellation warning
-    const preloadResponse = event?.preloadResponse ? await event.preloadResponse : null;
+    // For navigation requests with preload, race between preload and fetch
+    // This prevents the "preloadResponse cancelled" warning
+    if (event?.preloadResponse && request.mode === 'navigate') {
+      try {
+        // Wait for preload response - must be awaited to prevent cancellation
+        const preloadResponse = await event.preloadResponse;
 
-    if (preloadResponse) {
-      devLog('Using navigation preload for:', request.url);
+        if (preloadResponse) {
+          devLog('Using navigation preload for:', request.url);
 
-      // Cache the preloaded response asynchronously (don't block return)
-      // Using event.waitUntil ensures the cache operation completes even after response is returned
-      event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, preloadResponse.clone());
-        })
-      );
+          // Cache asynchronously
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, preloadResponse.clone());
+          });
 
-      return preloadResponse;
+          return preloadResponse;
+        }
+      } catch (preloadError) {
+        // Preload failed, fall through to normal fetch
+        devLog('Navigation preload failed, using fetch:', preloadError);
+      }
     }
 
     const networkResponse = await fetch(request);
