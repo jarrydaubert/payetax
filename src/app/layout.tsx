@@ -157,10 +157,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       >
         {/* Ahrefs Web Analytics - Privacy-first analytics without cookies */}
+        {/* lazyOnload defers until after page is fully loaded - better for mobile LCP */}
         <Script
           src='https://analytics.ahrefs.com/analytics.js'
           data-key='QVltTEcUkJo80YKtGhAvrg'
-          strategy='afterInteractive'
+          strategy='lazyOnload'
         />
 
         <ThemeProvider>
