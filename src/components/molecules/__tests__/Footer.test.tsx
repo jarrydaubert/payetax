@@ -23,7 +23,7 @@ describe('Footer Component', () => {
     it('should render copyright notice', () => {
       render(<Footer />);
 
-      expect(screen.getByText(/© 2025 PayeTax/i)).toBeInTheDocument();
+      expect(screen.getByText(/© 2026 PayeTax/i)).toBeInTheDocument();
     });
   });
 
@@ -176,7 +176,7 @@ describe('Footer Component', () => {
     it('should display current year in copyright', () => {
       render(<Footer />);
 
-      expect(screen.getByText(/2025/i)).toBeInTheDocument();
+      expect(screen.getByText(/2026/i)).toBeInTheDocument();
     });
 
     it('should display PayeTax brand name', () => {

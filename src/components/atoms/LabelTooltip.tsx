@@ -43,7 +43,9 @@ export const LabelTooltip = memo(function LabelTooltip({
 
   // If no tooltip content found, don't render anything
   if (!tooltipContent) {
-    console.warn(`[LabelTooltip] No tooltip content found for field: ${fieldName}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[LabelTooltip] No tooltip content found for field: ${fieldName}`);
+    }
     return null;
   }
 

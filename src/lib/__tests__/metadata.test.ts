@@ -190,11 +190,8 @@ describe('Metadata Module', () => {
       expect(metadata.verification?.google).toBe(
         'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c'
       );
-      expect(metadata.verification?.other).toEqual({
-        'msvalidate.01': 'YOUR_BING_VERIFICATION_CODE',
-        'yandex-verification': 'YOUR_YANDEX_VERIFICATION_CODE',
-        'baidu-site-verification': 'YOUR_BAIDU_VERIFICATION_CODE',
-      });
+      // Placeholder verification codes have been removed
+      expect(metadata.verification?.other).toBeUndefined();
     });
 
     test('should include proper icons configuration', () => {

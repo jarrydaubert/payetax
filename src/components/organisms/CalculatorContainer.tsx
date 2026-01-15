@@ -43,7 +43,7 @@ export function CalculatorContainer() {
   const input = useCalculatorStore((state) => state.input);
   const { calculate, calculatePreviousYear, setPensionContribution, setPensionContributionType } =
     useCalculatorActions();
-  const [_isPending, startTransition] = React.useTransition();
+  const [, startTransition] = React.useTransition();
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
     'Monthly',

@@ -206,14 +206,9 @@ export function generateMetadata({
     // Topic and category metadata
     category,
 
-    // Verification codes for search engines - using only supported properties
+    // Verification codes for search engines
     verification: {
       google: 'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c',
-      other: {
-        'msvalidate.01': 'YOUR_BING_VERIFICATION_CODE',
-        'yandex-verification': 'YOUR_YANDEX_VERIFICATION_CODE',
-        'baidu-site-verification': 'YOUR_BAIDU_VERIFICATION_CODE',
-      },
     },
 
     // Other metadata

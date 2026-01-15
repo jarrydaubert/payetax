@@ -213,27 +213,19 @@ describe('LabelTooltip Component', () => {
     });
   });
 
-  describe('Warning Logs', () => {
-    it('should warn when field not found in config', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+  describe('Missing Field Handling', () => {
+    it('should return null when field not found in config', () => {
+      const { container } = render(<LabelTooltip fieldName='unknownField' />);
 
-      render(<LabelTooltip fieldName='unknownField' />);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('No tooltip content found for field: unknownField')
-      );
-
-      consoleSpy.mockRestore();
+      // Component returns null for unknown fields
+      expect(container.firstChild).toBeNull();
     });
 
-    it('should not warn when valid field provided', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-
+    it('should render tooltip when valid field provided', () => {
       render(<LabelTooltip fieldName='salary' />);
 
-      expect(consoleSpy).not.toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
+      // Should render the tooltip trigger button
+      expect(screen.getByRole('button')).toBeInTheDocument();
     });
   });
 

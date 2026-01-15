@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 // src/components/pages/__tests__/HomePageContent.test.tsx
+// Note: Hero is now server-rendered in page.tsx for LCP optimization
 
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import HomePageContent from '../HomePageContent';
 
 // Mock child components
@@ -16,17 +16,6 @@ jest.mock('@/components/organisms/CalculatorContainer', () => ({
 
 jest.mock('@/components/organisms/CalculatorContent', () => ({
   CalculatorContent: () => <div data-testid='mock-calculator-content'>Calculator Content</div>,
-}));
-
-jest.mock('@/components/molecules/SimpleHero', () => ({
-  __esModule: true,
-  default: ({ onScrollToCalculator }: any) => (
-    <div data-testid='mock-simple-hero'>
-      <button type='button' onClick={onScrollToCalculator} data-testid='scroll-button'>
-        Scroll to Calculator
-      </button>
-    </div>
-  ),
 }));
 
 // Mock calculator store
@@ -41,10 +30,10 @@ describe('HomePageContent Component', () => {
     mockInit.mockClear();
   });
 
-  it('should render all main sections', () => {
+  it('should render all main sections (hero is server-rendered separately)', () => {
     render(<HomePageContent />);
 
-    expect(screen.getByTestId('mock-simple-hero')).toBeInTheDocument();
+    // Hero is now rendered in page.tsx for LCP optimization
     expect(screen.getByTestId('mock-calculator-container')).toBeInTheDocument();
     expect(screen.getByTestId('mock-calculator-content')).toBeInTheDocument();
   });
@@ -63,30 +52,12 @@ describe('HomePageContent Component', () => {
     expect(calculatorSection?.tagName).toBe('SECTION');
   });
 
-  it('should scroll to calculator when hero button clicked', async () => {
-    const user = userEvent.setup();
-    const { container } = render(<HomePageContent />);
-
-    // Mock scrollIntoView
-    const scrollIntoViewMock = jest.fn();
-    const calculatorSection = container.querySelector('#tax-calculator') as HTMLElement;
-    calculatorSection.scrollIntoView = scrollIntoViewMock;
-
-    const scrollButton = screen.getByTestId('scroll-button');
-    await user.click(scrollButton);
-
-    expect(scrollIntoViewMock).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  });
-
   it('should render main element with proper structure', () => {
     const { container } = render(<HomePageContent />);
 
-    const mainDiv = container.querySelector('div.flex.min-h-screen');
+    const mainDiv = container.querySelector('div.flex.flex-col');
     expect(mainDiv).toBeInTheDocument();
-    expect(mainDiv).toHaveClass('flex', 'min-h-screen', 'flex-col');
+    expect(mainDiv).toHaveClass('flex', 'flex-col');
   });
 
   it('should render calculator section with padding', () => {
@@ -101,21 +72,5 @@ describe('HomePageContent Component', () => {
 
     const contentSection = container.querySelectorAll('section')[1];
     expect(contentSection).toHaveClass('container', 'mx-auto', 'px-4', 'md:px-6');
-  });
-
-  it('should only scroll if calculator ref exists', async () => {
-    const user = userEvent.setup();
-    const { container } = render(<HomePageContent />);
-
-    // Mock scrollIntoView
-    const scrollIntoViewMock = jest.fn();
-    const calculatorSection = container.querySelector('#tax-calculator') as HTMLElement;
-    calculatorSection.scrollIntoView = scrollIntoViewMock;
-
-    const scrollButton = screen.getByTestId('scroll-button');
-
-    // Click should work and scroll should be called
-    await user.click(scrollButton);
-    expect(scrollIntoViewMock).toHaveBeenCalled();
   });
 });

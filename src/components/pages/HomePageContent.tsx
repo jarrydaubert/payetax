@@ -1,11 +1,11 @@
 // src/components/pages/HomePageContent.tsx
+// Interactive content for homepage - Hero is server-rendered in page.tsx for LCP
 'use client';
 
 import { BookOpen, Calculator, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { memo, useEffect, useRef, useTransition } from 'react';
+import { memo, useEffect } from 'react';
 import { PopularSalaryLinks } from '@/components/molecules/PopularSalaryLinks';
-import SimpleHero from '@/components/molecules/SimpleHero';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,35 +24,18 @@ const BASIC_RATE_THRESHOLD = CURRENT_RATES.bands[0].threshold + PERSONAL_ALLOWAN
 const HIGHER_RATE_THRESHOLD = CURRENT_RATES.bands[1].threshold;
 
 const HomePageContent = memo(function HomePageContent() {
-  const [, startTransition] = useTransition();
-  const calculatorRef = useRef<HTMLElement>(null);
   const init = useCalculatorStore((state) => state.init);
 
   useEffect(() => {
     init();
   }, [init]);
 
-  const handleScrollToCalculator = () => {
-    startTransition(() => {
-      if (calculatorRef.current) {
-        calculatorRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    });
-  };
-
   return (
-    <div className='flex min-h-screen flex-col'>
-      <SimpleHero onScrollToCalculator={handleScrollToCalculator} />
+    <div className='flex flex-col'>
+      {/* Hero is now server-rendered in page.tsx for instant LCP */}
 
       {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator */}
-      <section
-        id='tax-calculator'
-        ref={calculatorRef}
-        className={cn(SPACING.PY_12, 'md:py-16 lg:py-20')}
-      >
+      <section id='tax-calculator' className={cn(SPACING.PY_12, 'md:py-16 lg:py-20')}>
         <CalculatorContainer />
       </section>
 

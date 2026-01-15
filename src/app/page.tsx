@@ -3,13 +3,14 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import ServerHero from '@/components/molecules/ServerHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
-// Dynamic import for client component with loading state handled by Suspense
+// Dynamic import for interactive content - hero is server-rendered for fast LCP
 const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'));
 
 /**
@@ -26,7 +27,8 @@ export const metadata: Metadata = generateMetadata({
 
 /**
  * Home page component with enhanced SEO
- * Structured data rendered server-side for crawlers
+ * Hero is server-rendered for instant LCP (<2.5s target)
+ * Calculator and interactive content loaded via dynamic import
  */
 export default function HomePage() {
   return (
@@ -39,7 +41,10 @@ export default function HomePage() {
       <StructuredData type='howto' />
       <StructuredData type='dataset' />
 
-      {/* Main content with Suspense for client component */}
+      {/* Server-rendered hero for instant LCP - H1 appears immediately */}
+      <ServerHero />
+
+      {/* Interactive content with Suspense - loads after hero is visible */}
       <Suspense
         fallback={
           <div className='flex min-h-[400px] items-center justify-center p-8'>

@@ -25,7 +25,7 @@ interface FooterProps {
 
 export function Footer({ className }: FooterProps) {
   // Fix hydration mismatch by using static year
-  const currentYear = 2025;
+  const currentYear = 2026;
 
   return (
     <div
