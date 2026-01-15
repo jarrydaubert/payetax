@@ -11,10 +11,7 @@ import { generateMetadata } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
 // Dynamic import for interactive content - hero is server-rendered for fast LCP
-// ssr: false reduces server bundle and defers JS loading for better mobile LCP
-const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'), {
-  ssr: false,
-});
+const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'));
 
 /**
  * Enhanced metadata for the homepage with tax calculator
