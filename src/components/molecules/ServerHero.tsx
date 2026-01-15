@@ -40,20 +40,23 @@ export default function ServerHero({ className }: ServerHeroProps) {
           loans, and pension contributions.
         </p>
 
-        {/* CTA Button - Uses anchor link, no JS needed for initial interaction */}
+        {/* CTA Button - Gradient glow style, CSS-only for server rendering */}
         <div className='fade-in slide-in-from-bottom-2 inline-block animate-in delay-200 duration-500'>
-          <Link
-            href='#tax-calculator'
-            className={cn(
-              'group relative inline-flex items-center justify-center',
-              'rounded-full px-8 py-4 font-semibold text-white',
-              'bg-primary hover:bg-primary/90',
-              'shadow-lg shadow-primary/25 hover:shadow-primary/30 hover:shadow-xl',
-              'transition-all duration-300',
-              TYPOGRAPHY.TEXT_BASE
-            )}
-          >
-            <span className={cn('flex items-center', SPACING.GAP_2)}>
+          <Link href='#tax-calculator' className='group relative inline-block'>
+            {/* Background glow - gradient blur effect */}
+            <div className='absolute -inset-1 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 blur transition duration-500 group-hover:opacity-100' />
+
+            {/* Button - dark background with light text */}
+            <span
+              className={cn(
+                'relative flex items-center justify-center',
+                'rounded-lg bg-background px-5 py-2.5',
+                'font-medium text-foreground',
+                'transition-all duration-300 group-hover:scale-[1.02]',
+                SPACING.GAP_2,
+                TYPOGRAPHY.TEXT_SM
+              )}
+            >
               Calculate My Salary
               <ArrowRight
                 className={cn(ICON_SIZES.SIZE_4, 'transition-transform group-hover:translate-x-1')}
