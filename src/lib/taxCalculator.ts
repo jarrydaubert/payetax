@@ -41,14 +41,17 @@
  */
 
 import {
+  DEFAULT_HOURS_PER_WEEK,
   type NICategory,
   type PayPeriod,
+  PERIOD_CONVERSION_FACTORS,
   PERIODS,
   SCOTTISH_PREFIX,
   SCOTTISH_TAX_RATES,
   type StudentLoanSelection,
   TAX_RATES,
   type TaxYear,
+  WEEKS_PER_YEAR,
 } from '@/constants/taxRates';
 import type { IncomeSource } from '@/store/calculatorStore';
 import { convertPeriodToAnnual } from './periodCalculator';
@@ -260,11 +263,11 @@ export function convertToPeriods(
     net: annualValues.net / 12,
   };
 
-  const fourWeeklyFactor = 12 / 13;
-  const fortnightlyFactor = 12 / 26;
-  const weeklyFactor = 12 / 52;
-  const dailyFactor = 12 / 260;
-  const monthlyHours = hoursPerWeek * (52 / 12);
+  const fourWeeklyFactor = PERIOD_CONVERSION_FACTORS.FOUR_WEEKLY;
+  const fortnightlyFactor = PERIOD_CONVERSION_FACTORS.FORTNIGHTLY;
+  const weeklyFactor = PERIOD_CONVERSION_FACTORS.WEEKLY;
+  const dailyFactor = PERIOD_CONVERSION_FACTORS.DAILY;
+  const monthlyHours = hoursPerWeek * (WEEKS_PER_YEAR / 12);
 
   return {
     annually: annualValues,
@@ -319,12 +322,15 @@ export function convertToPeriods(
             net: roundToPence(monthly.net / monthlyHours),
           }
         : {
-            gross: roundToPence(annualValues.gross / (52 * 40)),
-            tax: roundToPence(annualValues.tax / (52 * 40)),
-            ni: roundToPence(annualValues.ni / (52 * 40)),
-            studentLoan: roundToPence(annualValues.studentLoan / (52 * 40)),
-            pension: roundToPence(annualValues.pension / (52 * 40)),
-            net: roundToPence(annualValues.net / (52 * 40)),
+            // Fallback: assume standard working hours when hoursPerWeek is 0
+            gross: roundToPence(annualValues.gross / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
+            tax: roundToPence(annualValues.tax / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
+            ni: roundToPence(annualValues.ni / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
+            studentLoan: roundToPence(
+              annualValues.studentLoan / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)
+            ),
+            pension: roundToPence(annualValues.pension / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
+            net: roundToPence(annualValues.net / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
           },
   };
 }

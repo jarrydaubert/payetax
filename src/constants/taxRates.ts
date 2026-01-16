@@ -31,6 +31,19 @@ export const PERIODS = {
   HOURLY: 'hourly',
 } as const;
 
+// Period conversion factors (from monthly to other periods)
+// These are mathematically derived: periods per year / 12 months
+export const PERIOD_CONVERSION_FACTORS = {
+  FOUR_WEEKLY: 12 / 13, // 13 four-week periods per year
+  FORTNIGHTLY: 12 / 26, // 26 fortnights per year
+  WEEKLY: 12 / 52, // 52 weeks per year
+  DAILY: 12 / 260, // ~260 working days per year (52 weeks * 5 days)
+} as const;
+
+// Standard working assumptions
+export const WEEKS_PER_YEAR = 52;
+export const WORKING_DAYS_PER_YEAR = 260;
+
 // Types
 export type PayPeriod = (typeof PERIODS)[keyof typeof PERIODS];
 export type TaxYear = '2023-2024' | '2024-2025' | '2025-2026';

@@ -104,8 +104,9 @@ export function calculateNewSalary(input: ComparisonInput): number | null {
       default:
         return null;
     }
-  } catch (error) {
-    console.error('[salaryComparison] Error calculating new salary:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[salaryComparison] Error calculating new salary:', message);
     return null;
   }
 }
@@ -175,8 +176,9 @@ export function calculateComparison(
       marginalRate,
       effectiveRate,
     };
-  } catch (error) {
-    console.error('[salaryComparison] Error calculating comparison:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[salaryComparison] Error calculating comparison:', message);
     return null;
   }
 }
@@ -209,8 +211,9 @@ export function calculateMarginalRate(
       marginalRate: Math.max(0, Math.min(100, marginalRate)), // Clamp 0-100
       effectiveRate: Math.max(0, Math.min(100, effectiveRate)),
     };
-  } catch (error) {
-    console.error('[salaryComparison] Error calculating marginal rate:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[salaryComparison] Error calculating marginal rate:', message);
     return { marginalRate: 0, effectiveRate: 100 };
   }
 }

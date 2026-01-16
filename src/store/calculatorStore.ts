@@ -115,14 +115,14 @@ interface IncomeSource {
 /**
  * Human-readable labels for income types
  */
-const INCOME_TYPE_LABELS: Record<IncomeSource['type'], string> = {
+const INCOME_TYPE_LABELS = {
   employment: 'Employment Income',
   pension: 'Private Pension',
   statePension: 'State Pension',
   rental: 'Rental Income',
   investment: 'Investment Income',
   other: 'Other Income',
-};
+} as const satisfies Record<IncomeSource['type'], string>;
 
 // Interface for tax rates that can be updated
 interface TaxRatesState {
@@ -313,8 +313,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             });
 
             set((state) => ({ input: { ...state.input, salary: validated.data } }));
-          } catch {
-            // Zod v4 can throw in edge cases - silently ignore
+          } catch (_error) {
+            // Zod v4 can throw in edge cases - silently ignore in production
+            // Error already handled by Zod validation feedback
           }
         },
         setPayPeriod: (payPeriod) => {

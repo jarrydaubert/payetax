@@ -1,6 +1,14 @@
 // src/lib/validation.ts
 
 import { z } from 'zod';
+import { type PayPeriod, PERIODS } from '@/constants/taxRates';
+
+/**
+ * Valid pay periods derived from PERIODS constant (single source of truth)
+ * Maps to: 'annually' | 'monthly' | 'fourWeekly' | 'fortnightly' | 'weekly' | 'daily' | 'hourly'
+ */
+const PayPeriodValues = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
+export const PayPeriodSchema = z.enum(PayPeriodValues);
 
 /**
  * ============================================================================
@@ -91,7 +99,7 @@ export const EmploymentIncomeSchema = z.object({
   type: z.literal('employment'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
   amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
   // Employment-specific: NI category
   niCategory: z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z'] as const).optional(),
 });
@@ -105,7 +113,7 @@ export const PrivatePensionIncomeSchema = z.object({
   type: z.literal('pension'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
   amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
   // Pension-specific: optional separate tax code
   taxCode: z
     .string()
@@ -122,7 +130,7 @@ export const StatePensionIncomeSchema = z.object({
   type: z.literal('statePension'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
   amount: z.number().positive('Amount must be positive').max(1_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
 });
 
 /**
@@ -134,7 +142,7 @@ export const RentalIncomeSchema = z.object({
   type: z.literal('rental'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
   amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
   // Rental-specific: optional expenses
   expenses: z.number().nonnegative('Expenses cannot be negative').optional(),
 });
@@ -148,7 +156,7 @@ export const InvestmentIncomeSchema = z.object({
   type: z.literal('investment'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long').optional(),
   amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
   // Investment-specific: whether it's dividend income (has allowance)
   isDividend: z.boolean().catch(false),
 });
@@ -162,7 +170,7 @@ export const OtherIncomeSchema = z.object({
   type: z.literal('other'),
   label: z.string().min(1, 'Label is required').max(100, 'Label too long'),
   amount: z.number().positive('Amount must be positive').max(10_000_000, 'Amount too large'),
-  period: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly'] as const),
+  period: PayPeriodSchema,
   description: z.string().max(500, 'Description too long').optional(),
 });
 
@@ -348,8 +356,8 @@ export const CalculatorInputSchema = z
       .max(10_000_000, 'Salary exceeds maximum (£10,000,000)')
       .finite('Salary must be a valid number'),
 
-    // Pay period
-    payPeriod: z.enum(['yearly', 'monthly', 'weekly', 'daily', 'hourly']),
+    // Pay period (uses PERIODS constant as single source of truth)
+    payPeriod: PayPeriodSchema,
 
     // Hours per week (required for hourly pay)
     hoursPerWeek: z
