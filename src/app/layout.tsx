@@ -65,33 +65,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel='dns-prefetch' href='https://vercel.live' />
         <link rel='preconnect' href='https://vercel.live' crossOrigin='anonymous' />
 
-        {/* Flash Prevention Script - Dark mode only */}
+        {/* Dark Mode Script - No visibility blocking for better FCP */}
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for flash prevention
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for dark mode initialization
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // Apply minimal critical styles immediately to prevent FOUC
-                const style = document.createElement('style');
-                style.textContent = 'html{visibility:hidden;opacity:0}html.hydrated{visibility:visible;opacity:1;transition:opacity 0.1s}';
-                document.head.appendChild(style);
-                
-                // Always use dark mode
-                document.documentElement.classList.remove('light');
-                document.documentElement.classList.add('dark');
-                document.documentElement.style.colorScheme = 'dark';
-                document.documentElement.setAttribute('data-theme', 'dark');
-                
-                // Remove FOUC prevention after CSS loads
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', function() {
-                    document.documentElement.classList.add('hydrated');
-                  });
-                } else {
-                  document.documentElement.classList.add('hydrated');
-                }
-              })();
-            `,
+            __html: `(function(){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';document.documentElement.setAttribute('data-theme','dark');})();`,
           }}
         />
 

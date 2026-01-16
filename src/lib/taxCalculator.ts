@@ -70,6 +70,269 @@ function roundToPence(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+// ============================================================================
+// HELPER FUNCTIONS - Extracted for maintainability
+// Exported for testing. calculateTax() will be incrementally refactored to use these.
+// ============================================================================
+
+/**
+ * Parse tax code to determine personal allowance
+ * HMRC tax code number × 10 = annual tax-free allowance
+ */
+export function parsePersonalAllowanceFromTaxCode(
+  taxCode: string,
+  defaultAllowance: number
+): number {
+  if (!taxCode.trim()) return defaultAllowance;
+
+  // Remove Scottish/Welsh prefix (S/C) - only affects which rates to use
+  const cleanTaxCode = taxCode.replace(/^[A-Za-z]/, '');
+  // Extract numeric portion, removing suffix letters (L, T, etc.)
+  const numericPart = Number.parseInt(cleanTaxCode.replace(/[A-Za-z]$/g, ''), 10);
+
+  return Number.isNaN(numericPart) ? defaultAllowance : numericPart * 10;
+}
+
+/**
+ * Calculate high income personal allowance reduction (HMRC "60% Tax Trap")
+ * Above £100k, allowance reduces by £1 for every £2 of income
+ */
+export function calculateAllowanceReduction(
+  salary: number,
+  currentAllowance: number,
+  threshold: number,
+  reductionRate: number
+): number {
+  if (salary <= threshold) return 0;
+
+  // HMRC formula: round down to nearest £2
+  return Math.min(currentAllowance, Math.floor(((salary - threshold) * reductionRate) / 2) * 2);
+}
+
+/**
+ * Calculate pension contribution (handles both percentage and fixed amount)
+ */
+export function calculatePensionAmount(
+  salary: number,
+  contribution: number,
+  contributionType: 'percentage' | 'amount'
+): number {
+  if (contributionType === 'percentage') {
+    return (salary * contribution) / 100;
+  }
+  // Fixed amount - convert to monthly equivalent
+  return contribution / 12;
+}
+
+/**
+ * Calculate income tax using progressive tax bands
+ * Returns { totalTax, taxBands } for the given monthly income
+ */
+export function calculateIncomeTaxFromBands(
+  monthlyTaxableIncome: number,
+  taxBands: Array<{ name: string; rate: number; threshold: number }>,
+  monthlyAllowance: number
+): { monthlyTax: number; taxBandsApplied: Array<{ name: string; rate: number; amount: number }> } {
+  let remainingIncome = monthlyTaxableIncome;
+  let monthlyTax = 0;
+  const taxBandsApplied: Array<{ name: string; rate: number; amount: number }> = [];
+
+  for (let i = 0; i < taxBands.length; i++) {
+    if (remainingIncome <= 0) break;
+
+    const band = taxBands[i];
+    const nextBand = taxBands[i + 1];
+
+    // Calculate band boundaries (monthly)
+    const bandStart = i === 0 ? 0 : (taxBands[i - 1].threshold - monthlyAllowance * 12) / 12;
+    const bandEnd = nextBand
+      ? (band.threshold - monthlyAllowance * 12) / 12
+      : Number.POSITIVE_INFINITY;
+    const bandWidth = Math.max(0, bandEnd - Math.max(0, bandStart));
+
+    // Calculate tax for this band
+    const incomeInBand = Math.min(remainingIncome, bandWidth);
+    const taxForBand = roundToPence((incomeInBand * band.rate) / 100);
+
+    if (taxForBand > 0) {
+      monthlyTax += taxForBand;
+      taxBandsApplied.push({
+        name: band.name,
+        rate: band.rate,
+        amount: roundToPence(taxForBand * 12), // Store as annual
+      });
+    }
+
+    remainingIncome -= incomeInBand;
+  }
+
+  return { monthlyTax: roundToPence(monthlyTax), taxBandsApplied };
+}
+
+/**
+ * Calculate National Insurance contributions
+ */
+export function calculateNIContributions(
+  monthlyEmploymentIncome: number,
+  rates: {
+    primaryThreshold: number;
+    upperEarningsLimit: number;
+    employeeRate: number;
+    employeeRateAboveUEL: number;
+  },
+  payNoNI: boolean,
+  isOverStatePensionAge: boolean
+): number {
+  if (payNoNI || isOverStatePensionAge) return 0;
+
+  const monthlyPrimaryThreshold = rates.primaryThreshold / 12;
+  const monthlyUEL = rates.upperEarningsLimit / 12;
+
+  let monthlyNI = 0;
+
+  if (monthlyEmploymentIncome > monthlyPrimaryThreshold) {
+    // NI on income between primary threshold and UEL
+    const incomeInMainBand = Math.min(
+      monthlyEmploymentIncome - monthlyPrimaryThreshold,
+      monthlyUEL - monthlyPrimaryThreshold
+    );
+    monthlyNI += (incomeInMainBand * rates.employeeRate) / 100;
+
+    // NI on income above UEL (lower rate)
+    if (monthlyEmploymentIncome > monthlyUEL) {
+      const incomeAboveUEL = monthlyEmploymentIncome - monthlyUEL;
+      monthlyNI += (incomeAboveUEL * rates.employeeRateAboveUEL) / 100;
+    }
+  }
+
+  return roundToPence(monthlyNI);
+}
+
+/**
+ * Calculate student loan repayments for all selected plans
+ */
+export function calculateStudentLoanRepayments(
+  monthlyGrossSalary: number,
+  studentLoanPlans: StudentLoanSelection,
+  loanRates: Record<string, { threshold: number; rate: number }>
+): number {
+  if (!Array.isArray(studentLoanPlans) || studentLoanPlans.length === 0) {
+    return 0;
+  }
+
+  let monthlyRepayment = 0;
+
+  for (const plan of studentLoanPlans) {
+    const rates = loanRates[plan];
+    const monthlyThreshold = rates.threshold / 12;
+
+    if (monthlyGrossSalary > monthlyThreshold) {
+      monthlyRepayment += ((monthlyGrossSalary - monthlyThreshold) * rates.rate) / 100;
+    }
+  }
+
+  return roundToPence(monthlyRepayment);
+}
+
+/**
+ * Convert values to different pay periods
+ */
+export function convertToPeriods(
+  annualValues: {
+    gross: number;
+    tax: number;
+    ni: number;
+    studentLoan: number;
+    pension: number;
+    net: number;
+  },
+  hoursPerWeek: number
+): Record<
+  PayPeriod,
+  { gross: number; tax: number; ni: number; studentLoan: number; pension: number; net: number }
+> {
+  const monthly = {
+    gross: annualValues.gross / 12,
+    tax: annualValues.tax / 12,
+    ni: annualValues.ni / 12,
+    studentLoan: annualValues.studentLoan / 12,
+    pension: annualValues.pension / 12,
+    net: annualValues.net / 12,
+  };
+
+  const fourWeeklyFactor = 12 / 13;
+  const fortnightlyFactor = 12 / 26;
+  const weeklyFactor = 12 / 52;
+  const dailyFactor = 12 / 260;
+  const monthlyHours = hoursPerWeek * (52 / 12);
+
+  return {
+    annually: annualValues,
+    monthly: {
+      gross: roundToPence(monthly.gross),
+      tax: roundToPence(monthly.tax),
+      ni: roundToPence(monthly.ni),
+      studentLoan: roundToPence(monthly.studentLoan),
+      pension: roundToPence(monthly.pension),
+      net: roundToPence(monthly.net),
+    },
+    fourWeekly: {
+      gross: roundToPence(monthly.gross * fourWeeklyFactor),
+      tax: roundToPence(monthly.tax * fourWeeklyFactor),
+      ni: roundToPence(monthly.ni * fourWeeklyFactor),
+      studentLoan: roundToPence(monthly.studentLoan * fourWeeklyFactor),
+      pension: roundToPence(monthly.pension * fourWeeklyFactor),
+      net: roundToPence(monthly.net * fourWeeklyFactor),
+    },
+    fortnightly: {
+      gross: roundToPence(monthly.gross * fortnightlyFactor),
+      tax: roundToPence(monthly.tax * fortnightlyFactor),
+      ni: roundToPence(monthly.ni * fortnightlyFactor),
+      studentLoan: roundToPence(monthly.studentLoan * fortnightlyFactor),
+      pension: roundToPence(monthly.pension * fortnightlyFactor),
+      net: roundToPence(monthly.net * fortnightlyFactor),
+    },
+    weekly: {
+      gross: roundToPence(monthly.gross * weeklyFactor),
+      tax: roundToPence(monthly.tax * weeklyFactor),
+      ni: roundToPence(monthly.ni * weeklyFactor),
+      studentLoan: roundToPence(monthly.studentLoan * weeklyFactor),
+      pension: roundToPence(monthly.pension * weeklyFactor),
+      net: roundToPence(monthly.net * weeklyFactor),
+    },
+    daily: {
+      gross: roundToPence(monthly.gross * dailyFactor),
+      tax: roundToPence(monthly.tax * dailyFactor),
+      ni: roundToPence(monthly.ni * dailyFactor),
+      studentLoan: roundToPence(monthly.studentLoan * dailyFactor),
+      pension: roundToPence(monthly.pension * dailyFactor),
+      net: roundToPence(monthly.net * dailyFactor),
+    },
+    hourly:
+      hoursPerWeek > 0
+        ? {
+            gross: roundToPence(monthly.gross / monthlyHours),
+            tax: roundToPence(monthly.tax / monthlyHours),
+            ni: roundToPence(monthly.ni / monthlyHours),
+            studentLoan: roundToPence(monthly.studentLoan / monthlyHours),
+            pension: roundToPence(monthly.pension / monthlyHours),
+            net: roundToPence(monthly.net / monthlyHours),
+          }
+        : {
+            gross: roundToPence(annualValues.gross / (52 * 40)),
+            tax: roundToPence(annualValues.tax / (52 * 40)),
+            ni: roundToPence(annualValues.ni / (52 * 40)),
+            studentLoan: roundToPence(annualValues.studentLoan / (52 * 40)),
+            pension: roundToPence(annualValues.pension / (52 * 40)),
+            net: roundToPence(annualValues.net / (52 * 40)),
+          },
+  };
+}
+
+// ============================================================================
+// END HELPER FUNCTIONS
+// ============================================================================
+
 /**
  * Input parameters required for tax calculation
  */
