@@ -7,16 +7,10 @@ import './globals.css';
 import '@/styles/table-drag-scroll.css';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { Suspense } from 'react';
+import { Toaster } from 'sonner';
 import ErrorBoundary from '@/components/atoms/ErrorBoundary';
-
-// Lazy load Toaster - not needed until user interaction triggers a toast
-const Toaster = dynamic(() => import('sonner').then((mod) => mod.Toaster), {
-  ssr: false,
-});
-
 import Analytics from '@/components/organisms/Analytics';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
