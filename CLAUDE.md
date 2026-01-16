@@ -108,16 +108,18 @@ Specialized expert modes available via slash commands:
 
 | Command | Role | Use For |
 |---------|------|---------|
-| `/security` | Security Architect | Web vulnerability review, OWASP |
-| `/audit` | Architecture Reviewer | Code/system analysis |
+| `/security` | Security Architect | OWASP, supply chain, modern threats |
+| `/audit` | Architecture Reviewer | SOLID principles, code quality |
 | `/finance` | UK Tax Specialist | HMRC compliance, calculation accuracy |
 | `/plan` | Architect | Feature design, planning |
+| `/perf` | Performance Engineer | Core Web Vitals, LCP, bundle analysis |
+| `/a11y` | Accessibility Specialist | WCAG 2.2 AA, screen readers, keyboard |
 
 ### Implementation (writes code)
 
 | Command | Role | Use For |
 |---------|------|---------|
-| `/test` | Test Engineer | Coverage gaps, write tests |
+| `/test` | Test Engineer | Coverage gaps, mutation testing |
 | `/debug` | Debugger | Fix issues |
 
 ## HMRC Compliance

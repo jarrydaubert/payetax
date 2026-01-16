@@ -107,6 +107,54 @@ test('calculates basic rate tax correctly', () => {
 
 **Note:** Coverage % is a vanity metric. 50% meaningful tests > 90% bloat tests.
 
+## Advanced Testing Strategies
+
+### Mutation Testing
+Tests that pass when code is broken are useless. Mutation testing verifies test quality:
+- **What it does**: Modifies code and checks if tests fail
+- **Tool**: Stryker (`npx stryker run`)
+- **Goal**: >80% mutation score for critical paths
+
+```typescript
+// If changing `>` to `>=` doesn't break a test, the test is weak
+if (salary > threshold) { /* ... */ }
+```
+
+### Property-Based Testing
+Instead of specific examples, test properties that should always hold:
+
+```typescript
+import { fc } from 'fast-check';
+
+test('tax + take-home = gross', () => {
+  fc.assert(
+    fc.property(fc.integer({ min: 0, max: 10000000 }), (salary) => {
+      const result = calculateTax(salary);
+      return result.incomeTax + result.ni + result.takeHome === salary;
+    })
+  );
+});
+```
+
+### Snapshot Testing Guidelines
+- ✓ Use for: Complex calculation results, serialized outputs
+- ✗ Avoid for: UI components (too brittle)
+- Always review snapshot changes carefully
+
+### Contract Testing
+For API routes, verify request/response contracts:
+
+```typescript
+test('salary API returns expected shape', () => {
+  const response = await api.calculate({ salary: 50000 });
+  expect(response).toMatchObject({
+    grossSalary: expect.any(Number),
+    incomeTax: expect.any(Number),
+    takeHome: expect.any(Number),
+  });
+});
+```
+
 ## Test Commands
 
 ```bash

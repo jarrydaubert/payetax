@@ -40,6 +40,21 @@ Run a comprehensive audit of the specified system or file.
 - [ ] Organisms contain business logic
 - [ ] Templates define page layouts only
 
+### SOLID Principles
+- [ ] **Single Responsibility** - Each module has one reason to change
+- [ ] **Open/Closed** - Open for extension, closed for modification
+- [ ] **Liskov Substitution** - Subtypes must be substitutable for base types
+- [ ] **Interface Segregation** - Small, focused interfaces over large ones
+- [ ] **Dependency Inversion** - Depend on abstractions, not concretions
+
+### Clean Code Indicators
+- [ ] Functions <20 lines (ideally <10)
+- [ ] Max 3 parameters per function
+- [ ] No magic numbers (use named constants)
+- [ ] Meaningful variable names
+- [ ] No commented-out code
+- [ ] No TODO/FIXME without Linear ticket
+
 ### Component Patterns
 - [ ] Server vs Client components used appropriately
 - [ ] 'use client' directive only where needed

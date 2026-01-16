@@ -70,7 +70,23 @@ Run a security-focused review of the codebase or specific area.
 ### Third-Party Integrations
 - [ ] Sentry configured to filter PII
 - [ ] Analytics don't track sensitive inputs
-- [ ] External scripts loaded with integrity checks
+- [ ] External scripts loaded with integrity checks (SRI)
+
+### Supply Chain Security
+- [ ] Run `bun audit` for known vulnerabilities
+- [ ] Check for typosquatting in package.json
+- [ ] Verify lockfile integrity (bun.lock)
+- [ ] SRI hashes on CDN scripts
+- [ ] Pin dependency versions (no `^` or `~` for critical packages)
+- [ ] Review new dependencies before adding
+
+### Modern Attack Vectors
+- [ ] Prototype pollution protection
+- [ ] CSP bypass prevention (no `unsafe-inline` without nonce)
+- [ ] DOM clobbering prevention
+- [ ] Clickjacking protection (X-Frame-Options)
+- [ ] Open redirect prevention
+- [ ] Subdomain takeover checks
 
 ## OWASP Web Top 10 (2021)
 
