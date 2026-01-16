@@ -694,15 +694,18 @@ animate={{ height: '100%', opacity: 1 }}
 ### 4. Performance Metrics
 
 **Core Web Vitals:**
-- LCP: 1.2s (target <2.5s) ✅
-- FID: 12ms (target <100ms) ✅
-- CLS: 0.02 (target <0.1) ✅
+- LCP (Desktop): 0.9s (target <2.5s) ✅
+- LCP (Mobile): 5.9s (target <2.5s) ⚠️ - needs optimization
+- FID/INP: 0ms (target <100ms) ✅
+- CLS: 0 (target <0.1) ✅
 
-**Lighthouse Scores:**
-- Performance: 98/100
-- Accessibility: 100/100
-- Best Practices: 100/100
-- SEO: 100/100
+**LCP Optimization:** Server-rendered `ServerHero.tsx` delivers H1 in initial HTML (no JS blocking).
+
+**Lighthouse Scores (Desktop / Mobile):**
+- Performance: 99 / 76
+- Accessibility: 100 / 100
+- Best Practices: 100 / 100
+- SEO: 100 / 100
 
 ---
 
