@@ -21,7 +21,7 @@ import { CategoryFilter } from '@/components/molecules/CategoryFilter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
-import { IMAGE_SIZES } from '@/constants/images';
+import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import type { BlogCategory, BlogPost } from '@/types/blog';
@@ -207,6 +207,8 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
                         sizes={IMAGE_SIZES.BLOG_HERO}
                         priority={!featuredPost.image.includes('placeholder')}
                         className='object-cover'
+                        placeholder='blur'
+                        blurDataURL={BLUR_DATA_URL}
                       />
                     </div>
                   )}
@@ -259,6 +261,8 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
                             sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
                             loading='lazy'
                             className='object-cover'
+                            placeholder='blur'
+                            blurDataURL={BLUR_DATA_URL}
                           />
                         </div>
                       )}

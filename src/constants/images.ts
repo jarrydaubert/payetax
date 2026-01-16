@@ -53,6 +53,14 @@ export const IMAGE_SIZES = {
 } as const;
 
 /**
+ * Blur placeholder data URL for remote images
+ * A subtle gray gradient that works for both light and dark modes
+ * Used with placeholder="blur" for better perceived LCP
+ */
+export const BLUR_DATA_URL =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+';
+
+/**
  * Type for valid image size keys
  */
 export type ImageSizeKey = keyof typeof IMAGE_SIZES;

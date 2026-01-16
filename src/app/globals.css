@@ -298,6 +298,47 @@
   }
 }
 
+/* Tailwind 4: @starting-style for smoother DOM insertion animations */
+/* These provide better entry animations than keyframes for dynamically inserted content */
+.fade-enter {
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.slide-up-enter {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  @starting-style {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.scale-enter {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Dialog/Modal entry animation using @starting-style */
+[data-state="open"].dialog-content {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  @starting-style {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
 /* View Transitions API - Smooth page navigation (Chrome 111+) */
 @view-transition {
   navigation: auto; /* Enable for all navigations */

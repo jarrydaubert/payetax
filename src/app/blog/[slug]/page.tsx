@@ -11,7 +11,7 @@ import { ReadingProgress } from '@/components/molecules/ReadingProgress';
 import { TableOfContents } from '@/components/molecules/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
-import { IMAGE_SIZES } from '@/constants/images';
+import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent } from '@/lib/mdx';
 import { cn } from '@/lib/utils';
@@ -272,6 +272,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   sizes={IMAGE_SIZES.POST_HERO}
                   className='object-cover'
                   priority={!post.image.includes('placeholder')}
+                  placeholder='blur'
+                  blurDataURL={BLUR_DATA_URL}
                 />
               </div>
             )}

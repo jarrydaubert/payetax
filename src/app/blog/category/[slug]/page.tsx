@@ -12,7 +12,7 @@ import Script from 'next/script';
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
-import { IMAGE_SIZES } from '@/constants/images';
+import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { categoryContent } from '@/lib/categoryContent';
 import { cn, formatDate } from '@/lib/utils'; // Now imported from shared utils
@@ -263,6 +263,8 @@ export default async function CategoryPage({
                       fill
                       className='object-cover transition-transform duration-300 hover:scale-105'
                       sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
+                      placeholder='blur'
+                      blurDataURL={BLUR_DATA_URL}
                     />
                   </Link>
                 )}
