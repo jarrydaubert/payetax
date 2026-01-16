@@ -29,10 +29,14 @@ export function DeferredContent({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fallback timer - ensure content loads even if user doesn't scroll
-    const timer = setTimeout(() => {
-      setShouldRender(true);
-    }, timeout);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    // Fallback timer - only set if timeout > 0
+    if (timeout > 0) {
+      timer = setTimeout(() => {
+        setShouldRender(true);
+      }, timeout);
+    }
 
     // Intersection Observer - load when approaching viewport
     const observer = new IntersectionObserver(
@@ -40,7 +44,7 @@ export function DeferredContent({
         if (entry.isIntersecting) {
           setShouldRender(true);
           observer.disconnect();
-          clearTimeout(timer);
+          if (timer) clearTimeout(timer);
         }
       },
       { rootMargin }
@@ -52,7 +56,7 @@ export function DeferredContent({
 
     return () => {
       observer.disconnect();
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
     };
   }, [rootMargin, timeout]);
 
