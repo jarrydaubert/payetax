@@ -45,9 +45,9 @@ export default function HomePage() {
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
 
-      {/* Interactive content - deferred until near viewport or 2s timeout for better mobile LCP */}
+      {/* Interactive content - deferred until near viewport or 4s timeout for better mobile LCP */}
       <DeferredContent
-        timeout={2000}
+        timeout={4000}
         rootMargin='400px'
         fallback={
           <div className='flex min-h-[400px] items-center justify-center p-8'>
