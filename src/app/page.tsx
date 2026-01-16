@@ -45,20 +45,12 @@ export default function HomePage() {
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
 
-      {/* Interactive content - deferred until near viewport or 4s timeout for better mobile LCP */}
+      {/* Interactive content - deferred until near viewport or 3s timeout for better mobile LCP */}
+      {/* Minimal fallback to keep H1 as LCP element */}
       <DeferredContent
-        timeout={4000}
+        timeout={3000}
         rootMargin='400px'
-        fallback={
-          <div className='flex min-h-[400px] items-center justify-center p-8'>
-            <div className='flex flex-col items-center gap-3'>
-              <Spinner className='size-8' />
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                Loading calculator...
-              </p>
-            </div>
-          </div>
-        }
+        fallback={<div className='min-h-[200px]' aria-hidden='true' />}
       >
         <Suspense
           fallback={
