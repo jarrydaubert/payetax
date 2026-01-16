@@ -147,7 +147,7 @@ self.addEventListener('fetch', (event) => {
 
   // Determine caching strategy based on URL
   if (shouldUseNetworkFirst(url)) {
-    event.respondWith(networkFirstStrategy(request, event));
+    event.respondWith(networkFirstStrategy(request));
   } else if (shouldUseCacheFirst(url)) {
     event.respondWith(cacheFirstStrategy(request));
   } else if (isAPIEndpoint(url)) {
@@ -196,7 +196,7 @@ async function handleNavigationWithPreload(request, event) {
 }
 
 // Network-first strategy (for dynamic content)
-async function networkFirstStrategy(request, event) {
+async function networkFirstStrategy(request) {
   try {
     const networkResponse = await fetch(request);
 

@@ -271,7 +271,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   fill
                   sizes={IMAGE_SIZES.POST_HERO}
                   className='object-cover'
-                  priority
+                  priority={!post.image.includes('placeholder')}
                 />
               </div>
             )}

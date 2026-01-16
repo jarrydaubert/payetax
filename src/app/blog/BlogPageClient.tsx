@@ -205,7 +205,7 @@ export function BlogPageClient({ featuredPost, categories, allPosts }: BlogPageC
                         alt={featuredPost.imageAlt || featuredPost.title}
                         fill
                         sizes={IMAGE_SIZES.BLOG_HERO}
-                        priority={true}
+                        priority={!featuredPost.image.includes('placeholder')}
                         className='object-cover'
                       />
                     </div>
