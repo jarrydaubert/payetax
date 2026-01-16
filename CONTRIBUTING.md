@@ -2,8 +2,6 @@
 
 > Best practices and guidelines for maintaining high-quality code
 
-**Last Updated:** January 2026
-
 ---
 
 ## START HERE (Every New Session)
@@ -158,14 +156,14 @@ This prevents duplicate code and ensures you use existing utilities.
 - Use `optimizePackageImports` for large packages
 
 ### Core Web Vitals Targets
-| Metric | Target | Desktop | Mobile |
-|--------|--------|---------|--------|
-| LCP | <2.5s | 0.9s ✓ | 5.9s (needs work) |
-| FCP | <1.8s | 0.5s ✓ | 1.7s ✓ |
-| CLS | <0.1 | 0 ✓ | 0 ✓ |
-| TBT | <200ms | 0ms ✓ | 130ms ✓ |
+| Metric | Target |
+|--------|--------|
+| LCP | <2.5s |
+| FCP | <1.8s |
+| CLS | <0.1 |
+| TBT | <200ms |
 
-**Note:** Mobile LCP is slower due to simulated 4G + CPU throttling. Desktop LCP improved from ~6.3s to 0.9s via server-rendered hero (`ServerHero.tsx`).
+Run `bun run lighthouse` to check current scores.
 
 ### framer-motion Usage
 Components using `initial={{ opacity: 0 }}` block server-side content painting. For critical above-the-fold content, prefer CSS animations:
