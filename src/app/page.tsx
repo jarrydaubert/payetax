@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
@@ -44,8 +45,10 @@ export default function HomePage() {
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
 
-      {/* Interactive content with Suspense - loads after hero is visible */}
-      <Suspense
+      {/* Interactive content - deferred until near viewport or 2s timeout for better mobile LCP */}
+      <DeferredContent
+        timeout={2000}
+        rootMargin='400px'
         fallback={
           <div className='flex min-h-[400px] items-center justify-center p-8'>
             <div className='flex flex-col items-center gap-3'>
@@ -57,8 +60,21 @@ export default function HomePage() {
           </div>
         }
       >
-        <HomePageContent />
-      </Suspense>
+        <Suspense
+          fallback={
+            <div className='flex min-h-[400px] items-center justify-center p-8'>
+              <div className='flex flex-col items-center gap-3'>
+                <Spinner className='size-8' />
+                <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                  Loading calculator...
+                </p>
+              </div>
+            </div>
+          }
+        >
+          <HomePageContent />
+        </Suspense>
+      </DeferredContent>
     </>
   );
 }

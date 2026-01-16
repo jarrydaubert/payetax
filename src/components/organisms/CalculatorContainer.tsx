@@ -185,12 +185,12 @@ export function CalculatorContainer() {
       )}
       data-testid='calculator-section'
     >
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={cn('order-1 text-center lg:col-span-2', 'py-6 lg:py-8')}
+      {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
+      <div
+        className={cn(
+          'order-1 py-6 text-center lg:col-span-2 lg:py-8',
+          'fade-in slide-in-from-top-4 animate-in duration-500'
+        )}
       >
         <h2
           className={cn(
@@ -205,7 +205,7 @@ export function CalculatorContainer() {
           Calculate your take-home pay with official HMRC rates. Fast, accurate, and completely
           free.
         </p>
-      </motion.div>
+      </div>
 
       {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
       <AnimatePresence mode='wait'>
