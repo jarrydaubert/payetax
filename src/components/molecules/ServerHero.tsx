@@ -15,7 +15,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
   return (
     <section
       className={cn(
-        'relative flex items-center justify-center overflow-hidden py-16 md:min-h-screen md:py-20',
+        'relative flex min-h-screen items-center justify-center overflow-hidden py-16 md:py-20',
         className
       )}
     >

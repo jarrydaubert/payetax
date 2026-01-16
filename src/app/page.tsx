@@ -45,12 +45,12 @@ export default function HomePage() {
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
 
-      {/* Interactive content - deferred until user scrolls near viewport */}
-      {/* No timeout = H1 stays as LCP, calculator loads on scroll */}
+      {/* Interactive content - deferred until user scrolls */}
+      {/* No timeout, small margin = calculator loads only on scroll, H1 is LCP */}
       <DeferredContent
         timeout={0}
-        rootMargin='600px'
-        fallback={<div className='min-h-[200px]' aria-hidden='true' />}
+        rootMargin='100px'
+        fallback={<div className='min-h-[100px]' aria-hidden='true' />}
       >
         <Suspense
           fallback={
