@@ -1,7 +1,6 @@
 // src/components/organisms/SimpleNavbar.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -81,18 +80,16 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             'sm:px-4'
           )}
         >
-          {/* Logo */}
+          {/* Logo - CSS hover instead of framer-motion for better mobile LCP */}
           <Link href='/' className='group' data-testid='nav-logo'>
-            <motion.span
+            <span
               className={cn(
-                'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+                'inline-block bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent transition-transform duration-200 hover:scale-105',
                 TYPOGRAPHY.TEXT_3XL
               )}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
             >
               PayeTax
-            </motion.span>
+            </span>
           </Link>
 
           {/* Desktop Navigation - Uses NavbarLinks molecule */}
