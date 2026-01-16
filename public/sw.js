@@ -1,9 +1,9 @@
 // Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices with advanced caching strategies
 
-const CACHE_NAME = 'payetax-v4.9.7';
-const STATIC_CACHE_NAME = 'payetax-static-v4.9.7';
-const API_CACHE_NAME = 'payetax-api-v4.9.7';
+const CACHE_NAME = 'payetax-v4.9.8';
+const STATIC_CACHE_NAME = 'payetax-static-v4.9.8';
+const API_CACHE_NAME = 'payetax-api-v4.9.8';
 
 // Helper function to log only in development
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -166,9 +166,12 @@ async function handleNavigationWithPreload(request, event) {
     if (preloadResponse) {
       devLog('Using navigation preload for:', request.url);
 
+      // Clone BEFORE returning (response body can only be used once)
+      const responseToCache = preloadResponse.clone();
+
       // Cache asynchronously
       caches.open(CACHE_NAME).then((cache) => {
-        cache.put(request, preloadResponse.clone());
+        cache.put(request, responseToCache);
       });
 
       return preloadResponse;
