@@ -109,6 +109,8 @@ Sentry.init({
     'invalid origin',
     'Failed to update a ServiceWorker',
     'An unknown error occurred when fetching the script',
+    'newestWorker is null',
+    'InvalidStateError',
     // Cancelled requests (user navigation)
     'AbortError',
     'The operation was aborted',

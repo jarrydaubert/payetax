@@ -23,12 +23,22 @@
       // Check for updates every 5 minutes when page is visible
       if (document.visibilityState === 'visible')
         setInterval(() => {
-          if (document.visibilityState === 'visible') e.update();
+          if (document.visibilityState === 'visible') {
+            try {
+              e.update();
+            } catch {
+              // InvalidStateError can occur if registration is in invalid state - not actionable
+            }
+          }
         }, 3e5); // 5 minutes (300000ms)
       // Also check for updates when tab becomes visible
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && e) {
-          e.update();
+          try {
+            e.update();
+          } catch {
+            // InvalidStateError can occur if registration is in invalid state - not actionable
+          }
         }
       });
       navigator.serviceWorker.addEventListener('message', s);
