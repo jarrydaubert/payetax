@@ -223,8 +223,8 @@ describe('Metadata Module', () => {
 
       expect(metadata.manifest).toBe('/manifest.json');
       expect(metadata.other).toEqual({
-        'msapplication-TileColor': '#1D4ED8',
-        'theme-color': '#1D4ED8',
+        'msapplication-TileColor': '#06b6d4',
+        'theme-color': '#06b6d4',
       });
     });
 
@@ -260,7 +260,7 @@ describe('Metadata Module', () => {
         themeColor: '#252525',
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 2,
+        maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
         userScalable: true,
         colorScheme: 'dark',
         viewportFit: 'cover',

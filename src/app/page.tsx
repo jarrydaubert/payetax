@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
+import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Spinner } from '@/components/ui/spinner';
 import { TYPOGRAPHY } from '@/constants/designTokens';
@@ -41,6 +42,7 @@ export default function HomePage() {
       <StructuredData type='calculator' />
       <StructuredData type='howto' />
       <StructuredData type='dataset' />
+      <StructuredData type='faq' faqs={faqs} />
 
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
@@ -67,6 +69,9 @@ export default function HomePage() {
           <HomePageContent />
         </Suspense>
       </DeferredContent>
+
+      {/* Landing page sections: Features, How It Works, FAQ, Final CTA */}
+      <LandingPageSections />
     </>
   );
 }

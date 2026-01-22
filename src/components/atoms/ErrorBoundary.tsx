@@ -250,7 +250,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               type='button'
               onClick={resetError}
               size='lg'
-              className='bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+              className='bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600'
             >
               <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
               Try Again

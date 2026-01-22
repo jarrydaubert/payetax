@@ -1,59 +1,44 @@
 // src/components/molecules/Footer.tsx
+// Simplified footer matching payetax-web design system
 
-import { FooterBrand } from '@/components/molecules/FooterBrand';
-import { FooterMainLinks } from '@/components/molecules/FooterMainLinks';
-import { FooterResourceLinks } from '@/components/molecules/FooterResourceLinks';
-import { SPACING } from '@/constants/designTokens';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 /**
- * Footer molecule component (Refactored to use sub-molecules)
+ * Footer molecule component - New design system
  *
  * IMPORTANT: This is a MOLECULE - it does NOT own the <footer> semantic tag.
  * The parent TEMPLATE (Layout.tsx) must wrap this in <footer></footer>.
  *
- * Composition:
- * - FooterBrand: Brand name and copyright
- * - FooterResourceLinks: External resources (HMRC, guides)
- * - FooterMainLinks: Primary nav links, social
- *
- * This component orchestrates layout only.
+ * Clean, minimal design with:
+ * - Logo (paye<span>tax</span>)
+ * - Essential links (Blog, About, Privacy, Compliance, Support)
+ * - Copyright
  */
 interface FooterProps {
   className?: string;
 }
 
 export function Footer({ className }: FooterProps) {
-  // Fix hydration mismatch by using static year
-  const currentYear = 2026;
-
   return (
-    <div
-      className={cn('mt-auto min-h-[140px] md:min-h-[120px]', className)}
-      style={{ contain: 'layout' }}
-    >
-      {/* Subtle separator line */}
-      <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
-
-      {/* Main footer content */}
-      <div className='glass py-8'>
-        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_2, 'sm:px-4')}>
-          <div className={cn('flex flex-col items-center text-center md:text-left', SPACING.GAP_6)}>
-            {/* Top row: Brand and resources - Uses sub-molecules */}
-            <div
-              className={cn(
-                'flex w-full flex-col items-center justify-between md:flex-row',
-                SPACING.GAP_4
-              )}
-            >
-              <FooterBrand currentYear={currentYear} />
-              <FooterResourceLinks />
-            </div>
-
-            {/* Quick links and social - Uses sub-molecule */}
-            <FooterMainLinks />
-          </div>
+    <div className={cn('footer-new', className)}>
+      <div className='footer-content-new'>
+        {/* Brand */}
+        <div className='footer-brand'>
+          paye<span>tax</span>
         </div>
+
+        {/* Links */}
+        <nav className='footer-links-new' aria-label='Footer navigation'>
+          <Link href='/blog'>Blog</Link>
+          <Link href='/about'>About</Link>
+          <Link href='/privacy'>Privacy</Link>
+          <Link href='/compliance'>Compliance</Link>
+          <a href='mailto:support@payetax.co.uk'>Support</a>
+        </nav>
+
+        {/* Copyright */}
+        <div className='footer-copy'>&copy; 2026 PayeTax</div>
       </div>
     </div>
   );

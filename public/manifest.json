@@ -47,7 +47,22 @@
       "url": "/blog"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/images/pwa-screenshot-narrow.webp",
+      "sizes": "390x844",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "PayeTax UK Tax Calculator - Mobile View"
+    },
+    {
+      "src": "/images/pwa-screenshot-wide.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "PayeTax UK Tax Calculator - Desktop View"
+    }
+  ],
   "share_target": {
     "action": "/",
     "method": "GET",

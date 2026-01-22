@@ -1,4 +1,6 @@
 // src/components/molecules/__tests__/Footer.test.tsx
+// Tests for new simplified footer design (payetax-web design system)
+
 import { render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
 
@@ -11,13 +13,15 @@ describe('Footer Component', () => {
       // The parent template (Layout.tsx) wraps it in <footer>
       const footerDiv = container.firstChild;
       expect(footerDiv).toBeInTheDocument();
-      expect(footerDiv).toHaveClass('mt-auto');
+      expect(footerDiv).toHaveClass('footer-new');
     });
 
-    it('should render brand name', () => {
-      render(<Footer />);
+    it('should render brand name with gradient', () => {
+      const { container } = render(<Footer />);
 
-      expect(screen.getByText('PayeTax')).toBeInTheDocument();
+      const brand = container.querySelector('.footer-brand');
+      expect(brand).toBeInTheDocument();
+      expect(brand).toHaveTextContent('payetax');
     });
 
     it('should render copyright notice', () => {
@@ -28,14 +32,6 @@ describe('Footer Component', () => {
   });
 
   describe('Navigation Links', () => {
-    it('should render About link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /About/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/about');
-    });
-
     it('should render Blog link', () => {
       render(<Footer />);
 
@@ -44,12 +40,12 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/blog');
     });
 
-    it('should render Compliance link', () => {
+    it('should render About link', () => {
       render(<Footer />);
 
-      const link = screen.getByRole('link', { name: /Compliance/i });
+      const link = screen.getByRole('link', { name: /About/i });
       expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/compliance');
+      expect(link).toHaveAttribute('href', '/about');
     });
 
     it('should render Privacy link', () => {
@@ -60,43 +56,27 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/privacy');
     });
 
-    it('should render Contact email link', () => {
+    it('should render Compliance link', () => {
       render(<Footer />);
 
-      const link = screen.getByRole('link', { name: /Contact/i });
+      const link = screen.getByRole('link', { name: /Compliance/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/compliance');
+    });
+
+    it('should render Support email link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Support/i });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', 'mailto:support@payetax.co.uk');
     });
 
-    it('should render X/Twitter link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /X: @PayeTaxUK/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', 'https://x.com/PayeTaxUK');
-    });
-
-    it('should have all links visible', () => {
+    it('should have 5 navigation links', () => {
       render(<Footer />);
 
       const links = screen.getAllByRole('link');
-      expect(links.length).toBeGreaterThanOrEqual(6);
-    });
-  });
-
-  describe('External Links', () => {
-    it('should have target="_blank" on X link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /X: @PayeTaxUK/i });
-      expect(link).toHaveAttribute('target', '_blank');
-    });
-
-    it('should have rel="noopener noreferrer" on X link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /X: @PayeTaxUK/i });
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(links).toHaveLength(5);
     });
   });
 
@@ -108,41 +88,18 @@ describe('Footer Component', () => {
       expect(footerDiv).toHaveClass('custom-class');
     });
 
-    it('should have mt-auto class for flexbox layout', () => {
+    it('should have footer-new class', () => {
       const { container } = render(<Footer />);
 
       const footerDiv = container.firstChild as HTMLElement;
-      expect(footerDiv).toHaveClass('mt-auto');
+      expect(footerDiv).toHaveClass('footer-new');
     });
 
-    it('should have glass effect on content', () => {
+    it('should have footer-content-new wrapper', () => {
       const { container } = render(<Footer />);
 
-      const glassDiv = container.querySelector('.glass');
-      expect(glassDiv).toBeInTheDocument();
-    });
-
-    it('should have gradient separator line', () => {
-      const { container } = render(<Footer />);
-
-      const separator = container.querySelector('.bg-gradient-to-r');
-      expect(separator).toBeInTheDocument();
-    });
-  });
-
-  describe('Layout', () => {
-    it('should have responsive flexbox layout', () => {
-      const { container } = render(<Footer />);
-
-      const contentDiv = container.querySelector('.flex.flex-col');
-      expect(contentDiv).toBeInTheDocument();
-    });
-
-    it('should have container with max-width', () => {
-      const { container } = render(<Footer />);
-
-      const container_div = container.querySelector('.container.max-w-7xl');
-      expect(container_div).toBeInTheDocument();
+      const content = container.querySelector('.footer-content-new');
+      expect(content).toBeInTheDocument();
     });
   });
 
@@ -150,25 +107,15 @@ describe('Footer Component', () => {
     it('should use div element (molecule pattern - template owns <footer>)', () => {
       const { container } = render(<Footer />);
 
-      // Molecule uses <div>, template wraps in <footer>
       const footerDiv = container.firstChild as HTMLElement;
       expect(footerDiv.tagName).toBe('DIV');
     });
 
-    it('should have aria-label on X link', () => {
+    it('should have nav element with aria-label', () => {
       render(<Footer />);
 
-      const link = screen.getByLabelText('X: @PayeTaxUK');
-      expect(link).toBeInTheDocument();
-    });
-
-    it('should render Twitter icon', () => {
-      render(<Footer />);
-
-      const xLink = screen.getByRole('link', { name: /X: @PayeTaxUK/i });
-      const icon = xLink.querySelector('svg');
-
-      expect(icon).toBeInTheDocument();
+      const nav = screen.getByRole('navigation', { name: /footer/i });
+      expect(nav).toBeInTheDocument();
     });
   });
 
@@ -179,18 +126,18 @@ describe('Footer Component', () => {
       expect(screen.getByText(/2026/i)).toBeInTheDocument();
     });
 
-    it('should display PayeTax brand name', () => {
-      render(<Footer />);
+    it('should have footer-brand class on brand', () => {
+      const { container } = render(<Footer />);
 
-      const brandName = screen.getByText('PayeTax');
-      expect(brandName).toBeInTheDocument();
-      expect(brandName).toHaveClass('font-bold');
+      const brand = container.querySelector('.footer-brand');
+      expect(brand).toBeInTheDocument();
     });
 
-    it('should display X handle', () => {
-      render(<Footer />);
+    it('should have footer-copy class on copyright', () => {
+      const { container } = render(<Footer />);
 
-      expect(screen.getByText(/@PayeTaxUK/i)).toBeInTheDocument();
+      const copy = container.querySelector('.footer-copy');
+      expect(copy).toBeInTheDocument();
     });
   });
 });

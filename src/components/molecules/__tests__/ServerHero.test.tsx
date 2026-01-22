@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 // src/components/molecules/__tests__/ServerHero.test.tsx
-// ServerHero is a server component for instant LCP optimization
+// ServerHero with new payetax-web design: badge, headline, dual CTAs, trust strip, bento grid
 
 import { render, screen } from '@testing-library/react';
 import ServerHero from '../ServerHero';
@@ -12,39 +12,62 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('Free UK PAYE Tax')).toBeInTheDocument();
-    expect(screen.getByText('Calculator 2025-2026')).toBeInTheDocument();
+    expect(screen.getByText('Calculate your')).toBeInTheDocument();
+    expect(screen.getByText('take-home pay')).toBeInTheDocument();
   });
 
-  it('should render the description text', () => {
+  it('should render badge with HMRC rates', () => {
     render(<ServerHero />);
 
-    expect(screen.getByText(/Calculate your take-home pay instantly/i)).toBeInTheDocument();
+    expect(screen.getByText('HMRC 2025-26 Rates')).toBeInTheDocument();
   });
 
-  it('should render CTA link with correct href', () => {
+  it('should render the tagline with HMRC mention', () => {
     render(<ServerHero />);
 
-    const ctaLink = screen.getByRole('link', { name: /Calculate My Salary/i });
+    expect(screen.getByText(/Free UK PAYE tax calculator/i)).toBeInTheDocument();
+  });
+
+  it('should render primary CTA link with correct href', () => {
+    render(<ServerHero />);
+
+    const ctaLink = screen.getByRole('link', { name: /Start Calculating/i });
     expect(ctaLink).toBeInTheDocument();
     expect(ctaLink).toHaveAttribute('href', '#tax-calculator');
   });
 
-  it('should render all feature badges', () => {
+  it('should render secondary CTA link', () => {
     render(<ServerHero />);
 
-    expect(screen.getByText('Accurate Calculations')).toBeInTheDocument();
-    expect(screen.getByText('2025-2026 Tax Year')).toBeInTheDocument();
-    expect(screen.getByText('Scottish Tax Support')).toBeInTheDocument();
-    expect(screen.getByText('Instant Results')).toBeInTheDocument();
+    const secondaryLink = screen.getByRole('link', { name: /See Features/i });
+    expect(secondaryLink).toBeInTheDocument();
+    expect(secondaryLink).toHaveAttribute('href', '#features');
   });
 
-  it('should have text-gradient class on year text for visual styling', () => {
+  it('should render trust strip items', () => {
+    render(<ServerHero />);
+
+    expect(screen.getByText('50,000+ calculations')).toBeInTheDocument();
+    expect(screen.getByText('HMRC 2025-26 rates')).toBeInTheDocument();
+    expect(screen.getByText('100% private')).toBeInTheDocument();
+    expect(screen.getByText('Always free')).toBeInTheDocument();
+  });
+
+  it('should render bento grid items', () => {
+    render(<ServerHero />);
+
+    expect(screen.getByText('HMRC Verified')).toBeInTheDocument();
+    expect(screen.getByText('Instant Results')).toBeInTheDocument();
+    expect(screen.getByText('Private')).toBeInTheDocument();
+    expect(screen.getByText('UK Coverage')).toBeInTheDocument();
+  });
+
+  it('should have text-gradient-new class on headline text', () => {
     const { container } = render(<ServerHero />);
 
-    const gradientText = container.querySelector('.text-gradient');
+    const gradientText = container.querySelector('.text-gradient-new');
     expect(gradientText).toBeInTheDocument();
-    expect(gradientText?.textContent).toBe('Calculator 2025-2026');
+    expect(gradientText?.textContent).toBe('take-home pay');
   });
 
   it('should accept and apply custom className', () => {

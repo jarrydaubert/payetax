@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
@@ -53,6 +54,12 @@ export function FeedbackDialog() {
   // Handle server action response
   useEffect(() => {
     if (state.success) {
+      // Track successful feedback submission
+      trackEvent({
+        action: 'feedback_submitted',
+        category: 'feedback',
+        custom_data: { has_email: !!formData.email },
+      });
       toast.success(state.message || 'Feedback sent successfully!');
       setFormData({ email: '', message: '' });
       setErrors({ email: '', message: '' });
@@ -60,7 +67,18 @@ export function FeedbackDialog() {
     } else if (state.error) {
       toast.error(state.error);
     }
-  }, [state]);
+  }, [state, formData.email]);
+
+  // Track dialog open
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (newOpen) {
+      trackEvent({
+        action: 'feedback_dialog_opened',
+        category: 'feedback',
+      });
+    }
+  };
 
   const messageLength = formData.message.trim().length;
   const minLength = 10;
@@ -118,7 +136,7 @@ export function FeedbackDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button
           type='button'

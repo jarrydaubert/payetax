@@ -6,6 +6,9 @@ import { addBreadcrumb, captureAPIError, setContext } from '@/lib/sentry';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// Security constants
+const MAX_BODY_SIZE = 100 * 1024; // 100KB max body size
+
 /**
  * Anonymize IP address for GDPR compliance by masking the last octet.
  * IPv4: 192.168.1.100 -> 192.168.1.xxx
@@ -75,6 +78,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Check body size before processing (security: prevent memory exhaustion)
+  const contentLength = request.headers.get('content-length');
+  if (contentLength && Number.parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
+  }
+
   // Early exit if Resend not configured
   if (!resend) {
     const configError = new Error('Resend API key not configured');
@@ -117,10 +126,11 @@ export async function POST(request: NextRequest) {
     const safeDigest = digest ? escapeHtml(digest) : 'N/A';
 
     // Send error email to support via Resend
+    // Security: Use generic subject to prevent email header injection
     const { error } = await resend.emails.send({
       from: 'PayeTax Error Monitor <support@payetax.co.uk>',
       to: ['support@payetax.co.uk'],
-      subject: `🚨 Error on PayeTax: ${message.substring(0, 50)}...`,
+      subject: '🚨 Application Error on PayeTax',
       tags: [
         { name: 'source', value: 'error-monitor' },
         { name: 'type', value: 'application-error' },

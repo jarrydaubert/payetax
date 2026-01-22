@@ -22,11 +22,11 @@
   --blog-font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
   --blog-font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
 
-  /* Brand Colors - Maintain identity across themes */
-  --brand-primary: oklch(0.55 0.22 264);        /* Indigo-blue */
-  --brand-accent: oklch(0.65 0.25 240);         /* Lighter blue */
-  --brand-gradient-start: oklch(0.50 0.20 264);
-  --brand-gradient-end: oklch(0.60 0.24 250);
+  /* Brand Colors - Cyan/Emerald design system (January 2026) */
+  --brand-primary: #06b6d4;                     /* Cyan */
+  --brand-accent: #10b981;                      /* Emerald */
+  --brand-gradient-start: #06b6d4;              /* Cyan */
+  --brand-gradient-end: #10b981;                /* Emerald */
 
   /* Chart Colors - High contrast for both light and dark modes */
   --chart-1: 210 100% 42%;    /* Blue - Employment income (darker) */
@@ -60,13 +60,437 @@
   --ring: oklch(0.708 0 0);
 }
 
-/* Dark Mode Theme (Updated March 12, 2025) */
+/* New Design System Colors (Cyan/Emerald) - January 2026 */
+:root {
+  /* New brand colors */
+  --brand-cyan: #06b6d4;
+  --brand-emerald: #10b981;
+  --brand-gradient-new: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+
+  /* New background colors */
+  --bg-deep: #020617;
+  --bg-dark: #0f172a;
+  --bg-card-new: #1e293b;
+
+  /* New text colors */
+  --text-primary-new: #f8fafc;
+  --text-secondary-new: #94a3b8;
+  --text-dim: #64748b;
+
+  /* New border colors */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-light: rgba(255, 255, 255, 0.08);
+}
+
+/* Background Elements - Geometric patterns */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.bg-circle-1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  right: -200px;
+  animation: bg-rotate 60s linear infinite;
+}
+
+.bg-circle-2 {
+  width: 800px;
+  height: 800px;
+  bottom: -300px;
+  left: -300px;
+  border-color: rgba(16, 185, 129, 0.08);
+  animation: bg-rotate 80s linear infinite reverse;
+}
+
+@keyframes bg-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hero Badge with pulse animation */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-cyan);
+  margin-bottom: 2rem;
+}
+
+.hero-badge .pulse {
+  width: 6px;
+  height: 6px;
+  background: var(--brand-cyan);
+  border-radius: 50%;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
+}
+
+/* New gradient text utility */
+.text-gradient-new {
+  background: var(--brand-gradient-new);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Bento Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  max-width: 900px;
+  margin: 3rem auto 0;
+}
+
+.bento-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: left;
+  transition: all 0.3s;
+}
+
+.bento-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--brand-cyan);
+  transform: translateY(-2px);
+}
+
+.bento-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 182, 212, 0.1);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.bento-title {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary-new);
+  margin-bottom: 0.25rem;
+}
+
+.bento-desc {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+@media (max-width: 900px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .bento-grid { grid-template-columns: 1fr; max-width: 350px; }
+}
+
+/* Section Base Styles */
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brand-cyan);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary-new);
+}
+
+/* Features Section */
+.features-section {
+  padding: 6rem 2rem;
+  background: var(--bg-dark);
+  position: relative;
+  z-index: 1;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: all 0.3s;
+}
+
+.feature-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--brand-cyan);
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 182, 212, 0.1);
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  font-size: 1.5rem;
+}
+
+.feature-card h3 {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary-new);
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary-new);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .features-grid { grid-template-columns: 1fr; max-width: 500px; }
+}
+
+/* How It Works Section */
+.how-section {
+  padding: 6rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.step-card {
+  text-align: center;
+  padding: 2rem;
+}
+
+.step-number {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-gradient-new);
+  border-radius: 50%;
+  color: var(--bg-deep);
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 auto 1.25rem;
+}
+
+.step-card h3 {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary-new);
+}
+
+.step-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary-new);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .steps-grid { grid-template-columns: 1fr; max-width: 400px; }
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 6rem 2rem;
+  background: var(--bg-dark);
+  position: relative;
+  z-index: 1;
+}
+
+.faq-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s;
+}
+
+.faq-item:hover {
+  border-color: var(--border-light);
+}
+
+.faq-question {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary-new);
+}
+
+.faq-answer {
+  font-size: 0.9rem;
+  color: var(--text-secondary-new);
+  line-height: 1.7;
+}
+
+/* Final CTA Section */
+.final-cta {
+  padding: 6rem 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.final-cta h2 {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  color: var(--text-primary-new);
+}
+
+.final-cta p {
+  color: var(--text-secondary-new);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* New Footer Styles */
+.footer-new {
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-content-new {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-brand {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary-new);
+}
+
+.footer-brand span {
+  background: var(--brand-gradient-new);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-links-new {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links-new a {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links-new a:hover {
+  color: var(--brand-cyan);
+}
+
+.footer-copy {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .footer-content-new {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  .footer-links-new {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .bg-circle-1, .bg-circle-2 {
+    animation: none;
+  }
+  .hero-badge .pulse {
+    animation: none;
+  }
+}
+
+/* Dark Mode Theme (Updated January 2026) */
 .dark {
-  /* Brand colors stay consistent in dark mode */
-  --brand-primary: oklch(0.60 0.24 264);        /* Slightly lighter for contrast */
-  --brand-accent: oklch(0.70 0.26 240);
-  --brand-gradient-start: oklch(0.55 0.22 264);
-  --brand-gradient-end: oklch(0.65 0.25 250);
+  /* Brand colors - Cyan/Emerald (slightly brighter for dark mode contrast) */
+  --brand-primary: #22d3ee;                     /* Cyan-400 (brighter) */
+  --brand-accent: #34d399;                      /* Emerald-400 (brighter) */
+  --brand-gradient-start: #22d3ee;              /* Cyan-400 */
+  --brand-gradient-end: #34d399;                /* Emerald-400 */
 
   /* Chart Colors - Brighter for dark mode visibility */
   --chart-1: 210 100% 68%;    /* Much brighter blue */

@@ -185,8 +185,8 @@ export function generateMetadata({
       title: formattedTitle,
       description,
       images: [imageUrl],
-      creator: '@toolhubx',
-      site: '@toolhubx',
+      creator: '@PayeTaxUK',
+      site: '@PayeTaxUK',
     },
 
     // Application icons
@@ -213,8 +213,8 @@ export function generateMetadata({
 
     // Other metadata
     other: {
-      'msapplication-TileColor': '#1D4ED8',
-      'theme-color': '#1D4ED8',
+      'msapplication-TileColor': '#06b6d4',
+      'theme-color': '#06b6d4',
       // Schema.org JSON-LD markup is handled separately via the StructuredData component
     },
   };
@@ -236,7 +236,7 @@ export function generateViewport(): Viewport {
     themeColor: '#252525', // Dark mode only
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 2,
+    maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
     userScalable: true,
     colorScheme: 'dark',
     viewportFit: 'cover', // For notched devices like iPhone X and newer

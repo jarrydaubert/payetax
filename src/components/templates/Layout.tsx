@@ -3,6 +3,7 @@
 
 import type React from 'react';
 import { Suspense } from 'react';
+import BackgroundElements from '@/components/atoms/BackgroundElements';
 import CookieBanner from '@/components/atoms/CookieBanner';
 import Footer from '@/components/molecules/Footer';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
@@ -13,7 +14,10 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
   return (
-    <div className='flex min-h-screen flex-col'>
+    <div className='relative flex min-h-screen flex-col' style={{ background: 'var(--bg-deep)' }}>
+      {/* Background geometric elements */}
+      <BackgroundElements />
+
       {/* Skip to main content for screen readers */}
       <a href='#main-content' className='skip-link'>
         Skip to main content

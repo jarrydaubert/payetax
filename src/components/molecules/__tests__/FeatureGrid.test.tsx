@@ -205,15 +205,15 @@ describe('FeatureGrid', () => {
         {
           ...mockFeatures[0],
           gradient: {
-            bg: 'from-blue-500/10 to-cyan-500/10',
-            icon: 'text-blue-500',
-            border: 'border-blue-500/20',
+            bg: 'from-cyan-500/10 to-emerald-500/10',
+            icon: 'text-cyan-500',
+            border: 'border-cyan-500/20',
           },
         },
       ];
 
       const { container } = render(<FeatureGrid features={featuresWithGradients} />);
-      const card = container.querySelector('.from-blue-500\\/10');
+      const card = container.querySelector('.from-cyan-500\\/10');
       expect(card).toBeInTheDocument();
     });
   });

@@ -42,9 +42,9 @@ interface GlowButtonProps {
 }
 
 const glowColorMap = {
-  primary: 'from-blue-500 via-purple-500 to-pink-500',
-  accent: 'from-cyan-400 via-blue-500 to-purple-600',
-  success: 'from-green-400 via-emerald-500 to-teal-500',
+  primary: 'from-cyan-500 via-emerald-500 to-cyan-500',
+  accent: 'from-cyan-400 via-emerald-400 to-cyan-400',
+  success: 'from-emerald-400 via-cyan-500 to-emerald-500',
 };
 
 export function GlowButton({

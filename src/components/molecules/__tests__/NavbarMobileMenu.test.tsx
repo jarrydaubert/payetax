@@ -15,8 +15,8 @@ import type { Route } from 'next';
 import { NavbarMobileMenu } from '../NavbarMobileMenu';
 
 const mockLinks = [
-  { href: '/' as Route, label: 'Calculator' },
-  { href: '/blog' as Route, label: 'TaxInsights' },
+  { href: '/#tax-calculator' as Route, label: 'Calculator' },
+  { href: '/blog' as Route, label: 'Blog' },
   { href: '/about' as Route, label: 'About' },
 ] as const;
 
@@ -50,21 +50,14 @@ describe('NavbarMobileMenu', () => {
     it('should render all navigation links', () => {
       render(<NavbarMobileMenu {...defaultProps} />);
       expect(screen.getByRole('link', { name: 'Calculator' })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'TaxInsights' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Blog' })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
     });
 
-    it('should render utilities when provided', () => {
-      render(
-        <NavbarMobileMenu {...defaultProps} utilities={<button type='button'>Feedback</button>} />
-      );
-      expect(screen.getByRole('button', { name: 'Feedback' })).toBeInTheDocument();
-    });
-
-    it('should not render utilities section when not provided', () => {
-      const { container } = render(<NavbarMobileMenu {...defaultProps} />);
-      // The utilities div with mt-4 class should not exist
-      expect(container.querySelector('.mt-4')).not.toBeInTheDocument();
+    it('should render CTA button', () => {
+      render(<NavbarMobileMenu {...defaultProps} />);
+      // The CTA button "Open Calculator" should be present
+      expect(screen.getByRole('link', { name: 'Open Calculator' })).toBeInTheDocument();
     });
   });
 
@@ -72,32 +65,33 @@ describe('NavbarMobileMenu', () => {
     it('should mark Calculator as active when pathname is /', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      expect(calculatorLink).toHaveClass('text-primary');
+      // Active state uses inline style with brand-cyan color
+      expect(calculatorLink).toHaveStyle({ color: 'var(--brand-cyan)' });
     });
 
-    it('should mark TaxInsights as active when pathname starts with /blog', () => {
+    it('should mark Blog as active when pathname starts with /blog', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog' />);
-      const blogLink = screen.getByRole('link', { name: 'TaxInsights' });
-      expect(blogLink).toHaveClass('text-primary');
+      const blogLink = screen.getByRole('link', { name: 'Blog' });
+      expect(blogLink).toHaveStyle({ color: 'var(--brand-cyan)' });
     });
 
-    it('should mark TaxInsights as active for blog sub-pages', () => {
+    it('should mark Blog as active for blog sub-pages', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog/some-article' />);
-      const blogLink = screen.getByRole('link', { name: 'TaxInsights' });
-      expect(blogLink).toHaveClass('text-primary');
+      const blogLink = screen.getByRole('link', { name: 'Blog' });
+      expect(blogLink).toHaveStyle({ color: 'var(--brand-cyan)' });
     });
 
     it('should mark link as active when pathname matches exactly', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveClass('text-primary');
+      expect(aboutLink).toHaveStyle({ color: 'var(--brand-cyan)' });
     });
 
     it('should not mark non-matching links as active', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      expect(calculatorLink).not.toHaveClass('text-primary');
-      expect(calculatorLink).toHaveClass('text-muted-foreground');
+      // Inactive state uses secondary text color
+      expect(calculatorLink).toHaveStyle({ color: 'var(--text-secondary-new)' });
     });
   });
 
@@ -115,8 +109,8 @@ describe('NavbarMobileMenu', () => {
       fireEvent.click(screen.getByRole('link', { name: 'Calculator' }));
       expect(mockOnLinkClick).toHaveBeenCalledWith('Calculator');
 
-      fireEvent.click(screen.getByRole('link', { name: 'TaxInsights' }));
-      expect(mockOnLinkClick).toHaveBeenCalledWith('TaxInsights');
+      fireEvent.click(screen.getByRole('link', { name: 'Blog' }));
+      expect(mockOnLinkClick).toHaveBeenCalledWith('Blog');
 
       fireEvent.click(screen.getByRole('link', { name: 'About' }));
       expect(mockOnLinkClick).toHaveBeenCalledWith('About');
@@ -145,8 +139,11 @@ describe('NavbarMobileMenu', () => {
 
     it('should have correct link href attributes', () => {
       render(<NavbarMobileMenu {...defaultProps} />);
-      expect(screen.getByRole('link', { name: 'Calculator' })).toHaveAttribute('href', '/');
-      expect(screen.getByRole('link', { name: 'TaxInsights' })).toHaveAttribute('href', '/blog');
+      expect(screen.getByRole('link', { name: 'Calculator' })).toHaveAttribute(
+        'href',
+        '/#tax-calculator'
+      );
+      expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('href', '/blog');
       expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about');
     });
   });
@@ -161,13 +158,15 @@ describe('NavbarMobileMenu', () => {
     it('should apply active styling to active links', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      expect(calculatorLink).toHaveClass('bg-primary/10', 'text-primary');
+      // New design uses inline styles for active state
+      expect(calculatorLink).toHaveStyle({ color: 'var(--brand-cyan)' });
+      expect(calculatorLink).toHaveStyle({ background: 'rgba(6, 182, 212, 0.1)' });
     });
 
     it('should apply inactive styling to inactive links', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveClass('text-muted-foreground');
+      expect(aboutLink).toHaveStyle({ color: 'var(--text-secondary-new)' });
     });
   });
 

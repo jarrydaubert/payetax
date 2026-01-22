@@ -1,10 +1,10 @@
 // src/components/molecules/ServerHero.tsx
 // Server-rendered hero for instant LCP - no 'use client' directive
-// The H1 renders immediately from the server, dramatically improving LCP
+// Matches payetax-web design: badge, headline, dual CTAs, trust strip, bento grid
 
-import { ArrowRight } from 'lucide-react';
+import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { TrackedCTA } from '@/components/atoms/TrackedCTA';
 import { cn } from '@/lib/utils';
 
 interface ServerHeroProps {
@@ -15,77 +15,106 @@ export default function ServerHero({ className }: ServerHeroProps) {
   return (
     <section
       className={cn(
-        'relative flex min-h-screen items-center justify-center overflow-hidden py-16 md:py-20',
+        'relative z-[1] flex min-h-screen flex-col items-center justify-center px-4 py-32 text-center sm:px-8',
         className
       )}
+      style={{ background: 'var(--bg-deep)' }}
     >
-      <div className={cn('relative z-10 mx-auto max-w-5xl text-center', SPACING.PX_2, 'sm:px-4')}>
-        {/* Heading - Server-rendered for instant LCP */}
-        <h1
-          className={cn(
-            'mx-auto mb-6 max-w-4xl font-bold text-foreground tracking-tight',
-            TYPOGRAPHY.TEXT_4XL,
-            `sm:${TYPOGRAPHY.TEXT_5XL}`,
-            `md:${TYPOGRAPHY.TEXT_6XL}`
-          )}
+      {/* Badge */}
+      <div className='hero-badge'>
+        <span className='pulse' />
+        HMRC 2025-26 Rates
+      </div>
+
+      {/* Heading */}
+      <h1
+        className='mx-auto mb-6 max-w-[900px] font-bold font-display leading-[1.05] tracking-[-0.04em]'
+        style={{
+          fontSize: 'clamp(3rem, 10vw, 5.5rem)',
+          color: 'var(--text-primary-new)',
+        }}
+      >
+        Calculate your
+        <br />
+        <span className='text-gradient-new'>take-home pay</span>
+      </h1>
+
+      {/* Tagline */}
+      <p
+        className='mx-auto mb-10 max-w-[580px] leading-[1.8]'
+        style={{ fontSize: '1.15rem', color: 'var(--text-secondary-new)' }}
+      >
+        Free UK PAYE tax calculator with official HMRC rates. Get accurate results for income tax,
+        National Insurance, student loans, and pension contributions.
+      </p>
+
+      {/* CTA Buttons */}
+      <div className='mb-16 flex flex-col gap-4 sm:flex-row'>
+        <TrackedCTA
+          href='#tax-calculator'
+          trackingLabel='hero_start_calculating'
+          className='group inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
+          style={{
+            background: 'var(--brand-gradient-new)',
+            color: 'var(--bg-deep)',
+            fontSize: '1rem',
+          }}
         >
-          Free UK PAYE Tax
-          <br />
-          <span className='text-gradient'>Calculator 2025-2026</span>
-        </h1>
-
-        {/* Description */}
-        <p className={cn('mx-auto mb-10 max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-          Calculate your take-home pay instantly. Includes income tax, National Insurance, student
-          loans, and pension contributions.
-        </p>
-
-        {/* CTA Button - Gradient glow style, CSS-only for server rendering */}
-        <div className='fade-in slide-in-from-bottom-2 inline-block animate-in delay-200 duration-500'>
-          <Link href='#tax-calculator' className='group relative inline-block'>
-            {/* Background glow - gradient blur effect */}
-            <div className='absolute -inset-1 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 blur transition duration-500 group-hover:opacity-100' />
-
-            {/* Button - dark background with light text */}
-            <span
-              className={cn(
-                'relative flex items-center justify-center',
-                'rounded-lg bg-background px-5 py-2.5',
-                'font-medium text-foreground',
-                'transition-all duration-300 group-hover:scale-[1.02]',
-                SPACING.GAP_2,
-                TYPOGRAPHY.TEXT_SM
-              )}
-            >
-              Calculate My Salary
-              <ArrowRight
-                className={cn(ICON_SIZES.SIZE_4, 'transition-transform group-hover:translate-x-1')}
-                aria-hidden='true'
-              />
-            </span>
-          </Link>
-        </div>
-
-        {/* Features */}
-        <div
-          className={cn(
-            'mt-16 flex flex-wrap items-center justify-center text-muted-foreground',
-            SPACING.GAP_8,
-            TYPOGRAPHY.TEXT_SM
-          )}
+          Start Calculating
+        </TrackedCTA>
+        <Link
+          href='#features'
+          className='inline-flex items-center justify-center gap-2 rounded-xl border px-8 py-4 font-medium transition-all duration-300 hover:border-[var(--brand-cyan)] hover:bg-white/5'
+          style={{
+            borderColor: 'var(--border-light)',
+            color: 'var(--text-primary-new)',
+            fontSize: '1rem',
+          }}
         >
-          {[
-            'Accurate Calculations',
-            '2025-2026 Tax Year',
-            'Scottish Tax Support',
-            'Instant Results',
-          ].map((feature) => (
-            <div key={feature} className={cn('flex items-center', SPACING.GAP_2)}>
-              <div className='h-1.5 w-1.5 rounded-full bg-primary' />
-              <span>{feature}</span>
-            </div>
-          ))}
-        </div>
+          See Features
+          <ChevronDown className='h-[18px] w-[18px]' />
+        </Link>
+      </div>
+
+      {/* Trust Strip */}
+      <div
+        className='flex max-w-[900px] flex-wrap justify-center gap-6 border-t py-8 sm:gap-8'
+        style={{ borderColor: 'var(--border-subtle)' }}
+      >
+        {[
+          { icon: CheckCircle, text: '50,000+ calculations' },
+          { icon: CheckCircle, text: 'HMRC 2025-26 rates' },
+          { icon: CheckCircle, text: '100% private' },
+          { icon: Shield, text: 'Always free' },
+        ].map(({ icon: Icon, text }) => (
+          <div
+            key={text}
+            className='flex items-center gap-2'
+            style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}
+          >
+            <Icon
+              className='h-[18px] w-[18px] flex-shrink-0'
+              style={{ color: 'var(--brand-emerald)' }}
+            />
+            <span>{text}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Bento Grid */}
+      <div className='bento-grid'>
+        {[
+          { icon: '✅', title: 'HMRC Verified', desc: 'Official 2025-26 rates' },
+          { icon: '⚡', title: 'Instant Results', desc: 'Calculate in seconds' },
+          { icon: '🔒', title: 'Private', desc: 'No data stored' },
+          { icon: '🇬🇧', title: 'UK Coverage', desc: 'England & Scotland' },
+        ].map((item) => (
+          <div key={item.title} className='bento-item'>
+            <div className='bento-icon'>{item.icon}</div>
+            <div className='bento-title'>{item.title}</div>
+            <div className='bento-desc'>{item.desc}</div>
+          </div>
+        ))}
       </div>
     </section>
   );

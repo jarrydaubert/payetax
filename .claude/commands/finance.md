@@ -163,6 +163,6 @@ This must be accurately reflected in marginal rate displays.
 ## Key Files to Review
 
 - `src/constants/taxRates.ts` - SINGLE SOURCE OF TRUTH
-- `src/lib/utils/taxCalculations.ts` - Calculation logic
+- `src/lib/taxCalculator.ts` - Calculation logic
 - `src/constants/__tests__/taxRates.test.ts` - Rate tests
-- `src/lib/utils/__tests__/` - Calculation tests
+- `src/lib/__tests__/taxCalculator*.ts` - Calculation tests

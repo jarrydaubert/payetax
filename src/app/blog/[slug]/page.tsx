@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Script from 'next/script';
 
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
 import { TableOfContents } from '@/components/molecules/TableOfContents';
@@ -151,12 +150,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <>
       {/* Structured Data */}
-      <Script type='application/ld+json' strategy='afterInteractive'>
-        {JSON.stringify(articleStructuredData)}
-      </Script>
-      <Script type='application/ld+json' strategy='afterInteractive'>
-        {JSON.stringify(breadcrumbStructuredData)}
-      </Script>
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
+      />
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
+      />
 
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>

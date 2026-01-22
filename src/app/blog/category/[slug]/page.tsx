@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Script from 'next/script';
+
 import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
@@ -138,23 +138,29 @@ export default async function CategoryPage({
   return (
     <div className='container mx-auto px-4 py-12'>
       {/* Structured Data Scripts */}
-      <Script type='application/ld+json' strategy='afterInteractive'>
-        {JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          headline: `${category.name} - PayeTax Blog`,
-          description: `Expert guides on ${category.name.toLowerCase()} for UK taxpayers. Official HMRC rates, practical examples, and tax planning for 2025-26.`,
-          url: `https://payetax.co.uk/blog/category/${slug}`,
-          author: {
-            '@type': 'Organization',
-            name: 'PayeTax',
-            url: 'https://payetax.co.uk',
-          },
-        })}
-      </Script>
-      <Script type='application/ld+json' strategy='afterInteractive'>
-        {JSON.stringify(breadcrumbStructuredData)}
-      </Script>
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            headline: `${category.name} - PayeTax Blog`,
+            description: `Expert guides on ${category.name.toLowerCase()} for UK taxpayers. Official HMRC rates, practical examples, and tax planning for 2025-26.`,
+            url: `https://payetax.co.uk/blog/category/${slug}`,
+            author: {
+              '@type': 'Organization',
+              name: 'PayeTax',
+              url: 'https://payetax.co.uk',
+            },
+          }),
+        }}
+      />
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
+      />
 
       {/* Breadcrumbs */}
       <nav
@@ -412,7 +418,7 @@ export default async function CategoryPage({
         </p>
         <Link
           href='/'
-          className='inline-flex rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700'
+          className='inline-flex rounded-lg bg-cyan-600 px-6 py-3 font-medium text-white transition-colors hover:bg-cyan-700'
         >
           Try Tax Calculator
         </Link>

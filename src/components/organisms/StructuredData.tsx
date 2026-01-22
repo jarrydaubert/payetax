@@ -39,11 +39,6 @@ interface WebsiteSchema {
   name: string;
   url: string;
   description?: string;
-  potentialAction?: {
-    '@type': 'SearchAction';
-    target: string;
-    'query-input': string;
-  };
 }
 
 interface SoftwareApplicationSchema {
@@ -318,7 +313,7 @@ const ORG_DATA: OrganizationSchema = {
     email: 'support@payetax.co.uk',
     contactType: 'customer support',
   },
-  sameAs: [],
+  sameAs: ['https://twitter.com/PayeTaxUK'],
 };
 
 // Website data
@@ -329,11 +324,7 @@ const WEBSITE_DATA: WebsiteSchema = {
   url: 'https://payetax.co.uk',
   description:
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: 'https://payetax.co.uk/search?q={search_term_string}',
-    'query-input': 'required name=search_term_string',
-  },
+  // Note: SearchAction removed - /search route not implemented
 };
 
 // Software application data for the tax calculator
@@ -350,13 +341,6 @@ const CALCULATOR_DATA: SoftwareApplicationSchema = {
   },
   description:
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    ratingCount: '156',
-    bestRating: '5',
-    worstRating: '1',
-  },
 };
 
 // Financial service data for enhanced AI discovery
@@ -408,13 +392,6 @@ const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
         priceCurrency: 'GBP',
       },
     ],
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    ratingCount: '156',
-    bestRating: '5',
-    worstRating: '1',
   },
 };
 

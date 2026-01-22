@@ -38,6 +38,7 @@ import {
   type TaxBand,
   type TaxYear,
 } from '@/constants/taxRates';
+import { trackCalculatorEvent, trackCalculatorUsage } from '@/lib/analytics';
 import {
   addBreadcrumb,
   captureCalculatorError,
@@ -224,6 +225,17 @@ const getCurrentTaxYear = (): TaxYear => {
 
   // Otherwise, we're in the current tax year
   return `${currentYear}-${currentYear + 1}` as TaxYear;
+};
+
+// Get salary range for privacy-safe analytics
+const getSalaryRange = (salary: number): string => {
+  if (salary < 25000) return 'under_25k';
+  if (salary < 35000) return '25k_35k';
+  if (salary < 50000) return '35k_50k';
+  if (salary < 75000) return '50k_75k';
+  if (salary < 100000) return '75k_100k';
+  if (salary < 150000) return '100k_150k';
+  return 'over_150k';
 };
 
 // Default tax year based on current date
@@ -805,6 +817,17 @@ export const useCalculatorStore = create<CalculatorState>()(
                 incomeTax: results.incomeTax.annually,
               },
             });
+
+            // Analytics tracking (privacy-safe: no exact salary)
+            const salaryRange = getSalaryRange(input.salary);
+            trackCalculatorEvent('calculate', {
+              tax_year: input.taxYear,
+              region: input.region,
+              has_student_loan: input.studentLoanPlans !== 'none',
+              has_pension: input.pensionContribution > 0,
+              salary_range: salaryRange,
+            });
+            trackCalculatorUsage('paye', salaryRange);
           } catch (error) {
             // Log calculation errors for debugging
             console.error('Tax calculation error:', error);

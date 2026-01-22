@@ -10,7 +10,7 @@
  * 4. Copy Client Secret → Add to Vercel as SENTRY_WEBHOOK_SECRET
  */
 
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -67,26 +67,33 @@ interface SentryWebhookPayload {
 }
 
 /**
- * Verify Sentry webhook signature using HMAC-SHA256
+ * Verify Sentry webhook signature using HMAC-SHA256 with timing-safe comparison
  */
 function verifySignature(rawBody: string, signature: string, secret: string): boolean {
   const hmac = createHmac('sha256', secret);
   hmac.update(rawBody, 'utf8');
   const digest = hmac.digest('hex');
-  return digest === signature;
+
+  // Use timing-safe comparison to prevent timing attacks
+  if (digest.length !== signature.length) return false;
+  return timingSafeEqual(Buffer.from(digest, 'utf8'), Buffer.from(signature, 'utf8'));
 }
 
 export async function POST(request: NextRequest) {
+  // Require webhook secret to be configured (security: prevent unauthorized requests)
+  if (!SENTRY_WEBHOOK_SECRET) {
+    console.error('SENTRY_WEBHOOK_SECRET not configured');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+  }
+
   // Get raw body for signature verification
   const rawBody = await request.text();
 
-  // Verify webhook signature if secret is configured
-  if (SENTRY_WEBHOOK_SECRET) {
-    const sentrySignature = request.headers.get('sentry-hook-signature');
-    if (!(sentrySignature && verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET))) {
-      console.error('Invalid Sentry webhook signature');
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
+  // Verify webhook signature (mandatory)
+  const sentrySignature = request.headers.get('sentry-hook-signature');
+  if (!(sentrySignature && verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET))) {
+    console.error('Invalid Sentry webhook signature');
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   // Check resource type
@@ -236,11 +243,10 @@ function getPriority(level: string, count: number): number {
   return 0; // No priority for info/debug
 }
 
-// Allow GET for health checks
+// Allow GET for health checks (no config exposure for security)
 export function GET() {
   return NextResponse.json({
     status: 'ok',
     service: 'sentry-webhook',
-    linearConfigured: !!LINEAR_API_KEY,
   });
 }

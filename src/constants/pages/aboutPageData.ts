@@ -121,7 +121,7 @@ export const ABOUT_UNIQUE_FEATURES = [
       'Compare job offers, raises, or "what if I earned X more?" scenarios instantly. See exactly how much of every extra pound you actually keep.',
     metric: 'Instant',
     gradient: {
-      bg: 'from-cyan-500/10 to-blue-500/10',
+      bg: 'from-cyan-500/10 to-emerald-500/10',
       icon: 'text-cyan-500',
       border: 'border-cyan-500/30',
     },
@@ -147,7 +147,7 @@ export const ABOUT_UNIQUE_FEATURES = [
 export const ABOUT_TECH_STACK = [
   {
     icon: Rocket,
-    title: 'Next.js 15 & React 19',
+    title: 'Next.js 16 & React 19',
     description:
       'Server Components, React Compiler, async request APIs. Built with the latest tech for maximum performance and developer experience.',
   },

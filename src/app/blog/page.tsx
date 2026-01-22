@@ -1,7 +1,7 @@
 // src/app/blog/page.tsx
 
 import type { Metadata } from 'next';
-import Script from 'next/script';
+
 import { getBlogCategories, getBlogPosts, getFeaturedPost } from '@/lib/blog';
 import { BlogPageClient } from './BlogPageClient';
 
@@ -83,9 +83,11 @@ export default async function BlogPage() {
 
   return (
     <>
-      <Script type='application/ld+json' strategy='afterInteractive'>
-        {JSON.stringify(blogStructuredData)}
-      </Script>
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogStructuredData) }}
+      />
       <BlogPageClient featuredPost={featuredPost} categories={categories} allPosts={allPosts} />
     </>
   );

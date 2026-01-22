@@ -135,14 +135,14 @@ describe('FeatureCard', () => {
       const featureWithGradient: Feature = {
         ...mockFeature,
         gradient: {
-          bg: 'from-blue-500/10 to-cyan-500/10',
-          icon: 'text-blue-500',
-          border: 'border-blue-500/20',
+          bg: 'from-cyan-500/10 to-emerald-500/10',
+          icon: 'text-cyan-500',
+          border: 'border-cyan-500/20',
         },
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('from-blue-500/10', 'to-cyan-500/10');
+      expect(card).toHaveClass('from-cyan-500/10', 'to-emerald-500/10');
     });
 
     it('should apply gradient icon color', () => {

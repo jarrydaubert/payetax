@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 // src/components/pages/__tests__/HomePageContent.test.tsx
-// Note: Hero is now server-rendered in page.tsx for LCP optimization
+// Simplified: Only renders calculator section
+// Hero and landing sections are server-rendered in page.tsx
 
 import { render, screen } from '@testing-library/react';
 import HomePageContent from '../HomePageContent';
@@ -12,10 +13,6 @@ jest.mock('@/components/organisms/CalculatorContainer', () => ({
   CalculatorContainer: () => (
     <div data-testid='mock-calculator-container'>Calculator Container</div>
   ),
-}));
-
-jest.mock('@/components/organisms/CalculatorContent', () => ({
-  CalculatorContent: () => <div data-testid='mock-calculator-content'>Calculator Content</div>,
 }));
 
 // Mock calculator store
@@ -30,12 +27,10 @@ describe('HomePageContent Component', () => {
     mockInit.mockClear();
   });
 
-  it('should render all main sections (hero is server-rendered separately)', () => {
+  it('should render calculator container', () => {
     render(<HomePageContent />);
 
-    // Hero is now rendered in page.tsx for LCP optimization
     expect(screen.getByTestId('mock-calculator-container')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-calculator-content')).toBeInTheDocument();
   });
 
   it('should initialize calculator store on mount', () => {
@@ -52,14 +47,6 @@ describe('HomePageContent Component', () => {
     expect(calculatorSection?.tagName).toBe('SECTION');
   });
 
-  it('should render main element with proper structure', () => {
-    const { container } = render(<HomePageContent />);
-
-    const mainDiv = container.querySelector('div.flex.flex-col');
-    expect(mainDiv).toBeInTheDocument();
-    expect(mainDiv).toHaveClass('flex', 'flex-col');
-  });
-
   it('should render calculator section with padding', () => {
     const { container } = render(<HomePageContent />);
 
@@ -67,10 +54,10 @@ describe('HomePageContent Component', () => {
     expect(calculatorSection).toHaveClass('py-12', 'md:py-16', 'lg:py-20');
   });
 
-  it('should render content section in container', () => {
+  it('should have z-index for layering above background', () => {
     const { container } = render(<HomePageContent />);
 
-    const contentSection = container.querySelectorAll('section')[1];
-    expect(contentSection).toHaveClass('container', 'mx-auto', 'px-4', 'md:px-6');
+    const calculatorSection = container.querySelector('#tax-calculator');
+    expect(calculatorSection).toHaveClass('z-[1]');
   });
 });

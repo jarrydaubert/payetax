@@ -115,9 +115,9 @@ Provide findings as:
 - `src/constants/` - Configuration
 
 ### Tax Calculations
-- `src/lib/utils/taxCalculations.ts` - Core logic
+- `src/lib/taxCalculator.ts` - Core logic
 - `src/constants/taxRates.ts` - Rate definitions
-- `src/components/organisms/TaxCalculator/` - Calculator UI
+- `src/components/organisms/CalculatorContainer.tsx` - Calculator UI
 
 ### Configuration
 - `next.config.ts` - Next.js settings

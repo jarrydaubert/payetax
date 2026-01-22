@@ -151,7 +151,7 @@ bun run bundle:analyze
 
 ### Tax Logic
 - `src/constants/taxRates.ts` - Rate definitions
-- `src/lib/utils/taxCalculations.ts` - Core calculations
+- `src/lib/taxCalculator.ts` - Core calculations
 - `src/lib/validation/` - Input schemas
 
 ### UI/State

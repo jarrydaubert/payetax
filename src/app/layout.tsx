@@ -14,7 +14,7 @@ import ErrorBoundary from '@/components/atoms/ErrorBoundary';
 import Analytics from '@/components/organisms/Analytics';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
-import { inter } from './fonts';
+import { inter, spaceGrotesk } from './fonts';
 
 export const metadata: Metadata = metadataGenerator({
   title: 'PayeTax - Free UK PAYE Tax Calculator 2025 | Salary & Take-Home Pay',
@@ -39,7 +39,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang='en'
+      lang='en-GB'
       suppressHydrationWarning
       data-scroll-behavior='smooth'
       data-view-transition='enabled'
@@ -82,54 +82,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Buy Me Coffee Widget - moved to body for better timing */}
 
-        {/* Structured Data for SEO */}
-        <script
-          type='application/ld+json'
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data for SEO schema
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'PayeTax UK Tax Calculator',
-              description:
-                'Free UK tax calculator with official HMRC rates 2025-2026. Calculate PAYE, self-employment tax, National Insurance, and take-home pay instantly.',
-              url: 'https://payetax.co.uk',
-              applicationCategory: 'FinanceApplication',
-              operatingSystem: 'Web Browser',
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'GBP',
-              },
-              author: {
-                '@type': 'Organization',
-                name: 'PayeTax',
-                url: 'https://payetax.co.uk',
-              },
-              featureList: [
-                'UK PAYE Tax Calculator',
-                'Salary to Take-Home Pay Calculator',
-                'National Insurance Calculator',
-                'Tax Code Analysis & Validation',
-                'Student Loan Repayment Calculator',
-                'Pension Contribution Calculator',
-                'Weekly/Monthly/Annual Breakdowns',
-              ],
-              screenshot: 'https://payetax.co.uk/images/calculator-screenshot.jpg',
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                ratingCount: '127',
-                bestRating: '5',
-                worstRating: '1',
-              },
-            }),
-          }}
-        />
+        {/* Structured Data handled by StructuredData component in page.tsx */}
       </head>
       <body
         className={cn(
           inter.variable,
+          spaceGrotesk.variable,
           'font-sans antialiased',
           'min-h-screen bg-background text-foreground'
         )}
