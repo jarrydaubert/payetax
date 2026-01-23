@@ -47,6 +47,18 @@ Run a security-focused review of the codebase or specific area.
 - [ ] Error messages don't leak internal details
 - [ ] Timeouts prevent hanging requests
 
+### Secrets & Key Management
+- [ ] API keys only in server-side code (`src/app/api/`, server actions)
+- [ ] No secrets in client components (check for `process.env` without `NEXT_PUBLIC_`)
+- [ ] No hardcoded keys/tokens in source (grep for API keys, tokens)
+- [ ] Sensitive env vars not logged (check console.log/error statements)
+- [ ] `.env` files in `.gitignore`
+
+### Server-Side Enforcement
+- [ ] Sensitive calculations happen server-side (not client-manipulable)
+- [ ] Premium/gated features enforced server-side (not just hidden in UI)
+- [ ] Payment/credit logic never trusts client input
+
 ### Security Headers (next.config.ts)
 - [ ] Content-Security-Policy configured
 - [ ] X-Frame-Options: DENY
@@ -126,6 +138,10 @@ Run a security-focused review of the codebase or specific area.
 
 - `next.config.ts` - Security headers
 - `src/lib/validation/` - Input schemas
-- `src/app/api/` - API routes
+- `src/app/api/` - API routes (check rate limiting, key usage)
+- `src/app/actions/` - Server actions
+- `src/lib/env.ts` - Environment variable validation
 - `sentry.*.config.ts` - Error tracking
 - `instrumentation-client.ts` - Client instrumentation
+- `.gitignore` - Verify `.env*` excluded
+- `.env.example` - No real secrets, only placeholders
