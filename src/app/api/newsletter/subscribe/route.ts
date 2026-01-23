@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const audienceId = process.env.RESEND_AUDIENCE_ID;
@@ -12,6 +13,19 @@ const SubscribeSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 subscribe attempts per minute per IP
+    const ipAddress =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+
+    if (!checkRateLimit(ipAddress, { max: 3, window: 60000 })) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     // Check configuration
     if (!resend) {
       console.error('[newsletter/subscribe] Resend not configured');

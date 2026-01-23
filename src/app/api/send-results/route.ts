@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rateLimit';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -162,6 +163,19 @@ function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): st
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 emails per minute per IP
+    const ipAddress =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+
+    if (!checkRateLimit(ipAddress, { max: 5, window: 60000 })) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     if (!resend) {
       console.error('[send-results] Resend not configured');
       return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
