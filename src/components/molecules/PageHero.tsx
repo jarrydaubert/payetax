@@ -130,7 +130,7 @@ export function PageHero({
             <div className={cn('mx-auto max-w-3xl', SPACING.SPACE_Y_4)}>
               {subtitles.map((text) => (
                 <p
-                  key={text.substring(0, 50)} // Use text content as key (first 50 chars)
+                  key={text}
                   className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}
                 >
                   {text}

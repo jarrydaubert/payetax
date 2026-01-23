@@ -37,15 +37,16 @@ export type EmailInputData = z.infer<typeof EmailInputSchema>;
  * Number input validation schema with optional bounds
  *
  * Generic schema for number inputs with configurable min/max values.
+ * Note: For atoms layer validation, use NumberInputSchema from atomsValidation.ts
  *
  * @example
  * ```typescript
- * const salarySchema = NumberInputSchema.extend({
+ * const salarySchema = BoundedNumberInputSchema.extend({
  *   value: z.number().min(0).max(10_000_000),
  * });
  * ```
  */
-export const NumberInputSchema = z.object({
+export const BoundedNumberInputSchema = z.object({
   /** Numeric value - must be finite */
   value: z.number().finite('Must be a valid number').optional(),
   /** Minimum allowed value (optional) */
@@ -55,9 +56,18 @@ export const NumberInputSchema = z.object({
 });
 
 /**
- * Type inferred from NumberInputSchema
+ * Type inferred from BoundedNumberInputSchema
  */
-export type NumberInputData = z.infer<typeof NumberInputSchema>;
+export type BoundedNumberInputData = z.infer<typeof BoundedNumberInputSchema>;
+
+/**
+ * @deprecated Use BoundedNumberInputSchema instead. Kept for backwards compatibility.
+ */
+export const NumberInputSchema = BoundedNumberInputSchema;
+/**
+ * @deprecated Use BoundedNumberInputData instead. Kept for backwards compatibility.
+ */
+export type NumberInputData = BoundedNumberInputData;
 
 /**
  * Text input validation schema with length constraints

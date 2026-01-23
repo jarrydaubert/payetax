@@ -9,7 +9,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 const MotionTableRow = motion.create(TableRow);
 
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -61,7 +61,12 @@ export function ResultTableRow({
     >
       <th
         scope='row'
-        className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5 text-left font-normal`}
+        className={cn(
+          color,
+          isHighlight && 'font-bold',
+          'sticky left-0 z-10 bg-background px-2 py-2.5 text-left font-normal',
+          LAYOUT.TABLE_LABEL_WIDTH
+        )}
       >
         <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
           <Icon className={cn(ICON_SIZES.SIZE_3_5, 'flex-shrink-0')} aria-hidden='true' />

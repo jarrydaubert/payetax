@@ -354,6 +354,9 @@ export const LAYOUT = {
   MAX_W_3XL: 'max-w-3xl',
   /** 5XL max width for wide sections (64rem / 1024px) */
   MAX_W_5XL: 'max-w-5xl',
+  // Table-specific widths
+  /** Results table label column width (195px) - sticky first column */
+  TABLE_LABEL_WIDTH: 'w-[195px]',
 } as const;
 
 /**
