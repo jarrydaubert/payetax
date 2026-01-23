@@ -24,6 +24,12 @@
 - [x] **Newsletter:** Create subscribe API and NewsletterSignup component
 - [x] **Newsletter:** Add newsletter signup to footer
 
+## Tech Debt
+
+- [ ] Align IncomeSource type in store with validation.ts discriminated union schema
+- [ ] Add validationError state to calculatorStore for UI feedback on validation failures
+- [ ] Create tsconfig.test.json to enable type-checking for test files
+
 ## Content Backlog
 
 - [ ] Write more salary insight blog posts (£25k, £30k, £35k, £45k, £55k, £65k, £75k, £90k)
