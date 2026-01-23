@@ -143,12 +143,13 @@ describe('Layout Component', () => {
     const wrapper = container.firstChild as HTMLElement;
     const children = Array.from(wrapper.children);
 
-    // Order: background elements, skip link, header (navbar), main (content), footer, suspense (cookie banner)
+    // Order: background elements, skip link, header (navbar), main (content), newsletter section, footer
     expect(children[0].tagName).toBe('DIV'); // Background elements
     expect(children[1].tagName).toBe('A'); // Skip link
     expect(children[2].tagName).toBe('HEADER'); // Navbar
     expect(children[3].tagName).toBe('MAIN'); // Main content
-    expect(children[4].tagName).toBe('FOOTER'); // Footer
+    expect(children[4].tagName).toBe('SECTION'); // Newsletter section
+    expect(children[5].tagName).toBe('FOOTER'); // Footer
   });
 
   it('should handle multiple children in content area', () => {

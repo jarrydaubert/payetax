@@ -4,7 +4,6 @@
 import type { Route } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { NewsletterSignup } from './NewsletterSignup';
 
 /**
  * Footer molecule component - New design system
@@ -14,7 +13,6 @@ import { NewsletterSignup } from './NewsletterSignup';
  *
  * Clean, minimal design with:
  * - Logo (paye<span>tax</span>)
- * - Newsletter signup
  * - Essential links (Blog, About, Privacy, Compliance, Support)
  * - Copyright
  */
@@ -29,11 +27,6 @@ export function Footer({ className }: FooterProps) {
         {/* Brand */}
         <div className='footer-brand'>
           paye<span>tax</span>
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className='footer-newsletter'>
-          <NewsletterSignup variant='inline' source='footer' />
         </div>
 
         {/* Links */}
