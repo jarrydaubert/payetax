@@ -60,37 +60,16 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'fixed top-0 right-0 left-0 z-50',
           'flex items-center justify-between',
           'px-4 py-4 sm:px-8 sm:py-6',
-          'border-b backdrop-blur-[20px]',
+          'border-border-subtle border-b bg-deep/80 backdrop-blur-[20px]',
           className
         )}
-        style={{
-          background: 'rgba(2, 6, 23, 0.8)',
-          borderColor: 'var(--border-subtle)',
-        }}
         aria-label='Main navigation'
       >
         {/* Logo */}
         <Link href='/' className='group' data-testid='nav-logo'>
-          <span
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '1.4rem',
-              fontWeight: 600,
-              color: 'var(--text-primary-new)',
-              letterSpacing: '-0.03em',
-            }}
-          >
+          <span className='font-display font-semibold text-[1.4rem] text-text-primary-new tracking-[-0.03em]'>
             paye
-            <span
-              style={{
-                background: 'var(--brand-gradient-new)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              tax
-            </span>
+            <span className='text-gradient-new'>tax</span>
           </span>
         </Link>
 
@@ -101,8 +80,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='font-medium text-[0.85rem] transition-colors duration-300 hover:text-[var(--brand-cyan)]'
-              style={{ color: 'var(--text-secondary-new)' }}
+              className='font-medium text-[0.85rem] text-text-secondary-new transition-colors duration-300 hover:text-cyan'
             >
               {link.label}
             </Link>
@@ -114,13 +92,9 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           href='/#tax-calculator'
           onClick={handleCalculatorClick}
           className={cn(
-            'hidden rounded-full px-5 py-2.5 font-semibold text-[0.85rem] transition-all duration-300 md:inline-block',
+            'hidden rounded-full bg-brand-gradient-new px-5 py-2.5 font-semibold text-[0.85rem] text-deep transition-all duration-300 md:inline-block',
             'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
           )}
-          style={{
-            background: 'var(--brand-gradient-new)',
-            color: 'var(--bg-deep)',
-          }}
         >
           Open Calculator
         </Link>
@@ -129,11 +103,10 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         <Button
           variant='ghost'
           size='icon'
-          className='md:hidden'
+          className='text-text-primary-new md:hidden'
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           data-testid='mobile-menu-button'
-          style={{ color: 'var(--text-primary-new)' }}
         >
           {isMobileMenuOpen ? (
             <X className={ICON_SIZES.SIZE_5} />

@@ -6,6 +6,7 @@ import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import * as React from 'react';
 import { toast } from 'sonner';
+import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
@@ -300,7 +301,7 @@ export function CalculatorContainer() {
                 Ready to Calculate
               </h3>
               <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                Enter your salary details and click Calculate to see your results
+                Enter your salary. See your take-home pay in seconds.
               </p>
             </div>
           </motion.div>
@@ -315,26 +316,36 @@ export function CalculatorContainer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3 }}
-            className={cn('order-8 flex justify-center md:gap-3 lg:col-span-2', SPACING.GAP_2)}
+            className={cn('order-8 flex flex-col items-center lg:col-span-2', SPACING.GAP_4)}
           >
-            <Button
-              variant='outline'
-              size='lg'
-              onClick={handlePrint}
-              aria-label='Print tax calculation results'
-            >
-              <Printer className={cn('mr-2', ICON_SIZES.SIZE_4)} />
-              Print
-            </Button>
-            <Button
-              variant='outline'
-              size='lg'
-              onClick={handleExport}
-              aria-label='Export results to CSV file'
-            >
-              <FileDown className={cn('mr-2', ICON_SIZES.SIZE_4)} />
-              Export CSV
-            </Button>
+            {/* Email Results Form */}
+            <EmailResultsForm
+              results={results}
+              taxYear={input.taxYear}
+              className='w-full max-w-md'
+            />
+
+            {/* Print and Export Buttons */}
+            <div className={cn('flex justify-center md:gap-3', SPACING.GAP_2)}>
+              <Button
+                variant='outline'
+                size='lg'
+                onClick={handlePrint}
+                aria-label='Print tax calculation results'
+              >
+                <Printer className={cn('mr-2', ICON_SIZES.SIZE_4)} />
+                Print
+              </Button>
+              <Button
+                variant='outline'
+                size='lg'
+                onClick={handleExport}
+                aria-label='Export results to CSV file'
+              >
+                <FileDown className={cn('mr-2', ICON_SIZES.SIZE_4)} />
+                Export CSV
+              </Button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

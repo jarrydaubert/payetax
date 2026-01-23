@@ -35,7 +35,12 @@ import type { FeatureSchema, StatSchema } from '@/lib/validation/pageDataValidat
  * Displayed in StatsGrid component (4 columns)
  */
 export const ABOUT_STATS = [
-  { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-primary to-accent' },
+  {
+    icon: Calculator,
+    value: '100%',
+    label: 'Free. No Premium Tiers',
+    color: 'from-primary to-accent',
+  },
   { icon: Lock, value: '0', label: 'Data Stored', color: 'from-primary/80 to-accent/80' },
   {
     icon: Award,
@@ -55,7 +60,7 @@ export const ABOUT_VALUES = [
     icon: Shield,
     title: 'Privacy is Sacred',
     description:
-      "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise - it's architectural impossibility.",
+      "Every calculation runs in your browser. We never see your salary, tax code, or personal details. This isn't a promise — it's technically impossible for us to see it.",
     gradient: {
       bg: 'from-primary/20 to-accent/20',
       icon: 'text-primary',
@@ -66,7 +71,7 @@ export const ABOUT_VALUES = [
     icon: Eye,
     title: 'Radical Transparency',
     description:
-      'Open-source philosophy, honest analytics, and clear documentation. No dark patterns, no hidden fees, no corporate speak. Just honest tax calculations.',
+      'Our code is public. Our analytics are honest. No tricks, no fees. Just honest tax calculations.',
     gradient: {
       bg: 'from-accent/20 to-primary/20',
       icon: 'text-accent',
@@ -154,8 +159,7 @@ export const ABOUT_TECH_STACK = [
   {
     icon: Code,
     title: 'TypeScript Strict Mode',
-    description:
-      '100% type coverage with strict mode enabled. Every calculation is type-safe. Runtime errors are nearly impossible with our validation layers.',
+    description: 'Type-safe calculations mean fewer bugs. Your numbers are right, every time.',
   },
   {
     icon: Sparkles,

@@ -8,39 +8,39 @@ import Link from 'next/link';
 const features = [
   {
     icon: '📈',
-    title: 'Complete Breakdown',
+    title: 'See Where Every Pound Goes',
     description:
-      'See exactly where your money goes - income tax by band, National Insurance, student loans, and pension contributions.',
+      'Your full breakdown: tax by band, NI, student loans, pension. Budget with confidence.',
   },
   {
     icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-    title: 'England & Scotland',
+    title: 'Accurate for Scottish Residents',
     description:
-      'Accurate calculations for both English and Scottish tax rates. Scotland has different income tax bands - we handle both.',
+      'Scottish residents pay different rates. Select your region for the right numbers — using official Revenue Scotland rates.',
   },
   {
     icon: '🔒',
-    title: 'Private & Secure',
+    title: 'Your Salary Stays Private',
     description:
-      'All calculations happen in your browser. Your salary data is never sent to our servers or stored anywhere.',
+      'All calculations happen in your browser. We never see, store, or share your salary.',
   },
   {
     icon: '🎓',
     title: 'Student Loans',
     description:
-      'Support for all student loan plan types - Plan 1, Plan 2, Plan 4, Plan 5, and Postgraduate loans with correct thresholds.',
+      'All plan types supported — Plan 1, 2, 4, 5, and Postgraduate. See exactly how much comes out each month.',
   },
   {
     icon: '💰',
     title: 'Pension Relief',
     description:
-      'Calculate pension contributions and see your tax relief. Supports both salary sacrifice and relief at source schemes.',
+      'See how £1,000 in pension contributions can save you £400 in tax. Supports salary sacrifice schemes.',
   },
   {
     icon: '📊',
-    title: 'Visual Charts',
+    title: 'Understand Your Tax at a Glance',
     description:
-      'Interactive charts show your tax breakdown at a glance. Understand your finances visually with clear graphics.',
+      'See your tax breakdown in clear charts. No spreadsheets needed — know where you stand in seconds.',
   },
 ];
 
@@ -57,7 +57,7 @@ const steps = [
   },
   {
     number: 3,
-    title: 'See your results',
+    title: 'See your take-home',
     description: 'Get an instant breakdown of your take-home pay with all deductions explained.',
   },
 ];
@@ -71,22 +71,22 @@ export const faqs = [
   {
     question: 'How accurate is this compared to my payslip?',
     answer:
-      'PayeTax uses the same HMRC tax tables your employer uses, so results should match your payslip closely. Small differences may occur due to cumulative tax calculations, benefits in kind, or employer-specific deductions not included here.',
+      "PayeTax uses official HMRC tax tables — the same rates your employer's payroll system uses. Any small differences are usually from how tax builds up month-to-month, benefits in kind, or employer-specific deductions.",
   },
   {
     question: 'Does PayeTax support Scottish tax rates?',
     answer:
-      'Yes, PayeTax fully supports Scottish income tax rates. Scottish residents pay different rates set by the Scottish Parliament - just select Scotland as your region.',
+      'Yes, PayeTax fully supports Scottish income tax rates. Scottish residents pay different rates set by the Scottish Parliament — select Scotland as your region.',
   },
   {
     question: 'Does this work for self-employed or contractors?',
     answer:
-      'PayeTax is designed for PAYE employees. Self-employed individuals pay tax differently (via Self Assessment) with different NI classes and payment schedules. We recommend using HMRC tools for self-employment calculations.',
+      "PayeTax is built for employees on PAYE. Self-employed? You pay differently via Self Assessment. Check our blog for guides, or use HMRC's Self Assessment tools.",
   },
   {
     question: 'Is my salary data safe?',
     answer:
-      'All calculations happen entirely in your browser. Your salary and personal data are never sent to our servers, stored, or shared with anyone.',
+      'Your salary is yours alone. We never see it. All calculations happen in your browser — nothing is sent to our servers, stored, or shared.',
   },
   {
     question: 'What deductions are included?',
@@ -167,19 +167,14 @@ export function FinalCTASection() {
   return (
     <section className='final-cta'>
       <h2>
-        Ready to see your <span className='text-gradient-new'>real take-home pay</span>?
+        Stop guessing your take-home. <span className='text-gradient-new'>See it now.</span>
       </h2>
-      <p>Free, instant, and accurate - no signup required.</p>
+      <p>Free, instant, and accurate — no signup required.</p>
       <Link
         href='#tax-calculator'
-        className='group inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
-        style={{
-          background: 'var(--brand-gradient-new)',
-          color: 'var(--bg-deep)',
-          fontSize: '1rem',
-        }}
+        className='group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient-new px-8 py-4 font-semibold text-base text-deep transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
       >
-        Open Calculator
+        Show My Take Home Pay
         <ArrowRight className='h-[18px] w-[18px] transition-transform group-hover:translate-x-1' />
       </Link>
     </section>

@@ -124,21 +124,21 @@ export function PrivacyPageClient() {
             features={[
               {
                 icon: Cookie,
-                title: 'Privacy-Focused Analytics',
+                title: 'Analytics Tools',
                 description:
-                  'We use Umami Analytics - a privacy-focused, GDPR-compliant alternative to Google Analytics. No cookies, no cross-site tracking, no personal data collection.',
+                  'We use Google Analytics 4 (with Consent Mode), Vercel Analytics for Web Vitals, and Sentry for error monitoring. GA4 only tracks after you accept cookies. Vercel Analytics is cookieless and collects no PII.',
               },
               {
                 icon: Eye,
                 title: 'What We Track',
                 description:
-                  'Page views, referral sources, device types (mobile/desktop), and country-level location. Nothing personally identifiable. No IP addresses stored.',
+                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, and performance metrics. Sentry may capture session replays (1% sample) for debugging - no financial data is recorded.',
               },
               {
                 icon: Shield,
                 title: 'Your Control',
                 description:
-                  'You can decline analytics entirely via our cookie banner. The calculator works exactly the same. We also respect Do Not Track browser settings.',
+                  'Decline analytics via our cookie banner to block GA4 tracking entirely. Vercel Analytics runs regardless but collects no personal data. The calculator works identically either way.',
               },
             ]}
             columns={3}

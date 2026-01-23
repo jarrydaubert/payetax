@@ -12,50 +12,38 @@ export const dynamic = 'force-static'; // Pre-render all params at build time
 export const dynamicParams = true; // Allow other salaries at runtime (fallback to SSR)
 export const revalidate = 86400; // Revalidate daily (24 hours)
 
-// Common UK salary searches based on keyword research
-// const SALARY_RANGES = [
-//   20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000,
-//   70000, 75000, 80000, 85000, 90000, 95000, 100000, 105000, 110000, 115000,
-//   120000, 125000, 130000, 140000, 150000, 160000, 170000, 180000, 190000, 200000,
-// ];
+// Expanded salary range for comprehensive SEO coverage
+// Covers £18k-£500k with higher density at common salary levels
+const PROGRAMMATIC_SALARIES = [
+  // Entry-level and minimum wage bracket (£18k-£25k)
+  18000, 19000, 20000, 21000, 22000, 23000, 24000, 25000,
+  // Lower-mid range (£26k-£35k) - high volume searches
+  26000, 27000, 28000, 29000, 30000, 31000, 32000, 33000, 34000, 35000,
+  // Mid range (£36k-£50k) - peak search volume
+  36000, 37000, 38000, 39000, 40000, 41000, 42000, 43000, 44000, 45000, 46000, 47000, 48000, 49000,
+  50000,
+  // Upper-mid range (£51k-£75k) - professionals
+  51000, 52000, 53000, 54000, 55000, 56000, 57000, 58000, 59000, 60000, 61000, 62000, 63000, 64000,
+  65000, 66000, 67000, 68000, 69000, 70000, 71000, 72000, 73000, 74000, 75000,
+  // Higher earners (£76k-£100k) - £5k increments
+  76000, 77000, 78000, 79000, 80000, 82000, 85000, 87000, 90000, 92000, 95000, 97000, 100000,
+  // Tax trap zone (£100k-£125k) - important for planning content
+  101000, 102000, 103000, 104000, 105000, 106000, 107000, 108000, 109000, 110000, 111000, 112000,
+  113000, 114000, 115000, 116000, 117000, 118000, 119000, 120000, 121000, 122000, 123000, 124000,
+  125000,
+  // High earners (£125k+) - £5k-£25k increments
+  130000, 135000, 140000, 145000, 150000, 155000, 160000, 165000, 170000, 175000, 180000, 185000,
+  190000, 195000, 200000,
+  // Executive salaries - larger increments
+  210000, 220000, 225000, 230000, 240000, 250000, 275000, 300000, 325000, 350000, 375000, 400000,
+  450000, 500000,
+];
 
-// High-volume keywords from CSV analysis - all salaries in sitemap
+// High-priority salaries get enhanced content (richer descriptions, more FAQs)
 const HIGH_PRIORITY_SALARIES = [
-  30000, // 280 searches/month
-  35000, // 250 searches/month
-  40000, // 320 searches/month
-  45000, // 230 searches/month
-  50000, // 350 searches/month
-  55000, // 210 searches/month
-  60000, // 390 searches/month
-  65000, // 190 searches/month
-  70000, // 480 searches/month
-  75000, // 180 searches/month
-  80000, // 620 searches/month
-  85000, // 160 searches/month
-  90000, // 530 searches/month
-  95000, // 150 searches/month
-  100000, // 450 searches/month
-  105000, // 170 searches/month
-  110000, // 130 searches/month
-  115000, // 170 searches/month
-  120000, // 120 searches/month
-  125000, // 140 searches/month
-  // High-salary pages (lower search volume but found in audits)
-  130000,
-  140000,
-  150000,
-  160000,
-  170000,
-  175000,
-  180000,
-  190000,
-  200000,
-  250000,
-  300000,
-  350000,
-  400000,
-  500000,
+  25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000, 85000, 90000,
+  95000, 100000, 105000, 110000, 115000, 120000, 125000, 130000, 140000, 150000, 175000, 200000,
+  250000, 300000, 500000,
 ];
 
 interface PageProps {
@@ -70,7 +58,7 @@ function parseSalary(salaryParam: string): number | null {
   const match = salaryParam.match(/^(\d+)k?(-after-tax)?$/);
   if (!match) return null;
 
-  const value = parseInt(match[1], 10);
+  const value = parseInt(match[1] ?? '0', 10);
   const multiplier = salaryParam.includes('k') ? 1000 : 1;
   const salary = value * multiplier;
 
@@ -81,11 +69,9 @@ function parseSalary(salaryParam: string): number | null {
 }
 
 // Generate static params for common salaries (for SSG)
+// Generates 150+ salary pages covering £18k-£500k
 export function generateStaticParams() {
-  // Start with high-priority salaries for initial deployment
-  const salaries = HIGH_PRIORITY_SALARIES;
-
-  return salaries.flatMap((salary) => [
+  return PROGRAMMATIC_SALARIES.flatMap((salary) => [
     { salary: `${salary}-after-tax` },
     { salary: `${salary}` },
     // Also generate with 'k' notation for common searches

@@ -162,6 +162,8 @@ const NumberInput = memo(function NumberInput({
         if (parts.length === 2) {
           const integerPart = parts[0] || '';
           const decimalPart = parts[1] || '';
+          // Thousand separator regex: \B = non-word boundary, (?=(\d{3})+(?!\d)) = lookahead for groups of 3 digits
+          // Example: "1234567" -> "1,234,567"
           const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
           setDisplayValue(`${formattedInteger}.${decimalPart}`);
         } else {

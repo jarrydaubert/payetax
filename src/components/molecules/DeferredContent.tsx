@@ -40,8 +40,9 @@ export function DeferredContent({
 
     // Intersection Observer - load when approaching viewport
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
           setShouldRender(true);
           observer.disconnect();
           if (timer) clearTimeout(timer);

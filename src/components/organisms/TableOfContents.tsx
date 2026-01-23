@@ -24,7 +24,8 @@ function extractHeadings(content: string): TocItem[] {
   let index = 0;
 
   for (const match of content.matchAll(headingRegex)) {
-    const text = match[1].trim();
+    const text = match[1]?.trim();
+    if (!text) continue;
     const id = text
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')

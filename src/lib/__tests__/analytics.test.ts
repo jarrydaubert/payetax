@@ -13,6 +13,11 @@ import {
   trackSEOAction,
 } from '../analytics';
 
+// Mock cookieUtils to simulate accepted consent
+jest.mock('@/lib/cookieUtils', () => ({
+  areCookiesAccepted: jest.fn(() => true),
+}));
+
 describe('analytics', () => {
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;

@@ -72,11 +72,27 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', 'mailto:support@payetax.co.uk');
     });
 
-    it('should have 5 navigation links', () => {
+    it('should render Tax Code Decoder link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Tax Code Decoder/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/tools/tax-code-decoder');
+    });
+
+    it('should render Scottish Tax link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Scottish Tax/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/tools/scottish-tax-calculator');
+    });
+
+    it('should have 8 navigation links', () => {
       render(<Footer />);
 
       const links = screen.getAllByRole('link');
-      expect(links).toHaveLength(5);
+      expect(links).toHaveLength(8);
     });
   });
 

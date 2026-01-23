@@ -6,8 +6,7 @@ export interface GtagConfig {
   page_title?: string;
   custom_map?: Record<string, string>;
   send_page_view?: boolean;
-  // biome-ignore lint/suspicious/noExplicitAny: Required for gtag compatibility
-  [key: string]: any;
+  [key: string]: string | boolean | number | Record<string, string> | undefined;
 }
 
 export interface GtagEvent {
@@ -16,8 +15,7 @@ export interface GtagEvent {
   value?: number;
   custom_parameters?: Record<string, unknown>;
   tool?: string;
-  // biome-ignore lint/suspicious/noExplicitAny: Required for gtag compatibility
-  [key: string]: any;
+  [key: string]: string | number | Record<string, unknown> | undefined;
 }
 
 export interface GtagConsentUpdate {

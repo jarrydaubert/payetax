@@ -16,11 +16,7 @@ const HomePageContent = memo(function HomePageContent() {
 
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator
-    <section
-      id='tax-calculator'
-      className='relative z-[1] py-12 md:py-16 lg:py-20'
-      style={{ background: 'var(--bg-deep)' }}
-    >
+    <section id='tax-calculator' className='relative z-[1] bg-deep py-12 md:py-16 lg:py-20'>
       <CalculatorContainer />
     </section>
   );

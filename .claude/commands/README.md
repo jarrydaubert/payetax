@@ -1,6 +1,8 @@
 # PayeTax Claude Configuration
 
 > Optimized commands and skills for PayeTax development.
+>
+> **Full generic documentation:** See [`docs/SKILLS_AND_COMMANDS.md`](../../docs/SKILLS_AND_COMMANDS.md) for a reusable guide.
 
 ## Philosophy
 
@@ -9,12 +11,13 @@
 
 ---
 
-## Commands (6)
+## Commands (7)
 
 | Command | Purpose | Use When |
 |---------|---------|----------|
 | `/plan` | Architecture planning | Designing features, major changes |
 | `/audit` | Deep code review | Reviewing systems, refactoring |
+| `/cleanup` | Project housekeeping | Finding duplicates, orphans, junk |
 | `/debug` | Systematic debugging | Investigating issues |
 | `/test` | Test engineering | Writing tests, coverage gaps |
 | `/security` | Security review | OWASP checklist, vulnerability audit |
@@ -28,6 +31,10 @@
 
 # Audit the calculator
 /audit calculator
+
+# Deep housekeeping scan
+/cleanup
+/cleanup components
 
 # Debug a calculation issue
 /debug wrong-ni-calculation
@@ -44,7 +51,7 @@
 
 ---
 
-## Skills (9)
+## Skills (19)
 
 Skills provide expert knowledge that activates contextually when you discuss relevant topics.
 
@@ -53,6 +60,7 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 | Skill | Activates When Discussing |
 |-------|--------------------------|
 | `nextjs-best-practices` | Next.js patterns, React 19, TypeScript, modernization |
+| `vercel-react-best-practices` | React/Next.js performance, 45 optimization rules from Vercel |
 | `accessibility` | WCAG, a11y, screen readers, keyboard nav |
 | `performance` | Core Web Vitals, LCP, bundle size, optimization |
 
@@ -65,12 +73,26 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 | `schema-markup` | Structured data, JSON-LD, rich snippets |
 | `content-marketing` | Blog posts, social media, UK tax content |
 | `analytics-tracking` | GA4, Vercel Analytics, tracking, conversions |
+| `competitor-alternatives` | Competitor comparison pages, "vs" content, positioning |
+| `social-content` | Twitter/LinkedIn content, seasonal tax posts, viral content |
+| `free-tool-strategy` | Engineering as marketing, calculator optimization |
 
-### Conversion
+### Conversion & Copy
 
 | Skill | Activates When Discussing |
 |-------|--------------------------|
 | `page-cro` | Calculator UX, conversion optimization |
+| `copywriting` | Landing page copy, headlines, CTAs |
+| `copy-editing` | Reviewing/improving existing copy, seven sweeps |
+| `marketing-psychology` | Mental models, persuasion, user behavior |
+| `marketing-ideas` | Growth tactics, 140 marketing strategies |
+
+### Design & Monetization
+
+| Skill | Activates When Discussing |
+|-------|--------------------------|
+| `ui-design` | Design system consistency, tokens, typography, hardcoded values |
+| `pricing-strategy` | Monetization, freemium, premium features, revenue models |
 
 ---
 
@@ -131,6 +153,7 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 .claude/
 ├── commands/
 │   ├── audit.md       # Code review
+│   ├── cleanup.md     # Housekeeping
 │   ├── debug.md       # Debugging
 │   ├── finance.md     # UK tax compliance
 │   ├── plan.md        # Architecture
@@ -139,13 +162,23 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 └── skills/
     ├── accessibility/       # WCAG 2.2 AA
     ├── analytics-tracking/  # GA4, tracking
+    ├── competitor-alternatives/ # Comparison pages
     ├── content-marketing/   # Blog, social
+    ├── copy-editing/        # Seven sweeps editing
+    ├── copywriting/         # Landing page copy
+    ├── free-tool-strategy/  # Engineering as marketing
+    ├── marketing-ideas/     # 140 growth tactics
+    ├── marketing-psychology/ # Mental models
     ├── nextjs-best-practices/ # Modern patterns
     ├── page-cro/            # Conversion
     ├── performance/         # Core Web Vitals
+    ├── pricing-strategy/    # Monetization
     ├── programmatic-seo/    # Salary pages
     ├── schema-markup/       # Structured data
-    └── seo-audit/           # Technical SEO
+    ├── seo-audit/           # Technical SEO
+    ├── social-content/      # Twitter/LinkedIn
+    ├── ui-design/           # Design system audit
+    └── vercel-react-best-practices/ # 45 Vercel perf rules
 ```
 
 ---

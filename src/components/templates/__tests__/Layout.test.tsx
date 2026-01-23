@@ -17,7 +17,7 @@ jest.mock('@/components/organisms/SimpleNavbar', () => ({
   default: () => <nav data-testid='mock-navbar'>Navbar</nav>,
 }));
 
-jest.mock('@/components/atoms/CookieBanner', () => ({
+jest.mock('@/components/organisms/CookieBanner', () => ({
   __esModule: true,
   default: () => <div data-testid='mock-cookie-banner'>Cookie Banner</div>,
 }));

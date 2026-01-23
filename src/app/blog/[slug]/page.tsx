@@ -6,13 +6,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
-import { TableOfContents } from '@/components/molecules/TableOfContents';
+import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
-import { compileMDXContent } from '@/lib/mdx';
+import { compileMDXContent, extractFAQs } from '@/lib/mdx';
 import { cn } from '@/lib/utils';
 
 // Next.js 16: Route segment config for optimized blog posts
@@ -91,6 +92,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3);
 
+  // Extract FAQs from content for schema.org FAQPage markup
+  const faqs = extractFAQs(post.content);
+
   // Generate Article structured data for SEO
   const articleStructuredData = {
     '@context': 'https://schema.org',
@@ -147,6 +151,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ],
   };
 
+  // FAQ structured data for rich snippets (only if FAQs exist)
+  const faqStructuredData =
+    faqs.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
+            },
+          })),
+        }
+      : null;
+
   return (
     <>
       {/* Structured Data */}
@@ -160,6 +181,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
       />
+      {/* FAQ Schema for rich snippets (conditionally rendered) */}
+      {faqStructuredData && (
+        <script
+          type='application/ld+json'
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+        />
+      )}
 
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>
@@ -307,8 +336,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
 
+            {/* Financial Disclaimer - Required for HMRC compliance */}
+            <BlogDisclaimer className='mt-12 md:mt-16' />
+
             {/* CTA Section */}
-            <div className='mt-12 rounded-xl border border-primary/20 bg-primary/5 p-6 md:mt-16 md:p-8'>
+            <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
                   <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>

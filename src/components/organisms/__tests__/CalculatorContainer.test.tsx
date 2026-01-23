@@ -192,7 +192,7 @@ describe('CalculatorContainer Component', () => {
 
       expect(screen.getByText('Ready to Calculate')).toBeInTheDocument();
       expect(
-        screen.getByText(/Enter your salary details and click Calculate to see your results/i)
+        screen.getByText(/Enter your salary\. See your take-home pay in seconds\./i)
       ).toBeInTheDocument();
     });
 

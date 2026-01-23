@@ -64,7 +64,9 @@ export function TaxTrapInlineAlert({
   }, []);
 
   // Get tax rates for the specified tax year
-  const taxRates = TAX_RATES[taxYear];
+  const effectiveTaxYear = taxYear ?? '2025-2026';
+  const taxRates = TAX_RATES[effectiveTaxYear];
+  if (!taxRates) return null;
   const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
   const personalAllowance = taxRates.personalAllowance; // £12,570
 

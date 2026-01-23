@@ -1,6 +1,9 @@
 // src/app/sitemap.ts
 
 import type { MetadataRoute } from 'next';
+import { getAllCompetitorSlugs } from '@/data/competitors';
+import { getAllScenarioSlugs } from '@/data/scenarios';
+import { getAllUseCaseSlugs } from '@/data/useCases';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 
 type SitemapFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
@@ -48,38 +51,113 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
+    // Competitor comparison pages
+    {
+      url: `${baseUrl}/best-uk-tax-calculators`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/alternatives`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    // Tool landing pages
+    {
+      url: `${baseUrl}/tools/tax-code-decoder`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/tools/scottish-tax-calculator`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/tools/national-insurance-calculator`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/tools/marriage-allowance-calculator`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/tools/embed-widget`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
   ];
 
-  // High-priority salary pages (based on search volume)
-  const salaryPages: SitemapEntry[] = [
-    // Top search volume salaries get highest priority
-    { salary: 80000, volume: 620 },
-    { salary: 90000, volume: 530 },
-    { salary: 70000, volume: 480 },
-    { salary: 100000, volume: 450 },
-    { salary: 60000, volume: 390 },
-    { salary: 50000, volume: 350 },
-    { salary: 105000, volume: 170 },
-    { salary: 115000, volume: 170 },
-    { salary: 125000, volume: 140 },
-    { salary: 40000, volume: 320 },
-    { salary: 30000, volume: 280 },
-    { salary: 35000, volume: 250 },
-    { salary: 45000, volume: 230 },
-    { salary: 55000, volume: 210 },
-    { salary: 65000, volume: 190 },
-    { salary: 75000, volume: 180 },
-    { salary: 85000, volume: 160 },
-    { salary: 95000, volume: 150 },
-    { salary: 110000, volume: 130 },
-    { salary: 120000, volume: 120 },
-  ].map(({ salary, volume }) => ({
-    url: `${baseUrl}/calculator/${salary}-after-tax`,
-    lastModified: currentDate,
-    changeFrequency: 'monthly' as SitemapFrequency,
-    // Priority based on search volume (0.7-0.9 range)
-    priority: Math.min(0.9, 0.7 + volume / 3000),
-  }));
+  // Expanded salary pages for comprehensive SEO coverage (150+ pages)
+  // High-volume salaries with known search data
+  const highVolumeSalaries: Record<number, number> = {
+    80000: 620,
+    90000: 530,
+    70000: 480,
+    100000: 450,
+    60000: 390,
+    50000: 350,
+    40000: 320,
+    30000: 280,
+    35000: 250,
+    45000: 230,
+    55000: 210,
+    65000: 190,
+    75000: 180,
+    105000: 170,
+    115000: 170,
+    85000: 160,
+    95000: 150,
+    125000: 140,
+    110000: 130,
+    120000: 120,
+  };
+
+  // All programmatic salaries (matches generateStaticParams in calculator/[salary]/page.tsx)
+  const allSalaries = [
+    // Entry-level (£18k-£25k)
+    18000, 19000, 20000, 21000, 22000, 23000, 24000, 25000,
+    // Lower-mid (£26k-£35k)
+    26000, 27000, 28000, 29000, 30000, 31000, 32000, 33000, 34000, 35000,
+    // Mid range (£36k-£50k)
+    36000, 37000, 38000, 39000, 40000, 41000, 42000, 43000, 44000, 45000, 46000, 47000, 48000,
+    49000, 50000,
+    // Upper-mid (£51k-£75k)
+    51000, 52000, 53000, 54000, 55000, 56000, 57000, 58000, 59000, 60000, 61000, 62000, 63000,
+    64000, 65000, 66000, 67000, 68000, 69000, 70000, 71000, 72000, 73000, 74000, 75000,
+    // Higher earners (£76k-£100k)
+    76000, 77000, 78000, 79000, 80000, 82000, 85000, 87000, 90000, 92000, 95000, 97000, 100000,
+    // Tax trap zone (£100k-£125k)
+    101000, 102000, 103000, 104000, 105000, 106000, 107000, 108000, 109000, 110000, 111000, 112000,
+    113000, 114000, 115000, 116000, 117000, 118000, 119000, 120000, 121000, 122000, 123000, 124000,
+    125000,
+    // High earners (£125k+)
+    130000, 135000, 140000, 145000, 150000, 155000, 160000, 165000, 170000, 175000, 180000, 185000,
+    190000, 195000, 200000,
+    // Executive
+    210000, 220000, 225000, 230000, 240000, 250000, 275000, 300000, 325000, 350000, 375000, 400000,
+    450000, 500000,
+  ];
+
+  const salaryPages: SitemapEntry[] = allSalaries.map((salary) => {
+    const volume = highVolumeSalaries[salary] || 50; // Default low volume for unlisted
+    return {
+      url: `${baseUrl}/calculator/${salary}-after-tax`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as SitemapFrequency,
+      // Priority based on search volume (0.65-0.9 range)
+      priority: Math.min(0.9, 0.65 + volume / 2000),
+    };
+  });
 
   let blogPosts: SitemapEntry[] = [];
   try {
@@ -135,5 +213,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   }
 
-  return [...staticPages, ...salaryPages, ...blogPosts, ...categoryPages];
+  // Competitor comparison pages (dynamic)
+  const competitorSlugs = getAllCompetitorSlugs();
+  const competitorPages: SitemapEntry[] = competitorSlugs.flatMap((slug) => [
+    {
+      url: `${baseUrl}/alternatives/${slug}`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as SitemapFrequency,
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/vs/${slug}`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as SitemapFrequency,
+      priority: 0.7,
+    },
+  ]);
+
+  // Scenario pages (tax optimization guides)
+  const scenarioSlugs = getAllScenarioSlugs();
+  const scenarioPages: SitemapEntry[] = [
+    // Scenario hub
+    {
+      url: `${baseUrl}/scenarios`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as SitemapFrequency,
+      priority: 0.85,
+    },
+    // Individual scenarios
+    ...scenarioSlugs.map((slug) => ({
+      url: `${baseUrl}/scenarios/${slug}`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as SitemapFrequency,
+      priority: 0.8,
+    })),
+  ];
+
+  // Use case pages (audience-specific landing pages)
+  const useCaseSlugs = getAllUseCaseSlugs();
+  const useCasePages: SitemapEntry[] = useCaseSlugs.map((slug) => ({
+    url: `${baseUrl}/best-for/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'monthly' as SitemapFrequency,
+    priority: 0.8,
+  }));
+
+  return [
+    ...staticPages,
+    ...salaryPages,
+    ...blogPosts,
+    ...categoryPages,
+    ...competitorPages,
+    ...scenarioPages,
+    ...useCasePages,
+  ];
 }

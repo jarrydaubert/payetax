@@ -1,8 +1,10 @@
 // src/components/molecules/Footer.tsx
 // Simplified footer matching payetax-web design system
 
+import type { Route } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { NewsletterSignup } from './NewsletterSignup';
 
 /**
  * Footer molecule component - New design system
@@ -12,6 +14,7 @@ import { cn } from '@/lib/utils';
  *
  * Clean, minimal design with:
  * - Logo (paye<span>tax</span>)
+ * - Newsletter signup
  * - Essential links (Blog, About, Privacy, Compliance, Support)
  * - Copyright
  */
@@ -28,9 +31,17 @@ export function Footer({ className }: FooterProps) {
           paye<span>tax</span>
         </div>
 
+        {/* Newsletter Signup */}
+        <div className='footer-newsletter'>
+          <NewsletterSignup variant='inline' source='footer' />
+        </div>
+
         {/* Links */}
         <nav className='footer-links-new' aria-label='Footer navigation'>
           <Link href='/blog'>Blog</Link>
+          <Link href={'/scenarios' as Route}>Scenarios</Link>
+          <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
+          <Link href={'/tools/scottish-tax-calculator' as Route}>Scottish Tax</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
           <Link href='/compliance'>Compliance</Link>

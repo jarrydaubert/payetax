@@ -59,14 +59,15 @@ export function ResultTableRow({
       layout={!shouldReduceMotion}
       transition={!shouldReduceMotion ? ANIMATION_TRANSITIONS.layout : undefined}
     >
-      <TableCell
-        className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5`}
+      <th
+        scope='row'
+        className={`${color} ${isHighlight ? 'font-bold' : ''} sticky left-0 z-10 w-[195px] bg-background px-2 py-2.5 text-left font-normal`}
       >
         <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
           <Icon className={cn(ICON_SIZES.SIZE_3_5, 'flex-shrink-0')} aria-hidden='true' />
           <span className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>{category}</span>
         </div>
-      </TableCell>
+      </th>
       <TableCell
         className={cn(
           'w-[55px] px-2 py-2.5 text-right font-mono',
@@ -78,9 +79,9 @@ export function ResultTableRow({
         {percentage}
       </TableCell>
       {visiblePeriods.map((period) => {
-        const currentValue = annual / periodOptions[period];
-        const whatIfValue =
-          whatIfAnnual !== undefined ? whatIfAnnual / periodOptions[period] : undefined;
+        const divisor = periodOptions[period] ?? 1;
+        const currentValue = annual / divisor;
+        const whatIfValue = whatIfAnnual !== undefined ? whatIfAnnual / divisor : undefined;
 
         if (hasWhatIf && whatIfValue !== undefined) {
           // Render Current and What If columns with min-width to prevent overlap

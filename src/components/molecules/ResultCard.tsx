@@ -3,6 +3,7 @@
 
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
+import { memo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -51,6 +52,7 @@ const variantStyles = {
  *
  * Uses design tokens: TEXT_SM for label, TEXT_2XL for value, SIZE_4 for icon, SPACE_Y_2 for spacing
  * Supports both immediate and scroll-triggered reveal animations with accessibility support
+ * Memoized to prevent unnecessary re-renders in result grids
  *
  * @param label - The metric label/description
  * @param value - The formatted value to display
@@ -61,7 +63,7 @@ const variantStyles = {
  * @param tooltip - Optional tooltip text for metric explanation
  * @param revealOnScroll - Enable scroll-triggered reveal (default: false for backward compatibility)
  */
-export function ResultCard({
+export const ResultCard = memo(function ResultCard({
   label,
   value,
   icon: Icon,
@@ -136,4 +138,4 @@ export function ResultCard({
       )}
     </motion.div>
   );
-}
+});

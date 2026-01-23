@@ -4,8 +4,8 @@
 import type React from 'react';
 import { Suspense } from 'react';
 import BackgroundElements from '@/components/atoms/BackgroundElements';
-import CookieBanner from '@/components/atoms/CookieBanner';
 import Footer from '@/components/molecules/Footer';
+import CookieBanner from '@/components/organisms/CookieBanner';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 
 interface LayoutProps {
@@ -14,7 +14,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps): React.ReactElement {
   return (
-    <div className='relative flex min-h-screen flex-col' style={{ background: 'var(--bg-deep)' }}>
+    <div className='relative flex min-h-screen flex-col bg-deep'>
       {/* Background geometric elements */}
       <BackgroundElements />
 

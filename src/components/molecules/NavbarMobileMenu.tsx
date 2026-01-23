@@ -42,7 +42,7 @@ export function NavbarMobileMenu({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='fixed inset-0 z-40 bg-[var(--bg-deep)]/80 backdrop-blur-sm md:hidden'
+            className='fixed inset-0 z-40 bg-deep/80 backdrop-blur-sm md:hidden'
             onClick={onBackdropClick}
             aria-hidden='true'
           />
@@ -57,11 +57,10 @@ export function NavbarMobileMenu({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className={cn('fixed top-[64px] right-0 left-0 z-50 md:hidden', 'border-b px-4 py-6')}
-            style={{
-              background: 'var(--bg-dark)',
-              borderColor: 'var(--border-subtle)',
-            }}
+            className={cn(
+              'fixed top-[64px] right-0 left-0 z-50 md:hidden',
+              'border-border-subtle border-b bg-dark px-4 py-6'
+            )}
             aria-label='Mobile navigation menu'
           >
             <div className='flex flex-col gap-2'>
@@ -77,13 +76,9 @@ export function NavbarMobileMenu({
                     href={link.href as Route}
                     onClick={() => onLinkClick(link.label)}
                     className={cn(
-                      'block rounded-lg px-4 py-3 font-medium text-[0.95rem] transition-colors',
-                      'min-h-[44px]' // Touch target
+                      'block min-h-[44px] rounded-lg px-4 py-3 font-medium text-[0.95rem] transition-colors',
+                      isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new'
                     )}
-                    style={{
-                      color: isActive ? 'var(--brand-cyan)' : 'var(--text-secondary-new)',
-                      background: isActive ? 'rgba(6, 182, 212, 0.1)' : 'transparent',
-                    }}
                   >
                     {link.label}
                   </Link>
@@ -94,11 +89,7 @@ export function NavbarMobileMenu({
               <Link
                 href='/#tax-calculator'
                 onClick={() => onLinkClick('Calculator')}
-                className='mt-4 block rounded-full px-5 py-3 text-center font-semibold text-[0.95rem] transition-all'
-                style={{
-                  background: 'var(--brand-gradient-new)',
-                  color: 'var(--bg-deep)',
-                }}
+                className='mt-4 block rounded-full bg-brand-gradient-new px-5 py-3 text-center font-semibold text-[0.95rem] text-deep transition-all'
               >
                 Open Calculator
               </Link>

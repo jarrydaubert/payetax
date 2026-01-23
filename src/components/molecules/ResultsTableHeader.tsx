@@ -91,6 +91,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                 )}
               >
                 Current
+                <span className='sr-only'> scenario values</span>
               </TableHead>
               <TableHead
                 className={cn(
@@ -101,6 +102,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                 )}
               >
                 What If
+                <span className='sr-only'> scenario values</span>
               </TableHead>
             </React.Fragment>
           ))}

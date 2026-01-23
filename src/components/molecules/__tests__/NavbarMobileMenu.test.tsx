@@ -65,33 +65,33 @@ describe('NavbarMobileMenu', () => {
     it('should mark Calculator as active when pathname is /', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      // Active state uses inline style with brand-cyan color
-      expect(calculatorLink).toHaveStyle({ color: 'var(--brand-cyan)' });
+      // Active state uses Tailwind class
+      expect(calculatorLink).toHaveClass('text-cyan');
     });
 
     it('should mark Blog as active when pathname starts with /blog', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog' />);
       const blogLink = screen.getByRole('link', { name: 'Blog' });
-      expect(blogLink).toHaveStyle({ color: 'var(--brand-cyan)' });
+      expect(blogLink).toHaveClass('text-cyan');
     });
 
     it('should mark Blog as active for blog sub-pages', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog/some-article' />);
       const blogLink = screen.getByRole('link', { name: 'Blog' });
-      expect(blogLink).toHaveStyle({ color: 'var(--brand-cyan)' });
+      expect(blogLink).toHaveClass('text-cyan');
     });
 
     it('should mark link as active when pathname matches exactly', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveStyle({ color: 'var(--brand-cyan)' });
+      expect(aboutLink).toHaveClass('text-cyan');
     });
 
     it('should not mark non-matching links as active', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      // Inactive state uses secondary text color
-      expect(calculatorLink).toHaveStyle({ color: 'var(--text-secondary-new)' });
+      // Inactive state uses secondary text class
+      expect(calculatorLink).toHaveClass('text-text-secondary-new');
     });
   });
 
@@ -158,15 +158,14 @@ describe('NavbarMobileMenu', () => {
     it('should apply active styling to active links', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
-      // New design uses inline styles for active state
-      expect(calculatorLink).toHaveStyle({ color: 'var(--brand-cyan)' });
-      expect(calculatorLink).toHaveStyle({ background: 'rgba(6, 182, 212, 0.1)' });
+      // New design uses Tailwind classes for active state
+      expect(calculatorLink).toHaveClass('bg-cyan/10', 'text-cyan');
     });
 
     it('should apply inactive styling to inactive links', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveStyle({ color: 'var(--text-secondary-new)' });
+      expect(aboutLink).toHaveClass('text-text-secondary-new');
     });
   });
 

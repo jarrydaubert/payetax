@@ -86,8 +86,8 @@ export function getAllPosts() {
     };
   });
 
-  // Sort by published date (newest first)
-  return posts.sort(
+  // Sort by published date (newest first) - use spread to avoid mutation
+  return [...posts].sort(
     (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   );
 }
@@ -237,4 +237,107 @@ export function getFeaturedPosts(limit?: number) {
   const posts = getAllPosts();
   const featured = posts.filter((post) => post.featured === true);
   return limit ? featured.slice(0, limit) : featured;
+}
+
+/**
+ * FAQ item structure for schema.org markup
+ */
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+/**
+ * Extract FAQ sections from MDX content for schema.org FAQPage markup
+ * Parses markdown to find FAQ headings and their answers
+ *
+ * Supported patterns:
+ * - ### Question here? (followed by paragraph answer)
+ * - **Question here?** (followed by paragraph answer)
+ * - FAQ sections with headers like "Frequently Asked Questions"
+ */
+export function extractFAQs(content: string): FAQItem[] {
+  const faqs: FAQItem[] = [];
+
+  // Find FAQ section - look for common FAQ header patterns
+  const faqSectionRegex =
+    /(?:^#{1,3}\s*(?:FAQ|Frequently Asked Questions|Common Questions)[^\n]*\n)([\s\S]*?)(?=^#{1,2}\s|$)/gim;
+  const faqSections = content.match(faqSectionRegex);
+
+  if (faqSections) {
+    for (const section of faqSections) {
+      // Pattern 1: ### Question? followed by answer paragraphs
+      const headingPattern = /^###\s*(.+\?)\s*\n\n([\s\S]*?)(?=\n###|\n---|\n##|$)/gm;
+      let match = headingPattern.exec(section);
+      while (match) {
+        const questionMatch = match[1];
+        const answerMatch = match[2];
+        if (questionMatch && answerMatch) {
+          const question = questionMatch.trim();
+          // Clean the answer: remove markdown formatting, limit length
+          const answer = cleanMarkdownForSchema(answerMatch.trim());
+          if (question && answer) {
+            faqs.push({ question, answer });
+          }
+        }
+        match = headingPattern.exec(section);
+      }
+    }
+  }
+
+  // Also look for bold question patterns throughout the document
+  // Pattern: **Question here?** followed by answer
+  const boldQuestionPattern = /^\*\*([^*]+\?)\*\*\s*\n\n([\s\S]*?)(?=\n\*\*[^*]+\?|\n###|\n##|$)/gm;
+  let boldMatch = boldQuestionPattern.exec(content);
+  while (boldMatch) {
+    const questionMatch = boldMatch[1];
+    const answerMatch = boldMatch[2];
+    if (questionMatch && answerMatch) {
+      const question = questionMatch.trim();
+      const answer = cleanMarkdownForSchema(answerMatch.trim());
+      if (question && answer && !faqs.some((f) => f.question === question)) {
+        faqs.push({ question, answer });
+      }
+    }
+    boldMatch = boldQuestionPattern.exec(content);
+  }
+
+  return faqs;
+}
+
+/**
+ * Clean markdown content for use in schema.org structured data
+ * Removes formatting while preserving readable text
+ */
+function cleanMarkdownForSchema(text: string): string {
+  return (
+    text
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '')
+      // Remove inline code
+      .replace(/`[^`]+`/g, '')
+      // Remove bold/italic
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      // Remove links but keep text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove images
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
+      // Remove HTML tags
+      .replace(/<[^>]+>/g, '')
+      // Remove blockquotes marker
+      .replace(/^>\s*/gm, '')
+      // Remove list markers
+      .replace(/^[-*+]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      // Collapse multiple newlines to single space
+      .replace(/\n+/g, ' ')
+      // Collapse multiple spaces
+      .replace(/\s+/g, ' ')
+      // Limit length for schema (Google recommends under 320 chars)
+      .trim()
+      .slice(0, 500)
+  );
 }

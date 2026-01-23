@@ -25,11 +25,14 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
 
   // Get tax rates for the specified tax year
-  const taxRates = TAX_RATES[taxYear];
-  const personalAllowance = taxRates.personalAllowance;
-  const basicRateThreshold = personalAllowance + taxRates.bands[0].threshold; // £50,270
-  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
-  const higherRateThreshold = personalAllowance + taxRates.bands[1].threshold; // £125,140
+  const effectiveTaxYear = taxYear ?? '2025-2026';
+  const taxRates = TAX_RATES[effectiveTaxYear];
+  const basicBand = taxRates?.bands[0];
+  const higherBand = taxRates?.bands[1];
+  const personalAllowance = taxRates?.personalAllowance ?? 12570;
+  const basicRateThreshold = personalAllowance + (basicBand?.threshold ?? 37700); // £50,270
+  const paReductionThreshold = taxRates?.personalAllowanceReductionThreshold ?? 100000; // £100,000
+  const higherRateThreshold = personalAllowance + (higherBand?.threshold ?? 112570); // £125,140
 
   // Calculate marginal tax rate: for every extra £1, how much do you keep?
   // This shows which tax band you're in

@@ -6,6 +6,7 @@
  * @module lib/analytics
  */
 
+import { areCookiesAccepted } from '@/lib/cookieUtils';
 import { addBreadcrumb } from '@/lib/sentry';
 
 // Types for analytics events
@@ -44,6 +45,11 @@ export interface SEOAnalyticsData {
  */
 export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {}): void {
   try {
+    // Respect user consent - only track if cookies accepted
+    if (!areCookiesAccepted()) {
+      return;
+    }
+
     // Enhanced data object with browser info
     const enhancedData = {
       ...data,
@@ -93,6 +99,11 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
  */
 export function trackEvent(event: AnalyticsEvent): void {
   try {
+    // Respect user consent - only track if cookies accepted
+    if (!areCookiesAccepted()) {
+      return;
+    }
+
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📊 Analytics Event:', event);
@@ -168,6 +179,11 @@ export function trackCalculatorUsage(calculation_type: string, salary_range?: st
  */
 export function trackPageView(page_path: string, page_title?: string): void {
   try {
+    // Respect user consent - only track if cookies accepted
+    if (!areCookiesAccepted()) {
+      return;
+    }
+
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📄 Page View:', page_path, page_title);

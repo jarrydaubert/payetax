@@ -79,7 +79,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Tested against HMRC published example calculations',
       'Formulas match official PAYE calculation methods',
       'Edge cases validated against gov.uk guidance',
-      'Open source for professional review and verification',
+      'Open source — anyone can check our maths',
     ],
     icon: Shield,
     lastUpdated: '2026-01-15',

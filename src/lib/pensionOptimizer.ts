@@ -68,7 +68,7 @@ export interface PensionOptimization {
 export function calculateOptimalPension(
   salary: number,
   currentPension = 0,
-  taxYear: TaxYear = TAX_YEARS[0]
+  taxYear: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear
 ): PensionOptimization | null {
   // Validate inputs
   try {
@@ -186,7 +186,9 @@ export function compareWithOptimization(
   }
 
   // Get tax rates for calculations
-  const taxRates = TAX_RATES[TAX_YEARS[0]];
+  const currentTaxYear = TAX_YEARS[0] ?? '2025-2026';
+  const taxRates = TAX_RATES[currentTaxYear];
+  if (!taxRates) return null;
   const paReductionThreshold = taxRates.personalAllowanceReductionThreshold;
 
   // NOTE: Simplified calculation for comparison display only

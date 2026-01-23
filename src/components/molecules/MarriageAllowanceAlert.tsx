@@ -56,11 +56,15 @@ export function MarriageAllowanceAlert({
   }
 
   // Get tax rates for the specified tax year
-  const taxRates = TAX_RATES[taxYear];
+  const effectiveTaxYear = taxYear ?? '2025-2026';
+  const taxRates = TAX_RATES[effectiveTaxYear];
+  if (!taxRates) return null;
+  const basicBand = taxRates.bands[0];
+  if (!basicBand) return null;
   const personalAllowance = taxRates.personalAllowance;
-  const higherRateThreshold = personalAllowance + taxRates.bands[0].threshold;
+  const higherRateThreshold = personalAllowance + basicBand.threshold;
   const marriageAllowanceTransfer = taxRates.marriageAllowance;
-  const basicRate = taxRates.bands[0].rate;
+  const basicRate = basicBand.rate;
 
   // User must be a basic rate taxpayer (between PA and higher rate threshold)
   if (userSalary <= personalAllowance || userSalary > higherRateThreshold) {

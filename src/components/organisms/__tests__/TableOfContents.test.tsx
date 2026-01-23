@@ -1,4 +1,4 @@
-// src/components/molecules/__tests__/TableOfContents.test.tsx
+// src/components/organisms/__tests__/TableOfContents.test.tsx
 import { render, screen } from '@testing-library/react';
 
 // Mock lucide-react icons

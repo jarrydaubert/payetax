@@ -100,27 +100,35 @@ src/constants/taxRates.ts
 
 **NEVER hardcode tax values elsewhere.** If you find hardcoded values, that's a bug.
 
-## Custom Commands
+## Custom Commands & Skills
+
+> **Full documentation:** See `docs/SKILLS_AND_COMMANDS.md` for comprehensive guide.
 
 Specialized expert modes available via slash commands:
 
-### Analysis Only (advise, don't implement)
+### Commands (7)
 
 | Command | Role | Use For |
 |---------|------|---------|
-| `/security` | Security Architect | OWASP, supply chain, modern threats |
 | `/audit` | Architecture Reviewer | SOLID principles, code quality |
+| `/cleanup` | Project Hygiene | Find duplicates, orphans, unused files |
+| `/debug` | Debugger | Systematic debugging |
 | `/finance` | UK Tax Specialist | HMRC compliance, calculation accuracy |
 | `/plan` | Architect | Feature design, planning |
-| `/perf` | Performance Engineer | Core Web Vitals, LCP, bundle analysis |
-| `/a11y` | Accessibility Specialist | WCAG 2.2 AA, screen readers, keyboard |
-
-### Implementation (writes code)
-
-| Command | Role | Use For |
-|---------|------|---------|
+| `/security` | Security Architect | OWASP, supply chain, modern threats |
 | `/test` | Test Engineer | Coverage gaps, mutation testing |
-| `/debug` | Debugger | Fix issues |
+
+### Skills (19)
+
+Skills are loaded explicitly: `Read .claude/skills/[name]/SKILL.md, then [task]`
+
+**Code Quality:** `nextjs-best-practices`, `vercel-react-best-practices`, `accessibility`, `performance`
+
+**SEO & Marketing:** `seo-audit`, `programmatic-seo`, `schema-markup`, `content-marketing`, `analytics-tracking`, `competitor-alternatives`, `social-content`, `free-tool-strategy`
+
+**Conversion & Copy:** `page-cro`, `copywriting`, `copy-editing`, `marketing-psychology`, `marketing-ideas`
+
+**Design & Monetization:** `ui-design`, `pricing-strategy`
 
 ## HMRC Compliance
 

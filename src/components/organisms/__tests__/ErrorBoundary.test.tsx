@@ -1,4 +1,4 @@
-// src/components/ui/__tests__/ErrorBoundary.test.tsx
+// src/components/organisms/__tests__/ErrorBoundary.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
 import type React from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';

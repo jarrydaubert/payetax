@@ -117,6 +117,16 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     slug: 'company-tax',
     description: 'Information about corporation tax and business taxation',
   },
+  {
+    name: 'Salary Guides',
+    slug: 'salary-guides',
+    description: 'Practical salary breakdowns showing take-home pay and lifestyle implications',
+  },
+  {
+    name: 'Tax Deadlines',
+    slug: 'tax-deadlines',
+    description: 'Important UK tax deadlines and what you need to do before them',
+  },
 ];
 
 /**

@@ -7,11 +7,12 @@ import './globals.css';
 import '@/styles/table-drag-scroll.css';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import Script from 'next/script';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
-import ErrorBoundary from '@/components/atoms/ErrorBoundary';
+
+import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
+import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
 import { inter, spaceGrotesk } from './fonts';
@@ -92,13 +93,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           'min-h-screen bg-background text-foreground'
         )}
       >
-        {/* Ahrefs Web Analytics - Privacy-first analytics without cookies */}
-        {/* lazyOnload defers until after page is fully loaded - better for mobile LCP */}
-        <Script
-          src='https://analytics.ahrefs.com/analytics.js'
-          data-key='QVltTEcUkJo80YKtGhAvrg'
-          strategy='lazyOnload'
-        />
+        {/* Ahrefs Web Analytics - Only loads after user accepts cookies */}
+        <AhrefsAnalytics />
 
         <ThemeProvider>
           <Suspense fallback={null}>

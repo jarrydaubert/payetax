@@ -114,8 +114,10 @@ export function ResultsTable({
 
     // Get tax constants for the current year
     const taxConstants = TAX_RATES[(taxYear || '2025-2026') as TaxYear];
+    const basicBand = taxConstants?.bands[0];
+    if (!(taxConstants && basicBand)) return false;
     const personalAllowance = taxConstants.personalAllowance;
-    const basicRateUpper = personalAllowance + taxConstants.bands[0].threshold;
+    const basicRateUpper = personalAllowance + basicBand.threshold;
 
     // Partner must earn less than Personal Allowance
     if (partnerGrossWage >= personalAllowance) return false;
@@ -401,6 +403,10 @@ export function ResultsTable({
               className={`table-drag-scroll w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
               style={{ tableLayout: 'auto', minWidth: '100%' }}
             >
+              <caption className='sr-only'>
+                Tax calculation breakdown showing gross pay, deductions, and take-home pay across
+                different time periods
+              </caption>
               <ResultsTableHeader
                 visiblePeriods={visiblePeriods}
                 hasWhatIfResults={!!whatIfResults}

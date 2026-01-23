@@ -122,7 +122,7 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
     iconColor: 'bg-primary/80',
     title: 'Our Servers',
     description:
-      'Only serve the website code (HTML, CSS, JS). No tax data, no personal information, no calculation results stored.',
+      'We only send you the calculator app. No tax data, no personal information, no calculation results stored.',
   },
   {
     icon: FileText,

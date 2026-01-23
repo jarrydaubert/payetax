@@ -82,7 +82,7 @@ export default async function CategoryPage({
   const currentPage = resolvedSearchParams.page
     ? Number.parseInt(
         Array.isArray(resolvedSearchParams.page)
-          ? resolvedSearchParams.page[0]
+          ? (resolvedSearchParams.page[0] ?? '1')
           : resolvedSearchParams.page,
         10
       )

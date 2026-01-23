@@ -11,6 +11,8 @@ const config: Config = {
        * Use these instead of inline gradient classes for consistency
        */
       backgroundImage: {
+        // New design system gradient (payetax-web mockup)
+        'brand-gradient-new': 'var(--brand-gradient-new)',
         // Brand gradients (24 uses across components)
         'brand-text':
           'linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-gradient-end))',
@@ -63,12 +65,32 @@ const config: Config = {
           'linear-gradient(to right, transparent, hsl(var(--color-foreground) / 0.3), transparent)',
       },
       colors: {
+        // New design system colors (payetax-web mockup)
+        deep: 'var(--bg-deep)',
+        dark: 'var(--bg-dark)',
+        'card-new': 'var(--bg-card-new)',
+        'text-primary-new': 'var(--text-primary-new)',
+        'text-secondary-new': 'var(--text-secondary-new)',
+        'text-dim': 'var(--text-dim)',
+        // Border colors
+        'border-subtle': 'var(--border-subtle)',
+        'border-light': 'var(--border-light)',
+        cyan: {
+          DEFAULT: 'var(--brand-cyan)',
+          brand: 'var(--brand-cyan)',
+        },
+        emerald: {
+          DEFAULT: 'var(--brand-emerald)',
+          brand: 'var(--brand-emerald)',
+        },
         // Brand colors - maintain identity across themes
         brand: {
           DEFAULT: 'var(--color-brand)',
           accent: 'var(--color-brand-accent)',
           'gradient-start': 'var(--color-brand-gradient-start)',
           'gradient-end': 'var(--color-brand-gradient-end)',
+          cyan: 'var(--brand-cyan)',
+          emerald: 'var(--brand-emerald)',
         },
         // Semantic colors
         border: 'var(--color-border)',

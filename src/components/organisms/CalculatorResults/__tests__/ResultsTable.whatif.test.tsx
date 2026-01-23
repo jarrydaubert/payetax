@@ -78,10 +78,10 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
     expect(pensionRow).toBeInTheDocument();
 
     // Both columns should show £0.00 since pension is 0%
-    const cells = pensionRow?.querySelectorAll('td');
+    const cells = pensionRow?.querySelectorAll('th, td');
     expect(cells).toBeDefined();
 
-    // Should have: Category, Percentage, and then pairs of (Current, WhatIf) for each visible period
+    // Should have: Category (th), Percentage (td), and then pairs of (Current, WhatIf) for each visible period
     // With 7 periods visible: Category (1) + Percentage (1) + 7 periods × 2 columns = 16 cells
     expect(cells?.length).toBe(16);
   });

@@ -1,4 +1,4 @@
-// src/components/ui/__tests__/CookieBanner.test.tsx
+// src/components/organisms/__tests__/CookieBanner.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CookieBanner from '../CookieBanner';
 

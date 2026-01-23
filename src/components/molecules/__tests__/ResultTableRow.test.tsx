@@ -208,8 +208,8 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      const cells = container.querySelectorAll('td');
-      expect(cells.length).toBe(4); // Category, Percentage, Yearly, Monthly
+      const cells = container.querySelectorAll('th, td');
+      expect(cells.length).toBe(4); // Category (th), Percentage, Yearly, Monthly
     });
 
     it('should render correct number of cells based on visible periods', () => {
@@ -221,8 +221,8 @@ describe('ResultTableRow Component', () => {
         { wrapper: TableWrapper }
       );
 
-      const cells = container.querySelectorAll('td');
-      expect(cells.length).toBe(6); // Category, Percentage, 4 periods
+      const cells = container.querySelectorAll('th, td');
+      expect(cells.length).toBe(6); // Category (th), Percentage, 4 periods
     });
 
     it('should have text-right alignment for numeric cells', () => {
@@ -253,8 +253,8 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      const cells = container.querySelectorAll('td');
-      expect(cells.length).toBe(2); // Only category and percentage
+      const cells = container.querySelectorAll('th, td');
+      expect(cells.length).toBe(2); // Only category (th) and percentage
     });
 
     it('should handle negative annual value', () => {

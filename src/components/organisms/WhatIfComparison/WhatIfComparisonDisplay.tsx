@@ -3,16 +3,21 @@
 
 import { motion } from 'framer-motion';
 import {
+  ArrowDown,
+  ArrowUp,
   Building,
   Calculator,
   Coins,
   CreditCard,
   GraduationCap,
+  Minus,
   Percent,
   PiggyBank,
   PoundSterling,
   Scale,
   Shield,
+  TrendingDown,
+  TrendingUp,
   Wallet,
 } from 'lucide-react';
 import * as React from 'react';
@@ -122,6 +127,11 @@ export function WhatIfComparisonDisplay({
 
   const currentGross = currentResults.grossSalary.annually;
   const whatIfGross = whatIfResults.grossSalary.annually;
+
+  // Calculate deltas for summary
+  const netPayDeltaMonthly = (whatIfResults.netPay.annually - currentResults.netPay.annually) / 12;
+  const taxDeltaAnnual = whatIfResults.incomeTax.annually - currentResults.incomeTax.annually;
+  const grossDeltaAnnual = whatIfGross - currentGross;
 
   // Build table rows
   const tableRows: ResultRowData[] = [
@@ -239,6 +249,115 @@ export function WhatIfComparisonDisplay({
         </p>
       </div>
 
+      {/* Delta Summary Card */}
+      <Card className='overflow-hidden border-2 border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5 dark:border-purple-400/30'>
+        <div className='p-4'>
+          <div className='grid gap-4 sm:grid-cols-3'>
+            {/* Net Pay Delta - Primary */}
+            <div className='flex flex-col items-center justify-center rounded-lg bg-background/50 p-4 text-center'>
+              <span className={cn('mb-1 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                Take-Home Difference
+              </span>
+              <div className='flex items-center gap-2'>
+                {netPayDeltaMonthly > 0 ? (
+                  <TrendingUp className='size-6 text-emerald' />
+                ) : netPayDeltaMonthly < 0 ? (
+                  <TrendingDown className='size-6 text-destructive' />
+                ) : (
+                  <Minus className='size-6 text-muted-foreground' />
+                )}
+                <span
+                  className={cn(
+                    'font-bold',
+                    TYPOGRAPHY.TEXT_2XL,
+                    netPayDeltaMonthly > 0
+                      ? 'text-emerald'
+                      : netPayDeltaMonthly < 0
+                        ? 'text-destructive'
+                        : 'text-muted-foreground'
+                  )}
+                >
+                  {netPayDeltaMonthly >= 0 ? '+' : ''}
+                  {formatCurrency(netPayDeltaMonthly)}
+                </span>
+              </div>
+              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per month</span>
+            </div>
+
+            {/* Gross Salary Delta */}
+            <div className='flex flex-col items-center justify-center rounded-lg bg-background/50 p-3 text-center'>
+              <span className={cn('mb-1 text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                Gross Salary
+              </span>
+              <div className='flex items-center gap-1'>
+                {grossDeltaAnnual > 0 ? (
+                  <ArrowUp className='size-4 text-foreground' />
+                ) : grossDeltaAnnual < 0 ? (
+                  <ArrowDown className='size-4 text-foreground' />
+                ) : null}
+                <span className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>
+                  {grossDeltaAnnual >= 0 ? '+' : ''}
+                  {formatCurrency(grossDeltaAnnual)}
+                </span>
+              </div>
+              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per year</span>
+            </div>
+
+            {/* Tax Delta */}
+            <div className='flex flex-col items-center justify-center rounded-lg bg-background/50 p-3 text-center'>
+              <span className={cn('mb-1 text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                Tax Difference
+              </span>
+              <div className='flex items-center gap-1'>
+                {taxDeltaAnnual > 0 ? (
+                  <ArrowUp className='size-4 text-destructive' />
+                ) : taxDeltaAnnual < 0 ? (
+                  <ArrowDown className='size-4 text-emerald' />
+                ) : null}
+                <span
+                  className={cn(
+                    'font-semibold',
+                    TYPOGRAPHY.TEXT_LG,
+                    taxDeltaAnnual > 0
+                      ? 'text-destructive'
+                      : taxDeltaAnnual < 0
+                        ? 'text-emerald'
+                        : ''
+                  )}
+                >
+                  {taxDeltaAnnual >= 0 ? '+' : ''}
+                  {formatCurrency(taxDeltaAnnual)}
+                </span>
+              </div>
+              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per year</span>
+            </div>
+          </div>
+
+          {/* Contextual Message */}
+          {netPayDeltaMonthly !== 0 && (
+            <p className={cn('mt-3 text-center text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+              {netPayDeltaMonthly > 0 ? (
+                <>
+                  With this change, you&apos;d take home{' '}
+                  <span className='font-semibold text-emerald'>
+                    {formatCurrency(Math.abs(netPayDeltaMonthly))} more
+                  </span>{' '}
+                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12))} per year).
+                </>
+              ) : (
+                <>
+                  With this change, you&apos;d take home{' '}
+                  <span className='font-semibold text-destructive'>
+                    {formatCurrency(Math.abs(netPayDeltaMonthly))} less
+                  </span>{' '}
+                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12))} per year).
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      </Card>
+
       {/* Period Selection */}
       <PeriodSelectorCard
         periods={Object.keys(periodOptions)}
@@ -351,8 +470,9 @@ export function WhatIfComparisonDisplay({
 
                       {/* Period Values (Current vs What If) */}
                       {visiblePeriods.map((period) => {
-                        const currentValue = row.currentAnnual / periodOptions[period];
-                        const whatIfValue = row.whatIfAnnual / periodOptions[period];
+                        const divisor = periodOptions[period] ?? 1;
+                        const currentValue = row.currentAnnual / divisor;
+                        const whatIfValue = row.whatIfAnnual / divisor;
 
                         return (
                           <React.Fragment key={period}>

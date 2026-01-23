@@ -236,36 +236,39 @@ export function BasicInputs() {
       </div>
 
       {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
-      <div className={cn('flex items-center', SPACING.GAP_4)}>
-        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
-          <LabelTooltip fieldName='marriageAllowance' />
-          <Label htmlFor={marriedId} className={TYPOGRAPHY.TEXT_SM}>
-            Married
-          </Label>
-          <Checkbox
-            id={marriedId}
-            checked={input.isMarried}
-            onCheckedChange={setIsMarried}
-            data-testid='married-checkbox'
-          />
-        </div>
+      <fieldset className='m-0 border-0 p-0'>
+        <legend className='sr-only'>Tax allowances and exemptions</legend>
+        <div className={cn('flex items-center', SPACING.GAP_4)}>
+          <div className={cn('flex items-center', SPACING.GAP_1_5)}>
+            <LabelTooltip fieldName='marriageAllowance' />
+            <Label htmlFor={marriedId} className={TYPOGRAPHY.TEXT_SM}>
+              Married
+            </Label>
+            <Checkbox
+              id={marriedId}
+              checked={input.isMarried}
+              onCheckedChange={setIsMarried}
+              data-testid='married-checkbox'
+            />
+          </div>
 
-        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
-          <LabelTooltip fieldName='blindAllowance' />
-          <Label htmlFor={blindId} className={TYPOGRAPHY.TEXT_SM}>
-            Blind
-          </Label>
-          <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
-        </div>
+          <div className={cn('flex items-center', SPACING.GAP_1_5)}>
+            <LabelTooltip fieldName='blindAllowance' />
+            <Label htmlFor={blindId} className={TYPOGRAPHY.TEXT_SM}>
+              Blind
+            </Label>
+            <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
+          </div>
 
-        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
-          <LabelTooltip fieldName='payNoNI' />
-          <Label htmlFor={payNoNIId} className={TYPOGRAPHY.TEXT_SM}>
-            I pay no NI
-          </Label>
-          <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
+          <div className={cn('flex items-center', SPACING.GAP_1_5)}>
+            <LabelTooltip fieldName='payNoNI' />
+            <Label htmlFor={payNoNIId} className={TYPOGRAPHY.TEXT_SM}>
+              I pay no NI
+            </Label>
+            <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
+          </div>
         </div>
-      </div>
+      </fieldset>
 
       {input.isMarried && (
         <div className={cn('flex items-center', SPACING.GAP_3)}>

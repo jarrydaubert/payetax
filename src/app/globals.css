@@ -461,11 +461,22 @@
   font-size: 0.8rem;
 }
 
+.footer-newsletter {
+  flex-shrink: 0;
+  min-width: 280px;
+  max-width: 320px;
+}
+
 @media (max-width: 640px) {
   .footer-content-new {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
+  }
+  .footer-newsletter {
+    min-width: 100%;
+    max-width: 100%;
+    order: -1;
   }
   .footer-links-new {
     flex-wrap: wrap;

@@ -144,10 +144,12 @@ export function calculateIncomeTaxFromBands(
     if (remainingIncome <= 0) break;
 
     const band = taxBands[i];
+    if (!band) continue;
     const nextBand = taxBands[i + 1];
+    const prevBand = taxBands[i - 1];
 
     // Calculate band boundaries (monthly)
-    const bandStart = i === 0 ? 0 : (taxBands[i - 1].threshold - monthlyAllowance * 12) / 12;
+    const bandStart = i === 0 ? 0 : ((prevBand?.threshold ?? 0) - monthlyAllowance * 12) / 12;
     const bandEnd = nextBand
       ? (band.threshold - monthlyAllowance * 12) / 12
       : Number.POSITIVE_INFINITY;
@@ -227,6 +229,7 @@ export function calculateStudentLoanRepayments(
 
   for (const plan of studentLoanPlans) {
     const rates = loanRates[plan];
+    if (!rates) continue;
     const monthlyThreshold = rates.threshold / 12;
 
     if (monthlyGrossSalary > monthlyThreshold) {
@@ -669,10 +672,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   if (input.isMarried && input.partnerGrossWage >= 0) {
     // Find the threshold where "Higher rate" (40% or 42%) starts
     const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
-    const basicRateThreshold =
-      higherRateBandIndex > 0
-        ? taxRates.bands[higherRateBandIndex - 1].threshold
-        : (taxRates.bands[0]?.threshold ?? taxRates.bands[0].threshold);
+    const prevBand = higherRateBandIndex > 0 ? taxRates.bands[higherRateBandIndex - 1] : null;
+    const firstBand = taxRates.bands[0];
+    const basicRateThreshold = prevBand?.threshold ?? firstBand?.threshold ?? 37700;
     const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
 
     // Check if USER can RECEIVE marriage allowance from their partner:
@@ -772,8 +774,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       // Process each Scottish tax band in order
       for (let i = 0; i < taxRates.bands.length; i++) {
         const band = taxRates.bands[i];
-        const lowerBound = monthlyBoundaries[i]; // Start of this band
-        const upperBound = monthlyBoundaries[i + 1]; // Start of next band (or infinity)
+        if (!band) continue;
+        const lowerBound = monthlyBoundaries[i] ?? 0; // Start of this band
+        const upperBound = monthlyBoundaries[i + 1] ?? Number.POSITIVE_INFINITY; // Start of next band (or infinity)
 
         // Calculate how much taxable income falls within this specific band
         // We compare:
@@ -829,6 +832,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       // Process each standard UK tax band sequentially
       for (let i = 0; i < taxRates.bands.length; i++) {
         const band = taxRates.bands[i];
+        if (!band) continue;
 
         // Convert annual band threshold to monthly equivalent
         // Example: £37,700 annual basic rate threshold = £3,141.67 monthly

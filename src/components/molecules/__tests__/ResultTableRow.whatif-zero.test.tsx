@@ -42,12 +42,12 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    // Should have: Category cell + Percentage cell + (Current + What If) × 2 periods = 6 cells
-    const cells = container.querySelectorAll('td');
+    // Should have: Category (th) + Percentage (td) + (Current + What If) × 2 periods = 6 cells
+    const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(6);
 
-    // Verify all cells show £0.00
-    const currencyCells = Array.from(cells).slice(2); // Skip category and percentage cells
+    // Verify all currency cells show £0.00 (skip category th and percentage td)
+    const currencyCells = Array.from(container.querySelectorAll('td')).slice(1);
     for (const cell of currencyCells) {
       expect(cell.textContent).toBe('£0.00');
     }
@@ -82,8 +82,8 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    // Should have: Category (1) + Percentage (1) + (Current + What If) × 7 periods = 16 cells
-    const cells = container.querySelectorAll('td');
+    // Should have: Category (th) + Percentage (td) + (Current + What If) × 7 periods = 16 cells
+    const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(16);
 
     // Verify Current columns have blue background
@@ -114,16 +114,15 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    const cells = container.querySelectorAll('td');
-    expect(cells.length).toBe(4); // Category + Percentage + Current + What If
+    const cells = container.querySelectorAll('th, td');
+    expect(cells.length).toBe(4); // Category (th) + Percentage + Current + What If
 
-    // Current should show £3,000
-    const currentCell = cells[2];
-    expect(currentCell.textContent).toBe('£3,000.00');
+    // Current should show £3,000 (cells[2] = first currency cell)
+    const tdCells = container.querySelectorAll('td');
+    expect(tdCells[1]?.textContent).toBe('£3,000.00');
 
     // What If should show £0.00 (not be missing!)
-    const whatIfCell = cells[3];
-    expect(whatIfCell.textContent).toBe('£0.00');
+    expect(tdCells[2]?.textContent).toBe('£0.00');
   });
 
   it('should NOT render What If columns when whatIfAnnual is undefined', () => {
@@ -145,8 +144,8 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    // Should have: Category + Percentage + 2 periods (no What If columns) = 4 cells
-    const cells = container.querySelectorAll('td');
+    // Should have: Category (th) + Percentage + 2 periods (no What If columns) = 4 cells
+    const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(4);
 
     // No cells should have purple background (What If columns)
@@ -173,12 +172,12 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    // Should have: Category (1) + Percentage (1) + (Current + What If) × 3 periods = 8 cells
-    const cells = container.querySelectorAll('td');
+    // Should have: Category (th) + Percentage (td) + (Current + What If) × 3 periods = 8 cells
+    const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(8);
 
-    // All currency cells should show £0.00
-    const currencyCells = Array.from(cells).slice(2);
+    // All currency cells should show £0.00 (skip percentage td)
+    const currencyCells = Array.from(container.querySelectorAll('td')).slice(1);
     for (const cell of currencyCells) {
       expect(cell.textContent).toBe('£0.00');
     }
@@ -203,10 +202,8 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       </table>
     );
 
-    const cells = container.querySelectorAll('td');
-
-    // Skip category and percentage, then check all period cells
-    const periodCells = Array.from(cells).slice(2);
+    // Skip category (th) and percentage (td), then check all period cells
+    const periodCells = Array.from(container.querySelectorAll('td')).slice(1);
 
     // All should show £0.00 regardless of period
     for (const cell of periodCells) {
