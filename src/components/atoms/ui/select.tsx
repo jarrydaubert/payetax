@@ -21,7 +21,7 @@ function SelectTrigger({ ref, className, children, ...props }: SelectTriggerProp
       ref={ref}
       className={cn(
         // Standardized to border-primary/20 to match Card and Input components
-        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-primary/20 bg-secondary/80 px-3 py-2 shadow-sm ring-offset-background backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-primary/20 bg-secondary/80 px-3 py-2 shadow-sm ring-offset-background backdrop-blur-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
         TYPOGRAPHY.TEXT_SM,
         className
       )}

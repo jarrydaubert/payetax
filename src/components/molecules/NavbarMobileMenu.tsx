@@ -4,6 +4,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Route } from 'next';
 import Link from 'next/link';
+import { LAYOUT } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface NavLink {
@@ -58,7 +59,8 @@ export function NavbarMobileMenu({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
-              'fixed top-[64px] right-0 left-0 z-50 md:hidden',
+              'fixed right-0 left-0 z-50 md:hidden',
+              LAYOUT.BELOW_NAVBAR,
               'border-border-subtle border-b bg-dark px-4 py-6'
             )}
             aria-label='Mobile navigation menu'

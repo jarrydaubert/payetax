@@ -20,7 +20,9 @@ export function HowToStepCard({ step, title, description }: HowToStepCardProps) 
         SPACING.P_6
       )}
     >
-      <div className={cn('absolute font-bold text-[80px] text-primary/10', 'top-4 right-4')}>
+      <div
+        className={cn('absolute font-bold text-primary/10', TYPOGRAPHY.TEXT_7XL, 'top-4 right-4')}
+      >
         {step}
       </div>
       <div className='relative'>

@@ -327,6 +327,11 @@ export const LAYOUT = {
   /** Section with light accent background */
   SECTION_TINTED_ACCENT: 'bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20',
 
+  /** Navbar height (64px / 4rem) */
+  NAVBAR_HEIGHT: 'h-16',
+  /** Position below navbar for fixed elements */
+  BELOW_NAVBAR: 'top-16',
+
   /** 2-column grid with gap */
   GRID_2: 'grid gap-6 md:grid-cols-2',
   /** 3-column grid with gap */
