@@ -13,6 +13,7 @@
 | **Write blog content?** | [`BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
 | **Follow code standards?** | [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
+| **Add monetization?** | [`MONETIZATION.md`](./guides/MONETIZATION.md) |
 | **Use Linear?** | [`LINEAR.md`](./setup/LINEAR.md) |
 
 ---
@@ -29,7 +30,8 @@ docs/
 │   ├── TECH_STACK.md      # Technology overview
 │   ├── BLOG_GUIDE.md      # Content strategy
 │   ├── STYLING-GUIDELINES.md  # Design system
-│   └── SENTRY_LOGGING.md  # Error monitoring
+│   ├── SENTRY_LOGGING.md  # Error monitoring
+│   └── MONETIZATION.md    # Revenue streams
 │
 ├── setup/                 # Tool configuration
 │   └── LINEAR.md          # Project management
@@ -78,6 +80,7 @@ docs/
 | **BLOG_GUIDE.md** | Writing style, SEO, content calendar |
 | **STYLING-GUIDELINES.md** | Design tokens, theming, components |
 | **SENTRY_LOGGING.md** | Error tracking configuration |
+| **MONETIZATION.md** | Affiliates, B2B pricing, referrals |
 
 ### Setup (`/setup/`)
 

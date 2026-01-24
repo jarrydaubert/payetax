@@ -95,8 +95,23 @@ Sentry.init({
 
   // Ignore common non-critical errors
   ignoreErrors: [
-    // Browser extensions
+    // Sentry SDK internal errors (not actionable)
+    'feature named `webCompat` was not found',
+    // Storage access denied (privacy mode, iframe restrictions, blocked cookies)
+    "Failed to read the 'localStorage' property from 'Window'",
+    "Failed to read the 'sessionStorage' property from 'Window'",
+    'Access is denied for this document',
+    // Hydration errors (often caused by browser extensions modifying DOM)
+    'Hydration failed',
+    'There was an error while hydrating',
+    'Minified React error #418',
+    'Minified React error #423',
+    'Text content does not match server-rendered HTML',
+    // Browser extensions (not actionable - user's installed extensions)
     'top.GLOBALS',
+    'MetaMask extension not found',
+    'Failed to connect to MetaMask',
+    'inpage.js',
     'ResizeObserver loop limit exceeded',
     'ResizeObserver loop completed with undelivered notifications',
     // Network errors (transient)
@@ -111,6 +126,9 @@ Sentry.init({
     'An unknown error occurred when fetching the script',
     'newestWorker is null',
     'InvalidStateError',
+    'register-sw.js',
+    'sw.js load failed',
+    'Script.*load failed',
     // Cancelled requests (user navigation)
     'AbortError',
     'The operation was aborted',

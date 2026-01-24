@@ -199,7 +199,7 @@ export function EmbedWidgetClient() {
               We can build a customized calculator with your branding, specific tax scenarios, or
               API integration.
             </p>
-            <Link href='mailto:hello@payetax.co.uk'>
+            <Link href='mailto:support@payetax.co.uk'>
               <Button variant='outline'>Contact Us</Button>
             </Link>
           </div>

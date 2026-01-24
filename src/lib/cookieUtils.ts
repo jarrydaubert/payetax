@@ -1,6 +1,8 @@
 // src/lib/cookieUtils.ts
 // Cookie consent utilities for GDPR compliance
 
+import { safeGetItem, safeRemoveItem } from './safeStorage';
+
 export type CookieConsent = 'accepted' | 'declined' | null;
 
 /**
@@ -8,22 +10,13 @@ export type CookieConsent = 'accepted' | 'declined' | null;
  * @returns 'accepted', 'declined', or null if no choice has been made
  */
 export function getCookieConsent(): CookieConsent {
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return null;
-    }
+  const consent = safeGetItem('cookie-consent');
 
-    const consent = localStorage.getItem('cookie-consent');
-
-    if (consent === 'accepted' || consent === 'declined') {
-      return consent as CookieConsent;
-    }
-
-    return null;
-  } catch (error) {
-    console.warn('Failed to get cookie consent status:', error);
-    return null;
+  if (consent === 'accepted' || consent === 'declined') {
+    return consent as CookieConsent;
   }
+
+  return null;
 }
 
 /**
@@ -44,69 +37,39 @@ export function areCookiesDeclined(): boolean {
  * Get the timestamp when consent was last given
  */
 export function getConsentTimestamp(): Date | null {
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return null;
+  const timestamp = safeGetItem('cookie-consent-timestamp');
+
+  if (timestamp) {
+    const date = new Date(timestamp);
+    // Validate the date is valid
+    if (!Number.isNaN(date.getTime())) {
+      return date;
     }
-
-    const timestamp = localStorage.getItem('cookie-consent-timestamp');
-
-    if (timestamp) {
-      return new Date(timestamp);
-    }
-
-    return null;
-  } catch (error) {
-    console.warn('Failed to get consent timestamp:', error);
-    return null;
   }
+
+  return null;
 }
 
 /**
  * Clear cookie consent (for testing or reset purposes)
  */
 export function clearCookieConsent(): void {
-  try {
-    if (window?.localStorage) {
-      localStorage.removeItem('cookie-consent');
-      localStorage.removeItem('cookie-consent-timestamp');
-    }
-  } catch (error) {
-    console.warn('Failed to clear cookie consent:', error);
-  }
+  safeRemoveItem('cookie-consent');
+  safeRemoveItem('cookie-consent-timestamp');
 }
 
 /**
  * Check if consent is expired (after 12 months)
  */
 export function isConsentExpired(): boolean {
-  try {
-    // Check if localStorage is available
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return false; // No consent storage available, not expired
-    }
+  const consentDate = getConsentTimestamp();
 
-    // Check if consent timestamp exists
-    let timestamp: string | null = null;
-    try {
-      timestamp = localStorage.getItem('cookie-consent-timestamp');
-    } catch (error) {
-      console.warn('Failed to check if consent is expired:', error);
-      return true; // Error accessing storage, assume expired for safety
-    }
-
-    if (!timestamp) {
-      return false; // No consent given, so not expired
-    }
-
-    // Parse and check if expired
-    const consentDate = new Date(timestamp);
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-
-    return consentDate < twelveMonthsAgo;
-  } catch (error) {
-    console.warn('Failed to check if consent is expired:', error);
-    return true; // Assume expired on error for safety
+  if (!consentDate) {
+    return false; // No consent given, so not expired
   }
+
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+  return consentDate < twelveMonthsAgo;
 }

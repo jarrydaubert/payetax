@@ -7,9 +7,10 @@
  * @module components/molecules/CompetitorCard
  */
 
-import { ArrowRight, ExternalLink, Star } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
+import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
 import { Badge } from '@/components/atoms/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/atoms/ui/card';
 import { ICON_SIZES, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
@@ -147,10 +148,9 @@ export function CompetitorCard({
               <ArrowRight className={ICON_SIZES.SIZE_4} />
             </Link>
           )}
-          <a
-            href={competitor.url}
-            target='_blank'
-            rel='noopener noreferrer'
+          <TrackedAffiliateLink
+            competitor={competitor}
+            pageType='hub'
             className={cn(
               'inline-flex items-center text-muted-foreground transition-colors hover:text-foreground',
               TYPOGRAPHY.TEXT_SM,
@@ -158,8 +158,7 @@ export function CompetitorCard({
             )}
           >
             Visit site
-            <ExternalLink className={ICON_SIZES.SIZE_3_5} />
-          </a>
+          </TrackedAffiliateLink>
         </div>
       </CardContent>
     </Card>

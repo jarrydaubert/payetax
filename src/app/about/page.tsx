@@ -1,5 +1,5 @@
 // src/app/about/page.tsx
-// Server component - no client-side interactivity needed
+'use client';
 
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 import { GradientText } from '@/components/atoms/GradientText';

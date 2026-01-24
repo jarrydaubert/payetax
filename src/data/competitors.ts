@@ -43,6 +43,10 @@ export interface Competitor {
   shortName: string;
   /** Competitor's website URL */
   url: string;
+  /** Affiliate URL if available (for monetization) */
+  affiliateUrl?: string;
+  /** Affiliate program name for tracking */
+  affiliateProgram?: string;
   /** Brief description of the competitor */
   description: string;
   /** What they do well */
@@ -1233,4 +1237,26 @@ export function getCompetitorCategoryInfo(
   category: CompetitorCategory
 ): CompetitorCategoryInfo | undefined {
   return COMPETITOR_CATEGORIES.find((c) => c.slug === category);
+}
+
+/**
+ * Get the appropriate URL for a competitor (affiliate or regular)
+ * Returns affiliate URL if available, otherwise regular URL
+ */
+export function getCompetitorUrl(competitor: Competitor): string {
+  return competitor.affiliateUrl ?? competitor.url;
+}
+
+/**
+ * Check if a competitor has an affiliate program
+ */
+export function hasAffiliateProgram(competitor: Competitor): boolean {
+  return !!competitor.affiliateUrl && !!competitor.affiliateProgram;
+}
+
+/**
+ * Get competitors with affiliate programs (for revenue tracking)
+ */
+export function getAffiliateCompetitors(): Competitor[] {
+  return COMPETITORS.filter(hasAffiliateProgram);
 }

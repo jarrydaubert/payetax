@@ -6,6 +6,8 @@ import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import * as React from 'react';
 import { toast } from 'sonner';
+// MONETIZATION: Disabled until partner agreements in place
+// import { AccountantReferralCTA } from '@/components/molecules/AccountantReferralCTA';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -224,6 +226,23 @@ export function CalculatorContainer() {
             aria-label='Tax calculation results summary'
           >
             <ResultsSummaryCards results={results} taxYear={input.taxYear} />
+
+            {/* MONETIZATION: Accountant referral CTA disabled until partner agreements in place
+            <AccountantReferralCTA
+              situation={{
+                salary: results.grossSalary.annually,
+                isScottish: input.isScottish ?? false,
+                effectiveTaxRate:
+                  results.grossSalary.annually > 0
+                    ? ((results.incomeTax.annually + results.nationalInsurance.annually) /
+                        results.grossSalary.annually) *
+                      100
+                    : 0,
+                taxCode: input.taxCode,
+              }}
+              className={SPACING.MT_4}
+            />
+            */}
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,10 +1,11 @@
 // src/app/alternatives/[competitor]/AlternativePageContent.tsx
 'use client';
 
-import { ArrowRight, Calculator, ExternalLink, RefreshCw } from 'lucide-react';
+import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
+import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
 import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
 import { TwoColumnComparison } from '@/components/molecules/ComparisonTable';
@@ -137,10 +138,9 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                 ))}
               </ul>
               <div className={SPACING.MT_6}>
-                <a
-                  href={competitor.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
+                <TrackedAffiliateLink
+                  competitor={competitor}
+                  pageType='alternative'
                   className={cn(
                     'inline-flex items-center text-muted-foreground transition-colors hover:text-foreground',
                     TYPOGRAPHY.TEXT_SM,
@@ -148,8 +148,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                   )}
                 >
                   Visit {competitor.shortName}
-                  <ExternalLink className={ICON_SIZES.SIZE_3_5} />
-                </a>
+                </TrackedAffiliateLink>
               </div>
             </Card>
           </div>

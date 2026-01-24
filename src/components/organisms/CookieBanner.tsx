@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
+import { safeSetItem } from '@/lib/safeStorage';
 import { cn } from '@/lib/utils';
 
 const CookieBanner: React.FC = () => {
@@ -42,10 +43,8 @@ const CookieBanner: React.FC = () => {
   const acceptCookies = useCallback(() => {
     try {
       // Store consent preference
-      if (window?.localStorage) {
-        localStorage.setItem('cookie-consent', 'accepted');
-        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
-      }
+      safeSetItem('cookie-consent', 'accepted');
+      safeSetItem('cookie-consent-timestamp', new Date().toISOString());
 
       setShowBanner(false);
 
@@ -69,10 +68,8 @@ const CookieBanner: React.FC = () => {
   const declineCookies = useCallback(() => {
     try {
       // Store decline preference
-      if (window?.localStorage) {
-        localStorage.setItem('cookie-consent', 'declined');
-        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
-      }
+      safeSetItem('cookie-consent', 'declined');
+      safeSetItem('cookie-consent-timestamp', new Date().toISOString());
 
       setShowBanner(false);
 

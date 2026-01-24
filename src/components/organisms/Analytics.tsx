@@ -4,6 +4,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useState } from 'react';
+import { safeGetItem } from '@/lib/safeStorage';
 
 // GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -133,7 +134,7 @@ export function Analytics() {
       });
 
       // Check if user previously gave consent
-      const hasConsent = localStorage.getItem('cookie-consent') === 'accepted';
+      const hasConsent = safeGetItem('cookie-consent') === 'accepted';
 
       // Store in window for other components to access
       window.consentMode = {
@@ -152,7 +153,7 @@ export function Analytics() {
     if (!isLoaded) return;
 
     // Only track page views if consent is given
-    const hasConsent = localStorage.getItem('cookie-consent') === 'accepted';
+    const hasConsent = safeGetItem('cookie-consent') === 'accepted';
     if (!(hasConsent && window.gtag)) return;
 
     // Construct full URL for tracking
@@ -187,7 +188,7 @@ export function Analytics() {
     };
 
     const handleConsentUpdate = () => {
-      const newConsent = localStorage.getItem('cookie-consent') === 'accepted';
+      const newConsent = safeGetItem('cookie-consent') === 'accepted';
       updateConsent(newConsent);
     };
 

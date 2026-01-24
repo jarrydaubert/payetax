@@ -1,10 +1,11 @@
 // src/app/vs/[competitor]/VsPageContent.tsx
 'use client';
 
-import { ArrowRight, Calculator, ExternalLink, Scale } from 'lucide-react';
+import { ArrowRight, Calculator, Scale } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
+import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
 import { Badge } from '@/components/atoms/ui/badge';
 import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
@@ -187,10 +188,9 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
 
               <div className={SPACING.MT_6}>
                 <Button asChild variant='outline' className='w-full'>
-                  <a href={competitor.url} target='_blank' rel='noopener noreferrer'>
+                  <TrackedAffiliateLink competitor={competitor} pageType='vs'>
                     Visit {competitor.shortName}
-                    <ExternalLink className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
-                  </a>
+                  </TrackedAffiliateLink>
                 </Button>
               </div>
             </Card>

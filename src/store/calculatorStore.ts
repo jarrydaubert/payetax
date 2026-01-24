@@ -26,7 +26,7 @@
 
 import { z } from 'zod';
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import {
   type NICategory,
@@ -38,6 +38,7 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import { trackCalculatorEvent, trackCalculatorUsage } from '@/lib/analytics';
+import { safeStorage } from '@/lib/safeStorage';
 import {
   addBreadcrumb,
   captureCalculatorError,
@@ -984,6 +985,7 @@ export const useCalculatorStore = create<CalculatorState>()(
       }),
       {
         name: 'tax-calculator-storage',
+        storage: createJSONStorage(() => safeStorage),
         partialize: (state) => ({
           input: state.input,
           // Don't persist calculation results

@@ -86,11 +86,8 @@ describe('Cookie Utils', () => {
         throw new Error('localStorage error');
       });
 
+      // safeStorage handles errors internally and returns null
       expect(getCookieConsent()).toBeNull();
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to get cookie consent status:',
-        expect.any(Error)
-      );
     });
   });
 
@@ -163,19 +160,16 @@ describe('Cookie Utils', () => {
         throw new Error('localStorage error');
       });
 
+      // safeStorage handles errors internally and returns null
       expect(getConsentTimestamp()).toBeNull();
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to get consent timestamp:',
-        expect.any(Error)
-      );
     });
 
     test('should handle invalid date strings', () => {
       localStorageMock.setItem('cookie-consent-timestamp', 'invalid-date');
 
+      // New implementation validates date and returns null for invalid dates
       const result = getConsentTimestamp();
-      expect(result).toBeInstanceOf(Date);
-      expect(Number.isNaN(result?.getTime())).toBe(true);
+      expect(result).toBeNull();
     });
   });
 
@@ -213,12 +207,8 @@ describe('Cookie Utils', () => {
         throw new Error('localStorage error');
       });
 
-      clearCookieConsent();
-
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to clear cookie consent:',
-        expect.any(Error)
-      );
+      // safeStorage handles errors internally - should not throw
+      expect(() => clearCookieConsent()).not.toThrow();
     });
   });
 
@@ -263,17 +253,10 @@ describe('Cookie Utils', () => {
         throw mockError;
       });
 
-      // Clear any existing items first to ensure we hit the error path
-      localStorageMock.clear();
-      localStorageMock.getItem.mockImplementationOnce(() => {
-        throw mockError;
-      });
-
-      expect(isConsentExpired()).toBe(true);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to check if consent is expired:',
-        mockError
-      );
+      // safeStorage handles errors internally and returns null
+      // When getConsentTimestamp returns null, isConsentExpired returns false
+      // (no consent timestamp = no consent given = not expired)
+      expect(isConsentExpired()).toBe(false);
     });
 
     // SKIP: Complex date mocking is fragile and this edge case is low-risk

@@ -24,6 +24,7 @@
 import { Smartphone, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { cn } from '@/lib/utils';
 
 interface LandscapePromptProps {
@@ -54,7 +55,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
 
   useEffect(() => {
     // Check if user has dismissed before (localStorage)
-    const dismissed = localStorage.getItem('landscape-prompt-dismissed');
+    const dismissed = safeGetItem('landscape-prompt-dismissed');
     if (dismissed === 'true') {
       setIsDismissed(true);
       return;
@@ -96,7 +97,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
   const handleDismiss = () => {
     setIsDismissed(true);
     setIsVisible(false);
-    localStorage.setItem('landscape-prompt-dismissed', 'true');
+    safeSetItem('landscape-prompt-dismissed', 'true');
     onDismiss?.();
   };
 
