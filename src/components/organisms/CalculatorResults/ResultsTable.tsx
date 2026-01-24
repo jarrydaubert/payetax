@@ -17,8 +17,8 @@ import {
   Wallet,
 } from 'lucide-react';
 import * as React from 'react';
-import { LandscapePrompt } from '@/components/atoms/LandscapePrompt';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
+import { LandscapePrompt } from '@/components/molecules/LandscapePrompt';
 import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultsTableHeader } from '@/components/molecules/ResultsTableHeader';
