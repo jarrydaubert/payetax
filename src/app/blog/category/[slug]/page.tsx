@@ -9,13 +9,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
 import { categoryContent } from '@/lib/categoryContent';
-import { cn, formatDate } from '@/lib/utils'; // Now imported from shared utils
+import { SITE_URL } from '@/lib/metadata';
+import { cn, formatDate } from '@/lib/utils';
+
+// Cache categories fetch to deduplicate calls across generateStaticParams, generateMetadata, and page
+const getCachedCategories = cache(() => getBlogCategories());
 
 // Next.js 16: Route segment config for optimized category pages
 export const dynamic = 'force-static'; // Pre-render all category pages at build time
@@ -23,7 +27,7 @@ export const dynamicParams = true; // Allow new categories to be created at runt
 export const revalidate = 3600; // ISR: Revalidate every hour for new posts in categories
 
 export async function generateStaticParams() {
-  const categories = await getBlogCategories();
+  const categories = await getCachedCategories();
   return categories.map((category) => ({
     slug: category.slug,
   }));
@@ -36,7 +40,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
-  const categories = await getBlogCategories();
+  const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
 
   if (!category) {
@@ -55,7 +59,7 @@ export async function generateMetadata({
       description,
       type: 'website',
       siteName: 'TaxInsights by PayeTax',
-      url: `https://payetax.co.uk/blog/category/${slug}`,
+      url: `${SITE_URL}/blog/category/${slug}`,
     },
     twitter: {
       card: 'summary_large_image',
@@ -63,7 +67,7 @@ export async function generateMetadata({
       description,
     },
     alternates: {
-      canonical: `https://payetax.co.uk/blog/category/${slug}`,
+      canonical: `${SITE_URL}/blog/category/${slug}`,
     },
   };
 }
@@ -89,7 +93,7 @@ export default async function CategoryPage({
     : 1;
   const pageSize = 12; // Align with main blog page; adjust via BLOG_CONFIG if needed
 
-  const categories = await getBlogCategories();
+  const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
 
   if (!category) return notFound();
@@ -118,19 +122,19 @@ export default async function CategoryPage({
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://payetax.co.uk',
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://payetax.co.uk/blog',
+        item: `${SITE_URL}/blog`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: category.name,
-        item: `https://payetax.co.uk/blog/category/${slug}`,
+        item: `${SITE_URL}/blog/category/${slug}`,
       },
     ],
   };
@@ -147,11 +151,11 @@ export default async function CategoryPage({
             '@type': 'CollectionPage',
             headline: `${category.name} - PayeTax Blog`,
             description: `Expert guides on ${category.name.toLowerCase()} for UK taxpayers. Official HMRC rates, practical examples, and tax planning for 2025-26.`,
-            url: `https://payetax.co.uk/blog/category/${slug}`,
+            url: `${SITE_URL}/blog/category/${slug}`,
             author: {
               '@type': 'Organization',
               name: 'PayeTax',
-              url: 'https://payetax.co.uk',
+              url: SITE_URL,
             },
           }),
         }}

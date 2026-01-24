@@ -28,6 +28,10 @@ jest.mock('@/components/organisms/CalculatorContent', () => ({
   CalculatorContent: () => <div data-testid='mock-calculator-content'>Calculator Content</div>,
 }));
 
+jest.mock('@/components/organisms/StructuredData', () => ({
+  StructuredData: () => null,
+}));
+
 // Mock taxCalculator
 const mockCalculateTax = jest.fn();
 jest.mock('@/lib/taxCalculator', () => ({
@@ -58,15 +62,23 @@ jest.mock('next/link', () => ({
 
 describe('SalaryCalculatorPage', () => {
   const mockResults = {
-    grossSalary: 45000,
+    grossSalary: { annually: 45000, monthly: 3750, weekly: 865, daily: 173, hourly: 21.63 },
     takeHome: 34302,
     totalTax: 6486,
     totalNI: 4212,
     personalAllowance: 12570,
     taxableIncome: 32430,
-    incomeTax: 6486,
-    nationalInsurance: 4212,
-    studentLoan: 0,
+    incomeTax: { annually: 6486, monthly: 540.5, weekly: 124.73, daily: 24.95, hourly: 3.12 },
+    nationalInsurance: {
+      annually: 2594,
+      monthly: 216.17,
+      weekly: 49.88,
+      daily: 9.98,
+      hourly: 1.25,
+    },
+    studentLoan: { annually: 0, monthly: 0, weekly: 0, daily: 0, hourly: 0 },
+    pensionContribution: { annually: 0, monthly: 0, weekly: 0, daily: 0, hourly: 0 },
+    netPay: { annually: 35920, monthly: 2993.33, weekly: 690.77, daily: 138.15, hourly: 17.27 },
     pension: 0,
     employerNI: 5310,
     effectiveRate: 23.78,
@@ -288,13 +300,14 @@ describe('SalaryCalculatorPage', () => {
       });
     });
 
-    it('should exclude current salary from related searches', async () => {
-      render(<SalaryCalculatorPage salary={50000} />);
+    it('should exclude current salary from related salary calculation links', async () => {
+      const { container } = render(<SalaryCalculatorPage salary={50000} />);
 
       await waitFor(() => {
-        // Should not show £50k in related (too close to current £50k)
-        const text = screen.queryByText(/£50,000 salary/);
-        expect(text).not.toBeInTheDocument();
+        // Should not have a calculator link to the current salary
+        // (note: the blog "Related Reading" section may still mention it)
+        const links = container.querySelectorAll('a[href="/calculator/50000-after-tax"]');
+        expect(links.length).toBe(0);
       });
     });
 

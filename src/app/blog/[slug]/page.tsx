@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
@@ -14,7 +15,11 @@ import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent, extractFAQs } from '@/lib/mdx';
+import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
+
+// Cache blog post fetch to deduplicate calls between generateMetadata and page component
+const getCachedBlogPost = cache((slug: string) => getBlogPostBySlug(slug));
 
 // Next.js 16: Route segment config for optimized blog posts
 export const dynamic = 'force-static'; // Pre-render all blog posts at build time
@@ -35,7 +40,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
-  const post = await getBlogPostBySlug(resolvedParams.slug);
+  const post = await getCachedBlogPost(resolvedParams.slug);
 
   if (!post) {
     return { title: 'Post Not Found | PayeTax Blog' };
@@ -47,7 +52,7 @@ export async function generateMetadata({
     description: post.seoDescription || post.excerpt,
     keywords: post.seoKeywords?.join(', '),
     alternates: {
-      canonical: `https://payetax.co.uk/blog/${resolvedParams.slug}`,
+      canonical: `${SITE_URL}/blog/${resolvedParams.slug}`,
     },
     openGraph: {
       title: post.seoTitle || post.title,
@@ -80,7 +85,7 @@ function formatDate(dateString: string): string {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const post = await getBlogPostBySlug(resolvedParams.slug);
+  const post = await getCachedBlogPost(resolvedParams.slug);
 
   if (!post) {
     notFound();
@@ -95,34 +100,48 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Extract FAQs from content for schema.org FAQPage markup
   const faqs = extractFAQs(post.content);
 
+  // Calculate word count from content (strip markdown/HTML for accurate count)
+  const plainText = post.content
+    .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+    .replace(/`[^`]*`/g, '') // Remove inline code
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // Replace links with text
+    .replace(/[#*_~>\-|]/g, '') // Remove markdown symbols
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+
   // Generate Article structured data for SEO
   const articleStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.seoDescription || post.excerpt,
-    image: post.image ? `https://payetax.co.uk${post.image}` : undefined,
+    image: post.image ? `${SITE_URL}${post.image}` : undefined,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt || post.publishedAt,
     author: {
       '@type': 'Organization',
       name: 'PayeTax',
-      url: 'https://payetax.co.uk',
+      url: SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
       name: 'PayeTax',
-      url: 'https://payetax.co.uk',
+      url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://payetax.co.uk/logo.png',
+        url: LOGO_URL,
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://payetax.co.uk/blog/${post.slug}`,
+      '@id': `${SITE_URL}/blog/${post.slug}`,
     },
     keywords: post.seoKeywords?.join(', '),
+    inLanguage: 'en-GB',
+    wordCount,
+    articleSection: post.category || 'Tax Tips',
   };
 
   // Breadcrumb structured data
@@ -134,19 +153,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://payetax.co.uk',
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://payetax.co.uk/blog',
+        item: `${SITE_URL}/blog`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: post.title,
-        item: `https://payetax.co.uk/blog/${post.slug}`,
+        item: `${SITE_URL}/blog/${post.slug}`,
       },
     ],
   };

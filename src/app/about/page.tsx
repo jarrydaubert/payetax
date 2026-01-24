@@ -7,6 +7,7 @@ import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
@@ -21,6 +22,18 @@ import { cn } from '@/lib/utils';
 export default function AboutPage() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
+      {/* Structured Data for SEO */}
+      <StructuredData type='organization' />
+      <StructuredData
+        type='person'
+        expert={{
+          name: 'Jarryd',
+          jobTitle: 'Creator & Developer',
+          description: 'Creator of PayeTax, building privacy-first tax tools for UK taxpayers.',
+          organization: 'PayeTax',
+        }}
+      />
+
       {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'About PayeTax' }}

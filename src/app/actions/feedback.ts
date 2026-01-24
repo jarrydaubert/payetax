@@ -28,6 +28,7 @@ export interface FeedbackFormState {
  * @param formData - Form data from the submission
  * @returns Promise<FeedbackFormState> - New state with success/error
  */
+// biome-ignore lint/suspicious/useAwait: Server action must be async for Next.js, await is in after() callback
 export async function submitFeedback(
   _prevState: FeedbackFormState,
   formData: FormData
@@ -85,7 +86,7 @@ export async function submitFeedback(
   const safeUrl = url ? escapeHtml(url) : 'N/A';
 
   // Validate Resend is configured before scheduling email
-  const resendClient = await Promise.resolve(resend);
+  const resendClient = resend;
 
   // Next.js 16 after() API: Send email AFTER response is returned to user
   // This makes the feedback submission feel instant while email sends in background

@@ -1,5 +1,11 @@
 // src/lib/taxCodeDecoder.ts
 
+import { TAX_RATES } from '@/constants/taxRates';
+
+// Get the standard personal allowance from the single source of truth
+// Using the latest tax year for reference
+const STANDARD_PERSONAL_ALLOWANCE = TAX_RATES['2025-2026'].personalAllowance;
+
 export interface TaxCodeDecoded {
   code: string;
   isValid: boolean;
@@ -209,14 +215,16 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
         `Your tax-free Personal Allowance is £${result.allowance.toLocaleString()} per year.`
       );
 
-      // Add context about common allowances
-      if (result.allowance === 12570) {
-        result.details.push('This is the standard Personal Allowance for 2024-26.');
-      } else if (result.allowance > 12570) {
+      // Add context about common allowances using the standard value from taxRates.ts
+      if (result.allowance === STANDARD_PERSONAL_ALLOWANCE) {
+        result.details.push(
+          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2024-26.`
+        );
+      } else if (result.allowance > STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(
           "Your allowance is higher than standard, possibly due to Blind Person's Allowance or Marriage Allowance received."
         );
-      } else if (result.allowance < 12570 && result.allowance > 0) {
+      } else if (result.allowance < STANDARD_PERSONAL_ALLOWANCE && result.allowance > 0) {
         result.details.push(
           'Your allowance is below the standard amount. This may be due to high income (over £100k) or Marriage Allowance transferred.'
         );

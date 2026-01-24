@@ -88,11 +88,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const formattedSalary = salary.toLocaleString('en-GB');
 
+  // Always use the canonical format: {salary}-after-tax
+  // This consolidates all URL variants (70000, 70k, 70000-after-tax, 70k-after-tax)
+  // to a single canonical URL to prevent duplicate content issues
+  const canonicalPath = `/calculator/${salary}-after-tax`;
+
   return generateMetadataHelper({
     title: `£${formattedSalary} After Tax UK 2025-26 | PayeTax`,
     description: `Calculate exact take-home pay from a £${formattedSalary} salary in the UK for 2025-26. See income tax, National Insurance, and net pay breakdown instantly.`,
     keywords: `${salary} after tax, ${salary} take home pay, ${salary} salary UK, ${salary} net pay, ${salary} salary calculator, £${formattedSalary} after tax UK`,
-    pathname: `/calculator/${salaryParam}`,
+    pathname: canonicalPath,
   });
 }
 

@@ -19,8 +19,18 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { TAX_RATES } from '@/constants/taxRates';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn, formatCurrency } from '@/lib/utils';
+
+// Get thresholds from the single source of truth
+const CURRENT_TAX_YEAR = '2025-2026' as const;
+const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+const PERSONAL_ALLOWANCE = currentRates.personalAllowance;
+// Non-null assertions safe here - tax rates structure is guaranteed by TAX_RATES type
+const BASIC_RATE_CEILING = PERSONAL_ALLOWANCE + currentRates.bands[0]!.threshold; // £50,270
+const PA_TAPER_START = currentRates.personalAllowanceReductionThreshold; // £100,000
+const HIGHER_RATE_CEILING = PERSONAL_ALLOWANCE + currentRates.bands[1]!.threshold; // £125,140
 
 interface NetIncomeComparisonChartProps {
   results: TaxCalculationResults;
@@ -52,18 +62,18 @@ export const NetIncomeComparisonChart = memo(function NetIncomeComparisonChart({
     const bands = [20000, 30000, 40000, 50000, 75000, 100000, 150000];
 
     return bands.map((salary) => {
-      // Simplified calculation - in reality you'd recalculate the full tax
-      // For demo, we'll estimate based on typical deduction percentages
+      // Estimate deduction rates based on thresholds from taxRates.ts
+      // These approximate effective rates for display purposes
       let deductionRate: number;
 
-      if (salary <= 12570) deductionRate = 0;
-      else if (salary <= 50270)
-        deductionRate = 0.25; // ~20% tax + 8% NI
-      else if (salary <= 100000)
+      if (salary <= PERSONAL_ALLOWANCE) deductionRate = 0;
+      else if (salary <= BASIC_RATE_CEILING)
+        deductionRate = 0.25; // ~20% tax + 8% NI (basic rate band)
+      else if (salary <= PA_TAPER_START)
         deductionRate = 0.35; // ~30% tax + some higher NI
-      else if (salary <= 125140)
-        deductionRate = 0.42; // Personal allowance taper
-      else deductionRate = 0.45; // ~45% effective at high salaries
+      else if (salary <= HIGHER_RATE_CEILING)
+        deductionRate = 0.42; // Personal allowance taper zone (effective 60% marginal)
+      else deductionRate = 0.45; // ~45% effective at high salaries (additional rate)
 
       const deductions = salary * deductionRate;
       const netIncome = salary - deductions;

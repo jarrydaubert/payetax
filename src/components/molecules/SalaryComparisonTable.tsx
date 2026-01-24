@@ -8,7 +8,44 @@ import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { Card } from '@/components/ui/card';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { calculateTax } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
+
+// Salaries to display in the comparison table
+const COMPARISON_SALARIES = [20000, 25000, 30000, 40000, 50000, 60000, 80000, 100000];
+
+/**
+ * Generate salary data dynamically using the tax calculator
+ * This ensures values always match current tax rates from taxRates.ts
+ */
+function generateSalaryData() {
+  return COMPARISON_SALARIES.map((salary) => {
+    const results = calculateTax({
+      salary,
+      payPeriod: 'annually',
+      taxYear: '2025-2026',
+      taxCode: '1257L',
+      isScottish: false,
+      isMarried: false,
+      partnerGrossWage: 0,
+      isBlind: false,
+      payNoNI: false,
+      studentLoanPlans: 'none',
+      pensionContribution: 0,
+      pensionContributionType: 'percentage',
+      niCategory: 'A',
+      hoursPerWeek: 37.5,
+    });
+
+    return {
+      salary,
+      tax: Math.round(results.incomeTax.annually),
+      ni: Math.round(results.nationalInsurance.annually),
+      annual: Math.round(results.netPay.annually),
+      monthly: Math.round(results.netPay.monthly),
+    };
+  });
+}
 
 /**
  * Salary comparison table molecule
@@ -21,16 +58,8 @@ export function SalaryComparisonTable() {
   const { showLeftIndicator, showRightIndicator } =
     useHorizontalScrollIndicator(comparisonTableRef);
 
-  const salaryData = [
-    { salary: 20000, tax: 1486, ni: 1220, annual: 17294, monthly: 1441 },
-    { salary: 25000, tax: 2486, ni: 1920, annual: 20594, monthly: 1716 },
-    { salary: 30000, tax: 3486, ni: 2620, annual: 23894, monthly: 1991 },
-    { salary: 40000, tax: 5486, ni: 3820, annual: 30694, monthly: 2558 },
-    { salary: 50000, tax: 7486, ni: 4720, annual: 37794, monthly: 3150 },
-    { salary: 60000, tax: 11432, ni: 5069, annual: 43499, monthly: 3625 },
-    { salary: 80000, tax: 19432, ni: 5669, annual: 54899, monthly: 4575 },
-    { salary: 100000, tax: 27432, ni: 6069, annual: 66499, monthly: 5542 },
-  ];
+  // Generate salary data dynamically from current tax rates
+  const salaryData = React.useMemo(() => generateSalaryData(), []);
 
   return (
     <motion.section

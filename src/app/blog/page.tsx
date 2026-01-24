@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 
 import { getBlogCategories, getBlogPosts, getFeaturedPost } from '@/lib/blog';
+import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 import { BlogPageClient } from './BlogPageClient';
 
 // ⚠️ CRITICAL: DO NOT CHANGE THIS CONFIGURATION WITHOUT TESTING
@@ -22,13 +23,13 @@ export const metadata: Metadata = {
   keywords:
     'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips, financial advice',
   alternates: {
-    canonical: 'https://payetax.co.uk/blog',
+    canonical: `${SITE_URL}/blog`,
   },
   openGraph: {
     title: 'TaxInsights by PayeTax | UK Tax Guidance',
     description:
       'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights.',
-    url: 'https://payetax.co.uk/blog',
+    url: `${SITE_URL}/blog`,
     type: 'website',
     siteName: 'TaxInsights by PayeTax',
     images: ['/images/blog/taxinsights-og.jpg'],
@@ -57,21 +58,21 @@ export default async function BlogPage() {
     name: 'TaxInsights by PayeTax',
     description:
       'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights.',
-    url: 'https://payetax.co.uk/blog',
+    url: `${SITE_URL}/blog`,
     publisher: {
       '@type': 'Organization',
       name: 'PayeTax',
-      url: 'https://payetax.co.uk',
+      url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://payetax.co.uk/logo.png',
+        url: LOGO_URL,
       },
     },
     blogPost: allPosts.slice(0, 10).map((post) => ({
       '@type': 'BlogPosting',
       headline: post.title,
       description: post.excerpt,
-      url: `https://payetax.co.uk/blog/${post.slug}`,
+      url: `${SITE_URL}/blog/${post.slug}`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt || post.publishedAt,
       author: {

@@ -1,6 +1,7 @@
 // src/app/vs/[competitor]/page.tsx
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
 import { VsPageContent } from './VsPageContent';
 
@@ -63,5 +64,31 @@ export default async function VsPage({ params }: PageProps) {
     notFound();
   }
 
-  return <VsPageContent competitor={competitor} />;
+  const title = `PayeTax vs ${competitor.name} | UK Tax Calculator Comparison`;
+  const description = `Compare PayeTax and ${competitor.name} side-by-side. See features, pros, cons, and which UK tax calculator is right for you.`;
+
+  return (
+    <>
+      <StructuredData
+        type='article'
+        articleData={{
+          title,
+          description,
+          url: `https://payetax.co.uk/vs/${slug}`,
+          imageUrl: 'https://payetax.co.uk/images/og-image.png',
+          publishDate: '2025-01-01T00:00:00Z',
+          authorName: 'PayeTax',
+        }}
+      />
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: 'https://payetax.co.uk' },
+          { name: 'Comparisons', url: 'https://payetax.co.uk/best-uk-tax-calculators' },
+          { name: `vs ${competitor.name}`, url: `https://payetax.co.uk/vs/${slug}` },
+        ]}
+      />
+      <VsPageContent competitor={competitor} />
+    </>
+  );
 }

@@ -5,8 +5,14 @@
  * for income breakdown, tax liability, and effective rate visualizations.
  */
 
+import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
 import type { TaxCalculationResults } from './taxCalculator';
 import { formatCurrency } from './utils';
+
+// Get tax thresholds from the single source of truth
+const CURRENT_TAX_YEAR = '2025-2026' as const;
+const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+const currentScottishRates = SCOTTISH_TAX_RATES[CURRENT_TAX_YEAR];
 
 /**
  * Income Breakdown Chart Data
@@ -158,15 +164,29 @@ function calculateEffectiveRate(
 
 /**
  * Estimate marginal tax rate for a salary point
- * This is a simplified calculation based on common tax bands
+ * Uses thresholds from taxRates.ts single source of truth
  */
 function estimateMarginalRate(salary: number, isScottish = false): number {
-  // Simplified UK/Scottish tax bands (2025-26)
-  if (salary <= 12570) return 0; // Personal allowance
-  if (salary <= 50270) return 20; // Basic rate
-  if (isScottish && salary <= 43662) return 21; // Scottish intermediate
-  if (salary <= 125140) return 40; // Higher rate
-  return 45; // Additional rate
+  const personalAllowance = currentRates.personalAllowance;
+  // Non-null assertions safe - tax bands structure is guaranteed by TAX_RATES type
+  const basicRateThreshold = personalAllowance + currentRates.bands[0]!.threshold;
+  const higherRateThreshold = personalAllowance + currentRates.bands[1]!.threshold;
+
+  if (isScottish) {
+    // Scottish has 6 bands - use intermediate rate threshold
+    const scottishIntermediateThreshold =
+      currentScottishRates.personalAllowance + currentScottishRates.bands[2]!.threshold;
+    if (salary <= personalAllowance) return 0;
+    if (salary <= scottishIntermediateThreshold) return currentScottishRates.bands[2]!.rate; // Intermediate
+    if (salary <= higherRateThreshold) return currentScottishRates.bands[3]!.rate; // Higher
+    return currentScottishRates.bands[5]!.rate; // Top rate
+  }
+
+  // UK (England, Wales, NI) rates
+  if (salary <= personalAllowance) return 0; // Personal allowance
+  if (salary <= basicRateThreshold) return currentRates.bands[0]!.rate; // Basic rate
+  if (salary <= higherRateThreshold) return currentRates.bands[1]!.rate; // Higher rate
+  return currentRates.bands[2]!.rate; // Additional rate
 }
 
 export function getEffectiveTaxRateData(

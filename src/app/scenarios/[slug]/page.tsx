@@ -22,7 +22,7 @@ import {
   getScenarioBySlug,
   type Scenario,
 } from '@/data/scenarios';
-import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import { ScenarioPageClient } from './ScenarioPageClient';
 
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * Generate JSON-LD structured data
  */
 function generateStructuredData(scenario: Scenario) {
-  const baseUrl = 'https://payetax.co.uk';
+  const baseUrl = SITE_URL;
 
   // FAQ Schema
   const faqSchema = {

@@ -9,8 +9,11 @@
 
 import type { Metadata, Viewport } from 'next';
 
-// Base domain for absolute URLs
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
+// Base domain for absolute URLs - exported for use in structured data
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
+
+// Logo URL for structured data
+export const LOGO_URL = `${SITE_URL}/logo.png`;
 
 // Default metadata values
 const DEFAULT_TITLE = 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay';

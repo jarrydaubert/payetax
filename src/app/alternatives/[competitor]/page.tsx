@@ -1,6 +1,7 @@
 // src/app/alternatives/[competitor]/page.tsx
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
 import { AlternativePageContent } from './AlternativePageContent';
 
@@ -63,5 +64,34 @@ export default async function AlternativePage({ params }: PageProps) {
     notFound();
   }
 
-  return <AlternativePageContent competitor={competitor} />;
+  const title = `${competitor.name} Alternative | PayeTax UK Tax Calculator`;
+  const description = `Looking for an alternative to ${competitor.name}? Compare with PayeTax - modern, ad-free, and privacy-first UK tax calculator with What-If scenarios.`;
+
+  return (
+    <>
+      <StructuredData
+        type='article'
+        articleData={{
+          title,
+          description,
+          url: `https://payetax.co.uk/alternatives/${slug}`,
+          imageUrl: 'https://payetax.co.uk/images/og-image.png',
+          publishDate: '2025-01-01T00:00:00Z',
+          authorName: 'PayeTax',
+        }}
+      />
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: 'https://payetax.co.uk' },
+          { name: 'Alternatives', url: 'https://payetax.co.uk/alternatives' },
+          {
+            name: `${competitor.name} Alternative`,
+            url: `https://payetax.co.uk/alternatives/${slug}`,
+          },
+        ]}
+      />
+      <AlternativePageContent competitor={competitor} />
+    </>
+  );
 }

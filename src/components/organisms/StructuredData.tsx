@@ -11,6 +11,17 @@
  */
 
 import type React from 'react';
+import { TAX_RATES } from '@/constants/taxRates';
+import { LOGO_URL, SITE_URL } from '@/lib/metadata';
+
+/**
+ * Format a number as GBP currency string for schema data
+ * @param amount - The amount to format
+ * @returns Formatted currency string (e.g., "£12,570")
+ */
+function formatCurrency(amount: number): string {
+  return `£${amount.toLocaleString('en-GB')}`;
+}
 
 // Define typed interfaces for each schema type
 interface OrganizationSchema {
@@ -110,6 +121,10 @@ interface ArticleSchema {
     '@type': 'WebPage';
     '@id': string;
   };
+  articleBody?: string;
+  wordCount?: number;
+  inLanguage?: string;
+  articleSection?: string;
 }
 
 interface FinancialServiceSchema {
@@ -280,6 +295,41 @@ interface DatasetSchema {
   };
 }
 
+/**
+ * Salary Calculation schema - custom schema for programmatic salary pages
+ * Uses MonetaryAmount and FinancialProduct patterns from schema.org
+ */
+interface SalaryCalculationSchema {
+  '@context': 'https://schema.org';
+  '@type': 'WebPage';
+  name: string;
+  description: string;
+  url: string;
+  mainEntity: {
+    '@type': 'FinancialProduct';
+    name: string;
+    description: string;
+    provider: {
+      '@type': 'Organization';
+      name: string;
+      url: string;
+    };
+    areaServed: string;
+  };
+  about: {
+    '@type': 'MonetaryAmount';
+    currency: string;
+    value: number;
+    name: string;
+  };
+  mentions: Array<{
+    '@type': 'MonetaryAmount';
+    currency: string;
+    value: number;
+    name: string;
+  }>;
+}
+
 // Union type for all schema types
 export type SchemaType =
   | OrganizationSchema
@@ -293,17 +343,18 @@ export type SchemaType =
   | PersonSchema
   | ReviewSchema
   | ServiceSchema
-  | DatasetSchema;
+  | DatasetSchema
+  | SalaryCalculationSchema;
 
 // Base organization details
 const ORG_DATA: OrganizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'PayeTax',
-  url: 'https://payetax.co.uk',
+  url: SITE_URL,
   logo: {
     '@type': 'ImageObject',
-    url: 'https://payetax.co.uk/logo.png',
+    url: LOGO_URL,
     width: 192,
     height: 192,
   },
@@ -321,7 +372,7 @@ const WEBSITE_DATA: WebsiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'PayeTax',
-  url: 'https://payetax.co.uk',
+  url: SITE_URL,
   description:
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
   // Note: SearchAction removed - /search route not implemented
@@ -353,7 +404,7 @@ const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
   provider: {
     '@type': 'Organization',
     name: 'PayeTax',
-    url: 'https://payetax.co.uk',
+    url: SITE_URL,
   },
   serviceType: 'Tax Calculation Service',
   areaServed: ['United Kingdom', 'England', 'Scotland', 'Wales', 'Northern Ireland'],
@@ -442,91 +493,106 @@ const HOW_TO_DATA: HowToSchema = {
   ],
 };
 
-// Dataset schema for UK tax rates data
-const DATASET_DATA: DatasetSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Dataset',
-  name: 'UK Tax Rates Dataset 2025-26',
-  description:
-    'Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the 2025-26 tax year',
-  url: 'https://payetax.co.uk',
-  datePublished: '2025-01-01',
-  dateModified: '2025-10-03',
-  license: 'https://creativecommons.org/publicdomain/zero/1.0/',
-  creator: {
-    '@type': 'Organization',
-    name: 'PayeTax',
-    url: 'https://payetax.co.uk',
-  },
-  keywords: [
-    'UK tax rates 2025',
-    'PAYE calculator',
-    'National Insurance rates',
-    'HMRC tax bands',
-    'income tax calculator',
-    'salary calculator UK',
-  ],
-  includedInDataCatalog: {
-    '@type': 'DataCatalog',
-    name: 'PayeTax Tax Data',
-    description: 'UK tax calculation data and examples',
-  },
-  variableMeasured: [
-    {
-      '@type': 'PropertyValue',
-      name: 'Personal Allowance',
-      value: '£12,570',
-      description: 'Tax-free income threshold for 2025-26',
+/**
+ * Generate Dataset schema with dynamic tax values from TAX_RATES
+ * This ensures all tax values come from the single source of truth
+ */
+function generateDatasetData(): DatasetSchema {
+  const rates = TAX_RATES['2025-2026'];
+  const niRates = rates.nationalInsurance.employee.A;
+  const basicBand = rates.bands[0];
+  const higherBand = rates.bands[1];
+  const additionalBand = rates.bands[2];
+
+  // Calculate thresholds for descriptions
+  const basicRateMax = rates.personalAllowance + (basicBand?.threshold ?? 0);
+  const higherRateMax = rates.personalAllowance + (higherBand?.threshold ?? 0);
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'UK Tax Rates Dataset 2025-26',
+    description:
+      'Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the 2025-26 tax year',
+    url: SITE_URL,
+    datePublished: '2025-01-01',
+    dateModified: '2025-10-03',
+    license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    creator: {
+      '@type': 'Organization',
+      name: 'PayeTax',
+      url: SITE_URL,
     },
-    {
-      '@type': 'PropertyValue',
-      name: 'Basic Rate Tax',
-      value: '20%',
-      description: 'Tax on income between £12,571 and £50,270',
+    keywords: [
+      'UK tax rates 2025',
+      'PAYE calculator',
+      'National Insurance rates',
+      'HMRC tax bands',
+      'income tax calculator',
+      'salary calculator UK',
+    ],
+    includedInDataCatalog: {
+      '@type': 'DataCatalog',
+      name: 'PayeTax Tax Data',
+      description: 'UK tax calculation data and examples',
     },
-    {
-      '@type': 'PropertyValue',
-      name: 'Higher Rate Tax',
-      value: '40%',
-      description: 'Tax on income between £50,271 and £125,140',
+    variableMeasured: [
+      {
+        '@type': 'PropertyValue',
+        name: 'Personal Allowance',
+        value: formatCurrency(rates.personalAllowance),
+        description: 'Tax-free income threshold for 2025-26',
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Basic Rate Tax',
+        value: `${basicBand?.rate ?? 20}%`,
+        description: `Tax on income between ${formatCurrency(rates.personalAllowance + 1)} and ${formatCurrency(basicRateMax)}`,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Higher Rate Tax',
+        value: `${higherBand?.rate ?? 40}%`,
+        description: `Tax on income between ${formatCurrency(basicRateMax + 1)} and ${formatCurrency(higherRateMax)}`,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Additional Rate Tax',
+        value: `${additionalBand?.rate ?? 45}%`,
+        description: `Tax on income above ${formatCurrency(higherRateMax)}`,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'National Insurance (Standard)',
+        value: `${niRates.primary.rate}%`,
+        description: `NI on income between ${formatCurrency(niRates.primary.threshold + 1)} and ${formatCurrency(niRates.upper.threshold)}`,
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'National Insurance (Higher)',
+        value: `${niRates.upper.rate}%`,
+        description: `NI on income above ${formatCurrency(niRates.upper.threshold)}`,
+      },
+    ],
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        contentUrl: `${SITE_URL}/api/tax-rates`,
+        description: 'Tax rates and calculation data in JSON format',
+      },
+    ],
+    temporalCoverage: '2025-04-06/2026-04-05',
+    spatialCoverage: {
+      '@type': 'Place',
+      name: 'United Kingdom',
+      geo: {
+        '@type': 'GeoShape',
+        addressCountry: 'GB',
+      },
     },
-    {
-      '@type': 'PropertyValue',
-      name: 'Additional Rate Tax',
-      value: '45%',
-      description: 'Tax on income above £125,140',
-    },
-    {
-      '@type': 'PropertyValue',
-      name: 'National Insurance (Standard)',
-      value: '12%',
-      description: 'NI on income between £12,571 and £50,270',
-    },
-    {
-      '@type': 'PropertyValue',
-      name: 'National Insurance (Higher)',
-      value: '2%',
-      description: 'NI on income above £50,270',
-    },
-  ],
-  distribution: [
-    {
-      '@type': 'DataDownload',
-      encodingFormat: 'application/json',
-      contentUrl: 'https://payetax.co.uk/api/tax-rates',
-      description: 'Tax rates and calculation data in JSON format',
-    },
-  ],
-  temporalCoverage: '2025-04-06/2026-04-05',
-  spatialCoverage: {
-    '@type': 'Place',
-    name: 'United Kingdom',
-    geo: {
-      '@type': 'GeoShape',
-      addressCountry: 'GB',
-    },
-  },
-};
+  };
+}
 
 /**
  * Interface for FAQ item structure
@@ -553,7 +619,8 @@ export interface StructuredDataProps {
     | 'person'
     | 'review'
     | 'service'
-    | 'dataset';
+    | 'dataset'
+    | 'salarycalculation';
   /** Optional custom schema data that overrides defaults */
   data?: SchemaType;
   /** Breadcrumb data for breadcrumb schema */
@@ -576,6 +643,12 @@ export interface StructuredDataProps {
     modifiedDate?: string;
     /** Name of the article's author */
     authorName?: string;
+    /** Full article body text (for SEO) */
+    articleBody?: string;
+    /** Word count of the article */
+    wordCount?: number;
+    /** Article section/category */
+    articleSection?: string;
   };
   /** Expert person data */
   expert?: {
@@ -603,6 +676,14 @@ export interface StructuredDataProps {
     serviceType: string;
     areaServed: string[];
   };
+  /** Salary calculation data for programmatic salary pages */
+  salaryData?: {
+    salary: number;
+    netPay: number;
+    incomeTax: number;
+    nationalInsurance: number;
+    url: string;
+  };
 }
 
 /**
@@ -624,6 +705,7 @@ export function StructuredData({
   expert,
   review,
   service,
+  salaryData,
 }: StructuredDataProps): React.ReactNode {
   // Determine the data to include based on the type
   let schemaData: SchemaType | null = null;
@@ -695,13 +777,17 @@ export function StructuredData({
           name: 'PayeTax',
           logo: {
             '@type': 'ImageObject',
-            url: 'https://payetax.co.uk/logo.png',
+            url: LOGO_URL,
           },
         },
         mainEntityOfPage: {
           '@type': 'WebPage',
           '@id': articleData.url,
         },
+        inLanguage: 'en-GB',
+        ...(articleData.articleBody && { articleBody: articleData.articleBody }),
+        ...(articleData.wordCount && { wordCount: articleData.wordCount }),
+        ...(articleData.articleSection && { articleSection: articleData.articleSection }),
       } as ArticleSchema;
       break;
     }
@@ -783,7 +869,7 @@ export function StructuredData({
         provider: {
           '@type': 'Organization',
           name: 'PayeTax',
-          url: 'https://payetax.co.uk',
+          url: SITE_URL,
         },
         serviceType: service.serviceType,
         areaServed: service.areaServed,
@@ -792,8 +878,60 @@ export function StructuredData({
     }
 
     case 'dataset':
-      schemaData = (data as DatasetSchema) || DATASET_DATA;
+      schemaData = (data as DatasetSchema) || generateDatasetData();
       break;
+
+    case 'salarycalculation': {
+      if (!salaryData) return null;
+
+      const formattedSalary = salaryData.salary.toLocaleString('en-GB');
+
+      schemaData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: `£${formattedSalary} After Tax UK 2025-26`,
+        description: `Calculate take-home pay from a £${formattedSalary} salary in the UK. Income tax: £${salaryData.incomeTax.toLocaleString('en-GB')}, NI: £${salaryData.nationalInsurance.toLocaleString('en-GB')}, Net pay: £${salaryData.netPay.toLocaleString('en-GB')} per year.`,
+        url: salaryData.url,
+        mainEntity: {
+          '@type': 'FinancialProduct',
+          name: 'UK PAYE Tax Calculator',
+          description: `Tax calculation for £${formattedSalary} annual salary`,
+          provider: {
+            '@type': 'Organization',
+            name: 'PayeTax',
+            url: SITE_URL,
+          },
+          areaServed: 'United Kingdom',
+        },
+        about: {
+          '@type': 'MonetaryAmount',
+          currency: 'GBP',
+          value: salaryData.salary,
+          name: 'Gross Annual Salary',
+        },
+        mentions: [
+          {
+            '@type': 'MonetaryAmount',
+            currency: 'GBP',
+            value: salaryData.netPay,
+            name: 'Annual Take-Home Pay',
+          },
+          {
+            '@type': 'MonetaryAmount',
+            currency: 'GBP',
+            value: salaryData.incomeTax,
+            name: 'Annual Income Tax',
+          },
+          {
+            '@type': 'MonetaryAmount',
+            currency: 'GBP',
+            value: salaryData.nationalInsurance,
+            name: 'Annual National Insurance',
+          },
+        ],
+      } as SalaryCalculationSchema;
+      break;
+    }
 
     default:
       return null;
