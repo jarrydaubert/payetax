@@ -44,9 +44,3 @@ export const inter = Inter({
   ],
   weight: ['300', '400', '500', '600', '700'],
 });
-
-/**
- * Legacy Roboto Flex export for backwards compatibility
- * @deprecated Use `inter` instead
- */
-export const robotoFlex = inter;

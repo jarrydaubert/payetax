@@ -58,7 +58,7 @@ export const BLOG_BRAND = {
   author: 'TaxInsights Editorial Team',
   publisher: 'PayeTax',
   url: 'https://payetax.co.uk/blog',
-  logo: '/images/blog/taxinsights-logo.svg',
+  logo: '/logo.png',
   socialImage: '/images/blog/taxinsights-og.jpg',
 };
 
@@ -169,7 +169,7 @@ export const BLOG_IMAGES_DIR = '/images/blog';
 export const DEFAULT_BLOG_METADATA = {
   author: 'TaxInsights Editorial Team',
   readTime: '5 min read',
-  image: '/images/blog/default-blog-image.jpg',
+  image: '/images/blog/placeholder.jpg',
   imageAlt: 'TaxInsights by PayeTax',
 };
 
