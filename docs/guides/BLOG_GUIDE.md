@@ -328,15 +328,54 @@ Already implemented in blog template:
 **Timing:** Next business day after blog publish (different audience cycle)
 
 ### Email Newsletter Integration
-**Frequency:** Weekly roundup (Fridays)
 
-**Format:**
-- One featured article
-- "Also this week" - secondary post
-- Calculator tip of the week
-- Tax deadline reminder (if applicable)
+We use **Resend** for newsletter emails. Subscribers sign up via the footer form and are added to a Resend Audience.
 
-**CTA:** Always links back to blog + calculator
+#### When You Publish a New Post
+
+Run the broadcast script to notify all subscribers:
+
+```bash
+# Preview first (no emails sent)
+bun run notify-subscribers --post="your-post-slug" --dry-run
+
+# Send for real
+bun run notify-subscribers --post="your-post-slug"
+```
+
+The script:
+- Fetches the post from `content/blog/{slug}.mdx`
+- Gets all subscribers from Resend Audience
+- Sends branded email with title, excerpt, and CTA
+- Tracks announced posts to prevent duplicates (`.announced-posts.json`)
+- Has 5-second countdown before sending (Ctrl+C to cancel)
+
+#### Email Templates
+
+Located in `/emails/`:
+- `welcome.tsx` - Sent automatically when someone subscribes
+- `new-blog-post.tsx` - Used by the broadcast script
+
+Both match the calculator results email style (light theme, gradient CTA).
+
+#### Subscriber Management
+
+**Resend Dashboard:** https://resend.com/audiences
+
+**API endpoints:**
+- `POST /api/newsletter/subscribe` - Add subscriber (sends welcome email + admin notification)
+- `GET /api/newsletter/unsubscribe?email=...` - Remove subscriber (shows confirmation page)
+
+**Admin notifications:** support@payetax.co.uk receives email when someone subscribes.
+
+#### Environment Variables
+
+```
+RESEND_API_KEY=re_...
+RESEND_AUDIENCE_ID=7ada0d6a-4440-4676-a361-b78e268f1538
+```
+
+Both configured in Vercel for all environments.
 
 ### Reddit/Forums Policy
 **Where:** r/UKPersonalFinance, r/TaxUK
@@ -518,6 +557,7 @@ New blog post? Follow this flow:
 - [ ] Add disclaimer & date stamp
 - [ ] Preview on mobile (50%+ traffic)
 - [ ] Publish & distribute (X, LinkedIn within 1h)
+- [ ] Notify subscribers: `bun run notify-subscribers --post="slug"`
 - [ ] Monitor performance (Search Console, Analytics)
 - [ ] Quarterly review & update
 
@@ -585,6 +625,6 @@ New blog post? Follow this flow:
 
 ---
 
-*Last updated: October 2025*
+*Last updated: January 2026*
 *Document owner: PayeTax Content Team*
 *Review cycle: Quarterly*
