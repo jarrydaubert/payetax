@@ -75,7 +75,7 @@ Use these clear, accurate terms:
 - "PAYE deduction" not "tax taken"
 - "Personal Allowance" not "tax-free amount" (unless explaining)
 - "Effective tax rate" not "real tax rate"
-- "Net pay" not "take-home"
+- "Take-home pay" or "net pay" (both acceptable; "take-home" is more user-friendly and matches search intent)
 
 ### Humor Policy
 **When to use:** Breaking up dense explanations, acknowledging absurdity
@@ -326,6 +326,35 @@ Already implemented in blog template:
 **Tone:** More formal than X, aimed at professionals/accountants
 
 **Timing:** Next business day after blog publish (different audience cycle)
+
+### TikTok/Reels Strategy
+**Format:** Short-form video (15-60 seconds)
+**Audience:** Younger workers, first-job employees, graduates
+
+**Script Template:**
+```
+Hook (0-3s): "Here's what £40k actually looks like after tax"
+
+Visual (3-20s):
+[Show calculator or graphics]
+"Gross salary: forty thousand"
+"Income tax takes five thousand four hundred"
+"National Insurance: two thousand"
+"You actually get: thirty-two thousand three hundred"
+"That's two thousand six hundred a month"
+
+CTA (20-25s): "Link in bio to calculate yours"
+
+Caption: £40,000 after tax UK 2025 #uktax #salary #moneytok
+```
+
+**Content Ideas:**
+- Salary breakdowns at common milestones (£25k, £30k, £40k, £50k)
+- "Scotland vs England: same salary, different take-home"
+- The £100k tax trap explained visually
+- "What your payslip actually means"
+
+**Timing:** 2-3 posts per week, evenings/weekends for higher engagement
 
 ### Email Newsletter Integration
 
@@ -586,6 +615,41 @@ New blog post? Follow this flow:
 
 **Using unnecessary jargon:**
 > "Your cumulative PAYE liability vis-à-vis your PSA..." (What does this mean to a normal person?)
+
+---
+
+## 🎣 Hook Formulas
+
+### Blog Headlines
+- "How Much Tax Do You Pay on £[X]? [Year] Calculator"
+- "£[X] After Tax UK: Your Complete [Year] Breakdown"
+- "The £100k Tax Trap: Why Your Raise Could Cost You"
+- "[Topic]: The Complete [Year] Guide"
+- "What [Event] Means for Your Take-Home Pay"
+
+### Social Media Hooks
+- "Most people don't realise..."
+- "Here's what £[X] actually looks like..."
+- "The tax mistake costing you £[X] per year"
+- "Scotland vs England: Same salary, different take-home"
+- "If you earn £[X], you need to know this..."
+
+### Engagement Drivers
+- **Regional comparisons:** Scotland vs England, Welsh rates
+- **"What would you do?" scenarios:** The £100k raise dilemma
+- **Surprising calculations:** Hidden effective rates, NI thresholds
+- **Common misconceptions:** "I pay 40% tax on everything"
+- **Deadline urgency:** Tax year end, self-assessment
+
+### Opening Line Formulas
+Use these to hook readers in the first paragraph:
+
+| Formula | Example |
+|---------|---------|
+| Number reveal | "On a £45,000 salary, you'll pay £6,486 in income tax. Here's exactly how that breaks down." |
+| Myth bust | "Think you're in the 40% tax bracket? You're probably only paying 40% on a fraction of your income." |
+| Direct question | "What does your tax code actually mean? That five-digit code on your payslip controls your entire take-home pay." |
+| Pain point | "Earning between £100k-£125k? You're paying a hidden 60% tax rate—here's why." |
 
 ---
 

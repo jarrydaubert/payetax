@@ -4,13 +4,16 @@ import { usePathname } from 'next/navigation';
 import SimpleNavbar from '../SimpleNavbar';
 
 // Mock Next.js navigation
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
+  useRouter: jest.fn(() => ({ push: mockPush })),
 }));
 
 describe('SimpleNavbar Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPush.mockClear();
     (usePathname as jest.Mock).mockReturnValue('/');
   });
 
