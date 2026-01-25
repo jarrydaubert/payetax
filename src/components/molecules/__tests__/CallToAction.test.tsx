@@ -37,15 +37,17 @@ describe('CallToAction Component', () => {
 
       expect(screen.getByText('Stay Updated')).toBeInTheDocument();
       expect(screen.getByText(/Get the latest UK tax insights/i)).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /Subscribe to Updates/i })).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Enter your email/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Subscribe/i })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Try Tax Calculator/i })).toBeInTheDocument();
     });
 
-    it('should have correct subscription href', () => {
+    it('should have email input field', () => {
       render(<CallToAction variant='newsletter' />);
 
-      const subscribeLink = screen.getByRole('link', { name: /Subscribe to Updates/i });
-      expect(subscribeLink).toHaveAttribute('href', expect.stringContaining('mailto:'));
+      const emailInput = screen.getByPlaceholderText(/Enter your email/i);
+      expect(emailInput).toHaveAttribute('type', 'email');
+      expect(emailInput).toBeRequired();
     });
   });
 

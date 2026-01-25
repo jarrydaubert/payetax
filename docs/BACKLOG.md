@@ -2,7 +2,25 @@
 
 ## Setup Required
 
-- [ ] **Newsletter:** Create Resend Audience (https://resend.com/audiences) and add `RESEND_AUDIENCE_ID` to Vercel
+### Newsletter (Blog Post Notifications)
+
+Subscribers get notified when new blog posts are published. See `docs/ideas/NEWSLETTER_RESEND.md` for full details.
+
+**Phase 1: Enable Subscriptions**
+- [ ] Create Resend Audience at https://resend.com/audiences
+- [ ] Add `RESEND_AUDIENCE_ID` to Vercel env vars (all environments)
+- [ ] Test subscription flow end-to-end
+
+**Phase 2: Email Templates**
+- [ ] Install `@react-email/components`
+- [ ] Create `emails/new-blog-post.tsx` template
+- [ ] Add unsubscribe link handling
+
+**Phase 3: Broadcast Functionality**
+- [ ] Create `scripts/notify-subscribers.ts` CLI script
+- [ ] Track announced posts (prevent duplicate sends)
+- [ ] Add `bun run notify-subscribers --post="slug"` command
+- [ ] Document in BLOG_GUIDE.md
 
 ## Monetization Setup
 

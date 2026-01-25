@@ -1,10 +1,12 @@
 // src/components/ui/CallToAction.tsx
 'use client';
 
-import { Calculator, Coffee, Mail, MessageSquare } from 'lucide-react';
+import { Calculator, CheckCircle, Coffee, Loader2, Mail, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +19,40 @@ export default function CallToAction({
   variant = 'contact',
   className = '',
 }: CallToActionProps): React.JSX.Element {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus('error');
+        setErrorMessage(data.error || 'Failed to subscribe');
+        return;
+      }
+
+      setStatus('success');
+      setEmail('');
+    } catch {
+      setStatus('error');
+      setErrorMessage('Something went wrong. Please try again.');
+    }
+  };
+
   const variants = {
     contact: {
       icon: MessageSquare,
@@ -39,8 +75,8 @@ export default function CallToAction({
       description:
         'Get the latest UK tax insights, updates, and practical tips. No spam, just valuable content.',
       primaryAction: {
-        href: 'mailto:support@payetax.co.uk?subject=Newsletter Subscription' as const,
-        text: 'Subscribe to Updates',
+        href: '/' as const,
+        text: 'Subscribe',
         icon: Mail,
       },
       secondaryAction: {
@@ -90,41 +126,88 @@ export default function CallToAction({
         {config.description}
       </p>
 
-      <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
-        <Button
-          asChild
-          size='lg'
-          className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
-        >
-          {config.primaryAction.href.startsWith('http') ||
-          config.primaryAction.href.startsWith('mailto:') ? (
-            <a href={config.primaryAction.href}>
-              <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-              {config.primaryAction.text}
-            </a>
+      {variant === 'newsletter' ? (
+        <div className='mx-auto max-w-md'>
+          {status === 'success' ? (
+            <div className='flex items-center justify-center gap-2 text-emerald-500'>
+              <CheckCircle className={ICON_SIZES.SIZE_5} />
+              <span>Thanks for subscribing!</span>
+            </div>
           ) : (
-            <Link href={config.primaryAction.href}>
-              <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-              {config.primaryAction.text}
-            </Link>
+            <form onSubmit={handleNewsletterSubmit} className='flex flex-col gap-3 sm:flex-row'>
+              <Input
+                type='email'
+                placeholder='Enter your email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className='flex-1'
+                disabled={status === 'loading'}
+              />
+              <Button
+                type='submit'
+                size='lg'
+                disabled={status === 'loading'}
+                className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
+              >
+                {status === 'loading' ? (
+                  <Loader2 className={cn('animate-spin', ICON_SIZES.SIZE_4)} />
+                ) : (
+                  <>
+                    <Mail className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+                    Subscribe
+                  </>
+                )}
+              </Button>
+            </form>
           )}
-        </Button>
+          {status === 'error' && <p className='mt-2 text-red-500 text-sm'>{errorMessage}</p>}
+          <div className='mt-6'>
+            <Button asChild variant='outline' size='lg'>
+              <Link href='/'>
+                <Calculator className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+                Try Tax Calculator
+              </Link>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
+          <Button
+            asChild
+            size='lg'
+            className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
+          >
+            {config.primaryAction.href.startsWith('http') ||
+            config.primaryAction.href.startsWith('mailto:') ? (
+              <a href={config.primaryAction.href}>
+                <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+                {config.primaryAction.text}
+              </a>
+            ) : (
+              <Link href={config.primaryAction.href}>
+                <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+                {config.primaryAction.text}
+              </Link>
+            )}
+          </Button>
 
-        <Button asChild variant='outline' size='lg'>
-          {config.secondaryAction.href.startsWith('http') ||
-          config.secondaryAction.href.startsWith('mailto:') ? (
-            <a href={config.secondaryAction.href}>
-              <SecondaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-              {config.secondaryAction.text}
-            </a>
-          ) : (
-            <Link href={config.secondaryAction.href}>
-              <SecondaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
-              {config.secondaryAction.text}
-            </Link>
-          )}
-        </Button>
-      </div>
+          <Button asChild variant='outline' size='lg'>
+            {config.secondaryAction.href.startsWith('http') ||
+            config.secondaryAction.href.startsWith('mailto:') ? (
+              <a href={config.secondaryAction.href}>
+                <SecondaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+                {config.secondaryAction.text}
+              </a>
+            ) : (
+              <Link href={config.secondaryAction.href}>
+                <SecondaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+                {config.secondaryAction.text}
+              </Link>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
