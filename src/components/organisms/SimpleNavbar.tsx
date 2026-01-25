@@ -45,12 +45,35 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   };
 
   const waitForElementAndScroll = () => {
-    // Try immediately, then retry with increasing delays
+    // Try immediately first
     if (scrollToCalculator()) return;
 
-    for (const delay of [100, 200, 400, 800]) {
-      setTimeout(scrollToCalculator, delay);
-    }
+    // Wait for navigation to complete
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        // Check again after navigation
+        if (scrollToCalculator()) return;
+
+        // Scroll down to trigger DeferredContent's IntersectionObserver
+        // (DeferredContent has timeout=0, so it only renders when scrolled into view)
+        window.scrollTo({ top: window.innerHeight, behavior: 'instant' });
+
+        // Watch for calculator to be added to DOM
+        const observer = new MutationObserver((_mutations, obs) => {
+          if (scrollToCalculator()) {
+            obs.disconnect();
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        // Safety timeout to prevent infinite observation
+        setTimeout(() => observer.disconnect(), 5000);
+      }, 100);
+    });
   };
 
   const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -58,7 +81,10 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
     setIsMobileMenuOpen(false);
 
     if (pathname === '/') {
-      scrollToCalculator();
+      // Try to scroll; if calculator hasn't rendered yet, trigger lazy loading
+      if (!scrollToCalculator()) {
+        waitForElementAndScroll();
+      }
     } else {
       router.push('/');
       waitForElementAndScroll();
