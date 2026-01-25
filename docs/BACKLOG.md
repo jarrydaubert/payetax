@@ -12,9 +12,9 @@ Subscribers get notified when new blog posts are published. See `docs/ideas/NEWS
 - [ ] Test subscription flow end-to-end
 
 **Phase 2: Email Templates**
-- [ ] Install `@react-email/components`
-- [ ] Create `emails/new-blog-post.tsx` template
-- [ ] Add unsubscribe link handling
+- [x] Install `@react-email/components`
+- [x] Create `emails/new-blog-post.tsx` template
+- [x] Add unsubscribe link handling (uses `{{{RESEND_UNSUBSCRIBE_URL}}}`)
 
 **Phase 3: Broadcast Functionality**
 - [ ] Create `scripts/notify-subscribers.ts` CLI script
