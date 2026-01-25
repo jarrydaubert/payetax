@@ -165,6 +165,7 @@ async function sendEmails(
           url: postUrl,
           category: post.category,
           publishedAt: post.publishedAt,
+          recipientEmail: contact.email,
         });
 
         const { error } = await resend.emails.send({

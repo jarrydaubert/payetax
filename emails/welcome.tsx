@@ -1,7 +1,8 @@
 // emails/welcome.tsx
 // Welcome email sent to new newsletter subscribers
 
-export function generateWelcomeEmailHtml(unsubscribeUrl = '{{{RESEND_UNSUBSCRIBE_URL}}}'): string {
+export function generateWelcomeEmailHtml(email: string): string {
+  const unsubscribeUrl = `https://payetax.co.uk/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
   return `
 <!DOCTYPE html>
 <html>

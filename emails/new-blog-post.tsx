@@ -7,7 +7,7 @@ interface NewBlogPostEmailProps {
   url: string;
   category?: string;
   publishedAt?: string;
-  unsubscribeUrl?: string;
+  recipientEmail: string;
 }
 
 export function generateNewBlogPostHtml({
@@ -16,8 +16,9 @@ export function generateNewBlogPostHtml({
   url = 'https://payetax.co.uk/blog/example-post',
   category = 'Tax Tips',
   publishedAt,
-  unsubscribeUrl = '{{{RESEND_UNSUBSCRIBE_URL}}}',
+  recipientEmail,
 }: NewBlogPostEmailProps): string {
+  const unsubscribeUrl = `https://payetax.co.uk/api/newsletter/unsubscribe?email=${encodeURIComponent(recipientEmail)}`;
   const formattedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString('en-GB', {
         day: 'numeric',

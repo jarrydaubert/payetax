@@ -75,10 +75,22 @@ export async function POST(request: NextRequest) {
         from: 'PayeTax <noreply@payetax.co.uk>',
         to: email,
         subject: 'Welcome to PayeTax!',
-        html: generateWelcomeEmailHtml(),
+        html: generateWelcomeEmailHtml(email),
       })
       .catch((err) => {
         console.error('[newsletter/subscribe] Failed to send welcome email:', err);
+      });
+
+    // Notify admin of new subscriber
+    resend.emails
+      .send({
+        from: 'PayeTax <noreply@payetax.co.uk>',
+        to: 'support@payetax.co.uk',
+        subject: `New subscriber: ${email}`,
+        html: `<p>New newsletter subscriber: <strong>${email}</strong></p><p>Time: ${new Date().toISOString()}</p>`,
+      })
+      .catch((err) => {
+        console.error('[newsletter/subscribe] Failed to send admin notification:', err);
       });
 
     return NextResponse.json({
