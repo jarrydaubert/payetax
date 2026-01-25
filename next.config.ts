@@ -182,10 +182,10 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            // Note: 'unsafe-inline' still needed for inline scripts/styles, but 'unsafe-eval' removed for security
+            // Note: 'unsafe-eval' only in dev for React source maps, removed in production for security
             value:
               process.env.NODE_ENV === 'development'
-                ? "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';"
+                ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';"
                 : "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';",
           },
         ],

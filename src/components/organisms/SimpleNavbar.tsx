@@ -128,6 +128,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => setIsMobileMenuOpen(false)}
+        utilities={<FeedbackDialog />}
       />
 
       {/* Spacer for fixed navbar */}

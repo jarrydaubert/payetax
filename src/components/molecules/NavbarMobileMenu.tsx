@@ -4,7 +4,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { LAYOUT } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,8 @@ interface NavbarMobileMenuProps {
   pathname: string;
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
+  /** Optional utility components (e.g., FeedbackDialog) */
+  utilities?: ReactNode;
 }
 
 /**
@@ -34,6 +36,7 @@ export function NavbarMobileMenu({
   pathname,
   onLinkClick,
   onBackdropClick,
+  utilities,
 }: NavbarMobileMenuProps) {
   const menuRef = useRef<HTMLElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
@@ -142,6 +145,9 @@ export function NavbarMobileMenu({
               >
                 Open Calculator
               </Link>
+
+              {/* Utilities (e.g., FeedbackDialog) */}
+              {utilities && <div className='mt-4'>{utilities}</div>}
             </div>
           </motion.nav>
         )}
