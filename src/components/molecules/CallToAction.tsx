@@ -163,7 +163,12 @@ export default function CallToAction({
           )}
           {status === 'error' && <p className='mt-2 text-red-500 text-sm'>{errorMessage}</p>}
           <div className='mt-6'>
-            <Button asChild variant='outline' size='lg'>
+            <Button
+              asChild
+              variant='outline'
+              size='lg'
+              className='border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white'
+            >
               <Link href='/'>
                 <Calculator className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
                 Try Tax Calculator

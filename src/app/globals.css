@@ -581,6 +581,8 @@
   html {
     overflow-x: hidden;
     max-width: 100vw;
+    /* Smooth scrolling for anchor links */
+    scroll-behavior: smooth;
     /* Smooth color-scheme transition for dark mode toggle (2025 enhancement) */
     transition: color-scheme 0.2s ease;
     /* Safe area support for notched devices (iPhone X+, iPad Pro) */
