@@ -161,7 +161,7 @@ export function ScenarioCalculator({
             onChange={setPensionPercent}
             suffix='%'
             clearOnFocus
-            decimals={0}
+            decimals={2}
           />
         </div>
 
