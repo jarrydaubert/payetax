@@ -14,6 +14,17 @@ const HomePageContent = memo(function HomePageContent() {
     init();
   }, [init]);
 
+  // Handle hash navigation from other pages (e.g., /blog -> /#tax-calculator)
+  useEffect(() => {
+    if (window.location.hash === '#tax-calculator') {
+      // Small delay to ensure DOM is ready after hydration
+      setTimeout(() => {
+        const element = document.getElementById('tax-calculator');
+        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, []);
+
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator
     <section id='tax-calculator' className='relative z-[1] bg-deep py-12 md:py-16 lg:py-20'>
