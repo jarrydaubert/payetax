@@ -7,8 +7,8 @@
 Subscribers get notified when new blog posts are published. See `docs/ideas/NEWSLETTER_RESEND.md` for full details.
 
 **Phase 1: Enable Subscriptions**
-- [ ] Create Resend Audience at https://resend.com/audiences
-- [ ] Add `RESEND_AUDIENCE_ID` to Vercel env vars (all environments)
+- [x] Create Resend Audience at https://resend.com/audiences (ID: 7ada0d6a-4440-4676-a361-b78e268f1538)
+- [x] Add `RESEND_AUDIENCE_ID` to Vercel env vars (all environments)
 - [ ] Test subscription flow end-to-end
 
 **Phase 2: Email Templates**
