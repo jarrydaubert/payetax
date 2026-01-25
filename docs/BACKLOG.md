@@ -2,7 +2,6 @@
 
 ## Setup Required
 
-- [ ] Verify Resend sender domain for `noreply@payetax.co.uk` (https://resend.com/domains)
 - [ ] **Newsletter:** Create Resend Audience (https://resend.com/audiences) and add `RESEND_AUDIENCE_ID` to Vercel
 
 ## Monetization Setup
