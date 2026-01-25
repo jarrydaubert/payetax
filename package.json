@@ -23,6 +23,7 @@
     "fix-all": "biome check --write . && bun run typecheck",
     "audit:tokens": "tsx scripts/audit-tokens.ts",
     "audit:tokens:fix": "tsx scripts/audit-tokens.ts --fix",
+    "notify-subscribers": "bun scripts/notify-subscribers.ts",
     "clean": "rm -rf .next coverage audit-outputs/playwright-report audit-outputs/test-results *.tsbuildinfo || true",
     "clean:reports": "rm -rf audit-outputs/playwright-report audit-outputs/test-results audit-outputs/coverage || true",
     "clean:cache": "rm -rf .next .swc node_modules/.cache || true",

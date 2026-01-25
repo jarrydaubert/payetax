@@ -17,9 +17,9 @@ Subscribers get notified when new blog posts are published. See `docs/ideas/NEWS
 - [x] Add unsubscribe link handling (uses `{{{RESEND_UNSUBSCRIBE_URL}}}`)
 
 **Phase 3: Broadcast Functionality**
-- [ ] Create `scripts/notify-subscribers.ts` CLI script
-- [ ] Track announced posts (prevent duplicate sends)
-- [ ] Add `bun run notify-subscribers --post="slug"` command
+- [x] Create `scripts/notify-subscribers.ts` CLI script
+- [x] Track announced posts (`.announced-posts.json`, gitignored)
+- [x] Add `bun run notify-subscribers --post="slug"` command
 - [ ] Document in BLOG_GUIDE.md
 
 ## Monetization Setup

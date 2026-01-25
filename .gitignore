@@ -78,3 +78,6 @@ security-audit-history.json
 tsconfig.tsbuildinfo
 playwright/.auth/
 .env*.local
+
+# Newsletter tracking
+.announced-posts.json
