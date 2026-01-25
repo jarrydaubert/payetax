@@ -18,37 +18,37 @@ describe('pensionOptimizer', () => {
         const result = calculateOptimalPension(110000);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(10000); // Need to drop £10k to reach £100k
-        expect(result!.allowanceLost).toBe(5000); // Lost £5k of allowance (£10k/2)
-        expect(result!.effectiveRate).toBe(60);
-        expect(result!.savingsFromOptimizing).toBe(6000); // 60% of £10k
-        expect(result!.shouldOptimize).toBe(true);
+        expect(result?.suggested).toBe(10000); // Need to drop £10k to reach £100k
+        expect(result?.allowanceLost).toBe(5000); // Lost £5k of allowance (£10k/2)
+        expect(result?.effectiveRate).toBe(60);
+        expect(result?.savingsFromOptimizing).toBe(6000); // 60% of £10k
+        expect(result?.shouldOptimize).toBe(true);
       });
 
       it('should calculate optimization for £105k salary', () => {
         const result = calculateOptimalPension(105000);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(5000);
-        expect(result!.allowanceLost).toBe(2500); // £5k excess / 2
-        expect(result!.savingsFromOptimizing).toBe(3000); // 60% of £5k
+        expect(result?.suggested).toBe(5000);
+        expect(result?.allowanceLost).toBe(2500); // £5k excess / 2
+        expect(result?.savingsFromOptimizing).toBe(3000); // 60% of £5k
       });
 
       it('should calculate optimization for £120k salary', () => {
         const result = calculateOptimalPension(120000);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(20000);
-        expect(result!.allowanceLost).toBe(10000); // £20k excess / 2
+        expect(result?.suggested).toBe(20000);
+        expect(result?.allowanceLost).toBe(10000); // £20k excess / 2
       });
 
       it('should calculate optimization for £125k salary (near full taper)', () => {
         const result = calculateOptimalPension(125000);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(25000);
+        expect(result?.suggested).toBe(25000);
         // Allowance lost capped at personal allowance (£12,570)
-        expect(result!.allowanceLost).toBe(12500); // £25k / 2, less than cap
+        expect(result?.allowanceLost).toBe(12500); // £25k / 2, less than cap
       });
 
       it('should cap allowance lost at personal allowance', () => {
@@ -56,7 +56,7 @@ describe('pensionOptimizer', () => {
         const result = calculateOptimalPension(125140);
 
         expect(result).not.toBeNull();
-        expect(result!.allowanceLost).toBe(12570); // Capped at full PA
+        expect(result?.allowanceLost).toBe(12570); // Capped at full PA
       });
     });
 
@@ -93,8 +93,8 @@ describe('pensionOptimizer', () => {
 
         expect(result).not.toBeNull();
         // Need additional £5k to reach £100k adjusted income
-        expect(result!.suggested).toBe(5000);
-        expect(result!.allowanceLost).toBe(2500); // Based on £105k adjusted
+        expect(result?.suggested).toBe(5000);
+        expect(result?.allowanceLost).toBe(2500); // Based on £105k adjusted
       });
 
       it('should return null if pension already drops below threshold', () => {
@@ -118,14 +118,14 @@ describe('pensionOptimizer', () => {
         const result = calculateOptimalPension(100500);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(1000); // Rounded up from £500
+        expect(result?.suggested).toBe(1000); // Rounded up from £500
       });
 
       it('should round up small excesses', () => {
         const result = calculateOptimalPension(100001);
 
         expect(result).not.toBeNull();
-        expect(result!.suggested).toBe(1000); // Rounded up from £1
+        expect(result?.suggested).toBe(1000); // Rounded up from £1
       });
     });
   });
@@ -135,10 +135,10 @@ describe('pensionOptimizer', () => {
       const result = compareWithOptimization(110000, 10000);
 
       expect(result).not.toBeNull();
-      expect(result!.currentTakeHome).toBeDefined();
-      expect(result!.optimizedTakeHome).toBeDefined();
-      expect(result!.difference).toBeDefined();
-      expect(typeof result!.worthIt).toBe('boolean');
+      expect(result?.currentTakeHome).toBeDefined();
+      expect(result?.optimizedTakeHome).toBeDefined();
+      expect(result?.difference).toBeDefined();
+      expect(typeof result?.worthIt).toBe('boolean');
     });
 
     it('should return null for salary below trap zone', () => {
@@ -171,7 +171,7 @@ describe('pensionOptimizer', () => {
       const result = calculateOptimalPension(110000, 0, '2025-2026');
 
       expect(result).not.toBeNull();
-      expect(result!.suggested).toBe(10000);
+      expect(result?.suggested).toBe(10000);
     });
 
     it('should work with 2024-2025 tax year', () => {
@@ -179,7 +179,7 @@ describe('pensionOptimizer', () => {
 
       expect(result).not.toBeNull();
       // Same thresholds for both years
-      expect(result!.suggested).toBe(10000);
+      expect(result?.suggested).toBe(10000);
     });
   });
 
@@ -189,7 +189,7 @@ describe('pensionOptimizer', () => {
 
       expect(result).not.toBeNull();
       // £10k contribution × 60% effective rate = £6k savings
-      expect(result!.savingsFromOptimizing).toBe(result!.suggested * 0.6);
+      expect(result?.savingsFromOptimizing).toBe(result?.suggested * 0.6);
     });
 
     it('should maintain 60% effective rate throughout trap zone', () => {
@@ -198,7 +198,7 @@ describe('pensionOptimizer', () => {
       for (const salary of salaries) {
         const result = calculateOptimalPension(salary);
         expect(result).not.toBeNull();
-        expect(result!.effectiveRate).toBe(60);
+        expect(result?.effectiveRate).toBe(60);
       }
     });
   });
@@ -208,14 +208,14 @@ describe('pensionOptimizer', () => {
       const result = calculateOptimalPension(100001);
 
       expect(result).not.toBeNull();
-      expect(result!.shouldOptimize).toBe(true);
+      expect(result?.shouldOptimize).toBe(true);
     });
 
     it('should handle £125,139 (just before full taper)', () => {
       const result = calculateOptimalPension(125139);
 
       expect(result).not.toBeNull();
-      expect(result!.shouldOptimize).toBe(true);
+      expect(result?.shouldOptimize).toBe(true);
     });
 
     it('should return null at exactly £125,140 (full taper point)', () => {

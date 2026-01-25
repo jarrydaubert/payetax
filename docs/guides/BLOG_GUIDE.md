@@ -327,35 +327,6 @@ Already implemented in blog template:
 
 **Timing:** Next business day after blog publish (different audience cycle)
 
-### TikTok/Reels Strategy
-**Format:** Short-form video (15-60 seconds)
-**Audience:** Younger workers, first-job employees, graduates
-
-**Script Template:**
-```
-Hook (0-3s): "Here's what £40k actually looks like after tax"
-
-Visual (3-20s):
-[Show calculator or graphics]
-"Gross salary: forty thousand"
-"Income tax takes five thousand four hundred"
-"National Insurance: two thousand"
-"You actually get: thirty-two thousand three hundred"
-"That's two thousand six hundred a month"
-
-CTA (20-25s): "Link in bio to calculate yours"
-
-Caption: £40,000 after tax UK 2025 #uktax #salary #moneytok
-```
-
-**Content Ideas:**
-- Salary breakdowns at common milestones (£25k, £30k, £40k, £50k)
-- "Scotland vs England: same salary, different take-home"
-- The £100k tax trap explained visually
-- "What your payslip actually means"
-
-**Timing:** 2-3 posts per week, evenings/weekends for higher engagement
-
 ### Email Newsletter Integration
 
 We use **Resend** for newsletter emails. Subscribers sign up via the footer form and are added to a Resend Audience.
