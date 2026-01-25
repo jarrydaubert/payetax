@@ -83,6 +83,37 @@ The free calculator stays free. But the money comes from solving expensive probl
 
 ---
 
+## Why Software Wins
+
+Not all AI business models are equal. Here's how they compare:
+
+| Model | Time Freedom | Recurring Revenue | Exit Potential | Future-Proof |
+|-------|--------------|-------------------|----------------|--------------|
+| AI Agency (AAA) | 2/10 | 4/10 | 1/10 | 3/10 |
+| Faceless Content | 6/10 | 2/10 | 2/10 | 3/10 |
+| Freelance AI Dev | 7/10 | 3/10 | 1/10 | 3/10 |
+| Day Trading Bots | 8/10 | 1/10 | 2/10 | 0/10 |
+| **Software (SaaS)** | **8/10** | **9/10** | **10/10** | **7/10** |
+
+**Why software wins:**
+- Build once, sell infinitely
+- 70-98% profit margins possible
+- Auto-evolves as AI models improve
+- Highest acquisition multiples
+- MRR/ARR built into the model
+
+**Case studies:**
+- **Base44:** 250k users → acquired for $80M cash (6 months)
+- **Lovable:** $100M ARR in 8 months (faster than OpenAI)
+- **Levels.io:** $3.5M/year, 90%+ margins, no employees
+- **N8N:** Side project → $2.5B valuation
+
+**PayeTax's path:** Free calculator (SEO/traffic) → SME Director Tools (SaaS revenue)
+
+This is exactly why the SME Director Optimizer is the right move. Not another free feature.
+
+---
+
 ## Targeting Everybody = Targeting Nobody
 
 Current: "UK taxpayers" (65 million people)
@@ -253,6 +284,28 @@ Those are the ones who will actually make money.
 
 ---
 
+## First-Time Founder Rules
+
+1. **Launch in 30 days.** Not 6 months. Set a deadline.
+2. **Get first paying customer ASAP.** Until someone pays, you might be wasting time.
+3. **Focus on product-market fit.** Don't get attached to ideas. Move on fast if it doesn't work.
+4. **Watch customers use the app.** In person. Every week. This is a cheat code.
+5. **Work on the biggest bottleneck.** If you can't clearly answer "what problem does this solve?" — work on something else.
+6. **Ignore all the 7/10 ideas** to focus on the one thing that solves the biggest problem.
+
+**Common objections answered:**
+
+| "But I don't have..." | Reality |
+|-----------------------|---------|
+| A following | Neither did N8N, Base44, or Midjourney at launch |
+| Time | Stripe, WhatsApp, Twitter were built while founders had 9-to-5s |
+| Technical skills | AI agents write 80-95% of code for successful founders now |
+| Investors | Vectal, Agent Zero, Base44, Midjourney — all bootstrapped |
+
+You don't need permission. You need to start.
+
+---
+
 ## Related Docs
 
 | Document | Purpose |
@@ -263,4 +316,4 @@ Those are the ones who will actually make money.
 
 ---
 
-*Adapted from David Ondrej's "How to build AI SaaS" and "Why you're stuck at $0 MRR" threads. The originals are worth reading in full.*
+*Adapted from David Ondrej's "How to build AI SaaS", "Why you're stuck at $0 MRR", and "The only AI business worth building" threads. The originals are worth reading in full.*
