@@ -45,7 +45,7 @@ export function Footer({ className }: FooterProps) {
         <div className='footer-copy'>
           &copy; 2026 PayeTax
           {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className='ml-2 text-white/30'>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+            <span className='ml-2 text-white/50'>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
           )}
         </div>
       </div>

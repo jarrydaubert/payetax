@@ -75,7 +75,7 @@
   /* New text colors */
   --text-primary-new: #f8fafc;
   --text-secondary-new: #94a3b8;
-  --text-dim: #64748b;
+  --text-dim: #94a3b8; /* slate-400 for WCAG AA contrast (was #64748b slate-500) */
 
   /* New border colors */
   --border-subtle: rgba(255, 255, 255, 0.01);
