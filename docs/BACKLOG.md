@@ -13,6 +13,11 @@
 - Reach out to finance content creators/newsletters about cross-promotion
 - Revisit B2B affiliate partner programs (requires company registration)
 
+## Lighthouse / Performance
+
+- Add Content-Security-Policy headers (Best Practices 96→100) - whitelist analytics domains
+- Reduce Total Blocking Time on mobile (Performance 98→100) - minor, low priority
+
 ## Tech Debt
 
 - Align IncomeSource type in store with validation.ts discriminated union schema

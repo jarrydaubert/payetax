@@ -5,11 +5,13 @@
 | Metric | Mobile | Desktop |
 |--------|--------|---------|
 | **Performance** | 98 | 100 |
-| **Accessibility** | 96 | 96 |
+| **Accessibility** | 96 → 100* | 96 → 100* |
 | **Best Practices** | 96 | 96 |
 | **SEO** | 100 | 100 |
 
 Source: PageSpeed Insights / Lighthouse v13.0.1
+
+*After contrast fixes deployed (v4.9.7)
 
 ---
 
@@ -17,6 +19,7 @@ Source: PageSpeed Insights / Lighthouse v13.0.1
 
 | Date | Version | Mobile Perf | Desktop Perf | Notes |
 |------|---------|-------------|--------------|-------|
+| 2026-01-25 | v4.9.7 | 98 | 100 | Accessibility fixes: contrast, 404/offline pages |
 | 2026-01-25 | v4.9.6 | 98 | 100 | Post-newsletter system, lazy loading optimizations |
 
 ---

@@ -44,28 +44,28 @@ export default function OfflinePage() {
                   className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
                   aria-hidden='true'
                 />
-                <span className='text-muted-foreground'>Tax calculations</span>
+                <span className='text-foreground/80'>Tax calculations</span>
               </div>
               <div className='flex items-center gap-3'>
                 <CheckCircle
                   className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
                   aria-hidden='true'
                 />
-                <span className='text-muted-foreground'>Cached tax rates</span>
+                <span className='text-foreground/80'>Cached tax rates</span>
               </div>
               <div className='flex items-center gap-3'>
                 <CheckCircle
                   className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
                   aria-hidden='true'
                 />
-                <span className='text-muted-foreground'>Previous results</span>
+                <span className='text-foreground/80'>Previous results</span>
               </div>
               <div className='flex items-center gap-3'>
                 <CheckCircle
                   className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
                   aria-hidden='true'
                 />
-                <span className='text-muted-foreground'>Saved calculations</span>
+                <span className='text-foreground/80'>Saved calculations</span>
               </div>
             </div>
           </div>

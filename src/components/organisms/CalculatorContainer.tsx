@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 // MONETIZATION: Disabled until partner agreements in place
 // import { AccountantReferralCTA } from '@/components/molecules/AccountantReferralCTA';
@@ -55,11 +56,17 @@ export function CalculatorContainer() {
     'Hourly',
   ]);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
+  const [portalMounted, setPortalMounted] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useMotionPreference();
 
   // Derive showResults from results state
   const showResults = !!results;
+
+  // Enable portal after mount (document not available during SSR)
+  React.useEffect(() => {
+    setPortalMounted(true);
+  }, []);
 
   // Lightweight scroll listener only for scroll-to-top button
   React.useEffect(() => {
@@ -369,25 +376,29 @@ export function CalculatorContainer() {
         )}
       </AnimatePresence>
 
-      {/* Scroll to Top Button - Fixed position FAB */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            onClick={scrollToTop}
-            className={cn(
-              'safe-bottom safe-right fixed z-50 flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-              ICON_SIZES.SIZE_12
+      {/* Scroll to Top Button - Portal to body to escape stacking contexts */}
+      {portalMounted &&
+        createPortal(
+          <AnimatePresence>
+            {showScrollTop && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+                onClick={scrollToTop}
+                className={cn(
+                  'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  ICON_SIZES.SIZE_12
+                )}
+                aria-label='Scroll to top'
+              >
+                <ArrowUp className={ICON_SIZES.SIZE_6} />
+              </motion.button>
             )}
-            aria-label='Scroll to top'
-          >
-            <ArrowUp className={ICON_SIZES.SIZE_6} />
-          </motion.button>
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </div>
   );
 }
