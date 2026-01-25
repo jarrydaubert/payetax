@@ -14,6 +14,56 @@ This document exists to fix that.
 
 ---
 
+## Why You're Stuck
+
+You're not stuck because you can't build. You're stuck because you won't sell.
+
+### The Builder Addiction
+
+Building doesn't feel like work. It's creative. It's tangible. Add a feature—dopamine hit. Fix a bug—feel productive.
+
+This is a trap disguised as progress.
+
+**The uncomfortable math:**
+```
+Product Quality × Distribution = Revenue
+
+If distribution = 0, revenue = 0.
+Zero times anything is zero.
+```
+
+### The Lies You Tell Yourself
+
+| What You Say | What It Means |
+|--------------|---------------|
+| "I just need this one feature, then I'll market" | I'm scared of rejection |
+| "Once it's polished, it'll sell itself" | I don't know how to sell |
+| "I'm not ready to put it out there" | Building feels safe, selling doesn't |
+
+This is avoidance dressed as work ethic.
+
+**Every hour spent adding feature #17 instead of distributing is functionally equivalent to scrolling TikTok.** Both feel productive. Neither moves the needle.
+
+### The Identity Shift
+
+You're not a coder. You're not a builder. You're not a maker.
+
+**You're a business owner.**
+
+Business owners do whatever the business requires. Sometimes that's building. Sometimes that's selling. Sometimes that's cold outreach that feels uncomfortable.
+
+The business doesn't care about your identity. It only cares about its needs.
+
+### The Real Test
+
+If you've never actually tried distribution—if you've been hiding behind your code editor, adding features nobody asked for, telling yourself you're "almost ready"—then you don't have a product problem.
+
+**You have a courage problem.**
+
+The product is done. Now do the other half of the work.
+
+---
+
 ## Painkiller vs Vitamin
 
 Most features are vitamins. Nice to have. Users might engage, might not.
@@ -213,4 +263,4 @@ Those are the ones who will actually make money.
 
 ---
 
-*Adapted from David Ondrej's "How to build AI SaaS" thread. The original is worth reading in full.*
+*Adapted from David Ondrej's "How to build AI SaaS" and "Why you're stuck at $0 MRR" threads. The originals are worth reading in full.*
