@@ -19,10 +19,4 @@
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
 
-## Content
-
-- Write more salary insight blog posts (£25k, £30k, £35k, £45k, £55k, £65k, £75k, £90k)
-- Create October/November content for Autumn Budget preview
-- Expand programmatic salary pages to £200k+ executive salaries
-
 

@@ -37,7 +37,20 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
   const scrollToCalculator = () => {
     const element = document.getElementById('tax-calculator');
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return true;
+    }
+    return false;
+  };
+
+  const waitForElementAndScroll = () => {
+    // Try immediately, then retry with increasing delays
+    if (scrollToCalculator()) return;
+
+    for (const delay of [100, 200, 400, 800]) {
+      setTimeout(scrollToCalculator, delay);
+    }
   };
 
   const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -48,8 +61,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       scrollToCalculator();
     } else {
       router.push('/');
-      // Wait for navigation then scroll
-      setTimeout(scrollToCalculator, 150);
+      waitForElementAndScroll();
     }
   };
 
