@@ -144,11 +144,13 @@ describe('StatsGrid', () => {
       expect(listItems).toHaveLength(3);
     });
 
-    it('should have aria-label for values', () => {
+    it('should display values as visible text', () => {
       render(<StatsGrid stats={mockStats} />);
 
-      const valueElements = screen.getAllByLabelText(/100%|0|<300kB/);
-      expect(valueElements.length).toBeGreaterThan(0);
+      // Values are visible text, no aria-label needed (avoids redundancy)
+      expect(screen.getByText('100%')).toBeInTheDocument();
+      expect(screen.getByText('0')).toBeInTheDocument();
+      expect(screen.getByText('<300kB')).toBeInTheDocument();
     });
 
     it('should mark icons as decorative', () => {

@@ -417,7 +417,7 @@ describe('CalculatorContent Component', () => {
       const { container } = render(<CalculatorContent />);
 
       const sections = container.querySelectorAll('section');
-      expect(sections.length).toBe(4); // 4 main sections
+      expect(sections.length).toBe(5); // 5 main sections (including scrollable table region)
     });
 
     it('should have accessible table structure', () => {
