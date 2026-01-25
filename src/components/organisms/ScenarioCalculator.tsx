@@ -193,7 +193,12 @@ export function ScenarioCalculator({
           <Label htmlFor={scottishId} className={TYPOGRAPHY.TEXT_SM}>
             Scottish Taxpayer
           </Label>
-          <Switch id={scottishId} checked={isScottish} onCheckedChange={setIsScottish} />
+          <Switch
+            id={scottishId}
+            checked={isScottish}
+            onCheckedChange={setIsScottish}
+            className='data-[state=unchecked]:bg-white/20'
+          />
         </div>
       </div>
 
