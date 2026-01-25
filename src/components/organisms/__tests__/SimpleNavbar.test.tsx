@@ -160,8 +160,8 @@ describe('SimpleNavbar Component', () => {
       const menuButton = screen.getByLabelText('Open menu');
       fireEvent.click(menuButton);
 
-      // Mobile menu should show with navigation role
-      const mobileMenu = screen.getByRole('navigation', { name: /mobile/i });
+      // Mobile menu should show with dialog role (for accessibility focus trap)
+      const mobileMenu = screen.getByRole('dialog', { name: /mobile/i });
       expect(mobileMenu).toBeInTheDocument();
     });
 
@@ -220,8 +220,8 @@ describe('SimpleNavbar Component', () => {
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      expect(nav).toHaveClass('border-b');
       expect(nav).toHaveClass('backdrop-blur-[20px]');
+      expect(nav).toHaveClass('bg-deep/80');
     });
 
     it('should apply consistent styling on all pages', () => {
@@ -230,9 +230,9 @@ describe('SimpleNavbar Component', () => {
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      // New design uses fixed positioning with backdrop blur
-      expect(nav).toHaveClass('border-b');
+      // New design uses fixed positioning with backdrop blur (border removed)
       expect(nav).toHaveClass('backdrop-blur-[20px]');
+      expect(nav).toHaveClass('bg-deep/80');
     });
   });
 

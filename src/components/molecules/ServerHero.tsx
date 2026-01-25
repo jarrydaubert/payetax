@@ -43,13 +43,13 @@ export default function ServerHero({ className }: ServerHeroProps) {
         <HeroCTA
           href='#tax-calculator'
           trackingLabel='hero_start_calculating'
-          className='group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient-new px-8 py-4 font-semibold text-base text-deep transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
+          className='group inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-8 py-4 font-semibold text-base text-text-primary-new transition-all duration-300 [background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box] hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
         >
           See My Take Home Pay
         </HeroCTA>
         <Link
           href='#features'
-          className='inline-flex items-center justify-center gap-2 rounded-xl border border-border-light px-8 py-4 font-medium text-base text-text-primary-new transition-all duration-300 hover:border-cyan hover:bg-white/5'
+          className='inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-8 py-4 font-medium text-base text-text-primary-new transition-all duration-300 hover:border-cyan/30 hover:bg-white/5'
         >
           See What&apos;s Included
           <ChevronDown className='h-[18px] w-[18px]' />

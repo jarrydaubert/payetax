@@ -305,6 +305,25 @@ export const ICON_SIZES = {
 } as const;
 
 /**
+ * Z-Index scale for predictable stacking order
+ * Prevents z-index collisions between fixed/modal elements
+ */
+export const Z_INDEX = {
+  /** Modal/menu backdrops */
+  BACKDROP: 'z-30',
+  /** Cookie banners, prompts */
+  BANNER: 'z-35',
+  /** Mobile menu panels, popovers, dropdowns */
+  DROPDOWN: 'z-40',
+  /** Modal dialogs */
+  MODAL: 'z-45',
+  /** Fixed navigation */
+  NAVBAR: 'z-50',
+  /** Toast notifications (highest) */
+  TOAST: 'z-60',
+} as const;
+
+/**
  * Layout utilities for consistent page structure
  * ADDED IN PAYTAX-109 for standardized containers and sections
  */

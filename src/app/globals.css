@@ -78,8 +78,8 @@
   --text-dim: #64748b;
 
   /* New border colors */
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-light: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.01);
+  --border-light: rgba(255, 255, 255, 0.02);
 }
 
 /* Background Elements - Geometric patterns */
@@ -152,6 +152,18 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* New gradient background utility */
+.bg-brand-gradient-new {
+  background: var(--brand-gradient-new);
+}
+
+/* Mobile menu blur - with webkit support */
+.mobile-menu-blur {
+  background: rgba(2, 6, 23, 0.6);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 /* Bento Grid */

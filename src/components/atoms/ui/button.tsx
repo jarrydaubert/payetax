@@ -26,6 +26,7 @@ const buttonVariants = cva(
         sm: cn('h-8 rounded-md px-3', TYPOGRAPHY.TEXT_XS),
         lg: 'h-10 rounded-md px-8',
         icon: 'size-9',
+        touch: 'h-11 px-4 py-2', // 44px min for WCAG 2.2 touch targets
       },
     },
     defaultVariants: {

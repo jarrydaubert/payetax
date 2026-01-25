@@ -12,7 +12,7 @@ interface TrackedCTAProps {
   className?: string;
   style?: React.CSSProperties;
   icon?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 /**
@@ -28,7 +28,7 @@ export function TrackedCTA({
   onClick,
 }: TrackedCTAProps) {
   return (
-    <Link href={href as Route} className={className} style={style} onClick={onClick}>
+    <Link href={href as Route} className={className} style={style} onClick={(e) => onClick?.(e)}>
       {children}
       {icon && (
         <ArrowRight className='h-[18px] w-[18px] transition-transform group-hover:translate-x-1' />

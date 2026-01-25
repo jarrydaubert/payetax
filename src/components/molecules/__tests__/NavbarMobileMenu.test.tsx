@@ -39,7 +39,7 @@ describe('NavbarMobileMenu', () => {
   describe('Rendering', () => {
     it('should render when isOpen is true', () => {
       render(<NavbarMobileMenu {...defaultProps} />);
-      expect(screen.getByRole('navigation', { name: /mobile navigation/i })).toBeInTheDocument();
+      expect(screen.getByRole('dialog', { name: /mobile navigation/i })).toBeInTheDocument();
     });
 
     it('should not render navigation when isOpen is false', () => {
@@ -131,10 +131,7 @@ describe('NavbarMobileMenu', () => {
   describe('Accessibility', () => {
     it('should have proper aria-label on navigation', () => {
       render(<NavbarMobileMenu {...defaultProps} />);
-      expect(screen.getByRole('navigation')).toHaveAttribute(
-        'aria-label',
-        'Mobile navigation menu'
-      );
+      expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Mobile navigation menu');
     });
 
     it('should have correct link href attributes', () => {
@@ -172,18 +169,18 @@ describe('NavbarMobileMenu', () => {
   describe('Animation', () => {
     it('should render without errors when opening', () => {
       const { rerender } = render(<NavbarMobileMenu {...defaultProps} isOpen={false} />);
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
       rerender(<NavbarMobileMenu {...defaultProps} isOpen={true} />);
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('should render without errors when closing', () => {
       const { rerender } = render(<NavbarMobileMenu {...defaultProps} isOpen={true} />);
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
 
       rerender(<NavbarMobileMenu {...defaultProps} isOpen={false} />);
-      // AnimatePresence handles exit animation, navigation may still be in DOM briefly
+      // AnimatePresence handles exit animation, dialog may still be in DOM briefly
     });
   });
 });

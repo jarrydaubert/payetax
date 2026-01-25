@@ -97,7 +97,7 @@ const CookieBanner: React.FC = () => {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center',
+        'safe-bottom pointer-events-none fixed inset-x-0 z-40 flex justify-center',
         SPACING.P_2,
         'sm:p-4'
       )}
@@ -133,12 +133,12 @@ const CookieBanner: React.FC = () => {
             'sm:gap-3'
           )}
         >
-          <Button onClick={declineCookies} variant='outline' size='sm' className='min-w-[140px]'>
+          <Button onClick={declineCookies} variant='outline' size='touch' className='min-w-[140px]'>
             Essential Only
           </Button>
           <Button
             onClick={acceptCookies}
-            size='sm'
+            size='touch'
             className='min-w-[140px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
             data-testid='cookie-accept-all'
           >
