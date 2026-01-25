@@ -107,6 +107,7 @@ export function ScenarioSummaryCard({
           label='Income Tax'
           value={formatCurrency(results.incomeTax.annually)}
           variant='deduction'
+          align='right'
         />
         <SummaryItem
           label='National Insurance'
@@ -117,6 +118,7 @@ export function ScenarioSummaryCard({
           label='Student Loan'
           value={formatCurrency(results.studentLoan.annually)}
           variant={results.studentLoan.annually > 0 ? 'deduction' : 'neutral'}
+          align='right'
         />
       </div>
 
@@ -190,13 +192,15 @@ function SummaryItem({
   label,
   value,
   variant = 'neutral',
+  align = 'left',
 }: {
   label: string;
   value: string;
   variant?: 'neutral' | 'deduction' | 'highlight';
+  align?: 'left' | 'right';
 }) {
   return (
-    <div>
+    <div className={align === 'right' ? 'text-right' : ''}>
       <p className={cn(TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>{label}</p>
       <p
         className={cn(

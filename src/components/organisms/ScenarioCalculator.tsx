@@ -10,9 +10,9 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useId, useState } from 'react';
+import NumberInput from '@/components/atoms/NumberInput';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -140,20 +140,14 @@ export function ScenarioCalculator({
           <Label htmlFor={salaryId} className={TYPOGRAPHY.TEXT_SM}>
             Annual Salary
           </Label>
-          <div className='relative'>
-            <span className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
-              £
-            </span>
-            <Input
-              id={salaryId}
-              type='number'
-              value={salary}
-              onChange={(e) => setSalary(Number(e.target.value))}
-              className='pl-7'
-              min={0}
-              max={10000000}
-            />
-          </div>
+          <NumberInput
+            id={salaryId}
+            value={salary}
+            onChange={setSalary}
+            prefix='£'
+            clearOnFocus
+            decimals={0}
+          />
         </div>
 
         {/* Pension */}
@@ -161,20 +155,14 @@ export function ScenarioCalculator({
           <Label htmlFor={pensionId} className={TYPOGRAPHY.TEXT_SM}>
             Pension Contribution (%)
           </Label>
-          <div className='relative'>
-            <Input
-              id={pensionId}
-              type='number'
-              value={pensionPercent}
-              onChange={(e) => setPensionPercent(Number(e.target.value))}
-              className='pr-7'
-              min={0}
-              max={100}
-            />
-            <span className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'>
-              %
-            </span>
-          </div>
+          <NumberInput
+            id={pensionId}
+            value={pensionPercent}
+            onChange={setPensionPercent}
+            suffix='%'
+            clearOnFocus
+            decimals={0}
+          />
         </div>
 
         {/* Student Loan */}
