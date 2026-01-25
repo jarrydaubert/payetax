@@ -168,25 +168,24 @@ function calculateEffectiveRate(
  */
 function estimateMarginalRate(salary: number, isScottish = false): number {
   const personalAllowance = currentRates.personalAllowance;
-  // Non-null assertions safe - tax bands structure is guaranteed by TAX_RATES type
-  const basicRateThreshold = personalAllowance + currentRates.bands[0]!.threshold;
-  const higherRateThreshold = personalAllowance + currentRates.bands[1]!.threshold;
+  const basicRateThreshold = personalAllowance + (currentRates.bands[0]?.threshold ?? 0);
+  const higherRateThreshold = personalAllowance + (currentRates.bands[1]?.threshold ?? 0);
 
   if (isScottish) {
     // Scottish has 6 bands - use intermediate rate threshold
     const scottishIntermediateThreshold =
-      currentScottishRates.personalAllowance + currentScottishRates.bands[2]!.threshold;
+      currentScottishRates.personalAllowance + (currentScottishRates.bands[2]?.threshold ?? 0);
     if (salary <= personalAllowance) return 0;
-    if (salary <= scottishIntermediateThreshold) return currentScottishRates.bands[2]!.rate; // Intermediate
-    if (salary <= higherRateThreshold) return currentScottishRates.bands[3]!.rate; // Higher
-    return currentScottishRates.bands[5]!.rate; // Top rate
+    if (salary <= scottishIntermediateThreshold) return currentScottishRates.bands[2]?.rate ?? 0;
+    if (salary <= higherRateThreshold) return currentScottishRates.bands[3]?.rate ?? 0;
+    return currentScottishRates.bands[5]?.rate ?? 0;
   }
 
   // UK (England, Wales, NI) rates
-  if (salary <= personalAllowance) return 0; // Personal allowance
-  if (salary <= basicRateThreshold) return currentRates.bands[0]!.rate; // Basic rate
-  if (salary <= higherRateThreshold) return currentRates.bands[1]!.rate; // Higher rate
-  return currentRates.bands[2]!.rate; // Additional rate
+  if (salary <= personalAllowance) return 0;
+  if (salary <= basicRateThreshold) return currentRates.bands[0]?.rate ?? 0;
+  if (salary <= higherRateThreshold) return currentRates.bands[1]?.rate ?? 0;
+  return currentRates.bands[2]?.rate ?? 0;
 }
 
 export function getEffectiveTaxRateData(

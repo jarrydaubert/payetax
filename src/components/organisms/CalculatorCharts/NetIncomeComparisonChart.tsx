@@ -27,10 +27,9 @@ import { cn, formatCurrency } from '@/lib/utils';
 const CURRENT_TAX_YEAR = '2025-2026' as const;
 const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
 const PERSONAL_ALLOWANCE = currentRates.personalAllowance;
-// Non-null assertions safe here - tax rates structure is guaranteed by TAX_RATES type
-const BASIC_RATE_CEILING = PERSONAL_ALLOWANCE + currentRates.bands[0]!.threshold; // £50,270
+const BASIC_RATE_CEILING = PERSONAL_ALLOWANCE + (currentRates.bands[0]?.threshold ?? 0); // £50,270
 const PA_TAPER_START = currentRates.personalAllowanceReductionThreshold; // £100,000
-const HIGHER_RATE_CEILING = PERSONAL_ALLOWANCE + currentRates.bands[1]!.threshold; // £125,140
+const HIGHER_RATE_CEILING = PERSONAL_ALLOWANCE + (currentRates.bands[1]?.threshold ?? 0); // £125,140
 
 interface NetIncomeComparisonChartProps {
   results: TaxCalculationResults;
