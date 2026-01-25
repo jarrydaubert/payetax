@@ -1,4 +1,4 @@
-// src/components/ui/CallToAction.tsx
+// src/components/molecules/CallToAction.tsx
 'use client';
 
 import { Calculator, CheckCircle, Coffee, Loader2, Mail, MessageSquare } from 'lucide-react';
