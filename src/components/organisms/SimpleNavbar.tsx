@@ -86,8 +86,18 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         )}
         aria-label='Main navigation'
       >
-        {/* Logo */}
-        <Link href='/' className='group' data-testid='nav-logo'>
+        {/* Logo - Home button */}
+        <Link
+          href='/'
+          className='group'
+          data-testid='nav-logo'
+          onClick={(e) => {
+            if (pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >
           <span className='font-display font-semibold text-[1.4rem] text-text-primary-new tracking-[-0.03em]'>
             paye
             <span className='text-gradient-new'>tax</span>
