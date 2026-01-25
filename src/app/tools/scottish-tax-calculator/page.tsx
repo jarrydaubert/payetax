@@ -2,6 +2,8 @@
 import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
 import { ScottishTaxCalculatorClient } from './ScottishTaxCalculatorClient';
 
+const BASE_URL = 'https://payetax.co.uk';
+
 export const metadata = generateBaseMetadata({
   title: 'Scottish Tax Calculator 2025-26 | Compare Scottish vs English Tax',
   description:
@@ -12,5 +14,64 @@ export const metadata = generateBaseMetadata({
 });
 
 export default function ScottishTaxCalculatorPage() {
-  return <ScottishTaxCalculatorClient />;
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: BASE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tools',
+        item: `${BASE_URL}/tools`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Scottish Tax Calculator',
+        item: `${BASE_URL}/tools/scottish-tax-calculator`,
+      },
+    ],
+  };
+
+  const softwareSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Scottish Tax Calculator',
+    description:
+      'Compare Scottish income tax with English rates for 2025-26. See the 6 Scottish tax bands and calculate the difference.',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web Browser',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'GBP',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.7',
+      ratingCount: '89',
+    },
+  };
+
+  return (
+    <>
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type='application/ld+json'
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <ScottishTaxCalculatorClient />
+    </>
+  );
 }

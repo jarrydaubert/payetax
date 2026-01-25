@@ -133,4 +133,46 @@ export const categoryContent: Record<string, CategoryContent> = {
       'online calculator',
     ],
   },
+
+  'salary-guides': {
+    title: 'UK Salary Guides & Take-Home Pay Analysis',
+    description:
+      "Detailed breakdowns of what different salaries actually look like in the UK after tax, National Insurance, and other deductions. Our salary guides explain exactly what you'll take home at various income levels, from graduate salaries to executive pay. Understand the real value of pay rises, bonuses, and salary bands with our comprehensive analysis. Each guide covers income tax calculations, NI contributions, student loan impact, pension considerations, and effective tax rates. Perfect for salary negotiations, job comparisons, and career planning. We break down common UK salaries like £25k, £30k, £40k, £50k, £60k, £75k, and £100k+ to show you the true take-home pay and marginal rates. Learn how crossing tax thresholds affects your net income and discover the optimal points for salary increases.",
+    keywords: [
+      'salary breakdown',
+      'take-home pay',
+      'after tax salary',
+      'UK salary guide',
+      'net pay',
+      'salary calculator',
+    ],
+  },
+
+  'tax-planning': {
+    title: 'Tax Planning Strategies for UK Taxpayers',
+    description:
+      "Strategic guides for optimizing your tax position legally and effectively. Learn advanced tax planning techniques for different income levels, from maximizing your Personal Allowance to navigating the £100k tax trap. Our tax planning articles cover pension contribution strategies, salary sacrifice arrangements, timing of income and deductions, and year-end tax planning. Essential reading for higher earners, company directors, and anyone looking to make their money work smarter. Understand how to minimize your effective tax rate while staying fully compliant with HMRC regulations. We explain when to take action, what reliefs to claim, and how different strategies interact with each other. Whether you're planning for the current tax year or thinking ahead, our guides help you make informed decisions about your tax position.",
+    keywords: [
+      'tax planning',
+      'tax optimization',
+      'tax efficiency',
+      '£100k tax trap',
+      'pension planning',
+      'tax strategy',
+    ],
+  },
+
+  'tax-deadlines': {
+    title: 'UK Tax Deadlines & Important Dates',
+    description:
+      'Never miss a tax deadline with our comprehensive guide to important dates in the UK tax calendar. From Self Assessment filing deadlines to payment due dates, PAYE year-end dates to tax credit renewals, we cover all the key dates you need to know. Understand the consequences of missing deadlines, including penalties and interest charges, and learn how to stay organized throughout the tax year. Our guides cover Self Assessment deadlines (31 January for online, 31 October for paper), payment on account dates, Corporation Tax filing requirements, and VAT return deadlines. We also explain the tax year structure, when new rates take effect, and key dates for claiming allowances and reliefs. Set reminders for the dates that matter to you and avoid costly late penalties.',
+    keywords: [
+      'tax deadlines',
+      'self assessment deadline',
+      'HMRC deadlines',
+      '31 January',
+      'tax year dates',
+      'filing deadline',
+    ],
+  },
 };
