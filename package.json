@@ -89,7 +89,6 @@
     "sonner": "2.0.7",
     "tailwind-merge": "3.4.0",
     "tailwindcss": "4.1.18",
-    "vercel": "50.5.0",
     "zod": "4.3.5",
     "zustand": "5.0.10"
   },

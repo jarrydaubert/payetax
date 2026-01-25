@@ -46,6 +46,19 @@ bun run bundle:analyze      # Bundle analysis
 bun run linear:me           # View Linear issues
 ```
 
+## Vercel CLI
+
+**IMPORTANT:** This machine has multiple Vercel accounts. Always verify you're logged into the correct account before running Vercel commands.
+
+```bash
+vercel whoami               # Check current account (should show "payetax")
+vercel logout && vercel login  # Switch accounts if needed
+vercel env pull .env.local  # Pull env vars from Vercel
+vercel link                 # Re-link project if .vercel is stale
+```
+
+The Vercel CLI is installed globally, not as a project dependency.
+
 ## Project Structure
 
 ```
