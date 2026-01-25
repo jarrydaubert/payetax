@@ -2,10 +2,8 @@
 
 ## Setup Required
 
-- [ ] Configure RESEND_API_KEY environment variable for email results feature
-- [ ] Verify Resend sender domain for `noreply@payetax.co.uk`
-- [ ] **Newsletter:** Create Resend Audience in dashboard (https://resend.com/audiences)
-- [ ] **Newsletter:** Add `RESEND_AUDIENCE_ID` to `.env.local` (see `docs/ideas/NEWSLETTER_RESEND.md`)
+- [ ] Verify Resend sender domain for `noreply@payetax.co.uk` (https://resend.com/domains)
+- [ ] **Newsletter:** Create Resend Audience (https://resend.com/audiences) and add `RESEND_AUDIENCE_ID` to Vercel
 
 ## Monetization Setup
 
