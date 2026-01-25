@@ -40,12 +40,20 @@ export default function CallToAction({
       const data = await res.json();
 
       if (!res.ok) {
+        // Handle "already subscribed" as a friendly message, not an error
+        if (res.status === 409) {
+          setStatus('success');
+          setErrorMessage('already');
+          setEmail('');
+          return;
+        }
         setStatus('error');
         setErrorMessage(data.error || 'Failed to subscribe');
         return;
       }
 
       setStatus('success');
+      setErrorMessage('');
       setEmail('');
     } catch {
       setStatus('error');
@@ -131,7 +139,11 @@ export default function CallToAction({
           {status === 'success' ? (
             <div className='flex items-center justify-center gap-2 text-emerald-500'>
               <CheckCircle className={ICON_SIZES.SIZE_5} />
-              <span>Thanks for subscribing!</span>
+              <span>
+                {errorMessage === 'already'
+                  ? "You're already subscribed - thanks for your support!"
+                  : 'Thanks for subscribing!'}
+              </span>
             </div>
           ) : (
             <form onSubmit={handleNewsletterSubmit} className='flex flex-col gap-3 sm:flex-row'>
