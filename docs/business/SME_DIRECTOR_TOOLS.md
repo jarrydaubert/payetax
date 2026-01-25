@@ -65,7 +65,7 @@ Our consumer PAYE calculator remains 100% free. This is our brand promise and SE
 
 ### Revenue Model
 
-- Monthly subscription via Stripe
+- Monthly subscription via Polar/Lemon Squeezy (merchant of record)
 - Annual discount (2 months free)
 - No per-calculation fees
 - Free tier has no time limit
@@ -93,7 +93,7 @@ Our consumer PAYE calculator remains 100% free. This is our brand promise and SE
 - Soft social promotion
 
 ### Phase 4: Public Launch (Week 9+)
-- Enable Stripe payments (Pro/Firm tiers)
+- Enable payments via Polar/Lemon Squeezy (Pro/Firm tiers)
 - Announce on LinkedIn, Twitter, accounting forums
 - Consider AccountingWeb partnership (nice-to-have, not dependency)
 - Monitor conversion rates and optimize
@@ -204,7 +204,7 @@ Side-by-side comparison showing:
 - Employer NI calculation
 - State pension NI credit warnings
 - Zustand store for scenario state
-- Stripe for Pro/Firm payments
+- Polar/Lemon Squeezy for Pro/Firm payments
 
 ---
 
@@ -241,16 +241,64 @@ Side-by-side comparison showing:
 
 ### Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 16 (existing) |
-| State | Zustand (extend existing store) |
-| Styling | Tailwind CSS 4 (consistent with current) |
-| Charts | Recharts (for comparison visualizations) |
-| PDF | jsPDF or react-pdf |
-| Auth | NextAuth.js |
-| Payments | Stripe |
-| DB | Supabase (scenario saves) |
+| Layer | Technology | Notes |
+|-------|------------|-------|
+| Frontend | Next.js 16 | Existing - no change |
+| State | Zustand | Extend existing store |
+| Styling | Tailwind CSS 4 | Existing - no change |
+| Components | shadcn/ui | Existing - no change |
+| Charts | Recharts | Already lazy-loaded in project |
+| PDF | jsPDF or react-pdf | For export functionality |
+| **Auth** | **Clerk** | Simpler than NextAuth, handles all edge cases |
+| **Payments** | **Polar** or **Lemon Squeezy** | Merchant of record - handles global tax compliance |
+| **DB** | **Supabase** | PostgreSQL for scenario saves, user data |
+| **Analytics** | **PostHog** | Product metrics, feature usage, conversion tracking |
+
+### Why NOT Raw Stripe for Payments
+
+> "Stripe is not a merchant of record. When you use Stripe, YOU are legally responsible for every transaction. VAT, GST, sales tax across 150+ jurisdictions."
+
+**Use a merchant of record instead:**
+
+| Service | Pros | Cons |
+|---------|------|------|
+| **Polar** | Built for developers, clean API, good DX | Newer, smaller |
+| **Lemon Squeezy** | Popular with indie hackers, simple setup | Slightly higher fees |
+| **Paddle** | Enterprise-ready, proven at scale | More complex, higher fees |
+
+The merchant of record owns the transaction legally. They handle:
+- EU VAT (27 countries)
+- UK VAT
+- US sales tax (50 states)
+- All invoicing and compliance
+
+**Recommendation:** Start with **Polar** (developer-friendly) or **Lemon Squeezy** (indie-proven).
+
+### Why Clerk over NextAuth
+
+| NextAuth | Clerk |
+|----------|-------|
+| DIY configuration | Managed service |
+| You handle edge cases | Edge cases handled |
+| Free but time-consuming | $25/mo after 10k MAU |
+| More flexible | Faster to implement |
+
+For an MVP launching in 30 days, **Clerk wins on speed**. Can migrate later if needed.
+
+### Supabase Setup
+
+```
+Tables needed:
+- users (synced from Clerk via webhook)
+- scenarios (saved calculations)
+- subscriptions (synced from Polar/Lemon Squeezy)
+```
+
+Supabase provides:
+- PostgreSQL database
+- Row-level security (RLS)
+- Real-time subscriptions (if needed later)
+- Edge functions (if needed later)
 
 ### Reusable Components
 
@@ -287,6 +335,10 @@ Side-by-side comparison showing:
 | Single tool MVP | Focus, faster launch, demand-driven expansion | Jan 2025 |
 | Partnership as nice-to-have | Don't block on external dependencies | Jan 2025 |
 | Free calculator stays free | Brand promise, SEO foundation, different audience | Jan 2025 |
+| Clerk over NextAuth | Faster to implement for 30-day launch, handles edge cases | Jan 2026 |
+| Polar/Lemon Squeezy over Stripe | Merchant of record handles VAT/tax compliance globally | Jan 2026 |
+| Supabase for database | PostgreSQL + RLS + good DX, pairs well with Clerk | Jan 2026 |
+| PostHog for analytics | Product metrics, conversion tracking, feature usage | Jan 2026 |
 
 ---
 
