@@ -148,7 +148,7 @@ export default function CallToAction({
                 type='submit'
                 size='lg'
                 disabled={status === 'loading'}
-                className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
+                className='bg-brand-gradient-new text-deep hover:opacity-90'
               >
                 {status === 'loading' ? (
                   <Loader2 className={cn('animate-spin', ICON_SIZES.SIZE_4)} />
@@ -178,11 +178,7 @@ export default function CallToAction({
         </div>
       ) : (
         <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
-          <Button
-            asChild
-            size='lg'
-            className='bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700'
-          >
+          <Button asChild size='lg' className='bg-brand-gradient-new text-deep hover:opacity-90'>
             {config.primaryAction.href.startsWith('http') ||
             config.primaryAction.href.startsWith('mailto:') ? (
               <a href={config.primaryAction.href}>
