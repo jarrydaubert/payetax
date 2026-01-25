@@ -28,7 +28,7 @@ export function CategoryFilter({
   };
 
   return (
-    <div className='mb-12' aria-labelledby={headingId}>
+    <nav className='mb-12' aria-labelledby={headingId}>
       <h2
         id={headingId}
         className={cn('mb-6 text-center font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}
@@ -81,6 +81,6 @@ export function CategoryFilter({
             ))}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

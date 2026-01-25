@@ -119,7 +119,6 @@ function StatCard({ stat, variant }: StatCardProps) {
             TYPOGRAPHY.TEXT_3XL,
             'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-transparent'
           )}
-          aria-label={`${value}`}
         >
           {value}
         </div>

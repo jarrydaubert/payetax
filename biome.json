@@ -88,8 +88,8 @@
         "useValidAriaRole": "error",
         "useValidAriaProps": "error",
         "useValidAriaValues": "error",
-        "noNoninteractiveTabindex": "off",
-        "useAriaPropsSupportedByRole": "off"
+        "noNoninteractiveTabindex": "warn",
+        "useAriaPropsSupportedByRole": "warn"
       },
       "complexity": {
         "noForEach": "error",

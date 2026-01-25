@@ -90,7 +90,7 @@ export function SalaryComparisonTable() {
           <ScrollIndicator direction='right' visible={showRightIndicator} />
 
           <Card className='overflow-hidden'>
-            <div
+            <section
               ref={comparisonTableRef}
               className='overflow-x-auto scroll-smooth'
               style={{
@@ -158,7 +158,7 @@ export function SalaryComparisonTable() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </section>
           </Card>
         </div>
 
