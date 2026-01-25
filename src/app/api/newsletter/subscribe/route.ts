@@ -51,6 +51,17 @@ export async function POST(request: NextRequest) {
 
     const { email } = validation.data;
 
+    // Check if contact already exists in audience
+    const { data: existingContact } = await resend.contacts.get({
+      email,
+      audienceId,
+    });
+
+    if (existingContact) {
+      // Already subscribed - return 409 so frontend can show friendly message
+      return NextResponse.json({ error: 'Already subscribed' }, { status: 409 });
+    }
+
     // Add contact to Resend Audience
     const { error } = await resend.contacts.create({
       email,
@@ -60,12 +71,6 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('[newsletter/subscribe] Resend error:', error);
-
-      // Check for duplicate email
-      if (error.message?.includes('already exists') || error.message?.includes('duplicate')) {
-        return NextResponse.json({ error: 'Already subscribed' }, { status: 409 });
-      }
-
       return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
     }
 
