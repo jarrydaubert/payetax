@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
+import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -87,18 +88,21 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           ))}
         </div>
 
-        {/* Desktop CTA Button */}
-        <Link
-          href='/#tax-calculator'
-          onClick={handleCalculatorClick}
-          className={cn(
-            'hidden rounded-full border border-transparent px-5 py-2.5 font-semibold text-[0.85rem] text-text-primary-new transition-all duration-300 md:inline-block',
-            '[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]',
-            'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
-          )}
-        >
-          Open Calculator
-        </Link>
+        {/* Desktop Utilities */}
+        <div className='hidden items-center gap-2 md:flex'>
+          <FeedbackDialog />
+          <Link
+            href='/#tax-calculator'
+            onClick={handleCalculatorClick}
+            className={cn(
+              'rounded-full border border-transparent px-5 py-2.5 font-semibold text-[0.85rem] text-text-primary-new transition-all duration-300',
+              '[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]',
+              'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+            )}
+          >
+            Open Calculator
+          </Link>
+        </div>
 
         {/* Mobile Menu Button */}
         <Button
