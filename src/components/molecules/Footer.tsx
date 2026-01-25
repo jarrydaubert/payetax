@@ -41,8 +41,13 @@ export function Footer({ className }: FooterProps) {
           <a href='mailto:support@payetax.co.uk'>Support</a>
         </nav>
 
-        {/* Copyright */}
-        <div className='footer-copy'>&copy; 2026 PayeTax</div>
+        {/* Copyright & Version */}
+        <div className='footer-copy'>
+          &copy; 2026 PayeTax
+          {process.env.NEXT_PUBLIC_APP_VERSION && (
+            <span className='ml-2 text-white/30'>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+          )}
+        </div>
       </div>
     </div>
   );

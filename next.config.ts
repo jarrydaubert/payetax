@@ -4,6 +4,7 @@ import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 // FIXED: Import webpack directly for plugins
 import webpack from 'webpack';
+import packageJson from './package.json';
 
 // Bundle analyzer setup
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -11,6 +12,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig: NextConfig = {
+  // Expose app version to client
+  env: {
+    NEXT_PUBLIC_APP_VERSION: packageJson.version,
+  },
+
   // Enhanced React 19 dev warnings and best practices
   reactStrictMode: true,
 
