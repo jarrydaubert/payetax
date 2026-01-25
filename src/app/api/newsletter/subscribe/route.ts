@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { generateWelcomeEmailHtml } from '@/../emails/welcome';
 import { checkRateLimit } from '@/lib/rateLimit';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -67,6 +68,18 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
     }
+
+    // Send welcome email (fire and forget - don't block response)
+    resend.emails
+      .send({
+        from: 'PayeTax <noreply@payetax.co.uk>',
+        to: email,
+        subject: 'Welcome to PayeTax!',
+        html: generateWelcomeEmailHtml(),
+      })
+      .catch((err) => {
+        console.error('[newsletter/subscribe] Failed to send welcome email:', err);
+      });
 
     return NextResponse.json({
       success: true,

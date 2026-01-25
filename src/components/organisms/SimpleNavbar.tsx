@@ -3,7 +3,7 @@
 
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
@@ -27,6 +27,7 @@ interface SimpleNavbarProps {
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const links = [
     { href: '/#tax-calculator', label: 'Calculator' },
@@ -34,14 +35,21 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
     { href: '/about', label: 'About' },
   ] as const;
 
+  const scrollToCalculator = () => {
+    const element = document.getElementById('tax-calculator');
+    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+
     if (pathname === '/') {
-      e.preventDefault();
-      const calculatorElement = document.getElementById('tax-calculator');
-      if (calculatorElement) {
-        calculatorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      setIsMobileMenuOpen(false);
+      scrollToCalculator();
+    } else {
+      router.push('/');
+      // Wait for navigation then scroll
+      setTimeout(scrollToCalculator, 150);
     }
   };
 
@@ -128,6 +136,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => setIsMobileMenuOpen(false)}
+        onCalculatorClick={handleCalculatorClick}
         utilities={<FeedbackDialog />}
       />
 

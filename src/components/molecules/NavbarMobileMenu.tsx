@@ -19,6 +19,8 @@ interface NavbarMobileMenuProps {
   pathname: string;
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
+  /** Handler for calculator CTA click */
+  onCalculatorClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   /** Optional utility components (e.g., FeedbackDialog) */
   utilities?: ReactNode;
 }
@@ -36,6 +38,7 @@ export function NavbarMobileMenu({
   pathname,
   onLinkClick,
   onBackdropClick,
+  onCalculatorClick,
   utilities,
 }: NavbarMobileMenuProps) {
   const menuRef = useRef<HTMLElement>(null);
@@ -140,7 +143,7 @@ export function NavbarMobileMenu({
               {/* Mobile CTA Button - gradient border */}
               <Link
                 href='/#tax-calculator'
-                onClick={() => onLinkClick('Calculator')}
+                onClick={onCalculatorClick}
                 className='mt-4 block min-h-[44px] rounded-full border border-transparent px-5 py-3 text-center font-semibold text-[0.95rem] text-text-primary-new transition-all [background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]'
               >
                 Open Calculator
