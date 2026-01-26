@@ -1,4 +1,5 @@
 // src/components/molecules/DirectorGuide/warnings/index.ts
+export { AlreadyTakenTooMuchWarning } from './AlreadyTakenTooMuchWarning';
 export { ComplexityWarning } from './ComplexityWarning';
 export { DLAWarning } from './DLAWarning';
 export { OtherIncomeWarning } from './OtherIncomeWarning';

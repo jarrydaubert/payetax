@@ -21,6 +21,7 @@ export {
 export { WhatYouNeed } from './WhatYouNeed';
 // Warnings
 export {
+  AlreadyTakenTooMuchWarning,
   ComplexityWarning,
   DLAWarning,
   OtherIncomeWarning,

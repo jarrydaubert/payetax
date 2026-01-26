@@ -23,14 +23,16 @@ export function Assumptions({ region, taxYear, className }: AssumptionsProps) {
 
   const assumptions = [
     'Your company is your only income',
+    'Outside IR35',
+    'No Employment Allowance claimed',
+    'No pension contributions',
+    'No student loan repayments',
     'Standard 12-month accounting year',
     'Full-year trading (adjust for shorter periods)',
-    'No student loan repayments',
     `Tax year ${taxYear} (starting April 6)`,
     region === 'scotland'
       ? 'Scottish salary rates, UK dividend rates'
       : 'UK tax rates for both salary and dividends',
-    'Uses current tax-year rules for the full 12 months',
   ];
 
   return (

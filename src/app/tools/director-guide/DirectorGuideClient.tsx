@@ -5,6 +5,7 @@ import { RotateCcw } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Button } from '@/components/atoms/ui/button';
 import {
+  AlreadyTakenTooMuchWarning,
   ComplexityWarning,
   DLAWarning,
   OtherIncomeWarning,
@@ -68,6 +69,9 @@ export function DirectorGuideClient() {
     showResults && results && isNormalMode(results) &&
     (formData.alreadyTaken ?? 0) > 0 &&
     formData.alreadyTakenViaPayroll === false;
+  const showAlreadyTakenTooMuchWarning =
+    showResults && results && isNormalMode(results) &&
+    (formData.alreadyTaken ?? 0) > results.annualTakeHome;
 
   // Track warnings (once per results view) - must be called unconditionally
   useEffect(() => {
@@ -75,7 +79,8 @@ export function DirectorGuideClient() {
     if (showVATWarning) trackWarningShown('VAT_THRESHOLD');
     if (showComplexityWarning) trackWarningShown('HIGH_COMPLEXITY');
     if (showDLAWarning) trackWarningShown('DLA_RISK');
-  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning]);
+    if (showAlreadyTakenTooMuchWarning) trackWarningShown('ALREADY_TAKEN_TOO_MUCH');
+  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning, showAlreadyTakenTooMuchWarning]);
 
   const handleReset = () => {
     trackGuideReset();
@@ -107,6 +112,7 @@ export function DirectorGuideClient() {
     <main className='container mx-auto max-w-2xl px-4 py-8'>
       {/* Warnings Section */}
       <div className='mb-6 space-y-3' role='alert' aria-live='polite'>
+        {showAlreadyTakenTooMuchWarning && <AlreadyTakenTooMuchWarning />}
         {showOtherIncomeWarning && <OtherIncomeWarning />}
         {showVATWarning && <VATWarning revenue={results.netRevenue} />}
         {showComplexityWarning && <ComplexityWarning />}
