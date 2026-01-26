@@ -1,4 +1,4 @@
-# Director Tools - Build Spec v3.1
+# Director Tools - Build Spec v3.2
 
 > **Purpose:** How to build the "How Much Can I Pay Myself?" guide
 > **For tax calculations:** See `DIRECTOR_TOOLS_MATH.md`
@@ -206,6 +206,77 @@ aria-expanded="false"  // Collapsed state
 > "⚠️ You may have taken more than your company can support based on this estimate. Pause and speak to an accountant."
 
 **Timeframe note:** All inputs are for "the year ahead" (next 12 months). If they've already taken money, we're calculating what's LEFT to take.
+
+---
+
+### 5. Other Income Gate (Pre-Calculation)
+
+**Purpose:** Force users to acknowledge the "only income" assumption before seeing results. This catches mid-year starters, people with rental income, etc.
+
+**Appears:** After all 4 inputs are complete, before results are calculated.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ ONE MORE THING                                              │
+│                                                                 │
+│  This calculation assumes your company is your ONLY income      │
+│  this tax year (April 2025 - April 2026).                       │
+│                                                                 │
+│  If you have ANY of these, these numbers won't be accurate:     │
+│                                                                 │
+│  • A job earlier this tax year (even if you've left)            │
+│  • Rental income                                                │
+│  • Another business or directorship                             │
+│  • Part-time or freelance work                                  │
+│  • Pension payments                                             │
+│  • Redundancy over £30,000                                      │
+│                                                                 │
+│  ○ None of these apply — show my results                        │
+│  ○ One of these applies — I'll talk to an accountant            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+| Selection | What Happens |
+|-----------|--------------|
+| "None of these apply" | Show full results with confident numbers |
+| "One of these applies" | Show results WITH persistent warning banner |
+
+**If "One of these applies" is selected, add banner to results:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ YOU INDICATED OTHER INCOME                                  │
+│                                                                 │
+│  These numbers assume your company is your only income.         │
+│  Because you have other income, your actual tax will be         │
+│  HIGHER than shown. Use these as a rough baseline only.         │
+│                                                                 │
+│  For accurate figures, talk to an accountant.                   │
+│                                                                 │
+│  [Coming soon: Enter your other income for accurate numbers]    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Analytics Events:**
+
+| Event | Trigger |
+|-------|---------|
+| `guide_other_income_gate_shown` | Gate displayed |
+| `guide_other_income_none` | User selected "None of these apply" |
+| `guide_other_income_has_other` | User selected "One of these applies" |
+
+**Why This Matters:**
+
+| User Type | Without Gate | With Gate |
+|-----------|--------------|-----------|
+| Pure first-timer | Accurate ✅ | Accurate ✅ |
+| Left £30k job mid-year | Under-saves £4,500+ ❌ | Warned, sees accountant ✅ |
+| Has rental income | Under-saves £2,500+ ❌ | Warned, uses as baseline ✅ |
+
+**v1.1 Enhancement:** Replace gate with actual "other income" input field that adjusts calculations.
 
 ---
 
@@ -504,7 +575,8 @@ src/
 │       │   ├── LocationStep.tsx          # Question 1
 │       │   ├── RevenueStep.tsx           # Question 2
 │       │   ├── ExpensesStep.tsx          # Question 3
-│       │   └── AlreadyTakenStep.tsx      # Question 4
+│       │   ├── AlreadyTakenStep.tsx      # Question 4
+│       │   └── OtherIncomeGate.tsx       # Pre-calculation gate
 │       ├── results/
 │       │   ├── ResultsSection.tsx        # Assembles results
 │       │   ├── CompanyBox.tsx            # Company position (includes Employer NI)
@@ -516,7 +588,8 @@ src/
 │       │   ├── SurvivalMode.tsx          # Low/no profit
 │       │   ├── DLAWarning.tsx            # Director's Loan
 │       │   ├── VATWarning.tsx            # VAT threshold
-│       │   └── ComplexityWarning.tsx     # High profit
+│       │   ├── ComplexityWarning.tsx     # High profit
+│       │   └── OtherIncomeWarning.tsx    # Persistent banner if other income
 │       └── education/
 │           ├── WhatIsPayroll.tsx         # Inline accordion
 │           ├── WhatAreDividends.tsx      # Inline accordion
@@ -708,6 +781,7 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [ ] `RevenueStep.tsx` (with VAT checkbox)
 - [ ] `ExpensesStep.tsx` (with VAT hint)
 - [ ] `AlreadyTakenStep.tsx` (with guardrail)
+- [ ] `OtherIncomeGate.tsx` (pre-calculation acknowledgment)
 
 ### Phase 3: Results Components
 - [ ] `ResultsSection.tsx`
@@ -722,6 +796,7 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [ ] `DLAWarning.tsx`
 - [ ] `VATWarning.tsx`
 - [ ] `ComplexityWarning.tsx`
+- [ ] `OtherIncomeWarning.tsx` (persistent banner if other income selected)
 
 ### Phase 5: Education (Inline Accordions)
 - [ ] `WhatIsPayroll.tsx`
@@ -749,6 +824,9 @@ const [formData, setFormData] = useState<DirectorInput>({
 | `guide_revenue_entered` | Step 2 completed |
 | `guide_expenses_entered` | Step 3 completed |
 | `guide_already_taken` | Step 4 completed |
+| `guide_other_income_gate_shown` | Other income gate displayed |
+| `guide_other_income_none` | User confirmed "None of these apply" |
+| `guide_other_income_has_other` | User selected "One of these applies" |
 | `guide_results_shown` | Results displayed |
 | `guide_results_copied` | Copy button clicked |
 | `guide_warning_shown` | Any warning displayed (with type) |
@@ -775,7 +853,7 @@ const [formData, setFormData] = useState<DirectorInput>({
 
 | Feature | When | Why |
 |---------|------|-----|
-| Other income input | v1.1 | Complexity |
+| Other income calculations | v1.1 | Gate acknowledges limitation; v1.1 adds actual input |
 | Student loan calculator | v1.1 | Need Plan type |
 | Employment Allowance toggle | v1.1 | Minority case |
 | PDF export | v1.1 (Pro) | Nice-to-have |
@@ -809,6 +887,23 @@ const [formData, setFormData] = useState<DirectorInput>({
 | localStorage spec | ✅ Added |
 | "Transfer today" → "safe monthly target" | ✅ Changed in Wife Test |
 
+### Edge Case Review (v3.2)
+
+| Reviewer | Recommendation |
+|----------|----------------|
+| Grok | Option A (gate) → Option B (v1.1) |
+| Claude | Option A (pre-calculation gate) → Option B (v1.1) |
+| ChatGPT | Option B now (or gate that softens output) |
+| Gemini | Option A (prominent disclaimer mandatory) → Option B (v1.1) |
+
+**Decision:** Ship with pre-calculation gate (Option A). Add other income input in v1.1.
+
+| Issue | Status |
+|-------|--------|
+| Other income gate | ✅ Added (forced acknowledgment before results) |
+| Persistent warning banner | ✅ Added (if user has other income) |
+| Analytics for gate | ✅ Added (track sole income vs other income) |
+
 ---
 
 ## The Golden Test
@@ -838,4 +933,4 @@ Before shipping, verify this scenario:
 
 ---
 
-**This is BUILD v3.1. All blockers resolved. Ship it.**
+**This is BUILD v3.2. All blockers resolved. Other income gate added. Ship it.**
