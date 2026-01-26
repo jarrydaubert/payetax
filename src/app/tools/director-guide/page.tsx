@@ -1,6 +1,6 @@
 // src/app/tools/director-guide/page.tsx
 import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
-import { DirectorGuideClient } from './DirectorGuideClient';
+import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
 
 const BASE_URL = 'https://payetax.co.uk';
 
@@ -102,7 +102,7 @@ export default function DirectorGuidePage() {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <DirectorGuideClient />
+      <DirectorDashboard />
     </>
   );
 }

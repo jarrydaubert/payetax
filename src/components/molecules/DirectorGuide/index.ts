@@ -1,13 +1,10 @@
 // src/components/molecules/DirectorGuide/index.ts
 
-// Form Steps
-export { AlreadyTakenStep } from './AlreadyTakenStep';
-export { ExpensesStep } from './ExpensesStep';
+// Dashboard
+export * from './dashboard';
+
 // Education
 export { WhatAreDividends, WhatIsPayroll, WhyThisSalary } from './education';
-export { LocationStep } from './LocationStep';
-export { OtherIncomeGate } from './OtherIncomeGate';
-export { RevenueStep } from './RevenueStep';
 
 // Results
 export {
@@ -18,7 +15,7 @@ export {
   PersonalBox,
   ResultsSection,
 } from './results';
-export { WhatYouNeed } from './WhatYouNeed';
+
 // Warnings
 export {
   AlreadyTakenTooMuchWarning,
