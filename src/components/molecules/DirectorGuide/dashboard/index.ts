@@ -7,6 +7,7 @@ export { DetailCards } from './DetailCards';
 export { EducationPanel } from './EducationPanel';
 export { InputsPanel } from './InputsPanel';
 export { MainContent } from './MainContent';
+export { OtherIncomeGate } from './OtherIncomeGate';
 export { MoneyFlowChart } from './MoneyFlowChart';
 export { SidebarNav } from './SidebarNav';
 export { SummaryCards } from './SummaryCards';

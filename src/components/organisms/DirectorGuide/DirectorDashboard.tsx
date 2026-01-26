@@ -9,6 +9,7 @@ import {
   generateStrategies,
   InputsPanel,
   MainContent,
+  OtherIncomeGate,
   SidebarNav,
   type Strategy,
 } from '@/components/molecules/DirectorGuide/dashboard';
@@ -34,6 +35,7 @@ type ViewState = 'empty' | 'comparison' | 'populated';
  */
 export function DirectorDashboard() {
   const [viewState, setViewState] = useState<ViewState>('empty');
+  const [showOtherIncomeGate, setShowOtherIncomeGate] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [inputsCollapsed, setInputsCollapsed] = useState(false);
@@ -78,19 +80,27 @@ export function DirectorDashboard() {
     formData.revenue > 0 &&
     formData.expenses !== undefined;
 
-  // Handle calculate button
+  // Handle calculate button - show other income gate first
   const handleCalculate = useCallback(() => {
     if (!canCalculate) return;
+    setShowOtherIncomeGate(true);
+  }, [canCalculate]);
 
-    // Set confirmed sole income (simplified - no other income gate for dashboard)
+  // Handle confirming sole income from gate
+  const handleConfirmSoleIncome = useCallback(() => {
     setHasOtherIncome(false);
-
-    // Calculate results
+    setShowOtherIncomeGate(false);
     calculate();
-
-    // Show comparison modal
     setShowComparison(true);
-  }, [canCalculate, calculate, setHasOtherIncome]);
+  }, [calculate, setHasOtherIncome]);
+
+  // Handle indicating other income from gate
+  const handleHasOtherIncome = useCallback(() => {
+    setHasOtherIncome(true);
+    setShowOtherIncomeGate(false);
+    calculate();
+    setShowComparison(true);
+  }, [calculate, setHasOtherIncome]);
 
   // Handle strategy selection from comparison modal
   const handleSelectStrategy = useCallback((_strategy: Strategy) => {
@@ -113,6 +123,7 @@ export function DirectorDashboard() {
         trackGuideReset();
         hasTrackedResults.current = false;
         setViewState('empty');
+        setShowOtherIncomeGate(false);
         setShowComparison(false);
       }
     });
@@ -159,6 +170,13 @@ export function DirectorDashboard() {
         educationCollapsed={educationCollapsed}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
+      />
+
+      {/* Other Income Gate - shown before comparison */}
+      <OtherIncomeGate
+        isOpen={showOtherIncomeGate}
+        onConfirmSoleIncome={handleConfirmSoleIncome}
+        onHasOtherIncome={handleHasOtherIncome}
       />
 
       {/* Comparison Modal */}
