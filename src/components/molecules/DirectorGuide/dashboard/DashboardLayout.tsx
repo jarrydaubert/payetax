@@ -10,8 +10,10 @@ interface DashboardLayoutProps {
   inputs: ReactNode;
   main: ReactNode;
   education: ReactNode;
+  sidebarCollapsed?: boolean;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
+  onToggleSidebar?: () => void;
   onToggleInputs?: () => void;
   onToggleEducation?: () => void;
   className?: string;
@@ -28,17 +30,20 @@ export function DashboardLayout({
   inputs,
   main,
   education,
+  sidebarCollapsed = false,
   inputsCollapsed = false,
   educationCollapsed = false,
+  onToggleSidebar,
   onToggleInputs,
   onToggleEducation,
   className,
 }: DashboardLayoutProps) {
   // Build grid columns based on collapsed state
   const getGridCols = () => {
+    const sidebarWidth = sidebarCollapsed ? '0px' : '60px';
     const inputsWidth = inputsCollapsed ? '0px' : '280px';
     const educationWidth = educationCollapsed ? '0px' : '320px';
-    return `60px ${inputsWidth} 1fr ${educationWidth}`;
+    return `${sidebarWidth} ${inputsWidth} 1fr ${educationWidth}`;
   };
 
   return (
@@ -51,8 +56,30 @@ export function DashboardLayout({
       )}
       style={{ gridTemplateColumns: getGridCols() }}
     >
-      {/* Icon sidebar - hidden on mobile */}
-      <div className='max-md:hidden'>{sidebar}</div>
+      {/* Icon sidebar - collapsible */}
+      <div
+        className={cn(
+          'relative overflow-hidden transition-all duration-300 max-md:hidden',
+          sidebarCollapsed && 'w-0'
+        )}
+      >
+        {!sidebarCollapsed && (
+          <>
+            {sidebar}
+            {/* Collapse button - bottom of sidebar */}
+            {onToggleSidebar && (
+              <button
+                type='button'
+                onClick={onToggleSidebar}
+                className='absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                title='Hide sidebar'
+              >
+                <PanelLeftClose className='size-4' />
+              </button>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Inputs panel - collapsible */}
       <div
@@ -83,19 +110,29 @@ export function DashboardLayout({
       <div className='relative overflow-y-auto'>
         {/* Toggle buttons at top when panels are collapsed */}
         <div className='absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
-          {/* Left: Show inputs button */}
-          {inputsCollapsed && onToggleInputs ? (
-            <button
-              type='button'
-              onClick={onToggleInputs}
-              className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-              title='Show inputs'
-            >
-              <PanelLeftOpen className='size-4' />
-            </button>
-          ) : (
-            <div />
-          )}
+          {/* Left: Show sidebar and/or inputs buttons */}
+          <div className='flex gap-1'>
+            {sidebarCollapsed && onToggleSidebar && (
+              <button
+                type='button'
+                onClick={onToggleSidebar}
+                className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                title='Show sidebar'
+              >
+                <PanelLeftOpen className='size-4' />
+              </button>
+            )}
+            {inputsCollapsed && onToggleInputs && (
+              <button
+                type='button'
+                onClick={onToggleInputs}
+                className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                title='Show inputs'
+              >
+                <PanelLeftOpen className='size-4' />
+              </button>
+            )}
+          </div>
 
           {/* Right: Show education button */}
           {educationCollapsed && onToggleEducation ? (

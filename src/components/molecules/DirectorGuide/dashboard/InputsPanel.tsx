@@ -53,16 +53,10 @@ export function InputsPanel({ onCalculate, isCalculateDisabled, className }: Inp
       className={cn('flex h-full flex-col border-r border-white/5 bg-slate-900 p-6', className)}
     >
       {/* Header */}
-      <div className='mb-6 flex items-center justify-between'>
+      <div className='mb-6'>
         <span className='font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Inputs
         </span>
-        <a
-          href='/tools'
-          className='flex items-center gap-1 text-slate-500 text-xs transition-colors hover:text-cyan-500'
-        >
-          ← Back
-        </a>
       </div>
 
       {/* Form fields */}

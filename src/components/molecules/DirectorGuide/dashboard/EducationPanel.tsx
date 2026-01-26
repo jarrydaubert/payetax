@@ -40,7 +40,7 @@ export function EducationPanel({
     >
       {/* Learn Section */}
       <section className='mb-8'>
-        <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
+        <h3 className='mb-4 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Learn
         </h3>
         <div className='space-y-3'>
