@@ -76,7 +76,7 @@ Mobile-first. Friendly. Slow. One thing at a time.
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │  🏴󠁧󠁢󠁳󠁣󠁴󠁿  Scotland (coming soon)                          │   │
+│  │  🏴󠁧󠁢󠁳󠁣󠁴󠁿  Scotland                                         │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │  ● ○ ○ ○ ○ ○                                                    │
@@ -251,7 +251,7 @@ out next year.
 
 | Condition | Show |
 |-----------|------|
-| **Scotland selected** | Block: "Scottish tax rates are different. Coming soon." |
+| **Scotland selected** | Use Scottish tax bands (different rates apply) |
 | **Profit ≤ 0** | Survival mode: "Your company hasn't made profit yet. Dividends aren't possible. If you take money, it's a loan you'll owe back." |
 | **Profit > £250k** | "This is getting complex. An accountant could save you serious money." |
 | **Revenue near £90k** | "Heads up: VAT registration may apply above £90k. This could affect your numbers." |
@@ -447,7 +447,7 @@ export function calculateSimplified(input: SimplifiedInput): SimplifiedResult {
 
 ### Step 2: Wizard Steps
 - [ ] WelcomeStep.tsx
-- [ ] LocationStep.tsx (Scotland blocked)
+- [ ] LocationStep.tsx (Scotland supported)
 - [ ] RevenueStep.tsx (with VAT checkbox)
 - [ ] ExpensesStep.tsx
 - [ ] AlreadyTakenStep.tsx
@@ -514,7 +514,6 @@ export function calculateSimplified(input: SimplifiedInput): SimplifiedResult {
 
 | Feature | Status | Why |
 |---------|--------|-----|
-| Scotland support | v1.1 | Different tax bands |
 | Other income input | v1.1 | Complexity |
 | Employment Allowance toggle | v1.1 | Minority case |
 | PDF export | v1.1 (Pro) | Nice-to-have |
