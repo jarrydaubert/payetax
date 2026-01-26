@@ -108,8 +108,8 @@ export function DashboardLayout({
 
       {/* Main content area */}
       <div className='relative overflow-y-auto'>
-        {/* Toggle buttons at top when panels are collapsed */}
-        <div className='absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
+        {/* Toggle buttons when panels are collapsed - positioned below header */}
+        <div className='absolute top-16 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
           {/* Left: Show sidebar and/or inputs buttons */}
           <div className='flex gap-1'>
             {sidebarCollapsed && onToggleSidebar && (
