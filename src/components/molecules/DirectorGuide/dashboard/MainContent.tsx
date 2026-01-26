@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/dashboard/MainContent.tsx
 'use client';
 
-import { RefreshCw } from 'lucide-react';
+import { MoreVertical, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DirectorCalculationResult } from '@/lib/validation/directorValidation';
 import { DetailCards } from './DetailCards';
@@ -47,6 +47,13 @@ export function MainContent({
             >
               <RefreshCw className='size-4' />
               Recalculate
+            </button>
+            <button
+              type='button'
+              className='flex items-center justify-center rounded-lg border border-white/10 bg-slate-800 px-3 py-2 text-slate-400 transition-all hover:bg-slate-700 hover:text-slate-200'
+              title='More options'
+            >
+              <MoreVertical className='size-4' />
             </button>
           </div>
         )}

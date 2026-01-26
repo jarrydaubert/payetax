@@ -155,6 +155,12 @@ export function DirectorDashboard() {
         onClose={() => setShowComparison(false)}
         onSelect={handleSelectStrategy}
         strategies={strategies}
+        inputSummary={{
+          revenue: formData.revenue ?? 0,
+          expenses: formData.expenses ?? 0,
+          region: formData.region === 'scotland' ? 'Scotland' : 'England',
+          alreadyTaken: formData.alreadyTaken ?? 0,
+        }}
       />
     </>
   );

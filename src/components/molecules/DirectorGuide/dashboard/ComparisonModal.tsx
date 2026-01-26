@@ -23,11 +23,19 @@ interface StrategyData {
   recommended?: boolean;
 }
 
+interface InputSummary {
+  revenue: number;
+  expenses: number;
+  region: string;
+  alreadyTaken: number;
+}
+
 interface ComparisonModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (strategy: Strategy) => void;
   strategies: StrategyData[];
+  inputSummary?: InputSummary;
   className?: string;
 }
 
@@ -51,6 +59,7 @@ export function ComparisonModal({
   onClose,
   onSelect,
   strategies,
+  inputSummary,
   className,
 }: ComparisonModalProps) {
   if (!isOpen) return null;
@@ -82,6 +91,19 @@ export function ComparisonModal({
             See how different payment strategies affect your take-home pay
           </p>
         </div>
+
+        {/* Input Summary Bar */}
+        {inputSummary && (
+          <div className='mx-auto mb-6 flex max-w-3xl flex-wrap justify-center gap-8 rounded-xl bg-slate-800 p-4'>
+            <InputSummaryItem label='Revenue' value={formatCurrency(inputSummary.revenue)} />
+            <InputSummaryItem label='Expenses' value={formatCurrency(inputSummary.expenses)} />
+            <InputSummaryItem label='Region' value={inputSummary.region} />
+            <InputSummaryItem
+              label='Already Taken'
+              value={formatCurrency(inputSummary.alreadyTaken)}
+            />
+          </div>
+        )}
 
         {/* Cards grid */}
         <div className='grid grid-cols-3 gap-4 max-lg:grid-cols-1 max-lg:gap-6'>
@@ -254,6 +276,20 @@ function MetricRow({ label, value, type }: MetricRowProps) {
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+interface InputSummaryItemProps {
+  label: string;
+  value: string;
+}
+
+function InputSummaryItem({ label, value }: InputSummaryItemProps) {
+  return (
+    <div className='text-center'>
+      <div className='text-slate-500 text-xs uppercase tracking-wider'>{label}</div>
+      <div className='font-semibold text-slate-100'>{value}</div>
     </div>
   );
 }

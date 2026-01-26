@@ -63,14 +63,23 @@ export function DirectorGuideClient() {
   // Determine which warnings to show (must be before useEffect to avoid conditional hooks)
   const showOtherIncomeWarning = showResults && hasOtherIncome === true;
   const showVATWarning =
-    showResults && results && isNormalMode(results) && results.netRevenue >= 85000 && results.netRevenue <= 95000;
-  const showComplexityWarning = showResults && results && isNormalMode(results) && results.grossProfit > 250000;
+    showResults &&
+    results &&
+    isNormalMode(results) &&
+    results.netRevenue >= 85000 &&
+    results.netRevenue <= 95000;
+  const showComplexityWarning =
+    showResults && results && isNormalMode(results) && results.grossProfit > 250000;
   const showDLAWarning =
-    showResults && results && isNormalMode(results) &&
+    showResults &&
+    results &&
+    isNormalMode(results) &&
     (formData.alreadyTaken ?? 0) > 0 &&
     formData.alreadyTakenViaPayroll === false;
   const showAlreadyTakenTooMuchWarning =
-    showResults && results && isNormalMode(results) &&
+    showResults &&
+    results &&
+    isNormalMode(results) &&
     (formData.alreadyTaken ?? 0) > results.annualTakeHome;
 
   // Track warnings (once per results view) - must be called unconditionally
@@ -80,7 +89,13 @@ export function DirectorGuideClient() {
     if (showComplexityWarning) trackWarningShown('HIGH_COMPLEXITY');
     if (showDLAWarning) trackWarningShown('DLA_RISK');
     if (showAlreadyTakenTooMuchWarning) trackWarningShown('ALREADY_TAKEN_TOO_MUCH');
-  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning, showAlreadyTakenTooMuchWarning]);
+  }, [
+    showOtherIncomeWarning,
+    showVATWarning,
+    showComplexityWarning,
+    showDLAWarning,
+    showAlreadyTakenTooMuchWarning,
+  ]);
 
   const handleReset = () => {
     trackGuideReset();

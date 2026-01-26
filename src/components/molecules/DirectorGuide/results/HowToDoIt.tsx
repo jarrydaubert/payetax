@@ -42,19 +42,24 @@ export function HowToDoIt({ result, className }: HowToDoItProps) {
     {
       number: 2,
       text: `Pay yourself ${monthlySalary}/month as salary via payroll`,
-      subtext: isLowProfit 
+      subtext: isLowProfit
         ? 'This is your full profit after employer NI - no tax on this amount'
         : 'We keep salary at £12,570/year to stay tax-efficient',
     },
-    ...(hasDividends ? [{
-      number: 3,
-      text: 'Take dividends occasionally when you have profit',
-    }] : []),
+    ...(hasDividends
+      ? [
+          {
+            number: 3,
+            text: 'Take dividends occasionally when you have profit',
+          },
+        ]
+      : []),
     {
       number: hasDividends ? 4 : 3,
-      text: result.personalTaxMonthly > 0
-        ? `Move ${monthlyTaxSavings}/mo to a savings account for your tax bill`
-        : 'No personal tax to save - your salary is within your Personal Allowance',
+      text:
+        result.personalTaxMonthly > 0
+          ? `Move ${monthlyTaxSavings}/mo to a savings account for your tax bill`
+          : 'No personal tax to save - your salary is within your Personal Allowance',
     },
   ];
 

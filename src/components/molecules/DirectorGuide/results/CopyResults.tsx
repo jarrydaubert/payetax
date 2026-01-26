@@ -37,19 +37,20 @@ function generateCopyText(result: DirectorResult, input: DirectorInput): string 
     month: 'short',
     year: 'numeric',
   });
-  
+
   const hasDividends = result.dividendsAvailable > 0;
   const isLowProfit = result.salary < 12570;
-  
+
   // Adjust messaging based on whether dividends are available
   const payDescription = hasDividends
     ? `(${formatCurrency(result.monthlySalary)} salary via payroll + dividends occasionally)`
     : `(${formatCurrency(result.monthlySalary)} salary via payroll - no dividends at this profit level)`;
-  
-  const companyTaxDescription = result.corporationTax > 0
-    ? `(includes Corporation Tax + Employer NI)`
-    : `(Employer NI only - no Corp Tax at this profit level)`;
-  
+
+  const companyTaxDescription =
+    result.corporationTax > 0
+      ? `(includes Corporation Tax + Employer NI)`
+      : `(Employer NI only - no Corp Tax at this profit level)`;
+
   const salaryNote = isLowProfit
     ? `This is your full profit after employer NI - tax-free since it's within your Personal Allowance`
     : `We keep salary at £12,570/year to stay tax-efficient`;

@@ -107,6 +107,7 @@ export function EducationPanel({
           <AssumptionRow label='Region' value='England' />
           <AssumptionRow label='Trading Period' value='Full Year' />
           <AssumptionRow label='Other Income' value={hasOtherIncome ? 'Yes' : 'None'} />
+          <AssumptionRow label='Tax Band' value='Basic Rate' />
           <AssumptionRow label='IR35 Status' value='Outside IR35' />
           <AssumptionRow label='Employment Allowance' value='Not claimed' isLast />
         </div>

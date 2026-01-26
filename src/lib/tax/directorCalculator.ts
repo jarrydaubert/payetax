@@ -174,10 +174,13 @@ export function calculateDirectorScenario(
       personalTaxAnnual: 0, // Salary within PA = no tax
       personalTaxMonthly: 0,
       includesPOA: false,
-      warnings: [{
-        type: 'MODIFIED_SURVIVAL',
-        message: "Profit is low, so we're recommending salary only (no dividends). This is tax-free since it's within your Personal Allowance."
-      }],
+      warnings: [
+        {
+          type: 'MODIFIED_SURVIVAL',
+          message:
+            "Profit is low, so we're recommending salary only (no dividends). This is tax-free since it's within your Personal Allowance.",
+        },
+      ],
       taxYear: taxYear as DirectorTaxYear,
       region: input.region,
     };
