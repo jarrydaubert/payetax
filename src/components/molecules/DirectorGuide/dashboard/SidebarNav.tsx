@@ -41,7 +41,7 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
       {/* Cover sheet - slides in from right to cover labels when collapsed */}
       <div
         className={cn(
-          'absolute inset-y-0 right-0 w-[132px] bg-slate-950 border-l border-white/5 transition-transform duration-200 ease-out',
+          'absolute inset-y-0 right-0 z-20 w-[132px] bg-slate-950 border-l border-white/5 transition-transform duration-200 ease-out',
           collapsed ? 'translate-x-0' : 'translate-x-full'
         )}
       />
