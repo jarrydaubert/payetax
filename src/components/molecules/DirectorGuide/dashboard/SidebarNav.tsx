@@ -40,7 +40,7 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
     <nav
       className={cn(
         'relative flex h-full flex-col overflow-hidden border-r border-white/5 bg-slate-950 py-4 transition-[width,padding] duration-200 ease-out',
-        collapsed ? 'w-16 px-2' : 'w-48 px-3'
+        collapsed ? 'w-14 px-1.5' : 'w-48 px-3'
       )}
     >
       {/* Logo */}
