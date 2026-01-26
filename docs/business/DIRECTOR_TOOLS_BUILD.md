@@ -777,11 +777,11 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] Create `lib/validation/__tests__/directorValidation.test.ts` (68 tests)
 - [x] Write golden example integration tests
 
-### Phase 2: Form Components ✅ COMPLETE
-- [x] `directorGuideStore.ts` (Zustand store for form state)
+### Phase 2: Form Components ✅ COMPLETE (26 tests)
+- [x] `directorGuideStore.ts` (Zustand store, 13 tests)
 - [x] `DirectorGuideForm.tsx` (progressive disclosure logic)
-- [x] `WhatYouNeed.tsx`
-- [x] `LocationStep.tsx` (Scotland / rUK with semantic radio inputs)
+- [x] `WhatYouNeed.tsx` (4 tests)
+- [x] `LocationStep.tsx` (Scotland / rUK, 9 tests)
 - [x] `RevenueStep.tsx` (with VAT checkbox)
 - [x] `ExpensesStep.tsx` (with VAT hint)
 - [x] `AlreadyTakenStep.tsx` (with guardrail)
