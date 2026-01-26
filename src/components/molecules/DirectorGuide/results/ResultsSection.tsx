@@ -42,7 +42,7 @@ function formatCurrency(amount: number): string {
 export function ResultsSection({ result, input, className }: ResultsSectionProps) {
   const headingId = useId();
 
-  // Handle survival mode separately
+  // Handle survival mode (no profit at all)
   if (!isNormalMode(result)) {
     return (
       <Card className={cn('border-amber-500/50 bg-amber-500/5', className)}>
@@ -51,23 +51,22 @@ export function ResultsSection({ result, input, className }: ResultsSectionProps
             <AlertTriangle className='mt-0.5 size-5 shrink-0 text-amber-500' aria-hidden='true' />
             <div>
               <h2 className='font-semibold text-foreground'>
-                Your company hasn&apos;t made enough profit yet
+                Your company hasn&apos;t made profit yet
               </h2>
               <p className='mt-2 text-muted-foreground text-sm'>
                 Based on your numbers, profit is ~{formatCurrency(result.grossProfit)}.
               </p>
               <p className='mt-2 text-muted-foreground text-sm'>
-                This isn&apos;t enough to pay yourself a full salary + dividends in the most
-                tax-efficient way.
+                Without profit, dividends aren&apos;t possible. If you take money, it&apos;s a loan
+                you&apos;ll owe back to the company.
               </p>
 
               <div className='mt-4'>
                 <p className='font-medium text-foreground text-sm'>Your options:</p>
                 <ol className='mt-2 space-y-1 text-muted-foreground text-sm'>
-                  <li>1. Take a smaller salary (up to your profit)</li>
-                  <li>2. Wait until you have more profit before taking dividends</li>
+                  <li>1. Wait until you have profit before paying yourself</li>
                   <li>
-                    3. If you need money now, talk to an accountant about Director&apos;s Loans
+                    2. If you need money now, talk to an accountant about Director&apos;s Loans
                     (there are tax implications)
                   </li>
                 </ol>
@@ -82,6 +81,8 @@ export function ResultsSection({ result, input, className }: ResultsSectionProps
       </Card>
     );
   }
+
+  // Normal mode - show actual numbers
 
   const profit = formatCurrency(result.grossProfit);
   const regionNote =

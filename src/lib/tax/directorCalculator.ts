@@ -134,15 +134,53 @@ export function calculateDirectorScenario(
   }
 
   if (grossProfit <= personalAllowance) {
-    return createSurvivalResult(
-      'modified_survival',
-      input,
+    // Calculate the maximum salary that fits within profit (accounting for employer NI)
+    // Salary + EmployerNI <= grossProfit
+    // If salary > 5000: salary + 0.15*(salary - 5000) <= grossProfit
+    // 1.15*salary - 750 <= grossProfit => salary <= (grossProfit + 750) / 1.15
+    const niThreshold = 5000;
+    let maxSalary: number;
+    if (grossProfit <= niThreshold) {
+      maxSalary = grossProfit; // No employer NI applies
+    } else {
+      maxSalary = Math.min(grossProfit, (grossProfit + niThreshold * 0.15) / 1.15);
+    }
+    maxSalary = roundToPence(Math.floor(maxSalary)); // Round down to be safe
+
+    const employerNI = getEmployerNI(maxSalary, taxYear);
+    const monthlySalary = roundToPence(maxSalary / 12);
+    const remainingSalary = roundToPence(Math.max(0, maxSalary - input.alreadyTaken));
+    const averageMonthlyPay = roundToPence(remainingSalary / 12);
+
+    // Return as 'normal' mode but with a warning about low profit
+    // This gives users actual numbers they can use
+    return {
+      mode: 'normal' as const,
       grossRevenue,
       netRevenue,
+      expenses: input.expenses,
       grossProfit,
-      taxYear,
-      "You can take a smaller salary (up to your profit), but dividends aren't advisable yet."
-    );
+      salary: maxSalary,
+      monthlySalary,
+      employerNI,
+      taxableProfit: 0,
+      corporationTax: 0,
+      dividendsAvailable: 0,
+      dividendTax: 0,
+      annualTakeHome: maxSalary,
+      remainingTakeHome: remainingSalary,
+      averageMonthlyPay,
+      companyTaxPot: roundToPence(employerNI),
+      personalTaxAnnual: 0, // Salary within PA = no tax
+      personalTaxMonthly: 0,
+      includesPOA: false,
+      warnings: [{
+        type: 'MODIFIED_SURVIVAL',
+        message: "Profit is low, so we're recommending salary only (no dividends). This is tax-free since it's within your Personal Allowance."
+      }],
+      taxYear: taxYear as DirectorTaxYear,
+      region: input.region,
+    };
   }
 
   // Step 4: Normal calculation path

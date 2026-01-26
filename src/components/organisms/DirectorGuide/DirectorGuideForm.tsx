@@ -67,9 +67,6 @@ export function DirectorGuideForm({ className }: DirectorGuideFormProps) {
         <p className='mt-2 text-muted-foreground'>
           Let&apos;s work it out together. No jargon. No stress.
         </p>
-        <p className='mt-1 text-muted-foreground/70 text-xs'>
-          Used by 2,000+ UK directors · HMRC-accurate calculations
-        </p>
       </div>
 
       {/* What You'll Need */}
