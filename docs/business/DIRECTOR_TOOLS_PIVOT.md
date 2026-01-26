@@ -1,6 +1,13 @@
 # Director Tools - Product Pivot
 
-> **Version:** 1.0 | **Created:** 2026-01-26 | **Status:** New Direction - Awaiting Review
+> **Version:** 1.4 (FINAL) | **Created:** 2026-01-26 | **Status:** ✅ ALL 4 REVIEWERS APPROVED
+>
+> **Review Notes:**
+> - v1.0: Initial pivot captured
+> - v1.1: Grok review - APPROVED pivot direction
+> - v1.2: Claude review - APPROVED with implementation roadmap
+> - v1.3: ChatGPT review - APPROVED with "set-aside pots" as killer feature
+> - v1.4: Gemini review - APPROVED with "Tax Bathtub" visualization and wizard UX
 
 ---
 
@@ -349,4 +356,372 @@ Not for tax nerds. **For busy people who just want to get back to their day job.
 
 ---
 
-**Document Status:** Pivot captured. Awaiting review feedback before proceeding.
+---
+
+## Review Feedback
+
+### Grok Review (v1.1) - ✅ APPROVED
+
+**Verdict:** "Yes, this should be the core product direction."
+
+#### Why Grok Supports the Pivot
+
+> "The current implementation specification, while technically sound, solves a secondary problem (fine-tuned optimization) for a smaller audience. Redesigning around clarity and education for first-time directors better matches observed user intent, expands market potential, and establishes a stronger foundation for growth."
+
+#### Advantages Grok Identified
+
+| Advantage | Impact |
+|-----------|--------|
+| **Larger market** | ~200k new Ltd companies/year in UK - high-volume, high-intent |
+| **Higher engagement** | Educational content fosters bookmarking, return visits, sharing |
+| **Better conversions** | Natural CTAs for accountant referrals |
+| **Reduced liability** | "Simple and safe" is more defensible than "optimal" |
+| **Content synergy** | SEO-rich blog posts, videos, email sequences |
+
+#### Potential Drawbacks & Mitigations
+
+| Drawback | Mitigation |
+|----------|------------|
+| Perceived lower sophistication | Layer "Advanced Optimizer" as optional expansion |
+| Delayed premium uptake | Use guide as funnel entry point to Pro tier |
+| Implementation overlap | Calculation engine reusable; primary change is UX framing |
+
+#### Grok's Suggested Next Steps
+
+1. **Reframe MVP:** Guide as primary landing, calculator embedded as Step 3
+2. **Safe defaults:** Highlight "simple safe approach" prominently
+3. **Educational elements:** Expandable FAQs, HMRC links
+4. **Preserve advanced:** Toggle for "Advanced: Optimize Your Mix"
+5. **Validate quickly:** Lightweight prototype to test engagement
+6. **Update strategy docs:** Emphasize beginner funnel
+
+---
+
+### Claude Review (v1.2) - ✅ APPROVED + IMPLEMENTATION ROADMAP
+
+**Verdict:** "Yes. Build this. The optimizer was a solution looking for a problem. The guide is the problem finally finding its solution."
+
+#### The Core Insight Claude Validated
+
+> "The optimizer answers the *second* question before answering the *first*."
+
+| What people search | What optimizer answers | What they actually need |
+|-------------------|------------------------|------------------------|
+| "how to pay yourself as director" | Here's the optimal split | What are my options? |
+| "director salary or dividends" | £12,570 + rest as dividends | What's the difference? |
+| "taking money from my company" | Tax calculation | Is this even allowed? |
+
+#### The £1,654 Problem
+
+| Message | Emotional Response |
+|---------|-------------------|
+| "Save £1,654 with optimal tax strategy" | "Cool, I guess" |
+| "Here's exactly how to pay yourself—and what to set aside so you're never surprised" | "Oh thank god, someone finally explained this" |
+
+> "The first is a feature. The second is relief."
+
+#### What You KEEP (Everything Technical)
+
+| Asset | Status |
+|-------|--------|
+| Calculation engine | ✅ Keep - still correct |
+| Tax rates | ✅ Keep - still needed |
+| Golden example verification | ✅ Keep - still valid |
+| Component structure | ✅ Keep - reuse in new flow |
+| Legal disclaimer | ✅ Keep - still required |
+
+> "The 1,600 lines of implementation spec aren't wasted. The calculator becomes a *component* of the guide, not the whole product."
+
+#### Implementation Effort (Minimal)
+
+| Change | Effort |
+|--------|--------|
+| Rename route to `/director-guide` | 5 min |
+| New page title | 5 min |
+| Add educational content before calculator | 2-3 hours |
+| Add "What to set aside" section | 1 hour |
+| Add "Key dates" calculator | 2 hours |
+| Add FAQ section | 1-2 hours |
+| Reframe results from "savings" to "your plan" | 30 min |
+| **Total** | **1-2 days** |
+
+#### SEO Implications (Big Win)
+
+| Current Target | Volume | Competition |
+|----------------|--------|-------------|
+| "salary vs dividend calculator UK" | ~1,600/mo | Medium |
+
+| New Target | Volume | Competition |
+|------------|--------|-------------|
+| "how to pay yourself as a director" | ~2,400/mo | Low |
+| "taking money out of limited company" | ~2,900/mo | Low |
+| "director salary dividends explained" | ~1,200/mo | Low |
+| "first time director tax" | ~800/mo | Very Low |
+
+> "The educational framing opens up more search queries with less competition."
+
+#### New Widget Pitch for Accountants
+
+**Before:** "Give your clients a self-service tax optimizer—branded as yours."
+
+**After:** "Stop answering the same 'how do I pay myself?' question. Put our guide on your site. Your clients get clarity. You get fewer basic questions and more qualified leads."
+
+> "This is a *much* stronger pitch because it solves a real pain point (repetitive questions)."
+
+#### Claude's Concrete Next Steps
+
+1. **Don't rewrite the spec** - Add "Product Framing" section
+2. **Ship the guide version** - 1-2 days more work, 10x better PMF
+3. **Revise widget pitch** - "Reduce basic questions" not "Lead gen"
+4. **Update success metrics** - Track "Guide completed" and "Tax dates added to calendar"
+5. **Move accountant referrals earlier** - Natural CTA after "This is confusing"
+
+---
+
+### ChatGPT Review (v1.3) - ✅ APPROVED + "SET-ASIDE POTS" INSIGHT
+
+**Verdict:** "Yes — this is the product. The optimizer is not wrong — it's just the wrong front door."
+
+#### The Core Reframe
+
+> "The dominant job-to-be-done is **reduce anxiety and prevent mistakes**, not shave marginal tax."
+
+#### The REAL Killer Feature: Set-Aside Pots
+
+> "For first-timers, the highest-value output is not 'you can take home £X,' it's:"
+
+| Output | What It Means |
+|--------|---------------|
+| **Spendable now** | "Here's what you can safely treat as personal money this month" |
+| **Set aside** | "Here's what must be ring-fenced for CT/SA/VAT" |
+| **Risk flags** | "If you do X, it becomes a director's loan / illegal dividend risk" |
+
+> "This turns you from 'calculator' into 'anti-surprise tax system,' which is what they actually want."
+
+#### Recommended Entry Choice
+
+**Two buttons at the start:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  How much do you know about paying yourself as a director?      │
+│                                                                 │
+│  [I'm new — explain and keep it simple]                         │
+│                                                                 │
+│  [I know the basics — go straight to the calculator]            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+This routes beginners to the guide and lets experts skip to the calculator.
+
+#### Recommended Flow (Stepper)
+
+1. **Your situation** (2 min)
+   - Expected profit
+   - Accounting period end date
+   - VAT registered?
+   - Already taken money from business account? (DLA warning trigger)
+
+2. **Your options** (plain English)
+   - Salary (PAYE)
+   - Dividends (only from distributable profits - hard rule)
+   - Director's loan (what it is, why it bites)
+
+3. **The simple safe approach**
+   - Salary up to PA (£12,570)
+   - Dividends from remaining profits
+   - Set-aside pots
+
+4. **Your numbers + set-asides**
+   - Estimated take-home
+   - Set aside for CT
+   - Set aside for SA (and payments on account)
+
+5. **Key dates + reminders**
+   - CT payment: 9 months + 1 day after year end
+   - CT return: 12 months after year end
+   - SA payment: 31 January
+   - "Add to calendar" buttons (ICS downloads)
+
+#### Non-Negotiable Triggers (Must Keep)
+
+| Trigger | Why |
+|---------|-----|
+| **Dividends legality gate** | "Dividends require distributable reserves; profit estimate alone is not proof" |
+| **Director's loan warning** | If they've taken money informally - HMRC guidance explicit |
+| **Employment Allowance as user-asserted** | Link, don't infer |
+| **Accounting period dates** | CT deadlines are period-based, not tax-year-based |
+
+#### How Optimizer Spec Is Salvaged
+
+> "Keep the engine. Change the surface area."
+
+| Before | After |
+|--------|-------|
+| Default output: "Lowest tax" | Default output: "Simple & safe" |
+| Calculator is the product | Calculator is embedded in guide |
+| Scenarios front and center | Scenarios in "Advanced" tab |
+
+> "Your current scenario generator (salary points, dividend tax, employer NI, CT) remains. You just stop presenting it as the core product."
+
+#### Widget Implication
+
+> "This pivot actually strengthens the accountant widget story."
+
+**What accountants DON'T want:** Tax nerd optimizer on their site
+
+**What they DO want:** Lead-qualifying explainer that:
+- Prevents bad client behaviour
+- Drives "talk to us" at exactly the right moments (DLA risk, dividend legality, VAT)
+
+**Conclusion:** Widget should embed the GUIDE flow, not just the calculator.
+
+---
+
+---
+
+### Gemini Review (v1.4) - ✅ APPROVED + "TAX BATHTUB" VISUALIZATION
+
+**Verdict:** "This is the pivot that turns a Tool into a Business. You have moved from building a 'Calculator' (competes with Excel) to building a 'Solution' (competes with anxiety). YES. THIS IS THE PRODUCT."
+
+#### The Paradigm Shift
+
+| Old Concept | New Concept |
+|-------------|-------------|
+| Director Salary Optimizer | First-Year Director's "Safe Pay" Guide |
+| Input: "Select Salary: £5k / £9k / £12k" | Input: "I have £X in the bank" |
+| Output: "You save £1,654 tax" | Output: "Transfer £2,000 to yourself. Leave £500 for tax." |
+| Vibe: Wall Street Spreadsheet | Vibe: Friendly Financial Copilot |
+| Goal: Maximize efficiency | Goal: Eliminate fear |
+
+#### The "Tax Bathtub" Visualization
+
+> A simple graphic showing how money flows:
+
+```
+     REVENUE (Water In)
+           ↓
+    ┌──────────────┐
+    │              │
+    │   BATHTUB    │
+    │              │
+    ├──────────────┤ ← Level 3: DIVIDENDS (Safe to take)
+    │   £££££      │
+    ├──────────────┤ ← Level 2: TAX POT (Set aside 20-25%)
+    │   £££        │
+    ├──────────────┤ ← Level 1: SALARY (£1,047/mo tax-free)
+    │   ££         │
+    └──────┬───────┘
+           ↓
+      EXPENSES (Drain)
+```
+
+#### The "Pay Yourself" Screen (The Money Shot)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Based on £50,000 profit:                                       │
+│                                                                 │
+│  💰 PAY YOURSELF TODAY                                          │
+│     £3,100                                                      │
+│     (Transfer this from Business to Personal)                   │
+│                                                                 │
+│  🏦 MOVE TO TAX POT                                             │
+│     £850                                                        │
+│     (Put in savings account. DO NOT TOUCH.)                     │
+│                                                                 │
+│  ✅ YOUR "SLEEP AT NIGHT" STATUS: SAFE                          │
+│                                                                 │
+│  [Show Breakdown ▼]                                             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Key UX Insight: Don't Ask, Tell
+
+> "Beginners shouldn't be choosing their salary strategy. We choose the safe, standard path for them."
+
+**Remove options:** Don't ask "Salary vs Dividend?" - TELL them the answer.
+
+Hardcode comparison to "Standard Salary (£12,570)" vs "No Planning."
+
+#### Lead Gen Supercharger
+
+**Old CTA:** "Speak to an accountant for advice." (Boring)
+
+**New CTA:** "This is a safe estimate. Want an accountant to set this up as monthly payroll so you don't have to do it manually?" (High Value)
+
+**Feature Idea: Download Payment Schedule (PDF)**
+
+```
+Apr 25: Pay £1,047 Salary
+May 25: Pay £1,047 Salary
+...
+Jan 31: Pay £X Tax
+```
+
+Gate this behind email capture.
+
+#### What Changes in Code
+
+| Keep | Change |
+|------|--------|
+| `taxRates.ts` (data same) | UI: Scrap comparator grid → Step-by-step wizard |
+| `directorCalculator.ts` (math same) | Inputs: Focus on "Company Profit" not "Target Income" |
+| Legal disclaimer | Outputs: Cash flow (Transfer X, Save Y) not tax efficiency |
+| | Content: Add tooltips in plain English |
+
+**Renaming:**
+- `DirectorOptimizer` → `PayYourselfWizard`
+- `Optimal Mix` → `The Smart Standard Strategy`
+
+---
+
+## Final Review Summary: 4/4 APPROVED ✅
+
+| Reviewer | Verdict | Key Addition |
+|----------|---------|--------------|
+| Grok | ✅ APPROVED | Advanced mode as optional toggle, ~200k new Ltd/year market |
+| Claude | ✅ APPROVED | 1-2 day implementation, better SEO queries, calculator becomes component |
+| ChatGPT | ✅ APPROVED | **"Set-aside pots" is killer feature** - anti-surprise tax system |
+| Gemini | ✅ APPROVED | "Tax Bathtub" visualization, wizard UX, "Sleep at Night Status" |
+
+---
+
+## Consolidated Insights from All 4 Reviews
+
+### What ALL Reviewers Agreed On
+
+1. **The pivot is correct** - education-first beats optimization-first
+2. **Larger market** - "confused first-timers" vastly outnumber "tax optimizers"
+3. **Calculator logic is preserved** - just wrapped in educational context
+4. **Implementation is minimal** - 1-2 days, not a rewrite
+5. **Accountants will share** - solves their "explain basics" pain point
+
+### The Killer Features (Synthesized)
+
+| Feature | Source | Why It Matters |
+|---------|--------|----------------|
+| **Set-aside pots** | ChatGPT | "What to ring-fence for tax" is the real question |
+| **Entry choice** | ChatGPT | "I'm new" vs "I know basics" - route appropriately |
+| **Tax Bathtub** | Gemini | Visual metaphor for how money flows |
+| **"Sleep at Night" status** | Gemini | Emotional reassurance, not just numbers |
+| **Don't ask, TELL** | Gemini | Choose safe path for them, don't make them choose |
+| **Payment Schedule PDF** | Gemini | High-value lead magnet, email capture |
+| **Key dates + calendar** | All | CT/SA deadlines with "Add to calendar" |
+
+### The Product In One Sentence
+
+> **"Finally understand how to pay yourself from your company - and never be surprised by a tax bill again."**
+
+---
+
+## Next Steps
+
+1. ✅ **Pivot document complete** - All 4 reviews captured
+2. 🔲 **Update implementation spec** - Reframe UX as wizard/guide (math stays same)
+3. 🔲 **Build the guide** - Education-first flow with calculator embedded
+4. 🔲 **Ship and learn** - Let real usage guide Phase 2
+
+---
+
+**Document Status:** ✅ FINAL - All 4 reviewers approved. Ready to build.
