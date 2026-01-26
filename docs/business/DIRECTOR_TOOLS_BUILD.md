@@ -777,8 +777,8 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] Create `lib/validation/__tests__/directorValidation.test.ts` (68 tests)
 - [x] Write golden example integration tests
 
-### Phase 2: Form Components ✅ COMPLETE (26 tests)
-- [x] `directorGuideStore.ts` (Zustand store, 13 tests)
+### Phase 2: Form Components ✅ COMPLETE (37 tests)
+- [x] `directorGuideStore.ts` (Zustand store, 24 tests)
 - [x] `DirectorGuideForm.tsx` (progressive disclosure logic)
 - [x] `WhatYouNeed.tsx` (4 tests)
 - [x] `LocationStep.tsx` (Scotland / rUK, 9 tests)
@@ -787,18 +787,18 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `AlreadyTakenStep.tsx` (with guardrail)
 - [x] `OtherIncomeGate.tsx` (pre-calculation acknowledgment)
 
-### Phase 3: Results Components ✅ COMPLETE (51 tests)
+### Phase 3: Results Components ✅ COMPLETE (47 tests)
 - [x] `ResultsSection.tsx` (orchestrator, 10 tests)
-- [x] `CompanyBox.tsx` (CT + Employer NI, 5 tests)
-- [x] `PersonalBox.tsx` (monthly pay + savings, 6 tests)
+- [x] `CompanyBox.tsx` (CT + Employer NI, 8 tests)
+- [x] `PersonalBox.tsx` (monthly pay + savings, 9 tests)
 - [x] `HowToDoIt.tsx` (4-step guide, 7 tests)
-- [x] `Assumptions.tsx` (collapsible, 8 tests)
-- [x] `CopyResults.tsx` (clipboard, 7 tests)
+- [x] `Assumptions.tsx` (collapsible, 7 tests)
+- [x] `CopyResults.tsx` (clipboard, 6 tests)
 
-### Phase 4: Warnings ✅ COMPLETE (26 tests)
-- [x] `SurvivalMode.tsx` (profit ≤ £12,570, 8 tests)
+### Phase 4: Warnings ✅ COMPLETE (39 tests)
+- [x] `SurvivalMode.tsx` (profit ≤ £12,570, 9 tests)
 - [x] `DLAWarning.tsx` (Director's Loan, 6 tests)
-- [x] `VATWarning.tsx` (£85k-£95k, 5 tests)
+- [x] `VATWarning.tsx` (£85k-£95k, 10 tests)
 - [x] `ComplexityWarning.tsx` (>£250k, 7 tests)
 - [x] `OtherIncomeWarning.tsx` (persistent banner, 7 tests)
 
