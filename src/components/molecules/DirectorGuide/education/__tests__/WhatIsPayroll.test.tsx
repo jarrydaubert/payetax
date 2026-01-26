@@ -1,5 +1,5 @@
 // src/components/molecules/DirectorGuide/education/__tests__/WhatIsPayroll.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { WhatIsPayroll } from '../WhatIsPayroll';
 
 describe('WhatIsPayroll', () => {

@@ -3,10 +3,11 @@
 // Form Steps
 export { AlreadyTakenStep } from './AlreadyTakenStep';
 export { ExpensesStep } from './ExpensesStep';
+// Education
+export { WhatAreDividends, WhatIsPayroll, WhyThisSalary } from './education';
 export { LocationStep } from './LocationStep';
 export { OtherIncomeGate } from './OtherIncomeGate';
 export { RevenueStep } from './RevenueStep';
-export { WhatYouNeed } from './WhatYouNeed';
 
 // Results
 export {
@@ -17,7 +18,7 @@ export {
   PersonalBox,
   ResultsSection,
 } from './results';
-
+export { WhatYouNeed } from './WhatYouNeed';
 // Warnings
 export {
   ComplexityWarning,
@@ -26,6 +27,3 @@ export {
   SurvivalMode,
   VATWarning,
 } from './warnings';
-
-// Education
-export { WhatAreDividends, WhatIsPayroll, WhyThisSalary } from './education';

@@ -114,7 +114,10 @@ export function trackOtherIncomeHasOther(): void {
 /**
  * Track results shown (bucketed profit for privacy)
  */
-export function trackResultsShown(profit: number, mode: 'normal' | 'survival' | 'modified_survival'): void {
+export function trackResultsShown(
+  profit: number,
+  mode: 'normal' | 'survival' | 'modified_survival'
+): void {
   trackEvent({
     action: 'guide_results_shown',
     category: 'director_guide',

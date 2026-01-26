@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/results/__tests__/HowToDoIt.test.tsx
 import { render, screen } from '@testing-library/react';
-import { HowToDoIt } from '../HowToDoIt';
 import type { DirectorResult } from '@/lib/validation/directorValidation';
+import { HowToDoIt } from '../HowToDoIt';
 
 const mockResult: DirectorResult = {
   mode: 'normal',

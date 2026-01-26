@@ -15,7 +15,7 @@ interface WhyThisSalaryProps {
  * Educates directors on the tax-efficient salary strategy.
  */
 export function WhyThisSalary({ className }: WhyThisSalaryProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Open by default - key insight
   const contentId = useId();
 
   return (

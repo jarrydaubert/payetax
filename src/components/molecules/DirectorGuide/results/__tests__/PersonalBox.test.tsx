@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/results/__tests__/PersonalBox.test.tsx
 import { render, screen } from '@testing-library/react';
-import { PersonalBox } from '../PersonalBox';
 import type { DirectorResult } from '@/lib/validation/directorValidation';
+import { PersonalBox } from '../PersonalBox';
 
 const mockResult: DirectorResult = {
   mode: 'normal',

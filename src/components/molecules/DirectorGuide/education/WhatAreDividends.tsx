@@ -64,8 +64,9 @@ export function WhatAreDividends({ className }: WhatAreDividendsProps) {
               </li>
             </ul>
             <p>
-              You get a <strong className='text-foreground'>£500 tax-free dividend allowance</strong>{' '}
-              each year.
+              You get a{' '}
+              <strong className='text-foreground'>£500 tax-free dividend allowance</strong> each
+              year.
             </p>
             <p className='text-xs'>
               Dividends are taxed on your personal tax return, not through PAYE.

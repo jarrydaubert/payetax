@@ -79,7 +79,7 @@ export default function DirectorGuidePage() {
         name: 'How much Employer NI do I pay on director salary?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'In 2025-26, Employer NI is 15% on salary above £5,000. For a £12,570 salary, that\'s approximately £1,135 per year.',
+          text: "In 2025-26, Employer NI is 15% on salary above £5,000. For a £12,570 salary, that's approximately £1,135 per year.",
         },
       },
     ],

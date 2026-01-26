@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/results/__tests__/CompanyBox.test.tsx
 import { render, screen } from '@testing-library/react';
-import { CompanyBox } from '../CompanyBox';
 import type { DirectorResult } from '@/lib/validation/directorValidation';
+import { CompanyBox } from '../CompanyBox';
 
 const mockResult: DirectorResult = {
   mode: 'normal',

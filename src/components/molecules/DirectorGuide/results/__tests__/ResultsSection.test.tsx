@@ -1,7 +1,11 @@
 // src/components/molecules/DirectorGuide/results/__tests__/ResultsSection.test.tsx
 import { render, screen } from '@testing-library/react';
+import type {
+  DirectorInput,
+  DirectorResult,
+  SurvivalResult,
+} from '@/lib/validation/directorValidation';
 import { ResultsSection } from '../ResultsSection';
-import type { DirectorInput, DirectorResult, SurvivalResult } from '@/lib/validation/directorValidation';
 
 const mockInput: DirectorInput = {
   region: 'rUK',

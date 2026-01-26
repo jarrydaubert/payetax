@@ -64,9 +64,14 @@ export function SurvivalMode({ result, className }: SurvivalModeProps) {
               <p className='font-medium text-foreground text-sm'>Your options:</p>
               <ol className='mt-2 space-y-1 text-muted-foreground text-sm'>
                 {!isZeroOrNegative && (
-                  <li>1. Take a smaller salary (up to {formatCurrency(result.maxPossibleSalary)})</li>
+                  <li>
+                    1. Take a smaller salary (up to {formatCurrency(result.maxPossibleSalary)})
+                  </li>
                 )}
-                <li>{isZeroOrNegative ? '1' : '2'}. Wait until you have more profit before taking dividends</li>
+                <li>
+                  {isZeroOrNegative ? '1' : '2'}. Wait until you have more profit before taking
+                  dividends
+                </li>
                 <li>
                   {isZeroOrNegative ? '2' : '3'}. If you need money now, talk to an accountant about
                   Director&apos;s Loans (there are tax implications)

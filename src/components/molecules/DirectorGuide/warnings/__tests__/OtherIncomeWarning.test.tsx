@@ -23,14 +23,9 @@ describe('OtherIncomeWarning', () => {
     expect(screen.getByText(/rough baseline/i)).toBeInTheDocument();
   });
 
-  it('should recommend accountant', () => {
+  it('should show accountant CTA button', () => {
     render(<OtherIncomeWarning />);
-    expect(screen.getByText(/talk to an accountant/i)).toBeInTheDocument();
-  });
-
-  it('should show coming soon feature note', () => {
-    render(<OtherIncomeWarning />);
-    expect(screen.getByText(/Coming soon/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /talk to an accountant/i })).toBeInTheDocument();
   });
 
   it('should render with custom className', () => {

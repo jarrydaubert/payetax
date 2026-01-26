@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/results/__tests__/CopyResults.test.tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { CopyResults } from '../CopyResults';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { DirectorInput, DirectorResult } from '@/lib/validation/directorValidation';
+import { CopyResults } from '../CopyResults';
 
 const mockResult: DirectorResult = {
   mode: 'normal',
@@ -56,9 +56,9 @@ describe('CopyResults', () => {
 
   it('should copy text to clipboard when clicked', async () => {
     render(<CopyResults result={mockResult} input={mockInput} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     await waitFor(() => {
       expect(mockWriteText).toHaveBeenCalledTimes(1);
     });
@@ -66,9 +66,9 @@ describe('CopyResults', () => {
 
   it('should show "Copied!" after clicking', async () => {
     render(<CopyResults result={mockResult} input={mockInput} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     await waitFor(() => {
       expect(screen.getByText('Copied!')).toBeInTheDocument();
     });
@@ -76,9 +76,9 @@ describe('CopyResults', () => {
 
   it('should include key data in copied text', async () => {
     render(<CopyResults result={mockResult} input={mockInput} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     await waitFor(() => {
       const copiedText = mockWriteText.mock.calls[0][0];
       expect(copiedText).toContain('PayeTax');
@@ -92,9 +92,9 @@ describe('CopyResults', () => {
   it('should include VAT note when VAT included', async () => {
     const vatInput = { ...mockInput, includesVat: true };
     render(<CopyResults result={mockResult} input={vatInput} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     await waitFor(() => {
       const copiedText = mockWriteText.mock.calls[0][0];
       expect(copiedText).toContain('before VAT');
@@ -105,9 +105,9 @@ describe('CopyResults', () => {
     const scottishInput = { ...mockInput, region: 'scotland' as const };
     const scottishResult = { ...mockResult, region: 'scotland' as const };
     render(<CopyResults result={scottishResult} input={scottishInput} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     await waitFor(() => {
       const copiedText = mockWriteText.mock.calls[0][0];
       expect(copiedText).toContain('Scotland');

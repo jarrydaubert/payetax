@@ -66,7 +66,7 @@ export function DirectorGuideClient() {
   };
 
   // Show form if no results yet
-  if (!showResults || !results) {
+  if (!(showResults && results)) {
     return (
       <main className='container mx-auto max-w-2xl px-4 py-8'>
         <DirectorGuideForm />

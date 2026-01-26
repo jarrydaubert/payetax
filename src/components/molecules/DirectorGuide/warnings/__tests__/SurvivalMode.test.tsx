@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/warnings/__tests__/SurvivalMode.test.tsx
 import { render, screen } from '@testing-library/react';
-import { SurvivalMode } from '../SurvivalMode';
 import type { SurvivalResult } from '@/lib/validation/directorValidation';
+import { SurvivalMode } from '../SurvivalMode';
 
 const createSurvivalResult = (profit: number): SurvivalResult => ({
   mode: profit <= 0 ? 'survival' : 'modified_survival',
@@ -28,7 +28,7 @@ describe('SurvivalMode', () => {
       expect(screen.getByText(/-£5,000/)).toBeInTheDocument();
     });
 
-    it('should mention Director\'s Loans', () => {
+    it("should mention Director's Loans", () => {
       render(<SurvivalMode result={createSurvivalResult(-5000)} />);
       expect(screen.getByText(/Director's Loans/i)).toBeInTheDocument();
     });
