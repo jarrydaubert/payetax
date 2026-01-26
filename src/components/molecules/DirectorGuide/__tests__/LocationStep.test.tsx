@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/__tests__/LocationStep.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { LocationStep } from '../LocationStep';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
+import { LocationStep } from '../LocationStep';
 
 describe('LocationStep Component', () => {
   beforeEach(() => {

@@ -1,0 +1,85 @@
+// src/components/molecules/DirectorGuide/results/HowToDoIt.tsx
+'use client';
+
+import { ClipboardList } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/ui/card';
+import { cn } from '@/lib/utils';
+import type { DirectorResult } from '@/lib/validation/directorValidation';
+
+interface HowToDoItProps {
+  result: DirectorResult;
+  className?: string;
+}
+
+/**
+ * Formats a number as GBP currency
+ */
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+/**
+ * Action steps card explaining how to implement the strategy
+ *
+ * Converts abstract numbers into concrete actions.
+ */
+export function HowToDoIt({ result, className }: HowToDoItProps) {
+  const monthlySalary = formatCurrency(result.monthlySalary);
+  const monthlyTaxSavings = formatCurrency(result.personalTaxMonthly);
+
+  const steps = [
+    {
+      number: 1,
+      text: 'Set up payroll (FreeAgent, Xero, or an accountant can help)',
+    },
+    {
+      number: 2,
+      text: `Pay yourself ${monthlySalary}/month as salary via payroll`,
+      subtext: 'We keep salary at £12,570/year to stay tax-efficient',
+    },
+    {
+      number: 3,
+      text: 'Take dividends occasionally when you have profit',
+    },
+    {
+      number: 4,
+      text: `Move ${monthlyTaxSavings}/mo to a savings account for your tax bill`,
+    },
+  ];
+
+  return (
+    <Card className={cn(className)}>
+      <CardHeader className='pb-3'>
+        <CardTitle className='flex items-center gap-2 text-lg'>
+          <ClipboardList className='size-5 text-primary' aria-hidden='true' />
+          How to Actually Do This
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ol className='space-y-3'>
+          {steps.map((step) => (
+            <li key={step.number} className='flex gap-3'>
+              <span
+                className='flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 font-medium text-primary text-sm'
+                aria-hidden='true'
+              >
+                {step.number}
+              </span>
+              <div className='flex-1'>
+                <p className='text-foreground text-sm'>{step.text}</p>
+                {step.subtext && (
+                  <p className='mt-0.5 text-muted-foreground text-xs'>({step.subtext})</p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </CardContent>
+    </Card>
+  );
+}
