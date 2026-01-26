@@ -38,19 +38,32 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <div className={cn('relative flex h-screen overflow-hidden bg-slate-950', className)}>
-      {/* Icon sidebar - always 60px, content overlays when expanded */}
+      {/* Icon sidebar - always 60px, expanded labels overlay to the right */}
       <div className='relative z-20 shrink-0 max-md:hidden' style={{ width: 60 }}>
         {/* Collapsed sidebar (icons only) - always visible */}
         <div className='h-full w-[60px]'>{sidebar}</div>
 
-        {/* Expanded overlay - slides out from the sidebar */}
+        {/* Expanded labels panel - slides out to the right of icons */}
         <div
           className={cn(
-            'absolute top-0 left-0 h-full w-48 shadow-2xl shadow-black/50 transition-transform duration-300 ease-in-out',
-            sidebarExpanded ? 'translate-x-0' : '-translate-x-full'
+            'absolute top-0 left-[60px] h-full w-36 border-r border-white/5 bg-slate-950 shadow-2xl shadow-black/50 transition-transform duration-300 ease-in-out',
+            sidebarExpanded ? 'translate-x-0' : '-translate-x-full opacity-0'
           )}
         >
-          {sidebar}
+          <div className='flex h-full flex-col py-4 px-3'>
+            {/* Spacer for logo */}
+            <div className='mb-4 h-10' />
+            {/* Labels */}
+            <div className='space-y-1'>
+              <NavLabel label='Dashboard' active />
+              <NavLabel label='Calculator' />
+              <NavLabel label='Reports' />
+              <NavLabel label='Settings' />
+            </div>
+            <div className='flex-1' />
+            <NavLabel label='Help' />
+            <NavLabel label='Collapse' onClick={onToggleSidebar} />
+          </div>
         </div>
       </div>
 
@@ -136,5 +149,31 @@ export function DashboardLayout({
         )}
       </div>
     </div>
+  );
+}
+
+/** Label shown in expanded sidebar panel */
+function NavLabel({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  const Component = onClick ? 'button' : 'div';
+  return (
+    <Component
+      onClick={onClick}
+      className={cn(
+        'block w-full whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm transition-colors',
+        active
+          ? 'bg-cyan-500/10 text-cyan-500'
+          : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+      )}
+    >
+      {label}
+    </Component>
   );
 }
