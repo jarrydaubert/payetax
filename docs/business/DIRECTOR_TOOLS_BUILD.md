@@ -787,13 +787,13 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `AlreadyTakenStep.tsx` (with guardrail)
 - [x] `OtherIncomeGate.tsx` (pre-calculation acknowledgment)
 
-### Phase 3: Results Components
-- [ ] `ResultsSection.tsx`
-- [ ] `CompanyBox.tsx` (includes Employer NI breakdown)
-- [ ] `PersonalBox.tsx`
-- [ ] `HowToDoIt.tsx`
-- [ ] `Assumptions.tsx` (collapsible)
-- [ ] `CopyResults.tsx`
+### Phase 3: Results Components ✅ COMPLETE
+- [x] `ResultsSection.tsx` (orchestrator with survival mode)
+- [x] `CompanyBox.tsx` (CT + Employer NI breakdown)
+- [x] `PersonalBox.tsx` (monthly pay + tax savings)
+- [x] `HowToDoIt.tsx` (4-step action guide)
+- [x] `Assumptions.tsx` (collapsible with useId)
+- [x] `CopyResults.tsx` (formatted clipboard output)
 
 ### Phase 4: Warnings
 - [ ] `SurvivalMode.tsx` (profit ≤ £12,570)

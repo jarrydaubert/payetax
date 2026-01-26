@@ -6,6 +6,8 @@ export { ExpensesStep } from './ExpensesStep';
 export { LocationStep } from './LocationStep';
 export { OtherIncomeGate } from './OtherIncomeGate';
 export { RevenueStep } from './RevenueStep';
+export { WhatYouNeed } from './WhatYouNeed';
+
 // Results
 export {
   Assumptions,
@@ -15,4 +17,12 @@ export {
   PersonalBox,
   ResultsSection,
 } from './results';
-export { WhatYouNeed } from './WhatYouNeed';
+
+// Warnings
+export {
+  ComplexityWarning,
+  DLAWarning,
+  OtherIncomeWarning,
+  SurvivalMode,
+  VATWarning,
+} from './warnings';
