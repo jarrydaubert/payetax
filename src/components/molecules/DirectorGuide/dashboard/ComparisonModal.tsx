@@ -68,16 +68,17 @@ export function ComparisonModal({
   const recommendedMonthly = recommended?.monthlyTakeHome ?? 0;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm'>
-      <div className={cn('relative max-h-[90vh] w-full max-w-5xl overflow-y-auto p-6', className)}>
-        {/* Close button */}
-        <button
-          type='button'
-          onClick={onClose}
-          className='absolute top-2 right-2 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
-        >
-          <X className='size-5' />
-        </button>
+    <div className={cn('fixed inset-0 z-50 overflow-y-auto bg-slate-950', className)}>
+      {/* Close button - fixed to top right edge */}
+      <button
+        type='button'
+        onClick={onClose}
+        className='fixed top-4 right-4 z-10 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
+      >
+        <X className='size-5' />
+      </button>
+
+      <div className='mx-auto max-w-5xl px-6 py-8'>
 
         {/* Header */}
         <div className='mb-6 text-center'>
