@@ -13,14 +13,15 @@ interface DashboardLayoutProps {
   sidebarExpanded?: boolean;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
+  onToggleSidebar?: () => void;
   onToggleInputs?: () => void;
   onToggleEducation?: () => void;
   className?: string;
 }
 
 /**
- * 4-column dashboard layout matching the mockup design
- * Uses flexbox for smoother animations than CSS grid
+ * Dashboard layout with overlay sidebar pattern
+ * Sidebar expands OVER the content (like Slack/Discord) instead of pushing it
  */
 export function DashboardLayout({
   sidebar,
@@ -30,28 +31,44 @@ export function DashboardLayout({
   sidebarExpanded = false,
   inputsCollapsed = false,
   educationCollapsed = false,
+  onToggleSidebar,
   onToggleInputs,
   onToggleEducation,
   className,
 }: DashboardLayoutProps) {
   return (
-    <div className={cn('flex h-screen overflow-hidden bg-slate-950', className)}>
-      {/* Icon sidebar - expandable */}
-      <div
-        className='shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-md:hidden'
-        style={{ width: sidebarExpanded ? 192 : 60 }}
-      >
-        {sidebar}
+    <div className={cn('relative flex h-screen overflow-hidden bg-slate-950', className)}>
+      {/* Icon sidebar - always 60px, content overlays when expanded */}
+      <div className='relative z-20 shrink-0 max-md:hidden' style={{ width: 60 }}>
+        {/* Collapsed sidebar (icons only) - always visible */}
+        <div className='h-full w-[60px]'>{sidebar}</div>
+
+        {/* Expanded overlay - slides out from the sidebar */}
+        <div
+          className={cn(
+            'absolute top-0 left-0 h-full w-48 shadow-2xl shadow-black/50 transition-transform duration-300 ease-in-out',
+            sidebarExpanded ? 'translate-x-0' : '-translate-x-full'
+          )}
+        >
+          {sidebar}
+        </div>
       </div>
+
+      {/* Backdrop when sidebar expanded */}
+      {sidebarExpanded && onToggleSidebar && (
+        <div
+          className='absolute inset-0 z-10 bg-black/20 max-md:hidden'
+          onClick={onToggleSidebar}
+          onKeyDown={(e) => e.key === 'Escape' && onToggleSidebar()}
+        />
+      )}
 
       {/* Inputs panel - collapsible */}
       <div
         className='relative shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-lg:hidden'
         style={{ width: inputsCollapsed ? 0 : 280 }}
       >
-        <div className='h-full w-[280px]'>
-          {inputs}
-        </div>
+        <div className='h-full w-[280px]'>{inputs}</div>
         {/* Collapse button - top right corner */}
         {onToggleInputs && !inputsCollapsed && (
           <button
@@ -105,9 +122,7 @@ export function DashboardLayout({
         className='relative shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-lg:hidden'
         style={{ width: educationCollapsed ? 0 : 320 }}
       >
-        <div className='h-full w-[320px]'>
-          {education}
-        </div>
+        <div className='h-full w-[320px]'>{education}</div>
         {/* Collapse button - top left corner */}
         {onToggleEducation && !educationCollapsed && (
           <button

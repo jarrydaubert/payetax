@@ -158,6 +158,7 @@ export function DirectorDashboard() {
         sidebarExpanded={sidebarExpanded}
         inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
+        onToggleSidebar={() => setSidebarExpanded((prev) => !prev)}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
       />
