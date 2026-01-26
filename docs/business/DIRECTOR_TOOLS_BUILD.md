@@ -795,12 +795,12 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `Assumptions.tsx` (collapsible with useId)
 - [x] `CopyResults.tsx` (formatted clipboard output)
 
-### Phase 4: Warnings
-- [ ] `SurvivalMode.tsx` (profit ≤ £12,570)
-- [ ] `DLAWarning.tsx`
-- [ ] `VATWarning.tsx`
-- [ ] `ComplexityWarning.tsx`
-- [ ] `OtherIncomeWarning.tsx` (persistent banner if other income selected)
+### Phase 4: Warnings ✅ COMPLETE
+- [x] `SurvivalMode.tsx` (profit ≤ £12,570)
+- [x] `DLAWarning.tsx` (Director's Loan risk)
+- [x] `VATWarning.tsx` (£85k-£95k threshold)
+- [x] `ComplexityWarning.tsx` (>£250k optimization)
+- [x] `OtherIncomeWarning.tsx` (persistent banner)
 
 ### Phase 5: Education (Inline Accordions)
 - [ ] `WhatIsPayroll.tsx`
