@@ -35,7 +35,7 @@ type ViewState = 'empty' | 'comparison' | 'populated';
 export function DirectorDashboard() {
   const [viewState, setViewState] = useState<ViewState>('empty');
   const [showComparison, setShowComparison] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [inputsCollapsed, setInputsCollapsed] = useState(false);
   const [educationCollapsed, setEducationCollapsed] = useState(false);
 
@@ -131,7 +131,12 @@ export function DirectorDashboard() {
   return (
     <>
       <DashboardLayout
-        sidebar={<SidebarNav />}
+        sidebar={
+          <SidebarNav
+            expanded={sidebarExpanded}
+            onToggle={() => setSidebarExpanded((prev) => !prev)}
+          />
+        }
         inputs={<InputsPanel onCalculate={handleCalculate} isCalculateDisabled={!canCalculate} />}
         main={
           <MainContent
@@ -150,10 +155,9 @@ export function DirectorDashboard() {
             alreadyTakenViaPayroll={formData.alreadyTakenViaPayroll}
           />
         }
-        sidebarCollapsed={sidebarCollapsed}
+        sidebarExpanded={sidebarExpanded}
         inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
-        onToggleSidebar={() => setSidebarCollapsed((prev) => !prev)}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
       />

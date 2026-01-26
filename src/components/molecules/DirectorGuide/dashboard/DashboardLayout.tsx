@@ -10,10 +10,9 @@ interface DashboardLayoutProps {
   inputs: ReactNode;
   main: ReactNode;
   education: ReactNode;
-  sidebarCollapsed?: boolean;
+  sidebarExpanded?: boolean;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
-  onToggleSidebar?: () => void;
   onToggleInputs?: () => void;
   onToggleEducation?: () => void;
   className?: string;
@@ -30,17 +29,16 @@ export function DashboardLayout({
   inputs,
   main,
   education,
-  sidebarCollapsed = false,
+  sidebarExpanded = false,
   inputsCollapsed = false,
   educationCollapsed = false,
-  onToggleSidebar,
   onToggleInputs,
   onToggleEducation,
   className,
 }: DashboardLayoutProps) {
-  // Build grid columns based on collapsed state
+  // Build grid columns based on collapsed/expanded state
   const getGridCols = () => {
-    const sidebarWidth = sidebarCollapsed ? '0px' : '60px';
+    const sidebarWidth = sidebarExpanded ? '192px' : '60px'; // 192px = w-48
     const inputsWidth = inputsCollapsed ? '0px' : '280px';
     const educationWidth = educationCollapsed ? '0px' : '320px';
     return `${sidebarWidth} ${inputsWidth} 1fr ${educationWidth}`;
@@ -56,29 +54,9 @@ export function DashboardLayout({
       )}
       style={{ gridTemplateColumns: getGridCols() }}
     >
-      {/* Icon sidebar - collapsible */}
-      <div
-        className={cn(
-          'relative overflow-hidden transition-all duration-300 max-md:hidden',
-          sidebarCollapsed && 'w-0'
-        )}
-      >
-        {!sidebarCollapsed && (
-          <>
-            {sidebar}
-            {/* Collapse button - bottom of sidebar */}
-            {onToggleSidebar && (
-              <button
-                type='button'
-                onClick={onToggleSidebar}
-                className='absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-                title='Hide sidebar'
-              >
-                <PanelLeftClose className='size-4' />
-              </button>
-            )}
-          </>
-        )}
+      {/* Icon sidebar - expandable (toggle handled inside SidebarNav) */}
+      <div className='overflow-hidden transition-all duration-300 max-md:hidden'>
+        {sidebar}
       </div>
 
       {/* Inputs panel - collapsible */}
@@ -110,29 +88,19 @@ export function DashboardLayout({
       <div className='relative overflow-y-auto'>
         {/* Toggle buttons when panels are collapsed - positioned below header */}
         <div className='absolute top-16 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
-          {/* Left: Show sidebar and/or inputs buttons */}
-          <div className='flex gap-1'>
-            {sidebarCollapsed && onToggleSidebar && (
-              <button
-                type='button'
-                onClick={onToggleSidebar}
-                className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-                title='Show sidebar'
-              >
-                <PanelLeftOpen className='size-4' />
-              </button>
-            )}
-            {inputsCollapsed && onToggleInputs && (
-              <button
-                type='button'
-                onClick={onToggleInputs}
-                className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-                title='Show inputs'
-              >
-                <PanelLeftOpen className='size-4' />
-              </button>
-            )}
-          </div>
+          {/* Left: Show inputs button */}
+          {inputsCollapsed && onToggleInputs ? (
+            <button
+              type='button'
+              onClick={onToggleInputs}
+              className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+              title='Show inputs'
+            >
+              <PanelLeftOpen className='size-4' />
+            </button>
+          ) : (
+            <div />
+          )}
 
           {/* Right: Show education button */}
           {educationCollapsed && onToggleEducation ? (

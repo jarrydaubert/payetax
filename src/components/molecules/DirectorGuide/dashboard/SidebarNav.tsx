@@ -1,7 +1,15 @@
 // src/components/molecules/DirectorGuide/dashboard/SidebarNav.tsx
 'use client';
 
-import { Calculator, FileText, HelpCircle, LayoutDashboard, Settings } from 'lucide-react';
+import {
+  Calculator,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  HelpCircle,
+  LayoutDashboard,
+  Settings,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -18,16 +26,29 @@ const navItems: NavItem[] = [
   { icon: Settings, label: 'Settings' },
 ];
 
+interface SidebarNavProps {
+  expanded?: boolean;
+  onToggle?: () => void;
+}
+
 /**
- * Icon-based sidebar navigation matching the mockup
+ * Icon-based sidebar navigation with expand/collapse functionality
  */
-export function SidebarNav() {
+export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
   return (
-    <nav className='flex h-full flex-col items-center gap-2 border-r border-white/5 bg-slate-950 px-2 py-4'>
+    <nav
+      className={cn(
+        'flex h-full flex-col border-r border-white/5 bg-slate-950 py-4 transition-all duration-300',
+        expanded ? 'w-48 items-stretch px-3' : 'w-[60px] items-center px-2'
+      )}
+    >
       {/* Logo */}
       <a
         href='/'
-        className='mb-4 flex size-10 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'
+        className={cn(
+          'mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950',
+          expanded && 'self-start'
+        )}
       >
         P
       </a>
@@ -38,26 +59,32 @@ export function SidebarNav() {
         const content = (
           <div
             className={cn(
-              'flex size-10 cursor-pointer items-center justify-center rounded-[10px] transition-all',
+              'flex cursor-pointer items-center gap-3 rounded-[10px] transition-all',
+              expanded ? 'px-3 py-2.5' : 'size-10 justify-center',
               item.active
                 ? 'bg-cyan-500/15 text-cyan-500'
                 : 'text-slate-500 hover:bg-slate-800 hover:text-slate-400'
             )}
-            title={item.label}
+            title={expanded ? undefined : item.label}
           >
-            <Icon className='size-5' />
+            <Icon className='size-5 shrink-0' />
+            {expanded && <span className='text-sm font-medium truncate'>{item.label}</span>}
           </div>
         );
 
         if (item.href) {
           return (
-            <a key={item.label} href={item.href}>
+            <a key={item.label} href={item.href} className='mb-1'>
               {content}
             </a>
           );
         }
 
-        return <div key={item.label}>{content}</div>;
+        return (
+          <div key={item.label} className='mb-1'>
+            {content}
+          </div>
+        );
       })}
 
       {/* Spacer */}
@@ -65,11 +92,37 @@ export function SidebarNav() {
 
       {/* Help */}
       <div
-        className='flex size-10 cursor-pointer items-center justify-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400'
-        title='Help'
+        className={cn(
+          'flex cursor-pointer items-center gap-3 rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
+          expanded ? 'px-3 py-2.5' : 'size-10 justify-center'
+        )}
+        title={expanded ? undefined : 'Help'}
       >
-        <HelpCircle className='size-5' />
+        <HelpCircle className='size-5 shrink-0' />
+        {expanded && <span className='text-sm font-medium'>Help</span>}
       </div>
+
+      {/* Expand/Collapse toggle */}
+      {onToggle && (
+        <button
+          type='button'
+          onClick={onToggle}
+          className={cn(
+            'mt-2 flex cursor-pointer items-center gap-3 rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
+            expanded ? 'px-3 py-2.5' : 'size-10 justify-center'
+          )}
+          title={expanded ? 'Collapse menu' : 'Expand menu'}
+        >
+          {expanded ? (
+            <>
+              <ChevronLeft className='size-5 shrink-0' />
+              <span className='text-sm font-medium'>Collapse</span>
+            </>
+          ) : (
+            <ChevronRight className='size-5 shrink-0' />
+          )}
+        </button>
+      )}
     </nav>
   );
 }
