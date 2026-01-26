@@ -802,10 +802,10 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `ComplexityWarning.tsx` (>£250k, 7 tests)
 - [x] `OtherIncomeWarning.tsx` (persistent banner, 7 tests)
 
-### Phase 5: Education (Inline Accordions)
-- [ ] `WhatIsPayroll.tsx`
-- [ ] `WhatAreDividends.tsx`
-- [ ] `WhyThisSalary.tsx`
+### Phase 5: Education ✅ COMPLETE (21 tests)
+- [x] `WhatIsPayroll.tsx` (PAYE basics, 6 tests)
+- [x] `WhatAreDividends.tsx` (dividend benefits, 7 tests)
+- [x] `WhyThisSalary.tsx` (£12,570 rationale, 8 tests)
 
 ### Phase 6: Page Assembly
 - [ ] `page.tsx` (metadata, schema)
