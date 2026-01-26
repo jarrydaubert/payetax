@@ -33,7 +33,7 @@ interface InputSummary {
 interface ComparisonModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (strategy: Strategy) => void;
+  onContinue: () => void;
   strategies: StrategyData[];
   inputSummary?: InputSummary;
   className?: string;
@@ -57,7 +57,7 @@ function formatCurrency(amount: number): string {
 export function ComparisonModal({
   isOpen,
   onClose,
-  onSelect,
+  onContinue,
   strategies,
   inputSummary,
   className,
@@ -83,13 +83,14 @@ export function ComparisonModal({
         {/* Header */}
         <div className='mb-6 text-center'>
           <h2 className='mb-2 font-semibold text-2xl text-slate-100'>
-            Compare Your{' '}
+            Why{' '}
             <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
-              Options
-            </span>
+              Salary + Dividends
+            </span>{' '}
+            Wins
           </h2>
           <p className='text-slate-400'>
-            See how different payment strategies affect your take-home pay
+            Here's how different strategies compare — and why we recommend the optimal mix
           </p>
         </div>
 
@@ -235,19 +236,20 @@ export function ComparisonModal({
                   </div>
                 </div>
 
-                {/* Select button */}
-                <button
-                  type='button'
-                  onClick={() => onSelect(strategy.id)}
-                  className={cn(
-                    'mt-5 w-full rounded-lg py-3 font-semibold transition-all',
-                    strategy.recommended
-                      ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/25'
-                      : 'border border-white/10 bg-slate-700 text-slate-200 hover:bg-slate-600'
-                  )}
-                >
-                  Select This Option
-                </button>
+                {/* Action button - only prominent for recommended */}
+                {strategy.recommended ? (
+                  <button
+                    type='button'
+                    onClick={onContinue}
+                    className='mt-5 w-full rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 py-3 font-semibold text-slate-950 transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/25'
+                  >
+                    Continue
+                  </button>
+                ) : (
+                  <div className='mt-5 pt-3 border-t border-white/5 text-center'>
+                    <span className='text-slate-500 text-sm'>Not recommended</span>
+                  </div>
+                )}
               </div>
             );
           })}

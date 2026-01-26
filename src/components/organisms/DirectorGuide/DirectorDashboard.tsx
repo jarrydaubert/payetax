@@ -11,7 +11,6 @@ import {
   MainContent,
   OtherIncomeGate,
   SidebarNav,
-  type Strategy,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import {
   trackGuideReset,
@@ -102,10 +101,8 @@ export function DirectorDashboard() {
     setShowComparison(true);
   }, [calculate, setHasOtherIncome]);
 
-  // Handle strategy selection from comparison modal
-  const handleSelectStrategy = useCallback((_strategy: Strategy) => {
-    // For MVP, we always use the optimal (salary-dividends) strategy
-    // In future, we could recalculate based on selected strategy
+  // Handle continuing from comparison modal (informational, not a choice)
+  const handleContinueFromComparison = useCallback(() => {
     setShowComparison(false);
     setViewState('populated');
   }, []);
@@ -179,11 +176,11 @@ export function DirectorDashboard() {
         onHasOtherIncome={handleHasOtherIncome}
       />
 
-      {/* Comparison Modal */}
+      {/* Comparison Modal - informational, shows why salary+dividends is optimal */}
       <ComparisonModal
         isOpen={showComparison}
         onClose={() => setShowComparison(false)}
-        onSelect={handleSelectStrategy}
+        onContinue={handleContinueFromComparison}
         strategies={strategies}
         inputSummary={{
           revenue: formData.revenue ?? 0,
