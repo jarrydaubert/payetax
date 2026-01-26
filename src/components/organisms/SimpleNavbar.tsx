@@ -177,14 +177,17 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         </Button>
       </nav>
 
-      {/* Mobile Menu - Outside nav to allow backdrop-filter to work */}
+      {/*
+       * Mobile Menu - Outside nav to allow backdrop-filter to work.
+       * Calculator navigation handled by links array (/#tax-calculator).
+       * FeedbackDialog passed as utility, rendered after nav links.
+       */}
       <NavbarMobileMenu
         isOpen={isMobileMenuOpen}
         links={links}
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => setIsMobileMenuOpen(false)}
-        onCalculatorClick={handleCalculatorClick}
         utilities={<FeedbackDialog />}
       />
 

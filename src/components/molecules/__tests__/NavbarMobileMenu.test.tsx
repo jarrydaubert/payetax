@@ -54,10 +54,12 @@ describe('NavbarMobileMenu', () => {
       expect(screen.getByRole('link', { name: 'About' })).toBeInTheDocument();
     });
 
-    it('should render CTA button', () => {
-      render(<NavbarMobileMenu {...defaultProps} />);
-      // The CTA button "Open Calculator" should be present
-      expect(screen.getByRole('link', { name: 'Open Calculator' })).toBeInTheDocument();
+    it('should render utilities when provided', () => {
+      render(
+        <NavbarMobileMenu {...defaultProps} utilities={<button type='button'>Feedback</button>} />
+      );
+      // Utilities (e.g., FeedbackDialog) render after nav links - no separate CTA button
+      expect(screen.getByRole('button', { name: 'Feedback' })).toBeInTheDocument();
     });
   });
 

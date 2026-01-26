@@ -19,9 +19,10 @@ interface NavbarMobileMenuProps {
   pathname: string;
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
-  /** Handler for calculator CTA click */
-  onCalculatorClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-  /** Optional utility components (e.g., FeedbackDialog) */
+  /**
+   * Optional utility components rendered after nav links (e.g., FeedbackDialog).
+   * Styled consistently with nav links for visual coherence.
+   */
   utilities?: ReactNode;
 }
 
@@ -38,7 +39,6 @@ export function NavbarMobileMenu({
   pathname,
   onLinkClick,
   onBackdropClick,
-  onCalculatorClick,
   utilities,
 }: NavbarMobileMenuProps) {
   const menuRef = useRef<HTMLElement>(null);
@@ -66,9 +66,16 @@ export function NavbarMobileMenu({
       firstLinkRef.current?.focus();
     }, 100);
 
-    // Trap focus within menu
+    // Trap focus within menu (but allow Radix dialogs to manage their own focus)
     const handleFocusTrap = (event: FocusEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      // If focus moved to a Radix dialog/portal, let Radix handle focus trapping
+      // This prevents infinite focus loops when FeedbackDialog opens from mobile menu
+      const isInRadixPortal = (target as Element).closest?.('[data-radix-portal]');
+      if (isInRadixPortal) return;
+
+      if (menuRef.current && !menuRef.current.contains(target)) {
         event.preventDefault();
         firstLinkRef.current?.focus();
       }
@@ -118,6 +125,7 @@ export function NavbarMobileMenu({
             aria-label='Mobile navigation menu'
           >
             <div className='flex flex-col gap-2'>
+              {/* Navigation links - Calculator link already handles /#tax-calculator */}
               {links.map((link, index) => {
                 const isActive =
                   pathname === link.href ||
@@ -140,17 +148,12 @@ export function NavbarMobileMenu({
                 );
               })}
 
-              {/* Mobile CTA Button - gradient border */}
-              <Link
-                href='/#tax-calculator'
-                onClick={onCalculatorClick}
-                className='mt-4 block min-h-[44px] rounded-full border border-transparent px-5 py-3 text-center font-semibold text-[0.95rem] text-text-primary-new transition-all [background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]'
-              >
-                Open Calculator
-              </Link>
-
-              {/* Utilities (e.g., FeedbackDialog) */}
-              {utilities && <div className='mt-4'>{utilities}</div>}
+              {/*
+               * Utilities section (e.g., FeedbackDialog)
+               * Rendered after nav links for logical flow - users navigate first, then provide feedback.
+               * No separate CTA button needed since "Calculator" link above serves that purpose.
+               */}
+              {utilities}
             </div>
           </motion.nav>
         )}
