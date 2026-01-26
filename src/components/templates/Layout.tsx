@@ -3,6 +3,7 @@
 
 import type React from 'react';
 import { Suspense } from 'react';
+import { usePathname } from 'next/navigation';
 import BackgroundElements from '@/components/atoms/BackgroundElements';
 import Footer from '@/components/molecules/Footer';
 import CookieBanner from '@/components/organisms/CookieBanner';
@@ -12,7 +13,31 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+/** Routes that should be full-screen without header/footer */
+const FULL_SCREEN_ROUTES = ['/tools/director-guide'];
+
 export function Layout({ children }: LayoutProps): React.ReactElement {
+  const pathname = usePathname();
+  const isFullScreen = FULL_SCREEN_ROUTES.some((route) => pathname?.startsWith(route));
+
+  // Full-screen mode: no header, footer, or background elements
+  if (isFullScreen) {
+    return (
+      <div className='relative min-h-screen'>
+        <a href='#main-content' className='skip-link'>
+          Skip to main content
+        </a>
+        {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for skip-link accessibility */}
+        <main id='main-content' className='h-screen'>
+          {children}
+        </main>
+        <Suspense fallback={null}>
+          <CookieBanner />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className='relative flex min-h-screen flex-col bg-deep'>
       {/* Background geometric elements */}
