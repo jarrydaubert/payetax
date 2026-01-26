@@ -787,20 +787,20 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `AlreadyTakenStep.tsx` (with guardrail)
 - [x] `OtherIncomeGate.tsx` (pre-calculation acknowledgment)
 
-### Phase 3: Results Components ✅ COMPLETE
-- [x] `ResultsSection.tsx` (orchestrator with survival mode)
-- [x] `CompanyBox.tsx` (CT + Employer NI breakdown)
-- [x] `PersonalBox.tsx` (monthly pay + tax savings)
-- [x] `HowToDoIt.tsx` (4-step action guide)
-- [x] `Assumptions.tsx` (collapsible with useId)
-- [x] `CopyResults.tsx` (formatted clipboard output)
+### Phase 3: Results Components ✅ COMPLETE (51 tests)
+- [x] `ResultsSection.tsx` (orchestrator, 10 tests)
+- [x] `CompanyBox.tsx` (CT + Employer NI, 5 tests)
+- [x] `PersonalBox.tsx` (monthly pay + savings, 6 tests)
+- [x] `HowToDoIt.tsx` (4-step guide, 7 tests)
+- [x] `Assumptions.tsx` (collapsible, 8 tests)
+- [x] `CopyResults.tsx` (clipboard, 7 tests)
 
-### Phase 4: Warnings ✅ COMPLETE
-- [x] `SurvivalMode.tsx` (profit ≤ £12,570)
-- [x] `DLAWarning.tsx` (Director's Loan risk)
-- [x] `VATWarning.tsx` (£85k-£95k threshold)
-- [x] `ComplexityWarning.tsx` (>£250k optimization)
-- [x] `OtherIncomeWarning.tsx` (persistent banner)
+### Phase 4: Warnings ✅ COMPLETE (26 tests)
+- [x] `SurvivalMode.tsx` (profit ≤ £12,570, 8 tests)
+- [x] `DLAWarning.tsx` (Director's Loan, 6 tests)
+- [x] `VATWarning.tsx` (£85k-£95k, 5 tests)
+- [x] `ComplexityWarning.tsx` (>£250k, 7 tests)
+- [x] `OtherIncomeWarning.tsx` (persistent banner, 7 tests)
 
 ### Phase 5: Education (Inline Accordions)
 - [ ] `WhatIsPayroll.tsx`
