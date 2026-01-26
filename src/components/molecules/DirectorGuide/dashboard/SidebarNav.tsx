@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Settings,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -35,10 +36,17 @@ interface SidebarNavProps {
  * Sidebar navigation - icons centered when collapsed, icons+labels when expanded
  */
 export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
+  // Disable transitions on initial render to prevent flash
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <nav
       className={cn(
-        'flex h-full flex-col border-r border-white/5 bg-slate-950 py-4 transition-all duration-200',
+        'flex h-full flex-col border-r border-white/5 bg-slate-950 py-4',
+        mounted && 'transition-[width,padding] duration-200',
         expanded ? 'w-48 px-3' : 'w-[60px] items-center px-2'
       )}
     >
