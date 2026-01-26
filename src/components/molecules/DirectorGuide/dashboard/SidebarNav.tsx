@@ -37,7 +37,12 @@ interface SidebarNavProps {
  */
 export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
   return (
-    <nav className='relative flex h-full w-48 flex-col overflow-hidden border-r border-white/5 bg-slate-950 px-3 py-4'>
+    <nav
+      className={cn(
+        'relative flex h-full flex-col overflow-hidden border-r border-white/5 bg-slate-950 py-4 transition-[width,padding] duration-200 ease-out',
+        collapsed ? 'w-[52px] px-1.5' : 'w-48 px-3'
+      )}
+    >
       {/* Cover sheet - slides in from right to cover labels when collapsed */}
       <div
         className={cn(
