@@ -4,6 +4,7 @@
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/atoms/ui/button';
+import { trackResultsCopied } from '@/lib/directorGuideAnalytics';
 import { cn } from '@/lib/utils';
 import type { DirectorInput, DirectorResult } from '@/lib/validation/directorValidation';
 
@@ -86,6 +87,7 @@ export function CopyResults({ result, input, className }: CopyResultsProps) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      trackResultsCopied();
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers

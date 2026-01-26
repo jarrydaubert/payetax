@@ -2,6 +2,7 @@
 'use client';
 
 import { RotateCcw } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/atoms/ui/button';
 import {
   ComplexityWarning,
@@ -15,12 +16,18 @@ import {
 } from '@/components/molecules/DirectorGuide';
 import { DirectorGuideForm } from '@/components/organisms/DirectorGuide/DirectorGuideForm';
 import {
+  trackGuideReset,
+  trackGuideStarted,
+  trackResultsShown,
+  trackWarningShown,
+} from '@/lib/directorGuideAnalytics';
+import { isNormalMode } from '@/lib/validation/directorValidation';
+import {
   useDirectorFormData,
   useDirectorGuideActions,
   useDirectorGuideStore,
   useDirectorResults,
 } from '@/store/directorGuideStore';
-import { isNormalMode } from '@/lib/validation/directorValidation';
 
 /**
  * Director Guide Client Component
@@ -33,6 +40,30 @@ export function DirectorGuideClient() {
   const results = useDirectorResults();
   const formData = useDirectorFormData();
   const { reset } = useDirectorGuideActions();
+  const hasTrackedStart = useRef(false);
+  const hasTrackedResults = useRef(false);
+
+  // Track page load (once)
+  useEffect(() => {
+    if (!hasTrackedStart.current) {
+      trackGuideStarted();
+      hasTrackedStart.current = true;
+    }
+  }, []);
+
+  // Track results shown (once per calculation)
+  useEffect(() => {
+    if (showResults && results && !hasTrackedResults.current) {
+      trackResultsShown(results.grossProfit, results.mode);
+      hasTrackedResults.current = true;
+    }
+  }, [showResults, results]);
+
+  const handleReset = () => {
+    trackGuideReset();
+    hasTrackedResults.current = false;
+    reset();
+  };
 
   // Show form if no results yet
   if (!showResults || !results) {
@@ -64,18 +95,28 @@ export function DirectorGuideClient() {
     (formData.alreadyTaken ?? 0) > 0 &&
     formData.alreadyTakenViaPayroll === false;
 
+  // Track warnings (once per results view)
+  useEffect(() => {
+    if (showOtherIncomeWarning) trackWarningShown('OTHER_INCOME');
+    if (showVATWarning) trackWarningShown('VAT_THRESHOLD');
+    if (showComplexityWarning) trackWarningShown('HIGH_COMPLEXITY');
+    if (showDLAWarning) trackWarningShown('DLA_RISK');
+  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning]);
+
   return (
     <main className='container mx-auto max-w-2xl px-4 py-8'>
       {/* Warnings Section */}
-      <div className='mb-6 space-y-3'>
+      <div className='mb-6 space-y-3' role='alert' aria-live='polite'>
         {showOtherIncomeWarning && <OtherIncomeWarning />}
         {showVATWarning && <VATWarning revenue={results.netRevenue} />}
         {showComplexityWarning && <ComplexityWarning />}
         {showDLAWarning && <DLAWarning />}
       </div>
 
-      {/* Results */}
-      <ResultsSection result={results} input={input} />
+      {/* Results - aria-live for screen readers */}
+      <div aria-live='polite'>
+        <ResultsSection result={results} input={input} />
+      </div>
 
       {/* Education Accordions */}
       {isNormalMode(results) && (
@@ -88,7 +129,7 @@ export function DirectorGuideClient() {
 
       {/* Start Over Button */}
       <div className='mt-8 flex justify-center'>
-        <Button variant='outline' onClick={reset} className='gap-2'>
+        <Button variant='outline' onClick={handleReset} className='gap-2'>
           <RotateCcw className='size-4' />
           Start over with new numbers
         </Button>
