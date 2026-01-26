@@ -26,3 +26,6 @@ export {
   SurvivalMode,
   VATWarning,
 } from './warnings';
+
+// Education
+export { WhatAreDividends, WhatIsPayroll, WhyThisSalary } from './education';
