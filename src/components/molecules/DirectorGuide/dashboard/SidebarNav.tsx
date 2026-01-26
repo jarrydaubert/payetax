@@ -32,12 +32,16 @@ interface SidebarNavProps {
 }
 
 /**
- * Icon-based sidebar navigation with expand/collapse functionality
- * Uses fixed positioning and overflow to prevent layout jumps
+ * Sidebar navigation - icons centered when collapsed, icons+labels when expanded
  */
 export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
   return (
-    <nav className='flex h-full w-48 flex-col border-r border-white/5 bg-slate-950 px-3 py-4'>
+    <nav
+      className={cn(
+        'flex h-full flex-col border-r border-white/5 bg-slate-950 py-4 transition-all duration-200',
+        expanded ? 'w-48 px-3' : 'w-[60px] items-center px-2'
+      )}
+    >
       {/* Logo */}
       <a
         href='/'
@@ -52,7 +56,8 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
         const content = (
           <div
             className={cn(
-              'flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5',
+              'flex cursor-pointer items-center rounded-[10px] transition-all duration-200',
+              expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center',
               item.active
                 ? 'bg-cyan-500/15 text-cyan-500'
                 : 'text-slate-500 hover:bg-slate-800 hover:text-slate-400'
@@ -60,7 +65,9 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
             title={item.label}
           >
             <Icon className='size-5 shrink-0' />
-            <span className='text-sm font-medium'>{item.label}</span>
+            {expanded && (
+              <span className='whitespace-nowrap text-sm font-medium'>{item.label}</span>
+            )}
           </div>
         );
 
@@ -84,11 +91,14 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
 
       {/* Help */}
       <div
-        className='flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
+        className={cn(
+          'flex cursor-pointer items-center rounded-[10px] text-slate-500 transition-all duration-200 hover:bg-slate-800 hover:text-slate-400',
+          expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center'
+        )}
         title='Help'
       >
         <HelpCircle className='size-5 shrink-0' />
-        <span className='text-sm font-medium'>Help</span>
+        {expanded && <span className='whitespace-nowrap text-sm font-medium'>Help</span>}
       </div>
 
       {/* Expand/Collapse toggle */}
@@ -96,15 +106,20 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
         <button
           type='button'
           onClick={onToggle}
-          className='mt-2 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
+          className={cn(
+            'mt-2 flex cursor-pointer items-center rounded-[10px] text-slate-500 transition-all duration-200 hover:bg-slate-800 hover:text-slate-400',
+            expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center'
+          )}
           title={expanded ? 'Collapse menu' : 'Expand menu'}
         >
           {expanded ? (
-            <ChevronLeft className='size-5 shrink-0' />
+            <>
+              <ChevronLeft className='size-5 shrink-0' />
+              <span className='whitespace-nowrap text-sm font-medium'>Collapse</span>
+            </>
           ) : (
             <ChevronRight className='size-5 shrink-0' />
           )}
-          <span className='text-sm font-medium'>{expanded ? 'Collapse' : 'Expand'}</span>
         </button>
       )}
     </nav>

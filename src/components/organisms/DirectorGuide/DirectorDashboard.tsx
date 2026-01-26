@@ -155,7 +155,6 @@ export function DirectorDashboard() {
             alreadyTakenViaPayroll={formData.alreadyTakenViaPayroll}
           />
         }
-        sidebarExpanded={sidebarExpanded}
         inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}

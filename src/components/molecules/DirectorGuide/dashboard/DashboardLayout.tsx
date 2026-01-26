@@ -10,7 +10,6 @@ interface DashboardLayoutProps {
   inputs: ReactNode;
   main: ReactNode;
   education: ReactNode;
-  sidebarExpanded?: boolean;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
   onToggleInputs?: () => void;
@@ -26,7 +25,6 @@ export function DashboardLayout({
   inputs,
   main,
   education,
-  sidebarExpanded = false,
   inputsCollapsed = false,
   educationCollapsed = false,
   onToggleInputs,
@@ -35,13 +33,8 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <div className={cn('flex h-screen overflow-hidden bg-slate-950', className)}>
-      {/* Sidebar - expands from 60px to 192px, pushes content */}
-      <div
-        className='shrink-0 overflow-hidden transition-[width] duration-200 ease-out max-md:hidden'
-        style={{ width: sidebarExpanded ? 192 : 60 }}
-      >
-        <div className='h-full w-48'>{sidebar}</div>
-      </div>
+      {/* Sidebar - controlled by SidebarNav's own width */}
+      <div className='shrink-0 max-md:hidden'>{sidebar}</div>
 
       {/* Inputs panel - collapsible */}
       <div
