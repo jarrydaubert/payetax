@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/dashboard/InputsPanel.tsx
 'use client';
 
-import { FileDown, RotateCcw, Share2 } from 'lucide-react';
+import { Crown, FileDown, RotateCcw, Share2 } from 'lucide-react';
 import { Input } from '@/components/atoms/ui/input';
 import { Label } from '@/components/atoms/ui/label';
 import {
@@ -140,8 +140,8 @@ export function InputsPanel({ onCalculate, isCalculateDisabled, className }: Inp
         </span>
         <div className='mt-3 space-y-2'>
           <QuickAction icon={RotateCcw} label='Reset to defaults' shortcut='R' onClick={reset} />
-          <QuickAction icon={FileDown} label='Export as PDF' shortcut='E' disabled />
-          <QuickAction icon={Share2} label='Share results' shortcut='S' disabled />
+          <QuickAction icon={FileDown} label='Export as PDF' shortcut='E' disabled isPro />
+          <QuickAction icon={Share2} label='Share results' shortcut='S' disabled isPro />
         </div>
       </div>
     </aside>
@@ -154,9 +154,10 @@ interface QuickActionProps {
   shortcut: string;
   onClick?: () => void;
   disabled?: boolean;
+  isPro?: boolean;
 }
 
-function QuickAction({ icon: Icon, label, shortcut, onClick, disabled }: QuickActionProps) {
+function QuickAction({ icon: Icon, label, shortcut, onClick, disabled, isPro }: QuickActionProps) {
   return (
     <button
       type='button'
@@ -171,6 +172,7 @@ function QuickAction({ icon: Icon, label, shortcut, onClick, disabled }: QuickAc
     >
       <Icon className='size-4 text-cyan-500' />
       <span className='flex-1'>{label}</span>
+      {isPro && <Crown className='size-3 text-amber-500' />}
       <span className='rounded bg-slate-900 px-1.5 py-0.5 font-mono text-slate-600 text-xs'>
         {shortcut}
       </span>
