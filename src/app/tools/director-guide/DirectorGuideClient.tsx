@@ -59,6 +59,24 @@ export function DirectorGuideClient() {
     }
   }, [showResults, results]);
 
+  // Determine which warnings to show (must be before useEffect to avoid conditional hooks)
+  const showOtherIncomeWarning = showResults && hasOtherIncome === true;
+  const showVATWarning =
+    showResults && results && isNormalMode(results) && results.netRevenue >= 85000 && results.netRevenue <= 95000;
+  const showComplexityWarning = showResults && results && isNormalMode(results) && results.grossProfit > 250000;
+  const showDLAWarning =
+    showResults && results && isNormalMode(results) &&
+    (formData.alreadyTaken ?? 0) > 0 &&
+    formData.alreadyTakenViaPayroll === false;
+
+  // Track warnings (once per results view) - must be called unconditionally
+  useEffect(() => {
+    if (showOtherIncomeWarning) trackWarningShown('OTHER_INCOME');
+    if (showVATWarning) trackWarningShown('VAT_THRESHOLD');
+    if (showComplexityWarning) trackWarningShown('HIGH_COMPLEXITY');
+    if (showDLAWarning) trackWarningShown('DLA_RISK');
+  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning]);
+
   const handleReset = () => {
     trackGuideReset();
     hasTrackedResults.current = false;
@@ -84,24 +102,6 @@ export function DirectorGuideClient() {
     alreadyTakenViaPayroll: formData.alreadyTakenViaPayroll ?? null,
     confirmedSoleIncome: formData.confirmedSoleIncome ?? false,
   };
-
-  // Determine which warnings to show
-  const showOtherIncomeWarning = hasOtherIncome === true;
-  const showVATWarning =
-    isNormalMode(results) && results.netRevenue >= 85000 && results.netRevenue <= 95000;
-  const showComplexityWarning = isNormalMode(results) && results.grossProfit > 250000;
-  const showDLAWarning =
-    isNormalMode(results) &&
-    (formData.alreadyTaken ?? 0) > 0 &&
-    formData.alreadyTakenViaPayroll === false;
-
-  // Track warnings (once per results view)
-  useEffect(() => {
-    if (showOtherIncomeWarning) trackWarningShown('OTHER_INCOME');
-    if (showVATWarning) trackWarningShown('VAT_THRESHOLD');
-    if (showComplexityWarning) trackWarningShown('HIGH_COMPLEXITY');
-    if (showDLAWarning) trackWarningShown('DLA_RISK');
-  }, [showOtherIncomeWarning, showVATWarning, showComplexityWarning, showDLAWarning]);
 
   return (
     <main className='container mx-auto max-w-2xl px-4 py-8'>
