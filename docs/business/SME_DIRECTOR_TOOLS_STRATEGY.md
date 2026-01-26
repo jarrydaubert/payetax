@@ -1,6 +1,12 @@
 # SME Director Tools - Strategy & Monetization
 
-> **Version:** 1.0 | **Created:** 2026-01-26 | **Status:** Strategic Planning
+> **Version:** 1.3 | **Created:** 2026-01-26 | **Status:** ALL 4 REVIEWS COMPLETE - Decisions Needed
+>
+> **Review Notes:**
+> - v1.0: Initial comprehensive strategy
+> - v1.1: Added Grok review - widget demand skepticism, pricing concerns, competitive landscape
+> - v1.2: Added Gemini + Claude reviews - fundamental questions about widget as product, market validation needed
+> - v1.3: Added ChatGPT review - cookie compliance, lead capture decision, embed privacy mode, debug tooling
 
 ---
 
@@ -1412,6 +1418,583 @@ NOT FOR:
 ❌ Partnerships (LLP)
 ❌ Employees (use our PAYE calculator)
 ```
+
+---
+
+---
+
+## Review Feedback
+
+### Grok Review (v1.1) - CRITICAL CONCERNS
+
+**Overall:** "Thorough and ambitious, but several assumptions appear overly optimistic, particularly around accountant adoption and willingness to pay."
+
+#### 🚨 Major Concerns
+
+**1. Widget Demand is Questionable**
+
+> "Many UK accounting firms already host free, self-built or third-party calculators (Gorilla Accounting, RSBC, Reflex Accounting, COPA Accounting). These are marketing tools, not revenue generators—accountants view them as cost centers for client acquisition, not differentiators worth paying for."
+
+**Reality check:** Free alternatives exist. Accountants may not pay for something they can get free or build themselves.
+
+**2. Pricing Likely Too High**
+
+> "£49-£74.99/mo is likely too high for a single calculator. UK accountants are cost-sensitive for marketing tools. Comparable website enhancements are one-off (£500-£2,000) or bundled in broader SaaS (£20-£100/mo for full practice tools)."
+
+**Recommendation:** Start lower (£29-£49) to test willingness.
+
+**3. Competitive Density Higher Than Assumed**
+
+| Competitor | What They Offer |
+|------------|-----------------|
+| Gorilla Accounting | Free salary/dividend calculator on site |
+| RSBC | Free director tax calculator |
+| Reflex Accounting | Free contractor calculator |
+| COPA Accounting | Free take-home calculator |
+| IT Contracting | Free IR35/dividend tools |
+
+"No evidence of paid embed models succeeding in this niche."
+
+**4. Direct SaaS Likely Outperforms Widget**
+
+> "Adjust targets accordingly. Direct SaaS subscriptions likely outperform embeds."
+
+#### ⚠️ Missing Considerations
+
+| Gap | Risk | Action Needed |
+|-----|------|---------------|
+| **GDPR for embedded widget** | Who is controller/processor? Need DPA with accountants? | Add GDPR/DPA section |
+| **Rate update process** | Tax rates change annually, no formal process defined | Document update workflow |
+| **Exit strategy for customers** | If we pivot/shut down, accountant sites break | Add notice period commitment |
+| **Geo-blocking** | Non-UK users could get wrong results | Add UK-only warning |
+| **Accessibility testing** | Widget must meet WCAG for public sector | Add to testing plan |
+| **Fraud/abuse** | Stolen cards, competitor scraping | Add fraud monitoring |
+
+#### ⚠️ Operational Gaps
+
+| Gap | Issue |
+|-----|-------|
+| **Multi-site too rigid** | Growth firms have multiple domains; 1-site rule frustrates |
+| **Subdomain handling** | Unclear if calculator.firm.com counts as same site |
+| **Trial abuse** | No-card invites spam; card-upfront adds friction |
+| **Support scalability** | No knowledge base or escalation path |
+| **Rate update SLA** | Who verifies? Downtime during deploy? |
+
+#### ⚠️ Legal/Compliance Gaps
+
+| Risk | Concern |
+|------|---------|
+| **FCA/FSMA** | Tax calculators may borderline "financial promotion" if implying optimization advice |
+| **Embedded errors liability** | If widget shows wrong tax post-budget, accountant clients blame us |
+| **Indemnity clause** | Missing from ToS |
+| **VAT reverse charge** | Confirm handling for non-UK customers |
+
+#### ⚠️ Technical Risks
+
+| Risk | Concern |
+|------|---------|
+| **Real-time validation overhead** | Every widget load hits API - scales poorly with viral adoption |
+| **Latency at scale** | High-traffic accountant site could cause issues |
+| **Third-party dependency** | Polar/Supabase/Vercel outages affect widget globally |
+| **Aggressive caching needed** | Not detailed in current architecture |
+
+#### ✅ What Grok Agreed With
+
+- Trial: Card upfront, 14 days ✅
+- Self-serve only for MVP ✅
+- SLA credits not worth complexity ✅
+- Facebook/LinkedIn balance correct ✅
+- Remotion worthwhile (after MVP) ✅
+
+#### 📋 Grok's Recommendations
+
+1. **Validate demand via free tool first** before heavy widget investment
+2. **Lower widget pricing** to £29-£49 or bundle with Pro features
+3. **Add GDPR/DPA section** and rate-update process
+4. **Temper widget revenue expectations** - direct SaaS likely outperforms
+5. **Build "Should I Incorporate?" sooner** - low-effort bridge for sole traders
+6. **Allow subdomains freely** - strict matching frustrates users
+
+---
+
+---
+
+### Gemini Review (v1.1) - COMMERCIAL VIABILITY CONCERNS
+
+**Overall:** "The strategy is 80% there. The tech is solid. The commercial model is the weak point—specifically the price sensitivity of the target market."
+
+#### 🚨 The "Why Buy" Problem
+
+> "If your free tool is good (and you promise 'Free stays free'), accountants will simply bookmark your site and run calculations there for clients. They won't pay £49/mo just to host it themselves."
+
+**The Fix:** Pivot widget messaging from "Client Tool" to **"Lead Magnet"**
+
+| Current Positioning | Better Positioning |
+|--------------------|--------------------|
+| "Help your existing clients" | "Get NEW clients" |
+| Client retention tool | Lead generation tool |
+| Service differentiator | Sales conversion tool |
+
+**Critical Feature Missing:**
+> "The widget must have an 'Email me this calculation' feature where the lead goes straight to the accountant."
+
+This is the killer feature. Visitor calculates → Enters email → Lead goes to accountant. THAT'S worth paying for.
+
+#### 🚨 Pricing Still Too High
+
+| Our Price | Gemini's View |
+|-----------|---------------|
+| £49 Starter | "I need to ask my partner" bracket |
+| £74.99 Pro | Irrelevant until we have a suite |
+
+**Gemini's Recommended Pricing:**
+
+| Tier | Price | Value |
+|------|-------|-------|
+| **Starter** | £19/mo | Branded ("Powered by PayeTax" = backlink for us) |
+| **White Label** | £49/mo | No badge, custom branding |
+| **Suite** | £75+/mo | Only when we have multiple tools |
+
+#### 🚨 Missing Sales Channel: Web Agencies
+
+> "Most accountants don't manage their own websites. They hire agencies (e.g., PracticeWeb, generic local agencies)."
+
+**Strategy:** Partner with agencies. One sale = 10 widget installs.
+
+| Direct to Accountant | Via Web Agency |
+|---------------------|----------------|
+| Cold email (low conversion) | Partner relationship |
+| 1 sale = 1 install | 1 sale = 10+ installs |
+| They don't know how to install | Agency handles install |
+| High support burden | Agency handles support |
+
+**Action:** Add web agencies as primary sales channel.
+
+#### ⚠️ Trial Strategy - DISAGREES WITH GROK
+
+| Grok Says | Gemini Says |
+|-----------|-------------|
+| Card upfront (filters tyre-kickers) | NO card (lower friction) |
+
+**Gemini's reasoning:**
+> "If they install the widget, they are 'sticky.' They won't want a broken widget on their site on Day 15. The 'broken widget' state is your leverage."
+
+#### ⚠️ Legal Requirements (Mandatory)
+
+**1. DPA (Data Processing Addendum)**
+
+> "You cannot just have a Privacy Policy. You need a DPA that the accountant accepts."
+
+- Accountant = Data Controller
+- PayeTax = Data Processor
+- Must define exactly what data (IPs, logs) is kept and for how long
+
+**2. Indemnity Clause**
+
+> "Your B2B Terms need an Indemnity Clause explicitly stating the Accountant indemnifies you against claims from their end-users."
+
+Scenario: User underpays tax → Sues accountant → Accountant sues us.
+
+#### ⚠️ Operational Concerns
+
+**Support Overload:**
+> "This will be 80% of your support tickets: 'I pasted the code into Wix and it looks weird.'"
+
+**Mitigation:** Screenshot-heavy guides for Wix, WordPress (Elementor/Divi), Squarespace IMMEDIATELY.
+
+**Agency Staging Problem:**
+> "Agency sets up on staging.agency-server.com. Your license blocks it."
+
+**Fix:** Allow localhost and staging patterns by default.
+
+#### 🚨 Competitive Threat
+
+> "If Xero adds a 'Director Optimizer' dashboard widget (which they easily could), your standalone product dies."
+
+**Defense:** Move faster. Be "marketing first." Sell a SALES TOOL for accountants, not just a calculator.
+
+#### ✅ Gemini's Specific Answers
+
+| Question | Gemini's Answer |
+|----------|-----------------|
+| 1 site per sub? | ✅ Yes, simple is best |
+| Card upfront? | ❌ No - kills B2B conversion |
+| Sales calls? | ❌ No - CAC doesn't justify at £50/mo |
+| SLA credits? | ❌ Drop it - admin waste |
+| Remotion videos? | ⏸️ Wait - static carousels often outperform |
+| Facebook vs LinkedIn? | FB for directors, LinkedIn for accountants |
+| Sole traders? | ❌ Ignore for Phase 1 |
+
+#### 📋 Gemini's Required Changes
+
+1. **Lower pricing:** £19 Starter / £49 White Label
+2. **Add web agencies** as primary sales channel
+3. **Draft DPA and Indemnity clause** immediately
+4. **Remove card requirement** for trial
+5. **Rebrand as "Lead Magnet"** - add "Email me this" feature
+
+---
+
+---
+
+### Claude Review (v1.1) - FUNDAMENTAL QUESTIONS
+
+**Overall:** "Well-thought-out strategy with solid operational detail. However, significant gaps in market validation, competitive analysis, and go-to-market execution could derail the £110k ARR target."
+
+#### 🚨 The Big Question You Haven't Asked
+
+> "Is the widget the right second product?"
+
+**Alternative path:**
+- Skip the widget entirely
+- Go straight to Pro tier for directors (save scenarios)
+- Firm tier for accountants managing client scenarios IN YOUR DASHBOARD (not embedded)
+
+**Why this might be better:**
+- Simpler to build
+- Simpler to sell
+- Doesn't require accountants to modify their websites
+- Accountants use YOUR platform, not embed on theirs
+
+> "The widget is technically elegant but commercially unvalidated. Validate demand before building."
+
+#### 🚨 Critical: Zero Market Validation
+
+> "Your plan assumes 50 Starter + 30 Professional = £55k ARR. You have zero evidence accountants will pay for this."
+
+**Questions not answered:**
+- How many accountant websites currently have ANY calculator? (Most don't)
+- What % of accountants even have a website worth embedding on?
+- Have you talked to a SINGLE accountant about paying £50/mo for this?
+
+**UK Accountant Website Reality:**
+- Many have basic template sites with minimal updates
+- They don't invest in "content" because referrals drive business
+- A self-service calculator COMPETES with billable hours
+
+**Action Required:**
+> "Before building the widget, interview 10 accountants. Ask: 'Would you pay £50/mo for an embedded tax calculator?' Most importantly: 'Show me your website.'"
+
+#### 🚨 The Value Proposition Is Backwards
+
+> "Many accountants don't WANT client self-service."
+
+**Why accountants might NOT want this:**
+
+| Concern | Impact |
+|---------|--------|
+| Reduces perceived value | "Why do I need you if I can calculate myself?" |
+| Creates support burden | Client uses calc, gets confused, calls accountant |
+| Liability concern | "What if calculator is wrong and client relies on it?" |
+| Not a differentiator | Clients choose accountants on trust/referrals, not website tools |
+
+**Who WILL want this (small segment):**
+- Marketing-focused accountants trying to generate leads
+- Firms positioned as "modern" or "digital-first"
+- Accountants already investing in content marketing
+
+#### 🚨 Competitor Analysis Is Missing
+
+| Competitor | What They Offer | Pricing |
+|------------|-----------------|---------|
+| **TaxCalc** | Full accountant practice software with client tools | £500+/year |
+| **BrightPay** | Payroll + calculators for accountants | £199/year |
+| **AccountingWEB** | Editorial + tools | Free (ad-supported) |
+| **Individual firms** | Many build their own simple calculators | Free |
+| **FreeAgent/Xero** | Built-in tax calculations for users | Part of subscription |
+
+> "Why would an accountant pay you £600/year when TaxCalc includes calculators in their practice software?"
+
+**Missing:** What's your defensible moat?
+
+#### 🚨 £1,654 Savings Won't Sell Widgets
+
+From implementation doc: actual savings is ~£1,654, not "thousands."
+
+> "An accountant thinking about spending £600/year asks: 'What's in it for me?' The widget doesn't do anything the accountant can't do in 5 minutes."
+
+**The real value needs to be:**
+- Lead generation ("X visitors became clients")
+- Time saved ("Don't explain this in every meeting")
+- Professional image ("Modern firm with tools")
+
+#### ⚠️ Self-Serve Only Won't Work for B2B
+
+> "B2B SaaS to professional services firms often requires human touch."
+
+**Evidence:**
+- Most successful SMB tools have self-serve AND sales-assist
+- Conversion rates: 10-25% with sales touchpoint vs 2-5% pure self-serve
+
+**Recommendation:**
+- Keep self-serve as primary
+- Add "Book a 15-min demo" option
+- Track which converts better
+
+#### ⚠️ Go-To-Market Is Vague
+
+**Problems with current plan:**
+- "Reach out personally" - How? Do you have accountant contacts?
+- "Scrape websites" - That's essentially all of them; not targeting
+- "AccountingWeb sponsored content" - Have you priced this? (Expensive)
+- "Xero integrations" - Enterprise partnerships take months
+
+**Missing: Concrete 90-day GTM plan**
+
+| Week | Action | Target |
+|------|--------|--------|
+| 1-4 | Personal network + LinkedIn outreach | 50 accountants |
+| 5-8 | Cold email sequence | 500 emails |
+| 9-12 | Paid LinkedIn ads | £500 test budget |
+
+Track: Opens, demos, trials, conversions.
+
+#### ⚠️ Technical Edge Cases
+
+| Challenge | Not Addressed |
+|-----------|---------------|
+| Caching | License validation needs <100ms or feels slow |
+| Offline/flaky connection | What if API is slow? Widget hangs? |
+| Version updates | How push fixes without breaking cached versions? |
+| Privacy browsers | Brave/Firefox may block cross-origin requests |
+| AMP pages | Standard scripts won't work |
+
+**Recommendation:** 1-hour TTL cache, test restrictive browsers.
+
+#### ✅ Claude's Specific Answers
+
+| Question | Claude's Answer |
+|----------|-----------------|
+| 1 site per sub? | ✅ Correct for MVP |
+| Card upfront? | ❌ No - accountants are risk-averse |
+| Sales calls? | ✅ Yes - add optional 15-min demo |
+| SLA credits? | ❌ Drop - offer goodwill gestures instead |
+| Remotion videos? | ❌ No - focus elsewhere, revisit after 10 paying customers |
+| Facebook vs LinkedIn? | LinkedIn P1 (accountants), Facebook P2 (directors) |
+| Sole traders? | ✅ "Coming soon" fine, add "Should I Incorporate?" to Phase 2 |
+
+#### 📋 Claude's Summary: What's Missing
+
+| Gap | Severity | Action |
+|-----|----------|--------|
+| Market validation for widget | 🔴 Critical | Interview 10 accountants |
+| Competitive analysis | 🔴 Critical | Map existing solutions |
+| Concrete GTM plan | 🔴 Critical | 90-day plan with metrics |
+| Human touchpoint option | 🟠 High | Add optional demo calls |
+| Widget technical edge cases | 🟠 High | Test caching, browsers |
+| Video content distraction | 🟡 Medium | Deprioritize Remotion |
+| SLA credit complexity | 🟡 Medium | Drop, offer goodwill |
+
+---
+
+### Review Comparison: All 4 Reviewers
+
+| Topic | Grok | Gemini | Claude | ChatGPT | Consensus |
+|-------|------|--------|--------|---------|-----------|
+| Widget demand | Skeptical | Skeptical (fixable) | Very skeptical | Fixable w/ lead capture | 🔴 **VALIDATE FIRST** |
+| Pricing | £29-49 | £19-49 | Lower | £19-49 + add-ons | ✅ Lower to £19-49 |
+| Card for trial | Yes | No | No | Yes + money-back | ❓ Test |
+| Multi-site | Subdomains | 1 site | 1 site | Add-on domains | ✅ Primary + add-ons |
+| SLA credits | Drop | Drop | Drop | Manual goodwill | ✅ Drop |
+| Sole traders | Sooner | Later | Phase 2 | Bridge tool | ✅ "Should I Incorporate?" |
+| Sales channel | Direct | Agencies | Demo calls | High-intent only | ✅ Agencies + optional demos |
+| Lead capture | - | Must add | Must add | P0 decision needed | 🔴 **DECIDE YES/NO** |
+| Legal | DPA | DPA + Indemnity | DPA + Indemnity | DPA + privacy mode | ✅ All needed |
+| Video/Remotion | Worth it | Wait | No | Install guides only | ✅ Minimal |
+| Cookie compliance | - | - | - | P0 zero-cookie mode | 🔴 **MUST ADD** |
+| Debug mode | - | - | - | MVP requirement | ✅ Add |
+| Competitor analysis | Missing | - | Missing | List provided | 🔴 **DO THIS** |
+| Market validation | - | - | Zero done | ICP too broad | 🔴 **DO THIS** |
+
+---
+
+### ChatGPT Review (v1.2) - COMPLIANCE & OPERATIONAL DETAIL
+
+**Overall:** "The strategy is substantially 'development-ready' IF you close a few critical gaps around cookie compliance, lead capture decisions, and embed privacy."
+
+#### 🚨 P0: Cookie Compliance on OTHER PEOPLE'S Websites
+
+> "Accountants are extremely sensitive to anything that creates cookie-banner obligations."
+
+**The problem:** Your analytics stack (PostHog, etc.) may set cookies. When embedded on an accountant's site, YOU create THEIR compliance burden.
+
+**Under PECR/ICO guidance:** Non-essential cookies require consent.
+
+**What's missing:** Explicit "widget mode" requirement:
+- No cookies
+- No localStorage
+- No cross-site identifiers
+- No third-party beacons
+
+**Action:** Add "Embed Privacy Mode" with:
+- Cookieless analytics (PostHog supports this)
+- Server-side logging only (with retention justification)
+- IP is personal data - define retention period
+
+#### 🚨 P0: Lead Capture Product Decision NOT MADE
+
+Current CTA: "Speak to [Firm Name]" - weak.
+
+**What accountants actually buy:** Measurable leads.
+
+**Options not decided:**
+
+| Feature | Impact |
+|---------|--------|
+| "Email me a copy" | Captures lead email |
+| "Book a call" (Calendly) | Direct conversion |
+| "Send to my accountant" | Lead + retention |
+| White-label results PDF | Firm branding |
+
+**GDPR impact:** If you add any of these, you become a data processor (or joint controller) for lead data. Your doc hints at this but doesn't resolve.
+
+**Action:** Make the yes/no decision on lead capture BEFORE development.
+
+#### 🚨 P0: "Accuracy to the Penny" Is Marketing Liability
+
+> "This is not a safe claim because it depends on facts you won't model."
+
+Real-world complexity you can't calculate:
+- Timing / accounting period mismatches
+- Pension contributions
+- Student loans
+- Benefits in kind
+- Prior-year adjustments
+
+**Action:** 
+- Internal standard: Penny-level arithmetic ✅
+- Marketing language: "Implements HMRC rules for the inputs you provide" + "estimate" everywhere
+- Don't guarantee accuracy externally
+
+#### ⚠️ Domain Policy: Add-On Model Better Than Multiple Subs
+
+> "Many firms run main site + marketing domain + acquired brands."
+
+**Current stance:** "Buy another subscription" = procurement friction + churn.
+
+**Better model:**
+
+| Item | Price |
+|------|-------|
+| Primary domain + all subdomains | Included |
+| Each additional domain | +£10-15/mo |
+
+This captures multi-brand value without forcing full subscription per domain.
+
+#### ⚠️ Installation Verification: Don't Rely on Crawling
+
+> "Crawling is surprisingly brittle (CDNs, caching, JS deferred loading, blocked robots, geo, basic auth)."
+
+**Better approach:**
+- User clicks "I've installed it"
+- Widget itself phones home with one-time verification token
+- More reliable than scraping their page
+
+#### ⚠️ Support: Add Debug Mode to MVP
+
+> "Embed failures will cluster around CSP blocks, page builders, ad blockers, HTTPS issues."
+
+**Action:** Include debug mode:
+```
+?payetax_debug=true
+```
+Prints diagnostic panel:
+- License status
+- Domain seen
+- CSP hints
+- Network errors
+
+This will cut support tickets dramatically.
+
+#### ⚠️ License Key Is PUBLIC - Don't Treat as Secret
+
+> "Domain checks stop casual abuse but not determined copying."
+
+**Reality:** Anyone can scrape a JS calculator.
+
+**Accept this. Instead:**
+- Rate limits per license
+- Serve widget bundle ONLY after validation
+- Tamper-resistant loading
+- Don't rely on key secrecy
+
+#### ⚠️ Trial Strategy: Card + Money-Back Guarantee
+
+**ChatGPT's compromise (differs from others):**
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| No card | More signups | More tyre-kickers |
+| Card required | Serious buyers | Reduces signups |
+| **Card + 14-day money-back** | Reduces fear without abuse | Best of both |
+
+#### ⚠️ More Competitors Identified
+
+| Competitor | URL | Notes |
+|------------|-----|-------|
+| ContractorCalculator | contractorcalculator.co.uk | Strong SEO moat |
+| Beata Beck | beatabeck.co.uk | Accountant with own calculator |
+| Pay-Go | pay-go.uk | Website provider bundling calculators |
+| Accountant-owned | Various | Many firms already have one |
+
+> "Your moat is not the math. It's distribution + embed UX + trust + operational polish."
+
+#### ✅ ChatGPT's Specific Answers
+
+| Question | ChatGPT's Answer |
+|----------|------------------|
+| 1 site per sub? | Too restrictive - add-on domains (+£10-15) |
+| Card upfront? | Yes + 14-day money-back guarantee |
+| Sales calls? | Only for annual/multi-domain (high intent) |
+| SLA credits? | Not at MVP - manual goodwill |
+| Remotion videos? | Small number (install guides) - not growth bet |
+| Facebook vs LinkedIn? | LinkedIn + AccountingWeb for widget; SEO for directors |
+| Sole traders? | "Should I Incorporate?" as bridge tool |
+
+#### 📋 ChatGPT's Required Additions
+
+**"Non-negotiables for embed adoption" section:**
+
+1. Zero-cookie widget mode by default
+2. Verification flow that doesn't rely on crawling
+3. Lead capture decision (yes/no) with GDPR role clarity
+4. Domain policy (primary + subdomains + add-ons)
+5. Debug mode for troubleshooting
+
+---
+
+#### The Fundamental Question (From Claude)
+
+> "Is the widget the right second product? What if you skipped the widget and went straight to Pro tier for directors + Firm tier for accountants managing scenarios in YOUR dashboard?"
+
+**Alternative Product Path:**
+
+| Widget Model | Dashboard Model |
+|--------------|-----------------|
+| Accountant embeds on their site | Accountant uses OUR platform |
+| Requires website modification | No website changes |
+| Complex (domain validation, etc.) | Simple SaaS |
+| Unvalidated demand | Directors already use free tool |
+| Hard to sell (cold outreach) | Upsell existing users |
+
+**This needs discussion before committing to widget development.**
+
+---
+
+### Decisions Needed Post-Review
+
+| Question | Grok | Gemini | Decision |
+|----------|------|--------|----------|
+| Widget pricing | £29-49 | £19-49 | TBD |
+| Trial card required? | Yes | No | TBD |
+| Primary revenue source | Direct SaaS | Widget (if positioned right) | TBD |
+| Multi-site restriction | Allow subdomains | 1 site is fine | TBD |
+| Sales channel | Direct only | Add web agencies | **ADD AGENCIES** |
+| Key widget feature | - | Lead capture email | **MUST ADD** |
+| GDPR/DPA | Must add | Must add + Indemnity | **TODO** |
+| Rate update process | Must add | - | **TODO** |
+| SLA credits | Drop | Drop | **DROP** |
+| Sole traders | Sooner | Later | TBD |
 
 ---
 
