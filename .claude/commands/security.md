@@ -113,6 +113,52 @@ Run a security-focused review of the codebase or specific area.
 9. **A09 Logging Failures** - Check Sentry config
 10. **A10 SSRF** - Check external API calls
 
+## Pentester Mindset
+
+When reviewing, think like an attacker:
+
+```
+"Find every security vulnerability in this file. Think like a pentester.
+Look for: input validation gaps, data exposure, logic flaws."
+```
+
+### Attack Vectors to Consider
+
+| Attack | How to Check | PayeTax Relevance |
+|--------|--------------|-------------------|
+| **Input manipulation** | Pass unexpected types to calculators | HIGH - salary inputs |
+| **Prototype pollution** | Check for `__proto__` in user objects | MEDIUM |
+| **Logic bypass** | Can calculations be skipped/manipulated? | HIGH |
+| **Data leakage** | Check error messages, logs, responses | MEDIUM |
+| **Client trust** | Is any server logic trusting client data? | HIGH |
+
+### Secrets Audit
+
+Scan entire codebase for leaked secrets:
+
+```bash
+# API keys, tokens, passwords in code
+grep -rn "sk_live\|sk_test\|api_key\|apikey\|password\|secret\|token" src/ --include="*.ts" --include="*.tsx"
+
+# Keys in comments
+grep -rn "TODO.*key\|FIXME.*secret\|// .*password" src/
+
+# Tokens in error messages or logs  
+grep -rn "console\.\|Sentry\." src/ | grep -i "key\|token\|secret"
+
+# Environment variable exposure
+grep -rn "process\.env\." src/ --include="*.tsx" | grep -v "NEXT_PUBLIC"
+```
+
+### Self-Audit Prompt
+
+Ask for vulnerabilities the code author knows exist:
+
+```
+"You wrote this code. What security shortcuts did you take?
+Where did you skip validation? What assumptions could be wrong?"
+```
+
 ## Output Format
 
 ```markdown

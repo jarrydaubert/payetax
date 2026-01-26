@@ -109,6 +109,55 @@ test('calculates basic rate tax correctly', () => {
 
 ## Advanced Testing Strategies
 
+### Self-Audit Testing ("Snitch on Yourself")
+
+When writing tests, adopt the mindset: **"Write tests designed to break this code."**
+
+This works because you know where you cut corners:
+- Which edge cases you didn't fully handle
+- Where validation is incomplete  
+- What assumptions you made that could be wrong
+
+**Think adversarially:**
+- What inputs would cause unexpected behavior?
+- Where did I skip validation?
+- What happens at boundary conditions?
+- What if the data is malformed?
+
+**Example approach:**
+```
+For calculateTax(): What assumptions did I make?
+- Salary is always positive? Test negative.
+- Salary is a number? Test string, null, undefined.
+- Salary is reasonable? Test 0, MAX_INT, decimals.
+```
+
+### Edge Case Generation
+
+When testing, systematically cover these categories:
+
+| Category | Examples |
+|----------|----------|
+| **Empty/null** | `null`, `undefined`, `NaN`, `""`, `[]`, `{}` |
+| **Boundaries** | `0`, `-1`, `threshold ± 1`, `MAX_SAFE_INTEGER` |
+| **Types** | string instead of number, array instead of object |
+| **Overflow** | Very large numbers, very long strings |
+| **Unicode** | Emoji, RTL text, special characters |
+| **Malformed** | Circular references, prototype pollution |
+
+**For tax calculations specifically:**
+```typescript
+const edgeCases = [
+  0, -1, 0.01, 0.001,           // Zero/negative
+  12570, 12569, 12571,           // Personal allowance boundary
+  50270, 50269, 50271,           // Basic rate boundary
+  100000, 99999, 100001,         // Taper start
+  125140, 125139, 125141,        // Taper end
+  Number.MAX_SAFE_INTEGER,       // Overflow
+  NaN, Infinity, -Infinity,      // Invalid numbers
+];
+```
+
 ### Mutation Testing
 Tests that pass when code is broken are useless. Mutation testing verifies test quality:
 - **What it does**: Modifies code and checks if tests fail

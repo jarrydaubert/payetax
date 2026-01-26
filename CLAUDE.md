@@ -20,6 +20,12 @@ When working on PayeTax, prioritize:
 - Run `bun run fix-all` (format, lint, typecheck)
 - Run `bun run test:no-coverage` (fast tests)
 
+**Before completing any task (security checks):**
+- Scan for hardcoded secrets: `grep -rn "sk_live\|api_key\|password\|secret" src/`
+- Verify user inputs are validated with Zod schemas
+- Check no `process.env.` without `NEXT_PUBLIC_` in client components
+- For full security audit, run `/security`
+
 ## Tech Stack
 
 | Layer | Technology |
