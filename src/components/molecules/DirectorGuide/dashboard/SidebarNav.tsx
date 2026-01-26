@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   Settings,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -28,33 +27,29 @@ const navItems: NavItem[] = [
 ];
 
 interface SidebarNavProps {
-  expanded?: boolean;
+  collapsed?: boolean;
   onToggle?: () => void;
 }
 
 /**
- * Sidebar navigation - icons centered when collapsed, icons+labels when expanded
+ * Sidebar navigation - always shows icons + labels (192px)
+ * When collapsed, a sheet slides over to cover just the labels
  */
-export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
-  // Disable transitions on initial render to prevent flash
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
+export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
   return (
-    <nav
-      className={cn(
-        'flex h-full flex-col border-r border-white/5 bg-slate-950 py-4 transition-[width,padding] duration-200',
-        expanded ? 'w-48 px-3' : 'w-[60px] items-center px-2'
-      )}
-    >
+    <nav className='relative flex h-full w-48 flex-col border-r border-white/5 bg-slate-950 px-3 py-4'>
+      {/* Cover sheet - slides in from right to cover labels when collapsed */}
+      <div
+        className={cn(
+          'absolute inset-y-0 right-0 w-[132px] bg-slate-950 border-l border-white/5 transition-transform duration-200 ease-out',
+          collapsed ? 'translate-x-0' : 'translate-x-full'
+        )}
+      />
+
       {/* Logo */}
       <a
         href='/'
-        className='mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'
+        className='relative z-10 mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'
       >
         P
       </a>
@@ -65,8 +60,7 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
         const content = (
           <div
             className={cn(
-              'flex cursor-pointer items-center rounded-[10px] transition-all duration-200',
-              expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center',
+              'relative z-10 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5',
               item.active
                 ? 'bg-cyan-500/15 text-cyan-500'
                 : 'text-slate-500 hover:bg-slate-800 hover:text-slate-400'
@@ -74,9 +68,7 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
             title={item.label}
           >
             <Icon className='size-5 shrink-0' />
-            {expanded && (
-              <span className='whitespace-nowrap text-sm font-medium'>{item.label}</span>
-            )}
+            <span className='text-sm font-medium'>{item.label}</span>
           </div>
         );
 
@@ -100,35 +92,27 @@ export function SidebarNav({ expanded = false, onToggle }: SidebarNavProps) {
 
       {/* Help */}
       <div
-        className={cn(
-          'flex cursor-pointer items-center rounded-[10px] text-slate-500 transition-all duration-200 hover:bg-slate-800 hover:text-slate-400',
-          expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center'
-        )}
+        className='relative z-10 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
         title='Help'
       >
         <HelpCircle className='size-5 shrink-0' />
-        {expanded && <span className='whitespace-nowrap text-sm font-medium'>Help</span>}
+        <span className='text-sm font-medium'>Help</span>
       </div>
 
-      {/* Expand/Collapse toggle */}
+      {/* Collapse/Expand toggle */}
       {onToggle && (
         <button
           type='button'
           onClick={onToggle}
-          className={cn(
-            'mt-2 flex cursor-pointer items-center rounded-[10px] text-slate-500 transition-all duration-200 hover:bg-slate-800 hover:text-slate-400',
-            expanded ? 'gap-3 px-3 py-2.5' : 'size-10 justify-center'
-          )}
-          title={expanded ? 'Collapse menu' : 'Expand menu'}
+          className='relative z-10 mt-2 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
+          title={collapsed ? 'Expand menu' : 'Collapse menu'}
         >
-          {expanded ? (
-            <>
-              <ChevronLeft className='size-5 shrink-0' />
-              <span className='whitespace-nowrap text-sm font-medium'>Collapse</span>
-            </>
-          ) : (
+          {collapsed ? (
             <ChevronRight className='size-5 shrink-0' />
+          ) : (
+            <ChevronLeft className='size-5 shrink-0' />
           )}
+          <span className='text-sm font-medium'>{collapsed ? 'Expand' : 'Collapse'}</span>
         </button>
       )}
     </nav>

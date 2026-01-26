@@ -18,7 +18,8 @@ interface DashboardLayoutProps {
 }
 
 /**
- * Dashboard layout - sidebar expands and pushes content right
+ * Dashboard layout
+ * - Sidebar always 192px with icons + labels (has internal sheet to cover labels)
  */
 export function DashboardLayout({
   sidebar,
@@ -33,7 +34,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <div className={cn('flex h-screen overflow-hidden bg-slate-950', className)}>
-      {/* Sidebar - controlled by SidebarNav's own width */}
+      {/* Sidebar - always full width, internal sheet covers labels when collapsed */}
       <div className='shrink-0 max-md:hidden'>{sidebar}</div>
 
       {/* Inputs panel - collapsible */}
