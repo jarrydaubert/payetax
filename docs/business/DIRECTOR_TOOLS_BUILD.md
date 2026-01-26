@@ -766,13 +766,15 @@ const [formData, setFormData] = useState<DirectorInput>({
 
 ## Build Order
 
-### Phase 1: Foundation
-- [ ] Verify `taxRates.ts` has all correct 2025-26 rates (✅ already verified)
-- [ ] Create `lib/tax/directorCalculator.ts` orchestrator
-- [ ] Create `lib/tax/corporationTax.ts`
-- [ ] Create `lib/tax/dividendTax.ts`
-- [ ] Create `types/director.ts`
-- [ ] Write golden example tests
+### Phase 1: Foundation ✅ COMPLETE (81 tests passing)
+- [x] Verify `taxRates.ts` has all correct 2025-26 rates
+- [x] Create `lib/tax/corporationTax.ts` (18 tests)
+- [x] Create `lib/tax/dividendTax.ts` (18 tests)
+- [x] Create `lib/tax/employerNI.ts` (20 tests)
+- [x] Create `lib/tax/directorCalculator.ts` orchestrator (25 tests)
+- [x] Create `lib/tax/index.ts` barrel export
+- [x] Create `lib/validation/directorValidation.ts` (Zod schemas + types)
+- [x] Write golden example integration tests
 
 ### Phase 2: Form Components
 - [ ] `DirectorGuideForm.tsx` (progressive disclosure logic)

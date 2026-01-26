@@ -27,6 +27,44 @@ export {
   validateSalary,
   validateTaxYear,
 } from './atomsValidation';
+// Director calculator validation
+export {
+  CALCULATION_MODES,
+  type CalculationMode,
+  CalculationModeSchema,
+  CurrencyAmountSchema,
+  DIRECTOR_TAX_YEARS,
+  type DirectorCalculationResult,
+  DirectorCalculationResultSchema,
+  type DirectorInput,
+  DirectorInputSchema,
+  type DirectorResult,
+  DirectorResultSchema,
+  type DirectorTaxYear,
+  DirectorTaxYearSchema,
+  isNormalMode,
+  isSurvivalMode,
+  type PartialDirectorInput,
+  PartialDirectorInputSchema,
+  // Constants
+  REGIONS,
+  // Types
+  type Region,
+  // Schemas
+  RegionSchema,
+  type SurvivalResult,
+  SurvivalResultSchema,
+  validateCurrencyAmount,
+  // Validation helpers
+  validateDirectorInput,
+  validatePartialDirectorInput,
+  validateRegion,
+  WARNING_TYPES,
+  type Warning,
+  WarningSchema,
+  type WarningType,
+  WarningTypeSchema,
+} from './directorValidation';
 // Molecules layer validation (feedback forms, filters)
 export {
   type CategoryFilterData,
