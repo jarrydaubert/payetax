@@ -143,6 +143,26 @@ describe('Corporation Tax Calculator', () => {
 
         expect(result.corporationTax).toBe(7600.1); // 40000.5 × 0.19 = 7600.095 → 7600.10
       });
+
+      it('should handle NaN gracefully', () => {
+        const result = calculateCorporationTax(Number.NaN);
+
+        expect(result.corporationTax).toBe(0);
+        expect(result.effectiveRate).toBe(0);
+      });
+
+      it('should handle Infinity gracefully', () => {
+        const result = calculateCorporationTax(Number.POSITIVE_INFINITY);
+
+        // Should not throw, returns safe default
+        expect(result.corporationTax).toBe(0);
+      });
+
+      it('should handle negative Infinity gracefully', () => {
+        const result = calculateCorporationTax(Number.NEGATIVE_INFINITY);
+
+        expect(result.corporationTax).toBe(0);
+      });
     });
   });
 

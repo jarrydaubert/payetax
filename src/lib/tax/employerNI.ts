@@ -76,10 +76,10 @@ export function calculateEmployerNI(
   const threshold = employerRates.threshold;
   const rate = employerRates.rate / 100; // Convert from percentage to decimal
 
-  // Handle zero or negative salary
-  if (salary <= 0) {
+  // Handle invalid, zero, or negative salary
+  if (!Number.isFinite(salary) || salary <= 0) {
     return {
-      salary,
+      salary: Number.isFinite(salary) ? salary : 0,
       employerNI: 0,
       threshold,
       rate,

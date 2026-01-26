@@ -103,6 +103,25 @@ describe('Employer NI Calculator', () => {
         // (12570.5 - 5000) × 0.15 = 7570.5 × 0.15 = 1135.575 → 1135.58
         expect(result.employerNI).toBe(1135.58);
       });
+
+      it('should handle NaN salary gracefully', () => {
+        const result = calculateEmployerNI(Number.NaN, '2025-2026');
+
+        expect(result.employerNI).toBe(0);
+        expect(result.salary).toBe(0);
+      });
+
+      it('should handle Infinity salary gracefully', () => {
+        const result = calculateEmployerNI(Number.POSITIVE_INFINITY, '2025-2026');
+
+        expect(result.employerNI).toBe(0);
+      });
+
+      it('should handle negative Infinity salary gracefully', () => {
+        const result = calculateEmployerNI(Number.NEGATIVE_INFINITY, '2025-2026');
+
+        expect(result.employerNI).toBe(0);
+      });
     });
 
     describe('Year-on-year comparison', () => {

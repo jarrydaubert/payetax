@@ -122,10 +122,10 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
     MARGINAL_RELIEF_FRACTION,
   } = CT_RATES;
 
-  // Handle zero or negative profit
-  if (taxableProfit <= 0) {
+  // Handle invalid, zero, or negative profit
+  if (!Number.isFinite(taxableProfit) || taxableProfit <= 0) {
     return {
-      taxableProfit,
+      taxableProfit: Number.isFinite(taxableProfit) ? taxableProfit : 0,
       corporationTax: 0,
       effectiveRate: 0,
       rateBand: 'small_profits',

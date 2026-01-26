@@ -116,10 +116,10 @@ export function calculateDividendTax(
   otherIncome: number,
   taxYear: TaxYear = '2025-2026'
 ): DividendTaxResult {
-  // Handle zero or negative dividends
-  if (dividends <= 0) {
+  // Handle invalid, zero, or negative dividends
+  if (!Number.isFinite(dividends) || dividends <= 0) {
     return {
-      totalDividends: dividends,
+      totalDividends: Number.isFinite(dividends) ? dividends : 0,
       allowanceUsed: 0,
       taxableDividends: 0,
       dividendTax: 0,
@@ -127,6 +127,9 @@ export function calculateDividendTax(
       bandBreakdown: [],
     };
   }
+
+  // Sanitize otherIncome (treat NaN/Infinity as 0)
+  const safeOtherIncome = Number.isFinite(otherIncome) ? otherIncome : 0;
 
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
@@ -163,7 +166,7 @@ export function calculateDividendTax(
 
   // Step 2: Calculate which bands the dividends fall into
   // Dividends "stack" on top of other income
-  const incomeBeforeDividends = otherIncome;
+  const incomeBeforeDividends = safeOtherIncome;
 
   let remainingDividends = taxableDividends;
   let totalTax = 0;

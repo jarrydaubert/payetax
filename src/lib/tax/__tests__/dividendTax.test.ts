@@ -161,6 +161,26 @@ describe('Dividend Tax Calculator', () => {
         // Verify tax is rounded to 2 decimal places
         expect(result.dividendTax.toFixed(2)).toBe(result.dividendTax.toString());
       });
+
+      it('should handle NaN dividends gracefully', () => {
+        const result = calculateDividendTax(Number.NaN, 12570);
+
+        expect(result.dividendTax).toBe(0);
+        expect(result.effectiveRate).toBe(0);
+      });
+
+      it('should handle Infinity dividends gracefully', () => {
+        const result = calculateDividendTax(Number.POSITIVE_INFINITY, 12570);
+
+        expect(result.dividendTax).toBe(0);
+      });
+
+      it('should handle NaN salary gracefully', () => {
+        const result = calculateDividendTax(50000, Number.NaN);
+
+        // Should still calculate, treating NaN salary as 0
+        expect(result.dividendTax).toBeGreaterThan(0);
+      });
     });
 
     describe('Director scenario (golden example)', () => {
