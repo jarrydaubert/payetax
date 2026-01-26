@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/dashboard/DashboardLayout.tsx
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -61,45 +61,57 @@ export function DashboardLayout({
           inputsCollapsed && 'w-0'
         )}
       >
-        {!inputsCollapsed && inputs}
-        {/* Collapse button */}
-        {onToggleInputs && (
-          <button
-            type='button'
-            onClick={onToggleInputs}
-            className='absolute top-1/2 -right-0 z-10 -translate-y-1/2 translate-x-1/2 rounded-full border border-white/10 bg-slate-800 p-1.5 text-slate-400 shadow-lg transition-colors hover:bg-slate-700 hover:text-slate-200'
-            title={inputsCollapsed ? 'Show inputs' : 'Hide inputs'}
-          >
-            {inputsCollapsed ? <ChevronRight className='size-4' /> : <ChevronLeft className='size-4' />}
-          </button>
+        {!inputsCollapsed && (
+          <>
+            {inputs}
+            {/* Collapse button - top right corner */}
+            {onToggleInputs && (
+              <button
+                type='button'
+                onClick={onToggleInputs}
+                className='absolute top-4 right-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                title='Hide inputs'
+              >
+                <PanelLeftClose className='size-4' />
+              </button>
+            )}
+          </>
         )}
       </div>
 
       {/* Main content area */}
       <div className='relative overflow-y-auto'>
-        {/* Show inputs toggle when collapsed */}
-        {inputsCollapsed && onToggleInputs && (
-          <button
-            type='button'
-            onClick={onToggleInputs}
-            className='absolute top-4 left-4 z-10 rounded-full border border-white/10 bg-slate-800 p-2 text-slate-400 shadow-lg transition-colors hover:bg-slate-700 hover:text-slate-200 max-lg:hidden'
-            title='Show inputs'
-          >
-            <ChevronRight className='size-4' />
-          </button>
-        )}
+        {/* Toggle buttons at top when panels are collapsed */}
+        <div className='absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
+          {/* Left: Show inputs button */}
+          {inputsCollapsed && onToggleInputs ? (
+            <button
+              type='button'
+              onClick={onToggleInputs}
+              className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+              title='Show inputs'
+            >
+              <PanelLeftOpen className='size-4' />
+            </button>
+          ) : (
+            <div />
+          )}
+
+          {/* Right: Show education button */}
+          {educationCollapsed && onToggleEducation ? (
+            <button
+              type='button'
+              onClick={onToggleEducation}
+              className='pointer-events-auto rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+              title='Show learn panel'
+            >
+              <PanelRightOpen className='size-4' />
+            </button>
+          ) : (
+            <div />
+          )}
+        </div>
         {main}
-        {/* Show education toggle when collapsed */}
-        {educationCollapsed && onToggleEducation && (
-          <button
-            type='button'
-            onClick={onToggleEducation}
-            className='absolute top-4 right-4 z-10 rounded-full border border-white/10 bg-slate-800 p-2 text-slate-400 shadow-lg transition-colors hover:bg-slate-700 hover:text-slate-200 max-lg:hidden'
-            title='Show learn panel'
-          >
-            <ChevronLeft className='size-4' />
-          </button>
-        )}
       </div>
 
       {/* Education panel - collapsible */}
@@ -109,17 +121,21 @@ export function DashboardLayout({
           educationCollapsed && 'w-0'
         )}
       >
-        {!educationCollapsed && education}
-        {/* Collapse button */}
-        {onToggleEducation && !educationCollapsed && (
-          <button
-            type='button'
-            onClick={onToggleEducation}
-            className='absolute top-1/2 -left-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-slate-800 p-1.5 text-slate-400 shadow-lg transition-colors hover:bg-slate-700 hover:text-slate-200'
-            title='Hide learn panel'
-          >
-            <ChevronRight className='size-4' />
-          </button>
+        {!educationCollapsed && (
+          <>
+            {/* Collapse button - top left corner */}
+            {onToggleEducation && (
+              <button
+                type='button'
+                onClick={onToggleEducation}
+                className='absolute top-4 left-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                title='Hide learn panel'
+              >
+                <PanelRightClose className='size-4' />
+              </button>
+            )}
+            {education}
+          </>
         )}
       </div>
     </div>
