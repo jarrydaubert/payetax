@@ -37,6 +37,31 @@ function generateCopyText(result: DirectorResult, input: DirectorInput): string 
     month: 'short',
     year: 'numeric',
   });
+  
+  const hasDividends = result.dividendsAvailable > 0;
+  const isLowProfit = result.salary < 12570;
+  
+  // Adjust messaging based on whether dividends are available
+  const payDescription = hasDividends
+    ? `(${formatCurrency(result.monthlySalary)} salary via payroll + dividends occasionally)`
+    : `(${formatCurrency(result.monthlySalary)} salary via payroll - no dividends at this profit level)`;
+  
+  const companyTaxDescription = result.corporationTax > 0
+    ? `(includes Corporation Tax + Employer NI)`
+    : `(Employer NI only - no Corp Tax at this profit level)`;
+  
+  const salaryNote = isLowProfit
+    ? `This is your full profit after employer NI - tax-free since it's within your Personal Allowance`
+    : `We keep salary at £12,570/year to stay tax-efficient`;
+
+  const howToDoIt = hasDividends
+    ? `1. Set up payroll
+2. Pay yourself ${formatCurrency(result.monthlySalary)}/month as salary
+3. Take dividends occasionally when you have profit
+4. Save ${formatCurrency(result.personalTaxMonthly)}/month for your tax bill`
+    : `1. Set up payroll
+2. Pay yourself ${formatCurrency(result.monthlySalary)}/month as salary
+3. ${result.personalTaxMonthly > 0 ? `Save ${formatCurrency(result.personalTaxMonthly)}/month for your tax bill` : 'No personal tax to save - salary is within Personal Allowance'}`;
 
   return `How Much Can I Pay Myself? - PayeTax.co.uk
 Tax Year: ${result.taxYear}
@@ -50,17 +75,16 @@ Profit: ~${formatCurrency(result.grossProfit)}
 
 AVERAGE MONTHLY PAY (TARGET)
 Around ${formatCurrency(result.averageMonthlyPay)}/month
-(${formatCurrency(result.monthlySalary)} salary via payroll + dividends occasionally)
+${payDescription}
 
 SET ASIDE FOR TAX
-Company tax pot: ${formatCurrency(result.companyTaxPot)} (includes Corporation Tax + Employer NI)
-Personal tax pot: ${formatCurrency(result.personalTaxMonthly)}/month (save for January)
+Company tax pot: ${formatCurrency(result.companyTaxPot)} ${companyTaxDescription}
+Personal tax pot: ${formatCurrency(result.personalTaxMonthly)}/month ${result.personalTaxMonthly > 0 ? '(save for January)' : '(nothing to save)'}
 
 HOW TO DO IT
-1. Set up payroll
-2. Pay yourself ${formatCurrency(result.monthlySalary)}/month as salary
-3. Take dividends occasionally when you have profit
-4. Save ${formatCurrency(result.personalTaxMonthly)}/month for your tax bill
+${howToDoIt}
+
+NOTE: ${salaryNote}
 
 ASSUMPTIONS
 • Your company is your only income

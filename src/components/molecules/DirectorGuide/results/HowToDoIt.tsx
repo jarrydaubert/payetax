@@ -31,6 +31,8 @@ function formatCurrency(amount: number): string {
 export function HowToDoIt({ result, className }: HowToDoItProps) {
   const monthlySalary = formatCurrency(result.monthlySalary);
   const monthlyTaxSavings = formatCurrency(result.personalTaxMonthly);
+  const hasDividends = result.dividendsAvailable > 0;
+  const isLowProfit = result.salary < 12570;
 
   const steps = [
     {
@@ -40,15 +42,19 @@ export function HowToDoIt({ result, className }: HowToDoItProps) {
     {
       number: 2,
       text: `Pay yourself ${monthlySalary}/month as salary via payroll`,
-      subtext: 'We keep salary at £12,570/year to stay tax-efficient',
+      subtext: isLowProfit 
+        ? 'This is your full profit after employer NI - no tax on this amount'
+        : 'We keep salary at £12,570/year to stay tax-efficient',
     },
-    {
+    ...(hasDividends ? [{
       number: 3,
       text: 'Take dividends occasionally when you have profit',
-    },
+    }] : []),
     {
-      number: 4,
-      text: `Move ${monthlyTaxSavings}/mo to a savings account for your tax bill`,
+      number: hasDividends ? 4 : 3,
+      text: result.personalTaxMonthly > 0
+        ? `Move ${monthlyTaxSavings}/mo to a savings account for your tax bill`
+        : 'No personal tax to save - your salary is within your Personal Allowance',
     },
   ];
 
