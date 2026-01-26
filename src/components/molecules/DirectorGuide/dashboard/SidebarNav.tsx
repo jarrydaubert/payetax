@@ -43,18 +43,10 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
         collapsed ? 'w-16 px-2' : 'w-48 px-3'
       )}
     >
-      {/* Cover sheet - slides in from right to cover labels when collapsed */}
-      <div
-        className={cn(
-          'absolute inset-y-0 right-0 z-20 w-[140px] bg-slate-950 transition-transform duration-200 ease-out',
-          collapsed ? 'translate-x-0' : 'translate-x-full'
-        )}
-      />
-
       {/* Logo */}
       <a
         href='/'
-        className='relative z-10 mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'
+        className='mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'
       >
         P
       </a>
@@ -65,7 +57,7 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
         const content = (
           <div
             className={cn(
-              'relative z-10 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5',
+              'flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5',
               item.active
                 ? 'bg-cyan-500/15 text-cyan-500'
                 : 'text-slate-500 hover:bg-slate-800 hover:text-slate-400'
@@ -97,7 +89,7 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
 
       {/* Help */}
       <div
-        className='relative z-10 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
+        className='flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
         title='Help'
       >
         <HelpCircle className='size-5 shrink-0' />
@@ -109,7 +101,7 @@ export function SidebarNav({ collapsed = false, onToggle }: SidebarNavProps) {
         <button
           type='button'
           onClick={onToggle}
-          className='relative z-10 mt-2 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
+          className='mt-2 flex cursor-pointer items-center gap-3 whitespace-nowrap rounded-[10px] px-3 py-2.5 text-slate-500 hover:bg-slate-800 hover:text-slate-400'
           title={collapsed ? 'Expand menu' : 'Collapse menu'}
         >
           {collapsed ? (
