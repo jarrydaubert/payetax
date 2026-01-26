@@ -807,9 +807,9 @@ const [formData, setFormData] = useState<DirectorInput>({
 - [x] `WhatAreDividends.tsx` (dividend benefits, 7 tests)
 - [x] `WhyThisSalary.tsx` (£12,570 rationale, 8 tests)
 
-### Phase 6: Page Assembly
-- [ ] `page.tsx` (metadata, schema)
-- [ ] `DirectorGuideClient.tsx`
+### Phase 6: Page Assembly ✅ COMPLETE
+- [x] `page.tsx` (metadata, BreadcrumbList, SoftwareApplication, FAQPage schemas)
+- [x] `DirectorGuideClient.tsx` (form/results orchestrator, warning logic)
 
 ### Phase 7: Polish
 - [ ] Mobile responsive
