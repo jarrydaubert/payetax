@@ -30,6 +30,7 @@ import { TAX_RATES } from '@/constants/taxRates';
 import type {
   DirectorCalculationResult,
   DirectorInput,
+  DirectorTaxYear,
   SurvivalResult,
   Warning,
 } from '@/lib/validation/directorValidation';
@@ -200,7 +201,7 @@ export function calculateDirectorScenario(
     personalTaxMonthly,
     includesPOA,
     warnings,
-    taxYear,
+    taxYear: taxYear as DirectorTaxYear,
     region: input.region,
   };
 }
@@ -232,7 +233,7 @@ function createSurvivalResult(
     expenses: input.expenses,
     grossProfit,
     warnings: [{ type: warningType, message }],
-    taxYear,
+    taxYear: taxYear as DirectorTaxYear,
     region: input.region,
     maxPossibleSalary: Math.max(0, grossProfit),
     message,

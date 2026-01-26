@@ -134,11 +134,11 @@ export function calculateDividendTax(
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
 
-  // Get band thresholds
+  // Get band thresholds (with fallbacks for safety)
   // Basic rate band ends at PA + basic rate threshold
-  const basicBandEnd = personalAllowance + rates.bands[0].threshold;
+  const basicBandEnd = personalAllowance + (rates.bands[0]?.threshold ?? 37700);
   // Higher rate band ends at PA + higher rate threshold
-  const higherBandEnd = personalAllowance + rates.bands[1].threshold;
+  const higherBandEnd = personalAllowance + (rates.bands[1]?.threshold ?? 125140);
 
   const { ALLOWANCE, BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
 

@@ -55,16 +55,12 @@ export const WARNING_TYPES = [
 /**
  * Region selection schema
  */
-export const RegionSchema = z.enum(REGIONS, {
-  errorMap: () => ({ message: 'Please select where you live' }),
-});
+export const RegionSchema = z.enum(REGIONS);
 
 /**
  * Tax year selection schema
  */
-export const DirectorTaxYearSchema = z.enum(DIRECTOR_TAX_YEARS, {
-  errorMap: () => ({ message: 'Please select a valid tax year' }),
-});
+export const DirectorTaxYearSchema = z.enum(DIRECTOR_TAX_YEARS);
 
 /**
  * Calculation mode schema
