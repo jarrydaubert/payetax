@@ -69,11 +69,13 @@ export function DirectorDashboard() {
   }, [showResults, results]);
 
   // Check if we can calculate
+  // Allow revenue >= 0 for survival mode, require expenses >= 0
   const canCalculate =
     formData.region !== undefined &&
     formData.revenue !== undefined &&
-    formData.revenue > 0 &&
-    formData.expenses !== undefined;
+    formData.revenue >= 0 &&
+    formData.expenses !== undefined &&
+    formData.expenses >= 0;
 
   // Handle calculate button - show other income gate first
   const handleCalculate = useCallback(() => {
@@ -85,16 +87,26 @@ export function DirectorDashboard() {
   const handleConfirmSoleIncome = useCallback(() => {
     setHasOtherIncome(false);
     setShowOtherIncomeGate(false);
-    calculate();
-    setShowComparison(true);
+    try {
+      calculate();
+      setShowComparison(true);
+    } catch (error) {
+      console.error('Calculation failed:', error);
+      // Stay on current view, user can try again
+    }
   }, [calculate, setHasOtherIncome]);
 
   // Handle indicating other income from gate
   const handleHasOtherIncome = useCallback(() => {
     setHasOtherIncome(true);
     setShowOtherIncomeGate(false);
-    calculate();
-    setShowComparison(true);
+    try {
+      calculate();
+      setShowComparison(true);
+    } catch (error) {
+      console.error('Calculation failed:', error);
+      // Stay on current view, user can try again
+    }
   }, [calculate, setHasOtherIncome]);
 
   // Handle continuing from comparison modal (informational, not a choice)
