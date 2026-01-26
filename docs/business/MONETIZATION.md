@@ -5,18 +5,33 @@
 
 ---
 
+## The Principle
+
+**We don't capitalize on stress and confusion.**
+
+Our users are often:
+- First-time directors who are anxious about tax
+- People on tight budgets (why else DIY instead of accountant?)
+- Stressed about getting it wrong
+
+**The core guide and calculator are FREE. Forever. No exceptions.**
+
+We only charge for convenience features that save time, not for reducing anxiety.
+
+---
+
 ## The Model
 
-**Free tool → Trust → Referrals → Pro tier → Widget (if demand)**
+**Free tool → Trust → Referrals → Optional Pro (if they WANT it)**
 
 | Phase | Focus | Revenue |
 |-------|-------|---------|
 | **Phase 1 (Now)** | Free guide + calculator | £0 (SEO, trust) |
-| **Phase 2 (Month 2-3)** | Accountant referrals | £500-2k/mo |
-| **Phase 3 (Month 4-6)** | Pro tier | £1-2k/mo |
-| **Phase 4 (If demand)** | Embeddable widget | £2-4k/mo |
+| **Phase 2 (Month 2-3)** | Accountant referrals | £500-1k/mo |
+| **Phase 3 (If demand)** | Optional Pro tier | £500-1k/mo |
+| **Phase 4 (If demand)** | Embeddable widget | TBD |
 
-**Year 1 Target:** £50-80k ARR (realistic)
+**Year 1 Target:** £20-40k ARR (very conservative, and that's fine)
 
 ---
 
@@ -73,35 +88,50 @@
 
 ---
 
-## Phase 3: Pro Tier
+## Phase 3: Pro Tier (Optional, If Demand)
+
+### Philosophy
+
+**Pro is for convenience, not access.**
+
+Everything that reduces anxiety stays free:
+- The guide
+- The calculator
+- The "safe monthly draw" output
+- The set-aside pots
+- The FAQ and education
+
+Pro is ONLY for people who want to save time:
+- Save scenarios for later
+- PDF to share with accountant
+- Email reminders for deadlines
 
 ### Features
-| Free | Pro (£9-19/mo) |
-|------|----------------|
-| One-time calculation | Save scenarios |
-| Results on screen | PDF export |
-| Manual date tracking | Email reminders for deadlines |
-| Basic output | Detailed breakdown |
-| — | Year-on-year comparison |
-| — | Payment schedule |
+| Free (Forever) | Pro (Optional) |
+|----------------|----------------|
+| Full guide | Same |
+| Full calculator | Same |
+| Results on screen | + Save scenarios |
+| Copy results | + PDF export |
+| Key dates shown | + Email reminders |
 
-### Target User
-Directors who:
-- Return multiple times
-- Want to track changes over time
-- Need to share with accountant
-- Value convenience
+### Pricing (Compassionate)
 
-### Pricing
 | Option | Price | Notes |
 |--------|-------|-------|
-| Monthly | £19/mo | Cancel anytime |
-| Annual | £149/yr | 2 months free |
+| Monthly | £5/mo | Coffee price |
+| Annual | £39/yr | 3 months free |
+
+**Why so cheap?**
+- Our users are often on tight budgets
+- £5/mo is accessible to almost everyone
+- 100 users at £5 = £500/mo (that's fine)
+- Trust matters more than revenue per user
 
 ### Build Trigger
-- 500+ monthly users
-- Users asking to save/export
-- Positive NPS feedback
+- Users explicitly asking for save/export
+- At least 50 requests
+- NOT before Phase 1 is working well
 
 ---
 
@@ -139,29 +169,31 @@ Directors who:
 
 ---
 
-## Revenue Projections (Conservative)
-
-### Month 3
-| Stream | Projection |
-|--------|------------|
-| Referrals | £500/mo |
-| Pro tier | £0 (not built yet) |
-| **Total** | **£500/mo** |
+## Revenue Projections (Very Conservative)
 
 ### Month 6
 | Stream | Projection |
 |--------|------------|
-| Referrals | £1,500/mo |
-| Pro tier | £500/mo (25 users) |
-| **Total** | **£2,000/mo** |
+| Referrals | £200/mo |
+| Pro tier | £0 (not built yet) |
+| **Total** | **£200/mo** |
 
 ### Month 12
 | Stream | Projection |
 |--------|------------|
-| Referrals | £2,000/mo |
-| Pro tier | £2,000/mo (100 users) |
-| Widget (if built) | £1,000/mo |
-| **Total** | **£4-5,000/mo** |
+| Referrals | £500/mo |
+| Pro tier | £250/mo (50 users × £5) |
+| **Total** | **£750/mo** |
+
+### Year 2 (If It Works)
+| Stream | Projection |
+|--------|------------|
+| Referrals | £1,000/mo |
+| Pro tier | £500/mo (100 users) |
+| Widget (only if demand) | TBD |
+| **Total** | **£1,500/mo** |
+
+**And that's okay.** This isn't a VC-backed startup. It's a tool that helps people.
 
 ---
 
@@ -170,26 +202,26 @@ Directors who:
 ### Phase 1 (Now)
 | Metric | Target |
 |--------|--------|
-| Monthly visitors | 5,000 |
-| Guide completions | 1,000 |
-| Time on page | > 3 min |
-| Return visitors | 20% |
+| Monthly visitors | 1,000 |
+| Guide completions | 200 |
+| Time on page | > 2 min |
+| "This helped" feedback | Positive |
 
 ### Phase 2 (Referrals)
 | Metric | Target |
 |--------|--------|
-| CTA click rate | 5% |
-| Lead conversion | 20% |
-| Leads/month | 20 |
-| Revenue/month | £1,000 |
+| CTA click rate | 2% |
+| Leads/month | 5 |
+| Revenue/month | £200 |
 
-### Phase 3 (Pro)
+### Phase 3 (Pro - Only If Requested)
 | Metric | Target |
 |--------|--------|
-| Free → Pro conversion | 2% |
-| Monthly Pro users | 100 |
-| Churn rate | < 5%/mo |
-| MRR | £2,000 |
+| Save/export requests | 50+ |
+| Pro users | 50 |
+| MRR | £250 |
+
+**The real success metric:** People saying "this finally made sense to me."
 
 ---
 
