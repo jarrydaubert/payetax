@@ -1,189 +1,216 @@
-# Monetization Guide
+# Monetization Strategy
 
-**Status:** Infrastructure built, features disabled for launch
-
-> **Note:** Monetization features are built but inactive. See "Enabling Features" section below.
-
----
-
-## Overview
-
-PayeTax monetization follows core principles:
-- Consumer experience stays **100% free**
-- Revenue from B2B and partnerships, not users
-- Growth and revenue in parallel
+> **Last Updated:** January 2026
+> **Status:** Phase 1 (Free tool, building trust)
 
 ---
 
-## Revenue Streams
+## The Model
 
-### 1. Affiliate Links
+**Free tool → Trust → Referrals → Pro tier → Widget (if demand)**
 
-**Status:** Implemented
+| Phase | Focus | Revenue |
+|-------|-------|---------|
+| **Phase 1 (Now)** | Free guide + calculator | £0 (SEO, trust) |
+| **Phase 2 (Month 2-3)** | Accountant referrals | £500-2k/mo |
+| **Phase 3 (Month 4-6)** | Pro tier | £1-2k/mo |
+| **Phase 4 (If demand)** | Embeddable widget | £2-4k/mo |
 
-Competitor comparison pages include tracked affiliate links for accounting software providers.
-
-**Files:**
-- `src/data/competitors.ts` - Competitor data with `affiliateUrl` field
-- `src/components/atoms/TrackedAffiliateLink.tsx` - Tracked link component
-- `src/lib/analytics.ts` - `trackAffiliateClick()` function
-
-**Current Affiliates:**
-| Competitor | Program | Status |
-|------------|---------|--------|
-| — | — | No active affiliates (B2B programs require company registration) |
-
-**To add a new affiliate:**
-1. Add `affiliateUrl` and `affiliateProgram` to competitor in `competitors.ts`
-2. Links automatically use affiliate URL via `TrackedAffiliateLink`
-3. Clicks tracked via `trackAffiliateClick` in analytics
-
-**Pages using affiliate links:**
-- `/alternatives/[competitor]` - Alternative landing pages
-- `/vs/[competitor]` - Head-to-head comparisons
-- `/best-uk-tax-calculators` - Comparison hub
+**Year 1 Target:** £50-80k ARR (realistic)
 
 ---
 
-### 2. B2B Widget Pricing
+## Phase 1: Free (Current)
 
-**Status:** Implemented (pricing page only)
+### What's Free Forever
+- Director's Guide to Paying Yourself
+- Calculator with "simple & safe" recommendation
+- Educational content, FAQs, tooltips
+- Key dates and deadlines
 
-Business pricing page for embed widget at `/pricing/business`.
-
-**Files:**
-- `src/app/pricing/business/page.tsx` - Page metadata
-- `src/app/pricing/business/BusinessPricingClient.tsx` - Pricing UI
-
-**Tiers:**
-| Tier | Price | Key Features |
-|------|-------|--------------|
-| Free | £0/forever | Full calculator, "Powered by PayeTax" badge |
-| Professional | £49/month | Remove branding, custom accent color, 3 domains |
-| Enterprise | £199/month | White-label, API access, unlimited domains, SLA |
-
-**TODO:** Widget registration system and Stripe billing (see Phase 3 below).
+### Why Free?
+1. **SEO traffic** - "how to pay yourself as director" queries
+2. **Build trust** - Users bookmark, return, share
+3. **Accountants share** - Saves them explaining basics
+4. **Referral pipeline** - Complex cases need accountants
 
 ---
 
-### 3. Accountant Referral System
+## Phase 2: Accountant Referrals
 
-**Status:** Implemented
+### How It Works
+1. User completes guide
+2. Sees "This is confusing—connect me with an accountant" CTA
+3. Lead captured → sent to partner accountant
+4. PayeTax receives referral fee
 
-High-income users (£75k+) see contextual CTA for professional tax advice.
+### Triggers for CTA
+| Trigger | Why |
+|---------|-----|
+| Profit > £100k | Complex, needs optimization advice |
+| Other income present | Tax stacking, multiple sources |
+| DLA warning triggered | Needs professional help |
+| VAT threshold approaching | Registration decision |
+| "My situation is complex" clicked | Self-selected |
 
-**Files:**
-- `src/components/molecules/AccountantReferralCTA.tsx` - CTA component
-- `src/app/api/referral/lead/route.ts` - Lead capture API
-- `src/components/organisms/CalculatorContainer.tsx` - Integration point
+### Revenue Model
+- Referral fee: £50-200 per qualified lead
+- Or: Revenue share on first-year fees
+- Target: 10-20 leads/month = £500-2k/mo
 
-**Triggering Conditions:**
-| Condition | Headline Shown |
-|-----------|----------------|
-| £100k-£125,140 salary | "You're in the £100k Tax Trap" |
-| £125,140+ salary | "Additional Rate Tax Planning" |
-| Scottish + £75k+ | "Scottish High Earner" |
-| £75k-£100k + 25%+ effective rate | "Maximize Your Take-Home Pay" |
+### Infrastructure (Already Built)
+| Component | File | Status |
+|-----------|------|--------|
+| Referral CTA | `AccountantReferralCTA.tsx` | Built, disabled |
+| Lead API | `/api/referral/lead/route.ts` | Built |
+| Email notification | Via Resend | Ready |
 
-**Lead Flow:**
-1. User sees contextual CTA below calculator results
-2. User clicks "Talk to an Expert"
-3. Lead form collects email
-4. API sends notification to `REFERRAL_PARTNER_EMAIL` (env var)
-5. User receives confirmation email
-
-**Environment Variables:**
-```bash
-REFERRAL_PARTNER_EMAIL=support@payetax.co.uk  # Default
-```
-
----
-
-## Analytics Tracking
-
-All monetization actions are tracked:
-
-| Event | Category | When |
-|-------|----------|------|
-| `affiliate_click` | monetization | User clicks affiliate link |
-| `referral_cta_clicked` | monetization | User clicks "Talk to an Expert" |
-| `referral_cta_dismissed` | monetization | User dismisses CTA |
-| `referral_lead_submitted` | monetization | User submits email for referral |
-
-Access via Google Analytics or check console in development.
+### To Enable
+1. Find accountant partner willing to pay for leads
+2. Uncomment CTA in `CalculatorContainer.tsx`
+3. Set `REFERRAL_PARTNER_EMAIL` env var
+4. Deploy
 
 ---
 
-## Phase 3: Future Implementation
+## Phase 3: Pro Tier
 
-### Widget Registration System
-**Status:** Not implemented
+### Features
+| Free | Pro (£9-19/mo) |
+|------|----------------|
+| One-time calculation | Save scenarios |
+| Results on screen | PDF export |
+| Manual date tracking | Email reminders for deadlines |
+| Basic output | Detailed breakdown |
+| — | Year-on-year comparison |
+| — | Payment schedule |
 
-Required:
-- Database for license keys (Prisma + PostgreSQL recommended)
-- License validation API
-- Widget badge enforcement via postMessage
-- Customer dashboard
+### Target User
+Directors who:
+- Return multiple times
+- Want to track changes over time
+- Need to share with accountant
+- Value convenience
 
-### Stripe Billing
-**Status:** Not implemented
+### Pricing
+| Option | Price | Notes |
+|--------|-------|-------|
+| Monthly | £19/mo | Cancel anytime |
+| Annual | £149/yr | 2 months free |
 
-Required:
-- Stripe account and API keys
-- Subscription checkout flow
-- Webhook handler for subscription events
-- Customer portal integration
-
----
-
-## Testing
-
-**Referral CTA:** Use calculator with salary > £100,000 to trigger CTA.
-
-**Affiliate Links:** Check competitor pages - links should have `rel="sponsored"` and fire `affiliate_click` event.
-
-**API Rate Limits:**
-- Referral leads: 3 per hour per IP
-- Email results: 5 per minute per IP
+### Build Trigger
+- 500+ monthly users
+- Users asking to save/export
+- Positive NPS feedback
 
 ---
 
-## Related Files
+## Phase 4: Widget (If Demand)
 
-| Purpose | File |
-|---------|------|
-| Competitor data | `src/data/competitors.ts` |
-| Analytics | `src/lib/analytics.ts` |
-| Affiliate tracking | `src/components/atoms/TrackedAffiliateLink.tsx` |
-| Referral CTA | `src/components/molecules/AccountantReferralCTA.tsx` |
-| Referral API | `src/app/api/referral/lead/route.ts` |
-| B2B pricing | `src/app/pricing/business/` |
-| Widget embed | `src/app/tools/embed-widget/` |
+### Only Build If
+1. Accountants explicitly ask to embed
+2. At least 10 requests received
+3. Willing to pay (not just "that would be nice")
+
+### What Changed from Original Strategy
+| Original | New |
+|----------|-----|
+| Widget is primary product | Widget is optional add-on |
+| Build first, validate later | Validate first, build if demand |
+| £49-75/mo pricing | £19-49/mo (if at all) |
+| Complex license system | Simple embed code |
+
+### If We Build It
+- Embeds the GUIDE, not just calculator
+- "Powered by PayeTax" badge (free tier)
+- White-label option (paid tier)
+- Lead capture flows to accountant
 
 ---
 
-## Enabling Features (Currently Disabled)
+## What's NOT in the Plan
 
-All monetization features are built but disabled for launch. To enable:
+| Idea | Why Not |
+|------|---------|
+| Paywall on calculator | Kills trust and SEO |
+| Ads | Looks cheap, low revenue |
+| Data selling | Unethical, GDPR nightmare |
+| Premium-only features that should be free | Undermines education mission |
 
-### 1. Accountant Referral CTA
+---
 
-**File:** `src/components/organisms/CalculatorContainer.tsx`
+## Revenue Projections (Conservative)
 
-1. Uncomment the import at line 9
-2. Uncomment the JSX block around line 230
-3. Configure `REFERRAL_PARTNER_EMAIL` env var
+### Month 3
+| Stream | Projection |
+|--------|------------|
+| Referrals | £500/mo |
+| Pro tier | £0 (not built yet) |
+| **Total** | **£500/mo** |
 
-### 2. B2B Pricing Page
+### Month 6
+| Stream | Projection |
+|--------|------------|
+| Referrals | £1,500/mo |
+| Pro tier | £500/mo (25 users) |
+| **Total** | **£2,000/mo** |
 
-**File:** `src/app/pricing/business/page.tsx`
+### Month 12
+| Stream | Projection |
+|--------|------------|
+| Referrals | £2,000/mo |
+| Pro tier | £2,000/mo (100 users) |
+| Widget (if built) | £1,000/mo |
+| **Total** | **£4-5,000/mo** |
 
-1. Remove `notFound()` call
-2. Uncomment the metadata export
-3. Uncomment the component import and return statement
+---
 
-### 3. Affiliate Links
+## Success Metrics
 
-**File:** `src/data/competitors.ts`
+### Phase 1 (Now)
+| Metric | Target |
+|--------|--------|
+| Monthly visitors | 5,000 |
+| Guide completions | 1,000 |
+| Time on page | > 3 min |
+| Return visitors | 20% |
 
-Add `affiliateUrl` and `affiliateProgram` fields to competitor entries once you have valid affiliate agreements. Infrastructure is ready.
+### Phase 2 (Referrals)
+| Metric | Target |
+|--------|--------|
+| CTA click rate | 5% |
+| Lead conversion | 20% |
+| Leads/month | 20 |
+| Revenue/month | £1,000 |
+
+### Phase 3 (Pro)
+| Metric | Target |
+|--------|--------|
+| Free → Pro conversion | 2% |
+| Monthly Pro users | 100 |
+| Churn rate | < 5%/mo |
+| MRR | £2,000 |
+
+---
+
+## The Rule
+
+**Don't build monetization features until there's demand signal.**
+
+Signs of demand:
+- Users emailing asking for feature
+- High exit rate at specific points
+- Accountants asking to partner
+- Competitors copying the approach
+
+No demand signal = don't build it yet.
+
+---
+
+## Related Docs
+
+| Document | Purpose |
+|----------|---------|
+| `DIRECTOR_TOOLS.md` | Product strategy (education-first) |
+| `DIRECTOR_TOOLS_IMPLEMENTATION.md` | Technical spec |
+| `READ_THIS_FIRST.md` | The mantra |

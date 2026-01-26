@@ -1,56 +1,62 @@
 # PayeTax Business Docs
 
-Everything related to making money.
+> **Read [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) before doing anything.** It's the mantra.
 
 ---
 
-## Start Here
+## Current Focus
 
-**[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** - The manifesto. Read before building anything.
+**Building:** First-Time Director's Guide to Paying Yourself
+
+**Phase:** Free tool → Build trust → Monetize later
 
 ---
 
 ## Documents
 
-| Document | Purpose |
-|----------|---------|
-| [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) | Distribution > Features. The mindset reset. |
-| [MONETIZATION.md](./MONETIZATION.md) | Current revenue streams and how to enable them |
-| [SME_DIRECTOR_TOOLS.md](./SME_DIRECTOR_TOOLS.md) | Priority #1 product: Director Optimizer spec |
-| [IDEAS.md](./IDEAS.md) | Future features (build AFTER revenue) |
+| Document | Purpose | Status |
+|----------|---------|--------|
+| [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) | The mantra. Distribution > Features. | ✅ Active |
+| [DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md) | Product strategy with all 4 LLM reviews | ✅ Active |
+| [DIRECTOR_TOOLS_IMPLEMENTATION.md](./DIRECTOR_TOOLS_IMPLEMENTATION.md) | Technical spec (math, logic) | ⚠️ Needs revision |
+| [MONETIZATION.md](./MONETIZATION.md) | Revenue strategy | ✅ Active |
+| [IDEAS.md](./IDEAS.md) | Future features (build AFTER revenue) | ✅ Active |
+| [ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md](./ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md) | Historical reference | 📁 Archive |
 
 ---
 
-## Quick Actions
+## The Product (Summary)
 
-### Enable Monetization Today
+**What:** Education-first guide for first-time directors
 
-```bash
-# 1. Accountant Referral CTA
-# File: src/components/organisms/CalculatorContainer.tsx
-# Uncomment import and JSX block
+**Who:** Confused people who just formed a Ltd and don't know how to pay themselves
 
-# 2. B2B Pricing Page  
-# File: src/app/pricing/business/page.tsx
-# Remove notFound() call
+**Why:** "Reduce anxiety and prevent mistakes" not "optimize tax"
 
-# 3. Set env var
-vercel env add REFERRAL_PARTNER_EMAIL
-```
+**Output:** 
+- "Safe monthly draw" (what you can take)
+- "Set aside for tax" (what to ring-fence)
+- Key dates and deadlines
 
-### Distribution Checklist
+**Monetization:**
+1. Free tool (SEO, trust)
+2. Accountant referrals (leads)
+3. Pro tier (save scenarios)
+4. Widget (only if demand)
 
-- [ ] Posted on LinkedIn today?
-- [ ] Engaged with 5 relevant comments?
-- [ ] Published blog content this week?
-- [ ] Reviewed analytics?
+---
+
+## Quick Links
+
+- **Strategy:** `DIRECTOR_TOOLS.md`
+- **Revenue:** `MONETIZATION.md`
+- **Technical:** `DIRECTOR_TOOLS_IMPLEMENTATION.md`
+- **The Mantra:** `READ_THIS_FIRST.md`
 
 ---
 
 ## The Rule
 
-**50% of time on distribution. 50% on product.**
-
-Not 90% building, 10% "marketing later."
+**50% distribution. 50% product.**
 
 If Stripe shows £0, you're not distributing enough.
