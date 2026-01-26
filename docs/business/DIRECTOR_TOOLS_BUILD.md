@@ -1,10 +1,10 @@
-# Director Tools - Build Spec v3.0
+# Director Tools - Build Spec v3.1
 
 > **Purpose:** How to build the "How Much Can I Pay Myself?" guide
 > **For tax calculations:** See `DIRECTOR_TOOLS_MATH.md`
 > **For product strategy:** See `DIRECTOR_TOOLS.md`
 > **Last Updated:** January 2026
-> **Status:** ✅ ALL 4 REVIEWERS APPROVED (v2.0 + Additions)
+> **Status:** ✅ ALL 4 REVIEWERS APPROVED - Ready to code
 
 ---
 
@@ -35,7 +35,7 @@ Before any feature, ask:
 | Does she need to know what a "fiscal year" is? | No |
 | Does she need to know what "Employment Allowance" is? | No |
 | Does she need to know what "IR35" means? | No |
-| Does she get a number she can transfer today? | **Yes** |
+| Does she get a safe monthly target she can plan around? | **Yes** |
 
 If a feature fails this test, cut it.
 
@@ -53,9 +53,27 @@ If a feature fails this test, cut it.
 
 - One page load (fast)
 - All questions visible (no mystery)
-- Current question active, upcoming questions blurred
+- Current question active, upcoming questions blurred/disabled
 - Completed questions collapse with ✓
 - Pros can click through fast; beginners take their time
+
+### Accessibility Requirements
+
+```tsx
+// Blurred/upcoming sections:
+aria-hidden="true"
+tabIndex={-1}  // Not focusable until active
+
+// Active section:
+aria-live="polite"  // Announce when becomes active
+autoFocus           // Move focus to first input
+
+// Completed sections:
+aria-expanded="false"  // Collapsed state
+// Edit button is focusable
+```
+
+### UI Mockup
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -83,24 +101,21 @@ If a feature fails this test, cut it.
 │  ○ Scotland                                                     │
 │  ○ England, Wales, or Northern Ireland                          │
 │                                                                 │
-│  [I split my time / not sure →] (links to: "Talk to an          │
-│   accountant - tax residency can be complex")                   │
+│  [I split my time / not sure →] (links to: "Tax residency can   │
+│   be complex. Talk to an accountant.")                          │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  2. WHAT'S YOUR ANNUAL REVENUE?                     ← BLURRED   │
-│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   │
-│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   │
+│  2. WHAT'S YOUR ANNUAL REVENUE?                     ← DISABLED  │
+│  (greyed out, not focusable)                                    │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  3. WHAT ARE YOUR BUSINESS EXPENSES?                ← BLURRED   │
-│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   │
+│  3. WHAT ARE YOUR BUSINESS EXPENSES?                ← DISABLED  │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  4. ALREADY PAID YOURSELF?                          ← BLURRED   │
-│  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   │
+│  4. ALREADY PAID YOURSELF?                          ← DISABLED  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -208,12 +223,36 @@ We don't ask. We assume the most common scenario.
 | Accounting period | 12 months | Most common |
 | Tax year | 2025-26 | Current |
 
-**Show in results (collapsible):**
-> **Assumptions we made:**
-> - Your company is your only income
-> - Standard 12-month accounting year
-> - No student loan repayments
-> - Tax year 2025-26 (starting April 6)
+---
+
+## Survival Mode: Threshold Table
+
+| Profit | What Shows |
+|--------|------------|
+| **≤ £0** | Full survival mode: "Your company hasn't made profit yet. Dividends aren't possible. If you take money, it's a loan you'll owe back." |
+| **£1 - £12,570** | Modified survival: "You can take a smaller salary (up to your profit), but dividends aren't advisable yet." |
+| **> £12,570** | Normal results with salary + dividend strategy |
+
+**Implementation:** Short-circuit at step 2 of calculation. If `profit <= 12570`, trigger survival mode UI and STOP before calculating full scenario.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ YOUR COMPANY HASN'T MADE ENOUGH PROFIT YET                  │
+│                                                                 │
+│  Based on your numbers, profit is ~£8,000.                      │
+│                                                                 │
+│  This isn't enough to pay yourself a full salary + dividends    │
+│  in the most tax-efficient way.                                 │
+│                                                                 │
+│  YOUR OPTIONS:                                                  │
+│  1. Take a smaller salary (up to your profit)                   │
+│  2. Wait until you have more profit before taking dividends     │
+│  3. If you need money now, talk to an accountant about          │
+│     Director's Loans (there are tax implications)               │
+│                                                                 │
+│  This is normal in year 1. Focus on growing the business.       │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -235,17 +274,17 @@ First-timers are confused about "the company" vs "me". Make it crystal clear.
 │  you - it has its own tax.     │  │  and it pays you.          │
 │                                │  │                            │
 │  🏦 COMPANY TAX POT            │  │  💰 AVERAGE MONTHLY PAY    │
-│  Set aside: £16,000            │  │  Around: £4,500/mo         │
+│  Set aside: £16,000            │  │  Target: ~£4,500/mo        │
 │                                │  │                            │
-│  Keep this in your business    │  │  Salary (£1,047/mo) goes   │
-│  account. Don't touch it.      │  │  monthly via payroll.      │
-│                                │  │  The rest comes as         │
-│  Due: ~9 months after your     │  │  dividends occasionally.   │
-│  company year ends             │  │                            │
-│                                │  │  🐷 YOUR TAX SAVINGS       │
+│  This includes:                │  │  Salary (£1,047/mo) goes   │
+│  • Corporation Tax             │  │  monthly via payroll.      │
+│  • Employer NI (~£1,100/yr)    │  │  The rest comes as         │
+│                                │  │  dividends occasionally.   │
+│  Keep this in your business    │  │                            │
+│  account. Don't touch it.      │  │  🐷 YOUR TAX SAVINGS       │
 │                                │  │  Save: £750/mo             │
-│                                │  │                            │
-│                                │  │  Put this in a personal    │
+│  Due: ~9 months after your     │  │                            │
+│  company year ends             │  │  Put this in a personal    │
 │                                │  │  savings account for your  │
 │                                │  │  tax bill (due 31 Jan).    │
 └────────────────────────────────┘  └────────────────────────────┘
@@ -255,11 +294,13 @@ First-timers are confused about "the company" vs "me". Make it crystal clear.
 │                                                                 │
 │  1. Set up payroll (FreeAgent, Xero, or an accountant can help) │
 │  2. Pay yourself £1,047/month as salary via payroll             │
+│     (We keep salary at £12,570/year to stay tax-efficient)      │
 │  3. Take dividends occasionally when you have profit            │
 │  4. Move £750/mo to a savings account for your tax bill         │
 │                                                                 │
 │  ▸ What's payroll? (inline accordion)                           │
 │  ▸ What are dividends? (inline accordion)                       │
+│  ▸ Why this salary amount? (inline accordion)                   │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -267,9 +308,12 @@ First-timers are confused about "the company" vs "me". Make it crystal clear.
 │                                                                 │
 │  • Your company is your only income                             │
 │  • Standard 12-month accounting year                            │
+│  • Full-year trading (adjust for shorter periods)               │
 │  • No student loan repayments                                   │
 │  • Tax year 2025-26 (starting April 6)                          │
 │  • Dividends taxed at UK rates (even for Scottish residents)    │
+│  • Uses current tax-year rules for the full 12 months           │
+│    (If your year crosses April 6, actual tax may differ)        │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -284,27 +328,18 @@ First-timers are confused about "the company" vs "me". Make it crystal clear.
 
 ---
 
-## Survival Mode (Profit ≤ £12,570)
+## Employer NI: Show It
 
-If profit is zero, negative, or below the Personal Allowance, HIDE the normal salary/dividend instructions.
+With the 2025-26 rates:
+- Employer NI threshold: **£5,000**
+- Employer NI rate: **15%**
+- On £12,570 salary: Employer NI = (£12,570 - £5,000) × 15% = **~£1,135/year**
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  ⚠️ YOUR COMPANY HASN'T MADE ENOUGH PROFIT YET                  │
-│                                                                 │
-│  Based on your numbers, profit is ~£8,000.                      │
-│                                                                 │
-│  This isn't enough to pay yourself a full salary + dividends    │
-│  in the most tax-efficient way.                                 │
-│                                                                 │
-│  YOUR OPTIONS:                                                  │
-│  1. Take a smaller salary (up to your profit)                   │
-│  2. Wait until you have more profit before taking dividends     │
-│  3. If you need money now, talk to an accountant about          │
-│     Director's Loans (there are tax implications)               │
-│                                                                 │
-│  This is normal in year 1. Focus on growing the business.       │
-└─────────────────────────────────────────────────────────────────┘
+**This must be included in the Company Tax Pot** and shown to users so there's no "surprise payroll tax."
+
+```typescript
+const employerNI = Math.max(0, salary - 5000) * 0.15;
+const companyTaxPot = corporationTax + employerNI;
 ```
 
 ---
@@ -338,15 +373,17 @@ from another job), payments on account may not apply to you.
 
 ## Conditional Warnings
 
-| Condition | Show |
-|-----------|------|
-| **Scotland** | Note in results: "Scottish resident: Your salary uses Scottish tax rates. Dividends use UK rates." |
-| **Profit ≤ 0** | Survival mode (see above) |
-| **0 < Profit < £12,570** | Modified survival mode: "You can take a smaller salary, but dividends aren't advisable yet." |
-| **Profit > £250k** | "This is getting complex. An accountant could save you serious money." |
-| **Revenue £85k-£95k** | "Heads up: VAT registration is required above £90k turnover. If you're not registered yet, you may need to be." |
-| **Already taken > take-home** | "⚠️ You may have taken more than is safe based on this estimate. Pause and speak to an accountant." |
-| **Already taken (not via payroll)** | "Money taken without payroll may be a Director's Loan. This has tax implications. Talk to an accountant." |
+| Condition | Trigger | Show |
+|-----------|---------|------|
+| **Scotland** | `region === 'scotland'` | Note in results: "Scottish resident: Your salary uses Scottish tax rates. Dividends use UK rates." |
+| **Full survival** | `profit <= 0` | Full survival mode UI |
+| **Modified survival** | `0 < profit <= 12570` | Modified survival mode UI |
+| **High complexity** | `profit > 250000` | "This is getting complex. An accountant could save you serious money." |
+| **VAT threshold** | `85000 < netRevenue < 95000` | "Heads up: VAT registration is required above £90k turnover. If you're not registered yet, you may need to be." |
+| **Already taken too much** | `alreadyTaken > netTakeHome` | "⚠️ You may have taken more than is safe based on this estimate. Pause and speak to an accountant." |
+| **DLA risk** | `alreadyTaken > 0 && !viaPayroll` | "Money taken without payroll may be a Director's Loan. This has tax implications. Talk to an accountant." |
+
+**VAT threshold constant:** £90,000 (GOV.UK). The £85k-£95k band is an "early warning" range.
 
 ---
 
@@ -358,17 +395,17 @@ Tax Year: 2025-26
 
 YOUR INPUTS
 Location: Scotland
-Revenue: £100,000 (before VAT)
+Revenue: £100,000 (no VAT included)
 Expenses: £20,000
 Already taken: £0
 Profit: ~£80,000
 
-AVERAGE MONTHLY PAY
+AVERAGE MONTHLY PAY (TARGET)
 Around £4,800/month
-(£1,047 salary + dividends)
+(£1,047 salary via payroll + dividends occasionally)
 
 SET ASIDE FOR TAX
-Company tax pot: £17,500 (keep in business account)
+Company tax pot: £17,500 (includes Corporation Tax + Employer NI)
 Personal tax pot: £900/month (save for January)
 
 HOW TO DO IT
@@ -379,13 +416,54 @@ HOW TO DO IT
 
 ASSUMPTIONS
 • Your company is your only income
+• Full-year trading
 • No student loan repayments
 • Scottish salary rates, UK dividend rates
+• Uses 2025-26 tax rules
 
 ⚠️ This is a rough estimate, not advice.
 For precision, talk to an accountant.
 
 Generated: [date] | payetax.co.uk/tools/director-guide
+```
+
+**Note:** Show "(no VAT included)" or "(before VAT)" depending on whether checkbox was ticked.
+
+---
+
+## localStorage Persistence
+
+Prevent data loss on page refresh.
+
+| Setting | Value |
+|---------|-------|
+| **What's stored** | `formData` only (not results) |
+| **Key** | `director-guide-draft` |
+| **When cleared** | When results are shown, OR after 7 days, OR if tax year changes |
+| **Tax year handling** | Store `taxYear` with data; clear if mismatched |
+
+```typescript
+interface StoredDraft {
+  formData: DirectorInput;
+  taxYear: string;
+  savedAt: string; // ISO date
+}
+
+// On page load
+const draft = localStorage.getItem('director-guide-draft');
+if (draft) {
+  const parsed = JSON.parse(draft);
+  const isExpired = daysSince(parsed.savedAt) > 7;
+  const wrongTaxYear = parsed.taxYear !== CURRENT_TAX_YEAR;
+  if (isExpired || wrongTaxYear) {
+    localStorage.removeItem('director-guide-draft');
+  } else {
+    setFormData(parsed.formData);
+  }
+}
+
+// On results shown
+localStorage.removeItem('director-guide-draft');
 ```
 
 ---
@@ -401,11 +479,6 @@ Pro features (save scenarios, PDF, reminders) are priced like a flat white.
 | Pro price | £3.99/month |
 | Marketing copy | "About the price of a flat white" |
 | Update frequency | Quarterly review of copy, NOT price |
-
-**Why NOT mechanical:**
-- Billing plan changes are operationally complex
-- Customer notice requirements
-- Churn from price confusion
 
 **Display:**
 > "Pro costs £3.99/month - about the price of a flat white."
@@ -434,7 +507,7 @@ src/
 │       │   └── AlreadyTakenStep.tsx      # Question 4
 │       ├── results/
 │       │   ├── ResultsSection.tsx        # Assembles results
-│       │   ├── CompanyBox.tsx            # Company position
+│       │   ├── CompanyBox.tsx            # Company position (includes Employer NI)
 │       │   ├── PersonalBox.tsx           # Personal position
 │       │   ├── HowToDoIt.tsx             # Action steps
 │       │   ├── Assumptions.tsx           # Collapsible assumptions
@@ -446,143 +519,65 @@ src/
 │       │   └── ComplexityWarning.tsx     # High profit
 │       └── education/
 │           ├── WhatIsPayroll.tsx         # Inline accordion
-│           └── WhatAreDividends.tsx      # Inline accordion
+│           ├── WhatAreDividends.tsx      # Inline accordion
+│           └── WhyThisSalary.tsx         # Inline accordion (explains £12,570)
 │
 ├── lib/
 │   └── tax/
 │       ├── index.ts                      # Exports orchestrator
 │       ├── directorCalculator.ts         # Orchestrator (<150 lines)
-│       ├── incomeTax.ts                  # Income tax calc (<150 lines)
+│       ├── incomeTax.ts                  # UK income tax calc (<150 lines)
 │       ├── scottishIncomeTax.ts          # Scottish bands (<150 lines)
-│       ├── nationalInsurance.ts          # NI calc (<150 lines)
+│       ├── nationalInsurance.ts          # Employee + Employer NI (<150 lines)
 │       ├── corporationTax.ts             # CT calc (<100 lines)
 │       ├── dividendTax.ts                # Dividend tax (<100 lines)
 │       └── taxYearSelector.ts            # Date logic for tax years
 │
 ├── constants/
-│   └── taxRates/
-│       ├── index.ts                      # Exports current year
-│       ├── 2024-2025.ts                  # Previous year
-│       ├── 2025-2026.ts                  # Current year
-│       └── types.ts                      # TaxRates type definition
+│   └── taxRates.ts                       # EXISTING - already has correct 2025-26 rates
 │
 └── types/
     └── director.ts                       # DirectorInput, DirectorResult types
 ```
 
+**Note:** Your existing `taxRates.ts` already has the correct 2025-26 rates including:
+- Employer NI: 15% above £5,000 threshold ✅
+- Scottish bands: Correct 2025-26 values ✅
+- Employee NI: 8% ✅
+
 ---
 
-## Tax Rates Structure (With Effective Dates)
+## Tax Rates: Use Existing Source of Truth
+
+Your `src/constants/taxRates.ts` already has correct 2025-26 rates. **Do not duplicate.**
+
+For the director calculator, import from the existing file:
 
 ```typescript
-// src/constants/taxRates/types.ts
-export interface TaxYearRates {
-  taxYear: string;
-  effectiveFrom: string;  // ISO date, e.g., '2025-04-06'
-  
-  personalAllowance: number;
-  
-  incomeTax: {
-    basicRate: number;
-    basicLimit: number;
-    higherRate: number;
-    higherLimit: number;
-    additionalRate: number;
-  };
-  
-  scottishIncomeTax: {
-    starterRate: number;
-    starterLimit: number;
-    basicRate: number;
-    basicLimit: number;
-    intermediateRate: number;
-    intermediateLimit: number;
-    higherRate: number;
-    higherLimit: number;
-    advancedRate: number;
-    advancedLimit: number;
-    topRate: number;
-  };
-  
-  dividendTax: {
-    allowance: number;
-    basicRate: number;
-    higherRate: number;
-    additionalRate: number;
-  };
-  
-  nationalInsurance: {
-    primaryThreshold: number;
-    upperEarningsLimit: number;
-    employeeRate: number;
-    employeeRateAboveUEL: number;
-    employerRate: number;
-    employerThreshold: number;
-  };
-  
-  corporationTax: {
-    smallProfitsRate: number;
-    smallProfitsLimit: number;
-    mainRate: number;
-    mainRateLimit: number;
-  };
-}
+import { TAX_RATES, SCOTTISH_TAX_RATES } from '@/constants/taxRates';
+
+const rates = TAX_RATES['2025-2026'];
+const scottishRates = SCOTTISH_TAX_RATES['2025-2026'];
+
+// Employer NI (already correct in your file)
+const employerNIThreshold = rates.nationalInsurance.employer.A.secondary.threshold; // 5000
+const employerNIRate = rates.nationalInsurance.employer.A.secondary.rate / 100;     // 0.15
 ```
 
-```typescript
-// src/constants/taxRates/2025-2026.ts
-export const TAX_RATES_2025_26: TaxYearRates = {
-  taxYear: '2025-2026',
-  effectiveFrom: '2025-04-06',
-  
-  personalAllowance: 12570,
-  
-  incomeTax: {
-    basicRate: 0.20,
-    basicLimit: 37700,
-    higherRate: 0.40,
-    higherLimit: 125140,
-    additionalRate: 0.45,
-  },
-  
-  scottishIncomeTax: {
-    starterRate: 0.19,
-    starterLimit: 14876,
-    basicRate: 0.20,
-    basicLimit: 26561,
-    intermediateRate: 0.21,
-    intermediateLimit: 43662,
-    higherRate: 0.42,
-    higherLimit: 75000,
-    advancedRate: 0.45,
-    advancedLimit: 125140,
-    topRate: 0.48,
-  },
-  
-  dividendTax: {
-    allowance: 500,
-    basicRate: 0.0875,
-    higherRate: 0.3375,
-    additionalRate: 0.3935,
-  },
-  
-  nationalInsurance: {
-    primaryThreshold: 12570,
-    upperEarningsLimit: 50270,
-    employeeRate: 0.08,
-    employeeRateAboveUEL: 0.02,
-    employerRate: 0.138,
-    employerThreshold: 5000,
-  },
-  
-  corporationTax: {
-    smallProfitsRate: 0.19,
-    smallProfitsLimit: 50000,
-    mainRate: 0.25,
-    mainRateLimit: 250000,
-  },
-};
-```
+**Key 2025-26 values (verified in your taxRates.ts):**
+
+| Item | Value |
+|------|-------|
+| Personal Allowance | £12,570 |
+| Employer NI threshold | £5,000 |
+| Employer NI rate | 15% |
+| Employee NI rate | 8% |
+| Scottish starter rate | 19% (£12,571-£15,397) |
+| Scottish basic rate | 20% (£15,398-£27,491) |
+| Scottish intermediate | 21% (£27,492-£43,662) |
+| Scottish higher | 42% (£43,663-£75,000) |
+| Scottish advanced | 45% (£75,001-£125,140) |
+| Scottish top | 48% (above £125,140) |
 
 ---
 
@@ -592,6 +587,7 @@ export const TAX_RATES_2025_26: TaxYearRates = {
 
 ```typescript
 // Scottish rates apply to NON-SAVINGS, NON-DIVIDEND income only
+// Dividend tax bands use UK thresholds, not Scottish
 function calculateIncomeTax(salary: number, region: 'scotland' | 'rUK'): number {
   if (region === 'scotland') {
     return calculateScottishIncomeTax(salary);
@@ -599,17 +595,73 @@ function calculateIncomeTax(salary: number, region: 'scotland' | 'rUK'): number 
   return calculateUKIncomeTax(salary);
 }
 
-// Dividends ALWAYS use UK rates, regardless of region
+// Dividends ALWAYS use UK rates AND UK band thresholds, regardless of region
 function calculateDividendTax(dividends: number, taxableIncome: number): number {
   // Uses UK dividend rates, never Scottish
+  // Band is based on total taxable income vs UK basic/higher limits
   return calculateUKDividendTax(dividends, taxableIncome);
+}
+```
+
+### Calculation Order of Operations
+
+```typescript
+function calculateDirectorScenario(input: DirectorInput): DirectorResult {
+  // 1. Adjust revenue for VAT if needed
+  const netRevenue = input.includesVat ? input.revenue / 1.2 : input.revenue;
+  
+  // 2. Calculate gross profit
+  const grossProfit = netRevenue - input.expenses;
+  
+  // 3. SHORT-CIRCUIT: Check for survival mode
+  if (grossProfit <= 12570) {
+    return { mode: 'survival', profit: grossProfit, ... };
+  }
+  
+  // 4. Calculate employer NI on salary
+  const salary = 12570;
+  const employerNI = Math.max(0, salary - 5000) * 0.15;
+  
+  // 5. Calculate taxable profit (after salary + employer NI)
+  const taxableProfit = grossProfit - salary - employerNI;
+  
+  // 6. Calculate corporation tax
+  const corporationTax = calculateCorporationTax(taxableProfit);
+  
+  // 7. Calculate dividends available
+  const dividends = taxableProfit - corporationTax;
+  
+  // 8. Calculate personal taxes
+  const incomeTax = calculateIncomeTax(salary, input.region);
+  const dividendTax = calculateDividendTax(dividends, salary);
+  
+  // 9. Calculate take-home
+  const netTakeHome = salary + dividends - incomeTax - dividendTax;
+  
+  // 10. Calculate company tax pot (CT + Employer NI)
+  const companyTaxPot = corporationTax + employerNI;
+  
+  // 11. Personal tax savings (with POA if applicable)
+  const personalTax = dividendTax;
+  const includesPOA = personalTax > 1000;
+  const personalTaxAnnual = includesPOA ? personalTax * 1.5 : personalTax;
+  
+  return {
+    mode: 'normal',
+    profit: grossProfit,
+    monthlyPay: (netTakeHome - input.alreadyTaken) / 12,
+    companyTaxPot,
+    personalTaxMonthly: personalTaxAnnual / 12,
+    includesPOA,
+    employerNI,
+    ...
+  };
 }
 ```
 
 ### Progressive Disclosure State
 
 ```typescript
-// In DirectorGuideForm.tsx
 const [currentStep, setCurrentStep] = useState(1);
 const [formData, setFormData] = useState<DirectorInput>({
   region: null,
@@ -620,9 +672,10 @@ const [formData, setFormData] = useState<DirectorInput>({
   alreadyTakenViaPayroll: null,
 });
 
-// Step is "active" if it's the current step
-// Step is "complete" if all previous steps are done and this one has a value
-// Step is "blurred" if it's after the current step
+// Step states:
+// - "active": currentStep === stepNumber
+// - "complete": stepNumber < currentStep && hasValue
+// - "disabled": stepNumber > currentStep
 ```
 
 ### Mobile Keyboard
@@ -641,10 +694,11 @@ const [formData, setFormData] = useState<DirectorInput>({
 ## Build Order
 
 ### Phase 1: Foundation
-- [ ] Create `taxRates/2025-2026.ts` with all rates including Scotland
-- [ ] Create `taxRates/types.ts` with TypeScript interface
-- [ ] Create atomic tax calculators (`incomeTax.ts`, `scottishIncomeTax.ts`, etc.)
-- [ ] Create `directorCalculator.ts` orchestrator
+- [ ] Verify `taxRates.ts` has all correct 2025-26 rates (✅ already verified)
+- [ ] Create `lib/tax/directorCalculator.ts` orchestrator
+- [ ] Create `lib/tax/corporationTax.ts`
+- [ ] Create `lib/tax/dividendTax.ts`
+- [ ] Create `types/director.ts`
 - [ ] Write golden example tests
 
 ### Phase 2: Form Components
@@ -657,7 +711,7 @@ const [formData, setFormData] = useState<DirectorInput>({
 
 ### Phase 3: Results Components
 - [ ] `ResultsSection.tsx`
-- [ ] `CompanyBox.tsx`
+- [ ] `CompanyBox.tsx` (includes Employer NI breakdown)
 - [ ] `PersonalBox.tsx`
 - [ ] `HowToDoIt.tsx`
 - [ ] `Assumptions.tsx` (collapsible)
@@ -672,6 +726,7 @@ const [formData, setFormData] = useState<DirectorInput>({
 ### Phase 5: Education (Inline Accordions)
 - [ ] `WhatIsPayroll.tsx`
 - [ ] `WhatAreDividends.tsx`
+- [ ] `WhyThisSalary.tsx`
 
 ### Phase 6: Page Assembly
 - [ ] `page.tsx` (metadata, schema)
@@ -679,9 +734,9 @@ const [formData, setFormData] = useState<DirectorInput>({
 
 ### Phase 7: Polish
 - [ ] Mobile responsive
-- [ ] Accessibility (keyboard nav, screen readers)
+- [ ] Accessibility (aria-hidden, tabIndex, aria-live)
 - [ ] Analytics events
-- [ ] localStorage persistence (prevent data loss on refresh)
+- [ ] localStorage persistence
 
 ---
 
@@ -698,7 +753,6 @@ const [formData, setFormData] = useState<DirectorInput>({
 | `guide_results_copied` | Copy button clicked |
 | `guide_warning_shown` | Any warning displayed (with type) |
 | `guide_education_expanded` | "What's payroll?" etc. clicked |
-| `guide_year_end_entered` | Optional year-end provided |
 
 **Privacy:** Bucket revenue/expenses/profit ranges. Do NOT log raw amounts.
 
@@ -733,25 +787,27 @@ const [formData, setFormData] = useState<DirectorInput>({
 
 ## Reviewer Sign-Off
 
-### v2.0 Core Approval
+### v3.0 Approval (All 4)
 
-| Reviewer | Status | Key Contribution |
-|----------|--------|------------------|
-| Grok | ✅ | Assumption transparency, thresholds |
-| Claude | ✅ | VAT help, guardrails, year-end optional |
-| ChatGPT | ✅ | Timeframe clarity, plain English copy |
-| Gemini | ✅ | Silent assumptions, POA safety net |
+| Reviewer | Status | Key Notes |
+|----------|--------|-----------|
+| Grok | ✅ | No blockers, proceed |
+| Claude | ✅ | Verify NI rate (✅ verified: 15%) |
+| ChatGPT | ✅ | Fix constants (✅ already correct in taxRates.ts), show employer NI |
+| Gemini | ✅ | Short-circuit survival mode |
 
-### v3.0 Additions Approval
+### Fixes Applied in v3.1
 
-| Reviewer | Scotland | Single Page | Atomic Design |
-|----------|----------|-------------|---------------|
-| Grok | ✅ | ✅ | ✅ |
-| Claude | ❌ (ship first) | N/A | ❌ (do later) |
-| ChatGPT | ✅ (salary only) | ✅ | ✅ |
-| Gemini | ✅ | ✅ | ✅ |
-
-**Final decision:** Scotland supported (salary-only), single page progressive, atomic design.
+| Issue | Status |
+|-------|--------|
+| Employer NI rate 15% | ✅ Verified in taxRates.ts |
+| Scottish bands 2025-26 | ✅ Verified in taxRates.ts |
+| Employer NI shown in Company box | ✅ Added |
+| Survival mode threshold table | ✅ Added |
+| Accessibility (aria-hidden, tabIndex) | ✅ Added |
+| "Year ahead" disclaimer | ✅ Added to assumptions |
+| localStorage spec | ✅ Added |
+| "Transfer today" → "safe monthly target" | ✅ Changed in Wife Test |
 
 ---
 
@@ -767,13 +823,19 @@ Before shipping, verify this scenario:
 
 **Expected:**
 - Net revenue: £100,000 (VAT removed)
-- Profit: £80,000
-- Average monthly pay: ~£4,800
-- Company tax pot: ~£17,500
-- Personal tax monthly: ~£900
+- Gross profit: £80,000
+- Salary: £12,570
+- Employer NI: ~£1,135
+- Taxable profit: ~£66,295
+- Corporation Tax: ~£13,800 (with marginal relief)
+- Company tax pot: ~£14,935 (CT + Employer NI)
+- Dividends available: ~£52,495
+- Dividend tax: ~£4,400
+- Personal tax monthly (with POA): ~£550
+- Average monthly pay: ~£5,200
 
-**Match against MATH doc calculations.**
+**Run against MATH doc and verify.**
 
 ---
 
-**This is BUILD v3.0. Ship it.**
+**This is BUILD v3.1. All blockers resolved. Ship it.**
