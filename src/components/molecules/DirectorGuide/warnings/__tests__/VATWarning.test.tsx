@@ -25,7 +25,7 @@ describe('VATWarning', () => {
     });
   });
 
-  describe('Above threshold (>£90k)', () => {
+  describe('Above threshold (>=£90k)', () => {
     it('should show "required" message', () => {
       render(<VATWarning revenue={95000} />);
       expect(screen.getByText(/required to register/i)).toBeInTheDocument();
@@ -34,6 +34,23 @@ describe('VATWarning', () => {
     it('should mention current registration status', () => {
       render(<VATWarning revenue={92000} />);
       expect(screen.getByText(/not registered yet/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('Boundary cases', () => {
+    it('should treat exactly £90,000 as above threshold', () => {
+      render(<VATWarning revenue={90000} />);
+      expect(screen.getByText(/required to register/i)).toBeInTheDocument();
+    });
+
+    it('should treat £89,999 as below threshold', () => {
+      render(<VATWarning revenue={89999} />);
+      expect(screen.getByText(/getting close/i)).toBeInTheDocument();
+    });
+
+    it('should handle revenue at lower boundary (£85,000)', () => {
+      render(<VATWarning revenue={85000} />);
+      expect(screen.getByText(/getting close/i)).toBeInTheDocument();
     });
   });
 

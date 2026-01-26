@@ -55,4 +55,32 @@ describe('CompanyBox', () => {
     render(<CompanyBox result={mockResult} />);
     expect(screen.getByText(/9 months after your company year ends/i)).toBeInTheDocument();
   });
+
+  describe('Edge cases', () => {
+    it('should handle zero company tax pot', () => {
+      const zeroResult = { ...mockResult, companyTaxPot: 0, corporationTax: 0, employerNI: 0 };
+      render(<CompanyBox result={zeroResult} />);
+      // Multiple £0 values will appear (tax pot, CT, NI)
+      const zeroElements = screen.getAllByText('£0');
+      expect(zeroElements.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should handle very large values', () => {
+      const largeResult = {
+        ...mockResult,
+        companyTaxPot: 10000000,
+        corporationTax: 9000000,
+        employerNI: 1000000,
+      };
+      render(<CompanyBox result={largeResult} />);
+      expect(screen.getByText('£10,000,000')).toBeInTheDocument();
+    });
+
+    it('should handle decimal rounding correctly', () => {
+      const decimalResult = { ...mockResult, companyTaxPot: 16135.49 };
+      render(<CompanyBox result={decimalResult} />);
+      // Should round to nearest pound
+      expect(screen.getByText('£16,135')).toBeInTheDocument();
+    });
+  });
 });

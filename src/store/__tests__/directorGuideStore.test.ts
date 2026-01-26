@@ -74,6 +74,65 @@ describe('DirectorGuideStore', () => {
       useDirectorGuideStore.getState().setIncludesVat(true);
       expect(useDirectorGuideStore.getState().formData.includesVat).toBe(true);
     });
+
+    it('should set alreadyTaken', () => {
+      useDirectorGuideStore.getState().setAlreadyTaken(5000);
+      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(5000);
+    });
+
+    it('should reject negative alreadyTaken', () => {
+      // Default is 0, so set a valid value first
+      useDirectorGuideStore.getState().setAlreadyTaken(5000);
+      useDirectorGuideStore.getState().setAlreadyTaken(-1000);
+      // Should remain at previous valid value
+      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(5000);
+    });
+
+    it('should reject Infinity alreadyTaken', () => {
+      useDirectorGuideStore.getState().setAlreadyTaken(3000);
+      useDirectorGuideStore.getState().setAlreadyTaken(Number.POSITIVE_INFINITY);
+      // Should remain at previous valid value
+      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(3000);
+    });
+
+    it('should set alreadyTakenViaPayroll to true', () => {
+      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(true);
+      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBe(true);
+    });
+
+    it('should set alreadyTakenViaPayroll to false', () => {
+      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(false);
+      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBe(false);
+    });
+
+    it('should set alreadyTakenViaPayroll to null (not sure)', () => {
+      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(null);
+      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBeNull();
+    });
+
+    it('should reject Infinity revenue', () => {
+      useDirectorGuideStore.getState().setRevenue(Number.POSITIVE_INFINITY);
+      expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
+    });
+
+    it('should reject negative expenses', () => {
+      useDirectorGuideStore.getState().setExpenses(-500);
+      expect(useDirectorGuideStore.getState().formData.expenses).toBeUndefined();
+    });
+
+    it('should set hasOtherIncome and update confirmedSoleIncome', () => {
+      useDirectorGuideStore.getState().setHasOtherIncome(true);
+      const state = useDirectorGuideStore.getState();
+      expect(state.hasOtherIncome).toBe(true);
+      expect(state.formData.confirmedSoleIncome).toBe(false);
+    });
+
+    it('should set confirmedSoleIncome true when hasOtherIncome is false', () => {
+      useDirectorGuideStore.getState().setHasOtherIncome(false);
+      const state = useDirectorGuideStore.getState();
+      expect(state.hasOtherIncome).toBe(false);
+      expect(state.formData.confirmedSoleIncome).toBe(true);
+    });
   });
 
   describe('Step Navigation', () => {
@@ -82,6 +141,11 @@ describe('DirectorGuideStore', () => {
       const state = useDirectorGuideStore.getState();
       expect(state.stepStatus.location).toBe(true);
       expect(state.currentStep).toBe('revenue');
+    });
+
+    it('should go to step directly', () => {
+      useDirectorGuideStore.getState().goToStep('expenses');
+      expect(useDirectorGuideStore.getState().currentStep).toBe('expenses');
     });
 
     it('should edit step and reset subsequent steps', () => {

@@ -59,4 +59,24 @@ describe('PersonalBox', () => {
     render(<PersonalBox result={mockResult} />);
     expect(screen.getByText(/due 31 Jan/i)).toBeInTheDocument();
   });
+
+  describe('Edge cases', () => {
+    it('should handle zero monthly pay', () => {
+      const zeroResult = { ...mockResult, averageMonthlyPay: 0, personalTaxMonthly: 0 };
+      render(<PersonalBox result={zeroResult} />);
+      expect(screen.getByText('~£0')).toBeInTheDocument();
+    });
+
+    it('should handle very small monthly pay', () => {
+      const smallResult = { ...mockResult, averageMonthlyPay: 50 };
+      render(<PersonalBox result={smallResult} />);
+      expect(screen.getByText('~£50')).toBeInTheDocument();
+    });
+
+    it('should handle very large monthly pay', () => {
+      const largeResult = { ...mockResult, averageMonthlyPay: 100000 };
+      render(<PersonalBox result={largeResult} />);
+      expect(screen.getByText('~£100,000')).toBeInTheDocument();
+    });
+  });
 });
