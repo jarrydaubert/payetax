@@ -5,7 +5,7 @@ import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
 const BASE_URL = 'https://payetax.co.uk';
 
 export const metadata = generateBaseMetadata({
-  title: 'How Much Can I Pay Myself? | Director Salary Calculator 2025-26',
+  title: 'Director Pay Dashboard | Salary & Dividend Calculator 2025-26',
   description:
     'Free calculator for UK company directors. Find the optimal salary and dividend mix to minimise tax. See exactly how much to pay yourself and set aside for tax.',
   keywords:
