@@ -12,11 +12,7 @@ import {
   OtherIncomeGate,
   SidebarNav,
 } from '@/components/molecules/DirectorGuide/dashboard';
-import {
-  trackGuideReset,
-  trackGuideStarted,
-  trackResultsShown,
-} from '@/lib/directorGuideAnalytics';
+import { trackGuideStarted, trackResultsShown } from '@/lib/directorGuideAnalytics';
 import { isNormalMode } from '@/lib/validation/directorValidation';
 import {
   useDirectorFormData,
@@ -112,12 +108,12 @@ export function DirectorDashboard() {
     setShowComparison(true);
   }, []);
 
-  // Track reset when store is reset (called from InputsPanel via reset quick action)
+  // Sync local state when store is reset
   useEffect(() => {
     const unsubscribe = useDirectorGuideStore.subscribe((state, prevState) => {
       // Detect reset by checking if we went from having results to not having them
       if (prevState.showResults && !state.showResults && prevState.results && !state.results) {
-        trackGuideReset();
+        // Analytics tracking moved to store.reset() action
         hasTrackedResults.current = false;
         setViewState('empty');
         setShowOtherIncomeGate(false);

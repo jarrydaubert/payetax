@@ -12,6 +12,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import type {
@@ -281,6 +282,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
         // Reset
         reset: () => {
+          trackGuideReset();
           set({ ...defaultState });
         },
       }),
