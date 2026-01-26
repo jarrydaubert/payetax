@@ -12,46 +12,40 @@
 
 ---
 
-## Documents
+## Document Structure
 
-| Document | Purpose | Status |
-|----------|---------|--------|
-| [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) | The mantra. Distribution > Features. | ✅ Active |
-| [DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md) | Product strategy with all 4 LLM reviews | ✅ Active |
-| [DIRECTOR_TOOLS_IMPLEMENTATION.md](./DIRECTOR_TOOLS_IMPLEMENTATION.md) | Technical spec (math, logic) | ⚠️ Needs revision |
-| [MONETIZATION.md](./MONETIZATION.md) | Revenue strategy | ✅ Active |
-| [IDEAS.md](./IDEAS.md) | Future features (build AFTER revenue) | ✅ Active |
-| [ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md](./ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md) | Historical reference | 📁 Archive |
+| Doc | Purpose | When to Read |
+|-----|---------|--------------|
+| **[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** | The mantra | Before anything |
+| **[DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md)** | WHAT + WHY (strategy, reviews) | Understanding the product |
+| **[DIRECTOR_TOOLS_BUILD.md](./DIRECTOR_TOOLS_BUILD.md)** | HOW (routes, components, UX) | When building |
+| **[DIRECTOR_TOOLS_MATH.md](./DIRECTOR_TOOLS_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
+| **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
+| **[IDEAS.md](./IDEAS.md)** | Future features | After revenue exists |
 
 ---
 
-## The Product (Summary)
+## Archive
 
-**What:** Education-first guide for first-time directors
+| Doc | Purpose |
+|-----|---------|
+| [ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md](./ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md) | Historical reference (Oct 2025 pitch) |
 
-**Who:** Confused people who just formed a Ltd and don't know how to pay themselves
+---
 
-**Why:** "Reduce anxiety and prevent mistakes" not "optimize tax"
+## Quick Summary
 
-**Output:** 
+**The Product:**
+- Education-first guide for confused first-time directors
+- "How do I pay myself?" not "What's the optimal tax extraction?"
+- Free forever. Compassionate pricing for optional Pro features.
+
+**Key Output:**
 - "Safe monthly draw" (what you can take)
-- "Set aside for tax" (what to ring-fence)
+- "Set-aside pots" (what to ring-fence for tax)
 - Key dates and deadlines
 
-**Monetization:**
-1. Free tool (SEO, trust)
-2. Accountant referrals (leads)
-3. Pro tier (save scenarios)
-4. Widget (only if demand)
-
----
-
-## Quick Links
-
-- **Strategy:** `DIRECTOR_TOOLS.md`
-- **Revenue:** `MONETIZATION.md`
-- **Technical:** `DIRECTOR_TOOLS_IMPLEMENTATION.md`
-- **The Mantra:** `READ_THIS_FIRST.md`
+**Route:** `/tools/director-guide`
 
 ---
 
