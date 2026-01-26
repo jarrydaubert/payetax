@@ -286,12 +286,33 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
       }),
       {
         name: 'director-guide-storage',
+        version: 1,
         storage: createJSONStorage(() => safeStorage),
         partialize: (state) => ({
           formData: state.formData,
           stepStatus: state.stepStatus,
           hasOtherIncome: state.hasOtherIncome,
+          _savedAt: Date.now(),
+          _taxYear: '2025-2026',
         }),
+        onRehydrateStorage: () => (state, error) => {
+          if (error || !state) return;
+
+          // Check for expiry (7 days) or tax year mismatch
+          const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+          const CURRENT_TAX_YEAR = '2025-2026';
+
+          const savedAt = (state as unknown as { _savedAt?: number })._savedAt;
+          const savedTaxYear = (state as unknown as { _taxYear?: string })._taxYear;
+
+          const isExpired = savedAt && Date.now() - savedAt > SEVEN_DAYS_MS;
+          const wrongTaxYear = savedTaxYear && savedTaxYear !== CURRENT_TAX_YEAR;
+
+          if (isExpired || wrongTaxYear) {
+            // Clear stale data
+            useDirectorGuideStore.getState().reset();
+          }
+        },
       }
     ),
     { name: 'DirectorGuideStore' }
