@@ -295,6 +295,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           _savedAt: Date.now(),
           _taxYear: '2025-2026',
         }),
+        migrate: (persistedState, version) => {
+          // Migration from version 0 (no version) to version 1
+          if (version === 0) {
+            // Clear old data and start fresh
+            return { ...defaultState };
+          }
+          return persistedState as DirectorGuideState;
+        },
         onRehydrateStorage: () => (state, error) => {
           if (error || !state) return;
 
