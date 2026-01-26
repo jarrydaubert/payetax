@@ -85,6 +85,27 @@ export function HowToDoIt({ result, className }: HowToDoItProps) {
             </li>
           ))}
         </ol>
+
+        {/* Bank transfer references */}
+        <div className='mt-4 rounded-md border border-border/50 bg-muted/30 p-3'>
+          <p className='font-medium text-foreground text-xs'>Bank transfer references</p>
+          <p className='mt-1 text-muted-foreground text-xs'>
+            Label your transfers clearly for easier bookkeeping:
+          </p>
+          <ul className='mt-2 space-y-1 text-muted-foreground text-xs'>
+            <li>
+              <code className='rounded bg-muted px-1'>SALARY JAN</code> — for monthly salary
+            </li>
+            {hasDividends && (
+              <li>
+                <code className='rounded bg-muted px-1'>DIVIDEND</code> — for dividend payments
+              </li>
+            )}
+            <li>
+              <code className='rounded bg-muted px-1'>TAX RESERVE</code> — for tax savings transfers
+            </li>
+          </ul>
+        </div>
       </CardContent>
     </Card>
   );
