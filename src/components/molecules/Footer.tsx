@@ -35,6 +35,7 @@ export function Footer({ className }: FooterProps) {
           <Link href={'/scenarios' as Route}>Scenarios</Link>
           <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
           <Link href={'/tools/scottish-tax-calculator' as Route}>Scottish Tax</Link>
+          <Link href={'/tools/director-guide' as Route}>Director Guide</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
           <Link href='/compliance'>Compliance</Link>
