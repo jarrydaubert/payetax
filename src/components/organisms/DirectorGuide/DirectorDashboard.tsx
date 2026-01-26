@@ -3,10 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ComparisonModal,
   DashboardLayout,
   EducationPanel,
-  generateStrategies,
   InputsPanel,
   MainContent,
   OtherIncomeGate,
@@ -21,17 +19,16 @@ import {
   useDirectorResults,
 } from '@/store/directorGuideStore';
 
-type ViewState = 'empty' | 'comparison' | 'populated';
+type ViewState = 'empty' | 'populated';
 
 /**
  * Director Dashboard - Main orchestrator component
  *
- * Handles the flow: empty → comparison modal → populated dashboard
+ * Handles the flow: empty → other income gate → populated dashboard
  */
 export function DirectorDashboard() {
   const [viewState, setViewState] = useState<ViewState>('empty');
   const [showOtherIncomeGate, setShowOtherIncomeGate] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [inputsCollapsed, setInputsCollapsed] = useState(false);
   const [educationCollapsed, setEducationCollapsed] = useState(false);
@@ -83,41 +80,35 @@ export function DirectorDashboard() {
     setShowOtherIncomeGate(true);
   }, [canCalculate]);
 
-  // Handle confirming sole income from gate
+  // Handle confirming sole income from gate - go directly to results
   const handleConfirmSoleIncome = useCallback(() => {
     setHasOtherIncome(false);
     setShowOtherIncomeGate(false);
     try {
       calculate();
-      setShowComparison(true);
+      setViewState('populated');
     } catch (error) {
       console.error('Calculation failed:', error);
       // Stay on current view, user can try again
     }
   }, [calculate, setHasOtherIncome]);
 
-  // Handle indicating other income from gate
+  // Handle indicating other income from gate - go directly to results
   const handleHasOtherIncome = useCallback(() => {
     setHasOtherIncome(true);
     setShowOtherIncomeGate(false);
     try {
       calculate();
-      setShowComparison(true);
+      setViewState('populated');
     } catch (error) {
       console.error('Calculation failed:', error);
       // Stay on current view, user can try again
     }
   }, [calculate, setHasOtherIncome]);
 
-  // Handle continuing from comparison modal (informational, not a choice)
-  const handleContinueFromComparison = useCallback(() => {
-    setShowComparison(false);
-    setViewState('populated');
-  }, []);
-
-  // Handle recalculate (show comparison again)
+  // Handle recalculate - show gate again to confirm income status
   const handleRecalculate = useCallback(() => {
-    setShowComparison(true);
+    setShowOtherIncomeGate(true);
   }, []);
 
   // Sync local state when store is reset
@@ -129,20 +120,10 @@ export function DirectorDashboard() {
         hasTrackedResults.current = false;
         setViewState('empty');
         setShowOtherIncomeGate(false);
-        setShowComparison(false);
       }
     });
     return unsubscribe;
   }, []);
-
-  // Generate strategies for comparison modal
-  const strategies = results
-    ? generateStrategies(
-        formData.revenue ?? 0,
-        formData.expenses ?? 0,
-        isNormalMode(results) ? results : null
-      )
-    : [];
 
   return (
     <>
@@ -177,25 +158,11 @@ export function DirectorDashboard() {
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
       />
 
-      {/* Other Income Gate - shown before comparison */}
+      {/* Other Income Gate - shown before results */}
       <OtherIncomeGate
         isOpen={showOtherIncomeGate}
         onConfirmSoleIncome={handleConfirmSoleIncome}
         onHasOtherIncome={handleHasOtherIncome}
-      />
-
-      {/* Comparison Modal - informational, shows why salary+dividends is optimal */}
-      <ComparisonModal
-        isOpen={showComparison}
-        onClose={() => setShowComparison(false)}
-        onContinue={handleContinueFromComparison}
-        strategies={strategies}
-        inputSummary={{
-          revenue: formData.revenue ?? 0,
-          expenses: formData.expenses ?? 0,
-          region: formData.region === 'scotland' ? 'Scotland' : 'England',
-          alreadyTaken: formData.alreadyTaken ?? 0,
-        }}
       />
     </>
   );
