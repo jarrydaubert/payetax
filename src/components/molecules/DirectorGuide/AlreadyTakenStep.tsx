@@ -200,13 +200,28 @@ export function AlreadyTakenStep({ className }: AlreadyTakenStepProps) {
                 </div>
               </div>
 
-              <Button
-                onClick={handleContinue}
-                disabled={!formData.alreadyTaken || formData.alreadyTaken <= 0}
-                className='w-full sm:w-auto'
-              >
-                Continue
-              </Button>
+              <div className='flex flex-wrap gap-2'>
+                <Button
+                  onClick={handleContinue}
+                  disabled={!formData.alreadyTaken || formData.alreadyTaken <= 0}
+                  className='sm:w-auto'
+                >
+                  Continue
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => {
+                    setHasTaken(null);
+                    setDisplayValue('');
+                    setAlreadyTaken(0);
+                    setAlreadyTakenViaPayroll(null);
+                  }}
+                  className='text-muted-foreground'
+                >
+                  Actually, I haven&apos;t taken any
+                </Button>
+              </div>
             </>
           )}
         </div>
