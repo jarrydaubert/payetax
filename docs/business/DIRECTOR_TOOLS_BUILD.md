@@ -1,24 +1,43 @@
-# Director Tools - Build Spec
+# Director Tools - Build Spec v2.0
 
-> **Purpose:** How to build the education-first director guide.
+> **Purpose:** How to build the "How Much Can I Pay Myself?" guide
 > **For tax calculations:** See `DIRECTOR_TOOLS_MATH.md`
 > **For product strategy:** See `DIRECTOR_TOOLS.md`
+> **Last Updated:** January 2026
+> **Status:** ✅ ALL 4 REVIEWERS APPROVED
 
 ---
 
-## What We're Building
+## The Principle
 
-**"First-Time Director's Guide to Paying Yourself"**
+**Ask what they KNOW. Calculate what they DON'T.**
 
-An educational guide with an embedded calculator. Not an optimizer.
+Our user (a first-time director like your wife) knows:
+- Where they live
+- What they've invoiced
+- What they've spent
 
-| Old Approach | New Approach |
-|--------------|--------------|
-| Calculator-first | Education-first |
-| "Optimal tax extraction" | "Simple & safe approach" |
-| "Save £1,654" | "What to set aside for tax" |
-| Comparison tables | Set-aside pots |
-| For experts | For confused beginners |
+They don't know:
+- Tax rates, optimal salary, what to set aside, when things are due
+- What IR35, Employment Allowance, or accounting periods mean
+- The difference between "them" and "their company"
+
+**We don't ask about complexity. We detect it and surface it gently.**
+
+---
+
+## The "Wife Test"
+
+Before any feature, ask:
+
+| Question | Required Answer |
+|----------|-----------------|
+| Does she need to know what a "fiscal year" is? | No |
+| Does she need to know what "Employment Allowance" is? | No |
+| Does she need to know what "IR35" means? | No |
+| Does she get a number she can transfer today? | **Yes** |
+
+If a feature fails this test, cut it.
 
 ---
 
@@ -26,297 +45,290 @@ An educational guide with an embedded calculator. Not an optimizer.
 
 `/tools/director-guide`
 
-(Not `/tools/director-optimizer`)
+---
+
+## Onboarding UX: One Question Per Screen
+
+**Not a form. A conversation.**
+
+Mobile-first. Friendly. Slow. One thing at a time.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 1: WELCOME                                              │
+│                                                                 │
+│  Let's figure out how much you can pay yourself.                │
+│                                                                 │
+│  No jargon. No stress. Just clear numbers.                      │
+│                                                                 │
+│                    [Let's go →]                                 │
+│                                                                 │
+│  ○ ○ ○ ○ ○ ○  (progress indicator)                              │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 2: LOCATION                                             │
+│                                                                 │
+│  First, where are you based?                                    │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  🏴󠁧󠁢󠁥󠁮󠁧󠁿  England, Wales, or Northern Ireland            │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  🏴󠁧󠁢󠁳󠁣󠁴󠁿  Scotland (coming soon)                          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ● ○ ○ ○ ○ ○                                                    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 3: MONEY IN                                             │
+│                                                                 │
+│  How much has your company invoiced?                            │
+│                                                                 │
+│  £ [________________________]                                   │
+│                                                                 │
+│  Just a rough number for the next 12 months.                    │
+│                                                                 │
+│  ☐ This includes VAT (20%)                                      │
+│                                                                 │
+│  💡 If you charge VAT, tick the box and we'll work it out.      │
+│                                                                 │
+│  ● ● ○ ○ ○ ○                        [Continue →]                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 4: MONEY OUT                                            │
+│                                                                 │
+│  And what have you spent on the business?                       │
+│                                                                 │
+│  £ [________________________]                                   │
+│                                                                 │
+│  Software, equipment, travel - that kind of thing.              │
+│  (Don't include money you've paid yourself)                     │
+│                                                                 │
+│  ● ● ● ○ ○ ○                        [Continue →]                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 5: ALREADY TAKEN?                                       │
+│                                                                 │
+│  Have you already paid yourself from the company?               │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  No, not yet                                             │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Yes, I've taken some money                              │   │
+│  │  → How much? £ [__________]                              │   │
+│  │  → Was this through payroll? ○ Yes ○ No ○ Not sure       │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ● ● ● ● ○ ○                                                    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 6: CALCULATING                                          │
+│                                                                 │
+│  Got it. Let me work this out for you...                        │
+│                                                                 │
+│  ⏳ (Brief pause - builds trust, even if instant)               │
+│                                                                 │
+│  ● ● ● ● ● ○                                                    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  SCREEN 7: RESULTS                                              │
+│  (See Results section below)                                    │
+│                                                                 │
+│  ● ● ● ● ● ●                                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Page Structure
+## Silent Assumptions (Hardcoded)
+
+We don't ask. We assume the most common scenario for a single-director startup.
+
+| Assumption | Value | Why |
+|------------|-------|-----|
+| Salary | £12,570 | Uses full Personal Allowance |
+| Employment Allowance | No | Single director = not eligible |
+| Other income | £0 | We treat this company in isolation |
+| Pension contributions | £0 | Keep it simple |
+| Student loan | None | Maximizes "happy number" |
+| Accounting period | 12 months | Most common |
+| Tax year | 2025-26 | Current |
+
+**Show these in results:**
+> "This assumes your company is your only income, and a standard 12-month year."
+
+---
+
+## Results: The "Two Boxes" Clarity
+
+First-timers are confused about "the company" vs "me". Make it crystal clear.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  FIRST-TIME DIRECTOR'S GUIDE TO PAYING YOURSELF                │
-│  No jargon. No stress. Just clear answers.                      │
-│  [Free] [2025-26 Tax Year]                                      │
+│  HERE'S WHAT WE WORKED OUT                                      │
+│  Based on ~£75,000 profit (money in minus money out)            │
 └─────────────────────────────────────────────────────────────────┘
 
+┌────────────────────────────────┐  ┌────────────────────────────┐
+│  🏢 YOUR COMPANY               │  │  👤 YOU                    │
+│                                │  │                            │
+│  The company is separate from  │  │  You work for your company │
+│  you - it has its own tax.     │  │  and it pays you.          │
+│                                │  │                            │
+│  🏦 COMPANY TAX POT            │  │  💰 YOUR MONTHLY PAY       │
+│  Set aside: £16,000            │  │  Around: £4,500/mo         │
+│                                │  │                            │
+│  Keep this in your business    │  │  This is yours to spend.   │
+│  account. Don't touch it.      │  │  Transfer it to your       │
+│                                │  │  personal account.         │
+│  Due: ~9 months after your     │  │                            │
+│  company year ends             │  │  🐷 YOUR TAX SAVINGS       │
+│                                │  │  Save: £750/mo             │
+│  Label transfers: "TAX SAVE"   │  │                            │
+│                                │  │  Put this in a personal    │
+│                                │  │  savings account for your  │
+│                                │  │  tax bill (due 31 Jan).    │
+└────────────────────────────────┘  └────────────────────────────┘
+
 ┌─────────────────────────────────────────────────────────────────┐
-│  STEP 1: ENTRY CHOICE                                           │
+│  📋 HOW TO ACTUALLY DO THIS                                     │
 │                                                                 │
-│  How much do you know about paying yourself as a director?      │
+│  1. Set up payroll (or use software like FreeAgent)             │
+│  2. Pay yourself £1,047/month as salary                         │
+│  3. Transfer the rest as dividends when you have profit         │
+│  4. Move £750/mo to a savings account for your tax bill         │
 │                                                                 │
-│  [I'm new to this — explain everything]                         │
+│  [What's payroll? →]  [What are dividends? →]                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚠️ IMPORTANT                                                   │
 │                                                                 │
-│  [I know the basics — just calculate]                           │
-└─────────────────────────────────────────────────────────────────┘
-
-↓ "I'm new" path shows all sections
-↓ "I know basics" jumps to calculator (Section 4)
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 2: YOUR THREE OPTIONS                                  │
-│  (Education - only shown to "I'm new" path)                     │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 3: THE SIMPLE SAFE APPROACH                            │
-│  (Education - only shown to "I'm new" path)                     │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 4: YOUR SITUATION                                      │
-│  (Calculator inputs)                                            │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 5: YOUR RESULTS                                        │
-│  (Set-aside pots, safe monthly draw)                            │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 6: KEY DATES                                           │
-│  (Deadlines + calendar download)                                │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  SECTION 7: FAQ                                                 │
-│  (Common questions)                                             │
+│  • Dividends can only be paid if your company has made profit   │
+│  • This is a rough estimate - for precision, see an accountant  │
+│  • Assumes this is your only income and a 12-month year         │
+│                                                                 │
+│  [Copy results]  [When's my year end? Get exact dates →]        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Section Details
+## Payments on Account: The January Surprise Safety Net
 
-### Section 2: Your Three Options
+If personal tax > £1,000, HMRC wants 1.5x in January (bill + advance).
 
-```
-How directors pay themselves:
-
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│   SALARY    │  │  DIVIDENDS  │  │  DIRECTOR'S │
-│             │  │             │  │    LOAN     │
-│ Like a job  │  │ Share of    │  │ Borrowing   │
-│ Tax + NI    │  │ profits     │  │ from company│
-│ deducted    │  │ Lower tax   │  │ ⚠️ Careful! │
-└─────────────┘  └─────────────┘  └─────────────┘
-
-[ⓘ] Every term has a tooltip explaining it in plain English
+**In calculation:**
+```typescript
+const personalTax = calculatePersonalTax(...);
+const monthlyTaxSaving = personalTax > 1000 
+  ? (personalTax * 1.5) / 12  // Include POA
+  : personalTax / 12;
 ```
 
-**Key educational points:**
-- Salary = like a normal job, taxed through PAYE
-- Dividends = from profits only, lower tax rates
-- Director's Loan = NOT a payment method, it's borrowing you must repay
-
-### Section 3: The Simple Safe Approach
-
+**In UI (if POA applies):**
 ```
-Most accountants recommend this for small company directors:
+🐷 YOUR TAX SAVINGS
+Save: £750/mo
 
-1. Pay yourself £12,570 salary (uses your tax-free allowance)
-2. Take the rest as dividends (taxed at lower rates)
-3. Set aside ~25% of profit for Corporation Tax
-4. Set aside money for your personal tax bill (January)
-
-This isn't perfectly optimal, but it's:
-✓ Simple to understand
-✓ Easy to run payroll
-✓ Low risk of mistakes
-✓ What most small company directors do
+This includes extra for your "payment on account" - 
+HMRC asks for an advance payment so you're not caught 
+out next year.
 ```
 
-**Payroll warning card:**
-```
-⚠️ SALARY MEANS PAYROLL
+---
 
-If you pay yourself salary, you (or payroll software) must:
-• Register as an employer with HMRC
-• Submit RTI returns each payday
-• Pay PAYE/NI monthly (or quarterly if small)
+## Conditional Warnings (Only When Relevant)
 
-[How to set up payroll →]  [Talk to an accountant →]
-```
+| Condition | Show |
+|-----------|------|
+| **Scotland selected** | Block: "Scottish tax rates are different. Coming soon." |
+| **Profit ≤ 0** | Survival mode: "Your company hasn't made profit yet. Dividends aren't possible. If you take money, it's a loan you'll owe back." |
+| **Profit > £250k** | "This is getting complex. An accountant could save you serious money." |
+| **Revenue near £90k** | "Heads up: VAT registration may apply above £90k. This could affect your numbers." |
+| **Already taken (not via payroll)** | DLA warning: "Money taken without payroll may be a Director's Loan. This has tax implications. Talk to an accountant." |
 
-### Section 4: Your Situation (Calculator Inputs)
+---
 
-**Input 1: Year-End Date**
-```
-When does your company's financial year end?
-○ 31 March (most common)
-○ 31 December
-○ Other: [date picker]
-○ I don't know → [How to find this]
-```
-
-**Input 2: Profit**
-```
-What's your company's estimated profit this year?
-£ [________]
-
-This is income minus expenses, before Corporation Tax and your pay.
-[ⓘ Where do I find this?]
-```
-
-**Input 3: Already Taken Money? (DLA Trigger)**
-```
-Have you already taken money from the company this year?
-○ No, not yet
-○ Yes, as salary through payroll
-○ Yes, but not through payroll ← Triggers DLA warning
-```
-
-**DLA Warning:**
-```
-⚠️ THIS MAY BE A DIRECTOR'S LOAN
-
-If you transferred money to yourself without declaring it as 
-salary or dividends, it's a Director's Loan. You'll need to either:
-
-• Pay it back
-• Declare it as salary/dividend (with back taxes)
-• Pay S455 tax (33.75%) if it stays as a loan
-
-This is common and fixable — but talk to an accountant.
-```
-
-**Input 4: Employment Allowance**
-```
-Does your company claim Employment Allowance?
-○ Yes  ○ No  ○ Not sure
-[ⓘ What is this?]
-```
-
-**Input 5: Other Income (Optional)**
-```
-▼ I have other personal income
-£ [________]
-(Salary from another job, rental income, etc.)
-```
-
-### Section 5: Your Results
-
-**Primary Output: Set-Aside Pots**
+## Key Dates (Generic → Optional Specific)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Based on £100,000 profit:                                      │
+│  📅 WHEN'S IT DUE?                                              │
 │                                                                 │
-│  💰 SAFE MONTHLY DRAW (estimate)                                │
-│     £5,545 /month                                               │
-│     Check you have this in the business account first.          │
+│  Company tax: ~9 months after your company year ends            │
+│  Your personal tax: 31 January each year                        │
 │                                                                 │
-│  🏦 SET ASIDE: BUSINESS TAX POT                                 │
-│     £19,118 for Corporation Tax                                 │
-│     Keep this in the business account. Don't touch.             │
-│     Label transfers: "TAX SAVE"                                 │
+│  [When does your company year end? →]                           │
 │                                                                 │
-│  💳 SET ASIDE: PERSONAL TAX POT                                 │
-│     £13,203 for Self Assessment                                 │
-│     Transfer to a personal savings account now.                 │
-│     Due: 31 January 2027                                        │
+│  ○ 31 March (most common)                                       │
+│  ○ 31 December                                                  │
+│  ○ Other: [date]                                                │
+│  ○ I don't know → "Check Companies House or your accountant"    │
 │                                                                 │
-│  ✅ STATUS: You're on track                                     │
-│                                                                 │
+│  → If answered: Show exact dates + [Add to calendar]            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Bank Transfer References:**
-```
-When you transfer money, label it clearly:
+---
 
-Salary Transfer:   "SALARY [Month]"
-Dividend Transfer: "DIVIDEND"
-Tax Pot Transfer:  "TAX SAVE"
-```
-
-**Survival Mode (Profit ≤ 0):**
-```
-⚠️ NO PROFIT YET
-
-You have no profit to extract as dividends. Your options:
-
-• Salary (if registered for PAYE) — but this adds to your loss
-• Director's Loan — must be repaid or face 33.75% S455 tax
-• If you put money IN previously, you can repay that loan to yourself
-
-Safest: Don't extract beyond expenses until profitable.
-
-[Talk to an accountant →]
-```
-
-**Comparison (Collapsed by Default):**
-```
-[▼ Show detailed breakdown]
-
-| | All Dividend | Simple & Safe |
-|---|---|---|
-| Salary | £0 | £12,570 |
-| Dividends | £77,250 | £67,176 |
-| Total Tax | £35,111 | £32,321 |
-| Take-Home | £64,889 | £66,543 |
-
-Potential extra with Simple & Safe: +£1,654
-```
-
-### Section 6: Key Dates
+## Copy Format (When User Clicks "Copy Results")
 
 ```
-📅 YOUR TAX CALENDAR
+How Much Can I Pay Myself? - PayeTax.co.uk
+Based on ~£75,000 profit (next 12 months)
 
-Based on year end: 31 March 2026
+YOUR MONTHLY PAY
+Around £4,500/month
 
-┌────────────────────────────────────────────────────────────────┐
-│  Corporation Tax Payment                                        │
-│  Due: 1 January 2027 (9 months after year end)                 │
-│  Amount: ~£19,118                                               │
-│  [Add to Calendar]                                              │
-├────────────────────────────────────────────────────────────────┤
-│  Company Tax Return                                             │
-│  Due: 31 March 2027 (12 months after year end)                 │
-│  [Add to Calendar]                                              │
-├────────────────────────────────────────────────────────────────┤
-│  Self Assessment Payment                                        │
-│  Due: 31 January 2027                                           │
-│  Amount: ~£13,203                                               │
-│  [Add to Calendar]                                              │
-└────────────────────────────────────────────────────────────────┘
+SET ASIDE FOR TAX
+Company tax pot: £16,000 (keep in business account)
+Personal tax pot: £750/month (save for January)
 
-⚠️ PAYMENTS ON ACCOUNT (YEAR 2 SURPRISE)
+HOW TO DO IT
+1. Pay yourself £1,047/month salary
+2. Transfer the rest as dividends
+3. Save £750/month for your tax bill
 
-If your personal tax is above threshold, HMRC may require 
-payments on account (January + July). This can make your 
-second-year cash needs higher than expected.
+⚠️ This is a rough estimate. Assumes this is your only 
+income and a 12-month year. For precision, see an accountant.
+
+Generated: [date] | payetax.co.uk/tools/director-guide
 ```
 
-**Calendar Download:** Simple .ics file generation (no OAuth).
+---
 
-### Section 7: FAQ
+## Pricing: "For the Price of a Coffee"
 
-```
-❓ Can I pay dividends if I haven't made a profit yet?
-No. Dividends must come from "distributable reserves" — 
-accumulated profit after Corporation Tax. If you've made a 
-loss, you can only take salary.
+Pro features (save scenarios, PDF, reminders) cost the same as a flat white.
 
-❓ I already took money from the company. Is that bad?
-It depends. If you didn't declare it as salary or dividend, 
-it's a Director's Loan. You'll need to either pay it back, 
-declare it properly, or pay S455 tax. Talk to an accountant.
+**Literally pegged to real data:**
 
-❓ Do I need to run payroll?
-Yes, if you're paying yourself salary. You need to register 
-as an employer with HMRC and file RTI returns.
+| Source | How |
+|--------|-----|
+| ONS CPI data | Average price of coffee out |
+| Or | Published price from Costa/Pret |
 
-❓ What if I'm employed somewhere else?
-If you have another job, your Personal Allowance is probably 
-used there. This changes the optimal salary from your company. 
-Use the "Other income" field, or talk to an accountant.
+**Update:** Quarterly
 
-❓ Should I get an accountant?
-For simple situations, you can probably manage year one yourself. 
-But an accountant is worth it for most directors — they'll 
-save you more than they cost.
-```
+**Display:**
+> "Pro costs £3.85/month - the price of a flat white. 
+> (Based on UK average, ONS data. When coffee prices change, we change.)"
+
+**Why:**
+- Radical transparency
+- Relatable ("it's just a coffee")
+- Memorable marketing angle
+- Shows we're not making up prices
 
 ---
 
@@ -325,40 +337,145 @@ save you more than they cost.
 ```
 src/
 ├── app/tools/
-│   ├── page.tsx                        # Tools landing page
 │   └── director-guide/
 │       ├── page.tsx                    # Server (metadata, schema)
-│       └── DirectorGuideClient.tsx     # Client (UI + state)
+│       └── DirectorGuideClient.tsx     # Client (wizard state)
 ├── components/
-│   ├── molecules/
-│   │   ├── SetAsidePot.tsx             # Single pot display
-│   │   ├── PayrollWarning.tsx          # RTI/PAYE warning
-│   │   ├── DLAWarning.tsx              # Director's Loan warning
-│   │   └── SurvivalMode.tsx            # Zero profit state
 │   └── organisms/DirectorGuide/
-│       ├── EntryChoice.tsx             # "I'm new" vs "I know basics"
-│       ├── ThreeOptions.tsx            # Education: Salary/Div/DLA
-│       ├── SimpleSafeApproach.tsx      # Education: The recommendation
-│       ├── YourSituation.tsx           # Calculator inputs
-│       ├── YourResults.tsx             # Set-aside pots output
-│       ├── KeyDates.tsx                # Deadlines + calendar
-│       └── FAQ.tsx                     # Common questions
+│       ├── WelcomeStep.tsx             # Screen 1
+│       ├── LocationStep.tsx            # Screen 2
+│       ├── RevenueStep.tsx             # Screen 3
+│       ├── ExpensesStep.tsx            # Screen 4
+│       ├── AlreadyTakenStep.tsx        # Screen 5
+│       ├── CalculatingStep.tsx         # Screen 6
+│       ├── ResultsStep.tsx             # Screen 7
+│       ├── CompanyBox.tsx              # Company position
+│       ├── PersonalBox.tsx             # Personal position
+│       ├── KeyDates.tsx                # Optional year-end
+│       └── Warnings/
+│           ├── SurvivalMode.tsx
+│           ├── DLAWarning.tsx
+│           ├── VATWarning.tsx
+│           └── ComplexityWarning.tsx
 ├── lib/
-│   ├── directorCalculator.ts           # Core math (see MATH doc)
-│   ├── calendarGenerator.ts            # .ics file generation
-│   └── __tests__/
-│       └── directorCalculator.test.ts
+│   ├── directorCalculator.ts           # Core math (from MATH doc)
+│   ├── simplifiedCalculator.ts         # NEW: Wrapper with hardcoded assumptions
+│   └── calendarGenerator.ts            # .ics generation
 └── constants/
-    └── taxRates.ts                     # Tax rates (see MATH doc)
+    └── taxRates.ts                     # Tax rates (from MATH doc)
 ```
 
 ---
 
-## Legal Disclaimer
+## New Function: Simplified Calculator
 
-Display on every page:
+```typescript
+// src/lib/simplifiedCalculator.ts
 
-> **Important:** This guide provides **estimates** based on current HMRC tax rates. It is for illustrative purposes only and does not constitute financial, tax, or legal advice. Your actual tax position may differ. **Always consult a qualified accountant before making financial decisions.**
+interface SimplifiedInput {
+  revenue: number;
+  includesVat: boolean;
+  expenses: number;
+  alreadyTaken: number;
+  alreadyTakenViaPayroll: boolean | null;
+}
+
+interface SimplifiedResult {
+  profit: number;
+  monthlyPay: number;
+  companyTaxPot: number;
+  personalTaxMonthly: number;
+  includesPOA: boolean;
+  warnings: Warning[];
+}
+
+export function calculateSimplified(input: SimplifiedInput): SimplifiedResult {
+  // 1. Adjust revenue for VAT if needed
+  const netRevenue = input.includesVat ? input.revenue / 1.2 : input.revenue;
+  
+  // 2. Calculate profit
+  const profit = netRevenue - input.expenses;
+  
+  // 3. Use existing calculator with hardcoded assumptions
+  const scenario = calculateDirectorScenario({
+    profit,
+    salary: 12570,  // Hardcoded
+    employmentAllowance: false,  // Hardcoded
+    otherIncome: 0,  // Hardcoded
+    taxYear: '2025-2026',
+  });
+  
+  // 4. Calculate outputs
+  const annualTakeHome = scenario.netTakeHome - input.alreadyTaken;
+  const monthlyPay = Math.max(0, annualTakeHome / 12);
+  
+  // 5. Personal tax with POA if > £1k
+  const personalTax = scenario.dividendTax;
+  const includesPOA = personalTax > 1000;
+  const personalTaxMonthly = includesPOA 
+    ? (personalTax * 1.5) / 12 
+    : personalTax / 12;
+  
+  // 6. Collect warnings
+  const warnings = [];
+  if (profit <= 0) warnings.push({ type: 'SURVIVAL_MODE' });
+  if (profit > 250000) warnings.push({ type: 'HIGH_COMPLEXITY' });
+  if (netRevenue > 85000) warnings.push({ type: 'VAT_THRESHOLD' });
+  if (input.alreadyTaken > 0 && !input.alreadyTakenViaPayroll) {
+    warnings.push({ type: 'DLA_RISK' });
+  }
+  
+  return {
+    profit,
+    monthlyPay,
+    companyTaxPot: scenario.corporationTax,
+    personalTaxMonthly,
+    includesPOA,
+    warnings,
+  };
+}
+```
+
+---
+
+## Build Order
+
+### Step 1: Foundation
+- [ ] Ensure `taxRates.ts` has all 2025-26 rates
+- [ ] Create `simplifiedCalculator.ts` wrapper
+- [ ] Test with golden example
+
+### Step 2: Wizard Steps
+- [ ] WelcomeStep.tsx
+- [ ] LocationStep.tsx (Scotland blocked)
+- [ ] RevenueStep.tsx (with VAT checkbox)
+- [ ] ExpensesStep.tsx
+- [ ] AlreadyTakenStep.tsx
+- [ ] CalculatingStep.tsx (artificial pause)
+- [ ] DirectorGuideClient.tsx (wizard state management)
+
+### Step 3: Results
+- [ ] CompanyBox.tsx
+- [ ] PersonalBox.tsx
+- [ ] ResultsStep.tsx (assembles boxes)
+- [ ] Copy functionality
+
+### Step 4: Warnings
+- [ ] SurvivalMode.tsx
+- [ ] DLAWarning.tsx
+- [ ] VATWarning.tsx
+- [ ] ComplexityWarning.tsx
+
+### Step 5: Optional Enhancements
+- [ ] KeyDates.tsx (year-end input → exact dates)
+- [ ] calendarGenerator.ts (.ics files)
+- [ ] Progress indicator component
+
+### Step 6: Polish
+- [ ] Mobile responsive (test each step)
+- [ ] Accessibility
+- [ ] Analytics events
+- [ ] Legal disclaimer
 
 ---
 
@@ -366,86 +483,17 @@ Display on every page:
 
 | Event | Trigger |
 |-------|---------|
-| `guide_viewed` | Page load |
-| `guide_path_selected` | "I'm new" or "I know basics" clicked |
-| `guide_section_viewed` | Each section reached |
-| `guide_year_end_entered` | Year-end date selected |
-| `guide_profit_entered` | Profit input completed |
-| `guide_dla_warning_shown` | DLA warning triggered |
-| `guide_results_shown` | Results calculated |
+| `guide_started` | Welcome screen "Let's go" clicked |
+| `guide_location_selected` | Location step completed |
+| `guide_revenue_entered` | Revenue step completed |
+| `guide_expenses_entered` | Expenses step completed |
+| `guide_already_taken` | Already taken step completed |
+| `guide_results_shown` | Results displayed |
+| `guide_results_copied` | Copy button clicked |
+| `guide_year_end_entered` | Optional year-end provided |
 | `guide_calendar_downloaded` | .ics downloaded |
-| `guide_copy_clicked` | Results copied |
+| `guide_warning_shown` | Any warning displayed (with type) |
 | `guide_accountant_cta_clicked` | "Talk to accountant" clicked |
-
----
-
-## Build Order
-
-### Step 1: Foundation
-- [ ] Add tax rates to `taxRates.ts`
-- [ ] Create `directorCalculator.ts` with tests
-- [ ] Verify golden example passes
-
-### Step 2: Components
-- [ ] EntryChoice.tsx
-- [ ] ThreeOptions.tsx (education)
-- [ ] SimpleSafeApproach.tsx (education)
-- [ ] YourSituation.tsx (inputs)
-- [ ] SetAsidePot.tsx
-- [ ] YourResults.tsx
-- [ ] KeyDates.tsx + calendarGenerator.ts
-- [ ] FAQ.tsx
-
-### Step 3: Warnings
-- [ ] PayrollWarning.tsx
-- [ ] DLAWarning.tsx
-- [ ] SurvivalMode.tsx
-
-### Step 4: Page Assembly
-- [ ] DirectorGuideClient.tsx
-- [ ] page.tsx with metadata
-
-### Step 5: Polish
-- [ ] Mobile responsive
-- [ ] Accessibility (WCAG 2.2 AA)
-- [ ] Analytics events
-- [ ] E2E tests
-
----
-
-## Copy Reference
-
-### Page Title
-"First-Time Director's Guide to Paying Yourself"
-
-### Subtitle
-"No jargon. No stress. Just clear answers."
-
-### Primary Output Label
-"Safe Monthly Draw (estimate)" — NOT "Spendable now"
-
-### Set-Aside Labels
-- "Business Tax Pot" (Corporation Tax)
-- "Personal Tax Pot" (Self Assessment)
-
-### Status Labels
-- ✅ "You're on track"
-- ⚠️ "Check this"
-- 🔴 "Talk to an accountant"
-
----
-
-## What's NOT In This Build
-
-| Feature | Status |
-|---------|--------|
-| Scotland support | Phase 2 |
-| PDF export | Phase 2 (Pro) |
-| Save scenarios | Phase 2 (Pro) |
-| Email reminders | Phase 2 (Pro) |
-| Pension contributions | Phase 2 |
-| Student loan | Phase 2 |
-| Multiple directors | Phase 2 |
 
 ---
 
@@ -453,7 +501,39 @@ Display on every page:
 
 | Metric | Target |
 |--------|--------|
-| Guide completion rate | > 50% |
-| Time on page | > 2 min |
+| Wizard completion rate | > 70% |
+| Time to results | < 60 seconds |
 | "This helped" feedback | Positive |
 | Zero "calculation is wrong" complaints | ✅ |
+
+**The real test:** Someone with no tax knowledge gets a clear, actionable number.
+
+---
+
+## What's NOT in v1.0.0
+
+| Feature | Status | Why |
+|---------|--------|-----|
+| Scotland support | v1.1 | Different tax bands |
+| Other income input | v1.1 | Complexity |
+| Employment Allowance toggle | v1.1 | Minority case |
+| PDF export | v1.1 (Pro) | Nice-to-have |
+| Save scenarios | v1.1 (Pro) | Nice-to-have |
+| Email reminders | v1.1 (Pro) | Nice-to-have |
+| Detailed comparison table | v1.1 | Not needed for core answer |
+| Education sections | v1.1 | Link to them, don't block flow |
+
+---
+
+## Reviewer Consensus (All 4 Approved)
+
+| Reviewer | Status | Key Contribution |
+|----------|--------|------------------|
+| Grok | ✅ | Assumption transparency, optional complexity detection |
+| Claude | ✅ | VAT help text, "already taken" upfront, year-end optional |
+| ChatGPT | ✅ | Define "this year", guardrails, plain English copy |
+| Gemini | ✅ | Silent assumptions, VAT checkbox, POA safety net |
+
+---
+
+**This is the build. Ship it.**
