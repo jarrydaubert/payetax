@@ -53,7 +53,7 @@ export function InputsPanel({ onCalculate, isCalculateDisabled, className }: Inp
       className={cn('flex h-full flex-col border-r border-white/5 bg-slate-900 p-6', className)}
     >
       {/* Header */}
-      <div className='mb-6'>
+      <div className='mb-6 text-center'>
         <span className='font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Inputs
         </span>
