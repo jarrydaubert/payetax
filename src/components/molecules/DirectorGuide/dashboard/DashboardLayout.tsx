@@ -20,9 +20,7 @@ interface DashboardLayoutProps {
 
 /**
  * 4-column dashboard layout matching the mockup design
- * sidebar (60px) | inputs (280px) | main (flex) | education (320px)
- *
- * Panels can be collapsed to give more space to the main content.
+ * Uses flexbox for smoother animations than CSS grid
  */
 export function DashboardLayout({
   sidebar,
@@ -36,56 +34,39 @@ export function DashboardLayout({
   onToggleEducation,
   className,
 }: DashboardLayoutProps) {
-  // Build grid columns based on collapsed/expanded state
-  const getGridCols = () => {
-    const sidebarWidth = sidebarExpanded ? '192px' : '60px'; // 192px = w-48
-    const inputsWidth = inputsCollapsed ? '0px' : '280px';
-    const educationWidth = educationCollapsed ? '0px' : '320px';
-    return `${sidebarWidth} ${inputsWidth} 1fr ${educationWidth}`;
-  };
-
   return (
-    <div
-      className={cn(
-        'grid h-screen overflow-hidden bg-slate-950 transition-all duration-300',
-        'max-lg:grid-cols-[60px_1fr]',
-        'max-md:grid-cols-1',
-        className
-      )}
-      style={{ gridTemplateColumns: getGridCols() }}
-    >
-      {/* Icon sidebar - expandable (toggle handled inside SidebarNav) */}
-      <div className='overflow-hidden transition-all duration-300 max-md:hidden'>
+    <div className={cn('flex h-screen overflow-hidden bg-slate-950', className)}>
+      {/* Icon sidebar - expandable */}
+      <div
+        className='shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-md:hidden'
+        style={{ width: sidebarExpanded ? 192 : 60 }}
+      >
         {sidebar}
       </div>
 
       {/* Inputs panel - collapsible */}
       <div
-        className={cn(
-          'relative overflow-hidden transition-all duration-300 max-lg:hidden',
-          inputsCollapsed && 'w-0'
-        )}
+        className='relative shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-lg:hidden'
+        style={{ width: inputsCollapsed ? 0 : 280 }}
       >
-        {!inputsCollapsed && (
-          <>
-            {inputs}
-            {/* Collapse button - top right corner */}
-            {onToggleInputs && (
-              <button
-                type='button'
-                onClick={onToggleInputs}
-                className='absolute top-4 right-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-                title='Hide inputs'
-              >
-                <PanelLeftClose className='size-4' />
-              </button>
-            )}
-          </>
+        <div className='h-full w-[280px]'>
+          {inputs}
+        </div>
+        {/* Collapse button - top right corner */}
+        {onToggleInputs && !inputsCollapsed && (
+          <button
+            type='button'
+            onClick={onToggleInputs}
+            className='absolute top-4 right-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+            title='Hide inputs'
+          >
+            <PanelLeftClose className='size-4' />
+          </button>
         )}
       </div>
 
       {/* Main content area */}
-      <div className='relative overflow-y-auto'>
+      <div className='relative min-w-0 flex-1 overflow-y-auto'>
         {/* Toggle buttons when panels are collapsed - positioned below header */}
         <div className='absolute top-16 left-4 right-4 z-10 flex justify-between pointer-events-none max-lg:hidden'>
           {/* Left: Show inputs button */}
@@ -121,26 +102,22 @@ export function DashboardLayout({
 
       {/* Education panel - collapsible */}
       <div
-        className={cn(
-          'relative overflow-hidden transition-all duration-300 max-lg:hidden',
-          educationCollapsed && 'w-0'
-        )}
+        className='relative shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out max-lg:hidden'
+        style={{ width: educationCollapsed ? 0 : 320 }}
       >
-        {!educationCollapsed && (
-          <>
-            {/* Collapse button - top left corner */}
-            {onToggleEducation && (
-              <button
-                type='button'
-                onClick={onToggleEducation}
-                className='absolute top-4 left-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-                title='Hide learn panel'
-              >
-                <PanelRightClose className='size-4' />
-              </button>
-            )}
-            {education}
-          </>
+        <div className='h-full w-[320px]'>
+          {education}
+        </div>
+        {/* Collapse button - top left corner */}
+        {onToggleEducation && !educationCollapsed && (
+          <button
+            type='button'
+            onClick={onToggleEducation}
+            className='absolute top-4 left-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+            title='Hide learn panel'
+          >
+            <PanelRightClose className='size-4' />
+          </button>
         )}
       </div>
     </div>
