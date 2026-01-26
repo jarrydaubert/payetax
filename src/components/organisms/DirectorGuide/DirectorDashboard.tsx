@@ -35,6 +35,8 @@ type ViewState = 'empty' | 'comparison' | 'populated';
 export function DirectorDashboard() {
   const [viewState, setViewState] = useState<ViewState>('empty');
   const [showComparison, setShowComparison] = useState(false);
+  const [inputsCollapsed, setInputsCollapsed] = useState(false);
+  const [educationCollapsed, setEducationCollapsed] = useState(false);
 
   const { showResults, hasOtherIncome } = useDirectorGuideStore();
   const results = useDirectorResults();
@@ -147,6 +149,10 @@ export function DirectorDashboard() {
             alreadyTakenViaPayroll={formData.alreadyTakenViaPayroll}
           />
         }
+        inputsCollapsed={inputsCollapsed}
+        educationCollapsed={educationCollapsed}
+        onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
+        onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
       />
 
       {/* Comparison Modal */}
