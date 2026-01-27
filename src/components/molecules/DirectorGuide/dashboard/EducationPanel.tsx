@@ -9,6 +9,7 @@ import { isNormalMode } from '@/lib/validation/directorValidation';
 interface EducationPanelProps {
   result: DirectorCalculationResult | null;
   revenue?: number;
+  region?: 'scotland' | 'rUK';
   hasOtherIncome?: boolean;
   alreadyTaken?: number;
   alreadyTakenViaPayroll?: boolean | null;
@@ -21,6 +22,7 @@ interface EducationPanelProps {
 export function EducationPanel({
   result,
   revenue = 0,
+  region = 'rUK',
   hasOtherIncome,
   alreadyTaken = 0,
   alreadyTakenViaPayroll,
@@ -30,9 +32,14 @@ export function EducationPanel({
 
   // Determine which warnings to show
   const showVATWarning = isNormal && revenue >= 85000 && revenue <= 95000;
-  const showSelfAssessmentWarning = isNormal && result.dividendsAvailable > 1000;
+  // Any dividends typically require Self Assessment for directors
+  const showSelfAssessmentWarning = isNormal && result.dividendsAvailable > 0;
   const showOtherIncomeWarning = hasOtherIncome === true;
-  const showDLAWarning = isNormal && alreadyTaken > 0 && alreadyTakenViaPayroll === false;
+  const showDLAWarning = alreadyTaken > 0 && alreadyTakenViaPayroll === false;
+  // High profit complexity warning
+  const showComplexityWarning = isNormal && result.grossProfit > 250000;
+  // Overdrawn warning - taken more than safe
+  const showOverdrawnWarning = isNormal && alreadyTaken > result.annualTakeHome;
 
   return (
     <aside
@@ -63,22 +70,36 @@ export function EducationPanel({
       {(showVATWarning ||
         showSelfAssessmentWarning ||
         showOtherIncomeWarning ||
-        showDLAWarning) && (
+        showDLAWarning ||
+        showComplexityWarning ||
+        showOverdrawnWarning) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
             Warnings
           </h3>
           <div className='space-y-3'>
+            {showOverdrawnWarning && (
+              <WarningCard
+                title='Already Taken Too Much'
+                description="You may have taken more than is safe this year. Speak to your accountant about options."
+              />
+            )}
+            {showComplexityWarning && (
+              <WarningCard
+                title='High Profit Complexity'
+                description="At this profit level, an accountant could save you serious money with advanced strategies."
+              />
+            )}
             {showVATWarning && (
               <WarningCard
                 title='VAT Threshold'
-                description={`Revenue approaching £90,000 VAT threshold. Consider registration.`}
+                description="Revenue approaching £90,000 VAT threshold. Consider registration."
               />
             )}
             {showSelfAssessmentWarning && (
               <WarningCard
-                title='Self Assessment'
-                description='Dividends over £1,000 require Self Assessment. Deadline: 31 Jan.'
+                title='Self Assessment Required'
+                description="Directors taking dividends need to file a Self Assessment. Deadline: 31 Jan."
               />
             )}
             {showOtherIncomeWarning && (
@@ -104,11 +125,15 @@ export function EducationPanel({
         </h3>
         <div className='rounded-[10px] border border-white/5 bg-slate-800 p-4'>
           <AssumptionRow label='Tax Year' value='2025/26' />
-          <AssumptionRow label='Region' value='England' />
+          <AssumptionRow
+            label='Main Home'
+            value={region === 'scotland' ? 'Scotland' : 'England/Wales/NI'}
+          />
           <AssumptionRow label='Trading Period' value='Full Year' />
-          <AssumptionRow label='Other Income' value={hasOtherIncome ? 'Yes' : 'None'} />
-          <AssumptionRow label='Tax Band' value='Basic Rate' />
-          <AssumptionRow label='IR35 Status' value='Outside IR35' />
+          <AssumptionRow
+            label='Other Income'
+            value={hasOtherIncome ? 'Yes (estimates may differ)' : 'None'}
+          />
           <AssumptionRow label='Employment Allowance' value='Not claimed' isLast />
         </div>
       </section>
@@ -123,7 +148,7 @@ interface LearnCardProps {
 
 function LearnCard({ title, description }: LearnCardProps) {
   return (
-    <div className='cursor-pointer rounded-[10px] border border-white/5 bg-slate-800 p-4 transition-all hover:border-white/10 hover:bg-slate-700'>
+    <div className='rounded-[10px] border border-white/5 bg-slate-800 p-4'>
       <div className='mb-1 font-medium text-slate-100 text-sm'>{title}</div>
       <div className='text-slate-500 text-xs leading-relaxed'>{description}</div>
     </div>

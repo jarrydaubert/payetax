@@ -147,6 +147,7 @@ export function DirectorDashboard() {
           <EducationPanel
             result={viewState === 'populated' ? results : null}
             revenue={formData.revenue}
+            region={formData.region}
             hasOtherIncome={hasOtherIncome ?? undefined}
             alreadyTaken={formData.alreadyTaken}
             alreadyTakenViaPayroll={formData.alreadyTakenViaPayroll}
