@@ -184,7 +184,7 @@ Pay yourself ≥£6,500 salary to earn NI credits even if taking mainly dividend
 |------|-----------|------|
 | **Plan 1** (pre-2012) | £26,065 | 9% |
 | **Plan 2** (post-2012 England/Wales) | £28,470 | 9% |
-| **Plan 4** (Scotland) | £31,395 | 9% |
+| **Plan 4** (Scotland) | £32,745 | 9% |
 | **Plan 5** (post-2023) | £25,000 | 9% |
 | **Postgraduate** | £21,000 | 6% |
 
