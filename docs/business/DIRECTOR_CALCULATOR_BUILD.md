@@ -114,6 +114,17 @@ Compares two salary options, picks highest take-home:
 | Employer NI | Above £5,000 | 15% |
 | Employment Allowance | — | £10,500 offset |
 
+**Employer NI by Salary Level:**
+
+| Salary | Employer NI (no EA) | With EA |
+|--------|---------------------|---------|
+| £5,000 | £0 | £0 |
+| £6,500 | £225 | £0 |
+| £12,570 | £1,135 | £0 |
+| £50,270 | £6,790 | £0 |
+
+**EA Eligibility:** Not available if ONLY employee is a director. Need 2+ directors both paid >£5k, OR director + other employee(s) paid >£5k.
+
 ### Corporation Tax
 
 | Profit | Rate |
@@ -124,6 +135,19 @@ Compares two salary options, picks highest take-home:
 
 **Marginal Relief:** `(250000 - profit) × 3/200`
 
+**Effective Rates in Marginal Zone:**
+
+| Profit | Effective Rate |
+|--------|----------------|
+| £50,000 | 19.00% |
+| £100,000 | 22.00% |
+| £150,000 | 23.50% |
+| £250,000 | 25.00% |
+
+**Associated Companies:** If you have associated companies, thresholds are divided:
+- 2 companies: £25k / £125k thresholds
+- 3 companies: £16.7k / £83.3k thresholds
+
 ### Dividend Tax
 
 - Allowance: £500
@@ -132,6 +156,71 @@ Compares two salary options, picks highest take-home:
 - Additional rate: 39.35%
 
 **Note:** Dividends use UK rates for ALL UK residents (including Scottish)
+
+### VAT
+
+| Threshold | Amount |
+|-----------|--------|
+| Registration | £90,000 (rolling 12 months) |
+| Deregistration | £88,000 |
+
+### State Pension
+
+| Threshold | Amount |
+|-----------|--------|
+| Qualifying salary (LEL) | £6,500/year |
+| Full pension (35 years) | £230.25/week (£11,973/year) |
+| Minimum years | 10 years for any pension |
+
+### High Income Child Benefit Charge (HICBC)
+
+| Threshold | Effect |
+|-----------|--------|
+| £60,000 | Charge starts (1% per £200 over) |
+| £80,000 | Full clawback (100%) |
+
+**Note:** Income = salary + dividends + other. Pension contributions reduce this.
+
+### Pension Annual Allowance
+
+| Threshold | Amount |
+|-----------|--------|
+| Standard AA | £60,000 |
+| Threshold income | £200,000 (check adjusted income if exceeded) |
+| Adjusted income | £260,000 (taper starts) |
+| Minimum AA | £10,000 (at £360,000+) |
+| Money Purchase AA | £10,000 (if flexibly accessed pension) |
+| Carry forward | 3 years unused AA |
+
+### Personal Savings Allowance
+
+| Tax Band | PSA |
+|----------|-----|
+| Basic rate | £1,000 |
+| Higher rate | £500 |
+| Additional rate | £0 |
+
+### Capital Gains Tax
+
+| Item | Rate/Amount |
+|------|-------------|
+| Annual Exempt Amount | £3,000 |
+| Basic rate | 18% |
+| Higher rate | 24% |
+| BADR (Business Asset Disposal Relief) | 14% (up to £1m lifetime) |
+| BADR from April 2026 | 18% |
+
+### Other Allowances
+
+| Allowance | Amount |
+|-----------|--------|
+| ISA | £20,000/year |
+| Trivial benefits (directors) | £50 per benefit, £300/year cap |
+| Beneficial loan threshold | £10,000 (no BIK below) |
+| Mileage allowance | 45p/mile (first 10k), 25p after |
+| Marriage allowance | £1,260 transfer |
+| Blind Person's Allowance | £3,130 |
+| Annual Investment Allowance | £1,000,000 |
 
 ### Student Loans (on TOTAL income via Self Assessment)
 
@@ -148,19 +237,42 @@ Compares two salary options, picks highest take-home:
 
 **Note:** If unearned income (dividends + savings + rental) < £2,000, it's ignored for SL purposes. If ≥ £2,000, full amount included. (Currently not implemented - edge case for future.)
 
+### Payments on Account (POA)
+
+| Threshold | Effect |
+|-----------|--------|
+| SA liability > £1,000 | POA required |
+| ≥80% collected via PAYE | POA exemption |
+
+**Warning:** First SA bill can be 150% of normal (100% current year + 50% advance).
+
+### Key Salary Decision Points
+
+| Salary | Pros | Cons |
+|--------|------|------|
+| £0 | No payroll hassle | No State Pension credits |
+| £5,000 | Zero Employer NI | Just below pension credit |
+| £6,500 | State Pension credits, £225 ErNI | Still some Employer NI |
+| £12,570 | Full PA used, max CT deduction | £1,135 Employer NI |
+| £50,270 | All basic rate band used | £3,016 EeNI, £6,790 ErNI |
+
 ---
 
 ## Warnings & Edge Cases
 
-| Condition | Warning |
-|-----------|---------|
-| Revenue £85k-90k | VAT threshold approaching (£90k) |
-| Revenue ≥£90k | VAT registration likely required |
-| Total income >£100k | PA taper zone (60% effective rate) |
-| Total income >£125,140 | PA fully lost |
-| Profit ≤£12,570 | "Survival mode" — limited strategy options |
-| Taken > take-home | Overdrawn warning |
-| Sole director + EA claimed | Employment Allowance not available (tooltip) |
+| Condition | Warning | Status |
+|-----------|---------|--------|
+| Revenue £85k-90k | VAT threshold approaching (£90k) | ✅ Implemented |
+| Revenue ≥£90k | VAT registration likely required | ✅ Implemented |
+| Total income >£100k | PA taper zone (60% effective rate) | ✅ Implemented |
+| Total income >£125,140 | PA fully lost | ✅ Implemented |
+| Profit ≤£12,570 | "Survival mode" — limited strategy options | ✅ Implemented |
+| Taken > take-home | Overdrawn warning | ✅ Implemented |
+| Sole director + EA claimed | Employment Allowance not available | ✅ Implemented (tooltip) |
+| Total income £60k-£80k | HICBC clawback zone | ❌ Phase 4 |
+| Pension contribution >£60k | Annual Allowance exceeded | ❌ Phase 4 |
+| Dividends > retained profit | Illegal dividend | ❌ Phase 4 |
+| Associated companies exist | CT thresholds divided | ❌ Phase 4 |
 
 ---
 
@@ -225,28 +337,47 @@ Based on company year-end month:
 
 ## Test Checklist
 
-### Tax Calculations
-- [ ] Income tax correct for rUK bands
-- [ ] Income tax correct for Scottish 6 bands
-- [ ] PA taper kicks in at exactly £100,000
-- [ ] PA = £0 at exactly £125,140
-- [ ] Employee NI 8%/2% split at £50,270
-- [ ] Employer NI 15% from £5,000
-- [ ] Employment Allowance £10,500 offset
-- [ ] CT 19% under £50k
-- [ ] CT marginal relief at exactly £50,000
-- [ ] CT marginal relief at exactly £250,000
-- [ ] CT 25% over £250k
-- [ ] Dividend allowance £500
-- [ ] Dividend tax rates 8.75/33.75/39.35%
+### Income Tax
+- [ ] rUK: £12,570 PA, 20% to £50,270, 40% to £125,140, 45% above
+- [ ] Scotland: All 6 bands (19/20/21/42/45/48%)
+- [ ] PA taper: Starts exactly at £100,000
+- [ ] PA taper: £0 PA at exactly £125,140
+- [ ] PA taper: 60% effective rate in £100k-£125,140 zone
+
+### National Insurance
+- [ ] Employee NI: 8% from £12,570 to £50,270
+- [ ] Employee NI: 2% above £50,270
+- [ ] Employer NI: 15% from £5,000
+- [ ] Employer NI: £0 at exactly £5,000
+- [ ] Employer NI: £225 at £6,500 (LEL)
+- [ ] Employer NI: £1,135 at £12,570 (PA)
+- [ ] Employment Allowance: £10,500 offset
+- [ ] LEL: £6,500 qualifies for State Pension credits
+
+### Corporation Tax
+- [ ] 19% at exactly £50,000
+- [ ] Marginal relief kicks in at £50,001
+- [ ] 25% at exactly £250,000
+- [ ] Marginal relief formula: (250000 - profit) × 3/200
+
+### Dividend Tax
+- [ ] Allowance: £500
+- [ ] Basic rate: 8.75%
+- [ ] Higher rate: 33.75%
+- [ ] Additional rate: 39.35%
+- [ ] UK rates used for Scottish taxpayers
 
 ### Student Loans
-- [ ] Plan 1 threshold £26,065
-- [ ] Plan 2 threshold £28,470
-- [ ] Plan 4 threshold £32,745
-- [ ] Postgrad threshold £21,000 @ 6%
-- [ ] Multiple plans stack correctly (Plan + Postgrad)
+- [ ] Plan 1: £26,065 @ 9%
+- [ ] Plan 2: £28,470 @ 9%
+- [ ] Plan 4: £32,745 @ 9%
+- [ ] Postgrad: £21,000 @ 6%
+- [ ] Multiple plans stack (Plan + Postgrad = 15%)
 - [ ] Applied to TOTAL income (salary + dividends + BIK + other)
+
+### VAT
+- [ ] Warning at £85k-£90k
+- [ ] Required warning at ≥£90k
 
 ### Strategy Comparison
 - [ ] All Salary calculates correctly
@@ -255,14 +386,16 @@ Based on company year-end month:
 - [ ] £12,570 salary usually wins over £6,500
 
 ### Edge Cases
-- [ ] Zero profit shows appropriate message
-- [ ] Negative profit (loss) handled gracefully
-- [ ] Profit < salary warns appropriately
-- [ ] Dividends > retained profit warning
+- [ ] Zero profit: Appropriate message
+- [ ] Negative profit: Loss handled gracefully
+- [ ] Profit < salary: Warning shown
+- [ ] £100k income: PA taper warning shown
+- [ ] Sole director + EA: Tooltip warning shown
 
 ### UI/UX
-- [ ] Slider updates all figures live
-- [ ] Email sends with correct data
-- [ ] .ics downloads work
-- [ ] Two Pots shows correct monthly amounts
-- [ ] Warnings appear at correct thresholds
+- [ ] Slider: Updates all figures live
+- [ ] Slider: Breakpoints at £0, £6,500, £12,570, £50,270
+- [ ] Email: Sends with correct data
+- [ ] Key dates: .ics downloads work
+- [ ] Two Pots: Correct monthly amounts
+- [ ] Warnings: Appear at correct thresholds
