@@ -88,11 +88,11 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/tools/scottish-tax-calculator');
     });
 
-    it('should have 8 navigation links', () => {
+    it('should have 9 navigation links', () => {
       render(<Footer />);
 
       const links = screen.getAllByRole('link');
-      expect(links).toHaveLength(8);
+      expect(links).toHaveLength(9);
     });
   });
 

@@ -94,8 +94,9 @@ export interface DividendTaxResult {
  * Calculate Dividend Tax with full breakdown
  *
  * Dividends are taxed based on the individual's total income:
- * 1. First, the dividend allowance (£500) is applied
- * 2. Then, remaining dividends are taxed at the rate corresponding
+ * 1. First, any unused Personal Allowance shelters dividends (0% tax)
+ * 2. Then, the dividend allowance (£500) is applied
+ * 3. Then, remaining dividends are taxed at the rate corresponding
  *    to the band they fall into (based on total income)
  *
  * @param dividends - Total dividend amount to be taxed
@@ -105,10 +106,13 @@ export interface DividendTaxResult {
  *
  * @example
  * ```typescript
- * // Director with £12,570 salary and £50,000 dividends
+ * // Director with £12,570 salary and £50,000 dividends (PA fully used)
  * const result = calculateDividendTax(50000, 12570);
  * // result.dividendTax ≈ £4,331
- * // result.effectiveRate ≈ 0.0866
+ *
+ * // Director with £0 salary and £50,000 dividends (PA shelters dividends)
+ * const result = calculateDividendTax(50000, 0);
+ * // result.dividendTax ≈ £3,231 (£12,570 sheltered by unused PA)
  * ```
  */
 export function calculateDividendTax(
@@ -142,37 +146,64 @@ export function calculateDividendTax(
 
   const { ALLOWANCE, BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
 
-  // Step 1: Apply dividend allowance
-  const allowanceUsed = Math.min(dividends, ALLOWANCE);
-  const taxableDividends = Math.max(0, dividends - ALLOWANCE);
+  // Step 1: Calculate unused Personal Allowance that can shelter dividends
+  // If other income < PA, the unused portion shelters dividends at 0% tax
+  const unusedPA = Math.max(0, personalAllowance - safeOtherIncome);
+  const dividendsSheltered = Math.min(dividends, unusedPA);
+  const dividendsAfterPA = dividends - dividendsSheltered;
+
+  // Step 2: Apply dividend allowance to remaining dividends
+  const allowanceUsed = Math.min(dividendsAfterPA, ALLOWANCE);
+  const taxableDividends = Math.max(0, dividendsAfterPA - ALLOWANCE);
 
   if (taxableDividends <= 0) {
+    const bandBreakdown: DividendBandBreakdown[] = [];
+    if (dividendsSheltered > 0) {
+      bandBreakdown.push({
+        band: 'allowance', // Using 'allowance' for PA-sheltered as well
+        rate: 0,
+        amount: dividendsSheltered,
+        tax: 0,
+      });
+    }
+    if (allowanceUsed > 0) {
+      bandBreakdown.push({
+        band: 'allowance',
+        rate: 0,
+        amount: allowanceUsed,
+        tax: 0,
+      });
+    }
     return {
       totalDividends: dividends,
-      allowanceUsed,
+      allowanceUsed: dividendsSheltered + allowanceUsed, // Total tax-free amount
       taxableDividends: 0,
       dividendTax: 0,
       effectiveRate: 0,
-      bandBreakdown: [
-        {
-          band: 'allowance',
-          rate: 0,
-          amount: allowanceUsed,
-          tax: 0,
-        },
-      ],
+      bandBreakdown,
     };
   }
 
-  // Step 2: Calculate which bands the dividends fall into
-  // Dividends "stack" on top of other income
-  const incomeBeforeDividends = safeOtherIncome;
+  // Step 3: Calculate which bands the taxable dividends fall into
+  // Dividends "stack" on top of other income + PA-sheltered dividends
+  // The PA-sheltered dividends still use up band space
+  const incomeBeforeTaxableDividends = safeOtherIncome + dividendsSheltered + allowanceUsed;
 
   let remainingDividends = taxableDividends;
   let totalTax = 0;
   const bandBreakdown: DividendBandBreakdown[] = [];
 
-  // Add allowance to breakdown
+  // Add PA-sheltered dividends to breakdown (if any)
+  if (dividendsSheltered > 0) {
+    bandBreakdown.push({
+      band: 'allowance',
+      rate: 0,
+      amount: dividendsSheltered,
+      tax: 0,
+    });
+  }
+
+  // Add dividend allowance to breakdown
   if (allowanceUsed > 0) {
     bandBreakdown.push({
       band: 'allowance',
@@ -183,8 +214,8 @@ export function calculateDividendTax(
   }
 
   // Basic rate band (up to £50,270 total income for 2025-26)
-  if (incomeBeforeDividends < basicBandEnd && remainingDividends > 0) {
-    const basicBandSpace = basicBandEnd - incomeBeforeDividends;
+  if (incomeBeforeTaxableDividends < basicBandEnd && remainingDividends > 0) {
+    const basicBandSpace = basicBandEnd - incomeBeforeTaxableDividends;
     const dividendsInBasicBand = Math.min(remainingDividends, basicBandSpace);
     const taxInBasicBand = roundToPence(dividendsInBasicBand * BASIC_RATE);
 
@@ -201,8 +232,8 @@ export function calculateDividendTax(
   }
 
   // Higher rate band (£50,271 - £125,140)
-  if (incomeBeforeDividends < higherBandEnd && remainingDividends > 0) {
-    const higherBandStart = Math.max(incomeBeforeDividends, basicBandEnd);
+  if (incomeBeforeTaxableDividends < higherBandEnd && remainingDividends > 0) {
+    const higherBandStart = Math.max(incomeBeforeTaxableDividends, basicBandEnd);
     const higherBandSpace = higherBandEnd - higherBandStart;
     const dividendsInHigherBand = Math.min(remainingDividends, higherBandSpace);
     const taxInHigherBand = roundToPence(dividendsInHigherBand * HIGHER_RATE);
@@ -237,7 +268,7 @@ export function calculateDividendTax(
 
   return {
     totalDividends: dividends,
-    allowanceUsed,
+    allowanceUsed: dividendsSheltered + allowanceUsed, // Total tax-free (PA + DA)
     taxableDividends,
     dividendTax: roundToPence(totalTax),
     effectiveRate: roundToFourDecimals(effectiveRate),

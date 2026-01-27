@@ -188,7 +188,7 @@ describe('Director Calculator', () => {
         expect(isSurvivalMode(result)).toBe(true);
       });
 
-      it('should trigger modified_survival when 0 < profit <= personal allowance', () => {
+      it('should return normal mode with MODIFIED_SURVIVAL warning when 0 < profit <= personal allowance', () => {
         const lowProfitInput: DirectorInput = {
           ...defaultInput,
           revenue: 15000,
@@ -196,8 +196,10 @@ describe('Director Calculator', () => {
         };
         const result = calculateDirectorScenario(lowProfitInput);
 
-        expect(result.mode).toBe('modified_survival');
-        expect(isSurvivalMode(result)).toBe(true);
+        // Returns 'normal' mode with actionable numbers, but includes MODIFIED_SURVIVAL warning
+        expect(result.mode).toBe('normal');
+        expect(isNormalMode(result)).toBe(true);
+        expect(result.warnings.some(w => w.type === 'MODIFIED_SURVIVAL')).toBe(true);
       });
 
       it('should return maxPossibleSalary in survival mode', () => {

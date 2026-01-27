@@ -159,15 +159,16 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
 
   // Case 3: Marginal relief (between £50,000 and £250,000)
   //
-  // The marginal relief formula:
-  // Relief = (Upper - Profits) × (Profits / Upper) × Fraction
+  // The HMRC marginal relief formula (for single company, no associated companies):
+  // Relief = F × (U - A)
+  // Where: F = 3/200, U = £250,000 upper limit, A = augmented profits
   //
-  // This creates a smooth transition from 19% to 25%
+  // For a simple company with no exempt distributions, this simplifies to:
+  // Relief = 3/200 × (250,000 - profit)
+  //
+  // @see https://www.gov.uk/guidance/corporation-tax-marginal-relief
   const mainRateTax = taxableProfit * MAIN_RATE;
-  const marginalRelief =
-    MARGINAL_RELIEF_FRACTION *
-    (MAIN_RATE_LIMIT - taxableProfit) *
-    (taxableProfit / MAIN_RATE_LIMIT);
+  const marginalRelief = MARGINAL_RELIEF_FRACTION * (MAIN_RATE_LIMIT - taxableProfit);
 
   const tax = roundToPence(mainRateTax - marginalRelief);
   const effectiveRate = tax / taxableProfit;

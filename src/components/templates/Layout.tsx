@@ -1,9 +1,9 @@
 // src/components/templates/Layout.tsx
 'use client';
 
+import { usePathname } from 'next/navigation';
 import type React from 'react';
 import { Suspense } from 'react';
-import { usePathname } from 'next/navigation';
 import BackgroundElements from '@/components/atoms/BackgroundElements';
 import Footer from '@/components/molecules/Footer';
 import CookieBanner from '@/components/organisms/CookieBanner';

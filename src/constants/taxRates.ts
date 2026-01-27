@@ -99,6 +99,8 @@ export const TAX_RATES: Record<
           secondary: { threshold: number; rate: number };
         }
       >;
+      employmentAllowance: number; // Annual EA that can offset employer NI
+      lowerEarningsLimit: number; // LEL - minimum for NI credits / State Pension qualification
     };
     studentLoan: {
       plan1: { threshold: number; rate: number };
@@ -178,6 +180,8 @@ export const TAX_RATES: Record<
           secondary: { threshold: 9100, rate: 13.8 },
         },
       },
+      employmentAllowance: 5000, // £5,000 for 2023-24
+      lowerEarningsLimit: 6396, // £123/week × 52 = £6,396/year
     },
     studentLoan: {
       plan1: { threshold: 22015, rate: 9 },
@@ -260,6 +264,8 @@ export const TAX_RATES: Record<
           secondary: { threshold: 9100, rate: 13.8 },
         },
       },
+      employmentAllowance: 5000, // £5,000 for 2024-25
+      lowerEarningsLimit: 6396, // £123/week × 52 = £6,396/year
     },
     studentLoan: {
       plan1: { threshold: 22015, rate: 9 },
@@ -339,6 +345,8 @@ export const TAX_RATES: Record<
           secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
         },
       },
+      employmentAllowance: 10500, // Increased from £5,000 to £10,500 in Autumn Budget 2024
+      lowerEarningsLimit: 6500, // £125/week × 52 = £6,500/year (increased from £6,396)
     },
     studentLoan: {
       // Updated thresholds for 2025-2026 (9% increase from frozen rates)

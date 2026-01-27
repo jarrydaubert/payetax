@@ -43,14 +43,10 @@ import { getEmployerNI } from './employerNI';
 // ============================================================================
 
 /**
- * Default salary - uses full Personal Allowance for tax efficiency
- *
- * At £12,570:
- * - No income tax (within Personal Allowance)
- * - No employee NI (at Primary Threshold)
- * - Employer NI applies (above Secondary Threshold of £5,000)
+ * Default salary for 2025-26 (for backwards compatibility with tests)
+ * IMPORTANT: Use TAX_RATES[taxYear].personalAllowance in calculations
  */
-export const DEFAULT_SALARY = 12570;
+export const DEFAULT_SALARY = TAX_RATES['2025-2026'].personalAllowance;
 
 /** VAT standard rate (20%) */
 export const VAT_RATE = 0.2;
@@ -136,14 +132,16 @@ export function calculateDirectorScenario(
   if (grossProfit <= personalAllowance) {
     // Calculate the maximum salary that fits within profit (accounting for employer NI)
     // Salary + EmployerNI <= grossProfit
-    // If salary > 5000: salary + 0.15*(salary - 5000) <= grossProfit
-    // 1.15*salary - 750 <= grossProfit => salary <= (grossProfit + 750) / 1.15
-    const niThreshold = 5000;
+    // If salary > threshold: salary + rate*(salary - threshold) <= grossProfit
+    // (1+rate)*salary - rate*threshold <= grossProfit
+    // salary <= (grossProfit + rate*threshold) / (1+rate)
+    const niThreshold = rates.nationalInsurance.employer.A.secondary.threshold;
+    const niRate = rates.nationalInsurance.employer.A.secondary.rate / 100;
     let maxSalary: number;
     if (grossProfit <= niThreshold) {
       maxSalary = grossProfit; // No employer NI applies
     } else {
-      maxSalary = Math.min(grossProfit, (grossProfit + niThreshold * 0.15) / 1.15);
+      maxSalary = Math.min(grossProfit, (grossProfit + niThreshold * niRate) / (1 + niRate));
     }
     maxSalary = roundToPence(Math.floor(maxSalary)); // Round down to be safe
 
@@ -187,7 +185,8 @@ export function calculateDirectorScenario(
   }
 
   // Step 4: Normal calculation path
-  const salary = DEFAULT_SALARY;
+  // Use personal allowance as optimal salary (tax-year specific)
+  const salary = personalAllowance;
   const monthlySalary = roundToPence(salary / 12);
 
   // Step 5: Calculate employer NI on salary

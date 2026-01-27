@@ -1,6 +1,7 @@
 // src/app/tools/director-guide/page.tsx
-import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
+
 import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
+import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
 
 const BASE_URL = 'https://payetax.co.uk';
 

@@ -1,7 +1,7 @@
 // src/components/molecules/DirectorGuide/dashboard/OtherIncomeGate.tsx
 'use client';
 
-import { AlertTriangle, Building2, Briefcase } from 'lucide-react';
+import { AlertTriangle, Briefcase, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OtherIncomeGateProps {
@@ -32,12 +32,8 @@ export function OtherIncomeGate({
             <div className='mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-cyan-500/10'>
               <AlertTriangle className='size-8 text-cyan-500' />
             </div>
-            <h2 className='mb-2 font-semibold text-2xl text-slate-100'>
-              One quick question
-            </h2>
-            <p className='text-slate-400'>
-              This helps us give you accurate numbers
-            </p>
+            <h2 className='mb-2 font-semibold text-2xl text-slate-100'>One quick question</h2>
+            <p className='text-slate-400'>This helps us give you accurate numbers</p>
           </div>
 
           {/* Question */}
@@ -75,9 +71,7 @@ export function OtherIncomeGate({
                 </div>
                 <div className='text-center'>
                   <div className='font-medium text-slate-100'>No, I have other income</div>
-                  <div className='mt-1 text-slate-500 text-sm'>
-                    Job, freelance, rental, etc.
-                  </div>
+                  <div className='mt-1 text-slate-500 text-sm'>Job, freelance, rental, etc.</div>
                 </div>
               </button>
             </div>
@@ -88,7 +82,8 @@ export function OtherIncomeGate({
             <p className='text-center text-slate-500 text-sm'>
               <strong className='text-slate-400'>Why does this matter?</strong>
               <br />
-              Other income uses up your tax-free allowances, which changes how much tax you'll pay on company earnings.
+              Other income uses up your tax-free allowances, which changes how much tax you'll pay
+              on company earnings.
             </p>
           </div>
         </div>

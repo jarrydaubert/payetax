@@ -81,25 +81,25 @@ export function EducationPanel({
             {showOverdrawnWarning && (
               <WarningCard
                 title='Already Taken Too Much'
-                description="You may have taken more than is safe this year. Speak to your accountant about options."
+                description='You may have taken more than is safe this year. Speak to your accountant about options.'
               />
             )}
             {showComplexityWarning && (
               <WarningCard
                 title='High Profit Complexity'
-                description="At this profit level, an accountant could save you serious money with advanced strategies."
+                description='At this profit level, an accountant could save you serious money with advanced strategies.'
               />
             )}
             {showVATWarning && (
               <WarningCard
                 title='VAT Threshold'
-                description="Revenue approaching £90,000 VAT threshold. Consider registration."
+                description='Revenue approaching £90,000 VAT threshold. Consider registration.'
               />
             )}
             {showSelfAssessmentWarning && (
               <WarningCard
                 title='Self Assessment Required'
-                description="Directors taking dividends need to file a Self Assessment. Deadline: 31 Jan."
+                description='Directors taking dividends need to file a Self Assessment. Deadline: 31 Jan.'
               />
             )}
             {showOtherIncomeWarning && (
