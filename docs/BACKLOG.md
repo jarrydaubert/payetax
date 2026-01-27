@@ -117,7 +117,32 @@
 
 ---
 
-## Director Guide - Post-Review Backlog
+## Director Calculator (Pro Tool) - Post-Review Backlog
+
+> Items identified during 3-reviewer (Grok/Claude/ChatGPT) feedback of Pro calculator
+
+### UI/UX Improvements
+- Refactor `DirectorCalculatorClient.tsx` (1,200 lines) into smaller components
+- Replace setTimeout .ics hack with combined multi-event .ics file
+- Add .ics UID random suffix to prevent collisions
+- Soften VAT warning wording ("may need to register promptly")
+- Add keyboard-first flow (Enter to calculate)
+- Add field-level validation errors (not just generic revenue error)
+- Add analytics events: `pro_calculator_started`, `pro_calculator_completed`, `pro_strategy_selected`, `pro_calendar_downloaded`
+
+### Accessibility
+- Full keyboard navigation audit for strategy table rows
+- ARIA labels for icons/tooltips
+- Accordion for assumptions section on mobile
+
+### SA Date Logic (Complex Edge Case)
+- Current logic ties SA date to company year-end
+- Technically SA deadline depends on tax year income was received
+- Consider adding "Income taken in tax year: 2025/26 or 2026/27" input for accuracy
+
+---
+
+## Director Guide (Consumer) - Post-Review Backlog
 
 > Items identified during 3-reviewer (Grok/Claude/ChatGPT) feedback process
 
