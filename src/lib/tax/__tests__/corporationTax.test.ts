@@ -69,47 +69,59 @@ describe('Corporation Tax Calculator', () => {
     });
 
     describe('Marginal relief (£50,001 - £249,999)', () => {
-      it('should apply marginal relief for profits at £100,000', () => {
+      it('should calculate exact marginal relief for £100,000 profit', () => {
+        // HMRC Marginal Relief formula (simple company, no distributions):
+        // Tax = (Profit × 25%) - MarginalRelief
+        // MarginalRelief = (250,000 - Profit) × 3/200
+        //
+        // For £100,000:
+        // Main rate tax: £100,000 × 25% = £25,000
+        // Marginal relief: (£250,000 - £100,000) × 3/200 = £150,000 × 0.015 = £2,250
+        // Final tax: £25,000 - £2,250 = £22,750
+        // Effective rate: 22.75%
         const result = calculateCorporationTax(100000);
 
-        // Main rate tax: 100000 × 0.25 = 25000
-        // Marginal relief: (250000 - 100000) × (100000 / 250000) × 0.015 = 900
-        // Final tax: 25000 - 900 = 24100
-        // But actually the formula gives: 3/200 × 150000 × 0.4 = 900
-        // Tax = 25000 - 900 = 24100? Let me recalculate...
-        // MR = (250000 - 100000) × (100000 / 250000) × (3/200)
-        // MR = 150000 × 0.4 × 0.015 = 900
-        // Tax = 25000 - 900 = 24100
-        // But HMRC calculator shows different... let me verify
-
         expect(result.rateBand).toBe('marginal');
-        expect(result.marginalRelief).toBeGreaterThan(0);
-        expect(result.corporationTax).toBeLessThan(25000); // Less than main rate
-        expect(result.corporationTax).toBeGreaterThan(19000); // More than small profits
+        expect(result.marginalRelief).toBe(2250);
+        expect(result.corporationTax).toBe(22750);
+        expect(result.effectiveRate).toBe(0.2275);
       });
 
-      it('should have effective rate between 19% and 25%', () => {
+      it('should calculate exact marginal relief for £150,000 profit', () => {
+        // Main rate tax: £150,000 × 25% = £37,500
+        // Marginal relief: (£250,000 - £150,000) × 3/200 = £100,000 × 0.015 = £1,500
+        // Final tax: £37,500 - £1,500 = £36,000
+        // Effective rate: 24%
         const result = calculateCorporationTax(150000);
 
-        expect(result.effectiveRate).toBeGreaterThan(0.19);
-        expect(result.effectiveRate).toBeLessThan(0.25);
         expect(result.rateBand).toBe('marginal');
+        expect(result.marginalRelief).toBe(1500);
+        expect(result.corporationTax).toBe(36000);
+        expect(result.effectiveRate).toBe(0.24);
       });
 
-      it('should calculate correctly just above small profits limit', () => {
+      it('should calculate correctly just above small profits limit (£50,001)', () => {
+        // Main rate tax: £50,001 × 25% = £12,500.25
+        // Marginal relief: (£250,000 - £50,001) × 3/200 = £199,999 × 0.015 = £2,999.985
+        // Final tax: £12,500.25 - £2,999.985 = £9,500.265 → £9,500.27
         const result = calculateCorporationTax(50001);
 
         expect(result.rateBand).toBe('marginal');
         // Effective rate should be very close to 19%
-        expect(result.effectiveRate).toBeCloseTo(0.19, 1);
+        expect(result.effectiveRate).toBeCloseTo(0.19, 2);
+        expect(result.corporationTax).toBeCloseTo(9500.27, 1);
       });
 
-      it('should calculate correctly just below main rate limit', () => {
+      it('should calculate correctly just below main rate limit (£249,999)', () => {
+        // Main rate tax: £249,999 × 25% = £62,499.75
+        // Marginal relief: (£250,000 - £249,999) × 3/200 = £1 × 0.015 = £0.015
+        // Final tax: £62,499.75 - £0.015 = £62,499.735 → £62,499.74
         const result = calculateCorporationTax(249999);
 
         expect(result.rateBand).toBe('marginal');
         // Effective rate should be very close to 25%
-        expect(result.effectiveRate).toBeCloseTo(0.25, 1);
+        expect(result.effectiveRate).toBeCloseTo(0.25, 2);
+        expect(result.corporationTax).toBeCloseTo(62499.74, 1);
       });
     });
 
