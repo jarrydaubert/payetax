@@ -26,25 +26,28 @@ function formatCurrency(amount: number): string {
 
 /**
  * Detail breakdown cards showing salary, dividends, corp tax, and tax summary
+ *
+ * Note: UI renders facts from engine - doesn't compute tax rules
+ * Rates vary by income level, so we use neutral labels
  */
 export function DetailCards({ result, revenue = 0, expenses = 0, className }: DetailCardsProps) {
-  const isNormal = result && isNormalMode(result);
+  const isNormal = !!(result && isNormalMode(result));
 
   return (
     <div className={cn('grid grid-cols-2 gap-4 max-lg:grid-cols-1', className)}>
       {/* Salary Breakdown */}
       <DetailCard
         title='Salary Breakdown'
-        badge='Tax-free'
+        badge={isNormal ? 'Via payroll' : undefined}
         isEmpty={!isNormal}
         rows={[
           { label: 'Gross Salary', value: isNormal ? formatCurrency(result.salary) : '—' },
-          { label: 'Income Tax', value: '£0', positive: true },
-          { label: 'Employee NI', value: '£0', positive: true },
+          { label: 'Income Tax', value: isNormal ? '£0' : '—', positive: isNormal },
+          { label: 'Employee NI', value: isNormal ? '£0' : '—', positive: isNormal },
           {
             label: 'Employer NI (company cost)',
             value: isNormal ? `-${formatCurrency(result.employerNI)}` : '—',
-            negative: true,
+            negative: isNormal,
           },
         ]}
         total={{
@@ -56,22 +59,22 @@ export function DetailCards({ result, revenue = 0, expenses = 0, className }: De
       {/* Dividend Breakdown */}
       <DetailCard
         title='Dividend Breakdown'
-        badge={isNormal ? '8.75% tax' : undefined}
+        badge={isNormal ? 'Rate varies by band' : undefined}
         isEmpty={!isNormal}
         rows={[
           {
             label: 'Gross Dividends',
             value: isNormal ? formatCurrency(result.dividendsAvailable) : '—',
           },
-          { label: 'Dividend Allowance', value: '£500 tax-free', positive: true },
           {
-            label: 'Taxable Amount',
-            value: isNormal ? formatCurrency(Math.max(0, result.dividendsAvailable - 500)) : '—',
+            label: 'Tax-Free Allowance',
+            value: isNormal ? '£500' : '—',
+            positive: isNormal,
           },
           {
-            label: 'Dividend Tax (8.75%)',
+            label: 'Dividend Tax',
             value: isNormal ? `-${formatCurrency(result.dividendTax)}` : '—',
-            negative: true,
+            negative: isNormal && result.dividendTax > 0,
           },
         ]}
         total={{
@@ -83,15 +86,19 @@ export function DetailCards({ result, revenue = 0, expenses = 0, className }: De
       {/* Corporation Tax */}
       <DetailCard
         title='Corporation Tax'
-        badge={isNormal ? '19% rate' : undefined}
+        badge={isNormal ? 'Rate varies by profit' : undefined}
         isEmpty={!isNormal}
         rows={[
-          { label: 'Revenue', value: formatCurrency(revenue) },
-          { label: 'Business Expenses', value: `-${formatCurrency(expenses)}`, negative: true },
+          { label: 'Revenue', value: isNormal ? formatCurrency(revenue) : '—' },
+          {
+            label: 'Business Expenses',
+            value: isNormal ? `-${formatCurrency(expenses)}` : '—',
+            negative: isNormal && expenses > 0,
+          },
           {
             label: 'Salary + Employer NI',
             value: isNormal ? `-${formatCurrency(result.salary + result.employerNI)}` : '—',
-            negative: true,
+            negative: isNormal,
           },
           { label: 'Taxable Profit', value: isNormal ? formatCurrency(result.taxableProfit) : '—' },
         ]}
@@ -107,28 +114,23 @@ export function DetailCards({ result, revenue = 0, expenses = 0, className }: De
         isEmpty={!isNormal}
         rows={[
           {
-            label: 'Corporation Tax',
-            value: isNormal ? `-${formatCurrency(result.corporationTax)}` : '—',
-            negative: true,
+            label: 'Corporation Tax (company)',
+            value: isNormal ? formatCurrency(result.corporationTax) : '—',
           },
           {
-            label: 'Employer NI',
-            value: isNormal ? `-${formatCurrency(result.employerNI)}` : '—',
-            negative: true,
+            label: 'Employer NI (company)',
+            value: isNormal ? formatCurrency(result.employerNI) : '—',
           },
           {
-            label: 'Personal Tax (dividends)',
-            value: isNormal ? `-${formatCurrency(result.dividendTax)}` : '—',
-            negative: true,
+            label: 'Dividend Tax (you)',
+            value: isNormal ? formatCurrency(result.dividendTax) : '—',
           },
-          { label: 'Personal Tax (salary)', value: '£0', positive: true },
         ]}
         total={{
-          label: 'Total Tax Paid',
+          label: 'All Taxes & NI',
           value: isNormal
             ? formatCurrency(result.corporationTax + result.employerNI + result.dividendTax)
             : '—',
-          isError: true,
         }}
       />
     </div>
