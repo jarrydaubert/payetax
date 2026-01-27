@@ -24,4 +24,34 @@
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
 
+## Director Guide - Post-Review Backlog
+
+> Items identified during 3-reviewer (Grok/Claude/ChatGPT) feedback process
+
+### EducationPanel
+
+- Make Learn cards expandable accordions (currently static, have no onClick)
+- Improve DLA warning logic - add "dividends declared" option to avoid false positives
+- Move warning logic to engine (return `result.flags.requiresSelfAssessment` etc.) instead of computing in UI
+
+### DashboardLayout
+
+- Add mobile fallback for education panel (currently only inputs has drawer)
+
+### DetailCards
+
+- Gate behind "Show detailed breakdown" toggle (too tax-nerdy for beginner flow)
+- Pass `netRevenue` prop (after VAT deduction) instead of gross revenue
+
+### Components Not Yet Reviewed
+
+- `InputsPanel.tsx` - needs 3-reviewer pass
+- `MainContent.tsx` - needs 3-reviewer pass
+- `SummaryCards.tsx` - needs 3-reviewer pass
+- `MoneyFlowChart.tsx` - needs 3-reviewer pass
+- `SidebarNav.tsx` - needs 3-reviewer pass
+- `OtherIncomeGate.tsx` - needs 3-reviewer pass
+- `results/` folder (7 files) - needs 3-reviewer pass
+- `warnings/` folder (7 files) - needs 3-reviewer pass
+
 
