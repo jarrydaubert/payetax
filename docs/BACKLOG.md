@@ -26,9 +26,11 @@
 
 ## Embed Widget
 
-- `/tools/embed-widget` page exists but is orphaned (only link is from disabled `/pricing/business`)
-- Either add link elsewhere (footer, /tools page) or remove if not launching soon
-- `/embed` route works but undiscoverable
+- Two routes exist and work together:
+  - `/embed` - The actual embeddable calculator (iframe content, noindex)
+  - `/tools/embed-widget` - Marketing page with embed code generator
+- `/tools/embed-widget` is orphaned (only link is from disabled `/pricing/business`)
+- Decision needed: add link elsewhere (footer, /tools page) or remove both if not launching soon
 
 ## Director Guide - Post-Review Backlog
 
