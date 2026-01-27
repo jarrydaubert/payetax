@@ -1178,67 +1178,63 @@ END:VCALENDAR`;
         )}
 
         {/* NI Credits / State Pension Note */}
-        {comparison && comparison.grossProfit > 0 && (
-          <Card className='mb-6 border-slate-500/30 bg-slate-50/30 dark:bg-slate-950/20'>
-            <CardHeader className='pb-2'>
-              <CardTitle className='flex items-center gap-2 text-lg'>
-                <Info className='size-5' />
-                NI Credits &amp; State Pension
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='text-sm'>
-              <div className='space-y-2'>
-                <p>
-                  <strong>Lower Earnings Limit (LEL):</strong>{' '}
-                  {formatCurrency(TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit)}
-                  /year (
-                  {formatCurrency(
-                    Math.round(
-                      TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit / 12
-                    )
-                  )}
-                  /month)
-                </p>
-                <p className='text-muted-foreground'>
-                  Salary above LEL earns NI credits toward your State Pension, even if below the
-                  Primary Threshold where you start paying NI.
-                </p>
-                <div className='mt-3 rounded-lg bg-muted/50 p-3'>
-                  {comparison.strategies.optimalMix.salary >=
-                  TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit ? (
-                    <p className='text-green-700 dark:text-green-400'>
-                      ✓{' '}
-                      <strong>
-                        Optimal Mix salary (
-                        {formatCurrency(comparison.strategies.optimalMix.salary)})
-                      </strong>{' '}
-                      qualifies for NI credits - you&apos;ll build State Pension entitlement.
-                    </p>
-                  ) : (
-                    <p className='text-amber-700 dark:text-amber-400'>
-                      ⚠{' '}
-                      <strong>
-                        Salary below{' '}
-                        {formatCurrency(
-                          TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit
-                        )}
-                      </strong>{' '}
-                      - you won&apos;t earn NI credits this year. Consider paying at least{' '}
-                      {formatCurrency(
-                        TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit
-                      )}{' '}
-                      salary to protect your State Pension.
-                    </p>
-                  )}
+        {comparison && comparison.grossProfit > 0 && activeScenario && (() => {
+          const currentSalary = activeScenario.salary;
+          const lel = TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit;
+          const st = TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.employer.A.secondary.threshold;
+          const isInPensionGap = currentSalary > st && currentSalary < lel;
+          const qualifiesForCredits = currentSalary >= lel;
+          const employerNIInGap = isInPensionGap ? (currentSalary - st) * 0.15 : 0;
+          const extraNICost = isInPensionGap ? (lel - st) * 0.15 - employerNIInGap : 0;
+          
+          return (
+            <Card className='mb-6 border-slate-500/30 bg-slate-50/30 dark:bg-slate-950/20'>
+              <CardHeader className='pb-2'>
+                <CardTitle className='flex items-center gap-2 text-lg'>
+                  <Info className='size-5' />
+                  NI Credits &amp; State Pension
+                </CardTitle>
+              </CardHeader>
+              <CardContent className='text-sm'>
+                <div className='space-y-2'>
+                  <p>
+                    <strong>Lower Earnings Limit (LEL):</strong>{' '}
+                    {formatCurrency(lel)}/year ({formatCurrency(Math.round(lel / 12))}/month)
+                  </p>
+                  <p className='text-muted-foreground'>
+                    Salary above LEL earns NI credits toward your State Pension, even if below the
+                    Primary Threshold where you start paying NI.
+                  </p>
+                  <div className='mt-3 rounded-lg bg-muted/50 p-3'>
+                    {qualifiesForCredits ? (
+                      <p className='text-green-700 dark:text-green-400'>
+                        ✓ <strong>{formatCurrency(currentSalary)} salary</strong> qualifies for NI
+                        credits — you&apos;ll build State Pension entitlement.
+                      </p>
+                    ) : isInPensionGap ? (
+                      <p className='text-amber-700 dark:text-amber-400'>
+                        ⚠ <strong>Inefficient zone:</strong> Paying{' '}
+                        {formatCurrency(employerNIInGap)}/year Employer NI but earning no pension
+                        credits. Increase to {formatCurrency(lel)} (+
+                        {formatCurrency(Math.round(extraNICost / 12))}/month) to secure a qualifying
+                        year.
+                      </p>
+                    ) : (
+                      <p className='text-muted-foreground'>
+                        {formatCurrency(currentSalary)} salary is below the Secondary Threshold — no
+                        Employer NI, but also no pension credits.
+                      </p>
+                    )}
+                  </div>
+                  <p className='mt-2 text-muted-foreground text-xs'>
+                    The £12,570 &quot;optimal&quot; salary is above the LEL, so you automatically
+                    qualify for NI credits without paying any Employee NI.
+                  </p>
                 </div>
-                <p className='mt-2 text-muted-foreground text-xs'>
-                  The £12,570 &quot;optimal&quot; salary is above the LEL, so you automatically
-                  qualify for NI credits without paying any NI.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Detailed Results */}
         {result && comparison && activeScenario && (
@@ -1909,12 +1905,17 @@ END:VCALENDAR`;
                               {formatCurrency(activeScenario.salary)}
                             </TableCell>
                             <TableCell>
-                              {activeScenario.salary >=
-                              TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit ? (
-                                <span className='text-green-600'>✓ Qualifies for NI credits</span>
-                              ) : (
-                                <span className='text-red-600'>✗ No pension credits</span>
-                              )}
+                              {(() => {
+                                const lel = TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.lowerEarningsLimit;
+                                const st = TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.employer.A.secondary.threshold;
+                                if (activeScenario.salary >= lel) {
+                                  return <span className='text-green-600'>✓ Qualifies for NI credits</span>;
+                                }
+                                if (activeScenario.salary > st) {
+                                  return <span className='text-amber-600'>⚠ Paying NI, no credits</span>;
+                                }
+                                return <span className='text-muted-foreground'>No NI, no credits</span>;
+                              })()}
                             </TableCell>
                           </TableRow>
                           <TableRow>
