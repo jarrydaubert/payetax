@@ -146,13 +146,29 @@ describe('Dividend Tax Calculator', () => {
         expect(result.dividendTax).toBe(0);
       });
 
-      it('should handle zero salary correctly', () => {
-        // With no other income, all dividends start at bottom of bands
+      it('should apply Personal Allowance to dividends when no other income', () => {
+        // With no other income, PA (£12,570) shelters dividends first
+        // £30,000 dividends - £12,570 PA = £17,430 after PA
+        // £17,430 - £500 allowance = £16,930 taxable
+        // All at 8.75% (within basic band) = £1,481.38
         const result = calculateDividendTax(30000, 0);
 
-        // Personal allowance space available (£12,570)
-        // But PA doesn't apply to dividends directly in this simplified model
-        expect(result.dividendTax).toBeGreaterThan(0);
+        // PA should shelter £12,570 of dividends
+        expect(result.allowanceUsed).toBe(12570 + 500); // PA + dividend allowance
+        expect(result.taxableDividends).toBe(16930);
+        expect(result.dividendTax).toBeCloseTo(1481.38, 1);
+      });
+
+      it('should shelter dividends with unused PA from low salary', () => {
+        // Salary £5,000 uses £5,000 of PA, leaving £7,570 for dividends
+        // £20,000 dividends - £7,570 PA = £12,430 after PA
+        // £12,430 - £500 allowance = £11,930 taxable
+        // All at 8.75% = £1,043.88
+        const result = calculateDividendTax(20000, 5000);
+
+        expect(result.allowanceUsed).toBe(7570 + 500); // Unused PA + dividend allowance
+        expect(result.taxableDividends).toBe(11930);
+        expect(result.dividendTax).toBeCloseTo(1043.88, 1);
       });
 
       it('should round to pence correctly', () => {
