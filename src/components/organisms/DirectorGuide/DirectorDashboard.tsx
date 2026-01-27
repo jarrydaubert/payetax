@@ -32,6 +32,7 @@ export function DirectorDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [inputsCollapsed, setInputsCollapsed] = useState(false);
   const [educationCollapsed, setEducationCollapsed] = useState(false);
+  const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
 
   const { showResults, hasOtherIncome } = useDirectorGuideStore();
   const results = useDirectorResults();
@@ -157,6 +158,8 @@ export function DirectorDashboard() {
         educationCollapsed={educationCollapsed}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
+        mobileInputsOpen={mobileInputsOpen}
+        onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
       />
 
       {/* Other Income Gate - shown before results */}
