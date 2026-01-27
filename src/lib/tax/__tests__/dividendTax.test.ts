@@ -199,22 +199,53 @@ describe('Dividend Tax Calculator', () => {
       });
     });
 
-    describe('Director scenario (golden example)', () => {
-      it('should calculate correctly for typical director extraction', () => {
+    describe('Director scenario (golden examples)', () => {
+      it('should calculate correctly for typical Optimal Mix (£12,570 salary + dividends)', () => {
         // Director with £12,570 salary and £52,000 dividends
-        // This is the common "take PA as salary, rest as dividends" scenario
+        // PA fully used by salary, so only dividend allowance applies
         const result = calculateDividendTax(52000, 12570);
 
         // Expected breakdown:
-        // - £500 at 0% (allowance)
-        // - £37,200 at 8.75% (basic band: £50,270 - £12,570 = £37,700, minus £500 allowance)
-        // - £14,300 at 33.75% (higher band: £52,000 - £500 - £37,200)
+        // - £500 at 0% (dividend allowance)
+        // - £37,200 at 8.75% (basic band: £50,270 - £12,570 - £500 = £37,200)
+        // - £14,300 at 33.75% (higher band: £52,000 - £500 - £37,200 = £14,300)
+        // Total: £3,255 + £4,826.25 = £8,081.25
         expect(result.allowanceUsed).toBe(500);
-        expect(result.dividendTax).toBeGreaterThan(0);
+        expect(result.taxableDividends).toBe(51500);
+        expect(result.dividendTax).toBeCloseTo(8081.25, 1);
+      });
 
-        // Effective rate should be between basic and higher rates
-        expect(result.effectiveRate).toBeGreaterThan(0.05);
-        expect(result.effectiveRate).toBeLessThan(0.2);
+      it('should calculate correctly for All Dividends strategy (£0 salary)', () => {
+        // "All Dividends" strategy: £77,250 dividends, no salary
+        // This is the critical test - PA MUST shelter dividends
+        const result = calculateDividendTax(77250, 0);
+
+        // Expected breakdown:
+        // - £12,570 sheltered by unused PA (0% tax)
+        // - £500 dividend allowance (0% tax)
+        // - Taxable: £77,250 - £12,570 - £500 = £64,180
+        // - £37,200 at 8.75% (basic band) = £3,255
+        // - £26,980 at 33.75% (higher band) = £9,105.75
+        // Total: £12,360.75
+        expect(result.allowanceUsed).toBe(12570 + 500); // PA + dividend allowance
+        expect(result.taxableDividends).toBe(64180);
+        expect(result.dividendTax).toBeCloseTo(12360.75, 1);
+
+        // Take-home should be ~£64,889
+        const takeHome = 77250 - result.dividendTax;
+        expect(takeHome).toBeCloseTo(64889.25, 0);
+      });
+
+      it('should calculate correctly for high dividends with PA taper warning', () => {
+        // £150,000 dividends with no salary - PA still applies but dividends hit additional rate
+        const result = calculateDividendTax(150000, 0);
+
+        // PA (£12,570) + dividend allowance (£500) = £13,070 tax-free
+        // Taxable: £136,930
+        // Additional rate band should be hit (income > £125,140)
+        const additionalBand = result.bandBreakdown.find((b) => b.band === 'additional');
+        expect(additionalBand).toBeDefined();
+        expect(result.dividendTax).toBeGreaterThan(30000);
       });
     });
   });
