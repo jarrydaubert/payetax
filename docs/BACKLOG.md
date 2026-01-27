@@ -24,12 +24,32 @@
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
 
-## Embed Widget
+## Tools Directory Audit
 
+### Missing Tools Index
+- No `/tools/page.tsx` index page exists - users can't browse all tools
+- Create index page listing all available tools
+
+### Orphaned Tools (in sitemap but no navigation)
+- `/tools/marriage-allowance-calculator` - no links to it
+- `/tools/national-insurance-calculator` - no links to it
+- `/tools/embed-widget` - only link is from disabled `/pricing/business`
+
+### Footer Links
+- Currently only links to: tax-code-decoder, scottish-tax-calculator
+- Consider adding "More Tools" section or linking remaining tools
+
+### Director Guide SEO
+- `/tools/director-guide` not in sitemap - decide if it should be (full-screen app)
+
+### MarriageAllowanceAlert Component
+- Links to gov.uk instead of internal `/tools/marriage-allowance-calculator`
+- Consider linking to internal tool instead
+
+### Embed Widget
 - Two routes exist and work together:
   - `/embed` - The actual embeddable calculator (iframe content, noindex)
   - `/tools/embed-widget` - Marketing page with embed code generator
-- `/tools/embed-widget` is orphaned (only link is from disabled `/pricing/business`)
 - Decision needed: add link elsewhere (footer, /tools page) or remove both if not launching soon
 
 ## Director Guide - Post-Review Backlog
