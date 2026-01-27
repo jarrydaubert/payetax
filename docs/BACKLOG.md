@@ -33,7 +33,7 @@
 ### Orphaned Tools (in sitemap but no navigation)
 - `/tools/marriage-allowance-calculator` - no links to it
 - `/tools/national-insurance-calculator` - no links to it
-- `/tools/embed-widget` - only link is from disabled `/pricing/business`
+- `/tools/embed-widget` - no links to it
 
 ### Footer Links
 - Currently only links to: tax-code-decoder, scottish-tax-calculator
