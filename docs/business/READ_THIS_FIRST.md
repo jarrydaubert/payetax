@@ -70,14 +70,13 @@ Most features are vitamins. Nice to have. Users might engage, might not.
 
 The market pays for **painkillers**.
 
-| Vitamin (Current) | Painkiller (Build This) |
-|-------------------|-------------------------|
+| Vitamin | Painkiller |
+|---------|------------|
 | "Calculate your tax" | "Save £8,000 on your director compensation" |
-| Free calculator for everyone | £100k tax trap escape tool |
-| Generic tax code decoder | SME Director Optimizer that saves real money |
+| Free calculator for everyone | Tool that solves expensive problems |
+| Generic information | Specific, actionable guidance that saves real money |
 
-**PayeTax for individuals = vitamin** (nice, free, SEO-driven)
-**PayeTax Pro for directors = painkiller** (saves thousands, worth paying for)
+**Free tools drive traffic. Painkillers drive revenue.**
 
 The free calculator stays free. But the money comes from solving expensive problems for people who will pay.
 
@@ -137,15 +136,11 @@ The SME Director is the avatar. One person. One problem. One solution.
 
 > If you're charging too little, you can't afford customer acquisition.
 
-Current monetization: **disabled**.
+If your Stripe dashboard shows £0, you're not monetizing.
 
-Accountant referral CTA: **commented out**.
-B2B pricing page: **returns 404**.
-Affiliate links: **no active partners**.
+A tool that saves users £8,000/year could charge £19/month. That's a 420x ROI for the customer.
 
-Meanwhile, the SME Director Optimizer could charge £19/month and save users £8,000/year. That's a 420x ROI for the customer.
-
-**Raise prices. Enable monetization. Stop leaving money on the table.**
+**Find ways to capture value. Stop leaving money on the table.**
 
 ---
 
@@ -200,37 +195,21 @@ Monthly:
 
 ---
 
-## Enable Monetization TODAY
+## Enable Monetization
 
-### Step 1: Accountant Referral CTA (1 hour)
+### Accountant Referrals
 
-File: `src/components/organisms/CalculatorContainer.tsx`
+Complex cases need accountants. When users hit triggers (high profit, other income, DLA warnings), show them a path to professional help.
 
-1. Uncomment the import
-2. Uncomment the JSX block
-3. Set `REFERRAL_PARTNER_EMAIL` env var
-4. Deploy
+Even without a partner yet, build the habit of thinking about monetization.
 
-High-income users (£75k+) will see contextual CTAs. Even without a partner, you're building the habit and collecting data.
+### Pre-sell Before You Build
 
-### Step 2: B2B Pricing Page (30 min)
+Before building any paid feature:
 
-File: `src/app/pricing/business/page.tsx`
-
-1. Remove `notFound()` call
-2. Uncomment metadata and component
-3. Deploy
-
-The page exists. Make it live.
-
-### Step 3: Pre-sell SME Director Tools
-
-Before building the full SME Optimizer:
-
-1. Create landing page: `/tools/director-optimizer`
-2. Explain the value (save £8k+ annually)
-3. Collect emails: "Get early access"
-4. **If nobody signs up, you've learned something important.**
+1. Create a landing page explaining the value
+2. Collect emails: "Get early access"
+3. **If nobody signs up, you've learned something important.**
 
 > If nobody will pay for your product before it exists, that tells you something about whether they'll pay after it exists.
 
@@ -310,8 +289,8 @@ You don't need permission. You need to start.
 
 | Document | Purpose |
 |----------|---------|
-| [MONETIZATION.md](./MONETIZATION.md) | Revenue streams, implementation details |
-| [SME_DIRECTOR_TOOLS.md](./SME_DIRECTOR_TOOLS.md) | Full product spec |
+| [MONETIZATION.md](./MONETIZATION.md) | Revenue strategy |
+| [DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md) | Current product direction |
 | [IDEAS.md](./IDEAS.md) | Feature backlog (build AFTER revenue) |
 
 ---
