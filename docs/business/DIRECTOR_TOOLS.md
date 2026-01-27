@@ -270,12 +270,13 @@ They'll share this because:
 
 ---
 
-## What Happens to the Existing Docs?
+## Related Docs
 
-| Document | Status |
+| Document | Purpose |
 |----------|--------|
-| `DIRECTOR_TOOLS_IMPLEMENTATION.md` | **Keep.** Math and calculation logic still valid. Reframe the UX around education. |
-| `SME_DIRECTOR_TOOLS_STRATEGY.md` | **Superseded.** Widget/B2B strategy on hold. This document is the new direction. |
+| `DIRECTOR_TOOLS_BUILD.md` | Build spec - how to implement the guide |
+| `DIRECTOR_TOOLS_MATH.md` | Tax calculation reference and formulas |
+| `ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md` | Historical - original pitch before pivot |
 
 ---
 

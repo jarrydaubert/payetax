@@ -244,5 +244,6 @@ No demand signal = don't build it yet.
 | Document | Purpose |
 |----------|---------|
 | `DIRECTOR_TOOLS.md` | Product strategy (education-first) |
-| `DIRECTOR_TOOLS_IMPLEMENTATION.md` | Technical spec |
+| `DIRECTOR_TOOLS_BUILD.md` | Build spec and UX |
+| `DIRECTOR_TOOLS_MATH.md` | Tax calculation reference |
 | `READ_THIS_FIRST.md` | The mantra |
