@@ -274,8 +274,8 @@ They'll share this because:
 
 | Document | Purpose |
 |----------|--------|
-| `DIRECTOR_TOOLS_BUILD.md` | Build spec - how to implement the guide |
-| `DIRECTOR_TOOLS_MATH.md` | Tax calculation reference and formulas |
+| `DIRECTOR_GUIDE_BUILD.md` | Build spec - how to implement the guide |
+| `DIRECTOR_TAX_MATH.md` | Tax calculation reference and formulas |
 | `ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md` | Historical - original pitch before pivot |
 
 ---

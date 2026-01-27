@@ -1,8 +1,8 @@
 # Director Tools - Build Spec v3.2
 
 > **Purpose:** How to build the "How Much Can I Pay Myself?" guide
-> **For tax calculations:** See `DIRECTOR_TOOLS_MATH.md`
-> **For product strategy:** See `DIRECTOR_TOOLS.md`
+> **For tax calculations:** See `DIRECTOR_TAX_MATH.md`
+> **For product strategy:** See `DIRECTOR_GUIDE_STRATEGY.md`
 > **Last Updated:** January 2026
 > **Status:** ✅ ALL 4 REVIEWERS APPROVED - Ready to code
 

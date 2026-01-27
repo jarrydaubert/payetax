@@ -290,7 +290,7 @@ You don't need permission. You need to start.
 | Document | Purpose |
 |----------|---------|
 | [MONETIZATION.md](./MONETIZATION.md) | Revenue strategy |
-| [DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md) | Current product direction |
+| [DIRECTOR_GUIDE_STRATEGY.md](./DIRECTOR_GUIDE_STRATEGY.md) | Current product direction |
 | [IDEAS.md](./IDEAS.md) | Feature backlog (build AFTER revenue) |
 
 ---

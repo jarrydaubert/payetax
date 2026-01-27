@@ -17,9 +17,9 @@
 | Doc | Purpose | When to Read |
 |-----|---------|--------------|
 | **[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** | The mantra | Before anything |
-| **[DIRECTOR_TOOLS.md](./DIRECTOR_TOOLS.md)** | WHAT + WHY (strategy, reviews) | Understanding the product |
-| **[DIRECTOR_TOOLS_BUILD.md](./DIRECTOR_TOOLS_BUILD.md)** | HOW (routes, components, UX) | When building |
-| **[DIRECTOR_TOOLS_MATH.md](./DIRECTOR_TOOLS_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
+| **[DIRECTOR_GUIDE_STRATEGY.md](./DIRECTOR_GUIDE_STRATEGY.md)** | WHAT + WHY (strategy, reviews) | Understanding the product |
+| **[DIRECTOR_GUIDE_BUILD.md](./DIRECTOR_GUIDE_BUILD.md)** | HOW (routes, components, UX) | When building |
+| **[DIRECTOR_TAX_MATH.md](./DIRECTOR_TAX_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
 | **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
 | **[IDEAS.md](./IDEAS.md)** | Future features | After revenue exists |
 

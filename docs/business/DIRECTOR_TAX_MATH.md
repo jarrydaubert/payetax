@@ -1,8 +1,8 @@
 # Director Tools - Tax Calculation Reference
 
 > **Purpose:** Pure tax calculation logic, rates, and verified examples.
-> **For UX/build specs:** See `DIRECTOR_TOOLS_BUILD.md`
-> **For product strategy:** See `DIRECTOR_TOOLS.md`
+> **For UX/build specs:** See `DIRECTOR_GUIDE_BUILD.md`
+> **For product strategy:** See `DIRECTOR_GUIDE_STRATEGY.md`
 
 ---
 

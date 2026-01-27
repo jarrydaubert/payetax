@@ -58,7 +58,7 @@
 
 ## Director Guide - Consumer Version Features
 
-> Features from DIRECTOR_TOOLS.md spec for the consumer-facing guide (education-first)
+> Features from DIRECTOR_GUIDE_STRATEGY.md spec for the consumer-facing guide (education-first)
 
 ### Core Consumer UX (P0)
 - Entry choice routing: "I'm new — explain and keep it simple" vs "I know the basics — go straight to the calculator"
