@@ -24,6 +24,12 @@
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
 
+## Embed Widget
+
+- `/tools/embed-widget` page exists but is orphaned (only link is from disabled `/pricing/business`)
+- Either add link elsewhere (footer, /tools page) or remove if not launching soon
+- `/embed` route works but undiscoverable
+
 ## Director Guide - Post-Review Backlog
 
 > Items identified during 3-reviewer (Grok/Claude/ChatGPT) feedback process
