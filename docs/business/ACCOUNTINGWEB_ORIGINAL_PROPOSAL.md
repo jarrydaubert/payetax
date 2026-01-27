@@ -4,6 +4,8 @@
 > **Prepared By:** PayeTax Development Team
 > **Date:** October 2025
 > **Status:** Submitted, no response received
+>
+> **Context:** This proposal came out of an initial meeting with AccountingWeb. They were positive about the director tools concept and thought it would be valuable for their audience. This document captures the original pitch before we pivoted to the simpler "First-Time Director's Guide" approach (see `DIRECTOR_TOOLS.md` for current direction).
 
 ---
 
