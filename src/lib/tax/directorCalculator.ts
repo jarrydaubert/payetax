@@ -213,7 +213,12 @@ export function calculateDirectorScenario(
   const companyTaxPot = roundToPence(corporationTax + employerNI);
 
   // Step 12: Calculate personal tax savings (with POA if applicable)
-  const includesPOA = dividendTax > POA_THRESHOLD;
+  // POA applies when total Self Assessment tax liability > £1,000
+  // Total SA liability = income tax (not paid via PAYE) + dividend tax
+  // For our model: salary ≤ PA so income tax = £0, SA liability ≈ dividend tax
+  // Note: POA doesn't apply if ≥80% of total tax was already collected via PAYE
+  const selfAssessmentLiability = dividendTax; // Income tax on PA salary = £0
+  const includesPOA = selfAssessmentLiability > POA_THRESHOLD;
   const personalTaxAnnual = includesPOA ? roundToPence(dividendTax * POA_MULTIPLIER) : dividendTax;
   const personalTaxMonthly = roundToPence(personalTaxAnnual / 12);
 

@@ -136,18 +136,31 @@ export function calculateDividendTax(
   const safeOtherIncome = Number.isFinite(otherIncome) ? otherIncome : 0;
 
   const rates = TAX_RATES[taxYear];
-  const personalAllowance = rates.personalAllowance;
+  const basePersonalAllowance = rates.personalAllowance;
+  const taperThreshold = rates.personalAllowanceReductionThreshold; // £100,000
+  const taperRate = rates.personalAllowanceReductionRate; // 0.5 (£1 per £2)
+
+  // Calculate Personal Allowance with taper for high earners
+  // PA reduces by £1 for every £2 over £100k, hitting zero at £125,140
+  // Total income for taper = other income + dividends
+  const totalIncome = safeOtherIncome + dividends;
+  let personalAllowance = basePersonalAllowance;
+  if (totalIncome > taperThreshold) {
+    const reduction = Math.floor((totalIncome - taperThreshold) * taperRate);
+    personalAllowance = Math.max(0, basePersonalAllowance - reduction);
+  }
 
   // Get band thresholds (with fallbacks for safety)
-  // Basic rate band ends at PA + basic rate threshold
-  const basicBandEnd = personalAllowance + (rates.bands[0]?.threshold ?? 37700);
-  // Higher rate band ends at PA + higher rate threshold
-  const higherBandEnd = personalAllowance + (rates.bands[1]?.threshold ?? 125140);
+  // Note: Band thresholds are based on BASE PA position, not tapered
+  // Basic rate band ends at base PA + basic rate threshold
+  const basicBandEnd = basePersonalAllowance + (rates.bands[0]?.threshold ?? 37700);
+  // Higher rate band ends at base PA + higher rate threshold
+  const higherBandEnd = basePersonalAllowance + (rates.bands[1]?.threshold ?? 125140);
 
   const { ALLOWANCE, BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
 
   // Step 1: Calculate unused Personal Allowance that can shelter dividends
-  // If other income < PA, the unused portion shelters dividends at 0% tax
+  // If other income < tapered PA, the unused portion shelters dividends at 0% tax
   const unusedPA = Math.max(0, personalAllowance - safeOtherIncome);
   const dividendsSheltered = Math.min(dividends, unusedPA);
   const dividendsAfterPA = dividends - dividendsSheltered;

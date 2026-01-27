@@ -28,6 +28,13 @@
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
 
+### Director Calculator Refactoring
+- Extract strategy table component from DirectorCalculatorClient.tsx
+- Extract Two Pots component
+- Extract Key Dates component
+- Extract Warnings component
+- Extract Assumptions component
+
 ## Tools Directory Audit
 
 ### Missing Tools Index

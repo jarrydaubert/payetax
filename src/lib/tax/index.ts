@@ -62,3 +62,22 @@ export {
   getEmployerNIRate,
   getEmployerNIThreshold,
 } from './employerNI';
+// Student Loan
+export {
+  getStudentLoanPlanName,
+  getStudentLoanRate,
+  getStudentLoanRepayment,
+  getStudentLoanThreshold,
+  type StudentLoanResult,
+} from './studentLoan';
+// Company Car BIK
+export {
+  BIK_RATES_2025_26,
+  type BIKCategory,
+  calculateCompanyCarBIK,
+  CAR_EXAMPLES,
+  type CompanyCarBIKInput,
+  type CompanyCarBIKResult,
+  getBIKCategoryName,
+  getBIKRate,
+} from './companyCarBIK';

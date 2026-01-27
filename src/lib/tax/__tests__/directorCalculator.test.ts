@@ -199,7 +199,7 @@ describe('Director Calculator', () => {
         // Returns 'normal' mode with actionable numbers, but includes MODIFIED_SURVIVAL warning
         expect(result.mode).toBe('normal');
         expect(isNormalMode(result)).toBe(true);
-        expect(result.warnings.some(w => w.type === 'MODIFIED_SURVIVAL')).toBe(true);
+        expect(result.warnings.some((w) => w.type === 'MODIFIED_SURVIVAL')).toBe(true);
       });
 
       it('should return maxPossibleSalary in survival mode', () => {

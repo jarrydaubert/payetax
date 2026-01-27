@@ -349,13 +349,13 @@ export const TAX_RATES: Record<
       lowerEarningsLimit: 6500, // £125/week × 52 = £6,500/year (increased from £6,396)
     },
     studentLoan: {
-      // Updated thresholds for 2025-2026 (9% increase from frozen rates)
-      // Source: https://www.gov.uk/repaying-your-student-loan
-      plan1: { threshold: 26065, rate: 9 }, // Updated from £22,015
-      plan2: { threshold: 28470, rate: 9 }, // Updated from £27,295
-      plan4: { threshold: 31395, rate: 9 }, // Updated from £27,660
-      plan5: { threshold: 25000, rate: 9 }, // Unchanged
-      postgrad: { threshold: 21000, rate: 6 }, // Unchanged
+      // Updated thresholds for 2025-2026
+      // Source: https://www.gov.uk/repaying-your-student-loan/what-you-pay
+      plan1: { threshold: 26065, rate: 9 },
+      plan2: { threshold: 28470, rate: 9 },
+      plan4: { threshold: 32745, rate: 9 }, // Fixed: was £31,395 (2024/25)
+      plan5: { threshold: 25000, rate: 9 },
+      postgrad: { threshold: 21000, rate: 6 },
     },
   },
 };

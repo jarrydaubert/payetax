@@ -236,16 +236,56 @@ describe('Dividend Tax Calculator', () => {
         expect(takeHome).toBeCloseTo(64889.25, 0);
       });
 
-      it('should calculate correctly for high dividends with PA taper warning', () => {
-        // £150,000 dividends with no salary - PA still applies but dividends hit additional rate
+      it('should apply PA taper for high income (£100k+ total)', () => {
+        // £110,000 dividends with £0 salary
+        // Total income = £110,000 (over £100k threshold)
+        // PA taper: (£110,000 - £100,000) × 0.5 = £5,000 reduction
+        // Tapered PA: £12,570 - £5,000 = £7,570
+        const result = calculateDividendTax(110000, 0);
+
+        // With tapered PA:
+        // - £7,570 sheltered by reduced PA
+        // - £500 dividend allowance
+        // - Taxable: £110,000 - £7,570 - £500 = £101,930
+        expect(result.allowanceUsed).toBe(7570 + 500);
+        expect(result.taxableDividends).toBe(101930);
+
+        // Higher rate band should be hit
+        const higherBand = result.bandBreakdown.find((b) => b.band === 'higher');
+        expect(higherBand).toBeDefined();
+      });
+
+      it('should fully taper PA at £125,140+ total income', () => {
+        // £150,000 dividends with £0 salary
+        // Total income = £150,000 (well over £125,140)
+        // PA taper: (£150,000 - £100,000) × 0.5 = £25,000 reduction
+        // Tapered PA: £12,570 - £25,000 = £0 (capped)
         const result = calculateDividendTax(150000, 0);
 
-        // PA (£12,570) + dividend allowance (£500) = £13,070 tax-free
-        // Taxable: £136,930
+        // With PA = £0:
+        // - £0 sheltered by PA
+        // - £500 dividend allowance
+        // - Taxable: £150,000 - £500 = £149,500
+        expect(result.allowanceUsed).toBe(500); // Only dividend allowance, no PA
+        expect(result.taxableDividends).toBe(149500);
+
         // Additional rate band should be hit (income > £125,140)
         const additionalBand = result.bandBreakdown.find((b) => b.band === 'additional');
         expect(additionalBand).toBeDefined();
-        expect(result.dividendTax).toBeGreaterThan(30000);
+        expect(result.dividendTax).toBeGreaterThan(35000);
+      });
+
+      it('should not taper PA when total income below £100k', () => {
+        // £80,000 dividends with £0 salary = £80,000 total (under £100k)
+        // PA should NOT taper
+        const result = calculateDividendTax(80000, 0);
+
+        // Full PA available:
+        // - £12,570 sheltered by PA
+        // - £500 dividend allowance
+        // - Taxable: £80,000 - £12,570 - £500 = £66,930
+        expect(result.allowanceUsed).toBe(12570 + 500);
+        expect(result.taxableDividends).toBe(66930);
       });
     });
   });
