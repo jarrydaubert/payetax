@@ -68,8 +68,39 @@ Compares two salary options, picks highest take-home:
 - **Effective tax rate** — Total tax / gross profit
 - **Two Pots** — Monthly set-aside (Company: CT + Employer NI / Personal: Dividend Tax + SA)
 - **Key dates** — CT payment, CT600 filing, SA deadline (with .ics downloads)
-- **Salary Explorer** — Slider from £0 to £50,270 with live updates
+- **Salary Explorer** — Slider from £0 to £50,270 with live updates (see below)
 - **Email results** — Send calculation to inbox
+
+### Salary Explorer (Interactive Slider)
+
+The slider is both an **optimiser** and a **what-if tool**. Users drag to explore implications live.
+
+**Key Breakpoints (visual markers on slider):**
+
+| Salary | Marker | What Happens |
+|--------|--------|--------------|
+| £0 | — | No payroll, no pension credits |
+| £5,000 | ST | Employer NI starts (but no pension credits yet!) |
+| £6,500 | LEL | State Pension credits secured |
+| £12,570 | PA | Full Personal Allowance used, Employee NI starts |
+| £50,270 | UEL | Employee NI drops to 2% |
+
+**Live Indicators (update as slider moves):**
+
+| Indicator | Display |
+|-----------|---------|
+| Employer NI | £X/year (£X/month) |
+| Employee NI | £X/year |
+| Income Tax | £X/year |
+| State Pension | ✅ Qualifying year / ❌ No credits |
+| Take-home | £X/year (£X/month) |
+
+**Pension Gap Warning (appears when salary £5,001-£6,499):**
+
+> ⚠️ **Inefficient Zone:** You're paying £X Employer NI but earning NO State Pension credits.
+> Slide to £6,500 (+£Y/month) to secure a qualifying year.
+
+This warning appears/disappears live as user drags through the zone.
 
 ---
 
@@ -269,10 +300,32 @@ Compares two salary options, picks highest take-home:
 | Profit ≤£12,570 | "Survival mode" — limited strategy options | ✅ Implemented |
 | Taken > take-home | Overdrawn warning | ✅ Implemented |
 | Sole director + EA claimed | Employment Allowance not available | ✅ Implemented (tooltip) |
+| **Salary £5k-£6.5k** | **Pension Gap: Paying NI for zero benefit** | 🔧 **Add Now** |
 | Total income £60k-£80k | HICBC clawback zone | ❌ Phase 4 |
 | Pension contribution >£60k | Annual Allowance exceeded | ❌ Phase 4 |
 | Dividends > retained profit | Illegal dividend | ❌ Phase 4 |
 | Associated companies exist | CT thresholds divided | ❌ Phase 4 |
+
+### Pension Gap Warning (Priority)
+
+**The Problem:** Salaries between £5,000 and £6,500 are the WORST zone:
+- Above £5,000 = paying Employer NI (15%)
+- Below £6,500 = NO State Pension credits
+
+**Real Example:** Director paying £5,845 salary:
+- Employer NI paid: £127/year
+- State Pension credits: NONE
+- **Paying tax for zero benefit**
+
+**The Fix:** Increase to £6,500:
+- Extra cost: £98/year (£8/month)
+- Result: Qualifying year secured
+
+**Warning Text:**
+> ⚠️ **Inefficient Zone:** You're paying £X Employer NI but earning NO State Pension credits.
+> Increase salary to £6,500 (+£Y/month) to secure a qualifying year.
+
+**Note:** Do NOT monetize pension value (e.g., "worth £342/year"). Just say "secures qualifying year" — future pension depends on total NI record.
 
 ---
 
@@ -313,7 +366,9 @@ Based on company year-end month:
 
 ## Future Features
 
-### Phase 3: Spouse Modelling
+### Phase 3: Spouse Modelling + Variable Income
+
+**Spouse Modelling:**
 - Spouse shareholder toggle (Solo / With Spouse)
 - Spouse other income input
 - Spouse student loan selection
@@ -322,13 +377,51 @@ Based on company year-end month:
 - Settlements legislation warning (unmarried partners)
 - Arctic Systems case note for salary payments
 
+**Variable Income Mode (for commission-based directors):**
+
+For recruiters, sales, freelancers — anyone with "feast or famine" income.
+
+**The Problem:** Standard "optimal extraction" assumes known annual revenue. Commission-based directors need cash buffer for bad months, making aggressive extraction risky.
+
+**New Inputs:**
+
+| Input | Type | Notes |
+|-------|------|-------|
+| Cash in company bank | Currency | NOT retained earnings — actual bank balance |
+| Minimum monthly draw | Currency | What you MUST take each month to live |
+| Runway target | Months | How many months buffer you want |
+| Monthly fixed costs | Currency | (Optional) Insurance, software, etc. |
+
+**New Outputs:**
+
+| Output | Description |
+|--------|-------------|
+| Safe salary range | Maintains runway through bad months |
+| NI credits status | "Qualifying year: Yes / No" (not monetized) |
+| Safe vs Optimal card | Compare take-home vs runway trade-off |
+| Cash runway | Months remaining after extraction |
+
+**Constraints & Warnings:**
+- "Dividends require distributable reserves (not verified by this tool)"
+- "Cash runway based on your inputs — confirm with accountant"
+- Checkbox: "Do you already expect full NI record?" (affects pension advice relevance)
+
+**Logic:**
+1. Calculate buffer needed: `runway_target × (min_draw + fixed_costs)`
+2. Compare to cash available
+3. If insufficient: warn and recommend lower extraction
+4. Always recommend at least £6,500 salary if affordable (pension credits)
+
+**Why Phase 3 (not Phase 4):** This is core value for a huge cohort (commission-based directors). Without it, we recommend aggressive extraction that feels wrong to experienced directors — exactly the trust failure we're trying to avoid.
+
+@see `docs/business/CASE_STUDY_RECRUITER.md` for real-world validation.
+
 ### Phase 4: Polish
 - Tax year selector (2024/25 vs 2025/26 vs 2026/27)
 - Visual charts (pie, bar, waterfall)
 - PDF export
 - 2026/27 rates: Plan 5 student loan, dividend tax increase (10.75%/35.75%)
 - HICBC warning (£60k-£80k)
-- £5,000 salary breakpoint on slider
 - Blind Person's Allowance input (adds £3,130)
 - Associated Companies input (divides CT thresholds)
 - £2k unearned income rule for student loans
@@ -385,6 +478,15 @@ Based on company year-end month:
 - [ ] All Dividends calculates correctly
 - [ ] £12,570 salary usually wins over £6,500
 
+### Pension Gap Warning
+- [ ] £5,845 salary: Warning shown (in gap zone)
+- [ ] £5,001 salary: Warning shown (edge case)
+- [ ] £5,000 salary: NO warning (below ST, no NI paid)
+- [ ] £6,500 salary: NO warning (at LEL, pension credits earned)
+- [ ] Warning calculates correct extra cost to fix
+- [ ] Warning disappears when slider leaves gap zone
+- [ ] NI credits indicator: "Yes" at ≥£6,500, "No" below
+
 ### Edge Cases
 - [ ] Zero profit: Appropriate message
 - [ ] Negative profit: Loss handled gracefully
@@ -394,7 +496,9 @@ Based on company year-end month:
 
 ### UI/UX
 - [ ] Slider: Updates all figures live
-- [ ] Slider: Breakpoints at £0, £6,500, £12,570, £50,270
+- [ ] Slider: Breakpoints visible at £0, £5,000, £6,500, £12,570, £50,270
+- [ ] Slider: Pension Gap warning appears/disappears live in £5k-£6.5k zone
+- [ ] Slider: NI credits indicator updates live
 - [ ] Email: Sends with correct data
 - [ ] Key dates: .ics downloads work
 - [ ] Two Pots: Correct monthly amounts
