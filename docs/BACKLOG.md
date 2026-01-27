@@ -108,12 +108,56 @@
 | `src/lib/tax/incomeTax.ts` | High | rUK vs Scotland rates, PA tapering at £100k+ |
 | `src/lib/tax/strategyComparison.ts` | **Critical** | All 3 strategies, verify optimal mix beats others |
 
+### Golden Example Test Improvements
+- Tighten `directorCalculator.test.ts` golden example tolerances (currently ±30%, should be ±£100)
+- Use `toBeCloseTo(expected, -2)` instead of wide `toBeGreaterThan/LessThan` ranges
+
+### Other Income Scenarios (P0)
+- Test: Other income (£30k) consumes basic band → dividends hit higher rate sooner
+- Test: Other income (£105k) triggers PA taper → affects dividend tax + salary tax
+- Test: Scottish vs rUK divergence when salary exceeds PA (Scottish rates differ, dividends same)
+
 ### HMRC Sources for Verification
 - Income Tax: gov.uk/income-tax-rates
 - NI rates: gov.uk/national-insurance-rates-letters  
 - Corporation Tax: gov.uk/corporation-tax-rates
 - Dividend Tax: gov.uk/tax-on-dividends
 - Scottish rates: gov.scot/scottish-income-tax
+
+---
+
+## Other Income Input (P0 - High Impact)
+
+> "Assumes this is your only income" as a footnote is NOT sufficient - can be wrong by thousands
+
+### Consumer Guide - Currently Broken
+- `directorCalculator.ts` uses `confirmedSoleIncome: boolean` flag only
+- Does NOT accept an amount to adjust tax bands
+- **Fix:** Add "Is this your only income?" Yes/No + optional "Roughly how much? £____" field
+- If "No/Not sure" selected, show warning: "Personal tax numbers may be too low"
+- Add helper text: "Redundancy: only amount over £30,000 counts"
+
+### Pro Tool - Already Correct (verify with tests)
+- `strategyComparison.ts` passes `otherIncome` through all calculations ✅
+- UI has `otherIncome` input field ✅
+- Need tests to verify band consumption and PA taper
+
+### Output Positioning (for users with PAYE history)
+- Don't try to net off PAYE withheld in v1.0
+- Label clearly: "If you've had PAYE income, treat this set-aside as a safety buffer"
+
+---
+
+## Validation Schema Improvements
+
+### Schema Consistency Constraints
+- Consider refinement: if `alreadyTaken === 0` then `alreadyTakenViaPayroll` should be `null`
+- Prevents confusing state combinations
+
+### Result Schema Strictness
+- `DirectorResultSchema` monetary outputs are plain `z.number()`
+- Should add `.finite()` and mostly non-negative constraints
+- Currently would accept nonsense like `-999999` for `annualTakeHome`
 
 ---
 
