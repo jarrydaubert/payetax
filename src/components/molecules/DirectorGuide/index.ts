@@ -1,27 +1,13 @@
 // src/components/molecules/DirectorGuide/index.ts
+/**
+ * Director Guide molecules
+ *
+ * Post-merge structure:
+ * - calculator/ - Strategy comparison, slider, breakdowns
+ * - dashboard/ - Layout + EducationPanel
+ * - inputs/ - All input components
+ */
 
-// Dashboard
+export * from './calculator';
 export * from './dashboard';
-
-// Education
-export { WhatAreDividends, WhatIsPayroll, WhyThisSalary } from './education';
-
-// Results
-export {
-  Assumptions,
-  CompanyBox,
-  CopyResults,
-  HowToDoIt,
-  PersonalBox,
-  ResultsSection,
-} from './results';
-
-// Warnings
-export {
-  AlreadyTakenTooMuchWarning,
-  ComplexityWarning,
-  DLAWarning,
-  OtherIncomeWarning,
-  SurvivalMode,
-  VATWarning,
-} from './warnings';
+export * from './inputs';
