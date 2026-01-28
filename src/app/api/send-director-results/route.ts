@@ -181,7 +181,7 @@ function generateDirectorEmailHtml(
 
     <!-- CTA -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://payetax.co.uk/tools/director-calculator" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+      <a href="https://payetax.co.uk/tools/director-guide" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
         Calculate Again
       </a>
     </div>
