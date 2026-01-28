@@ -671,6 +671,42 @@ Users (especially accountants) may want to print docs:
 - Script to find docs not updated in >6 months
 - Alert when `taxRates.ts` changes but docs aren't updated
 
+### Link Verification (verify-docs script)
+
+**Problem:** Manual `lastVerified` updates are error-prone. HMRC moves pages frequently.
+
+**Solution:** Scheduled GitHub Action (monthly) that checks all `<HMRCLink>` URLs:
+
+```yaml
+# .github/workflows/verify-docs.yml
+name: Verify Docs Links
+on:
+  schedule:
+    - cron: '0 9 1 * *'  # 1st of each month
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bun run scripts/verify-docs.ts
+      - uses: actions/github-script@v7
+        if: failure()
+        with:
+          script: |
+            // Create issue with broken links report
+```
+
+**Script behaviour:**
+1. Extracts all `<HMRCLink href="...">` from MDX files
+2. HEAD request each URL (respects rate limits)
+3. If 404/5xx → flags doc as "Needs Verification"
+4. If all links valid → does NOT auto-update `lastVerified` (YMYL requires human review)
+5. Outputs "Docs Health Report" to maintainer
+
+**Important:** This catches broken links, but human verification is still required for content accuracy.
+
 ---
 
 ## Tax Year Versioning Governance
@@ -751,25 +787,44 @@ referencedBy:
 
 ## Field Definition Registry
 
-To prevent docs-to-calculator drift, fields should declare their doc slug at the source:
+To prevent docs-to-calculator drift, fields should declare their doc slug at the source.
+
+### Avoiding the Circular Dependency Trap
+
+**Problem:** If the registry imports heavy dependencies (MDX content, Zod schemas with server-only code), it breaks Client Component boundaries or bloats the bundle.
+
+**Solution:** Split into two files:
 
 ```ts
-// src/lib/fields/registry.ts
-export const FIELD_DEFINITIONS = {
+// src/lib/fields/metadata.ts (Client-Safe - import anywhere)
+export const FIELD_METADATA = {
   salary: {
     id: 'salary',
     label: 'Annual Salary',
     docSlug: 'salary',
+    tooltipExcerpt: 'Gross yearly income before tax...', // Hardcoded for instant render
     calculators: ['paye', 'ni', 'scottish'],
   },
   personalAllowance: {
     id: 'personal-allowance',
     label: 'Personal Allowance',
     docSlug: 'personal-allowance',
+    tooltipExcerpt: 'The amount you can earn tax-free each year.',
     calculators: ['paye', 'decoder'],
   },
   // ...
-} as const satisfies Record<string, FieldDefinition>;
+} as const satisfies Record<string, FieldMetadata>;
+```
+
+```ts
+// src/lib/fields/validation.ts (Server/Action only - never import in Client Components)
+import { z } from 'zod';
+
+export const FIELD_SCHEMAS = {
+  salary: z.number().min(0).max(10_000_000),
+  personalAllowance: z.number().min(0),
+  // ... heavy Zod schemas with transforms, refinements, etc.
+} as const;
 ```
 
 Benefits:
@@ -777,6 +832,7 @@ Benefits:
 - CI can validate all `docSlug` values exist
 - Auto-generate "Related calculators" section in docs
 - Type-safe `<DocLink>` usage
+- **No bundle bloat** - metadata.ts stays tiny (~2KB)
 
 ---
 
@@ -1059,7 +1115,7 @@ For Phase 1 pilot docs, start with these high-traffic candidates:
 
 | Question | Options | Decision |
 |----------|---------|----------|
-| Framework | Fumadocs / Custom MDX / Nextra | TBD |
+| Framework | Fumadocs / Custom MDX / Nextra | **Fumadocs** (confirmed) |
 | Search | Flexsearch / Algolia | Flexsearch (MVP) |
 | Hosting | Same domain / Subdomain | Same (`/docs`) |
 | Content format | MDX / Markdown | MDX |
