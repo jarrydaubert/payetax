@@ -35,8 +35,11 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const showOtherIncomeWarning = formData.otherIncome > 0;
   const showDLAWarning = formData.alreadyTaken > 0 && formData.takenViaPayroll === 'no';
   const showComplexityWarning = hasResults && comparison.grossProfit > 250000;
-  const showOverdrawnWarning =
-    hasResults && formData.alreadyTaken > comparison.strategies.optimalMix.takeHome;
+  // Compare against gross extraction available (salary + dividends), not post-tax takeHome
+  const grossExtraction = hasResults
+    ? comparison.strategies.optimalMix.salary + comparison.strategies.optimalMix.dividends
+    : 0;
+  const showOverdrawnWarning = hasResults && formData.alreadyTaken > grossExtraction;
   const showPensionWarning = formData.pensionContribution > 60000;
   const showStudentLoanWarning = formData.studentLoanPlans.length > 0;
   const showPATaperWarning = totalIncome > 100000 && totalIncome <= 125140;
@@ -52,7 +55,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
         <div className='space-y-3'>
           <LearnCard
             title='Why £12,570 Salary?'
-            description='This is the Personal Allowance - earn below this and pay zero income tax and employee NI. You also get NI credits for State Pension.'
+            description='This is the Personal Allowance - in most cases, earn below this and pay zero income tax and employee NI. You also get NI credits for State Pension.'
           />
           <LearnCard
             title='What Are Dividends?'
@@ -124,8 +127,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
             )}
             {showSelfAssessmentWarning && (
               <WarningCard
-                title='Self Assessment Required'
-                description='Directors taking dividends need to file a Self Assessment. Deadline: 31 Jan.'
+                title='Self Assessment Likely Required'
+                description='Directors taking dividends typically need to file a Self Assessment tax return. Check HMRC criteria. Deadline: 31 Jan.'
               />
             )}
             {showOtherIncomeWarning && (
@@ -136,20 +139,20 @@ export function EducationPanel({ className }: EducationPanelProps) {
             )}
             {showDLAWarning && (
               <WarningCard
-                title="Director's Loan"
-                description="Money taken without payroll may create a Director's Loan with S455 tax implications."
+                title="Possible Director's Loan"
+                description="Money taken without payroll may create a Director's Loan balance depending on how it's treated in your accounts. Check with your accountant."
               />
             )}
             {showPensionWarning && (
               <WarningCard
                 title='Pension Annual Allowance'
-                description='Contributions over £60k may incur tax charges unless you have unused allowance from previous years.'
+                description='Contributions over £60k may incur tax charges. Rules are complex (carry forward, taper for high earners, MPAA). Check with a financial adviser.'
               />
             )}
             {showStudentLoanWarning && (
               <WarningCard
-                title='Student Loan on Dividends'
-                description='Directors pay student loans on TOTAL income (salary + dividends) via Self Assessment, not just salary.'
+                title='Student Loan via Self Assessment'
+                description='Student loan repayments may be calculated on total income (including dividends) via Self Assessment. Rules depend on your circumstances.'
               />
             )}
           </div>
