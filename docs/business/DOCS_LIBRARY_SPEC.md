@@ -675,27 +675,25 @@ Users (especially accountants) may want to print docs:
 
 **Problem:** Manual `lastVerified` updates are error-prone. HMRC moves pages frequently.
 
-**Solution:** Scheduled GitHub Action (monthly) that checks all `<HMRCLink>` URLs:
+**Solution:** Scheduled GitLab CI job (monthly) that checks all `<HMRCLink>` URLs:
 
 ```yaml
-# .github/workflows/verify-docs.yml
-name: Verify Docs Links
-on:
-  schedule:
-    - cron: '0 9 1 * *'  # 1st of each month
-  workflow_dispatch:  # Manual trigger
-
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: bun run scripts/verify-docs.ts
-      - uses: actions/github-script@v7
-        if: failure()
-        with:
-          script: |
-            // Create issue with broken links report
+# .gitlab-ci.yml (add to existing)
+verify-docs:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"  # Monthly schedule
+    - if: $CI_PIPELINE_SOURCE == "web"       # Manual trigger
+  script:
+    - bun run scripts/verify-docs.ts
+  after_script:
+    - |
+      if [ $CI_JOB_STATUS == "failed" ]; then
+        # Create issue via GitLab API with broken links report
+        curl --request POST --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+          "$CI_API_V4_URL/projects/$CI_PROJECT_ID/issues" \
+          --data "title=Docs Link Verification Failed&labels=docs,maintenance"
+      fi
 ```
 
 **Script behaviour:**
