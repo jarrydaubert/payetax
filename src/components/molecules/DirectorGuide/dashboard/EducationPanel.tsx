@@ -45,6 +45,16 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const showPATaperWarning = totalIncome > 100000 && totalIncome <= 125140;
   const showHICBCWarning = totalIncome >= 60000 && totalIncome <= 80000;
 
+  // New P0 warnings from strategy doc
+  const showPayrollWarning = hasResults && comparison.strategies.optimalMix.salary > 0;
+  const personalTax = hasResults
+    ? comparison.strategies.optimalMix.incomeTax +
+      comparison.strategies.optimalMix.dividendTax +
+      comparison.strategies.optimalMix.studentLoan
+    : 0;
+  const showPaymentsOnAccountWarning = personalTax > 1000;
+  const showSurvivalModeWarning = comparison && comparison.grossProfit <= 0;
+
   return (
     <aside className={cn('flex h-full flex-col bg-muted/30 p-6', className)}>
       {/* Learn Section */}
@@ -83,7 +93,10 @@ export function EducationPanel({ className }: EducationPanelProps) {
         showPensionWarning ||
         showStudentLoanWarning ||
         showPATaperWarning ||
-        showHICBCWarning) && (
+        showHICBCWarning ||
+        showPayrollWarning ||
+        showPaymentsOnAccountWarning ||
+        showSurvivalModeWarning) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
             Warnings
@@ -153,6 +166,24 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <WarningCard
                 title='Student Loan via Self Assessment'
                 description='Student loan repayments may be calculated on total income (including dividends) via Self Assessment. Rules depend on your circumstances.'
+              />
+            )}
+            {showPayrollWarning && (
+              <WarningCard
+                title='Payroll Administration Required'
+                description='Taking a salary means running payroll and submitting RTI to HMRC each payday. Consider payroll software or ask your accountant to set this up.'
+              />
+            )}
+            {showPaymentsOnAccountWarning && (
+              <WarningCard
+                title='Payments on Account (Year 2)'
+                description='If your Self Assessment tax exceeds £1,000 and less than 80% is collected at source, HMRC requires payments on account in Jan and Jul. Your second year may have higher cash needs.'
+              />
+            )}
+            {showSurvivalModeWarning && (
+              <WarningCard
+                title='No Profit Yet'
+                description="Without distributable profits, you cannot legally pay dividends. Money taken may be a Director's Loan (must be repaid or face S455 tax). Consider minimal salary only until profitable."
               />
             )}
           </div>
