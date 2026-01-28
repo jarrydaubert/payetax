@@ -2,7 +2,129 @@
 
 > **Goal:** Merge Director Calculator (pro) into Director Guide, following atomic design principles
 > **Created:** January 2026
-> **Status:** PLANNING
+> **Status:** IN PROGRESS
+
+---
+
+## Complete File Inventory (54 files)
+
+### KEEP (unchanged) - 8 files
+
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/app/tools/director-guide/page.tsx` | 110 | Route entry point |
+| `src/lib/tax/directorCalculator.ts` | 350 | Core calculation |
+| `src/lib/tax/strategyComparison.ts` | 522 | Strategy comparison |
+| `src/lib/validation/directorValidation.ts` | 318 | Types/validation |
+| `src/lib/directorGuideAnalytics.ts` | 173 | Analytics tracking |
+| `src/components/molecules/DirectorEmailResultsForm.tsx` | 116 | Email form |
+| `src/lib/tax/__tests__/directorCalculator.test.ts` | ~300 | Tests |
+| `src/lib/tax/__tests__/directorCalculator.caseStudy.test.ts` | ~500 | Tests |
+
+### MODIFY - 6 files
+
+| File | Lines | Changes |
+|------|-------|---------|
+| `src/store/directorGuideStore.ts` | 394 | Add Calculator fields (student loans, pension, BIK, EA, strategy) |
+| `src/components/organisms/DirectorGuide/DirectorDashboard.tsx` | 174 | Remove wizard, use new layout |
+| `src/components/organisms/DirectorGuide/index.ts` | 2 | Update exports |
+| `src/components/molecules/DirectorGuide/dashboard/DashboardLayout.tsx` | 177 | Simplify to 2-panel |
+| `src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx` | 190 | Add strategy-aware content |
+| `src/components/molecules/DirectorGuide/index.ts` | 27 | Update exports |
+
+### DELETE - 28 files
+
+**Route (2 files):**
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/app/tools/director-calculator/page.tsx` | 8 | Merged into Guide |
+| `src/app/tools/director-calculator/DirectorCalculatorClient.tsx` | 2,379 | Broken into molecules |
+
+**Dashboard molecules being replaced (7 files):**
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/components/molecules/DirectorGuide/dashboard/InputsPanel.tsx` | 175 | Replaced by new inputs |
+| `src/components/molecules/DirectorGuide/dashboard/MainContent.tsx` | 115 | Replaced by calculator molecules |
+| `src/components/molecules/DirectorGuide/dashboard/SummaryCards.tsx` | 102 | Replaced by strategy comparison |
+| `src/components/molecules/DirectorGuide/dashboard/DetailCards.tsx` | 208 | Replaced by tax breakdown |
+| `src/components/molecules/DirectorGuide/dashboard/MoneyFlowChart.tsx` | 100 | Not in Calculator |
+| `src/components/molecules/DirectorGuide/dashboard/SidebarNav.tsx` | 117 | Not needed |
+| `src/components/molecules/DirectorGuide/dashboard/OtherIncomeGate.tsx` | 93 | Replaced by numeric input |
+| `src/components/molecules/DirectorGuide/dashboard/index.ts` | 11 | Will be recreated |
+
+**Results molecules (7 files):**
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/components/molecules/DirectorGuide/results/Assumptions.tsx` | ~50 | In EducationPanel |
+| `src/components/molecules/DirectorGuide/results/CompanyBox.tsx` | ~80 | Replaced by tax pots |
+| `src/components/molecules/DirectorGuide/results/PersonalBox.tsx` | ~80 | Replaced by tax pots |
+| `src/components/molecules/DirectorGuide/results/CopyResults.tsx` | ~100 | Not in Calculator |
+| `src/components/molecules/DirectorGuide/results/HowToDoIt.tsx` | ~60 | In EducationPanel |
+| `src/components/molecules/DirectorGuide/results/ResultsSection.tsx` | ~150 | Replaced by strategy |
+| `src/components/molecules/DirectorGuide/results/index.ts` | 7 | Folder deleted |
+
+**Warnings molecules (7 files):**
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/components/molecules/DirectorGuide/warnings/VATWarning.tsx` | 40 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/DLAWarning.tsx` | ~40 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/ComplexityWarning.tsx` | ~40 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/OtherIncomeWarning.tsx` | ~40 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/SurvivalMode.tsx` | 90 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/AlreadyTakenTooMuchWarning.tsx` | ~40 | Inline in Calculator |
+| `src/components/molecules/DirectorGuide/warnings/index.ts` | 7 | Folder deleted |
+
+**Tests for deleted files (13 files):**
+- `src/components/molecules/DirectorGuide/results/__tests__/*.test.tsx` (6 files)
+- `src/components/molecules/DirectorGuide/warnings/__tests__/*.test.tsx` (5 files)
+- `src/store/__tests__/directorGuideStore.test.ts` (1 file - will be rewritten)
+- `src/lib/validation/__tests__/directorValidation.test.ts` (1 file - may need updates)
+
+### CREATE - 14 new files
+
+**New input molecules (7 files):**
+| File | Purpose |
+|------|---------|
+| `src/components/molecules/DirectorGuide/inputs/CoreInputs.tsx` | Revenue, expenses, region, year-end |
+| `src/components/molecules/DirectorGuide/inputs/StudentLoanInputs.tsx` | Plan 1/2/4/Postgrad checkboxes |
+| `src/components/molecules/DirectorGuide/inputs/PensionInput.tsx` | Employer pension contribution |
+| `src/components/molecules/DirectorGuide/inputs/CompanyCarInput.tsx` | BIK value |
+| `src/components/molecules/DirectorGuide/inputs/EmploymentAllowanceInput.tsx` | EA checkbox |
+| `src/components/molecules/DirectorGuide/inputs/AlreadyTakenInputs.tsx` | Already taken + via payroll |
+| `src/components/molecules/DirectorGuide/inputs/index.ts` | Exports |
+
+**New calculator molecules (7 files):**
+| File | Purpose |
+|------|---------|
+| `src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx` | 3-strategy table |
+| `src/components/molecules/DirectorGuide/calculator/SalarySlider.tsx` | Slider with breakpoints |
+| `src/components/molecules/DirectorGuide/calculator/PensionGapWarning.tsx` | NI credits warning |
+| `src/components/molecules/DirectorGuide/calculator/TaxBreakdownTable.tsx` | Detailed breakdown |
+| `src/components/molecules/DirectorGuide/calculator/KeyDates.tsx` | Dates + .ics export |
+| `src/components/molecules/DirectorGuide/calculator/TaxPots.tsx` | Company/Personal pots |
+| `src/components/molecules/DirectorGuide/calculator/index.ts` | Exports |
+
+### KEEP (education) - 4 files
+
+| File | Lines | Reason |
+|------|-------|--------|
+| `src/components/molecules/DirectorGuide/education/WhyThisSalary.tsx` | ~80 | Educational content |
+| `src/components/molecules/DirectorGuide/education/WhatAreDividends.tsx` | ~60 | Educational content |
+| `src/components/molecules/DirectorGuide/education/WhatIsPayroll.tsx` | ~60 | Educational content |
+| `src/components/molecules/DirectorGuide/education/index.ts` | 4 | Exports |
+| + 3 test files | ~160 | Keep tests |
+
+---
+
+## Summary
+
+| Action | Files | Lines |
+|--------|-------|-------|
+| KEEP | 12 | ~2,200 |
+| MODIFY | 6 | ~970 |
+| DELETE | 28 | ~4,400 |
+| CREATE | 14 | ~2,000 (estimated) |
+| **Net** | **4 fewer files** | **~800 fewer lines** |
 
 ---
 
