@@ -1,11 +1,10 @@
 // src/components/molecules/DirectorGuide/dashboard/index.ts
+/**
+ * Dashboard molecules for Director Guide
+ *
+ * Post-merge: Only DashboardLayout and EducationPanel remain.
+ * Other components replaced by calculator/ and inputs/ molecules.
+ */
 
 export { DashboardLayout } from './DashboardLayout';
-export { DetailCards } from './DetailCards';
 export { EducationPanel } from './EducationPanel';
-export { InputsPanel } from './InputsPanel';
-export { MainContent } from './MainContent';
-export { MoneyFlowChart } from './MoneyFlowChart';
-export { OtherIncomeGate } from './OtherIncomeGate';
-export { SidebarNav } from './SidebarNav';
-export { SummaryCards } from './SummaryCards';

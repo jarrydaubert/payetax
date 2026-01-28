@@ -1,43 +1,49 @@
 // src/components/organisms/DirectorGuide/DirectorDashboard.tsx
-'use client';
-
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  DashboardLayout,
-  EducationPanel,
-  InputsPanel,
-  MainContent,
-  OtherIncomeGate,
-  SidebarNav,
-} from '@/components/molecules/DirectorGuide/dashboard';
-import { trackGuideStarted, trackResultsShown } from '@/lib/directorGuideAnalytics';
-import { isNormalMode } from '@/lib/validation/directorValidation';
-import {
-  useDirectorFormData,
-  useDirectorGuideActions,
-  useDirectorGuideStore,
-  useDirectorResults,
-} from '@/store/directorGuideStore';
-
-type ViewState = 'empty' | 'populated';
-
 /**
  * Director Dashboard - Main orchestrator component
  *
- * Handles the flow: empty → other income gate → populated dashboard
+ * Post-merge: Single-page calculator with all inputs visible.
+ * No wizard, no gates - direct calculation on input change.
  */
-export function DirectorDashboard() {
-  const [viewState, setViewState] = useState<ViewState>('empty');
-  const [showOtherIncomeGate, setShowOtherIncomeGate] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [inputsCollapsed, setInputsCollapsed] = useState(false);
-  const [educationCollapsed, setEducationCollapsed] = useState(false);
-  const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
+'use client';
 
-  const { showResults, hasOtherIncome } = useDirectorGuideStore();
-  const results = useDirectorResults();
+import { RotateCcw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import {
+  KeyDates,
+  PensionGapWarning,
+  SalarySlider,
+  StrategyComparisonTable,
+  TaxBreakdownTable,
+  TaxPots,
+} from '@/components/molecules/DirectorGuide/calculator';
+import {
+  DashboardLayout,
+  EducationPanel,
+} from '@/components/molecules/DirectorGuide/dashboard';
+import {
+  AlreadyTakenInputs,
+  CompanyCarInput,
+  CoreInputs,
+  EmploymentAllowanceInput,
+  OtherIncomeInput,
+  PensionInput,
+  StudentLoanInputs,
+} from '@/components/molecules/DirectorGuide/inputs';
+import { trackGuideReset, trackGuideStarted, trackResultsShown } from '@/lib/directorGuideAnalytics';
+import {
+  useDirectorFormData,
+  useDirectorGuideActions,
+  useStrategyComparison,
+} from '@/store/directorGuideStore';
+
+export function DirectorDashboard() {
+  const [educationCollapsed, setEducationCollapsed] = useState(true); // Collapsed on mobile by default
   const formData = useDirectorFormData();
-  const { calculate, setHasOtherIncome } = useDirectorGuideActions();
+  const comparison = useStrategyComparison();
+  const { calculate, reset } = useDirectorGuideActions();
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
@@ -50,124 +56,131 @@ export function DirectorDashboard() {
     }
   }, []);
 
-  // Track results shown
+  // Auto-calculate when inputs change (debounced via store)
   useEffect(() => {
-    if (showResults && results && !hasTrackedResults.current) {
-      const mode = isNormalMode(results) ? results.mode : 'survival';
-      trackResultsShown(isNormalMode(results) ? results.grossProfit : 0, mode);
+    const canCalculate =
+      formData.region !== undefined &&
+      formData.revenue !== undefined &&
+      formData.revenue >= 0 &&
+      formData.expenses !== undefined &&
+      formData.expenses >= 0;
+
+    if (canCalculate) {
+      calculate();
+    }
+  }, [
+    formData.region,
+    formData.revenue,
+    formData.includesVat,
+    formData.expenses,
+    formData.alreadyTaken,
+    formData.takenViaPayroll,
+    formData.otherIncome,
+    formData.studentLoanPlans,
+    formData.pensionContribution,
+    formData.companyCarBIK,
+    formData.hasEmploymentAllowance,
+    calculate,
+  ]);
+
+  // Track results shown (once per session)
+  useEffect(() => {
+    if (comparison && comparison.grossProfit > 0 && !hasTrackedResults.current) {
+      trackResultsShown(comparison.grossProfit, 'normal');
       hasTrackedResults.current = true;
     }
-  }, [showResults, results]);
+  }, [comparison]);
 
-  // Sync view state with store
-  useEffect(() => {
-    if (showResults && results) {
-      setViewState('populated');
-    }
-  }, [showResults, results]);
+  // Handle reset
+  const handleReset = useCallback(() => {
+    trackGuideReset();
+    hasTrackedResults.current = false;
+    reset();
+  }, [reset]);
 
-  // Check if we can calculate
-  // Allow revenue >= 0 for survival mode, require expenses >= 0
-  const canCalculate =
-    formData.region !== undefined &&
-    formData.revenue !== undefined &&
-    formData.revenue >= 0 &&
-    formData.expenses !== undefined &&
-    formData.expenses >= 0;
-
-  // Handle calculate button - show other income gate first
-  const handleCalculate = useCallback(() => {
-    if (!canCalculate) return;
-    setShowOtherIncomeGate(true);
-  }, [canCalculate]);
-
-  // Handle confirming sole income from gate - go directly to results
-  const handleConfirmSoleIncome = useCallback(() => {
-    setHasOtherIncome(false);
-    setShowOtherIncomeGate(false);
-    try {
-      calculate();
-      setViewState('populated');
-    } catch (error) {
-      console.error('Calculation failed:', error);
-      // Stay on current view, user can try again
-    }
-  }, [calculate, setHasOtherIncome]);
-
-  // Handle indicating other income from gate - go directly to results
-  const handleHasOtherIncome = useCallback(() => {
-    setHasOtherIncome(true);
-    setShowOtherIncomeGate(false);
-    try {
-      calculate();
-      setViewState('populated');
-    } catch (error) {
-      console.error('Calculation failed:', error);
-      // Stay on current view, user can try again
-    }
-  }, [calculate, setHasOtherIncome]);
-
-  // Handle recalculate - show gate again to confirm income status
-  const handleRecalculate = useCallback(() => {
-    setShowOtherIncomeGate(true);
-  }, []);
-
-  // Sync local state when store is reset
-  useEffect(() => {
-    const unsubscribe = useDirectorGuideStore.subscribe((state, prevState) => {
-      // Detect reset by checking if we went from having results to not having them
-      if (prevState.showResults && !state.showResults && prevState.results && !state.results) {
-        // Analytics tracking moved to store.reset() action
-        hasTrackedResults.current = false;
-        setViewState('empty');
-        setShowOtherIncomeGate(false);
-      }
-    });
-    return unsubscribe;
-  }, []);
+  const hasResults = comparison && comparison.grossProfit > 0;
 
   return (
-    <>
+    <TooltipProvider>
       <DashboardLayout
-        sidebar={
-          <SidebarNav
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed((prev) => !prev)}
-          />
-        }
-        inputs={<InputsPanel onCalculate={handleCalculate} isCalculateDisabled={!canCalculate} />}
         main={
-          <MainContent
-            result={viewState === 'populated' ? results : null}
-            revenue={formData.revenue}
-            expenses={formData.expenses}
-            onRecalculate={handleRecalculate}
-          />
-        }
-        education={
-          <EducationPanel
-            result={viewState === 'populated' ? results : null}
-            revenue={formData.revenue}
-            region={formData.region}
-            hasOtherIncome={hasOtherIncome ?? undefined}
-            alreadyTaken={formData.alreadyTaken}
-            alreadyTakenViaPayroll={formData.alreadyTakenViaPayroll}
-          />
-        }
-        inputsCollapsed={inputsCollapsed}
-        educationCollapsed={educationCollapsed}
-        onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
-        onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
-        mobileInputsOpen={mobileInputsOpen}
-        onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
-      />
+          <main className='mx-auto max-w-4xl space-y-6 p-4 pb-24 md:p-6 lg:p-8'>
+            {/* Header */}
+            <header className='flex items-center justify-between'>
+              <div>
+                <h1 className='font-bold text-2xl tracking-tight md:text-3xl'>
+                  Director Tax Calculator
+                </h1>
+                <p className='text-muted-foreground'>
+                  Find your optimal salary/dividend split for 2025/26
+                </p>
+              </div>
+              <Button variant='outline' size='sm' onClick={handleReset}>
+                <RotateCcw className='mr-2 size-4' />
+                Reset
+              </Button>
+            </header>
 
-      {/* Other Income Gate - shown before results */}
-      <OtherIncomeGate
-        isOpen={showOtherIncomeGate}
-        onConfirmSoleIncome={handleConfirmSoleIncome}
-        onHasOtherIncome={handleHasOtherIncome}
+            {/* Core Inputs */}
+            <CoreInputs />
+
+            {/* Director Situation */}
+            <section className='space-y-4 rounded-lg border bg-card p-4 md:p-6'>
+              <h2 className='font-semibold text-lg'>Your Situation</h2>
+              <AlreadyTakenInputs />
+              <OtherIncomeInput />
+            </section>
+
+            {/* Advanced Inputs */}
+            <section className='space-y-4 rounded-lg border bg-card p-4 md:p-6'>
+              <h2 className='font-semibold text-lg'>Advanced Options</h2>
+              <div className='grid gap-4 md:grid-cols-2'>
+                <StudentLoanInputs />
+                <PensionInput />
+              </div>
+              <div className='grid gap-4 md:grid-cols-2'>
+                <CompanyCarInput />
+                <EmploymentAllowanceInput />
+              </div>
+            </section>
+
+            {/* Results Section */}
+            {hasResults && (
+              <>
+                {/* Strategy Comparison */}
+                <StrategyComparisonTable />
+
+                {/* Salary Slider */}
+                <SalarySlider />
+
+                {/* NI Credits Warning */}
+                <PensionGapWarning />
+
+                {/* Tax Pots */}
+                <TaxPots />
+
+                {/* Detailed Breakdown */}
+                <TaxBreakdownTable />
+
+                {/* Key Dates */}
+                <KeyDates />
+              </>
+            )}
+
+            {/* Empty State */}
+            {!hasResults && (
+              <div className='rounded-lg border border-dashed bg-muted/30 p-8 text-center'>
+                <p className='text-muted-foreground'>
+                  Enter your revenue, expenses, and region above to see your optimal strategy.
+                </p>
+              </div>
+            )}
+          </main>
+        }
+        education={<EducationPanel />}
+        educationCollapsed={educationCollapsed}
+        onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
       />
-    </>
+    </TooltipProvider>
   );
 }
