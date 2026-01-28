@@ -705,6 +705,53 @@ verify-docs:
 
 **Important:** This catches broken links, but human verification is still required for content accuracy.
 
+### New Content Detection
+
+The script also scans `content/docs/` for files not yet integrated:
+
+```ts
+// scripts/verify-docs.ts (additional checks)
+
+// 1. Find new MDX files missing from manifest
+const allMdxFiles = glob('content/docs/**/*.mdx');
+const manifestSlugs = manifest.map(d => d.slug);
+const newFiles = allMdxFiles.filter(f => !manifestSlugs.includes(slugify(f)));
+
+// 2. Find docs missing excerpts (needed for tooltips)
+const excerpts = JSON.parse(read('content/docs/_excerpts.json'));
+const missingExcerpts = manifestSlugs.filter(s => !excerpts[s]);
+
+// 3. Find docs not referenced by any calculator field
+const fieldRegistry = FIELD_METADATA; // from metadata.ts
+const referencedSlugs = Object.values(fieldRegistry).map(f => f.docSlug);
+const orphanedDocs = manifestSlugs.filter(s => 
+  !referencedSlugs.includes(s) && !isConceptualDoc(s)
+);
+```
+
+**Health Report output:**
+```
+=== Docs Health Report ===
+
+🔴 Broken HMRC Links (2):
+  - /docs/tax/personal-allowance → gov.uk/income-tax-rates (404)
+  - /docs/ni/thresholds → gov.uk/national-insurance (301 redirect)
+
+🟡 New Files Not in Manifest (1):
+  - content/docs/pensions/lifetime-allowance.mdx
+
+🟡 Missing Excerpts (3):
+  - corporation-tax
+  - dividend-tax  
+  - employment-allowance
+
+🟢 Orphaned Docs (not linked from calculators):
+  - how-uk-tax-works (OK - conceptual doc)
+  - glossary (OK - reference doc)
+```
+
+This ensures new docs don't get forgotten - they'll appear in the health report until properly integrated.
+
 ---
 
 ## Tax Year Versioning Governance
