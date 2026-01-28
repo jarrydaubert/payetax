@@ -1,7 +1,7 @@
 // src/components/organisms/SimpleNavbar.tsx
 'use client';
 
-import { Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -10,6 +10,14 @@ import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
+
+const tools = [
+  { href: '/tools/director-guide', label: 'Director Guide', description: 'Salary vs dividend optimizer' },
+  { href: '/tools/tax-code-decoder', label: 'Tax Code Decoder', description: 'Understand your tax code' },
+  { href: '/tools/scottish-tax-calculator', label: 'Scottish Tax', description: '6-band Scottish rates' },
+  { href: '/tools/national-insurance-calculator', label: 'NI Calculator', description: 'National Insurance breakdown' },
+  { href: '/tools/marriage-allowance-calculator', label: 'Marriage Allowance', description: 'Transfer allowance calculator' },
+] as const;
 
 /**
  * Navigation bar with new design system (Cyan/Emerald theme)
@@ -131,7 +139,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className='hidden items-center gap-12 md:flex'>
+        <div className='hidden items-center gap-10 md:flex'>
           {links.map((link) => (
             <Link
               key={link.href}
@@ -142,6 +150,37 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               {link.label}
             </Link>
           ))}
+
+          {/* Tools Dropdown */}
+          <div className='group relative'>
+            <button
+              type='button'
+              className='flex items-center gap-1 font-medium text-[0.85rem] text-text-secondary-new transition-colors duration-300 hover:text-cyan'
+            >
+              Tools
+              <ChevronDown className='size-4 transition-transform duration-200 group-hover:rotate-180' />
+            </button>
+
+            {/* Dropdown Menu */}
+            <div className='pointer-events-none invisible absolute top-full left-1/2 z-50 w-64 -translate-x-1/2 pt-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100'>
+              <div className='overflow-hidden rounded-xl border border-white/10 bg-deep/95 shadow-xl backdrop-blur-xl'>
+                {tools.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className='block px-4 py-3 transition-colors hover:bg-white/5'
+                  >
+                    <span className='block font-medium text-sm text-text-primary-new'>
+                      {tool.label}
+                    </span>
+                    <span className='block text-text-secondary-new text-xs'>
+                      {tool.description}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Desktop Utilities */}
@@ -185,6 +224,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       <NavbarMobileMenu
         isOpen={isMobileMenuOpen}
         links={links}
+        tools={tools}
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => setIsMobileMenuOpen(false)}
