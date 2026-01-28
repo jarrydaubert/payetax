@@ -15,6 +15,11 @@
       "source": "/blog/scottish-vs-english-tax-rates-2025-comparison",
       "destination": "/blog/scottish-vs-english-tax-rates-2026-comparison",
       "permanent": true
+    },
+    {
+      "source": "/tools/director-calculator",
+      "destination": "/tools/director-guide",
+      "permanent": true
     }
   ],
   "headers": [
