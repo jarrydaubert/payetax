@@ -57,6 +57,14 @@ All calculations are performed entirely in your browser with zero data collectio
 - [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy explaining client-side calculations with zero server-side data storage
 - [Compliance](https://payetax.co.uk/compliance): HMRC compliance, tax rate verification, and data sources
 
+## Tools
+
+- [Director Guide](https://payetax.co.uk/tools/director-guide): Salary vs dividend optimizer for UK company directors - compares extraction strategies, calculates optimal split, shows tax savings
+- [Tax Code Decoder](https://payetax.co.uk/tools/tax-code-decoder): Decode and understand your HMRC tax code - explains what each letter and number means
+- [Scottish Tax Calculator](https://payetax.co.uk/tools/scottish-tax-calculator): Dedicated calculator for Scottish 6-band income tax rates
+- [National Insurance Calculator](https://payetax.co.uk/tools/national-insurance-calculator): Calculate NI contributions for employees, employers, and self-employed
+- [Marriage Allowance Calculator](https://payetax.co.uk/tools/marriage-allowance-calculator): Check eligibility and calculate tax savings from transferring allowance to spouse
+
 ## Tax Rates (2025-2026)
 
 **Income Tax (England, Wales, Northern Ireland):**
@@ -79,10 +87,10 @@ All calculations are performed entirely in your browser with zero data collectio
 - Rate £12,570 - £50,270: 12%
 - Rate £50,270+: 2%
 
-**Student Loan Repayment Thresholds:**
-- Plan 1: £24,990 (9%)
-- Plan 2: £27,295 (9%)
-- Plan 4: £31,395 (9%)
+**Student Loan Repayment Thresholds (2025-26):**
+- Plan 1: £26,065 (9%)
+- Plan 2: £28,470 (9%)
+- Plan 4: £32,745 (9%)
 - Plan 5: £25,000 (9%)
 - Postgraduate: £21,000 (6%)
 
