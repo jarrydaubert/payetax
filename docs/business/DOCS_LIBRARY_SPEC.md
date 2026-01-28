@@ -21,7 +21,8 @@ Create a Stripe/Vercel-style documentation library that explains every input and
 - Every input field across all calculators
 - Every output field across all calculators
 - Deduplicated (e.g., "Salary" appears once, not per calculator)
-- No general tax guides outside calculator context
+- Foundational guides that provide context for calculator fields (e.g., "How UK Tax Works" explains concepts referenced across multiple field docs)
+- No standalone tax advice or guides unrelated to calculator functionality
 
 ---
 
@@ -67,13 +68,22 @@ nextra + nextra-theme-docs
 
 **Pros:**
 - Popular, well-documented
-- Great search
+- Great search (Rust-powered Pagefind in v4)
+- Now App Router native (v4 dropped Pages Router)
 
 **Cons:**
-- Pages Router focused (App Router support newer)
-- Heavier
+- Heavier bundle
+- Less customizable than Fumadocs
 
-**Recommendation:** Option A (Fumadocs) - best balance of features and Next.js 16 App Router compatibility.
+### Framework Prerequisites
+
+| Framework | Minimum Requirements | PayeTax Status |
+|-----------|---------------------|----------------|
+| Fumadocs v16 | Next.js 16+, React 19.2+ | ✅ Compatible (16.1.6, 19.2.4) |
+| Nextra v4 | Next.js 15+, App Router | ✅ Compatible |
+| Custom MDX | Any Next.js | ✅ Compatible |
+
+**Recommendation:** Option A (Fumadocs) - best balance of features and Next.js 16 App Router compatibility. Project already meets all prerequisites.
 
 ---
 
@@ -129,8 +139,7 @@ Docs
 │   ├── What is Personal Allowance?
 │   ├── Personal Allowance Taper (£100k+)
 │   ├── Marriage Allowance
-│   ├── Blind Person's Allowance
-│   └── Age-Related Allowances
+│   └── Blind Person's Allowance
 │
 ├── Income Tax
 │   ├── How Income Tax Works
@@ -346,9 +355,11 @@ Each doc follows a consistent structure:
 title: "Personal Allowance"
 description: "The amount you can earn tax-free each year"
 category: "tax"
+taxYear: "2025-26"           # REQUIRED - prevents mixed-year content
 relatedCalculators: ["paye", "director-guide"]
 relatedDocs: ["pa-taper", "marriage-allowance", "income-tax"]
 lastUpdated: "2026-01-28"
+lastVerified: "2026-01-28"   # When HMRC sources were checked
 ---
 
 # Personal Allowance
@@ -653,6 +664,243 @@ Users (especially accountants) may want to print docs:
 - CI check for hardcoded tax values in MDX files
 - Script to find docs not updated in >6 months
 - Alert when `taxRates.ts` changes but docs aren't updated
+
+---
+
+## Tax Year Versioning Governance
+
+**Staleness is the #1 reputational risk for a tax site.**
+
+### Required Frontmatter
+
+Every doc MUST include:
+```yaml
+taxYear: "2025-26"           # Which tax year rates apply
+lastVerified: "2026-01-28"   # When HMRC sources were checked
+```
+
+### Build-Time Validation
+
+CI enforces:
+1. `taxYear` is present in all MDX files
+2. `<ThresholdTable year="X">` matches frontmatter `taxYear`
+3. No hardcoded tax values in prose (regex lint)
+4. All docs verified within 6 months
+
+### Tax Year Changelog
+
+Maintain `content/docs/reference/changelog.mdx`:
+```md
+## 2025-26 Changes (April 6, 2025)
+- Personal Allowance: £12,570 (frozen)
+- NI Primary Threshold: £12,570
+- Dividend Allowance: £500 (reduced from £1,000)
+```
+
+### Mid-Year Changes
+
+Rare but possible (e.g., emergency budget). Process:
+1. Update `taxRates.ts` immediately
+2. Add banner to affected docs: `<Callout type="warning">Updated mid-year</Callout>`
+3. Log in changelog with effective date
+
+---
+
+## Slug Uniqueness & Coverage
+
+### Preventing Collisions
+
+With `/docs/[category]/[slug]` routing, slug collisions across categories are possible.
+
+**Build-time manifest generation:**
+```ts
+// scripts/validate-docs.ts
+// Generates content/docs/_manifest.json at build time
+// Fails CI if:
+// - Duplicate slugs across categories
+// - DocLink references non-existent slug
+// - Orphaned docs (not in nav)
+```
+
+### Calculator-to-Docs Coverage
+
+Every `<DocLink slug="...">` in calculator code must have a matching doc:
+
+```ts
+// CI check: scan for DocLink/DocTooltip usage
+// Verify each slug exists in manifest
+// Fail build on missing docs
+```
+
+### Reverse Index
+
+Each doc should list which calculator fields reference it:
+```yaml
+referencedBy:
+  - paye-calculator/salary-input
+  - director-guide/salary-slider
+```
+
+---
+
+## Field Definition Registry
+
+To prevent docs-to-calculator drift, fields should declare their doc slug at the source:
+
+```ts
+// src/lib/fields/registry.ts
+export const FIELD_DEFINITIONS = {
+  salary: {
+    id: 'salary',
+    label: 'Annual Salary',
+    docSlug: 'salary',
+    calculators: ['paye', 'ni', 'scottish'],
+  },
+  personalAllowance: {
+    id: 'personal-allowance',
+    label: 'Personal Allowance',
+    docSlug: 'personal-allowance',
+    calculators: ['paye', 'decoder'],
+  },
+  // ...
+} as const satisfies Record<string, FieldDefinition>;
+```
+
+Benefits:
+- Single source of truth for field metadata
+- CI can validate all `docSlug` values exist
+- Auto-generate "Related calculators" section in docs
+- Type-safe `<DocLink>` usage
+
+---
+
+## Search Implementation
+
+### Build-Time Index (MVP)
+
+Generate compact JSON at build, not runtime:
+
+```ts
+// scripts/build-search-index.ts
+// Extracts: slug, title, description, headings, category
+// Output: public/search-index.json (~50KB for 80 docs)
+```
+
+### Client-Side Loading
+
+```tsx
+// Load lazily on Cmd+K, not on page load
+const loadSearchIndex = () => import('/search-index.json');
+```
+
+### What Gets Indexed
+- Title (high weight)
+- Description (high weight)
+- H2/H3 headings (medium weight)
+- First 200 chars of content (low weight)
+- NOT: full MDX content (bundle bloat)
+
+---
+
+## Tooltip & Panel Content Strategy
+
+**Problem:** Rendering full MDX in tooltips/panels ships large bundles to calculator pages.
+
+### Tooltips: Precomputed Excerpts Only
+
+```ts
+// Build-time: generate excerpts
+// content/docs/_excerpts.json
+{
+  "personal-allowance": {
+    "title": "Personal Allowance",
+    "excerpt": "The amount you can earn tax-free each year. For 2025-26, this is £12,570.",
+    "href": "/docs/tax/personal-allowance"
+  }
+}
+```
+
+Tooltip shows excerpt + "Learn more" link. Never renders full MDX.
+
+### Panels: Fetch On-Demand
+
+```tsx
+<DocPanel slug="personal-allowance" />
+// Fetches /api/docs/personal-allowance on open
+// Returns pre-rendered HTML, not raw MDX
+// Constrained subset: Summary, Key thresholds, FAQ
+```
+
+---
+
+## YMYL Trust Signals
+
+Tax content is "Your Money or Your Life" (YMYL) - Google holds it to higher standards.
+
+### Required Per-Page
+
+1. **HMRC Source Link** - Already have `<HMRCLink>`
+2. **Last Verified Date** - Added to frontmatter
+3. **Disclaimer** - Footer on every doc page:
+   ```
+   This information is for guidance only. Always verify with HMRC 
+   or consult a qualified accountant for your specific circumstances.
+   ```
+
+### Site-Wide
+
+1. **Editorial Policy Page** - `/docs/about/editorial-policy`
+   - How content is researched and verified
+   - Update process and frequency
+   - Qualifications of reviewers (future: "Reviewed by ACA/CTA")
+
+2. **About Page** - Clear company information
+
+3. **Contact** - Way to report errors
+
+### Structured Data Enhancement
+
+```json
+{
+  "@type": "Article",
+  "about": {
+    "@type": "Thing",
+    "name": "UK Income Tax"
+  },
+  "citation": {
+    "@type": "WebPage",
+    "url": "https://www.gov.uk/income-tax-rates"
+  }
+}
+```
+
+---
+
+## Docs Quality Gate
+
+Before publishing any doc, CI validates:
+
+| Check | Requirement |
+|-------|-------------|
+| HMRC Source | At least 1 `<HMRCLink>` present |
+| Tax Year | `taxYear` frontmatter matches current |
+| No Advice Language | No "you should", "you must" phrasing |
+| Worked Example | Has `<Callout type="example">` OR explicit "calculator handles the math" note |
+| Excerpt Exists | Entry in `_excerpts.json` |
+| Slug Valid | Exists in manifest, no collisions |
+
+### Lint Rules
+
+```bash
+# scripts/lint-docs.ts
+bun run lint:docs
+
+# Checks:
+# - No hardcoded £ values (must use ThresholdTable)
+# - No "you should/must" advisory language
+# - All HMRCLink URLs are valid (HEAD request)
+# - Frontmatter complete
+```
 
 ---
 
