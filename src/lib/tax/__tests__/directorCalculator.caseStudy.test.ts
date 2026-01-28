@@ -8,7 +8,7 @@
  */
 
 import { TAX_RATES } from '@/constants/taxRates';
-import { getEmployerNI, getEmployerNIRate, getEmployerNIThreshold } from '../employerNI';
+import { getEmployerNI, getEmployerNIThreshold } from '../employerNI';
 
 // Helper to match existing test patterns
 const calculateEmployerNI = (salary: number) => getEmployerNI(salary);
@@ -293,7 +293,7 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       expect(allSalaryTakeHome).toBeGreaterThan(lelDividendsTakeHome);
 
       // LEL strategy leaves more in company for buffer
-      const lelBuffer = grossProfit - 6500 - 225 - 206.53 - 880;
+      const _lelBuffer = grossProfit - 6500 - 225 - 206.53 - 880;
       // This is ~0 because we took all dividends in the calc above
 
       // The real benefit of LEL is lower monthly commitment:

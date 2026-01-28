@@ -159,7 +159,7 @@ export function NavbarMobileMenu({
               {/* Tools section */}
               {tools && tools.length > 0 && (
                 <>
-                  <div className='my-2 border-t border-white/10' />
+                  <div className='my-2 border-white/10 border-t' />
                   <p className='px-4 pt-2 pb-1 font-medium text-text-secondary-new text-xs uppercase tracking-wider'>
                     Tools
                   </p>

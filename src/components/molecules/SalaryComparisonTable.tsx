@@ -98,7 +98,6 @@ export function SalaryComparisonTable() {
                 scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
                 WebkitOverflowScrolling: 'touch',
               }}
-              tabIndex={0}
               aria-label='Salary comparison table - scrollable'
             >
               <table className='w-full min-w-[640px] border-collapse'>

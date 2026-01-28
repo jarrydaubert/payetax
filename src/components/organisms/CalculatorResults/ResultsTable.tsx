@@ -393,7 +393,6 @@ export function ResultsTable({
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',
             }}
-            tabIndex={0}
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
             data-testid='results-table-container'

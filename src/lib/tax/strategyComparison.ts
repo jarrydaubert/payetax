@@ -223,7 +223,7 @@ function calculateAllSalaryStrategy(
 
   // Verify we're within budget
   if (salary + employerNI > grossProfit) {
-    salary = salary - 1; // Adjust if rounding caused overflow
+    salary -= 1; // Adjust if rounding caused overflow
   }
 
   const employeeNI = getEmployeeNI(salary, taxYear);

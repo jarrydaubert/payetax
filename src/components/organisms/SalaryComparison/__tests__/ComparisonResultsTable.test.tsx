@@ -241,12 +241,6 @@ describe('ComparisonResultsTable', () => {
       expect(headers.length).toBe(4);
     });
 
-    it('should have scrollable container with tabindex', () => {
-      const { container } = render(<ComparisonResultsTable results={mockResults} />);
-      const scrollContainer = container.querySelector('[tabIndex="0"]');
-      expect(scrollContainer).toBeInTheDocument();
-    });
-
     it('should have aria-label on scrollable area', () => {
       render(<ComparisonResultsTable results={mockResults} />);
       const scrollArea = screen.getByLabelText('Salary comparison results - scrollable');

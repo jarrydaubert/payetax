@@ -69,20 +69,7 @@ export function DirectorDashboard() {
     if (canCalculate) {
       calculate();
     }
-  }, [
-    formData.region,
-    formData.revenue,
-    formData.includesVat,
-    formData.expenses,
-    formData.alreadyTaken,
-    formData.takenViaPayroll,
-    formData.otherIncome,
-    formData.studentLoanPlans,
-    formData.pensionContribution,
-    formData.companyCarBIK,
-    formData.hasEmploymentAllowance,
-    calculate,
-  ]);
+  }, [formData.region, formData.revenue, formData.expenses, calculate]);
 
   // Track results shown (once per session)
   useEffect(() => {

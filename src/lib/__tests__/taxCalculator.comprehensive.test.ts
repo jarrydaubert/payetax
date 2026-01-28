@@ -220,7 +220,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
     }> = [
       { plan: ['plan1'], threshold: 26065, rate: 9 },
       { plan: ['plan2'], threshold: 28470, rate: 9 },
-      { plan: ['plan4'], threshold: 31395, rate: 9 },
+      { plan: ['plan4'], threshold: 32745, rate: 9 }, // 2025-26 threshold
       { plan: ['plan5'], threshold: 25000, rate: 9 },
       { plan: ['postgrad'], threshold: 21000, rate: 6 },
     ];

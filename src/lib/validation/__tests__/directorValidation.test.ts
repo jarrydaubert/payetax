@@ -14,7 +14,6 @@ import {
   CALCULATION_MODES,
   CurrencyAmountSchema,
   DIRECTOR_TAX_YEARS,
-  type DirectorCalculationResult,
   type DirectorInput,
   DirectorInputSchema,
   type DirectorResult,
@@ -31,7 +30,6 @@ import {
   validateRegion,
   WARNING_TYPES,
   WarningSchema,
-  WarningTypeSchema,
 } from '../directorValidation';
 
 // ============================================================================

@@ -74,7 +74,6 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
           scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
           WebkitOverflowScrolling: 'touch',
         }}
-        tabIndex={0}
         aria-label='Salary comparison results - scrollable'
       >
         <Table aria-label='Salary comparison results'>

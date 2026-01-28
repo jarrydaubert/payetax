@@ -32,9 +32,27 @@ jest.mock('@/lib/tax/strategyComparison', () => ({
   calculateStrategyComparison: jest.fn().mockReturnValue({
     grossProfit: 80000,
     strategies: {
-      allSalary: { name: 'All Salary', salary: 80000, dividends: 0, takeHome: 55000, effectiveRate: 31 },
-      optimalMix: { name: 'Optimal Mix', salary: 12570, dividends: 50000, takeHome: 60000, effectiveRate: 25 },
-      allDividends: { name: 'All Dividends', salary: 0, dividends: 60000, takeHome: 58000, effectiveRate: 27 },
+      allSalary: {
+        name: 'All Salary',
+        salary: 80000,
+        dividends: 0,
+        takeHome: 55000,
+        effectiveRate: 31,
+      },
+      optimalMix: {
+        name: 'Optimal Mix',
+        salary: 12570,
+        dividends: 50000,
+        takeHome: 60000,
+        effectiveRate: 25,
+      },
+      allDividends: {
+        name: 'All Dividends',
+        salary: 0,
+        dividends: 60000,
+        takeHome: 58000,
+        effectiveRate: 27,
+      },
     },
     recommended: 'optimalMix',
     savingsVsAllSalary: 5000,

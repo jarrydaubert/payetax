@@ -12,11 +12,31 @@ import { ICON_SIZES } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const tools = [
-  { href: '/tools/director-guide', label: 'Director Guide', description: 'Salary vs dividend optimizer' },
-  { href: '/tools/tax-code-decoder', label: 'Tax Code Decoder', description: 'Understand your tax code' },
-  { href: '/tools/scottish-tax-calculator', label: 'Scottish Tax', description: '6-band Scottish rates' },
-  { href: '/tools/national-insurance-calculator', label: 'NI Calculator', description: 'National Insurance breakdown' },
-  { href: '/tools/marriage-allowance-calculator', label: 'Marriage Allowance', description: 'Transfer allowance calculator' },
+  {
+    href: '/tools/director-guide',
+    label: 'Director Guide',
+    description: 'Salary vs dividend optimizer',
+  },
+  {
+    href: '/tools/tax-code-decoder',
+    label: 'Tax Code Decoder',
+    description: 'Understand your tax code',
+  },
+  {
+    href: '/tools/scottish-tax-calculator',
+    label: 'Scottish Tax',
+    description: '6-band Scottish rates',
+  },
+  {
+    href: '/tools/national-insurance-calculator',
+    label: 'NI Calculator',
+    description: 'National Insurance breakdown',
+  },
+  {
+    href: '/tools/marriage-allowance-calculator',
+    label: 'Marriage Allowance',
+    description: 'Transfer allowance calculator',
+  },
 ] as const;
 
 /**

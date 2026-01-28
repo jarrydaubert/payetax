@@ -379,7 +379,6 @@ export function WhatIfComparisonDisplay({
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
-            tabIndex={0}
             aria-label='What If comparison table - scrollable horizontally'
           >
             <Table aria-label='What If comparison results'>

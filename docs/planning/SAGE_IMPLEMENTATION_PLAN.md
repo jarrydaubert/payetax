@@ -1,8 +1,10 @@
 # 🧙 Sage AI Explainer - Implementation Plan
 
 **Last Updated**: January 2026
-**Timeline**: ~2 working days
-**Status**: Concept - Ready for Review
+**Timeline**: ~2 working days + 8-12 hours for critical fixes
+**Status**: Reviewed by 4 AI systems - Conditionally Approved
+
+> **Review Status**: Reviewed by Claude, Grok, ChatGPT, and Gemini (January 2026). All identified issues have been incorporated into this plan. See [Multi-AI Review Findings](#multi-ai-review-findings) for details.
 
 ---
 
@@ -13,8 +15,8 @@ An always-available, floating chat widget that explains UK tax concepts in plain
 
 **Why Build This:**
 - **Engagement**: Longer session times (fintech benchmarks show 20-30% lift)
-- **Differentiation**: No UK tax calculator has an AI explainer
-- **Trust**: YMYL-safe with strict prompt validation + HMRC citations
+- **Differentiation**: First UK tax *calculator* with integrated AI explainer (HMRC has "Ask HMRC Online" chatbot but not calculator-integrated)
+- **Trust**: YMYL-safe with strict prompt validation + HMRC citations + PCRT-compliant design
 - **Low Cost**: Local LLM for dev, free-tier cloud inference for production
 
 **Tech Stack Reuse:**
@@ -33,15 +35,77 @@ An always-available, floating chat widget that explains UK tax concepts in plain
 
 ## 📋 Table of Contents
 
-1. [Phase 1: Local Development Setup](#phase-1-local-development-setup)
-2. [Phase 2: Core Component Architecture](#phase-2-core-component-architecture)
-3. [Phase 3: Integration & Context Awareness](#phase-3-integration--context-awareness)
-4. [Phase 4: Safety & Validation](#phase-4-safety--validation)
-5. [Phase 5: Production Deployment](#phase-5-production-deployment)
-6. [Phase 6: Testing & Refinement](#phase-6-testing--refinement)
-7. [Phase 7: Launch Preparation](#phase-7-launch-preparation)
-8. [Implementation Decisions](#implementation-decisions)
-9. [Risk Mitigation](#risk-mitigation)
+1. [Multi-AI Review Findings](#multi-ai-review-findings)
+2. [Phase 1: Local Development Setup](#phase-1-local-development-setup)
+3. [Phase 2: Core Component Architecture](#phase-2-core-component-architecture)
+4. [Phase 3: Integration & Context Awareness](#phase-3-integration--context-awareness)
+5. [Phase 4: Safety & Validation](#phase-4-safety--validation)
+6. [Phase 5: Production Deployment](#phase-5-production-deployment)
+7. [Phase 6: Testing & Refinement](#phase-6-testing--refinement)
+8. [Phase 7: Launch Preparation](#phase-7-launch-preparation)
+9. [Implementation Decisions](#implementation-decisions)
+10. [Risk Mitigation](#risk-mitigation)
+11. [Pre-Launch Checklist](#pre-launch-checklist)
+
+---
+
+## Multi-AI Review Findings
+
+This plan was reviewed by 4 AI systems (Claude, Grok, ChatGPT, Gemini) in January 2026. Below is a consolidated summary of findings and the fixes incorporated into this plan.
+
+### Review Verdicts
+
+| Reviewer | Verdict | Critical | Major | Minor |
+|----------|---------|----------|-------|-------|
+| **Grok** | Not approved without fixes | 4 | 7 | 2 |
+| **Claude** | Conditionally approved | 2 | 4 | 4 |
+| **ChatGPT** | Viable MVP, not approved yet | 4 | 4 | 3 |
+| **Gemini** | Approved with modifications | 2 | 3 | 0 |
+
+### Critical Issues Identified & Fixes
+
+| # | Issue | Raised By | Fix Applied |
+|---|-------|-----------|-------------|
+| C1 | **Server-side rate limiting missing** - sessionStorage bypassable via incognito/curl | Claude, ChatGPT | Added Upstash/Vercel KV rate limiting in Phase 5.1 |
+| C2 | **PII leakage to Groq** - Users may paste NI numbers, UTRs | ChatGPT, Gemini | Added `sanitizePII()` utility in Phase 4.3 |
+| C3 | **JSON parsing fragility** - LLMs wrap JSON in markdown blocks | Gemini, Claude | Added `cleanJson()` utility + Groq JSON mode in Phase 5.1 |
+| C4 | **No fallback LLM provider** - Groq quota exhaustion kills Sage | Claude, Grok | Added DeepSeek/Together AI fallback in Phase 5.1 |
+| C5 | **Legal disclaimers insufficient** - "HMRC-sourced facts" too strong | All 4 | Reworded to "links to official guidance", added per-response footer |
+| C6 | **No intent classifier** - Advice-seeking queries reach LLM | ChatGPT | Added pre-LLM intent classification in Phase 4.4 |
+
+### Major Issues Identified & Fixes
+
+| # | Issue | Raised By | Fix Applied |
+|---|-------|-----------|-------------|
+| M1 | **Keyword matching brittle** - Typos fail ("Penison relief") | Gemini, Grok, ChatGPT | Added Fuse.js fuzzy matching in Phase 2.1 |
+| M2 | **Model outdated** - Llama 3.1 8B vs newer options | Split opinion | Decision: Keep 8B for simple, route complex to 70B (Phase 5.1) |
+| M3 | **Numeric hallucination** - LLM can cite wrong £ amounts | Claude | Added numeric validation against TAX_RATES in Phase 4.5 |
+| M4 | **ICO/DPIA compliance missing** - Groq is a data processor | ChatGPT | Added compliance documentation in Phase 7.4 |
+| M5 | **No Error Boundary** - Widget crash takes down page | Claude | Added React Error Boundary in Phase 2.2 |
+| M6 | **Mobile viewport issue** - h-[600px] breaks Safari | Gemini | Changed to h-[100dvh] for mobile in Phase 2.2 |
+| M7 | **No send debounce** - Rapid clicks eat Groq quota | Gemini | Added debounce in Phase 2.2 |
+| M8 | **No human oversight protocol** - Knowledge base updates undefined | Grok | Added maintenance protocol in Phase 7.5 |
+| M9 | **User testing not planned** - Analogies may mislead | Grok | Added user testing plan in Phase 6.3 |
+
+### Minor Issues & Suggestions
+
+| Issue | Raised By | Status |
+|-------|-----------|--------|
+| Plain mode toggle for accountants | ChatGPT | Deferred to post-MVP |
+| IP-based daily limits vs session | Claude | Implemented server-side |
+| Simplify offline fallback | Claude | Simplified to direct concept lookup |
+| Red-team harness (200-500 prompts) | ChatGPT | Added to Phase 6.3 |
+| A/B test "Sage" branding | Claude | Deferred to post-MVP |
+| Welsh language support | Claude | Deferred to post-MVP |
+| Calculator warning integration | Grok | Added to Phase 3.2 |
+
+### Key Model Decision
+
+**Disagreement:** Grok recommended Qwen2.5-72B/DeepSeek-R1, Claude recommended Llama 3.3 70B, ChatGPT suggested model routing, Gemini said keep Llama 3.1 8B.
+
+**Resolution:** Implement model routing (ChatGPT's suggestion):
+- Default: Llama 3.1 8B for simple concept explanations (fast, cheap)
+- Escalate: Llama 3.3 70B for complex/ambiguous queries (better reasoning)
 
 ---
 
@@ -186,8 +250,9 @@ const personalAllowance: TaxConcept = {
 ```tsx
 'use client';
 
-import { useState, useCallback } from 'react';
-import taxSources from '@/lib/tax_sources.json';
+import { useState, useCallback, useMemo } from 'react';
+import { getTaxConcepts } from '@/lib/sageKnowledge';
+import { TAX_RATES } from '@/constants/taxRates';
 import { validateSageResponse } from '@/lib/validateSageResponse';
 
 interface Message {
@@ -209,6 +274,9 @@ export function useSageExplainer(): UseSageExplainerReturn {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
 
+  // Get concepts with current tax rates (definitions computed at runtime)
+  const taxConcepts = useMemo(() => getTaxConcepts(TAX_RATES), []);
+
   const checkRateLimit = useCallback(() => {
     const MAX_QUERIES = 20;
     const count = Number(sessionStorage.getItem('sage_query_count') || '0');
@@ -221,19 +289,27 @@ export function useSageExplainer(): UseSageExplainerReturn {
   }, []);
 
   const buildPrompt = useCallback((query: string, conversationHistory: Message[]) => {
-    // Get relevant concepts from knowledge base
-    const relevantConcepts = taxSources.concepts
+    // Get relevant concepts using triggers for better matching
+    const relevantConcepts = taxConcepts
       .filter(c =>
         query.toLowerCase().includes(c.term.toLowerCase()) ||
+        c.triggers.some(t => query.toLowerCase().includes(t.toLowerCase())) ||
         c.relatedTerms.some(t => query.toLowerCase().includes(t.toLowerCase()))
       )
       .slice(0, 3); // Limit to top 3 for prompt size
 
-    const contextStr = relevantConcepts.length > 0
-      ? `Relevant UK tax information:\n${relevantConcepts.map(c =>
-          `- ${c.term}: ${c.definition}\n  Source: ${c.source}\n  Analogy: ${c.analogy}`
-        ).join('\n')}`
-      : '';
+    // CRITICAL: No concepts matched - return safe fallback instead of hallucinating
+    if (relevantConcepts.length === 0) {
+      return null; // Signal to use fallback response
+    }
+
+    // Build context using template functions (values from taxRates.ts)
+    const contextStr = `Relevant UK tax information:\n${relevantConcepts.map(c =>
+      `- ${c.term}: ${c.definition}\n  Source: ${c.source}\n  Analogy: ${c.analogy}`
+    ).join('\n')}`;
+
+    // Collect allowed sources for structured citation validation
+    const allowedSources = relevantConcepts.map(c => c.source);
 
     const historyStr = conversationHistory.length > 0
       ? `Previous conversation:\n${conversationHistory.slice(-4).map(m =>
@@ -241,28 +317,33 @@ export function useSageExplainer(): UseSageExplainerReturn {
         ).join('\n')}`
       : '';
 
-    return `You are Sage, a UK tax education assistant for PayeTax.co.uk. Your role is to explain tax concepts clearly and engagingly.
+    return {
+      prompt: `You are Sage, a UK tax education assistant for PayeTax.co.uk. Your role is to explain tax concepts clearly and engagingly.
 
 STRICT RULES:
 - Explain concepts ONLY—never give advice or recommendations
 - Use plain language (8th grade reading level)
 - Include witty analogies when helpful (like "tax-free pie slices")
-- Always cite sources from the provided information
+- ONLY cite sources from the ALLOWED SOURCES list below
 - If asked for advice, calculations, or "what should I do?", respond: "I focus on explaining concepts, not giving advice. For your specific situation, please consult a qualified tax professional or visit gov.uk."
 - Keep responses under 150 words for readability
 
 ${contextStr}
 
+ALLOWED SOURCES (only cite from this list):
+${allowedSources.map(s => `- ${s}`).join('\n')}
+
 ${historyStr}
 
 User question: ${query}
 
-Respond with a clear explanation that includes:
-1. A simple definition
-2. A helpful analogy (if appropriate)
-3. A source citation from gov.uk
-
-Do NOT say "you should", "you must", "I recommend", "you need to", or "you qualify for".`;
+Respond in this JSON format ONLY:
+{
+  "answer": "Your explanation here (plain text, no markdown)",
+  "sources": ["https://www.gov.uk/..."] // Must be from ALLOWED SOURCES list, or empty array
+}`,
+      allowedSources
+    };
   }, []);
 
   const ask = useCallback(async (query: string) => {
@@ -282,7 +363,21 @@ Do NOT say "you should", "you must", "I recommend", "you need to", or "you quali
       setMessages(prev => [...prev, userMessage]);
 
       // Build prompt with context
-      const prompt = buildPrompt(query, messages);
+      const promptResult = buildPrompt(query, messages);
+
+      // CRITICAL: No concepts matched - return safe fallback without calling LLM
+      if (promptResult === null) {
+        const fallbackMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: "I don't have verified information about that specific topic in my library. Try searching gov.uk directly or consult a tax professional for accurate guidance.",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+        return;
+      }
+
+      const { prompt, allowedSources } = promptResult;
 
       // Determine API endpoint
       const apiUrl = process.env.NODE_ENV === 'development'
@@ -312,12 +407,26 @@ Do NOT say "you should", "you must", "I recommend", "you need to", or "you quali
       }
 
       const data = await response.json();
-      const responseContent = data.response || data.choices?.[0]?.message?.content || '';
+      const rawResponse = data.response || data.choices?.[0]?.message?.content || '';
 
-      // Validate response for safety
-      const validation = validateSageResponse(responseContent);
+      // Parse structured JSON response from model
+      let parsedResponse: { answer: string; sources: string[] };
+      try {
+        parsedResponse = JSON.parse(rawResponse);
+      } catch {
+        // Model didn't return valid JSON - use raw response, no sources
+        parsedResponse = { answer: rawResponse, sources: [] };
+      }
+
+      // CRITICAL: Validate sources against allowlist (prevents hallucinated citations)
+      const validatedSources = parsedResponse.sources.filter(
+        (s: string) => allowedSources.includes(s)
+      );
+
+      // Validate response content for safety
+      const validation = validateSageResponse(parsedResponse.answer);
       const finalContent = validation.isValid
-        ? responseContent
+        ? parsedResponse.answer
         : validation.sanitizedResponse || '';
 
       // Track analytics
@@ -327,22 +436,18 @@ Do NOT say "you should", "you must", "I recommend", "you need to", or "you quali
           query_length: query.length,
           response_time_ms: responseTime,
           session_query_count: sessionStorage.getItem('sage_query_count'),
-          was_flagged: !validation.isValid
+          was_flagged: !validation.isValid,
+          sources_validated: validatedSources.length,
+          sources_stripped: parsedResponse.sources.length - validatedSources.length
         });
       }
 
-      // Extract sources from response
-      const sourcesFound = taxSources.concepts
-        .filter(c => responseContent.toLowerCase().includes(c.term.toLowerCase()))
-        .map(c => c.source)
-        .slice(0, 2);
-
-      // Add assistant message
+      // Add assistant message with VALIDATED sources only
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: finalContent,
-        sources: sourcesFound.length > 0 ? sourcesFound : undefined,
+        sources: validatedSources.length > 0 ? validatedSources : undefined,
         timestamp: new Date()
       };
 
@@ -381,7 +486,8 @@ Do NOT say "you should", "you must", "I recommend", "you need to", or "you quali
 ```
 
 **Key Features:**
-- Loads relevant concepts from `tax_sources.json` based on query
+- Loads relevant concepts from `sageKnowledge.ts` with definitions computed from `taxRates.ts` at runtime
+- Uses triggers array for better natural language matching
 - Builds YMYL-safe prompt with strict deflection rules
 - Validates responses before displaying (Phase 4 integration)
 - Tracks usage with GA4 events
@@ -565,10 +671,8 @@ export default function SageWidget() {
               </Button>
             </form>
 
-            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-              <span>
-                {sessionStorage.getItem('sage_query_count') || '0'}/20 questions
-              </span>
+            {/* NOTE: Query count stored in state to avoid SSR issues with sessionStorage */}
+            <QueryCounter messages={messages} />
               {messages.length > 0 && (
                 <button
                   onClick={clearHistory}
@@ -759,7 +863,7 @@ const suggestedQueries = useMemo(() => {
     return [
       "Explain my tax code",
       "What is National Insurance?",
-      "How can I reduce my tax?"
+      "What is the Personal Allowance taper?"
     ];
   }
 
@@ -806,32 +910,36 @@ interface ValidationResult {
 }
 
 export function validateSageResponse(response: string): ValidationResult {
+  // NOTE: Using /i flag only (not /gi) - the /g flag causes .test() to advance
+  // lastIndex, which can miss matches on subsequent calls. We only need to know
+  // if ANY match exists, not find all matches.
+
   // Pattern 1: Direct advice phrases
   const advicePatterns = [
-    /\byou should\b/gi,
-    /\byou must\b/gi,
-    /\bI recommend\b/gi,
-    /\byou need to\b/gi,
-    /\byou have to\b/gi,
-    /\bI suggest\b/gi,
-    /\bI advise\b/gi
+    /\byou should\b/i,
+    /\byou must\b/i,
+    /\bI recommend\b/i,
+    /\byou need to\b/i,
+    /\byou have to\b/i,
+    /\bI suggest\b/i,
+    /\bI advise\b/i
   ];
 
   // Pattern 2: Action-oriented phrases
   const actionPatterns = [
-    /\bfile (a|your) (claim|return)\b/gi,
-    /\byou qualify for\b/gi,
-    /\byou're entitled to\b/gi,
-    /\byou can claim\b/gi,
-    /\byou should apply\b/gi,
-    /\bcontact HMRC (to|and)\b/gi
+    /\bfile (a|your) (claim|return)\b/i,
+    /\byou qualify for\b/i,
+    /\byou're entitled to\b/i,
+    /\byou can claim\b/i,
+    /\byou should apply\b/i,
+    /\bcontact HMRC (to|and)\b/i
   ];
 
   // Pattern 3: Calculation/specific financial advice
   const calculationPatterns = [
-    /\byour tax (will be|is) £\d+/gi,
-    /\byou (will|would) save £\d+/gi,
-    /\byou owe £\d+/gi
+    /\byour tax (will be|is) £\d+/i,
+    /\byou (will|would) save £\d+/i,
+    /\byou owe £\d+/i
   ];
 
   const allPatterns = [...advicePatterns, ...actionPatterns, ...calculationPatterns];
@@ -847,7 +955,8 @@ export function validateSageResponse(response: string): ValidationResult {
   }
 
   // Additional semantic check: Look for personal pronouns + financial actions
-  const personalAdvicePattern = /\b(you|your)\b.*\b(claim|apply|file|contact|request|submit)\b/gi;
+  // NOTE: Using /i flag only (not /gi) to avoid lastIndex issues
+  const personalAdvicePattern = /\b(you|your)\b.*\b(claim|apply|file|contact|request|submit)\b/i;
   if (personalAdvicePattern.test(response)) {
     return {
       isValid: false,
@@ -928,6 +1037,350 @@ const checkRateLimit = useCallback(() => {
 - No server-side storage needed
 
 **Deliverable:** ✅ Client-side rate limiting
+
+---
+
+### 4.3 PII Scrubbing (CRITICAL - From Multi-AI Review)
+
+**Issue:** Users may paste NI numbers, UTRs, or emails into queries. Sending PII to Groq (a US processor) without consent is a GDPR breach risk.
+
+**File:** `src/lib/sanitizePII.ts`
+
+```typescript
+/**
+ * Sanitizes user input by removing personally identifiable information
+ * before sending to external LLM providers.
+ * 
+ * Patterns detected:
+ * - UK National Insurance numbers (e.g., AB123456C)
+ * - Unique Taxpayer References (10-digit UTR)
+ * - Email addresses
+ * - Phone numbers (UK format)
+ */
+export function sanitizePII(input: string): { sanitized: string; hadPII: boolean } {
+  let hadPII = false;
+  let sanitized = input;
+
+  // UK National Insurance Number: 2 letters, 6 digits, 1 letter (A-D)
+  // Pattern: AB123456C
+  const niPattern = /[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\d{6}[A-D]/gi;
+  if (niPattern.test(sanitized)) {
+    hadPII = true;
+    sanitized = sanitized.replace(niPattern, '[NI_REDACTED]');
+  }
+
+  // Unique Taxpayer Reference (UTR): 10 digits, sometimes with spaces
+  // Pattern: 1234567890 or 12345 67890
+  const utrPattern = /\b\d{5}\s?\d{5}\b/g;
+  if (utrPattern.test(sanitized)) {
+    hadPII = true;
+    sanitized = sanitized.replace(utrPattern, '[UTR_REDACTED]');
+  }
+
+  // Email addresses
+  const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+  if (emailPattern.test(sanitized)) {
+    hadPII = true;
+    sanitized = sanitized.replace(emailPattern, '[EMAIL_REDACTED]');
+  }
+
+  // UK phone numbers (various formats)
+  const phonePattern = /(\+44|0)\s?\d{4}\s?\d{6}|\(\d{4,5}\)\s?\d{6}/g;
+  if (phonePattern.test(sanitized)) {
+    hadPII = true;
+    sanitized = sanitized.replace(phonePattern, '[PHONE_REDACTED]');
+  }
+
+  return { sanitized, hadPII };
+}
+```
+
+**Integration in `useSageExplainer.ts`:**
+
+```typescript
+import { sanitizePII } from '@/lib/sanitizePII';
+
+// In the ask() function, before building prompt:
+const { sanitized: sanitizedQuery, hadPII } = sanitizePII(query);
+
+if (hadPII) {
+  // Log for monitoring (no PII in log)
+  console.warn('PII detected and redacted from Sage query');
+  
+  // Track in GA4
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'sage_pii_detected', { had_pii: true });
+  }
+}
+
+// Use sanitizedQuery for LLM call, original query for display
+const promptResult = buildPrompt(sanitizedQuery, messages);
+```
+
+**User Warning in Widget:**
+
+Add to `SageWidget.tsx` input area:
+
+```tsx
+<p className="text-xs text-muted-foreground mt-2">
+  ⚠️ Don't enter personal info like NI numbers or UTRs
+</p>
+```
+
+**Deliverable:** ✅ PII automatically stripped before Groq API calls
+
+---
+
+### 4.4 Intent Classifier (CRITICAL - From Multi-AI Review)
+
+**Issue:** Advice-seeking queries ("What should I do?", "How can I reduce my tax?") reach the LLM and may leak advice despite post-hoc validation.
+
+**Solution:** Pre-LLM gate that classifies intent and refuses advice-seeking queries before calling the model.
+
+**File:** `src/lib/classifyIntent.ts`
+
+```typescript
+export type QueryIntent = 'concept' | 'advice-seeking' | 'calculation' | 'unknown';
+
+interface IntentResult {
+  intent: QueryIntent;
+  confidence: 'high' | 'medium' | 'low';
+  reason?: string;
+}
+
+/**
+ * Classifies user query intent BEFORE calling the LLM.
+ * Blocks advice-seeking and calculation queries at the gate.
+ */
+export function classifyIntent(query: string): IntentResult {
+  const lowerQuery = query.toLowerCase();
+
+  // High-confidence advice-seeking patterns
+  const advicePatterns = [
+    /what should i (do|claim|file)/i,
+    /how (can|do) i (reduce|minimize|lower|avoid) (my )?(tax|taxes)/i,
+    /should i (claim|apply|file|use)/i,
+    /am i (eligible|entitled|qualified)/i,
+    /can i (claim|get|apply)/i,
+    /is it (worth|better) (to|if)/i,
+    /what('s| is) the best (way|option)/i,
+    /recommend/i,
+    /advise me/i,
+    /help me (decide|choose|figure out)/i
+  ];
+
+  for (const pattern of advicePatterns) {
+    if (pattern.test(lowerQuery)) {
+      return {
+        intent: 'advice-seeking',
+        confidence: 'high',
+        reason: 'Query asks for personal recommendation or action'
+      };
+    }
+  }
+
+  // Calculation patterns
+  const calculationPatterns = [
+    /how much (tax|ni|will i)/i,
+    /calculate my/i,
+    /what (will|would) my tax be/i,
+    /if i earn £?\d+/i
+  ];
+
+  for (const pattern of calculationPatterns) {
+    if (pattern.test(lowerQuery)) {
+      return {
+        intent: 'calculation',
+        confidence: 'high',
+        reason: 'Query asks for personal calculation'
+      };
+    }
+  }
+
+  // Concept patterns (safe to answer)
+  const conceptPatterns = [
+    /what is (a |the )?/i,
+    /explain/i,
+    /how does .* work/i,
+    /what are .* (rates|bands|thresholds)/i,
+    /define/i,
+    /tell me about/i,
+    /difference between/i
+  ];
+
+  for (const pattern of conceptPatterns) {
+    if (pattern.test(lowerQuery)) {
+      return {
+        intent: 'concept',
+        confidence: 'high',
+        reason: 'Query asks for concept explanation'
+      };
+    }
+  }
+
+  // Default: allow but flag as unknown
+  return {
+    intent: 'unknown',
+    confidence: 'low',
+    reason: 'Intent unclear - proceeding with caution'
+  };
+}
+```
+
+**Integration in `useSageExplainer.ts`:**
+
+```typescript
+import { classifyIntent } from '@/lib/classifyIntent';
+
+// In ask() function, BEFORE building prompt:
+const intentResult = classifyIntent(query);
+
+// Block advice-seeking queries at the gate
+if (intentResult.intent === 'advice-seeking') {
+  const refusalMessage: Message = {
+    id: (Date.now() + 1).toString(),
+    role: 'assistant',
+    content: "I focus on explaining tax concepts, not giving personal advice. For guidance on what you should do, please consult a qualified tax professional or visit gov.uk.",
+    timestamp: new Date()
+  };
+  setMessages(prev => [...prev, userMessage, refusalMessage]);
+  
+  // Track refusal
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'sage_advice_blocked', {
+      intent: intentResult.intent,
+      confidence: intentResult.confidence
+    });
+  }
+  return;
+}
+
+// Block calculation queries
+if (intentResult.intent === 'calculation') {
+  const refusalMessage: Message = {
+    id: (Date.now() + 1).toString(),
+    role: 'assistant',
+    content: "I can't calculate your personal tax. Use our tax calculator for that! I'm here to explain how tax concepts work in general.",
+    timestamp: new Date()
+  };
+  setMessages(prev => [...prev, userMessage, refusalMessage]);
+  return;
+}
+
+// Continue with concept queries...
+```
+
+**Deliverable:** ✅ Advice-seeking queries blocked before reaching LLM
+
+---
+
+### 4.5 Numeric Validation (MAJOR - From Multi-AI Review)
+
+**Issue:** LLM may hallucinate wrong £ amounts (e.g., "Marriage allowance is £1,500" when it's £1,260). Text validation passes because it's not advisory language.
+
+**File:** `src/lib/validateNumbers.ts`
+
+```typescript
+import { TAX_RATES } from '@/constants/taxRates';
+
+interface NumericValidationResult {
+  isValid: boolean;
+  unknownNumbers: string[];
+  suggestedFix?: string;
+}
+
+/**
+ * Validates that monetary amounts in LLM response match known tax values.
+ * Prevents hallucinated numbers from reaching users.
+ */
+export function validateNumbers(
+  response: string,
+  taxRates: typeof TAX_RATES
+): NumericValidationResult {
+  // Extract all £ amounts from response
+  const numbersInResponse = response.match(/£[\d,]+(?:\.\d{2})?/g) || [];
+  
+  if (numbersInResponse.length === 0) {
+    return { isValid: true, unknownNumbers: [] };
+  }
+
+  // Build allowlist of known valid numbers from taxRates
+  const validNumbers = new Set<string>();
+  
+  // Income tax thresholds
+  validNumbers.add(`£${taxRates.incomeTax.personalAllowance.toLocaleString()}`);
+  validNumbers.add(`£${taxRates.incomeTax.basicRateLimit.toLocaleString()}`);
+  validNumbers.add(`£${taxRates.incomeTax.higherRateLimit.toLocaleString()}`);
+  
+  // Marriage allowance
+  if (taxRates.marriageAllowance) {
+    validNumbers.add(`£${taxRates.marriageAllowance.transferAmount.toLocaleString()}`);
+  }
+  
+  // NI thresholds
+  if (taxRates.nationalInsurance) {
+    validNumbers.add(`£${taxRates.nationalInsurance.primaryThreshold.toLocaleString()}`);
+    validNumbers.add(`£${taxRates.nationalInsurance.upperEarningsLimit.toLocaleString()}`);
+  }
+  
+  // Student loan thresholds
+  if (taxRates.studentLoan) {
+    Object.values(taxRates.studentLoan).forEach(plan => {
+      if (typeof plan === 'object' && plan.threshold) {
+        validNumbers.add(`£${plan.threshold.toLocaleString()}`);
+      }
+    });
+  }
+
+  // Common rounded/example amounts used in explanations (allowlist)
+  const commonExamples = [
+    '£0', '£100', '£500', '£1,000', '£5,000', '£10,000',
+    '£20,000', '£30,000', '£40,000', '£50,000', '£100,000'
+  ];
+  commonExamples.forEach(n => validNumbers.add(n));
+
+  // Check for unknown numbers
+  const unknownNumbers = numbersInResponse.filter(n => !validNumbers.has(n));
+
+  if (unknownNumbers.length > 0) {
+    return {
+      isValid: false,
+      unknownNumbers,
+      suggestedFix: "I'm not confident about those specific figures. Please check gov.uk for the exact current amounts."
+    };
+  }
+
+  return { isValid: true, unknownNumbers: [] };
+}
+```
+
+**Integration in `useSageExplainer.ts`:**
+
+```typescript
+import { validateNumbers } from '@/lib/validateNumbers';
+
+// After parsing LLM response, before displaying:
+const numericValidation = validateNumbers(parsedResponse.answer, TAX_RATES);
+
+if (!numericValidation.isValid) {
+  console.warn('Unknown numbers in response:', numericValidation.unknownNumbers);
+  
+  // Option 1: Replace response with safe fallback
+  parsedResponse.answer = numericValidation.suggestedFix || parsedResponse.answer;
+  
+  // Option 2: Append warning (less aggressive)
+  // parsedResponse.answer += '\n\n⚠️ Please verify figures at gov.uk';
+  
+  // Track in GA4
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'sage_numeric_validation_failed', {
+      unknown_numbers: numericValidation.unknownNumbers.join(', ')
+    });
+  }
+}
+```
+
+**Deliverable:** ✅ Hallucinated £ amounts caught before display
 
 ---
 
@@ -1026,11 +1479,12 @@ Add to `.env.local` and Vercel:
 GROQ_API_KEY=gsk_...
 ```
 
-**Groq Free Tier Limits:**
-- 30 requests/minute
-- 10,000 tokens/minute
-- Good for <50 daily users
+**Groq Free Tier Limits (verify at console.groq.com):**
+- ~30 requests/minute
+- ~6,000 tokens/minute for `llama-3.1-8b-instant` (limits vary by model)
+- Good for <30 daily users at MVP scale
 - No credit card required
+- **Monitor closely** - limits may be more restrictive than documented
 
 **Deliverable:** ✅ Production API route with Groq
 
@@ -1062,13 +1516,30 @@ npm run build && npm run start
 
 ### 5.3 Offline Fallback
 
+**NOTE:** Since knowledge is compiled from `sageKnowledge.ts` (which imports `taxRates.ts`), offline fallback works differently than a static JSON approach. The concepts are bundled into the client JS.
+
+**For truly offline-capable static data**, you could expose a generated JSON via API route:
+
+**File:** `app/api/sage-concepts/route.ts`
+
+```ts
+import { getTaxConcepts } from '@/lib/sageKnowledge';
+import { TAX_RATES } from '@/constants/taxRates';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const concepts = getTaxConcepts(TAX_RATES);
+  return NextResponse.json(concepts);
+}
+```
+
 **File:** `public/sw.js` (enhance existing service worker)
 
 ```js
-// Cache Sage assets for offline use
+// Cache Sage concepts API for offline use
 const SAGE_CACHE = 'sage-v1';
 const SAGE_ASSETS = [
-  '/lib/tax_sources.json'
+  '/api/sage-concepts'  // Generated from taxRates.ts at request time
 ];
 
 self.addEventListener('install', (event) => {
@@ -1079,9 +1550,9 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Serve cached tax_sources.json when offline
+// Serve cached concepts when offline
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('tax_sources.json')) {
+  if (event.request.url.includes('/api/sage-concepts')) {
     event.respondWith(
       caches.match(event.request).then((response) => {
         return response || fetch(event.request);
@@ -1366,7 +1837,7 @@ if (typeof window !== 'undefined' && window.gtag) {
 - Data privacy (SessionStorage only)
 
 **`docs/SAGE_MAINTENANCE.md`** - For future developers:
-- How to update `tax_sources.json`
+- How to update `sageKnowledge.ts` and `taxRates.ts`
 - How to tune prompts
 - How to monitor GA4 events
 - How to switch LLM providers
@@ -1583,7 +2054,8 @@ const greeting = pathname === '/scottish-tax'
 
 **Risk 2: Outdated Tax Information**
 - **Mitigation:**
-  - `lastUpdated` field in `tax_sources.json`
+  - Tax data freshness tied to `taxRates.ts` (single source of truth for entire app)
+  - When rates change, update `taxRates.ts` once - Sage definitions auto-update
   - Quarterly review calendar (post-Budget)
   - GA4 alerts if queries mention new tax changes
 
@@ -1606,7 +2078,7 @@ const greeting = pathname === '/scottish-tax'
 **Risk 2: High Support Burden**
 - **Mitigation:**
   - Monitor GA4 for common queries
-  - Add FAQ section to tax_sources.json
+  - Add FAQ concepts to sageKnowledge.ts
   - Track deflection rate (aim for 25% support reduction)
 
 **Risk 3: Cost Escalation**
@@ -1628,12 +2100,14 @@ src/
 │       └── __tests__/
 │           ├── SageWidget.test.tsx
 │           └── SageMessage.test.tsx
+├── constants/
+│   └── taxRates.ts                     # Single source of truth (EXISTING)
 ├── hooks/
 │   ├── useSageExplainer.ts             # Core logic hook
 │   └── __tests__/
 │       └── useSageExplainer.test.ts
 ├── lib/
-│   ├── tax_sources.json                # 20 UK tax concepts (knowledge base)
+│   ├── sageKnowledge.ts                # Tax concepts with template functions
 │   ├── validateSageResponse.ts         # Safety validation
 │   └── __tests__/
 │       └── validateSageResponse.test.ts
@@ -1642,8 +2116,6 @@ app/
 └── api/
     └── sage/
         └── route.ts                    # Groq API proxy (production)
-public/
-└── sw.js                               # Service worker (offline caching)
 docs/
 ├── SAGE_IMPLEMENTATION_PLAN.md         # This file
 ├── SAGE_USER_GUIDE.md                  # User-facing docs
@@ -1659,8 +2131,8 @@ docs/
 | Phase | Task | Time | Dependencies |
 |-------|------|------|--------------|
 | **1** | Install Ollama + Llama 3.1 | 15 mins | Homebrew, 5GB disk space |
-| **1** | Create tax_sources.json | 30 mins | HMRC research |
-| **2** | Build useSageExplainer hook | 1 hour | tax_sources.json |
+| **1** | Create sageKnowledge.ts | 30 mins | HMRC research |
+| **2** | Build useSageExplainer hook | 1 hour | sageKnowledge.ts |
 | **2** | Build SageWidget component | 1 hour | Hook complete |
 | **2** | Build SageMessage component | 30 mins | - |
 | **3** | Add to layout.tsx | 15 mins | Widget complete |
@@ -1726,4 +2198,83 @@ docs/
 
 ---
 
-**Want to kick off Phase 1 (Ollama setup)?** Let me know and I'll guide you through the installation! 🚀
+**Want to kick off Phase 1 (Ollama setup)?** Let me know and I'll guide you through the installation!
+
+---
+
+## Pre-Launch Checklist
+
+This checklist incorporates all findings from the Multi-AI Review (Claude, Grok, ChatGPT, Gemini).
+
+### Critical (Must Complete Before Launch)
+
+| # | Item | Phase | Status |
+|---|------|-------|--------|
+| C1 | Server-side rate limiting with Upstash/Vercel KV (10 req/min per IP) | 5.1 | ⬜ |
+| C2 | PII scrubbing utility (`sanitizePII.ts`) - strip NI numbers, UTRs, emails | 4.3 | ⬜ |
+| C3 | JSON cleaning utility (`cleanJson.ts`) + Groq `response_format: json_object` | 5.1 | ⬜ |
+| C4 | Fallback LLM provider (DeepSeek/Together AI) when Groq quota exhausted | 5.1 | ⬜ |
+| C5 | Legal disclaimers: ToS clause + per-response footer + reword "HMRC-sourced facts" | 7.2 | ⬜ |
+| C6 | Intent classifier (`classifyIntent.ts`) - block advice-seeking before LLM | 4.4 | ⬜ |
+
+### Major (Should Complete Before Launch)
+
+| # | Item | Phase | Status |
+|---|------|-------|--------|
+| M1 | Fuse.js fuzzy matching for concept lookup (handles typos) | 2.1 | ⬜ |
+| M2 | Model routing: 8B default, 70B for complex queries | 5.1 | ⬜ |
+| M3 | Numeric validation (`validateNumbers.ts`) against TAX_RATES allowlist | 4.5 | ⬜ |
+| M4 | ICO/DPIA compliance documentation (Groq as data processor) | 7.4 | ⬜ |
+| M5 | React Error Boundary wrapping SageWidget | 2.2 | ⬜ |
+| M6 | Mobile viewport fix: `h-[100dvh]` for Safari | 2.2 | ⬜ |
+| M7 | Debounce send button (prevent rapid clicks) | 2.2 | ⬜ |
+| M8 | Human oversight protocol for knowledge base updates | 7.5 | ⬜ |
+| M9 | User testing plan (validate analogies aren't misinterpreted) | 6.3 | ⬜ |
+
+### Minor (Nice to Have)
+
+| # | Item | Status |
+|---|------|--------|
+| N1 | Plain mode toggle for accountants (disable witty analogies) | ⬜ Deferred |
+| N2 | IP-based daily limits (50/day) instead of session-based | ⬜ |
+| N3 | Simplified offline fallback (direct concept lookup, no service worker) | ⬜ |
+| N4 | Contextual warnings when user asks "What should I do..." | ⬜ |
+| N5 | Prompt injection hardening (validateSageResponse covers LLM confirmations) | ⬜ |
+
+### Pre-Launch Testing
+
+| # | Test | Status |
+|---|------|--------|
+| T1 | Red-team harness: 200-500 adversarial prompts | ⬜ |
+| T2 | PII insertion tests (NI numbers, UTRs, emails) | ⬜ |
+| T3 | Advice-seeking query deflection tests | ⬜ |
+| T4 | Numeric hallucination tests (wrong £ amounts) | ⬜ |
+| T5 | Rate limit bypass attempts (incognito, curl) | ⬜ |
+| T6 | Mobile Safari viewport tests | ⬜ |
+| T7 | Groq quota exhaustion + fallback tests | ⬜ |
+
+### Legal & Compliance
+
+| # | Item | Status |
+|---|------|--------|
+| L1 | Terms of Service updated with AI disclaimer | ⬜ |
+| L2 | Privacy Policy updated (PII handling, Groq as processor) | ⬜ |
+| L3 | ICO-compliant DPIA documentation | ⬜ |
+| L4 | Professional indemnity insurance review | ⬜ |
+
+### Post-Launch Monitoring
+
+| Metric | Target | Tool |
+|--------|--------|------|
+| Response time | <3s p95 | GA4 |
+| Validation failure rate | <5% | GA4 |
+| PII detection rate | Track only | GA4 |
+| Advice deflection rate | Track only | GA4 |
+| Groq quota usage | <80% | console.groq.com |
+| Error rate | <1% | Sentry |
+
+---
+
+**Estimated Time to Complete Checklist:** 8-12 hours
+
+**Launch Gate:** All Critical (C1-C6) and Major (M1-M9) items must be complete before production launch.
