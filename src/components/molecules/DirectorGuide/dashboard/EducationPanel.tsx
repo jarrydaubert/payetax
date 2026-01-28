@@ -60,11 +60,11 @@ export function EducationPanel({ className }: EducationPanelProps) {
           />
           <LearnCard
             title='Corporation Tax'
-            description='19% on profits up to £50k, marginal relief £50k-£250k (effective ~26.5%), 25% above £250k.'
+            description='19% on profits up to £50k. Between £50k-£250k, marginal relief applies (26.5% on profits in this band). 25% above £250k.'
           />
           <LearnCard
             title='Employer Pension'
-            description='Most tax-efficient extraction. Company deducts from CT, you pay no tax or NI. Annual limit £60k.'
+            description='Tax-efficient: company deducts from CT, you pay no tax or NI. Annual allowance £60k (includes all contributions). Can carry forward unused allowance from previous 3 years.'
           />
         </div>
       </section>
