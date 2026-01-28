@@ -6,7 +6,9 @@
 
 ## Current Focus
 
-**Building:** First-Time Director's Guide to Paying Yourself
+**Building:** Director Calculator with Education Panel
+
+**Route:** `/tools/director-guide`
 
 **Phase:** Free tool → Build trust → Monetize later
 
@@ -18,34 +20,35 @@
 |-----|---------|--------------|
 | **[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** | The mantra | Before anything |
 | **[DIRECTOR_GUIDE_STRATEGY.md](./DIRECTOR_GUIDE_STRATEGY.md)** | WHAT + WHY (strategy, reviews) | Understanding the product |
-| **[DIRECTOR_GUIDE_BUILD.md](./DIRECTOR_GUIDE_BUILD.md)** | HOW (routes, components, UX) | When building |
+| **[DIRECTOR_TOOLS_MERGE_PLAN.md](./DIRECTOR_TOOLS_MERGE_PLAN.md)** | HOW (file inventory, atomic design) | When building |
 | **[DIRECTOR_TAX_MATH.md](./DIRECTOR_TAX_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
 | **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
 | **[IDEAS.md](./IDEAS.md)** | Future features | After revenue exists |
 
 ---
 
-## Archive
+## Reference
 
 | Doc | Purpose |
 |-----|---------|
-| [ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md](./ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md) | Historical reference (Oct 2025 pitch) |
+| **[CASE_STUDY_RECRUITER.md](./CASE_STUDY_RECRUITER.md)** | Real-world case study (commission-based director) |
+| **[COMPETITOR_GAP_ANALYSIS.md](./COMPETITOR_GAP_ANALYSIS.md)** | UK competitor landscape |
 
 ---
 
 ## Quick Summary
 
 **The Product:**
-- Education-first guide for confused first-time directors
-- "How do I pay myself?" not "What's the optimal tax extraction?"
-- Free forever. Compassionate pricing for optional Pro features.
+- Full-featured salary/dividend calculator with educational sidebar
+- Student loans, pension, BIK, Employment Allowance support
+- Strategy comparison (3 strategies), salary slider, pension gap warning
+- Education panel explains concepts without jargon
 
 **Key Output:**
-- "Safe monthly draw" (what you can take)
-- "Set-aside pots" (what to ring-fence for tax)
-- Key dates and deadlines
-
-**Route:** `/tools/director-guide`
+- Strategy comparison (All Salary / Optimal / All Dividends)
+- "Two Pots" - company tax pot + personal tax pot
+- Key dates with .ics calendar export
+- Pension gap warning for NI credits
 
 ---
 
