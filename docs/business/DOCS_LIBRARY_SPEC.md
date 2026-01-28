@@ -1091,6 +1091,21 @@ bun add flexsearch
 | Bounce rate | <40% |
 | Help icon clicks | Track per field |
 
+### Analytics Dashboard
+
+Track docs effectiveness with dedicated dashboard:
+
+| Metric | Implementation | Purpose |
+|--------|----------------|---------|
+| Help icon clicks | `data-doc-slug` attribute + event listener | Which fields confuse users most |
+| Doc → Calculator journeys | UTM params on "Try calculator" links | Content driving conversions |
+| Search queries with no results | Log to analytics | Content gaps to fill |
+| Time to first help click | Session tracking | Onboarding friction |
+| Doc feedback (thumbs up/down) | `<DocFeedback>` component | Content quality signal |
+| Scroll depth per doc | Intersection observer | Are users reading fully? |
+
+Priority: Help icon clicks and search gaps are highest signal for content priorities.
+
 ---
 
 ## Next Steps
@@ -1101,6 +1116,17 @@ bun add flexsearch
 4. **Review with team** - Get feedback on format
 5. **Scale content** - Write remaining docs
 6. **Integrate** - Add to calculators
+
+---
+
+## Contributing to Docs
+
+For contribution guidelines (PR process, style rules, review requirements), see `CONTRIBUTING.md` in the project root. The docs library follows the same standards as the main codebase.
+
+Key points for doc contributions:
+- All MDX must pass `bun run lint:docs` before merge
+- Tax threshold changes require HMRC source link in PR description
+- New docs need excerpt added to `_excerpts.json`
 
 ---
 
