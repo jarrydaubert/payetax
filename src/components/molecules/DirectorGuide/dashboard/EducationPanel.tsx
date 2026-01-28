@@ -20,6 +20,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
   const hasResults = comparison && comparison.grossProfit > 0;
   const revenue = formData.revenue ?? 0;
+  const optimalSalary = comparison?.strategies?.optimalMix?.salary ?? 0;
 
   // Calculate total income for PA taper / HICBC warnings
   const totalIncome = hasResults
@@ -54,6 +55,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
     : 0;
   const showPaymentsOnAccountWarning = personalTax > 1000;
   const showSurvivalModeWarning = comparison && comparison.grossProfit <= 0;
+
+  // Pension Gap Warning (Feast/Famine): Paying ErNI (>£5k) but no State Pension credit (<£6,396)
+  const showPensionGapWarning = hasResults && optimalSalary > 5000 && optimalSalary < 6396;
 
   return (
     <aside className={cn('flex h-full flex-col bg-muted/30 p-6', className)}>
@@ -96,12 +100,21 @@ export function EducationPanel({ className }: EducationPanelProps) {
         showHICBCWarning ||
         showPayrollWarning ||
         showPaymentsOnAccountWarning ||
-        showSurvivalModeWarning) && (
+        showSurvivalModeWarning ||
+        showPensionGapWarning) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
             Warnings
           </h3>
           <div className='space-y-3'>
+            {/* Critical: Pension Gap Warning (shown first) */}
+            {showPensionGapWarning && (
+              <WarningCard
+                title='Inefficient Salary Zone'
+                description='Your salary is between £5,000 and £6,396. You are paying 15% Employer NI but NOT earning a State Pension credit. Consider increasing to ~£6,500 for the credit (~£8/month extra cost).'
+                isCritical
+              />
+            )}
             {showOverdrawnWarning && (
               <WarningCard
                 title='Already Taken Too Much'
@@ -240,14 +253,34 @@ function LearnCard({ title, description }: LearnCardProps) {
 interface WarningCardProps {
   title: string;
   description: string;
+  isCritical?: boolean;
 }
 
-function WarningCard({ title, description }: WarningCardProps) {
+function WarningCard({ title, description, isCritical }: WarningCardProps) {
   return (
-    <div className='rounded-lg border border-amber-500/30 bg-amber-500/10 p-4'>
+    <div
+      className={cn(
+        'rounded-lg border p-4',
+        isCritical
+          ? 'border-red-500/30 bg-red-500/10'
+          : 'border-amber-500/30 bg-amber-500/10'
+      )}
+    >
       <div className='mb-2 flex items-center gap-2'>
-        <AlertTriangle className='size-4 text-amber-600 dark:text-amber-500' />
-        <span className='font-semibold text-amber-700 text-sm dark:text-amber-500'>{title}</span>
+        <AlertTriangle
+          className={cn(
+            'size-4',
+            isCritical ? 'text-red-600 dark:text-red-500' : 'text-amber-600 dark:text-amber-500'
+          )}
+        />
+        <span
+          className={cn(
+            'font-semibold text-sm',
+            isCritical ? 'text-red-700 dark:text-red-500' : 'text-amber-700 dark:text-amber-500'
+          )}
+        >
+          {title}
+        </span>
       </div>
       <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
     </div>

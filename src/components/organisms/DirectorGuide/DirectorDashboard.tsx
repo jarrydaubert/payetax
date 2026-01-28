@@ -28,6 +28,9 @@ import {
   StudentLoanInputs,
 } from '@/components/molecules/DirectorGuide/inputs';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
   trackGuideReset,
@@ -45,6 +48,10 @@ export function DirectorDashboard() {
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
   const { calculate, reset } = useDirectorGuideActions();
+
+  // Local state for Variable Income (Feast/Famine mode - not yet connected to calculations)
+  const [isVariableIncome, setIsVariableIncome] = useState(false);
+  const [bufferMonths, setBufferMonths] = useState(3);
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
@@ -96,6 +103,8 @@ export function DirectorDashboard() {
   const handleReset = useCallback(() => {
     trackGuideReset();
     hasTrackedResults.current = false;
+    setIsVariableIncome(false);
+    setBufferMonths(3);
     reset();
   }, [reset]);
 
@@ -130,6 +139,47 @@ export function DirectorDashboard() {
               <h2 className='font-semibold text-lg'>Your Situation</h2>
               <AlreadyTakenInputs />
               <OtherIncomeInput />
+
+              {/* Variable Income / Feast or Famine */}
+              <div className='border-t pt-4'>
+                <div className='mb-4 flex items-center justify-between'>
+                  <div className='space-y-0.5'>
+                    <Label className='text-base'>Variable / Unstable Income</Label>
+                    <p className='text-muted-foreground text-xs'>
+                      I need to retain a cash buffer for bad months (e.g. commission-based)
+                    </p>
+                  </div>
+                  <Switch
+                    checked={isVariableIncome}
+                    onCheckedChange={setIsVariableIncome}
+                    aria-label='Toggle variable income mode'
+                  />
+                </div>
+
+                {isVariableIncome && (
+                  <div className='animate-in fade-in slide-in-from-top-2 grid gap-4 duration-300 md:grid-cols-2'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='buffer-months'>Monthly Buffer Needed</Label>
+                      <div className='flex items-center gap-2'>
+                        <Input
+                          id='buffer-months'
+                          type='number'
+                          min={1}
+                          max={12}
+                          value={bufferMonths}
+                          onChange={(e) => setBufferMonths(Number(e.target.value))}
+                          className='w-24'
+                        />
+                        <span className='text-muted-foreground text-sm'>months of expenses</span>
+                      </div>
+                      <p className='text-muted-foreground text-xs'>
+                        We&apos;ll adjust the recommended extraction to leave this cash in the
+                        company. (Coming soon)
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </section>
 
             {/* Advanced Inputs */}
