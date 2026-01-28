@@ -41,7 +41,7 @@ import {
 } from '@/store/directorGuideStore';
 
 export function DirectorDashboard() {
-  const [educationCollapsed, setEducationCollapsed] = useState(true); // Collapsed on mobile by default
+  const [educationCollapsed, setEducationCollapsed] = useState(false); // Show education panel by default for trust
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
   const { calculate, reset } = useDirectorGuideActions();
