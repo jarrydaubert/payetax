@@ -73,7 +73,7 @@ nextra + nextra-theme-docs
 - Pages Router focused (App Router support newer)
 - Heavier
 
-**Recommendation:** Option A (Fumadocs) - best balance of features and Next.js 16 compatibility.
+**Recommendation:** Option A (Fumadocs) - best balance of features and Next.js 16 App Router compatibility.
 
 ---
 
@@ -156,9 +156,9 @@ Docs
 │   ├── Plan 1
 │   ├── Plan 2
 │   ├── Plan 4 (Scotland)
-│   ├── Plan 5 (Post-2023)
+│   ├── Plan 5 (Sept 2023+ courses, repayments from April 2026)
 │   ├── Postgraduate Loan
-│   └── Multiple Plans
+│   └── Multiple Plans (Important for directors)
 │
 ├── Pensions
 │   ├── Pension Contributions Explained
@@ -462,14 +462,27 @@ before you start paying Income Tax. For 2025-26, this is **£12,570**.
 // Help icon that links to doc
 <DocLink slug="personal-allowance" />
 
-// Tooltip with doc preview
+// Tooltip with doc preview (with accessibility)
 <DocTooltip slug="personal-allowance">
-  <HelpCircle className="size-4" />
+  <HelpCircle className="size-4" aria-hidden="true" />
+  <span className="sr-only">Learn about Personal Allowance</span>
 </DocTooltip>
 
 // In-calculator doc panel (slide-out)
 <DocPanel slug="personal-allowance" />
+
+// Feedback component for each doc
+<DocFeedback slug="personal-allowance" />
+// Thumbs up/down + optional comment
 ```
+
+### Accessibility Requirements
+
+- All help icons must have `sr-only` labels
+- Keyboard navigation support (Tab to focus, Enter to open)
+- ARIA labels on interactive elements
+- Focus management in modals/panels
+- Consistent icon placement (right of label)
 
 ---
 
@@ -605,11 +618,79 @@ export const metadata: Metadata = {
 ### Sitemap
 Auto-generate from docs content directory.
 
+### Print Styles
+
+Users (especially accountants) may want to print docs:
+
+```css
+@media print {
+  .docs-sidebar,
+  .docs-search,
+  .docs-feedback,
+  .docs-navigation { display: none; }
+  .docs-content { max-width: 100%; }
+}
+```
+
+---
+
+## Content Maintenance
+
+### When Tax Rates Change (Annual)
+1. Update `src/constants/taxRates.ts` (single source of truth)
+2. `<ThresholdTable>` components auto-update from taxRates.ts
+3. Review prose for any hardcoded values
+4. Update `lastUpdated` dates in frontmatter
+
+### Maintenance Calendar
+| When | Action |
+|------|--------|
+| Post-Budget (Nov/Dec) | Review for announced changes |
+| April 6 | Apply new tax year rates |
+| Quarterly | Audit for stale content |
+
+### Automation
+- CI check for hardcoded tax values in MDX files
+- Script to find docs not updated in >6 months
+- Alert when `taxRates.ts` changes but docs aren't updated
+
+---
+
+## URL Redirects
+
+When docs are renamed or restructured, old URLs will break. Maintain redirects in `next.config.ts`:
+
+```ts
+redirects: async () => [
+  {
+    source: '/docs/tax/personal-allowance',
+    destination: '/docs/allowances/personal-allowance',
+    permanent: true,
+  },
+],
+```
+
+Track all URL changes in `docs/REDIRECT_LOG.md`.
+
+---
+
+## Pilot Doc Priority
+
+For Phase 1 pilot docs, start with these high-traffic candidates:
+
+| Doc | Reason |
+|-----|--------|
+| `personal-allowance` | Most searched tax term |
+| `tax-code` | Common confusion point |
+| `employee-ni` | Appears on every payslip |
+| `dividends` | Director calculator core concept |
+| `student-loan-plan-2` | Largest loan cohort |
+
 ---
 
 ## Implementation Phases
 
-### Phase 1: Foundation (3-4 days)
+### Phase 1: Foundation
 - [ ] Install Fumadocs (or chosen framework)
 - [ ] Set up `/docs` route structure
 - [ ] Create layout with sidebar
@@ -617,27 +698,26 @@ Auto-generate from docs content directory.
 - [ ] Create 5 pilot docs to test structure
 - [ ] Add search (Flexsearch)
 
-### Phase 2: Content (5-7 days)
+### Phase 2: Content
 - [ ] Write all input docs (~36)
 - [ ] Write all output docs (~38)
 - [ ] Write conceptual docs (~15)
 - [ ] Write reference docs (~5)
-- [ ] Review and QA
+- [ ] Cross-check all thresholds against HMRC sources
+- [ ] Review against calculator logic for accuracy
 
-### Phase 3: Integration (2-3 days)
+### Phase 3: Integration
 - [ ] Add DocTooltip to all calculator fields
 - [ ] Add "Learn more" links in results
 - [ ] Add to navigation (Docs menu item)
 - [ ] Update sitemap
 - [ ] Test all links
 
-### Phase 4: Polish (1-2 days)
-- [ ] Mobile responsive testing
-- [ ] Accessibility audit
+### Phase 4: Polish
+- [ ] Mobile responsive testing (sidebar collapse, search UX)
+- [ ] Accessibility audit (keyboard nav, ARIA labels)
 - [ ] Performance optimization
-- [ ] Analytics integration
-
-**Total estimate: 11-16 days**
+- [ ] Analytics integration (per-field help icon tracking)
 
 ---
 
