@@ -5,26 +5,31 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function PensionInput() {
+  const id = useId();
   const formData = useDirectorFormData();
   const { setPensionContribution } = useDirectorGuideActions();
+
+  const inputId = `${id}-pension`;
 
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-1'>
-        <Label htmlFor='pensionContribution'>Employer Pension Contribution</Label>
+        <Label htmlFor={inputId}>Employer Pension Contribution</Label>
         <Tooltip>
           <TooltipTrigger>
             <Info className='size-4 text-muted-foreground' />
           </TooltipTrigger>
           <TooltipContent>
             <p className='max-w-xs'>
-              <strong>Most tax-efficient extraction method.</strong> Company pays directly to your pension:
+              <strong>Most tax-efficient extraction method.</strong> Company pays directly to your
+              pension:
               <span className='mt-1 block'>• Deductible from Corporation Tax</span>
               <span className='block'>• No Employer or Employee NI</span>
               <span className='block'>• No Income Tax</span>
@@ -38,7 +43,7 @@ export function PensionInput() {
       <div className='flex items-center gap-2'>
         <span className='text-muted-foreground'>£</span>
         <Input
-          id='pensionContribution'
+          id={inputId}
           type='number'
           value={formData.pensionContribution || ''}
           onChange={(e) => setPensionContribution(parseFloat(e.target.value) || 0)}

@@ -16,10 +16,7 @@ import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
 import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
-import {
-  calculateStrategyComparison,
-  type StrategyComparison,
-} from '@/lib/tax/strategyComparison';
+import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import type {
   DirectorCalculationResult,
   DirectorInput,
@@ -51,16 +48,16 @@ export interface DirectorFormData {
   revenue: number | undefined;
   includesVat: boolean;
   expenses: number | undefined;
-  
+
   // Director situation
   alreadyTaken: number;
   takenViaPayroll: TakenViaPayroll;
   otherIncome: number;
-  
+
   // Year-end
   yearEndMonth: YearEndMonth;
   yearEndCustom: string;
-  
+
   // Advanced inputs
   studentLoanPlans: StudentLoanPlan[];
   pensionContribution: number;
@@ -95,16 +92,16 @@ interface DirectorGuideActions {
   setRevenue: (revenue: number) => void;
   setIncludesVat: (includesVat: boolean) => void;
   setExpenses: (expenses: number) => void;
-  
+
   // Director situation setters
   setAlreadyTaken: (amount: number) => void;
   setTakenViaPayroll: (value: TakenViaPayroll) => void;
   setOtherIncome: (amount: number) => void;
-  
+
   // Year-end setters
   setYearEndMonth: (month: YearEndMonth) => void;
   setYearEndCustom: (custom: string) => void;
-  
+
   // Advanced input setters
   setStudentLoanPlans: (plans: StudentLoanPlan[]) => void;
   toggleStudentLoanPlan: (plan: StudentLoanPlan) => void;
@@ -340,9 +337,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 expenses: formData.expenses,
                 otherIncome: formData.otherIncome,
                 employmentAllowance: formData.hasEmploymentAllowance,
-                studentLoanPlans: formData.studentLoanPlans.length > 0
-                  ? formData.studentLoanPlans
-                  : undefined,
+                studentLoanPlans:
+                  formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
                 pensionContribution: formData.pensionContribution,
                 companyCarBIK: formData.companyCarBIK,
               },

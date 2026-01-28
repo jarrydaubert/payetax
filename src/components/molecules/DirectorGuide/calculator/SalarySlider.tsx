@@ -73,17 +73,13 @@ export function SalarySlider() {
       salary: strategy.salary,
       dividends: strategy.dividends,
       takeHome: strategy.takeHome,
-      totalTax:
-        strategy.totalPersonalTax + strategy.employerNI + strategy.corporationTax,
+      totalTax: strategy.totalPersonalTax + strategy.employerNI + strategy.corporationTax,
     };
   }, [comparison, sliderSalary, selectedStrategy, formData]);
 
   if (!comparison || comparison.grossProfit <= 0 || !activeScenario) return null;
 
-  const maxSliderSalary = Math.min(
-    comparison.grossProfit,
-    comparison.strategies.allSalary.salary
-  );
+  const maxSliderSalary = Math.min(comparison.grossProfit, comparison.strategies.allSalary.salary);
 
   const currentSalary = sliderSalary ?? comparison.strategies[selectedStrategy].salary;
 
@@ -116,15 +112,13 @@ export function SalarySlider() {
             </Button>
           )}
         </CardTitle>
-        <CardDescription>
-          Drag to see how the entire breakdown changes in real-time
-        </CardDescription>
+        <CardDescription>Drag to see how the entire breakdown changes in real-time</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='space-y-4'>
           {/* Current value */}
           <div className='flex items-center justify-between'>
-            <span className='text-lg font-semibold'>{formatCurrency(currentSalary)}</span>
+            <span className='font-semibold text-lg'>{formatCurrency(currentSalary)}</span>
             <span className='text-muted-foreground'>
               {formatCurrency(currentSalary / 12)}/month
             </span>
@@ -181,9 +175,7 @@ export function SalarySlider() {
 
           {/* Comparison message */}
           {sliderSalary !== null && diff !== 0 && (
-            <p
-              className={`text-center text-sm ${diff > 0 ? 'text-green-600' : 'text-amber-600'}`}
-            >
+            <p className={`text-center text-sm ${diff > 0 ? 'text-green-600' : 'text-amber-600'}`}>
               {diff > 0 ? '+' : ''}
               {formatCurrency(diff)} vs recommended strategy
             </p>

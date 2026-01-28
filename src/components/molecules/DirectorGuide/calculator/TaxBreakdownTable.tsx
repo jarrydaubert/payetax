@@ -62,33 +62,57 @@ export function TaxBreakdownTable() {
                 <TableCell className='pl-6'>Income Tax</TableCell>
                 <TableCell className='text-right'>{formatCurrency(allSalary.incomeTax)}</TableCell>
                 <TableCell className='text-right'>{formatCurrency(optimalMix.incomeTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.incomeTax)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.incomeTax)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className='pl-6'>Employee NI</TableCell>
                 <TableCell className='text-right'>{formatCurrency(allSalary.employeeNI)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(optimalMix.employeeNI)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.employeeNI)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(optimalMix.employeeNI)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.employeeNI)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className='pl-6'>Dividend Tax</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allSalary.dividendTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(optimalMix.dividendTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.dividendTax)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allSalary.dividendTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(optimalMix.dividendTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.dividendTax)}
+                </TableCell>
               </TableRow>
               {hasStudentLoans && (
                 <TableRow>
                   <TableCell className='pl-6'>Student Loan</TableCell>
-                  <TableCell className='text-right'>{formatCurrency(allSalary.studentLoan)}</TableCell>
-                  <TableCell className='text-right'>{formatCurrency(optimalMix.studentLoan)}</TableCell>
-                  <TableCell className='text-right'>{formatCurrency(allDividends.studentLoan)}</TableCell>
+                  <TableCell className='text-right'>
+                    {formatCurrency(allSalary.studentLoan)}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    {formatCurrency(optimalMix.studentLoan)}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    {formatCurrency(allDividends.studentLoan)}
+                  </TableCell>
                 </TableRow>
               )}
               <TableRow className='font-medium'>
                 <TableCell className='pl-6'>Subtotal (Personal)</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allSalary.totalPersonalTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(optimalMix.totalPersonalTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.totalPersonalTax)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allSalary.totalPersonalTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(optimalMix.totalPersonalTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.totalPersonalTax)}
+                </TableCell>
               </TableRow>
 
               {/* Company Taxes Section */}
@@ -100,14 +124,24 @@ export function TaxBreakdownTable() {
               <TableRow>
                 <TableCell className='pl-6'>Employer NI</TableCell>
                 <TableCell className='text-right'>{formatCurrency(allSalary.employerNI)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(optimalMix.employerNI)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.employerNI)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(optimalMix.employerNI)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.employerNI)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className='pl-6'>Corporation Tax</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allSalary.corporationTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(optimalMix.corporationTax)}</TableCell>
-                <TableCell className='text-right'>{formatCurrency(allDividends.corporationTax)}</TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allSalary.corporationTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(optimalMix.corporationTax)}
+                </TableCell>
+                <TableCell className='text-right'>
+                  {formatCurrency(allDividends.corporationTax)}
+                </TableCell>
               </TableRow>
               <TableRow className='font-medium'>
                 <TableCell className='pl-6'>Subtotal (Company)</TableCell>
@@ -126,13 +160,21 @@ export function TaxBreakdownTable() {
               <TableRow className='bg-muted/50 font-semibold'>
                 <TableCell>TOTAL TAX (All Sources)</TableCell>
                 <TableCell className='text-right'>
-                  {formatCurrency(allSalary.totalPersonalTax + allSalary.employerNI + allSalary.corporationTax)}
+                  {formatCurrency(
+                    allSalary.totalPersonalTax + allSalary.employerNI + allSalary.corporationTax
+                  )}
                 </TableCell>
                 <TableCell className='text-right'>
-                  {formatCurrency(optimalMix.totalPersonalTax + optimalMix.employerNI + optimalMix.corporationTax)}
+                  {formatCurrency(
+                    optimalMix.totalPersonalTax + optimalMix.employerNI + optimalMix.corporationTax
+                  )}
                 </TableCell>
                 <TableCell className='text-right'>
-                  {formatCurrency(allDividends.totalPersonalTax + allDividends.employerNI + allDividends.corporationTax)}
+                  {formatCurrency(
+                    allDividends.totalPersonalTax +
+                      allDividends.employerNI +
+                      allDividends.corporationTax
+                  )}
                 </TableCell>
               </TableRow>
             </TableBody>

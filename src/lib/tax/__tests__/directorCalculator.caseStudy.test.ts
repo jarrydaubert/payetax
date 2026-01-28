@@ -7,12 +7,8 @@
  * @see docs/business/CASE_STUDY_RECRUITER.md
  */
 
-import {
-  getEmployerNI,
-  getEmployerNIThreshold,
-  getEmployerNIRate,
-} from '../employerNI';
 import { TAX_RATES } from '@/constants/taxRates';
+import { getEmployerNI, getEmployerNIRate, getEmployerNIThreshold } from '../employerNI';
 
 // Helper to match existing test patterns
 const calculateEmployerNI = (salary: number) => getEmployerNI(salary);
@@ -184,22 +180,22 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       { salary: 50270, expectedNI: 6790.5, pensionCredits: true },
     ];
 
-    it.each(salaryBreakpoints)(
-      'should calculate correct NI for £$salary salary',
-      ({ salary, expectedNI }) => {
-        const employerNI = calculateEmployerNI(salary);
-        expect(employerNI).toBeCloseTo(expectedNI, 1);
-      }
-    );
+    it.each(salaryBreakpoints)('should calculate correct NI for £$salary salary', ({
+      salary,
+      expectedNI,
+    }) => {
+      const employerNI = calculateEmployerNI(salary);
+      expect(employerNI).toBeCloseTo(expectedNI, 1);
+    });
 
-    it.each(salaryBreakpoints)(
-      'should determine pension credit eligibility for £$salary salary',
-      ({ salary, pensionCredits }) => {
-        const lel = NI_THRESHOLDS.lowerEarningsLimit;
-        const qualifiesForPension = salary >= lel;
-        expect(qualifiesForPension).toBe(pensionCredits);
-      }
-    );
+    it.each(salaryBreakpoints)('should determine pension credit eligibility for £$salary salary', ({
+      salary,
+      pensionCredits,
+    }) => {
+      const lel = NI_THRESHOLDS.lowerEarningsLimit;
+      const qualifiesForPension = salary >= lel;
+      expect(qualifiesForPension).toBe(pensionCredits);
+    });
   });
 
   describe('Cash Buffer vs Retained Earnings', () => {

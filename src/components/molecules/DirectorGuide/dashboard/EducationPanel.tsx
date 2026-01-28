@@ -8,10 +8,7 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  useDirectorFormData,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
+import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
 
 interface EducationPanelProps {
   className?: string;
@@ -26,11 +23,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
   // Determine which warnings to show
   const showVATWarning = hasResults && revenue >= 85000 && revenue <= 95000;
-  const showSelfAssessmentWarning =
-    hasResults && comparison.strategies.optimalMix.dividends > 0;
+  const showSelfAssessmentWarning = hasResults && comparison.strategies.optimalMix.dividends > 0;
   const showOtherIncomeWarning = formData.otherIncome > 0;
-  const showDLAWarning =
-    formData.alreadyTaken > 0 && formData.takenViaPayroll === 'no';
+  const showDLAWarning = formData.alreadyTaken > 0 && formData.takenViaPayroll === 'no';
   const showComplexityWarning = hasResults && comparison.grossProfit > 250000;
   const showOverdrawnWarning =
     hasResults && formData.alreadyTaken > comparison.strategies.optimalMix.takeHome;
@@ -153,9 +148,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
           <AssumptionRow
             label='Student Loans'
             value={
-              formData.studentLoanPlans.length > 0
-                ? formData.studentLoanPlans.join(', ')
-                : 'None'
+              formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans.join(', ') : 'None'
             }
             isLast
           />
@@ -189,9 +182,7 @@ function WarningCard({ title, description }: WarningCardProps) {
     <div className='rounded-lg border border-amber-500/30 bg-amber-500/10 p-4'>
       <div className='mb-2 flex items-center gap-2'>
         <AlertTriangle className='size-4 text-amber-600 dark:text-amber-500' />
-        <span className='font-semibold text-amber-700 text-sm dark:text-amber-500'>
-          {title}
-        </span>
+        <span className='font-semibold text-amber-700 text-sm dark:text-amber-500'>{title}</span>
       </div>
       <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
     </div>

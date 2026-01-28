@@ -5,6 +5,7 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -16,21 +17,25 @@ import {
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
+  type TakenViaPayroll,
   useDirectorFormData,
   useDirectorGuideActions,
-  type TakenViaPayroll,
 } from '@/store/directorGuideStore';
 
 export function AlreadyTakenInputs() {
+  const id = useId();
   const formData = useDirectorFormData();
   const { setAlreadyTaken, setTakenViaPayroll } = useDirectorGuideActions();
+
+  const alreadyTakenId = `${id}-alreadyTaken`;
+  const viaPayrollId = `${id}-viaPayroll`;
 
   return (
     <div className='grid gap-4 sm:grid-cols-2'>
       {/* Already Taken */}
       <div className='space-y-2'>
         <div className='flex items-center gap-1'>
-          <Label htmlFor='alreadyTaken'>Already Taken This Year</Label>
+          <Label htmlFor={alreadyTakenId}>Already Taken This Year</Label>
           <Tooltip>
             <TooltipTrigger>
               <Info className='size-4 text-muted-foreground' />
@@ -45,7 +50,7 @@ export function AlreadyTakenInputs() {
         <div className='flex items-center gap-2'>
           <span className='text-muted-foreground'>£</span>
           <Input
-            id='alreadyTaken'
+            id={alreadyTakenId}
             type='number'
             value={formData.alreadyTaken || ''}
             onChange={(e) => setAlreadyTaken(parseFloat(e.target.value) || 0)}
@@ -57,7 +62,7 @@ export function AlreadyTakenInputs() {
       {/* Via Payroll */}
       <div className='space-y-2'>
         <div className='flex items-center gap-1'>
-          <Label htmlFor='takenViaPayroll'>Was this via payroll?</Label>
+          <Label htmlFor={viaPayrollId}>Was this via payroll?</Label>
           <Tooltip>
             <TooltipTrigger>
               <Info className='size-4 text-muted-foreground' />
@@ -73,7 +78,7 @@ export function AlreadyTakenInputs() {
           value={formData.takenViaPayroll}
           onValueChange={(v) => setTakenViaPayroll(v as TakenViaPayroll)}
         >
-          <SelectTrigger id='takenViaPayroll'>
+          <SelectTrigger id={viaPayrollId}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

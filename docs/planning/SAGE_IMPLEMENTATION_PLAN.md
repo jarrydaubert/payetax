@@ -1,33 +1,33 @@
 # 🧙 Sage AI Explainer - Implementation Plan
 
-**Last Updated**: October 9, 2025
-**Timeline**: 9-13 hours (~2 working days)
-**Status**: Ready for Phase 1 Prototype
+**Last Updated**: January 2026
+**Timeline**: ~2 working days
+**Status**: Concept - Ready for Review
 
 ---
 
 ## Executive Summary
 
 **What It Is:**
-An always-available, floating chat widget that explains UK tax concepts in plain language with witty analogies. Read-only education tool—no advice, just HMRC-sourced facts. Runs on Ollama (local dev) and Groq (production) for zero ongoing costs.
+An always-available, floating chat widget that explains UK tax concepts in plain language with witty analogies. Read-only education tool—no advice, just HMRC-sourced facts.
 
-**Why Now:**
-- **Engagement**: 20-30% longer session times (fintech benchmarks)
-- **Differentiation**: First UK tax calculator with local AI explainer
+**Why Build This:**
+- **Engagement**: Longer session times (fintech benchmarks show 20-30% lift)
+- **Differentiation**: No UK tax calculator has an AI explainer
 - **Trust**: YMYL-safe with strict prompt validation + HMRC citations
-- **Zero Cost**: Ollama (free) + Groq free tier (30 req/min) + Vercel edge
+- **Low Cost**: Local LLM for dev, free-tier cloud inference for production
 
 **Tech Stack Reuse:**
 - `SustainabilityBadge` modal pattern (Framer Motion)
 - shadcn/ui Dialog, Button, ScrollArea
 - Glassmorphism from Footer/SimpleNavbar
 - React 19 hooks, SessionStorage
+- **Tax data from existing `src/constants/taxRates.ts`** (single source of truth)
 
 **Success Metrics:**
-- Prototype working: 2-3 hours
-- Production-ready: 2-3 days
-- Engagement lift: +20-30% time on site
-- Support deflection: 25% fewer "what is X?" questions
+- Engagement lift on pages with widget
+- Reduction in basic "what is X?" support questions
+- User feedback on clarity of explanations
 
 ---
 
@@ -101,202 +101,76 @@ curl http://localhost:11434/api/generate \
 
 ---
 
-### 1.2 Create Tax Knowledge Base
+### 1.2 Knowledge Base Architecture
 
-**File:** `src/lib/tax_sources.json`
+**Critical Design Decision:** No hardcoded tax values in the knowledge base.
 
-**Strategy:** Start with **20 core concepts** based on:
-- 2025-26 HMRC priorities (NI hikes, non-dom reforms, CGT)
-- High-traffic topics (personal allowance, tax codes, marriage allowance)
-- Seasonal relevance (tax year end in April, Autumn Budget changes)
+All numeric tax data (rates, thresholds, allowances) MUST come from the existing single source of truth: `src/constants/taxRates.ts`. This prevents the #1 failure mode: stale/wrong numbers that destroy trust.
 
-```json
-{
-  "concepts": [
-    {
-      "id": "paye",
-      "term": "PAYE",
-      "definition": "Pay As You Earn - tax deducted from your salary by your employer before you receive it",
-      "source": "https://www.gov.uk/paye-for-employees",
-      "analogy": "Like your employer taking a slice of your paycheck pie before handing it to you",
-      "relatedTerms": ["tax-code", "ni-contributions", "personal-allowance"]
-    },
-    {
-      "id": "personal-allowance",
-      "term": "Personal Allowance",
-      "definition": "The amount you can earn tax-free each year. For 2025-26, it's £12,570 (frozen until April 2028)",
-      "source": "https://www.gov.uk/income-tax-rates",
-      "analogy": "Your tax-free slice of income pie—earn up to £12,570 without HMRC taking a bite",
-      "relatedTerms": ["income-tax-bands", "marriage-allowance"]
-    },
-    {
-      "id": "marriage-allowance",
-      "term": "Marriage Allowance",
-      "definition": "Transfer £1,260 of your personal allowance to your spouse/civil partner if they earn more. Saves up to £252/year",
-      "source": "https://www.gov.uk/marriage-allowance",
-      "analogy": "Sharing your tax-free pie slice with your partner",
-      "savings": "Up to £252/year",
-      "relatedTerms": ["personal-allowance"]
-    },
-    {
-      "id": "national-insurance",
-      "term": "National Insurance",
-      "definition": "Contributions deducted from earnings to fund NHS, state pension, and benefits. Rates for 2025-26: 8% on £12,570-£50,270, then 2% above",
-      "source": "https://www.gov.uk/national-insurance-rates-letters",
-      "analogy": "Your ticket to state pension and NHS—pay now, benefit later",
-      "relatedTerms": ["paye", "employer-ni"]
-    },
-    {
-      "id": "tax-code",
-      "term": "Tax Code",
-      "definition": "A code that tells your employer how much tax to deduct. Most common: 1257L (£12,570 personal allowance)",
-      "source": "https://www.gov.uk/tax-codes",
-      "analogy": "Your tax recipe—tells your employer how much to cook off your paycheck",
-      "relatedTerms": ["paye", "personal-allowance"]
-    },
-    {
-      "id": "income-tax-bands",
-      "term": "Income Tax Bands (England/Wales/NI)",
-      "definition": "Basic rate: 20% on £12,571-£50,270 | Higher rate: 40% on £50,271-£125,140 | Additional rate: 45% above £125,140",
-      "source": "https://www.gov.uk/income-tax-rates",
-      "analogy": "Tax stairs—the more you earn, the higher you climb",
-      "relatedTerms": ["personal-allowance", "scottish-tax-bands"]
-    },
-    {
-      "id": "scottish-tax-bands",
-      "term": "Scottish Income Tax Bands",
-      "definition": "Starter: 19% | Basic: 20% | Intermediate: 21% | Higher: 42% | Top: 47%. Different rates from rest of UK",
-      "source": "https://www.gov.scot/publications/scottish-income-tax-2025-26/",
-      "analogy": "Scotland's own tax recipe—more bands, different flavors",
-      "relatedTerms": ["income-tax-bands"]
-    },
-    {
-      "id": "non-dom-reforms",
-      "term": "Non-Dom Reforms (April 2025)",
-      "definition": "From April 6, 2025, non-domiciled residents pay UK tax on worldwide income. Remittance basis abolished",
-      "source": "https://www.gov.uk/government/publications/non-domicile-taxation",
-      "analogy": "The overseas tax holiday is over—UK now taxes all your income",
-      "relatedTerms": ["income-tax-bands"]
-    },
-    {
-      "id": "employer-ni",
-      "term": "Employer National Insurance",
-      "definition": "Employers pay 15% NI on employee earnings above £175/week (from April 2025). Separate from employee NI",
-      "source": "https://www.gov.uk/national-insurance-rates-letters",
-      "analogy": "The hidden payroll tax—your employer pays before you even see your salary",
-      "relatedTerms": ["national-insurance"]
-    },
-    {
-      "id": "student-loan",
-      "term": "Student Loan Repayments",
-      "definition": "Plan 1: 9% above £24,990 | Plan 2: 9% above £27,295 | Plan 4: 9% above £31,395 | Plan 5: 9% above £25,000",
-      "source": "https://www.gov.uk/repaying-your-student-loan",
-      "analogy": "A graduate tax—9% of everything you earn above the threshold",
-      "relatedTerms": ["paye"]
-    },
-    {
-      "id": "capital-gains-tax",
-      "term": "Capital Gains Tax (CGT)",
-      "definition": "Tax on profits from selling assets like property or shares. Rates: 10%/18% (basic) or 20%/24% (higher). Allowance: £3,000 (2025-26)",
-      "source": "https://www.gov.uk/capital-gains-tax",
-      "analogy": "Profit tax—sell something for more than you paid, HMRC wants a slice",
-      "relatedTerms": []
-    },
-    {
-      "id": "vat",
-      "term": "VAT (Value Added Tax)",
-      "definition": "20% tax on most goods and services. Businesses must register if turnover exceeds £90,000",
-      "source": "https://www.gov.uk/vat-rates",
-      "analogy": "The shopping tax—one-fifth of most purchases goes to HMRC",
-      "relatedTerms": []
-    },
-    {
-      "id": "pension-tax-relief",
-      "term": "Pension Tax Relief",
-      "definition": "Tax relief on pension contributions at your marginal rate. Basic rate (20%), higher rate (40%), additional rate (45%)",
-      "source": "https://www.gov.uk/tax-on-your-private-pension",
-      "analogy": "Government tops up your pension pot—save £80, get £100 in your pension",
-      "relatedTerms": ["income-tax-bands"]
-    },
-    {
-      "id": "isa",
-      "term": "ISA (Individual Savings Account)",
-      "definition": "Tax-free savings account. 2025-26 allowance: £20,000. No tax on interest, dividends, or capital gains",
-      "source": "https://www.gov.uk/individual-savings-accounts",
-      "analogy": "Your tax-free piggy bank—keep up to £20K growing without HMRC touching it",
-      "relatedTerms": []
-    },
-    {
-      "id": "child-benefit",
-      "term": "Child Benefit",
-      "definition": "£25.60/week for first child, £16.95 for additional children. High Income Child Benefit Charge applies if parent earns over £60,000",
-      "source": "https://www.gov.uk/child-benefit",
-      "analogy": "Government's contribution to raising kids—but high earners pay some back",
-      "relatedTerms": []
-    },
-    {
-      "id": "self-assessment",
-      "term": "Self-Assessment Tax Return",
-      "definition": "Annual tax return for self-employed, landlords, or those with complex income. Deadline: January 31 following tax year",
-      "source": "https://www.gov.uk/self-assessment-tax-returns",
-      "analogy": "Your annual tax homework—tell HMRC what you earned and owe",
-      "relatedTerms": []
-    },
-    {
-      "id": "dividend-tax",
-      "term": "Dividend Tax",
-      "definition": "Tax on dividends from shares. Rates: 8.75% (basic), 33.75% (higher), 39.35% (additional). Allowance: £500 (2025-26)",
-      "source": "https://www.gov.uk/tax-on-dividends",
-      "analogy": "Tax on company profit shares—HMRC wants a cut of your dividend pie",
-      "relatedTerms": ["income-tax-bands"]
-    },
-    {
-      "id": "inheritance-tax",
-      "term": "Inheritance Tax (IHT)",
-      "definition": "40% tax on estates over £325,000 (frozen until 2030). Spouse transfers are tax-free",
-      "source": "https://www.gov.uk/inheritance-tax",
-      "analogy": "The death tax—40% of your estate above £325K goes to HMRC",
-      "relatedTerms": []
-    },
-    {
-      "id": "blind-persons-allowance",
-      "term": "Blind Person's Allowance",
-      "definition": "Extra £3,070 tax-free allowance for registered blind/severely sight-impaired people (2025-26)",
-      "source": "https://www.gov.uk/blind-persons-allowance",
-      "analogy": "Extra tax-free slice for those with severe sight loss",
-      "relatedTerms": ["personal-allowance"]
-    },
-    {
-      "id": "scottish-taxpayer",
-      "term": "Scottish Taxpayer",
-      "definition": "If you live in Scotland, you pay Scottish income tax rates (different bands). NI rates stay the same across UK",
-      "source": "https://www.gov.scot/policies/taxes/",
-      "analogy": "Scotland's tax recipe—your postcode determines your tax rates",
-      "relatedTerms": ["scottish-tax-bands", "income-tax-bands"]
-    }
-  ],
-  "disclaimers": [
-    "This is educational information only, not financial or tax advice",
-    "Tax rules change frequently—always check gov.uk for the latest",
-    "For your specific situation, consult a qualified tax advisor or accountant",
-    "HMRC is the authoritative source for all UK tax matters"
-  ],
-  "lastUpdated": "2025-10-09",
-  "sources": [
-    "https://www.gov.uk/browse/tax",
-    "https://www.gov.scot/policies/taxes/",
-    "https://www.gov.uk/government/organisations/hm-revenue-customs"
-  ]
+**Knowledge Base Structure:**
+
+```typescript
+// src/lib/sageKnowledge.ts
+
+import { TAX_RATES } from '@/constants/taxRates';
+
+interface TaxConcept {
+  id: string;
+  term: string;
+  // Definition is a TEMPLATE with placeholders, not hardcoded values
+  definitionTemplate: (rates: typeof TAX_RATES) => string;
+  source: string;  // Must be gov.uk or gov.scot URL
+  analogy: string;
+  triggers: string[];  // Natural language phrases that should match this concept
+  relatedTerms: string[];
 }
+
+// Example concept - values pulled from taxRates.ts at runtime
+const personalAllowance: TaxConcept = {
+  id: 'personal-allowance',
+  term: 'Personal Allowance',
+  definitionTemplate: (rates) => 
+    `The amount you can earn tax-free each year. Currently £${rates.incomeTax.personalAllowance.toLocaleString()}.`,
+  source: 'https://www.gov.uk/income-tax-rates',
+  analogy: 'Your tax-free slice of income pie',
+  triggers: ['tax free', 'allowance', 'before tax', 'no tax on'],
+  relatedTerms: ['income-tax-bands', 'marriage-allowance']
+};
 ```
 
-**Expansion Strategy:**
-- Launch with these 20 core concepts (<50KB JSON)
-- Monitor GA4 query logs for 2 weeks
-- Add 10-15 more based on top unanswered questions
-- Quarterly updates post-Budget announcements (next: March 2026 Spring Statement)
+**Core Concepts to Include (20 for MVP):**
 
-**Deliverable:** ✅ JSON file with 20 HMRC-sourced tax concepts ready for RAG
+| Concept | Triggers (examples) | Source |
+|---------|---------------------|--------|
+| PAYE | "pay as you earn", "employer deducts" | gov.uk/paye-for-employees |
+| Personal Allowance | "tax free amount", "no tax on" | gov.uk/income-tax-rates |
+| National Insurance | "NI", "national insurance", "contributions" | gov.uk/national-insurance |
+| Tax Codes | "1257L", "tax code", "wrong code" | gov.uk/tax-codes |
+| Income Tax Bands | "tax rate", "40%", "higher rate" | gov.uk/income-tax-rates |
+| Scottish Tax | "scottish tax", "live in scotland" | gov.scot/scottish-income-tax |
+| Marriage Allowance | "married", "civil partner", "transfer allowance" | gov.uk/marriage-allowance |
+| Student Loans | "student loan", "plan 1", "plan 2" | gov.uk/repaying-your-student-loan |
+| Dividends | "dividend", "company shares" | gov.uk/tax-on-dividends |
+| Pension Relief | "pension", "tax relief", "contribution" | gov.uk/tax-on-your-private-pension |
+| Self Assessment | "tax return", "self employed" | gov.uk/self-assessment-tax-returns |
+| Employer NI | "employer ni", "employer national insurance" | gov.uk/national-insurance-rates-letters |
+| CGT | "capital gains", "selling property", "selling shares" | gov.uk/capital-gains-tax |
+| ISA | "isa", "tax free savings" | gov.uk/individual-savings-accounts |
+| Child Benefit | "child benefit", "HICBC" | gov.uk/child-benefit |
+| VAT | "vat", "value added tax" | gov.uk/vat-rates |
+| Inheritance Tax | "inheritance", "estate tax", "death tax" | gov.uk/inheritance-tax |
+| £100k Trap | "100k trap", "lose allowance", "60% tax" | gov.uk/income-tax-rates |
+| Salary Sacrifice | "salary sacrifice", "pension sacrifice" | gov.uk/salary-sacrifice |
+| Employment Allowance | "employment allowance", "employer allowance" | gov.uk/claim-employment-allowance |
+
+**Why This Architecture:**
+
+1. **Single source of truth** - When tax rates change (Budget, new tax year), update `taxRates.ts` once. Sage automatically uses correct values.
+2. **No stale data** - Can't accidentally ship wrong numbers because they're never hardcoded.
+3. **Triggers improve matching** - User asks "why does my tax spike at £100k?" → matches "100k trap" concept even without exact term.
+4. **Verifiable sources** - Every concept links to official gov.uk page.
+
+**Deliverable:** Knowledge base architecture that cannot contain stale tax data
 
 ---
 

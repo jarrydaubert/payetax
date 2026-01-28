@@ -14,9 +14,9 @@ const formatDate = (date: Date) =>
   date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 const generateICS = (title: string, date: Date, description: string) => {
-  const formatICSDate = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const formatICSDate = (d: Date) => `${d.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`;
   const dateStr = date.toISOString().split('T')[0]?.replace(/-/g, '') ?? '';
-  
+
   const ics = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//PayeTax//Director Calculator//EN
@@ -128,10 +128,7 @@ export function KeyDates() {
       <CardContent>
         <div className='grid gap-4 sm:grid-cols-2'>
           {dates.map(({ label, date, description }) => (
-            <div
-              key={label}
-              className='flex items-center justify-between rounded-lg border p-3'
-            >
+            <div key={label} className='flex items-center justify-between rounded-lg border p-3'>
               <div>
                 <div className='font-medium'>{label}</div>
                 <div className='text-muted-foreground text-sm'>{formatDate(date)}</div>

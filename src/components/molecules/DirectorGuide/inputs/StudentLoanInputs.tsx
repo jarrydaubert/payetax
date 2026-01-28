@@ -46,8 +46,8 @@ export function StudentLoanInputs() {
           </TooltipTrigger>
           <TooltipContent>
             <p className='max-w-xs'>
-              <strong>Directors pay student loans on TOTAL income</strong> (salary + dividends)
-              via Self Assessment — not just salary.
+              <strong>Directors pay student loans on TOTAL income</strong> (salary + dividends) via
+              Self Assessment — not just salary.
               <span className='mt-1 block text-amber-200'>
                 This is different from employees where student loans only come from salary via PAYE.
               </span>
@@ -63,7 +63,7 @@ export function StudentLoanInputs() {
               checked={formData.studentLoanPlans.includes(plan.id)}
               onCheckedChange={() => toggleStudentLoanPlan(plan.id)}
             />
-            <Label htmlFor={plan.id} className='text-sm font-normal'>
+            <Label htmlFor={plan.id} className='font-normal text-sm'>
               {plan.label}
             </Label>
           </div>

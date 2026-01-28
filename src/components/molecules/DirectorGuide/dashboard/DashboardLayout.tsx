@@ -84,7 +84,7 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={onToggleEducation}
-          className='fixed bottom-6 right-6 z-50 rounded-full bg-primary p-4 text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:hidden'
+          className='fixed right-6 bottom-6 z-50 rounded-full bg-primary p-4 text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:hidden'
           aria-label='Show learn panel'
         >
           <BookOpen className='size-6' aria-hidden='true' />

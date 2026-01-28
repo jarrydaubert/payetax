@@ -9,8 +9,6 @@
 
 import { RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import {
   KeyDates,
   PensionGapWarning,
@@ -19,10 +17,7 @@ import {
   TaxBreakdownTable,
   TaxPots,
 } from '@/components/molecules/DirectorGuide/calculator';
-import {
-  DashboardLayout,
-  EducationPanel,
-} from '@/components/molecules/DirectorGuide/dashboard';
+import { DashboardLayout, EducationPanel } from '@/components/molecules/DirectorGuide/dashboard';
 import {
   AlreadyTakenInputs,
   CompanyCarInput,
@@ -32,7 +27,13 @@ import {
   PensionInput,
   StudentLoanInputs,
 } from '@/components/molecules/DirectorGuide/inputs';
-import { trackGuideReset, trackGuideStarted, trackResultsShown } from '@/lib/directorGuideAnalytics';
+import { Button } from '@/components/ui/button';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import {
+  trackGuideReset,
+  trackGuideStarted,
+  trackResultsShown,
+} from '@/lib/directorGuideAnalytics';
 import {
   useDirectorFormData,
   useDirectorGuideActions,

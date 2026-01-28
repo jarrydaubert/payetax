@@ -5,19 +5,23 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function CompanyCarInput() {
+  const id = useId();
   const formData = useDirectorFormData();
   const { setCompanyCarBIK } = useDirectorGuideActions();
+
+  const inputId = `${id}-bik`;
 
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-1'>
-        <Label htmlFor='companyCarBIK'>Company Car (BIK Value)</Label>
+        <Label htmlFor={inputId}>Company Car (BIK Value)</Label>
         <Tooltip>
           <TooltipTrigger>
             <Info className='size-4 text-muted-foreground' />
@@ -38,7 +42,7 @@ export function CompanyCarInput() {
       <div className='flex items-center gap-2'>
         <span className='text-muted-foreground'>£</span>
         <Input
-          id='companyCarBIK'
+          id={inputId}
           type='number'
           value={formData.companyCarBIK || ''}
           onChange={(e) => setCompanyCarBIK(parseFloat(e.target.value) || 0)}

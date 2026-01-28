@@ -91,20 +91,28 @@ function generateDirectorEmailHtml(
             <td style="padding: 16px 0; text-align: right; color: #020617;">${formatCurrency(strategy.dividends)}</td>
             <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.dividends / 12)}</td>
           </tr>
-          ${strategy.pension > 0 ? `
+          ${
+            strategy.pension > 0
+              ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 16px 0; color: #f59e0b;">Employer Pension</td>
             <td style="padding: 16px 0; text-align: right; color: #f59e0b;">${formatCurrency(strategy.pension)}</td>
             <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.pension / 12)}</td>
           </tr>
-          ` : ''}
-          ${strategy.companyCarBIK > 0 ? `
+          `
+              : ''
+          }
+          ${
+            strategy.companyCarBIK > 0
+              ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 16px 0; color: #8b5cf6;">Company Car (BIK)</td>
             <td style="padding: 16px 0; text-align: right; color: #8b5cf6;">${formatCurrency(strategy.companyCarBIK)}</td>
             <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.companyCarBIK / 12)}</td>
           </tr>
-          ` : ''}
+          `
+              : ''
+          }
           
           <!-- Company Taxes -->
           <tr style="border-bottom: 1px solid #f1f5f9; background: #fef2f2;">
@@ -134,13 +142,17 @@ function generateDirectorEmailHtml(
             <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.dividendTax)}</td>
             <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.dividendTax / 12)}</td>
           </tr>
-          ${strategy.studentLoan > 0 ? `
+          ${
+            strategy.studentLoan > 0
+              ? `
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 16px 0; color: #8b5cf6;">Student Loan</td>
             <td style="padding: 16px 0; text-align: right; color: #8b5cf6;">-${formatCurrency(strategy.studentLoan)}</td>
             <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.studentLoan / 12)}</td>
           </tr>
-          ` : ''}
+          `
+              : ''
+          }
           
           <!-- Take-Home -->
           <tr style="background: #f0fdf4;">

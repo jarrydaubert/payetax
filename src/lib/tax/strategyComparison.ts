@@ -454,7 +454,11 @@ function calculateAllDividendsStrategy(
   const employeeNI = 0;
 
   // BIK is still taxable even with £0 salary
-  const bikIncomeTax = companyCarBIK > 0 ? getIncomeTax(otherIncome + companyCarBIK, region, taxYear) - getIncomeTax(otherIncome, region, taxYear) : 0;
+  const bikIncomeTax =
+    companyCarBIK > 0
+      ? getIncomeTax(otherIncome + companyCarBIK, region, taxYear) -
+        getIncomeTax(otherIncome, region, taxYear)
+      : 0;
   const incomeTax = bikIncomeTax;
 
   // All profit goes through corporation tax

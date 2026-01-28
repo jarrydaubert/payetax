@@ -23,6 +23,17 @@
  * ```
  */
 
+// Company Car BIK
+export {
+  BIK_RATES_2025_26,
+  type BIKCategory,
+  CAR_EXAMPLES,
+  type CompanyCarBIKInput,
+  type CompanyCarBIKResult,
+  calculateCompanyCarBIK,
+  getBIKCategoryName,
+  getBIKRate,
+} from './companyCarBIK';
 // Corporation Tax
 export {
   type CorporationTaxBand,
@@ -70,14 +81,3 @@ export {
   getStudentLoanThreshold,
   type StudentLoanResult,
 } from './studentLoan';
-// Company Car BIK
-export {
-  BIK_RATES_2025_26,
-  type BIKCategory,
-  calculateCompanyCarBIK,
-  CAR_EXAMPLES,
-  type CompanyCarBIKInput,
-  type CompanyCarBIKResult,
-  getBIKCategoryName,
-  getBIKRate,
-} from './companyCarBIK';

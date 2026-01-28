@@ -75,10 +75,7 @@ export function getStudentLoanThreshold(
 /**
  * Get student loan rate for a specific plan
  */
-export function getStudentLoanRate(
-  plan: StudentLoanPlan,
-  taxYear: TaxYear = '2025-2026'
-): number {
+export function getStudentLoanRate(plan: StudentLoanPlan, taxYear: TaxYear = '2025-2026'): number {
   return TAX_RATES[taxYear].studentLoan[plan].rate;
 }
 

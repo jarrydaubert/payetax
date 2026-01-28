@@ -1,4 +1,9 @@
 // src/store/__tests__/directorGuideStore.test.ts
+/**
+ * Tests for Director Guide Store
+ *
+ * Post-merge: Removed step wizard tests, added strategy comparison tests.
+ */
 
 import { useDirectorGuideStore } from '../directorGuideStore';
 
@@ -22,6 +27,20 @@ jest.mock('@/lib/tax/directorCalculator', () => ({
   }),
 }));
 
+// Mock strategy comparison
+jest.mock('@/lib/tax/strategyComparison', () => ({
+  calculateStrategyComparison: jest.fn().mockReturnValue({
+    grossProfit: 80000,
+    strategies: {
+      allSalary: { name: 'All Salary', salary: 80000, dividends: 0, takeHome: 55000, effectiveRate: 31 },
+      optimalMix: { name: 'Optimal Mix', salary: 12570, dividends: 50000, takeHome: 60000, effectiveRate: 25 },
+      allDividends: { name: 'All Dividends', salary: 0, dividends: 60000, takeHome: 58000, effectiveRate: 27 },
+    },
+    recommended: 'optimalMix',
+    savingsVsAllSalary: 5000,
+  }),
+}));
+
 describe('DirectorGuideStore', () => {
   beforeEach(() => {
     useDirectorGuideStore.getState().reset();
@@ -32,15 +51,16 @@ describe('DirectorGuideStore', () => {
       const state = useDirectorGuideStore.getState();
       expect(state.formData.region).toBeUndefined();
       expect(state.formData.revenue).toBeUndefined();
-      expect(state.currentStep).toBe('location');
+      expect(state.formData.expenses).toBeUndefined();
+      expect(state.formData.alreadyTaken).toBe(0);
+      expect(state.formData.takenViaPayroll).toBe('unsure');
+      expect(state.formData.otherIncome).toBe(0);
+      expect(state.formData.studentLoanPlans).toEqual([]);
+      expect(state.formData.pensionContribution).toBe(0);
+      expect(state.formData.companyCarBIK).toBe(0);
+      expect(state.formData.hasEmploymentAllowance).toBe(false);
       expect(state.results).toBeNull();
-    });
-
-    it('should have all steps incomplete initially', () => {
-      const state = useDirectorGuideStore.getState();
-      expect(state.stepStatus.location).toBe(false);
-      expect(state.stepStatus.revenue).toBe(false);
-      expect(state.stepStatus.expenses).toBe(false);
+      expect(state.strategyComparison).toBeNull();
     });
   });
 
@@ -81,33 +101,9 @@ describe('DirectorGuideStore', () => {
     });
 
     it('should reject negative alreadyTaken', () => {
-      // Default is 0, so set a valid value first
       useDirectorGuideStore.getState().setAlreadyTaken(5000);
       useDirectorGuideStore.getState().setAlreadyTaken(-1000);
-      // Should remain at previous valid value
       expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(5000);
-    });
-
-    it('should reject Infinity alreadyTaken', () => {
-      useDirectorGuideStore.getState().setAlreadyTaken(3000);
-      useDirectorGuideStore.getState().setAlreadyTaken(Number.POSITIVE_INFINITY);
-      // Should remain at previous valid value
-      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(3000);
-    });
-
-    it('should set alreadyTakenViaPayroll to true', () => {
-      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(true);
-      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBe(true);
-    });
-
-    it('should set alreadyTakenViaPayroll to false', () => {
-      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(false);
-      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBe(false);
-    });
-
-    it('should set alreadyTakenViaPayroll to null (not sure)', () => {
-      useDirectorGuideStore.getState().setAlreadyTakenViaPayroll(null);
-      expect(useDirectorGuideStore.getState().formData.alreadyTakenViaPayroll).toBeNull();
     });
 
     it('should reject Infinity revenue', () => {
@@ -120,46 +116,42 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.expenses).toBeUndefined();
     });
 
-    it('should set hasOtherIncome and update confirmedSoleIncome', () => {
-      useDirectorGuideStore.getState().setHasOtherIncome(true);
-      const state = useDirectorGuideStore.getState();
-      expect(state.hasOtherIncome).toBe(true);
-      expect(state.formData.confirmedSoleIncome).toBe(false);
+    it('should set takenViaPayroll', () => {
+      useDirectorGuideStore.getState().setTakenViaPayroll('yes');
+      expect(useDirectorGuideStore.getState().formData.takenViaPayroll).toBe('yes');
     });
 
-    it('should set confirmedSoleIncome true when hasOtherIncome is false', () => {
-      useDirectorGuideStore.getState().setHasOtherIncome(false);
-      const state = useDirectorGuideStore.getState();
-      expect(state.hasOtherIncome).toBe(false);
-      expect(state.formData.confirmedSoleIncome).toBe(true);
-    });
-  });
-
-  describe('Step Navigation', () => {
-    it('should complete step and advance to next', () => {
-      useDirectorGuideStore.getState().completeStep('location');
-      const state = useDirectorGuideStore.getState();
-      expect(state.stepStatus.location).toBe(true);
-      expect(state.currentStep).toBe('revenue');
+    it('should set otherIncome', () => {
+      useDirectorGuideStore.getState().setOtherIncome(25000);
+      expect(useDirectorGuideStore.getState().formData.otherIncome).toBe(25000);
     });
 
-    it('should go to step directly', () => {
-      useDirectorGuideStore.getState().goToStep('expenses');
-      expect(useDirectorGuideStore.getState().currentStep).toBe('expenses');
+    it('should toggle student loan plans', () => {
+      useDirectorGuideStore.getState().toggleStudentLoanPlan('plan1');
+      expect(useDirectorGuideStore.getState().formData.studentLoanPlans).toContain('plan1');
+
+      useDirectorGuideStore.getState().toggleStudentLoanPlan('plan1');
+      expect(useDirectorGuideStore.getState().formData.studentLoanPlans).not.toContain('plan1');
     });
 
-    it('should edit step and reset subsequent steps', () => {
-      const store = useDirectorGuideStore.getState();
-      store.completeStep('location');
-      store.completeStep('revenue');
-      store.completeStep('expenses');
+    it('should set pension contribution', () => {
+      useDirectorGuideStore.getState().setPensionContribution(10000);
+      expect(useDirectorGuideStore.getState().formData.pensionContribution).toBe(10000);
+    });
 
-      useDirectorGuideStore.getState().editStep('revenue');
+    it('should set company car BIK', () => {
+      useDirectorGuideStore.getState().setCompanyCarBIK(3600);
+      expect(useDirectorGuideStore.getState().formData.companyCarBIK).toBe(3600);
+    });
 
-      const state = useDirectorGuideStore.getState();
-      expect(state.stepStatus.location).toBe(true);
-      expect(state.stepStatus.revenue).toBe(false);
-      expect(state.stepStatus.expenses).toBe(false);
+    it('should set employment allowance', () => {
+      useDirectorGuideStore.getState().setHasEmploymentAllowance(true);
+      expect(useDirectorGuideStore.getState().formData.hasEmploymentAllowance).toBe(true);
+    });
+
+    it('should set year-end month', () => {
+      useDirectorGuideStore.getState().setYearEndMonth('12');
+      expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('12');
     });
   });
 
@@ -179,7 +171,25 @@ describe('DirectorGuideStore', () => {
 
       const state = useDirectorGuideStore.getState();
       expect(state.results).not.toBeNull();
-      expect(state.showResults).toBe(true);
+      expect(state.strategyComparison).not.toBeNull();
+    });
+  });
+
+  describe('Strategy Selection', () => {
+    it('should set selected strategy', () => {
+      useDirectorGuideStore.getState().setSelectedStrategy('allDividends');
+      expect(useDirectorGuideStore.getState().selectedStrategy).toBe('allDividends');
+    });
+
+    it('should set slider salary', () => {
+      useDirectorGuideStore.getState().setSliderSalary(25000);
+      expect(useDirectorGuideStore.getState().sliderSalary).toBe(25000);
+    });
+
+    it('should reset slider salary to null', () => {
+      useDirectorGuideStore.getState().setSliderSalary(25000);
+      useDirectorGuideStore.getState().setSliderSalary(null);
+      expect(useDirectorGuideStore.getState().sliderSalary).toBeNull();
     });
   });
 
@@ -188,13 +198,18 @@ describe('DirectorGuideStore', () => {
       const store = useDirectorGuideStore.getState();
       store.setRegion('scotland');
       store.setRevenue(50000);
-      store.completeStep('location');
+      store.setExpenses(10000);
+      store.setOtherIncome(5000);
+      store.toggleStudentLoanPlan('plan2');
 
       useDirectorGuideStore.getState().reset();
 
       const state = useDirectorGuideStore.getState();
       expect(state.formData.region).toBeUndefined();
-      expect(state.currentStep).toBe('location');
+      expect(state.formData.revenue).toBeUndefined();
+      expect(state.formData.otherIncome).toBe(0);
+      expect(state.formData.studentLoanPlans).toEqual([]);
+      expect(state.strategyComparison).toBeNull();
     });
   });
 });

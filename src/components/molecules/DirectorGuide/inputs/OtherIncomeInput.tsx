@@ -5,19 +5,23 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function OtherIncomeInput() {
+  const id = useId();
   const formData = useDirectorFormData();
   const { setOtherIncome } = useDirectorGuideActions();
+
+  const inputId = `${id}-otherIncome`;
 
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-1'>
-        <Label htmlFor='otherIncome'>Other Personal Income</Label>
+        <Label htmlFor={inputId}>Other Personal Income</Label>
         <Tooltip>
           <TooltipTrigger>
             <Info className='size-4 text-muted-foreground' />
@@ -32,7 +36,7 @@ export function OtherIncomeInput() {
       <div className='flex items-center gap-2'>
         <span className='text-muted-foreground'>£</span>
         <Input
-          id='otherIncome'
+          id={inputId}
           type='number'
           value={formData.otherIncome || ''}
           onChange={(e) => setOtherIncome(parseFloat(e.target.value) || 0)}

@@ -88,22 +88,22 @@ export function PensionGapWarning() {
             {formatCurrency(Math.round(LEL / 12))}/month)
           </p>
           <p className='text-muted-foreground'>
-            Salary above LEL earns NI credits toward your State Pension, even if below the
-            Primary Threshold where you start paying NI.
+            Salary above LEL earns NI credits toward your State Pension, even if below the Primary
+            Threshold where you start paying NI.
           </p>
 
           <div className='mt-3 rounded-lg bg-background p-3'>
             {hasNICredits ? (
               <p className='text-green-700 dark:text-green-400'>
-                ✓ <strong>{formatCurrency(currentSalary)} salary</strong> qualifies for NI
-                credits — you&apos;ll build State Pension entitlement.
+                ✓ <strong>{formatCurrency(currentSalary)} salary</strong> qualifies for NI credits —
+                you&apos;ll build State Pension entitlement.
               </p>
             ) : inPensionGap ? (
               <div className='space-y-2'>
                 <p className='text-amber-700 dark:text-amber-400'>
                   ⚠ <strong>Inefficient zone:</strong> Paying{' '}
-                  {formatCurrency(Math.round(employerNIInGap))}/year Employer NI but earning
-                  no pension credits.
+                  {formatCurrency(Math.round(employerNIInGap))}/year Employer NI but earning no
+                  pension credits.
                 </p>
                 <p className='font-medium text-amber-700 dark:text-amber-400'>
                   Increase to {formatCurrency(LEL)} (+{formatCurrency(Math.round(monthlyFixCost))}
@@ -119,8 +119,8 @@ export function PensionGapWarning() {
           </div>
 
           <p className='mt-2 text-muted-foreground text-xs'>
-            The £12,570 &quot;optimal&quot; salary is above the LEL, so you automatically
-            qualify for NI credits without paying any Employee NI.
+            The £12,570 &quot;optimal&quot; salary is above the LEL, so you automatically qualify
+            for NI credits without paying any Employee NI.
           </p>
         </div>
       </CardContent>

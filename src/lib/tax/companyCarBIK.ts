@@ -116,5 +116,10 @@ export function getBIKCategoryName(category: BIKCategory): string {
 export const CAR_EXAMPLES = [
   { name: 'Tesla Model 3', listPrice: 40000, bikRate: 2, category: 'electric' as BIKCategory },
   { name: 'BMW 330e', listPrice: 45000, bikRate: 8, category: 'hybrid_40_69' as BIKCategory },
-  { name: 'Range Rover Sport', listPrice: 80000, bikRate: 37, category: 'petrol_max' as BIKCategory },
+  {
+    name: 'Range Rover Sport',
+    listPrice: 80000,
+    bikRate: 37,
+    category: 'petrol_max' as BIKCategory,
+  },
 ] as const;

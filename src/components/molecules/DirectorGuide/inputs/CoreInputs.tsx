@@ -7,6 +7,7 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useId } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -27,15 +28,16 @@ import {
 } from '@/store/directorGuideStore';
 
 export function CoreInputs() {
+  const id = useId();
   const formData = useDirectorFormData();
-  const {
-    setRegion,
-    setRevenue,
-    setIncludesVat,
-    setExpenses,
-    setYearEndMonth,
-    setYearEndCustom,
-  } = useDirectorGuideActions();
+  const { setRegion, setRevenue, setIncludesVat, setExpenses, setYearEndMonth, setYearEndCustom } =
+    useDirectorGuideActions();
+
+  const revenueId = `${id}-revenue`;
+  const vatId = `${id}-vat`;
+  const expensesId = `${id}-expenses`;
+  const regionId = `${id}-region`;
+  const yearEndId = `${id}-yearEnd`;
 
   return (
     <Card>
@@ -46,11 +48,11 @@ export function CoreInputs() {
         <div className='grid gap-4 sm:grid-cols-2'>
           {/* Revenue */}
           <div className='space-y-2'>
-            <Label htmlFor='revenue'>Annual Revenue</Label>
+            <Label htmlFor={revenueId}>Annual Revenue</Label>
             <div className='flex items-center gap-2'>
               <span className='text-muted-foreground'>£</span>
               <Input
-                id='revenue'
+                id={revenueId}
                 type='number'
                 value={formData.revenue ?? ''}
                 onChange={(e) => setRevenue(parseFloat(e.target.value) || 0)}
@@ -59,11 +61,11 @@ export function CoreInputs() {
             </div>
             <div className='flex items-center gap-2'>
               <Checkbox
-                id='includesVat'
+                id={vatId}
                 checked={formData.includesVat}
                 onCheckedChange={(checked) => setIncludesVat(checked === true)}
               />
-              <Label htmlFor='includesVat' className='text-sm'>
+              <Label htmlFor={vatId} className='text-sm'>
                 Includes VAT (we&apos;ll deduct 20%)
               </Label>
             </div>
@@ -72,22 +74,20 @@ export function CoreInputs() {
           {/* Expenses */}
           <div className='space-y-2'>
             <div className='flex items-center gap-1'>
-              <Label htmlFor='expenses'>Business Expenses</Label>
+              <Label htmlFor={expensesId}>Business Expenses</Label>
               <Tooltip>
                 <TooltipTrigger>
                   <Info className='size-4 text-muted-foreground' />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className='max-w-xs'>
-                    Exclude director salary - we calculate that separately
-                  </p>
+                  <p className='max-w-xs'>Exclude director salary - we calculate that separately</p>
                 </TooltipContent>
               </Tooltip>
             </div>
             <div className='flex items-center gap-2'>
               <span className='text-muted-foreground'>£</span>
               <Input
-                id='expenses'
+                id={expensesId}
                 type='number'
                 value={formData.expenses ?? ''}
                 onChange={(e) => setExpenses(parseFloat(e.target.value) || 0)}
@@ -98,12 +98,9 @@ export function CoreInputs() {
 
           {/* Region */}
           <div className='space-y-2'>
-            <Label htmlFor='region'>Region</Label>
-            <Select
-              value={formData.region ?? ''}
-              onValueChange={(v) => setRegion(v as Region)}
-            >
-              <SelectTrigger id='region'>
+            <Label htmlFor={regionId}>Region</Label>
+            <Select value={formData.region ?? ''} onValueChange={(v) => setRegion(v as Region)}>
+              <SelectTrigger id={regionId}>
                 <SelectValue placeholder='Select region' />
               </SelectTrigger>
               <SelectContent>
@@ -116,15 +113,13 @@ export function CoreInputs() {
           {/* Year End */}
           <div className='space-y-2'>
             <div className='flex items-center gap-1'>
-              <Label htmlFor='yearEnd'>Financial Year End</Label>
+              <Label htmlFor={yearEndId}>Financial Year End</Label>
               <Tooltip>
                 <TooltipTrigger>
                   <Info className='size-4 text-muted-foreground' />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className='max-w-xs'>
-                    Used to calculate key tax deadlines
-                  </p>
+                  <p className='max-w-xs'>Used to calculate key tax deadlines</p>
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -132,7 +127,7 @@ export function CoreInputs() {
               value={formData.yearEndMonth}
               onValueChange={(v) => setYearEndMonth(v as YearEndMonth)}
             >
-              <SelectTrigger id='yearEnd'>
+              <SelectTrigger id={yearEndId}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
