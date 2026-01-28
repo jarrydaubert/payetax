@@ -1,4 +1,4 @@
-# Blog Page Redesign - Build Spec v1.6
+# Blog Page Redesign - Build Spec v1.7
 
 > **Purpose:** How to build the new PayeTax blog page
 > **Design:** Magazine Editorial + Hero Carousel (Mockup 1 + 4 hybrid)
@@ -891,6 +891,7 @@ If desired later, requires:
 | v1.4 | Jan 2026 | Final AI review by Grok and Claude. Both approved. Minor fixes documented. Added Review Findings section. |
 | v1.5 | Jan 2026 | Added ChatGPT review: 4 critical implementation traps identified (routing collision, SEO canonical, client/server boundary, overlay link accessibility). Status changed to Conditionally Approved. |
 | v1.6 | Jan 2026 | Added Gemini review: "Exceptionally high-quality" - approved with SEO correction. Added implementation watch-outs (z-index stacking, naming collision, accordion CLS). All 4 reviewers now incorporated. |
+| v1.7 | Jan 2026 | Added Mockup Review Findings section. HTML mockup reviewed by Grok, Claude, ChatGPT (Gemini provided implementation code). 8 critical, 9 major, 6 minor mockup issues documented. Visual design approved with accessibility fixes required. |
 
 ---
 
@@ -978,6 +979,83 @@ Final review conducted by Grok, Claude, ChatGPT, and Gemini (January 2026).
 ### Overall Assessment (Grok)
 
 > "The build spec v1.3 represents a professional, SEO-conscious redesign with strong technical foundations. Existing infrastructure preservation minimizes risk, and resolved questions demonstrate thorough iteration. No dealbreakers—proceed to implementation with the noted pagination and accessibility refinements."
+
+---
+
+## Mockup Review Findings
+
+The HTML mockup (`/payetax-web/public/blog/1-magazine.html`) was reviewed by Grok, Claude, and ChatGPT (January 2026). Gemini provided implementation code instead of a mockup review.
+
+> **Verdict:** Visual design approved. Do NOT use mockup as-is for implementation - copy styles while implementing accessibility fixes.
+
+### Mockup Issues Summary
+
+| Reviewer | Critical | Major | Minor |
+|----------|----------|-------|-------|
+| Grok | 0 | 2 | 4 |
+| Claude | 5 | 5 | 5 |
+| ChatGPT | 4 | 4 | 3 |
+
+### Critical Mockup Issues (Must Fix in Implementation)
+
+| # | Issue | Raised By | Fix |
+|---|-------|-----------|-----|
+| MC1 | **Carousel dots are `<div>`, not `<button>`** | All 3 | Use `<button aria-label="Go to slide N" aria-current="true">` |
+| MC2 | **No pause/play button** | All 3 | Add visible pause control with `aria-pressed` state |
+| MC3 | **No keyboard navigation** | All 3 | Add `keydown` listener for arrow keys when carousel focused |
+| MC4 | **No reduced motion support** | All 3 | Add `@media (prefers-reduced-motion: reduce)` to disable autoplay + transitions |
+| MC5 | **No ARIA live region** | Claude | Add `aria-live="polite"` region for slide change announcements |
+| MC6 | **Multiple H1 elements (3 H1s)** | ChatGPT | Each slide has `<h1>` - use single `<h1>` for page, `<h2>` for slides |
+| MC7 | **Search is `<div>`, not `<button>`** | Claude, ChatGPT | Make search a `<button>` that opens modal |
+| MC8 | **Newsletter form missing semantics** | Claude, ChatGPT | Add `<label>`, `name`, `required`, success/error states |
+
+### Major Mockup Issues (Fix During Implementation)
+
+| # | Issue | Raised By | Fix |
+|---|-------|-----------|-----|
+| MM1 | **Auto-rotate 5000ms, should be 8000ms** | Claude, Grok | Change interval to 8000 |
+| MM2 | **Mobile carousel `height: 50vh`** | Claude | Use `aspect-ratio: 4/3; min-height: 300px` per spec |
+| MM3 | **All badges use `color: white`** | Claude, Grok | Use `textColor` from category config (black for tax/guide) |
+| MM4 | **Newsletter missing privacy/honeypot** | Claude, ChatGPT | Add privacy link, honeypot field, loading/error states |
+| MM5 | **Inactive slides still focusable** | Claude, ChatGPT | Add `aria-hidden="true"` and `tabIndex={-1}` to inactive slides |
+| MM6 | **Hero category uses brand gradient** | ChatGPT | Should use category-specific colors for consistency |
+| MM7 | **Background images CSS-only** | ChatGPT | Production needs `<img>`/Next Image with `alt`, `sizes`, lazy loading |
+| MM8 | **No SEO meta beyond `<title>`** | ChatGPT | Add description, OG tags, canonical |
+| MM9 | **Fixed back-link overlaps on mobile** | ChatGPT, Grok | Hide or reposition on small screens |
+
+### Minor Mockup Issues (Polish)
+
+| # | Issue | Raised By | Fix |
+|---|-------|-----------|-----|
+| MN1 | **Pull quote missing `role="note"`** | Claude | Add `role="note"` for screen readers |
+| MN2 | **No skip link** | Claude | Add skip-to-content link after `<body>` |
+| MN3 | **No `@supports` fallback for backdrop-filter** | Claude | Wrap in `@supports` with solid background fallback |
+| MN4 | **Date formatting inconsistent** | Claude, ChatGPT | "15 January 2025" vs "8 Jan 2025" - standardize |
+| MN5 | **Google Fonts privacy/performance** | ChatGPT | Consider self-hosting fonts |
+| MN6 | **Image placeholders need optimization** | Grok | Replace unsplash.it with Next.js Image + meaningful alt |
+
+### Mockup Strengths (Carry Forward)
+
+- Color system matches spec exactly (all CSS variables correct)
+- Typography correct (Space Grotesk headings, Inter body)
+- Asymmetric grid layout (`1.6fr 1fr`) implemented well
+- Sticky sidebar with proper positioning
+- Newsletter gradient background matches brand
+- Card hover effects smooth and performant
+- Category color variables all defined
+- Pull quote styling visually strong
+- Editor's Picks numbered list looks editorial
+- Responsive breakpoints mostly correct
+
+### Gemini Implementation Notes
+
+Gemini provided starter implementation code instead of mockup review. Key patterns from their code worth adopting:
+
+1. **Mobile accordion using native `<details>`/`<summary>`** - Zero CLS, no JS needed
+2. **Embla Carousel with Autoplay plugin** - `stopOnMouseEnter: true` for hover pause
+3. **Parallel data fetching** - `Promise.all([getFeaturedPosts(), getLatestPosts(), ...])`
+4. **Dynamic canonical in `generateMetadata`** - Self-referential per page
+5. **Category fallback guard** - `BLOG_CATEGORIES[category] || BLOG_CATEGORIES['guide']`
 
 ---
 

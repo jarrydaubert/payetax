@@ -21,8 +21,16 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const hasResults = comparison && comparison.grossProfit > 0;
   const revenue = formData.revenue ?? 0;
 
+  // Calculate total income for PA taper / HICBC warnings
+  const totalIncome = hasResults
+    ? formData.otherIncome +
+      comparison.strategies.optimalMix.salary +
+      comparison.strategies.optimalMix.dividends
+    : 0;
+
   // Determine which warnings to show
-  const showVATWarning = hasResults && revenue >= 85000 && revenue <= 95000;
+  const showVATWarning = hasResults && revenue >= 85000 && revenue < 90000;
+  const showVATMandatoryWarning = hasResults && revenue >= 90000;
   const showSelfAssessmentWarning = hasResults && comparison.strategies.optimalMix.dividends > 0;
   const showOtherIncomeWarning = formData.otherIncome > 0;
   const showDLAWarning = formData.alreadyTaken > 0 && formData.takenViaPayroll === 'no';
@@ -31,6 +39,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
     hasResults && formData.alreadyTaken > comparison.strategies.optimalMix.takeHome;
   const showPensionWarning = formData.pensionContribution > 60000;
   const showStudentLoanWarning = formData.studentLoanPlans.length > 0;
+  const showPATaperWarning = totalIncome > 100000 && totalIncome <= 125140;
+  const showHICBCWarning = totalIncome >= 60000 && totalIncome <= 80000;
 
   return (
     <aside className={cn('flex h-full flex-col bg-muted/30 p-6', className)}>
@@ -61,13 +71,16 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
       {/* Warnings Section */}
       {(showVATWarning ||
+        showVATMandatoryWarning ||
         showSelfAssessmentWarning ||
         showOtherIncomeWarning ||
         showDLAWarning ||
         showComplexityWarning ||
         showOverdrawnWarning ||
         showPensionWarning ||
-        showStudentLoanWarning) && (
+        showStudentLoanWarning ||
+        showPATaperWarning ||
+        showHICBCWarning) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
             Warnings
@@ -85,10 +98,28 @@ export function EducationPanel({ className }: EducationPanelProps) {
                 description='At this profit level, an accountant could save you serious money with advanced strategies.'
               />
             )}
+            {showPATaperWarning && (
+              <WarningCard
+                title='Personal Allowance Taper'
+                description='Income over £100k reduces your Personal Allowance by £1 for every £2. This creates an effective 60% tax rate between £100k-£125k.'
+              />
+            )}
+            {showHICBCWarning && (
+              <WarningCard
+                title='High Income Child Benefit Charge'
+                description='If you or your partner claim Child Benefit and your income is £60k-£80k, you may owe HICBC via Self Assessment.'
+              />
+            )}
+            {showVATMandatoryWarning && (
+              <WarningCard
+                title='VAT Registration Required'
+                description='Revenue exceeds £90,000 threshold. VAT registration is mandatory within 30 days of exceeding.'
+              />
+            )}
             {showVATWarning && (
               <WarningCard
-                title='VAT Threshold'
-                description='Revenue approaching £90,000 VAT threshold. Consider registration.'
+                title='VAT Threshold Approaching'
+                description='Revenue approaching £90,000 VAT threshold. Monitor closely and consider voluntary registration.'
               />
             )}
             {showSelfAssessmentWarning && (
