@@ -85,6 +85,13 @@ nextra + nextra-theme-docs
 
 **Recommendation:** Option A (Fumadocs) - best balance of features and Next.js 16 App Router compatibility. Project already meets all prerequisites.
 
+### Framework Portability Guarantee
+
+To avoid lock-in:
+- Content lives in `content/docs/` as standard MDX — portable to any framework
+- Custom components in `components/docs/` avoid framework-specific imports where possible
+- If migrating from Fumadocs, only layout/routing code changes; content remains intact
+
 ---
 
 ## URL Structure
@@ -227,9 +234,8 @@ Docs
 | 6 | `is-married` | Marriage Status | PAYE, Marriage |
 | 7 | `partner-income` | Partner's Income | PAYE, Marriage |
 | 8 | `is-blind` | Blind Person's Allowance | PAYE |
-| 9 | `age` | Age | PAYE |
-| 10 | `pay-no-ni` | Pay No NI | PAYE |
-| 11 | `student-loan-plans` | Student Loan Plans | PAYE, Director |
+| 9 | `pay-no-ni` | State Pension Age (No NI) | PAYE |
+| 10 | `student-loan-plans` | Student Loan Plans | PAYE, Director |
 | 12 | `pension-contribution` | Pension Contribution | PAYE, Director |
 | 13 | `pension-type` | Pension Type (% vs £) | PAYE |
 | 14 | `ni-category` | NI Category | PAYE, NI |
@@ -790,7 +796,15 @@ Generate compact JSON at build, not runtime:
 
 ```tsx
 // Load lazily on Cmd+K, not on page load
-const loadSearchIndex = () => import('/search-index.json');
+let searchIndexCache: SearchIndex | null = null;
+
+const loadSearchIndex = async () => {
+  if (!searchIndexCache) {
+    const res = await fetch('/search-index.json');
+    searchIndexCache = await res.json();
+  }
+  return searchIndexCache;
+};
 ```
 
 ### What Gets Indexed
@@ -829,6 +843,51 @@ Tooltip shows excerpt + "Learn more" link. Never renders full MDX.
 // Fetches /api/docs/personal-allowance on open
 // Returns pre-rendered HTML, not raw MDX
 // Constrained subset: Summary, Key thresholds, FAQ
+```
+
+### Why We Have `/api/docs`
+
+This is a deliberate exception to our "avoid API endpoints" principle:
+- **Justification:** Panels need dynamic content without shipping full MDX bundles
+- **Contract:** Stable endpoint, cached (1 hour), rate-limited (60/min per IP)
+- **Security:** HTML generated at build-time from MDX; no runtime markdown parsing; output sanitised with allowlisted tags only
+
+---
+
+## Doc Consolidation Rules
+
+To prevent duplicate/competing pages:
+
+1. **Field doc is canonical** - If a concept is tied to a specific input/output field, that's the single page
+2. **Conceptual doc only if 3+ calculators reference it** - Don't create standalone concept pages for single-calculator features
+3. **Input + Output = One page** - If a concept appears as both input and output (e.g., Personal Allowance), consolidate
+4. **Taper/edge cases link to parent** - `pa-taper` links prominently to `personal-allowance`, not the reverse
+
+---
+
+## Glossary Integration
+
+The glossary (`/docs/reference/glossary`) should be actively linked, not just a reference page.
+
+### Auto-Linking Terms
+
+```tsx
+// In MDX, wrap technical terms for glossary tooltips
+Your <Term>Personal Allowance</Term> is reduced by £1 for every £2 over £100,000.
+
+// Renders as subtle dotted underline with hover tooltip showing glossary definition
+// Click opens full glossary entry
+```
+
+### Glossary Entry Format
+
+```yaml
+# content/docs/reference/glossary.mdx
+terms:
+  - term: "Personal Allowance"
+    slug: "personal-allowance"
+    definition: "The amount of income you can earn tax-free each year."
+    docLink: "/docs/tax/personal-allowance"  # Optional deep link
 ```
 
 ---
@@ -896,11 +955,26 @@ Before publishing any doc, CI validates:
 bun run lint:docs
 
 # Checks:
-# - No hardcoded £ values (must use ThresholdTable)
-# - No "you should/must" advisory language
-# - All HMRCLink URLs are valid (HEAD request)
-# - Frontmatter complete
+# - No hardcoded threshold £ values (PA, band edges, VAT threshold)
+#   ALLOWED: example values inside <Callout type="example">
+# - No advisory language ("you should", "you must", "best approach", "optimal")
+# - Frontmatter complete (taxYear, lastVerified required)
+# - HMRCLink URLs syntactically valid (full validation in nightly job, not PR)
 ```
+
+### Content Style Guide
+
+**Allowed patterns:**
+- Definitions: "Personal Allowance is..."
+- Mechanics: "Tax is calculated by..."
+- Eligibility: "You qualify if..."
+- Examples: "For instance, on a £50,000 salary..."
+
+**Disallowed patterns:**
+- Recommendations: "You should...", "We recommend..."
+- Superlatives: "The best approach...", "The optimal strategy..."
+- Imperatives: "Always do X", "Never do Y"
+- Financial advice: "You would save more by..."
 
 ---
 
@@ -933,6 +1007,18 @@ For Phase 1 pilot docs, start with these high-traffic candidates:
 | `employee-ni` | Appears on every payslip |
 | `dividends` | Director calculator core concept |
 | `student-loan-plan-2` | Largest loan cohort |
+
+---
+
+## Timeline Estimate
+
+| Phase | Duration | Notes |
+|-------|----------|-------|
+| Phase 1: Foundation | 3-4 days | Framework setup, 5 pilot docs |
+| Phase 2: Content | 7-10 days | ~70 docs @ 2-3 hours each |
+| Phase 3: Integration | 2-3 days | DocTooltips, links |
+| Phase 4: Polish | 1-2 days | Testing, a11y audit |
+| **Total** | **13-19 days** | Single writer estimate |
 
 ---
 
