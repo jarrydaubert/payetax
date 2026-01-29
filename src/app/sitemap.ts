@@ -95,12 +95,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.85,
     },
-    {
-      url: `${baseUrl}/tools/embed-widget`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
   ];
 
   // Expanded salary pages for comprehensive SEO coverage (150+ pages)

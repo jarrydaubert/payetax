@@ -27,16 +27,12 @@ Accountancy firms embed branded calculator on their website. Leads flow to them,
 
 ## Infrastructure Needed
 
-- Embed script generator
+- Embed page (`/embed`) with iframe support
+- Embed code generator page
 - License key system
 - Domain validation
 - Analytics dashboard
 - Stripe billing
-
-## Files Already Built
-
-- `src/app/pricing/business/` - Pricing page (returns 404)
-- `src/app/tools/embed-widget/` - Embed widget
 
 ## Validation
 

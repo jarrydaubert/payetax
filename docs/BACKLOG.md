@@ -20,14 +20,20 @@
 
 ## P0 - Revenue & Trust
 
-### Monetization Setup
-> All features are built but disabled. See `docs/business/MONETIZATION.md` for enabling instructions.
+### Monetization
+> Stripe = £0. Fix that first. See `docs/business/MONETIZATION.md`.
 
-- [ ] Find local accountant willing to pay per referral (informal partnership)
-- [ ] Configure `REFERRAL_PARTNER_EMAIL` env var
-- [ ] Enable CTA in `CalculatorContainer.tsx`
-- [ ] Enable `/pricing/business` page (currently returns 404)
-- [ ] Reach out to finance content creators/newsletters about cross-promotion
+**Distribution (daily):**
+- [ ] 1 LinkedIn post per day (value-first, show calculator in action)
+- [ ] Engage with SME director communities
+
+**Validation:**
+- [ ] Talk to 5 accountants - would they pay for referrals?
+- [ ] Track "this is complex" clicks - demand signal
+
+**Enable (after validation):**
+- [ ] Find accountant partner willing to pay per lead
+- [ ] Enable referral CTA (code ready, just uncomment)
 
 ### Other Income Input
 > "Assumes this is your only income" footnote is NOT sufficient - can be wrong by thousands
@@ -58,7 +64,7 @@
 
 ### Tools Directory Audit
 - [ ] Create `/tools/page.tsx` index page
-- [ ] Add navigation links to orphaned tools (marriage-allowance, NI calculator, embed-widget)
+- [ ] Add navigation links to orphaned tools (marriage-allowance, NI calculator)
 - [ ] Update MarriageAllowanceAlert to link to internal tool instead of gov.uk
 
 ### Analytics Events

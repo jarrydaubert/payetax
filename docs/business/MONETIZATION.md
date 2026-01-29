@@ -262,7 +262,6 @@ All monetization features are **built but disabled** for launch:
 |---------|-------------|---------|
 | Affiliate links | ✅ Built | ❌ No affiliates signed |
 | Accountant referral CTA | ✅ Built | ❌ Commented out |
-| B2B widget pricing page | ✅ Built | ❌ Returns 404 |
 | Lead capture API | ✅ Built | ✅ Ready |
 
 ### File Locations
@@ -274,8 +273,6 @@ All monetization features are **built but disabled** for launch:
 | Affiliate tracking | `src/components/atoms/TrackedAffiliateLink.tsx` |
 | Referral CTA | `src/components/molecules/AccountantReferralCTA.tsx` |
 | Referral API | `src/app/api/referral/lead/route.ts` |
-| B2B pricing | `src/app/pricing/business/` |
-| Widget embed | `src/app/tools/embed-widget/` |
 
 ### Affiliate Links
 
@@ -314,11 +311,6 @@ All monetization features are **built but disabled** for launch:
 - Uncomment the import and JSX block
 - Set `REFERRAL_PARTNER_EMAIL` env var
 
-**2. B2B Pricing Page**
-- File: `src/app/pricing/business/page.tsx`
-- Remove `notFound()` call
-- Uncomment metadata and component
-
-**3. Affiliate Links**
+**2. Affiliate Links**
 - File: `src/data/competitors.ts`
 - Add `affiliateUrl` field to competitor entries
