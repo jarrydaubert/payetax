@@ -81,3 +81,7 @@ playwright/.auth/
 
 # Newsletter tracking
 .announced-posts.json
+
+# Local caches
+.npm/
+.lighthouseci/
