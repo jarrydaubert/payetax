@@ -146,4 +146,4 @@ Tests run across Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari.
 ## Related Docs
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Component architecture
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) - Code standards
+- [CLAUDE.md](../../CLAUDE.md) - Code standards

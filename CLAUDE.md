@@ -164,9 +164,7 @@ When verifying calculations:
 
 ## Full Guidelines
 
-See `CONTRIBUTING.md` for complete development guidelines including:
-- Testing philosophy
-- Code quality standards
-- Git workflow
-- Linear integration
-- Icon usage patterns
+See `docs/guides/` for detailed guides:
+- `TESTING.md` - Testing philosophy and commands
+- `LINEAR.md` - Project management integration
+- `ARCHITECTURE.md` - Codebase structure

@@ -1,11 +1,14 @@
 # PayeTax Documentation
 
+> **Start here:** [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) - The guiding philosophy
+
 ---
 
 ## Quick Links
 
 | Need to... | Read this |
 |------------|-----------|
+| **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
 | **Understand the codebase?** | [`ARCHITECTURE.md`](./guides/ARCHITECTURE.md) |
 | **Check tech stack?** | [`TECH_STACK.md`](./guides/TECH_STACK.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
@@ -22,12 +25,12 @@
 ```
 docs/
 ├── README.md
+├── READ_THIS_FIRST.md     # START HERE
 ├── BACKLOG.md
 ├── SKILLS_AND_COMMANDS.md
 │
-├── business/              # Product & business strategy (8)
+├── business/              # Product & business strategy (7)
 │   ├── README.md
-│   ├── READ_THIS_FIRST.md
 │   ├── DIRECTOR_GUIDE_POSITIONING.md
 │   ├── DIRECTOR_CALCULATOR_BUILD.md
 │   ├── DIRECTOR_TAX_MATH.md
@@ -76,7 +79,6 @@ docs/
 
 | File | Description |
 |------|-------------|
-| **READ_THIS_FIRST.md** | Founder mindset, distribution focus |
 | **DIRECTOR_GUIDE_POSITIONING.md** | Director tools product positioning |
 | **DIRECTOR_TAX_MATH.md** | Tax rates, formulas, golden examples |
 | **MONETIZATION.md** | Revenue strategy + technical implementation |
@@ -116,5 +118,4 @@ docs/
 ## Related Files
 
 - **Root README:** [`../README.md`](../README.md)
-- **Contributing:** [`../CONTRIBUTING.md`](../CONTRIBUTING.md)
 - **Claude instructions:** [`../CLAUDE.md`](../CLAUDE.md)

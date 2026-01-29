@@ -1222,7 +1222,7 @@ Priority: Help icon clicks and search gaps are highest signal for content priori
 
 ## Contributing to Docs
 
-For contribution guidelines (PR process, style rules, review requirements), see `CONTRIBUTING.md` in the project root. The docs library follows the same standards as the main codebase.
+For development guidelines, see `CLAUDE.md` in the project root. The docs library follows the same standards as the main codebase.
 
 Key points for doc contributions:
 - All MDX must pass `bun run lint:docs` before merge

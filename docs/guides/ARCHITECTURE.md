@@ -186,4 +186,4 @@ All tax rates in `src/constants/taxRates.ts`. Never hardcode values.
 ## Related Docs
 
 - [TECH_STACK.md](./TECH_STACK.md) - Technology details
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) - Code standards
+- [CLAUDE.md](../../CLAUDE.md) - Code standards

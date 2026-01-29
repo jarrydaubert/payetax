@@ -1,6 +1,6 @@
 # PayeTax Business Docs
 
-> **Read [READ_THIS_FIRST.md](./READ_THIS_FIRST.md) before doing anything.** It's the mantra.
+> **Read [READ_THIS_FIRST.md](../READ_THIS_FIRST.md) before doing anything.** It's the mantra.
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Doc | Purpose | When to Read |
 |-----|---------|--------------|
-| **[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** | The mantra | Before anything |
+| **[READ_THIS_FIRST.md](../READ_THIS_FIRST.md)** | The mantra | Before anything |
 | **[DIRECTOR_GUIDE_POSITIONING.md](./DIRECTOR_GUIDE_POSITIONING.md)** | WHO + WHY (audiences, positioning) | Understanding the product |
 | **[DIRECTOR_CALCULATOR_BUILD.md](./DIRECTOR_CALCULATOR_BUILD.md)** | WHAT (inputs, outputs, features) | When building |
 | **[DIRECTOR_TAX_MATH.md](./DIRECTOR_TAX_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
 | **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
-| **[IDEAS.md](./IDEAS.md)** | Future features | After revenue exists |
+| **[ideas/](../ideas/)** | Future features | After revenue exists |
 
 ---
 

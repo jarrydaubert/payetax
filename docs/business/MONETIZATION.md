@@ -246,7 +246,7 @@ No demand signal = don't build it yet.
 | `DIRECTOR_GUIDE_POSITIONING.md` | Product positioning (audiences) |
 | `DIRECTOR_CALCULATOR_BUILD.md` | Build spec and features |
 | `DIRECTOR_TAX_MATH.md` | Tax calculation reference |
-| `READ_THIS_FIRST.md` | The mantra |
+| [`READ_THIS_FIRST.md`](../READ_THIS_FIRST.md) | The mantra |
 
 ---
 

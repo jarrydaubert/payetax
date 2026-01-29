@@ -533,7 +533,7 @@ Writing a blog post about [topic] to [target audience benefit]
 
 **Resources:**
 - Content calendar: [link]
-- SEO guidelines: CONTRIBUTING.md
+- SEO guidelines: guides/BLOG_GUIDE.md
 ```
 
 ---
@@ -655,7 +655,7 @@ npm run linear:list | grep PAYTAX-123
 **You now know everything about Linear!**
 
 **For deeper project context:**
-- 📖 [CONTRIBUTING.md](../../CONTRIBUTING.md) - Development workflow
+- 📖 [CLAUDE.md](../../CLAUDE.md) - Development workflow
 - 🏗️ [ARCHITECTURE.md](../guides/ARCHITECTURE.md) - Codebase structure
 - 🧪 [QUALITY_GATES.md](./QUALITY_GATES.md) - Testing standards
 
