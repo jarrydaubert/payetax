@@ -34,7 +34,7 @@ const _CACHE_ON_NAVIGATE = [
 ];
 
 // API endpoints to cache with different strategies
-const API_ENDPOINTS = ['/api/feedback', '/api/error-log'];
+const API_ENDPOINTS = ['/api/feedback'];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST = ['/api/', '/blog/category/', '/_next/static/chunks/'];

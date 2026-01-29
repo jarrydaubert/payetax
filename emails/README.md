@@ -15,7 +15,7 @@ Templates use **raw HTML strings** (template literals) for simplicity and zero r
 
 `@react-email/components` is installed but not yet used. It's kept for potential future migration to React Email components (better DX, preview tooling).
 
-See `docs/ideas/NEWSLETTER_RESEND.md` Phase 2 for migration plan.
+See `docs/setup/RESEND.md` for newsletter setup and usage.
 
 ## Usage
 

@@ -1,7 +1,5 @@
 # PayeTax Documentation
 
-**Status:** Evergreen docs only
-
 ---
 
 ## Quick Links
@@ -11,10 +9,10 @@
 | **Understand the codebase?** | [`ARCHITECTURE.md`](./guides/ARCHITECTURE.md) |
 | **Check tech stack?** | [`TECH_STACK.md`](./guides/TECH_STACK.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
-| **Follow code standards?** | [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
+| **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
-| **Add monetization?** | [`MONETIZATION.md`](./guides/MONETIZATION.md) |
-| **Use Linear?** | [`LINEAR.md`](./setup/LINEAR.md) |
+| **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
+| **Use Linear?** | [`LINEAR.md`](./guides/LINEAR.md) |
 | **Director tools strategy?** | [`business/README.md`](./business/README.md) |
 
 ---
@@ -23,74 +21,52 @@
 
 ```
 docs/
-├── README.md              # This file
-├── BACKLOG.md             # Active TODO list
-├── Testing.md             # HMRC test data integration
-├── SKILLS_AND_COMMANDS.md # AI skills/commands guide
-├── VIDEO_CONTENT.md       # Video generation (separate repo)
+├── README.md
+├── BACKLOG.md
+├── SKILLS_AND_COMMANDS.md
 │
-├── business/              # Product & business strategy
-│   ├── README.md          # Start here
-│   ├── READ_THIS_FIRST.md # Founder mindset
-│   ├── DIRECTOR_GUIDE_STRATEGY.md  # Director tools pivot
-│   ├── DIRECTOR_TAX_MATH.md        # Tax calculations
-│   ├── DIRECTOR_TOOLS_MERGE_PLAN.md
-│   ├── MONETIZATION.md    # Revenue strategy
-│   ├── IDEAS.md           # Feature ideas
+├── business/              # Product & business strategy (8)
+│   ├── README.md
+│   ├── READ_THIS_FIRST.md
+│   ├── DIRECTOR_GUIDE_POSITIONING.md
+│   ├── DIRECTOR_CALCULATOR_BUILD.md
+│   ├── DIRECTOR_TAX_MATH.md
+│   ├── DOCS_LIBRARY_SPEC.md
+│   ├── MONETIZATION.md
 │   ├── CASE_STUDY_RECRUITER.md
 │   └── COMPETITOR_GAP_ANALYSIS.md
 │
-├── guides/                # Developer guides
-│   ├── ARCHITECTURE.md    # Codebase architecture
-│   ├── TECH_STACK.md      # Technology overview
-│   ├── BLOG_GUIDE.md      # Content strategy
-│   ├── CONTENT_PHILOSOPHY.md  # Social-first writing
-│   ├── STYLING-GUIDELINES.md  # Design system
-│   ├── SENTRY_LOGGING.md  # Error monitoring
-│   └── MONETIZATION.md    # Revenue implementation
+├── guides/                # Developer guides (9)
+│   ├── ARCHITECTURE.md
+│   ├── TECH_STACK.md
+│   ├── TESTING.md
+│   ├── BLOG_GUIDE.md
+│   ├── CONTENT_PHILOSOPHY.md
+│   ├── STYLING-GUIDELINES.md
+│   ├── SENTRY_LOGGING.md
+│   ├── RESEND.md
+│   └── LINEAR.md
 │
-├── ideas/                 # Future feature ideas
-│   ├── LANDLORD_TAX_CALCULATOR.md
-│   ├── LEAD_MAGNET_NEWSLETTER.md
-│   └── NEWSLETTER_RESEND.md
+├── ideas/                 # Future features (6)
+│   ├── PDF_EXPORT.md
+│   ├── MARRIAGE_ALLOWANCE.md
+│   ├── XERO_QUICKBOOKS_INTEGRATION.md
+│   ├── WHITE_LABEL_CALCULATOR.md
+│   ├── DIRECTOR_PRO_SUBSCRIPTION.md
+│   └── LEAD_MAGNET_NEWSLETTER.md
 │
-├── marketing/             # Marketing assets
+├── archive/               # Parked ideas (2)
+│   ├── SELF_EMPLOYED_CALCULATOR.md
+│   └── LANDLORD_TAX_CALCULATOR.md
+│
+├── marketing/
 │   └── v4.9.5-release-tweet.md
 │
-├── performance/           # Performance tracking
-│   └── lighthouse-scores.md
-│
-├── planning/              # Implementation plans
-│   ├── BLOG_PAGE_BUILD.md
-│   ├── SAGE_IMPLEMENTATION_PLAN.md
-│   └── SELF_EMPLOYED_PLAN.md
-│
-└── setup/                 # Tool configuration
-    └── LINEAR.md          # Project management
+└── performance/
+    └── lighthouse-scores.md
 ```
 
----
-
-## Evergreen Documentation Policy
-
-**Rules:**
-- Only permanent, reusable guides belong in `/docs/`
-- No one-off audit reports or incident analysis
-- All tasks tracked in Linear, not docs
-- Update existing docs rather than creating new ones
-- Delete or archive outdated content promptly
-
-**What belongs here:**
-- Architecture and tech stack guides
-- Setup and configuration instructions
-- Content strategy and style guides
-- Future feature plans
-
-**What does NOT belong here:**
-- Completed audit reports
-- Temporary analysis documents
-- Issue-specific notes
-- Status summaries
+**28 docs total**
 
 ---
 
@@ -101,10 +77,9 @@ docs/
 | File | Description |
 |------|-------------|
 | **READ_THIS_FIRST.md** | Founder mindset, distribution focus |
-| **DIRECTOR_GUIDE_STRATEGY.md** | Director tools product pivot (4-reviewer approved) |
+| **DIRECTOR_GUIDE_POSITIONING.md** | Director tools product positioning |
 | **DIRECTOR_TAX_MATH.md** | Tax rates, formulas, golden examples |
-| **MONETIZATION.md** | Revenue strategy and phases |
-| **IDEAS.md** | Validated feature ideas |
+| **MONETIZATION.md** | Revenue strategy + technical implementation |
 
 ### Developer Guides (`/guides/`)
 
@@ -112,24 +87,29 @@ docs/
 |------|-------------|
 | **ARCHITECTURE.md** | Component structure, data flow, patterns |
 | **TECH_STACK.md** | React 19, Next.js 16, Tailwind v4, versions |
+| **TESTING.md** | Test philosophy, commands, HMRC verification |
 | **BLOG_GUIDE.md** | Writing style, SEO, content calendar |
-| **STYLING-GUIDELINES.md** | Design tokens, theming, components |
-| **SENTRY_LOGGING.md** | Error tracking configuration |
-| **MONETIZATION.md** | Technical implementation of revenue features |
-
-### Planning (`/planning/`)
-
-| File | Description |
-|------|-------------|
-| **BLOG_PAGE_BUILD.md** | Blog page redesign spec |
-| **SAGE_IMPLEMENTATION_PLAN.md** | AI explainer widget |
-| **SELF_EMPLOYED_PLAN.md** | Self-employed calculator |
-
-### Setup (`/setup/`)
-
-| File | Description |
-|------|-------------|
+| **RESEND.md** | Newsletter, email results, feedback setup |
 | **LINEAR.md** | Project management integration |
+| **SENTRY_LOGGING.md** | Error monitoring configuration |
+
+### Ideas (`/ideas/`) - Focused
+
+| File | Priority | Description |
+|------|----------|-------------|
+| **PDF_EXPORT.md** | NOW | PDF export with workings |
+| **MARRIAGE_ALLOWANCE.md** | NOW | Marriage allowance toggle |
+| **XERO_QUICKBOOKS_INTEGRATION.md** | NEXT | Accounting software integration |
+| **WHITE_LABEL_CALCULATOR.md** | LATER | B2B white-label embed |
+| **DIRECTOR_PRO_SUBSCRIPTION.md** | LATER | B2C subscription product |
+| **LEAD_MAGNET_NEWSLETTER.md** | LATER | Newsletter lead magnets |
+
+### Archive (`/archive/`) - Different Avatar
+
+| File | Why Archived |
+|------|--------------|
+| **SELF_EMPLOYED_CALCULATOR.md** | Different avatar (not SME director) |
+| **LANDLORD_TAX_CALCULATOR.md** | Different avatar (not SME director) |
 
 ---
 
@@ -137,6 +117,4 @@ docs/
 
 - **Root README:** [`../README.md`](../README.md)
 - **Contributing:** [`../CONTRIBUTING.md`](../CONTRIBUTING.md)
-- **Environment:** [`../.env.template`](../.env.template)
-
-
+- **Claude instructions:** [`../CLAUDE.md`](../CLAUDE.md)

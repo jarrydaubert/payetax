@@ -81,7 +81,6 @@ const excludePatterns = [
   'next.config',
   // Email templates and server actions that require inline styles
   '/actions/feedback',
-  '/api/error-log',
   '/api/indexnow',
   'email',
   'mail',

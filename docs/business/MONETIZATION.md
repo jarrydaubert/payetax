@@ -247,4 +247,78 @@ No demand signal = don't build it yet.
 | `DIRECTOR_CALCULATOR_BUILD.md` | Build spec and features |
 | `DIRECTOR_TAX_MATH.md` | Tax calculation reference |
 | `READ_THIS_FIRST.md` | The mantra |
-| `../guides/MONETIZATION.md` | Technical implementation guide |
+
+---
+
+## Technical Implementation Reference
+
+> Developer guide for enabling monetization features.
+
+### Current State
+
+All monetization features are **built but disabled** for launch:
+
+| Feature | Code Status | Enabled |
+|---------|-------------|---------|
+| Affiliate links | ✅ Built | ❌ No affiliates signed |
+| Accountant referral CTA | ✅ Built | ❌ Commented out |
+| B2B widget pricing page | ✅ Built | ❌ Returns 404 |
+| Lead capture API | ✅ Built | ✅ Ready |
+
+### File Locations
+
+| Purpose | File |
+|---------|------|
+| Competitor data | `src/data/competitors.ts` |
+| Analytics | `src/lib/analytics.ts` |
+| Affiliate tracking | `src/components/atoms/TrackedAffiliateLink.tsx` |
+| Referral CTA | `src/components/molecules/AccountantReferralCTA.tsx` |
+| Referral API | `src/app/api/referral/lead/route.ts` |
+| B2B pricing | `src/app/pricing/business/` |
+| Widget embed | `src/app/tools/embed-widget/` |
+
+### Affiliate Links
+
+**To add a new affiliate:**
+1. Add `affiliateUrl` and `affiliateProgram` to competitor in `competitors.ts`
+2. Links automatically use affiliate URL via `TrackedAffiliateLink`
+3. Clicks tracked via `trackAffiliateClick` in analytics
+
+**Pages using affiliate links:**
+- `/alternatives/[competitor]`
+- `/vs/[competitor]`
+- `/best-uk-tax-calculators`
+
+### Referral CTA Triggers
+
+| Condition | Headline Shown |
+|-----------|----------------|
+| £100k-£125,140 salary | "You're in the £100k Tax Trap" |
+| £125,140+ salary | "Additional Rate Tax Planning" |
+| Scottish + £75k+ | "Scottish High Earner" |
+| £75k-£100k + 25%+ effective rate | "Maximize Your Take-Home Pay" |
+
+### Analytics Events
+
+| Event | When |
+|-------|------|
+| `affiliate_click` | User clicks affiliate link |
+| `referral_cta_clicked` | User clicks "Talk to an Expert" |
+| `referral_cta_dismissed` | User dismisses CTA |
+| `referral_lead_submitted` | User submits email |
+
+### Enabling Features
+
+**1. Accountant Referral CTA**
+- File: `src/components/organisms/CalculatorContainer.tsx`
+- Uncomment the import and JSX block
+- Set `REFERRAL_PARTNER_EMAIL` env var
+
+**2. B2B Pricing Page**
+- File: `src/app/pricing/business/page.tsx`
+- Remove `notFound()` call
+- Uncomment metadata and component
+
+**3. Affiliate Links**
+- File: `src/data/competitors.ts`
+- Add `affiliateUrl` field to competitor entries
