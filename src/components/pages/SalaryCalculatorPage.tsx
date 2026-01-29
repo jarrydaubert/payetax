@@ -190,6 +190,11 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
             </ol>
           </nav>
 
+          {/* H1 for SEO */}
+          <h1 className={cn('font-bold font-display tracking-tight', SPACING.MB_6, TYPOGRAPHY.TEXT_3XL, 'sm:text-4xl')}>
+            £{formattedSalary} After Tax UK 2025-26
+          </h1>
+
           <div className={cn('grid lg:grid-cols-2', SPACING.GAP_6)}>
             {/* Quick Results Card */}
             <SalaryQuickResults salary={salary} results={results} comparisons={comparisons} />

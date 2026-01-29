@@ -15,7 +15,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
 
   return (
     <div className='prose prose-sm dark:prose-invert max-w-none'>
-      <h2>£{formattedSalary} Salary Take-Home Pay Breakdown</h2>
+      <h2>Take-Home Pay Breakdown</h2>
       <p>
         With a gross annual salary of <strong>£{formattedSalary}</strong> in the UK for the 2025-26
         tax year, your take-home pay will be approximately{' '}
