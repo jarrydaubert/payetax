@@ -1,11 +1,13 @@
 // src/app/calculator/[salary]/page.tsx
 // Dynamic salary-specific landing pages for SEO
 // Example: /calculator/70000-after-tax
+// SSR: Tax results calculated server-side for Googlebot
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SalaryCalculatorPage } from '@/components/pages/SalaryCalculatorPage';
 import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
+import { calculateTax } from '@/lib/taxCalculator';
 
 // Next.js 16: Optimize route segment config
 export const dynamic = 'force-static'; // Pre-render all params at build time
@@ -113,5 +115,29 @@ export default async function SalaryPage({ params }: PageProps) {
   // Check if this is a high-priority salary for enhanced content
   const isHighPriority = HIGH_PRIORITY_SALARIES.includes(salary);
 
-  return <SalaryCalculatorPage salary={salary} isHighPriority={isHighPriority} />;
+  // Calculate tax results server-side for SSR (Googlebot sees this immediately)
+  const initialResults = calculateTax({
+    salary: salary,
+    payPeriod: 'annually',
+    taxYear: '2025-2026',
+    taxCode: '1257L',
+    isScottish: false,
+    isMarried: false,
+    partnerGrossWage: 0,
+    isBlind: false,
+    payNoNI: false,
+    studentLoanPlans: 'none',
+    pensionContribution: 0,
+    pensionContributionType: 'percentage',
+    niCategory: 'A',
+    hoursPerWeek: 37.5,
+  });
+
+  return (
+    <SalaryCalculatorPage
+      salary={salary}
+      isHighPriority={isHighPriority}
+      initialResults={initialResults}
+    />
+  );
 }

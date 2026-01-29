@@ -100,7 +100,8 @@ export function generateMetadata({
   const url = `${SITE_URL}${pathname}`;
 
   // Format title with site name if not already included
-  const formattedTitle = title.includes('PayeTax') ? title : `${title} | PayeTax`;
+  const hasPayeTax = title.includes('PayeTax');
+  const formattedTitle = hasPayeTax ? title : `${title} | PayeTax`;
 
   // Generate article-specific metadata if applicable
   const articleMetadata =
@@ -115,12 +116,16 @@ export function generateMetadata({
       : undefined;
 
   // Generate base metadata
+  // If title already has PayeTax, use string to avoid template duplication
+  // If not, use object with template for child pages
   return {
     // Basic metadata
-    title: {
-      default: formattedTitle,
-      template: '%s | PayeTax',
-    },
+    title: hasPayeTax
+      ? formattedTitle
+      : {
+          default: formattedTitle,
+          template: '%s | PayeTax',
+        },
     description,
     keywords: keywords.split(',').map((keyword) => keyword.trim()),
 

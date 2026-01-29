@@ -10,7 +10,7 @@ import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
+import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
@@ -74,34 +74,17 @@ function generateSalaryFAQs(salary: number, results: TaxCalculationResults) {
 interface SalaryCalculatorPageProps {
   salary: number;
   isHighPriority?: boolean;
+  initialResults: TaxCalculationResults; // SSR: passed from server for Googlebot
 }
 
-export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
-  const [results, setResults] = useState<TaxCalculationResults | null>(null);
+export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculatorPageProps) {
+  // Use SSR results immediately - no "Loading..." state for Googlebot
+  const [results] = useState<TaxCalculationResults>(initialResults);
   const setSalary = useCalculatorStore((state) => state.setSalary);
   const calculate = useCalculatorStore((state) => state.calculate);
 
-  // Calculate results immediately on mount
+  // Sync store on mount for interactive calculator
   useEffect(() => {
-    const quickResults = calculateTax({
-      salary: salary,
-      payPeriod: 'annually',
-      taxYear: '2025-2026',
-      taxCode: '1257L',
-      isScottish: false,
-      isMarried: false,
-      partnerGrossWage: 0,
-      isBlind: false,
-      payNoNI: false,
-      studentLoanPlans: 'none',
-      pensionContribution: 0,
-      pensionContributionType: 'percentage',
-      niCategory: 'A',
-      hoursPerWeek: 37.5,
-    });
-    setResults(quickResults);
-
-    // Also set in store for the full calculator
     setSalary(salary);
     calculate();
   }, [salary, setSalary, calculate]);
@@ -115,10 +98,6 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
     { amount: salary + 5000, label: '£5k more' },
     { amount: salary + 10000, label: '£10k more' },
   ].filter((c) => c.amount >= 20000 && c.amount <= 500000);
-
-  if (!results) {
-    return <div className='min-h-screen bg-background'>Loading...</div>;
-  }
 
   // Generate structured data for SEO
   const breadcrumbItems = [
@@ -191,7 +170,14 @@ export function SalaryCalculatorPage({ salary }: SalaryCalculatorPageProps) {
           </nav>
 
           {/* H1 for SEO */}
-          <h1 className={cn('font-bold font-display tracking-tight', SPACING.MB_6, TYPOGRAPHY.TEXT_3XL, 'sm:text-4xl')}>
+          <h1
+            className={cn(
+              'font-bold font-display tracking-tight',
+              SPACING.MB_6,
+              TYPOGRAPHY.TEXT_3XL,
+              'sm:text-4xl'
+            )}
+          >
             £{formattedSalary} After Tax UK 2025-26
           </h1>
 
