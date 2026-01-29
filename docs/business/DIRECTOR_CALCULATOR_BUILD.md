@@ -1,392 +1,435 @@
-# Director Calculator - Product Spec
+# Director Pay Calculator — Product Spec
 
-> **Route:** `/tools/director-guide`
-> **Audience:** Accountants, experienced directors, finance-savvy founders
-> **Tax Year:** 2025-26 (constants from `src/constants/taxRates.ts`)
-> **Disclaimer:** Illustrative only. Not financial advice. Consult a qualified accountant.
+> **Vision:** The seamless go-to calculator for ALL your UK limited company director needs.
 
----
+**Position:** DIY optimization tool that empowers directors to understand their tax position, flags complexity, and hands off to accountants when needed.
 
-## File Inventory
-
-### Page & Orchestration
-| File | Purpose |
-|------|---------|
-| `src/app/tools/director-guide/page.tsx` | Route page with SEO metadata |
-| `src/components/organisms/DirectorGuide/DirectorDashboard.tsx` | Main orchestrator, 4-panel layout |
-
-### Dashboard Components
-| File | Purpose |
-|------|---------|
-| `src/components/molecules/DirectorGuide/dashboard/DashboardLayout.tsx` | 4-panel responsive layout |
-| `src/components/molecules/DirectorGuide/dashboard/SidebarNav.tsx` | Icon sidebar (collapsed by default) |
-| `src/components/molecules/DirectorGuide/dashboard/InputsPanel.tsx` | All user inputs |
-| `src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx` | Learn cards + warnings |
-| `src/components/molecules/DirectorGuide/dashboard/SummaryCards.tsx` | Top metrics row |
-| `src/components/molecules/DirectorGuide/dashboard/DetailCards.tsx` | 4 breakdown cards |
-| `src/components/molecules/DirectorGuide/dashboard/MoneyFlowChart.tsx` | Horizontal bar chart |
-
-### Calculator Components
-| File | Purpose |
-|------|---------|
-| `src/components/molecules/DirectorGuide/calculator/SalarySlider.tsx` | Interactive salary explorer |
-| `src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx` | 3 strategy cards |
-| `src/components/molecules/DirectorGuide/calculator/TaxPots.tsx` | Company + Personal tax pots |
-| `src/components/molecules/DirectorGuide/calculator/PensionGapWarning.tsx` | State pension status |
-| `src/components/molecules/DirectorGuide/calculator/KeyDates.tsx` | Tax deadline display |
-| `src/components/molecules/DirectorGuide/calculator/TaxBreakdownTable.tsx` | Full breakdown (unused) |
-
-### State & Logic
-| File | Purpose |
-|------|---------|
-| `src/store/directorGuideStore.ts` | Zustand store for form + results |
-| `src/lib/tax/strategyComparison.ts` | 3-strategy calculation engine |
-| `src/lib/tax/directorCalculator.ts` | Single scenario calculator |
-| `src/lib/validation/directorValidation.ts` | Zod schemas for inputs |
-| `src/lib/directorGuideAnalytics.ts` | Analytics tracking |
-
-### Tax Calculation Modules
-| File | Purpose |
-|------|---------|
-| `src/lib/tax/incomeTax.ts` | Income tax (rUK + Scotland) |
-| `src/lib/tax/employeeNI.ts` | Employee National Insurance |
-| `src/lib/tax/employerNI.ts` | Employer National Insurance |
-| `src/lib/tax/corporationTax.ts` | Corporation Tax + marginal relief |
-| `src/lib/tax/dividendTax.ts` | Dividend tax calculation |
-| `src/lib/tax/studentLoan.ts` | Student loan repayments |
-
-### Legacy/Unused Input Components
-| File | Purpose |
-|------|---------|
-| `src/components/molecules/DirectorGuide/inputs/CoreInputs.tsx` | Old inputs (has Year-End) |
-| `src/components/molecules/DirectorGuide/inputs/*.tsx` | Individual input components |
+**Route:** `/tools/director-guide`
 
 ---
 
-## What It Does
+## Pillar 1: INPUTS (What We Accept)
 
-A **salary vs dividend optimiser** that auto-recommends the most tax-efficient extraction strategy for UK limited company directors.
+### Core Inputs
 
-### Key Differentiators
+| Input | Purpose |
+|-------|---------|
+| Region | Determines income tax bands (rUK vs Scotland) |
+| Profit before director remuneration | Base for all calculations — avoids double-counting salary in expenses |
+| VAT status | Triggers threshold warnings (not used in tax calc). Note: "Deduct 20%" shortcut is dangerous for mixed-rate/partial exemption businesses — keep as warning-only, not calculation. |
+| Already taken this year | Accounts for mid-year usage |
+| Other personal income | Affects tax bands, PA taper, student loans |
+| Year-end month | Drives key dates calculation |
+| Losses brought forward | Reduces CT liability (common for SMEs) |
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Student loans on TOTAL income | ✅ | Correctly applies SA rules to salary + dividends + BIK |
-| Scottish 6-band support | ✅ | Full 2025-26 Scottish rates |
-| Marginal relief CT | ✅ | Proper 19%→25% taper |
-| Strategy comparison | ✅ | 3 clickable strategy cards |
-| Interactive salary slider | ✅ | Live updates all figures |
-| Two Pots budgeting | ✅ | Company + Personal monthly set-aside |
+**Profit Input Guidance (Critical UX):**
 
----
+> "Company profit BEFORE your pay"
+> 
+> This means: Revenue minus business expenses, but NOT minus your salary, dividends, pension contributions, or benefits in kind.
+> 
+> If unsure, ask your accountant for your "profit before director remuneration."
 
-## Inputs
+**"Already Taken" Clarification:**
 
-| Input | Type | Status | Location |
-|-------|------|--------|----------|
-| Region | Select (England/Wales/NI/Scotland) | ✅ | InputsPanel |
-| Annual Revenue | Currency | ✅ | InputsPanel |
-| Includes VAT | Checkbox | ✅ | InputsPanel |
-| Business Expenses | Currency | ✅ | InputsPanel |
-| Already Taken | Currency | ✅ | InputsPanel |
-| Other Personal Income | Currency | ✅ | InputsPanel |
-| Employment Allowance | Toggle | ✅ | InputsPanel (Advanced) |
-| Student Loan Plans | Checkboxes (1/2/4/Postgrad) | ✅ | InputsPanel (Advanced) |
-| Pension Contribution | Currency | ✅ | InputsPanel (Advanced) |
-| Company Car BIK | Currency | ✅ | InputsPanel (Advanced) |
-| Company Year-End | Select (March/Dec/Other/Unknown) | ✅ | InputsPanel |
+This input mixes multiple concepts (gross salary, net salary, dividends, drawings). Either:
+- Split into: YTD gross salary, YTD dividends, other drawings, OR
+- Demote behind advanced toggle with explicit guidance on units
 
----
+### Advanced Inputs
 
-## Outputs
+| Input | Purpose | Notes |
+|-------|---------|-------|
+| Employment Allowance | Offsets employer NI | Default: No (many don't qualify — eligibility gate needed) |
+| Student Loan plans | Adds repayment to personal tax | Only active plans shown (Plan 5 from April 2026) |
+| Company Pension Contribution | Reduces taxable profit, personal tax relief | Explicit label to avoid personal pension confusion |
+| Benefits in Kind | Adds to personal income | Shows "company cost incomplete" warning (Class 1A = 15% employer NI) |
+| Do you have other PAYE employment? | Affects NI threshold usage | If yes, NI threshold may already be used |
+| Minimum salary requirement | Floor for mortgage applications | Optional — lenders often require £25k+ PAYE |
 
-### Summary Cards (Top Row) ✅
-| Metric | Status |
-|--------|--------|
-| Monthly Take-Home | ✅ |
-| Annual Salary | ✅ |
-| Annual Dividends | ✅ |
-| Corporation Tax | ✅ |
+**Pension Input Notes:**
+- If pension is already included in profit figure, add checkbox: "Is pension already deducted?"
+- Warn about Annual Allowance (standard + taper + MPAA)
+- Pension carry-forward from previous years not modelled — note in limitations
 
-### 3-Strategy Comparison Cards ✅
+### Compare Mode Inputs
 
-| Strategy | Description | Status |
-|----------|-------------|--------|
-| All Salary | Take everything as PAYE salary | ✅ |
-| Recommended | Optimal salary + dividends | ✅ (cyan glow + "Recommended" badge) |
-| All Dividends | £0 salary, all dividends | ✅ |
+| Input | Purpose |
+|-------|---------|
+| Your current salary | What you actually pay yourself |
+| Your current dividends | What you actually take |
 
-Each card shows: Salary, Dividends, Total Tax, Effective Rate
+**Location:** Input Panel (not inside strategy card — avoids fat-finger UX issues)
 
-**Dynamic Message Below Cards:**
-- At optimal: "Optimal tax efficiency — this is your best option" (green)
-- Not optimal: "X% more tax than optimal (£Y extra)" (red)
+### Input Validation Rules
 
-### Salary Slider ✅
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Range £0 to UEL (or profit) | ✅ | Uses `TAX_RATES[TAX_YEAR].nationalInsurance.employee.A.upper.threshold` |
-| Live figure updates | ✅ | All components react to slider |
-| Initializes to optimal | ✅ | Starts at £12,570 |
+| Rule | Behaviour |
+|------|-----------|
+| Profit ≤ 0 | Trigger "Survival Mode" — show £6,500 salary recommendation to preserve NI credits for State Pension, even if it creates a loss. The NI-credit decision is still valuable at zero/low profit. |
+| Compare inputs > available profit | Flag as potential Director's Loan (soft wording: "may create/increase") |
+| Already taken > available | Overdrawn warning |
+| EA selected but likely ineligible | Show "assumes eligible" banner |
 
-### Detail Cards (2x2 Grid) ✅
-| Card | Status |
-|------|--------|
-| Salary Breakdown | ✅ (Gross, Income Tax, Employee NI, Employer NI, Net) |
-| Dividend Breakdown | ✅ (Gross, Allowance, Taxable, Tax, Net) |
-| Corporation Tax | ✅ (Revenue, Expenses, Salary+NI, Taxable Profit, CT Due) |
-| Tax Summary | ✅ (All taxes totaled) |
+### What We Don't Accept (Scope Boundaries)
 
-### Tax Pots (Two Pots) ✅
-| Pot | Status | Contents |
-|-----|--------|----------|
-| Company Tax Pot | ✅ | Corporation Tax (monthly) |
-| Personal Tax Pot | ✅ | Income Tax + Dividend Tax + Student Loan (monthly) |
-
-### State Pension Status ✅
-| Salary Range | Status | Display |
-|--------------|--------|---------|
-| £6,500+ | ✅ | Green: "Qualifying Year" |
-| £5,000-£6,499 | ✅ | Amber: "Inefficient Salary Zone" warning |
-| Below £5,000 | ✅ | Gray: "No Credits This Year" |
-
-Uses constants: `SECONDARY_THRESHOLD`, `LEL` from taxRates.ts
-
-### Money Flow Chart ✅
-Simple horizontal bar chart showing:
-- Gross Profit (100%)
-- Take-Home (% of profit)
-- Total Tax (% of profit)
-
-### Key Dates ✅
-| Date | Status | Notes |
-|------|--------|-------|
-| Year End | ✅ | Based on yearEndMonth input |
-| CT Payment | ✅ | Year-end + 9 months + 1 day |
-| CT Return | ✅ | Year-end + 12 months |
-| Self Assessment | ✅ | 31 January following tax year |
-
-### Education Panel ✅
-| Section | Status |
-|---------|--------|
-| Learn Cards | ✅ (Why £12,570, Dividends, Corp Tax, Pension) |
-| Warnings | ✅ (Context-sensitive) |
-| Assumptions | ✅ (Tax year, region, period) |
-
-### Additional Features
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Effective tax rate | ✅ | Shown on strategy cards |
-| Email results | ❌ | Not implemented |
-| PDF export | ❌ | Disabled, marked "Pro" |
-| .ics downloads | ❌ | Not implemented |
+| Input | Why Not |
+|-------|---------|
+| Multiple directors / spouse | Complexity — future consideration |
+| Retained profits target | Requires cash flow modelling |
+| Contract rate / day rate | Different user journey (contractor vs director) |
+| IR35 status | Affects entire validity — out of scope |
+| Associated companies count | Affects CT thresholds — noted in limitations |
+| Specific accounting period dates | Assumes 12-month periods |
 
 ---
 
-## Warnings System ✅
+## Pillar 2: LOGIC (What We Do)
 
-All warnings in EducationPanel use constants where available:
+### Calculations Performed
 
-| Condition | Warning | Status |
-|-----------|---------|--------|
-| Revenue £85k-90k | VAT threshold approaching | ✅ |
-| Revenue ≥£90k | VAT registration required | ✅ |
-| Income >£100k | PA taper zone (60% rate) | ✅ (uses `PA_TAPER_THRESHOLD`) |
-| Profit >£250k | High complexity | ✅ |
-| Taken > available | Overdrawn warning | ✅ |
-| Sole director + EA | Employment Allowance not available | ✅ (tooltip) |
-| Salary £5k-£6.5k | Pension Gap warning | ✅ (uses `SECONDARY_THRESHOLD`, `LEL`) |
-| Income £60k-£80k | HICBC clawback | ✅ |
-| Pension >£60k | Annual Allowance warning | ✅ |
-| Dividends declared | Self Assessment required | ✅ |
-| Student loans selected | SA repayment warning | ✅ |
-| Any salary | Payroll admin required | ✅ |
-| SA tax >£1k | Payments on Account warning | ✅ |
-| No profit | Survival mode warning | ✅ |
+| Calculation | Notes |
+|-------------|-------|
+| Income Tax | rUK bands OR Scotland 6-band based on region |
+| Personal Allowance | Including taper for high earners |
+| Employee National Insurance | On salary above threshold (8% / 2%) |
+| Employer National Insurance | On salary above threshold (15% from April 2025) |
+| Employment Allowance | Offset against employer NI (if eligible) |
+| Corporation Tax | Including marginal relief for mid-range profits |
+| Dividend Tax | UK dividend rates for ALL regions (not Scottish bands) |
+| Student Loan repayments | On total income (salary + dividends + BIK + other) |
+| Director cumulative NI | Directors use annual earnings method — calculated cumulatively over tax year, not per pay period |
 
----
+**Key Rate Changes (Autumn Budget 2024, effective April 2025):**
+- Employer NI: 13.8% → 15%
+- Secondary threshold: £9,100 → £5,000
+- Employment Allowance: £5,000 → £10,500
 
-## Tax Calculations
+### Optimization Approach
 
-All rates from `src/constants/taxRates.ts` — NO hardcoded values in components.
+1. Test salary/dividend combinations across valid range (0 to sensible cap)
+2. For each combination, calculate all taxes
+3. Find combination with highest net take-home
+4. Label as "Highest Take-Home" (factual, not advisory)
 
-### Income Tax (rUK) ✅
-- £0-12,570: 0% (Personal Allowance)
-- £12,571-50,270: 20%
-- £50,271-125,140: 40%
-- £125,140+: 45%
-- PA Taper: Reduces £1 for every £2 over £100k
+**Slider rationale:** Capped at upper earnings limit because above this, salary is rarely tax-efficient. Users can model higher via "Your Setup".
 
-### Income Tax (Scotland) ✅
-- £0-12,570: 0%
-- £12,571-15,397: 19% (Starter)
-- £15,398-27,491: 20% (Basic)
-- £27,492-43,662: 21% (Intermediate)
-- £43,663-75,000: 42% (Higher)
-- £75,001-125,140: 45% (Advanced)
-- £125,140+: 48% (Top)
+### Warning Triggers
 
-### National Insurance ✅
-| Type | Threshold | Rate |
-|------|-----------|------|
-| Employee NI | £12,570-50,270 | 8% |
-| Employee NI | £50,270+ | 2% |
-| Employer NI | Above £5,000 | 15% |
-| Employment Allowance | — | £10,500 offset |
-| LEL (pension credits) | £6,500 | — |
+| Condition | Warning | Tone |
+|-----------|---------|------|
+| No profit | Survival Mode | Hard constraint |
+| Taken > available | Potential Director's Loan | Soft — "may create/increase depending on treatment" |
+| Revenue near VAT threshold | May need to register | Soft — based on rolling 12-month turnover |
+| Dividends declared | May need to file Self Assessment | Soft — depends on amount and other income |
+| Income in PA taper zone | Effective 60% rate explained | Educational |
+| Income in HICBC zone | Child Benefit clawback | Educational |
+| SA liability >£1k AND <80% deducted at source | Payments on Account likely | Educational — BOTH conditions must be met |
+| Salary in pension gap zone | Paying employer NI without earning pension credits | Educational — no specific £ benefit claims |
+| Pension contribution exceeds Annual Allowance | Tax charge warning | Educational |
+| Total income near pension taper threshold | Annual Allowance may be reduced | Educational |
+| Compare inputs exceed available profit | Flags as Director's Loan | Card turns red |
 
-### Corporation Tax ✅
-| Profit | Rate |
-|--------|------|
-| £0-50,000 | 19% |
-| £50,001-250,000 | Marginal relief |
-| £250,001+ | 25% |
+### What We Don't Calculate (Noted Limitations)
 
-Marginal relief formula: `(250000 - profit) × 3/200`
+| Item | Impact | Shown to User |
+|------|--------|---------------|
+| £2k unearned income rule for student loans | May overstate SL when dividends ≤£2k (CSLM16035) | Yes — in Accuracy panel |
+| Class 1A NI on BIK | Company cost understated by 15% of BIK value | Yes — warning on BIK input |
+| Plan 5 student loans | Not applicable until April 2026 | Yes — note in SL options |
+| Associated companies CT threshold division | CT may be understated for groups | Yes — in Accuracy panel |
+| Short accounting periods | Assumes 12 months | Yes — in Accuracy panel |
+| Marriage Allowance transfer | Could shift optimal by small amount | Yes — in Accuracy panel |
+| S455 tax on Director's Loan | Not calculated, only flagged | Yes — in warning |
+| Pension taper (adjusted income >£260k) | Allowance reduces to min £10k | Yes — in warning |
+| MPAA (Money Purchase Annual Allowance) | If accessed pension flexibly, allowance is £10k not £60k | Yes — in Accuracy panel |
+| Pension carry-forward | Previous years' unused allowance not modelled | Yes — in Accuracy panel |
+| Dividend timing (declare vs pay) | Affects which tax year | Yes — in Key Dates notes |
+| Distributable profits verification | Requires accountant sign-off | Yes — in Accuracy panel |
 
-### Dividend Tax ✅
-- Allowance: £500 (from `dividendAllowance` constant)
-- Basic rate: 8.75%
-- Higher rate: 33.75%
-- Additional rate: 39.35%
+**Dividend Wording Note:**
 
-### Student Loans ✅
-| Plan | Threshold | Rate |
-|------|-----------|------|
-| Plan 1 | £26,065 | 9% |
-| Plan 2 | £28,470 | 9% |
-| Plan 4 | £32,745 | 9% |
-| Postgrad | £21,000 | 6% |
-
-Applied to TOTAL income (salary + dividends + BIK + other)
+Replace "illegal dividend" with conditional language:
+> "Dividend may be unlawful IF you lack distributable reserves — check your accounts or consult your accountant."
 
 ---
 
-## UI Layout
+## Pillar 3: OUTPUTS (What We Show)
+
+### Strategy Comparison (4 Cards)
+
+| Card | Description |
+|------|-------------|
+| All Salary | Take everything as PAYE — baseline |
+| Highest Take-Home | Optimal salary + dividend split (highlighted) |
+| All Dividends | Minimum salary, rest as dividends — baseline |
+| Your Setup | User's actual arrangement with delta vs optimal |
+
+**Each card shows:** Salary, Dividends, Total Tax, Effective Rate, Net Take-Home
+
+**Your Setup behaviour:**
+- Shows difference vs optimal (e.g., "+£1,200 more tax" or "Matches optimal")
+- If inputs exceed available profit → card turns RED with DLA warning
+- Pre-populated with optimal values; user edits to compare
+
+### Interactive Salary Slider
+
+- Range: 0 to sensible cap
+- Live updates all figures as user drags
+- Starts at optimal position
+- Strategy cards clickable to jump slider to that position
+
+### Detail Breakdowns
+
+**Salary Breakdown:**
+Gross → Income Tax → Employee NI → Employer NI → Net
+
+**Dividend Breakdown:**
+Gross → Allowance Used → Taxable → Tax → Net
+
+**Corporation Tax Breakdown:**
+Profit → Salary Cost Deduction → Pension Deduction → Taxable Profit → CT Due
+
+### Monthly Set-Aside ("Two Pots")
+
+| Pot | Contents |
+|-----|----------|
+| Company Pot | Corporation Tax ÷ 12 |
+| Personal Pot | (Income Tax + Dividend Tax + Student Loan) ÷ 12 |
+
+**Important labelling:** "Recommended set-aside for budgeting — not HMRC payment amounts. See Key Dates for actual due dates."
+
+### Key Dates
+
+| Date | Calculation |
+|------|-------------|
+| Year End | Per user input |
+| CT Payment Due | Year-end + 9 months + 1 day |
+| CT Return Due | Year-end + 12 months |
+| Self Assessment | 31 January following the tax year |
+
+**Notes shown:**
+- Dividend timing matters: declared in March, paid in April = next tax year
+- Actual distributable profits require accountant verification
+- Dividends must be properly documented with board minutes and dividend vouchers
+
+### Warnings Panel
+
+**Grouped by severity:**
+
+| Category | Examples |
+|----------|----------|
+| Hard constraints | No profit, overdrawn, illegal dividend |
+| May apply | VAT registration, Self Assessment, POA |
+| Complexity flags | PA taper, HICBC, pension issues, associated companies |
+
+**Behaviour:** Context-sensitive — only show relevant warnings based on inputs
+
+### Accuracy & Scope Panel
+
+**Always visible in Education Panel**
+
+**What this calculator does:**
+- Compares salary vs dividend extraction strategies
+- Uses current HMRC rates (single source of truth)
+- Assumes single director, 12-month period, standalone company
+
+**What it doesn't do:**
+- Student loan £2k unearned income rule (may overstate)
+- Class 1A NI on benefits in kind (company cost incomplete)
+- Associated company CT threshold adjustments
+- Short accounting period adjustments
+- Marriage Allowance transfers
+- IR35 status considerations
+
+**Disclaimer:** Illustrative only. Not financial advice. Always consult a qualified accountant.
+
+### What We Could Show (Future Possibilities)
+
+| Output | Value |
+|--------|-------|
+| Multi-year comparison | Fiscal drag impact, rate change planning |
+| Spouse/household view | Joint optimization |
+| Cash runway / buffer mode | "Maximise take-home subject to keeping £X in company" — addresses variable income reality, major differentiator |
+| Retained profits scenarios | Leave X in company, take Y |
+| Dividend voucher generation | Document automation |
+| CT payment reminders | Notification service |
+| Charts/visualizations | Clearer money flow |
+
+---
+
+## UX / UI
+
+### Desktop Layout
 
 ```
 ┌──────────┬───────────┬─────────────────────┬──────────────┐
 │ Sidebar  │  Inputs   │    Main Content     │  Education   │
-│   48px   │   280px   │      (flex)         │    320px     │
-│  icons   │   forms   │                     │    learn     │
-│collapsed │ expanded  │                     │   expanded   │
+│  (nav)   │  (form)   │   (results/cards)   │  (warnings)  │
 └──────────┴───────────┴─────────────────────┴──────────────┘
 ```
 
-### Main Content Flow (top to bottom):
-1. Header: "Director Pay Dashboard"
-2. SummaryCards (4 metrics)
-3. SalarySlider
-4. StrategyComparisonTable (3 cards + message)
-5. DetailCards (2x2 grid)
-6. TaxPots (Company + Personal)
-7. PensionGapWarning
-8. MoneyFlowChart + KeyDates (side by side)
+### Mobile Layout
 
-### Styling
-- Dark theme: `bg-[#0f172a]`, `bg-[#1e293b]`
-- Cards: `rounded-xl border border-white/[0.04] p-4`
-- Accent: Cyan (`cyan-500`) + Emerald (`emerald-500`)
-- Fonts: `font-mono` for currency values
+- Panels stack vertically
+- Strategy cards in 2×2 grid (not 4 in a row)
+- Compare inputs in collapsible section
+- Sticky header for navigation
 
----
+### Key Interactions
 
-## Known Limitations
-
-| Item | Status |
-|------|--------|
-| £2k unearned income rule for SL | ❌ Not implemented |
-| Class 1A NI on BIK | ❌ Not applied to company cost |
-| Associated companies CT thresholds | ❌ Not implemented |
-| Short accounting periods | ❌ Not implemented |
+| Interaction | Behaviour |
+|-------------|-----------|
+| Drag slider | All figures update live |
+| Click strategy card | Slider jumps to that position |
+| Edit Compare inputs | 4th card recalculates with delta |
+| Expand warning | Shows explanation and next steps |
+| Toggle advanced inputs | Reveals/hides student loans, pension, BIK |
 
 ---
 
-## Not Implemented (Backlog)
+## Monetization Approach
 
-### Phase 2 - Common Scenarios
+### Free Core (Trust + SEO + Shareability)
 
-| Feature | Impact | Notes |
+Full calculator with no gates. Accuracy is never paywalled.
+
+### Email Capture
+
+"Email my results" — saves scenarios, key dates, set-aside figures. Builds lead list for nurture.
+
+### Accountant Referral
+
+"Need help implementing this? Talk to a specialist" — appears when complexity flags trigger. Revenue share with partner firms.
+
+**Disclosure required:** "We may receive a referral fee if you engage with our partner firms. This doesn't affect our recommendations."
+
+### White-Label (B2B)
+
+Accountants embed calculator on their sites. They get leads; we get recurring revenue.
+
+### Future Possibilities
+
+- Pro features: Multi-director, spouse, retained profits (only if demand proves out)
+- Document generation: Dividend vouchers, board minutes
+- Integrations: Xero, FreeAgent, QuickBooks
+
+### Red Lines
+
+| Never Do | Why |
+|----------|-----|
+| Gate accuracy behind pay | Destroys trust |
+| Say "you should" | Advisory territory |
+| Aggressive CTAs / pop-ups | Erodes credibility |
+| Hide limitations | Accountants will catch it |
+
+---
+
+## Competitive Edge
+
+### What We Do Better
+
+| Feature | Us | Most Competitors |
+|---------|:--:|:----------------:|
+| 4-strategy comparison (incl. Your Setup) | ✅ | ❌ |
+| Interactive slider with live updates | ✅ | ❌ |
+| Student loans on total income | ✅ | ❌ |
+| Scottish tax bands (correct dividend handling) | ✅ | ⚠️ |
+| Pension gap warning | ✅ | ❌ |
+| Monthly set-aside (Two Pots) | ✅ | ❌ |
+| Key dates with year-end customization | ✅ | ❌ |
+| HICBC clawback warning | ✅ | ❌ |
+| "Compare My Setup" as audit tool | ✅ | ❌ |
+| Transparent limitations (Accuracy panel) | ✅ | ❌ |
+
+### What Competitors Have (We Don't — Yet)
+
+| Feature | Value |
+|---------|-------|
+| Sole trader vs Ltd comparison | First-timer journey |
+| IR35 / umbrella comparison | Contractor journey |
+| Spouse/share split calculator | Family companies |
+| Contract rate → take-home flow | Contractor UX |
+| Xero/FreeAgent integration | Real data |
+
+---
+
+## The 10x Vision
+
+**From "Calculator" to "Director Financial Copilot"**
+
+| Current | 10x |
+|---------|-----|
+| User types profit manually | Connect to Xero → pull live P&L |
+| Shows optimal extraction | Shows "You've taken £30k — stop now or hit higher rate" |
+| Static annual view | Multi-year projection with fiscal drag |
+| Single director | Household optimizer (spouse, children for HICBC) |
+| Tax calculation | Constraint-based: "Maximize take-home while keeping 6 months runway" |
+
+### Reviewer-Recommended Priority Features
+
+| Feature | Source | Value |
 |---------|--------|-------|
-| Multiple directors | High | Husband/wife setups common - split profit extraction |
-| Retained profits option | High | "How much to leave in company?" - not everyone extracts 100% |
-| Director's loan S455 calc | Medium | DLA warning exists, but no S455 tax calculation (32.5% on overdrawn balance) |
-| IR35 status question | Medium | "Are you a contractor?" - affects entire strategy validity |
+| **Dividend timing optimizer** | Claude | "You have £X basic rate band remaining. Declare £Y before April 5 to save £Z." |
+| **Safe Extraction Mode** | ChatGPT, Grok | Max take-home while keeping X months cash runway |
+| **"Safe to Spend" number** | Gemini | "Of the £10k in your bank today, £X is yours" |
+| **Household optimizer** | Grok | Spouse salary/dividends, HICBC impact |
+| **Dividend voucher generation** | Gemini | Zero-marginal-cost sticky feature |
+| **Retained profits planner** | ChatGPT | Leave £X in company to avoid future traps |
 
-### Phase 2 - Quick Wins
+### Long-Term Wedge
 
-| Feature | Impact | Notes |
-|---------|--------|-------|
-| Trivial benefits | Low | £300/year tax-free (gift cards, small perks) - easy to add |
-| Home office allowance | Low | £6/week (£312/year) or actual costs - common director expense |
-
-### Phase 3 - Advanced
-
-| Feature | Notes |
-|---------|-------|
-| Spouse modelling | Paying spouse up to £12,570 for legitimate work |
-| Variable income mode | "My profit varies year to year" |
-
-### Phase 4 - Polish
-
-| Feature | Notes |
-|---------|-------|
-| Tax year selector | Support multiple tax years |
-| Visual charts (pie/waterfall) | Better visualization of money flow |
-
-### Infrastructure
-
-| Feature | Notes |
-|---------|-------|
-| Tests for new calculators | Unit tests for strategyComparison, directorCalculator |
-| Email results | API exists at `/api/send-director-results` |
-| PDF export | Marked as "Pro" feature |
-| .ics calendar downloads | For key dates |
+```
+Director Calculator → Tax Deadline Dashboard → Director's Toolkit → White-Label B2B → Xero Integration
+```
 
 ---
 
-## Test Checklist
+## Ask for Reviewers
 
-### Income Tax
-- [ ] rUK: All bands correct
-- [ ] Scotland: All 6 bands correct
-- [ ] PA taper: Starts at £100k
-- [ ] PA taper: Zero at £125,140
+```
+Review this product spec through these lenses:
 
-### National Insurance
-- [ ] Employee NI: 8% from £12,570
-- [ ] Employee NI: 2% above £50,270
-- [ ] Employer NI: 15% from £5,000
-- [ ] Employment Allowance: £10,500 offset
+1. INPUT MODEL
+   - Any gaps or confusion risks?
+   - What inputs are missing for your use case?
+   - Would the "profit before director remuneration" approach work?
 
-### Corporation Tax
-- [ ] 19% up to £50,000
-- [ ] Marginal relief £50,001-£250,000
-- [ ] 25% above £250,000
+2. LOGIC APPROACH
+   - Is the optimization sound?
+   - What edge cases would break it?
+   - Any calculations missing that would embarrass us?
 
-### Dividend Tax
-- [ ] Allowance: Uses constant (£500)
-- [ ] Rates: 8.75% / 33.75% / 39.35%
+3. OUTPUT CLARITY
+   - Would you trust these numbers?
+   - Is "Compare My Setup" positioned correctly?
+   - What would make an accountant roll their eyes?
 
-### Student Loans
-- [ ] All plan thresholds from constants
-- [ ] Applied to total income
-- [ ] Multiple plans stack
+4. PRODUCT-MARKET FIT
+   - Would you use this? Share it?
+   - What's the killer feature?
+   - What's the biggest gap vs competitors?
 
-### Strategy Comparison
-- [ ] All Salary calculates correctly
-- [ ] Recommended shows highest take-home
-- [ ] All Dividends calculates correctly
-- [ ] Clicking card updates slider
+5. LIMITATIONS HONESTY
+   - Are we being transparent enough?
+   - Anything we claim that we shouldn't?
+   - Anything we disclaim that we should actually do?
 
-### State Pension Warning
-- [ ] £5,000-£6,499: Warning shown
-- [ ] £6,500+: Qualifying message
-- [ ] Below £5,000: No credits message
-- [ ] Updates live with slider
+6. 10x THINKING
+   - What would make this indispensable?
+   - What's the wedge into broader director tools?
 
-### UI/UX
-- [ ] Slider updates all figures live
-- [ ] Strategy cards highlight on selection
-- [ ] Two Pots show correct monthly amounts
-- [ ] All warnings appear at correct thresholds
+Be brutal. Tell me what's weak.
+```
+
+---
+
+## Sign-Off Status
+
+| Reviewer | Technical | Business | Status |
+|----------|-----------|----------|--------|
+| Grok | ✅ | ✅ | Approved |
+| Claude | ✅ | ✅ | Approved |
+| ChatGPT | ✅ | ✅ | Approved with input model note |
+| Gemini | ✅ | ✅ | Approved with validation note |
+
+**Consensus:** Product is sound. Execute noted improvements, then ship.

@@ -100,13 +100,24 @@ export const DirectorStrategySchema = z.object({
 });
 
 /**
+ * All strategies comparison for comprehensive director email
+ */
+export const AllStrategiesSchema = z.object({
+  allSalary: DirectorStrategySchema,
+  optimalMix: DirectorStrategySchema,
+  allDividends: DirectorStrategySchema,
+});
+
+/**
  * Request body for /api/send-director-results
  */
 export const SendDirectorResultsRequestSchema = z.object({
   email: EmailSchema,
   results: z.object({
     grossProfit: z.number(),
-    strategy: DirectorStrategySchema,
+    strategies: AllStrategiesSchema,
+    recommended: z.enum(['allSalary', 'optimalMix', 'allDividends']),
+    savingsVsAllSalary: z.number(),
   }),
   taxYear: TaxYearStringSchema,
 });

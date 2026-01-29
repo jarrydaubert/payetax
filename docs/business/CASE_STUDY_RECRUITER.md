@@ -241,3 +241,129 @@ For commission-based directors, the goal shifts from "max take-home" to "sustain
 - Input: Employees = 1 (director only)
 - Expected: Employment Allowance disabled
 - Expected: Tooltip explaining EA rules
+
+---
+
+## HMRC CA44 Official Test Data (2025-26)
+
+> **Source:** CA44 HMRC 04/25 - "National Insurance for company directors"
+> These are OFFICIAL worked examples from HMRC guidance. Our calculator MUST match these exactly.
+
+### CA44 Thresholds (2025-26)
+
+| Threshold | Annual | Monthly | Weekly |
+|-----------|--------|---------|--------|
+| ST (Secondary) | £5,000 | £417 | £96 |
+| LEL (Lower Earnings) | £6,500 | £542 | £125 |
+| PT (Primary) | £12,570 | £1,048 | £242 |
+| UEL | £50,270 | £4,189 | £967 |
+| FUST (Freeports) | £25,000 | £2,083 | £481 |
+
+### Official Worked Examples
+
+#### Example 1: Mr Armstrong (Category A, over 21)
+| Field | Value |
+|-------|-------|
+| Monthly salary | £1,615 |
+| Annual earnings | £19,380 |
+| **Employee NI** | **£544.80** |
+| **Employer NI** | **£2,157.00** |
+
+*Calculation:*
+- Employee: (£19,380 - £12,570) × 8% = £544.80
+- Employer: (£19,380 - £5,000) × 15% = £2,157.00
+
+#### Example 2: Mr Taylor (Category M, under 21)
+| Field | Value |
+|-------|-------|
+| Annual earnings | £19,380 |
+| **Employee NI** | **£544.80** |
+| **Employer NI** | **£0.00** |
+
+*Key: Under-21 (Cat M) = 0% employer NI up to £50,270 UST*
+
+#### Example 3: Mr Morris (Category A, with bonus)
+| Field | Value |
+|-------|-------|
+| Monthly salary | £1,160 |
+| Bonus | £10,000 |
+| Annual earnings | £23,920 |
+| **Employee NI** | **£908.00** |
+| **Employer NI** | **£2,838.00** |
+
+#### Example 4: Mr Johnson (Category F, Freeport)
+| Field | Value |
+|-------|-------|
+| Monthly salary | £2,000 |
+| Bonus | £10,000 |
+| Annual earnings | £34,000 |
+| **Employee NI** | **£1,714.40** |
+| **Employer NI** | **£1,350.00** |
+
+*Key: Freeport uses FUST £25,000, not UST £50,270*
+- Employer: (£34,000 - £25,000) × 15% = £1,350.00
+
+#### Example 5: Mr Williams (Category M→A, turns 21 mid-year)
+| Field | Value |
+|-------|-------|
+| Earnings before 21 (Cat M) | £12,000 |
+| Earnings after 21 (Cat A) | £9,700 |
+| Total | £21,700 |
+| **Employee NI** | **£730.40** |
+| **Employer NI** | **£1,455.00** |
+
+*Key: Category priority - Cat M fills thresholds first*
+
+#### Example 6: Mr Roberts (Category A→C, State Pension age)
+| Field | Value |
+|-------|-------|
+| Earnings before SPA (Cat A) | £12,000 |
+| Earnings after SPA (Cat C) | £18,000 |
+| Total | £30,000 |
+| **Employee NI** | **£0.00** |
+| **Employer NI** | **£3,750.00** |
+
+*Key: Employee NI stops at SPA, employer NI continues*
+
+#### Example 7: Mrs Brown (Category B→A, reduced rate revoked)
+| Field | Value |
+|-------|-------|
+| Earnings before revoke (Cat B) | £50,270 |
+| Earnings after revoke (Cat A) | £8,000 |
+| Total | £58,270 |
+| **Employee NI** | **£857.45** |
+| **Employer NI** | **£7,990.50** |
+
+*Cat B uses 1.85% rate (not 8%)*
+
+#### Example 8: Mrs Cross (Category B→A, divorce)
+| Field | Value |
+|-------|-------|
+| Earnings before divorce (Cat B) | £10,000 |
+| Earnings after divorce (Cat A) | £20,000 |
+| Total | £30,000 |
+| **Employee NI** | **£1,394.40** |
+| **Employer NI** | **£3,750.00** |
+
+### CA44 Validation Test Cases
+
+```typescript
+const HMRC_CA44_TESTS = [
+  { name: 'Armstrong', earnings: 19380, cat: 'A', eeNI: 544.80, erNI: 2157.00 },
+  { name: 'Taylor', earnings: 19380, cat: 'M', eeNI: 544.80, erNI: 0.00 },
+  { name: 'Morris', earnings: 23920, cat: 'A', eeNI: 908.00, erNI: 2838.00 },
+  { name: 'Johnson', earnings: 34000, cat: 'F', eeNI: 1714.40, erNI: 1350.00 },
+  { name: 'Williams', earnings: 21700, cats: ['M','A'], eeNI: 730.40, erNI: 1455.00 },
+  { name: 'Roberts', earnings: 30000, cats: ['A','C'], eeNI: 0.00, erNI: 3750.00 },
+  { name: 'Brown', earnings: 58270, cats: ['B','A'], eeNI: 857.45, erNI: 7990.50 },
+  { name: 'Cross', earnings: 30000, cats: ['B','A'], eeNI: 1394.40, erNI: 3750.00 },
+];
+```
+
+### Relevance to This Case Study
+
+The recruiter director's salary of £5,845 demonstrates the CA44 annual method:
+- **2024-25:** £5,845 < £9,100 ST = £0 employer NI
+- **2025-26:** £5,845 > £5,000 ST = (£5,845 - £5,000) × 15% = **£126.75** employer NI
+
+This aligns with CA44's rule that directors use **annual earnings periods**, not monthly thresholds.

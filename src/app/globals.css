@@ -937,3 +937,184 @@
   }
 }
 
+/* Print Styles - Director Guide Dashboard */
+@media print {
+  /* Reset page */
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  /* Hide non-printable elements */
+  .print\\:hidden,
+  [data-print-hide],
+  nav,
+  button,
+  .fixed,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Reset backgrounds for printing */
+  body,
+  html {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Director Guide specific print styles */
+  .director-dashboard-print {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Make sure main content fills the page */
+  main {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Hide sidebars and panels */
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  [class*="education"],
+  [class*="Education"],
+  [class*="inputs-panel"] {
+    display: none !important;
+  }
+
+  /* Cards print styling */
+  [class*="card"],
+  [class*="Card"] {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12pt;
+    padding: 12pt;
+  }
+
+  /* Text colors for print */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    -webkit-text-fill-color: black !important;
+    background: none !important;
+    page-break-after: avoid;
+  }
+
+  p, span, td, th, li {
+    color: #1f2937 !important;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10pt;
+  }
+
+  th, td {
+    border: 1px solid #d1d5db !important;
+    padding: 6pt 8pt;
+    text-align: left;
+  }
+
+  th {
+    background: #f3f4f6 !important;
+    font-weight: 600;
+  }
+
+  /* Grids become single column */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 12pt;
+  }
+
+  /* Hide gradient backgrounds */
+  [class*="gradient"],
+  [class*="bg-gradient"] {
+    background: white !important;
+  }
+
+  /* Links */
+  a {
+    color: #1d4ed8 !important;
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #6b7280;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+
+  /* Print header */
+  .print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 20pt;
+    padding-bottom: 10pt;
+    border-bottom: 2px solid #06b6d4;
+  }
+
+  .print-header h1 {
+    font-size: 18pt;
+    margin: 0;
+  }
+
+  .print-header p {
+    font-size: 10pt;
+    color: #6b7280 !important;
+    margin: 4pt 0 0;
+  }
+
+  /* Print footer */
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 8pt;
+    color: #9ca3af !important;
+    padding-top: 8pt;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  /* Charts - hide complex visualizations */
+  svg,
+  canvas,
+  [class*="chart"],
+  [class*="Chart"] {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print\\:block {
+    display: block !important;
+  }
+
+  /* Mobile elements hidden */
+  .lg\\:hidden,
+  .md\\:hidden {
+    display: none !important;
+  }
+}
+

@@ -84,6 +84,11 @@
 
 > New files added for pro tool have NO test coverage - high risk
 
+### Spec File Implementation
+- Uncomment and implement tests in `src/lib/tax/__tests__/directorCalculator.spec.ts` once calculator dev is complete
+- 3,000+ line test spec with HMRC CA44 official examples, ruthless edge cases, security tests
+- TDD approach: uncomment one test at a time, write minimal code to pass
+
 | File | Risk | Golden Tests Needed |
 |------|------|---------------------|
 | `src/lib/tax/employeeNI.ts` | Medium | £12,570→£0, £25k→£994.40, £60k→£3,210.60 |
@@ -140,6 +145,13 @@
 - `DirectorResultSchema` monetary outputs are plain `z.number()`
 - Should add `.finite()` and mostly non-negative constraints
 - Currently would accept nonsense like `-999999` for `annualTakeHome`
+
+---
+
+## Director Calculator - "Compare My Setup" Feature (P1) ✅ APPROVED
+
+> **Status:** APPROVED — Option B (Always-On Custom Row) unanimously selected by all 4 reviewers.
+> **Full spec:** See `docs/business/DIRECTOR_CALCULATOR_BUILD.md` → "Feature: Compare My Setup Mode"
 
 ---
 

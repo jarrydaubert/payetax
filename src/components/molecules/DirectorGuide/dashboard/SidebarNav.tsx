@@ -29,7 +29,12 @@ interface SidebarNavProps {
   onReset?: () => void;
 }
 
-export function SidebarNav({ collapsed = false, onToggle, onEmailResults, onReset }: SidebarNavProps) {
+export function SidebarNav({
+  collapsed = false,
+  onToggle,
+  onEmailResults,
+  onReset,
+}: SidebarNavProps) {
   const handlePrint = () => {
     window.print();
   };

@@ -10,7 +10,7 @@
  */
 'use client';
 
-import { Calculator } from 'lucide-react';
+import { Calculator, Mail } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   KeyDates,
@@ -28,6 +28,7 @@ import {
   SidebarNav,
   SummaryCards,
 } from '@/components/molecules/DirectorGuide/dashboard';
+import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
   trackGuideReset,
@@ -46,6 +47,7 @@ export function DirectorDashboard() {
   const [educationCollapsed, setEducationCollapsed] = useState(false); // Education panel expanded
   const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
   const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
@@ -101,10 +103,7 @@ export function DirectorDashboard() {
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
             onReset={handleReset}
-            onEmailResults={() => {
-              // TODO: Open email dialog when implemented
-              window.alert('Email feature coming soon!');
-            }}
+            onEmailResults={() => setEmailDialogOpen(true)}
           />
         }
         inputs={<InputsPanel onReset={handleReset} />}
@@ -146,6 +145,29 @@ export function DirectorDashboard() {
                   <MoneyFlowChart />
                   <KeyDates />
                 </div>
+
+                {/* Email CTA Banner */}
+                <div className='mt-8 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 p-6'>
+                  <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
+                    <div className='text-center sm:text-left'>
+                      <h3 className='mb-1 font-semibold text-lg text-slate-100'>
+                        Save this breakdown for your records
+                      </h3>
+                      <p className='text-slate-400 text-sm'>
+                        Get a full tax strategy report emailed to you - perfect for sharing with
+                        your accountant.
+                      </p>
+                    </div>
+                    <button
+                      type='button'
+                      onClick={() => setEmailDialogOpen(true)}
+                      className='flex shrink-0 items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-[#020617] text-sm transition-opacity hover:opacity-90'
+                    >
+                      <Mail className='size-4' />
+                      Email My Results
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               /* Empty State */
@@ -179,6 +201,13 @@ export function DirectorDashboard() {
         onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
         mobileEducationOpen={mobileEducationOpen}
         onToggleMobileEducation={() => setMobileEducationOpen((prev) => !prev)}
+      />
+
+      {/* Email Results Dialog */}
+      <EmailResultsDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        comparison={comparison}
       />
     </TooltipProvider>
   );

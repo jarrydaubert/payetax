@@ -10,165 +10,392 @@ import {
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// Tax year constants for 2025-26
+const TAX_THRESHOLDS = {
+  personalAllowance: 12570,
+  basicRateLimit: 50270,
+  higherRateLimit: 125140,
+  niPrimaryThreshold: 12570,
+  niUpperLimit: 50270,
+  dividendAllowance: 500,
+  corpTaxSmallProfitsRate: 19,
+  corpTaxMainRate: 25,
+  corpTaxSmallProfitsLimit: 50000,
+  corpTaxUpperLimit: 250000,
+  employerNiThreshold: 5000,
+  employerNiRate: 15,
+};
+
+interface AllStrategies {
+  allSalary: DirectorStrategy;
+  optimalMix: DirectorStrategy;
+  allDividends: DirectorStrategy;
+}
+
 function generateDirectorEmailHtml(
   grossProfit: number,
-  strategy: DirectorStrategy,
+  strategies: AllStrategies,
+  recommended: 'allSalary' | 'optimalMix' | 'allDividends',
+  savingsVsAllSalary: number,
   taxYear?: string
 ): string {
+  const strategy = strategies[recommended];
+  const generatedDate = new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // Calculate retained profits
+  const totalExtracted = strategy.salary + strategy.dividends + strategy.pension;
+  const retainedInCompany =
+    grossProfit - totalExtracted - strategy.corporationTax - strategy.employerNI;
+
   return `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Director Tax Strategy - PayeTax</title>
+  <title>Director Tax Strategy Report - PayeTax</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+  <div style="max-width: 700px; margin: 0 auto; padding: 40px 20px;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
       <h1 style="margin: 0; font-size: 24px; color: #020617;">
         <span style="color: #020617;">paye</span><span style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">tax</span>
       </h1>
-      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Director Tax Calculator${taxYear ? ` - ${taxYear}` : ''}</p>
+      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Director Tax Strategy Report${taxYear ? ` - ${taxYear}` : ''}</p>
+      <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px;">Generated: ${generatedDate}</p>
     </div>
 
-    <!-- Main Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-      <!-- Summary -->
-      <div style="text-align: center; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
-        <p style="margin: 0 0 8px; color: #64748b; font-size: 14px;">Your Take-Home Pay</p>
-        <p style="margin: 0; font-size: 36px; font-weight: 700; color: #10b981;">${formatCurrency(strategy.takeHome)}</p>
-        <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">per year (${strategy.effectiveRate.toFixed(1)}% effective tax rate)</p>
-        <p style="margin: 8px 0 0; color: #020617; font-size: 14px; font-weight: 500;">${strategy.name}</p>
+    <!-- Executive Summary Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Executive Summary</h2>
+      
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div style="flex: 1; min-width: 140px; text-align: center; padding: 16px; background: #f0fdf4; border-radius: 12px;">
+          <p style="margin: 0 0 4px; color: #64748b; font-size: 12px; text-transform: uppercase;">Take-Home Pay</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981;">${formatCurrency(strategy.takeHome)}</p>
+        </div>
+        <div style="flex: 1; min-width: 140px; text-align: center; padding: 16px; background: #f8fafc; border-radius: 12px;">
+          <p style="margin: 0 0 4px; color: #64748b; font-size: 12px; text-transform: uppercase;">Effective Rate</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #020617;">${strategy.effectiveRate.toFixed(1)}%</p>
+        </div>
+        <div style="flex: 1; min-width: 140px; text-align: center; padding: 16px; background: #ecfeff; border-radius: 12px;">
+          <p style="margin: 0 0 4px; color: #64748b; font-size: 12px; text-transform: uppercase;">Savings vs All-Salary</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #06b6d4;">${formatCurrency(savingsVsAllSalary)}</p>
+        </div>
       </div>
 
-      <!-- Breakdown Table -->
-      <table style="width: 100%; border-collapse: collapse; margin-top: 24px;">
+    </div>
+
+    <!-- Strategy Comparison Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Strategy Comparison</h2>
+      
+      <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr style="border-bottom: 2px solid #e2e8f0;">
-            <th style="text-align: left; padding: 12px 0; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase;">Item</th>
-            <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase;">Annual</th>
-            <th style="text-align: right; padding: 12px 0; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase;">Monthly</th>
+            <th style="text-align: left; padding: 12px 8px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase;">Strategy</th>
+            <th style="text-align: right; padding: 12px 8px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase;">Salary</th>
+            <th style="text-align: right; padding: 12px 8px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase;">Dividends</th>
+            <th style="text-align: right; padding: 12px 8px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase;">Total Tax</th>
+            <th style="text-align: right; padding: 12px 8px; color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase;">Take-Home</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Income Section -->
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #020617; font-weight: 500;">Gross Profit</td>
-            <td style="padding: 16px 0; text-align: right; color: #020617;">${formatCurrency(grossProfit)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(grossProfit / 12)}</td>
+          <tr style="border-bottom: 1px solid #f1f5f9;${recommended === 'allSalary' ? ' background: #f0fdf4;' : ''}">
+            <td style="padding: 12px 8px; color: #020617; font-weight: 500;">${strategies.allSalary.name}${recommended === 'allSalary' ? ' ✓' : ''}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.allSalary.salary)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.allSalary.dividends)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #ef4444;">${formatCurrency(strategies.allSalary.corporationTax + strategies.allSalary.employerNI + strategies.allSalary.totalPersonalTax)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #020617; font-weight: 600;">${formatCurrency(strategies.allSalary.takeHome)}</td>
           </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #020617; font-weight: 500;">Salary</td>
-            <td style="padding: 16px 0; text-align: right; color: #020617;">${formatCurrency(strategy.salary)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.salary / 12)}</td>
+          <tr style="border-bottom: 1px solid #f1f5f9;${recommended === 'optimalMix' ? ' background: #f0fdf4;' : ''}">
+            <td style="padding: 12px 8px; color: #020617; font-weight: 500;">${strategies.optimalMix.name}${recommended === 'optimalMix' ? ' ✓' : ''}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.optimalMix.salary)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.optimalMix.dividends)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #ef4444;">${formatCurrency(strategies.optimalMix.corporationTax + strategies.optimalMix.employerNI + strategies.optimalMix.totalPersonalTax)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #020617; font-weight: 600;">${formatCurrency(strategies.optimalMix.takeHome)}</td>
           </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #020617; font-weight: 500;">Dividends</td>
-            <td style="padding: 16px 0; text-align: right; color: #020617;">${formatCurrency(strategy.dividends)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.dividends / 12)}</td>
-          </tr>
-          ${
-            strategy.pension > 0
-              ? `
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #f59e0b;">Employer Pension</td>
-            <td style="padding: 16px 0; text-align: right; color: #f59e0b;">${formatCurrency(strategy.pension)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.pension / 12)}</td>
-          </tr>
-          `
-              : ''
-          }
-          ${
-            strategy.companyCarBIK > 0
-              ? `
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #8b5cf6;">Company Car (BIK)</td>
-            <td style="padding: 16px 0; text-align: right; color: #8b5cf6;">${formatCurrency(strategy.companyCarBIK)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">${formatCurrency(strategy.companyCarBIK / 12)}</td>
-          </tr>
-          `
-              : ''
-          }
-          
-          <!-- Company Taxes -->
-          <tr style="border-bottom: 1px solid #f1f5f9; background: #fef2f2;">
-            <td style="padding: 16px 0; padding-left: 8px; color: #ef4444;">Corporation Tax</td>
-            <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.corporationTax)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.corporationTax / 12)}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #ef4444;">Employer NI</td>
-            <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.employerNI)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.employerNI / 12)}</td>
-          </tr>
-          
-          <!-- Personal Taxes -->
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #ef4444;">Income Tax</td>
-            <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.incomeTax)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.incomeTax / 12)}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #ef4444;">Employee NI</td>
-            <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.employeeNI)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.employeeNI / 12)}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #ef4444;">Dividend Tax</td>
-            <td style="padding: 16px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.dividendTax)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.dividendTax / 12)}</td>
-          </tr>
-          ${
-            strategy.studentLoan > 0
-              ? `
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 16px 0; color: #8b5cf6;">Student Loan</td>
-            <td style="padding: 16px 0; text-align: right; color: #8b5cf6;">-${formatCurrency(strategy.studentLoan)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #64748b;">-${formatCurrency(strategy.studentLoan / 12)}</td>
-          </tr>
-          `
-              : ''
-          }
-          
-          <!-- Take-Home -->
-          <tr style="background: #f0fdf4;">
-            <td style="padding: 16px 0; padding-left: 8px; color: #10b981; font-weight: 700;">Take-Home Pay</td>
-            <td style="padding: 16px 0; text-align: right; color: #10b981; font-weight: 700;">${formatCurrency(strategy.takeHome)}</td>
-            <td style="padding: 16px 0; text-align: right; color: #10b981; font-weight: 600;">${formatCurrency(strategy.takeHome / 12)}</td>
+          <tr style="${recommended === 'allDividends' ? 'background: #f0fdf4;' : ''}">
+            <td style="padding: 12px 8px; color: #020617; font-weight: 500;">${strategies.allDividends.name}${recommended === 'allDividends' ? ' ✓' : ''}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.allDividends.salary)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #64748b;">${formatCurrency(strategies.allDividends.dividends)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #ef4444;">${formatCurrency(strategies.allDividends.corporationTax + strategies.allDividends.employerNI + strategies.allDividends.totalPersonalTax)}</td>
+            <td style="padding: 12px 8px; text-align: right; color: #020617; font-weight: 600;">${formatCurrency(strategies.allDividends.takeHome)}</td>
           </tr>
         </tbody>
       </table>
+    </div>
 
-      <!-- Two Pots Summary -->
-      <div style="margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px;">
-        <p style="margin: 0 0 12px; font-weight: 600; color: #020617; font-size: 14px;">Monthly Set-Aside</p>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 4px 0; color: #64748b; font-size: 13px;">Company Tax Pot (CT + Employer NI)</td>
-            <td style="padding: 4px 0; text-align: right; font-weight: 500; font-size: 13px;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}/mo</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 0; color: #64748b; font-size: 13px;">Personal Tax Pot (for Self Assessment)</td>
-            <td style="padding: 4px 0; text-align: right; font-weight: 500; font-size: 13px;">${formatCurrency(strategy.totalPersonalTax / 12)}/mo</td>
-          </tr>
-        </table>
+    <!-- Detailed Breakdown Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Detailed Breakdown - ${strategy.name}</h2>
+      
+      <!-- Income Section -->
+      <h3 style="margin: 0 0 12px; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Income</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617;">Gross Profit</td>
+          <td style="padding: 12px 0; text-align: right; color: #020617; font-weight: 600;">${formatCurrency(grossProfit)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">${formatCurrency(grossProfit / 12)}/mo</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617;">Director's Salary</td>
+          <td style="padding: 12px 0; text-align: right; color: #020617;">${formatCurrency(strategy.salary)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">${formatCurrency(strategy.salary / 12)}/mo</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617;">Dividends</td>
+          <td style="padding: 12px 0; text-align: right; color: #020617;">${formatCurrency(strategy.dividends)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">${formatCurrency(strategy.dividends / 12)}/mo</td>
+        </tr>
+        ${
+          strategy.pension > 0
+            ? `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #f59e0b;">Employer Pension Contribution</td>
+          <td style="padding: 12px 0; text-align: right; color: #f59e0b;">${formatCurrency(strategy.pension)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">${formatCurrency(strategy.pension / 12)}/mo</td>
+        </tr>
+        `
+            : ''
+        }
+        ${
+          strategy.companyCarBIK > 0
+            ? `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #8b5cf6;">Company Car (Benefit in Kind)</td>
+          <td style="padding: 12px 0; text-align: right; color: #8b5cf6;">${formatCurrency(strategy.companyCarBIK)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">${formatCurrency(strategy.companyCarBIK / 12)}/mo</td>
+        </tr>
+        `
+            : ''
+        }
+      </table>
+
+      <!-- Company Taxes Section -->
+      <h3 style="margin: 0 0 12px; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Company Taxes</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <tr style="border-bottom: 1px solid #f1f5f9; background: #fef2f2;">
+          <td style="padding: 12px 8px; color: #ef4444;">Corporation Tax</td>
+          <td style="padding: 12px 8px; text-align: right; color: #ef4444;">-${formatCurrency(strategy.corporationTax)}</td>
+          <td style="padding: 12px 8px; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.corporationTax / 12)}/mo</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #ef4444;">Employer's National Insurance</td>
+          <td style="padding: 12px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.employerNI)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.employerNI / 12)}/mo</td>
+        </tr>
+        <tr style="background: #fef2f2;">
+          <td style="padding: 12px 8px; color: #dc2626; font-weight: 600;">Total Company Tax</td>
+          <td style="padding: 12px 8px; text-align: right; color: #dc2626; font-weight: 600;">-${formatCurrency(strategy.corporationTax + strategy.employerNI)}</td>
+          <td style="padding: 12px 8px; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}/mo</td>
+        </tr>
+      </table>
+
+      <!-- Personal Taxes Section -->
+      <h3 style="margin: 0 0 12px; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Personal Taxes (Self Assessment)</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #ef4444;">Income Tax</td>
+          <td style="padding: 12px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.incomeTax)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.incomeTax / 12)}/mo</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #ef4444;">Employee National Insurance</td>
+          <td style="padding: 12px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.employeeNI)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.employeeNI / 12)}/mo</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #ef4444;">Dividend Tax</td>
+          <td style="padding: 12px 0; text-align: right; color: #ef4444;">-${formatCurrency(strategy.dividendTax)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.dividendTax / 12)}/mo</td>
+        </tr>
+        ${
+          strategy.studentLoan > 0
+            ? `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #8b5cf6;">Student Loan Repayment</td>
+          <td style="padding: 12px 0; text-align: right; color: #8b5cf6;">-${formatCurrency(strategy.studentLoan)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.studentLoan / 12)}/mo</td>
+        </tr>
+        `
+            : ''
+        }
+        <tr style="background: #fef2f2;">
+          <td style="padding: 12px 8px; color: #dc2626; font-weight: 600;">Total Personal Tax</td>
+          <td style="padding: 12px 8px; text-align: right; color: #dc2626; font-weight: 600;">-${formatCurrency(strategy.totalPersonalTax)}</td>
+          <td style="padding: 12px 8px; text-align: right; color: #64748b; font-size: 13px;">-${formatCurrency(strategy.totalPersonalTax / 12)}/mo</td>
+        </tr>
+      </table>
+
+      <!-- Net Result -->
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background: #f0fdf4;">
+          <td style="padding: 16px 12px; color: #10b981; font-weight: 700; font-size: 16px;">Your Take-Home Pay</td>
+          <td style="padding: 16px 12px; text-align: right; color: #10b981; font-weight: 700; font-size: 20px;">${formatCurrency(strategy.takeHome)}</td>
+          <td style="padding: 16px 12px; text-align: right; color: #10b981; font-weight: 600;">${formatCurrency(strategy.takeHome / 12)}/mo</td>
+        </tr>
+        ${
+          retainedInCompany > 0
+            ? `
+        <tr style="background: #f8fafc;">
+          <td style="padding: 12px; color: #64748b;">Retained in Company</td>
+          <td style="padding: 12px; text-align: right; color: #020617; font-weight: 500;">${formatCurrency(retainedInCompany)}</td>
+          <td style="padding: 12px; text-align: right; color: #64748b;">${formatCurrency(retainedInCompany / 12)}/mo</td>
+        </tr>
+        `
+            : ''
+        }
+        <tr style="background: #f8fafc;">
+          <td style="padding: 12px; color: #64748b;">Total Company Cost</td>
+          <td style="padding: 12px; text-align: right; color: #020617; font-weight: 500;">${formatCurrency(strategy.companyCost)}</td>
+          <td style="padding: 12px; text-align: right; color: #64748b;">${formatCurrency(strategy.companyCost / 12)}/mo</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Monthly Set-Aside Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Monthly Set-Aside Pots</h2>
+      <p style="margin: 0 0 16px; color: #64748b; font-size: 14px;">Amounts to set aside each month to cover tax liabilities:</p>
+      
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; padding: 16px; background: #fef2f2; border-radius: 12px; border: 1px solid #fecaca;">
+          <p style="margin: 0 0 4px; color: #991b1b; font-size: 12px; text-transform: uppercase; font-weight: 600;">Company Tax Pot</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+          <p style="margin: 8px 0 0; color: #991b1b; font-size: 12px;">Corporation Tax + Employer NI</p>
+        </div>
+        <div style="flex: 1; min-width: 200px; padding: 16px; background: #faf5ff; border-radius: 12px; border: 1px solid #e9d5ff;">
+          <p style="margin: 0 0 4px; color: #6b21a8; font-size: 12px; text-transform: uppercase; font-weight: 600;">Personal Tax Pot</p>
+          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #7c3aed;">${formatCurrency(strategy.totalPersonalTax / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+          <p style="margin: 8px 0 0; color: #6b21a8; font-size: 12px;">For Self Assessment (31 Jan)</p>
+        </div>
       </div>
+    </div>
+
+    <!-- Key Dates Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Key Tax Dates</h2>
+      
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617; font-weight: 500;">Self Assessment Deadline</td>
+          <td style="padding: 12px 0; text-align: right; color: #dc2626; font-weight: 600;">31 January 2027</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617; font-weight: 500;">Corporation Tax Due</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b;">9 months + 1 day after year-end</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 12px 0; color: #020617; font-weight: 500;">Company Tax Return</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b;">12 months after year-end</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; color: #020617; font-weight: 500;">PAYE/NI Payments</td>
+          <td style="padding: 12px 0; text-align: right; color: #64748b;">22nd of each month (electronic)</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Tax Thresholds Card -->
+    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+      <h2 style="margin: 0 0 24px; font-size: 18px; color: #020617;">Tax Rates & Thresholds Used (${taxYear || '2025-26'})</h2>
+      
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <tr style="background: #f8fafc;">
+          <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Income Tax</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Personal Allowance</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.personalAllowance)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Basic Rate (20%)</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">to ${formatCurrency(TAX_THRESHOLDS.basicRateLimit)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Higher Rate (40%)</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">to ${formatCurrency(TAX_THRESHOLDS.higherRateLimit)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 8px 12px; color: #64748b;">Additional Rate (45%)</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">above ${formatCurrency(TAX_THRESHOLDS.higherRateLimit)}</td>
+        </tr>
+        
+        <tr style="background: #f8fafc;">
+          <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">National Insurance</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Primary Threshold</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.niPrimaryThreshold)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Upper Earnings Limit</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.niUpperLimit)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Employer NI Threshold</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.employerNiThreshold)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 8px 12px; color: #64748b;">Employer NI Rate</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${TAX_THRESHOLDS.employerNiRate}%</td>
+        </tr>
+        
+        <tr style="background: #f8fafc;">
+          <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Dividends & Corporation Tax</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Dividend Allowance</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.dividendAllowance)}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Small Profits Rate</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${TAX_THRESHOLDS.corpTaxSmallProfitsRate}%</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 8px 12px; color: #64748b;">Main CT Rate</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${TAX_THRESHOLDS.corpTaxMainRate}%</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 12px; color: #64748b;">Small Profits Limit</td>
+          <td style="padding: 8px 12px; text-align: right; color: #020617;">${formatCurrency(TAX_THRESHOLDS.corpTaxSmallProfitsLimit)}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Assumptions Card -->
+    <div style="background: #f8fafc; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+      <h3 style="margin: 0 0 12px; font-size: 14px; color: #64748b; text-transform: uppercase;">Assumptions</h3>
+      <ul style="margin: 0; padding-left: 20px; color: #64748b; font-size: 13px; line-height: 1.8;">
+        <li>Director has no other taxable income</li>
+        <li>Company is sole-director owned (no associated companies)</li>
+        <li>Standard NI Category A applies</li>
+        <li>Director is UK resident and domiciled</li>
+        <li>No Marriage Allowance transfer</li>
+        <li>Dividends paid from distributable reserves</li>
+      </ul>
     </div>
 
     <!-- CTA -->
     <div style="text-align: center; margin-top: 32px;">
       <a href="https://payetax.co.uk/tools/director-guide" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
-        Calculate Again
+        Recalculate with Different Inputs
       </a>
     </div>
 
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
       <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-        This calculation uses official HMRC rates${taxYear ? ` for ${taxYear}` : ''}.
-        <br>For professional tax advice, consult a qualified accountant.
+        This calculation uses official HMRC rates${taxYear ? ` for ${taxYear}` : ''}. Calculations are estimates only.
+        <br><strong>For professional tax advice, please consult a qualified accountant.</strong>
       </p>
       <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
         <a href="https://payetax.co.uk" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
@@ -215,15 +442,22 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, results, taxYear } = validationResult.data;
+    const recommendedStrategy = results.strategies[results.recommended];
 
     // Generate email HTML
-    const html = generateDirectorEmailHtml(results.grossProfit, results.strategy, taxYear);
+    const html = generateDirectorEmailHtml(
+      results.grossProfit,
+      results.strategies,
+      results.recommended,
+      results.savingsVsAllSalary,
+      taxYear
+    );
 
     // Send email
     const { error } = await resend.emails.send({
-      from: 'PayeTax <results@payetax.uk>',
+      from: 'PayeTax <noreply@payetax.co.uk>',
       to: email,
-      subject: `Your Director Tax Strategy - ${results.strategy.name}`,
+      subject: `Director Tax Strategy Report - ${formatCurrency(recommendedStrategy.takeHome)} Take-Home`,
       html,
     });
 
