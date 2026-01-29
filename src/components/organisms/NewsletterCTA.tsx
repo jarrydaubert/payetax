@@ -77,14 +77,14 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
     >
       {/* Background decoration */}
       <div className='absolute inset-0 opacity-10'>
-        <div className='absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white blur-3xl' />
+        <div className='absolute -top-20 -left-20 h-64 w-64 rounded-full bg-white blur-3xl' />
         <div className='absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-white blur-3xl' />
       </div>
 
       <div className='relative text-center'>
         <h2
           id='newsletter-heading'
-          className='mb-3 font-display text-2xl font-bold text-white md:text-3xl'
+          className='mb-3 font-bold font-display text-2xl text-white md:text-3xl'
         >
           Stay Updated on UK Tax Changes
         </h2>
@@ -142,7 +142,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                   'rounded-lg bg-white px-6 py-3 font-semibold text-emerald-600',
                   'transition-all hover:bg-white/90',
                   'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-emerald-500',
-                  'disabled:opacity-50 disabled:cursor-not-allowed'
+                  'disabled:cursor-not-allowed disabled:opacity-50'
                 )}
               >
                 {status === 'loading' ? (
@@ -162,7 +162,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
               </p>
             )}
 
-            <p className='mt-4 text-xs text-white/70'>
+            <p className='mt-4 text-white/70 text-xs'>
               We respect your privacy.{' '}
               <Link href='/privacy' className='underline hover:text-white'>
                 Privacy Policy

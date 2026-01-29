@@ -222,7 +222,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* All Posts Section - Server-side pagination */}
-        <div className='border-t border-slate-800'>
+        <div className='border-slate-800 border-t'>
           <AllPostsGrid
             posts={paginatedPosts}
             currentPage={currentPage}

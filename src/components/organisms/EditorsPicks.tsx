@@ -61,24 +61,24 @@ interface EditorsPicksListProps {
 
 function EditorsPicksList({ posts }: EditorsPicksListProps) {
   return (
-    <div className='rounded-xl bg-slate-800/50 p-5 border border-slate-700/50'>
-      <h2 className='mb-4 font-display text-lg font-semibold text-white'>Editor&apos;s Picks</h2>
+    <div className='rounded-xl border border-slate-700/50 bg-slate-800/50 p-5'>
+      <h2 className='mb-4 font-display font-semibold text-lg text-white'>Editor&apos;s Picks</h2>
 
       <ol className='space-y-4'>
         {posts.map((post, index) => (
           <li key={post.slug}>
-            <Link href={`/blog/${post.slug}`} className='group flex gap-3 items-start'>
+            <Link href={`/blog/${post.slug}`} className='group flex items-start gap-3'>
               {/* Number */}
-              <span className='flex-shrink-0 font-display text-2xl font-bold text-slate-600 group-hover:text-cyan-500 transition-colors'>
+              <span className='flex-shrink-0 font-bold font-display text-2xl text-slate-600 transition-colors group-hover:text-cyan-500'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               {/* Content */}
               <div className='pt-1'>
-                <h3 className='text-sm font-medium text-white line-clamp-2 group-hover:text-cyan-400 transition-colors'>
+                <h3 className='line-clamp-2 font-medium text-sm text-white transition-colors group-hover:text-cyan-400'>
                   {post.title}
                 </h3>
-                <span className='mt-1 text-xs text-slate-500'>{post.readTime}</span>
+                <span className='mt-1 text-slate-500 text-xs'>{post.readTime}</span>
               </div>
             </Link>
           </li>

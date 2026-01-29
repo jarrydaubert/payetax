@@ -30,7 +30,7 @@ export default function CalculatorError({
         </div>
 
         {/* Title */}
-        <h1 className='font-display font-bold text-3xl tracking-tight'>Calculation error</h1>
+        <h1 className='font-bold font-display text-3xl tracking-tight'>Calculation error</h1>
 
         {/* Description */}
         <p className='mt-3 text-white/60'>

@@ -151,10 +151,10 @@ export default async function CategoryPage({
       />
 
       {/* Header */}
-      <div className='border-b border-slate-800 bg-slate-900/50 py-12'>
+      <div className='border-slate-800 border-b bg-slate-900/50 py-12'>
         <div className='container mx-auto max-w-7xl px-4'>
           {/* Breadcrumbs */}
-          <nav aria-label='Breadcrumbs' className='mb-6 text-sm text-slate-400'>
+          <nav aria-label='Breadcrumbs' className='mb-6 text-slate-400 text-sm'>
             <ol className='flex items-center gap-2'>
               <li>
                 <Link href='/' className='hover:text-white'>
@@ -172,7 +172,7 @@ export default async function CategoryPage({
             </ol>
           </nav>
 
-          <h1 className='mb-4 font-display text-3xl font-bold text-white md:text-4xl'>
+          <h1 className='mb-4 font-bold font-display text-3xl text-white md:text-4xl'>
             {displayName}
           </h1>
           <p className='max-w-2xl text-slate-300'>
@@ -180,7 +180,7 @@ export default async function CategoryPage({
               ? `Browse all ${displayName.toLowerCase()} articles - expert UK tax guidance with no jargon.`
               : `Expert articles on ${displayName.toLowerCase()} including UK tax updates, guidance, and practical advice.`}
           </p>
-          <p className='mt-2 text-sm text-slate-500'>
+          <p className='mt-2 text-slate-500 text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
           </p>
         </div>
@@ -200,7 +200,7 @@ export default async function CategoryPage({
                 key={post.id}
                 className='group rounded-lg border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-slate-700'
               >
-                <div className='mb-3 flex items-center gap-2 text-xs text-slate-400'>
+                <div className='mb-3 flex items-center gap-2 text-slate-400 text-xs'>
                   <span className='font-medium text-cyan-400'>
                     {post.categoryData?.name || post.category}
                   </span>
@@ -210,8 +210,8 @@ export default async function CategoryPage({
                 <h3 className='mb-2 font-semibold text-white group-hover:text-cyan-400'>
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                 </h3>
-                <p className='mb-4 line-clamp-2 text-sm text-slate-400'>{post.excerpt}</p>
-                <time className='text-xs text-slate-500' dateTime={post.publishedAt}>
+                <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
+                <time className='text-slate-500 text-xs' dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
               </article>
@@ -234,7 +234,7 @@ export default async function CategoryPage({
                 Previous
               </Link>
             )}
-            <span className='px-4 py-2 text-sm text-slate-400'>
+            <span className='px-4 py-2 text-slate-400 text-sm'>
               Page {currentPage} of {totalPages}
             </span>
             {currentPage < totalPages && (

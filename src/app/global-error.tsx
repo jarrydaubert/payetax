@@ -39,7 +39,7 @@ export default function GlobalError({
             </div>
 
             {/* Title */}
-            <h1 className='font-display font-bold text-3xl tracking-tight'>Something went wrong</h1>
+            <h1 className='font-bold font-display text-3xl tracking-tight'>Something went wrong</h1>
 
             {/* Description */}
             <p className='mt-3 text-white/60'>

@@ -25,7 +25,7 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
     <section aria-labelledby='latest-articles-heading'>
       <h2
         id='latest-articles-heading'
-        className='mb-6 font-display text-xl font-semibold text-white md:text-2xl'
+        className='mb-6 font-display font-semibold text-white text-xl md:text-2xl'
       >
         Latest Articles
       </h2>

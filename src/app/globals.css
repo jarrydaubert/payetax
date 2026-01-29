@@ -946,7 +946,7 @@
   }
 
   /* Hide non-printable elements */
-  .print\\:hidden,
+  [class*="print\:hidden"],
   [data-print-hide],
   nav,
   button,
@@ -1107,13 +1107,13 @@
   }
 
   /* Show print-only elements */
-  .print\\:block {
+  [class*="print\:block"] {
     display: block !important;
   }
 
   /* Mobile elements hidden */
-  .lg\\:hidden,
-  .md\\:hidden {
+  [class*="lg\:hidden"],
+  [class*="md\:hidden"] {
     display: none !important;
   }
 }

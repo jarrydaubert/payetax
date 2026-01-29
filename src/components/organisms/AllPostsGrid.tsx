@@ -40,11 +40,11 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
         <div className='mb-8 flex items-center justify-between'>
           <h2
             id='all-posts-heading'
-            className='font-display text-xl font-semibold text-white md:text-2xl'
+            className='font-display font-semibold text-white text-xl md:text-2xl'
           >
             All Articles
           </h2>
-          <p className='text-sm text-slate-400'>
+          <p className='text-slate-400 text-sm'>
             {totalPosts} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
@@ -98,7 +98,7 @@ function PostCard({ post }: PostCardProps) {
 
           {/* Category badge */}
           <span
-            className='absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider'
+            className='absolute top-3 left-3 rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider'
             style={{
               backgroundColor: categoryConfig.color,
               color: categoryConfig.textColor,
@@ -110,14 +110,14 @@ function PostCard({ post }: PostCardProps) {
 
         {/* Content */}
         <div className='p-4'>
-          <h3 className='mb-2 line-clamp-2 font-display text-base font-semibold text-white transition-colors group-hover:text-cyan-400'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-white transition-colors group-hover:text-cyan-400'>
             {post.title}
           </h3>
 
-          <p className='mb-3 line-clamp-2 text-sm text-slate-400'>{post.excerpt}</p>
+          <p className='mb-3 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-xs text-slate-500'>
+          <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
             <span>•</span>
             <time dateTime={post.publishedAt}>

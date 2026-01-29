@@ -256,14 +256,14 @@ export function ScottishTaxCalculatorClient() {
           <div className='overflow-x-auto'>
             <table className='w-full'>
               <thead>
-                <tr className='border-b border-border/50'>
+                <tr className='border-border/50 border-b'>
                   <th className='px-4 py-3 text-left font-medium'>Band</th>
                   <th className='px-4 py-3 text-left font-medium'>Rate</th>
                   <th className='px-4 py-3 text-left font-medium'>Income Range</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className='border-b border-border/50'>
+                <tr className='border-border/50 border-b'>
                   <td className='px-4 py-3'>Personal Allowance</td>
                   <td className='px-4 py-3 font-mono'>0%</td>
                   <td className='px-4 py-3 text-muted-foreground'>Up to £12,570</td>
@@ -278,7 +278,7 @@ export function ScottishTaxCalculatorClient() {
                       : scottishRates.personalAllowance + band.threshold;
 
                   return (
-                    <tr key={band.name} className='border-b border-border/50 last:border-0'>
+                    <tr key={band.name} className='border-border/50 border-b last:border-0'>
                       <td className='px-4 py-3'>{band.name}</td>
                       <td className='px-4 py-3 font-medium font-mono'>{band.rate}%</td>
                       <td className='px-4 py-3 text-muted-foreground'>

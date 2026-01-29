@@ -77,7 +77,7 @@ export function BlogPagination({
           href={getPageUrl(currentPage - 1)}
           scroll={false}
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
             'border border-slate-700/50 transition-colors'
           )}
@@ -88,8 +88,8 @@ export function BlogPagination({
       ) : (
         <span
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
-            'bg-slate-800/30 text-slate-500 cursor-not-allowed',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
+            'cursor-not-allowed bg-slate-800/30 text-slate-500',
             'border border-slate-700/30'
           )}
           aria-disabled='true'
@@ -115,10 +115,10 @@ export function BlogPagination({
               href={getPageUrl(page)}
               scroll={false}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium transition-colors',
+                'flex h-10 w-10 items-center justify-center rounded-lg font-medium text-sm transition-colors',
                 page === currentPage
                   ? 'bg-cyan-500 text-white'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white border border-slate-700/50'
+                  : 'border border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
               )}
               aria-current={page === currentPage ? 'page' : undefined}
             >
@@ -129,7 +129,7 @@ export function BlogPagination({
       </div>
 
       {/* Mobile page indicator */}
-      <span className='flex h-10 items-center px-3 text-sm text-slate-400 sm:hidden'>
+      <span className='flex h-10 items-center px-3 text-slate-400 text-sm sm:hidden'>
         Page {currentPage} of {totalPages}
       </span>
 
@@ -139,7 +139,7 @@ export function BlogPagination({
           href={getPageUrl(currentPage + 1)}
           scroll={false}
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
             'border border-slate-700/50 transition-colors'
           )}
@@ -150,8 +150,8 @@ export function BlogPagination({
       ) : (
         <span
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
-            'bg-slate-800/30 text-slate-500 cursor-not-allowed',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
+            'cursor-not-allowed bg-slate-800/30 text-slate-500',
             'border border-slate-700/30'
           )}
           aria-disabled='true'

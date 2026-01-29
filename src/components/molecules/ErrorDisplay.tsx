@@ -36,7 +36,7 @@ export function ErrorDisplay({
         </div>
 
         {/* Title */}
-        <h1 className='font-display font-bold text-3xl tracking-tight'>{title}</h1>
+        <h1 className='font-bold font-display text-3xl tracking-tight'>{title}</h1>
 
         {/* Description */}
         <p className='mt-3 text-white/60'>{description}</p>

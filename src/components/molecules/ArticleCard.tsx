@@ -57,7 +57,7 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
 
           {/* Category badge */}
           <span
-            className='absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider'
+            className='absolute top-4 left-4 rounded-full px-3 py-1 font-semibold text-xs uppercase tracking-wider'
             style={{
               backgroundColor: categoryConfig.color,
               color: categoryConfig.textColor,
@@ -69,14 +69,14 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
 
         {/* Content */}
         <div className='p-5'>
-          <h3 className='mb-2 font-display text-lg font-semibold text-white line-clamp-2 group-hover:text-cyan-400 transition-colors md:text-xl'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-lg text-white transition-colors group-hover:text-cyan-400 md:text-xl'>
             {post.title}
           </h3>
 
-          <p className='mb-4 text-sm text-slate-400 line-clamp-2'>{post.excerpt}</p>
+          <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-3 text-xs text-slate-500'>
+          <div className='flex items-center gap-3 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
             <span>•</span>
             <time dateTime={post.publishedAt}>
@@ -128,7 +128,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
 
           {/* Category badge overlay */}
           <span
-            className='absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase'
+            className='absolute bottom-1 left-1 rounded px-1.5 py-0.5 font-semibold text-[10px] uppercase'
             style={{
               backgroundColor: categoryConfig.color,
               color: categoryConfig.textColor,
@@ -140,12 +140,12 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
 
         {/* Content */}
         <div className='flex flex-1 flex-col justify-center py-1'>
-          <h3 className='mb-1 font-display text-sm font-semibold text-white line-clamp-2 group-hover:text-cyan-400 transition-colors'>
+          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-sm text-white transition-colors group-hover:text-cyan-400'>
             {post.title}
           </h3>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-xs text-slate-500'>
+          <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
             <span>•</span>
             <time dateTime={post.publishedAt}>
@@ -196,7 +196,7 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
 
           {/* Category badge */}
           <span
-            className='absolute top-3 left-3 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider'
+            className='absolute top-3 left-3 rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider'
             style={{
               backgroundColor: categoryConfig.color,
               color: categoryConfig.textColor,
@@ -208,14 +208,14 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
 
         {/* Content */}
         <div className='p-4'>
-          <h3 className='mb-2 font-display text-base font-semibold text-white line-clamp-2 group-hover:text-cyan-400 transition-colors'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-white transition-colors group-hover:text-cyan-400'>
             {post.title}
           </h3>
 
-          <p className='mb-3 text-sm text-slate-400 line-clamp-2'>{post.excerpt}</p>
+          <p className='mb-3 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-xs text-slate-500'>
+          <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
             <span>•</span>
             <time dateTime={post.publishedAt}>

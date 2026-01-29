@@ -24,7 +24,7 @@ export function DeepDives({ posts }: DeepDivesProps) {
     <section aria-labelledby='deep-dives-heading'>
       <h2
         id='deep-dives-heading'
-        className='mb-6 font-display text-xl font-semibold text-white md:text-2xl'
+        className='mb-6 font-display font-semibold text-white text-xl md:text-2xl'
       >
         Deep Dives
       </h2>

@@ -29,7 +29,7 @@
  * - Corporation Tax: 19% (under £50k), 25% (over £250k), marginal relief between
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it } from '@jest/globals';
 
 // =============================================================================
 // PILLAR 1: INPUT VALIDATION TESTS
@@ -40,7 +40,7 @@ describe('Input Validation', () => {
     it('should accept valid profit before director remuneration', () => {
       // Profit should be revenue minus business expenses
       // NOT minus salary, dividends, pension, or BIK
-      const input = {
+      const _input = {
         profit: 100000,
         region: 'rUK',
       };
@@ -48,7 +48,7 @@ describe('Input Validation', () => {
     });
 
     it('should accept Scottish region and use 6-band income tax', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         region: 'scotland',
       };
@@ -57,7 +57,7 @@ describe('Input Validation', () => {
     });
 
     it('should handle VAT-inclusive revenue by deducting 20%', () => {
-      const input = {
+      const _input = {
         revenue: 120000,
         includesVat: true,
       };
@@ -66,7 +66,7 @@ describe('Input Validation', () => {
     });
 
     it('should track already taken amounts this year', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 30000,
         takenViaPayroll: true,
@@ -76,7 +76,7 @@ describe('Input Validation', () => {
     });
 
     it('should include other personal income in tax band calculations', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         otherIncome: 20000, // e.g., rental income, other employment
       };
@@ -85,7 +85,7 @@ describe('Input Validation', () => {
     });
 
     it('should accept losses brought forward to reduce CT liability', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         lossesBroughtForward: 20000,
       };
@@ -96,7 +96,7 @@ describe('Input Validation', () => {
 
   describe('Validation Rules', () => {
     it('should trigger Survival Mode when profit <= 0', () => {
-      const input = { profit: 0 };
+      const _input = { profit: 0 };
       // expect(getWarnings(input)).toContain('SURVIVAL_MODE');
       // All strategies should show minimal extraction
     });
@@ -104,7 +104,7 @@ describe('Input Validation', () => {
     it('should recommend £6,500 salary in Survival Mode to preserve NI credits', () => {
       // ChatGPT Review: Survival Mode shouldn't just "remove comparison" —
       // the £6,500 NI-credit salary decision is still valuable at zero/low profit
-      const input = { profit: 0 };
+      const _input = { profit: 0 };
       // Even with zero profit, show option to pay £6,500 salary to secure
       // State Pension NI credits (creates loss but preserves pension rights)
       // expect(getSurvivalModeRecommendation(input)).toContain('NI_CREDIT_OPTION');
@@ -114,7 +114,7 @@ describe('Input Validation', () => {
     it('should warn that DLA flag is based on profit not distributable reserves', () => {
       // ChatGPT Review: "Your Setup" can falsely accuse users of illegal dividends
       // if they have brought-forward reserves that exceed this year's profit
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 20000,
         compareDividends: 60000, // Exceeds this year's profit
@@ -126,7 +126,7 @@ describe('Input Validation', () => {
     });
 
     it('should flag potential Directors Loan when compare inputs > available profit', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000, // Total 70k > 50k profit
@@ -135,7 +135,7 @@ describe('Input Validation', () => {
     });
 
     it('should show overdrawn warning when already taken > available', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         alreadyTaken: 60000,
       };
@@ -144,7 +144,7 @@ describe('Input Validation', () => {
 
     it('should show EA eligibility banner when selected but likely ineligible', () => {
       // EA not available if: sole director, already claimed by connected company, etc.
-      const input = {
+      const _input = {
         profit: 100000,
         hasEmploymentAllowance: true,
         // No other employees implied
@@ -158,13 +158,13 @@ describe('Input Validation', () => {
       const plans = ['plan1', 'plan2', 'plan4', 'postgrad'];
       // Plan 5 not applicable until April 2026
       plans.forEach((plan) => {
-        const input = { profit: 50000, studentLoanPlans: [plan] };
+        const _input = { profit: 50000, studentLoanPlans: [plan] };
         // expect(validateInput(input).isValid).toBe(true);
       });
     });
 
     it('should accept company pension contributions', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         pensionContribution: 10000,
       };
@@ -173,7 +173,7 @@ describe('Input Validation', () => {
     });
 
     it('should accept Benefits in Kind with warning about Class 1A NI', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         companyCarBIK: 5000,
       };
@@ -183,7 +183,7 @@ describe('Input Validation', () => {
     });
 
     it('should handle other PAYE employment affecting NI threshold', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         hasOtherPAYE: true,
       };
@@ -192,7 +192,7 @@ describe('Input Validation', () => {
     });
 
     it('should accept minimum salary requirement for mortgage applications', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         minimumSalaryRequired: 25000, // Lender requires £25k PAYE
       };
@@ -210,18 +210,18 @@ describe('Tax Calculations', () => {
   describe('Income Tax - rUK', () => {
     it('should calculate zero tax on income within Personal Allowance', () => {
       // PA = £12,570
-      const salary = 12570;
+      const _salary = 12570;
       // expect(calculateIncomeTax(salary, 'rUK')).toBe(0);
     });
 
     it('should calculate basic rate tax (20%) on income £12,571 to £50,270', () => {
-      const salary = 30000;
+      const _salary = 30000;
       // Tax = (30000 - 12570) * 0.20 = £3,486
       // expect(calculateIncomeTax(salary, 'rUK')).toBe(3486);
     });
 
     it('should calculate higher rate tax (40%) on income £50,271 to £125,140', () => {
-      const salary = 60000;
+      const _salary = 60000;
       // Basic: (50270 - 12570) * 0.20 = £7,540
       // Higher: (60000 - 50270) * 0.40 = £3,892
       // Total: £11,432
@@ -229,7 +229,7 @@ describe('Tax Calculations', () => {
     });
 
     it('should calculate additional rate tax (45%) on income over £125,140', () => {
-      const salary = 150000;
+      const _salary = 150000;
       // PA tapered to zero at this level
       // Basic: 37700 * 0.20 = £7,540
       // Higher: (125140 - 37700) * 0.40 = £34,976
@@ -241,20 +241,20 @@ describe('Tax Calculations', () => {
     it('should taper Personal Allowance for income over £100,000', () => {
       // PA reduces by £1 for every £2 over £100k
       // PA = 0 at £125,140
-      const salary = 110000;
+      const _salary = 110000;
       // PA = 12570 - ((110000 - 100000) / 2) = 12570 - 5000 = £7,570
       // expect(getPersonalAllowance(salary)).toBe(7570);
     });
 
     it('should show 60% effective rate warning in £100k-£125,140 zone', () => {
-      const salary = 110000;
+      const _salary = 110000;
       // expect(getWarnings({ salary })).toContain('PA_TAPER_WARNING');
     });
   });
 
   describe('Income Tax - Scotland (6 bands)', () => {
     it('should apply Scottish starter rate (19%) on £12,571 to £14,876', () => {
-      const salary = 14000;
+      const _salary = 14000;
       // Tax = (14000 - 12570) * 0.19 = £271.70
       // expect(calculateIncomeTax(salary, 'scotland')).toBeCloseTo(271.70, 0);
     });
@@ -267,13 +267,13 @@ describe('Tax Calculations', () => {
       // Higher: 42% (£43,663 - £75,000)
       // Advanced: 45% (£75,001 - £125,140)
       // Top: 48% (over £125,140)
-      const salary = 80000;
+      const _salary = 80000;
       // expect(calculateIncomeTax(salary, 'scotland')).toBeGreaterThan(0);
     });
 
     it('should use UK dividend rates for Scottish taxpayers (NOT Scottish bands)', () => {
       // Dividends are taxed at UK rates regardless of region
-      const dividends = 10000;
+      const _dividends = 10000;
       // expect(calculateDividendTax(dividends, 'scotland')).toBe(
       //   calculateDividendTax(dividends, 'rUK')
       // );
@@ -283,19 +283,19 @@ describe('Tax Calculations', () => {
   describe('Employee National Insurance', () => {
     it('should calculate zero NI on earnings below Primary Threshold', () => {
       // PT = £12,570 for 2025-26
-      const salary = 12000;
+      const _salary = 12000;
       // expect(calculateEmployeeNI(salary)).toBe(0);
     });
 
     it('should calculate 8% NI on earnings between PT and UEL', () => {
       // UEL = £50,270
-      const salary = 30000;
+      const _salary = 30000;
       // NI = (30000 - 12570) * 0.08 = £1,394.40
       // expect(calculateEmployeeNI(salary)).toBeCloseTo(1394.40, 0);
     });
 
     it('should calculate 2% NI on earnings above UEL', () => {
-      const salary = 60000;
+      const _salary = 60000;
       // Below UEL: (50270 - 12570) * 0.08 = £3,016
       // Above UEL: (60000 - 50270) * 0.02 = £194.60
       // Total: £3,210.60
@@ -305,7 +305,7 @@ describe('Tax Calculations', () => {
     it('should use cumulative annual method for directors (not per pay period)', () => {
       // Directors use annual earnings method
       // This affects mid-year joiners and irregular payments
-      const annualSalary = 50000;
+      const _annualSalary = 50000;
       // expect(calculateDirectorNI(annualSalary)).toBe(calculateEmployeeNI(annualSalary));
     });
   });
@@ -313,21 +313,21 @@ describe('Tax Calculations', () => {
   describe('Employer National Insurance', () => {
     it('should calculate 15% employer NI above Secondary Threshold', () => {
       // ST = £5,000 from April 2025 (was £9,100)
-      const salary = 30000;
+      const _salary = 30000;
       // Employer NI = (30000 - 5000) * 0.15 = £3,750
       // expect(calculateEmployerNI(salary)).toBe(3750);
     });
 
     it('should offset Employment Allowance against employer NI', () => {
       // EA = £10,500 from April 2025 (was £5,000)
-      const salary = 50000;
+      const _salary = 50000;
       // Employer NI before EA = (50000 - 5000) * 0.15 = £6,750
       // After EA: £6,750 - £6,750 = £0 (capped at actual NI)
       // expect(calculateEmployerNI(salary, { hasEA: true })).toBe(0);
     });
 
     it('should not reduce employer NI below zero with EA', () => {
-      const salary = 20000;
+      const _salary = 20000;
       // Employer NI = (20000 - 5000) * 0.15 = £2,250
       // EA = £10,500, but can only offset actual liability
       // expect(calculateEmployerNI(salary, { hasEA: true })).toBe(0);
@@ -336,19 +336,19 @@ describe('Tax Calculations', () => {
 
   describe('Corporation Tax', () => {
     it('should calculate 19% CT on profits under £50,000', () => {
-      const profit = 40000;
+      const _profit = 40000;
       // CT = 40000 * 0.19 = £7,600
       // expect(calculateCorporationTax(profit)).toBe(7600);
     });
 
     it('should calculate 25% CT on profits over £250,000', () => {
-      const profit = 300000;
+      const _profit = 300000;
       // CT = 300000 * 0.25 = £75,000
       // expect(calculateCorporationTax(profit)).toBe(75000);
     });
 
     it('should apply marginal relief for profits between £50k and £250k', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // Marginal relief formula applies
       // Effective rate between 19% and 25%
       // expect(calculateCorporationTax(profit)).toBeGreaterThan(profit * 0.19);
@@ -356,8 +356,8 @@ describe('Tax Calculations', () => {
     });
 
     it('should reduce taxable profit by salary cost (gross + employer NI)', () => {
-      const profit = 100000;
-      const salary = 30000;
+      const _profit = 100000;
+      const _salary = 30000;
       // Employer NI = (30000 - 5000) * 0.15 = £3,750
       // Salary cost = 30000 + 3750 = £33,750
       // Taxable profit = 100000 - 33750 = £66,250
@@ -365,15 +365,15 @@ describe('Tax Calculations', () => {
     });
 
     it('should reduce taxable profit by pension contributions', () => {
-      const profit = 100000;
-      const pension = 10000;
+      const _profit = 100000;
+      const _pension = 10000;
       // Taxable profit = 100000 - 10000 = £90,000
       // expect(calculateTaxableProfit(profit, 0, pension)).toBe(90000);
     });
 
     it('should reduce taxable profit by losses brought forward', () => {
-      const profit = 100000;
-      const losses = 20000;
+      const _profit = 100000;
+      const _losses = 20000;
       // Taxable profit = 100000 - 20000 = £80,000
       // expect(calculateTaxableProfit(profit, 0, 0, losses)).toBe(80000);
     });
@@ -381,13 +381,13 @@ describe('Tax Calculations', () => {
 
   describe('Dividend Tax', () => {
     it('should apply £500 dividend allowance before taxation', () => {
-      const dividends = 500;
+      const _dividends = 500;
       // expect(calculateDividendTax(dividends, 0)).toBe(0);
     });
 
     it('should calculate 8.75% on dividends in basic rate band', () => {
-      const salary = 12570; // Uses PA
-      const dividends = 20000;
+      const _salary = 12570; // Uses PA
+      const _dividends = 20000;
       // Taxable dividends = 20000 - 500 = £19,500
       // All in basic rate band (up to £50,270 total)
       // Tax = 19500 * 0.0875 = £1,706.25
@@ -395,8 +395,8 @@ describe('Tax Calculations', () => {
     });
 
     it('should calculate 33.75% on dividends in higher rate band', () => {
-      const salary = 50270; // Fills basic rate band
-      const dividends = 20000;
+      const _salary = 50270; // Fills basic rate band
+      const _dividends = 20000;
       // Taxable dividends = 20000 - 500 = £19,500
       // All in higher rate band
       // Tax = 19500 * 0.3375 = £6,581.25
@@ -404,8 +404,8 @@ describe('Tax Calculations', () => {
     });
 
     it('should calculate 39.35% on dividends in additional rate band', () => {
-      const salary = 125140;
-      const dividends = 50000;
+      const _salary = 125140;
+      const _dividends = 50000;
       // All dividends in additional rate
       // Taxable = 50000 - 500 = £49,500
       // Tax = 49500 * 0.3935 = £19,478.25
@@ -413,8 +413,8 @@ describe('Tax Calculations', () => {
     });
 
     it('should split dividends across bands when straddling thresholds', () => {
-      const salary = 40000;
-      const dividends = 30000;
+      const _salary = 40000;
+      const _dividends = 30000;
       // Remaining basic rate band = 50270 - 40000 = £10,270
       // Dividends in basic: 10270 - 500 (allowance portion) = varies
       // This test verifies band-straddling logic
@@ -424,31 +424,31 @@ describe('Tax Calculations', () => {
 
   describe('Student Loan Repayments', () => {
     it('should calculate Plan 1 repayments at 9% above £26,065', () => {
-      const totalIncome = 50000; // salary + dividends
+      const _totalIncome = 50000; // salary + dividends
       // Repayment = (50000 - 26065) * 0.09 = £2,154.15
       // expect(calculateStudentLoan(totalIncome, 'plan1')).toBeCloseTo(2154.15, 0);
     });
 
     it('should calculate Plan 2 repayments at 9% above £28,470', () => {
-      const totalIncome = 50000;
+      const _totalIncome = 50000;
       // Repayment = (50000 - 28470) * 0.09 = £1,937.70
       // expect(calculateStudentLoan(totalIncome, 'plan2')).toBeCloseTo(1937.70, 0);
     });
 
     it('should calculate Plan 4 repayments at 9% above £32,745', () => {
-      const totalIncome = 50000;
+      const _totalIncome = 50000;
       // Repayment = (50000 - 32745) * 0.09 = £1,552.95
       // expect(calculateStudentLoan(totalIncome, 'plan4')).toBeCloseTo(1552.95, 0);
     });
 
     it('should calculate Postgraduate Loan at 6% above £21,000', () => {
-      const totalIncome = 50000;
+      const _totalIncome = 50000;
       // Repayment = (50000 - 21000) * 0.06 = £1,740
       // expect(calculateStudentLoan(totalIncome, 'postgrad')).toBe(1740);
     });
 
     it('should stack multiple student loan plans', () => {
-      const totalIncome = 50000;
+      const _totalIncome = 50000;
       // Plan 2 + Postgrad = £2,043.45 + £1,740 = £3,783.45
       // expect(calculateStudentLoan(totalIncome, ['plan2', 'postgrad'])).toBeCloseTo(3783.45, 0);
     });
@@ -457,7 +457,7 @@ describe('Tax Calculations', () => {
       const salary = 20000;
       const dividends = 25000;
       const bik = 5000;
-      const totalIncome = salary + dividends + bik; // £50,000
+      const _totalIncome = salary + dividends + bik; // £50,000
       // Student loan threshold applies to total
       // expect(calculateStudentLoanBase({ salary, dividends, bik })).toBe(50000);
     });
@@ -466,7 +466,7 @@ describe('Tax Calculations', () => {
       // CSLM16035: First £2k of unearned income excluded from SL calc
       // This calculator doesn't implement this - may overstate SL when dividends ≤£2k
       // This is a known limitation per spec
-      const dividends = 2000;
+      const _dividends = 2000;
       // expect(getLimitations()).toContain('STUDENT_LOAN_2K_RULE');
     });
   });
@@ -479,7 +479,7 @@ describe('Tax Calculations', () => {
 describe('Strategy Optimization', () => {
   describe('Strategy Comparison', () => {
     it('should calculate All Salary strategy correctly', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // All profit taken as salary
       // High income tax + employee NI + employer NI
       // Low CT (profit reduced to near zero)
@@ -487,14 +487,14 @@ describe('Strategy Optimization', () => {
     });
 
     it('should calculate All Dividends strategy correctly', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // Minimum salary (e.g., £12,570 or £6,500), rest as dividends
       // Lower personal tax but higher CT
       // expect(calculateAllDividends(profit).strategy).toBe('ALL_DIVIDENDS');
     });
 
     it('should find optimal salary/dividend split', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // Test combinations and find highest net take-home
       // Optimal is usually around NI threshold or PA
       // expect(calculateOptimal(profit).netTakeHome).toBeGreaterThan(
@@ -503,13 +503,13 @@ describe('Strategy Optimization', () => {
     });
 
     it('should label optimal as "Highest Take-Home" (not advisory language)', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // expect(calculateOptimal(profit).label).toBe('Highest Take-Home');
       // NOT "Recommended" or "You should"
     });
 
     it('should calculate Your Setup strategy with user inputs', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         compareSalary: 30000,
         compareDividends: 50000,
@@ -518,7 +518,7 @@ describe('Strategy Optimization', () => {
     });
 
     it('should show delta between Your Setup and optimal', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         compareSalary: 50000, // Suboptimal high salary
         compareDividends: 30000,
@@ -531,13 +531,13 @@ describe('Strategy Optimization', () => {
 
   describe('Optimization Logic', () => {
     it('should test salary/dividend combinations across valid range', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // Range: 0 to sensible cap (e.g., UEL £50,270)
       // expect(getOptimizationRange(profit).min).toBe(0);
     });
 
     it('should respect minimum salary requirement when set', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         minimumSalaryRequired: 25000,
       };
@@ -551,7 +551,7 @@ describe('Strategy Optimization', () => {
     });
 
     it('should account for already taken amounts in optimization', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 30000,
         takenViaPayroll: true,
@@ -569,17 +569,17 @@ describe('Strategy Optimization', () => {
 describe('Warning Triggers', () => {
   describe('Hard Constraints', () => {
     it('should trigger Survival Mode when profit <= 0', () => {
-      const input = { profit: -5000 };
+      const _input = { profit: -5000 };
       // expect(getWarnings(input)).toContain({ type: 'SURVIVAL_MODE', severity: 'hard' });
     });
 
     it('should warn about overdrawn position', () => {
-      const input = { profit: 50000, alreadyTaken: 60000 };
+      const _input = { profit: 50000, alreadyTaken: 60000 };
       // expect(getWarnings(input)).toContain({ type: 'OVERDRAWN', severity: 'hard' });
     });
 
     it('should warn about potential illegal dividend', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareDividends: 60000, // More than available
       };
@@ -590,17 +590,17 @@ describe('Warning Triggers', () => {
 
   describe('May Apply Warnings', () => {
     it('should warn about VAT registration near threshold', () => {
-      const input = { revenue: 85000 }; // Near £90k threshold
+      const _input = { revenue: 85000 }; // Near £90k threshold
       // expect(getWarnings(input)).toContain({ type: 'VAT_THRESHOLD', severity: 'soft' });
     });
 
     it('should warn about Self Assessment filing when dividends declared', () => {
-      const input = { profit: 50000, dividends: 20000 };
+      const _input = { profit: 50000, dividends: 20000 };
       // expect(getWarnings(input)).toContain({ type: 'SELF_ASSESSMENT', severity: 'soft' });
     });
 
     it('should warn about Payments on Account when SA liability >£1k AND <80% deducted', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         salary: 12570, // Low PAYE deduction
         dividends: 60000, // High dividend = high SA liability
@@ -610,7 +610,7 @@ describe('Warning Triggers', () => {
     });
 
     it('should NOT warn about POA if SA liability <=£1k', () => {
-      const input = {
+      const _input = {
         profit: 30000,
         salary: 12570,
         dividends: 10000,
@@ -620,7 +620,7 @@ describe('Warning Triggers', () => {
     });
 
     it('should NOT warn about POA if >=80% deducted at source', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         salary: 60000, // High PAYE deduction
         dividends: 20000,
@@ -632,29 +632,29 @@ describe('Warning Triggers', () => {
 
   describe('Educational Warnings', () => {
     it('should explain 60% effective rate in PA taper zone (£100k-£125,140)', () => {
-      const input = { salary: 110000 };
+      const _input = { salary: 110000 };
       // expect(getWarnings(input)).toContain({ type: 'PA_TAPER', severity: 'educational' });
     });
 
     it('should warn about HICBC in £60k-£80k zone', () => {
-      const input = { salary: 65000, hasChildren: true };
+      const _input = { salary: 65000, hasChildren: true };
       // Child Benefit clawback starts at £60k, fully gone at £80k
       // expect(getWarnings(input)).toContain({ type: 'HICBC', severity: 'educational' });
     });
 
     it('should warn about pension gap zone', () => {
       // Paying employer NI without earning State Pension credits
-      const input = { salary: 8000 }; // Below LEL £6,500 but above ST £5,000
+      const _input = { salary: 8000 }; // Below LEL £6,500 but above ST £5,000
       // expect(getWarnings(input)).toContain({ type: 'PENSION_GAP', severity: 'educational' });
     });
 
     it('should warn when pension contribution exceeds Annual Allowance', () => {
-      const input = { pensionContribution: 70000 }; // Over £60k AA
+      const _input = { pensionContribution: 70000 }; // Over £60k AA
       // expect(getWarnings(input)).toContain({ type: 'PENSION_AA_EXCEEDED', severity: 'educational' });
     });
 
     it('should warn about pension taper near £260k threshold', () => {
-      const input = {
+      const _input = {
         salary: 200000,
         dividends: 80000, // Adjusted income ~£280k
       };
@@ -663,7 +663,7 @@ describe('Warning Triggers', () => {
     });
 
     it('should flag potential DLA when compare inputs exceed available', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000,
@@ -683,7 +683,7 @@ describe('Warning Triggers', () => {
 describe('Outputs', () => {
   describe('Strategy Cards', () => {
     it('should output 4 strategy cards', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // const strategies = calculateAllStrategies(profit);
       // expect(strategies).toHaveLength(4);
       // expect(strategies.map(s => s.name)).toEqual([
@@ -695,7 +695,7 @@ describe('Outputs', () => {
     });
 
     it('should show salary, dividends, total tax, effective rate, net take-home on each card', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // const card = calculateOptimal(profit);
       // expect(card).toHaveProperty('salary');
       // expect(card).toHaveProperty('dividends');
@@ -705,14 +705,14 @@ describe('Outputs', () => {
     });
 
     it('should highlight Highest Take-Home card as recommended', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // const strategies = calculateAllStrategies(profit);
       // const optimal = strategies.find(s => s.name === 'Highest Take-Home');
       // expect(optimal.isHighlighted).toBe(true);
     });
 
     it('should pre-populate Your Setup with optimal values', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // const optimal = calculateOptimal(profit);
       // const yourSetup = getYourSetupDefaults(profit);
       // expect(yourSetup.salary).toBe(optimal.salary);
@@ -720,7 +720,7 @@ describe('Outputs', () => {
     });
 
     it('should turn Your Setup card RED when inputs exceed profit', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000,
@@ -736,7 +736,7 @@ describe('Outputs', () => {
     });
 
     it('should start at optimal position', () => {
-      const profit = 100000;
+      const _profit = 100000;
       // const optimal = calculateOptimal(profit);
       // expect(getSliderInitialValue(profit)).toBe(optimal.salary);
     });
@@ -754,7 +754,7 @@ describe('Outputs', () => {
 
   describe('Detail Breakdowns', () => {
     it('should show salary breakdown: Gross → Income Tax → Employee NI → Employer NI → Net', () => {
-      const salary = 30000;
+      const _salary = 30000;
       // const breakdown = getSalaryBreakdown(salary);
       // expect(breakdown).toHaveProperty('gross', 30000);
       // expect(breakdown).toHaveProperty('incomeTax');
@@ -764,7 +764,7 @@ describe('Outputs', () => {
     });
 
     it('should show dividend breakdown: Gross → Allowance → Taxable → Tax → Net', () => {
-      const dividends = 20000;
+      const _dividends = 20000;
       // const breakdown = getDividendBreakdown(dividends, 12570);
       // expect(breakdown).toHaveProperty('gross', 20000);
       // expect(breakdown).toHaveProperty('allowanceUsed', 500);
@@ -774,7 +774,7 @@ describe('Outputs', () => {
     });
 
     it('should show CT breakdown: Profit → Salary Deduction → Pension Deduction → Taxable → CT', () => {
-      const input = { profit: 100000, salary: 30000, pension: 10000 };
+      const _input = { profit: 100000, salary: 30000, pension: 10000 };
       // const breakdown = getCTBreakdown(input);
       // expect(breakdown).toHaveProperty('profit', 100000);
       // expect(breakdown).toHaveProperty('salaryCostDeduction');
@@ -786,12 +786,12 @@ describe('Outputs', () => {
 
   describe('Two Pots (Monthly Set-Aside)', () => {
     it('should calculate Company Pot as CT ÷ 12', () => {
-      const ct = 12000;
+      const _ct = 12000;
       // expect(getCompanyPot(ct)).toBe(1000);
     });
 
     it('should calculate Personal Pot as (Income Tax + Dividend Tax + Student Loan) ÷ 12', () => {
-      const personalTaxes = {
+      const _personalTaxes = {
         incomeTax: 6000,
         dividendTax: 3000,
         studentLoan: 1200,
@@ -808,13 +808,13 @@ describe('Outputs', () => {
 
   describe('Key Dates', () => {
     it('should calculate CT payment due as year-end + 9 months + 1 day', () => {
-      const yearEnd = new Date('2026-03-31');
+      const _yearEnd = new Date('2026-03-31');
       // CT due = 1 January 2027
       // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2027-01-01'));
     });
 
     it('should calculate CT return due as year-end + 12 months', () => {
-      const yearEnd = new Date('2026-03-31');
+      const _yearEnd = new Date('2026-03-31');
       // CT return due = 31 March 2027
       // expect(getCTReturnDue(yearEnd)).toEqual(new Date('2027-03-31'));
     });
@@ -863,13 +863,13 @@ describe('Outputs', () => {
 
 describe('Edge Cases', () => {
   it('should handle zero profit gracefully', () => {
-    const input = { profit: 0 };
+    const _input = { profit: 0 };
     // Should trigger Survival Mode, not crash
     // expect(calculateAllStrategies(input)).toBeDefined();
   });
 
   it('should handle very high profits (£500k+)', () => {
-    const input = { profit: 500000 };
+    const _input = { profit: 500000 };
     // Should still calculate, though less relevant for typical users
     // expect(calculateAllStrategies(input)).toBeDefined();
   });
@@ -898,7 +898,7 @@ describe('Edge Cases', () => {
   });
 
   it('should handle other income pushing total into higher bands', () => {
-    const input = {
+    const _input = {
       profit: 30000,
       otherIncome: 80000, // e.g., spouse with high income, rental
     };
@@ -907,7 +907,7 @@ describe('Edge Cases', () => {
   });
 
   it('should handle BIK adding to total income for tax purposes', () => {
-    const input = {
+    const _input = {
       salary: 50000,
       dividends: 40000,
       companyCarBIK: 10000,
@@ -917,7 +917,7 @@ describe('Edge Cases', () => {
   });
 
   it('should handle Scotland region with high income correctly', () => {
-    const input = {
+    const _input = {
       profit: 150000,
       region: 'scotland',
     };
@@ -926,7 +926,7 @@ describe('Edge Cases', () => {
   });
 
   it('should handle multiple student loan plans stacking', () => {
-    const input = {
+    const _input = {
       profit: 80000,
       studentLoanPlans: ['plan1', 'plan2', 'postgrad'],
     };
@@ -935,7 +935,7 @@ describe('Edge Cases', () => {
   });
 
   it('should handle pension contribution reducing income below thresholds', () => {
-    const input = {
+    const _input = {
       salary: 110000, // In PA taper zone
       pensionContribution: 15000, // Reduces adjusted income to £95k
     };
@@ -946,7 +946,7 @@ describe('Edge Cases', () => {
   it('should handle year-end month variations', () => {
     const months = ['03', '12', '06', '09']; // Mar, Dec, Jun, Sep
     months.forEach((month) => {
-      const input = { profit: 100000, yearEndMonth: month };
+      const _input = { profit: 100000, yearEndMonth: month };
       // expect(getKeyDates(input)).toBeDefined();
     });
   });
@@ -1036,7 +1036,7 @@ describe('Additional Calculation Tests', () => {
       // Directors get full annual thresholds upfront
       // Monthly employee: £1,048/month threshold = £12,576/year
       // Director: £12,570 annual threshold applied cumulatively
-      const annualSalary = 30000;
+      const _annualSalary = 30000;
       // expect(calculateDirectorNI(annualSalary, 'annual')).toBe(
       //   calculateDirectorNI(annualSalary, 'cumulative')
       // );
@@ -1045,7 +1045,7 @@ describe('Additional Calculation Tests', () => {
     it('should handle mid-year director appointment correctly', () => {
       // Director appointed in October (6 months)
       // Pro-rated thresholds apply
-      const input = {
+      const _input = {
         salary: 30000,
         monthsAsDirector: 6,
       };
@@ -1054,14 +1054,14 @@ describe('Additional Calculation Tests', () => {
 
     it('should reconcile at year-end for directors using alternative method', () => {
       // Alternative method: per pay period, then reconcile
-      const monthlyPayments = Array(12).fill(2500); // £30k total
+      const _monthlyPayments = Array(12).fill(2500); // £30k total
       // expect(reconcileDirectorNI(monthlyPayments)).toBe(calculateDirectorNI(30000));
     });
   });
 
   describe('Losses Brought Forward', () => {
     it('should reduce CT liability by losses carried forward', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         lossesBroughtForward: 30000,
       };
@@ -1071,7 +1071,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should not allow losses to create negative taxable profit', () => {
-      const input = {
+      const _input = {
         profit: 20000,
         lossesBroughtForward: 50000,
       };
@@ -1082,7 +1082,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should track losses remaining after partial use', () => {
-      const input = {
+      const _input = {
         profit: 40000,
         lossesBroughtForward: 25000,
       };
@@ -1093,13 +1093,13 @@ describe('Additional Calculation Tests', () => {
 
   describe('BIK Class 1A NI Calculation', () => {
     it('should calculate Class 1A NI as 15% of BIK value', () => {
-      const bik = 10000;
+      const _bik = 10000;
       // Class 1A = £10,000 × 0.15 = £1,500
       // expect(calculateClass1ANI(bik)).toBe(1500);
     });
 
     it('should add Class 1A to total company cost', () => {
-      const input = {
+      const _input = {
         salary: 30000,
         companyCarBIK: 8000,
       };
@@ -1110,7 +1110,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should include BIK in personal income for tax calculations', () => {
-      const input = {
+      const _input = {
         salary: 50000,
         companyCarBIK: 10000,
       };
@@ -1119,7 +1119,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should warn when BIK entered but Class 1A not fully calculated', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         companyCarBIK: 5000,
       };
@@ -1132,7 +1132,7 @@ describe('Additional Calculation Tests', () => {
 
   describe('Payments on Account Multiplier', () => {
     it('should apply 1.5× multiplier for POA when SA liability >£1k', () => {
-      const dividendTax = 5000; // SA liability
+      const _dividendTax = 5000; // SA liability
       // Year 1: £5,000
       // Year 2 with POA: £5,000 + £2,500 (50% advance) = £7,500
       // Monthly set-aside: £7,500 / 12 = £625 (not £417)
@@ -1140,13 +1140,13 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should NOT apply POA multiplier when SA liability <=£1k', () => {
-      const dividendTax = 800;
+      const _dividendTax = 800;
       // No POA, just the actual liability
       // expect(calculatePersonalPotWithPOA(dividendTax)).toBe(800);
     });
 
     it('should NOT apply POA when >=80% collected at source', () => {
-      const input = {
+      const _input = {
         incomeTax: 10000, // Collected via PAYE
         dividendTax: 2000, // SA liability
       };
@@ -1155,7 +1155,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should apply POA when <80% collected at source AND >£1k', () => {
-      const input = {
+      const _input = {
         incomeTax: 1000, // Collected via PAYE (low salary)
         dividendTax: 8000, // SA liability
       };
@@ -1168,7 +1168,7 @@ describe('Additional Calculation Tests', () => {
     it('should calculate exact marginal relief for profits between £50k and £250k', () => {
       // Formula: MR = (250,000 - profit) × (profit × 0.25 - profit × 0.19) / (250,000 - 50,000)
       // Simplified: MR = (250,000 - profit) × 3/200
-      const profit = 100000;
+      const _profit = 100000;
       // Main rate CT: £100,000 × 0.25 = £25,000
       // Marginal relief: (250,000 - 100,000) × 3/200 = £2,250
       // CT payable: £25,000 - £2,250 = £22,750
@@ -1177,7 +1177,7 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should calculate marginal relief at £150k profit', () => {
-      const profit = 150000;
+      const _profit = 150000;
       // Main rate CT: £150,000 × 0.25 = £37,500
       // Marginal relief: (250,000 - 150,000) × 3/200 = £1,500
       // CT payable: £37,500 - £1,500 = £36,000
@@ -1186,20 +1186,20 @@ describe('Additional Calculation Tests', () => {
     });
 
     it('should apply no marginal relief at exactly £250k', () => {
-      const profit = 250000;
+      const _profit = 250000;
       // MR = (250,000 - 250,000) × 3/200 = £0
       // CT = £250,000 × 0.25 = £62,500
       // expect(calculateCorporationTax(profit)).toBe(62500);
     });
 
     it('should apply full small profits rate at exactly £50k', () => {
-      const profit = 50000;
+      const _profit = 50000;
       // CT = £50,000 × 0.19 = £9,500
       // expect(calculateCorporationTax(profit)).toBe(9500);
     });
 
     it('should transition correctly at £50,001', () => {
-      const profit = 50001;
+      const _profit = 50001;
       // Marginal relief kicks in
       // CT > £9,500.19 but < £12,500.25
       // expect(calculateCorporationTax(profit)).toBeGreaterThan(9500);
@@ -1209,28 +1209,28 @@ describe('Additional Calculation Tests', () => {
 
   describe('Rounding Consistency', () => {
     it('should round tax calculations to pence', () => {
-      const salary = 33333;
+      const _salary = 33333;
       // expect(calculateIncomeTax(salary) % 0.01).toBe(0);
     });
 
     it('should round NI calculations to pence', () => {
-      const salary = 33333;
+      const _salary = 33333;
       // expect(calculateEmployeeNI(salary) % 0.01).toBe(0);
     });
 
     it('should round CT to nearest pound', () => {
-      const profit = 77777;
+      const _profit = 77777;
       // expect(calculateCorporationTax(profit) % 1).toBe(0);
     });
 
     it('should round monthly set-aside to nearest pound', () => {
-      const annualTax = 12345;
+      const _annualTax = 12345;
       // Monthly = £1,028.75 → £1,029 or £1,028 (consistent)
       // expect(calculateMonthlySetAside(annualTax) % 1).toBe(0);
     });
 
     it('should ensure net take-home is sum of components (no rounding drift)', () => {
-      const input = { profit: 100000 };
+      const _input = { profit: 100000 };
       // const result = calculateAllTaxes(input);
       // const calculatedNet = input.profit - result.totalTax;
       // expect(result.netTakeHome).toBe(calculatedNet);
@@ -1245,7 +1245,7 @@ describe('Additional Calculation Tests', () => {
 describe('Scenario Tests', () => {
   describe('Already Taken Affects Available', () => {
     it('should reduce available extraction by already taken amount', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 40000,
         takenViaPayroll: true,
@@ -1255,7 +1255,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should optimize only the remaining amount', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 30000,
         takenViaPayroll: true,
@@ -1266,7 +1266,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should account for already taken salary in NI calculations', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 12570, // Already used PA
         takenViaPayroll: true,
@@ -1276,7 +1276,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should show overdrawn when already taken exceeds available', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         alreadyTaken: 60000,
       };
@@ -1284,7 +1284,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should differentiate salary vs dividend already taken', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTakenSalary: 12570,
         alreadyTakenDividends: 20000,
@@ -1297,7 +1297,7 @@ describe('Scenario Tests', () => {
 
   describe('Other PAYE Employment', () => {
     it('should reduce available NI threshold when other PAYE exists', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         hasOtherPAYE: true,
         otherPAYEIncome: 30000, // Used PA and some basic rate
@@ -1308,7 +1308,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should warn about NI threshold usage from other employment', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         hasOtherPAYE: true,
       };
@@ -1318,7 +1318,7 @@ describe('Scenario Tests', () => {
     it('should still apply director annual method even with other PAYE', () => {
       // Director NI is calculated annually for this directorship
       // Other PAYE is separate
-      const input = {
+      const _input = {
         salary: 30000,
         hasOtherPAYE: true,
       };
@@ -1326,7 +1326,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should include other income in PA taper calculation', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         otherIncome: 80000, // Rental, other employment
       };
@@ -1337,7 +1337,7 @@ describe('Scenario Tests', () => {
 
   describe('Minimum Salary Floor', () => {
     it('should respect minimum salary requirement in optimization', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         minimumSalaryRequired: 25000, // Mortgage requirement
       };
@@ -1347,7 +1347,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should show mortgage impact warning when salary below £25k', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         salary: 12570, // Tax optimal but mortgage-hostile
       };
@@ -1355,7 +1355,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should calculate optimal above floor even if tax-inefficient', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         minimumSalaryRequired: 40000,
       };
@@ -1366,7 +1366,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should not apply floor when not set', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         // No minimumSalaryRequired
       };
@@ -1378,7 +1378,7 @@ describe('Scenario Tests', () => {
 
   describe('Pension Reducing Adjusted Income', () => {
     it('should restore PA when pension reduces income below £100k', () => {
-      const input = {
+      const _input = {
         salary: 110000,
         pensionContribution: 15000, // Adjusted income = £95k
       };
@@ -1387,7 +1387,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should partially restore PA when pension partially reduces taper', () => {
-      const input = {
+      const _input = {
         salary: 115000,
         pensionContribution: 10000, // Adjusted income = £105k
       };
@@ -1397,7 +1397,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should show pension optimization opportunity when in taper zone', () => {
-      const input = {
+      const _input = {
         salary: 110000,
         pensionContribution: 0,
       };
@@ -1406,7 +1406,7 @@ describe('Scenario Tests', () => {
     });
 
     it('should calculate net benefit of pension vs PA restoration', () => {
-      const input = {
+      const _input = {
         salary: 110000,
         pensionContribution: 10000,
       };
@@ -1426,13 +1426,13 @@ describe('Scottish Tax Bands (Detailed)', () => {
   // Source: https://www.mygov.scot/scottish-income-tax/current-income-tax-rates
 
   it('should calculate Starter Rate (19%) on £12,571 - £15,397', () => {
-    const salary = 15397;
+    const _salary = 15397;
     // Tax = (15397 - 12570) × 0.19 = £537.13
     // expect(calculateIncomeTax(salary, 'scotland')).toBeCloseTo(537.13, 0);
   });
 
   it('should calculate Basic Rate (20%) on £15,398 - £27,491', () => {
-    const salary = 27491;
+    const _salary = 27491;
     // Starter: (15397 - 12570) × 0.19 = £537.13
     // Basic: (27491 - 15397) × 0.20 = £2,418.80
     // Total: £2,955.93
@@ -1440,7 +1440,7 @@ describe('Scottish Tax Bands (Detailed)', () => {
   });
 
   it('should calculate Intermediate Rate (21%) on £27,492 - £43,662', () => {
-    const salary = 43662;
+    const _salary = 43662;
     // Starter: £537.13
     // Basic: £2,418.80
     // Intermediate: (43662 - 27491) × 0.21 = £3,395.91
@@ -1449,7 +1449,7 @@ describe('Scottish Tax Bands (Detailed)', () => {
   });
 
   it('should calculate Higher Rate (42%) on £43,663 - £75,000', () => {
-    const salary = 75000;
+    const _salary = 75000;
     // Starter: £537.13
     // Basic: £2,418.80
     // Intermediate: £3,395.91
@@ -1459,7 +1459,7 @@ describe('Scottish Tax Bands (Detailed)', () => {
   });
 
   it('should calculate Advanced Rate (45%) on £75,001 - £125,140', () => {
-    const salary = 125140;
+    const _salary = 125140;
     // Starter: £537.13
     // Basic: £2,418.80
     // Intermediate: £3,395.91
@@ -1471,7 +1471,7 @@ describe('Scottish Tax Bands (Detailed)', () => {
   });
 
   it('should calculate Top Rate (48%) on income over £125,140', () => {
-    const salary = 150000;
+    const _salary = 150000;
     // PA fully tapered (income > £125,140)
     // All income taxable
     // Top rate on amount over £125,140
@@ -1479,13 +1479,13 @@ describe('Scottish Tax Bands (Detailed)', () => {
   });
 
   it('should apply PA taper same as rUK for Scottish taxpayers', () => {
-    const salary = 110000;
+    const _salary = 110000;
     // PA taper applies same way
     // expect(getPersonalAllowance(salary, 'scotland')).toBe(getPersonalAllowance(salary, 'rUK'));
   });
 
   it('should use UK dividend rates for Scottish taxpayer with high dividends', () => {
-    const input = {
+    const _input = {
       salary: 50000,
       dividends: 40000,
       region: 'scotland',
@@ -1504,7 +1504,7 @@ describe('Scottish Tax Bands (Detailed)', () => {
 describe('Real-World Scenarios', () => {
   describe('Scenario A: Typical Small Company Director', () => {
     it('should calculate optimal for £80k profit, rUK, Plan 2 loan, £5k pension', () => {
-      const input = {
+      const _input = {
         profit: 80000,
         region: 'rUK',
         studentLoanPlans: ['plan2'],
@@ -1521,7 +1521,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario B: High Earner in PA Taper Zone', () => {
     it('should calculate optimal for £200k profit, rUK, no loans, £40k pension', () => {
-      const input = {
+      const _input = {
         profit: 200000,
         region: 'rUK',
         studentLoanPlans: [],
@@ -1538,7 +1538,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario C: Low Profit with EA', () => {
     it('should calculate optimal for £25k profit, rUK, EA claimed', () => {
-      const input = {
+      const _input = {
         profit: 25000,
         region: 'rUK',
         hasEmploymentAllowance: true,
@@ -1552,7 +1552,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario D: Scottish Director with Multiple Loans', () => {
     it('should calculate optimal for £100k profit, Scotland, Plan 1 + Postgrad', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         region: 'scotland',
         studentLoanPlans: ['plan1', 'postgrad'],
@@ -1567,7 +1567,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario E: Compare Mode - User Overpaying', () => {
     it('should show delta when user pays £2k more than optimal', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         compareSalary: 50000, // High salary (tax inefficient)
         compareDividends: 30000,
@@ -1581,7 +1581,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario F: Mid-Year Director', () => {
     it('should calculate for £60k profit, 6 months as director', () => {
-      const input = {
+      const _input = {
         profit: 60000,
         monthsAsDirector: 6,
         alreadyTaken: 20000,
@@ -1595,7 +1595,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario G: Company Car BIK', () => {
     it('should calculate for £80k profit with £8k company car BIK', () => {
-      const input = {
+      const _input = {
         profit: 80000,
         companyCarBIK: 8000,
       };
@@ -1608,7 +1608,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario H: Minimum Salary for Mortgage', () => {
     it('should respect £30k floor for mortgage application', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         minimumSalaryRequired: 30000,
       };
@@ -1622,7 +1622,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario I: Already Taken Significant Amount', () => {
     it('should optimize remaining when £50k already taken from £100k profit', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: 50000,
         takenViaPayroll: true,
@@ -1636,7 +1636,7 @@ describe('Real-World Scenarios', () => {
 
   describe('Scenario J: Pension Taper Warning', () => {
     it('should warn for £300k adjusted income with £40k pension contribution', () => {
-      const input = {
+      const _input = {
         profit: 350000,
         salary: 100000,
         dividends: 200000,
@@ -1657,7 +1657,7 @@ describe('Real-World Scenarios', () => {
 describe('Validation Edge Cases', () => {
   describe('Invalid Input Handling', () => {
     it('should reject pension contribution greater than profit', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         pensionContribution: 60000,
       };
@@ -1665,7 +1665,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should reject negative already taken', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         alreadyTaken: -5000,
       };
@@ -1673,7 +1673,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should reject future year-end date', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         yearEndDate: new Date('2030-03-31'),
       };
@@ -1681,7 +1681,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should reject invalid region', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         region: 'wales', // Should be 'rUK' not 'wales'
       };
@@ -1689,7 +1689,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should reject invalid student loan plan', () => {
-      const input = {
+      const _input = {
         profit: 100000,
         studentLoanPlans: ['plan5'], // Not valid until April 2026
       };
@@ -1697,18 +1697,18 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should handle NaN profit gracefully', () => {
-      const input = { profit: NaN };
+      const _input = { profit: NaN };
       // expect(validateInput(input).isValid).toBe(false);
       // expect(() => calculateAllStrategies(input)).not.toThrow();
     });
 
     it('should handle undefined profit gracefully', () => {
-      const input = { profit: undefined };
+      const _input = { profit: undefined };
       // expect(validateInput(input).isValid).toBe(false);
     });
 
     it('should handle extremely large profit', () => {
-      const input = { profit: 100000000 }; // £100m
+      const _input = { profit: 100000000 }; // £100m
       // Should calculate but show HIGH_COMPLEXITY warning
       // expect(calculateAllStrategies(input)).toBeDefined();
       // expect(getWarnings(input)).toContain({ type: 'HIGH_COMPLEXITY' });
@@ -1717,7 +1717,7 @@ describe('Validation Edge Cases', () => {
 
   describe('Compare Mode Validation', () => {
     it('should turn card RED when salary + dividends > profit', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000, // Total 70k > 50k
@@ -1726,7 +1726,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should show DLA warning with soft wording', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000,
@@ -1737,7 +1737,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should show dividend reserves warning with conditional wording', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareDividends: 60000,
       };
@@ -1747,7 +1747,7 @@ describe('Validation Edge Cases', () => {
     });
 
     it('should calculate delta even when compare exceeds profit', () => {
-      const input = {
+      const _input = {
         profit: 50000,
         compareSalary: 30000,
         compareDividends: 40000,
@@ -1759,37 +1759,37 @@ describe('Validation Edge Cases', () => {
 
   describe('Threshold Boundary Precision', () => {
     it('should handle salary at exactly Primary Threshold', () => {
-      const salary = 12570;
+      const _salary = 12570;
       // expect(calculateEmployeeNI(salary)).toBe(0);
     });
 
     it('should handle salary £1 above Primary Threshold', () => {
-      const salary = 12571;
+      const _salary = 12571;
       // NI = £1 × 0.08 = £0.08
       // expect(calculateEmployeeNI(salary)).toBe(0.08);
     });
 
     it('should handle profit at exactly Small Profits Limit', () => {
-      const profit = 50000;
+      const _profit = 50000;
       // CT = £50,000 × 0.19 = £9,500
       // expect(calculateCorporationTax(profit)).toBe(9500);
     });
 
     it('should handle profit £1 above Small Profits Limit', () => {
-      const profit = 50001;
+      const _profit = 50001;
       // Marginal relief applies
       // CT slightly above £9,500.19
       // expect(calculateCorporationTax(profit)).toBeGreaterThan(9500.19);
     });
 
     it('should handle income at exactly PA taper start', () => {
-      const income = 100000;
+      const _income = 100000;
       // PA still full £12,570
       // expect(getPersonalAllowance(income)).toBe(12570);
     });
 
     it('should handle income £1 above PA taper start', () => {
-      const income = 100001;
+      const _income = 100001;
       // PA reduced by £0.50 (rounds to £0 or £1)
       // expect(getPersonalAllowance(income)).toBeLessThan(12570);
     });
@@ -1802,31 +1802,31 @@ describe('Validation Edge Cases', () => {
 
 describe('Key Dates Edge Cases', () => {
   it('should calculate CT due for March year-end', () => {
-    const yearEnd = new Date('2026-03-31');
+    const _yearEnd = new Date('2026-03-31');
     // CT due = 1 January 2027
     // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2027-01-01'));
   });
 
   it('should calculate CT due for December year-end', () => {
-    const yearEnd = new Date('2025-12-31');
+    const _yearEnd = new Date('2025-12-31');
     // CT due = 1 October 2026
     // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2026-10-01'));
   });
 
   it('should calculate CT due for June year-end', () => {
-    const yearEnd = new Date('2026-06-30');
+    const _yearEnd = new Date('2026-06-30');
     // CT due = 1 April 2027
     // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2027-04-01'));
   });
 
   it('should calculate CT due for September year-end', () => {
-    const yearEnd = new Date('2025-09-30');
+    const _yearEnd = new Date('2025-09-30');
     // CT due = 1 July 2026
     // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2026-07-01'));
   });
 
   it('should handle leap year February year-end', () => {
-    const yearEnd = new Date('2024-02-29'); // Leap year
+    const _yearEnd = new Date('2024-02-29'); // Leap year
     // CT due = 1 December 2024
     // expect(getCTPaymentDue(yearEnd)).toEqual(new Date('2024-12-01'));
   });
@@ -1850,21 +1850,21 @@ describe('RUTHLESS: Off-By-One Threshold Attacks', () => {
   it('should charge ZERO tax at exactly £12,570 (not £0.01 or crash)', () => {
     // BUG: Using < instead of <= at PA boundary
     // If bug exists: will charge 20% on £0 or crash
-    const salary = 12570;
+    const _salary = 12570;
     // expect(calculateIncomeTax(salary, 'rUK')).toBe(0);
   });
 
   it('should charge 20% on exactly £12,571 (one penny above PA)', () => {
     // BUG: Off-by-one at PA boundary
     // If bug exists: either charges 0% or 40%
-    const salary = 12571;
+    const _salary = 12571;
     // Tax = £1 × 0.20 = £0.20
     // expect(calculateIncomeTax(salary, 'rUK')).toBe(0.20);
   });
 
   it('should charge basic rate on exactly £50,270 (top of basic)', () => {
     // BUG: Higher rate kicks in too early
-    const salary = 50270;
+    const _salary = 50270;
     // All in basic (no higher rate yet)
     // Tax = (50270 - 12570) × 0.20 = £7,540
     // expect(calculateIncomeTax(salary, 'rUK')).toBe(7540);
@@ -1872,48 +1872,48 @@ describe('RUTHLESS: Off-By-One Threshold Attacks', () => {
 
   it('should charge higher rate on exactly £50,271 (first penny of higher)', () => {
     // BUG: Higher rate missing or basic rate continues
-    const salary = 50271;
+    const _salary = 50271;
     // Basic: £7,540, Higher: £1 × 0.40 = £0.40, Total: £7,540.40
     // expect(calculateIncomeTax(salary, 'rUK')).toBe(7540.40);
   });
 
   it('should have full PA at exactly £100,000 (taper starts AFTER)', () => {
     // BUG: Taper starts at £100k instead of after
-    const income = 100000;
+    const _income = 100000;
     // expect(getPersonalAllowance(income)).toBe(12570);
   });
 
   it('should lose £1 PA at exactly £100,002 (taper active)', () => {
     // BUG: Taper calculation wrong by £1 or uses wrong divisor
-    const income = 100002;
+    const _income = 100002;
     // PA = 12570 - floor((100002 - 100000) / 2) = 12570 - 1 = £12,569
     // expect(getPersonalAllowance(income)).toBe(12569);
   });
 
   it('should have ZERO PA at exactly £125,140', () => {
     // BUG: PA doesn't fully taper or goes negative
-    const income = 125140;
+    const _income = 125140;
     // PA = 12570 - ((125140 - 100000) / 2) = 12570 - 12570 = £0
     // expect(getPersonalAllowance(income)).toBe(0);
   });
 
   it('should still have ZERO PA at £125,141 (not negative)', () => {
     // BUG: PA goes negative, causing tax credit
-    const income = 125141;
+    const _income = 125141;
     // expect(getPersonalAllowance(income)).toBe(0);
     // expect(getPersonalAllowance(income)).toBeGreaterThanOrEqual(0);
   });
 
   it('should charge 19% CT at exactly £50,000 (small profits limit)', () => {
     // BUG: Marginal relief kicks in at £50k instead of above
-    const profit = 50000;
+    const _profit = 50000;
     // CT = £50,000 × 0.19 = £9,500 (no marginal relief)
     // expect(calculateCorporationTax(profit)).toBe(9500);
   });
 
   it('should apply marginal relief at £50,001', () => {
     // BUG: Marginal relief doesn't trigger or calculation wrong
-    const profit = 50001;
+    const _profit = 50001;
     // CT > £9,500.19 (19% rate would give this)
     // CT < £12,500.25 (25% rate would give this)
     // expect(calculateCorporationTax(profit)).toBeGreaterThan(9500.19);
@@ -1922,7 +1922,7 @@ describe('RUTHLESS: Off-By-One Threshold Attacks', () => {
 
   it('should charge 25% CT at exactly £250,000 (main rate threshold)', () => {
     // BUG: Marginal relief still applies at boundary
-    const profit = 250000;
+    const _profit = 250000;
     // CT = £250,000 × 0.25 = £62,500 (no marginal relief)
     // expect(calculateCorporationTax(profit)).toBe(62500);
   });
@@ -1933,7 +1933,7 @@ describe('RUTHLESS: Floating Point Precision Disasters', () => {
 
   it('should handle £33,333.33 salary without floating point drift', () => {
     // BUG: Accumulated floating point errors in tax band calculation
-    const salary = 33333.33;
+    const _salary = 33333.33;
     // Exact calculation: (33333.33 - 12570) × 0.20 = £4,152.666
     // Should round consistently, not have floating point noise
     // const tax = calculateIncomeTax(salary, 'rUK');
@@ -1942,28 +1942,28 @@ describe('RUTHLESS: Floating Point Precision Disasters', () => {
 
   it('should handle dividend tax at 8.75% without precision errors', () => {
     // BUG: 8.75% = 0.0875 causes floating point issues
-    const dividends = 10000;
+    const _dividends = 10000;
     // Tax = (10000 - 500) × 0.0875 = £831.25 exactly
     // expect(calculateDividendTax(dividends, 12570)).toBe(831.25);
   });
 
   it('should handle 33.75% dividend rate without precision errors', () => {
     // BUG: 33.75% = 0.3375 causes floating point issues
-    const dividends = 10000;
+    const _dividends = 10000;
     // Tax = (10000 - 500) × 0.3375 = £3,206.25 exactly
     // expect(calculateDividendTax(dividends, 50270)).toBe(3206.25);
   });
 
   it('should handle 39.35% dividend rate without precision errors', () => {
     // BUG: 39.35% = 0.3935 is a floating point nightmare
-    const dividends = 10000;
+    const _dividends = 10000;
     // Tax = (10000 - 500) × 0.3935 = £3,738.25 exactly
     // expect(calculateDividendTax(dividends, 125140)).toBe(3738.25);
   });
 
   it('should maintain precision across multiple tax calculations', () => {
     // BUG: Accumulated rounding errors across components
-    const profit = 100000;
+    const _profit = 100000;
     // const result = calculateAllTaxes({ profit });
     // Sum of parts should equal total (no drift)
     // const sumOfParts = result.incomeTax + result.employeeNI +
@@ -1984,7 +1984,7 @@ describe('RUTHLESS: Floating Point Precision Disasters', () => {
 
   it('should handle marginal relief fraction (3/200) precisely', () => {
     // BUG: 3/200 = 0.015 causes floating point issues
-    const profit = 150000;
+    const _profit = 150000;
     // MR = (250000 - 150000) × 3/200 = 100000 × 0.015 = £1,500 exactly
     // CT = 150000 × 0.25 - 1500 = £36,000
     // expect(calculateCorporationTax(profit)).toBe(36000);
@@ -1996,38 +1996,34 @@ describe('RUTHLESS: Negative and Zero Value Attacks', () => {
 
   it('should not crash on zero profit', () => {
     // BUG: Division by zero in effective rate calculation
-    const input = { profit: 0 };
+    const _input = { profit: 0 };
     // expect(() => calculateAllStrategies(input)).not.toThrow();
     // expect(calculateEffectiveRate(input)).toBe(0); // Not NaN or Infinity
   });
 
   it('should not crash on negative profit', () => {
     // BUG: Negative values cause NaN or crash
-    const input = { profit: -50000 };
+    const _input = { profit: -50000 };
     // expect(() => calculateAllStrategies(input)).not.toThrow();
   });
 
   it('should not crash on zero salary', () => {
     // BUG: Zero salary causes division by zero
-    const salary = 0;
+    const _salary = 0;
     // expect(calculateIncomeTax(salary, 'rUK')).toBe(0);
     // expect(calculateEmployeeNI(salary)).toBe(0);
   });
 
   it('should not crash on zero dividends', () => {
     // BUG: Zero dividends causes issues in split calculation
-    const dividends = 0;
+    const _dividends = 0;
     // expect(calculateDividendTax(dividends, 30000)).toBe(0);
   });
 
   it('should not allow negative tax (become a credit)', () => {
     // BUG: Edge case combinations produce negative tax
     // This would be a security issue - users could get "refunds"
-    const inputs = [
-      { profit: 1 },
-      { profit: 100, salary: 100 },
-      { profit: 12570, salary: 12570 },
-    ];
+    const inputs = [{ profit: 1 }, { profit: 100, salary: 100 }, { profit: 12570, salary: 12570 }];
     inputs.forEach((input) => {
       // const result = calculateAllTaxes(input);
       // expect(result.totalTax).toBeGreaterThanOrEqual(0);
@@ -2049,7 +2045,7 @@ describe('RUTHLESS: Negative and Zero Value Attacks', () => {
 
   it('should not crash on extremely small profit (£0.01)', () => {
     // BUG: Very small values cause precision issues or division by zero
-    const input = { profit: 0.01 };
+    const _input = { profit: 0.01 };
     // expect(() => calculateAllStrategies(input)).not.toThrow();
   });
 });
@@ -2059,7 +2055,7 @@ describe('RUTHLESS: Overflow and Extreme Value Attacks', () => {
 
   it('should handle £1 billion profit without overflow', () => {
     // BUG: Large numbers cause integer overflow or precision loss
-    const input = { profit: 1000000000 };
+    const _input = { profit: 1000000000 };
     // expect(() => calculateAllStrategies(input)).not.toThrow();
     // CT = £1bn × 0.25 = £250m
     // expect(calculateCorporationTax(input.profit)).toBe(250000000);
@@ -2067,26 +2063,26 @@ describe('RUTHLESS: Overflow and Extreme Value Attacks', () => {
 
   it('should handle profit near MAX_SAFE_INTEGER', () => {
     // BUG: Numbers near JS limits cause issues
-    const input = { profit: Number.MAX_SAFE_INTEGER };
+    const _input = { profit: Number.MAX_SAFE_INTEGER };
     // Should either calculate or throw meaningful error, not garbage
     // expect(() => validateInput(input)).not.toThrow();
   });
 
   it('should reject Infinity profit', () => {
     // BUG: Infinity not caught in validation
-    const input = { profit: Infinity };
+    const _input = { profit: Infinity };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should reject -Infinity profit', () => {
     // BUG: -Infinity not caught in validation
-    const input = { profit: -Infinity };
+    const _input = { profit: -Infinity };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should handle maximum reasonable UK salary (£10m)', () => {
     // BUG: High salaries overflow or produce nonsense
-    const salary = 10000000; // £10m
+    const _salary = 10000000; // £10m
     // Should calculate additional rate correctly
     // const tax = calculateIncomeTax(salary, 'rUK');
     // expect(tax).toBeLessThan(salary); // Tax can't exceed income
@@ -2099,31 +2095,31 @@ describe('RUTHLESS: Type Coercion and NaN Attacks', () => {
 
   it('should reject string profit that looks like number', () => {
     // BUG: "100000" coerced to 100000 without validation
-    const input = { profit: '100000' as unknown as number };
+    const _input = { profit: '100000' as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should reject profit with embedded spaces', () => {
     // BUG: " 100000 " coerced incorrectly
-    const input = { profit: ' 100000 ' as unknown as number };
+    const _input = { profit: ' 100000 ' as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should reject profit with currency symbol', () => {
     // BUG: "£100000" partially parsed
-    const input = { profit: '£100000' as unknown as number };
+    const _input = { profit: '£100000' as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should reject profit with commas', () => {
     // BUG: "100,000" becomes NaN or 100
-    const input = { profit: '100,000' as unknown as number };
+    const _input = { profit: '100,000' as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should propagate NaN correctly (not silently convert)', () => {
     // BUG: NaN silently becomes 0 or crashes later
-    const salary = NaN;
+    const _salary = NaN;
     // const tax = calculateIncomeTax(salary, 'rUK');
     // expect(Number.isNaN(tax) || tax === 0).toBe(true);
     // NOT: expect(tax).toBe(some random number)
@@ -2131,13 +2127,13 @@ describe('RUTHLESS: Type Coercion and NaN Attacks', () => {
 
   it('should handle null inputs gracefully', () => {
     // BUG: null coerced to 0 without validation
-    const input = { profit: null as unknown as number };
+    const _input = { profit: null as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 
   it('should handle undefined inputs gracefully', () => {
     // BUG: undefined coerced to NaN causing downstream crashes
-    const input = { profit: undefined as unknown as number };
+    const _input = { profit: undefined as unknown as number };
     // expect(validateInput(input).isValid).toBe(false);
   });
 });
@@ -2147,7 +2143,7 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should find optimal close to PA when profit is modest', () => {
     // BUG: Optimizer suggests nonsensical salary
-    const input = { profit: 80000 };
+    const _input = { profit: 80000 };
     // Optimal salary is typically around PA (£12,570) or slightly higher
     // const optimal = calculateOptimal(input);
     // expect(optimal.salary).toBeGreaterThanOrEqual(0);
@@ -2165,7 +2161,7 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should never suggest salary exceeding profit', () => {
     // BUG: Optimizer ignores profit constraint
-    const profit = 30000;
+    const _profit = 30000;
     // const optimal = calculateOptimal({ profit });
     // expect(optimal.salary).toBeLessThanOrEqual(profit);
   });
@@ -2181,7 +2177,7 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should have optimal net >= all salary net', () => {
     // BUG: "Optimal" is actually worse than all-salary
-    const profit = 100000;
+    const _profit = 100000;
     // const optimal = calculateOptimal({ profit });
     // const allSalary = calculateAllSalary(profit);
     // expect(optimal.netTakeHome).toBeGreaterThanOrEqual(allSalary.netTakeHome);
@@ -2189,7 +2185,7 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should have optimal net >= all dividends net', () => {
     // BUG: "Optimal" is actually worse than all-dividends
-    const profit = 100000;
+    const _profit = 100000;
     // const optimal = calculateOptimal({ profit });
     // const allDividends = calculateAllDividends(profit);
     // expect(optimal.netTakeHome).toBeGreaterThanOrEqual(allDividends.netTakeHome);
@@ -2197,7 +2193,7 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should not change optimal when irrelevant input changes', () => {
     // BUG: Optimizer is not deterministic or has cache issues
-    const input = { profit: 100000 };
+    const _input = { profit: 100000 };
     // const optimal1 = calculateOptimal(input);
     // const optimal2 = calculateOptimal(input);
     // expect(optimal1.salary).toBe(optimal2.salary);
@@ -2206,14 +2202,14 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
 
   it('should respect minimum salary constraint', () => {
     // BUG: Minimum salary constraint ignored
-    const input = { profit: 100000, minimumSalaryRequired: 40000 };
+    const _input = { profit: 100000, minimumSalaryRequired: 40000 };
     // const optimal = calculateOptimal(input);
     // expect(optimal.salary).toBeGreaterThanOrEqual(40000);
   });
 
   it('should handle minimum salary exceeding profit gracefully', () => {
     // BUG: Impossible constraint causes crash
-    const input = { profit: 30000, minimumSalaryRequired: 50000 };
+    const _input = { profit: 30000, minimumSalaryRequired: 50000 };
     // Should either warn or cap at profit, not crash
     // expect(() => calculateOptimal(input)).not.toThrow();
   });
@@ -2224,7 +2220,7 @@ describe('RUTHLESS: Compound Rounding Errors', () => {
 
   it('should have tax components sum to total (no drift)', () => {
     // BUG: Each component rounds independently, total doesn't match
-    const input = { profit: 77777 };
+    const _input = { profit: 77777 };
     // const result = calculateAllTaxes(input);
     // const sum = result.incomeTax + result.employeeNI + result.employerNI +
     //             result.corporationTax + result.dividendTax;
@@ -2233,15 +2229,15 @@ describe('RUTHLESS: Compound Rounding Errors', () => {
 
   it('should have monthly set-aside × 12 ≈ annual tax', () => {
     // BUG: Monthly calculation has rounding that compounds
-    const ct = 15678;
+    const _ct = 15678;
     // const monthly = getCompanyPot(ct);
     // expect(Math.abs(monthly * 12 - ct)).toBeLessThan(12); // Max £12 drift
   });
 
   it('should calculate same result forward and backward', () => {
     // BUG: Order of operations affects result
-    const profit = 100000;
-    const salary = 30000;
+    const _profit = 100000;
+    const _salary = 30000;
     // Calculate: profit → deduct salary cost → CT
     // const ct1 = calculateCT({ profit, salary });
     // Calculate: salary cost → profit - cost → CT
@@ -2266,7 +2262,7 @@ describe('RUTHLESS: Date Edge Cases', () => {
 
   it('should calculate CT due correctly for 31-day months', () => {
     // BUG: Jan 31 + 9 months = Oct 31 (not Nov 1)
-    const yearEnd = new Date('2026-01-31');
+    const _yearEnd = new Date('2026-01-31');
     // CT due = 1 November 2026 (9 months + 1 day)
     // expect(getCTPaymentDue(yearEnd).getMonth()).toBe(10); // November = 10
     // expect(getCTPaymentDue(yearEnd).getDate()).toBe(1);
@@ -2274,36 +2270,36 @@ describe('RUTHLESS: Date Edge Cases', () => {
 
   it('should handle February 28 year-end in non-leap year', () => {
     // BUG: Date overflow to March
-    const yearEnd = new Date('2025-02-28');
+    const _yearEnd = new Date('2025-02-28');
     // CT due = 1 December 2025
     // expect(getCTPaymentDue(yearEnd).getMonth()).toBe(11); // December = 11
   });
 
   it('should handle February 29 year-end in leap year', () => {
     // BUG: Leap year not handled correctly
-    const yearEnd = new Date('2024-02-29');
+    const _yearEnd = new Date('2024-02-29');
     // CT due = 1 December 2024
     // expect(getCTPaymentDue(yearEnd).toISOString().slice(0, 10)).toBe('2024-12-01');
   });
 
   it('should handle year-end on December 31 (year boundary)', () => {
     // BUG: Year rollover not handled
-    const yearEnd = new Date('2025-12-31');
+    const _yearEnd = new Date('2025-12-31');
     // CT due = 1 October 2026
     // expect(getCTPaymentDue(yearEnd).getFullYear()).toBe(2026);
   });
 
   it('should handle April 5 year-end (tax year boundary)', () => {
     // BUG: Tax year boundary confusion
-    const yearEnd = new Date('2026-04-05');
+    const _yearEnd = new Date('2026-04-05');
     // CT due = 6 January 2027
     // This is tricky because it's the end of tax year 2025-26
   });
 
   it('should handle timezone-naive dates consistently', () => {
     // BUG: UTC vs local time causes off-by-one day
-    const yearEnd1 = new Date('2026-03-31T00:00:00Z');
-    const yearEnd2 = new Date('2026-03-31T23:59:59Z');
+    const _yearEnd1 = new Date('2026-03-31T00:00:00Z');
+    const _yearEnd2 = new Date('2026-03-31T23:59:59Z');
     // Both should give same CT due date
     // expect(getCTPaymentDue(yearEnd1)).toEqual(getCTPaymentDue(yearEnd2));
   });
@@ -2314,7 +2310,7 @@ describe('RUTHLESS: Scottish/rUK Consistency', () => {
 
   it('should apply DIFFERENT income tax for Scotland vs rUK at £30k', () => {
     // BUG: Same rates applied regardless of region
-    const salary = 30000;
+    const _salary = 30000;
     // Scotland has starter rate at 19%, rUK has no starter rate
     // const scottishTax = calculateIncomeTax(salary, 'scotland');
     // const rukTax = calculateIncomeTax(salary, 'rUK');
@@ -2323,8 +2319,8 @@ describe('RUTHLESS: Scottish/rUK Consistency', () => {
 
   it('should apply SAME dividend tax for Scotland vs rUK', () => {
     // BUG: Scottish rates wrongly applied to dividends
-    const dividends = 20000;
-    const salary = 30000;
+    const _dividends = 20000;
+    const _salary = 30000;
     // Dividend tax is always UK rates, never Scottish
     // const scottishDivTax = calculateDividendTax(dividends, salary, 'scotland');
     // const rukDivTax = calculateDividendTax(dividends, salary, 'rUK');
@@ -2333,7 +2329,7 @@ describe('RUTHLESS: Scottish/rUK Consistency', () => {
 
   it('should apply SAME employer NI for Scotland vs rUK', () => {
     // BUG: Different NI rates wrongly applied
-    const salary = 30000;
+    const _salary = 30000;
     // NI is UK-wide, never varies by region
     // const scottishNI = calculateEmployerNI(salary, 'scotland');
     // const rukNI = calculateEmployerNI(salary, 'rUK');
@@ -2342,7 +2338,7 @@ describe('RUTHLESS: Scottish/rUK Consistency', () => {
 
   it('should apply SAME corporation tax for Scotland vs rUK', () => {
     // BUG: Different CT rates wrongly applied (CT is not devolved)
-    const profit = 100000;
+    const _profit = 100000;
     // CT is UK-wide
     // const scottishCT = calculateCorporationTax(profit, 'scotland');
     // const rukCT = calculateCorporationTax(profit, 'rUK');
@@ -2351,7 +2347,7 @@ describe('RUTHLESS: Scottish/rUK Consistency', () => {
 
   it('should use Scottish 6 bands (not 4) for Scottish taxpayer', () => {
     // BUG: Only 4 bands applied (missing starter, intermediate, advanced)
-    const salary = 80000;
+    const _salary = 80000;
     // Scottish tax should be calculated using all 6 bands
     // If only using 4 rUK bands, calculation will be wrong
     // const scottishTax = calculateIncomeTax(salary, 'scotland');
@@ -2364,20 +2360,20 @@ describe('RUTHLESS: Student Loan Edge Cases', () => {
 
   it('should calculate ZERO Plan 1 repayment at exactly £26,065', () => {
     // BUG: Repayment starts at threshold instead of above
-    const income = 26065;
+    const _income = 26065;
     // expect(calculateStudentLoan(income, 'plan1')).toBe(0);
   });
 
   it('should calculate £0.09 Plan 1 repayment at £26,066', () => {
     // BUG: Off-by-one or wrong rate
-    const income = 26066;
+    const _income = 26066;
     // Repayment = £1 × 0.09 = £0.09
     // expect(calculateStudentLoan(income, 'plan1')).toBe(0.09);
   });
 
   it('should stack Plan 1 + Plan 2 correctly (both 9%)', () => {
     // BUG: Plans not stacked, or double-counted
-    const income = 50000;
+    const _income = 50000;
     // Plan 1: (50000 - 26065) × 0.09 = £2,154.15
     // Plan 2: (50000 - 28470) × 0.09 = £1,937.70
     // Total: £4,091.85
@@ -2386,7 +2382,7 @@ describe('RUTHLESS: Student Loan Edge Cases', () => {
 
   it('should stack Plan 2 + Postgrad correctly (9% + 6%)', () => {
     // BUG: Wrong rates for stacked loans
-    const income = 50000;
+    const _income = 50000;
     // Plan 2: (50000 - 28470) × 0.09 = £1,937.70
     // Postgrad: (50000 - 21000) × 0.06 = £1,740.00
     // Total: £3,677.70
@@ -2395,14 +2391,14 @@ describe('RUTHLESS: Student Loan Edge Cases', () => {
 
   it('should include dividends in student loan income calculation', () => {
     // BUG: Only salary counted, dividends ignored
-    const input = { salary: 20000, dividends: 30000 };
+    const _input = { salary: 20000, dividends: 30000 };
     // Total income for SL = £50,000
     // expect(getStudentLoanIncome(input)).toBe(50000);
   });
 
   it('should include BIK in student loan income calculation', () => {
     // BUG: BIK ignored
-    const input = { salary: 20000, dividends: 20000, bik: 10000 };
+    const _input = { salary: 20000, dividends: 20000, bik: 10000 };
     // Total income for SL = £50,000
     // expect(getStudentLoanIncome(input)).toBe(50000);
   });
@@ -2413,7 +2409,7 @@ describe('RUTHLESS: Employment Allowance Edge Cases', () => {
 
   it('should cap EA offset at actual employer NI liability', () => {
     // BUG: EA creates negative employer NI
-    const salary = 10000;
+    const _salary = 10000;
     // Employer NI = (10000 - 5000) × 0.15 = £750
     // EA = £10,500, but can only offset £750
     // Net employer NI = £0 (not -£9,750)
@@ -2422,7 +2418,7 @@ describe('RUTHLESS: Employment Allowance Edge Cases', () => {
 
   it('should show EA wasted when NI < EA', () => {
     // BUG: No warning about wasted EA
-    const salary = 15000;
+    const _salary = 15000;
     // Employer NI = (15000 - 5000) × 0.15 = £1,500
     // EA = £10,500, wasting £9,000
     // expect(getWarnings({ salary, hasEA: true })).toContain({ type: 'EA_PARTIALLY_WASTED' });
@@ -2430,7 +2426,7 @@ describe('RUTHLESS: Employment Allowance Edge Cases', () => {
 
   it('should fully use EA when employer NI exceeds £10,500', () => {
     // BUG: EA not fully applied
-    const salary = 80000;
+    const _salary = 80000;
     // Employer NI = (80000 - 5000) × 0.15 = £11,250
     // After EA: £11,250 - £10,500 = £750
     // expect(calculateEmployerNI(salary, { hasEA: true })).toBe(750);
@@ -2438,7 +2434,7 @@ describe('RUTHLESS: Employment Allowance Edge Cases', () => {
 
   it('should warn about EA eligibility for sole directors', () => {
     // BUG: EA assumed available when it's not
-    const input = { salary: 50000, hasEA: true, numberOfEmployees: 0 };
+    const _input = { salary: 50000, hasEA: true, numberOfEmployees: 0 };
     // Sole directors typically can't claim EA
     // expect(getWarnings(input)).toContain({ type: 'EA_ELIGIBILITY_WARNING' });
   });
@@ -2449,14 +2445,14 @@ describe('RUTHLESS: Pension Contribution Edge Cases', () => {
 
   it('should flag pension exceeding Annual Allowance (£60k)', () => {
     // BUG: No warning for AA breach
-    const input = { profit: 200000, pensionContribution: 70000 };
+    const _input = { profit: 200000, pensionContribution: 70000 };
     // expect(getWarnings(input)).toContain({ type: 'PENSION_AA_EXCEEDED' });
   });
 
   it('should reduce CT by pension amount', () => {
     // BUG: Pension not deducted from taxable profit
-    const profit = 100000;
-    const pension = 20000;
+    const _profit = 100000;
+    const _pension = 20000;
     // CT on £80k, not £100k
     // const ctWithPension = calculateCorporationTax(profit - pension);
     // const ctCalculated = calculateCT({ profit, pension });
@@ -2465,21 +2461,21 @@ describe('RUTHLESS: Pension Contribution Edge Cases', () => {
 
   it('should restore PA when pension reduces adjusted income below £100k', () => {
     // BUG: Pension not considered in PA taper calculation
-    const input = { salary: 110000, pensionContribution: 15000 };
+    const _input = { salary: 110000, pensionContribution: 15000 };
     // Adjusted income = £95k, PA should be full £12,570
     // expect(getPersonalAllowance(input)).toBe(12570);
   });
 
   it('should warn about pension taper at £260k adjusted income', () => {
     // BUG: Pension taper warning missing
-    const input = { salary: 150000, dividends: 120000 };
+    const _input = { salary: 150000, dividends: 120000 };
     // Adjusted income = £270k, AA tapers
     // expect(getWarnings(input)).toContain({ type: 'PENSION_TAPER' });
   });
 
   it('should not allow pension > profit', () => {
     // BUG: Can contribute more than company has
-    const input = { profit: 50000, pensionContribution: 60000 };
+    const _input = { profit: 50000, pensionContribution: 60000 };
     // expect(validateInput(input).isValid).toBe(false);
   });
 });
@@ -2489,7 +2485,7 @@ describe('RUTHLESS: Compare Mode Attack Vectors', () => {
 
   it('should calculate delta correctly when user overpays by £1', () => {
     // BUG: Small deltas rounded to zero
-    const input = {
+    const _input = {
       profit: 100000,
       compareSalary: 12571, // £1 more than optimal
       compareDividends: 0,
@@ -2501,7 +2497,7 @@ describe('RUTHLESS: Compare Mode Attack Vectors', () => {
 
   it('should handle compare salary + dividends = exactly profit', () => {
     // BUG: Boundary condition causes issues
-    const input = {
+    const _input = {
       profit: 100000,
       compareSalary: 40000,
       compareDividends: 60000, // Exactly = profit
@@ -2512,7 +2508,7 @@ describe('RUTHLESS: Compare Mode Attack Vectors', () => {
 
   it('should handle compare salary + dividends > profit by £1', () => {
     // BUG: Off-by-one in DLA detection
-    const input = {
+    const _input = {
       profit: 100000,
       compareSalary: 40000,
       compareDividends: 60001, // £1 over
@@ -2523,15 +2519,15 @@ describe('RUTHLESS: Compare Mode Attack Vectors', () => {
 
   it('should show RED card only when compare exceeds profit', () => {
     // BUG: Red card shown incorrectly
-    const okInput = { profit: 100000, compareSalary: 50000, compareDividends: 50000 };
-    const badInput = { profit: 100000, compareSalary: 50000, compareDividends: 50001 };
+    const _okInput = { profit: 100000, compareSalary: 50000, compareDividends: 50000 };
+    const _badInput = { profit: 100000, compareSalary: 50000, compareDividends: 50001 };
     // expect(getYourSetupCardStyle(okInput)).not.toBe('red');
     // expect(getYourSetupCardStyle(badInput)).toBe('red');
   });
 
   it('should still calculate tax even when compare exceeds profit', () => {
     // BUG: Calculation refuses or crashes
-    const input = {
+    const _input = {
       profit: 50000,
       compareSalary: 80000,
       compareDividends: 40000,
@@ -2546,7 +2542,7 @@ describe('RUTHLESS: Security and Injection Attacks', () => {
 
   it('should sanitize region input (prevent code injection)', () => {
     // BUG: Region used unsafely
-    const input = {
+    const _input = {
       profit: 100000,
       region: '<script>alert("xss")</script>' as unknown as string,
     };
@@ -2556,7 +2552,7 @@ describe('RUTHLESS: Security and Injection Attacks', () => {
 
   it('should handle prototype pollution attempt', () => {
     // BUG: __proto__ or constructor manipulation
-    const input = {
+    const _input = {
       profit: 100000,
       __proto__: { isAdmin: true },
     } as unknown as { profit: number };
@@ -2566,7 +2562,7 @@ describe('RUTHLESS: Security and Injection Attacks', () => {
 
   it('should not execute string profit as code', () => {
     // BUG: eval() or Function() used on input
-    const input = {
+    const _input = {
       profit: 'require("child_process").exec("rm -rf /")' as unknown as number,
     };
     // Should reject, not execute
@@ -2575,7 +2571,7 @@ describe('RUTHLESS: Security and Injection Attacks', () => {
 
   it('should handle extremely long string inputs', () => {
     // BUG: Buffer overflow or memory exhaustion
-    const input = {
+    const _input = {
       profit: 100000,
       region: 'A'.repeat(1000000),
     };
@@ -2589,7 +2585,7 @@ describe('RUTHLESS: Concurrency and State Attacks', () => {
 
   it('should produce consistent results across multiple calls', () => {
     // BUG: Global state mutation between calls
-    const input = { profit: 100000 };
+    const _input = { profit: 100000 };
     // const results = Array(10).fill(null).map(() => calculateOptimal(input));
     // All results should be identical
     // const firstResult = results[0];
@@ -2602,19 +2598,14 @@ describe('RUTHLESS: Concurrency and State Attacks', () => {
   it('should not mutate input object', () => {
     // BUG: Input object modified as side effect
     const input = { profit: 100000, region: 'rUK' };
-    const inputCopy = JSON.stringify(input);
+    const _inputCopy = JSON.stringify(input);
     // calculateAllStrategies(input);
     // expect(JSON.stringify(input)).toBe(inputCopy);
   });
 
   it('should handle rapid successive calls', () => {
     // BUG: State leak between rapid calls
-    const inputs = [
-      { profit: 10000 },
-      { profit: 50000 },
-      { profit: 100000 },
-      { profit: 500000 },
-    ];
+    const _inputs = [{ profit: 10000 }, { profit: 50000 }, { profit: 100000 }, { profit: 500000 }];
     // const results = inputs.map(i => calculateOptimal(i));
     // Each result should correspond to its input
     // results.forEach((r, i) => {
@@ -2647,7 +2638,7 @@ describe('RUTHLESS: Display Rounding Sanity', () => {
 
   it('should show salary + dividends + retained = profit (for valid setups)', () => {
     // BUG: Money appears or disappears
-    const profit = 100000;
+    const _profit = 100000;
     // const result = calculateOptimal({ profit });
     // const total = result.salary + result.dividends + result.retainedProfit;
     // Allow for rounding to nearest pound
@@ -2656,7 +2647,7 @@ describe('RUTHLESS: Display Rounding Sanity', () => {
 
   it('should show tax breakdown summing to total tax', () => {
     // BUG: Components don't add up
-    const profit = 100000;
+    const _profit = 100000;
     // const result = calculateAllTaxes({ profit });
     // const sumOfTaxes = result.incomeTax + result.employeeNI + result.employerNI +
     //                    result.corporationTax + result.dividendTax + result.studentLoan;
@@ -2692,7 +2683,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 1: Mr Armstrong (Category A, over 21, regular salary)', () => {
     // CA44 Page 4: Director over 21, monthly salary £1,615, 12 months
-    const CA44_ARMSTRONG = {
+    const _CA44_ARMSTRONG = {
       category: 'A',
       monthlyPay: 1615,
       annualEarnings: 19380, // 12 × £1,615
@@ -2719,7 +2710,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 2: Mr Taylor (Category M, under 21, regular salary)', () => {
     // CA44 Page 5: Director under 21, monthly salary £1,615, 12 months
-    const CA44_TAYLOR = {
+    const _CA44_TAYLOR = {
       category: 'M',
       monthlyPay: 1615,
       annualEarnings: 19380,
@@ -2740,7 +2731,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
     it('should apply 15% employer NI only above UST for under-21s', () => {
       // If earnings exceeded £50,270, employer NI would apply on excess
-      const earningsAboveUST = 60000;
+      const _earningsAboveUST = 60000;
       // Employer NI = (£60,000 - £50,270) × 15% = £1,459.50
       // expect(calculateDirectorEmployerNI(earningsAboveUST, 'M')).toBe(1459.50);
     });
@@ -2748,7 +2739,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 3: Mr Morris (Category A, over 21, with bonus)', () => {
     // CA44 Page 6: Director over 21, £1,160/month + £10,000 bonus in June
-    const CA44_MORRIS = {
+    const _CA44_MORRIS = {
       category: 'A',
       monthlySalary: 1160,
       bonus: 10000,
@@ -2769,15 +2760,15 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
     it('should include bonus in annual earnings for cumulative calculation', () => {
       // Bonus is part of total annual earnings, not separate
-      const annualSalary = 1160 * 12;
-      const bonus = 10000;
+      const _annualSalary = 1160 * 12;
+      const _bonus = 10000;
       // expect(annualSalary + bonus).toBe(23920);
     });
   });
 
   describe('Example 4: Mr Johnson (Category F, Freeport, age 26, with bonus)', () => {
     // CA44 Page 7: Freeport director, £2,000/month + £10,000 bonus
-    const CA44_JOHNSON = {
+    const _CA44_JOHNSON = {
       category: 'F',
       monthlySalary: 2000,
       bonus: 10000,
@@ -2813,7 +2804,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 5: Mr Williams (Category M→A transition at age 21)', () => {
     // CA44 Page 21: Director turns 21 mid-year
-    const CA44_WILLIAMS = {
+    const _CA44_WILLIAMS = {
       totalEarnings: 21700,
       earningsBeforeAge21: 12000, // Category M
       earningsAfterAge21: 9700, // Category A
@@ -2844,7 +2835,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 6: Mr Roberts (Category A→C at State Pension age)', () => {
     // CA44 Page 22: Director reaches State Pension age mid-year
-    const CA44_ROBERTS = {
+    const _CA44_ROBERTS = {
       totalEarnings: 30000,
       earningsBeforeSPA: 12000, // Category A
       earningsAfterSPA: 18000, // Category C
@@ -2875,7 +2866,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 7: Mrs Brown (Category B→A, reduced rate revoked)', () => {
     // CA44 Page 23: Married woman revokes reduced rate election mid-year
-    const CA44_BROWN = {
+    const _CA44_BROWN = {
       totalEarnings: 58270, // £50,270 + £8,000
       earningsBeforeRevoke: 50270, // Category B (reduced rate)
       earningsAfterRevoke: 8000, // Category A (standard rate)
@@ -2906,7 +2897,7 @@ describe('HMRC CA44 Official Test Cases (2025-26)', () => {
 
   describe('Example 8: Mrs Cross (Category B→A, divorce)', () => {
     // CA44 Page 24: Marriage ends in divorce, reduced rate lost
-    const CA44_CROSS = {
+    const _CA44_CROSS = {
       totalEarnings: 30000,
       earningsBeforeDivorce: 10000, // Category B
       earningsAfterDivorce: 20000, // Category A

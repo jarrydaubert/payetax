@@ -28,7 +28,7 @@ export function BlogNav({ activeGroup, className }: BlogNavProps) {
       <Link
         href='/blog'
         className={cn(
-          'whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors',
+          'whitespace-nowrap rounded-full px-4 py-2 font-medium text-sm transition-colors',
           !activeGroup
             ? 'bg-cyan-500 text-white'
             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
@@ -44,7 +44,7 @@ export function BlogNav({ activeGroup, className }: BlogNavProps) {
           key={group.slug}
           href={`/blog/category/${group.slug}` as `/blog/category/${string}`}
           className={cn(
-            'whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors',
+            'whitespace-nowrap rounded-full px-4 py-2 font-medium text-sm transition-colors',
             activeGroup === group.slug
               ? 'bg-cyan-500 text-white'
               : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'

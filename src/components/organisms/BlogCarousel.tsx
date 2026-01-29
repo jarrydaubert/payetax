@@ -137,7 +137,6 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
         ref={emblaRef}
         className='overflow-hidden'
         onKeyDown={handleKeyDown}
-        tabIndex={0}
         role='region'
         aria-label='Featured articles'
       >
@@ -227,7 +226,7 @@ function CarouselSlide({ post, isActive }: CarouselSlideProps) {
     >
       {/* Gradient background based on category color */}
       <div
-        className='relative aspect-[4/3] min-h-[300px] md:aspect-auto md:h-[50vh] md:min-h-[350px] md:max-h-[450px]'
+        className='relative aspect-[4/3] min-h-[300px] md:aspect-auto md:h-[50vh] md:max-h-[450px] md:min-h-[350px]'
         style={{
           background: `linear-gradient(135deg, ${categoryConfig.color}15 0%, ${categoryConfig.color}05 50%, #0f172a 100%)`,
         }}
@@ -241,7 +240,7 @@ function CarouselSlide({ post, isActive }: CarouselSlideProps) {
           <div className='max-w-3xl'>
             {/* Category badge */}
             <span
-              className='mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider'
+              className='mb-3 inline-block rounded-full px-3 py-1 font-semibold text-xs uppercase tracking-wider'
               style={{
                 backgroundColor: categoryConfig.color,
                 color: categoryConfig.textColor,
@@ -251,17 +250,17 @@ function CarouselSlide({ post, isActive }: CarouselSlideProps) {
             </span>
 
             {/* Title */}
-            <h2 className='mb-3 font-display text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl'>
+            <h2 className='mb-3 font-bold font-display text-2xl text-white tracking-tight md:text-3xl lg:text-4xl'>
               {post.title}
             </h2>
 
             {/* Excerpt */}
-            <p className='mb-4 line-clamp-2 text-sm text-slate-300 md:text-base lg:line-clamp-3'>
+            <p className='mb-4 line-clamp-2 text-slate-300 text-sm md:text-base lg:line-clamp-3'>
               {post.excerpt}
             </p>
 
             {/* Meta */}
-            <div className='flex items-center gap-4 text-xs text-slate-400 md:text-sm'>
+            <div className='flex items-center gap-4 text-slate-400 text-xs md:text-sm'>
               <span>{post.readTime}</span>
               <span>•</span>
               <time dateTime={post.publishedAt}>
