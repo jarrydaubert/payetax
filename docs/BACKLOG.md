@@ -33,7 +33,11 @@
 
 **Enable (after validation):**
 - [ ] Find accountant partner willing to pay per lead
-- [ ] Enable referral CTA (code ready, just uncomment)
+- [ ] Enable referral CTA - uncomment in `CalculatorContainer.tsx` line ~238
+
+**Dormant code (built, not used):**
+- `src/components/molecules/AccountantReferralCTA.tsx` - referral CTA component
+- `src/app/api/referral/lead/route.ts` - captures leads, emails to partner
 
 ### Other Income Input
 > "Assumes this is your only income" footnote is NOT sufficient - can be wrong by thousands
