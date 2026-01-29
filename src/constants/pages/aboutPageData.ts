@@ -15,13 +15,20 @@
 import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
 import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.js';
 import Award from 'lucide-react/dist/esm/icons/award.js';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open.js';
+import Briefcase from 'lucide-react/dist/esm/icons/briefcase.js';
 import Calculator from 'lucide-react/dist/esm/icons/calculator.js';
 import Code from 'lucide-react/dist/esm/icons/code.js';
 import Eye from 'lucide-react/dist/esm/icons/eye.js';
+import FileSearch from 'lucide-react/dist/esm/icons/file-search.js';
 import Heart from 'lucide-react/dist/esm/icons/heart.js';
 import Lightbulb from 'lucide-react/dist/esm/icons/lightbulb.js';
 import Lock from 'lucide-react/dist/esm/icons/lock.js';
-
+import Mail from 'lucide-react/dist/esm/icons/mail.js';
+import Users from 'lucide-react/dist/esm/icons/users.js';
+import WifiOff from 'lucide-react/dist/esm/icons/wifi-off.js';
+import MapPin from 'lucide-react/dist/esm/icons/map-pin.js';
+import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw.js';
 import Rocket from 'lucide-react/dist/esm/icons/rocket.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles.js';
@@ -71,7 +78,7 @@ export const ABOUT_VALUES = [
     icon: Eye,
     title: 'Radical Transparency',
     description:
-      'Our code is public. Our analytics are honest. No tricks, no fees. Just honest tax calculations.',
+      'You can see exactly how we calculate your tax — our code is public. No hidden fees, no surprise upgrades. What you see is what you get.',
     gradient: {
       bg: 'from-accent/20 to-primary/20',
       icon: 'text-accent',
@@ -108,6 +115,18 @@ export const ABOUT_VALUES = [
  */
 export const ABOUT_UNIQUE_FEATURES = [
   {
+    icon: Briefcase,
+    title: 'Director Pay Dashboard',
+    description:
+      'Full salary vs dividends calculator for company directors. Find your optimal extraction strategy with Corporation Tax, Employer NI, and dividend tax all calculated.',
+    metric: 'Optimal',
+    gradient: {
+      bg: 'from-emerald-500/10 to-cyan-500/10',
+      icon: 'text-emerald-500',
+      border: 'border-emerald-500/30',
+    },
+  },
+  {
     icon: AlertTriangle,
     title: '£100k Tax Trap Detector',
     description:
@@ -117,6 +136,30 @@ export const ABOUT_UNIQUE_FEATURES = [
       bg: 'from-amber-500/10 to-orange-500/10',
       icon: 'text-amber-500',
       border: 'border-amber-500/30',
+    },
+  },
+  {
+    icon: FileSearch,
+    title: 'Tax Code Decoder',
+    description:
+      'Enter any UK tax code and get a plain-English explanation. Understand what 1257L, BR, K codes, and Scottish prefixes actually mean for your pay.',
+    metric: 'Decoded',
+    gradient: {
+      bg: 'from-blue-500/10 to-indigo-500/10',
+      icon: 'text-blue-500',
+      border: 'border-blue-500/30',
+    },
+  },
+  {
+    icon: MapPin,
+    title: 'Scottish Tax Calculator',
+    description:
+      'Side-by-side comparison of Scottish vs English tax rates. See exactly how much more (or less) you pay living in Scotland with the same salary.',
+    metric: '6 Bands',
+    gradient: {
+      bg: 'from-sky-500/10 to-blue-500/10',
+      icon: 'text-sky-500',
+      border: 'border-sky-500/30',
     },
   },
   {
@@ -143,34 +186,83 @@ export const ABOUT_UNIQUE_FEATURES = [
       border: 'border-purple-500/30',
     },
   },
+  {
+    icon: BookOpen,
+    title: 'Educational Tax Guides',
+    description:
+      'In-depth articles on director pay strategies, the £100k tax trap, student loan repayments, and more. Written in plain English, not accountant-speak.',
+    metric: '20+',
+    gradient: {
+      bg: 'from-violet-500/10 to-purple-500/10',
+      icon: 'text-violet-500',
+      border: 'border-violet-500/30',
+    },
+  },
+  {
+    icon: Mail,
+    title: 'Email Your Results',
+    description:
+      'Send your full tax breakdown to yourself for reference. Your data goes straight to your inbox — private, secure, and entirely yours.',
+    metric: 'Private',
+    gradient: {
+      bg: 'from-rose-500/10 to-pink-500/10',
+      icon: 'text-rose-500',
+      border: 'border-rose-500/30',
+    },
+  },
+  {
+    icon: Users,
+    title: 'Marriage Allowance Calculator',
+    description:
+      "Check if you're eligible and see exactly how much you could save — up to £252 per year. Transfer 10% of your Personal Allowance to your spouse in seconds.",
+    metric: '£252',
+    gradient: {
+      bg: 'from-pink-500/10 to-rose-500/10',
+      icon: 'text-pink-500',
+      border: 'border-pink-500/30',
+    },
+  },
 ] satisfies z.infer<typeof FeatureSchema>[];
 
 /**
- * Tech stack features
+ * Tech stack features (user-focused benefits)
  * Displayed in FeatureGrid component (3 columns)
  */
 export const ABOUT_TECH_STACK = [
   {
     icon: Rocket,
-    title: 'Next.js 16 & React 19',
+    title: 'Lightning Fast',
     description:
-      'Server Components, React Compiler, async request APIs. Built with the latest tech for maximum performance and developer experience.',
+      'Results appear instantly, no waiting. Built with the same technology used by Vercel, Netflix, and other performance-obsessed companies.',
   },
   {
     icon: Code,
-    title: 'TypeScript Strict Mode',
-    description: 'Type-safe calculations mean fewer bugs. Your numbers are right, every time.',
+    title: 'Bulletproof Calculations',
+    description:
+      'Every calculation is type-checked and validated. The same rigour banks use for financial software, applied to your tax calculator.',
   },
   {
     icon: Sparkles,
-    title: 'Modern Development',
+    title: 'Tested to Breaking Point',
     description:
-      'Biome for linting/formatting (10/10 strictness), Playwright for E2E testing, Sentry for error monitoring. Professional tooling for a free service.',
+      'Automated tests run hundreds of tax scenarios before every update. Edge cases, Scottish rates, student loans — all verified against HMRC.',
   },
   {
     icon: Lightbulb,
-    title: 'Zod Validation',
+    title: 'Catches Your Mistakes',
     description:
-      'Every input validated at runtime with comprehensive schemas. Type safety meets runtime safety for bulletproof calculations.',
+      "Entered £1,000,000 instead of £100,000? We'll spot it. Input validation prevents errors before they happen, so you always get accurate results.",
+  },
+  {
+    icon: RefreshCw,
+    title: 'Always Up-to-Date',
+    description:
+      'HMRC rates updated within 24 hours of any changes. Budget announcements, threshold updates, new tax year rates — reflected immediately.',
+  },
+  {
+    icon: WifiOff,
+    title: 'Works Offline',
+    description:
+      'Installed as an app on your phone or laptop, PayeTax works without internet. Calculate your tax on the train, on a plane, anywhere.',
   },
 ] satisfies z.infer<typeof FeatureSchema>[];

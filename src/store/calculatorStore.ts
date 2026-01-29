@@ -47,6 +47,11 @@ import {
 } from '@/lib/sentry';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 import {
+  INCOME_TYPE_LABELS,
+  type IncomeSource,
+  IncomeSourceUpdateSchema,
+} from '@/lib/types/calculator';
+import {
   BooleanSchema,
   NICategorySchema,
   PensionContributionTypeSchema,
@@ -95,35 +100,6 @@ interface CalculatorInput {
   /** Additional income sources (pensions, rental, etc.) */
   incomeSources: IncomeSource[];
 }
-
-/**
- * Represents an additional income source beyond primary employment
- * Used for pensioners and those with multiple income streams
- */
-interface IncomeSource {
-  /** Unique identifier for React keys and list management */
-  id: string;
-  /** Type of income (determines NI treatment) */
-  type: 'employment' | 'pension' | 'statePension' | 'rental' | 'investment' | 'other';
-  /** Optional user-friendly label (e.g., "Pension from Previous Job") */
-  label?: string;
-  /** Amount of income */
-  amount: number;
-  /** How often this income is received */
-  period: PayPeriod;
-}
-
-/**
- * Human-readable labels for income types
- */
-const INCOME_TYPE_LABELS = {
-  employment: 'Employment Income',
-  pension: 'Private Pension',
-  statePension: 'State Pension',
-  rental: 'Rental Income',
-  investment: 'Investment Income',
-  other: 'Other Income',
-} as const satisfies Record<IncomeSource['type'], string>;
 
 // Interface for calculation results
 type CalculationResults = TaxCalculationResults | null;
@@ -709,6 +685,12 @@ export const useCalculatorStore = create<CalculatorState>()(
 
         // Income Sources Management
         addIncomeSource: () => {
+          // Guard: crypto.randomUUID is only available client-side
+          if (typeof crypto === 'undefined' || typeof crypto.randomUUID !== 'function') {
+            console.warn('[Calculator] Cannot add income source during SSR');
+            return;
+          }
+
           set((state) => ({
             input: {
               ...state.input,
@@ -726,11 +708,21 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         updateIncomeSource: (id, updates) => {
+          // Validate updates using schema
+          const validated = IncomeSourceUpdateSchema.safeParse(updates);
+          if (!validated.success) {
+            console.warn(
+              '[Calculator] Invalid income source update:',
+              validated.error.issues[0]?.message ?? 'Validation failed'
+            );
+            return;
+          }
+
           set((state) => ({
             input: {
               ...state.input,
               incomeSources: state.input.incomeSources.map((source: IncomeSource) =>
-                source.id === id ? { ...source, ...updates } : source
+                source.id === id ? { ...source, ...validated.data } : source
               ),
             },
           }));

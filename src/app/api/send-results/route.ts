@@ -1,47 +1,12 @@
 // src/app/api/send-results/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
+import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-
-// Simplified schema for the results - we only need the key values
-const PayPeriodSchema = z.object({
-  annually: z.number(),
-  monthly: z.number(),
-  weekly: z.number().optional(),
-  daily: z.number().optional(),
-  hourly: z.number().optional(),
-});
-
-const SendResultsSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  results: z.object({
-    grossSalary: PayPeriodSchema,
-    incomeTax: PayPeriodSchema,
-    nationalInsurance: PayPeriodSchema,
-    pensionContribution: PayPeriodSchema,
-    studentLoan: PayPeriodSchema,
-    netPay: PayPeriodSchema,
-    taxFreeAmount: z.number().optional(),
-    taxableIncome: z.number().optional(),
-    employerNI: z.number().optional(),
-    taxBands: z
-      .array(
-        z.object({
-          name: z.string(),
-          rate: z.number(),
-          amount: z.number(),
-        })
-      )
-      .optional(),
-  }),
-  taxYear: z.string().optional(),
-  subscribeToAlerts: z.boolean().optional(),
-});
 
 function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): string {
   const effectiveRate =
@@ -182,7 +147,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const validation = SendResultsSchema.safeParse(body);
+    const validation = SendResultsRequestSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(

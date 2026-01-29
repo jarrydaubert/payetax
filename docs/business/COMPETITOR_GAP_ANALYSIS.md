@@ -1,7 +1,7 @@
 # UK Director Tool Competitor Gap Analysis
 
 > **Research completed:** 2026-01-27
-> **Source docs:** `DIRECTOR_GUIDE_STRATEGY.md`, `ACCOUNTINGWEB_ORIGINAL_PROPOSAL.md`, `competitor-alternatives/SKILL.md`
+> **Source docs:** `DIRECTOR_GUIDE_POSITIONING.md`, `DIRECTOR_CALCULATOR_BUILD.md`
 
 ---
 
@@ -14,7 +14,7 @@
 
 ---
 
-## What PayeTax Is Building (from DIRECTOR_GUIDE_STRATEGY.md)
+## What PayeTax Is Building
 
 | Feature | Description |
 |---------|-------------|
@@ -117,7 +117,7 @@
 
 ## SEO Opportunity
 
-From DIRECTOR_GUIDE_STRATEGY.md, the pivot opens better search queries:
+The educational positioning opens better search queries:
 
 | Current Target | Volume | Competition |
 |----------------|--------|-------------|
@@ -149,7 +149,7 @@ Target "how to" and "explained" queries, not just "calculator" queries.
 
 ### 3. Create shareable accountant resource
 
-From DIRECTOR_GUIDE_STRATEGY.md: Accountants will share because it saves them time explaining basics. This is free distribution.
+Accountants will share because it saves them time explaining basics. This is free distribution.
 
 ### 4. Consider comparison pages later
 
@@ -198,4 +198,4 @@ Lead with:
 
 The "First-Time Director's Guide" with integrated calculator, tax set-asides, calendar downloads, and emotional reassurance ("Sleep at Night status") is genuinely differentiated.
 
-**Build confidence:** This research validates the pivot documented in `DIRECTOR_GUIDE_STRATEGY.md`. The market gap is real.
+**Build confidence:** This research validates the product positioning. The market gap is real.

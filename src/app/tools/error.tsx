@@ -1,10 +1,8 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
-import { AlertTriangle, Home, RefreshCw, Wrench } from 'lucide-react';
-import { useEffect, useId } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { ChevronDown, Home, RotateCcw } from 'lucide-react';
+import { useEffect, useId, useState } from 'react';
 
 export default function ToolsError({
   error,
@@ -14,6 +12,7 @@ export default function ToolsError({
   reset: () => void;
 }) {
   const errorId = useId().replace(/:/g, '');
+  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
     Sentry.captureException(error, {
@@ -23,40 +22,68 @@ export default function ToolsError({
   }, [error, errorId]);
 
   return (
-    <div className='flex min-h-[60vh] items-center justify-center p-4'>
-      <Card className='w-full max-w-md p-8 text-center'>
-        <div className='mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-destructive/10'>
-          <AlertTriangle className='size-8 text-destructive' />
+    <div className='flex min-h-[70vh] flex-col items-center justify-center p-6'>
+      <div className='w-full max-w-md text-center'>
+        {/* Icon */}
+        <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'>
+          <span className='font-display text-4xl'>!</span>
         </div>
 
-        <h1 className='font-bold text-2xl'>Tool Error</h1>
-        <p className='mt-2 text-muted-foreground'>
-          Something went wrong with this tool. Please try again or explore our other tools.
+        {/* Title */}
+        <h1 className='font-display font-bold text-3xl tracking-tight'>Something went wrong</h1>
+
+        {/* Description */}
+        <p className='mt-3 text-white/60'>
+          This tool hit an unexpected error. Try refreshing, or head back to explore other tools.
         </p>
 
-        <p className='mt-4 font-mono text-muted-foreground text-xs'>
-          Reference: <span className='text-primary'>{errorId.slice(-8)}</span>
-        </p>
-
+        {/* Actions */}
         <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center'>
-          <Button onClick={() => reset()} className='gap-2'>
-            <RefreshCw className='size-4' />
+          <button
+            type='button'
+            onClick={() => reset()}
+            className='inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+          >
+            <RotateCcw className='size-4' />
             Try again
-          </Button>
-          <Button variant='outline' asChild className='gap-2'>
-            <a href='/tools'>
-              <Wrench className='size-4' />
-              All tools
-            </a>
-          </Button>
-          <Button variant='ghost' asChild className='gap-2'>
-            <a href='/'>
-              <Home className='size-4' />
-              Home
-            </a>
-          </Button>
+          </button>
+          <a
+            href='/'
+            className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+          >
+            <Home className='size-4' />
+            Go home
+          </a>
         </div>
-      </Card>
+
+        {/* Error reference - subtle */}
+        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+
+        {/* Dev Debug - only in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className='mt-6'>
+            <button
+              type='button'
+              onClick={() => setShowDebug(!showDebug)}
+              className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
+            >
+              <ChevronDown
+                className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
+              />
+              Debug info
+            </button>
+            {showDebug && (
+              <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
+                <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
+                  {error.message}
+                  {'\n\n'}
+                  {error.stack}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

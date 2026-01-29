@@ -7,7 +7,6 @@ import {
   formatInputValue,
   formatNumber,
   formatPercent,
-  getTaxBandColor,
   parseFormattedValue,
 } from '../utils';
 
@@ -283,45 +282,6 @@ describe('Utils', () => {
       // Note: parseFormattedValue removes ALL non-numeric characters except decimal
       expect(parseFormattedValue('-1000')).toBe(1000);
       expect(parseFormattedValue('-£500.50')).toBe(500.5);
-    });
-  });
-
-  describe('getTaxBandColor', () => {
-    describe('dark mode', () => {
-      it('returns correct colors for first 4 indices', () => {
-        expect(getTaxBandColor(0, true)).toBe('rgba(59, 130, 246, 0.9)');
-        expect(getTaxBandColor(1, true)).toBe('rgba(99, 102, 241, 0.9)');
-        expect(getTaxBandColor(2, true)).toBe('rgba(139, 92, 246, 0.9)');
-        expect(getTaxBandColor(3, true)).toBe('rgba(236, 72, 153, 0.9)');
-      });
-
-      it('cycles through colors for indices beyond 4', () => {
-        expect(getTaxBandColor(4, true)).toBe('rgba(59, 130, 246, 0.9)');
-        expect(getTaxBandColor(5, true)).toBe('rgba(99, 102, 241, 0.9)');
-        expect(getTaxBandColor(8, true)).toBe('rgba(59, 130, 246, 0.9)');
-      });
-    });
-
-    describe('light mode', () => {
-      it('returns correct colors for first 4 indices', () => {
-        expect(getTaxBandColor(0, false)).toBe('rgba(59, 130, 246, 0.7)');
-        expect(getTaxBandColor(1, false)).toBe('rgba(99, 102, 241, 0.7)');
-        expect(getTaxBandColor(2, false)).toBe('rgba(139, 92, 246, 0.7)');
-        expect(getTaxBandColor(3, false)).toBe('rgba(236, 72, 153, 0.7)');
-      });
-
-      it('cycles through colors for indices beyond 4', () => {
-        expect(getTaxBandColor(4, false)).toBe('rgba(59, 130, 246, 0.7)');
-        expect(getTaxBandColor(5, false)).toBe('rgba(99, 102, 241, 0.7)');
-      });
-    });
-
-    it('always returns a valid color string', () => {
-      // Test with various indices
-      for (let i = 0; i < 20; i++) {
-        const color = getTaxBandColor(i, true);
-        expect(color).toMatch(/^rgba\(\d+,\s*\d+,\s*\d+,\s*[\d.]+\)$/);
-      }
     });
   });
 

@@ -329,6 +329,8 @@ export const BlogFrontmatterSchema = z.object({
   tags: z.array(z.string()).catch([]), // Zod 4: fallback to empty array on parse error
   author: z.string().catch('PayeTax Team'), // Zod 4: fallback to default on parse error
   featured: z.boolean().catch(false), // Zod 4: fallback to false on parse error
+  editorsPick: z.boolean().catch(false), // Show in Editor's Picks sidebar
+  deepDive: z.boolean().catch(false), // Show in Deep Dives section
   image: z.string().optional(), // Allow both URLs and relative paths
   imageAlt: z.string().optional(),
   readTime: z.string().catch('5 min read'), // Zod 4: fallback if missing or invalid

@@ -2,35 +2,32 @@
 /**
  * Director Dashboard - Main orchestrator component
  *
- * Post-merge: Single-page calculator with all inputs visible.
- * No wizard, no gates - direct calculation on input change.
+ * 4-panel layout matching the original mockup:
+ * - Sidebar nav (60px)
+ * - Inputs panel (280px)
+ * - Main content: Summary Cards → Slider → Detail Cards → Chart
+ * - Education panel (320px)
  */
 'use client';
 
-import { RotateCcw } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   KeyDates,
   PensionGapWarning,
   SalarySlider,
   StrategyComparisonTable,
-  TaxBreakdownTable,
   TaxPots,
 } from '@/components/molecules/DirectorGuide/calculator';
-import { DashboardLayout, EducationPanel } from '@/components/molecules/DirectorGuide/dashboard';
 import {
-  AlreadyTakenInputs,
-  CompanyCarInput,
-  CoreInputs,
-  EmploymentAllowanceInput,
-  OtherIncomeInput,
-  PensionInput,
-  StudentLoanInputs,
-} from '@/components/molecules/DirectorGuide/inputs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+  DashboardLayout,
+  DetailCards,
+  EducationPanel,
+  InputsPanel,
+  MoneyFlowChart,
+  SidebarNav,
+  SummaryCards,
+} from '@/components/molecules/DirectorGuide/dashboard';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
   trackGuideReset,
@@ -44,14 +41,15 @@ import {
 } from '@/store/directorGuideStore';
 
 export function DirectorDashboard() {
-  const [educationCollapsed, setEducationCollapsed] = useState(false); // Show education panel by default for trust
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Icon menu collapsed by default
+  const [inputsCollapsed, setInputsCollapsed] = useState(false); // Inputs panel expanded
+  const [educationCollapsed, setEducationCollapsed] = useState(false); // Education panel expanded
+  const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
+  const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
+
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
   const { calculate, reset } = useDirectorGuideActions();
-
-  // Local state for Variable Income (Feast/Famine mode - not yet connected to calculations)
-  const [isVariableIncome, setIsVariableIncome] = useState(false);
-  const [bufferMonths, setBufferMonths] = useState(3);
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
@@ -64,7 +62,7 @@ export function DirectorDashboard() {
     }
   }, []);
 
-  // Auto-calculate when inputs change (debounced via store)
+  // Auto-calculate when inputs change
   useEffect(() => {
     const canCalculate =
       formData.region !== undefined &&
@@ -76,20 +74,7 @@ export function DirectorDashboard() {
     if (canCalculate) {
       calculate();
     }
-  }, [
-    formData.region,
-    formData.revenue,
-    formData.includesVat,
-    formData.expenses,
-    formData.alreadyTaken,
-    formData.takenViaPayroll,
-    formData.otherIncome,
-    formData.studentLoanPlans,
-    formData.pensionContribution,
-    formData.companyCarBIK,
-    formData.hasEmploymentAllowance,
-    calculate,
-  ]);
+  }, [formData.region, formData.revenue, formData.expenses, calculate]);
 
   // Track results shown (once per session)
   useEffect(() => {
@@ -103,8 +88,6 @@ export function DirectorDashboard() {
   const handleReset = useCallback(() => {
     trackGuideReset();
     hasTrackedResults.current = false;
-    setIsVariableIncome(false);
-    setBufferMonths(3);
     reset();
   }, [reset]);
 
@@ -113,124 +96,89 @@ export function DirectorDashboard() {
   return (
     <TooltipProvider>
       <DashboardLayout
+        sidebar={
+          <SidebarNav
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed((prev) => !prev)}
+            onReset={handleReset}
+            onEmailResults={() => {
+              // TODO: Open email dialog when implemented
+              window.alert('Email feature coming soon!');
+            }}
+          />
+        }
+        inputs={<InputsPanel onReset={handleReset} />}
         main={
-          <main className='mx-auto max-w-4xl space-y-6 p-4 pb-24 md:p-6 lg:p-8'>
+          <main className='p-6'>
             {/* Header */}
-            <header className='flex items-center justify-between'>
-              <div>
-                <h1 className='font-bold text-2xl tracking-tight md:text-3xl'>
-                  Director Tax Calculator
-                </h1>
-                <p className='text-muted-foreground'>
-                  Find your optimal salary/dividend split for 2025/26
-                </p>
-              </div>
-              <Button variant='outline' size='sm' onClick={handleReset}>
-                <RotateCcw className='mr-2 size-4' />
-                Reset
-              </Button>
-            </header>
+            <div className={inputsCollapsed ? 'mb-6 pl-12' : 'mb-6'}>
+              <h1 className='font-semibold text-2xl text-slate-100'>
+                Director Pay{' '}
+                <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
+                  Dashboard
+                </span>
+              </h1>
+            </div>
 
-            {/* Core Inputs */}
-            <CoreInputs />
-
-            {/* Director Situation */}
-            <section className='space-y-4 rounded-lg border bg-card p-4 md:p-6'>
-              <h2 className='font-semibold text-lg'>Your Situation</h2>
-              <AlreadyTakenInputs />
-              <OtherIncomeInput />
-
-              {/* Variable Income / Feast or Famine */}
-              <div className='border-t pt-4'>
-                <div className='mb-4 flex items-center justify-between'>
-                  <div className='space-y-0.5'>
-                    <Label className='text-base'>Variable / Unstable Income</Label>
-                    <p className='text-muted-foreground text-xs'>
-                      I need to retain a cash buffer for bad months (e.g. commission-based)
-                    </p>
-                  </div>
-                  <Switch
-                    checked={isVariableIncome}
-                    onCheckedChange={setIsVariableIncome}
-                    aria-label='Toggle variable income mode'
-                  />
-                </div>
-
-                {isVariableIncome && (
-                  <div className='animate-in fade-in slide-in-from-top-2 grid gap-4 duration-300 md:grid-cols-2'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='buffer-months'>Monthly Buffer Needed</Label>
-                      <div className='flex items-center gap-2'>
-                        <Input
-                          id='buffer-months'
-                          type='number'
-                          min={1}
-                          max={12}
-                          value={bufferMonths}
-                          onChange={(e) => setBufferMonths(Number(e.target.value))}
-                          className='w-24'
-                        />
-                        <span className='text-muted-foreground text-sm'>months of expenses</span>
-                      </div>
-                      <p className='text-muted-foreground text-xs'>
-                        We&apos;ll adjust the recommended extraction to leave this cash in the
-                        company. (Coming soon)
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Advanced Inputs */}
-            <section className='space-y-4 rounded-lg border bg-card p-4 md:p-6'>
-              <h2 className='font-semibold text-lg'>Advanced Options</h2>
-              <div className='grid gap-4 md:grid-cols-2'>
-                <StudentLoanInputs />
-                <PensionInput />
-              </div>
-              <div className='grid gap-4 md:grid-cols-2'>
-                <CompanyCarInput />
-                <EmploymentAllowanceInput />
-              </div>
-            </section>
-
-            {/* Results Section */}
-            {hasResults && (
-              <>
-                {/* Strategy Comparison */}
-                <StrategyComparisonTable />
+            {/* Results */}
+            {hasResults ? (
+              <div className='space-y-6'>
+                {/* Summary Cards */}
+                <SummaryCards />
 
                 {/* Salary Slider */}
                 <SalarySlider />
 
-                {/* NI Credits Warning */}
-                <PensionGapWarning />
+                {/* Strategy Comparison Table */}
+                <StrategyComparisonTable />
 
-                {/* Tax Pots */}
+                {/* Detail Cards (2x2 grid) */}
+                <DetailCards />
+
+                {/* Two Pots - Company vs Personal */}
                 <TaxPots />
 
-                {/* Detailed Breakdown */}
-                <TaxBreakdownTable />
+                {/* Pension Gap Warning */}
+                <PensionGapWarning />
 
-                {/* Key Dates */}
-                <KeyDates />
-              </>
-            )}
-
-            {/* Empty State */}
-            {!hasResults && (
-              <div className='rounded-lg border border-dashed bg-muted/30 p-8 text-center'>
-                <p className='text-muted-foreground'>
-                  Enter your revenue, expenses, and region above to see your optimal strategy.
-                </p>
+                {/* Money Flow + Key Dates */}
+                <div className='grid gap-4 md:grid-cols-2'>
+                  <MoneyFlowChart />
+                  <KeyDates />
+                </div>
+              </div>
+            ) : (
+              /* Empty State */
+              <div className='flex min-h-[60vh] flex-col items-center justify-center rounded-2xl border border-white/[0.08] border-dashed bg-[#0f172a]/50'>
+                <div className='mx-auto max-w-md text-center'>
+                  <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20'>
+                    <Calculator className='size-10 text-cyan-500' />
+                  </div>
+                  <h2 className='mb-2 font-semibold text-lg text-slate-100'>
+                    Find your optimal salary & dividend mix
+                  </h2>
+                  <p className='mb-6 text-slate-500'>
+                    Enter your company profit on the left to see exactly how much you could take
+                    home. We&apos;ll show you the tax-efficient split and when to pay yourself.
+                  </p>
+                  <div className='flex items-center justify-center gap-2 text-slate-600 text-sm'>
+                    <span className='size-2 animate-pulse rounded-full bg-cyan-500' />
+                    Enter your figures to get started
+                  </div>
+                </div>
               </div>
             )}
           </main>
         }
         education={<EducationPanel />}
+        inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
+        onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
+        mobileInputsOpen={mobileInputsOpen}
+        onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
+        mobileEducationOpen={mobileEducationOpen}
+        onToggleMobileEducation={() => setMobileEducationOpen((prev) => !prev)}
       />
     </TooltipProvider>
   );

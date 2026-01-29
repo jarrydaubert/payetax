@@ -107,33 +107,6 @@ export function parseFormattedValue(value: string): number {
 }
 
 /**
- * Generates a color for tax breakdown visualization based on index.
- * Provides different colors for light and dark mode.
- *
- * @param index - Index of the band or section
- * @param isDarkMode - Whether dark mode is active
- * @returns CSS color string for the specified index
- */
-export function getTaxBandColor(index: number, isDarkMode: boolean): string {
-  const baseColors = isDarkMode
-    ? [
-        'rgba(59, 130, 246, 0.9)', // blue-500 with alpha
-        'rgba(99, 102, 241, 0.9)', // indigo-500 with alpha
-        'rgba(139, 92, 246, 0.9)', // purple-500 with alpha
-        'rgba(236, 72, 153, 0.9)', // pink-500 with alpha
-      ]
-    : [
-        'rgba(59, 130, 246, 0.7)', // blue-500 with alpha
-        'rgba(99, 102, 241, 0.7)', // indigo-500 with alpha
-        'rgba(139, 92, 246, 0.7)', // purple-500 with alpha
-        'rgba(236, 72, 153, 0.7)', // pink-500 with alpha
-      ];
-
-  // Cycle through colors for indices beyond array length
-  return baseColors[index % baseColors.length] ?? baseColors[0] ?? '#000000';
-}
-
-/**
  * Formats an ISO date string to a localized date string.
  *
  * @param dateString - ISO date string to format

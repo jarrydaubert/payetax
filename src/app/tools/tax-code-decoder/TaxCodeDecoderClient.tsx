@@ -84,7 +84,7 @@ export function TaxCodeDecoderClient() {
                   type='button'
                   onClick={() => handleDecode(exampleCode)}
                   className={cn(
-                    'rounded-full border px-3 py-1 font-mono text-sm transition-colors',
+                    'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5'
                   )}
                 >
@@ -223,7 +223,7 @@ export function TaxCodeDecoderClient() {
             ].map(({ code: letterCode, desc }) => (
               <div
                 key={letterCode}
-                className='flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50'
+                className='flex items-start gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:bg-muted/50'
               >
                 <span className='rounded bg-primary/10 px-2 py-1 font-bold font-mono text-primary'>
                   {letterCode}

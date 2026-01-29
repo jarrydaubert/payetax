@@ -1,40 +1,18 @@
 // src/app/api/send-director-results/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { formatCurrency } from '@/lib/utils';
+import {
+  type DirectorStrategy,
+  SendDirectorResultsRequestSchema,
+} from '@/lib/validation/emailValidation';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const DirectorResultsSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  results: z.object({
-    grossProfit: z.number(),
-    strategy: z.object({
-      name: z.string(),
-      salary: z.number(),
-      dividends: z.number(),
-      pension: z.number(),
-      companyCarBIK: z.number(),
-      employerNI: z.number(),
-      employeeNI: z.number(),
-      incomeTax: z.number(),
-      corporationTax: z.number(),
-      dividendTax: z.number(),
-      studentLoan: z.number(),
-      totalPersonalTax: z.number(),
-      companyCost: z.number(),
-      takeHome: z.number(),
-      effectiveRate: z.number(),
-    }),
-  }),
-  taxYear: z.string().optional(),
-});
-
 function generateDirectorEmailHtml(
   grossProfit: number,
-  strategy: z.infer<typeof DirectorResultsSchema>['results']['strategy'],
+  strategy: DirectorStrategy,
   taxYear?: string
 ): string {
   return `
@@ -227,7 +205,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    const validationResult = DirectorResultsSchema.safeParse(body);
+    const validationResult = SendDirectorResultsRequestSchema.safeParse(body);
 
     if (!validationResult.success) {
       return NextResponse.json(

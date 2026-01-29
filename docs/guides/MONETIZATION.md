@@ -1,14 +1,39 @@
-# Monetization Guide
+# Monetization Guide (Developer Reference)
+
+> **Purpose:** Technical implementation guide for enabling monetization features.
+> **For business strategy:** See `docs/business/MONETIZATION.md`
 
 **Status:** Infrastructure built, features disabled for launch
 
-> **Note:** Monetization features are built but inactive. See "Enabling Features" section below.
+---
+
+## What This Doc Is
+
+This is a **developer reference** - it tells you:
+- What monetization code exists
+- Where the files are located
+- How to enable/disable features
+- What environment variables to set
+
+**This is NOT the business strategy.** For "why" and "what we're building", see `docs/business/MONETIZATION.md`.
 
 ---
 
-## Overview
+## Current State
 
-PayeTax monetization follows core principles:
+All monetization features are **built but disabled** for launch:
+
+| Feature | Code Status | Enabled |
+|---------|-------------|---------|
+| Affiliate links | ✅ Built | ❌ No affiliates signed |
+| Accountant referral CTA | ✅ Built | ❌ Commented out |
+| B2B widget pricing page | ✅ Built | ❌ Returns 404 |
+| Lead capture API | ✅ Built | ✅ Ready |
+
+---
+
+## Principles
+
 - Consumer experience stays **100% free**
 - Revenue from B2B and partnerships, not users
 - Growth and revenue in parallel

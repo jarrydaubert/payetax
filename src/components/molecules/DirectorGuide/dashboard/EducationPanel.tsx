@@ -7,8 +7,17 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
+import { TAX_RATES } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
+
+const TAX_YEAR = '2025-2026';
+const rates = TAX_RATES[TAX_YEAR];
+const PERSONAL_ALLOWANCE = rates.personalAllowance;
+const PA_TAPER_THRESHOLD = rates.personalAllowanceReductionThreshold;
+const PA_TAPER_END = PERSONAL_ALLOWANCE + (rates.bands[1]?.threshold ?? 112570); // 125,140
+const SECONDARY_THRESHOLD = rates.nationalInsurance.employer.A.secondary.threshold;
+const LEL = rates.nationalInsurance.lowerEarningsLimit;
 
 interface EducationPanelProps {
   className?: string;
@@ -43,7 +52,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const showOverdrawnWarning = hasResults && formData.alreadyTaken > grossExtraction;
   const showPensionWarning = formData.pensionContribution > 60000;
   const showStudentLoanWarning = formData.studentLoanPlans.length > 0;
-  const showPATaperWarning = totalIncome > 100000 && totalIncome <= 125140;
+  const showPATaperWarning = totalIncome > PA_TAPER_THRESHOLD && totalIncome <= PA_TAPER_END;
   const showHICBCWarning = totalIncome >= 60000 && totalIncome <= 80000;
 
   // New P0 warnings from strategy doc
@@ -56,14 +65,15 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const showPaymentsOnAccountWarning = personalTax > 1000;
   const showSurvivalModeWarning = comparison && comparison.grossProfit <= 0;
 
-  // Pension Gap Warning (Feast/Famine): Paying ErNI (>£5k) but no State Pension credit (<£6,396)
-  const showPensionGapWarning = hasResults && optimalSalary > 5000 && optimalSalary < 6396;
+  // Pension Gap Warning: Paying ErNI but no State Pension credit
+  const showPensionGapWarning =
+    hasResults && optimalSalary > SECONDARY_THRESHOLD && optimalSalary < LEL;
 
   return (
-    <aside className={cn('flex h-full flex-col bg-muted/30 p-6', className)}>
+    <aside className={cn('flex h-full flex-col bg-[#0f172a] p-6', className)}>
       {/* Learn Section */}
       <section className='mb-8'>
-        <h3 className='mb-4 text-center font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+        <h3 className='mb-4 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Learn
         </h3>
         <div className='space-y-3'>
@@ -103,7 +113,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
         showSurvivalModeWarning ||
         showPensionGapWarning) && (
         <section className='mb-8'>
-          <h3 className='mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+          <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
             Warnings
           </h3>
           <div className='space-y-3'>
@@ -205,10 +215,10 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
       {/* Assumptions Section */}
       <section>
-        <h3 className='mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+        <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Assumptions
         </h3>
-        <div className='rounded-lg border bg-background p-4'>
+        <div className='rounded-[10px] border border-white/[0.04] bg-[#1e293b] p-4'>
           <AssumptionRow label='Tax Year' value='2025/26' />
           <AssumptionRow
             label='Region'
@@ -243,9 +253,9 @@ interface LearnCardProps {
 
 function LearnCard({ title, description }: LearnCardProps) {
   return (
-    <div className='rounded-lg border bg-background p-4'>
-      <div className='mb-1 font-medium text-sm'>{title}</div>
-      <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
+    <div className='rounded-[10px] border border-white/[0.04] bg-[#1e293b] p-4'>
+      <div className='mb-1 font-medium text-slate-100 text-sm'>{title}</div>
+      <div className='text-slate-400 text-xs leading-relaxed'>{description}</div>
     </div>
   );
 }
@@ -260,29 +270,19 @@ function WarningCard({ title, description, isCritical }: WarningCardProps) {
   return (
     <div
       className={cn(
-        'rounded-lg border p-4',
-        isCritical
-          ? 'border-red-500/30 bg-red-500/10'
-          : 'border-amber-500/30 bg-amber-500/10'
+        'rounded-[10px] border p-4',
+        isCritical ? 'border-red-500/30 bg-red-500/10' : 'border-amber-500/30 bg-amber-500/10'
       )}
     >
       <div className='mb-2 flex items-center gap-2'>
-        <AlertTriangle
-          className={cn(
-            'size-4',
-            isCritical ? 'text-red-600 dark:text-red-500' : 'text-amber-600 dark:text-amber-500'
-          )}
-        />
+        <AlertTriangle className={cn('size-4', isCritical ? 'text-red-500' : 'text-amber-500')} />
         <span
-          className={cn(
-            'font-semibold text-sm',
-            isCritical ? 'text-red-700 dark:text-red-500' : 'text-amber-700 dark:text-amber-500'
-          )}
+          className={cn('font-semibold text-sm', isCritical ? 'text-red-500' : 'text-amber-500')}
         >
           {title}
         </span>
       </div>
-      <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
+      <div className='text-slate-400 text-xs leading-relaxed'>{description}</div>
     </div>
   );
 }
@@ -295,9 +295,14 @@ interface AssumptionRowProps {
 
 function AssumptionRow({ label, value, isLast }: AssumptionRowProps) {
   return (
-    <div className={cn('flex justify-between py-1.5 text-xs', !isLast && 'border-b')}>
-      <span className='text-muted-foreground'>{label}</span>
-      <span>{value}</span>
+    <div
+      className={cn(
+        'flex justify-between py-1.5 text-xs',
+        !isLast && 'border-white/[0.04] border-b'
+      )}
+    >
+      <span className='text-slate-500'>{label}</span>
+      <span className='text-slate-300'>{value}</span>
     </div>
   );
 }

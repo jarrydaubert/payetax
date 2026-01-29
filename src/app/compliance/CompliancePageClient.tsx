@@ -203,8 +203,8 @@ export function CompliancePageClient() {
         description='If you have questions about our data sources, calculation methods, or compliance standards, reach out.'
         links={[
           {
-            text: 'compliance@payetax.co.uk',
-            href: 'mailto:compliance@payetax.co.uk?subject=Compliance Question',
+            text: 'support@payetax.co.uk',
+            href: 'mailto:support@payetax.co.uk?subject=Compliance Question',
             type: 'email',
           },
         ]}

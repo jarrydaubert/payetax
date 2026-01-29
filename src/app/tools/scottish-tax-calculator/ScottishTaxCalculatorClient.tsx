@@ -165,7 +165,7 @@ export function ScottishTaxCalculatorClient() {
                   type='button'
                   onClick={() => handleQuickCalculate(exampleSalary)}
                   className={cn(
-                    'rounded-full border px-3 py-1 font-mono text-sm transition-colors',
+                    'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5'
                   )}
                 >
@@ -182,7 +182,7 @@ export function ScottishTaxCalculatorClient() {
         <Card className='mb-8'>
           <CardContent className='pt-6'>
             <div className='grid gap-4 md:grid-cols-3'>
-              <div className='rounded-lg border bg-blue-50 p-4 dark:bg-blue-900/20'>
+              <div className='rounded-lg border border-blue-200/50 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20'>
                 <p className='mb-1 font-medium text-blue-800 text-sm dark:text-blue-300'>
                   Scottish Tax
                 </p>
@@ -190,13 +190,13 @@ export function ScottishTaxCalculatorClient() {
                   {formatCurrency(comparison.scottishTax)}
                 </p>
               </div>
-              <div className='rounded-lg border bg-gray-50 p-4 dark:bg-gray-800'>
+              <div className='rounded-lg border border-border/50 bg-gray-50 p-4 dark:bg-gray-800'>
                 <p className='mb-1 font-medium text-muted-foreground text-sm'>English Tax</p>
                 <p className='font-bold text-2xl'>{formatCurrency(comparison.englishTax)}</p>
               </div>
               <div
                 className={cn(
-                  'rounded-lg border p-4',
+                  'rounded-lg border border-border/50 p-4',
                   comparison.difference > 0
                     ? 'bg-amber-50 dark:bg-amber-900/20'
                     : comparison.difference < 0
@@ -227,7 +227,7 @@ export function ScottishTaxCalculatorClient() {
               </div>
             </div>
 
-            <div className='mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20'>
+            <div className='mt-6 rounded-lg border border-blue-200/50 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20'>
               <div className='flex items-start gap-2'>
                 <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-blue-600')} />
                 <p className='text-blue-800 text-sm dark:text-blue-200'>
@@ -256,14 +256,14 @@ export function ScottishTaxCalculatorClient() {
           <div className='overflow-x-auto'>
             <table className='w-full'>
               <thead>
-                <tr className='border-b'>
+                <tr className='border-b border-border/50'>
                   <th className='px-4 py-3 text-left font-medium'>Band</th>
                   <th className='px-4 py-3 text-left font-medium'>Rate</th>
                   <th className='px-4 py-3 text-left font-medium'>Income Range</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className='border-b'>
+                <tr className='border-b border-border/50'>
                   <td className='px-4 py-3'>Personal Allowance</td>
                   <td className='px-4 py-3 font-mono'>0%</td>
                   <td className='px-4 py-3 text-muted-foreground'>Up to £12,570</td>
@@ -278,7 +278,7 @@ export function ScottishTaxCalculatorClient() {
                       : scottishRates.personalAllowance + band.threshold;
 
                   return (
-                    <tr key={band.name} className='border-b last:border-0'>
+                    <tr key={band.name} className='border-b border-border/50 last:border-0'>
                       <td className='px-4 py-3'>{band.name}</td>
                       <td className='px-4 py-3 font-medium font-mono'>{band.rate}%</td>
                       <td className='px-4 py-3 text-muted-foreground'>

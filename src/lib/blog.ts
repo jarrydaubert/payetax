@@ -38,6 +38,8 @@ function convertMDXPost(post: ReturnType<typeof getMDXPosts>[0]): BlogPost {
     // Optional fields
     updatedAt: post.updatedAt || post.publishedAt,
     featured: post.featured,
+    editorsPick: post.editorsPick,
+    deepDive: post.deepDive,
     published: true, // All posts in /content/blog are published
     author: post.author || 'PayeTax Team',
     readTime: `${post.readingTime} min read`,
@@ -93,8 +95,13 @@ function sortPosts(posts: BlogPost[], sortBy: BlogSortOption = 'date-desc'): Blo
 function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPost[] {
   let filtered = [...posts];
 
-  // Filter by category
-  if (options.category) {
+  // Filter by multiple categories (for nav groups)
+  if (options.categories && options.categories.length > 0) {
+    const categorySet = new Set(options.categories);
+    filtered = filtered.filter((post) => categorySet.has(post.category));
+  }
+  // Filter by single category
+  else if (options.category) {
     filtered = filtered.filter((post) => post.category === options.category);
   }
 
@@ -216,6 +223,8 @@ const getCachedBlogPostBySlug = unstable_cache(
       categoryData,
       updatedAt: post.updatedAt || post.publishedAt,
       featured: post.featured,
+      editorsPick: post.editorsPick,
+      deepDive: post.deepDive,
       published: true, // All posts in /content/blog are published
       author: post.author || 'PayeTax Team',
       readTime: `${post.readingTime} min read`,
@@ -294,6 +303,72 @@ export async function getFeaturedPosts(): Promise<BlogPost[]> {
 export async function getFeaturedPost(): Promise<BlogPost | null> {
   const featuredPosts = await getFeaturedPosts();
   return featuredPosts[0] || null;
+}
+
+/**
+ * Get editor's picks posts
+ * Primary: Posts with editorsPick: true frontmatter
+ * Fallback: Most recent posts if insufficient picks
+ */
+export async function getEditorsPicks(limit: number = 5): Promise<BlogPost[]> {
+  const allPosts = await getAllCachedPosts();
+
+  // Filter for editor's picks
+  const editorsPicks = allPosts.filter((post) => post.editorsPick === true);
+
+  // If we have enough editor's picks, return them
+  if (editorsPicks.length >= limit) {
+    return editorsPicks.slice(0, limit);
+  }
+
+  // Backfill with most recent posts (excluding already picked)
+  const pickedSlugs = new Set(editorsPicks.map((p) => p.slug));
+  const recentPosts = allPosts
+    .filter((p) => !pickedSlugs.has(p.slug))
+    .slice(0, limit - editorsPicks.length);
+
+  return [...editorsPicks, ...recentPosts].slice(0, limit);
+}
+
+/**
+ * Get deep dive posts
+ * Primary: Posts with deepDive: true frontmatter
+ * Fallback: Curated slugs from constants
+ */
+export async function getDeepDives(limit: number = 6): Promise<BlogPost[]> {
+  const allPosts = await getAllCachedPosts();
+
+  // Filter for deep dives
+  const deepDives = allPosts.filter((post) => post.deepDive === true);
+
+  // If we have enough deep dives, return them
+  if (deepDives.length >= 3) {
+    return deepDives.slice(0, limit);
+  }
+
+  // Import fallback slugs dynamically to avoid circular dependency
+  const { DEEP_DIVE_FALLBACK_SLUGS } = await import('@/constants/deepDives');
+
+  // Backfill with curated slugs
+  const deepDiveSlugs = new Set(deepDives.map((p) => p.slug));
+  const fallbackPosts = DEEP_DIVE_FALLBACK_SLUGS.filter((slug) => !deepDiveSlugs.has(slug))
+    .map((slug) => allPosts.find((p) => p.slug === slug))
+    .filter((post): post is BlogPost => post !== undefined);
+
+  return [...deepDives, ...fallbackPosts].slice(0, limit);
+}
+
+/**
+ * Get latest posts (excluding featured/carousel posts)
+ */
+export async function getLatestPosts(
+  limit: number = 5,
+  excludeSlugs: string[] = []
+): Promise<BlogPost[]> {
+  const allPosts = await getAllCachedPosts();
+  const excludeSet = new Set(excludeSlugs);
+
+  return allPosts.filter((post) => !excludeSet.has(post.slug)).slice(0, limit);
 }
 
 /**

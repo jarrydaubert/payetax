@@ -1,11 +1,12 @@
 // src/components/molecules/DirectorGuide/calculator/TaxPots.tsx
 /**
  * Tax Pots - Company and Personal tax pots to set aside
+ *
+ * Dark theme with cyan/emerald accents.
  */
 'use client';
 
 import { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import {
   useDirectorFormData,
@@ -74,83 +75,55 @@ export function TaxPots() {
     <div className='space-y-6'>
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Company Tax Pot */}
-        <Card className='border-blue-500/50'>
-          <CardHeader>
-            <CardTitle className='text-blue-700 dark:text-blue-400'>Company Tax Pot</CardTitle>
-            <CardDescription>Set aside in company account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-2'>
-              <div className='flex justify-between'>
-                <span>Corporation Tax</span>
-                <span>{formatCurrency(values.corporationTax)}</span>
-              </div>
-              <div className='flex justify-between border-t pt-2'>
-                <span className='font-semibold'>Total</span>
-                <span className='font-bold text-xl'>{formatCurrency(values.corporationTax)}</span>
-              </div>
+        <div className='rounded-xl border border-cyan-500/30 bg-slate-800 p-5'>
+          <div className='mb-4'>
+            <h3 className='font-semibold text-cyan-400 text-sm'>Company Tax Pot</h3>
+            <p className='text-slate-500 text-xs'>Set aside in company account</p>
+          </div>
+          <div className='space-y-1.5 text-sm'>
+            <div className='flex justify-between text-slate-300'>
+              <span>Corporation Tax</span>
+              <span className='font-mono'>{formatCurrency(values.corporationTax)}</span>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Personal Tax Pot */}
-        <Card className='border-purple-500/50'>
-          <CardHeader>
-            <CardTitle className='text-purple-700 dark:text-purple-400'>Personal Tax Pot</CardTitle>
-            <CardDescription>Set aside for Self Assessment</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-2'>
-              <div className='flex justify-between'>
-                <span>Income Tax</span>
-                <span>{formatCurrency(values.incomeTax)}</span>
-              </div>
-              <div className='flex justify-between'>
-                <span>Dividend Tax</span>
-                <span>{formatCurrency(values.dividendTax)}</span>
-              </div>
-              {values.studentLoan > 0 && (
-                <div className='flex justify-between'>
-                  <span>Student Loan</span>
-                  <span>{formatCurrency(values.studentLoan)}</span>
-                </div>
-              )}
-              <div className='flex justify-between border-t pt-2'>
-                <span className='font-semibold'>Total</span>
-                <span className='font-bold text-xl'>{formatCurrency(personalTotal)}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bank Transfer References */}
-      <Card className='border-muted'>
-        <CardHeader className='pb-3'>
-          <CardTitle className='text-base'>Bank Transfer References</CardTitle>
-          <CardDescription>Use these labels when making transfers for clear records</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='grid gap-2 text-sm md:grid-cols-2'>
-            <div className='flex items-center justify-between rounded bg-muted/50 px-3 py-2'>
-              <span className='text-muted-foreground'>Salary transfer:</span>
-              <code className='font-mono text-xs'>SALARY [MONTH]</code>
-            </div>
-            <div className='flex items-center justify-between rounded bg-muted/50 px-3 py-2'>
-              <span className='text-muted-foreground'>Dividend payment:</span>
-              <code className='font-mono text-xs'>DIVIDEND [DATE]</code>
-            </div>
-            <div className='flex items-center justify-between rounded bg-muted/50 px-3 py-2'>
-              <span className='text-muted-foreground'>Tax pot (company):</span>
-              <code className='font-mono text-xs'>TAX RESERVE</code>
-            </div>
-            <div className='flex items-center justify-between rounded bg-muted/50 px-3 py-2'>
-              <span className='text-muted-foreground'>Tax pot (personal):</span>
-              <code className='font-mono text-xs'>SA TAX SAVE</code>
+            <div className='flex justify-between border-white/5 border-t pt-2'>
+              <span className='font-medium text-slate-100'>Total</span>
+              <span className='font-mono font-semibold text-cyan-400'>
+                {formatCurrency(values.corporationTax)}
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Personal Tax Pot */}
+        <div className='rounded-xl border border-purple-500/30 bg-slate-800 p-5'>
+          <div className='mb-4'>
+            <h3 className='font-semibold text-purple-400 text-sm'>Personal Tax Pot</h3>
+            <p className='text-slate-500 text-xs'>Set aside for Self Assessment</p>
+          </div>
+          <div className='space-y-1.5 text-sm'>
+            <div className='flex justify-between text-slate-300'>
+              <span>Income Tax</span>
+              <span className='font-mono'>{formatCurrency(values.incomeTax)}</span>
+            </div>
+            <div className='flex justify-between text-slate-300'>
+              <span>Dividend Tax</span>
+              <span className='font-mono'>{formatCurrency(values.dividendTax)}</span>
+            </div>
+            {values.studentLoan > 0 && (
+              <div className='flex justify-between text-slate-300'>
+                <span>Student Loan</span>
+                <span className='font-mono'>{formatCurrency(values.studentLoan)}</span>
+              </div>
+            )}
+            <div className='flex justify-between border-white/5 border-t pt-2'>
+              <span className='font-medium text-slate-100'>Total</span>
+              <span className='font-mono font-semibold text-purple-400'>
+                {formatCurrency(personalTotal)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

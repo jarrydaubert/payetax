@@ -13,16 +13,9 @@ interface NavLink {
   readonly label: string;
 }
 
-interface ToolLink {
-  readonly href: string;
-  readonly label: string;
-  readonly description: string;
-}
-
 interface NavbarMobileMenuProps {
   isOpen: boolean;
   links: readonly NavLink[];
-  tools?: readonly ToolLink[];
   pathname: string;
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
@@ -43,7 +36,6 @@ interface NavbarMobileMenuProps {
 export function NavbarMobileMenu({
   isOpen,
   links,
-  tools,
   pathname,
   onLinkClick,
   onBackdropClick,
@@ -155,35 +147,6 @@ export function NavbarMobileMenu({
                   </Link>
                 );
               })}
-
-              {/* Tools section */}
-              {tools && tools.length > 0 && (
-                <>
-                  <div className='my-2 border-white/10 border-t' />
-                  <p className='px-4 pt-2 pb-1 font-medium text-text-secondary-new text-xs uppercase tracking-wider'>
-                    Tools
-                  </p>
-                  {tools.map((tool) => {
-                    const isActive = pathname === tool.href;
-                    return (
-                      <Link
-                        key={tool.href}
-                        href={tool.href as Route}
-                        onClick={() => onLinkClick(tool.label)}
-                        className={cn(
-                          'block min-h-[44px] rounded-lg px-4 py-3 transition-colors',
-                          isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new'
-                        )}
-                      >
-                        <span className='block font-medium text-[0.95rem]'>{tool.label}</span>
-                        <span className='block text-text-secondary-new text-xs'>
-                          {tool.description}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </>
-              )}
 
               {/*
                * Utilities section (e.g., FeedbackDialog)

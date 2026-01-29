@@ -17,10 +17,12 @@ import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
-import type {
-  DirectorCalculationResult,
-  DirectorInput,
-  Region,
+import {
+  CurrencyAmountSchema,
+  type DirectorCalculationResult,
+  type DirectorInput,
+  type Region,
+  RegionSchema,
 } from '@/lib/validation/directorValidation';
 
 // ============================================================================
@@ -168,15 +170,18 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setRegion: (region) => {
+          const validated = RegionSchema.safeParse(region);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, region },
+            formData: { ...state.formData, region: validated.data },
           }));
         },
 
         setRevenue: (revenue) => {
-          if (!Number.isFinite(revenue) || revenue < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(revenue);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, revenue },
+            formData: { ...state.formData, revenue: validated.data },
           }));
         },
 
@@ -187,9 +192,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setExpenses: (expenses) => {
-          if (!Number.isFinite(expenses) || expenses < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(expenses);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, expenses },
+            formData: { ...state.formData, expenses: validated.data },
           }));
         },
 
@@ -198,9 +204,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setAlreadyTaken: (amount) => {
-          if (!Number.isFinite(amount) || amount < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, alreadyTaken: amount },
+            formData: { ...state.formData, alreadyTaken: validated.data },
           }));
         },
 
@@ -211,9 +218,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setOtherIncome: (amount) => {
-          if (!Number.isFinite(amount) || amount < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, otherIncome: amount },
+            formData: { ...state.formData, otherIncome: validated.data },
           }));
         },
 
@@ -256,16 +264,18 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setPensionContribution: (amount) => {
-          if (!Number.isFinite(amount) || amount < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, pensionContribution: amount },
+            formData: { ...state.formData, pensionContribution: validated.data },
           }));
         },
 
         setCompanyCarBIK: (amount) => {
-          if (!Number.isFinite(amount) || amount < 0) return;
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, companyCarBIK: amount },
+            formData: { ...state.formData, companyCarBIK: validated.data },
           }));
         },
 

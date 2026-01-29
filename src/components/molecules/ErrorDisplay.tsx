@@ -1,0 +1,104 @@
+'use client';
+
+import { ChevronDown, Home, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+
+interface ErrorDisplayProps {
+  title?: string;
+  description?: string;
+  errorId: string;
+  error?: Error;
+  reset: () => void;
+  secondaryAction?: {
+    label: string;
+    href: string;
+    icon?: React.ReactNode;
+  };
+}
+
+export function ErrorDisplay({
+  title = 'Something went wrong',
+  description = 'We hit an unexpected snag. Try refreshing the page.',
+  errorId,
+  error,
+  reset,
+  secondaryAction,
+}: ErrorDisplayProps) {
+  const [showDebug, setShowDebug] = useState(false);
+  const isDev = process.env.NODE_ENV === 'development';
+
+  return (
+    <div className='flex min-h-[60vh] flex-col items-center justify-center p-6'>
+      <div className='w-full max-w-md text-center'>
+        {/* Icon */}
+        <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'>
+          <span className='font-display text-4xl'>!</span>
+        </div>
+
+        {/* Title */}
+        <h1 className='font-display font-bold text-3xl tracking-tight'>{title}</h1>
+
+        {/* Description */}
+        <p className='mt-3 text-white/60'>{description}</p>
+
+        {/* Actions */}
+        <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center'>
+          <button
+            type='button'
+            onClick={() => reset()}
+            className='inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+          >
+            <RotateCcw className='size-4' />
+            Try again
+          </button>
+
+          {secondaryAction ? (
+            <a
+              href={secondaryAction.href}
+              className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+            >
+              {secondaryAction.icon}
+              {secondaryAction.label}
+            </a>
+          ) : (
+            <a
+              href='/'
+              className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+            >
+              <Home className='size-4' />
+              Go home
+            </a>
+          )}
+        </div>
+
+        {/* Error reference - subtle */}
+        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+
+        {/* Dev Debug - only in development */}
+        {isDev && error && (
+          <div className='mt-6'>
+            <button
+              type='button'
+              onClick={() => setShowDebug(!showDebug)}
+              className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
+            >
+              <ChevronDown
+                className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
+              />
+              Debug info
+            </button>
+            {showDebug && (
+              <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
+                <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
+                  {error.message}
+                  {'\n\n'}
+                  {error.stack}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

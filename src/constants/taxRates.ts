@@ -81,6 +81,7 @@ export const TAX_RATES: Record<
     bands: TaxBand[];
     marriageAllowance: number;
     blindPersonsAllowance: number;
+    dividendAllowance: number; // Tax-free dividend allowance
     // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
     ageAllowance65to74: number;
     ageAllowance75plus: number;
@@ -122,6 +123,7 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
+    dividendAllowance: 1000, // £1,000 for 2023-24 (reduced from £2,000)
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,
@@ -206,6 +208,7 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
+    dividendAllowance: 500, // £500 for 2024-25 (reduced from £1,000)
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,
@@ -286,6 +289,7 @@ export const TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026
+    dividendAllowance: 500, // £500 for 2025-26 (maintained from 2024-25)
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,

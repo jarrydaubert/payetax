@@ -19,8 +19,8 @@
 | Doc | Purpose | When to Read |
 |-----|---------|--------------|
 | **[READ_THIS_FIRST.md](./READ_THIS_FIRST.md)** | The mantra | Before anything |
-| **[DIRECTOR_GUIDE_STRATEGY.md](./DIRECTOR_GUIDE_STRATEGY.md)** | WHAT + WHY (strategy, reviews) | Understanding the product |
-| **[DIRECTOR_TOOLS_MERGE_PLAN.md](./DIRECTOR_TOOLS_MERGE_PLAN.md)** | HOW (file inventory, atomic design) | When building |
+| **[DIRECTOR_GUIDE_POSITIONING.md](./DIRECTOR_GUIDE_POSITIONING.md)** | WHO + WHY (audiences, positioning) | Understanding the product |
+| **[DIRECTOR_CALCULATOR_BUILD.md](./DIRECTOR_CALCULATOR_BUILD.md)** | WHAT (inputs, outputs, features) | When building |
 | **[DIRECTOR_TAX_MATH.md](./DIRECTOR_TAX_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
 | **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
 | **[IDEAS.md](./IDEAS.md)** | Future features | After revenue exists |
@@ -33,6 +33,7 @@
 |-----|---------|
 | **[CASE_STUDY_RECRUITER.md](./CASE_STUDY_RECRUITER.md)** | Real-world case study (commission-based director) |
 | **[COMPETITOR_GAP_ANALYSIS.md](./COMPETITOR_GAP_ANALYSIS.md)** | UK competitor landscape |
+| **[DOCS_LIBRARY_SPEC.md](./DOCS_LIBRARY_SPEC.md)** | Future /docs section spec |
 
 ---
 

@@ -1,36 +1,38 @@
 // src/app/blog/category/[slug]/page.tsx
 /**
  * Category-specific blog page using local MDX blog system
+ * Supports both individual categories AND nav groups (e.g., "tax-guides" = tax-guide + guide)
  */
 
-import { ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
-import { cache, Suspense } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
-import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
-import { getBlogCategories, getBlogPosts, getBlogPostsCount } from '@/lib/blog';
-import { categoryContent } from '@/lib/categoryContent';
+import { BlogNav } from '@/components/molecules/BlogNav';
+import {
+  getCategoriesForNavGroup,
+  getNavGroupBySlug,
+  NAV_GROUPS,
+  POSTS_PER_PAGE,
+} from '@/constants/blogCategories';
+import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 import { SITE_URL } from '@/lib/metadata';
-import { cn, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
-// Cache categories fetch to deduplicate calls across generateStaticParams, generateMetadata, and page
+// Cache categories fetch to deduplicate calls
 const getCachedCategories = cache(() => getBlogCategories());
 
-// Next.js 16: Route segment config for optimized category pages
-export const dynamic = 'force-static'; // Pre-render all category pages at build time
-export const dynamicParams = true; // Allow new categories to be created at runtime
-export const revalidate = 3600; // ISR: Revalidate every hour for new posts in categories
+// Next.js 16: Route segment config
+export const dynamicParams = true;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
+  // Generate params for both nav groups AND individual categories
   const categories = await getCachedCategories();
-  return categories.map((category) => ({
-    slug: category.slug,
-  }));
+  const categoryParams = categories.map((c) => ({ slug: c.slug }));
+  const navGroupParams = NAV_GROUPS.map((g) => ({ slug: g.slug }));
+  return [...navGroupParams, ...categoryParams];
 }
 
 export async function generateMetadata({
@@ -38,37 +40,35 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const { slug } = await params;
+
+  // Check if it's a nav group first
+  const navGroup = getNavGroupBySlug(slug);
+  if (navGroup) {
+    const title = `${navGroup.label} | TaxInsights by PayeTax`;
+    const description = `Expert ${navGroup.label.toLowerCase()} articles from TaxInsights. Clear UK tax advice with no jargon.`;
+    return {
+      title,
+      description,
+      alternates: { canonical: `${SITE_URL}/blog/category/${slug}` },
+      openGraph: { title, description, url: `${SITE_URL}/blog/category/${slug}` },
+    };
+  }
+
+  // Fall back to individual category
   const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
-
   if (!category) {
     return { title: 'Category Not Found | TaxInsights by PayeTax' };
   }
 
   const title = `${category.name} | TaxInsights by PayeTax`;
-  const description = `Expert guidance and articles on ${category.name.toLowerCase()} from TaxInsights. Clear UK tax advice with no jargon.`;
-
+  const description = `Expert guidance and articles on ${category.name.toLowerCase()} from TaxInsights.`;
   return {
     title,
     description,
-    keywords: `${category.name}, UK tax, tax guide, tax advice, PAYE, tax calculator, TaxInsights`,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-      siteName: 'TaxInsights by PayeTax',
-      url: `${SITE_URL}/blog/category/${slug}`,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-    alternates: {
-      canonical: `${SITE_URL}/blog/category/${slug}`,
-    },
+    alternates: { canonical: `${SITE_URL}/blog/category/${slug}` },
+    openGraph: { title, description, url: `${SITE_URL}/blog/category/${slug}` },
   };
 }
 
@@ -79,9 +79,8 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const resolvedParams = await params;
+  const { slug } = await params;
   const resolvedSearchParams = await searchParams;
-  const slug = resolvedParams.slug;
 
   const currentPage = resolvedSearchParams.page
     ? Number.parseInt(
@@ -91,341 +90,163 @@ export default async function CategoryPage({
         10
       )
     : 1;
-  const pageSize = 12; // Align with main blog page; adjust via BLOG_CONFIG if needed
 
-  const categories = await getCachedCategories();
-  const category = categories.find((c) => c.slug === slug);
+  // Check if this is a nav group (e.g., "tax-guides" maps to ["tax-guide", "guide"])
+  const navGroup = getNavGroupBySlug(slug);
+  const isGroup = !!navGroup;
+  const categoryKeys = isGroup ? getCategoriesForNavGroup(slug) : [slug];
 
-  if (!category) return notFound();
+  // Fetch posts filtered by category keys (multiple for groups, single for categories)
+  const posts = await getBlogPosts({
+    page: currentPage,
+    pageSize: POSTS_PER_PAGE,
+    categories: categoryKeys,
+  });
 
-  const [posts, totalCount] = await Promise.all([
-    getBlogPosts({
-      page: currentPage,
-      pageSize,
-      category: slug,
-    }),
-    getBlogPostsCount(slug),
-  ]);
+  // Count total posts in these categories
+  const allPosts = await getBlogPosts({ categories: categoryKeys, pageSize: 1000 });
+  const totalCount = allPosts.length;
+  const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
 
-  const totalPages = Math.ceil(totalCount / pageSize);
-
+  // 404 if no posts and not first page
   if (posts.length === 0 && currentPage > 1) {
     return notFound();
   }
+
+  // For individual categories, verify it exists
+  if (!isGroup) {
+    const categories = await getCachedCategories();
+    const category = categories.find((c) => c.slug === slug);
+    if (!category) return notFound();
+  }
+
+  // Display name for header
+  const displayName = isGroup
+    ? navGroup.label
+    : slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   // Breadcrumb structured data
   const breadcrumbStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Blog',
-        item: `${SITE_URL}/blog`,
-      },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
       {
         '@type': 'ListItem',
         position: 3,
-        name: category.name,
+        name: displayName,
         item: `${SITE_URL}/blog/category/${slug}`,
       },
     ],
   };
 
   return (
-    <div className='container mx-auto px-4 py-12'>
-      {/* Structured Data Scripts */}
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'CollectionPage',
-            headline: `${category.name} - PayeTax Blog`,
-            description: `Expert guides on ${category.name.toLowerCase()} for UK taxpayers. Official HMRC rates, practical examples, and tax planning for 2025-26.`,
-            url: `${SITE_URL}/blog/category/${slug}`,
-            author: {
-              '@type': 'Organization',
-              name: 'PayeTax',
-              url: SITE_URL,
-            },
-          }),
-        }}
-      />
+    <div className='min-h-screen bg-slate-950'>
+      {/* Structured Data */}
       <script
         type='application/ld+json'
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
       />
 
-      {/* Breadcrumbs */}
-      <nav
-        aria-label='Breadcrumbs'
-        className={cn('mb-8 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}
-      >
-        <ol className='flex items-center space-x-2'>
-          <li>
-            <Link href='/' className='hover:text-primary'>
-              Home
-            </Link>
-          </li>
-          <li>/</li>
-          <li>
-            <Link href='/blog' className='hover:text-primary'>
-              Blog
-            </Link>
-          </li>
-          <li>/</li>
-          <li className='text-primary'>{category.name}</li>
-        </ol>
-      </nav>
+      {/* Header */}
+      <div className='border-b border-slate-800 bg-slate-900/50 py-12'>
+        <div className='container mx-auto max-w-7xl px-4'>
+          {/* Breadcrumbs */}
+          <nav aria-label='Breadcrumbs' className='mb-6 text-sm text-slate-400'>
+            <ol className='flex items-center gap-2'>
+              <li>
+                <Link href='/' className='hover:text-white'>
+                  Home
+                </Link>
+              </li>
+              <li>/</li>
+              <li>
+                <Link href='/blog' className='hover:text-white'>
+                  Blog
+                </Link>
+              </li>
+              <li>/</li>
+              <li className='text-cyan-400'>{displayName}</li>
+            </ol>
+          </nav>
 
-      {/* Header with Category Description */}
-      <div className='mb-12'>
-        <h1
-          className={cn(
-            'mb-4 text-center font-bold',
-            TYPOGRAPHY.TEXT_3XL,
-            `md:${TYPOGRAPHY.TEXT_4XL}`
-          )}
-        >
-          {categoryContent[slug]?.title || `${category.name} Insights`}
-        </h1>
-        {categoryContent[slug] ? (
-          <div className='mx-auto max-w-3xl'>
-            <p
-              className={cn(
-                'mb-6 text-center text-foreground/90 leading-relaxed',
-                TYPOGRAPHY.TEXT_LG
-              )}
-            >
-              {categoryContent[slug].description}
-            </p>
-            <div className='flex flex-wrap justify-center gap-2'>
-              {categoryContent[slug].keywords.map((keyword) => (
-                <Badge key={keyword} variant='outline' className={TYPOGRAPHY.TEXT_SM}>
-                  {keyword}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <p
-            className={cn(
-              'mx-auto max-w-3xl text-center text-muted-foreground',
-              TYPOGRAPHY.TEXT_LG
-            )}
-          >
-            Explore expert articles on {category.name.toLowerCase()} including UK tax updates,
-            guidance, and practical advice.
+          <h1 className='mb-4 font-display text-3xl font-bold text-white md:text-4xl'>
+            {displayName}
+          </h1>
+          <p className='max-w-2xl text-slate-300'>
+            {isGroup
+              ? `Browse all ${displayName.toLowerCase()} articles - expert UK tax guidance with no jargon.`
+              : `Expert articles on ${displayName.toLowerCase()} including UK tax updates, guidance, and practical advice.`}
           </p>
-        )}
-      </div>
-
-      {/* Categories */}
-      <div className='mb-12'>
-        <h2 className={cn('mb-6 font-bold', TYPOGRAPHY.TEXT_2XL)}>Categories</h2>
-        <div className='flex flex-wrap gap-3'>
-          <Link
-            href='/blog'
-            className='rounded-full border border-border bg-secondary px-4 py-2 font-medium text-foreground transition-colors hover:bg-accent'
-          >
-            All Posts
-          </Link>
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/blog/category/${cat.slug}`}
-              className={`rounded-full px-4 py-2 font-medium transition-colors ${
-                slug === cat.slug
-                  ? 'bg-primary text-primary-foreground'
-                  : 'border border-border bg-secondary text-foreground hover:bg-accent'
-              }`}
-            >
-              {cat.name} {cat.count ? `(${cat.count})` : ''}
-            </Link>
-          ))}
+          <p className='mt-2 text-sm text-slate-500'>
+            {totalCount} {totalCount === 1 ? 'article' : 'articles'}
+          </p>
         </div>
       </div>
 
-      {/* Posts Grid with Suspense for PPR */}
-      <Suspense fallback={<div className='py-16 text-center'>Loading articles...</div>}>
+      {/* Blog Nav */}
+      <div className='container mx-auto max-w-7xl px-4 pt-8'>
+        <BlogNav activeGroup={isGroup ? slug : undefined} />
+      </div>
+
+      {/* Posts Grid */}
+      <div className='container mx-auto max-w-7xl px-4 py-12'>
         {posts.length > 0 ? (
-          <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {posts.map((post) => (
               <article
                 key={post.id}
-                className='overflow-hidden rounded-lg border border-border bg-card shadow-md transition-shadow hover:shadow-lg'
+                className='group rounded-lg border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-slate-700'
               >
-                {post.image && (
-                  <Link href={`/blog/${post.slug}`} className='relative block h-48 overflow-hidden'>
-                    <Image
-                      src={post.image}
-                      alt={post.imageAlt || post.title}
-                      fill
-                      className='object-cover transition-transform duration-300 hover:scale-105'
-                      sizes={IMAGE_SIZES.BLOG_THUMBNAIL}
-                      placeholder='blur'
-                      blurDataURL={BLUR_DATA_URL}
-                    />
-                  </Link>
-                )}
-                <div className='p-6'>
-                  <div
-                    className={cn(
-                      'mb-3 flex items-center justify-between text-muted-foreground',
-                      TYPOGRAPHY.TEXT_SM
-                    )}
-                  >
-                    <span className='font-medium text-primary'>
-                      {post.categoryData?.name || post.category}
-                    </span>
-                    <span>{formatDate(post.publishedAt)}</span>
-                  </div>
-                  <h3 className={cn('mb-3 font-bold', TYPOGRAPHY.TEXT_XL)}>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className='text-foreground transition-colors hover:text-primary'
-                    >
-                      {post.title}
-                    </Link>
-                  </h3>
-                  <p className='mb-4 line-clamp-3 text-muted-foreground'>{post.excerpt}</p>
-                  <div className='flex items-center justify-between'>
-                    <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                      {post.readTime}
-                    </span>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className={cn(
-                        'inline-flex items-center font-medium text-primary hover:text-primary/80',
-                        TYPOGRAPHY.TEXT_SM
-                      )}
-                    >
-                      Read more
-                      <ChevronRight className={`ml-1 ${ICON_SIZES.SIZE_3_5}`} aria-hidden='true' />
-                    </Link>
-                  </div>
+                <div className='mb-3 flex items-center gap-2 text-xs text-slate-400'>
+                  <span className='font-medium text-cyan-400'>
+                    {post.categoryData?.name || post.category}
+                  </span>
+                  <span>•</span>
+                  <span>{post.readTime}</span>
                 </div>
+                <h3 className='mb-2 font-semibold text-white group-hover:text-cyan-400'>
+                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                </h3>
+                <p className='mb-4 line-clamp-2 text-sm text-slate-400'>{post.excerpt}</p>
+                <time className='text-xs text-slate-500' dateTime={post.publishedAt}>
+                  {formatDate(post.publishedAt)}
+                </time>
               </article>
             ))}
           </div>
         ) : (
           <div className='py-16 text-center'>
-            <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-              No articles found in this category. Check back soon!
-            </p>
+            <p className='text-lg text-slate-400'>No articles found. Check back soon!</p>
           </div>
         )}
-      </Suspense>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <nav className='flex items-center justify-center space-x-2' aria-label='Pagination'>
-          {currentPage > 1 && (
-            <Link
-              href={`/blog/category/${slug}?page=${currentPage - 1}`}
-              className='rounded-md border border-border bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent'
-            >
-              Previous
-            </Link>
-          )}
-          <div className='flex space-x-1'>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav className='mt-12 flex items-center justify-center gap-2' aria-label='Pagination'>
+            {currentPage > 1 && (
               <Link
-                key={page}
-                href={`/blog/category/${slug}?page=${page}`}
-                className={`rounded-md px-4 py-2 transition-colors ${
-                  page === currentPage
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-border bg-secondary text-foreground hover:bg-accent'
-                }`}
+                href={`/blog/category/${slug}?page=${currentPage - 1}`}
+                className='rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700'
               >
-                {page}
+                Previous
               </Link>
-            ))}
-          </div>
-          {currentPage < totalPages && (
-            <Link
-              href={`/blog/category/${slug}?page=${currentPage + 1}`}
-              className='rounded-md border border-border bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent'
-            >
-              Next
-            </Link>
-          )}
-        </nav>
-      )}
-
-      {/* Additional SEO Content Section */}
-      {categoryContent[slug] && posts.length > 0 && (
-        <div className='mt-12 rounded-lg border border-border bg-card p-8'>
-          <h2 className={cn('mb-6 font-bold', TYPOGRAPHY.TEXT_2XL)}>About {category.name}</h2>
-          <div className='prose prose-slate dark:prose-invert max-w-none'>
-            <p className='mb-4 text-foreground/80 leading-relaxed'>
-              Our {category.name.toLowerCase()} articles are written by tax experts and updated
-              regularly to reflect the latest HMRC guidance and UK tax law changes. Whether you're
-              looking for basic information or detailed guides on specific topics, you'll find
-              comprehensive, easy-to-understand content that helps you navigate the UK tax system
-              with confidence.
-            </p>
-            <p className='mb-4 text-foreground/80 leading-relaxed'>
-              All information is based on official HMRC rates for the current tax year{' '}
-              {new Date().getMonth() >= 3
-                ? `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`
-                : `${new Date().getFullYear() - 1}/${new Date().getFullYear()}`}
-              . We explain complex tax concepts in plain English, providing practical examples and
-              actionable advice you can use immediately. Our goal is to help UK taxpayers understand
-              their tax obligations, maximize their allowances, and make informed financial
-              decisions.
-            </p>
-          </div>
-
-          {/* Related Topics */}
-          <div className='mt-8'>
-            <h3 className={cn('mb-4 font-bold', TYPOGRAPHY.TEXT_XL)}>Related Topics</h3>
-            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-              {categories
-                .filter((cat) => cat.slug !== slug)
-                .slice(0, 4)
-                .map((cat) => (
-                  <Link
-                    key={cat.slug}
-                    href={`/blog/category/${cat.slug}`}
-                    className='rounded-lg border border-border bg-secondary p-4 transition-colors hover:bg-accent'
-                  >
-                    <h4 className='mb-2 font-semibold text-foreground'>{cat.name}</h4>
-                    <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                      {cat.count} {cat.count === 1 ? 'article' : 'articles'}
-                    </p>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* CTA */}
-      <div className='glass mt-12 rounded-lg p-6'>
-        <h2 className={cn('mb-3 font-bold', TYPOGRAPHY.TEXT_XL)}>Calculate Your UK Tax Now</h2>
-        <p className='mb-4'>
-          Use our free PAYE tax calculator to determine your take-home pay and plan your finances
-          better. Includes all {new Date().getFullYear()}/{new Date().getFullYear() + 1} tax rates,
-          National Insurance contributions, and student loan repayments.
-        </p>
-        <Link
-          href='/'
-          className='inline-flex rounded-lg bg-cyan-600 px-6 py-3 font-medium text-white transition-colors hover:bg-cyan-700'
-        >
-          Try Tax Calculator
-        </Link>
+            )}
+            <span className='px-4 py-2 text-sm text-slate-400'>
+              Page {currentPage} of {totalPages}
+            </span>
+            {currentPage < totalPages && (
+              <Link
+                href={`/blog/category/${slug}?page=${currentPage + 1}`}
+                className='rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700'
+              >
+                Next
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
     </div>
   );

@@ -409,12 +409,7 @@ function calculateOptimalMixStrategy(
   const companyCost = salary + employerNI + corporationTax;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
-  // Dynamic name based on chosen salary
-  const salaryLabel =
-    salary <= lowerEarningsLimit
-      ? `£${lowerEarningsLimit.toLocaleString()}`
-      : `£${personalAllowance.toLocaleString()}`;
-  const name = `Recommended (${salaryLabel} salary)`;
+  const name = 'Recommended';
 
   return {
     name,

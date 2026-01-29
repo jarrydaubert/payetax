@@ -1,25 +1,26 @@
 // src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx
 /**
- * Strategy Comparison Table - 3-strategy comparison (All Salary / Optimal / All Dividends)
+ * Strategy Comparison Cards - 3 selectable strategy cards
+ *
+ * All Salary | Optimal Mix (Recommended) | All Dividends
+ * Selected card has cyan glow. Clicking a card updates the slider.
+ * Dynamic message shows savings (green) or cost (red) vs optimal.
  */
 'use client';
 
-import { CheckCircle2 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Banknote, PiggyBank, Split } from 'lucide-react';
+import { useMemo } from 'react';
+import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
+  useDirectorFormData,
   useDirectorGuideActions,
   useSelectedStrategy,
+  useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
+
+const TAX_YEAR = '2025-2026';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -32,79 +33,172 @@ const formatCurrency = (amount: number) =>
 export function StrategyComparisonTable() {
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
-  const { setSelectedStrategy } = useDirectorGuideActions();
+  const sliderSalary = useSliderSalary();
+  const formData = useDirectorFormData();
+  const { setSelectedStrategy, setSliderSalary } = useDirectorGuideActions();
+
+  // Calculate current scenario based on slider position
+  const currentScenario = useMemo(() => {
+    if (!comparison || comparison.grossProfit <= 0 || sliderSalary === null) return null;
+
+    return calculateSalaryScenario(
+      sliderSalary,
+      comparison.grossProfit - (formData.pensionContribution || 0),
+      formData.region!,
+      TAX_YEAR,
+      formData.otherIncome,
+      formData.hasEmploymentAllowance,
+      formData.studentLoanPlans,
+      formData.pensionContribution,
+      formData.companyCarBIK
+    );
+  }, [comparison, sliderSalary, formData]);
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
+  // Calculate tax difference vs optimal
+  const optimalStrategy = comparison.strategies.optimalMix;
+  const optimalTotalTax =
+    optimalStrategy.totalPersonalTax + optimalStrategy.corporationTax + optimalStrategy.employerNI;
+
+  const currentTotalTax = currentScenario
+    ? currentScenario.incomeTax +
+      currentScenario.employeeNI +
+      currentScenario.dividendTax +
+      currentScenario.studentLoan +
+      currentScenario.corporationTax +
+      currentScenario.employerNI
+    : optimalTotalTax;
+
+  const taxDifference = currentTotalTax - optimalTotalTax;
+  const taxPercentageMore = optimalTotalTax > 0 ? (taxDifference / optimalTotalTax) * 100 : 0;
+
+  const isAtOptimal = Math.abs(taxDifference) < 10; // Within £10 of optimal
+  const isCosting = taxDifference > 10; // Paying MORE tax than optimal
+
   const strategies = [
-    { key: 'allSalary' as const, data: comparison.strategies.allSalary },
-    { key: 'optimalMix' as const, data: comparison.strategies.optimalMix },
-    { key: 'allDividends' as const, data: comparison.strategies.allDividends },
+    {
+      key: 'allSalary' as const,
+      data: comparison.strategies.allSalary,
+      icon: Banknote,
+      description: 'Maximum PAYE salary',
+    },
+    {
+      key: 'optimalMix' as const,
+      data: comparison.strategies.optimalMix,
+      icon: Split,
+      description: 'Tax-efficient split',
+    },
+    {
+      key: 'allDividends' as const,
+      data: comparison.strategies.allDividends,
+      icon: PiggyBank,
+      description: 'Minimum salary, max dividends',
+    },
   ];
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Strategy Comparison</CardTitle>
-        {comparison.savingsVsAllSalary > 0 && (
-          <CardDescription>
-            Save {formatCurrency(comparison.savingsVsAllSalary)} vs all-salary approach
-          </CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className='overflow-x-auto'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Strategy</TableHead>
-                <TableHead className='text-right'>Salary</TableHead>
-                <TableHead className='text-right'>Dividends</TableHead>
-                <TableHead className='text-right'>Total Tax</TableHead>
-                <TableHead className='text-right'>Take-Home</TableHead>
-                <TableHead className='text-right'>Effective Rate</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {strategies.map(({ key, data }) => {
-                const isSelected = selectedStrategy === key;
-                const isBest = comparison.recommended === key;
-                const totalTax = data.totalPersonalTax + data.corporationTax + data.employerNI;
+  const handleSelectStrategy = (key: 'allSalary' | 'optimalMix' | 'allDividends') => {
+    setSelectedStrategy(key);
+    const salary = comparison.strategies[key].salary;
+    setSliderSalary(salary);
+  };
 
-                return (
-                  <TableRow
-                    key={key}
-                    className={cn(
-                      'cursor-pointer transition-colors hover:bg-muted/50',
-                      isSelected &&
-                        'bg-blue-50 ring-2 ring-blue-500 ring-inset dark:bg-blue-950/30',
-                      !isSelected && isBest && 'bg-green-50 dark:bg-green-950/20'
-                    )}
-                    onClick={() => setSelectedStrategy(key)}
-                  >
-                    <TableCell className='font-medium'>
-                      {data.name}
-                      {isBest && (
-                        <span className='ml-2 rounded bg-green-100 px-1.5 py-0.5 text-green-700 text-xs dark:bg-green-900 dark:text-green-300'>
-                          Best
-                        </span>
-                      )}
-                      {isSelected && <CheckCircle2 className='ml-2 inline size-4 text-blue-600' />}
-                    </TableCell>
-                    <TableCell className='text-right'>{formatCurrency(data.salary)}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(data.dividends)}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(totalTax)}</TableCell>
-                    <TableCell className='text-right font-medium'>
-                      {formatCurrency(data.takeHome)}
-                    </TableCell>
-                    <TableCell className='text-right'>{data.effectiveRate.toFixed(1)}%</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+  return (
+    <div className='space-y-3'>
+      {/* Header with dynamic message */}
+      <div>
+        <h3 className='font-semibold text-slate-100'>Choose Your Strategy</h3>
+        {isAtOptimal && (
+          <p className='text-sm'>
+            <span className='font-medium text-emerald-400'>Optimal tax efficiency</span>
+            <span className='text-slate-500'> — this is your best option</span>
+          </p>
+        )}
+        {isCosting && (
+          <p className='text-sm'>
+            <span className='font-medium text-red-400'>
+              {taxPercentageMore.toFixed(0)}% more tax
+            </span>
+            <span className='text-slate-500'>
+              {' '}
+              than optimal ({formatCurrency(taxDifference)} extra)
+            </span>
+          </p>
+        )}
+      </div>
+
+      {/* 3 Strategy Cards */}
+      <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
+        {strategies.map(({ key, data, icon: Icon, description }) => {
+          const isSelected = selectedStrategy === key;
+          const isRecommended = comparison.recommended === key;
+          const totalTax = data.totalPersonalTax + data.corporationTax + data.employerNI;
+
+          return (
+            <button
+              type='button'
+              key={key}
+              onClick={() => handleSelectStrategy(key)}
+              className={cn(
+                'relative rounded-xl border p-4 text-left transition-all',
+                isSelected
+                  ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                  : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]'
+              )}
+            >
+              {/* Recommended Badge */}
+              {isRecommended && (
+                <span className='absolute -top-2 right-3 rounded-full bg-emerald-500 px-2 py-0.5 font-medium text-white text-xs'>
+                  Recommended
+                </span>
+              )}
+
+              {/* Icon & Title */}
+              <div className='mb-3 flex items-center gap-2'>
+                <div
+                  className={cn(
+                    'flex size-8 items-center justify-center rounded-lg',
+                    isSelected ? 'bg-cyan-500/20' : 'bg-white/5'
+                  )}
+                >
+                  <Icon className={cn('size-4', isSelected ? 'text-cyan-400' : 'text-slate-400')} />
+                </div>
+                <div>
+                  <h4 className='font-medium text-slate-100'>{data.name}</h4>
+                  <p className='text-slate-500 text-xs'>{description}</p>
+                </div>
+              </div>
+
+              {/* Key Metrics */}
+              <div className='space-y-1.5 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-slate-500'>Salary</span>
+                  <span className='font-mono text-slate-300'>{formatCurrency(data.salary)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-slate-500'>Dividends</span>
+                  <span className='font-mono text-slate-300'>{formatCurrency(data.dividends)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-slate-500'>Total Tax</span>
+                  <span className='font-mono text-red-400'>{formatCurrency(totalTax)}</span>
+                </div>
+                <div className='mt-2 flex justify-between border-white/[0.08] border-t pt-2'>
+                  <span className='font-medium text-slate-400'>Take-Home</span>
+                  <span className='font-mono font-semibold text-emerald-400'>
+                    {formatCurrency(data.takeHome)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Effective Rate */}
+              <div className='mt-2 text-right text-slate-500 text-xs'>
+                {data.effectiveRate.toFixed(1)}% effective rate
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

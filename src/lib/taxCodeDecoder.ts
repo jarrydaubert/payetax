@@ -218,7 +218,7 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
       // Add context about common allowances using the standard value from taxRates.ts
       if (result.allowance === STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(
-          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2024-26.`
+          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2025-26.`
         );
       } else if (result.allowance > STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(

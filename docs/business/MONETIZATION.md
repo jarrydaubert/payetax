@@ -243,7 +243,8 @@ No demand signal = don't build it yet.
 
 | Document | Purpose |
 |----------|---------|
-| `DIRECTOR_GUIDE_STRATEGY.md` | Product strategy (education-first) |
-| `DIRECTOR_GUIDE_BUILD.md` | Build spec and UX |
+| `DIRECTOR_GUIDE_POSITIONING.md` | Product positioning (audiences) |
+| `DIRECTOR_CALCULATOR_BUILD.md` | Build spec and features |
 | `DIRECTOR_TAX_MATH.md` | Tax calculation reference |
 | `READ_THIS_FIRST.md` | The mantra |
+| `../guides/MONETIZATION.md` | Technical implementation guide |

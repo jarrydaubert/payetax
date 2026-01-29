@@ -3,6 +3,34 @@
 > **This is a TODO list only.** No status tracking - when something is done, delete it.
 > Keep items actionable and specific. If it's not actionable, it doesn't belong here.
 
+---
+
+## Recurring / Floating Items
+
+> These are not one-time tasks - keep them here as reminders
+
+### After Each HMRC/Gov Budget Change
+- Review ALL blog posts for outdated tax rates, thresholds, and allowances
+- Update `publishedAt` / `updatedAt` dates on affected posts
+- Check director-related posts especially (salary thresholds, dividend allowance, CT rates)
+- Verify calculator constants in `src/constants/taxRates.ts` are updated first
+- Key posts to check: director guides, £100k tax trap, Scottish rates comparison, student loans
+
+---
+
+## Director Calculator Spec Completeness
+
+- Review `docs/business/DIRECTOR_CALCULATOR_BUILD.md` for missing features/scenarios
+- Verify all inputs, outputs, warnings, and edge cases are documented
+- Delete this item when spec matches implementation completely
+
+## Documentation Library (P1)
+
+- Implement docs library per `docs/business/DOCS_LIBRARY_SPEC.md`
+- Fumadocs-based `/docs` section explaining every calculator input/output
+- HMRC source links on every page ("Trust signals")
+- Tooltips with "Learn more" links from calculator fields
+
 ## Blog Page Redesign
 
 - Implement blog page redesign per `docs/planning/BLOG_PAGE_BUILD.md`
@@ -19,7 +47,6 @@
 
 ## Lighthouse / Performance
 
-- Add Content-Security-Policy headers (Best Practices 96→100) - whitelist analytics domains
 - Reduce Total Blocking Time on mobile (Performance 98→100) - minor, low priority
 
 ## Tech Debt
@@ -27,13 +54,6 @@
 - Align IncomeSource type in store with validation.ts discriminated union schema
 - Add validationError state to calculatorStore for UI feedback on validation failures
 - Create tsconfig.test.json to enable type-checking for test files
-
-### Director Calculator Refactoring
-- Extract strategy table component from DirectorCalculatorClient.tsx
-- Extract Two Pots component
-- Extract Key Dates component
-- Extract Warnings component
-- Extract Assumptions component
 
 ## Tools Directory Audit
 
@@ -50,9 +70,6 @@
 - Currently only links to: tax-code-decoder, scottish-tax-calculator
 - Consider adding "More Tools" section or linking remaining tools
 
-### Director Guide SEO
-- `/tools/director-guide` not in sitemap - decide if it should be (full-screen app)
-
 ### MarriageAllowanceAlert Component
 - Links to gov.uk instead of internal `/tools/marriage-allowance-calculator`
 - Consider linking to internal tool instead
@@ -62,48 +79,6 @@
   - `/embed` - The actual embeddable calculator (iframe content, noindex)
   - `/tools/embed-widget` - Marketing page with embed code generator
 - Decision needed: add link elsewhere (footer, /tools page) or remove both if not launching soon
-
-## Director Guide - Consumer Version Features
-
-> Features from DIRECTOR_GUIDE_STRATEGY.md spec for the consumer-facing guide (education-first)
-
-### Core Consumer UX (P0)
-- Entry choice routing: "I'm new — explain and keep it simple" vs "I know the basics — go straight to the calculator"
-- Education-first flow with sections: Understand → Calculate → Plan → Next Steps
-- "Sleep at Night" status indicator (🟢🟡🔴) based on set-aside coverage
-- Tax Bathtub visualization - visual metaphor for money flow (revenue → expenses → tax pots → take-home)
-- Jargon tooltips on EVERY technical term (Wife Test compliance)
-- "Safe Monthly Draw (Estimate)" - renamed from "Spendable Now" with cash check reminder
-
-### Educational Content
-- "How can I take money from my company?" explainer (Salary vs Dividends vs Director's Loan)
-- FAQ section: "Can I just transfer money to my personal account?", "What if my company has no profit yet?", "Do I need to run payroll for just myself?"
-- "When to DIY vs When to get an accountant" guidance section
-- Questions to ask an accountant template
-
-### First-Year Director Guidance
-- "Expenses you might not have thought of" card: accountant fees (£500-2000), payroll software (£100+), Companies House filing (£13), professional indemnity insurance, registered office service
-- "Keep a buffer in your business account" recommendation (e.g. 3 months running costs)
-- "Your first year costs more" warning - setup costs, accountant onboarding, software subscriptions
-- Expense estimation helper for first-timers who don't know their costs yet
-
-### Wizard Flow (Stepper)
-- Step 1: Your situation (profit, year-end, VAT, already taken)
-- Step 2: Your options (plain English education)
-- Step 3: The simple safe approach (£12,570 salary recommendation)
-- Step 4: Your numbers + set-asides
-- Step 5: Key dates + reminders
-
-### Visualizations
-- Money flow diagram (Sankey or bathtub style)
-- Two pots visual split (Company Account vs Personal Savings)
-- Progress stepper for wizard flow
-
-### Nice-to-Have (P1)
-- "Share with my accountant" button (pre-filled message + UTM)
-- Glossary drawer (centralized jargon definitions)
-- Input confidence level toggle ("rough estimate" vs "from accounts")
-- PDF export of results (gated behind email capture for P2)
 
 ## Director Calculator - Missing Tests (P0)
 
@@ -191,36 +166,6 @@
 - Technically SA deadline depends on tax year income was received
 - Consider adding "Income taken in tax year: 2025/26 or 2026/27" input for accuracy
 
----
 
-## Director Guide (Consumer) - Post-Review Backlog
-
-> Items identified during 3-reviewer (Grok/Claude/ChatGPT) feedback process
-
-### EducationPanel
-
-- Make Learn cards expandable accordions (currently static, have no onClick)
-- Improve DLA warning logic - add "dividends declared" option to avoid false positives
-- Move warning logic to engine (return `result.flags.requiresSelfAssessment` etc.) instead of computing in UI
-
-### DashboardLayout
-
-- Add mobile fallback for education panel (currently only inputs has drawer)
-
-### DetailCards
-
-- Gate behind "Show detailed breakdown" toggle (too tax-nerdy for beginner flow)
-- Pass `netRevenue` prop (after VAT deduction) instead of gross revenue
-
-### Components Not Yet Reviewed
-
-- `InputsPanel.tsx` - needs 3-reviewer pass
-- `MainContent.tsx` - needs 3-reviewer pass
-- `SummaryCards.tsx` - needs 3-reviewer pass
-- `MoneyFlowChart.tsx` - needs 3-reviewer pass
-- `SidebarNav.tsx` - needs 3-reviewer pass
-- `OtherIncomeGate.tsx` - needs 3-reviewer pass
-- `results/` folder (7 files) - needs 3-reviewer pass
-- `warnings/` folder (7 files) - needs 3-reviewer pass
 
 

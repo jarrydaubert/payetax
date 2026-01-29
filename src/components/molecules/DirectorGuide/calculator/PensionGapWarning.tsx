@@ -1,18 +1,17 @@
 // src/components/molecules/DirectorGuide/calculator/PensionGapWarning.tsx
 /**
- * Pension Gap Warning - NI credits / State Pension warning
+ * State Pension Status - Shows pension qualification status based on salary
  *
- * Warns when salary is in the "pension gap" zone:
- * - Above £5,000 (paying Employer NI)
- * - Below £6,500 (not qualifying for State Pension credits)
+ * Salary zones:
+ * - £0 - £4,999: No employer National Insurance, no pension credits
+ * - £5,000 - £6,499: Paying employer NI but NOT earning pension credits (inefficient!)
+ * - £6,500+: Earning State Pension credits (good)
  */
 'use client';
 
-import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
 import {
   useSelectedStrategy,
   useSliderSalary,
@@ -34,96 +33,96 @@ export function PensionGapWarning() {
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
 
-  // Get current salary (from slider or selected strategy)
   const currentSalary = useMemo(() => {
     if (sliderSalary !== null) return sliderSalary;
     if (!comparison) return 0;
     return comparison.strategies[selectedStrategy].salary;
   }, [sliderSalary, comparison, selectedStrategy]);
 
-  // Thresholds
-  const ST = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.threshold;
-  const LEL = TAX_RATES[TAX_YEAR].nationalInsurance.lowerEarningsLimit;
-  const niRate = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.rate / 100;
+  // Thresholds from tax rates
+  const secondaryThreshold = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.threshold; // £5,000
+  const lowerEarningsLimit = TAX_RATES[TAX_YEAR].nationalInsurance.lowerEarningsLimit; // £6,500
+  const niRate = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.rate / 100; // 15%
 
-  // Calculate status
-  const inPensionGap = currentSalary > ST && currentSalary < LEL;
-  const hasNICredits = currentSalary >= LEL;
+  // Determine status
+  const inGapZone = currentSalary >= secondaryThreshold && currentSalary < lowerEarningsLimit;
+  const qualifiesForPension = currentSalary >= lowerEarningsLimit;
 
-  // Calculate costs if in gap
-  const employerNIInGap = inPensionGap ? (currentSalary - ST) * niRate : 0;
-  const salaryToFix = LEL - currentSalary;
-  const additionalNICost = salaryToFix > 0 ? salaryToFix * niRate : 0;
-  const monthlyFixCost = additionalNICost / 12;
+  // Calculate gap zone costs
+  const employerNIBeingPaid = inGapZone
+    ? Math.round((currentSalary - secondaryThreshold) * niRate)
+    : 0;
+  const extraNeededForPension = lowerEarningsLimit - currentSalary;
+  const extraMonthlyCost =
+    extraNeededForPension > 0 ? Math.round((extraNeededForPension * niRate) / 12) : 0;
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
-  return (
-    <Card
-      className={cn(
-        'border',
-        hasNICredits
-          ? 'border-green-500/50 bg-green-50/50 dark:bg-green-950/20'
-          : inPensionGap
-            ? 'border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20'
-            : 'border-muted bg-muted/30'
-      )}
-    >
-      <CardHeader className='pb-2'>
-        <CardTitle className='flex items-center gap-2 text-lg'>
-          {hasNICredits ? (
-            <CheckCircle2 className='size-5 text-green-600' />
-          ) : inPensionGap ? (
-            <AlertTriangle className='size-5 text-amber-600' />
-          ) : (
-            <Info className='size-5 text-muted-foreground' />
-          )}
-          NI Credits &amp; State Pension
-        </CardTitle>
-      </CardHeader>
-      <CardContent className='text-sm'>
-        <div className='space-y-2'>
-          <p>
-            <strong>Lower Earnings Limit (LEL):</strong> {formatCurrency(LEL)}/year (
-            {formatCurrency(Math.round(LEL / 12))}/month)
-          </p>
-          <p className='text-muted-foreground'>
-            Salary above LEL earns NI credits toward your State Pension, even if below the Primary
-            Threshold where you start paying NI.
-          </p>
-
-          <div className='mt-3 rounded-lg bg-background p-3'>
-            {hasNICredits ? (
-              <p className='text-green-700 dark:text-green-400'>
-                ✓ <strong>{formatCurrency(currentSalary)} salary</strong> qualifies for NI credits —
-                you&apos;ll build State Pension entitlement.
-              </p>
-            ) : inPensionGap ? (
-              <div className='space-y-2'>
-                <p className='text-amber-700 dark:text-amber-400'>
-                  ⚠ <strong>Inefficient zone:</strong> Paying{' '}
-                  {formatCurrency(Math.round(employerNIInGap))}/year Employer NI but earning no
-                  pension credits.
-                </p>
-                <p className='font-medium text-amber-700 dark:text-amber-400'>
-                  Increase to {formatCurrency(LEL)} (+{formatCurrency(Math.round(monthlyFixCost))}
-                  /month) to secure a qualifying year.
-                </p>
-              </div>
-            ) : (
-              <p className='text-muted-foreground'>
-                {formatCurrency(currentSalary)} salary is below the Secondary Threshold — no
-                Employer NI, but also no pension credits.
-              </p>
-            )}
+  // Qualifies for pension - green success state
+  if (qualifiesForPension) {
+    return (
+      <div className='rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4'>
+        <div className='flex items-start gap-3'>
+          <CheckCircle2 className='mt-0.5 size-5 shrink-0 text-emerald-500' />
+          <div className='space-y-1 text-sm'>
+            <p className='font-medium text-emerald-400'>State Pension: Qualifying Year</p>
+            <p className='text-slate-400'>
+              Your {formatCurrency(currentSalary)} salary is above{' '}
+              {formatCurrency(lowerEarningsLimit)}, so this year counts toward your State Pension
+              entitlement.
+            </p>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          <p className='mt-2 text-muted-foreground text-xs'>
-            The £12,570 &quot;optimal&quot; salary is above the LEL, so you automatically qualify
-            for NI credits without paying any Employee NI.
+  // In the gap zone - amber warning state
+  if (inGapZone) {
+    return (
+      <div className='rounded-xl border border-amber-500/30 bg-amber-500/5 p-4'>
+        <div className='flex items-start gap-3'>
+          <AlertTriangle className='mt-0.5 size-5 shrink-0 text-amber-500' />
+          <div className='space-y-2 text-sm'>
+            <p className='font-medium text-amber-400'>Warning: Inefficient Salary Zone</p>
+            <p className='text-slate-400'>
+              At {formatCurrency(currentSalary)} salary, your company pays{' '}
+              {formatCurrency(employerNIBeingPaid)}/year in employer National Insurance, but you're{' '}
+              <strong className='text-slate-300'>not earning any State Pension credits</strong>.
+            </p>
+            <p className='text-slate-400'>
+              Increase to {formatCurrency(lowerEarningsLimit)} (+{formatCurrency(extraMonthlyCost)}
+              /month employer cost) to make this a qualifying year for your pension.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Below threshold - neutral info state
+  return (
+    <div className='rounded-xl border border-white/[0.04] bg-[#1e293b] p-4'>
+      <div className='flex items-start gap-3'>
+        <XCircle className='mt-0.5 size-5 shrink-0 text-slate-500' />
+        <div className='space-y-1 text-sm'>
+          <p className='font-medium text-slate-400'>State Pension: No Credits This Year</p>
+          <p className='text-slate-500'>
+            {currentSalary === 0 ? (
+              <>
+                With £0 salary, you pay no employer National Insurance but also earn no State
+                Pension credits.
+              </>
+            ) : (
+              <>
+                Your {formatCurrency(currentSalary)} salary is below{' '}
+                {formatCurrency(secondaryThreshold)}, so there's no employer National Insurance cost
+                — but also no pension credits.
+              </>
+            )}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

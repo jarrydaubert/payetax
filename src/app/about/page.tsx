@@ -1,7 +1,9 @@
 // src/app/about/page.tsx
 'use client';
 
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
@@ -97,8 +99,8 @@ export default function AboutPage() {
         <div className={LAYOUT.CONTAINER}>
           <FeatureGrid
             heading={{
-              title: 'Built with Modern Technology',
-              subtitle: 'Professional tools for a free service',
+              title: 'Why It Just Works',
+              subtitle: 'Built for accuracy, not profit',
               align: 'center',
             }}
             features={ABOUT_TECH_STACK}
@@ -152,12 +154,20 @@ export default function AboutPage() {
                 job offers, or just curious about your tax breakdown &mdash; you deserve a tool that
                 respects your time and data.
               </p>
-              <p className='text-muted-foreground'>
-                No VC funding. No premium tiers. No data harvesting. Just a useful tool built with
-                care, because it needed to exist.
-              </p>
+              <p className='text-muted-foreground'>User-funded. Always free. Your data is yours.</p>
             </div>
           </Card>
+
+          {/* Try Calculator CTA */}
+          <div className={cn(SPACING.MT_12, LAYOUT.TEXT_CENTER)}>
+            <Link
+              href='/'
+              className='group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-8 py-4 font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-lg'
+            >
+              Try the Calculator
+              <ArrowRight className='size-5 transition-transform group-hover:translate-x-1' />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -167,8 +177,8 @@ export default function AboutPage() {
         description="We're always improving. If you have suggestions, found a bug, or just want to say hi, reach out!"
         links={[
           {
-            text: 'feedback@payetax.co.uk',
-            href: 'mailto:feedback@payetax.co.uk?subject=Feedback',
+            text: 'support@payetax.co.uk',
+            href: 'mailto:support@payetax.co.uk?subject=Feedback',
             type: 'email',
           },
         ]}

@@ -53,7 +53,7 @@ import {
   type TaxYear,
   WEEKS_PER_YEAR,
 } from '@/constants/taxRates';
-import type { IncomeSource } from '@/store/calculatorStore';
+import type { IncomeSource } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
 
 /**

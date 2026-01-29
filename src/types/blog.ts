@@ -21,6 +21,8 @@ export interface BlogPostFrontmatter {
   // Optional fields
   updatedAt?: string; // ISO date string
   featured?: boolean;
+  editorsPick?: boolean; // Show in Editor's Picks sidebar
+  deepDive?: boolean; // Show in Deep Dives section
   author?: string;
   readTime?: string; // e.g., "5 min read"
   tags?: string[];
@@ -64,6 +66,7 @@ export interface BlogPaginationOptions {
   page?: number;
   pageSize?: number;
   category?: string;
+  categories?: string[]; // Filter by multiple categories (for nav groups)
   tag?: string;
   featured?: boolean;
   searchQuery?: string;

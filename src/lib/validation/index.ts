@@ -65,6 +65,32 @@ export {
   type WarningType,
   WarningTypeSchema,
 } from './directorValidation';
+// Email-related API validation
+export {
+  type DirectorStrategy,
+  DirectorStrategySchema,
+  EmailSchema,
+  type NewsletterSubscribeRequest,
+  NewsletterSubscribeRequestSchema,
+  type PayeResults,
+  PayeResultsSchema,
+  type PayPeriodValues,
+  PayPeriodValuesSchema,
+  REFERRAL_REASON_LABELS,
+  type ReferralLeadRequest,
+  ReferralLeadRequestSchema,
+  type ReferralReason,
+  ReferralReasonSchema,
+  type SalaryRange,
+  SalaryRangeSchema,
+  type SendDirectorResultsRequest,
+  SendDirectorResultsRequestSchema,
+  type SendResultsRequest,
+  SendResultsRequestSchema,
+  type TaxBand,
+  TaxBandSchema,
+  TaxYearStringSchema,
+} from './emailValidation';
 // Molecules layer validation (feedback forms, filters)
 export {
   type CategoryFilterData,
