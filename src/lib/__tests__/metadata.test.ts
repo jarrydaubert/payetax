@@ -56,10 +56,8 @@ describe('Metadata Module', () => {
         title: 'Custom Page | PayeTax',
       });
 
-      expect(metadata.title).toEqual({
-        default: 'Custom Page | PayeTax',
-        template: '%s | PayeTax',
-      });
+      // When title already contains PayeTax, returns string to avoid template duplication
+      expect(metadata.title).toBe('Custom Page | PayeTax');
     });
 
     test('should handle custom OpenGraph image URL', () => {

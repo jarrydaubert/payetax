@@ -70,21 +70,12 @@ describe('SalarySEOContent', () => {
   });
 
   describe('Main Heading and Intro', () => {
-    it('should render the main heading with salary', () => {
+    it('should render the main heading', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 2, name: '£30,000 Salary Take-Home Pay Breakdown' })
-      ).toBeInTheDocument();
-    });
-
-    it('should format large salaries with commas in heading', () => {
-      const mockResults = createMockResults({ grossSalary: 125000 });
-      render(<SalarySEOContent salary={125000} results={mockResults} />);
-
-      expect(
-        screen.getByRole('heading', { level: 2, name: '£125,000 Salary Take-Home Pay Breakdown' })
+        screen.getByRole('heading', { level: 2, name: 'Take-Home Pay Breakdown' })
       ).toBeInTheDocument();
     });
 

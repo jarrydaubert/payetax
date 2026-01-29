@@ -23,6 +23,7 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
 
   return (
     <section aria-labelledby='latest-articles-heading'>
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
       <h2
         id='latest-articles-heading'
         className='mb-6 font-display font-semibold text-white text-xl md:text-2xl'

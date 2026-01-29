@@ -38,6 +38,7 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
       <div className='container mx-auto max-w-7xl px-4'>
         {/* Section Header */}
         <div className='mb-8 flex items-center justify-between'>
+          {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
             className='font-display font-semibold text-white text-xl md:text-2xl'

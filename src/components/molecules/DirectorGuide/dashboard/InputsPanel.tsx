@@ -16,7 +16,7 @@ import {
   RotateCcw,
   Share2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,7 @@ const countryToRegion: Record<Country, Region> = {
 };
 
 export function InputsPanel({ onReset, className }: InputsPanelProps) {
+  const includesVatId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | ''>('');
   const formData = useDirectorFormData();
@@ -106,12 +107,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
         <div className='flex items-center gap-2'>
           <Checkbox
-            id='includesVat'
+            id={includesVatId}
             checked={formData.includesVat}
             onCheckedChange={(checked) => setIncludesVat(checked === true)}
             className='border-white/20 data-[state=checked]:bg-cyan-500'
           />
-          <Label htmlFor='includesVat' className='cursor-pointer text-slate-400 text-sm'>
+          <Label htmlFor={includesVatId} className='cursor-pointer text-slate-400 text-sm'>
             Revenue includes VAT
           </Label>
           <Tip content='If checked, we divide by 1.2 to get net revenue' />

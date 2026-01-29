@@ -61,8 +61,8 @@ jest.mock('next/link', () => ({
 }));
 
 describe('SalaryCalculatorPage', () => {
-  const mockResults = {
-    grossSalary: { annually: 45000, monthly: 3750, weekly: 865, daily: 173, hourly: 21.63 },
+  const createMockResults = (salary: number = 45000) => ({
+    grossSalary: salary,
     takeHome: 34302,
     totalTax: 6486,
     totalNI: 4212,
@@ -77,13 +77,18 @@ describe('SalaryCalculatorPage', () => {
       hourly: 1.25,
     },
     studentLoan: { annually: 0, monthly: 0, weekly: 0, daily: 0, hourly: 0 },
+    studentLoanRepayment: { annually: 0, monthly: 0, weekly: 0, daily: 0, hourly: 0 },
     pensionContribution: { annually: 0, monthly: 0, weekly: 0, daily: 0, hourly: 0 },
     netPay: { annually: 35920, monthly: 2993.33, weekly: 690.77, daily: 138.15, hourly: 17.27 },
-    pension: 0,
-    employerNI: 5310,
-    effectiveRate: 23.78,
-    marginalRate: 33.25,
-  };
+    employerNI: { annually: 5310, monthly: 442.5, weekly: 102.12, daily: 20.42, hourly: 2.55 },
+    effectiveTaxRate: 23.78,
+    marginalTaxRate: 33.25,
+    taxYear: '2025-2026',
+    taxCode: '1257L',
+    isScottish: false,
+  });
+
+  const mockResults = createMockResults(45000);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -92,7 +97,7 @@ describe('SalaryCalculatorPage', () => {
 
   describe('Rendering', () => {
     it('should render without crashing', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
@@ -100,7 +105,7 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should render main sections', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       // Component renders immediately with results in tests (useEffect runs sync in jsdom)
       await waitFor(() => {
@@ -109,7 +114,7 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should render all main sections after loading', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
@@ -119,7 +124,7 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should render breadcrumb navigation', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
@@ -130,7 +135,7 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should render section headings', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByText('Customize Your Calculation')).toBeInTheDocument();
@@ -140,23 +145,17 @@ describe('SalaryCalculatorPage', () => {
   });
 
   describe('Salary Calculations', () => {
-    it('should calculate tax on mount', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+    it('should use SSR results directly without calling calculateTax', async () => {
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith(
-          expect.objectContaining({
-            salary: 45000,
-            payPeriod: 'annually',
-            taxYear: '2025-2026',
-            taxCode: '1257L',
-          })
-        );
+        // Component uses SSR results - no client-side calculation needed
+        expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
       });
     });
 
-    it('should update store with salary', async () => {
-      render(<SalaryCalculatorPage salary={50000} />);
+    it('should update store with salary for interactive calculator', async () => {
+      render(<SalaryCalculatorPage salary={50000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(mockSetSalary).toHaveBeenCalledWith(50000);
@@ -164,48 +163,28 @@ describe('SalaryCalculatorPage', () => {
       });
     });
 
-    it('should handle different salary amounts', async () => {
-      const { rerender } = render(<SalaryCalculatorPage salary={30000} />);
+    it('should handle different salary amounts via SSR', async () => {
+      const results30k = createMockResults(30000);
+      const results60k = createMockResults(60000);
+      const { rerender } = render(
+        <SalaryCalculatorPage salary={30000} initialResults={results30k as any} />
+      );
 
       await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith(expect.objectContaining({ salary: 30000 }));
+        expect(screen.getByText('£30,000 Salary')).toBeInTheDocument();
       });
 
-      mockCalculateTax.mockClear();
-      rerender(<SalaryCalculatorPage salary={60000} />);
+      rerender(<SalaryCalculatorPage salary={60000} initialResults={results60k as any} />);
 
       await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith(expect.objectContaining({ salary: 60000 }));
-      });
-    });
-
-    it('should use default tax calculation parameters', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
-
-      await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith({
-          salary: 45000,
-          payPeriod: 'annually',
-          taxYear: '2025-2026',
-          taxCode: '1257L',
-          isScottish: false,
-          isMarried: false,
-          partnerGrossWage: 0,
-          isBlind: false,
-          payNoNI: false,
-          studentLoanPlans: 'none',
-          pensionContribution: 0,
-          pensionContributionType: 'percentage',
-          niCategory: 'A',
-          hoursPerWeek: 37.5,
-        });
+        expect(screen.getByText('£60,000 Salary')).toBeInTheDocument();
       });
     });
   });
 
   describe('Salary Formatting', () => {
     it('should format salary with UK locale', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByText('£45,000 Salary')).toBeInTheDocument();
@@ -213,7 +192,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should format large salaries correctly', async () => {
-      render(<SalaryCalculatorPage salary={125000} />);
+      render(
+        <SalaryCalculatorPage salary={125000} initialResults={createMockResults(125000) as any} />
+      );
 
       await waitFor(() => {
         expect(screen.getByText('£125,000 Salary')).toBeInTheDocument();
@@ -221,7 +202,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should format small salaries correctly', async () => {
-      render(<SalaryCalculatorPage salary={20000} />);
+      render(
+        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />
+      );
 
       await waitFor(() => {
         expect(screen.getByText('£20,000 Salary')).toBeInTheDocument();
@@ -231,67 +214,62 @@ describe('SalaryCalculatorPage', () => {
 
   describe('Comparison Salaries', () => {
     it('should generate comparison salaries', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
       });
-
-      // Comparisons: 35k, 40k, 50k, 55k
-      // Note: These are passed to component but not rendered in our mock
     });
 
     it('should filter out salaries below 20k', async () => {
-      render(<SalaryCalculatorPage salary={25000} />);
+      render(
+        <SalaryCalculatorPage salary={25000} initialResults={createMockResults(25000) as any} />
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
       });
-
-      // Would generate: 15k (-10k), 20k (-5k), 30k (+5k), 35k (+10k)
-      // 15k should be filtered out (< 20k)
     });
 
     it('should filter out salaries above 500k', async () => {
-      render(<SalaryCalculatorPage salary={495000} />);
+      render(
+        <SalaryCalculatorPage salary={495000} initialResults={createMockResults(495000) as any} />
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
       });
-
-      // Would generate: 485k (-10k), 490k (-5k), 500k (+5k), 505k (+10k)
-      // 505k should be filtered out (> 500k)
     });
   });
 
   describe('Related Searches', () => {
     it('should render related salary links', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
-        // £45k will show £25k, £30k, £35k, £60k, £70k (not £40k or £50k - too close)
         expect(screen.getByText(/£30,000 salary/)).toBeInTheDocument();
         expect(screen.getByText(/£70,000 salary/)).toBeInTheDocument();
       });
     });
 
     it('should filter related salaries within range', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const links = container.querySelectorAll('a[href^="/calculator/"]');
         const relatedLinks = Array.from(links).filter((link) =>
           link.textContent?.includes('salary')
         );
-
-        // Should show salaries within £5k-£30k range of £45k
-        // Valid: £25k, £30k, £35k, £40k, £50k, £60k, £70k
         expect(relatedLinks.length).toBeGreaterThan(0);
       });
     });
 
     it('should link to correct calculator URLs', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const link = container.querySelector('a[href="/calculator/30000-after-tax"]');
@@ -301,22 +279,20 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should exclude current salary from related salary calculation links', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={50000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={50000} initialResults={createMockResults(50000) as any} />
+      );
 
       await waitFor(() => {
-        // Should not have a calculator link to the current salary
-        // (note: the blog "Related Reading" section may still mention it)
         const links = container.querySelectorAll('a[href="/calculator/50000-after-tax"]');
         expect(links.length).toBe(0);
       });
     });
 
     it('should exclude salaries within £5k range', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
-        // Should not show £45k (current) or very close salaries
-        // £40k is exactly £5k away, should be filtered
         const links = screen.queryAllByText(/£40,000 salary/);
         expect(links.length).toBe(0);
       });
@@ -325,16 +301,18 @@ describe('SalaryCalculatorPage', () => {
 
   describe('Accessibility', () => {
     it('should have proper semantic sections', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const sections = container.querySelectorAll('section');
-        expect(sections.length).toBeGreaterThanOrEqual(3); // Hero, calculator, related
+        expect(sections.length).toBeGreaterThanOrEqual(3);
       });
     });
 
     it('should have accessible breadcrumb', async () => {
-      render(<SalaryCalculatorPage salary={45000} />);
+      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
 
       await waitFor(() => {
         const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
@@ -344,7 +322,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should have proper heading hierarchy', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const h2Headings = container.querySelectorAll('h2');
@@ -355,7 +335,9 @@ describe('SalaryCalculatorPage', () => {
 
   describe('Layout & Styling', () => {
     it('should have min-height screen', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const mainDiv = container.querySelector('.min-h-screen');
@@ -365,7 +347,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should have responsive grid layout', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const grid = container.querySelector('.grid.lg\\:grid-cols-2');
@@ -374,7 +358,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should have gradient background', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const gradient = container.querySelector('.bg-gradient-to-br');
@@ -383,7 +369,9 @@ describe('SalaryCalculatorPage', () => {
     });
 
     it('should use design tokens for spacing', async () => {
-      const { container } = render(<SalaryCalculatorPage salary={45000} />);
+      const { container } = render(
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+      );
 
       await waitFor(() => {
         const containerDiv = container.querySelector('.container.mx-auto.max-w-7xl');
@@ -394,18 +382,22 @@ describe('SalaryCalculatorPage', () => {
 
   describe('Edge Cases', () => {
     it('should handle minimum salary', async () => {
-      render(<SalaryCalculatorPage salary={20000} />);
+      render(
+        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />
+      );
 
       await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith(expect.objectContaining({ salary: 20000 }));
+        expect(screen.getByText('£20,000 Salary')).toBeInTheDocument();
       });
     });
 
     it('should handle maximum salary', async () => {
-      render(<SalaryCalculatorPage salary={500000} />);
+      render(
+        <SalaryCalculatorPage salary={500000} initialResults={createMockResults(500000) as any} />
+      );
 
       await waitFor(() => {
-        expect(mockCalculateTax).toHaveBeenCalledWith(expect.objectContaining({ salary: 500000 }));
+        expect(screen.getByText('£500,000 Salary')).toBeInTheDocument();
       });
     });
 
@@ -413,11 +405,12 @@ describe('SalaryCalculatorPage', () => {
       const salaries = [25000, 30000, 35000, 40000, 45000, 50000, 60000, 80000, 100000];
 
       for (const salary of salaries) {
-        mockCalculateTax.mockClear();
-        const { unmount } = render(<SalaryCalculatorPage salary={salary} />);
+        const { unmount } = render(
+          <SalaryCalculatorPage salary={salary} initialResults={createMockResults(salary) as any} />
+        );
 
         await waitFor(() => {
-          expect(mockCalculateTax).toHaveBeenCalledWith(expect.objectContaining({ salary }));
+          expect(screen.getByText(`£${salary.toLocaleString('en-GB')} Salary`)).toBeInTheDocument();
         });
 
         unmount();

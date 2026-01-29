@@ -26,8 +26,8 @@ export function BlogPagination({
   if (totalPages <= 1) return null;
 
   // Generate page numbers to display (show max 5 pages with ellipsis)
-  const getPageNumbers = (): (number | 'ellipsis')[] => {
-    const pages: (number | 'ellipsis')[] = [];
+  const getPageNumbers = (): (number | 'ellipsis-start' | 'ellipsis-end')[] => {
+    const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
     const maxVisible = 5;
 
     if (totalPages <= maxVisible) {
@@ -40,7 +40,7 @@ export function BlogPagination({
       pages.push(1);
 
       if (currentPage > 3) {
-        pages.push('ellipsis');
+        pages.push('ellipsis-start');
       }
 
       // Show pages around current
@@ -52,7 +52,7 @@ export function BlogPagination({
       }
 
       if (currentPage < totalPages - 2) {
-        pages.push('ellipsis');
+        pages.push('ellipsis-end');
       }
 
       // Always show last page
@@ -100,10 +100,10 @@ export function BlogPagination({
 
       {/* Page numbers */}
       <div className='hidden items-center gap-1 sm:flex'>
-        {pageNumbers.map((page, index) =>
-          page === 'ellipsis' ? (
+        {pageNumbers.map((page) =>
+          typeof page === 'string' ? (
             <span
-              key={`ellipsis-${index}`}
+              key={page}
               className='flex h-10 w-10 items-center justify-center text-slate-500'
               aria-hidden='true'
             >

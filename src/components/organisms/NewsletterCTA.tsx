@@ -12,7 +12,7 @@
 
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,11 @@ interface NewsletterCTAProps {
 }
 
 export function NewsletterCTA({ className }: NewsletterCTAProps) {
+  const id = useId();
+  const headingId = `${id}-heading`;
+  const emailId = `${id}-email`;
+  const errorId = `${id}-error`;
+
   const [email, setEmail] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -73,7 +78,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
         'bg-gradient-to-br from-cyan-500 to-emerald-500',
         className
       )}
-      aria-labelledby='newsletter-heading'
+      aria-labelledby={headingId}
     >
       {/* Background decoration */}
       <div className='absolute inset-0 opacity-10'>
@@ -82,10 +87,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
       </div>
 
       <div className='relative text-center'>
-        <h2
-          id='newsletter-heading'
-          className='mb-3 font-bold font-display text-2xl text-white md:text-3xl'
-        >
+        <h2 id={headingId} className='mb-3 font-bold font-display text-2xl text-white md:text-3xl'>
           Stay Updated on UK Tax Changes
         </h2>
 
@@ -102,11 +104,11 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
         ) : (
           <form onSubmit={handleSubmit} className='mx-auto max-w-md'>
             <div className='flex flex-col gap-3 sm:flex-row'>
-              <label htmlFor='newsletter-email' className='sr-only'>
+              <label htmlFor={emailId} className='sr-only'>
                 Email address
               </label>
               <input
-                id='newsletter-email'
+                id={emailId}
                 type='email'
                 name='email'
                 value={email}
@@ -120,7 +122,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                   'focus:outline-none focus:ring-2 focus:ring-white/50',
                   'disabled:opacity-50'
                 )}
-                aria-describedby={status === 'error' ? 'newsletter-error' : undefined}
+                aria-describedby={status === 'error' ? errorId : undefined}
               />
 
               {/* Honeypot field - hidden from users, visible to bots */}
@@ -157,7 +159,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
             </div>
 
             {status === 'error' && (
-              <p id='newsletter-error' className='mt-3 text-sm text-white/90' role='alert'>
+              <p id={errorId} className='mt-3 text-sm text-white/90' role='alert'>
                 {errorMessage}
               </p>
             )}

@@ -2,7 +2,7 @@
 'use client';
 
 import { Mail } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +24,7 @@ interface EmailResultsDialogProps {
 }
 
 export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResultsDialogProps) {
+  const emailInputId = useId();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -92,7 +93,7 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
 
         <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
           <div className='space-y-2'>
-            <label htmlFor='email' className='font-medium text-slate-300 text-sm'>
+            <label htmlFor={emailInputId} className='font-medium text-slate-300 text-sm'>
               Email address
             </label>
             <div className='relative'>
@@ -103,7 +104,7 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
                 )}
               />
               <Input
-                id='email'
+                id={emailInputId}
                 type='email'
                 placeholder='you@example.com'
                 value={email}
