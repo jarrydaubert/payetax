@@ -209,7 +209,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               className='inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-slate-900/50 px-6 py-3 font-medium text-cyan-400 transition-all hover:border-cyan-500/50 hover:bg-slate-800/50'
             >
               Try the Free Calculator
-              <svg className='size-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+              <svg className='size-4' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'>
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'

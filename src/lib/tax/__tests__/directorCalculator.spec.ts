@@ -157,10 +157,10 @@ describe('Input Validation', () => {
     it('should handle all student loan plans', () => {
       const plans = ['plan1', 'plan2', 'plan4', 'postgrad'];
       // Plan 5 not applicable until April 2026
-      plans.forEach((plan) => {
+      for (const plan of plans) {
         const _input = { profit: 50000, studentLoanPlans: [plan] };
         // expect(validateInput(input).isValid).toBe(true);
-      });
+      }
     });
 
     it('should accept company pension contributions', () => {
@@ -877,9 +877,9 @@ describe('Edge Cases', () => {
   it('should handle profit exactly at CT threshold boundaries', () => {
     // £50,000 - small profits rate boundary
     // £250,000 - main rate boundary
-    [50000, 250000].forEach((profit) => {
+    for (const _profit of [50000, 250000]) {
       // expect(calculateCorporationTax(profit)).toBeDefined();
-    });
+    }
   });
 
   it('should handle salary exactly at NI thresholds', () => {

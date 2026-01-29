@@ -40,7 +40,7 @@ export function TaxPots() {
       const scenario = calculateSalaryScenario(
         sliderSalary,
         comparison.grossProfit - formData.pensionContribution,
-        formData.region!,
+        formData.region ?? 'rUK',
         TAX_YEAR,
         formData.otherIncome,
         formData.hasEmploymentAllowance,
