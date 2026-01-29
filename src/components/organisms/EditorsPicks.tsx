@@ -37,7 +37,13 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
         <summary className='flex cursor-pointer items-center justify-between rounded-lg bg-slate-800/50 p-4 text-white hover:bg-slate-800/70'>
           <span className='font-display font-semibold'>Editor&apos;s Picks</span>
           <span className='text-slate-400 transition-transform group-open:rotate-180'>
-            <svg className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor' aria-hidden='true'>
+            <svg
+              className='h-5 w-5'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+              aria-hidden='true'
+            >
               <path
                 strokeLinecap='round'
                 strokeLinejoin='round'

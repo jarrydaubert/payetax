@@ -74,10 +74,13 @@ export function getCurrentQuote(): PullQuote {
 
   // Fallback: sort by validUntil descending and return most recent
   const sorted = [...PULL_QUOTES].sort((a, b) => b.validUntil.localeCompare(a.validUntil));
-  return sorted[0] ?? PULL_QUOTES[0] ?? {
-    text: 'Tax knowledge is financial freedom.',
-    attribution: 'PayeTax Mission',
-    validFrom: '2020-01-01',
-    validUntil: '2099-12-31',
-  };
+  return (
+    sorted[0] ??
+    PULL_QUOTES[0] ?? {
+      text: 'Tax knowledge is financial freedom.',
+      attribution: 'PayeTax Mission',
+      validFrom: '2020-01-01',
+      validUntil: '2099-12-31',
+    }
+  );
 }
