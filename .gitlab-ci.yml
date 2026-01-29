@@ -50,11 +50,6 @@ mr_validation:
 #    - Deployment succeeds/fails
 #    - All automatic, zero GitLab minutes used
 #
-# ✅ Husky pre-push hook (PAYTAX-24) catches issues locally:
-#    - Full test suite runs before push
-#    - Build validation runs before push
-#    - Zero CI minutes wasted on bad commits
-#
 # ✅ GitHub Dependabot (free, external):
 #    - Security vulnerability scanning
 #    - Dependency updates
@@ -83,9 +78,9 @@ mr_validation:
 # WHAT RUNS WHERE:
 # ──────────────────────────────────────────────────────────
 # 
-# LOCAL (Husky Hooks):
-# ✅ Pre-commit: Linting + typecheck (fast gate)
-# ✅ Pre-push: Full tests + build (comprehensive gate)
+# LOCAL (Manual):
+# - bun run fix-all (lint, format, typecheck)
+# - bun run test:no-coverage (quick tests)
 #
 # GITLAB CI (This File):
 # ✅ MRs only: Typecheck + lint (contributor validation)
