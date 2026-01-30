@@ -3,7 +3,7 @@
  *
  * Compares three extraction strategies for company directors:
  * 1. All Salary - Take entire profit as salary
- * 2. Recommended - Dynamic salary (£6,500 or £12,570) + dividends (tax efficient)
+ * 2. Optimal Mix - Dynamic salary (£6,500 or £12,570) + dividends (tax efficient)
  * 3. All Dividends - £0 salary, all dividends
  *
  * @module lib/tax/strategyComparison
@@ -144,6 +144,7 @@ export function calculateStrategyComparison(
   const companyCarBIK = input.companyCarBIK ?? 0;
   const minimumSalary = input.minimumSalaryRequirement ?? 0;
   const hasOtherPAYE = input.hasOtherPAYEEmployment ?? false;
+  const lossesBroughtForward = input.lossesBroughtForward ?? 0;
 
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
   const netRevenue = input.includesVat ? input.revenue / (1 + VAT_RATE) : input.revenue;
@@ -160,7 +161,8 @@ export function calculateStrategyComparison(
     studentLoanPlans,
     pensionContribution,
     companyCarBIK,
-    hasOtherPAYE
+    hasOtherPAYE,
+    lossesBroughtForward
   );
   const optimalMix = calculateOptimalMixStrategy(
     grossProfit,
@@ -172,7 +174,8 @@ export function calculateStrategyComparison(
     pensionContribution,
     companyCarBIK,
     minimumSalary,
-    hasOtherPAYE
+    hasOtherPAYE,
+    lossesBroughtForward
   );
   const allDividends = calculateAllDividendsStrategy(
     grossProfit,
@@ -181,7 +184,8 @@ export function calculateStrategyComparison(
     otherIncome,
     studentLoanPlans,
     pensionContribution,
-    companyCarBIK
+    companyCarBIK,
+    lossesBroughtForward
   );
 
   // Find best strategy
@@ -240,7 +244,8 @@ function calculateAllSalaryStrategy(
   studentLoanPlans: StudentLoanPlan[],
   pension: number,
   companyCarBIK: number,
-  hasOtherPAYE: boolean = false
+  hasOtherPAYE: boolean = false,
+  _lossesBroughtForward: number = 0 // Not used for all-salary (no CT), but kept for consistency
 ): StrategyResult {
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary');
@@ -425,7 +430,8 @@ function calculateSalaryScenarioInternal(
   studentLoanPlans: StudentLoanPlan[],
   pension: number,
   companyCarBIK: number,
-  hasOtherPAYE: boolean
+  hasOtherPAYE: boolean,
+  lossesBroughtForward: number = 0
 ): {
   salary: number;
   employerNI: number;
@@ -457,9 +463,12 @@ function calculateSalaryScenarioInternal(
     employerNI = Math.max(0, employerNI - employmentAllowance);
   }
 
-  const taxableProfit = Math.max(0, grossProfit - salary - employerNI);
+  const profitAfterSalaryCost = Math.max(0, grossProfit - salary - employerNI);
+  // Losses reduce the taxable profit for CT (cannot go below 0)
+  const taxableProfit = Math.max(0, profitAfterSalaryCost - lossesBroughtForward);
   const corporationTax = getCorporationTax(taxableProfit);
-  const dividends = taxableProfit - corporationTax;
+  // Dividends come from post-CT profit (losses reduce CT, increasing available dividends)
+  const dividends = profitAfterSalaryCost - corporationTax;
 
   // If other PAYE employment, NI threshold already used - pay NI from first pound
   const employeeNI = hasOtherPAYE
@@ -506,10 +515,11 @@ function calculateOptimalMixStrategy(
   pension: number,
   companyCarBIK: number,
   minimumSalary: number = 0,
-  hasOtherPAYE: boolean = false
+  hasOtherPAYE: boolean = false,
+  lossesBroughtForward: number = 0
 ): StrategyResult {
   if (grossProfit <= 0) {
-    return createEmptyResult('Recommended');
+    return createEmptyResult('Optimal Mix');
   }
 
   const personalAllowance = getPersonalAllowance(taxYear); // £12,570
@@ -537,7 +547,8 @@ function calculateOptimalMixStrategy(
       studentLoanPlans,
       pension,
       companyCarBIK,
-      hasOtherPAYE
+      hasOtherPAYE,
+      lossesBroughtForward
     );
     return scenario;
   });
@@ -567,7 +578,7 @@ function calculateOptimalMixStrategy(
   const companyCost = salary + employerNI + corporationTax;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
-  const name = 'Recommended';
+  const name = 'Optimal Mix'; // FCA compliant - avoid advisory language like "Recommended"
 
   return {
     name,
@@ -595,8 +606,8 @@ function calculateAllDividendsStrategy(
   otherIncome: number,
   studentLoanPlans: StudentLoanPlan[],
   pension: number,
-  companyCarBIK: number
-  // Note: Employment Allowance not passed - with £0 salary, there's no employer NI to offset
+  companyCarBIK: number,
+  lossesBroughtForward: number = 0
 ): StrategyResult {
   if (grossProfit <= 0) {
     return createEmptyResult('All Dividends');
@@ -614,8 +625,11 @@ function calculateAllDividendsStrategy(
       : 0;
   const incomeTax = bikIncomeTax;
 
-  // All profit goes through corporation tax
-  const corporationTax = getCorporationTax(grossProfit);
+  // Losses reduce the taxable profit for CT (cannot go below 0)
+  const taxableProfit = Math.max(0, grossProfit - lossesBroughtForward);
+  const corporationTax = getCorporationTax(taxableProfit);
+  // Dividends come from post-CT profit, but losses don't create extra cash
+  // So dividends = grossProfit - CT (where CT is calculated on reduced taxable profit)
   const dividends = grossProfit - corporationTax;
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, otherIncome + companyCarBIK, taxYear);

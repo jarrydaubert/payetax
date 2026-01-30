@@ -315,3 +315,171 @@ export function isSurvivalMode(result: DirectorCalculationResult): result is Sur
 export function isNormalMode(result: DirectorCalculationResult): result is DirectorResult {
   return result.mode === 'normal';
 }
+
+// ============================================================================
+// STRATEGY INPUT VALIDATION
+// ============================================================================
+
+/**
+ * Valid student loan plans for 2025-26 tax year
+ * Note: Plan 5 is not valid until April 2026
+ */
+const VALID_STUDENT_LOAN_PLANS = ['plan1', 'plan2', 'plan4', 'postgrad'] as const;
+
+/**
+ * Input for strategy calculation validation
+ */
+export interface StrategyValidationInput {
+  profit?: number;
+  revenue?: number;
+  expenses?: number;
+  region?: string;
+  alreadyTaken?: number;
+  pensionContribution?: number;
+  studentLoanPlans?: string[];
+  yearEndDate?: Date;
+  lossesBroughtForward?: number;
+  minimumSalaryRequired?: number;
+  companyCarBIK?: number;
+  hasOtherPAYE?: boolean;
+  hasEmploymentAllowance?: boolean;
+}
+
+/**
+ * Validation result with errors array
+ */
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+/**
+ * Validates strategy calculation input with business rules
+ *
+ * Returns an object with isValid boolean and errors array for easy testing.
+ * Handles edge cases like NaN, Infinity, negative values, and invalid types.
+ *
+ * @param input - The strategy input to validate
+ * @returns Validation result with isValid flag and errors array
+ *
+ * @example
+ * ```typescript
+ * const result = validateInput({ profit: 50000, pensionContribution: 60000 });
+ * // { isValid: false, errors: ['Pension contribution cannot exceed profit'] }
+ * ```
+ */
+export function validateInput(input: StrategyValidationInput): ValidationResult {
+  const errors: string[] = [];
+
+  // Handle null/undefined input
+  if (input === null || input === undefined) {
+    return { isValid: false, errors: ['Input is required'] };
+  }
+
+  // Validate profit
+  if (input.profit !== undefined) {
+    if (typeof input.profit !== 'number') {
+      errors.push('Profit must be a number');
+    } else if (Number.isNaN(input.profit)) {
+      errors.push('Profit cannot be NaN');
+    } else if (!Number.isFinite(input.profit)) {
+      errors.push('Profit must be a finite number');
+    } else if (input.profit < 0) {
+      errors.push('Profit cannot be negative');
+    }
+  }
+
+  // Validate already taken
+  if (input.alreadyTaken !== undefined) {
+    if (typeof input.alreadyTaken !== 'number') {
+      errors.push('Already taken must be a number');
+    } else if (input.alreadyTaken < 0) {
+      errors.push('Already taken cannot be negative');
+    }
+  }
+
+  // Validate pension contribution
+  if (input.pensionContribution !== undefined) {
+    if (typeof input.pensionContribution !== 'number') {
+      errors.push('Pension contribution must be a number');
+    } else if (input.pensionContribution < 0) {
+      errors.push('Pension contribution cannot be negative');
+    } else if (
+      input.profit !== undefined &&
+      typeof input.profit === 'number' &&
+      Number.isFinite(input.profit) &&
+      input.pensionContribution > input.profit
+    ) {
+      errors.push('Pension contribution cannot exceed profit');
+    }
+  }
+
+  // Validate region
+  if (input.region !== undefined) {
+    if (typeof input.region !== 'string') {
+      errors.push('Region must be a string');
+    } else if (!REGIONS.includes(input.region as (typeof REGIONS)[number])) {
+      errors.push('Invalid region');
+    }
+  }
+
+  // Validate student loan plans
+  if (input.studentLoanPlans !== undefined) {
+    if (!Array.isArray(input.studentLoanPlans)) {
+      errors.push('Student loan plans must be an array');
+    } else {
+      for (const plan of input.studentLoanPlans) {
+        if (plan === 'plan5') {
+          errors.push('Plan 5 not available until 2026-27');
+        } else if (
+          !VALID_STUDENT_LOAN_PLANS.includes(plan as (typeof VALID_STUDENT_LOAN_PLANS)[number])
+        ) {
+          errors.push(`Invalid student loan plan: ${plan}`);
+        }
+      }
+    }
+  }
+
+  // Validate year-end date
+  if (input.yearEndDate !== undefined) {
+    if (!(input.yearEndDate instanceof Date)) {
+      errors.push('Year-end date must be a Date');
+    } else if (Number.isNaN(input.yearEndDate.getTime())) {
+      errors.push('Year-end date is invalid');
+    } else if (input.yearEndDate > new Date()) {
+      errors.push('Year-end cannot be in the future');
+    }
+  }
+
+  // Validate losses brought forward
+  if (input.lossesBroughtForward !== undefined) {
+    if (typeof input.lossesBroughtForward !== 'number') {
+      errors.push('Losses brought forward must be a number');
+    } else if (input.lossesBroughtForward < 0) {
+      errors.push('Losses brought forward cannot be negative');
+    }
+  }
+
+  // Validate minimum salary required
+  if (input.minimumSalaryRequired !== undefined) {
+    if (typeof input.minimumSalaryRequired !== 'number') {
+      errors.push('Minimum salary required must be a number');
+    } else if (input.minimumSalaryRequired < 0) {
+      errors.push('Minimum salary required cannot be negative');
+    }
+  }
+
+  // Validate company car BIK
+  if (input.companyCarBIK !== undefined) {
+    if (typeof input.companyCarBIK !== 'number') {
+      errors.push('Company car BIK must be a number');
+    } else if (input.companyCarBIK < 0) {
+      errors.push('Company car BIK cannot be negative');
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
