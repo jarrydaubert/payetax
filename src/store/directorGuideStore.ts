@@ -50,6 +50,7 @@ export interface DirectorFormData {
   revenue: number | undefined;
   includesVat: boolean;
   expenses: number | undefined;
+  lossesBroughtForward: number;
 
   // Director situation
   alreadyTaken: number;
@@ -65,6 +66,10 @@ export interface DirectorFormData {
   pensionContribution: number;
   companyCarBIK: number;
   hasEmploymentAllowance: boolean;
+
+  // Compare mode (Your Setup)
+  yourSetupSalary: number | undefined;
+  yourSetupDividends: number | undefined;
 }
 
 /**
@@ -94,6 +99,7 @@ interface DirectorGuideActions {
   setRevenue: (revenue: number) => void;
   setIncludesVat: (includesVat: boolean) => void;
   setExpenses: (expenses: number) => void;
+  setLossesBroughtForward: (amount: number) => void;
 
   // Director situation setters
   setAlreadyTaken: (amount: number) => void;
@@ -110,6 +116,10 @@ interface DirectorGuideActions {
   setPensionContribution: (amount: number) => void;
   setCompanyCarBIK: (amount: number) => void;
   setHasEmploymentAllowance: (has: boolean) => void;
+
+  // Compare mode setters
+  setYourSetupSalary: (amount: number | undefined) => void;
+  setYourSetupDividends: (amount: number | undefined) => void;
 
   // UI actions
   setSelectedStrategy: (strategy: 'allSalary' | 'optimalMix' | 'allDividends') => void;
@@ -133,6 +143,7 @@ const defaultFormData: DirectorFormData = {
   revenue: undefined,
   includesVat: false,
   expenses: undefined,
+  lossesBroughtForward: 0,
   alreadyTaken: 0,
   takenViaPayroll: 'unsure',
   otherIncome: 0,
@@ -142,6 +153,8 @@ const defaultFormData: DirectorFormData = {
   pensionContribution: 0,
   companyCarBIK: 0,
   hasEmploymentAllowance: false,
+  yourSetupSalary: undefined,
+  yourSetupDividends: undefined,
 };
 
 const defaultState: DirectorGuideState = {
@@ -196,6 +209,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           if (!validated.success) return;
           set((state) => ({
             formData: { ...state.formData, expenses: validated.data },
+          }));
+        },
+
+        setLossesBroughtForward: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, lossesBroughtForward: validated.data },
           }));
         },
 
@@ -286,6 +307,38 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         // ====================================================================
+        // COMPARE MODE SETTERS
+        // ====================================================================
+
+        setYourSetupSalary: (amount) => {
+          if (amount === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, yourSetupSalary: undefined },
+            }));
+            return;
+          }
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, yourSetupSalary: validated.data },
+          }));
+        },
+
+        setYourSetupDividends: (amount) => {
+          if (amount === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, yourSetupDividends: undefined },
+            }));
+            return;
+          }
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, yourSetupDividends: validated.data },
+          }));
+        },
+
+        // ====================================================================
         // UI ACTIONS
         // ====================================================================
 
@@ -345,12 +398,15 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 revenue: formData.revenue,
                 includesVat: formData.includesVat,
                 expenses: formData.expenses,
+                lossesBroughtForward: formData.lossesBroughtForward,
                 otherIncome: formData.otherIncome,
                 employmentAllowance: formData.hasEmploymentAllowance,
                 studentLoanPlans:
                   formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
                 pensionContribution: formData.pensionContribution,
                 companyCarBIK: formData.companyCarBIK,
+                yourSetupSalary: formData.yourSetupSalary,
+                yourSetupDividends: formData.yourSetupDividends,
               },
               CURRENT_TAX_YEAR
             );
@@ -484,6 +540,7 @@ export function useDirectorGuideActions() {
       setRevenue: state.setRevenue,
       setIncludesVat: state.setIncludesVat,
       setExpenses: state.setExpenses,
+      setLossesBroughtForward: state.setLossesBroughtForward,
       // Director situation
       setAlreadyTaken: state.setAlreadyTaken,
       setTakenViaPayroll: state.setTakenViaPayroll,
@@ -497,6 +554,9 @@ export function useDirectorGuideActions() {
       setPensionContribution: state.setPensionContribution,
       setCompanyCarBIK: state.setCompanyCarBIK,
       setHasEmploymentAllowance: state.setHasEmploymentAllowance,
+      // Compare mode
+      setYourSetupSalary: state.setYourSetupSalary,
+      setYourSetupDividends: state.setYourSetupDividends,
       // UI actions
       setSelectedStrategy: state.setSelectedStrategy,
       setSliderSalary: state.setSliderSalary,

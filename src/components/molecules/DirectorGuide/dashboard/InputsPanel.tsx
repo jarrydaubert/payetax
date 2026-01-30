@@ -65,6 +65,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     setRevenue,
     setIncludesVat,
     setExpenses,
+    setLossesBroughtForward,
     setAlreadyTaken,
     setOtherIncome,
     setYearEndMonth,
@@ -72,6 +73,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     toggleStudentLoanPlan,
     setPensionContribution,
     setCompanyCarBIK,
+    setYourSetupSalary,
+    setYourSetupDividends,
     reset,
   } = useDirectorGuideActions();
 
@@ -265,9 +268,51 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
               />
             </Field>
+
+            {/* Losses Brought Forward */}
+            <Field label='Losses Brought Forward' hint='Trading losses from prior years'>
+              <Input
+                type='text'
+                value={formatCurrency(formData.lossesBroughtForward)}
+                onChange={(e) => setLossesBroughtForward(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+              />
+            </Field>
           </div>
         )}
       </div>
+
+      {/* Section: Compare My Setup */}
+      <Section title='Compare My Setup'>
+        <p className='mb-3 text-slate-500 text-xs'>
+          Enter your current salary and dividends to see how it compares to the optimal mix.
+        </p>
+        <Field label='Your Current Salary' hint='Annual gross salary'>
+          <Input
+            type='text'
+            value={formatCurrency(formData.yourSetupSalary)}
+            onChange={(e) => {
+              const val = parseCurrency(e.target.value);
+              setYourSetupSalary(val === 0 ? undefined : val);
+            }}
+            placeholder='£0'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+          />
+        </Field>
+        <Field label='Your Current Dividends' hint='Annual dividends'>
+          <Input
+            type='text'
+            value={formatCurrency(formData.yourSetupDividends)}
+            onChange={(e) => {
+              const val = parseCurrency(e.target.value);
+              setYourSetupDividends(val === 0 ? undefined : val);
+            }}
+            placeholder='£0'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+          />
+        </Field>
+      </Section>
 
       {/* Spacer */}
       <div className='flex-1' />

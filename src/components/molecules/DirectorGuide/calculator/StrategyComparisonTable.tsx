@@ -8,9 +8,9 @@
  */
 'use client';
 
-import { Banknote, PiggyBank, Split } from 'lucide-react';
+import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
 import { useMemo } from 'react';
-import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
+import { calculateSalaryScenario, type YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
   useDirectorFormData,
@@ -198,6 +198,106 @@ export function StrategyComparisonTable() {
             </button>
           );
         })}
+      </div>
+
+      {/* Your Setup Card (4th card) */}
+      {comparison.strategies.yourSetup && (
+        <YourSetupCard yourSetup={comparison.strategies.yourSetup} />
+      )}
+    </div>
+  );
+}
+
+interface YourSetupCardProps {
+  yourSetup: YourSetupResult;
+}
+
+function YourSetupCard({ yourSetup }: YourSetupCardProps) {
+  const totalTax = yourSetup.totalPersonalTax + yourSetup.corporationTax + yourSetup.employerNI;
+  const delta = yourSetup.deltaVsOptimal;
+  const isOptimal = Math.abs(delta) < 10;
+  const isCosting = delta > 10;
+  const isSaving = delta < -10;
+
+  return (
+    <div
+      className={cn(
+        'relative mt-4 rounded-xl border p-4',
+        yourSetup.exceedsProfit
+          ? 'border-red-500/50 bg-red-500/10'
+          : 'border-amber-500/30 bg-amber-500/5'
+      )}
+    >
+      {/* DLA Warning Badge */}
+      {yourSetup.exceedsProfit && (
+        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-full bg-red-500 px-2 py-0.5 font-medium text-white text-xs'>
+          <AlertTriangle className='size-3' />
+          Exceeds Profit
+        </span>
+      )}
+
+      {/* Icon & Title */}
+      <div className='mb-3 flex items-center gap-2'>
+        <div className='flex size-8 items-center justify-center rounded-lg bg-amber-500/20'>
+          <User className='size-4 text-amber-400' />
+        </div>
+        <div>
+          <h4 className='font-medium text-slate-100'>Your Setup</h4>
+          <p className='text-slate-500 text-xs'>Your current arrangement</p>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className='space-y-1.5 text-sm'>
+        <div className='flex justify-between'>
+          <span className='text-slate-500'>Salary</span>
+          <span className='font-mono text-slate-300'>{formatCurrency(yourSetup.salary)}</span>
+        </div>
+        <div className='flex justify-between'>
+          <span className='text-slate-500'>Dividends</span>
+          <span className='font-mono text-slate-300'>{formatCurrency(yourSetup.dividends)}</span>
+        </div>
+        <div className='flex justify-between'>
+          <span className='text-slate-500'>Total Tax</span>
+          <span className='font-mono text-red-400'>{formatCurrency(totalTax)}</span>
+        </div>
+        <div className='mt-2 flex justify-between border-white/[0.08] border-t pt-2'>
+          <span className='font-medium text-slate-400'>Take-Home</span>
+          <span className='font-mono font-semibold text-emerald-400'>
+            {formatCurrency(yourSetup.takeHome)}
+          </span>
+        </div>
+      </div>
+
+      {/* Delta vs Optimal */}
+      <div className='mt-3 rounded-lg bg-black/20 p-2 text-center text-sm'>
+        {isOptimal && <span className='text-emerald-400'>Matches optimal - well done!</span>}
+        {isCosting && (
+          <span className='text-red-400'>
+            Costs {formatCurrency(delta)} more than optimal per year
+          </span>
+        )}
+        {isSaving && (
+          <span className='text-emerald-400'>
+            Saves {formatCurrency(Math.abs(delta))} vs our recommendation
+          </span>
+        )}
+      </div>
+
+      {/* DLA Warning */}
+      {yourSetup.exceedsProfit && (
+        <div className='mt-3 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3'>
+          <AlertTriangle className='mt-0.5 size-4 shrink-0 text-red-400' />
+          <p className='text-red-300 text-xs'>
+            Your salary + dividends exceeds available profit. This may create or increase a
+            Director&apos;s Loan Account balance. Speak to your accountant.
+          </p>
+        </div>
+      )}
+
+      {/* Effective Rate */}
+      <div className='mt-2 text-right text-slate-500 text-xs'>
+        {yourSetup.effectiveRate.toFixed(1)}% effective rate
       </div>
     </div>
   );

@@ -28,11 +28,14 @@ export interface StrategyInput {
   revenue: number;
   includesVat: boolean;
   expenses: number;
+  lossesBroughtForward?: number; // Trading losses from previous years (reduces CT)
   otherIncome?: number;
   employmentAllowance?: boolean;
   studentLoanPlans?: StudentLoanPlan[];
   pensionContribution?: number; // Employer contribution (reduces CT profit)
   companyCarBIK?: number; // Taxable benefit added to income
+  yourSetupSalary?: number; // User's current salary for comparison
+  yourSetupDividends?: number; // User's current dividends for comparison
 }
 
 export interface StrategyResult {
@@ -53,12 +56,18 @@ export interface StrategyResult {
   effectiveRate: number;
 }
 
+export interface YourSetupResult extends StrategyResult {
+  deltaVsOptimal: number; // Positive = paying more tax than optimal
+  exceedsProfit: boolean; // True if salary + dividends > gross profit (DLA warning)
+}
+
 export interface StrategyComparison {
   grossProfit: number;
   strategies: {
     allSalary: StrategyResult;
     optimalMix: StrategyResult;
     allDividends: StrategyResult;
+    yourSetup?: YourSetupResult; // Only present if user entered their setup
   };
   recommended: 'allSalary' | 'optimalMix' | 'allDividends';
   savingsVsAllSalary: number;
@@ -139,7 +148,7 @@ export function calculateStrategyComparison(
   );
 
   // Find best strategy
-  const strategies = { allSalary, optimalMix, allDividends };
+  const strategies: StrategyComparison['strategies'] = { allSalary, optimalMix, allDividends };
   let recommended: 'allSalary' | 'optimalMix' | 'allDividends' = 'optimalMix';
   let maxTakeHome = optimalMix.takeHome;
 
@@ -150,6 +159,24 @@ export function calculateStrategyComparison(
   if (allDividends.takeHome > maxTakeHome) {
     recommended = 'allDividends';
     maxTakeHome = allDividends.takeHome;
+  }
+
+  // Calculate "Your Setup" if user provided inputs
+  if (input.yourSetupSalary !== undefined || input.yourSetupDividends !== undefined) {
+    const yourSetup = calculateYourSetupStrategy(
+      grossProfit,
+      input.region,
+      taxYear,
+      otherIncome,
+      hasEA,
+      studentLoanPlans,
+      pensionContribution,
+      companyCarBIK,
+      input.yourSetupSalary ?? 0,
+      input.yourSetupDividends ?? 0,
+      optimalMix.takeHome
+    );
+    strategies.yourSetup = yourSetup;
   }
 
   // Calculate savings
@@ -488,6 +515,91 @@ function calculateAllDividendsStrategy(
     companyCost: round(companyCost),
     takeHome: round(takeHome),
     effectiveRate: round(effectiveRate),
+  };
+}
+
+/**
+ * Calculate "Your Setup" strategy based on user-provided salary and dividends
+ * This allows users to compare their current arrangement against optimal
+ */
+function calculateYourSetupStrategy(
+  grossProfit: number,
+  region: Region,
+  taxYear: TaxYear,
+  otherIncome: number,
+  hasEmploymentAllowance: boolean,
+  studentLoanPlans: StudentLoanPlan[],
+  pension: number,
+  companyCarBIK: number,
+  userSalary: number,
+  userDividends: number,
+  optimalTakeHome: number
+): YourSetupResult {
+  const salary = userSalary;
+  const dividends = userDividends;
+
+  // Check if user's setup exceeds available profit (DLA warning)
+  let employerNI = getEmployerNI(salary, taxYear);
+  if (hasEmploymentAllowance) {
+    const employmentAllowance = getEmploymentAllowance(taxYear);
+    employerNI = Math.max(0, employerNI - employmentAllowance);
+  }
+
+  // Company cost for salary = salary + employer NI
+  // Profit available for dividends = grossProfit - salary - employerNI - CT on remaining
+  const costOfSalary = salary + employerNI;
+  const profitAfterSalary = Math.max(0, grossProfit - costOfSalary);
+  const ctOnRemaining = getCorporationTax(profitAfterSalary);
+  const maxDividends = profitAfterSalary - ctOnRemaining;
+
+  // Flag if user setup exceeds what's available
+  const exceedsProfit = salary + dividends > salary + maxDividends || costOfSalary > grossProfit;
+
+  // Calculate taxes on user's setup
+  const employeeNI = getEmployeeNI(salary, taxYear);
+
+  // Income tax on salary + other income + BIK
+  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
+  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const incomeTax = totalIncomeTax - baseIncomeTax;
+
+  // Corporation tax: based on profit minus salary cost
+  const corporationTax = getCorporationTax(Math.max(0, grossProfit - costOfSalary));
+
+  // Dividend tax
+  const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
+
+  // Student loan on total income
+  const totalIncome = salary + dividends + otherIncome + companyCarBIK;
+  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
+  const studentLoan = studentLoanResult.total;
+
+  const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
+  const companyCost = costOfSalary + corporationTax;
+  const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
+  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
+
+  // Delta vs optimal (positive = paying more tax / getting less take-home)
+  const deltaVsOptimal = optimalTakeHome - takeHome;
+
+  return {
+    name: 'Your Setup',
+    salary: round(salary),
+    dividends: round(dividends),
+    pension: round(pension),
+    companyCarBIK: round(companyCarBIK),
+    employerNI: round(employerNI),
+    employeeNI: round(employeeNI),
+    incomeTax: round(incomeTax),
+    corporationTax: round(corporationTax),
+    dividendTax: round(dividendTax),
+    studentLoan: round(studentLoan),
+    totalPersonalTax: round(totalPersonalTax),
+    companyCost: round(companyCost),
+    takeHome: round(takeHome),
+    effectiveRate: round(effectiveRate),
+    deltaVsOptimal: round(deltaVsOptimal),
+    exceedsProfit,
   };
 }
 

@@ -214,7 +214,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
       )}
 
       {/* Assumptions Section */}
-      <section>
+      <section className='mb-8'>
         <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
           Assumptions
         </h3>
@@ -240,6 +240,42 @@ export function EducationPanel({ className }: EducationPanelProps) {
             }
             isLast
           />
+        </div>
+      </section>
+
+      {/* Accuracy & Scope Section */}
+      <section>
+        <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
+          Accuracy & Scope
+        </h3>
+        <div className='space-y-3'>
+          <div className='rounded-[10px] border border-white/[0.04] bg-[#1e293b] p-4'>
+            <div className='mb-2 font-medium text-slate-200 text-sm'>What this calculator does</div>
+            <ul className='space-y-1 text-slate-400 text-xs'>
+              <li>• Compares salary vs dividend extraction strategies</li>
+              <li>• Uses current HMRC rates (single source of truth)</li>
+              <li>• Assumes single director, 12-month period, standalone company</li>
+            </ul>
+          </div>
+          <div className='rounded-[10px] border border-white/[0.04] bg-[#1e293b] p-4'>
+            <div className='mb-2 font-medium text-slate-200 text-sm'>Known limitations</div>
+            <ul className='space-y-1 text-slate-400 text-xs'>
+              <li>• Student loan £2k unearned income rule (may overstate)</li>
+              <li>• Class 1A NI on benefits in kind (company cost incomplete)</li>
+              <li>• Associated company CT threshold adjustments</li>
+              <li>• Short accounting period adjustments</li>
+              <li>• Marriage Allowance transfers</li>
+              <li>• IR35 status considerations</li>
+              <li>• Pension carry-forward from previous years</li>
+              <li>• Dividend timing (declaration vs payment date)</li>
+            </ul>
+          </div>
+          <div className='rounded-[10px] border border-amber-500/20 bg-amber-500/5 p-3'>
+            <p className='text-amber-200 text-xs leading-relaxed'>
+              <strong>Disclaimer:</strong> Illustrative only. Not financial advice. Always consult a
+              qualified accountant before making decisions.
+            </p>
+          </div>
         </div>
       </section>
     </aside>
