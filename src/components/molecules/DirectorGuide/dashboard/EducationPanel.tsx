@@ -38,18 +38,22 @@ export function EducationPanel({ className }: EducationPanelProps) {
       comparison.strategies.optimalMix.dividends
     : 0;
 
+  // Compute total already taken from YTD fields
+  const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
+
   // Determine which warnings to show
   const showVATWarning = hasResults && revenue >= 85000 && revenue < 90000;
   const showVATMandatoryWarning = hasResults && revenue >= 90000;
   const showSelfAssessmentWarning = hasResults && comparison.strategies.optimalMix.dividends > 0;
   const showOtherIncomeWarning = formData.otherIncome > 0;
-  const showDLAWarning = formData.alreadyTaken > 0 && formData.takenViaPayroll === 'no';
+  // DLA warning if drawings (not salary/dividends) were taken
+  const showDLAWarning = formData.ytdDrawings > 0;
   const showComplexityWarning = hasResults && comparison.grossProfit > 250000;
   // Compare against gross extraction available (salary + dividends), not post-tax takeHome
   const grossExtraction = hasResults
     ? comparison.strategies.optimalMix.salary + comparison.strategies.optimalMix.dividends
     : 0;
-  const showOverdrawnWarning = hasResults && formData.alreadyTaken > grossExtraction;
+  const showOverdrawnWarning = hasResults && alreadyTaken > grossExtraction;
   const showPensionWarning = formData.pensionContribution > 60000;
   const showStudentLoanWarning = formData.studentLoanPlans.length > 0;
   const showPATaperWarning = totalIncome > PA_TAPER_THRESHOLD && totalIncome <= PA_TAPER_END;
@@ -72,12 +76,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
   // Pension taper warning: Annual Allowance reduces from £260k adjusted income
   const showPensionTaperWarning = totalIncome >= 240000;
 
-  // S455 tax warning: When DLA is likely and not via payroll
-  const showS455Warning =
-    formData.alreadyTaken > 0 &&
-    formData.takenViaPayroll !== 'yes' &&
-    hasResults &&
-    formData.alreadyTaken > grossExtraction;
+  // S455 tax warning: When drawings exist and total taken exceeds available
+  const showS455Warning = formData.ytdDrawings > 0 && hasResults && alreadyTaken > grossExtraction;
 
   // BIK warning: Class 1A NI not included in company cost
   const showBIKWarning = formData.companyCarBIK > 0;

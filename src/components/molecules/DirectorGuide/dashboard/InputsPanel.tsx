@@ -67,8 +67,9 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     setIncludesVat,
     setExpenses,
     setLossesBroughtForward,
-    setAlreadyTaken,
-    setTakenViaPayroll,
+    setYtdSalary,
+    setYtdDividends,
+    setYtdDrawings,
     setOtherIncome,
     setHasOtherPAYEEmployment,
     setYearEndMonth,
@@ -176,36 +177,40 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       </Section>
 
       {/* Section: Your Situation */}
-      <Section title='Your Situation'>
-        <Field label='Already Taken This Year' hint='Salary, dividends, or drawings YTD'>
+      <Section title='Already Taken This Year'>
+        <Field label='YTD Salary' hint='Gross salary via PAYE'>
           <Input
             type='text'
-            value={formatCurrency(formData.alreadyTaken)}
-            onChange={(e) => setAlreadyTaken(parseCurrency(e.target.value))}
+            value={formatCurrency(formData.ytdSalary)}
+            onChange={(e) => setYtdSalary(parseCurrency(e.target.value))}
             placeholder='£0'
             className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
           />
         </Field>
 
-        {/* Only show if already taken > 0 */}
-        {formData.alreadyTaken > 0 && (
-          <Field label='Was this via payroll?' hint='Affects how it appears in your accounts'>
-            <Select
-              value={formData.takenViaPayroll}
-              onValueChange={(v) => setTakenViaPayroll(v as 'yes' | 'no' | 'unsure')}
-            >
-              <SelectTrigger className='border-white/[0.08] bg-[#1e293b] text-slate-100'>
-                <SelectValue placeholder='Select option' />
-              </SelectTrigger>
-              <SelectContent className='border-slate-700 bg-[#1e293b]'>
-                <SelectItem value='yes'>Yes - salary via PAYE</SelectItem>
-                <SelectItem value='no'>No - direct withdrawal</SelectItem>
-                <SelectItem value='unsure'>Not sure</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
-        )}
+        <Field label='YTD Dividends' hint='Dividends declared'>
+          <Input
+            type='text'
+            value={formatCurrency(formData.ytdDividends)}
+            onChange={(e) => setYtdDividends(parseCurrency(e.target.value))}
+            placeholder='£0'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+          />
+        </Field>
 
+        <Field label='Other Drawings' hint="Director's loan or other withdrawals">
+          <Input
+            type='text'
+            value={formatCurrency(formData.ytdDrawings)}
+            onChange={(e) => setYtdDrawings(parseCurrency(e.target.value))}
+            placeholder='£0'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+          />
+        </Field>
+      </Section>
+
+      {/* Section: Your Situation */}
+      <Section title='Your Situation'>
         <Field label='Other Personal Income' hint='Employment, rental, etc.'>
           <Input
             type='text'

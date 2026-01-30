@@ -52,9 +52,10 @@ export interface DirectorFormData {
   expenses: number | undefined;
   lossesBroughtForward: number;
 
-  // Director situation
-  alreadyTaken: number;
-  takenViaPayroll: TakenViaPayroll;
+  // Director situation - YTD amounts taken
+  ytdSalary: number;
+  ytdDividends: number;
+  ytdDrawings: number; // Other drawings (director's loan account)
   otherIncome: number;
   hasOtherPAYEEmployment: boolean;
 
@@ -104,9 +105,10 @@ interface DirectorGuideActions {
   setExpenses: (expenses: number) => void;
   setLossesBroughtForward: (amount: number) => void;
 
-  // Director situation setters
-  setAlreadyTaken: (amount: number) => void;
-  setTakenViaPayroll: (value: TakenViaPayroll) => void;
+  // Director situation setters (YTD amounts)
+  setYtdSalary: (amount: number) => void;
+  setYtdDividends: (amount: number) => void;
+  setYtdDrawings: (amount: number) => void;
   setOtherIncome: (amount: number) => void;
   setHasOtherPAYEEmployment: (has: boolean) => void;
 
@@ -150,8 +152,9 @@ const defaultFormData: DirectorFormData = {
   includesVat: false,
   expenses: undefined,
   lossesBroughtForward: 0,
-  alreadyTaken: 0,
-  takenViaPayroll: 'unsure',
+  ytdSalary: 0,
+  ytdDividends: 0,
+  ytdDrawings: 0,
   otherIncome: 0,
   hasOtherPAYEEmployment: false,
   yearEndMonth: '03',
@@ -230,20 +233,30 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         // ====================================================================
-        // DIRECTOR SITUATION SETTERS
+        // DIRECTOR SITUATION SETTERS (YTD amounts)
         // ====================================================================
 
-        setAlreadyTaken: (amount) => {
+        setYtdSalary: (amount) => {
           const validated = CurrencyAmountSchema.safeParse(amount);
           if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, alreadyTaken: validated.data },
+            formData: { ...state.formData, ytdSalary: validated.data },
           }));
         },
 
-        setTakenViaPayroll: (value) => {
+        setYtdDividends: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
           set((state) => ({
-            formData: { ...state.formData, takenViaPayroll: value },
+            formData: { ...state.formData, ytdDividends: validated.data },
+          }));
+        },
+
+        setYtdDrawings: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, ytdDrawings: validated.data },
           }));
         },
 
@@ -405,13 +418,15 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           set({ isCalculating: true, error: null });
 
           try {
-            // Map takenViaPayroll to boolean | null
-            const takenViaPayrollValue =
-              formData.takenViaPayroll === 'yes'
-                ? true
-                : formData.takenViaPayroll === 'no'
-                  ? false
-                  : null;
+            // Compute total already taken from YTD fields
+            const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
+
+            // Determine if taken via payroll:
+            // - true if salary was taken (via PAYE)
+            // - false if only drawings (not via payroll)
+            // - null if only dividends or nothing taken
+            const alreadyTakenViaPayroll =
+              formData.ytdSalary > 0 ? true : formData.ytdDrawings > 0 ? false : null;
 
             // Main calculation (for survival mode detection)
             const input: DirectorInput = {
@@ -419,8 +434,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               revenue: formData.revenue,
               includesVat: formData.includesVat,
               expenses: formData.expenses,
-              alreadyTaken: formData.alreadyTaken,
-              alreadyTakenViaPayroll: takenViaPayrollValue,
+              alreadyTaken,
+              alreadyTakenViaPayroll,
               confirmedSoleIncome: formData.otherIncome === 0,
             };
 
@@ -476,7 +491,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
       }),
       {
         name: 'director-guide-storage',
-        version: 2, // Bumped version for new schema
+        version: 3, // Bumped for YTD split (was alreadyTaken + takenViaPayroll)
         storage: createJSONStorage(() => safeStorage),
         partialize: (state) => ({
           formData: state.formData,
@@ -485,9 +500,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           _taxYear: CURRENT_TAX_YEAR,
         }),
         migrate: (persistedState, version) => {
-          // Migration from version 0 or 1 to version 2
-          if (version < 2) {
-            // Clear old data and start fresh with new schema
+          // Migration from older versions - clear and start fresh
+          if (version < 3) {
             return { ...defaultState };
           }
           return persistedState as DirectorGuideState;
@@ -580,9 +594,10 @@ export function useDirectorGuideActions() {
       setIncludesVat: state.setIncludesVat,
       setExpenses: state.setExpenses,
       setLossesBroughtForward: state.setLossesBroughtForward,
-      // Director situation
-      setAlreadyTaken: state.setAlreadyTaken,
-      setTakenViaPayroll: state.setTakenViaPayroll,
+      // Director situation (YTD amounts)
+      setYtdSalary: state.setYtdSalary,
+      setYtdDividends: state.setYtdDividends,
+      setYtdDrawings: state.setYtdDrawings,
       setOtherIncome: state.setOtherIncome,
       setHasOtherPAYEEmployment: state.setHasOtherPAYEEmployment,
       // Year-end

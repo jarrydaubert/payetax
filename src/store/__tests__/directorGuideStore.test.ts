@@ -70,8 +70,9 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.region).toBeUndefined();
       expect(state.formData.revenue).toBeUndefined();
       expect(state.formData.expenses).toBeUndefined();
-      expect(state.formData.alreadyTaken).toBe(0);
-      expect(state.formData.takenViaPayroll).toBe('unsure');
+      expect(state.formData.ytdSalary).toBe(0);
+      expect(state.formData.ytdDividends).toBe(0);
+      expect(state.formData.ytdDrawings).toBe(0);
       expect(state.formData.otherIncome).toBe(0);
       expect(state.formData.studentLoanPlans).toEqual([]);
       expect(state.formData.pensionContribution).toBe(0);
@@ -113,15 +114,25 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.includesVat).toBe(true);
     });
 
-    it('should set alreadyTaken', () => {
-      useDirectorGuideStore.getState().setAlreadyTaken(5000);
-      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(5000);
+    it('should set ytdSalary', () => {
+      useDirectorGuideStore.getState().setYtdSalary(5000);
+      expect(useDirectorGuideStore.getState().formData.ytdSalary).toBe(5000);
     });
 
-    it('should reject negative alreadyTaken', () => {
-      useDirectorGuideStore.getState().setAlreadyTaken(5000);
-      useDirectorGuideStore.getState().setAlreadyTaken(-1000);
-      expect(useDirectorGuideStore.getState().formData.alreadyTaken).toBe(5000);
+    it('should reject negative ytdSalary', () => {
+      useDirectorGuideStore.getState().setYtdSalary(5000);
+      useDirectorGuideStore.getState().setYtdSalary(-1000);
+      expect(useDirectorGuideStore.getState().formData.ytdSalary).toBe(5000);
+    });
+
+    it('should set ytdDividends', () => {
+      useDirectorGuideStore.getState().setYtdDividends(10000);
+      expect(useDirectorGuideStore.getState().formData.ytdDividends).toBe(10000);
+    });
+
+    it('should set ytdDrawings', () => {
+      useDirectorGuideStore.getState().setYtdDrawings(2000);
+      expect(useDirectorGuideStore.getState().formData.ytdDrawings).toBe(2000);
     });
 
     it('should reject Infinity revenue', () => {
@@ -132,11 +143,6 @@ describe('DirectorGuideStore', () => {
     it('should reject negative expenses', () => {
       useDirectorGuideStore.getState().setExpenses(-500);
       expect(useDirectorGuideStore.getState().formData.expenses).toBeUndefined();
-    });
-
-    it('should set takenViaPayroll', () => {
-      useDirectorGuideStore.getState().setTakenViaPayroll('yes');
-      expect(useDirectorGuideStore.getState().formData.takenViaPayroll).toBe('yes');
     });
 
     it('should set otherIncome', () => {
