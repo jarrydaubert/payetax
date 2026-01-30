@@ -66,6 +66,7 @@ export interface DirectorFormData {
   pensionContribution: number;
   companyCarBIK: number;
   hasEmploymentAllowance: boolean;
+  minimumSalaryRequirement: number | undefined;
 
   // Compare mode (Your Setup)
   yourSetupSalary: number | undefined;
@@ -116,6 +117,7 @@ interface DirectorGuideActions {
   setPensionContribution: (amount: number) => void;
   setCompanyCarBIK: (amount: number) => void;
   setHasEmploymentAllowance: (has: boolean) => void;
+  setMinimumSalaryRequirement: (amount: number | undefined) => void;
 
   // Compare mode setters
   setYourSetupSalary: (amount: number | undefined) => void;
@@ -153,6 +155,7 @@ const defaultFormData: DirectorFormData = {
   pensionContribution: 0,
   companyCarBIK: 0,
   hasEmploymentAllowance: false,
+  minimumSalaryRequirement: undefined,
   yourSetupSalary: undefined,
   yourSetupDividends: undefined,
 };
@@ -303,6 +306,20 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         setHasEmploymentAllowance: (has) => {
           set((state) => ({
             formData: { ...state.formData, hasEmploymentAllowance: has },
+          }));
+        },
+
+        setMinimumSalaryRequirement: (amount) => {
+          if (amount === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, minimumSalaryRequirement: undefined },
+            }));
+            return;
+          }
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, minimumSalaryRequirement: validated.data },
           }));
         },
 
@@ -554,6 +571,7 @@ export function useDirectorGuideActions() {
       setPensionContribution: state.setPensionContribution,
       setCompanyCarBIK: state.setCompanyCarBIK,
       setHasEmploymentAllowance: state.setHasEmploymentAllowance,
+      setMinimumSalaryRequirement: state.setMinimumSalaryRequirement,
       // Compare mode
       setYourSetupSalary: state.setYourSetupSalary,
       setYourSetupDividends: state.setYourSetupDividends,

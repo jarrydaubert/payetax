@@ -67,12 +67,14 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     setExpenses,
     setLossesBroughtForward,
     setAlreadyTaken,
+    setTakenViaPayroll,
     setOtherIncome,
     setYearEndMonth,
     setHasEmploymentAllowance,
     toggleStudentLoanPlan,
     setPensionContribution,
     setCompanyCarBIK,
+    setMinimumSalaryRequirement,
     setYourSetupSalary,
     setYourSetupDividends,
     reset,
@@ -172,7 +174,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       {/* Section: Your Situation */}
       <Section title='Your Situation'>
-        <Field label='Already Taken This Year' hint='YTD withdrawals from company'>
+        <Field label='Already Taken This Year' hint='Salary, dividends, or drawings YTD'>
           <Input
             type='text'
             value={formatCurrency(formData.alreadyTaken)}
@@ -181,6 +183,25 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
           />
         </Field>
+
+        {/* Only show if already taken > 0 */}
+        {formData.alreadyTaken > 0 && (
+          <Field label='Was this via payroll?' hint='Affects how it appears in your accounts'>
+            <Select
+              value={formData.takenViaPayroll}
+              onValueChange={(v) => setTakenViaPayroll(v as 'yes' | 'no' | 'unsure')}
+            >
+              <SelectTrigger className='border-white/[0.08] bg-[#1e293b] text-slate-100'>
+                <SelectValue placeholder='Select option' />
+              </SelectTrigger>
+              <SelectContent className='border-slate-700 bg-[#1e293b]'>
+                <SelectItem value='yes'>Yes - salary via PAYE</SelectItem>
+                <SelectItem value='no'>No - direct withdrawal</SelectItem>
+                <SelectItem value='unsure'>Not sure</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+        )}
 
         <Field label='Other Personal Income' hint='Employment, rental, etc.'>
           <Input
@@ -275,6 +296,20 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 type='text'
                 value={formatCurrency(formData.lossesBroughtForward)}
                 onChange={(e) => setLossesBroughtForward(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+              />
+            </Field>
+
+            {/* Minimum Salary Requirement */}
+            <Field label='Minimum Salary' hint='Floor for mortgage or visa applications'>
+              <Input
+                type='text'
+                value={formatCurrency(formData.minimumSalaryRequirement)}
+                onChange={(e) => {
+                  const val = parseCurrency(e.target.value);
+                  setMinimumSalaryRequirement(val === 0 ? undefined : val);
+                }}
                 placeholder='£0'
                 className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
               />

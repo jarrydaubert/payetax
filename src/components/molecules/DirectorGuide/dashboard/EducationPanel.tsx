@@ -69,6 +69,28 @@ export function EducationPanel({ className }: EducationPanelProps) {
   const showPensionGapWarning =
     hasResults && optimalSalary > SECONDARY_THRESHOLD && optimalSalary < LEL;
 
+  // Pension taper warning: Annual Allowance reduces from £260k adjusted income
+  const showPensionTaperWarning = totalIncome >= 240000;
+
+  // S455 tax warning: When DLA is likely and not via payroll
+  const showS455Warning =
+    formData.alreadyTaken > 0 &&
+    formData.takenViaPayroll !== 'yes' &&
+    hasResults &&
+    formData.alreadyTaken > grossExtraction;
+
+  // BIK warning: Class 1A NI not included in company cost
+  const showBIKWarning = formData.companyCarBIK > 0;
+
+  // Plan 5 student loans note
+  const showPlan5Note = formData.studentLoanPlans.length > 0;
+
+  // Dividend timing note
+  const showDividendTimingNote = hasResults && comparison.strategies.optimalMix.dividends > 0;
+
+  // Distributable profits note
+  const showDistributableNote = hasResults && comparison.strategies.optimalMix.dividends > 0;
+
   return (
     <aside className={cn('flex h-full flex-col bg-[#0f172a] p-6', className)}>
       {/* Learn Section */}
@@ -111,7 +133,13 @@ export function EducationPanel({ className }: EducationPanelProps) {
         showPayrollWarning ||
         showPaymentsOnAccountWarning ||
         showSurvivalModeWarning ||
-        showPensionGapWarning) && (
+        showPensionGapWarning ||
+        showPensionTaperWarning ||
+        showS455Warning ||
+        showBIKWarning ||
+        showPlan5Note ||
+        showDividendTimingNote ||
+        showDistributableNote) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
             Warnings
@@ -207,6 +235,43 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <WarningCard
                 title='No Profit Yet'
                 description="Without distributable profits, you cannot legally pay dividends. Money taken may be a Director's Loan (must be repaid or face S455 tax). Consider minimal salary only until profitable."
+              />
+            )}
+            {showPensionTaperWarning && (
+              <WarningCard
+                title='Pension Annual Allowance Taper'
+                description="With adjusted income near or above £240k, your Annual Allowance may be reduced from £60k down to £10k minimum. This is called the 'tapered annual allowance'. Speak to a financial adviser."
+              />
+            )}
+            {showS455Warning && (
+              <WarningCard
+                title='S455 Tax Warning'
+                description="If your Director's Loan is not repaid within 9 months after year-end, the company must pay S455 tax at 33.75%. This is refunded when the loan is repaid, but creates cash flow issues."
+                isCritical
+              />
+            )}
+            {showBIKWarning && (
+              <WarningCard
+                title='Benefit in Kind - Company Cost Incomplete'
+                description='The company also pays Class 1A NI (15%) on the BIK value. This is not included in our company cost calculation. Your actual costs will be higher.'
+              />
+            )}
+            {showPlan5Note && (
+              <WarningCard
+                title='Student Loan Note'
+                description='Plan 5 student loans start from April 2026 and are not yet included. If you have multiple plans, repayments are stacked (calculated separately on total income).'
+              />
+            )}
+            {showDividendTimingNote && (
+              <WarningCard
+                title='Dividend Timing Matters'
+                description='Dividends are taxed in the tax year they are declared (not paid). Board minutes and dividend vouchers are legally required. Consider timing around 5 April.'
+              />
+            )}
+            {showDistributableNote && (
+              <WarningCard
+                title='Verify Distributable Profits'
+                description='Dividends can only be paid from distributable profits (retained earnings). Check your last filed accounts or ask your accountant for current position.'
               />
             )}
           </div>
