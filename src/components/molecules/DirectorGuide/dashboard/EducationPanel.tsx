@@ -91,6 +91,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
   // Distributable profits note
   const showDistributableNote = hasResults && comparison.strategies.optimalMix.dividends > 0;
 
+  // Other PAYE employment warning
+  const showOtherPAYEWarning = formData.hasOtherPAYEEmployment;
+
   return (
     <aside className={cn('flex h-full flex-col bg-[#0f172a] p-6', className)}>
       {/* Learn Section */}
@@ -139,7 +142,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
         showBIKWarning ||
         showPlan5Note ||
         showDividendTimingNote ||
-        showDistributableNote) && (
+        showDistributableNote ||
+        showOtherPAYEWarning) && (
         <section className='mb-8'>
           <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
             Warnings
@@ -272,6 +276,12 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <WarningCard
                 title='Verify Distributable Profits'
                 description='Dividends can only be paid from distributable profits (retained earnings). Check your last filed accounts or ask your accountant for current position.'
+              />
+            )}
+            {showOtherPAYEWarning && (
+              <WarningCard
+                title='Other PAYE Employment'
+                description='Your NI Primary Threshold may already be used by your other employer. This means any salary from your company will be subject to NI from the first pound. Our calculations assume this is your only PAYE source.'
               />
             )}
           </div>

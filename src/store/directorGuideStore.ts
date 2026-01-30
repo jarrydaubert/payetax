@@ -56,6 +56,7 @@ export interface DirectorFormData {
   alreadyTaken: number;
   takenViaPayroll: TakenViaPayroll;
   otherIncome: number;
+  hasOtherPAYEEmployment: boolean;
 
   // Year-end
   yearEndMonth: YearEndMonth;
@@ -106,6 +107,7 @@ interface DirectorGuideActions {
   setAlreadyTaken: (amount: number) => void;
   setTakenViaPayroll: (value: TakenViaPayroll) => void;
   setOtherIncome: (amount: number) => void;
+  setHasOtherPAYEEmployment: (has: boolean) => void;
 
   // Year-end setters
   setYearEndMonth: (month: YearEndMonth) => void;
@@ -149,6 +151,7 @@ const defaultFormData: DirectorFormData = {
   alreadyTaken: 0,
   takenViaPayroll: 'unsure',
   otherIncome: 0,
+  hasOtherPAYEEmployment: false,
   yearEndMonth: '03',
   yearEndCustom: '',
   studentLoanPlans: [],
@@ -246,6 +249,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           if (!validated.success) return;
           set((state) => ({
             formData: { ...state.formData, otherIncome: validated.data },
+          }));
+        },
+
+        setHasOtherPAYEEmployment: (has) => {
+          set((state) => ({
+            formData: { ...state.formData, hasOtherPAYEEmployment: has },
           }));
         },
 
@@ -562,6 +571,7 @@ export function useDirectorGuideActions() {
       setAlreadyTaken: state.setAlreadyTaken,
       setTakenViaPayroll: state.setTakenViaPayroll,
       setOtherIncome: state.setOtherIncome,
+      setHasOtherPAYEEmployment: state.setHasOtherPAYEEmployment,
       // Year-end
       setYearEndMonth: state.setYearEndMonth,
       setYearEndCustom: state.setYearEndCustom,

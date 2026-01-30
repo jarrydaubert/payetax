@@ -69,6 +69,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     setAlreadyTaken,
     setTakenViaPayroll,
     setOtherIncome,
+    setHasOtherPAYEEmployment,
     setYearEndMonth,
     setHasEmploymentAllowance,
     toggleStudentLoanPlan,
@@ -212,6 +213,19 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
           />
         </Field>
+
+        {/* Other PAYE Employment */}
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Label className='text-slate-400 text-sm'>Other PAYE employment?</Label>
+            <Tip content='If yes, your NI threshold may already be used by your other employer' />
+          </div>
+          <Switch
+            checked={formData.hasOtherPAYEEmployment}
+            onCheckedChange={setHasOtherPAYEEmployment}
+            className='data-[state=checked]:bg-cyan-500'
+          />
+        </div>
       </Section>
 
       {/* Section: Advanced (collapsible) */}
