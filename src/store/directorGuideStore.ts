@@ -65,6 +65,7 @@ export interface DirectorFormData {
   // Advanced inputs
   studentLoanPlans: StudentLoanPlan[];
   pensionContribution: number;
+  isPensionAlreadyDeducted: boolean; // If true, pension is already in profit figure
   companyCarBIK: number;
   hasEmploymentAllowance: boolean;
   minimumSalaryRequirement: number | undefined;
@@ -117,6 +118,7 @@ interface DirectorGuideActions {
   setStudentLoanPlans: (plans: StudentLoanPlan[]) => void;
   toggleStudentLoanPlan: (plan: StudentLoanPlan) => void;
   setPensionContribution: (amount: number) => void;
+  setIsPensionAlreadyDeducted: (deducted: boolean) => void;
   setCompanyCarBIK: (amount: number) => void;
   setHasEmploymentAllowance: (has: boolean) => void;
   setMinimumSalaryRequirement: (amount: number | undefined) => void;
@@ -156,6 +158,7 @@ const defaultFormData: DirectorFormData = {
   yearEndCustom: '',
   studentLoanPlans: [],
   pensionContribution: 0,
+  isPensionAlreadyDeducted: false,
   companyCarBIK: 0,
   hasEmploymentAllowance: false,
   minimumSalaryRequirement: undefined,
@@ -304,6 +307,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           }));
         },
 
+        setIsPensionAlreadyDeducted: (deducted) => {
+          set((state) => ({
+            formData: { ...state.formData, isPensionAlreadyDeducted: deducted },
+          }));
+        },
+
         setCompanyCarBIK: (amount) => {
           const validated = CurrencyAmountSchema.safeParse(amount);
           if (!validated.success) return;
@@ -429,7 +438,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 employmentAllowance: formData.hasEmploymentAllowance,
                 studentLoanPlans:
                   formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
-                pensionContribution: formData.pensionContribution,
+                pensionContribution: formData.isPensionAlreadyDeducted
+                  ? 0
+                  : formData.pensionContribution,
                 companyCarBIK: formData.companyCarBIK,
                 yourSetupSalary: formData.yourSetupSalary,
                 yourSetupDividends: formData.yourSetupDividends,
@@ -581,6 +592,7 @@ export function useDirectorGuideActions() {
       setStudentLoanPlans: state.setStudentLoanPlans,
       toggleStudentLoanPlan: state.toggleStudentLoanPlan,
       setPensionContribution: state.setPensionContribution,
+      setIsPensionAlreadyDeducted: state.setIsPensionAlreadyDeducted,
       setCompanyCarBIK: state.setCompanyCarBIK,
       setHasEmploymentAllowance: state.setHasEmploymentAllowance,
       setMinimumSalaryRequirement: state.setMinimumSalaryRequirement,

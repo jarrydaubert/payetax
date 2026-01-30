@@ -57,6 +57,7 @@ const countryToRegion: Record<Country, Region> = {
 
 export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const includesVatId = useId();
+  const pensionDeductedId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | ''>('');
   const formData = useDirectorFormData();
@@ -74,6 +75,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     setHasEmploymentAllowance,
     toggleStudentLoanPlan,
     setPensionContribution,
+    setIsPensionAlreadyDeducted,
     setCompanyCarBIK,
     setMinimumSalaryRequirement,
     setYourSetupSalary,
@@ -292,6 +294,23 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
               />
             </Field>
+            {formData.pensionContribution > 0 && (
+              <div className='flex items-center gap-2'>
+                <Checkbox
+                  id={pensionDeductedId}
+                  checked={formData.isPensionAlreadyDeducted}
+                  onCheckedChange={(checked) => setIsPensionAlreadyDeducted(checked === true)}
+                  className='border-white/20 data-[state=checked]:bg-cyan-500'
+                />
+                <Label
+                  htmlFor={pensionDeductedId}
+                  className='cursor-pointer text-slate-400 text-sm'
+                >
+                  Already deducted from profit figure
+                </Label>
+                <Tip content="Check this if your profit figure already includes the pension deduction. We won't subtract it again." />
+              </div>
+            )}
 
             {/* Company Car BIK */}
             <Field label='Company Car BIK' hint='Taxable benefit amount'>
