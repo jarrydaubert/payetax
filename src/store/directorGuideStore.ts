@@ -433,6 +433,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 companyCarBIK: formData.companyCarBIK,
                 yourSetupSalary: formData.yourSetupSalary,
                 yourSetupDividends: formData.yourSetupDividends,
+                minimumSalaryRequirement: formData.minimumSalaryRequirement,
+                hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
               },
               CURRENT_TAX_YEAR
             );

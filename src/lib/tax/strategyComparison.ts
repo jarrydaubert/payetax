@@ -36,6 +36,8 @@ export interface StrategyInput {
   companyCarBIK?: number; // Taxable benefit added to income
   yourSetupSalary?: number; // User's current salary for comparison
   yourSetupDividends?: number; // User's current dividends for comparison
+  minimumSalaryRequirement?: number; // Minimum salary needed (e.g., for mortgage)
+  hasOtherPAYEEmployment?: boolean; // If true, NI threshold already used by other employer
 }
 
 export interface StrategyResult {
@@ -97,6 +99,36 @@ function getEmployerNIParams(taxYear: TaxYear): { threshold: number; rate: numbe
   return { threshold: niRates.threshold, rate: niRates.rate / 100 };
 }
 
+/**
+ * Calculate Employee NI assuming no threshold benefit (for people with other PAYE)
+ * When you have another PAYE job, your Primary Threshold is used there,
+ * so any salary from this company is subject to NI from the first pound.
+ */
+function getEmployeeNIWithNoThreshold(salary: number, taxYear: TaxYear): number {
+  if (salary <= 0) return 0;
+
+  const rates = TAX_RATES[taxYear];
+  const employeeRates = rates.nationalInsurance.employee.A;
+  const upperEarningsLimit = employeeRates.upper.threshold;
+  const primaryRate = employeeRates.primary.rate / 100;
+  const upperRate = employeeRates.upper.rate / 100;
+
+  let employeeNI = 0;
+
+  // NI on all earnings up to UEL at primary rate (no threshold)
+  const earningsInPrimaryBand = Math.min(salary, upperEarningsLimit);
+  if (earningsInPrimaryBand > 0) {
+    employeeNI += earningsInPrimaryBand * primaryRate;
+  }
+
+  // NI on earnings above UEL
+  if (salary > upperEarningsLimit) {
+    employeeNI += (salary - upperEarningsLimit) * upperRate;
+  }
+
+  return Math.round(employeeNI * 100) / 100;
+}
+
 // ============================================================================
 // MAIN FUNCTION
 // ============================================================================
@@ -110,6 +142,8 @@ export function calculateStrategyComparison(
   const studentLoanPlans = input.studentLoanPlans ?? [];
   const pensionContribution = input.pensionContribution ?? 0;
   const companyCarBIK = input.companyCarBIK ?? 0;
+  const minimumSalary = input.minimumSalaryRequirement ?? 0;
+  const hasOtherPAYE = input.hasOtherPAYEEmployment ?? false;
 
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
   const netRevenue = input.includesVat ? input.revenue / (1 + VAT_RATE) : input.revenue;
@@ -125,7 +159,8 @@ export function calculateStrategyComparison(
     hasEA,
     studentLoanPlans,
     pensionContribution,
-    companyCarBIK
+    companyCarBIK,
+    hasOtherPAYE
   );
   const optimalMix = calculateOptimalMixStrategy(
     grossProfit,
@@ -135,7 +170,9 @@ export function calculateStrategyComparison(
     hasEA,
     studentLoanPlans,
     pensionContribution,
-    companyCarBIK
+    companyCarBIK,
+    minimumSalary,
+    hasOtherPAYE
   );
   const allDividends = calculateAllDividendsStrategy(
     grossProfit,
@@ -202,7 +239,8 @@ function calculateAllSalaryStrategy(
   hasEmploymentAllowance: boolean,
   studentLoanPlans: StudentLoanPlan[],
   pension: number,
-  companyCarBIK: number
+  companyCarBIK: number,
+  hasOtherPAYE: boolean = false
 ): StrategyResult {
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary');
@@ -253,7 +291,10 @@ function calculateAllSalaryStrategy(
     salary -= 1; // Adjust if rounding caused overflow
   }
 
-  const employeeNI = getEmployeeNI(salary, taxYear);
+  // If other PAYE employment, NI threshold already used - pay NI from first pound
+  const employeeNI = hasOtherPAYE
+    ? getEmployeeNIWithNoThreshold(salary, taxYear)
+    : getEmployeeNI(salary, taxYear);
   // Income tax is on salary + other income + BIK, but we only show the tax portion attributable to salary + BIK
   const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
   const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
@@ -370,6 +411,91 @@ export function calculateSalaryScenario(
   };
 }
 
+/**
+ * Internal version of calculateSalaryScenario that supports hasOtherPAYE
+ * Used by the optimal strategy calculator
+ */
+function calculateSalaryScenarioInternal(
+  targetSalary: number,
+  grossProfit: number,
+  region: Region,
+  taxYear: TaxYear,
+  otherIncome: number,
+  hasEmploymentAllowance: boolean,
+  studentLoanPlans: StudentLoanPlan[],
+  pension: number,
+  companyCarBIK: number,
+  hasOtherPAYE: boolean
+): {
+  salary: number;
+  employerNI: number;
+  employeeNI: number;
+  incomeTax: number;
+  corporationTax: number;
+  dividends: number;
+  dividendTax: number;
+  studentLoan: number;
+  pension: number;
+  companyCarBIK: number;
+  takeHome: number;
+} {
+  const { threshold: niThreshold, rate: niRate } = getEmployerNIParams(taxYear);
+
+  // Calculate max affordable salary (salary + employer NI <= grossProfit)
+  let maxAffordableSalary: number;
+  if (grossProfit <= niThreshold) {
+    maxAffordableSalary = grossProfit;
+  } else {
+    maxAffordableSalary = (grossProfit + niThreshold * niRate) / (1 + niRate);
+  }
+
+  const salary = Math.min(targetSalary, maxAffordableSalary, grossProfit);
+  let employerNI = getEmployerNI(salary, taxYear);
+
+  if (hasEmploymentAllowance) {
+    const employmentAllowance = getEmploymentAllowance(taxYear);
+    employerNI = Math.max(0, employerNI - employmentAllowance);
+  }
+
+  const taxableProfit = Math.max(0, grossProfit - salary - employerNI);
+  const corporationTax = getCorporationTax(taxableProfit);
+  const dividends = taxableProfit - corporationTax;
+
+  // If other PAYE employment, NI threshold already used - pay NI from first pound
+  const employeeNI = hasOtherPAYE
+    ? getEmployeeNIWithNoThreshold(salary, taxYear)
+    : getEmployeeNI(salary, taxYear);
+
+  // Income tax includes BIK as taxable benefit
+  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
+  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const incomeTax = totalIncomeTax - baseIncomeTax;
+
+  // Dividend tax - BIK uses up some of the tax bands
+  const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
+
+  // Student loan is calculated on TOTAL income (salary + dividends + BIK) for Self Assessment filers
+  const totalIncome = salary + dividends + otherIncome + companyCarBIK;
+  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
+  const studentLoan = studentLoanResult.total;
+
+  const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
+
+  return {
+    salary,
+    employerNI,
+    employeeNI,
+    incomeTax,
+    corporationTax,
+    dividends,
+    dividendTax,
+    studentLoan,
+    pension,
+    companyCarBIK,
+    takeHome,
+  };
+}
+
 function calculateOptimalMixStrategy(
   grossProfit: number,
   region: Region,
@@ -378,7 +504,9 @@ function calculateOptimalMixStrategy(
   hasEmploymentAllowance: boolean,
   studentLoanPlans: StudentLoanPlan[],
   pension: number,
-  companyCarBIK: number
+  companyCarBIK: number,
+  minimumSalary: number = 0,
+  hasOtherPAYE: boolean = false
 ): StrategyResult {
   if (grossProfit <= 0) {
     return createEmptyResult('Recommended');
@@ -387,38 +515,41 @@ function calculateOptimalMixStrategy(
   const personalAllowance = getPersonalAllowance(taxYear); // £12,570
   const lowerEarningsLimit = getLowerEarningsLimit(taxYear); // £6,500
 
-  // Calculate take-home for both salary options
-  const paSalaryScenario = calculateSalaryScenario(
-    personalAllowance,
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    pension,
-    companyCarBIK
-  );
+  // Build list of salary options to test
+  const salaryOptions = [personalAllowance, lowerEarningsLimit];
 
-  const lelSalaryScenario = calculateSalaryScenario(
-    lowerEarningsLimit,
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    pension,
-    companyCarBIK
-  );
+  // Add minimum salary requirement if it's higher than existing options
+  if (minimumSalary > 0 && minimumSalary > personalAllowance) {
+    salaryOptions.push(minimumSalary);
+  }
 
-  // Pick the scenario with higher take-home
+  // Calculate take-home for all salary options
+  const scenarios = salaryOptions.map((targetSalary) => {
+    // If minimum salary is set, enforce it as the floor
+    const effectiveSalary = Math.max(targetSalary, minimumSalary);
+    const scenario = calculateSalaryScenarioInternal(
+      effectiveSalary,
+      grossProfit,
+      region,
+      taxYear,
+      otherIncome,
+      hasEmploymentAllowance,
+      studentLoanPlans,
+      pension,
+      companyCarBIK,
+      hasOtherPAYE
+    );
+    return scenario;
+  });
+
+  // Pick the scenario with highest take-home
   // In most cases, £12,570 (PA) salary wins because:
   // - Extra salary saves more in CT than it costs in Employer NI
   // - £6,070 extra salary saves ~£1,500 CT (25%) but costs only ~£910 Employer NI (15%)
   // With EA, the advantage is even larger since Employer NI is offset
-  const bestScenario =
-    paSalaryScenario.takeHome >= lelSalaryScenario.takeHome ? paSalaryScenario : lelSalaryScenario;
+  const bestScenario = scenarios.reduce((best, current) =>
+    current.takeHome > best.takeHome ? current : best
+  );
 
   const {
     salary,
