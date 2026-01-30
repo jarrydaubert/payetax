@@ -133,11 +133,10 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
       </div>
 
       {/* Carousel viewport */}
-      <div
+      <section
         ref={emblaRef}
         className='overflow-hidden'
         onKeyDown={handleKeyDown}
-        role='region'
         aria-label='Featured articles'
       >
         <div className='flex touch-pan-y'>
@@ -145,7 +144,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
             <CarouselSlide key={post.slug} post={post} isActive={index === selectedIndex} />
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Controls overlay */}
       <div className='pointer-events-none absolute inset-0 z-20'>

@@ -884,17 +884,17 @@ describe('Edge Cases', () => {
 
   it('should handle salary exactly at NI thresholds', () => {
     // PT £12,570, UEL £50,270
-    [12570, 50270].forEach((salary) => {
+    for (const _salary of [12570, 50270]) {
       // expect(calculateEmployeeNI(salary)).toBeDefined();
-    });
+    }
   });
 
   it('should handle income exactly at PA taper boundaries', () => {
     // £100,000 - taper starts
     // £125,140 - PA fully tapered
-    [100000, 125140].forEach((income) => {
+    for (const _income of [100000, 125140]) {
       // expect(getPersonalAllowance(income)).toBeDefined();
-    });
+    }
   });
 
   it('should handle other income pushing total into higher bands', () => {
@@ -945,10 +945,10 @@ describe('Edge Cases', () => {
 
   it('should handle year-end month variations', () => {
     const months = ['03', '12', '06', '09']; // Mar, Dec, Jun, Sep
-    months.forEach((month) => {
+    for (const month of months) {
       const _input = { profit: 100000, yearEndMonth: month };
       // expect(getKeyDates(input)).toBeDefined();
-    });
+    }
   });
 
   it('should not crash on invalid inputs', () => {
@@ -959,10 +959,10 @@ describe('Edge Cases', () => {
       { region: 'invalid' },
       { studentLoanPlans: ['invalid'] },
     ];
-    invalidInputs.forEach((input) => {
+    for (const _input of invalidInputs) {
       // Should return validation error, not crash
       // expect(() => validateInput(input)).not.toThrow();
-    });
+    }
   });
 });
 
@@ -1975,11 +1975,11 @@ describe('RUTHLESS: Floating Point Precision Disasters', () => {
   it('should handle £0.01 salary increments correctly', () => {
     // BUG: Penny increments cause cumulative errors
     const salaries = [12570.01, 12570.02, 12570.99, 50270.01, 50270.99];
-    salaries.forEach((salary) => {
+    for (const _salary of salaries) {
       // const tax = calculateIncomeTax(salary, 'rUK');
       // expect(tax).toBeGreaterThanOrEqual(0);
       // expect(Number.isFinite(tax)).toBe(true);
-    });
+    }
   });
 
   it('should handle marginal relief fraction (3/200) precisely', () => {
@@ -2024,23 +2024,23 @@ describe('RUTHLESS: Negative and Zero Value Attacks', () => {
     // BUG: Edge case combinations produce negative tax
     // This would be a security issue - users could get "refunds"
     const inputs = [{ profit: 1 }, { profit: 100, salary: 100 }, { profit: 12570, salary: 12570 }];
-    inputs.forEach((input) => {
+    for (const _input of inputs) {
       // const result = calculateAllTaxes(input);
       // expect(result.totalTax).toBeGreaterThanOrEqual(0);
       // expect(result.incomeTax).toBeGreaterThanOrEqual(0);
       // expect(result.employeeNI).toBeGreaterThanOrEqual(0);
       // expect(result.employerNI).toBeGreaterThanOrEqual(0);
       // expect(result.corporationTax).toBeGreaterThanOrEqual(0);
-    });
+    }
   });
 
   it('should handle net take-home never exceeding gross profit', () => {
     // BUG: Net somehow greater than gross (math error)
     const profits = [1000, 10000, 50000, 100000, 500000];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const result = calculateOptimal({ profit });
       // expect(result.netTakeHome).toBeLessThanOrEqual(profit);
-    });
+    }
   });
 
   it('should not crash on extremely small profit (£0.01)', () => {
@@ -2153,10 +2153,10 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
   it('should never suggest negative salary', () => {
     // BUG: Optimizer goes below zero
     const profits = [1000, 10000, 50000, 100000, 500000];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const optimal = calculateOptimal({ profit });
       // expect(optimal.salary).toBeGreaterThanOrEqual(0);
-    });
+    }
   });
 
   it('should never suggest salary exceeding profit', () => {
@@ -2169,10 +2169,10 @@ describe('RUTHLESS: Optimization Algorithm Attacks', () => {
   it('should never suggest negative dividends', () => {
     // BUG: Optimizer calculates negative dividends
     const profits = [1000, 10000, 50000, 100000];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const optimal = calculateOptimal({ profit });
       // expect(optimal.dividends).toBeGreaterThanOrEqual(0);
-    });
+    }
   });
 
   it('should have optimal net >= all salary net', () => {
@@ -2249,11 +2249,11 @@ describe('RUTHLESS: Compound Rounding Errors', () => {
   it('should round net take-home to pence (not fractions of penny)', () => {
     // BUG: Net shows £50,000.003 or similar
     const profits = [33333, 77777, 99999, 123456];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const result = calculateOptimal({ profit });
       // const pence = result.netTakeHome * 100;
       // expect(Number.isInteger(pence)).toBe(true);
-    });
+    }
   });
 });
 
@@ -2620,20 +2620,20 @@ describe('RUTHLESS: Display Rounding Sanity', () => {
   it('should display effective rate between 0% and 100%', () => {
     // BUG: Effective rate shows 150% or -20%
     const profits = [1000, 10000, 50000, 100000, 500000];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const result = calculateOptimal({ profit });
       // expect(result.effectiveRate).toBeGreaterThanOrEqual(0);
       // expect(result.effectiveRate).toBeLessThanOrEqual(100);
-    });
+    }
   });
 
   it('should never show more net than gross', () => {
     // BUG: Net take-home exceeds gross profit
     const profits = [1000, 10000, 50000, 100000, 500000];
-    profits.forEach((profit) => {
+    for (const _profit of profits) {
       // const result = calculateOptimal({ profit });
       // expect(result.netTakeHome).toBeLessThanOrEqual(profit);
-    });
+    }
   });
 
   it('should show salary + dividends + retained = profit (for valid setups)', () => {

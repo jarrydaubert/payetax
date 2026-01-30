@@ -66,7 +66,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
       <ScrollIndicator direction='left' visible={showLeftIndicator} />
       <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-      <div
+      <section
         ref={containerRef}
         className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border active:cursor-grabbing'
         style={{
@@ -195,7 +195,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             </TableRow>
           </TableBody>
         </Table>
-      </div>
+      </section>
     </div>
   );
 }
