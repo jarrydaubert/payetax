@@ -446,3 +446,63 @@ export const SCOTTISH_TAX_RATES: Record<
     ageAllowanceTaperThreshold: 34600,
   },
 };
+
+// ============================================================================
+// DIVIDEND TAX RATES (2024-25 onwards)
+// ============================================================================
+//
+// Dividend tax rates for UK shareholders. These rates apply after the
+// dividend allowance and are based on the individual's income tax band.
+//
+// @see https://www.gov.uk/tax-on-dividends
+
+export const DIVIDEND_RATES = {
+  /** Tax-free dividend allowance (reduced from £1,000 in 2023-24) */
+  ALLOWANCE: 500,
+
+  /** Basic rate (8.75%) - for income within basic rate band */
+  BASIC_RATE: 0.0875,
+
+  /** Higher rate (33.75%) - for income within higher rate band */
+  HIGHER_RATE: 0.3375,
+
+  /** Additional rate (39.35%) - for income above £125,140 */
+  ADDITIONAL_RATE: 0.3935,
+} as const;
+
+export type DividendRates = typeof DIVIDEND_RATES;
+
+// ============================================================================
+// CORPORATION TAX RATES (April 2023 onwards)
+// ============================================================================
+//
+// Corporation Tax rates for UK limited companies. The rate depends on
+// taxable profits, with marginal relief for profits between £50k-£250k.
+//
+// @see https://www.gov.uk/government/publications/rates-and-allowances-corporation-tax
+
+export const CT_RATES = {
+  /** Small profits rate (19%) - applies to profits ≤ £50,000 */
+  SMALL_PROFITS_RATE: 0.19,
+
+  /** Small profits threshold */
+  SMALL_PROFITS_LIMIT: 50_000,
+
+  /** Main rate (25%) - applies to profits ≥ £250,000 */
+  MAIN_RATE: 0.25,
+
+  /** Main rate threshold */
+  MAIN_RATE_LIMIT: 250_000,
+
+  /**
+   * Marginal relief fraction (3/200 = 0.015)
+   *
+   * Used to calculate the smooth transition between small profits rate
+   * and main rate for profits between £50,000 and £250,000.
+   *
+   * Formula: Marginal Relief = (Upper Limit - Profits) × (Profits / Profits) × 3/200
+   */
+  MARGINAL_RELIEF_FRACTION: 3 / 200,
+} as const;
+
+export type CorporationTaxRates = typeof CT_RATES;

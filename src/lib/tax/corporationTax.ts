@@ -9,39 +9,10 @@
  * @see docs/business/DIRECTOR_TOOLS_MATH.md
  */
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
+import { CT_RATES } from '@/constants/taxRates';
 
-/**
- * Corporation Tax rates for 2023 onwards
- *
- * These rates apply to accounting periods starting on or after 1 April 2023.
- * Prior to this, a flat 19% rate applied to all profits.
- *
- * @see https://www.gov.uk/government/publications/rates-and-allowances-corporation-tax
- */
-export const CT_RATES = {
-  /** Small profits rate (profits ≤ £50,000) */
-  SMALL_PROFITS_RATE: 0.19,
-
-  /** Small profits threshold */
-  SMALL_PROFITS_LIMIT: 50_000,
-
-  /** Main rate (profits ≥ £250,000) */
-  MAIN_RATE: 0.25,
-
-  /** Main rate threshold */
-  MAIN_RATE_LIMIT: 250_000,
-
-  /**
-   * Marginal relief fraction (3/200 = 0.015)
-   *
-   * This fraction is used in the marginal relief calculation to create
-   * a smooth transition between the small profits rate and main rate.
-   */
-  MARGINAL_RELIEF_FRACTION: 3 / 200,
-} as const;
+// Re-export for backwards compatibility with existing imports
+export { CT_RATES } from '@/constants/taxRates';
 
 // ============================================================================
 // TYPES

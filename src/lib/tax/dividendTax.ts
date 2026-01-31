@@ -17,33 +17,10 @@
  */
 
 import type { TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import { DIVIDEND_RATES, TAX_RATES } from '@/constants/taxRates';
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-/**
- * Dividend tax rates for 2025-26
- *
- * These rates are LOWER than income tax rates because the company
- * has already paid Corporation Tax on the profits.
- *
- * @see https://www.gov.uk/tax-on-dividends
- */
-export const DIVIDEND_RATES = {
-  /** Tax-free dividend allowance */
-  ALLOWANCE: 500,
-
-  /** Basic rate (8.75%) - for income up to £50,270 */
-  BASIC_RATE: 0.0875,
-
-  /** Higher rate (33.75%) - for income £50,271 to £125,140 */
-  HIGHER_RATE: 0.3375,
-
-  /** Additional rate (39.35%) - for income above £125,140 */
-  ADDITIONAL_RATE: 0.3935,
-} as const;
+// Re-export for backwards compatibility with existing imports
+export { DIVIDEND_RATES } from '@/constants/taxRates';
 
 // ============================================================================
 // TYPES
