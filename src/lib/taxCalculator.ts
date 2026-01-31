@@ -687,18 +687,19 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const taxCodeBandOverride = taxCodeResult.bandOverride;
 
   // High Income Personal Allowance Reduction (HMRC "60% Tax Trap")
-  // Above £100,000 income, personal allowance is reduced by £1 for every £2 of income
+  // Above £100,000 TOTAL income, personal allowance is reduced by £1 for every £2 of income
   // This creates an effective 60% tax rate between £100k-£125k (40% income tax + 20% lost allowance)
-  if (annualGrossSalary > taxRates.personalAllowanceReductionThreshold) {
+  // IMPORTANT: Uses totalGrossIncome (all sources) not just primary salary
+  if (totalGrossIncome > taxRates.personalAllowanceReductionThreshold) {
     // Calculate the allowance reduction using HMRC formula:
-    // Reduction = (Income - £100,000) ÷ 2
+    // Reduction = (Total Income - £100,000) ÷ 2
     // The Math.floor and ×2 ensure we follow HMRC's rounding rules (round down to nearest £2)
     const reduction = Math.min(
       annualTaxFreeAmount, // Cannot reduce below zero
       Math.floor(
-        ((annualGrossSalary - taxRates.personalAllowanceReductionThreshold) *
+        ((totalGrossIncome - taxRates.personalAllowanceReductionThreshold) *
           taxRates.personalAllowanceReductionRate) / // Rate is 0.5 (50% of excess)
-          2 // Divide by 2 for the "£1 reduction per £2 income" rule
+          2 // Divide by 2 for the "£1 reduction per £2 income\" rule
       ) * 2 // Multiply back by 2 to ensure even pound amounts (HMRC requirement)
     );
 
@@ -735,10 +736,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       ageAllowance = taxRates.ageAllowance65to74; // Standard age allowance for 65-74
     }
 
-    // Apply income taper for high earners
+    // Apply income taper for high earners (based on total income, not just salary)
     const ageTaperThreshold = taxRates.ageAllowanceTaperThreshold;
-    if (annualGrossSalary > ageTaperThreshold && ageAllowance > 0) {
-      const excessIncome = annualGrossSalary - ageTaperThreshold;
+    if (totalGrossIncome > ageTaperThreshold && ageAllowance > 0) {
+      const excessIncome = totalGrossIncome - ageTaperThreshold;
       const taperReduction = Math.floor(excessIncome / 2);
       ageAllowance = Math.max(0, ageAllowance - taperReduction);
     }
@@ -764,11 +765,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     // Check if USER can RECEIVE marriage allowance from their partner:
     // 1. Partner must earn LESS than personal allowance (they transfer it)
     // 2. User must earn MORE than personal allowance (they pay tax)
-    // 3. User must be a basic rate taxpayer (not higher rate)
+    // 3. User must be a basic rate taxpayer (not higher rate) - based on TOTAL income
     if (
       input.partnerGrossWage < taxRates.personalAllowance && // Partner earns LESS than PA
-      annualGrossSalary > taxRates.personalAllowance && // User pays tax
-      annualGrossSalary <= higherRateThreshold // User is basic rate taxpayer
+      totalGrossIncome > taxRates.personalAllowance && // User pays tax (total income)
+      totalGrossIncome <= higherRateThreshold // User is basic rate taxpayer (total income)
     ) {
       // User RECEIVES the marriage allowance from their lower-earning partner
       annualTaxFreeAmount += taxRates.marriageAllowance;
