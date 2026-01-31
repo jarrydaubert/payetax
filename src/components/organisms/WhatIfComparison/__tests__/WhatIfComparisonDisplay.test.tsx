@@ -167,7 +167,7 @@ const mockInput = {
 describe('WhatIfComparisonDisplay', () => {
   beforeEach(() => {
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: mockInput })
+      selector({ input: mockInput }),
     );
   });
 
@@ -177,7 +177,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.getByText('Current vs What If Comparison')).toBeInTheDocument();
@@ -189,7 +189,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       // Period selector should be present (appears multiple times)
@@ -202,7 +202,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.getByLabelText(/What If comparison table/i)).toBeInTheDocument();
@@ -213,7 +213,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.getByText('Gross Pay')).toBeInTheDocument();
@@ -231,7 +231,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       const currentHeaders = screen.getAllByText('Current');
@@ -246,7 +246,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       // Check for gross pay values (they appear multiple times for different periods)
@@ -261,7 +261,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       // Periods appear multiple times (in selector and table headers)
@@ -279,7 +279,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       // Click on a period checkbox to toggle
@@ -301,7 +301,7 @@ describe('WhatIfComparisonDisplay', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: mockInputWithLoan })
+        selector({ input: mockInputWithLoan }),
       );
 
       const resultsWithLoan = {
@@ -319,7 +319,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={resultsWithLoan}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.getByText(/Student Loan/i)).toBeInTheDocument();
@@ -330,7 +330,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.queryByText(/Student Loan/i)).not.toBeInTheDocument();
@@ -343,7 +343,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       // Gross Pay should be 100%
@@ -364,7 +364,7 @@ describe('WhatIfComparisonDisplay', () => {
       };
 
       const { container } = render(
-        <WhatIfComparisonDisplay currentResults={zeroResults} whatIfResults={mockWhatIfResults} />
+        <WhatIfComparisonDisplay currentResults={zeroResults} whatIfResults={mockWhatIfResults} />,
       );
 
       // Check that zero values are rendered in the table
@@ -379,7 +379,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       const table = screen.getByLabelText(/What If comparison table/i);
@@ -391,7 +391,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       const table = screen.getByRole('table');
@@ -406,7 +406,7 @@ describe('WhatIfComparisonDisplay', () => {
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
           className='custom-test-class'
-        />
+        />,
       );
 
       const element = container.querySelector('.custom-test-class');
@@ -420,7 +420,7 @@ describe('WhatIfComparisonDisplay', () => {
         <WhatIfComparisonDisplay
           currentResults={mockCurrentResults}
           whatIfResults={mockWhatIfResults}
-        />
+        />,
       );
 
       expect(screen.getByText(/Blue columns show your current scenario/i)).toBeInTheDocument();

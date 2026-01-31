@@ -26,7 +26,7 @@ describe('CallToAction Component', () => {
       const emailLink = screen.getByRole('link', { name: /Email Us/i });
       expect(emailLink).toHaveAttribute(
         'href',
-        expect.stringContaining('mailto:support@payetax.co.uk')
+        expect.stringContaining('mailto:support@payetax.co.uk'),
       );
     });
   });

@@ -48,7 +48,7 @@ export interface EmployeeNIResult {
  */
 export function calculateEmployeeNI(
   salary: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): EmployeeNIResult {
   const rates = TAX_RATES[taxYear];
   const employeeRates = rates.nationalInsurance.employee.A;

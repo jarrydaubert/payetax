@@ -160,7 +160,7 @@ describe('NumberInput Component', () => {
 
     it('should format value on blur', () => {
       const { rerender } = render(
-        <NumberInput value={1000} onChange={mockOnChange} decimals={2} />
+        <NumberInput value={1000} onChange={mockOnChange} decimals={2} />,
       );
       const input = screen.getByRole('textbox') as HTMLInputElement;
 
@@ -254,7 +254,7 @@ describe('NumberInput Component', () => {
 
     it('should disable controls when disabled', () => {
       render(
-        <NumberInput value={10} onChange={mockOnChange} disabled={true} showControls={true} />
+        <NumberInput value={10} onChange={mockOnChange} disabled={true} showControls={true} />,
       );
 
       const incrementButton = screen.getByLabelText(/increment/i);
@@ -289,7 +289,7 @@ describe('NumberInput Component', () => {
     it('should have unique IDs for accessibility', () => {
       const { container } = render(
         // biome-ignore lint/correctness/useUniqueElementIds: Testing id attribute in isolation
-        <NumberInput value={10} onChange={mockOnChange} id='test-input' />
+        <NumberInput value={10} onChange={mockOnChange} id='test-input' />,
       );
       const input = container.querySelector('#test-input');
 

@@ -19,7 +19,7 @@ describe('Skeleton Component', () => {
       render(
         <Skeleton>
           <span>Loading content</span>
-        </Skeleton>
+        </Skeleton>,
       );
       expect(screen.getByText('Loading content')).toBeInTheDocument();
     });
@@ -96,7 +96,7 @@ describe('Skeleton Component', () => {
             <Skeleton className='h-4 w-[250px]' />
             <Skeleton className='h-4 w-[200px]' />
           </div>
-        </div>
+        </div>,
       );
 
       const cardSkeleton = screen.getByTestId('card');
@@ -178,7 +178,7 @@ describe('Skeleton Component', () => {
           <Skeleton data-testid='skeleton-1' />
           <Skeleton data-testid='skeleton-2' />
           <Skeleton data-testid='skeleton-3' />
-        </div>
+        </div>,
       );
 
       expect(screen.getByTestId('skeleton-1')).toBeInTheDocument();

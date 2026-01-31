@@ -8,7 +8,7 @@ describe('PageContainer Component', () => {
       render(
         <PageContainer>
           <div>Page content</div>
-        </PageContainer>
+        </PageContainer>,
       );
 
       expect(screen.getByText('Page content')).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe('PageContainer Component', () => {
           <header>Header</header>
           <main>Main content</main>
           <footer>Footer</footer>
-        </PageContainer>
+        </PageContainer>,
       );
 
       expect(screen.getByText('Header')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer className='custom-container'>
           <div>Content</div>
-        </PageContainer>
+        </PageContainer>,
       );
 
       const pageContainer = container.firstChild;
@@ -45,7 +45,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer>
           <div>Content</div>
-        </PageContainer>
+        </PageContainer>,
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='sm'>
           <div>Small content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-sm');
     });
@@ -66,7 +66,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='md'>
           <div>Medium content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-md');
     });
@@ -75,7 +75,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='lg'>
           <div>Large content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-lg');
     });
@@ -84,7 +84,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='xl'>
           <div>XL content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-xl');
     });
@@ -93,7 +93,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='2xl'>
           <div>2XL content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-2xl');
     });
@@ -102,7 +102,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='4xl'>
           <div>4XL content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-4xl');
     });
@@ -111,7 +111,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer>
           <div>Default content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-5xl');
     });
@@ -120,7 +120,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='6xl'>
           <div>6XL content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-6xl');
     });
@@ -129,7 +129,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer maxWidth='7xl'>
           <div>7XL content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('max-w-7xl');
     });
@@ -140,7 +140,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer>
           <div>Glass content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.querySelector('.glass-card')).toBeInTheDocument();
       expect(container.querySelector('.glass-card-inner')).toBeInTheDocument();
@@ -150,7 +150,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer glass={false}>
           <div>Non-glass content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.querySelector('.glass-card')).not.toBeInTheDocument();
       expect(screen.getByText('Non-glass content')).toBeInTheDocument();
@@ -162,7 +162,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer>
           <div>Spaced content</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('pt-24');
     });
@@ -171,7 +171,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer includeNavbarSpacing={false}>
           <div>No navbar spacing</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveClass('py-8');
       expect(container.firstChild).not.toHaveClass('pt-24');
@@ -184,7 +184,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer id={testId}>
           <div>Content with ID</div>
-        </PageContainer>
+        </PageContainer>,
       );
       expect(container.firstChild).toHaveAttribute('id', testId);
     });
@@ -195,7 +195,7 @@ describe('PageContainer Component', () => {
       const { container } = render(
         <PageContainer>
           <div>Content</div>
-        </PageContainer>
+        </PageContainer>,
       );
 
       expect(container.querySelector('div')).toBeInTheDocument();
@@ -214,7 +214,7 @@ describe('PageContainer Component', () => {
               </article>
             </section>
           </div>
-        </PageContainer>
+        </PageContainer>,
       );
 
       expect(screen.getByText('Page Title')).toBeInTheDocument();
@@ -230,7 +230,7 @@ describe('PageContainer Component', () => {
             <h1>Accessible Page</h1>
             <p>Content</p>
           </main>
-        </PageContainer>
+        </PageContainer>,
       );
 
       const main = screen.getByRole('main');

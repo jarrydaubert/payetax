@@ -23,7 +23,7 @@ function calculateTax(
   bands: typeof scottishRates.bands,
   personalAllowance: number,
   paReductionThreshold: number,
-  paReductionRate: number
+  paReductionRate: number,
 ): number {
   // Handle personal allowance reduction for high earners
   let effectiveAllowance = personalAllowance;
@@ -75,14 +75,14 @@ export function ScottishTaxCalculatorClient() {
       scottishRates.bands,
       scottishRates.personalAllowance,
       scottishRates.personalAllowanceReductionThreshold,
-      scottishRates.personalAllowanceReductionRate
+      scottishRates.personalAllowanceReductionRate,
     );
     const englishTax = calculateTax(
       salaryNum,
       englishRates.bands,
       englishRates.personalAllowance,
       englishRates.personalAllowanceReductionThreshold,
-      englishRates.personalAllowanceReductionRate
+      englishRates.personalAllowanceReductionRate,
     );
 
     setComparison({
@@ -99,14 +99,14 @@ export function ScottishTaxCalculatorClient() {
       scottishRates.bands,
       scottishRates.personalAllowance,
       scottishRates.personalAllowanceReductionThreshold,
-      scottishRates.personalAllowanceReductionRate
+      scottishRates.personalAllowanceReductionRate,
     );
     const englishTax = calculateTax(
       salaryValue,
       englishRates.bands,
       englishRates.personalAllowance,
       englishRates.personalAllowanceReductionThreshold,
-      englishRates.personalAllowanceReductionRate
+      englishRates.personalAllowanceReductionRate,
     );
     setComparison({
       scottishTax,
@@ -126,7 +126,7 @@ export function ScottishTaxCalculatorClient() {
         <h1
           className={cn(
             'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL
+            TYPOGRAPHY.TEXT_4XL,
           )}
         >
           Scottish Tax Calculator 2025-26
@@ -180,7 +180,7 @@ export function ScottishTaxCalculatorClient() {
                   onClick={() => handleQuickCalculate(exampleSalary)}
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
-                    'hover:border-primary hover:bg-primary/5'
+                    'hover:border-primary hover:bg-primary/5',
                   )}
                 >
                   £{exampleSalary.toLocaleString()}
@@ -215,7 +215,7 @@ export function ScottishTaxCalculatorClient() {
                     ? 'bg-amber-50 dark:bg-amber-900/20'
                     : comparison.difference < 0
                       ? 'bg-emerald-50 dark:bg-emerald-900/20'
-                      : 'bg-gray-50 dark:bg-gray-800'
+                      : 'bg-gray-50 dark:bg-gray-800',
                 )}
               >
                 <p className='mb-1 font-medium text-sm'>
@@ -232,7 +232,7 @@ export function ScottishTaxCalculatorClient() {
                       ? 'text-amber-700 dark:text-amber-300'
                       : comparison.difference < 0
                         ? 'text-emerald-700 dark:text-emerald-300'
-                        : ''
+                        : '',
                   )}
                 >
                   {comparison.difference > 0 ? '+' : ''}

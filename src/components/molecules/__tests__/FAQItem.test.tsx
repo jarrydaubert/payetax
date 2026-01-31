@@ -8,7 +8,7 @@ describe('FAQItem', () => {
     render(
       <FAQItem question='What is PAYE?'>
         <p>Pay As You Earn</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     expect(screen.getByText('What is PAYE?')).toBeInTheDocument();
@@ -18,7 +18,7 @@ describe('FAQItem', () => {
     render(
       <FAQItem question='Question'>
         <p>This is the answer</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     expect(screen.getByText('This is the answer')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('FAQItem', () => {
     const { container } = render(
       <FAQItem question='Question'>
         <p>Answer content</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     const details = container.querySelector('details');
@@ -40,7 +40,7 @@ describe('FAQItem', () => {
     const { container } = render(
       <FAQItem question='Question'>
         <p>Answer content</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     const summary = screen.getByText('Question');
@@ -59,7 +59,7 @@ describe('FAQItem', () => {
           <li>Item 2</li>
         </ul>
         <p>Paragraph 2</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     expect(screen.getByText('Paragraph 1')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('FAQItem', () => {
     const { container } = render(
       <FAQItem question='Styled Question'>
         <p>Answer</p>
-      </FAQItem>
+      </FAQItem>,
     );
 
     const details = container.querySelector('details');

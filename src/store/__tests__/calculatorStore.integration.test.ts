@@ -139,7 +139,7 @@ describe('CalculatorStore Integration', () => {
       expect(state.whatIfResults?.grossSalary.annually).toBe(60000);
       // Should have higher tax due to higher rate band
       expect(state.whatIfResults?.incomeTax.annually).toBeGreaterThan(
-        state.results?.incomeTax.annually ?? 0
+        state.results?.incomeTax.annually ?? 0,
       );
     });
   });

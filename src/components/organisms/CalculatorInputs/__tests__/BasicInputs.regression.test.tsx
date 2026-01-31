@@ -38,7 +38,7 @@ describe('BasicInputs - Regression Tests', () => {
     jest.clearAllMocks();
 
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: defaultInput })
+      selector({ input: defaultInput }),
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
@@ -68,7 +68,7 @@ describe('BasicInputs - Regression Tests', () => {
       const pensionInput = pensionInputs.find(
         (input) =>
           (input as HTMLInputElement).value.includes('5.5') ||
-          (input as HTMLInputElement).placeholder === '5.00'
+          (input as HTMLInputElement).placeholder === '5.00',
       );
 
       expect(pensionInput).toBeTruthy();

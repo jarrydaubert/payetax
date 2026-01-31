@@ -68,7 +68,7 @@ export interface PensionOptimization {
 export function calculateOptimalPension(
   salary: number,
   currentPension = 0,
-  taxYear: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear
+  taxYear: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear,
 ): PensionOptimization | null {
   // Validate inputs
   try {
@@ -159,7 +159,7 @@ function isValidSalary(salary: number): boolean {
  */
 export function compareWithOptimization(
   salary: number,
-  pensionContribution: number
+  pensionContribution: number,
 ): {
   currentTakeHome: number;
   optimizedTakeHome: number;

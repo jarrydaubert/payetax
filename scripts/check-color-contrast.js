@@ -47,7 +47,7 @@ for (const [_mode, colors] of Object.entries(colorTests)) {
   const mutedRgb = oklchToRgb(
     colors.mutedForeground.l,
     colors.mutedForeground.c,
-    colors.mutedForeground.h
+    colors.mutedForeground.h,
   );
   const primaryRgb = oklchToRgb(colors.primary.l, colors.primary.c, colors.primary.h);
 

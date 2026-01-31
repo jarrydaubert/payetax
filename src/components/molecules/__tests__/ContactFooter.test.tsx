@@ -39,7 +39,7 @@ describe('ContactFooter', () => {
 
     it('should render description when provided', () => {
       render(
-        <ContactFooter links={mockLinks} description="We're here to help with your questions" />
+        <ContactFooter links={mockLinks} description="We're here to help with your questions" />,
       );
       expect(screen.getByText("We're here to help with your questions")).toBeInTheDocument();
     });
@@ -139,10 +139,10 @@ describe('ContactFooter', () => {
 
     it('should render separators only when centered', () => {
       const { container: centeredContainer } = render(
-        <ContactFooter links={mockLinks} centered={true} />
+        <ContactFooter links={mockLinks} centered={true} />,
       );
       const { container: notCenteredContainer } = render(
-        <ContactFooter links={mockLinks} centered={false} />
+        <ContactFooter links={mockLinks} centered={false} />,
       );
 
       const centeredSeparators = centeredContainer.querySelectorAll('[aria-hidden="true"]');
@@ -303,7 +303,7 @@ describe('ContactFooter', () => {
           links={mockLinks}
           className='custom-footer'
           centered={true}
-        />
+        />,
       );
 
       // Title

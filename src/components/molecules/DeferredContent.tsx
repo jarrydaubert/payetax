@@ -48,7 +48,7 @@ export function DeferredContent({
           if (timer) clearTimeout(timer);
         }
       },
-      { rootMargin }
+      { rootMargin },
     );
 
     if (ref.current) {

@@ -19,7 +19,7 @@ describe('Table Component', () => {
               <TableCell>30</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('Table Component', () => {
               <TableCell>Cell 2</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       const headers = screen.getAllByRole('columnheader');
@@ -62,7 +62,7 @@ describe('Table Component', () => {
               <TableCell>Row 2</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       const rows = screen.getAllByRole('row');
@@ -81,7 +81,7 @@ describe('Table Component', () => {
               <TableCell>Cell 3</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       expect(screen.getByText('Cell 1')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('Table Component', () => {
               <TableCell>Test</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       const table = screen.getByRole('table');
@@ -114,7 +114,7 @@ describe('Table Component', () => {
               <TableCell>Test</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       const row = screen.getByRole('row');
@@ -129,7 +129,7 @@ describe('Table Component', () => {
               <TableCell className='custom-cell'>Test</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       const cell = screen.getByText('Test');
@@ -157,7 +157,7 @@ describe('Table Component', () => {
               <TableCell>£20</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       expect(screen.getByText('Product')).toBeInTheDocument();
@@ -176,7 +176,7 @@ describe('Table Component', () => {
               <TableCell>Data</TableCell>
             </TableRow>
           </TableBody>
-        </Table>
+        </Table>,
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();

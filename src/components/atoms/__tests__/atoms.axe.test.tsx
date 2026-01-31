@@ -18,7 +18,7 @@ describe('Atoms Components - Accessibility', () => {
       const { container } = render(
         <InputTooltip fieldName='salary'>
           <input type='number' aria-label='Gross Salary' data-testid='salary-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const results = await axe(container);
@@ -36,7 +36,7 @@ describe('Atoms Components - Accessibility', () => {
           }}
         >
           <input type='number' aria-label='Custom Input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const results = await axe(container);
@@ -53,7 +53,7 @@ describe('Atoms Components - Accessibility', () => {
             <LabelTooltip fieldName='salary' />
           </div>
           <input type='text' aria-label='Test input' />
-        </div>
+        </div>,
       );
 
       const results = await axe(container);
@@ -71,7 +71,7 @@ describe('Atoms Components - Accessibility', () => {
             <label htmlFor='taxCode'>Tax Code</label>
             <LabelTooltip fieldName='taxCode' />
           </div>
-        </div>
+        </div>,
       );
 
       const results = await axe(container);
@@ -85,7 +85,7 @@ describe('Atoms Components - Accessibility', () => {
   describe('PeriodCheckbox', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(
-        <PeriodCheckbox period='monthly' checked={false} onChange={() => {}} />
+        <PeriodCheckbox period='monthly' checked={false} onChange={() => {}} />,
       );
 
       const results = await axe(container);
@@ -94,7 +94,7 @@ describe('Atoms Components - Accessibility', () => {
 
     it('should have no violations when checked', async () => {
       const { container } = render(
-        <PeriodCheckbox period='weekly' checked={true} onChange={() => {}} />
+        <PeriodCheckbox period='weekly' checked={true} onChange={() => {}} />,
       );
 
       const results = await axe(container);
@@ -108,7 +108,7 @@ describe('Atoms Components - Accessibility', () => {
           <PeriodCheckbox period='yearly' checked={true} onChange={() => {}} />
           <PeriodCheckbox period='monthly' checked={true} onChange={() => {}} />
           <PeriodCheckbox period='weekly' checked={false} onChange={() => {}} />
-        </fieldset>
+        </fieldset>,
       );
 
       const results = await axe(container);
@@ -122,7 +122,7 @@ describe('Atoms Components - Accessibility', () => {
         <div style={{ position: 'relative' }}>
           <ScrollIndicator direction='left' visible={true} />
           <div>Scrollable content</div>
-        </div>
+        </div>,
       );
 
       const results = await axe(container);
@@ -134,7 +134,7 @@ describe('Atoms Components - Accessibility', () => {
         <div style={{ position: 'relative' }}>
           <ScrollIndicator direction='right' visible={false} />
           <div>Scrollable content</div>
-        </div>
+        </div>,
       );
 
       const results = await axe(container);
@@ -147,7 +147,7 @@ describe('Atoms Components - Accessibility', () => {
           <ScrollIndicator direction='left' visible={true} />
           <ScrollIndicator direction='right' visible={true} />
           <div>Scrollable content</div>
-        </div>
+        </div>,
       );
 
       const results = await axe(container);
@@ -177,7 +177,7 @@ describe('Atoms Components - Accessibility', () => {
             <PeriodCheckbox period='yearly' checked={true} onChange={() => {}} />
             <PeriodCheckbox period='monthly' checked={true} onChange={() => {}} />
           </fieldset>
-        </form>
+        </form>,
       );
 
       const results = await axe(container);

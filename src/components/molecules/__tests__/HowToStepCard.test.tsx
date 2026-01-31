@@ -9,7 +9,7 @@ describe('HowToStepCard', () => {
         step={1}
         title='Enter Your Salary'
         description='Input your gross annual salary'
-      />
+      />,
     );
 
     // Step number should appear twice (large background and badge)
@@ -23,7 +23,7 @@ describe('HowToStepCard', () => {
         step={1}
         title='Enter Your Salary'
         description='Input your gross annual salary'
-      />
+      />,
     );
 
     expect(screen.getByText('Enter Your Salary')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('HowToStepCard', () => {
         step={1}
         title='Enter Your Salary'
         description='Input your gross annual salary'
-      />
+      />,
     );
 
     expect(screen.getByText('Input your gross annual salary')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('HowToStepCard', () => {
 
   it('renders different step numbers correctly', () => {
     const { rerender } = render(
-      <HowToStepCard step={1} title='Step 1' description='Description 1' />
+      <HowToStepCard step={1} title='Step 1' description='Description 1' />,
     );
 
     expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(1);
@@ -60,7 +60,7 @@ describe('HowToStepCard', () => {
 
   it('applies correct styling classes', () => {
     const { container } = render(
-      <HowToStepCard step={1} title='Title' description='Description' />
+      <HowToStepCard step={1} title='Title' description='Description' />,
     );
 
     const card = container.firstChild;

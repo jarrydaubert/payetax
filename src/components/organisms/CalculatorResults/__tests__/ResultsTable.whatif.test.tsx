@@ -70,7 +70,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Find the Pension row
@@ -109,7 +109,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Current pension: £60,000 × 5% = £3,000 annually
@@ -154,7 +154,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Both should show £5,000 since it's a fixed amount
@@ -187,7 +187,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Find the Allowances/Deductions row
@@ -232,7 +232,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Verify all period headers are present (use getAllByText since text appears in both checkboxes and headers)
@@ -287,7 +287,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // grossSalary only includes employment income (not rental income)
@@ -335,7 +335,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Net pay should be different due to salary increase
@@ -384,7 +384,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         isMarried={false}
         partnerGrossWage={0}
         taxCode='1257L'
-      />
+      />,
     );
 
     // Current pension: £60,000 × 10% = £6,000

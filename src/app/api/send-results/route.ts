@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     if (!checkRateLimit(ipAddress, { max: 5, window: 60000 })) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid request', details: validation.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

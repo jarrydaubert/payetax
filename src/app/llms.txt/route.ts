@@ -32,7 +32,7 @@ export async function GET() {
       const postLinks = categoryPosts
         .map(
           (post) =>
-            `- [${post.title}](https://payetax.co.uk/blog/${post.slug}): ${post.excerpt.slice(0, 150)}${post.excerpt.length > 150 ? '...' : ''}`
+            `- [${post.title}](https://payetax.co.uk/blog/${post.slug}): ${post.excerpt.slice(0, 150)}${post.excerpt.length > 150 ? '...' : ''}`,
         )
         .join('\n');
 

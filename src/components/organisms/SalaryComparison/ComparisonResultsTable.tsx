@@ -48,7 +48,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
       <div
         className={cn(
           `flex items-center ${SPACING.GAP_1}`,
-          isGain ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'
+          isGain ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400',
         )}
       >
         {isGain ? <ArrowUp className='size-3' /> : <ArrowDown className='size-3' />}

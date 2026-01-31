@@ -16,7 +16,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
     <section
       className={cn(
         'relative z-[1] flex min-h-screen flex-col items-center justify-center bg-deep px-4 py-32 text-center sm:px-8',
-        className
+        className,
       )}
     >
       {/* Badge */}

@@ -159,7 +159,7 @@ test.describe('Essential SEO Tests', () => {
       await expect(
         page
           .getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
-          .first()
+          .first(),
       ).toBeVisible({ timeout: 10000 });
 
       const currentURL = page.url();

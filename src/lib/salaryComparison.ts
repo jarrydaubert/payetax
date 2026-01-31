@@ -127,7 +127,7 @@ export function calculateNewSalary(input: ComparisonInput): number | null {
  */
 export function calculateComparison(
   currentInput: TaxCalculationInput,
-  comparisonInput: ComparisonInput
+  comparisonInput: ComparisonInput,
 ): ComparisonResults | null {
   try {
     // Calculate new salary
@@ -197,7 +197,7 @@ export function calculateComparison(
  */
 export function calculateMarginalRate(
   increase: number,
-  netIncrease: number
+  netIncrease: number,
 ): { marginalRate: number; effectiveRate: number } {
   try {
     if (increase <= 0) {

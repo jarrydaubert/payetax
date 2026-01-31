@@ -222,7 +222,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                   SPACING.MB_4,
                   colors.bg,
                   colors.border,
-                  'border'
+                  'border',
                 )}
               >
                 <span className='mr-2'>{categoryInfo.icon}</span>
@@ -238,7 +238,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                 TYPOGRAPHY.TEXT_3XL,
                 'sm:text-4xl',
                 'font-bold tracking-tight',
-                SPACING.MB_4
+                SPACING.MB_4,
               )}
             >
               {scenario.title}
@@ -268,7 +268,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                 '[&>p]:mb-4 [&>p]:leading-relaxed',
                 '[&>ul]:mb-4 [&>ul]:list-disc [&>ul]:pl-6',
                 '[&>ol]:mb-4 [&>ol]:list-decimal [&>ol]:pl-6',
-                '[&>li]:mb-2'
+                '[&>li]:mb-2',
               )}
             >
               {scenario.explanation.split('\n\n').map((paragraph) => {
@@ -305,7 +305,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                   className={cn(
                     'prose prose-invert prose-sm max-w-none',
                     '[&>p]:mb-3 [&>ul]:mb-3 [&>ul]:pl-5',
-                    '[&>li]:mb-1'
+                    '[&>li]:mb-1',
                   )}
                 >
                   {scenario.optimization.split('\n\n').map((paragraph) => {
@@ -353,7 +353,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                     <Card
                       className={cn(
                         'h-full transition-colors hover:border-primary/50',
-                        SPACING.P_4
+                        SPACING.P_4,
                       )}
                     >
                       <h3 className={cn(TYPOGRAPHY.TEXT_SM, 'line-clamp-2 font-medium')}>
@@ -399,7 +399,7 @@ export default async function ScenarioPage({ params }: PageProps) {
             className={cn(
               'inline-flex items-center',
               SPACING.GAP_2,
-              'text-muted-foreground transition-colors hover:text-foreground'
+              'text-muted-foreground transition-colors hover:text-foreground',
             )}
           >
             <ArrowLeft className='size-4' />

@@ -94,7 +94,7 @@ describe('SimpleNavbar Component', () => {
 
       const links = screen.getAllByRole('link');
       const calculatorLink = links.find((link) =>
-        link.getAttribute('href')?.includes('#tax-calculator')
+        link.getAttribute('href')?.includes('#tax-calculator'),
       );
 
       expect(calculatorLink).toBeDefined();

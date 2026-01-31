@@ -47,7 +47,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
       stopOnInteraction: false,
       stopOnMouseEnter: true,
       stopOnFocusIn: true,
-    })
+    }),
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -55,7 +55,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
       loop: true,
       skipSnaps: false,
     },
-    prefersReducedMotion ? [] : [autoplayRef.current]
+    prefersReducedMotion ? [] : [autoplayRef.current],
   );
 
   // Update selected index on scroll
@@ -88,7 +88,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
     (index: number) => {
       if (emblaApi) emblaApi.scrollTo(index);
     },
-    [emblaApi]
+    [emblaApi],
   );
 
   // Pause/play toggle
@@ -116,7 +116,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
         scrollNext();
       }
     },
-    [scrollPrev, scrollNext]
+    [scrollPrev, scrollNext],
   );
 
   if (posts.length === 0) return null;
@@ -196,7 +196,7 @@ export function BlogCarousel({ posts }: BlogCarouselProps) {
               onClick={() => scrollTo(index)}
               className={cn(
                 'h-2 w-2 rounded-full transition-all',
-                index === selectedIndex ? 'w-6 bg-white' : 'bg-white/40 hover:bg-white/60'
+                index === selectedIndex ? 'w-6 bg-white' : 'bg-white/40 hover:bg-white/60',
               )}
               aria-label={`Go to slide ${index + 1}: ${post.title}`}
               aria-current={index === selectedIndex ? 'true' : undefined}

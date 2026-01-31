@@ -226,7 +226,7 @@ describe('Calculator Store - What If Feature', () => {
       // Note: band.amount is the income taxed at that rate, not the tax itself
       const totalTaxFromBands = whatIfResults?.taxBands.reduce(
         (sum, band) => sum + (band.amount * band.rate) / 100,
-        0
+        0,
       );
       expect(totalTaxFromBands).toBeCloseTo(whatIfResults?.incomeTax.annually || 0, 0);
     });

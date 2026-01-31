@@ -161,19 +161,19 @@ export function TaxBreakdownTable() {
                 <TableCell>TOTAL TAX (All Sources)</TableCell>
                 <TableCell className='text-right'>
                   {formatCurrency(
-                    allSalary.totalPersonalTax + allSalary.employerNI + allSalary.corporationTax
+                    allSalary.totalPersonalTax + allSalary.employerNI + allSalary.corporationTax,
                   )}
                 </TableCell>
                 <TableCell className='text-right'>
                   {formatCurrency(
-                    optimalMix.totalPersonalTax + optimalMix.employerNI + optimalMix.corporationTax
+                    optimalMix.totalPersonalTax + optimalMix.employerNI + optimalMix.corporationTax,
                   )}
                 </TableCell>
                 <TableCell className='text-right'>
                   {formatCurrency(
                     allDividends.totalPersonalTax +
                       allDividends.employerNI +
-                      allDividends.corporationTax
+                      allDividends.corporationTax,
                   )}
                 </TableCell>
               </TableRow>

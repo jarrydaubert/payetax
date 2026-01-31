@@ -69,7 +69,7 @@ describe('ResultTableRow Component', () => {
     it('should render multiple period values', () => {
       render(
         <ResultTableRow {...defaultProps} visiblePeriods={['Yearly', 'Monthly', 'Weekly']} />,
-        { wrapper: TableWrapper }
+        { wrapper: TableWrapper },
       );
 
       expect(screen.getByText('£12,000.00')).toBeInTheDocument(); // Yearly
@@ -218,7 +218,7 @@ describe('ResultTableRow Component', () => {
           {...defaultProps}
           visiblePeriods={['Yearly', 'Monthly', 'Weekly', 'Fortnightly']}
         />,
-        { wrapper: TableWrapper }
+        { wrapper: TableWrapper },
       );
 
       const cells = container.querySelectorAll('th, td');
@@ -279,11 +279,11 @@ describe('ResultTableRow Component', () => {
           {...defaultProps}
           category='This is a very long category name that might wrap'
         />,
-        { wrapper: TableWrapper }
+        { wrapper: TableWrapper },
       );
 
       expect(
-        screen.getByText('This is a very long category name that might wrap')
+        screen.getByText('This is a very long category name that might wrap'),
       ).toBeInTheDocument();
     });
   });

@@ -139,7 +139,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const updateCalls = mockGtag.mock.calls.filter(
-          (call) => call[0] === 'consent' && call[1] === 'update'
+          (call) => call[0] === 'consent' && call[1] === 'update',
         );
         expect(updateCalls.length).toBe(0);
       });
@@ -193,7 +193,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const configCall = mockGtag.mock.calls.find(
-          (call) => call[0] === 'config' && call[2]?.page_path
+          (call) => call[0] === 'config' && call[2]?.page_path,
         );
         expect(configCall?.[2].page_path).toContain('utm_source=test');
       });
@@ -206,7 +206,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const configCall = mockGtag.mock.calls.find(
-          (call) => call[0] === 'config' && call[2]?.transport_type
+          (call) => call[0] === 'config' && call[2]?.transport_type,
         );
         expect(configCall?.[2].transport_type).toBe('beacon');
       });
@@ -219,7 +219,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const configCall = mockGtag.mock.calls.find(
-          (call) => call[0] === 'config' && call[2]?.cookie_flags
+          (call) => call[0] === 'config' && call[2]?.cookie_flags,
         );
         expect(configCall?.[2].cookie_flags).toBe('SameSite=None;Secure');
       });
@@ -255,7 +255,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const scrollEvents = mockGtag.mock.calls.filter(
-          (call) => call[0] === 'event' && call[1] === 'scroll_depth'
+          (call) => call[0] === 'event' && call[1] === 'scroll_depth',
         );
         expect(scrollEvents.length).toBeGreaterThan(0);
       });
@@ -283,7 +283,7 @@ describe('Analytics Component', () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const scrollEvents = mockGtag.mock.calls.filter(
-        (call) => call[0] === 'event' && call[1] === 'scroll_depth'
+        (call) => call[0] === 'event' && call[1] === 'scroll_depth',
       );
       expect(scrollEvents.length).toBe(0);
     });
@@ -313,7 +313,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const engagementEvents = mockGtag.mock.calls.filter(
-          (call) => call[0] === 'event' && call[1] === 'engagement'
+          (call) => call[0] === 'event' && call[1] === 'engagement',
         );
         expect(engagementEvents.length).toBeGreaterThan(0);
         expect(engagementEvents[0][2].value).toBeGreaterThanOrEqual(30);
@@ -333,7 +333,7 @@ describe('Analytics Component', () => {
       window.dispatchEvent(new Event('beforeunload'));
 
       const engagementEvents = mockGtag.mock.calls.filter(
-        (call) => call[0] === 'event' && call[1] === 'engagement'
+        (call) => call[0] === 'event' && call[1] === 'engagement',
       );
       expect(engagementEvents.length).toBe(0);
     });
@@ -437,7 +437,7 @@ describe('Analytics Component', () => {
       expect(removeEventListenerSpy).toHaveBeenCalledWith('storage', expect.any(Function));
       expect(removeDocEventListenerSpy).toHaveBeenCalledWith(
         'cookieConsentUpdated',
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });

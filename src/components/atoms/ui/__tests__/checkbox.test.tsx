@@ -179,7 +179,7 @@ describe('Checkbox Component', () => {
         <form onSubmit={handleSubmit}>
           <Checkbox name='terms' value='accepted' defaultChecked />
           <button type='submit'>Submit</button>
-        </form>
+        </form>,
       );
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });

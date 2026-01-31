@@ -31,7 +31,7 @@ export interface IncomeBreakdownData {
 }
 
 export function getIncomeBreakdownData(
-  results: TaxCalculationResults
+  results: TaxCalculationResults,
 ): IncomeBreakdownData[] | null {
   // Only show if there's an income breakdown (multiple sources)
   if (!results.incomeBreakdown) return null;
@@ -79,7 +79,7 @@ export interface TaxLiabilityData {
 
 export function getTaxLiabilityData(
   results: TaxCalculationResults,
-  whatIfResults?: TaxCalculationResults | null
+  whatIfResults?: TaxCalculationResults | null,
 ): {
   current: TaxLiabilityData[];
   whatIf?: TaxLiabilityData[];
@@ -155,7 +155,7 @@ function calculateEffectiveRate(
   incomeTax: number,
   ni: number,
   studentLoan: number,
-  grossSalary: number
+  grossSalary: number,
 ): number {
   if (grossSalary === 0) return 0;
   const totalDeductions = incomeTax + ni + studentLoan;
@@ -191,7 +191,7 @@ function estimateMarginalRate(salary: number, isScottish = false): number {
 export function getEffectiveTaxRateData(
   currentSalary: number,
   results: TaxCalculationResults,
-  isScottish = false
+  isScottish = false,
 ): EffectiveTaxRateData[] {
   const range = currentSalary * 0.3; // ±30% range
   const minSalary = Math.max(10000, currentSalary - range);
@@ -210,7 +210,7 @@ export function getEffectiveTaxRateData(
         results.incomeTax.annually,
         results.nationalInsurance.annually,
         results.studentLoan.annually,
-        results.grossSalary.annually
+        results.grossSalary.annually,
       );
 
       dataPoints.push({
@@ -230,7 +230,7 @@ export function getEffectiveTaxRateData(
           results.incomeTax.annually,
           results.nationalInsurance.annually,
           results.studentLoan.annually,
-          results.grossSalary.annually
+          results.grossSalary.annually,
         ) *
         scaleFactor ** 0.3; // Gentle scaling
 

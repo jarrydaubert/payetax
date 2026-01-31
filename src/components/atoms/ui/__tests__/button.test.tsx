@@ -141,7 +141,7 @@ describe('Button Component', () => {
         const { unmount } = render(
           <Button variant={variant} size={size}>
             Test
-          </Button>
+          </Button>,
         );
         const button = screen.getByRole('button');
         expect(button).toBeInTheDocument();

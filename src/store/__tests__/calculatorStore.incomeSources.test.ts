@@ -265,7 +265,7 @@ describe('CalculatorStore - Income Sources Management', () => {
     it('should support all pay periods', () => {
       const { addIncomeSource, updateIncomeSource } = useCalculatorStore.getState();
 
-      const periods = ['annually', 'monthly', '4-weekly', 'fortnightly', 'weekly'] as const;
+      const periods = ['annually', 'monthly', 'fourWeekly', 'fortnightly', 'weekly'] as const;
 
       for (const _period of periods) {
         addIncomeSource();

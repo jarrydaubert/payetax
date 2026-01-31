@@ -36,7 +36,7 @@ const ChartsContainer = dynamic(
   {
     loading: () => <ChartsSkeleton />,
     ssr: false, // Charts not needed for SEO, reduces SSR payload
-  }
+  },
 );
 
 export function CalculatorContainer() {
@@ -191,7 +191,7 @@ export function CalculatorContainer() {
         SPACING.GAP_3,
         SPACING.PX_2,
         SPACING.PY_4,
-        'md:gap-6 lg:gap-4 xl:gap-6'
+        'md:gap-6 lg:gap-4 xl:gap-6',
       )}
       data-testid='calculator-section'
     >
@@ -199,14 +199,14 @@ export function CalculatorContainer() {
       <div
         className={cn(
           'order-1 py-6 text-center lg:col-span-2 lg:py-8',
-          'fade-in slide-in-from-top-4 animate-in duration-500'
+          'fade-in slide-in-from-top-4 animate-in duration-500',
         )}
       >
         <h2
           className={cn(
             'mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
             TYPOGRAPHY.TEXT_4XL,
-            `md:${TYPOGRAPHY.TEXT_5XL}`
+            `md:${TYPOGRAPHY.TEXT_5XL}`,
           )}
         >
           UK Tax Calculator
@@ -259,7 +259,7 @@ export function CalculatorContainer() {
         className={cn(
           'order-2 lg:sticky lg:top-4 lg:order-3 lg:self-start',
           SPACING.P_3,
-          'sm:p-4 md:p-6'
+          'sm:p-4 md:p-6',
         )}
       >
         <CalculatorInputsSection
@@ -316,7 +316,7 @@ export function CalculatorContainer() {
             exit={{ opacity: 0 }}
             className={cn(
               'order-6 flex h-full items-center justify-center rounded-lg border border-dashed text-center lg:order-3',
-              'p-12'
+              'p-12',
             )}
           >
             <div>
@@ -389,7 +389,7 @@ export function CalculatorContainer() {
                 onClick={scrollToTop}
                 className={cn(
                   'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  ICON_SIZES.SIZE_12
+                  ICON_SIZES.SIZE_12,
                 )}
                 aria-label='Scroll to top'
               >
@@ -397,7 +397,7 @@ export function CalculatorContainer() {
               </motion.button>
             )}
           </AnimatePresence>,
-          document.body
+          document.body,
         )}
     </div>
   );

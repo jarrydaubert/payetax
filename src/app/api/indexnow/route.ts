@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   if (!checkRateLimit(ipAddress)) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -60,18 +60,18 @@ export async function POST(request: NextRequest) {
     if (urls.length > MAX_URLS) {
       return NextResponse.json(
         { error: `Maximum ${MAX_URLS} URLs allowed per request` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate each URL format and domain
     const invalidUrls = urls.filter(
-      (url: unknown) => typeof url !== 'string' || !isValidPayetaxUrl(url)
+      (url: unknown) => typeof url !== 'string' || !isValidPayetaxUrl(url),
     );
     if (invalidUrls.length > 0) {
       return NextResponse.json(
         { error: 'All URLs must be valid payetax.co.uk URLs' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
           success: false,
           message: 'IndexNow not configured. Set INDEXNOW_KEY environment variable.',
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       // Return generic error to client (security: don't expose implementation details)
       return NextResponse.json(
         { success: false, error: 'Failed to submit URLs to search engines' },
-        { status: 500 }
+        { status: 500 },
       );
     }
     return NextResponse.json({

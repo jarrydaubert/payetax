@@ -45,7 +45,7 @@ export function FeedbackDialog() {
   // React 19: useActionState hook for server action state management
   const [state, formAction, isPending] = useActionState<FeedbackFormState, FormData>(
     submitFeedback,
-    { success: false }
+    { success: false },
   );
 
   // React 19: useTransition for wrapping async actions
@@ -143,7 +143,7 @@ export function FeedbackDialog() {
           className={cn(
             'flex min-h-[44px] items-center px-4 py-2.5 font-medium text-muted-foreground transition-colors hover:text-foreground',
             SPACING.GAP_2,
-            TYPOGRAPHY.TEXT_SM
+            TYPOGRAPHY.TEXT_SM,
           )}
         >
           <MessageSquare className={ICON_SIZES.SIZE_4} />
@@ -192,7 +192,7 @@ export function FeedbackDialog() {
                     ? 'text-destructive'
                     : messageLength > maxLength - 100
                       ? 'text-amber-600 dark:text-amber-400'
-                      : 'text-muted-foreground'
+                      : 'text-muted-foreground',
                 )}
                 aria-live='polite'
               >
@@ -238,7 +238,7 @@ export function FeedbackDialog() {
                   <div
                     className={cn(
                       'mr-2 animate-spin rounded-full border-2 border-current border-t-transparent',
-                      ICON_SIZES.SIZE_4
+                      ICON_SIZES.SIZE_4,
                     )}
                   />
                   Sending...

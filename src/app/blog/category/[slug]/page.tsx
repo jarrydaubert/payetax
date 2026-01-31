@@ -87,7 +87,7 @@ export default async function CategoryPage({
         Array.isArray(resolvedSearchParams.page)
           ? (resolvedSearchParams.page[0] ?? '1')
           : resolvedSearchParams.page,
-        10
+        10,
       )
     : 1;
 

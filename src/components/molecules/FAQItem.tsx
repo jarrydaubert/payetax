@@ -17,13 +17,13 @@ export function FAQItem({ question, children }: FAQItemProps) {
     <details
       className={cn(
         'group overflow-hidden rounded-xl border-2 border-border/20 bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg',
-        SPACING.P_6
+        SPACING.P_6,
       )}
     >
       <summary
         className={cn(
           'cursor-pointer font-bold text-foreground transition-colors hover:text-primary',
-          TYPOGRAPHY.TEXT_LG
+          TYPOGRAPHY.TEXT_LG,
         )}
       >
         {question}

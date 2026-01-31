@@ -69,7 +69,7 @@ export function StatsGrid({ stats, columns = 3, variant = 'default', className }
       'grid-cols-1 md:grid-cols-2 lg:grid-cols-3': columns === 3,
       'grid-cols-1 md:grid-cols-2 lg:grid-cols-4': columns === 4,
     },
-    className
+    className,
   );
 
   return (
@@ -102,7 +102,7 @@ function StatCard({ stat, variant }: StatCardProps) {
 
   const iconClasses = cn(
     'mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br',
-    color || 'from-primary to-accent'
+    color || 'from-primary to-accent',
   );
 
   return (
@@ -117,7 +117,7 @@ function StatCard({ stat, variant }: StatCardProps) {
         <div
           className={cn(
             TYPOGRAPHY.TEXT_3XL,
-            'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-transparent'
+            'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-transparent',
           )}
         >
           {value}

@@ -51,7 +51,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
           }
         }
       },
-      { rootMargin: '-80px 0px -80% 0px', threshold: 0 }
+      { rootMargin: '-80px 0px -80% 0px', threshold: 0 },
     );
 
     for (const heading of headings) {
@@ -89,7 +89,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
                   TYPOGRAPHY.TEXT_SM,
                   activeId === heading.id
                     ? 'border-primary font-medium text-primary'
-                    : 'border-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+                    : 'border-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground',
                 )}
               >
                 {heading.text}

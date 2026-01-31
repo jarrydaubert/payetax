@@ -101,7 +101,7 @@ export const VAT_WARNING_UPPER = 95000;
  */
 export function calculateDirectorScenario(
   input: DirectorInput,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): DirectorCalculationResult {
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
@@ -125,7 +125,7 @@ export function calculateDirectorScenario(
       grossProfit,
       taxYear,
       "Your company hasn't made profit yet. Dividends aren't possible. " +
-        "If you take money, it's a loan you'll owe back."
+        "If you take money, it's a loan you'll owe back.",
     );
   }
 
@@ -267,7 +267,7 @@ function createSurvivalResult(
   netRevenue: number,
   grossProfit: number,
   taxYear: TaxYear,
-  message: string
+  message: string,
 ): SurvivalResult {
   const warningType = mode === 'survival' ? 'SURVIVAL_MODE' : 'MODIFIED_SURVIVAL';
 
@@ -292,7 +292,7 @@ function collectWarnings(
   input: DirectorInput,
   grossProfit: number,
   netRevenue: number,
-  annualTakeHome: number
+  annualTakeHome: number,
 ): Warning[] {
   const warnings: Warning[] = [];
 

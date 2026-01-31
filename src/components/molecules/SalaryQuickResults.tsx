@@ -112,7 +112,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
                 'rounded-md px-3 py-2 text-center',
                 TYPOGRAPHY.TEXT_SM,
                 'border border-border hover:border-primary',
-                'transition-colors hover:bg-primary/5'
+                'transition-colors hover:bg-primary/5',
               )}
             >
               <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>{comp.label}</span>

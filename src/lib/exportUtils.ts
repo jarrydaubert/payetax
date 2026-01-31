@@ -133,7 +133,7 @@ export function printResults({
     whatIfAnnual: number | undefined,
     highlight = false,
     isSubRow = false,
-    color = ''
+    color = '',
   ) => {
     const highlightClass = highlight ? ' highlight' : '';
     const subRowClass = isSubRow ? ' sub-row' : '';
@@ -173,7 +173,7 @@ export function printResults({
         .map(
           (period) => `
         <th colspan="2" class="period-header">${period}</th>
-      `
+      `,
         )
         .join('')
     : visiblePeriods.map((period) => `<th>${period}</th>`).join('');
@@ -187,7 +187,7 @@ export function printResults({
           () => `
         <th class="current-header">Current</th>
         <th class="whatif-header">What If</th>
-      `
+      `,
         )
         .join('')}
     </tr>
@@ -347,19 +347,19 @@ export function printResults({
                 results.grossSalary.annually,
                 '100%',
                 whatIfResults?.grossSalary.annually,
-                true
+                true,
               )}
               ${row(
                 'Tax-Free Allowance',
                 results.taxFreeAmount,
                 calculatePercentage(results.taxFreeAmount, grossAnnual),
-                whatIfResults?.taxFreeAmount
+                whatIfResults?.taxFreeAmount,
               )}
               ${row(
                 'Total Taxable',
                 results.taxableIncome,
                 calculatePercentage(results.taxableIncome, grossAnnual),
-                whatIfResults?.taxableIncome
+                whatIfResults?.taxableIncome,
               )}
               ${row(
                 'Total Tax Due',
@@ -368,7 +368,7 @@ export function printResults({
                 whatIfResults?.incomeTax.annually,
                 false,
                 false,
-                'red-text'
+                'red-text',
               )}
               ${results.taxBands
                 .map((band, idx) =>
@@ -379,8 +379,8 @@ export function printResults({
                     whatIfResults?.taxBands[idx]?.amount,
                     false,
                     true,
-                    'red-text'
-                  )
+                    'red-text',
+                  ),
                 )
                 .join('')}
               ${
@@ -392,7 +392,7 @@ export function printResults({
                       whatIfResults?.studentLoan.annually,
                       false,
                       false,
-                      'orange-text'
+                      'orange-text',
                     )
                   : ''
               }
@@ -403,7 +403,7 @@ export function printResults({
                 whatIfResults?.nationalInsurance.annually,
                 false,
                 false,
-                'yellow-text'
+                'yellow-text',
               )}
               ${row(
                 'Pension',
@@ -412,7 +412,7 @@ export function printResults({
                 whatIfResults?.pensionContribution.annually,
                 false,
                 false,
-                'purple-text'
+                'purple-text',
               )}
               ${row(
                 'Allowances/Deductions',
@@ -421,7 +421,7 @@ export function printResults({
                 whatIfResults ? allowancesDeductions : undefined,
                 false,
                 false,
-                'teal-text'
+                'teal-text',
               )}
               ${row(
                 'Net Pay',
@@ -430,7 +430,7 @@ export function printResults({
                 whatIfResults?.netPay.annually,
                 true,
                 false,
-                'green-text'
+                'green-text',
               )}
               ${row(
                 'Employers NI',
@@ -439,7 +439,7 @@ export function printResults({
                 whatIfResults?.employerNI,
                 false,
                 false,
-                'gray-text'
+                'gray-text',
               )}
               ${
                 previousYearResults
@@ -448,12 +448,12 @@ export function printResults({
                       yearChange,
                       calculatePercentage(
                         Math.abs(yearChange),
-                        previousYearResults.netPay.annually
+                        previousYearResults.netPay.annually,
                       ),
                       whatIfYearChange,
                       false,
                       false,
-                      yearChange >= 0 ? 'green-text' : 'red-text'
+                      yearChange >= 0 ? 'green-text' : 'red-text',
                     )
                   : ''
               }

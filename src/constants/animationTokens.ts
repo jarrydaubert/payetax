@@ -274,7 +274,7 @@ export const ANIMATION_TRANSITIONS = {
  */
 export function getAccessibleTransition(
   shouldReduceMotion: boolean,
-  transition: Transition
+  transition: Transition,
 ): Transition {
   if (shouldReduceMotion) {
     return { duration: 0 };
@@ -298,7 +298,7 @@ export function getAccessibleTransition(
  */
 export function getAccessibleAnimation<T>(
   shouldReduceMotion: boolean,
-  animation: T
+  animation: T,
 ): T | Record<string, never> {
   if (shouldReduceMotion) {
     return {};

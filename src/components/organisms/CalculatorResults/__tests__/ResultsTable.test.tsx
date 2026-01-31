@@ -283,7 +283,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       const headers = screen.getAllByRole('columnheader');
@@ -313,7 +313,7 @@ describe('ResultsTable Component', () => {
           results={mockResults}
           visiblePeriods={['Yearly', 'Monthly']}
           onVisiblePeriodsChange={mockOnVisiblePeriodsChange}
-        />
+        />,
       );
 
       // Find and click a period checkbox (implementation depends on PeriodSelectorCard)
@@ -440,7 +440,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -458,7 +458,7 @@ describe('ResultsTable Component', () => {
 
     it('should update indicators when periods change', () => {
       const { rerender } = render(
-        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly']} />
+        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly']} />,
       );
 
       // Add more periods to trigger potential overflow
@@ -474,7 +474,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       // Table should re-render with all periods
@@ -495,7 +495,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -523,7 +523,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -540,7 +540,7 @@ describe('ResultsTable Component', () => {
 
     it('should not show indicators when table fits in viewport', () => {
       const { container } = render(
-        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly']} />
+        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly']} />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -557,7 +557,7 @@ describe('ResultsTable Component', () => {
 
     it('should respond to window resize events', () => {
       const { container } = render(
-        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly', 'Weekly']} />
+        <ResultsTable results={mockResults} visiblePeriods={['Yearly', 'Monthly', 'Weekly']} />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -586,7 +586,7 @@ describe('ResultsTable Component', () => {
             'Daily',
             'Hourly',
           ]}
-        />
+        />,
       );
 
       const scrollContainer = container.querySelector('[role="region"]') as HTMLElement;
@@ -1038,7 +1038,7 @@ describe('ResultsTable Component', () => {
           studentLoans={['plan2']}
           allowancesDeductions={312}
           previousYearResults={previousYearResults}
-        />
+        />,
       );
 
       expect(screen.getByText('Student Loan')).toBeInTheDocument();
@@ -1133,7 +1133,7 @@ describe('ResultsTable Component', () => {
           studentLoans={['plan2', 'postgrad']}
           allowancesDeductions={2000}
           previousYearResults={previousHighEarner}
-        />
+        />,
       );
 
       // Verify all components render
@@ -1175,7 +1175,7 @@ describe('ResultsTable Component', () => {
           studentLoans={['plan2']}
           allowancesDeductions={312}
           previousYearResults={previousYearResults}
-        />
+        />,
       );
 
       expect(screen.getAllByText(/£3,000/).length).toBeGreaterThan(0); // Pension

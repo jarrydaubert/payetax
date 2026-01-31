@@ -66,7 +66,7 @@ export function ProsCons({
       <Card
         className={cn(
           'border-green-500/20 bg-gradient-to-br from-green-500/5 to-green-500/10',
-          SPACING.P_6
+          SPACING.P_6,
         )}
       >
         <h3
@@ -74,7 +74,7 @@ export function ProsCons({
             'flex items-center font-bold text-green-600 dark:text-green-400',
             TYPOGRAPHY.TEXT_LG,
             SPACING.MB_4,
-            SPACING.GAP_2
+            SPACING.GAP_2,
           )}
         >
           <Check className={ICON_SIZES.SIZE_5} aria-hidden='true' />
@@ -86,7 +86,7 @@ export function ProsCons({
               <Check
                 className={cn(
                   ICON_SIZES.SIZE_4,
-                  'mt-0.5 shrink-0 text-green-600 dark:text-green-400'
+                  'mt-0.5 shrink-0 text-green-600 dark:text-green-400',
                 )}
                 aria-hidden='true'
               />
@@ -100,7 +100,7 @@ export function ProsCons({
       <Card
         className={cn(
           'border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-amber-500/10',
-          SPACING.P_6
+          SPACING.P_6,
         )}
       >
         <h3
@@ -108,7 +108,7 @@ export function ProsCons({
             'flex items-center font-bold text-amber-600 dark:text-amber-400',
             TYPOGRAPHY.TEXT_LG,
             SPACING.MB_4,
-            SPACING.GAP_2
+            SPACING.GAP_2,
           )}
         >
           <X className={ICON_SIZES.SIZE_5} aria-hidden='true' />
@@ -120,7 +120,7 @@ export function ProsCons({
               <X
                 className={cn(
                   ICON_SIZES.SIZE_4,
-                  'mt-0.5 shrink-0 text-amber-600 dark:text-amber-400'
+                  'mt-0.5 shrink-0 text-amber-600 dark:text-amber-400',
                 )}
                 aria-hidden='true'
               />
@@ -155,7 +155,7 @@ export function AdvantagesList({
       className={cn(
         'border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5',
         SPACING.P_6,
-        className
+        className,
       )}
     >
       <h3 className={cn('font-bold text-primary', TYPOGRAPHY.TEXT_LG, SPACING.MB_4)}>{title}</h3>

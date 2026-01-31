@@ -1234,7 +1234,7 @@ export function getCompetitorsByCategory(category: CompetitorCategory): Competit
  * Get category info by slug
  */
 export function getCompetitorCategoryInfo(
-  category: CompetitorCategory
+  category: CompetitorCategory,
 ): CompetitorCategoryInfo | undefined {
   return COMPETITOR_CATEGORIES.find((c) => c.slug === category);
 }

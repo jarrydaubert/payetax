@@ -45,7 +45,7 @@ describe('TaxRatesOverview', () => {
     it('should render the subheading', () => {
       render(<TaxRatesOverview />);
       expect(
-        screen.getByText('Quick reference for current tax year rates and thresholds')
+        screen.getByText('Quick reference for current tax year rates and thresholds'),
       ).toBeInTheDocument();
     });
   });

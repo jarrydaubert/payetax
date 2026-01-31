@@ -51,7 +51,7 @@ export function NavbarMobileMenu({
         onBackdropClick();
       }
     },
-    [onBackdropClick]
+    [onBackdropClick],
   );
 
   // Focus trap: keep focus within menu when open
@@ -120,7 +120,7 @@ export function NavbarMobileMenu({
             className={cn(
               'fixed right-0 left-0 z-50 md:hidden',
               LAYOUT.BELOW_NAVBAR,
-              'mobile-menu-blur px-4 py-6'
+              'mobile-menu-blur px-4 py-6',
             )}
             aria-label='Mobile navigation menu'
           >
@@ -140,7 +140,7 @@ export function NavbarMobileMenu({
                     onClick={() => onLinkClick(link.label)}
                     className={cn(
                       'block min-h-[44px] rounded-lg px-4 py-3 font-medium text-[0.95rem] transition-colors',
-                      isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new'
+                      isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new',
                     )}
                   >
                     {link.label}

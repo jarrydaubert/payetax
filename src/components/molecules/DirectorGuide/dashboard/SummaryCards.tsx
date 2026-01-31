@@ -52,7 +52,7 @@ export function SummaryCards({ className }: SummaryCardsProps) {
         formData.hasEmploymentAllowance,
         formData.studentLoanPlans,
         formData.pensionContribution,
-        formData.companyCarBIK
+        formData.companyCarBIK,
       );
 
       return {
@@ -123,7 +123,7 @@ function SummaryCard({ label, value, subtext, highlight, isEmpty }: SummaryCardP
         'rounded-xl border border-white/5 bg-slate-800 p-5 transition-all hover:-translate-y-0.5 hover:border-white/10',
         highlight &&
           !isEmpty &&
-          'border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5'
+          'border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5',
       )}
     >
       <div className='mb-2 font-medium text-slate-500 text-xs uppercase tracking-wider'>
@@ -135,7 +135,7 @@ function SummaryCard({ label, value, subtext, highlight, isEmpty }: SummaryCardP
           highlight && !isEmpty
             ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'
             : 'text-slate-100',
-          isEmpty && 'text-slate-600'
+          isEmpty && 'text-slate-600',
         )}
       >
         {value}

@@ -50,7 +50,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           payPeriod: 'annually',
-        })
+        }),
       );
       expect(result.grossSalary.annually).toBe(30000);
       expect(result.grossSalary.monthly).toBeCloseTo(2500, 2);
@@ -62,7 +62,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 2500,
           payPeriod: 'monthly',
-        })
+        }),
       );
       expect(result.grossSalary.annually).toBe(30000);
       expect(result.grossSalary.monthly).toBe(2500);
@@ -74,7 +74,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 576.92,
           payPeriod: 'weekly',
-        })
+        }),
       );
       expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
       expect(result.grossSalary.monthly).toBeCloseTo(2500, 0);
@@ -86,7 +86,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 1153.85,
           payPeriod: 'fortnightly',
-        })
+        }),
       );
       expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
       expect(result.grossSalary.fortnightly).toBe(1153.85);
@@ -97,7 +97,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 2307.69,
           payPeriod: 'fourWeekly',
-        })
+        }),
       );
       expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
       expect(result.grossSalary.fourWeekly).toBe(2307.69);
@@ -108,7 +108,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 115.38,
           payPeriod: 'daily',
-        })
+        }),
       );
       // 260 working days per year (115.38 × 260 = 29,998.8)
       expect(result.grossSalary.annually).toBeCloseTo(29998.8, 0);
@@ -121,7 +121,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 15.38,
           payPeriod: 'hourly',
           hoursPerWeek: 37.5,
-        })
+        }),
       );
       // 15.38 × 37.5 × 52 = 29,991
       expect(result.grossSalary.annually).toBeCloseTo(29991, 0);
@@ -134,7 +134,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 20,
           payPeriod: 'hourly',
           hoursPerWeek: 40,
-        })
+        }),
       );
       // 20 × 40 × 52 = 41,600
       expect(result.grossSalary.annually).toBeCloseTo(41600, 0);
@@ -146,7 +146,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 20,
           payPeriod: 'hourly',
           hoursPerWeek: 0,
-        })
+        }),
       );
       // With 0 hours, hourly calculation gives 0 annual salary
       expect(result.grossSalary.annually).toBe(0);
@@ -163,7 +163,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           createInput({
             salary: 30000,
             niCategory: category,
-          })
+          }),
         );
 
         switch (category) {
@@ -206,7 +206,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           niCategory: 'C',
           age: 67,
           payNoNI: true,
-        })
+        }),
       );
       expect(result.nationalInsurance.annually).toBe(0);
     });
@@ -233,7 +233,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           createInput({
             salary,
             studentLoanPlans: plan,
-          })
+          }),
         );
 
         const expectedRepayment = Math.max(0, (salary - threshold) * (rate / 100));
@@ -246,7 +246,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 20000,
           studentLoanPlans: ['plan2'], // Threshold £28,470
-        })
+        }),
       );
       expect(result.studentLoan.annually).toBe(0);
     });
@@ -256,7 +256,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 100000,
           studentLoanPlans: ['postgrad'],
-        })
+        }),
       );
       // (£100,000 - £21,000) × 6% = £4,740
       expect(result.studentLoan.annually).toBeCloseTo(4740, 0);
@@ -311,7 +311,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: 'BR',
-        })
+        }),
       );
       // Calculator may treat BR as standard code
       expect(brResult.taxFreeAmount).toBeGreaterThanOrEqual(0);
@@ -321,7 +321,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: 'D0',
-        })
+        }),
       );
       expect(d0Result.taxFreeAmount).toBeGreaterThanOrEqual(0);
 
@@ -330,7 +330,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: 'D1',
-        })
+        }),
       );
       expect(d1Result.taxFreeAmount).toBeGreaterThanOrEqual(0);
 
@@ -339,7 +339,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: '0T',
-        })
+        }),
       );
       expect(otResult.taxFreeAmount).toBeGreaterThanOrEqual(0);
 
@@ -348,7 +348,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: 'NT',
-        })
+        }),
       );
       // NT uses band override (0% rate on all income), allowance is 0 because it's not used
       expect(ntResult.taxFreeAmount).toBe(0);
@@ -360,7 +360,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 30000,
           taxCode: 'K100',
-        })
+        }),
       );
       // K codes represent additional tax to collect
       expect(Math.abs(k100Result.taxFreeAmount)).toBe(1000);
@@ -380,7 +380,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           createInput({
             salary: 25000,
             age,
-          })
+          }),
         );
         expect(result.taxFreeAmount).toBe(expectedPA);
       });
@@ -393,7 +393,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 30000,
           pensionContribution: 150,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
       expect(result1.pensionContribution.annually).toBe(45000); // 150% of £30k
 
@@ -403,7 +403,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 30000,
           pensionContribution: -1000,
           pensionContributionType: 'amount',
-        })
+        }),
       );
       // Calculator handles negative pension as 0
       expect(result2.pensionContribution.annually).toBeLessThanOrEqual(0);
@@ -415,7 +415,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 30000,
           isMarried: true,
           partnerGrossWage: -5000, // Negative
-        })
+        }),
       );
       // Should not apply marriage allowance with negative wage
       expect(result.taxFreeAmount).toBe(12570);
@@ -431,7 +431,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           isBlind: true,
           isMarried: true,
           partnerGrossWage: 8000,
-        })
+        }),
       );
       // £12,570 + £3,960 (age 75+) + £3,130 (blind) + £1,260 (marriage) = £20,920
       expect(result.taxFreeAmount).toBe(20920);
@@ -448,7 +448,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           studentLoanPlans: ['plan2'],
           pensionContribution: 10,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
 
       // PA fully removed at this income, but blind allowance (£3,130) still applies
@@ -473,7 +473,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           niCategory: 'A',
           pensionContribution: 5,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
 
       // Should apply Scottish tax rates (may have same number of bands stored)
@@ -490,7 +490,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           age: 19,
           niCategory: 'M', // Under 21
           studentLoanPlans: ['plan1'],
-        })
+        }),
       );
 
       // Should pay reduced NI
@@ -508,7 +508,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           studentLoanPlans: ['plan2'],
           pensionContribution: 3,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
 
       // £12 × 20 × 52 = £12,480 annually
@@ -576,7 +576,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           createInput({
             salary: 30000,
             taxYear: year,
-          })
+          }),
         );
 
         expect(result.grossSalary.annually).toBe(30000);
@@ -599,7 +599,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 10.42,
           payPeriod: 'hourly',
           hoursPerWeek: 37.5,
-        })
+        }),
       );
 
       // £10.42 × 37.5 × 52 = £20,319
@@ -616,7 +616,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 13.15,
           payPeriod: 'hourly',
           hoursPerWeek: 40,
-        })
+        }),
       );
 
       // £13.15 × 40 × 52 = £27,352
@@ -631,7 +631,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           studentLoanPlans: ['plan2'],
           pensionContribution: 5,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
 
       expect(result.grossSalary.annually).toBe(35000);
@@ -645,7 +645,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         createInput({
           salary: 500,
           payPeriod: 'daily',
-        })
+        }),
       );
 
       // £500 × 260 = £130,000
@@ -660,7 +660,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           salary: 11.5,
           payPeriod: 'hourly',
           hoursPerWeek: 25,
-        })
+        }),
       );
 
       // £11.50 × 25 × 52 = £14,950

@@ -108,7 +108,7 @@ export function NICalculatorClient() {
         <h1
           className={cn(
             'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL
+            TYPOGRAPHY.TEXT_4XL,
           )}
         >
           National Insurance Calculator 2025-26
@@ -168,7 +168,7 @@ export function NICalculatorClient() {
                       'rounded-lg border px-4 py-2 text-sm transition-colors',
                       category === cat.code
                         ? 'border-primary bg-primary/10 font-medium text-primary'
-                        : 'hover:border-primary hover:bg-primary/5'
+                        : 'hover:border-primary hover:bg-primary/5',
                     )}
                     title={cat.description}
                   >
@@ -204,7 +204,7 @@ export function NICalculatorClient() {
                     onClick={() => handleQuickCalculate(exampleSalary)}
                     className={cn(
                       'rounded-full border px-3 py-1 font-mono text-sm transition-colors',
-                      'hover:border-primary hover:bg-primary/5'
+                      'hover:border-primary hover:bg-primary/5',
                     )}
                   >
                     £{exampleSalary.toLocaleString()}

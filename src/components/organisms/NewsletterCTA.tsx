@@ -64,11 +64,11 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
       } catch (error) {
         setStatus('error');
         setErrorMessage(
-          error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+          error instanceof Error ? error.message : 'Something went wrong. Please try again.',
         );
       }
     },
-    [email, honeypot]
+    [email, honeypot],
   );
 
   return (
@@ -76,7 +76,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
       className={cn(
         'relative overflow-hidden rounded-2xl p-8 md:p-12',
         'bg-gradient-to-br from-cyan-500 to-emerald-500',
-        className
+        className,
       )}
       aria-labelledby={headingId}
     >
@@ -120,7 +120,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                   'flex-1 rounded-lg border-0 bg-white/20 px-4 py-3',
                   'text-white placeholder:text-white/60',
                   'focus:outline-none focus:ring-2 focus:ring-white/50',
-                  'disabled:opacity-50'
+                  'disabled:opacity-50',
                 )}
                 aria-describedby={status === 'error' ? errorId : undefined}
               />
@@ -144,7 +144,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                   'rounded-lg bg-white px-6 py-3 font-semibold text-emerald-600',
                   'transition-all hover:bg-white/90',
                   'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-emerald-500',
-                  'disabled:cursor-not-allowed disabled:opacity-50'
+                  'disabled:cursor-not-allowed disabled:opacity-50',
                 )}
               >
                 {status === 'loading' ? (

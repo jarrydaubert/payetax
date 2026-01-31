@@ -72,7 +72,7 @@ export default function ScenariosPage() {
                 TYPOGRAPHY.TEXT_4XL,
                 'sm:text-5xl',
                 'font-bold tracking-tight',
-                SPACING.MB_4
+                SPACING.MB_4,
               )}
             >
               <span className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text text-transparent'>
@@ -119,7 +119,7 @@ export default function ScenariosPage() {
               'inline-flex items-center',
               SPACING.GAP_2,
               'rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground',
-              'transition-colors hover:bg-primary/90'
+              'transition-colors hover:bg-primary/90',
             )}
           >
             Open Calculator
@@ -203,7 +203,7 @@ function ScenarioCard({
           'group relative overflow-hidden transition-all duration-200',
           'hover:-translate-y-0.5 hover:shadow-lg',
           styles.border,
-          SPACING.P_0
+          SPACING.P_0,
         )}
       >
         {/* Gradient background */}
@@ -217,7 +217,7 @@ function ScenarioCard({
               'inline-flex items-center rounded-full bg-background/80 px-3 py-1',
               TYPOGRAPHY.TEXT_SM,
               'font-semibold',
-              SPACING.MB_3
+              SPACING.MB_3,
             )}
           >
             £{formattedSalary}
@@ -237,7 +237,7 @@ function ScenarioCard({
           <div
             className={cn(
               'absolute right-4 bottom-4 text-muted-foreground',
-              'transition-transform group-hover:translate-x-1'
+              'transition-transform group-hover:translate-x-1',
             )}
           >
             <ArrowRight className='size-4' />
@@ -251,7 +251,7 @@ function ScenarioCard({
               className={cn(
                 'bg-primary/90 text-primary-foreground',
                 'px-2 py-0.5 font-medium text-xs',
-                'rounded-bl-lg'
+                'rounded-bl-lg',
               )}
             >
               Popular

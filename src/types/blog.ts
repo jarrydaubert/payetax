@@ -139,7 +139,7 @@ export type BlogSortOption = 'date-desc' | 'date-asc' | 'title-asc' | 'title-des
 export class BlogError extends Error {
   constructor(
     message: string,
-    public code: 'POST_NOT_FOUND' | 'INVALID_FRONTMATTER' | 'FILE_READ_ERROR' | 'PARSE_ERROR'
+    public code: 'POST_NOT_FOUND' | 'INVALID_FRONTMATTER' | 'FILE_READ_ERROR' | 'PARSE_ERROR',
   ) {
     super(message);
     this.name = 'BlogError';

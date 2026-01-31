@@ -254,7 +254,7 @@ export function validateTextInput(value: string, min = 1, max = 500) {
  */
 export function validateSelect<T extends readonly [string, ...string[]]>(
   value: string,
-  options: T
+  options: T,
 ) {
   return z.enum(options).safeParse(value);
 }

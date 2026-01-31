@@ -99,7 +99,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
         delay: Math.random() * 3,
         duration: 2 + Math.random() * 4,
       })),
-    []
+    [],
   );
 
   return (
@@ -131,7 +131,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             'border border-red-400/20',
             SPACING.P_6,
             'md:p-12',
-            SHADOWS.XXL
+            SHADOWS.XXL,
           )}
         >
           {/* Error icon with animation */}
@@ -142,7 +142,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 'border border-red-400/30 bg-red-500/20',
                 SPACING.MB_4,
                 ICON_SIZES.SIZE_12,
-                'md:size-20'
+                'md:size-20',
               )}
             >
               <AlertTriangle
@@ -158,7 +158,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               'font-bold text-foreground',
               TYPOGRAPHY.TEXT_3XL,
               `md:${TYPOGRAPHY.TEXT_4XL}`,
-              SPACING.MB_6
+              SPACING.MB_6,
             )}
           >
             Oops! Something Went Wrong
@@ -171,7 +171,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               'text-muted-foreground',
               TYPOGRAPHY.TEXT_LG,
               `md:${TYPOGRAPHY.TEXT_XL}`,
-              SPACING.MB_8
+              SPACING.MB_8,
             )}
           >
             Don't worry - even the best tax calculators have their off days! We've automatically
@@ -184,14 +184,14 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               'glass-card',
               'border border-yellow-400/20 bg-yellow-500/5',
               SPACING.P_6,
-              SPACING.MB_8
+              SPACING.MB_8,
             )}
           >
             <h3
               className={cn(
                 'font-semibold text-yellow-500 dark:text-yellow-400',
                 TYPOGRAPHY.TEXT_LG,
-                SPACING.MB_3
+                SPACING.MB_3,
               )}
             >
               What can you do?
@@ -201,7 +201,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 'mx-auto max-w-md text-left',
                 'text-muted-foreground',
                 TYPOGRAPHY.TEXT_SM,
-                SPACING.SPACE_Y_2
+                SPACING.SPACE_Y_2,
               )}
             >
               <li>• Try refreshing the page or clicking "Try Again"</li>
@@ -220,7 +220,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 'text-white/70 dark:border-white/5 dark:bg-black/40',
                 TYPOGRAPHY.TEXT_SM,
                 SPACING.P_4,
-                SPACING.MB_8
+                SPACING.MB_8,
               )}
             >
               <strong className='text-white dark:text-white/90'>Error Reference:</strong>
@@ -229,7 +229,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 className={cn(
                   'break-all font-mono',
                   'text-purple-300 dark:text-purple-400',
-                  TYPOGRAPHY.TEXT_XS
+                  TYPOGRAPHY.TEXT_XS,
                 )}
               >
                 {eventId}
@@ -279,7 +279,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                   'text-yellow-300 dark:text-yellow-400',
                   'transition-colors hover:text-yellow-200 dark:hover:text-yellow-300',
                   TYPOGRAPHY.TEXT_LG,
-                  SPACING.MB_4
+                  SPACING.MB_4,
                 )}
               >
                 🔧 Developer Debug Info (Dev Mode Only)
@@ -288,7 +288,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 className={cn(
                   'glass-card',
                   'border border-yellow-400/30 bg-yellow-500/5',
-                  SPACING.P_4
+                  SPACING.P_4,
                 )}
               >
                 <h4
@@ -300,7 +300,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                   className={cn(
                     'font-mono text-red-300 dark:text-red-400',
                     TYPOGRAPHY.TEXT_SM,
-                    SPACING.MB_4
+                    SPACING.MB_4,
                   )}
                 >
                   {error.message}
@@ -317,7 +317,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                     'border border-red-400/20 bg-black/40 dark:bg-black/60',
                     'font-mono text-red-300 dark:text-red-400',
                     TYPOGRAPHY.TEXT_XS,
-                    SPACING.P_4
+                    SPACING.P_4,
                   )}
                 >
                   {error.stack}

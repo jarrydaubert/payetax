@@ -100,14 +100,14 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
     <div
       className={cn(
         'rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10',
-        SPACING.SPACE_Y_4
+        SPACING.SPACE_Y_4,
       )}
     >
       {/* Header */}
       <div
         className={cn(
           'flex items-center border-purple-500/20 border-b pb-2 dark:border-purple-400/20',
-          SPACING.GAP_2
+          SPACING.GAP_2,
         )}
       >
         <Wand2 className={cn(ICON_SIZES.SIZE_5, 'text-accent-foreground')} />

@@ -157,20 +157,20 @@ function printResults() {
   console.log(`${colors.bold}SUMMARY${colors.reset}`);
   console.log(`Total pages audited: ${results.total}`);
   console.log(
-    `${colors.green}✓ Optimal (${OPTIMAL_MIN}-${OPTIMAL_MAX} chars): ${results.optimal.length}${colors.reset}`
+    `${colors.green}✓ Optimal (${OPTIMAL_MIN}-${OPTIMAL_MAX} chars): ${results.optimal.length}${colors.reset}`,
   );
   console.log(
-    `${colors.yellow}⚠ Too Long (>${OPTIMAL_MAX} chars): ${results.tooLong.length}${colors.reset}`
+    `${colors.yellow}⚠ Too Long (>${OPTIMAL_MAX} chars): ${results.tooLong.length}${colors.reset}`,
   );
   console.log(
-    `${colors.yellow}⚠ Too Short (<${OPTIMAL_MIN} chars): ${results.tooShort.length}${colors.reset}`
+    `${colors.yellow}⚠ Too Short (<${OPTIMAL_MIN} chars): ${results.tooShort.length}${colors.reset}`,
   );
   console.log(`${colors.red}✗ Missing: ${results.missing.length}${colors.reset}\n`);
 
   // Too Long
   if (results.tooLong.length > 0) {
     console.log(
-      `${colors.bold}${colors.yellow}TOO LONG (>${OPTIMAL_MAX} characters)${colors.reset}`
+      `${colors.bold}${colors.yellow}TOO LONG (>${OPTIMAL_MAX} characters)${colors.reset}`,
     );
     console.log(`These will be truncated in search results:\n`);
     results.tooLong.forEach((item, index) => {
@@ -186,7 +186,7 @@ function printResults() {
   // Too Short
   if (results.tooShort.length > 0) {
     console.log(
-      `${colors.bold}${colors.yellow}TOO SHORT (<${OPTIMAL_MIN} characters)${colors.reset}`
+      `${colors.bold}${colors.yellow}TOO SHORT (<${OPTIMAL_MIN} characters)${colors.reset}`,
     );
     console.log(`These could be more descriptive:\n`);
     results.tooShort.forEach((item, index) => {
@@ -212,7 +212,7 @@ function printResults() {
   // Optimal
   if (results.optimal.length > 0) {
     console.log(
-      `${colors.bold}${colors.green}✓ OPTIMAL (${OPTIMAL_MIN}-${OPTIMAL_MAX} characters)${colors.reset}`
+      `${colors.bold}${colors.green}✓ OPTIMAL (${OPTIMAL_MIN}-${OPTIMAL_MAX} characters)${colors.reset}`,
     );
     console.log(`These are well-optimized:\n`);
     results.optimal.forEach((item, index) => {
@@ -226,26 +226,26 @@ function printResults() {
   // Recommendations
   console.log(`${colors.bold}RECOMMENDATIONS:${colors.reset}\n`);
   console.log(
-    `1. ${colors.yellow}Fix ${results.tooLong.length} descriptions that are too long${colors.reset}`
+    `1. ${colors.yellow}Fix ${results.tooLong.length} descriptions that are too long${colors.reset}`,
   );
   console.log(`   - Target: ${OPTIMAL_MIN}-${OPTIMAL_MAX} characters`);
   console.log(`   - Remove unnecessary words, focus on key benefits\n`);
 
   console.log(
-    `2. ${colors.yellow}Expand ${results.tooShort.length} descriptions that are too short${colors.reset}`
+    `2. ${colors.yellow}Expand ${results.tooShort.length} descriptions that are too short${colors.reset}`,
   );
   console.log(`   - Add more detail, include key keywords`);
   console.log(`   - Highlight unique value proposition\n`);
 
   if (results.missing.length > 0) {
     console.log(
-      `3. ${colors.red}Add ${results.missing.length} missing descriptions${colors.reset}`
+      `3. ${colors.red}Add ${results.missing.length} missing descriptions${colors.reset}`,
     );
     console.log(`   - CRITICAL: Every page needs a meta description\n`);
   }
 
   console.log(
-    `${colors.green}✓ Estimated Time: ${Math.ceil((results.tooLong.length + results.tooShort.length + results.missing.length) * 3)} minutes${colors.reset}`
+    `${colors.green}✓ Estimated Time: ${Math.ceil((results.tooLong.length + results.tooShort.length + results.missing.length) * 3)} minutes${colors.reset}`,
   );
   console.log(`${colors.cyan}  (Avg 3 minutes per description)${colors.reset}\n`);
 }

@@ -46,7 +46,7 @@ export function PrivacyPageClient() {
         <div
           className={cn(
             'flex items-center justify-center gap-2 text-muted-foreground',
-            TYPOGRAPHY.TEXT_SM
+            TYPOGRAPHY.TEXT_SM,
           )}
         >
           <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />

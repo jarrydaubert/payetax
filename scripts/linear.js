@@ -91,7 +91,7 @@ async function listIssues(options = {}) {
     if (options.projectName) {
       const projects = await team.projects();
       const project = projects.nodes.find(
-        (p) => p.name.toLowerCase() === options.projectName.toLowerCase()
+        (p) => p.name.toLowerCase() === options.projectName.toLowerCase(),
       );
 
       if (!project) {
@@ -134,7 +134,7 @@ async function listIssues(options = {}) {
         issues.nodes = filteredIssues;
         log(
           `\n✨ Found ${issues.nodes.length} team-level issues (no project assigned):\n`,
-          'green'
+          'green',
         );
       } else {
         log(`\n✨ Found ${issues.nodes.length} issues in ${team.name}:\n`, 'green');
@@ -220,7 +220,7 @@ async function createIssue(title, description, options = {}) {
       const labelIds = options.labels
         .map((labelName) => {
           const label = teamLabels.nodes.find(
-            (l) => l.name.toLowerCase() === labelName.toLowerCase()
+            (l) => l.name.toLowerCase() === labelName.toLowerCase(),
           );
           return label?.id;
         })
@@ -576,7 +576,7 @@ async function listCycles() {
       log(`    ${formatDate(cycle.startsAt)} - ${formatDate(cycle.endsAt)}`, 'dim');
       log(
         `    Issues: ${issues.nodes.length} (${completedIssues.length} completed, ${progress}%)`,
-        'dim'
+        'dim',
       );
       log('');
     }
@@ -624,7 +624,7 @@ async function listProjects() {
       log(`  Status: ${project.state}`, 'dim');
       log(
         `  Progress: ${progress}% (${completedIssues.length}/${issues.nodes.length} issues)`,
-        'cyan'
+        'cyan',
       );
       if (project.targetDate) log(`  Target: ${formatDate(project.targetDate)}`, 'yellow');
       log(`  URL: ${project.url}`, 'blue');
@@ -677,7 +677,7 @@ async function interactiveCreate() {
 
   const question = (query) =>
     new Promise((resolve) =>
-      rl.question(`${colors.cyan}${query}${colors.reset}`, (answer) => resolve(answer))
+      rl.question(`${colors.cyan}${query}${colors.reset}`, (answer) => resolve(answer)),
     );
 
   try {
@@ -694,7 +694,7 @@ async function interactiveCreate() {
     const description = await question('Description (optional): ');
 
     const priorityInput = await question(
-      'Priority (0=Urgent, 1=High, 2=Medium, 3=Low, 4=None) [2]: '
+      'Priority (0=Urgent, 1=High, 2=Medium, 3=Low, 4=None) [2]: ',
     );
     const priority = priorityInput ? parseInt(priorityInput, 10) : 2;
 
@@ -862,7 +862,7 @@ async function main() {
           log('Example: npm run linear assign-to-project PayeTax PAYTAX-1', 'dim');
           log(
             'Example: npm run linear assign-to-project PayeTax PAYTAX-1 PAYTAX-2 PAYTAX-3',
-            'dim'
+            'dim',
           );
         } else {
           const projectName = args[1];

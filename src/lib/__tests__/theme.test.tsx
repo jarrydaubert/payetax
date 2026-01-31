@@ -14,7 +14,7 @@ describe('ThemeProvider (dark mode only)', () => {
     render(
       <ThemeProvider>
         <div>Test Child</div>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText('Test Child')).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('ThemeProvider (dark mode only)', () => {
     render(
       <ThemeProvider>
         <div>Content</div>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     await waitFor(() => {
@@ -40,7 +40,7 @@ describe('ThemeProvider (dark mode only)', () => {
     render(
       <ThemeProvider>
         <div>Content</div>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     await waitFor(() => {

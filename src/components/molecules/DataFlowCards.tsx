@@ -74,7 +74,7 @@ export function DataFlowCards({ cards, columns = 3, className }: DataFlowCardsPr
       'md:grid-cols-2': columns === 2,
       'md:grid-cols-3': columns === 3,
     },
-    className
+    className,
   );
 
   return (
@@ -100,14 +100,14 @@ function DataFlowCardItem({ card }: DataFlowCardItemProps) {
     <Card
       className={cn(
         'h-full border-primary/20 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl',
-        SPACING.P_8
+        SPACING.P_8,
       )}
     >
       {/* Icon */}
       <div
         className={cn(
           `mx-auto mb-6 flex ${'size-20'} items-center justify-center rounded-2xl shadow-lg`,
-          iconColor
+          iconColor,
         )}
       >
         <Icon className={cn(ICON_SIZES.SIZE_10, 'text-primary-foreground')} aria-hidden='true' />

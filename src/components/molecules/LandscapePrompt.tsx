@@ -111,7 +111,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
         'fixed inset-0 z-40 flex items-center justify-center md:hidden',
         'fade-in animate-in duration-500',
         'pointer-events-none', // Allow clicks through to content
-        className
+        className,
       )}
       aria-live='polite'
       aria-label='Rotate device for better viewing of results'
@@ -121,7 +121,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
           'glass-card relative mx-4 flex max-w-sm items-center gap-3 p-4',
           'pointer-events-auto', // Enable clicks on the card itself
           'border-primary/20 bg-primary/5 backdrop-blur-lg',
-          'shadow-lg dark:bg-primary/10'
+          'shadow-lg dark:bg-primary/10',
         )}
       >
         {/* Animated Phone Icon */}
@@ -130,7 +130,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
             className={cn(
               ICON_SIZES.SIZE_8,
               'text-primary',
-              'animate-[wiggle_1s_ease-in-out_infinite]'
+              'animate-[wiggle_1s_ease-in-out_infinite]',
             )}
             aria-hidden='true'
           />
@@ -153,7 +153,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
             'flex-shrink-0 rounded-md p-1',
             'text-muted-foreground hover:text-foreground',
             'transition-colors duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
           )}
           aria-label='Dismiss landscape prompt'
           type='button'

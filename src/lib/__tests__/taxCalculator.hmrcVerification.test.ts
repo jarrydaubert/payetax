@@ -171,7 +171,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 30000,
           isMarried: true,
           partnerGrossWage: 30000,
-        })
+        }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
@@ -182,7 +182,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 50270,
           isMarried: true,
           partnerGrossWage: 12569,
-        })
+        }),
       );
       expect(result.taxFreeAmount).toBe(13830);
     });
@@ -193,7 +193,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 50271,
           isMarried: true,
           partnerGrossWage: 10000,
-        })
+        }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
@@ -205,7 +205,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isScottish: true,
           isMarried: true,
           partnerGrossWage: 10000,
-        })
+        }),
       );
       // Scottish higher rate starts at £43,663
       expect(result.taxFreeAmount).toBe(13830);
@@ -218,7 +218,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isScottish: true,
           isMarried: true,
           partnerGrossWage: 10000,
-        })
+        }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
@@ -230,7 +230,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 34600,
           age: 67,
-        })
+        }),
       );
       expect(result.taxFreeAmount).toBe(12570 + 3660);
     });
@@ -240,7 +240,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 41920,
           age: 67,
-        })
+        }),
       );
       // (£41,920 - £34,600) ÷ 2 = £3,660 reduction
       expect(result.taxFreeAmount).toBe(12570);
@@ -251,7 +251,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 42520,
           age: 75,
-        })
+        }),
       );
       // (£42,520 - £34,600) ÷ 2 = £3,960 reduction
       expect(result.taxFreeAmount).toBe(12570);
@@ -262,7 +262,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 110000,
           age: 67,
-        })
+        }),
       );
       // Age allowance: fully tapered (income > £41,920)
       // PA reduction: (£110,000 - £100,000) ÷ 2 = £5,000
@@ -278,7 +278,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isMarried: true,
           partnerGrossWage: 8000,
           isBlind: true,
-        })
+        }),
       );
       // £12,570 + £1,260 + £3,130 = £16,960 (2025-26 blind allowance)
       expect(result.taxFreeAmount).toBe(16960);
@@ -292,7 +292,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isMarried: true,
           partnerGrossWage: 8000,
           isBlind: true,
-        })
+        }),
       );
       // £12,570 + £3,660 + £1,260 + £3,130 = £20,620 (2025-26 blind allowance)
       expect(result.taxFreeAmount).toBe(20620);
@@ -308,7 +308,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isBlind: true,
           pensionContribution: 10,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
       // Allowances: £12,570 + £3,960 + £1,260 + £3,070 = £20,860
       // Income partially tapered but complex calculation
@@ -327,7 +327,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isMarried: true,
           partnerGrossWage: 10000,
           studentLoanPlans: ['plan2'],
-        })
+        }),
       );
 
       // Marriage allowance reduces tax
@@ -342,7 +342,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 40000,
           studentLoanPlans: ['plan1'],
-        })
+        }),
       );
 
       // Plan 1: (£40,000 - £26,065) × 9% = £1,254.15
@@ -354,7 +354,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 100000,
           studentLoanPlans: ['postgrad'],
-        })
+        }),
       );
 
       // Postgrad: (£100,000 - £21,000) × 6%
@@ -368,7 +368,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 30000,
           niCategory: 'A',
-        })
+        }),
       );
       // (£30,000 - £12,570) × 8% = £1,394.40
       expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 1);
@@ -379,7 +379,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 30000,
           niCategory: 'B',
-        })
+        }),
       );
       // (£30,000 - £12,570) × 5% = £871.50
       expect(result.nationalInsurance.annually).toBeCloseTo(871.5, 0);
@@ -392,7 +392,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           niCategory: 'C',
           age: 67,
           payNoNI: true,
-        })
+        }),
       );
       // No NI for category C
       expect(result.nationalInsurance.annually).toBe(0);
@@ -404,7 +404,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 50000,
           age: 67,
           payNoNI: true,
-        })
+        }),
       );
       expect(result.nationalInsurance.annually).toBe(0);
     });
@@ -417,7 +417,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 40000,
           pensionContribution: 10,
           pensionContributionType: 'percentage',
-        })
+        }),
       );
 
       // £4,000 pension contribution
@@ -436,7 +436,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           salary: 50000,
           pensionContribution: 5000,
           pensionContributionType: 'amount',
-        })
+        }),
       );
 
       expect(result.pensionContribution.annually).toBe(5000);
@@ -452,7 +452,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 2500,
           payPeriod: 'monthly',
-        })
+        }),
       );
 
       // Annual equivalent: £30,000
@@ -466,7 +466,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         createInput({
           salary: 500,
           payPeriod: 'weekly',
-        })
+        }),
       );
 
       // Annual equivalent: £26,000
@@ -483,10 +483,10 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Check tax bands are correctly populated
       // Note: taxBands stores the taxable income amount in each band, not the tax amount
       const basicBand = result.taxBands.find(
-        (b) => b.name.includes('Basic') || b.name.includes('basic') || b.rate === 20
+        (b) => b.name.includes('Basic') || b.name.includes('basic') || b.rate === 20,
       );
       const higherBand = result.taxBands.find(
-        (b) => b.name.includes('Higher') || b.name.includes('higher') || b.rate === 40
+        (b) => b.name.includes('Higher') || b.name.includes('higher') || b.rate === 40,
       );
 
       expect(basicBand).toBeDefined();

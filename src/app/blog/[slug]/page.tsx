@@ -247,7 +247,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <span
                   className={cn(
                     'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
-                    TYPOGRAPHY.TEXT_XS
+                    TYPOGRAPHY.TEXT_XS,
                   )}
                 >
                   {post.categoryData?.name || post.category}
@@ -257,7 +257,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     key={tag}
                     className={cn(
                       'rounded-full bg-foreground/5 px-2.5 py-1 text-foreground/70',
-                      TYPOGRAPHY.TEXT_XS
+                      TYPOGRAPHY.TEXT_XS,
                     )}
                   >
                     {tag}
@@ -270,7 +270,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 className={cn(
                   'mb-4 font-bold text-foreground leading-tight md:mb-6',
                   TYPOGRAPHY.TEXT_4XL,
-                  'md:text-5xl'
+                  'md:text-5xl',
                 )}
               >
                 {post.title}
@@ -281,7 +281,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 className={cn(
                   'mb-6 text-foreground/80 leading-relaxed md:mb-8',
                   TYPOGRAPHY.TEXT_LG,
-                  'md:text-xl'
+                  'md:text-xl',
                 )}
               >
                 {post.excerpt}
@@ -291,7 +291,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div
                 className={cn(
                   'flex flex-wrap items-center gap-4 text-foreground/60 md:gap-6',
-                  TYPOGRAPHY.TEXT_SM
+                  TYPOGRAPHY.TEXT_SM,
                 )}
               >
                 <div className='flex items-center gap-2'>
@@ -348,7 +348,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   'prose-blockquote:border-primary/30 prose-blockquote:text-foreground/80',
                   'prose-code:rounded prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none',
                   'prose-pre:border prose-pre:border-foreground/10 prose-pre:bg-foreground/5',
-                  'md:prose-xl'
+                  'md:prose-xl',
                 )}
               >
                 <MDXContent />
@@ -399,7 +399,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     <h3
                       className={cn(
                         'mb-2 font-semibold text-foreground transition-colors group-hover:text-primary',
-                        TYPOGRAPHY.TEXT_BASE
+                        TYPOGRAPHY.TEXT_BASE,
                       )}
                     >
                       {relatedPost.title}
@@ -410,7 +410,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     <div
                       className={cn(
                         'flex items-center gap-3 text-foreground/50',
-                        TYPOGRAPHY.TEXT_XS
+                        TYPOGRAPHY.TEXT_XS,
                       )}
                     >
                       {relatedPost.readTime && (

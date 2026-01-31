@@ -80,7 +80,7 @@ export function ComparisonTable({
               className={cn(
                 TYPOGRAPHY.TEXT_SM,
                 'text-center',
-                highlightPayeTax && 'bg-primary/5 font-semibold text-primary'
+                highlightPayeTax && 'bg-primary/5 font-semibold text-primary',
               )}
             >
               {PAYETAX_INFO.shortName}
@@ -138,7 +138,7 @@ export function TwoColumnComparison({ competitor, className }: TwoColumnComparis
             <TableHead
               className={cn(
                 TYPOGRAPHY.TEXT_SM,
-                'bg-primary/5 text-center font-semibold text-primary'
+                'bg-primary/5 text-center font-semibold text-primary',
               )}
             >
               PayeTax

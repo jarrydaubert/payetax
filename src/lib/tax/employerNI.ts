@@ -67,7 +67,7 @@ export interface EmployerNIResult {
  */
 export function calculateEmployerNI(
   salary: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): EmployerNIResult {
   // Get employer NI rates from tax rates constant
   const rates = TAX_RATES[taxYear];

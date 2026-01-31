@@ -99,7 +99,7 @@ describe('PageHero', () => {
               <GradientText variant='brand-full'>Gradient</GradientText> Regular Text
             </>
           }
-        />
+        />,
       );
       expect(screen.getByText(/Gradient/)).toBeInTheDocument();
       expect(screen.getByText(/Regular Text/)).toBeInTheDocument();

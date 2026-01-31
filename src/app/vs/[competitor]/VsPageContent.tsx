@@ -230,7 +230,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
             className={cn(
               'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 text-center',
               SPACING.P_8,
-              'md:p-12'
+              'md:p-12',
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>

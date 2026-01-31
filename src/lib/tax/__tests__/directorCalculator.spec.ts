@@ -607,7 +607,7 @@ describe('Strategy Optimization', () => {
       const result = calculateStrategyComparison(input, TAX_YEAR);
       // Optimal mix should have better take-home than all salary
       expect(result.strategies.optimalMix.takeHome).toBeGreaterThanOrEqual(
-        result.strategies.allSalary.takeHome
+        result.strategies.allSalary.takeHome,
       );
       // Optimal usually uses salary around PA (£12,570) or LEL (£6,500)
       expect(result.strategies.optimalMix.salary).toBeLessThanOrEqual(12570);
@@ -702,7 +702,7 @@ describe('Warning Triggers', () => {
       // Soft wording: "may be unlawful IF you lack distributable reserves"
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'DIVIDEND_RESERVES' && w.severity === 'hard')).toBe(
-        true
+        true,
       );
     });
   });
@@ -718,7 +718,7 @@ describe('Warning Triggers', () => {
       const input = { profit: 50000, dividends: 20000 };
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'SELF_ASSESSMENT' && w.severity === 'soft')).toBe(
-        true
+        true,
       );
     });
 
@@ -731,7 +731,7 @@ describe('Warning Triggers', () => {
       // BOTH conditions must be met
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'PAYMENTS_ON_ACCOUNT' && w.severity === 'soft')).toBe(
-        true
+        true,
       );
     });
 
@@ -766,7 +766,7 @@ describe('Warning Triggers', () => {
       const input = { salary: 110000 };
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'PA_TAPER' && w.severity === 'educational')).toBe(
-        true
+        true,
       );
     });
 
@@ -784,7 +784,7 @@ describe('Warning Triggers', () => {
       const input = { salary: 5500 }; // Between ST and LEL
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'PENSION_GAP' && w.severity === 'educational')).toBe(
-        true
+        true,
       );
     });
 
@@ -792,7 +792,7 @@ describe('Warning Triggers', () => {
       const input = { pensionContribution: 70000 }; // Over £60k AA
       const warnings = getWarnings(input);
       expect(
-        warnings.some((w) => w.type === 'PENSION_AA_EXCEEDED' && w.severity === 'educational')
+        warnings.some((w) => w.type === 'PENSION_AA_EXCEEDED' && w.severity === 'educational'),
       ).toBe(true);
     });
 
@@ -804,7 +804,7 @@ describe('Warning Triggers', () => {
       // AA reduces to min £10k for high earners
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'PENSION_TAPER' && w.severity === 'educational')).toBe(
-        true
+        true,
       );
     });
 
@@ -817,7 +817,7 @@ describe('Warning Triggers', () => {
       // Soft wording: "may create/increase depending on treatment"
       const warnings = getWarnings(input);
       expect(warnings.some((w) => w.type === 'POTENTIAL_DLA' && w.severity === 'educational')).toBe(
-        true
+        true,
       );
     });
   });
@@ -1280,7 +1280,7 @@ describe('Additional Calculation Tests', () => {
       const withoutLosses = calculateStrategyComparison(baseInput, TAX_YEAR);
       const withLosses = calculateStrategyComparison(
         { ...baseInput, lossesBroughtForward: 30000 },
-        TAX_YEAR
+        TAX_YEAR,
       );
 
       // All Dividends strategy shows losses impact on CT clearly
@@ -1288,12 +1288,12 @@ describe('Additional Calculation Tests', () => {
       // CT on £100k (no losses) = £22,750 (marginal relief)
       // CT on £70k (with losses) = £16,000 (marginal relief)
       expect(withLosses.strategies.allDividends.corporationTax).toBeLessThan(
-        withoutLosses.strategies.allDividends.corporationTax
+        withoutLosses.strategies.allDividends.corporationTax,
       );
 
       // Lower CT = higher take-home
       expect(withLosses.strategies.allDividends.takeHome).toBeGreaterThan(
-        withoutLosses.strategies.allDividends.takeHome
+        withoutLosses.strategies.allDividends.takeHome,
       );
 
       // Verify exact CT reduction: £30k losses saves ~£6,750 in CT
@@ -1349,17 +1349,17 @@ describe('Additional Calculation Tests', () => {
       const withoutLosses = calculateStrategyComparison(baseInput, TAX_YEAR);
       const withLosses = calculateStrategyComparison(
         { ...baseInput, lossesBroughtForward: 20000 },
-        TAX_YEAR
+        TAX_YEAR,
       );
 
       // Optimal mix should also benefit from losses (lower CT on remaining profit)
       expect(withLosses.strategies.optimalMix.corporationTax).toBeLessThan(
-        withoutLosses.strategies.optimalMix.corporationTax
+        withoutLosses.strategies.optimalMix.corporationTax,
       );
 
       // Take-home should be higher with losses
       expect(withLosses.strategies.optimalMix.takeHome).toBeGreaterThan(
-        withoutLosses.strategies.optimalMix.takeHome
+        withoutLosses.strategies.optimalMix.takeHome,
       );
     });
   });
@@ -1582,13 +1582,13 @@ describe('Scenario Tests', () => {
       const withoutOtherPAYE = calculateStrategyComparison(baseInput, TAX_YEAR);
       const withOtherPAYE = calculateStrategyComparison(
         { ...baseInput, hasOtherPAYEEmployment: true },
-        TAX_YEAR
+        TAX_YEAR,
       );
 
       // All Salary strategy should show lower take-home when hasOtherPAYE
       // due to paying NI from first pound
       expect(withOtherPAYE.strategies.allSalary.takeHome).toBeLessThan(
-        withoutOtherPAYE.strategies.allSalary.takeHome
+        withoutOtherPAYE.strategies.allSalary.takeHome,
       );
     });
 
@@ -1605,12 +1605,12 @@ describe('Scenario Tests', () => {
       const withoutOtherPAYE = calculateStrategyComparison(baseInput, TAX_YEAR);
       const withOtherPAYE = calculateStrategyComparison(
         { ...baseInput, hasOtherPAYEEmployment: true },
-        TAX_YEAR
+        TAX_YEAR,
       );
 
       // Employee NI should be higher when hasOtherPAYE
       expect(withOtherPAYE.strategies.allSalary.employeeNI).toBeGreaterThan(
-        withoutOtherPAYE.strategies.allSalary.employeeNI
+        withoutOtherPAYE.strategies.allSalary.employeeNI,
       );
 
       // The difference should be roughly PT * primary rate = £12,570 * 0.08 = £1,005.60
@@ -1910,7 +1910,7 @@ describe('Real-World Scenarios', () => {
       expect(result.strategies.yourSetup?.deltaVsOptimal).toBeGreaterThan(0);
       // Delta should be significant (overpaying)
       expect(result.strategies.yourSetup?.takeHome).toBeLessThan(
-        result.strategies.optimalMix.takeHome
+        result.strategies.optimalMix.takeHome,
       );
     });
   });

@@ -21,7 +21,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={['Monthly']}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       expect(screen.getByText('Display Periods')).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       for (const period of defaultPeriods) {
@@ -48,7 +48,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxes = screen.getAllByRole('checkbox');
@@ -63,7 +63,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={visiblePeriods}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       for (const period of visiblePeriods) {
@@ -80,7 +80,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={visiblePeriods}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const nonVisiblePeriods = defaultPeriods.filter((p) => !visiblePeriods.includes(p));
@@ -97,7 +97,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       // Card component should have these classes
@@ -116,7 +116,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={handleToggle}
-        />
+        />,
       );
 
       const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
@@ -135,7 +135,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={handleToggle}
-        />
+        />,
       );
 
       await user.click(screen.getByRole('checkbox', { name: 'Weekly' }));
@@ -157,7 +157,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={handleToggle}
-        />
+        />,
       );
 
       const weeklyLabel = screen.getByText('Weekly');
@@ -175,7 +175,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={['Weekly']}
           onPeriodToggle={handleToggle}
-        />
+        />,
       );
 
       const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
@@ -193,7 +193,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={handleToggle}
-        />
+        />,
       );
 
       const weeklyCheckbox = screen.getByRole('checkbox', { name: 'Weekly' });
@@ -211,7 +211,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const card = container.firstChild;
@@ -225,7 +225,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const title = screen.getByText('Display Periods');
@@ -238,7 +238,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxContainer = container.querySelector('.flex-wrap');
@@ -251,7 +251,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       // Updated to responsive gap
@@ -270,7 +270,7 @@ describe('PeriodSelectorCard', () => {
 
     it('handles single period', () => {
       render(
-        <PeriodSelectorCard periods={['Weekly']} visiblePeriods={[]} onPeriodToggle={jest.fn()} />
+        <PeriodSelectorCard periods={['Weekly']} visiblePeriods={[]} onPeriodToggle={jest.fn()} />,
       );
 
       expect(screen.getAllByRole('checkbox')).toHaveLength(1);
@@ -282,7 +282,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={defaultPeriods}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxes = screen.getAllByRole('checkbox');
@@ -297,7 +297,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxes = screen.getAllByRole('checkbox');
@@ -314,7 +314,7 @@ describe('PeriodSelectorCard', () => {
           periods={periodsWithHyphens}
           visiblePeriods={['4-Weekly']}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       expect(screen.getByRole('checkbox', { name: '4-Weekly' })).toBeChecked();
@@ -327,7 +327,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={['Weekly']}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       expect(screen.getByRole('checkbox', { name: 'Weekly' })).toBeChecked();
@@ -337,7 +337,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={['Monthly']}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       expect(screen.getByRole('checkbox', { name: 'Weekly' })).not.toBeChecked();
@@ -352,7 +352,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxes = screen.getAllByRole('checkbox');
@@ -367,7 +367,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const title = screen.getByText('Display Periods');
@@ -384,7 +384,7 @@ describe('PeriodSelectorCard', () => {
           periods={['Weekly', 'Monthly', 'Yearly']}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       // Tab through checkboxes (they render in array order)
@@ -406,7 +406,7 @@ describe('PeriodSelectorCard', () => {
           periods={['Weekly', 'Monthly']}
           visiblePeriods={['Weekly']}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       // Verify Weekly is checked
@@ -422,7 +422,7 @@ describe('PeriodSelectorCard', () => {
           periods={defaultPeriods}
           visiblePeriods={[]}
           onPeriodToggle={jest.fn()}
-        />
+        />,
       );
 
       const checkboxes = container.querySelectorAll('[id^="period-"]');

@@ -33,7 +33,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <div>Test content</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Test content')).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('ErrorBoundary Component', () => {
         <ErrorBoundary>
           <div>First child</div>
           <div>Second child</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('First child')).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText(/Oops! Something Went Wrong/i)).toBeInTheDocument();
@@ -67,11 +67,11 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(
-        screen.getByText(/Don't worry - even the best tax calculators have their off days!/i)
+        screen.getByText(/Don't worry - even the best tax calculators have their off days!/i),
       ).toBeInTheDocument();
     });
 
@@ -79,7 +79,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText(/What can you do\?/i)).toBeInTheDocument();
@@ -92,7 +92,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Check for "Error Reference:" text
@@ -106,7 +106,7 @@ describe('ErrorBoundary Component', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <TestComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Error boundary shows fallback
@@ -123,7 +123,7 @@ describe('ErrorBoundary Component', () => {
       rerender(
         <ErrorBoundary>
           <div>Content after reset</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should show content now
@@ -138,7 +138,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary fallback={CustomFallback}>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Custom error message')).toBeInTheDocument();
@@ -152,7 +152,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary fallback={CustomFallback}>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Error: Test error')).toBeInTheDocument();
@@ -164,7 +164,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const tryAgainButton = screen.getByRole('button', { name: /Try Again/i });
@@ -175,7 +175,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const homeLink = screen.getByRole('link', { name: /Go Home/i });
@@ -189,7 +189,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const tryAgainButton = screen.getByRole('button', { name: /Try Again/i });
@@ -200,7 +200,7 @@ describe('ErrorBoundary Component', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const homeLink = screen.getByRole('link', { name: /Go Home/i });

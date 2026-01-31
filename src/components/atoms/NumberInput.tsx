@@ -75,7 +75,7 @@ const NumberInput = memo(function NumberInput({
   // Generate unique IDs for accessibility if not provided
   const inputId = useMemo(
     () => id || `number-input-${Math.random().toString(36).substring(2, 9)}`,
-    [id]
+    [id],
   );
   const controlsId = `${inputId}-controls`;
   const incrementId = `${inputId}-increment`;
@@ -107,7 +107,7 @@ const NumberInput = memo(function NumberInput({
         onFocus(e);
       }
     },
-    [clearOnFocus, onFocus]
+    [clearOnFocus, onFocus],
   );
 
   /**
@@ -131,7 +131,7 @@ const NumberInput = memo(function NumberInput({
         onBlur(e);
       }
     },
-    [decimals, onChange, onBlur]
+    [decimals, onChange, onBlur],
   );
 
   /**
@@ -182,7 +182,7 @@ const NumberInput = memo(function NumberInput({
         setDisplayValue(formattedValue);
       }
     },
-    [decimals]
+    [decimals],
   );
 
   /**
@@ -217,7 +217,7 @@ const NumberInput = memo(function NumberInput({
         onKeyDown(e);
       }
     },
-    [displayValue, onChange, onKeyDown, showControls]
+    [displayValue, onChange, onKeyDown, showControls],
   );
 
   /**
@@ -284,7 +284,7 @@ const NumberInput = memo(function NumberInput({
           suffix && 'pr-7',
           showControls && 'pr-16',
           isFocused && 'glow-sm',
-          className
+          className,
         )}
         {...props}
       />
@@ -312,7 +312,7 @@ const NumberInput = memo(function NumberInput({
             'bg-glass-deep backdrop-blur-glass-sm',
             'overflow-hidden rounded-r-md',
             'shadow-sm',
-            disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100'
+            disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
           )}
           aria-label='Value controls'
         >
@@ -326,7 +326,7 @@ const NumberInput = memo(function NumberInput({
             className={cn(
               'flex flex-1 items-center justify-center px-2',
               'text-foreground transition-colors hover:bg-glass',
-              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none'
+              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
             )}
             aria-label='Increment value'
             aria-controls={inputId}
@@ -356,7 +356,7 @@ const NumberInput = memo(function NumberInput({
             className={cn(
               'flex flex-1 items-center justify-center px-2',
               'text-foreground transition-colors hover:bg-glass',
-              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none'
+              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
             )}
             aria-label='Decrement value'
             aria-controls={inputId}

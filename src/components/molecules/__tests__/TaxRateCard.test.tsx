@@ -31,7 +31,7 @@ describe('TaxRateCard', () => {
         title='National Insurance'
         items={mockItems}
         footerNote='Class 1 contributions'
-      />
+      />,
     );
 
     expect(screen.getByText('Class 1 contributions')).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('TaxRateCard', () => {
 
   it('applies custom color classes to values', () => {
     const { container } = render(
-      <TaxRateCard icon={Calculator} title='Tax Rates' items={mockItems} />
+      <TaxRateCard icon={Calculator} title='Tax Rates' items={mockItems} />,
     );
 
     const greenValue = container.querySelector('.text-green-600');

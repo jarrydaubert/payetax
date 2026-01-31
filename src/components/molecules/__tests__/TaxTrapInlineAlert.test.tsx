@@ -65,7 +65,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={110000}
           suggestedPension={12500}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByText(/Add £12,500 to your pension/)).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={110000}
           suggestedPension={15000}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /Add £15,000 to Pension/i })).toBeInTheDocument();
@@ -133,7 +133,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={110000}
           suggestedPension={12000}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       const button = screen.getByRole('button', { name: /Add £12,000 to Pension/i });
@@ -150,7 +150,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={115000}
           suggestedPension={18500}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       const button = screen.getByRole('button', { name: /Add £18,500 to Pension/i });
@@ -214,7 +214,7 @@ describe('TaxTrapInlineAlert', () => {
       expect(container.firstChild).not.toBeNull();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining('localStorage unavailable'),
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleWarnSpy.mockRestore();
@@ -269,7 +269,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={110000}
           suggestedPension={10000}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       const button = screen.getByRole('button', { name: /Add.*to Pension/i });
@@ -298,7 +298,7 @@ describe('TaxTrapInlineAlert', () => {
     it('should handle £0 suggested pension', () => {
       const mockCallback = jest.fn();
       render(
-        <TaxTrapInlineAlert salary={110000} suggestedPension={0} onApplyPension={mockCallback} />
+        <TaxTrapInlineAlert salary={110000} suggestedPension={0} onApplyPension={mockCallback} />,
       );
 
       expect(screen.getByRole('button', { name: /Add £0 to Pension/i })).toBeInTheDocument();
@@ -311,7 +311,7 @@ describe('TaxTrapInlineAlert', () => {
           salary={150000}
           suggestedPension={60000}
           onApplyPension={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /Add £60,000 to Pension/i })).toBeInTheDocument();

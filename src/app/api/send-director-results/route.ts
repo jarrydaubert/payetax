@@ -37,7 +37,7 @@ function generateDirectorEmailHtml(
   strategies: AllStrategies,
   recommended: 'allSalary' | 'optimalMix' | 'allDividends',
   savingsVsAllSalary: number,
-  taxYear?: string
+  taxYear?: string,
 ): string {
   const strategy = strategies[recommended];
   const generatedDate = new Date().toLocaleDateString('en-GB', {
@@ -420,7 +420,7 @@ export async function POST(request: NextRequest) {
     if (!checkRateLimit(ipAddress, { max: 5, window: 60000 })) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -437,7 +437,7 @@ export async function POST(request: NextRequest) {
     if (!validationResult.success) {
       return NextResponse.json(
         { error: 'Invalid request data', details: validationResult.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -450,7 +450,7 @@ export async function POST(request: NextRequest) {
       results.strategies,
       results.recommended,
       results.savingsVsAllSalary,
-      taxYear
+      taxYear,
     );
 
     // Send email

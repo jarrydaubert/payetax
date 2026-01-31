@@ -9,7 +9,7 @@ import { SalarySEOContent } from '../SalarySEOContent';
 
 describe('SalarySEOContent', () => {
   const createMockResults = (
-    overrides: Partial<TaxCalculationResults> = {}
+    overrides: Partial<TaxCalculationResults> = {},
   ): TaxCalculationResults => ({
     grossSalary: 30000,
     incomeTax: {
@@ -75,7 +75,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 2, name: 'Take-Home Pay Breakdown' })
+        screen.getByRole('heading', { level: 2, name: 'Take-Home Pay Breakdown' }),
       ).toBeInTheDocument();
     });
 
@@ -111,7 +111,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 3, name: 'Tax and National Insurance Deductions' })
+        screen.getByRole('heading', { level: 3, name: 'Tax and National Insurance Deductions' }),
       ).toBeInTheDocument();
     });
 
@@ -181,7 +181,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 3, name: /Is £30,000 a Good Salary in 2025/i })
+        screen.getByRole('heading', { level: 3, name: /Is £30,000 a Good Salary in 2025/i }),
       ).toBeInTheDocument();
     });
 
@@ -254,7 +254,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={25000} results={mockResults} />);
 
       expect(
-        screen.getByText(/below the UK median salary, but above minimum wage/)
+        screen.getByText(/below the UK median salary, but above minimum wage/),
       ).toBeInTheDocument();
     });
 
@@ -263,7 +263,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={29999} results={mockResults} />);
 
       expect(
-        screen.getByText(/below the UK median salary, but above minimum wage/)
+        screen.getByText(/below the UK median salary, but above minimum wage/),
       ).toBeInTheDocument();
     });
 
@@ -272,7 +272,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByText(/UK median full-time salary is approximately £35,000/)
+        screen.getByText(/UK median full-time salary is approximately £35,000/),
       ).toBeInTheDocument();
     });
   });
@@ -283,7 +283,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 3, name: 'Customize Your Calculation' })
+        screen.getByRole('heading', { level: 3, name: 'Customize Your Calculation' }),
       ).toBeInTheDocument();
     });
 
@@ -292,7 +292,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByText(/tax code 1257L, no student loan, no pension contributions/)
+        screen.getByText(/tax code 1257L, no student loan, no pension contributions/),
       ).toBeInTheDocument();
     });
 
@@ -309,7 +309,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByText(/Include pension contributions.*with tax relief/)
+        screen.getByText(/Include pension contributions.*with tax relief/),
       ).toBeInTheDocument();
     });
 

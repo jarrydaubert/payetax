@@ -105,7 +105,7 @@ async function setTheme(page: Page, theme: 'light' | 'dark'): Promise<void> {
  */
 async function runAxeScan(
   page: Page,
-  context: { pageName: string; viewport: string; theme: string }
+  context: { pageName: string; viewport: string; theme: string },
 ): Promise<void> {
   const { pageName, viewport, theme } = context;
 
@@ -425,7 +425,7 @@ test.describe('WCAG 2.2 AA - Touch Targets (2.5.8)', () => {
             text: el.textContent?.substring(0, 30),
           }));
           tooSmall.push(
-            `${elementInfo.tag}#${elementInfo.id || 'no-id'}.${elementInfo.class}: ${box.width.toFixed(0)}×${box.height.toFixed(0)}px (min: ${minSize.toFixed(0)}px) "${elementInfo.text}"`
+            `${elementInfo.tag}#${elementInfo.id || 'no-id'}.${elementInfo.class}: ${box.width.toFixed(0)}×${box.height.toFixed(0)}px (min: ${minSize.toFixed(0)}px) "${elementInfo.text}"`,
           );
         }
       }

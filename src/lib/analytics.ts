@@ -144,7 +144,7 @@ export function trackEvent(event: AnalyticsEvent): void {
  */
 export function trackCalculatorEvent(
   action: 'calculate' | 'reset' | 'update' | 'error',
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
 ): void {
   trackEvent({
     action: 'calculator_action',
@@ -229,7 +229,7 @@ export function trackAffiliateClick(
   competitorSlug: string,
   competitorName: string,
   affiliateProgram: string | undefined,
-  pageType: 'alternative' | 'vs' | 'hub'
+  pageType: 'alternative' | 'vs' | 'hub',
 ): void {
   trackSEOAction('affiliate_click', {
     source: `${pageType}_page`,
@@ -262,7 +262,7 @@ export function trackAffiliateClick(
 export function trackPerformanceMetric(
   metric_name: string,
   value: number,
-  unit: string = 'ms'
+  unit: string = 'ms',
 ): void {
   trackEvent({
     action: 'performance_metric',

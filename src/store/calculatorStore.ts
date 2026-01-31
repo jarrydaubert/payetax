@@ -288,7 +288,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               // Invalid pay period - just log and don't update state
               console.warn(
                 '[Calculator] Invalid pay period:',
-                validated.error.issues[0]?.message ?? 'Validation failed'
+                validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
@@ -314,7 +314,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                 {
                   message:
                     'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
-                }
+                },
               )
               .refine(
                 (year) => {
@@ -336,14 +336,14 @@ export const useCalculatorStore = create<CalculatorState>()(
 
                   return end === start + 1;
                 },
-                { message: 'Tax year must be consecutive (e.g., 2024-25)' }
+                { message: 'Tax year must be consecutive (e.g., 2024-25)' },
               )
               .safeParse(taxYear);
 
             if (!validated.success) {
               console.warn(
                 '[Calculator] Invalid tax year:',
-                validated.error.issues[0]?.message ?? 'Validation failed'
+                validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
@@ -383,7 +383,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                     kCodePattern.test(codeWithoutEmergency)
                   );
                 },
-                { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' }
+                { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' },
               )
               .safeParse(taxCode);
 
@@ -392,7 +392,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               // This is expected user behavior, not an error
               console.warn(
                 '[Calculator] Invalid tax code:',
-                validated.error.issues[0]?.message ?? 'Validation failed'
+                validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
@@ -414,7 +414,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             if (!validated.success) {
               console.warn(
                 '[Calculator] Invalid region:',
-                validated.error.issues[0]?.message ?? 'Validation failed'
+                validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
@@ -438,7 +438,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid isScottish:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -452,7 +452,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid isMarried:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -471,7 +471,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid partner wage:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -484,7 +484,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid isBlind:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -504,7 +504,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             if (!validated.success) {
               console.warn(
                 '[Calculator] Invalid age:',
-                validated.error.issues[0]?.message ?? 'Validation failed'
+                validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
@@ -519,7 +519,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid payNoNI:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -537,7 +537,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid pension contribution:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -551,7 +551,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid pension contribution type:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -568,7 +568,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid student loan plans:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -593,7 +593,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!planValidated.success) {
             console.warn(
               '[Calculator] Invalid student loan plan:',
-              planValidated.error.issues[0]?.message ?? 'Validation failed'
+              planValidated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -639,7 +639,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid NI category:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -658,7 +658,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid hours per week:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -676,7 +676,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid allowances/deductions:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -713,7 +713,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid income source update:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -722,7 +722,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             input: {
               ...state.input,
               incomeSources: state.input.incomeSources.map((source: IncomeSource) =>
-                source.id === id ? { ...source, ...validated.data } : source
+                source.id === id ? { ...source, ...validated.data } : source,
               ),
             },
           }));
@@ -733,7 +733,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             input: {
               ...state.input,
               incomeSources: state.input.incomeSources.filter(
-                (source: IncomeSource) => source.id !== id
+                (source: IncomeSource) => source.id !== id,
               ),
             },
           }));
@@ -880,7 +880,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid what-if type:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -901,7 +901,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (!validated.success) {
             console.warn(
               '[Calculator] Invalid what-if value:',
-              validated.error.issues[0]?.message ?? 'Validation failed'
+              validated.error.issues[0]?.message ?? 'Validation failed',
             );
             return;
           }
@@ -984,7 +984,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         }),
         merge: (
           persistedState: Partial<CalculatorState> | unknown,
-          currentState: CalculatorState
+          currentState: CalculatorState,
         ) => {
           // Merge persisted state with defaults for new fields
           const state = persistedState as Partial<CalculatorState> | undefined;
@@ -998,9 +998,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             },
           };
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 /**
@@ -1048,7 +1048,7 @@ export const useCalculatorActions = () =>
       setWhatIfValue: state.setWhatIfValue,
       calculateWhatIf: state.calculateWhatIf,
       clearWhatIf: state.clearWhatIf,
-    }))
+    })),
   );
 
 // Selector for What If state

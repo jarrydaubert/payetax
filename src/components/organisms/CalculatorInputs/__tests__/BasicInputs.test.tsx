@@ -43,7 +43,7 @@ describe('BasicInputs Component', () => {
     jest.clearAllMocks();
 
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: defaultInput })
+      selector({ input: defaultInput }),
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
@@ -139,7 +139,7 @@ describe('BasicInputs Component', () => {
   describe('Partner Wage Conditional', () => {
     it('should show partner wage input when married', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { ...defaultInput, isMarried: true } })
+        selector({ input: { ...defaultInput, isMarried: true } }),
       );
 
       render(<BasicInputs />);
@@ -181,7 +181,7 @@ describe('BasicInputs Component', () => {
 
     it('should show S1257L placeholder for Scotland', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { ...defaultInput, region: 'Scotland' } })
+        selector({ input: { ...defaultInput, region: 'Scotland' } }),
       );
 
       render(<BasicInputs />);

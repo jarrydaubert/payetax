@@ -23,7 +23,7 @@ describe('Select Component', () => {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('Select Component', () => {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       expect(screen.getByText('Select fruit')).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe('Select Component', () => {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       expect(screen.getByText('Banana')).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('Select Component', () => {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       const trigger = screen.getByTestId('trigger');
@@ -108,7 +108,7 @@ describe('Select Component', () => {
           <SelectContent>
             <SelectItem value='test'>Test</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('Select Component', () => {
           <SelectContent>
             <SelectItem value='test'>Test</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       const trigger = screen.getByRole('combobox');
@@ -141,7 +141,7 @@ describe('Select Component', () => {
           <SelectContent>
             <SelectItem value='test'>Test</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
 
       const trigger = screen.getByRole('combobox');

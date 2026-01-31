@@ -10,7 +10,7 @@ describe('Alert Component', () => {
         <Alert>
           <AlertTitle>Test Title</AlertTitle>
           <AlertDescription>Test Description</AlertDescription>
-        </Alert>
+        </Alert>,
       );
 
       expect(screen.getByText('Test Title')).toBeInTheDocument();
@@ -22,7 +22,7 @@ describe('Alert Component', () => {
         <Alert>
           <AlertCircle className='size-4' />
           <AlertTitle>Alert</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const icon = container.querySelector('svg');
@@ -33,7 +33,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = screen.getByRole('alert');
@@ -46,7 +46,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert variant='default'>
           <AlertTitle>Default</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -58,7 +58,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert variant='warning'>
           <AlertTitle>Warning</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -69,7 +69,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert variant='destructive'>
           <AlertTitle>Error</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -80,7 +80,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert variant='success'>
           <AlertTitle>Success</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -91,7 +91,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert variant='info'>
           <AlertTitle>Info</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -104,7 +104,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert className='custom-alert'>
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(container.firstChild).toHaveClass('custom-alert');
@@ -114,7 +114,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertTitle className='custom-title'>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const title = screen.getByText('Title');
@@ -125,7 +125,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertDescription className='custom-description'>Description</AlertDescription>
-        </Alert>
+        </Alert>,
       );
 
       const description = screen.getByText('Description');
@@ -136,7 +136,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert>
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(container.firstChild).toHaveClass('rounded-lg');
@@ -146,7 +146,7 @@ describe('Alert Component', () => {
       const { container } = render(
         <Alert>
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(container.firstChild).toHaveClass('border');
@@ -159,7 +159,7 @@ describe('Alert Component', () => {
         <Alert>
           <AlertCircle className='size-4' />
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -171,7 +171,7 @@ describe('Alert Component', () => {
         <Alert>
           <AlertCircle className='size-4' />
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = container.firstChild as HTMLElement;
@@ -186,11 +186,11 @@ describe('Alert Component', () => {
           <AlertTitle>
             This is a very long title that might wrap to multiple lines in the alert component
           </AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(
-        screen.getByText(/This is a very long title that might wrap to multiple lines/)
+        screen.getByText(/This is a very long title that might wrap to multiple lines/),
       ).toBeInTheDocument();
     });
 
@@ -201,7 +201,7 @@ describe('Alert Component', () => {
             This is a very long description that provides detailed information about the alert and
             might span multiple lines to properly convey the message to users
           </AlertDescription>
-        </Alert>
+        </Alert>,
       );
 
       expect(screen.getByText(/This is a very long description/)).toBeInTheDocument();
@@ -211,7 +211,7 @@ describe('Alert Component', () => {
       const { unmount } = render(
         <Alert>
           <AlertTitle>Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(() => unmount()).not.toThrow();
@@ -221,7 +221,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertTitle>Only Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       expect(screen.getByText('Only Title')).toBeInTheDocument();
@@ -231,7 +231,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertDescription>Only Description</AlertDescription>
-        </Alert>
+        </Alert>,
       );
 
       expect(screen.getByText('Only Description')).toBeInTheDocument();
@@ -243,7 +243,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertTitle>Alert Title</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const title = screen.getByText('Alert Title');
@@ -254,7 +254,7 @@ describe('Alert Component', () => {
       render(
         <Alert variant='warning'>
           <AlertTitle>Warning</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const title = screen.getByText('Warning');
@@ -265,7 +265,7 @@ describe('Alert Component', () => {
       render(
         <Alert>
           <AlertTitle>Important Alert</AlertTitle>
-        </Alert>
+        </Alert>,
       );
 
       const alert = screen.getByRole('alert');

@@ -107,7 +107,7 @@ export function MarriageAllowanceClient() {
         <h1
           className={cn(
             'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL
+            TYPOGRAPHY.TEXT_4XL,
           )}
         >
           Marriage Allowance Calculator 2025-26
@@ -207,7 +207,7 @@ export function MarriageAllowanceClient() {
             'mb-8',
             result.status === 'eligible'
               ? 'border-emerald-200 dark:border-emerald-800'
-              : 'border-destructive/30'
+              : 'border-destructive/30',
           )}
         >
           <CardContent className='pt-6'>
@@ -221,7 +221,7 @@ export function MarriageAllowanceClient() {
                 <h3
                   className={cn(
                     'mb-2 font-semibold text-lg',
-                    result.status === 'eligible' ? 'text-emerald-700 dark:text-emerald-300' : ''
+                    result.status === 'eligible' ? 'text-emerald-700 dark:text-emerald-300' : '',
                   )}
                 >
                   {result.status === 'eligible'

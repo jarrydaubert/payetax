@@ -22,7 +22,7 @@ export async function onRequestError(
   },
   context: {
     routerKind: 'Pages Router' | 'App Router';
-  }
+  },
 ) {
   Sentry.captureException(err, {
     tags: {

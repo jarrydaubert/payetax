@@ -269,7 +269,7 @@ describe('Tax Rates Constants', () => {
       for (const year of TAX_YEARS) {
         expect(SCOTTISH_TAX_RATES[year].marriageAllowance).toBe(TAX_RATES[year].marriageAllowance);
         expect(SCOTTISH_TAX_RATES[year].blindPersonsAllowance).toBe(
-          TAX_RATES[year].blindPersonsAllowance
+          TAX_RATES[year].blindPersonsAllowance,
         );
       }
     });

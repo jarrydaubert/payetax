@@ -67,7 +67,7 @@ export function CompliancePageClient() {
                     'bg-gradient-to-br',
                     feature.color,
                     SPACING.P_8,
-                    'backdrop-blur-sm'
+                    'backdrop-blur-sm',
                   )}
                 >
                   <div className='mb-6 flex items-start gap-4'>
@@ -89,7 +89,7 @@ export function CompliancePageClient() {
                         key={detail}
                         className={cn(
                           'flex items-start gap-2 text-muted-foreground',
-                          TYPOGRAPHY.TEXT_SM
+                          TYPOGRAPHY.TEXT_SM,
                         )}
                       >
                         <CheckCircle
@@ -103,7 +103,7 @@ export function CompliancePageClient() {
                   <div
                     className={cn(
                       'mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground',
-                      TYPOGRAPHY.TEXT_XS
+                      TYPOGRAPHY.TEXT_XS,
                     )}
                   >
                     <span>Last updated: {feature.lastUpdated}</span>
@@ -136,7 +136,7 @@ export function CompliancePageClient() {
                 <div
                   className={cn(
                     'space-y-2 border-primary/10 border-t pt-4 text-muted-foreground',
-                    TYPOGRAPHY.TEXT_XS
+                    TYPOGRAPHY.TEXT_XS,
                   )}
                 >
                   <p className='font-medium'>{statement.verification}</p>
@@ -184,7 +184,7 @@ export function CompliancePageClient() {
                   <div
                     className={cn(
                       'flex items-center justify-between text-muted-foreground',
-                      TYPOGRAPHY.TEXT_XS
+                      TYPOGRAPHY.TEXT_XS,
                     )}
                   >
                     <span className='font-medium text-primary'>{source.reliability}</span>

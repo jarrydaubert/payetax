@@ -27,7 +27,7 @@ describe('Layout Component', () => {
     render(
       <Layout>
         <div data-testid='test-content'>Test Content</div>
-      </Layout>
+      </Layout>,
     );
 
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('Layout Component', () => {
     render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const navbar = screen.getByTestId('mock-navbar');
@@ -50,7 +50,7 @@ describe('Layout Component', () => {
     render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const footer = screen.getByTestId('mock-footer');
@@ -62,7 +62,7 @@ describe('Layout Component', () => {
     render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     expect(screen.getByTestId('mock-cookie-banner')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('Layout Component', () => {
     render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const skipLink = screen.getByText('Skip to main content');
@@ -85,7 +85,7 @@ describe('Layout Component', () => {
     const { container } = render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const skipLink = screen.getByText('Skip to main content');
@@ -103,7 +103,7 @@ describe('Layout Component', () => {
     const { container } = render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const main = container.querySelector('main');
@@ -115,7 +115,7 @@ describe('Layout Component', () => {
     const { container } = render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const wrapper = container.firstChild;
@@ -126,7 +126,7 @@ describe('Layout Component', () => {
     const { container } = render(
       <Layout>
         <div>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const main = container.querySelector('main');
@@ -137,7 +137,7 @@ describe('Layout Component', () => {
     const { container } = render(
       <Layout>
         <div data-testid='test-content'>Content</div>
-      </Layout>
+      </Layout>,
     );
 
     const wrapper = container.firstChild as HTMLElement;
@@ -157,7 +157,7 @@ describe('Layout Component', () => {
         <div data-testid='child-1'>Child 1</div>
         <div data-testid='child-2'>Child 2</div>
         <div data-testid='child-3'>Child 3</div>
-      </Layout>
+      </Layout>,
     );
 
     expect(screen.getByTestId('child-1')).toBeInTheDocument();

@@ -75,7 +75,7 @@ describe('Badge', () => {
       render(
         <Badge data-testid='custom-badge' aria-label='Custom Badge'>
           Test
-        </Badge>
+        </Badge>,
       );
       const badge = screen.getByTestId('custom-badge');
       expect(badge).toHaveAttribute('aria-label', 'Custom Badge');
@@ -107,7 +107,7 @@ describe('Badge', () => {
       render(
         <Badge aria-label='Status badge' data-testid='status-badge'>
           Active
-        </Badge>
+        </Badge>,
       );
       const badge = screen.getByTestId('status-badge');
       expect(badge).toHaveAttribute('aria-label', 'Status badge');
@@ -125,7 +125,7 @@ describe('Badge', () => {
         <Badge>
           <span>Icon</span>
           <span>Text</span>
-        </Badge>
+        </Badge>,
       );
       expect(screen.getByText('Icon')).toBeInTheDocument();
       expect(screen.getByText('Text')).toBeInTheDocument();

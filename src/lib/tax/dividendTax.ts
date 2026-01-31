@@ -95,7 +95,7 @@ export interface DividendTaxResult {
 export function calculateDividendTax(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): DividendTaxResult {
   // Handle invalid, zero, or negative dividends
   if (!Number.isFinite(dividends) || dividends <= 0) {
@@ -281,7 +281,7 @@ export function calculateDividendTax(
 export function getDividendTax(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   return calculateDividendTax(dividends, otherIncome, taxYear).dividendTax;
 }
@@ -297,7 +297,7 @@ export function getDividendTax(
 export function getEffectiveDividendRate(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   return calculateDividendTax(dividends, otherIncome, taxYear).effectiveRate;
 }

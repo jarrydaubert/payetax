@@ -25,7 +25,7 @@ describe('Card Components', () => {
         <Card>
           <div>Child 1</div>
           <div>Child 2</div>
-        </Card>
+        </Card>,
       );
       expect(screen.getByText('Child 1')).toBeInTheDocument();
       expect(screen.getByText('Child 2')).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('Card Components', () => {
 
     it('should accept custom className', () => {
       const { container } = render(
-        <CardDescription className='custom-desc'>Description</CardDescription>
+        <CardDescription className='custom-desc'>Description</CardDescription>,
       );
       const description = container.firstChild as HTMLElement;
       expect(description).toHaveClass('custom-desc');
@@ -109,7 +109,7 @@ describe('Card Components', () => {
           </CardHeader>
           <CardContent>Main content area</CardContent>
           <CardFooter>Footer actions</CardFooter>
-        </Card>
+        </Card>,
       );
 
       expect(screen.getByText('Card Title')).toBeInTheDocument();
@@ -125,7 +125,7 @@ describe('Card Components', () => {
             <CardTitle>Title Only</CardTitle>
           </CardHeader>
           <CardContent>Content Only</CardContent>
-        </Card>
+        </Card>,
       );
 
       expect(screen.getByText('Title Only')).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('Card Components', () => {
             <button type='button'>Action Button</button>
             <p>Some paragraph text</p>
           </CardContent>
-        </Card>
+        </Card>,
       );
 
       expect(screen.getByRole('button', { name: 'Action Button' })).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe('Card Components', () => {
             <CardTitle>Title</CardTitle>
           </CardHeader>
           <CardContent />
-        </Card>
+        </Card>,
       );
       expect(container.firstChild).toBeInTheDocument();
     });
@@ -172,7 +172,7 @@ describe('Card Components', () => {
           <Card>Card 1</Card>
           <Card>Card 2</Card>
           <Card>Card 3</Card>
-        </div>
+        </div>,
       );
 
       expect(screen.getByText('Card 1')).toBeInTheDocument();

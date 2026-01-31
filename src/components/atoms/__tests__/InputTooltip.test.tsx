@@ -12,7 +12,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='nonexistent'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       expect(screen.getByTestId('test-input')).toBeInTheDocument();
@@ -23,7 +23,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       expect(screen.getByTestId('test-input')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('InputTooltip Component', () => {
       const { container } = render(
         <InputTooltip fieldName='taxCode'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const wrapper = container.querySelector('.flex.items-center.gap-2');
@@ -49,7 +49,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
@@ -69,7 +69,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
@@ -92,7 +92,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='studentLoanPlan'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-studentLoanPlan');
@@ -118,7 +118,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary' customContent={customContent}>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
@@ -136,7 +136,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByLabelText('Help for Gross Salary');
@@ -149,7 +149,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
@@ -165,7 +165,7 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='salary'>
           <input data-testid='test-input' />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
@@ -181,7 +181,7 @@ describe('InputTooltip Component', () => {
         const { container } = render(
           <InputTooltip fieldName={fieldName}>
             <input />
-          </InputTooltip>
+          </InputTooltip>,
         );
 
         const trigger = screen.getByTestId(`tooltip-trigger-${fieldName}`);
@@ -199,11 +199,11 @@ describe('InputTooltip Component', () => {
       render(
         <InputTooltip fieldName='unknownField'>
           <input />
-        </InputTooltip>
+        </InputTooltip>,
       );
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('No tooltip content found for field: unknownField')
+        expect.stringContaining('No tooltip content found for field: unknownField'),
       );
 
       consoleSpy.mockRestore();

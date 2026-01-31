@@ -37,7 +37,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
         includeScore: true,
         minMatchCharLength: 2,
       }),
-    [posts]
+    [posts],
   );
 
   const results = useMemo(() => {
@@ -56,7 +56,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
         <Search
           className={cn(
             'pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-            ICON_SIZES.SIZE_4
+            ICON_SIZES.SIZE_4,
           )}
           aria-hidden='true'
         />
@@ -110,7 +110,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
                       <span
                         className={cn(
                           'rounded bg-primary/10 px-2 py-0.5 text-primary',
-                          TYPOGRAPHY.TEXT_XS
+                          TYPOGRAPHY.TEXT_XS,
                         )}
                       >
                         {post.category}
@@ -119,7 +119,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
                         <span
                           className={cn(
                             'flex items-center gap-1 text-muted-foreground',
-                            TYPOGRAPHY.TEXT_XS
+                            TYPOGRAPHY.TEXT_XS,
                           )}
                         >
                           <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />

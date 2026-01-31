@@ -63,7 +63,7 @@ export function ScenarioCalculator({
   const [salary, setSalary] = useState(defaults.salary);
   const [pensionPercent, setPensionPercent] = useState(defaults.pensionPercent ?? 0);
   const [studentLoan, setStudentLoan] = useState<StudentLoanPlan | 'none'>(
-    defaults.studentLoan ?? 'none'
+    defaults.studentLoan ?? 'none',
   );
   const [isScottish, setIsScottish] = useState(defaults.scottish ?? false);
   const [results, setResults] = useState<TaxCalculationResults | null>(null);
@@ -115,7 +115,7 @@ export function ScenarioCalculator({
           'bg-gradient-to-r',
           categoryColors[category] || categoryColors['life-stage'],
           SPACING.P_4,
-          'sm:p-6'
+          'sm:p-6',
         )}
       >
         <div className='flex items-center justify-between'>
@@ -269,7 +269,7 @@ function ResultItem({
           TYPOGRAPHY.TEXT_BASE,
           'font-semibold',
           negative && 'text-red-400/80',
-          highlight && 'text-green-400'
+          highlight && 'text-green-400',
         )}
       >
         {value}

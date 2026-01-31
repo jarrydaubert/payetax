@@ -92,7 +92,7 @@ describe('analytics', () => {
           page_path: expect.any(String),
           user_agent: 'Test User Agent',
           timestamp: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -129,7 +129,7 @@ describe('analytics', () => {
         'navigation',
         expect.objectContaining({
           event_label: 'unknown',
-        })
+        }),
       );
     });
 
@@ -144,7 +144,7 @@ describe('analytics', () => {
           custom_parameters: expect.objectContaining({
             page_path: expect.any(String),
           }),
-        })
+        }),
       );
     });
   });
@@ -176,7 +176,7 @@ describe('analytics', () => {
         'test_action',
         expect.objectContaining({
           event_category: 'general',
-        })
+        }),
       );
     });
 
@@ -216,7 +216,7 @@ describe('analytics', () => {
         'custom_event',
         expect.objectContaining({
           custom_parameters: customData,
-        })
+        }),
       );
     });
   });
@@ -564,7 +564,7 @@ describe('analytics', () => {
       expect(() => trackCoreWebVitals()).not.toThrow();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Performance metrics tracking error:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 

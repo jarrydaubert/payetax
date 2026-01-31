@@ -62,7 +62,7 @@ const TaxYearSelect: React.FC<TaxYearSelectProps> = memo(function TaxYearSelect(
           className={cn(
             'mb-1 block font-medium text-foreground',
             TYPOGRAPHY.TEXT_SM,
-            hideLabel && 'sr-only'
+            hideLabel && 'sr-only',
           )}
         >
           {label}

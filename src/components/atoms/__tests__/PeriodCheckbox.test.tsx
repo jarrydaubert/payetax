@@ -28,7 +28,7 @@ describe('PeriodCheckbox', () => {
 
     it('generates correct id for checkbox', () => {
       const { container } = render(
-        <PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />
+        <PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />,
       );
 
       const checkbox = container.querySelector('#period-4-Weekly');
@@ -37,7 +37,7 @@ describe('PeriodCheckbox', () => {
 
     it('links label to checkbox via htmlFor', () => {
       const { container } = render(
-        <PeriodCheckbox period='Daily' checked={false} onCheckedChange={jest.fn()} />
+        <PeriodCheckbox period='Daily' checked={false} onCheckedChange={jest.fn()} />,
       );
 
       const label = screen.getByText('Daily');
@@ -178,7 +178,7 @@ describe('PeriodCheckbox', () => {
 
     it('maintains state consistency when parent re-renders', () => {
       const { rerender } = render(
-        <PeriodCheckbox period='Weekly' checked={false} onCheckedChange={jest.fn()} />
+        <PeriodCheckbox period='Weekly' checked={false} onCheckedChange={jest.fn()} />,
       );
 
       expect(screen.getByRole('checkbox')).not.toBeChecked();
@@ -192,7 +192,7 @@ describe('PeriodCheckbox', () => {
   describe('Visual Styling', () => {
     it('applies correct layout classes', () => {
       const { container } = render(
-        <PeriodCheckbox period='Weekly' checked={false} onCheckedChange={jest.fn()} />
+        <PeriodCheckbox period='Weekly' checked={false} onCheckedChange={jest.fn()} />,
       );
 
       const wrapper = container.firstChild;

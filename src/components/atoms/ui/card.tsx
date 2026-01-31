@@ -14,7 +14,7 @@ const Card = ({
     ref={ref}
     className={cn(
       'rounded-xl border border-primary/20 bg-card text-card-foreground shadow-sm',
-      className
+      className,
     )}
     {...props}
   />

@@ -53,7 +53,7 @@ export interface IncomeTaxResult {
 export function calculateIncomeTax(
   salary: number,
   region: Region,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): IncomeTaxResult {
   const rates = region === 'scotland' ? SCOTTISH_TAX_RATES[taxYear] : TAX_RATES[taxYear];
 
@@ -123,7 +123,7 @@ export function calculateIncomeTax(
 export function getIncomeTax(
   salary: number,
   region: Region,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   return calculateIncomeTax(salary, region, taxYear).incomeTax;
 }

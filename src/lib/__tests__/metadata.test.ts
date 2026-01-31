@@ -186,7 +186,7 @@ describe('Metadata Module', () => {
       const metadata = generateMetadata({});
 
       expect(metadata.verification?.google).toBe(
-        'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c'
+        'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c',
       );
       // Placeholder verification codes have been removed
       expect(metadata.verification?.other).toBeUndefined();

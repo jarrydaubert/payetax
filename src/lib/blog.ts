@@ -66,7 +66,7 @@ const getAllCachedPosts = unstable_cache(
     return Promise.resolve(posts.map(convertMDXPost));
   },
   ['blog-all-posts'],
-  { revalidate: 3600, tags: ['blog'] }
+  { revalidate: 3600, tags: ['blog'] },
 );
 
 /**
@@ -121,7 +121,7 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
     const query = options.searchQuery.toLowerCase();
     filtered = filtered.filter(
       (post) =>
-        post.title.toLowerCase().includes(query) || post.excerpt.toLowerCase().includes(query)
+        post.title.toLowerCase().includes(query) || post.excerpt.toLowerCase().includes(query),
     );
   }
 
@@ -239,7 +239,7 @@ const getCachedBlogPostBySlug = unstable_cache(
     };
   },
   ['blog-post'],
-  { revalidate: 3600, tags: ['blog'] }
+  { revalidate: 3600, tags: ['blog'] },
 );
 
 /**
@@ -363,7 +363,7 @@ export async function getDeepDives(limit: number = 6): Promise<BlogPost[]> {
  */
 export async function getLatestPosts(
   limit: number = 5,
-  excludeSlugs: string[] = []
+  excludeSlugs: string[] = [],
 ): Promise<BlogPost[]> {
   const allPosts = await getAllCachedPosts();
   const excludeSet = new Set(excludeSlugs);
@@ -376,7 +376,7 @@ export async function getLatestPosts(
  */
 export async function getRelatedPosts(
   currentPost: BlogPost,
-  limit: number = BLOG_CONFIG.relatedPostsCount
+  limit: number = BLOG_CONFIG.relatedPostsCount,
 ): Promise<RelatedPost[]> {
   const allPosts = await getAllCachedPosts();
 

@@ -90,22 +90,22 @@ function ComparisonCard({ item }: ComparisonCardProps) {
     'h-full overflow-hidden p-8',
     isNegative
       ? 'border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10'
-      : 'border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10'
+      : 'border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10',
   );
 
   const iconContainerClasses = cn(
     `flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-xl shadow-lg`,
-    isNegative ? 'bg-destructive' : 'bg-primary'
+    isNegative ? 'bg-destructive' : 'bg-primary',
   );
 
   const iconClasses = cn(
     ICON_SIZES.SIZE_6,
-    isNegative ? 'text-destructive-foreground' : 'text-primary-foreground'
+    isNegative ? 'text-destructive-foreground' : 'text-primary-foreground',
   );
 
   const listIconClasses = cn(
     `mt-0.5 ${ICON_SIZES.SIZE_5} flex-shrink-0`,
-    isNegative ? 'text-destructive' : 'text-primary'
+    isNegative ? 'text-destructive' : 'text-primary',
   );
 
   return (

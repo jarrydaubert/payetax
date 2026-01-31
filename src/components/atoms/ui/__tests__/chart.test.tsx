@@ -59,7 +59,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={defaultConfig}>
           <div data-testid='child'>Chart Content</div>
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByTestId('child')).toBeInTheDocument();
     });
@@ -68,7 +68,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={defaultConfig}>
           <TestUseChartComponent />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByTestId('config')).toHaveTextContent('Salary');
     });
@@ -77,7 +77,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={defaultConfig} className='custom-class'>
           <div>Content</div>
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.firstChild).toHaveClass('custom-class');
     });
@@ -86,7 +86,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={defaultConfig}>
           <div>Content</div>
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.firstChild).toHaveClass('relative', 'flex', 'w-full');
     });
@@ -95,7 +95,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={defaultConfig} aria-label='Tax breakdown chart' role='img'>
           <div>Content</div>
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.firstChild).toHaveAttribute('aria-label', 'Tax breakdown chart');
       expect(container.firstChild).toHaveAttribute('role', 'img');
@@ -106,7 +106,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={defaultConfig} ref={ref}>
           <div>Content</div>
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
@@ -129,7 +129,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={testConfig}>
           <TestUseChartComponent />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByTestId('config')).toHaveTextContent('Test Label');
     });
@@ -156,7 +156,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={false} payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.querySelector('[class*="rounded-lg"]')).not.toBeInTheDocument();
     });
@@ -165,7 +165,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={[]} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.querySelector('[class*="rounded-lg"]')).not.toBeInTheDocument();
     });
@@ -174,7 +174,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('50000')).toBeInTheDocument();
       expect(screen.getByText('10000')).toBeInTheDocument();
@@ -184,7 +184,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       // Labels appear in multiple places (label and row)
       expect(screen.getAllByText('Gross Salary').length).toBeGreaterThan(0);
@@ -200,7 +200,7 @@ describe('chart.tsx', () => {
             hideLabel={true}
             label='Test Label'
           />
-        </ChartContainer>
+        </ChartContainer>,
       );
       // Label should not be rendered
       expect(screen.queryByText('Test Label')).not.toBeInTheDocument();
@@ -210,7 +210,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} hideIndicator={true} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       // No color indicators should be present
       const indicators = container.querySelectorAll('.h-2\\.5.w-2\\.5');
@@ -221,7 +221,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       const dotIndicators = container.querySelectorAll('.rounded-full');
       expect(dotIndicators.length).toBeGreaterThan(0);
@@ -231,7 +231,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} indicator='line' />
-        </ChartContainer>
+        </ChartContainer>,
       );
       const lineIndicators = container.querySelectorAll('.w-1');
       expect(lineIndicators.length).toBeGreaterThan(0);
@@ -242,7 +242,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} formatter={formatter} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('£50000')).toBeInTheDocument();
     });
@@ -257,7 +257,7 @@ describe('chart.tsx', () => {
             label='Original'
             labelFormatter={labelFormatter}
           />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('Custom Label')).toBeInTheDocument();
     });
@@ -266,7 +266,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartTooltipContent active={true} payload={mockPayload} className='custom-tooltip' />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.querySelector('.custom-tooltip')).toBeInTheDocument();
     });
@@ -293,7 +293,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={[]} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       // Should render nothing visible
       expect(container.querySelector('.flex.items-center.justify-center')).not.toBeInTheDocument();
@@ -303,7 +303,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={undefined} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.querySelector('.flex.items-center.justify-center')).not.toBeInTheDocument();
     });
@@ -312,7 +312,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('Gross Salary')).toBeInTheDocument();
       expect(screen.getByText('Income Tax')).toBeInTheDocument();
@@ -322,7 +322,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={mockPayload} hideIcon={true} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       // No color indicators should be present
       const indicators = container.querySelectorAll('.h-2.w-2');
@@ -333,7 +333,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={mockPayload} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       const indicators = container.querySelectorAll('.h-2.w-2');
       expect(indicators.length).toBe(2);
@@ -343,7 +343,7 @@ describe('chart.tsx', () => {
       const { container } = render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={mockPayload} className='custom-legend' />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(container.querySelector('.custom-legend')).toBeInTheDocument();
     });
@@ -353,7 +353,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={payloadWithDataKey} nameKey='salary' />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('Gross Salary')).toBeInTheDocument();
     });
@@ -363,7 +363,7 @@ describe('chart.tsx', () => {
       render(
         <ChartContainer config={mockConfig}>
           <ChartLegendContent payload={payloadWithUnknown} />
-        </ChartContainer>
+        </ChartContainer>,
       );
       expect(screen.getByText('unknown')).toBeInTheDocument();
     });

@@ -90,7 +90,7 @@ export function UseCasePageContent({ useCase }: UseCasePageContentProps) {
                   <div
                     className={cn(
                       'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10',
-                      SPACING.MB_4
+                      SPACING.MB_4,
                     )}
                   >
                     <Icon className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />
@@ -233,7 +233,7 @@ export function UseCasePageContent({ useCase }: UseCasePageContentProps) {
             className={cn(
               'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 text-center',
               SPACING.P_8,
-              'md:p-12'
+              'md:p-12',
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>

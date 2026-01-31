@@ -326,7 +326,7 @@ describe('ComparisonInputs', () => {
       const errorId = input.getAttribute('aria-describedby');
       expect(errorId).toBeTruthy();
       expect(document.getElementById(errorId as string)).toHaveTextContent(
-        /percentage must be between/i
+        /percentage must be between/i,
       );
     });
   });

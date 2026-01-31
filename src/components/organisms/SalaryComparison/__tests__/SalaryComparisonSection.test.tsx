@@ -91,7 +91,7 @@ describe('SalaryComparisonSection', () => {
         <SalaryComparisonSection
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /Compare Salary Scenarios/i })).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe('SalaryComparisonSection', () => {
         <SalaryComparisonSection
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
-        />
+        />,
       );
 
       // Inputs should not be visible initially
@@ -117,7 +117,7 @@ describe('SalaryComparisonSection', () => {
         <SalaryComparisonSection
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
-        />
+        />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /Compare Salary Scenarios/i });
@@ -139,7 +139,7 @@ describe('SalaryComparisonSection', () => {
         <SalaryComparisonSection
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
-        />
+        />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /Compare Salary Scenarios/i });
@@ -166,7 +166,7 @@ describe('SalaryComparisonSection', () => {
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
           className='custom-test-class'
-        />
+        />,
       );
 
       const section = container.querySelector('.custom-test-class');
@@ -180,7 +180,7 @@ describe('SalaryComparisonSection', () => {
         <SalaryComparisonSection
           currentInput={mockCurrentInput}
           currentResults={mockCurrentResults}
-        />
+        />,
       );
 
       const button = screen.getByRole('button', { name: /Compare Salary Scenarios/i });

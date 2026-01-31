@@ -80,7 +80,7 @@ function PostCard({ post }: PostCardProps) {
       className={cn(
         'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
         'border border-slate-700/50 hover:border-cyan-500/50',
-        'motion-safe:hover:-translate-y-0.5'
+        'motion-safe:hover:-translate-y-0.5',
       )}
     >
       <Link href={`/blog/${post.slug}`} className='block'>

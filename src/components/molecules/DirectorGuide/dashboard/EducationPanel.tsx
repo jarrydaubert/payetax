@@ -383,7 +383,7 @@ function WarningCard({ title, description, isCritical }: WarningCardProps) {
     <div
       className={cn(
         'rounded-[10px] border p-4',
-        isCritical ? 'border-red-500/30 bg-red-500/10' : 'border-amber-500/30 bg-amber-500/10'
+        isCritical ? 'border-red-500/30 bg-red-500/10' : 'border-amber-500/30 bg-amber-500/10',
       )}
     >
       <div className='mb-2 flex items-center gap-2'>
@@ -410,7 +410,7 @@ function AssumptionRow({ label, value, isLast }: AssumptionRowProps) {
     <div
       className={cn(
         'flex justify-between py-1.5 text-xs',
-        !isLast && 'border-white/[0.04] border-b'
+        !isLast && 'border-white/[0.04] border-b',
       )}
     >
       <span className='text-slate-500'>{label}</span>

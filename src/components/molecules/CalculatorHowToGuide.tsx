@@ -26,7 +26,7 @@ export function CalculatorHowToGuide() {
             className={cn(
               'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
               SPACING.MB_3,
-              TYPOGRAPHY.TEXT_4XL
+              TYPOGRAPHY.TEXT_4XL,
             )}
           >
             How to Use the Calculator

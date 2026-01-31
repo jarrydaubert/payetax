@@ -75,7 +75,7 @@ export function SalaryComparisonTable() {
             className={cn(
               'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
               SPACING.MB_3,
-              TYPOGRAPHY.TEXT_4XL
+              TYPOGRAPHY.TEXT_4XL,
             )}
           >
             Salary Take-Home Comparison
@@ -145,7 +145,7 @@ export function SalaryComparisonTable() {
                       <td
                         className={cn(
                           'text-right font-bold text-green-600 dark:text-green-400',
-                          SPACING.P_4
+                          SPACING.P_4,
                         )}
                       >
                         £{row.annual.toLocaleString()}

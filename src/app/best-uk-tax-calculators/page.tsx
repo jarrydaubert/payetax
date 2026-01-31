@@ -63,7 +63,7 @@ export default function BestUKTaxCalculatorsPage() {
               <div
                 className={cn(
                   'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10',
-                  SPACING.MB_4
+                  SPACING.MB_4,
                 )}
               >
                 <Calculator className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />
@@ -79,7 +79,7 @@ export default function BestUKTaxCalculatorsPage() {
               <div
                 className={cn(
                   'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10',
-                  SPACING.MB_4
+                  SPACING.MB_4,
                 )}
               >
                 <Search className={cn(ICON_SIZES.SIZE_6, 'text-amber-600')} />
@@ -95,7 +95,7 @@ export default function BestUKTaxCalculatorsPage() {
               <div
                 className={cn(
                   'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10',
-                  SPACING.MB_4
+                  SPACING.MB_4,
                 )}
               >
                 <Users className={cn(ICON_SIZES.SIZE_6, 'text-blue-600')} />
@@ -113,7 +113,7 @@ export default function BestUKTaxCalculatorsPage() {
               <div
                 className={cn(
                   'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10',
-                  SPACING.MB_4
+                  SPACING.MB_4,
                 )}
               >
                 <Award className={cn(ICON_SIZES.SIZE_6, 'text-purple-600')} />
@@ -225,7 +225,7 @@ export default function BestUKTaxCalculatorsPage() {
             className={cn(
               'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 text-center',
               SPACING.P_8,
-              'md:p-12'
+              'md:p-12',
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>

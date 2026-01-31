@@ -141,7 +141,7 @@ async function sendEmails(
   resend: Resend,
   contacts: Contact[],
   post: BlogPost,
-  dryRun: boolean
+  dryRun: boolean,
 ): Promise<{ sent: number; failed: number }> {
   const postUrl = `https://payetax.co.uk/blog/${post.slug}`;
   let sent = 0;

@@ -56,7 +56,7 @@ describe('Dividend Tax Calculator', () => {
           expect.objectContaining({
             band: 'basic',
             rate: 0.0875,
-          })
+          }),
         );
       });
 

@@ -149,7 +149,7 @@ describe('CalculatorContainer Component', () => {
           studentLoanPlans: 'none',
           allowancesDeductions: 0,
         },
-      })
+      }),
     );
   });
 
@@ -170,7 +170,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByText(/Calculate your take-home pay with official HMRC rates/i)
+        screen.getByText(/Calculate your take-home pay with official HMRC rates/i),
       ).toBeInTheDocument();
     });
 
@@ -192,7 +192,7 @@ describe('CalculatorContainer Component', () => {
 
       expect(screen.getByText('Ready to Calculate')).toBeInTheDocument();
       expect(
-        screen.getByText(/Enter your salary\. See your take-home pay in seconds\./i)
+        screen.getByText(/Enter your salary\. See your take-home pay in seconds\./i),
       ).toBeInTheDocument();
     });
 
@@ -285,10 +285,10 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByRole('button', { name: /Print tax calculation results/i })
+        screen.getByRole('button', { name: /Print tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Export results to CSV file/i })
+        screen.getByRole('button', { name: /Export results to CSV file/i }),
       ).toBeInTheDocument();
     });
 
@@ -297,10 +297,10 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.queryByRole('button', { name: /Print tax calculation results/i })
+        screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: /Export results to CSV file/i })
+        screen.queryByRole('button', { name: /Export results to CSV file/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -353,7 +353,7 @@ describe('CalculatorContainer Component', () => {
 
       // Export button shouldn't be visible
       expect(
-        screen.queryByRole('button', { name: /Export results to CSV file/i })
+        screen.queryByRole('button', { name: /Export results to CSV file/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -402,7 +402,7 @@ describe('CalculatorContainer Component', () => {
 
       // Print button shouldn't be visible
       expect(
-        screen.queryByRole('button', { name: /Print tax calculation results/i })
+        screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -463,10 +463,10 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByRole('button', { name: /Print tax calculation results/i })
+        screen.getByRole('button', { name: /Print tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Export results to CSV file/i })
+        screen.getByRole('button', { name: /Export results to CSV file/i }),
       ).toBeInTheDocument();
     });
   });

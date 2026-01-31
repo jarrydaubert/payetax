@@ -16,7 +16,7 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
     <aside
       className={cn(
         'rounded-lg border border-amber-200/50 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-950/20',
-        className
+        className,
       )}
       aria-label='Important disclaimer'
     >

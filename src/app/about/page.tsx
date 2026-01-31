@@ -141,7 +141,7 @@ export default function AboutPage() {
               LAYOUT.CENTERED_CONTENT,
               SPACING.MT_12,
               SURFACES.CARD_LARGE,
-              SURFACES.BG_GRADIENT_PRIMARY
+              SURFACES.BG_GRADIENT_PRIMARY,
             )}
           >
             <div className={cn(SPACING.SPACE_Y_4, LAYOUT.TEXT_CENTER)}>

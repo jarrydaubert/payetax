@@ -170,7 +170,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         setIsSubmitting(false);
       }
     },
-    [email, isSubmitting, situation, complexity?.reason]
+    [email, isSubmitting, situation, complexity?.reason],
   );
 
   // Don't show if no complex situation or dismissed
@@ -183,7 +183,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
       className={cn(
         'relative border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-orange-500/5',
         SPACING.P_6,
-        className
+        className,
       )}
     >
       {/* Dismiss button */}

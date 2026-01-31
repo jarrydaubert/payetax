@@ -46,7 +46,7 @@ describe('ResultCard Component', () => {
   describe('Variants', () => {
     it('should apply default variant styles', () => {
       const { container } = render(
-        <ResultCard label='Label' value='Value' icon={Calculator} variant='default' />
+        <ResultCard label='Label' value='Value' icon={Calculator} variant='default' />,
       );
 
       const icon = container.querySelector('svg');
@@ -55,7 +55,7 @@ describe('ResultCard Component', () => {
 
     it('should apply success variant styles', () => {
       const { container } = render(
-        <ResultCard label='Label' value='Value' icon={Calculator} variant='success' />
+        <ResultCard label='Label' value='Value' icon={Calculator} variant='success' />,
       );
 
       const icon = container.querySelector('svg');
@@ -65,7 +65,7 @@ describe('ResultCard Component', () => {
 
     it('should apply warning variant styles', () => {
       const { container } = render(
-        <ResultCard label='Label' value='Value' icon={Calculator} variant='warning' />
+        <ResultCard label='Label' value='Value' icon={Calculator} variant='warning' />,
       );
 
       const icon = container.querySelector('svg');
@@ -75,7 +75,7 @@ describe('ResultCard Component', () => {
 
     it('should apply info variant styles', () => {
       const { container } = render(
-        <ResultCard label='Label' value='Value' icon={Calculator} variant='info' />
+        <ResultCard label='Label' value='Value' icon={Calculator} variant='info' />,
       );
 
       const icon = container.querySelector('svg');
@@ -93,7 +93,7 @@ describe('ResultCard Component', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <ResultCard label='Label' value='Value' className='custom-class' />
+        <ResultCard label='Label' value='Value' className='custom-class' />,
       );
 
       const wrapper = container.firstChild;
@@ -159,11 +159,11 @@ describe('ResultCard Component', () => {
         <ResultCard
           label='This is a very long label that might wrap to multiple lines'
           value='£100,000'
-        />
+        />,
       );
 
       expect(
-        screen.getByText('This is a very long label that might wrap to multiple lines')
+        screen.getByText('This is a very long label that might wrap to multiple lines'),
       ).toBeInTheDocument();
     });
 

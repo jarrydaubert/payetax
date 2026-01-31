@@ -104,7 +104,7 @@ export interface PerformanceContext {
 export function captureCalculatorError(
   error: unknown,
   context: CalculatorErrorContext,
-  severity: ErrorSeverity = 'error'
+  severity: ErrorSeverity = 'error',
 ): string | undefined {
   return Sentry.captureException(error, {
     level: severity as SeverityLevel,
@@ -152,7 +152,7 @@ export function captureCalculatorError(
 export function captureValidationError(
   error: unknown,
   context: ValidationErrorContext,
-  _severity: ErrorSeverity = 'warning'
+  _severity: ErrorSeverity = 'warning',
 ): string | undefined {
   // Extract detailed Zod error information if available
   const zodDetails = extractZodErrorDetails(error);
@@ -273,7 +273,7 @@ function extractZodErrorDetails(error: unknown): {
 export function captureAPIError(
   error: unknown,
   context: APIErrorContext,
-  severity: ErrorSeverity = 'error'
+  severity: ErrorSeverity = 'error',
 ): string | undefined {
   return Sentry.captureException(error, {
     level: severity as SeverityLevel,
@@ -322,7 +322,7 @@ export function captureAPIError(
 export function capturePerformanceIssue(
   message: string,
   context: PerformanceContext,
-  severity: ErrorSeverity = 'warning'
+  severity: ErrorSeverity = 'warning',
 ): string | undefined {
   return Sentry.captureMessage(message, {
     level: severity as SeverityLevel,
@@ -364,7 +364,7 @@ export function capturePerformanceIssue(
  */
 export function startPerformanceTransaction(
   name: string,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
 ): { end: () => void } | undefined {
   // Add breadcrumb instead of transaction for simpler tracking
   addBreadcrumb('performance', {
@@ -396,7 +396,7 @@ export function startPerformanceTransaction(
  */
 export function startPerformanceSpan(
   operation: string,
-  description?: string
+  description?: string,
 ): { end: () => void } | undefined {
   addBreadcrumb('performance', {
     message: `Starting: ${description || operation}`,
@@ -431,7 +431,7 @@ export function addBreadcrumb(
     message: string;
     level?: ErrorSeverity;
     data?: Record<string, unknown>;
-  }
+  },
 ): void {
   Sentry.addBreadcrumb({
     category,
@@ -520,7 +520,7 @@ export function clearUserContext(): void {
 export function withErrorTracking<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   operationName: string,
-  tags?: Record<string, string>
+  tags?: Record<string, string>,
 ): T {
   return (async (...args: unknown[]) => {
     const transaction = startPerformanceTransaction(operationName, {
@@ -565,7 +565,7 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
 export function withErrorTrackingSync<T extends (...args: unknown[]) => unknown>(
   fn: T,
   operationName: string,
-  tags?: Record<string, string>
+  tags?: Record<string, string>,
 ): T {
   return ((...args: unknown[]) => {
     const transaction = startPerformanceTransaction(operationName, {

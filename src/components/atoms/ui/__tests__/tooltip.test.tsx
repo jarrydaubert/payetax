@@ -12,7 +12,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       expect(screen.getByText('Hover me')).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const tooltips = screen.queryAllByText('Tooltip text');
@@ -44,7 +44,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const trigger = screen.getByText('Hover me');
@@ -66,7 +66,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const trigger = screen.getByText('Hover me');
@@ -82,7 +82,7 @@ describe('Tooltip Component', () => {
       await waitFor(() => {
         const tooltips = screen.queryAllByText('Tooltip text');
         expect(
-          tooltips.every((el) => !el.isVisible || el.getAttribute('data-state') === 'closed')
+          tooltips.every((el) => !el.isVisible || el.getAttribute('data-state') === 'closed'),
         ).toBe(true);
       });
     });
@@ -98,7 +98,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent className='custom-tooltip'>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const trigger = screen.getByText('Hover me');
@@ -123,7 +123,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Second</TooltipTrigger>
             <TooltipContent>Second tooltip</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       expect(screen.getByText('First')).toBeInTheDocument();
@@ -141,7 +141,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const trigger = screen.getByText('Hover me');
@@ -163,7 +163,7 @@ describe('Tooltip Component', () => {
             <TooltipTrigger>Hover me</TooltipTrigger>
             <TooltipContent>Tooltip text</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider>,
       );
 
       const trigger = screen.getByText('Hover me');

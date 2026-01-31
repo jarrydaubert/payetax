@@ -143,7 +143,7 @@ export const TaxLiabilityChart = memo(function TaxLiabilityChart({
               {formatCurrency(
                 current
                   .filter((d) => d.category !== 'Net Pay')
-                  .reduce((sum, d) => sum + d.amount, 0)
+                  .reduce((sum, d) => sum + d.amount, 0),
               )}
             </p>
           </div>

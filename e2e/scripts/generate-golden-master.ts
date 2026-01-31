@@ -264,7 +264,7 @@ console.log('✅ Golden master generated successfully!');
 console.log('');
 console.log(`📄 Output: golden-tax-cases-${filename}-COMPLETE.json`);
 console.log(
-  `📊 Scenarios: ${generated.length} (${generated.length - 1} auto-generated + 1 manual)`
+  `📊 Scenarios: ${generated.length} (${generated.length - 1} auto-generated + 1 manual)`,
 );
 console.log('');
 console.log('📋 Sample values:');

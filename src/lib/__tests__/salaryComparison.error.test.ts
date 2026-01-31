@@ -60,7 +60,7 @@ describe('Salary Comparison - Error Handling', () => {
             mode: 'percentage',
             value,
             currentSalary: 40000,
-          })
+          }),
         ).not.toThrow();
       });
     });

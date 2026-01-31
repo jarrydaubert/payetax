@@ -167,7 +167,7 @@ describe('SalaryCalculatorPage', () => {
       const results30k = createMockResults(30000);
       const results60k = createMockResults(60000);
       const { rerender } = render(
-        <SalaryCalculatorPage salary={30000} initialResults={results30k as any} />
+        <SalaryCalculatorPage salary={30000} initialResults={results30k as any} />,
       );
 
       await waitFor(() => {
@@ -193,7 +193,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should format large salaries correctly', async () => {
       render(
-        <SalaryCalculatorPage salary={125000} initialResults={createMockResults(125000) as any} />
+        <SalaryCalculatorPage salary={125000} initialResults={createMockResults(125000) as any} />,
       );
 
       await waitFor(() => {
@@ -203,7 +203,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should format small salaries correctly', async () => {
       render(
-        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />
+        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />,
       );
 
       await waitFor(() => {
@@ -223,7 +223,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should filter out salaries below 20k', async () => {
       render(
-        <SalaryCalculatorPage salary={25000} initialResults={createMockResults(25000) as any} />
+        <SalaryCalculatorPage salary={25000} initialResults={createMockResults(25000) as any} />,
       );
 
       await waitFor(() => {
@@ -233,7 +233,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should filter out salaries above 500k', async () => {
       render(
-        <SalaryCalculatorPage salary={495000} initialResults={createMockResults(495000) as any} />
+        <SalaryCalculatorPage salary={495000} initialResults={createMockResults(495000) as any} />,
       );
 
       await waitFor(() => {
@@ -248,7 +248,7 @@ describe('SalaryCalculatorPage', () => {
   describe('Accessibility', () => {
     it('should have proper semantic sections', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -269,7 +269,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should have proper heading hierarchy', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -282,7 +282,7 @@ describe('SalaryCalculatorPage', () => {
   describe('Layout & Styling', () => {
     it('should have min-height screen', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -294,7 +294,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should have responsive grid layout', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -306,7 +306,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should have gradient background', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -317,7 +317,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should use design tokens for spacing', async () => {
       const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
+        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />,
       );
 
       await waitFor(() => {
@@ -330,7 +330,7 @@ describe('SalaryCalculatorPage', () => {
   describe('Edge Cases', () => {
     it('should handle minimum salary', async () => {
       render(
-        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />
+        <SalaryCalculatorPage salary={20000} initialResults={createMockResults(20000) as any} />,
       );
 
       await waitFor(() => {
@@ -340,7 +340,7 @@ describe('SalaryCalculatorPage', () => {
 
     it('should handle maximum salary', async () => {
       render(
-        <SalaryCalculatorPage salary={500000} initialResults={createMockResults(500000) as any} />
+        <SalaryCalculatorPage salary={500000} initialResults={createMockResults(500000) as any} />,
       );
 
       await waitFor(() => {
@@ -353,7 +353,10 @@ describe('SalaryCalculatorPage', () => {
 
       for (const salary of salaries) {
         const { unmount } = render(
-          <SalaryCalculatorPage salary={salary} initialResults={createMockResults(salary) as any} />
+          <SalaryCalculatorPage
+            salary={salary}
+            initialResults={createMockResults(salary) as any}
+          />,
         );
 
         await waitFor(() => {

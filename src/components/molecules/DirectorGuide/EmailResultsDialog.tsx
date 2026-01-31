@@ -100,7 +100,7 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
               <Mail
                 className={cn(
                   'absolute top-1/2 left-3 -translate-y-1/2 text-slate-500',
-                  ICON_SIZES.SIZE_4
+                  ICON_SIZES.SIZE_4,
                 )}
               />
               <Input

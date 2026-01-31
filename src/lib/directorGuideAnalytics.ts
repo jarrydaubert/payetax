@@ -116,7 +116,7 @@ export function trackOtherIncomeHasOther(): void {
  */
 export function trackResultsShown(
   profit: number,
-  mode: 'normal' | 'survival' | 'modified_survival'
+  mode: 'normal' | 'survival' | 'modified_survival',
 ): void {
   trackEvent({
     action: 'guide_results_shown',

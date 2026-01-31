@@ -57,7 +57,7 @@ describe('Utils', () => {
         'conditional',
         false,
         undefined,
-        'final'
+        'final',
       );
       expect(result).toBe('base array1 array2 obj-true conditional final');
     });

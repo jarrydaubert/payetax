@@ -86,7 +86,7 @@ describe('ComparisonCards', () => {
   describe('Custom ClassName', () => {
     it('should accept and apply custom className', () => {
       const { container } = render(
-        <ComparisonCards left={mockLeft} right={mockRight} className='custom-class' />
+        <ComparisonCards left={mockLeft} right={mockRight} className='custom-class' />,
       );
 
       const grid = container.firstChild as HTMLElement;

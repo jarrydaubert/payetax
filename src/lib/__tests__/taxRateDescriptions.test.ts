@@ -62,10 +62,10 @@ describe('Tax Rate Descriptions', () => {
       const description2023 = getTaxRateDescription('2023-2024');
 
       expect(description2024).toContain(
-        'National Insurance is 800% on earnings between £12,570-£50,270 and 200% above that'
+        'National Insurance is 800% on earnings between £12,570-£50,270 and 200% above that',
       );
       expect(description2023).toContain(
-        'National Insurance is 1200% on earnings between £12,570-£50,270 and 200% above that'
+        'National Insurance is 1200% on earnings between £12,570-£50,270 and 200% above that',
       );
     });
 

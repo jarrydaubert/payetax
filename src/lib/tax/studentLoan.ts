@@ -33,7 +33,7 @@ export interface StudentLoanResult {
 export function getStudentLoanRepayment(
   totalIncome: number,
   plans: StudentLoanPlan[],
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): StudentLoanResult {
   const rates = TAX_RATES[taxYear].studentLoan;
 
@@ -67,7 +67,7 @@ export function getStudentLoanRepayment(
  */
 export function getStudentLoanThreshold(
   plan: StudentLoanPlan,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   return TAX_RATES[taxYear].studentLoan[plan].threshold;
 }

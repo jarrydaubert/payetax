@@ -64,7 +64,7 @@ export function EmailResultsForm({ results, taxYear, className }: EmailResultsFo
       <div
         className={cn(
           'flex items-center justify-center gap-2 rounded-lg border border-emerald/20 bg-emerald/10 px-4 py-3 text-emerald text-sm',
-          className
+          className,
         )}
       >
         <Mail className={ICON_SIZES.SIZE_4} />
@@ -79,7 +79,7 @@ export function EmailResultsForm({ results, taxYear, className }: EmailResultsFo
         <Mail
           className={cn(
             'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-            ICON_SIZES.SIZE_4
+            ICON_SIZES.SIZE_4,
           )}
         />
         <Input

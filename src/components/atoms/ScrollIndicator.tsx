@@ -57,7 +57,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
         'pointer-events-none absolute inset-y-0 z-30 flex w-16 items-center md:w-20',
         positionClass,
         gradientClass,
-        'from-background via-background/90 to-transparent'
+        'from-background via-background/90 to-transparent',
       )}
       aria-hidden='true'
     >

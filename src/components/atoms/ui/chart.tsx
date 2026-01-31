@@ -67,7 +67,7 @@ function ChartContainer({ className, config, children, ref, ...props }: ChartCon
           TYPOGRAPHY.TEXT_XS,
           // Landscape optimization: taller charts on mobile landscape
           'landscape:max-md:h-[350px]',
-          className
+          className,
         )}
         {...props}
       >
@@ -111,7 +111,7 @@ interface ChartTooltipContentProps {
     name: string,
     item: TooltipPayloadItem,
     index: number,
-    payload: TooltipPayloadItem[]
+    payload: TooltipPayloadItem[],
   ) => React.ReactNode;
   color?: string;
   ref?: React.Ref<HTMLDivElement>;
@@ -176,7 +176,7 @@ function ChartTooltipContent({
       className={cn(
         'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 shadow-xl',
         TYPOGRAPHY.TEXT_XS,
-        className
+        className,
       )}
     >
       {tooltipLabel}
@@ -199,7 +199,7 @@ function ChartTooltipContent({
                   className={cn(
                     'h-2.5 w-2.5 shrink-0 rounded-[2px]',
                     indicator === 'dot' && 'rounded-full',
-                    indicator === 'line' && 'w-1'
+                    indicator === 'line' && 'w-1',
                   )}
                   style={{
                     backgroundColor: indicatorColor as string | undefined,
@@ -269,7 +269,7 @@ function ChartLegendContent({
         'flex items-center justify-center',
         SPACING.GAP_4,
         TYPOGRAPHY.TEXT_XS,
-        className
+        className,
       )}
     >
       {payload.map((item) => {
@@ -283,7 +283,7 @@ function ChartLegendContent({
             key={item.value}
             className={cn(
               'flex items-center [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground',
-              SPACING.GAP_1_5
+              SPACING.GAP_1_5,
             )}
           >
             {!hideIcon && (

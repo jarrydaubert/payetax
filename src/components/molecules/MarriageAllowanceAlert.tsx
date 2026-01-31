@@ -92,7 +92,7 @@ export function MarriageAllowanceAlert({
       <div
         className={cn(
           'flex flex-col sm:flex-row sm:items-center sm:justify-between',
-          SPACING.GAP_3
+          SPACING.GAP_3,
         )}
       >
         <div className='flex-1'>
@@ -119,7 +119,7 @@ export function MarriageAllowanceAlert({
           size='sm'
           className={cn(
             'w-full whitespace-nowrap bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 sm:w-auto',
-            SPACING.GAP_2
+            SPACING.GAP_2,
           )}
         >
           <a href='https://www.gov.uk/marriage-allowance' target='_blank' rel='noopener noreferrer'>

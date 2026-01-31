@@ -44,7 +44,7 @@ import * as React from 'react';
  * Solution: Use scrollTo() API with explicit behavior override
  */
 export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
-  ref: React.RefObject<T | null>
+  ref: React.RefObject<T | null>,
 ) {
   const isDraggingRef = React.useRef(false);
   const startPosRef = React.useRef({ x: 0, y: 0 });

@@ -89,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           inter.variable,
           spaceGrotesk.variable,
           'font-sans antialiased',
-          'min-h-screen bg-background text-foreground'
+          'min-h-screen bg-background text-foreground',
         )}
       >
         {/* Ahrefs Web Analytics - Only loads after user accepts cookies */}

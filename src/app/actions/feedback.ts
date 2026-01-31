@@ -31,7 +31,7 @@ export interface FeedbackFormState {
 // biome-ignore lint/suspicious/useAwait: Server action must be async for Next.js, await is in after() callback
 export async function submitFeedback(
   _prevState: FeedbackFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<FeedbackFormState> {
   // Extract form data
   const email = formData.get('email') as string;

@@ -64,7 +64,7 @@ describe('mdx-components', () => {
         render(<H1>What's New in 2024?</H1>);
         expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute(
           'id',
-          'what-s-new-in-2024'
+          'what-s-new-in-2024',
         );
       });
 
@@ -72,7 +72,7 @@ describe('mdx-components', () => {
         render(
           <H1>
             <span>Complex</span> Content
-          </H1>
+          </H1>,
         );
         // Should generate empty id for non-string children
         expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('id', '');
@@ -172,7 +172,7 @@ describe('mdx-components', () => {
           <UL>
             <LI>Item 1</LI>
             <LI>Item 2</LI>
-          </UL>
+          </UL>,
         );
         expect(screen.getByRole('list')).toHaveClass('list-disc');
         expect(screen.getAllByRole('listitem')).toHaveLength(2);
@@ -186,7 +186,7 @@ describe('mdx-components', () => {
             <LI>First</LI>
             <LI>Second</LI>
             <LI>Third</LI>
-          </OL>
+          </OL>,
         );
         expect(screen.getByRole('list')).toHaveClass('list-decimal');
         expect(screen.getAllByRole('listitem')).toHaveLength(3);
@@ -198,7 +198,7 @@ describe('mdx-components', () => {
         render(
           <UL>
             <LI>List item content</LI>
-          </UL>
+          </UL>,
         );
         expect(screen.getByText('List item content')).toHaveClass('leading-relaxed');
       });
@@ -299,7 +299,7 @@ describe('mdx-components', () => {
               <TD>Cell 4</TD>
             </TR>
           </TBody>
-        </Table>
+        </Table>,
       );
 
     it('should render table with all parts', () => {

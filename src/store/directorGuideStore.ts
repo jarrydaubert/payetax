@@ -466,7 +466,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 ytdDividends: formData.ytdDividends,
                 ytdDrawings: formData.ytdDrawings,
               },
-              CURRENT_TAX_YEAR
+              CURRENT_TAX_YEAR,
             );
 
             set({
@@ -527,10 +527,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             useDirectorGuideStore.getState().reset();
           }
         },
-      }
+      },
     ),
-    { name: 'DirectorGuideStore' }
-  )
+    { name: 'DirectorGuideStore' },
+  ),
 );
 
 // ============================================================================
@@ -624,6 +624,6 @@ export function useDirectorGuideActions() {
       // Calculation
       calculate: state.calculate,
       reset: state.reset,
-    }))
+    })),
   );
 }

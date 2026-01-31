@@ -36,7 +36,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByRole('heading', { name: /Salary Take-Home Comparison/i })
+        screen.getByRole('heading', { name: /Salary Take-Home Comparison/i }),
       ).toBeInTheDocument();
     });
 
@@ -50,7 +50,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByRole('heading', { name: /How to Use the Calculator/i })
+        screen.getByRole('heading', { name: /How to Use the Calculator/i }),
       ).toBeInTheDocument();
     });
   });
@@ -190,7 +190,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Based on England\/Wales\/NI rates for 2025-26. Scottish rates differ./i)
+        screen.getByText(/Based on England\/Wales\/NI rates for 2025-26. Scottish rates differ./i),
       ).toBeInTheDocument();
     });
   });
@@ -215,17 +215,17 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i)
+        screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/What is the UK personal allowance for 2025-26\?/i)
+        screen.getByText(/What is the UK personal allowance for 2025-26\?/i),
       ).toBeInTheDocument();
       expect(screen.getByText(/How is PAYE tax calculated in the UK\?/i)).toBeInTheDocument();
       expect(
-        screen.getByText(/What's the difference between Scottish and English tax rates\?/i)
+        screen.getByText(/What's the difference between Scottish and English tax rates\?/i),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/How do student loan repayments work with PAYE\?/i)
+        screen.getByText(/How do student loan repayments work with PAYE\?/i),
       ).toBeInTheDocument();
       expect(screen.getByText(/How does pension tax relief work\?/i)).toBeInTheDocument();
     });
@@ -282,7 +282,7 @@ describe('CalculatorContent Component', () => {
       const { container } = render(<CalculatorContent />);
 
       const summary = screen.getByText(
-        /What's the difference between Scottish and English tax rates\?/i
+        /What's the difference between Scottish and English tax rates\?/i,
       );
       fireEvent.click(summary);
 
@@ -328,7 +328,7 @@ describe('CalculatorContent Component', () => {
       fireEvent.click(summary);
 
       expect(container.textContent).toMatch(
-        /Pension contributions are deducted.*before.*tax is calculated/i
+        /Pension contributions are deducted.*before.*tax is calculated/i,
       );
     });
 
@@ -369,7 +369,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Input your gross annual, monthly, or weekly salary/i)
+        screen.getByText(/Input your gross annual, monthly, or weekly salary/i),
       ).toBeInTheDocument();
     });
 
@@ -377,7 +377,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Choose the tax year \(2025-26 for current rates\)/i)
+        screen.getByText(/Choose the tax year \(2025-26 for current rates\)/i),
       ).toBeInTheDocument();
     });
 
@@ -385,7 +385,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Include pension contributions, student loan plans/i)
+        screen.getByText(/Include pension contributions, student loan plans/i),
       ).toBeInTheDocument();
     });
 
@@ -393,7 +393,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/See your breakdown by income tax, National Insurance/i)
+        screen.getByText(/See your breakdown by income tax, National Insurance/i),
       ).toBeInTheDocument();
     });
   });

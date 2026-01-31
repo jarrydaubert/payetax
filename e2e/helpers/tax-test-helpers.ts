@@ -31,7 +31,7 @@ function getRates(taxYear: TaxYear = '2025-2026') {
 
 export function calculateExpectedIncomeTax(
   salary: number,
-  options: { scottish?: boolean; taxYear?: TaxYear } = {}
+  options: { scottish?: boolean; taxYear?: TaxYear } = {},
 ): number {
   const { scottish = false, taxYear = '2025-2026' } = options;
   const rates = getRates(taxYear);
@@ -51,7 +51,7 @@ export function calculateExpectedIncomeTax(
 
 function calculateEnglishIncomeTax(
   taxableIncome: number,
-  rates: (typeof TAX_RATES)['2025-2026']
+  rates: (typeof TAX_RATES)['2025-2026'],
 ): number {
   let tax = 0;
 
@@ -70,7 +70,7 @@ function calculateEnglishIncomeTax(
     if (taxableIncome > higherRateStart) {
       const higherRateTaxable = Math.min(
         taxableIncome - higherRateStart,
-        higherBand.threshold - (basicBand?.threshold || 0)
+        higherBand.threshold - (basicBand?.threshold || 0),
       );
       tax += higherRateTaxable * higherBand.rate;
     }
@@ -91,7 +91,7 @@ function calculateEnglishIncomeTax(
 
 function calculateScottishIncomeTax(
   taxableIncome: number,
-  rates: (typeof TAX_RATES)['2025-2026']
+  rates: (typeof TAX_RATES)['2025-2026'],
 ): number {
   // Scottish tax uses SCOTTISH_TAX_RATES from taxRates.ts
   // For now, simplified implementation - full Scottish bands would use SCOTTISH_TAX_RATES
@@ -111,7 +111,7 @@ function calculateScottishIncomeTax(
 
 export function calculateExpectedNationalInsurance(
   salary: number,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   const rates = getRates(taxYear);
   const niRates = rates.nationalInsurance.employee.A; // Category A (most common)
@@ -139,7 +139,7 @@ export function calculateExpectedNationalInsurance(
 export function calculateExpectedStudentLoan(
   salary: number,
   plan: string,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): number {
   const rates = getRates(taxYear);
   const planData = rates.studentLoan[plan as keyof typeof rates.studentLoan];
@@ -155,7 +155,7 @@ export function calculateExpectedStudentLoan(
 export function calculateExpectedPension(
   salary: number,
   contribution: number,
-  isPercentage: boolean = true
+  isPercentage: boolean = true,
 ): number {
   if (isPercentage) {
     return Math.round(salary * (contribution / 100) * 100) / 100;
@@ -164,7 +164,7 @@ export function calculateExpectedPension(
 }
 
 export function generateUniqueTestData(
-  baseData: Partial<TaxCalculationInputs> = {}
+  baseData: Partial<TaxCalculationInputs> = {},
 ): TaxCalculationInputs & { testId: string } {
   const timestamp = Date.now();
   const randomId = Math.floor(Math.random() * 1000);
@@ -182,7 +182,7 @@ export function generateUniqueTestData(
 export function validateCalculationResults(
   actualResults: { [key: string]: number },
   expectedResults: Partial<TaxCalculationResults>,
-  tolerance: number = 1
+  tolerance: number = 1,
 ): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
@@ -191,7 +191,7 @@ export function validateCalculationResults(
     if (typeof actualValue === 'number' && typeof expectedValue === 'number') {
       if (Math.abs(actualValue - expectedValue) > tolerance) {
         errors.push(
-          `${key}: expected ${expectedValue}, got ${actualValue} (tolerance: ±${tolerance})`
+          `${key}: expected ${expectedValue}, got ${actualValue} (tolerance: ±${tolerance})`,
         );
       }
     }

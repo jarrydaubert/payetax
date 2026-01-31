@@ -43,7 +43,7 @@ export function MoneyFlowChart() {
         formData.hasEmploymentAllowance,
         formData.studentLoanPlans,
         formData.pensionContribution,
-        formData.companyCarBIK
+        formData.companyCarBIK,
       );
       return {
         salary: scenario.salary,

@@ -36,7 +36,7 @@ export function TaxCodeDecoderClient() {
         <h1
           className={cn(
             'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL
+            TYPOGRAPHY.TEXT_4XL,
           )}
         >
           UK Tax Code Decoder
@@ -85,7 +85,7 @@ export function TaxCodeDecoderClient() {
                   onClick={() => handleDecode(exampleCode)}
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
-                    'hover:border-primary hover:bg-primary/5'
+                    'hover:border-primary hover:bg-primary/5',
                   )}
                 >
                   {exampleCode}
@@ -123,7 +123,7 @@ export function TaxCodeDecoderClient() {
                     className={cn(
                       'font-bold',
                       TYPOGRAPHY.TEXT_2XL,
-                      result.allowance < 0 ? 'text-destructive' : 'text-emerald'
+                      result.allowance < 0 ? 'text-destructive' : 'text-emerald',
                     )}
                   >
                     {formatAllowance(result.allowance)}

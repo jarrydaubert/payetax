@@ -159,7 +159,7 @@ function getEmployeeNIWithNoThreshold(salary: number, taxYear: TaxYear): number 
 
 export function calculateStrategyComparison(
   input: StrategyInput,
-  taxYear: TaxYear = '2025-2026'
+  taxYear: TaxYear = '2025-2026',
 ): StrategyComparison {
   // Calculate YTD amounts already taken
   const ytdSalary = input.ytdSalary ?? 0;
@@ -216,7 +216,7 @@ export function calculateStrategyComparison(
       opts,
       input.yourSetupSalary ?? 0,
       input.yourSetupDividends ?? 0,
-      optimalMix.takeHome
+      optimalMix.takeHome,
     );
     strategies.yourSetup = yourSetup;
   }
@@ -352,7 +352,7 @@ export function calculateSalaryScenario(
   hasEmploymentAllowance: boolean,
   studentLoanPlans: StudentLoanPlan[] = [],
   pension: number = 0,
-  companyCarBIK: number = 0
+  companyCarBIK: number = 0,
 ): {
   salary: number;
   employerNI: number;
@@ -426,7 +426,7 @@ export function calculateSalaryScenario(
  */
 function calculateSalaryScenarioInternal(
   targetSalary: number,
-  opts: StrategyCalcOptions
+  opts: StrategyCalcOptions,
 ): {
   salary: number;
   employerNI: number;
@@ -544,7 +544,7 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
   // - £6,070 extra salary saves ~£1,500 CT (25%) but costs only ~£910 Employer NI (15%)
   // With EA, the advantage is even larger since Employer NI is offset
   const bestScenario = scenarios.reduce((best, current) =>
-    current.takeHome > best.takeHome ? current : best
+    current.takeHome > best.takeHome ? current : best,
   );
 
   const {
@@ -658,7 +658,7 @@ function calculateYourSetupStrategy(
   opts: StrategyCalcOptions,
   userSalary: number,
   userDividends: number,
-  optimalTakeHome: number
+  optimalTakeHome: number,
 ): YourSetupResult {
   const {
     grossProfit,

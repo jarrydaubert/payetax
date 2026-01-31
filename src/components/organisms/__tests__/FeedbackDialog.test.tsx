@@ -260,7 +260,7 @@ describe('FeedbackDialog Component', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: expect.stringContaining('test@example.com'),
-          })
+          }),
         );
       });
     });
@@ -285,7 +285,7 @@ describe('FeedbackDialog Component', () => {
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith(
-          expect.stringContaining('Thanks! Your feedback has been sent')
+          expect.stringContaining('Thanks! Your feedback has been sent'),
         );
       });
     });
@@ -353,7 +353,7 @@ describe('FeedbackDialog Component', () => {
       });
 
       (global.fetch as jest.Mock).mockReturnValueOnce(
-        submitPromise.then(() => ({ ok: true, json: async () => ({}) }))
+        submitPromise.then(() => ({ ok: true, json: async () => ({}) })),
       );
 
       render(<FeedbackDialog />);
@@ -386,7 +386,7 @@ describe('FeedbackDialog Component', () => {
       });
 
       (global.fetch as jest.Mock).mockReturnValueOnce(
-        submitPromise.then(() => ({ ok: true, json: async () => ({}) }))
+        submitPromise.then(() => ({ ok: true, json: async () => ({}) })),
       );
 
       render(<FeedbackDialog />);

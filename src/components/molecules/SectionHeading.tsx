@@ -95,13 +95,13 @@ export function SectionHeading({
   const titleClasses = cn(
     'mb-4 font-bold text-foreground',
     level === 'h2' ? TYPOGRAPHY.TEXT_4XL : TYPOGRAPHY.TEXT_3XL,
-    alignClass
+    alignClass,
   );
 
   const subtitleClasses = cn(
     'text-muted-foreground leading-relaxed',
     TYPOGRAPHY.TEXT_LG,
-    alignClass
+    alignClass,
   );
 
   return (
@@ -129,7 +129,7 @@ export function SectionHeading({
             'max-w-3xl',
             SPACING.MT_4,
             align === 'center' && 'mx-auto',
-            subtitleClasses
+            subtitleClasses,
           )}
         >
           {subtitle}

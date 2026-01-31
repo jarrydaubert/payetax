@@ -65,7 +65,7 @@ export function ResultTableRow({
           color,
           isHighlight && 'font-bold',
           'sticky left-0 z-10 bg-background px-2 py-2.5 text-left font-normal',
-          LAYOUT.TABLE_LABEL_WIDTH
+          LAYOUT.TABLE_LABEL_WIDTH,
         )}
       >
         <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
@@ -78,7 +78,7 @@ export function ResultTableRow({
           'w-[55px] px-2 py-2.5 text-right font-mono',
           TYPOGRAPHY.TEXT_SM,
           color,
-          isHighlight && 'font-bold'
+          isHighlight && 'font-bold',
         )}
       >
         {percentage}
@@ -97,7 +97,7 @@ export function ResultTableRow({
                   'min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2.5 text-right font-mono',
                   TYPOGRAPHY.TEXT_SM,
                   color,
-                  isHighlight && 'font-bold'
+                  isHighlight && 'font-bold',
                 )}
               >
                 {formatCurrency(currentValue)}
@@ -107,7 +107,7 @@ export function ResultTableRow({
                   'min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2.5 text-right font-mono',
                   TYPOGRAPHY.TEXT_SM,
                   color,
-                  isHighlight && 'font-bold'
+                  isHighlight && 'font-bold',
                 )}
               >
                 {formatCurrency(whatIfValue)}
@@ -124,7 +124,7 @@ export function ResultTableRow({
               'min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-mono',
               TYPOGRAPHY.TEXT_SM,
               color,
-              isHighlight && 'font-bold'
+              isHighlight && 'font-bold',
             )}
           >
             {formatCurrency(currentValue)}

@@ -112,7 +112,7 @@ export function validatePublicEnv(): PublicEnv {
   if (!result.success) {
     console.error('❌ Public environment validation failed:', result.error.issues);
     throw new Error(
-      `Invalid public environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`
+      `Invalid public environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`,
     );
   }
 
@@ -141,7 +141,7 @@ export function validateServerEnv(): ServerEnv {
   if (!result.success) {
     console.error('❌ Server environment validation failed:', result.error.issues);
     throw new Error(
-      `Invalid server environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`
+      `Invalid server environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`,
     );
   }
 

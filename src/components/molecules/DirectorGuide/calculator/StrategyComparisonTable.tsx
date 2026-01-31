@@ -50,7 +50,7 @@ export function StrategyComparisonTable() {
       formData.hasEmploymentAllowance,
       formData.studentLoanPlans,
       formData.pensionContribution,
-      formData.companyCarBIK
+      formData.companyCarBIK,
     );
   }, [comparison, sliderSalary, formData]);
 
@@ -143,7 +143,7 @@ export function StrategyComparisonTable() {
                 'relative rounded-xl border p-4 text-left transition-all',
                 isSelected
                   ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
-                  : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]'
+                  : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]',
               )}
             >
               {/* Highest Take-Home Badge */}
@@ -158,7 +158,7 @@ export function StrategyComparisonTable() {
                 <div
                   className={cn(
                     'flex size-8 items-center justify-center rounded-lg',
-                    isSelected ? 'bg-cyan-500/20' : 'bg-white/5'
+                    isSelected ? 'bg-cyan-500/20' : 'bg-white/5',
                   )}
                 >
                   <Icon className={cn('size-4', isSelected ? 'text-cyan-400' : 'text-slate-400')} />
@@ -225,7 +225,7 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
         'relative mt-4 rounded-xl border p-4',
         yourSetup.exceedsProfit
           ? 'border-red-500/50 bg-red-500/10'
-          : 'border-amber-500/30 bg-amber-500/5'
+          : 'border-amber-500/30 bg-amber-500/5',
       )}
     >
       {/* DLA Warning Badge */}

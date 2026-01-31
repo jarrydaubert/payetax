@@ -68,7 +68,7 @@ import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
  */
 const createBasicInput = (
   salary: number,
-  overrides: Partial<TaxCalculationInput> = {}
+  overrides: Partial<TaxCalculationInput> = {},
 ): TaxCalculationInput => ({
   salary,
   payPeriod: 'annually',
@@ -395,7 +395,7 @@ describe('Tax Calculator', () => {
 
       // Net pay should be reduced by student loan as well as tax and NI
       expect(result.netPay.annually).toBeLessThan(
-        35000 - result.incomeTax.annually - result.nationalInsurance.annually
+        35000 - result.incomeTax.annually - result.nationalInsurance.annually,
       );
     });
 

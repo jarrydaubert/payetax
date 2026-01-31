@@ -44,7 +44,7 @@ describe('SectionHeading', () => {
               <span>Bold</span> Text
             </>
           }
-        />
+        />,
       );
       expect(screen.getByText('Bold')).toBeInTheDocument();
       expect(screen.getByText(/Text/)).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('SectionHeading', () => {
 
     it('should render badge with icon', () => {
       const { container } = render(
-        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'New Feature' }} />
+        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'New Feature' }} />,
       );
       expect(screen.getByText('New Feature')).toBeInTheDocument();
       // Icon should have aria-hidden
@@ -184,7 +184,7 @@ describe('SectionHeading', () => {
 
     it('should render icon with correct size class', () => {
       const { container } = render(
-        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'Test' }} />
+        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'Test' }} />,
       );
       const icon = container.querySelector('svg');
       expect(icon).toBeInTheDocument();
@@ -204,7 +204,7 @@ describe('SectionHeading', () => {
 
     it('should mark badge icons as decorative', () => {
       const { container } = render(
-        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'Test' }} />
+        <SectionHeading title='Title' badge={{ icon: Sparkles, text: 'Test' }} />,
       );
       const icon = container.querySelector('[aria-hidden="true"]');
       expect(icon).toBeInTheDocument();
@@ -241,7 +241,7 @@ describe('SectionHeading', () => {
 
       for (const variant of variants) {
         const { unmount } = render(
-          <SectionHeading title='Title' badge={{ text: variant, variant }} />
+          <SectionHeading title='Title' badge={{ text: variant, variant }} />,
         );
         expect(screen.getByText(variant)).toBeInTheDocument();
         unmount();

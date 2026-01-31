@@ -128,7 +128,7 @@ export default function CallToAction({
       <p
         className={cn(
           'mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed',
-          TYPOGRAPHY.TEXT_XL
+          TYPOGRAPHY.TEXT_XL,
         )}
       >
         {config.description}

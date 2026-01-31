@@ -39,7 +39,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     // Should have: Category (th) + Percentage (td) + (Current + What If) × 2 periods = 6 cells
@@ -79,7 +79,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     // Should have: Category (th) + Percentage (td) + (Current + What If) × 7 periods = 16 cells
@@ -111,7 +111,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     const cells = container.querySelectorAll('th, td');
@@ -141,7 +141,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     // Should have: Category (th) + Percentage + 2 periods (no What If columns) = 4 cells
@@ -169,7 +169,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     // Should have: Category (th) + Percentage (td) + (Current + What If) × 3 periods = 8 cells
@@ -199,7 +199,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
             periodOptions={periodOptions}
           />
         </tbody>
-      </table>
+      </table>,
     );
 
     // Skip category (th) and percentage (td), then check all period cells

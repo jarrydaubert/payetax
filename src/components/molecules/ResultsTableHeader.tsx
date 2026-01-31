@@ -28,7 +28,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             'sticky left-0 z-20 w-[195px] whitespace-nowrap bg-card font-semibold text-foreground',
             SPACING.PX_2,
             'py-2.5',
-            TYPOGRAPHY.TEXT_LG
+            TYPOGRAPHY.TEXT_LG,
           )}
         >
           Payslip
@@ -38,7 +38,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             'w-[55px] text-right font-semibold',
             SPACING.PX_2,
             'py-2.5',
-            TYPOGRAPHY.TEXT_SM
+            TYPOGRAPHY.TEXT_SM,
           )}
         >
           %
@@ -52,7 +52,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                   'min-w-[200px] text-center font-semibold',
                   SPACING.PX_2,
                   'py-2.5',
-                  TYPOGRAPHY.TEXT_SM
+                  TYPOGRAPHY.TEXT_SM,
                 )}
                 colSpan={2}
               >
@@ -67,7 +67,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                   'min-w-[100px] whitespace-nowrap text-right font-semibold',
                   SPACING.PX_2,
                   'py-2.5',
-                  TYPOGRAPHY.TEXT_SM
+                  TYPOGRAPHY.TEXT_SM,
                 )}
               >
                 {period}
@@ -87,7 +87,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                   'min-w-[100px] whitespace-nowrap bg-blue-500/10 text-center font-medium',
                   SPACING.PX_2,
                   SPACING.PY_2,
-                  TYPOGRAPHY.TEXT_SM
+                  TYPOGRAPHY.TEXT_SM,
                 )}
               >
                 Current
@@ -98,7 +98,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                   'min-w-[100px] whitespace-nowrap bg-purple-500/10 text-center font-medium',
                   SPACING.PX_2,
                   SPACING.PY_2,
-                  TYPOGRAPHY.TEXT_SM
+                  TYPOGRAPHY.TEXT_SM,
                 )}
               >
                 What If

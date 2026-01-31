@@ -138,7 +138,7 @@ const nextConfig: NextConfig = {
       config.plugins.push(
         new webpack.IgnorePlugin({
           resourceRegExp: /^esprima$/,
-        })
+        }),
       );
     }
 

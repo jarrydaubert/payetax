@@ -157,7 +157,7 @@ export function ScenarioSummaryCard({
             value={formatCurrency(
               results.incomeTax.monthly +
                 results.nationalInsurance.monthly +
-                results.studentLoan.monthly
+                results.studentLoan.monthly,
             )}
             negative
           />
@@ -175,7 +175,7 @@ export function ScenarioSummaryCard({
           'rounded-lg bg-primary/10 text-primary',
           'transition-colors hover:bg-primary/20',
           TYPOGRAPHY.TEXT_SM,
-          TYPOGRAPHY.FONT_MEDIUM
+          TYPOGRAPHY.FONT_MEDIUM,
         )}
       >
         Calculate with your numbers
@@ -207,7 +207,7 @@ function SummaryItem({
           TYPOGRAPHY.TEXT_BASE,
           'font-semibold',
           variant === 'deduction' && 'text-red-400/80',
-          variant === 'highlight' && 'text-green-400'
+          variant === 'highlight' && 'text-green-400',
         )}
       >
         {variant === 'deduction' && value !== '£0' ? `-${value.slice(1)}` : value}
@@ -238,7 +238,7 @@ function MiniStat({
           TYPOGRAPHY.TEXT_SM,
           'font-semibold',
           negative && 'text-red-400/80',
-          highlight && 'text-green-400'
+          highlight && 'text-green-400',
         )}
       >
         {negative && value !== '£0' ? `-${value.slice(1)}` : value}

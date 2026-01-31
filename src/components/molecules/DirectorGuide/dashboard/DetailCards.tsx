@@ -53,7 +53,7 @@ export function DetailCards({ className }: DetailCardsProps) {
         formData.hasEmploymentAllowance,
         formData.studentLoanPlans,
         formData.pensionContribution,
-        formData.companyCarBIK
+        formData.companyCarBIK,
       );
 
       return {
@@ -186,7 +186,7 @@ export function DetailCards({ className }: DetailCardsProps) {
               values.employerNI +
               values.dividendTax +
               values.incomeTax +
-              values.employeeNI
+              values.employeeNI,
           ),
           isError: true,
         }}
@@ -235,7 +235,7 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
                 'font-mono text-sm',
                 row.positive && 'text-emerald-500',
                 row.negative && 'text-red-400',
-                !(row.positive || row.negative) && 'text-slate-100'
+                !(row.positive || row.negative) && 'text-slate-100',
               )}
             >
               {row.value}
@@ -249,7 +249,7 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
         <span
           className={cn(
             'font-mono font-semibold text-lg',
-            total.isError ? 'text-red-400' : 'text-cyan-500'
+            total.isError ? 'text-red-400' : 'text-cyan-500',
           )}
         >
           {total.value}

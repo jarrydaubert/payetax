@@ -70,7 +70,7 @@ const TableRow = ({
     ref={ref}
     className={cn(
       'border-border/20 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
-      className
+      className,
     )}
     {...props}
   />
@@ -89,7 +89,7 @@ const TableHead = ({
     scope='col'
     className={cn(
       'h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
-      className
+      className,
     )}
     {...props}
   />
@@ -107,7 +107,7 @@ const TableCell = ({
     ref={ref}
     className={cn(
       'p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
-      className
+      className,
     )}
     {...props}
   />

@@ -118,7 +118,7 @@ export function CalculatorInputsSection({
               <ChevronDown
                 className={cn(
                   ICON_SIZES.SIZE_5,
-                  `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`
+                  `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`,
                 )}
               />
             </div>

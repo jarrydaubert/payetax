@@ -17,7 +17,7 @@ export function HowToStepCard({ step, title, description }: HowToStepCardProps) 
     <Card
       className={cn(
         'group relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 backdrop-blur-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-2xl',
-        SPACING.P_6
+        SPACING.P_6,
       )}
     >
       <div
@@ -29,7 +29,7 @@ export function HowToStepCard({ step, title, description }: HowToStepCardProps) 
         <div
           className={cn(
             'mb-4 flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-white shadow-lg',
-            TYPOGRAPHY.TEXT_2XL
+            TYPOGRAPHY.TEXT_2XL,
           )}
         >
           {step}

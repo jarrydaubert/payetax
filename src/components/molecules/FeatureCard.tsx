@@ -84,13 +84,13 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
     },
     gradient?.bg,
     gradient?.border,
-    className
+    className,
   );
 
   const iconContainerClasses = cn(
     'mb-4 flex h-12 w-12 items-center justify-center rounded-lg',
     gradient?.icon || 'text-primary',
-    variant === 'showcase' && !gradient?.bg && 'bg-primary/10'
+    variant === 'showcase' && !gradient?.bg && 'bg-primary/10',
   );
 
   return (
@@ -118,7 +118,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
           className={cn(
             'text-muted-foreground leading-relaxed',
             SPACING.MB_4,
-            TYPOGRAPHY.TEXT_BASE
+            TYPOGRAPHY.TEXT_BASE,
           )}
         >
           {description}
@@ -130,7 +130,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
             href={link.href as Route}
             className={cn(
               'group inline-flex items-center gap-2 font-semibold text-primary transition-colors hover:text-primary/80',
-              TYPOGRAPHY.TEXT_SM
+              TYPOGRAPHY.TEXT_SM,
             )}
           >
             {link.text}

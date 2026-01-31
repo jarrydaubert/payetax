@@ -9,7 +9,7 @@ function Empty({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='empty'
       className={cn(
         'flex min-w-0 flex-1 flex-col items-center justify-center gap-6 text-balance rounded-lg border-dashed p-6 text-center md:p-12',
-        className
+        className,
       )}
       {...props}
     />
@@ -38,7 +38,7 @@ const emptyMediaVariants = cva(
     defaultVariants: {
       variant: 'default',
     },
-  }
+  },
 );
 
 function EmptyMedia({
@@ -73,7 +73,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
       className={cn(
         'text-muted-foreground [&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4',
         TYPOGRAPHY.TEXT_SM,
-        className
+        className,
       )}
       {...props}
     />
@@ -86,7 +86,7 @@ function EmptyContent({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='empty-content'
       className={cn(
         'flex w-full min-w-0 max-w-sm flex-col items-center gap-4 text-balance text-sm',
-        className
+        className,
       )}
       {...props}
     />

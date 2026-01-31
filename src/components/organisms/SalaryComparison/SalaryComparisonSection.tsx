@@ -66,7 +66,7 @@ export function SalaryComparisonSection({
           className={cn(
             ICON_SIZES.SIZE_4,
             'transition-transform duration-200',
-            isOpen && 'rotate-180'
+            isOpen && 'rotate-180',
           )}
         />
       </Button>

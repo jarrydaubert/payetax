@@ -26,7 +26,7 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(
-      screen.getByText(/Free UK tax calculator with official HMRC rates/i)
+      screen.getByText(/Free UK tax calculator with official HMRC rates/i),
     ).toBeInTheDocument();
   });
 

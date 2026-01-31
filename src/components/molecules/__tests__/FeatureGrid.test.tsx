@@ -64,7 +64,7 @@ describe('FeatureGrid', () => {
             subtitle: 'What makes us special',
           }}
           features={mockFeatures}
-        />
+        />,
       );
 
       expect(screen.getByRole('heading', { name: 'Our Features' })).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('FeatureGrid', () => {
             title: 'Latest Features',
           }}
           features={mockFeatures}
-        />
+        />,
       );
 
       expect(screen.getByText('New')).toBeInTheDocument();
@@ -105,7 +105,7 @@ describe('FeatureGrid', () => {
             level: 'h2',
           }}
           features={mockFeatures}
-        />
+        />,
       );
 
       const heading = screen.getByRole('heading', { name: 'Test', level: 2 });
@@ -271,7 +271,7 @@ describe('FeatureGrid', () => {
           columns={3}
           variant='showcase'
           className='my-custom-class'
-        />
+        />,
       );
 
       // Heading
@@ -293,7 +293,7 @@ describe('FeatureGrid', () => {
   describe('Accessibility', () => {
     it('should have proper semantic structure', () => {
       const { container } = render(
-        <FeatureGrid heading={{ title: 'Features' }} features={mockFeatures} />
+        <FeatureGrid heading={{ title: 'Features' }} features={mockFeatures} />,
       );
 
       const section = container.querySelector('section');
@@ -302,7 +302,7 @@ describe('FeatureGrid', () => {
 
     it('should maintain heading hierarchy', () => {
       render(
-        <FeatureGrid heading={{ title: 'Main Heading', level: 'h2' }} features={mockFeatures} />
+        <FeatureGrid heading={{ title: 'Main Heading', level: 'h2' }} features={mockFeatures} />,
       );
 
       // Should have one h2 (main) and multiple h3 (features)

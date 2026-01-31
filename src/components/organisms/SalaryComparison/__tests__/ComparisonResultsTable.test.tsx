@@ -257,7 +257,7 @@ describe('ComparisonResultsTable', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <ComparisonResultsTable results={mockResults} className='custom-class' />
+        <ComparisonResultsTable results={mockResults} className='custom-class' />,
       );
       const wrapper = container.querySelector('.custom-class');
       expect(wrapper).toBeInTheDocument();

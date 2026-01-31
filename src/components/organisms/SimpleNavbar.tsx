@@ -109,7 +109,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'grid grid-cols-[1fr_auto_1fr] items-center',
           'px-4 py-4 sm:px-8 sm:py-6',
           'bg-deep/80 backdrop-blur-[20px]',
-          className
+          className,
         )}
         aria-label='Main navigation'
       >
@@ -154,7 +154,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             className={cn(
               'rounded-full border border-transparent px-5 py-2.5 font-semibold text-[0.85rem] text-text-primary-new transition-all duration-300',
               '[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]',
-              'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+              'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]',
             )}
           >
             Open Calculator

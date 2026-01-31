@@ -155,7 +155,7 @@ describe('EmptyState Components', () => {
           <EmptyContent>
             <button type='button'>Clear filters</button>
           </EmptyContent>
-        </Empty>
+        </Empty>,
       );
 
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
@@ -169,7 +169,7 @@ describe('EmptyState Components', () => {
       render(
         <Empty>
           <EmptyTitle>Nothing here yet</EmptyTitle>
-        </Empty>
+        </Empty>,
       );
 
       expect(screen.getByText('Nothing here yet')).toBeInTheDocument();

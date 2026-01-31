@@ -31,7 +31,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
     <nav
       className={cn(
         'relative flex h-full flex-col border-white/[0.04] border-r bg-[#020617] py-4 transition-[width,padding] duration-200 ease-out',
-        collapsed ? 'w-14 items-center px-2' : 'w-48 px-3'
+        collapsed ? 'w-14 items-center px-2' : 'w-48 px-3',
       )}
     >
       {/* Logo */}
@@ -55,7 +55,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         onClick={onEmailResults}
         className={cn(
           'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='Email Results'
       >
@@ -78,7 +78,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/'
         className={cn(
           'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='PAYE Calculator'
       >
@@ -91,7 +91,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/tools/tax-code-decoder'
         className={cn(
           'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='Tax Code Decoder'
       >
@@ -104,7 +104,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/tools/scottish-tax-calculator'
         className={cn(
           'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='Scottish Calculator'
       >
@@ -117,7 +117,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/blog'
         className={cn(
           'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='Tax Guides'
       >
@@ -132,7 +132,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
           onClick={onToggle}
           className={cn(
             'mt-2 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-            collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+            collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
           )}
           title={collapsed ? 'Expand menu' : 'Collapse menu'}
         >
@@ -153,7 +153,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/about'
         className={cn(
           'flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
         )}
         title='Help & About'
       >

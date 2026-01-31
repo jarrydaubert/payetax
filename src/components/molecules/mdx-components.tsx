@@ -29,7 +29,7 @@ export const mdxComponents = {
           SPACING.MT_8,
           SPACING.MB_4,
           SPACING.GAP_3,
-          'md:mt-12 md:mb-6'
+          'md:mt-12 md:mb-6',
         )}
         style={{ fontSize: 'var(--blog-font-size-4xl)' }}
         id={id}
@@ -56,7 +56,7 @@ export const mdxComponents = {
           SPACING.MT_6,
           SPACING.MB_3,
           SPACING.GAP_3,
-          'md:mt-10 md:mb-5'
+          'md:mt-10 md:mb-5',
         )}
         style={{ fontSize: 'var(--blog-font-size-3xl)' }}
         id={id}
@@ -83,7 +83,7 @@ export const mdxComponents = {
           'mt-5',
           SPACING.MB_2,
           SPACING.GAP_2,
-          'md:mt-8 md:mb-4'
+          'md:mt-8 md:mb-4',
         )}
         style={{ fontSize: 'var(--blog-font-size-2xl)' }}
         id={id}
@@ -170,7 +170,7 @@ export const mdxComponents = {
         href={href}
         className={cn(
           'inline-flex items-center font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80',
-          SPACING.GAP_1
+          SPACING.GAP_1,
         )}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
@@ -214,7 +214,7 @@ export const mdxComponents = {
       className={cn(
         'glass-card-inner rounded-lg border-primary/50 border-l-4 px-6',
         'my-8 flex items-center [&_p]:mb-0',
-        SPACING.PY_4
+        SPACING.PY_4,
       )}
       {...props}
     >
@@ -250,7 +250,7 @@ export const mdxComponents = {
       className={cn(
         'text-left font-semibold text-foreground uppercase tracking-wider',
         SPACING.PX_6,
-        'py-3'
+        'py-3',
       )}
       style={{ fontSize: 'var(--blog-font-size-sm)' }}
       {...props}
@@ -291,7 +291,7 @@ export const mdxComponents = {
           className={cn(
             'text-center text-muted-foreground italic',
             SPACING.MT_2,
-            TYPOGRAPHY.TEXT_SM
+            TYPOGRAPHY.TEXT_SM,
           )}
         >
           {alt}

@@ -88,7 +88,7 @@ export function getAllPosts() {
 
   // Sort by published date (newest first) - use spread to avoid mutation
   return [...posts].sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
 }
 

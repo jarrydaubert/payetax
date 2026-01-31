@@ -58,7 +58,7 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
               className={cn(
                 'flex justify-between rounded-md bg-muted/30',
                 SPACING.P_2,
-                TYPOGRAPHY.TEXT_SM
+                TYPOGRAPHY.TEXT_SM,
               )}
             >
               <span className='text-muted-foreground'>{item.label}</span>

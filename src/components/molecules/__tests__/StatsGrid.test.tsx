@@ -122,7 +122,7 @@ describe('StatsGrid', () => {
 
     it('should preserve grid classes with custom className', () => {
       const { container } = render(
-        <StatsGrid stats={mockStats} columns={3} className='custom-class' />
+        <StatsGrid stats={mockStats} columns={3} className='custom-class' />,
       );
       const grid = container.querySelector('ul');
       expect(grid).toHaveClass('custom-class', 'lg:grid-cols-3');

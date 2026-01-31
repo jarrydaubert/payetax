@@ -110,7 +110,7 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       expect(blobContent).toContain(
-        'Category,Yearly,Monthly,4-Weekly,Fortnightly,Weekly,Daily,Hourly'
+        'Category,Yearly,Monthly,4-Weekly,Fortnightly,Weekly,Daily,Hourly',
       );
     });
 

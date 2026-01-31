@@ -79,7 +79,7 @@ export function BlogPagination({
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
-            'border border-slate-700/50 transition-colors'
+            'border border-slate-700/50 transition-colors',
           )}
           rel='prev'
         >
@@ -90,7 +90,7 @@ export function BlogPagination({
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'cursor-not-allowed bg-slate-800/30 text-slate-500',
-            'border border-slate-700/30'
+            'border border-slate-700/30',
           )}
           aria-disabled='true'
         >
@@ -118,13 +118,13 @@ export function BlogPagination({
                 'flex h-10 w-10 items-center justify-center rounded-lg font-medium text-sm transition-colors',
                 page === currentPage
                   ? 'bg-cyan-500 text-white'
-                  : 'border border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  : 'border border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
               )}
               aria-current={page === currentPage ? 'page' : undefined}
             >
               {page}
             </Link>
-          )
+          ),
         )}
       </div>
 
@@ -141,7 +141,7 @@ export function BlogPagination({
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
-            'border border-slate-700/50 transition-colors'
+            'border border-slate-700/50 transition-colors',
           )}
           rel='next'
         >
@@ -152,7 +152,7 @@ export function BlogPagination({
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'cursor-not-allowed bg-slate-800/30 text-slate-500',
-            'border border-slate-700/30'
+            'border border-slate-700/30',
           )}
           aria-disabled='true'
         >

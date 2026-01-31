@@ -148,7 +148,7 @@ function analyzeComponents() {
     testFiles.map((f) => {
       const testName = path.basename(f).replace('.test.tsx', '').replace('.test.ts', '');
       return testName;
-    })
+    }),
   );
 
   const untestedSource = sourceFiles.filter((f) => {

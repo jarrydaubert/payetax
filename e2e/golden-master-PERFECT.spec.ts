@@ -256,7 +256,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         expect(results.incomeTax, '❌ Income Tax mismatch').toBeCloseTo(expected.incomeTax, 1);
         // biome-ignore lint/suspicious/noConsole: Test verification
         console.log(
-          `  ✅ Income Tax: £${results.incomeTax.toFixed(2)} (expected £${expected.incomeTax.toFixed(2)})`
+          `  ✅ Income Tax: £${results.incomeTax.toFixed(2)} (expected £${expected.incomeTax.toFixed(2)})`,
         );
       }
 
@@ -264,7 +264,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         expect(results.employeeNI, '❌ Employee NI mismatch').toBeCloseTo(expected.employeeNI, 1);
         // biome-ignore lint/suspicious/noConsole: Test verification
         console.log(
-          `  ✅ Employee NI: £${results.employeeNI.toFixed(2)} (expected £${expected.employeeNI.toFixed(2)})`
+          `  ✅ Employee NI: £${results.employeeNI.toFixed(2)} (expected £${expected.employeeNI.toFixed(2)})`,
         );
       }
 
@@ -272,18 +272,18 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         expect(results.netPay, '❌ Net Pay mismatch').toBeCloseTo(expected.netPay, 1);
         // biome-ignore lint/suspicious/noConsole: Test verification
         console.log(
-          `  ✅ Net Pay: £${results.netPay.toFixed(2)} (expected £${expected.netPay.toFixed(2)})`
+          `  ✅ Net Pay: £${results.netPay.toFixed(2)} (expected £${expected.netPay.toFixed(2)})`,
         );
       }
 
       if (expected.studentLoanRepayment !== undefined) {
         expect(results.studentLoan, '❌ Student Loan mismatch').toBeCloseTo(
           expected.studentLoanRepayment,
-          2
+          2,
         );
         // biome-ignore lint/suspicious/noConsole: Test verification
         console.log(
-          `  ✅ Student Loan: £${results.studentLoan.toFixed(2)} (expected £${expected.studentLoanRepayment.toFixed(2)})`
+          `  ✅ Student Loan: £${results.studentLoan.toFixed(2)} (expected £${expected.studentLoanRepayment.toFixed(2)})`,
         );
       }
 
@@ -291,7 +291,7 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
         expect(results.pension, '❌ Pension mismatch').toBeCloseTo(expected.pensionContribution, 2);
         // biome-ignore lint/suspicious/noConsole: Test verification
         console.log(
-          `  ✅ Pension: £${results.pension.toFixed(2)} (expected £${expected.pensionContribution.toFixed(2)})`
+          `  ✅ Pension: £${results.pension.toFixed(2)} (expected £${expected.pensionContribution.toFixed(2)})`,
         );
       }
 

@@ -99,7 +99,7 @@ const CookieBanner: React.FC = () => {
       className={cn(
         'safe-bottom pointer-events-none fixed inset-x-0 z-40 flex justify-center',
         SPACING.P_2,
-        'sm:p-4'
+        'sm:p-4',
       )}
     >
       <Card className='pointer-events-auto w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
@@ -130,7 +130,7 @@ const CookieBanner: React.FC = () => {
             'flex flex-col justify-center pt-0 sm:flex-row sm:p-6',
             SPACING.GAP_2,
             SPACING.P_4,
-            'sm:gap-3'
+            'sm:gap-3',
           )}
         >
           <Button onClick={declineCookies} variant='outline' size='touch' className='min-w-[140px]'>

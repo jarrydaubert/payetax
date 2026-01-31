@@ -73,7 +73,7 @@ export function FeatureGrid({
       'grid-cols-1 md:grid-cols-2': columns === 2,
       'grid-cols-1 md:grid-cols-2 lg:grid-cols-3': columns === 3,
     },
-    className
+    className,
   );
 
   return (

@@ -57,7 +57,7 @@ export const ChartsContainer = memo(function ChartsContainer({
           SPACING.SPACE_Y_4,
           // Landscape optimization: increase chart height
           'landscape:space-y-6',
-          className
+          className,
         )}
       >
         {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}
@@ -78,7 +78,7 @@ export const ChartsContainer = memo(function ChartsContainer({
         SPACING.GAP_4,
         // Landscape optimization: full-width charts on mobile landscape
         'landscape:max-md:grid-cols-1 landscape:max-md:gap-6',
-        className
+        className,
       )}
     >
       {showIncomeBreakdown && <IncomeBreakdownChart results={results} />}

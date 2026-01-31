@@ -28,7 +28,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByText('Browse Topics')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /All Posts 10/i })).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /Tax Basics 5/i })).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.queryByRole('button', { name: /Empty Category/i })).not.toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByText('10')).toBeInTheDocument(); // All posts count
@@ -97,7 +97,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory={undefined}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
@@ -112,7 +112,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory={undefined}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
@@ -128,7 +128,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
@@ -143,7 +143,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
@@ -158,7 +158,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxTipsButton = screen.getByRole('button', { name: /Tax Tips 3/i });
@@ -173,7 +173,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
@@ -189,7 +189,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
@@ -205,7 +205,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxTipsButton = screen.getByRole('button', { name: /Tax Tips 3/i });
@@ -227,7 +227,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
@@ -259,7 +259,7 @@ describe('CategoryFilter', () => {
           categories={emptyCategories}
           allPostsCount={0}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /All Posts 0/i })).toBeInTheDocument();
@@ -273,7 +273,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={0}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByText('0')).toBeInTheDocument();
@@ -289,7 +289,7 @@ describe('CategoryFilter', () => {
           categories={largeCategories}
           allPostsCount={1234}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByText('1234')).toBeInTheDocument();
@@ -308,7 +308,7 @@ describe('CategoryFilter', () => {
           categories={manyCategories}
           allPostsCount={100}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(screen.getByRole('button', { name: /Category 0 1/i })).toBeInTheDocument();
@@ -323,7 +323,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const heading = screen.getByRole('heading', { level: 2 });
@@ -336,7 +336,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const heading = screen.getByRole('heading', { level: 2 });
@@ -353,7 +353,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -369,7 +369,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const taxBasicsButton = screen.getByRole('button', { name: /Tax Basics 5/i });
@@ -384,7 +384,7 @@ describe('CategoryFilter', () => {
           allPostsCount={10}
           selectedCategory='tax-basics'
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
@@ -397,7 +397,7 @@ describe('CategoryFilter', () => {
           categories={mockCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const allPostsButton = screen.getByRole('button', { name: /All Posts 10/i });
@@ -416,7 +416,7 @@ describe('CategoryFilter', () => {
           categories={categoriesWithUndefined}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       // Should not render category with undefined count (filtered out by count > 0)
@@ -437,13 +437,13 @@ describe('CategoryFilter', () => {
           categories={longCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       expect(
         screen.getByRole('button', {
           name: /This is a Very Long Category Name That Should Wrap Properly/i,
-        })
+        }),
       ).toBeInTheDocument();
     });
 
@@ -457,7 +457,7 @@ describe('CategoryFilter', () => {
           categories={specialCategories}
           allPostsCount={10}
           onCategoryClick={mockCallback}
-        />
+        />,
       );
 
       const button = screen.getByRole('button', { name: /Tax & Finance/i });

@@ -105,7 +105,7 @@ export function TaxTrapInlineAlert({
         onClick={handleDismiss}
         className={cn(
           'absolute top-3 right-3 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-          SPACING.P_2
+          SPACING.P_2,
         )}
         aria-label='Dismiss tax trap alert'
       >
@@ -115,7 +115,7 @@ export function TaxTrapInlineAlert({
       <div
         className={cn(
           'flex flex-col pr-8 sm:flex-row sm:items-center sm:justify-between',
-          SPACING.GAP_3
+          SPACING.GAP_3,
         )}
       >
         <div className='flex-1'>
@@ -139,7 +139,7 @@ export function TaxTrapInlineAlert({
             size='sm'
             className={cn(
               'w-full whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto',
-              SPACING.GAP_2
+              SPACING.GAP_2,
             )}
           >
             Add {formatCurrency(suggestedPension, 0)} to Pension

@@ -49,7 +49,7 @@ export function CategoryFilter({
               className={cn(
                 'rounded px-1.5 py-0.5 font-mono',
                 TYPOGRAPHY.TEXT_XS,
-                isActive() ? 'bg-primary-foreground/20' : 'text-muted-foreground'
+                isActive() ? 'bg-primary-foreground/20' : 'text-muted-foreground',
               )}
             >
               {allPostsCount}
@@ -72,7 +72,7 @@ export function CategoryFilter({
                   className={cn(
                     'rounded px-1.5 py-0.5 font-mono',
                     TYPOGRAPHY.TEXT_XS,
-                    isActive(category.slug) ? 'bg-primary-foreground/20' : 'text-muted-foreground'
+                    isActive(category.slug) ? 'bg-primary-foreground/20' : 'text-muted-foreground',
                   )}
                 >
                   {category.count}

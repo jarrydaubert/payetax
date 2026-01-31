@@ -157,7 +157,7 @@ describe('LabelTooltip Component', () => {
         <div>
           <input data-testid='other-input' />
           <LabelTooltip fieldName='salary' />
-        </div>
+        </div>,
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');

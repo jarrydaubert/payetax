@@ -47,7 +47,7 @@ describe('TableOfContents', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <TableOfContents content={mockContent} className='custom-class' />
+      <TableOfContents content={mockContent} className='custom-class' />,
     );
     expect(container.firstChild).toHaveClass('custom-class');
   });

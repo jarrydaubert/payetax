@@ -84,7 +84,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
           ? 'pt-24 pb-8 sm:pt-28 sm:pb-12' // Top padding for navbar clearance
           : 'py-8 sm:py-12', // Original padding for non-navbar pages
         getMaxWidthClass(),
-        className
+        className,
       )}
     >
       {glass ? (

@@ -20,7 +20,7 @@ describe('IncomeSourceList Component', () => {
     jest.clearAllMocks();
 
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: defaultInput })
+      selector({ input: defaultInput }),
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
@@ -37,7 +37,7 @@ describe('IncomeSourceList Component', () => {
 
       // The empty state message should not be in the document when collapsed
       expect(
-        screen.queryByText('Add pension income, rental income, or other sources')
+        screen.queryByText('Add pension income, rental income, or other sources'),
       ).not.toBeInTheDocument();
     });
 
@@ -68,7 +68,7 @@ describe('IncomeSourceList Component', () => {
 
       // After expansion, the empty state message should be in the document
       expect(
-        screen.getByText('Add pension income, rental income, or other sources')
+        screen.getByText('Add pension income, rental income, or other sources'),
       ).toBeInTheDocument();
     });
 
@@ -95,14 +95,14 @@ describe('IncomeSourceList Component', () => {
       // Expand
       await user.click(trigger);
       expect(
-        screen.getByText('Add pension income, rental income, or other sources')
+        screen.getByText('Add pension income, rental income, or other sources'),
       ).toBeInTheDocument();
 
       // Collapse
       await user.click(trigger);
       // After collapse, content should not be in the document
       expect(
-        screen.queryByText('Add pension income, rental income, or other sources')
+        screen.queryByText('Add pension income, rental income, or other sources'),
       ).not.toBeInTheDocument();
     });
   });
@@ -145,7 +145,7 @@ describe('IncomeSourceList Component', () => {
 
     beforeEach(() => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: mockIncomeSources } })
+        selector({ input: { incomeSources: mockIncomeSources } }),
       );
     });
 
@@ -202,7 +202,7 @@ describe('IncomeSourceList Component', () => {
 
       // Empty state message should not appear when income sources exist
       expect(
-        screen.queryByText('Add pension income, rental income, or other sources')
+        screen.queryByText('Add pension income, rental income, or other sources'),
       ).not.toBeInTheDocument();
     });
   });
@@ -217,7 +217,7 @@ describe('IncomeSourceList Component', () => {
 
     beforeEach(() => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } })
+        selector({ input: { incomeSources: [mockIncomeSource] } }),
       );
     });
 
@@ -246,7 +246,7 @@ describe('IncomeSourceList Component', () => {
               { id: 'source-2', type: 'rental' as const, amount: 500, period: 'monthly' as const },
             ],
           },
-        })
+        }),
       );
 
       const user = userEvent.setup();
@@ -270,7 +270,7 @@ describe('IncomeSourceList Component', () => {
       }));
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: maxIncomeSources } })
+        selector({ input: { incomeSources: maxIncomeSources } }),
       );
 
       const user = userEvent.setup();
@@ -292,7 +292,7 @@ describe('IncomeSourceList Component', () => {
       }));
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: maxIncomeSources } })
+        selector({ input: { incomeSources: maxIncomeSources } }),
       );
 
       const user = userEvent.setup();
@@ -327,7 +327,7 @@ describe('IncomeSourceList Component', () => {
               },
             ],
           },
-        })
+        }),
       );
 
       const user = userEvent.setup();
@@ -353,7 +353,7 @@ describe('IncomeSourceList Component', () => {
       // Initial render with income sources
       const { rerender } = render(<IncomeSourceList />);
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } })
+        selector({ input: { incomeSources: [mockIncomeSource] } }),
       );
 
       // Re-render to simulate sources being added
@@ -361,7 +361,7 @@ describe('IncomeSourceList Component', () => {
 
       // Clear income sources
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [] } })
+        selector({ input: { incomeSources: [] } }),
       );
 
       // Re-render to simulate reset
@@ -369,7 +369,7 @@ describe('IncomeSourceList Component', () => {
 
       // Should be collapsed (empty state message not in the document)
       expect(
-        screen.queryByText('Add pension income, rental income, or other sources')
+        screen.queryByText('Add pension income, rental income, or other sources'),
       ).not.toBeInTheDocument();
     });
   });
@@ -384,7 +384,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } })
+        selector({ input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();
@@ -407,7 +407,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } })
+        selector({ input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();
@@ -430,7 +430,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } })
+        selector({ input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();

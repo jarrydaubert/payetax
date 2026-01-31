@@ -36,7 +36,7 @@ interface UseHorizontalScrollIndicatorReturn {
  */
 export function useHorizontalScrollIndicator<T extends HTMLElement = HTMLDivElement>(
   containerRef: React.RefObject<T | null>,
-  deps: React.DependencyList = []
+  deps: React.DependencyList = [],
 ): UseHorizontalScrollIndicatorReturn {
   const [showLeftIndicator, setShowLeftIndicator] = React.useState(false);
   const [showRightIndicator, setShowRightIndicator] = React.useState(false);

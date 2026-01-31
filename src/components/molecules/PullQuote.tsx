@@ -23,7 +23,7 @@ export function PullQuote({ text, attribution, className }: PullQuoteProps) {
       className={cn(
         'relative my-8 rounded-r-2xl border-l-4 p-6 md:p-8',
         'bg-gradient-to-br from-cyan-500/10 to-emerald-500/5',
-        className
+        className,
       )}
       style={{
         borderImage: 'linear-gradient(to bottom, #06b6d4, #10b981) 1',

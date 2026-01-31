@@ -115,7 +115,7 @@ export function WhatIfComparisonDisplay({
           })();
       setVisiblePeriods(newPeriods);
     },
-    [visiblePeriods]
+    [visiblePeriods],
   );
 
   const calculatePercentage = React.useCallback((amount: number, total: number): string => {
@@ -274,7 +274,7 @@ export function WhatIfComparisonDisplay({
                       ? 'text-emerald'
                       : netPayDeltaMonthly < 0
                         ? 'text-destructive'
-                        : 'text-muted-foreground'
+                        : 'text-muted-foreground',
                   )}
                 >
                   {netPayDeltaMonthly >= 0 ? '+' : ''}
@@ -322,7 +322,7 @@ export function WhatIfComparisonDisplay({
                       ? 'text-destructive'
                       : taxDeltaAnnual < 0
                         ? 'text-emerald'
-                        : ''
+                        : '',
                   )}
                 >
                   {taxDeltaAnnual >= 0 ? '+' : ''}
@@ -415,7 +415,7 @@ export function WhatIfComparisonDisplay({
                         scope='col'
                         className={cn(
                           'sticky top-0 z-10 min-w-[90px] bg-blue-500/10 text-right font-medium sm:min-w-[100px]',
-                          TYPOGRAPHY.TEXT_XS
+                          TYPOGRAPHY.TEXT_XS,
                         )}
                       >
                         Current
@@ -424,7 +424,7 @@ export function WhatIfComparisonDisplay({
                         scope='col'
                         className={cn(
                           'sticky top-0 z-10 min-w-[90px] bg-purple-500/10 text-right font-medium sm:min-w-[100px]',
-                          TYPOGRAPHY.TEXT_XS
+                          TYPOGRAPHY.TEXT_XS,
                         )}
                       >
                         What If

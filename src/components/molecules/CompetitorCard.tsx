@@ -63,7 +63,7 @@ export function CompetitorCard({
       className={cn(
         'h-full transition-all duration-300 hover:shadow-lg',
         featured && 'ring-2 ring-primary',
-        className
+        className,
       )}
     >
       <CardHeader>
@@ -141,7 +141,7 @@ export function CompetitorCard({
               className={cn(
                 'inline-flex items-center font-semibold text-primary transition-colors hover:text-primary/80',
                 TYPOGRAPHY.TEXT_SM,
-                SPACING.GAP_1
+                SPACING.GAP_1,
               )}
             >
               Full comparison
@@ -154,7 +154,7 @@ export function CompetitorCard({
             className={cn(
               'inline-flex items-center text-muted-foreground transition-colors hover:text-foreground',
               TYPOGRAPHY.TEXT_SM,
-              SPACING.GAP_1
+              SPACING.GAP_1,
             )}
           >
             Visit site
@@ -177,7 +177,7 @@ export function PayeTaxCard({ className }: PayeTaxCardProps) {
     <Card
       className={cn(
         'h-full border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5',
-        className
+        className,
       )}
     >
       <CardHeader>
@@ -229,7 +229,7 @@ export function PayeTaxCard({ className }: PayeTaxCardProps) {
             className={cn(
               'inline-flex items-center font-semibold text-primary transition-colors hover:text-primary/80',
               TYPOGRAPHY.TEXT_SM,
-              SPACING.GAP_1
+              SPACING.GAP_1,
             )}
           >
             Try PayeTax now

@@ -39,7 +39,7 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
         'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
         'border border-slate-700/50 hover:border-cyan-500/50',
         'motion-safe:hover:-translate-y-0.5',
-        className
+        className,
       )}
     >
       <Link href={`/blog/${post.slug}`} className='block'>
@@ -110,7 +110,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
         'group relative overflow-hidden rounded-lg bg-slate-800/50 transition-all duration-200',
         'border border-slate-700/50 hover:border-cyan-500/50',
         'motion-safe:hover:-translate-y-0.5',
-        className
+        className,
       )}
     >
       <Link href={`/blog/${post.slug}`} className='flex gap-4 p-3'>
@@ -178,7 +178,7 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
         'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
         'border border-slate-700/50 hover:border-cyan-500/50',
         'motion-safe:hover:-translate-y-0.5',
-        className
+        className,
       )}
     >
       <Link href={`/blog/${post.slug}`} className='block'>

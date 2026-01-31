@@ -248,7 +248,7 @@ export function getWarnings(input: WarningInput): Warning[] {
   if (input.hasChildren && totalIncome >= HICBC_START && totalIncome <= HICBC_END) {
     const clawbackPercent = Math.min(
       100,
-      ((totalIncome - HICBC_START) / (HICBC_END - HICBC_START)) * 100
+      ((totalIncome - HICBC_START) / (HICBC_END - HICBC_START)) * 100,
     );
     warnings.push({
       type: 'HICBC',
@@ -283,7 +283,7 @@ export function getWarnings(input: WarningInput): Warning[] {
   if (adjustedIncome > PENSION_TAPER_THRESHOLD) {
     const reduction = Math.min(
       PENSION_ANNUAL_ALLOWANCE - 10000, // Can't reduce below £10k
-      (adjustedIncome - PENSION_TAPER_THRESHOLD) / 2
+      (adjustedIncome - PENSION_TAPER_THRESHOLD) / 2,
     );
     const taperedAA = PENSION_ANNUAL_ALLOWANCE - reduction;
     warnings.push({

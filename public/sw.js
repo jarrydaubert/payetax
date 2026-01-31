@@ -69,7 +69,7 @@ self.addEventListener('install', (event) => {
       } catch (error) {
         devLog('Precache failed:', error);
       }
-    })()
+    })(),
   );
 });
 
@@ -84,14 +84,14 @@ self.addEventListener('activate', (event) => {
       const currentCaches = [CACHE_NAME, STATIC_CACHE_NAME, API_CACHE_NAME];
 
       const oldCaches = cacheNames.filter(
-        (name) => name.startsWith('payetax-') && !currentCaches.includes(name)
+        (name) => name.startsWith('payetax-') && !currentCaches.includes(name),
       );
 
       await Promise.all(
         oldCaches.map((cacheName) => {
           devLog('Deleting old cache:', cacheName);
           return caches.delete(cacheName);
-        })
+        }),
       );
 
       devLog(`Cleaned up ${oldCaches.length} old cache(s)`);
@@ -109,7 +109,7 @@ self.addEventListener('activate', (event) => {
       // Take control of all open clients
       await self.clients.claim();
       devLog('Service worker activated and controlling all clients');
-    })()
+    })(),
   );
 });
 
@@ -330,7 +330,7 @@ async function enforceMaxCacheSize(cacheName, maxSize) {
       }
 
       devLog(
-        `Cache cleanup: removed ${(deletedSize / 1024 / 1024).toFixed(1)} MB from ${cacheName}`
+        `Cache cleanup: removed ${(deletedSize / 1024 / 1024).toFixed(1)} MB from ${cacheName}`,
       );
     }
   } catch (error) {
@@ -422,7 +422,7 @@ self.addEventListener('notificationclick', (event) => {
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
       }
-    })
+    }),
   );
 });
 
@@ -450,7 +450,7 @@ async function updateCriticalAssets() {
         } catch (error) {
           devLog('[SW] Failed to update page:', page, error);
         }
-      })
+      }),
     );
 
     devLog('[SW] Critical assets updated');

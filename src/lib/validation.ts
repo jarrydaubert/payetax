@@ -48,7 +48,7 @@ export const PensionAmountBrand = z
   .finite('Pension amount must be a valid number')
   .brand<'PensionAmount'>()
   .describe(
-    'Pension contribution amount in GBP — type-safe to prevent accidental salary/income mixing'
+    'Pension contribution amount in GBP — type-safe to prevent accidental salary/income mixing',
   );
 
 export type PensionAmount = z.infer<typeof PensionAmountBrand>;
@@ -76,7 +76,7 @@ export const NetIncomeBrand = z
   .finite('Net income must be a valid number')
   .brand<'NetIncome'>()
   .describe(
-    'Net income after tax, NI, pension, and student loan deductions — type-safe branded value'
+    'Net income after tax, NI, pension, and student loan deductions — type-safe branded value',
   );
 
 export type NetIncome = z.infer<typeof NetIncomeBrand>;
@@ -197,7 +197,7 @@ export const IncomeSourceSchema = z
     OtherIncomeSchema,
   ])
   .describe(
-    'Tax-aware income source with type-specific fields and UK tax/NI handling — uses discriminated union for compile-time type narrowing'
+    'Tax-aware income source with type-specific fields and UK tax/NI handling — uses discriminated union for compile-time type narrowing',
   );
 
 export type IncomeSource = z.infer<typeof IncomeSourceSchema>;
@@ -286,11 +286,11 @@ export const TaxCodeSchema = z
       },
       {
         message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100, 1257L W1)',
-      }
-    )
+      },
+    ),
   )
   .describe(
-    'UK HMRC tax code with full support for Scottish, K codes, emergency codes, and special rates — ✅ Zod v4 .pipe() pattern'
+    'UK HMRC tax code with full support for Scottish, K codes, emergency codes, and special rates — ✅ Zod v4 .pipe() pattern',
   );
 
 /**
@@ -421,7 +421,7 @@ export const CalculatorInputSchema = z
     {
       message: 'Hours per week is required for hourly pay period',
       path: ['hoursPerWeek'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -434,7 +434,7 @@ export const CalculatorInputSchema = z
     {
       message: 'Pension contribution percentage cannot exceed 100%',
       path: ['pensionContribution'],
-    }
+    },
   );
 
 export type CalculatorInput = z.infer<typeof CalculatorInputSchema>;
@@ -526,7 +526,7 @@ export const SearchQuerySchema = z.object({
     .pipe(
       z.number().refine((val) => val > 0 && val <= 1000, {
         message: 'Page out of valid range (1-1000)',
-      })
+      }),
     )
     .optional(),
 });
@@ -555,7 +555,7 @@ export type Pagination = z.infer<typeof PaginationSchema>;
  */
 export function safeValidate<T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): { success: true; data: T } | { success: false; errors: z.ZodError } {
   const result = schema.safeParse(data);
 
@@ -597,7 +597,7 @@ export const TaxYearSchema = z
     },
     {
       message: 'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
-    }
+    },
   )
   .refine(
     (year) => {
@@ -629,7 +629,7 @@ export const TaxYearSchema = z
     },
     {
       message: 'Tax year must be consecutive (e.g., 2024-25, 2025-26)',
-    }
+    },
   );
 
 /**
@@ -800,7 +800,7 @@ export function validateWhatIfValue(type: 'percentage' | 'amount' | 'total', val
 export function validateComparisonValue(
   mode: 'percentage' | 'amount' | 'total',
   value: number,
-  modeValue?: number
+  modeValue?: number,
 ) {
   const data: Record<string, unknown> = { mode, value };
   if (mode === 'percentage' && modeValue !== undefined) data.percentage = modeValue;

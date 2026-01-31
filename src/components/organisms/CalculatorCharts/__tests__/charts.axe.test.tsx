@@ -201,7 +201,7 @@ describe('Calculator Charts - Accessibility', () => {
 
     it('should have no accessibility violations (comparison mode)', async () => {
       const { container } = render(
-        <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />
+        <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />,
       );
 
       const results = await axe(container);
@@ -227,7 +227,7 @@ describe('Calculator Charts - Accessibility', () => {
 
     it('should have descriptive aria-label for comparison mode', () => {
       const { container } = render(
-        <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />
+        <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />,
       );
 
       const chartContainer = container.querySelector('[role="img"]');
@@ -264,7 +264,7 @@ describe('Calculator Charts - Accessibility', () => {
 
     it('should have no violations for Scottish taxpayers', async () => {
       const { container } = render(
-        <EffectiveTaxRateChart results={mockResults} isScottish={true} />
+        <EffectiveTaxRateChart results={mockResults} isScottish={true} />,
       );
 
       const results = await axe(container);
@@ -311,7 +311,7 @@ describe('Calculator Charts - Accessibility', () => {
 
     it('should have no accessibility violations (comparison mode)', async () => {
       const { container } = render(
-        <ChartsContainer results={mockMultiSourceResults} whatIfResults={mockWhatIfResults} />
+        <ChartsContainer results={mockMultiSourceResults} whatIfResults={mockWhatIfResults} />,
       );
 
       const results = await axe(container);
@@ -320,7 +320,7 @@ describe('Calculator Charts - Accessibility', () => {
 
     it('should have no violations for Scottish taxpayers', async () => {
       const { container } = render(
-        <ChartsContainer results={mockMultiSourceResults} isScottish={true} />
+        <ChartsContainer results={mockMultiSourceResults} isScottish={true} />,
       );
 
       const results = await axe(container);
@@ -381,7 +381,7 @@ describe('Calculator Charts - Accessibility', () => {
           <IncomeBreakdownChart results={mockMultiSourceResults} />
           <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />
           <EffectiveTaxRateChart results={mockResults} />
-        </div>
+        </div>,
       );
 
       const results = await axe(container);

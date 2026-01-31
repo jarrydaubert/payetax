@@ -151,7 +151,7 @@ function scanFile(filePath: string): Violation[] {
         // Skip common framework classes
         if (
           hardcodedClass.match(
-            /^(container|flex|grid|block|inline|hidden|sr-only|pointer-events-none)$/
+            /^(container|flex|grid|block|inline|hidden|sr-only|pointer-events-none)$/,
           )
         ) {
           continue;

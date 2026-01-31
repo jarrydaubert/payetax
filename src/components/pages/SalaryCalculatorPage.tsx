@@ -150,7 +150,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
             <ol
               className={cn(
                 'flex items-center space-x-2 text-muted-foreground',
-                TYPOGRAPHY.TEXT_SM
+                TYPOGRAPHY.TEXT_SM,
               )}
             >
               <li>
@@ -174,7 +174,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
             className={cn(
               'font-bold font-display tracking-tight',
               TYPOGRAPHY.TEXT_3XL,
-              'sm:text-4xl'
+              'sm:text-4xl',
             )}
           >
             £{formattedSalary} After Tax UK 2025-26
@@ -223,7 +223,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                   href={`/blog/${relatedBlogPost.slug}`}
                   className={cn(
                     'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block'
+                    'block',
                   )}
                 >
                   <span className={cn('font-medium text-primary', TYPOGRAPHY.TEXT_SM)}>
@@ -243,7 +243,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                   href={`/blog/${post.slug}`}
                   className={cn(
                     'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block'
+                    'block',
                   )}
                 >
                   <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_BASE)}>{post.title}</h3>
@@ -258,7 +258,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                   href='/blog/100k-tax-trap-avoid-60-percent-tax-2025'
                   className={cn(
                     'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block'
+                    'block',
                   )}
                 >
                   <span className={cn('font-medium text-destructive', TYPOGRAPHY.TEXT_SM)}>

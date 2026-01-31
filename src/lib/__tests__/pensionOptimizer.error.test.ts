@@ -230,7 +230,7 @@ describe('Pension Optimizer - Error Handling', () => {
       calculateOptimalPension(NaN);
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[pensionOptimizer] Invalid salary input')
+        expect.stringContaining('[pensionOptimizer] Invalid salary input'),
       );
     });
 
@@ -238,7 +238,7 @@ describe('Pension Optimizer - Error Handling', () => {
       compareWithOptimization(NaN, 10000);
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[pensionOptimizer] Invalid input to compareWithOptimization')
+        expect.stringContaining('[pensionOptimizer] Invalid input to compareWithOptimization'),
       );
     });
 
@@ -247,8 +247,8 @@ describe('Pension Optimizer - Error Handling', () => {
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          '[pensionOptimizer] Pension contribution must be between 0 and salary'
-        )
+          '[pensionOptimizer] Pension contribution must be between 0 and salary',
+        ),
       );
     });
   });
@@ -287,7 +287,7 @@ describe('Pension Optimizer - Error Handling', () => {
 
     it('should handle concurrent calculations safely', () => {
       const promises = Array.from({ length: 100 }, (_, i) =>
-        Promise.resolve(calculateOptimalPension(100000 + i * 100))
+        Promise.resolve(calculateOptimalPension(100000 + i * 100)),
       );
 
       expect(() => Promise.all(promises)).not.toThrow();

@@ -28,14 +28,14 @@ export function MarginalRateInsight({
         <div
           className={cn(
             'flex flex-col sm:flex-row sm:items-center sm:justify-between',
-            SPACING.GAP_4
+            SPACING.GAP_4,
           )}
         >
           <div className={cn('flex items-center', SPACING.GAP_3)}>
             <div
               className={cn(
                 'flex items-center justify-center rounded-full bg-primary/10',
-                ICON_SIZES.SIZE_12
+                ICON_SIZES.SIZE_12,
               )}
             >
               <TrendingUp className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />

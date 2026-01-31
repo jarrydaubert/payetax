@@ -66,7 +66,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
             <span>
               £
               {(results.incomeTax.annually + results.nationalInsurance.annually).toLocaleString(
-                'en-GB'
+                'en-GB',
               )}
               /year{' '}
               <span className='text-xs'>

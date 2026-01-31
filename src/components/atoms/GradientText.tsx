@@ -52,7 +52,7 @@ export function GradientText({
       className={cn(
         'bg-clip-text text-transparent',
         variant !== 'custom' && gradientClasses[variant],
-        className
+        className,
       )}
     >
       {children}

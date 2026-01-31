@@ -17,7 +17,7 @@ describe('Dialog Component', () => {
       render(
         <Dialog>
           <DialogTrigger>Open Dialog</DialogTrigger>
-        </Dialog>
+        </Dialog>,
       );
 
       expect(screen.getByText('Open Dialog')).toBeInTheDocument();
@@ -30,7 +30,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Dialog Title</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       expect(screen.queryByText('Dialog Title')).not.toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Dialog Title</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -61,7 +61,7 @@ describe('Dialog Component', () => {
             <DialogTitle>Title</DialogTitle>
             <DialogDescription>This is a description</DialogDescription>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -83,7 +83,7 @@ describe('Dialog Component', () => {
               <button type='button'>Footer Button</button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -101,7 +101,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Title</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -120,7 +120,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Dialog Content</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       const trigger = screen.getByText('Open Dialog');
@@ -138,7 +138,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Content</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -165,7 +165,7 @@ describe('Dialog Component', () => {
               <button type='button'>Cancel</button>
             </DialogClose>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -224,7 +224,7 @@ describe('Dialog Component', () => {
           <DialogContent className='custom-dialog' data-testid='dialog-content'>
             <DialogTitle>Content</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -244,7 +244,7 @@ describe('Dialog Component', () => {
               <DialogTitle>Title</DialogTitle>
             </DialogHeader>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -263,7 +263,7 @@ describe('Dialog Component', () => {
             <DialogTitle>Title</DialogTitle>
             <DialogFooter className='custom-footer'>Footer Content</DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -283,7 +283,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Accessible Dialog</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -300,7 +300,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Title</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -318,7 +318,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Dialog Title</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -338,7 +338,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Content</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       fireEvent.click(screen.getByText('Open'));
@@ -357,7 +357,7 @@ describe('Dialog Component', () => {
           <DialogContent>
             <DialogTitle>Content</DialogTitle>
           </DialogContent>
-        </Dialog>
+        </Dialog>,
       );
 
       // Rapidly open and close

@@ -20,7 +20,7 @@ import { DEFAULT_HOURS_PER_WEEK, type PayPeriod, PERIODS } from '@/constants/tax
 export function convertPeriodToAnnual(
   amount: number,
   period: PayPeriod,
-  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK
+  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): number {
   switch (period) {
     case PERIODS.ANNUALLY:
@@ -53,7 +53,7 @@ export function convertPeriodToAnnual(
 export function convertAnnualToPeriod(
   annualAmount: number,
   targetPeriod: PayPeriod,
-  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK
+  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): number {
   switch (targetPeriod) {
     case PERIODS.ANNUALLY:
@@ -88,7 +88,7 @@ export function convertBetweenPeriods(
   amount: number,
   fromPeriod: PayPeriod,
   toPeriod: PayPeriod,
-  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK
+  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): number {
   // First convert to annual, then convert to target period
   const annualAmount = convertPeriodToAnnual(amount, fromPeriod, hoursPerWeek);
@@ -106,7 +106,7 @@ export function convertBetweenPeriods(
 export function getPeriodValues(
   annualValue: number,
   _periods: string[] | string,
-  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK
+  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): Record<string, number> {
   // Initialize with all required keys for type safety
   return {

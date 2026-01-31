@@ -101,7 +101,7 @@ export function PageHero({
       className={cn(
         'relative overflow-hidden pt-20 pb-10 md:pt-32 md:pb-20',
         backgroundClass,
-        className
+        className,
       )}
     >
       <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4)}>
@@ -112,7 +112,7 @@ export function PageHero({
               variant={badge.variant || 'outline'}
               className={cn(
                 'mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm',
-                SPACING.GAP_2
+                SPACING.GAP_2,
               )}
             >
               {badge.icon && <badge.icon className={ICON_SIZES.SIZE_5} aria-hidden='true' />}

@@ -46,7 +46,7 @@ export function TaxPots() {
         formData.hasEmploymentAllowance,
         formData.studentLoanPlans,
         formData.pensionContribution,
-        formData.companyCarBIK
+        formData.companyCarBIK,
       );
 
       return {

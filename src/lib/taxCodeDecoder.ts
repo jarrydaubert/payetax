@@ -121,7 +121,7 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
     result.isScottish = true;
     result.prefix = 'S';
     result.details.push(
-      'Scottish tax rates apply. You pay Scottish Income Tax instead of UK rates.'
+      'Scottish tax rates apply. You pay Scottish Income Tax instead of UK rates.',
     );
   } else if (code.startsWith('C')) {
     result.isWelsh = true;
@@ -137,13 +137,13 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
     result.isEmergency = true;
     result.suffix = codeWithoutPrefix.slice(-2);
     result.warnings.push(
-      'This is an emergency tax code. Your tax may not be calculated correctly until HMRC provides your correct code.'
+      'This is an emergency tax code. Your tax may not be calculated correctly until HMRC provides your correct code.',
     );
   } else if (codeWithoutPrefix.endsWith('X')) {
     result.isEmergency = true;
     result.suffix = 'X';
     result.warnings.push(
-      'This is a non-cumulative tax code. Contact HMRC if you think this is wrong.'
+      'This is a non-cumulative tax code. Contact HMRC if you think this is wrong.',
     );
   }
 
@@ -193,10 +193,10 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
       result.allowance = -(number * 10);
       result.meaning = 'Tax code adds to your taxable income';
       result.details.push(
-        `Your employer adds £${(number * 10).toLocaleString()} to your taxable income because you have benefits or owe tax from previous years.`
+        `Your employer adds £${(number * 10).toLocaleString()} to your taxable income because you have benefits or owe tax from previous years.`,
       );
       result.warnings.push(
-        'K codes are used when your benefits or tax owed exceed your Personal Allowance.'
+        'K codes are used when your benefits or tax owed exceed your Personal Allowance.',
       );
     } else {
       // Standard codes - number × 10 = personal allowance
@@ -212,21 +212,21 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
       }
 
       result.details.unshift(
-        `Your tax-free Personal Allowance is £${result.allowance.toLocaleString()} per year.`
+        `Your tax-free Personal Allowance is £${result.allowance.toLocaleString()} per year.`,
       );
 
       // Add context about common allowances using the standard value from taxRates.ts
       if (result.allowance === STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(
-          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2025-26.`
+          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2025-26.`,
         );
       } else if (result.allowance > STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(
-          "Your allowance is higher than standard, possibly due to Blind Person's Allowance or Marriage Allowance received."
+          "Your allowance is higher than standard, possibly due to Blind Person's Allowance or Marriage Allowance received.",
         );
       } else if (result.allowance < STANDARD_PERSONAL_ALLOWANCE && result.allowance > 0) {
         result.details.push(
-          'Your allowance is below the standard amount. This may be due to high income (over £100k) or Marriage Allowance transferred.'
+          'Your allowance is below the standard amount. This may be due to high income (over £100k) or Marriage Allowance transferred.',
         );
       }
     }
@@ -237,7 +237,7 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
   // If we get here, the code is not valid
   result.meaning = 'Unrecognized tax code format';
   result.warnings.push(
-    'This tax code format is not recognized. Please check it is correct or contact HMRC for clarification.'
+    'This tax code format is not recognized. Please check it is correct or contact HMRC for clarification.',
   );
 
   return result;

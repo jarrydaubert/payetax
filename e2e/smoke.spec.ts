@@ -22,7 +22,7 @@ test.describe('Smoke Tests', () => {
     await page.goto('/blog');
     await expect(page).toHaveTitle(/TaxInsights|Blog/i);
     await expect(
-      page.locator('article, [data-testid="blog-card"], a[href^="/blog/"]').first()
+      page.locator('article, [data-testid="blog-card"], a[href^="/blog/"]').first(),
     ).toBeVisible();
   });
 

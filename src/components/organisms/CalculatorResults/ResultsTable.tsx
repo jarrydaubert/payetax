@@ -100,7 +100,7 @@ export function ResultsTable({
   const taxTrapOptimization = React.useMemo(() => {
     return calculateOptimalPension(
       results.grossSalary.annually,
-      results.pensionContribution.annually
+      results.pensionContribution.annually,
     );
   }, [results.grossSalary.annually, results.pensionContribution.annually]);
 
@@ -226,7 +226,7 @@ export function ResultsTable({
                   whatIfAnnual: whatIfResults?.incomeBreakdown?.nonEmployment,
                   percentage: calculatePercentage(
                     results.incomeBreakdown.nonEmployment,
-                    grossAnnual
+                    grossAnnual,
                   ),
                   color: 'text-muted-foreground',
                   isHighlight: false,

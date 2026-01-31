@@ -180,7 +180,7 @@ function generateBundleReport(analysis, history) {
 
   if (!analysis.thresholds.totalSizeOK) {
     recommendations.push(
-      'Total bundle size exceeds threshold. Consider code splitting and tree shaking.'
+      'Total bundle size exceeds threshold. Consider code splitting and tree shaking.',
     );
   }
 
@@ -195,12 +195,12 @@ function generateBundleReport(analysis, history) {
 
   // Check for optimization opportunities
   const duplicateDependencies = analysis.chunks.filter(
-    (chunk) => chunk.name.includes('vendor') || chunk.name.includes('node_modules')
+    (chunk) => chunk.name.includes('vendor') || chunk.name.includes('node_modules'),
   );
 
   if (duplicateDependencies.length > 1) {
     recommendations.push(
-      'Multiple vendor chunks detected. Consider optimizing chunk splitting configuration.'
+      'Multiple vendor chunks detected. Consider optimizing chunk splitting configuration.',
     );
   }
 

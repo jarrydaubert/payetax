@@ -144,7 +144,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                   className={cn(
                     'inline-flex items-center text-muted-foreground transition-colors hover:text-foreground',
                     TYPOGRAPHY.TEXT_SM,
-                    SPACING.GAP_1
+                    SPACING.GAP_1,
                   )}
                 >
                   Visit {competitor.shortName}
@@ -162,7 +162,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
             className={cn(
               'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 text-center',
               SPACING.P_8,
-              'md:p-12'
+              'md:p-12',
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>

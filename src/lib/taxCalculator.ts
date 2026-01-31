@@ -195,7 +195,7 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
  */
 export function parsePersonalAllowanceFromTaxCode(
   taxCode: string,
-  defaultAllowance: number
+  defaultAllowance: number,
 ): number {
   // Delegate to new function for backwards compatibility
   return parseTaxCode(taxCode, defaultAllowance).allowance;
@@ -209,7 +209,7 @@ export function calculateAllowanceReduction(
   salary: number,
   currentAllowance: number,
   threshold: number,
-  reductionRate: number
+  reductionRate: number,
 ): number {
   if (salary <= threshold) return 0;
 
@@ -223,7 +223,7 @@ export function calculateAllowanceReduction(
 export function calculatePensionAmount(
   salary: number,
   contribution: number,
-  contributionType: 'percentage' | 'amount'
+  contributionType: 'percentage' | 'amount',
 ): number {
   if (contributionType === 'percentage') {
     return (salary * contribution) / 100;
@@ -239,7 +239,7 @@ export function calculatePensionAmount(
 export function calculateIncomeTaxFromBands(
   monthlyTaxableIncome: number,
   taxBands: Array<{ name: string; rate: number; threshold: number }>,
-  monthlyAllowance: number
+  monthlyAllowance: number,
 ): { monthlyTax: number; taxBandsApplied: Array<{ name: string; rate: number; amount: number }> } {
   let remainingIncome = monthlyTaxableIncome;
   let monthlyTax = 0;
@@ -291,7 +291,7 @@ export function calculateNIContributions(
     employeeRateAboveUEL: number;
   },
   payNoNI: boolean,
-  isOverStatePensionAge: boolean
+  isOverStatePensionAge: boolean,
 ): number {
   if (payNoNI || isOverStatePensionAge) return 0;
 
@@ -304,7 +304,7 @@ export function calculateNIContributions(
     // NI on income between primary threshold and UEL
     const incomeInMainBand = Math.min(
       monthlyEmploymentIncome - monthlyPrimaryThreshold,
-      monthlyUEL - monthlyPrimaryThreshold
+      monthlyUEL - monthlyPrimaryThreshold,
     );
     monthlyNI += (incomeInMainBand * rates.employeeRate) / 100;
 
@@ -324,7 +324,7 @@ export function calculateNIContributions(
 export function calculateStudentLoanRepayments(
   monthlyGrossSalary: number,
   studentLoanPlans: StudentLoanSelection,
-  loanRates: Record<string, { threshold: number; rate: number }>
+  loanRates: Record<string, { threshold: number; rate: number }>,
 ): number {
   if (!Array.isArray(studentLoanPlans) || studentLoanPlans.length === 0) {
     return 0;
@@ -357,7 +357,7 @@ export function convertToPeriods(
     pension: number;
     net: number;
   },
-  hoursPerWeek: number
+  hoursPerWeek: number,
 ): Record<
   PayPeriod,
   { gross: number; tax: number; ni: number; studentLoan: number; pension: number; net: number }
@@ -435,7 +435,7 @@ export function convertToPeriods(
             tax: roundToPence(annualValues.tax / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
             ni: roundToPence(annualValues.ni / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
             studentLoan: roundToPence(
-              annualValues.studentLoan / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)
+              annualValues.studentLoan / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK),
             ),
             pension: roundToPence(annualValues.pension / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
             net: roundToPence(annualValues.net / (WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK)),
@@ -643,7 +643,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualGrossSalary = convertPeriodToAnnual(
     input.salary,
     input.payPeriod,
-    input.hoursPerWeek
+    input.hoursPerWeek,
   );
 
   // ---------------
@@ -718,8 +718,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       Math.floor(
         ((totalGrossIncome - taxRates.personalAllowanceReductionThreshold) *
           taxRates.personalAllowanceReductionRate) / // Rate is 0.5 (50% of excess)
-          2 // Divide by 2 for the "£1 reduction per £2 income\" rule
-      ) * 2 // Multiply back by 2 to ensure even pound amounts (HMRC requirement)
+          2, // Divide by 2 for the "£1 reduction per £2 income\" rule
+      ) * 2, // Multiply back by 2 to ensure even pound amounts (HMRC requirement)
     );
 
     // Apply the reduction - personal allowance can be reduced to zero but not negative
@@ -817,7 +817,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       annualPensionContribution = convertPeriodToAnnual(
         input.pensionContribution,
         input.payPeriod,
-        input.hoursPerWeek
+        input.hoursPerWeek,
       );
       monthlyPensionContribution = annualPensionContribution / 12;
     }
@@ -912,8 +912,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
             0, // Cannot have negative income in a band
             Math.min(
               upperBound - lowerBound, // Maximum possible income for this band
-              remainingMonthlyIncome // Actual remaining income to be taxed
-            )
+              remainingMonthlyIncome, // Actual remaining income to be taxed
+            ),
           );
 
           // Only calculate tax if there's income in this band
@@ -1055,7 +1055,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     if (monthlyTaxableAdjustedEmploymentIncome > monthlyPrimaryThreshold) {
       const lowerAmount = Math.min(
         monthlyTaxableAdjustedEmploymentIncome - monthlyPrimaryThreshold,
-        monthlyUpperThreshold - monthlyPrimaryThreshold
+        monthlyUpperThreshold - monthlyPrimaryThreshold,
       );
       monthlyNationalInsurance += (lowerAmount * niRates.primary.rate) / 100;
     }
@@ -1195,11 +1195,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         grossSalary[period] = roundToPence(monthlyGrossSalary * fourWeeklyFactor);
         incomeTax[period] = roundToPence(monthlyTax * fourWeeklyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(
-          monthlyNationalInsurance * fourWeeklyFactor
+          monthlyNationalInsurance * fourWeeklyFactor,
         );
         studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fourWeeklyFactor);
         pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * fourWeeklyFactor
+          monthlyPensionContribution * fourWeeklyFactor,
         );
         netPay[period] = roundToPence(monthlyNetPay * fourWeeklyFactor);
         break;
@@ -1211,11 +1211,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         grossSalary[period] = roundToPence(monthlyGrossSalary * fortnightlyFactor);
         incomeTax[period] = roundToPence(monthlyTax * fortnightlyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(
-          monthlyNationalInsurance * fortnightlyFactor
+          monthlyNationalInsurance * fortnightlyFactor,
         );
         studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fortnightlyFactor);
         pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * fortnightlyFactor
+          monthlyPensionContribution * fortnightlyFactor,
         );
         netPay[period] = roundToPence(monthlyNetPay * fortnightlyFactor);
         break;
@@ -1229,7 +1229,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * weeklyFactor);
         studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * weeklyFactor);
         pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * weeklyFactor
+          monthlyPensionContribution * weeklyFactor,
         );
         netPay[period] = roundToPence(monthlyNetPay * weeklyFactor);
         break;
@@ -1243,7 +1243,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * dailyFactor);
         studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * dailyFactor);
         pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * dailyFactor
+          monthlyPensionContribution * dailyFactor,
         );
         netPay[period] = roundToPence(monthlyNetPay * dailyFactor);
         break;
@@ -1259,7 +1259,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance / monthlyHours);
           studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan / monthlyHours);
           pensionContributionByPeriod[period] = roundToPence(
-            monthlyPensionContribution / monthlyHours
+            monthlyPensionContribution / monthlyHours,
           );
           netPay[period] = roundToPence(monthlyNetPay / monthlyHours);
         } else {

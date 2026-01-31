@@ -54,13 +54,13 @@ export function IncomeSourceList() {
           className={cn(
             'group flex items-center font-medium transition-colors hover:text-primary',
             SPACING.GAP_2,
-            TYPOGRAPHY.TEXT_SM
+            TYPOGRAPHY.TEXT_SM,
           )}
         >
           <ChevronRight
             className={cn(
               ICON_SIZES.SIZE_4,
-              'transition-transform group-data-[state=open]:rotate-90'
+              'transition-transform group-data-[state=open]:rotate-90',
             )}
           />
           <span>Additional Income Sources</span>
@@ -95,7 +95,7 @@ export function IncomeSourceList() {
                   variant='outline'
                   className={cn(
                     'flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0',
-                    TYPOGRAPHY.TEXT_XS
+                    TYPOGRAPHY.TEXT_XS,
                   )}
                 >
                   {index + 1}

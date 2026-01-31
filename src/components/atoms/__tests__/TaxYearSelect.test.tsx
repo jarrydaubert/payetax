@@ -18,7 +18,7 @@ describe('TaxYearSelect Component', () => {
 
     it('should render with custom label', () => {
       render(
-        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} label='Select Tax Year' />
+        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} label='Select Tax Year' />,
       );
       expect(screen.getByText('Select Tax Year')).toBeInTheDocument();
     });
@@ -42,7 +42,7 @@ describe('TaxYearSelect Component', () => {
 
     it('should render calendar icon', () => {
       const { container } = render(
-        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />
+        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />,
       );
       const calendarIcon = container.querySelector('svg');
       expect(calendarIcon).toBeInTheDocument();
@@ -179,7 +179,7 @@ describe('TaxYearSelect Component', () => {
 
     it('should have aria-hidden on decorative icons', () => {
       const { container } = render(
-        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />
+        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />,
       );
 
       const icons = container.querySelectorAll('svg[aria-hidden="true"]');
@@ -190,7 +190,7 @@ describe('TaxYearSelect Component', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} className='custom-class' />
+        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} className='custom-class' />,
       );
 
       const wrapper = container.firstChild;
@@ -236,7 +236,7 @@ describe('TaxYearSelect Component', () => {
 
     it('should render with all available tax years', () => {
       const { container } = render(
-        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />
+        <TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />,
       );
 
       const button = screen.getByRole('combobox');

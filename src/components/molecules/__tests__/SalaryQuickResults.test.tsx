@@ -71,7 +71,7 @@ describe('SalaryQuickResults', () => {
   describe('Monthly Take-Home Display', () => {
     it('should display monthly take-home pay prominently', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Monthly Take-Home Pay')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display explanation text', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('After tax and National Insurance')).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe('SalaryQuickResults', () => {
   describe('Quick Breakdown Section', () => {
     it('should display annual take-home', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display weekly take-home', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Weekly Take-Home')).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('SalaryQuickResults', () => {
   describe('Tax Breakdown Section', () => {
     it('should display gross salary', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Gross Salary')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display income tax deduction', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Income Tax')).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display National Insurance deduction', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('National Insurance')).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display net pay annual total', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Net Pay (Annual)')).toBeInTheDocument();
@@ -149,7 +149,7 @@ describe('SalaryQuickResults', () => {
   describe('Effective Tax Rate', () => {
     it('should calculate and display effective tax rate correctly', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
@@ -159,7 +159,7 @@ describe('SalaryQuickResults', () => {
 
     it('should display effective tax rate badge', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const badge = container.querySelector('.font-mono');
@@ -180,7 +180,7 @@ describe('SalaryQuickResults', () => {
           salary={100000}
           results={highEarnerResults}
           comparisons={mockComparisons}
-        />
+        />,
       );
 
       // (27432 + 7379) / 100000 = 34.811%
@@ -191,17 +191,17 @@ describe('SalaryQuickResults', () => {
   describe('Compare Similar Salaries Section', () => {
     it('should render comparison section heading', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(
-        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i })
+        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i }),
       ).toBeInTheDocument();
     });
 
     it('should render TrendingUp icon', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const icon = container.querySelector('[aria-hidden="true"]');
@@ -210,7 +210,7 @@ describe('SalaryQuickResults', () => {
 
     it('should render all comparison links', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByRole('link', { name: /£2k less £28,000/i })).toBeInTheDocument();
@@ -221,7 +221,7 @@ describe('SalaryQuickResults', () => {
 
     it('should have correct href for comparison links', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const link28k = screen.getByRole('link', { name: /£28,000/i });
@@ -238,7 +238,7 @@ describe('SalaryQuickResults', () => {
       ];
 
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={bigComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={bigComparisons} />,
       );
 
       expect(screen.getByText('£125,000')).toBeInTheDocument();
@@ -262,7 +262,7 @@ describe('SalaryQuickResults', () => {
       };
 
       render(
-        <SalaryQuickResults salary={100000} results={bigResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={100000} results={bigResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('£100,000')).toBeInTheDocument();
@@ -280,7 +280,7 @@ describe('SalaryQuickResults', () => {
       };
 
       render(
-        <SalaryQuickResults salary={15000} results={smallResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={15000} results={smallResults} comparisons={mockComparisons} />,
       );
 
       expect(screen.getByText('£15,000')).toBeInTheDocument();
@@ -308,7 +308,7 @@ describe('SalaryQuickResults', () => {
       render(<SalaryQuickResults salary={30000} results={mockResults} comparisons={[]} />);
 
       expect(
-        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i })
+        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i }),
       ).toBeInTheDocument();
       // Should still render the section but with no links
       const links = screen.queryAllByRole('link');
@@ -321,7 +321,7 @@ describe('SalaryQuickResults', () => {
           salary={30000}
           results={mockResults}
           comparisons={[{ amount: 32000, label: '£2k more' }]}
-        />
+        />,
       );
 
       expect(screen.getByRole('link', { name: /£2k more £32,000/i })).toBeInTheDocument();
@@ -339,7 +339,11 @@ describe('SalaryQuickResults', () => {
       };
 
       render(
-        <SalaryQuickResults salary={50000} results={highTaxResults} comparisons={mockComparisons} />
+        <SalaryQuickResults
+          salary={50000}
+          results={highTaxResults}
+          comparisons={mockComparisons}
+        />,
       );
 
       // (15000 + 5000) / 50000 = 40%
@@ -350,7 +354,7 @@ describe('SalaryQuickResults', () => {
   describe('Styling and Layout', () => {
     it('should render Card components', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       // Should have 2 Card components (main results + comparisons)
@@ -360,7 +364,7 @@ describe('SalaryQuickResults', () => {
 
     it('should use sticky positioning for sidebar effect', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const wrapper = container.firstChild;
@@ -370,7 +374,7 @@ describe('SalaryQuickResults', () => {
 
     it('should apply destructive color to tax deductions', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const incomeTaxRow = container.querySelector('.text-destructive');
@@ -381,7 +385,7 @@ describe('SalaryQuickResults', () => {
   describe('Accessibility', () => {
     it('should have proper heading hierarchy', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       // h1 is rendered in parent SalaryCalculatorPage; this component has h2
@@ -390,7 +394,7 @@ describe('SalaryQuickResults', () => {
 
     it('should hide decorative icons from screen readers', () => {
       const { container } = render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const icon = container.querySelector('[aria-hidden="true"]');
@@ -399,7 +403,7 @@ describe('SalaryQuickResults', () => {
 
     it('should use semantic links for comparisons', () => {
       render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
+        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
       const links = screen.getAllByRole('link');

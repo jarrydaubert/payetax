@@ -77,7 +77,7 @@ export function ContactFooter({
 
   const linksContainerClasses = cn(
     'flex gap-4',
-    centered ? 'flex-col items-center justify-center sm:flex-row sm:gap-6' : 'flex-wrap'
+    centered ? 'flex-col items-center justify-center sm:flex-row sm:gap-6' : 'flex-wrap',
   );
 
   return (
@@ -122,7 +122,7 @@ function ContactLinkItem({ link, showSeparator }: ContactLinkItemProps) {
   const linkClasses = cn(
     'text-primary transition-colors hover:text-primary/80',
     TYPOGRAPHY.TEXT_BASE,
-    link.type === 'email' && 'font-mono'
+    link.type === 'email' && 'font-mono',
   );
 
   const content = (
