@@ -6,7 +6,7 @@ import Clock from 'lucide-react/dist/esm/icons/clock.js';
 import Search from 'lucide-react/dist/esm/icons/search.js';
 import X from 'lucide-react/dist/esm/icons/x.js';
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,9 @@ interface BlogSearchProps {
 export function BlogSearch({ posts, className }: BlogSearchProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+
+  // Defer search computation to avoid blocking UI during typing
+  const deferredQuery = useDeferredValue(query);
 
   const fuse = useMemo(
     () =>
@@ -38,9 +41,9 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
   );
 
   const results = useMemo(() => {
-    if (!query.trim()) return [];
-    return fuse.search(query).slice(0, 5);
-  }, [fuse, query]);
+    if (!deferredQuery.trim()) return [];
+    return fuse.search(deferredQuery).slice(0, 5);
+  }, [fuse, deferredQuery]);
 
   const handleClear = useCallback(() => {
     setQuery('');

@@ -319,7 +319,6 @@ const NumberInput = memo(function NumberInput({
           <motion.button
             id={incrementId}
             type='button'
-            tabIndex={-1}
             onClick={handleIncrement}
             disabled={disabled}
             whileHover={{ scale: disabled ? 1 : 1.05 }}
@@ -350,7 +349,6 @@ const NumberInput = memo(function NumberInput({
           <motion.button
             id={decrementId}
             type='button'
-            tabIndex={-1}
             onClick={handleDecrement}
             disabled={disabled}
             whileHover={{ scale: disabled ? 1 : 1.05 }}

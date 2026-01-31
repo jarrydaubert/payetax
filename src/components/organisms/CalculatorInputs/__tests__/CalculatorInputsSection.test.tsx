@@ -82,25 +82,25 @@ describe('CalculatorInputsSection Component', () => {
       expect(mockOnCalculate).toHaveBeenCalledTimes(1);
     });
 
-    it('should disable Calculate button while calculating', async () => {
+    it('should complete calculation synchronously', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const button = screen.getByTestId('calculate-button');
       fireEvent.click(button);
 
-      expect(button).toBeDisabled();
-
-      // Button should re-enable after 500ms timeout
-      await waitFor(() => expect(button).not.toBeDisabled(), { timeout: 1000 });
+      // Calculation completes synchronously
+      expect(mockOnCalculate).toHaveBeenCalled();
+      expect(button).not.toBeDisabled();
     });
 
-    it('should show "Calculating..." text while calculating', () => {
+    it('should return to Calculate text after completion', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const button = screen.getByTestId('calculate-button');
       fireEvent.click(button);
 
-      expect(button).toHaveTextContent('Calculating...');
+      // Button shows normal state after sync calculation
+      expect(button).toHaveTextContent('Calculate');
     });
 
     it('should show rotating icon while calculating', () => {
@@ -242,16 +242,17 @@ describe('CalculatorInputsSection Component', () => {
       expect(screen.getByRole('button', { name: /Reset/i })).toBeInTheDocument();
     });
 
-    it('should properly disable Calculate button during operation', () => {
+    it('should enable Calculate button after sync calculation', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const button = screen.getByTestId('calculate-button');
       fireEvent.click(button);
 
-      expect(button).toHaveAttribute('disabled');
+      // Button is enabled after sync calculation completes
+      expect(button).not.toHaveAttribute('disabled');
     });
 
-    it('should keep Reset button enabled during calculation', () => {
+    it('should keep Reset button always enabled', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const calculateButton = screen.getByTestId('calculate-button');
@@ -263,14 +264,16 @@ describe('CalculatorInputsSection Component', () => {
   });
 
   describe('Animation', () => {
-    it('should use Framer Motion for calculating animation', () => {
+    it('should call onCalculate synchronously and complete', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const button = screen.getByTestId('calculate-button');
       fireEvent.click(button);
 
-      // Motion.div should be present in calculating state
-      expect(button).toHaveTextContent('Calculating...');
+      // Synchronous calculation completes immediately
+      expect(mockOnCalculate).toHaveBeenCalled();
+      // Button returns to normal state after sync calculation
+      expect(button).toHaveTextContent('Calculate');
     });
 
     it('should not throw errors on mount', () => {

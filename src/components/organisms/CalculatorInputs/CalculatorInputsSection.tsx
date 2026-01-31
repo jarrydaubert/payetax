@@ -61,7 +61,7 @@ export function CalculatorInputsSection({
         description: error instanceof Error ? error.message : 'Please check your inputs',
       });
     } finally {
-      setTimeout(() => setIsCalculating(false), 500);
+      setIsCalculating(false);
     }
   };
 

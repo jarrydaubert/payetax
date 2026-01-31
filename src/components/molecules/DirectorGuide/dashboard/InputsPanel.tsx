@@ -232,6 +232,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <button
           type='button'
           onClick={() => setAdvancedOpen(!advancedOpen)}
+          aria-expanded={advancedOpen}
+          aria-controls='advanced-options-panel'
           className='flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-[#1e293b] px-4 py-3 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-[#273548]'
         >
           <span className='font-medium'>Advanced Options</span>
@@ -239,7 +241,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         </button>
 
         {advancedOpen && (
-          <div className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-[#0c1222] p-4'>
+          <div
+            id='advanced-options-panel'
+            className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-[#0c1222] p-4'
+          >
             {/* Employment Allowance */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>

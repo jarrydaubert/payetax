@@ -3,6 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { useMemo } from 'react';
 import { ResultCard } from '@/components/molecules/ResultCard';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING } from '@/constants/designTokens';
@@ -36,7 +37,7 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
 
   // Calculate marginal tax rate: for every extra £1, how much do you keep?
   // This shows which tax band you're in
-  const calculateMarginalRate = (): number => {
+  const marginalRate = useMemo(() => {
     const salary = results.grossSalary.annually;
 
     // Tax bands for England/Wales (2025-26) - using constants from taxRates.ts
@@ -45,9 +46,13 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
     if (salary <= paReductionThreshold) return 57.25; // 40% tax + 2% NI = keep 57.25%
     if (salary <= higherRateThreshold) return 37.25; // 60% effective (allowance taper) + 2% NI = keep 37.25%
     return 52.75; // 45% additional rate + 2% NI = keep 52.75%
-  };
-
-  const marginalRate = calculateMarginalRate();
+  }, [
+    results.grossSalary.annually,
+    personalAllowance,
+    basicRateThreshold,
+    paReductionThreshold,
+    higherRateThreshold,
+  ]);
 
   return (
     <motion.section
