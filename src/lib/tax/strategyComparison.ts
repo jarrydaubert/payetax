@@ -44,6 +44,24 @@ export interface StrategyInput {
   ytdDrawings?: number; // Other drawings (director's loan)
 }
 
+/**
+ * Common options passed to strategy calculator functions.
+ * Consolidates the many parameters into a single object for cleaner function signatures.
+ */
+interface StrategyCalcOptions {
+  grossProfit: number;
+  region: Region;
+  taxYear: TaxYear;
+  otherIncome: number;
+  hasEmploymentAllowance: boolean;
+  studentLoanPlans: StudentLoanPlan[];
+  pension: number;
+  companyCarBIK: number;
+  hasOtherPAYE: boolean;
+  lossesBroughtForward: number;
+  minimumSalary?: number;
+}
+
 export interface StrategyResult {
   name: string;
   salary: number;
@@ -143,15 +161,6 @@ export function calculateStrategyComparison(
   input: StrategyInput,
   taxYear: TaxYear = '2025-2026'
 ): StrategyComparison {
-  const otherIncome = input.otherIncome ?? 0;
-  const hasEA = input.employmentAllowance ?? false;
-  const studentLoanPlans = input.studentLoanPlans ?? [];
-  const pensionContribution = input.pensionContribution ?? 0;
-  const companyCarBIK = input.companyCarBIK ?? 0;
-  const minimumSalary = input.minimumSalaryRequirement ?? 0;
-  const hasOtherPAYE = input.hasOtherPAYEEmployment ?? false;
-  const lossesBroughtForward = input.lossesBroughtForward ?? 0;
-
   // Calculate YTD amounts already taken
   const ytdSalary = input.ytdSalary ?? 0;
   const ytdDividends = input.ytdDividends ?? 0;
@@ -159,6 +168,7 @@ export function calculateStrategyComparison(
   const alreadyTaken = ytdSalary + ytdDividends + ytdDrawings;
 
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
+  const pensionContribution = input.pensionContribution ?? 0;
   const netRevenue = input.includesVat ? input.revenue / (1 + VAT_RATE) : input.revenue;
   const grossProfitBeforePension = netRevenue - input.expenses;
   const grossProfit = Math.max(0, grossProfitBeforePension - pensionContribution);
@@ -166,42 +176,25 @@ export function calculateStrategyComparison(
   // Available for extraction (profit minus what's already been taken)
   const availableForExtraction = Math.max(0, grossProfit - alreadyTaken);
 
+  // Build shared options object for all strategy calculators
+  const opts: StrategyCalcOptions = {
+    grossProfit,
+    region: input.region,
+    taxYear,
+    otherIncome: input.otherIncome ?? 0,
+    hasEmploymentAllowance: input.employmentAllowance ?? false,
+    studentLoanPlans: input.studentLoanPlans ?? [],
+    pension: pensionContribution,
+    companyCarBIK: input.companyCarBIK ?? 0,
+    hasOtherPAYE: input.hasOtherPAYEEmployment ?? false,
+    lossesBroughtForward: input.lossesBroughtForward ?? 0,
+    minimumSalary: input.minimumSalaryRequirement ?? 0,
+  };
+
   // Calculate each strategy
-  const allSalary = calculateAllSalaryStrategy(
-    grossProfit,
-    input.region,
-    taxYear,
-    otherIncome,
-    hasEA,
-    studentLoanPlans,
-    pensionContribution,
-    companyCarBIK,
-    hasOtherPAYE,
-    lossesBroughtForward
-  );
-  const optimalMix = calculateOptimalMixStrategy(
-    grossProfit,
-    input.region,
-    taxYear,
-    otherIncome,
-    hasEA,
-    studentLoanPlans,
-    pensionContribution,
-    companyCarBIK,
-    minimumSalary,
-    hasOtherPAYE,
-    lossesBroughtForward
-  );
-  const allDividends = calculateAllDividendsStrategy(
-    grossProfit,
-    input.region,
-    taxYear,
-    otherIncome,
-    studentLoanPlans,
-    pensionContribution,
-    companyCarBIK,
-    lossesBroughtForward
-  );
+  const allSalary = calculateAllSalaryStrategy(opts);
+  const optimalMix = calculateOptimalMixStrategy(opts);
+  const allDividends = calculateAllDividendsStrategy(opts);
 
   // Find best strategy
   const strategies: StrategyComparison['strategies'] = { allSalary, optimalMix, allDividends };
@@ -220,14 +213,7 @@ export function calculateStrategyComparison(
   // Calculate "Your Setup" if user provided inputs
   if (input.yourSetupSalary !== undefined || input.yourSetupDividends !== undefined) {
     const yourSetup = calculateYourSetupStrategy(
-      grossProfit,
-      input.region,
-      taxYear,
-      otherIncome,
-      hasEA,
-      studentLoanPlans,
-      pensionContribution,
-      companyCarBIK,
+      opts,
       input.yourSetupSalary ?? 0,
       input.yourSetupDividends ?? 0,
       optimalMix.takeHome
@@ -252,18 +238,19 @@ export function calculateStrategyComparison(
 // STRATEGY CALCULATORS
 // ============================================================================
 
-function calculateAllSalaryStrategy(
-  grossProfit: number,
-  region: Region,
-  taxYear: TaxYear,
-  otherIncome: number,
-  hasEmploymentAllowance: boolean,
-  studentLoanPlans: StudentLoanPlan[],
-  pension: number,
-  companyCarBIK: number,
-  hasOtherPAYE: boolean = false,
-  _lossesBroughtForward: number = 0 // Not used for all-salary (no CT), but kept for consistency
-): StrategyResult {
+function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
+  const {
+    grossProfit,
+    region,
+    taxYear,
+    otherIncome,
+    hasEmploymentAllowance,
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+    hasOtherPAYE,
+  } = opts;
+
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary');
   }
@@ -434,21 +421,12 @@ export function calculateSalaryScenario(
 }
 
 /**
- * Internal version of calculateSalaryScenario that supports hasOtherPAYE
+ * Internal version of calculateSalaryScenario that supports all options
  * Used by the optimal strategy calculator
  */
 function calculateSalaryScenarioInternal(
   targetSalary: number,
-  grossProfit: number,
-  region: Region,
-  taxYear: TaxYear,
-  otherIncome: number,
-  hasEmploymentAllowance: boolean,
-  studentLoanPlans: StudentLoanPlan[],
-  pension: number,
-  companyCarBIK: number,
-  hasOtherPAYE: boolean,
-  lossesBroughtForward: number = 0
+  opts: StrategyCalcOptions
 ): {
   salary: number;
   employerNI: number;
@@ -462,6 +440,19 @@ function calculateSalaryScenarioInternal(
   companyCarBIK: number;
   takeHome: number;
 } {
+  const {
+    grossProfit,
+    region,
+    taxYear,
+    otherIncome,
+    hasEmploymentAllowance,
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+    hasOtherPAYE,
+    lossesBroughtForward,
+  } = opts;
+
   const { threshold: niThreshold, rate: niRate } = getEmployerNIParams(taxYear);
 
   // Calculate max affordable salary (salary + employer NI <= grossProfit)
@@ -522,19 +513,9 @@ function calculateSalaryScenarioInternal(
   };
 }
 
-function calculateOptimalMixStrategy(
-  grossProfit: number,
-  region: Region,
-  taxYear: TaxYear,
-  otherIncome: number,
-  hasEmploymentAllowance: boolean,
-  studentLoanPlans: StudentLoanPlan[],
-  pension: number,
-  companyCarBIK: number,
-  minimumSalary: number = 0,
-  hasOtherPAYE: boolean = false,
-  lossesBroughtForward: number = 0
-): StrategyResult {
+function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult {
+  const { grossProfit, taxYear, pension, companyCarBIK, minimumSalary = 0 } = opts;
+
   if (grossProfit <= 0) {
     return createEmptyResult('Optimal Mix');
   }
@@ -554,20 +535,7 @@ function calculateOptimalMixStrategy(
   const scenarios = salaryOptions.map((targetSalary) => {
     // If minimum salary is set, enforce it as the floor
     const effectiveSalary = Math.max(targetSalary, minimumSalary);
-    const scenario = calculateSalaryScenarioInternal(
-      effectiveSalary,
-      grossProfit,
-      region,
-      taxYear,
-      otherIncome,
-      hasEmploymentAllowance,
-      studentLoanPlans,
-      pension,
-      companyCarBIK,
-      hasOtherPAYE,
-      lossesBroughtForward
-    );
-    return scenario;
+    return calculateSalaryScenarioInternal(effectiveSalary, opts);
   });
 
   // Pick the scenario with highest take-home
@@ -616,16 +584,18 @@ function calculateOptimalMixStrategy(
   };
 }
 
-function calculateAllDividendsStrategy(
-  grossProfit: number,
-  region: Region,
-  taxYear: TaxYear,
-  otherIncome: number,
-  studentLoanPlans: StudentLoanPlan[],
-  pension: number,
-  companyCarBIK: number,
-  lossesBroughtForward: number = 0
-): StrategyResult {
+function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResult {
+  const {
+    grossProfit,
+    region,
+    taxYear,
+    otherIncome,
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+    lossesBroughtForward,
+  } = opts;
+
   if (grossProfit <= 0) {
     return createEmptyResult('All Dividends');
   }
@@ -685,18 +655,22 @@ function calculateAllDividendsStrategy(
  * This allows users to compare their current arrangement against optimal
  */
 function calculateYourSetupStrategy(
-  grossProfit: number,
-  region: Region,
-  taxYear: TaxYear,
-  otherIncome: number,
-  hasEmploymentAllowance: boolean,
-  studentLoanPlans: StudentLoanPlan[],
-  pension: number,
-  companyCarBIK: number,
+  opts: StrategyCalcOptions,
   userSalary: number,
   userDividends: number,
   optimalTakeHome: number
 ): YourSetupResult {
+  const {
+    grossProfit,
+    region,
+    taxYear,
+    otherIncome,
+    hasEmploymentAllowance,
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+  } = opts;
+
   const salary = userSalary;
   const dividends = userDividends;
 
