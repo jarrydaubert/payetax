@@ -1,7 +1,7 @@
 # Monetization Strategy
 
 > **Last Updated:** January 2026
-> **Status:** Phase 1 (Free tool, building trust)
+> **Status:** Phase 2 (Tax Pack build)
 
 ---
 
@@ -22,55 +22,92 @@ We only charge for convenience features that save time, not for reducing anxiety
 
 ## The Model
 
-**Free tool → Trust → Referrals → Optional Pro (if they WANT it)**
+**Free calculator → Tax Pack (£19) → Referrals**
 
 | Phase | Focus | Revenue |
 |-------|-------|---------|
-| **Phase 1 (Now)** | Free guide + calculator | £0 (SEO, trust) |
-| **Phase 2 (Month 2-3)** | Accountant referrals | £500-1k/mo |
-| **Phase 3 (If demand)** | Optional Pro tier | £500-1k/mo |
-| **Phase 4 (If demand)** | Embeddable widget | TBD |
+| **Phase 1 (Done)** | Free calculator, SEO, trust | £0 |
+| **Phase 2 (Now)** | Director Tax Pack (£19) | £200-400/mo |
+| **Phase 3 (Month 3+)** | Accountant referrals | £500-1k/mo |
+| **Phase 4 (If demand)** | White-label widget | TBD |
 
-**Year 1 Target:** £20-40k ARR (very conservative, and that's fine)
+**Year 1 Target:** £15-30k (conservative)
 
 ---
 
-## Phase 1: Free (Current)
+## Phase 1: Free Calculator (Done)
 
 ### What's Free Forever
-- Director's Guide to Paying Yourself
-- Calculator with "simple & safe" recommendation
-- Educational content, FAQs, tooltips
-- Key dates and deadlines
+- Full 4-strategy comparison (All Salary / Optimal / All Dividends / Your Setup)
+- All inputs: profit, YTD, pension, BIK, student loans, losses, etc.
+- All calculations: IT, NI, CT, DT, student loans
+- Two Pots monthly set-aside
+- Key Dates (CT payment, CT return, Self Assessment)
+- 16+ contextual warnings
+- Education Panel with accuracy & scope disclosure
 
 ### Why Free?
-1. **SEO traffic** - "how to pay yourself as director" queries
+1. **SEO traffic** - "director salary dividend calculator" queries
 2. **Build trust** - Users bookmark, return, share
 3. **Accountants share** - Saves them explaining basics
 4. **Referral pipeline** - Complex cases need accountants
 
 ---
 
-## Phase 2: Accountant Referrals
+## Phase 2: Director Tax Pack (Now)
+
+### What It Is
+A one-off £19 purchase that gives directors everything they need to implement their chosen strategy:
+
+| Deliverable | Format |
+|-------------|--------|
+| **Personalised Tax Summary** | PDF (A4, print-ready) |
+| **Annual Spreadsheet** | CSV (12-month payroll + dividends) |
+| **Board Minutes Template** | DOCX (pre-filled with amounts) |
+| **Dividend Voucher Template** | DOCX (pre-filled, ready to sign) |
+
+### Why £19?
+- Cheaper than 30 mins of accountant time
+- Low enough to be impulse purchase
+- High enough to filter tire-kickers
+- No subscription friction
+
+### Revenue Model
+- Price: £19 one-off (no recurring)
+- Target: 10-20 packs/month = £190-380/mo
+- Conversion: ~1-2% of calculator users
+
+### Technical Stack
+- Stripe Checkout (one-time payment)
+- Cloudflare KV (purchase validation)
+- Edge functions (PDF/CSV/DOCX generation)
+- Email delivery via Resend
+
+### Full Spec
+See **[DIRECTOR_TAX_PACK_SPEC.md](./DIRECTOR_TAX_PACK_SPEC.md)** for complete build spec.
+
+---
+
+## Phase 3: Accountant Referrals
 
 ### How It Works
-1. User completes guide
-2. Sees "This is confusing—connect me with an accountant" CTA
-3. Lead captured → sent to partner accountant
-4. PayeTax receives referral fee
+1. User completes calculator
+2. Sees complexity warnings (PA taper, HICBC, DLA, etc.)
+3. Clicks "Talk to an Expert" CTA
+4. Lead captured → sent to partner accountant
+5. PayeTax receives referral fee
 
 ### Triggers for CTA
 | Trigger | Why |
 |---------|-----|
 | Profit > £100k | Complex, needs optimization advice |
+| PA taper zone | Effective 60% rate, needs planning |
 | Other income present | Tax stacking, multiple sources |
 | DLA warning triggered | Needs professional help |
-| VAT threshold approaching | Registration decision |
 | "My situation is complex" clicked | Self-selected |
 
 ### Revenue Model
 - Referral fee: £50-200 per qualified lead
-- Or: Revenue share on first-year fees
 - Target: 10-20 leads/month = £500-2k/mo
 
 ### Infrastructure (Already Built)
@@ -79,59 +116,6 @@ We only charge for convenience features that save time, not for reducing anxiety
 | Referral CTA | `AccountantReferralCTA.tsx` | Built, disabled |
 | Lead API | `/api/referral/lead/route.ts` | Built |
 | Email notification | Via Resend | Ready |
-
-### To Enable
-1. Find accountant partner willing to pay for leads
-2. Uncomment CTA in `CalculatorContainer.tsx`
-3. Set `REFERRAL_PARTNER_EMAIL` env var
-4. Deploy
-
----
-
-## Phase 3: Pro Tier (Optional, If Demand)
-
-### Philosophy
-
-**Pro is for convenience, not access.**
-
-Everything that reduces anxiety stays free:
-- The guide
-- The calculator
-- The "safe monthly draw" output
-- The set-aside pots
-- The FAQ and education
-
-Pro is ONLY for people who want to save time:
-- Save scenarios for later
-- PDF to share with accountant
-- Email reminders for deadlines
-
-### Features
-| Free (Forever) | Pro (Optional) |
-|----------------|----------------|
-| Full guide | Same |
-| Full calculator | Same |
-| Results on screen | + Save scenarios |
-| Copy results | + PDF export |
-| Key dates shown | + Email reminders |
-
-### Pricing (Compassionate)
-
-| Option | Price | Notes |
-|--------|-------|-------|
-| Monthly | £5/mo | Coffee price |
-| Annual | £39/yr | 3 months free |
-
-**Why so cheap?**
-- Our users are often on tight budgets
-- £5/mo is accessible to almost everyone
-- 100 users at £5 = £500/mo (that's fine)
-- Trust matters more than revenue per user
-
-### Build Trigger
-- Users explicitly asking for save/export
-- At least 50 requests
-- NOT before Phase 1 is working well
 
 ---
 
@@ -142,16 +126,8 @@ Pro is ONLY for people who want to save time:
 2. At least 10 requests received
 3. Willing to pay (not just "that would be nice")
 
-### What Changed from Original Strategy
-| Original | New |
-|----------|-----|
-| Widget is primary product | Widget is optional add-on |
-| Build first, validate later | Validate first, build if demand |
-| £49-75/mo pricing | £19-49/mo (if at all) |
-| Complex license system | Simple embed code |
-
 ### If We Build It
-- Embeds the GUIDE, not just calculator
+- Embeds the calculator, not just results
 - "Powered by PayeTax" badge (free tier)
 - White-label option (paid tier)
 - Lead capture flows to accountant
@@ -162,6 +138,7 @@ Pro is ONLY for people who want to save time:
 
 | Idea | Why Not |
 |------|---------|
+| Subscription/Pro tier | One-off Tax Pack is simpler, less friction |
 | Paywall on calculator | Kills trust and SEO |
 | Ads | Looks cheap, low revenue |
 | Data selling | Unethical, GDPR nightmare |
@@ -169,29 +146,36 @@ Pro is ONLY for people who want to save time:
 
 ---
 
-## Revenue Projections (Very Conservative)
+## Revenue Projections (Conservative)
+
+### Month 3 (Tax Pack launched)
+| Stream | Projection |
+|--------|------------|
+| Tax Packs | £150/mo (8 × £19) |
+| Referrals | £0 (not enabled yet) |
+| **Total** | **£150/mo** |
 
 ### Month 6
 | Stream | Projection |
 |--------|------------|
-| Referrals | £200/mo |
-| Pro tier | £0 (not built yet) |
-| **Total** | **£200/mo** |
+| Tax Packs | £300/mo (16 × £19) |
+| Referrals | £200/mo (4 leads) |
+| **Total** | **£500/mo** |
 
 ### Month 12
 | Stream | Projection |
 |--------|------------|
-| Referrals | £500/mo |
-| Pro tier | £250/mo (50 users × £5) |
-| **Total** | **£750/mo** |
+| Tax Packs | £500/mo (26 × £19) |
+| Referrals | £500/mo (10 leads) |
+| **Total** | **£1,000/mo** |
 
 ### Year 2 (If It Works)
 | Stream | Projection |
 |--------|------------|
+| Tax Packs | £750/mo |
 | Referrals | £1,000/mo |
-| Pro tier | £500/mo (100 users) |
 | Widget (only if demand) | TBD |
-| **Total** | **£1,500/mo** |
+| **Total** | **£1,750/mo** |
 
 **And that's okay.** This isn't a VC-backed startup. It's a tool that helps people.
 
@@ -199,27 +183,27 @@ Pro is ONLY for people who want to save time:
 
 ## Success Metrics
 
-### Phase 1 (Now)
-| Metric | Target |
-|--------|--------|
-| Monthly visitors | 1,000 |
-| Guide completions | 200 |
-| Time on page | > 2 min |
-| "This helped" feedback | Positive |
+### Phase 1 (Calculator - Done)
+| Metric | Target | Status |
+|--------|--------|--------|
+| Monthly visitors | 1,000 | Tracking |
+| Calculator completions | 200 | Tracking |
+| Time on page | > 2 min | Tracking |
 
-### Phase 2 (Referrals)
+### Phase 2 (Tax Pack - Now)
 | Metric | Target |
 |--------|--------|
-| CTA click rate | 2% |
-| Leads/month | 5 |
-| Revenue/month | £200 |
+| Pack CTA click rate | 5% |
+| Checkout conversion | 20% |
+| Monthly packs sold | 10 |
+| MRR | £190 |
 
-### Phase 3 (Pro - Only If Requested)
+### Phase 3 (Referrals)
 | Metric | Target |
 |--------|--------|
-| Save/export requests | 50+ |
-| Pro users | 50 |
-| MRR | £250 |
+| Referral CTA click rate | 2% |
+| Leads/month | 10 |
+| Revenue/month | £500 |
 
 **The real success metric:** People saying "this finally made sense to me."
 
@@ -235,7 +219,7 @@ Signs of demand:
 - Accountants asking to partner
 - Competitors copying the approach
 
-No demand signal = don't build it yet.
+Exception: Tax Pack is validated by market research (see TAX_PACK_SPEC.md competitive analysis).
 
 ---
 
@@ -243,23 +227,21 @@ No demand signal = don't build it yet.
 
 | Document | Purpose |
 |----------|---------|
-| `DIRECTOR_GUIDE_POSITIONING.md` | Product positioning (audiences) |
-| `DIRECTOR_CALCULATOR_BUILD.md` | Build spec and features |
-| `DIRECTOR_TAX_MATH.md` | Tax calculation reference |
+| `DIRECTOR_TAX_PACK_SPEC.md` | Full Tax Pack build spec |
+| `DIRECTOR_CALCULATOR_BUILD.md` | Calculator features |
+| `DIRECTOR_GUIDE_POSITIONING.md` | Product positioning |
 | [`READ_THIS_FIRST.md`](../READ_THIS_FIRST.md) | The mantra |
 
 ---
 
 ## Technical Implementation Reference
 
-> Developer guide for enabling monetization features.
-
 ### Current State
-
-All monetization features are **built but disabled** for launch:
 
 | Feature | Code Status | Enabled |
 |---------|-------------|---------|
+| Calculator | ✅ Built | ✅ Live |
+| Tax Pack | 🔨 Building | ❌ Not yet |
 | Affiliate links | ✅ Built | ❌ No affiliates signed |
 | Accountant referral CTA | ✅ Built | ❌ Commented out |
 | Lead capture API | ✅ Built | ✅ Ready |
@@ -274,43 +256,11 @@ All monetization features are **built but disabled** for launch:
 | Referral CTA | `src/components/molecules/AccountantReferralCTA.tsx` |
 | Referral API | `src/app/api/referral/lead/route.ts` |
 
-### Affiliate Links
+### Tax Pack (To Build)
 
-**To add a new affiliate:**
-1. Add `affiliateUrl` and `affiliateProgram` to competitor in `competitors.ts`
-2. Links automatically use affiliate URL via `TrackedAffiliateLink`
-3. Clicks tracked via `trackAffiliateClick` in analytics
-
-**Pages using affiliate links:**
-- `/alternatives/[competitor]`
-- `/vs/[competitor]`
-- `/best-uk-tax-calculators`
-
-### Referral CTA Triggers
-
-| Condition | Headline Shown |
-|-----------|----------------|
-| £100k-£125,140 salary | "You're in the £100k Tax Trap" |
-| £125,140+ salary | "Additional Rate Tax Planning" |
-| Scottish + £75k+ | "Scottish High Earner" |
-| £75k-£100k + 25%+ effective rate | "Maximize Your Take-Home Pay" |
-
-### Analytics Events
-
-| Event | When |
-|-------|------|
-| `affiliate_click` | User clicks affiliate link |
-| `referral_cta_clicked` | User clicks "Talk to an Expert" |
-| `referral_cta_dismissed` | User dismisses CTA |
-| `referral_lead_submitted` | User submits email |
-
-### Enabling Features
-
-**1. Accountant Referral CTA**
-- File: `src/components/organisms/CalculatorContainer.tsx`
-- Uncomment the import and JSX block
-- Set `REFERRAL_PARTNER_EMAIL` env var
-
-**2. Affiliate Links**
-- File: `src/data/competitors.ts`
-- Add `affiliateUrl` field to competitor entries
+See **[DIRECTOR_TAX_PACK_SPEC.md](./DIRECTOR_TAX_PACK_SPEC.md)** for:
+- Stripe Checkout integration
+- KV storage schema
+- PDF/CSV/DOCX generation
+- Email delivery flow
+- Security considerations

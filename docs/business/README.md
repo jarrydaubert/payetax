@@ -10,7 +10,7 @@
 
 **Route:** `/tools/director-guide`
 
-**Phase:** Free tool → Build trust → Monetize later
+**Phase:** Free calculator → Tax Pack (£19) → Referrals
 
 ---
 
@@ -21,6 +21,7 @@
 | **[READ_THIS_FIRST.md](../READ_THIS_FIRST.md)** | The mantra | Before anything |
 | **[DIRECTOR_GUIDE_POSITIONING.md](./DIRECTOR_GUIDE_POSITIONING.md)** | WHO + WHY (audiences, positioning) | Understanding the product |
 | **[DIRECTOR_CALCULATOR_BUILD.md](./DIRECTOR_CALCULATOR_BUILD.md)** | WHAT (inputs, outputs, features) | When building |
+| **[DIRECTOR_TAX_PACK_SPEC.md](./DIRECTOR_TAX_PACK_SPEC.md)** | Tax Pack product spec (£19) | When building monetization |
 | **[DIRECTOR_TAX_MATH.md](./DIRECTOR_TAX_MATH.md)** | THE MATH (rates, formulas, tests) | When coding calculations |
 | **[MONETIZATION.md](./MONETIZATION.md)** | Revenue strategy | When thinking about money |
 | **[ideas/](../ideas/)** | Future features | After revenue exists |
@@ -46,10 +47,11 @@
 - Education panel explains concepts without jargon
 
 **Key Output:**
-- Strategy comparison (All Salary / Optimal / All Dividends)
+- 4-strategy comparison (All Salary / Optimal / All Dividends / Your Setup)
 - "Two Pots" - company tax pot + personal tax pot
-- Key dates with .ics calendar export
-- Pension gap warning for NI credits
+- Key dates (CT payment, CT return, Self Assessment)
+- 16+ contextual warnings (DLA, PA taper, HICBC, pension gap, etc.)
+- YTD tracking (salary, dividends, drawings)
 
 ---
 

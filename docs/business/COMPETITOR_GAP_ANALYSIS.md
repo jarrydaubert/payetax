@@ -76,22 +76,25 @@
 | Feature | PayeTax | Beata Beck | Alto | Crunch | IPSE | Ltd-Cos |
 |---------|---------|------------|------|--------|------|---------|
 | Salary vs Dividend Calculator | Y | Y | Y | Y | - | - |
+| 4-strategy comparison | **UNIQUE** | - | - | - | - | - |
+| "Your Setup" audit tool | **UNIQUE** | - | - | - | - | - |
 | Education-first flow | **UNIQUE** | - | - | - | - | - |
-| Entry choice routing | **UNIQUE** | - | - | - | - | - |
-| Tax set-aside guidance | **UNIQUE** | - | - | - | - | - |
-| "Sleep at Night" status | **UNIQUE** | - | - | - | - | - |
-| Tax Bathtub visual | **UNIQUE** | - | - | - | - | - |
-| Calendar/deadline .ics | **UNIQUE** | - | - | - | - | - |
+| Tax set-aside guidance (Two Pots) | **UNIQUE** | - | - | - | - | - |
+| 16+ contextual warnings | **UNIQUE** | - | - | - | - | - |
+| Key Dates (CT/SA) | **UNIQUE** | - | - | - | - | - |
 | Survival mode (no profit) | **UNIQUE** | - | - | - | - | - |
-| Bank transfer references | **UNIQUE** | - | - | - | - | - |
 | Payments on account warning | **UNIQUE** | - | - | - | - | - |
 | DLA trigger warnings | Y | - | - | - | - | - |
-| Payroll/RTI education | Y | - | - | - | - | Partial |
+| YTD tracking (salary/dividends/drawings) | **UNIQUE** | - | - | - | - | - |
 | Mobile-first design | Y | Y | Y | Y | - | - |
 | Jargon tooltips | **UNIQUE** | - | - | - | - | - |
 | Employment Allowance toggle | Y | Y | Y | - | - | - |
+| Entry choice routing | *PLANNED* | - | - | - | - | - |
+| Calendar .ics downloads | *PLANNED* | - | - | - | - | - |
+| Tax Bathtub visual | *PLANNED* | - | - | - | - | - |
+| Bank transfer references | *PLANNED* | - | - | - | - | - |
 
-**Legend:** Y = Has feature, Partial = Partial implementation, - = Missing, **UNIQUE** = PayeTax only
+**Legend:** Y = Has feature, **UNIQUE** = PayeTax only (built), *PLANNED* = Future feature, - = Missing
 
 ---
 
