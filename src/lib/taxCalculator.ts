@@ -789,9 +789,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   if (input.pensionContribution > 0) {
     if (input.pensionContributionType === 'percentage') {
-      // Percentage of salary (apply to annual and monthly consistently)
+      // Percentage of PRIMARY employment salary (not other income sources)
+      // Pension contributions are typically on employment earnings only
       annualPensionContribution = annualGrossSalary * (input.pensionContribution / 100);
-      monthlyPensionContribution = monthlyGrossSalary * (input.pensionContribution / 100);
+      monthlyPensionContribution = annualPensionContribution / 12; // Derive from annual for consistency
     } else {
       // Fixed amount (normalize from input period to annual and monthly)
       annualPensionContribution = convertPeriodToAnnual(
