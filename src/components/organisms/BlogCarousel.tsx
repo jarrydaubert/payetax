@@ -232,7 +232,7 @@ function CarouselSlide({ post, isActive }: CarouselSlideProps) {
       >
         {/* Subtle glow effect */}
         <div
-          className='absolute top-1/4 right-1/4 h-64 w-64 rounded-full blur-3xl opacity-20'
+          className='absolute top-1/4 right-1/4 h-64 w-64 rounded-full opacity-20 blur-3xl'
           style={{ backgroundColor: categoryConfig.color }}
         />
         {/* Subtle pattern overlay */}

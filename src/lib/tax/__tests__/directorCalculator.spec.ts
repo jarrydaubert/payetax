@@ -34,36 +34,16 @@
  */
 
 import { describe, expect, it } from '@jest/globals';
-// Constants
-import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
 // Validation
-import {
-  CurrencyAmountSchema,
-  DirectorInputSchema,
-  RegionSchema,
-  validateCurrencyAmount,
-  validateDirectorInput,
-  validateInput,
-  validateRegion,
-} from '@/lib/validation/directorValidation';
-import {
-  CT_RATES,
-  calculateCorporationTax,
-  getCorporationTax,
-  getEffectiveCTRate,
-} from '../corporationTax';
-import { calculateDirectorScenario, DEFAULT_SALARY } from '../directorCalculator';
-import { calculateDividendTax, DIVIDEND_RATES, getDividendTax } from '../dividendTax';
-import { calculateEmployeeNI, getEmployeeNI } from '../employeeNI';
-import { calculateEmployerNI, getEmployerNI, getEmployerNIThreshold } from '../employerNI';
+import { validateInput } from '@/lib/validation/directorValidation';
+import { calculateCorporationTax } from '../corporationTax';
+import { calculateDividendTax, getDividendTax } from '../dividendTax';
+import { calculateEmployeeNI } from '../employeeNI';
+import { calculateEmployerNI, getEmployerNIThreshold } from '../employerNI';
 // Tax calculation modules
-import { calculateIncomeTax, getIncomeTax } from '../incomeTax';
+import { calculateIncomeTax } from '../incomeTax';
 import { calculateStrategyComparison } from '../strategyComparison';
-import {
-  getStudentLoanRate,
-  getStudentLoanRepayment,
-  getStudentLoanThreshold,
-} from '../studentLoan';
+import { getStudentLoanRepayment } from '../studentLoan';
 import { getWarnings } from '../warnings';
 
 // Tax year for all tests

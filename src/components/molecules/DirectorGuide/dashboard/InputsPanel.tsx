@@ -50,6 +50,7 @@ const countryToRegion: Record<Country, Region> = {
 export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const includesVatId = useId();
   const pensionDeductedId = useId();
+  const advancedPanelId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | ''>('');
   const formData = useDirectorFormData();
@@ -102,7 +103,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.revenue)}
             onChange={(e) => setRevenue(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
 
@@ -125,7 +126,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.expenses)}
             onChange={(e) => setExpenses(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
 
@@ -176,7 +177,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.ytdSalary)}
             onChange={(e) => setYtdSalary(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
 
@@ -186,7 +187,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.ytdDividends)}
             onChange={(e) => setYtdDividends(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
 
@@ -196,7 +197,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.ytdDrawings)}
             onChange={(e) => setYtdDrawings(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
       </Section>
@@ -209,7 +210,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             value={formatCurrency(formData.otherIncome)}
             onChange={(e) => setOtherIncome(parseCurrency(e.target.value))}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
 
@@ -233,7 +234,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           type='button'
           onClick={() => setAdvancedOpen(!advancedOpen)}
           aria-expanded={advancedOpen}
-          aria-controls='advanced-options-panel'
+          aria-controls={advancedPanelId}
           className='flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-[#1e293b] px-4 py-3 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-[#273548]'
         >
           <span className='font-medium'>Advanced Options</span>
@@ -242,7 +243,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
         {advancedOpen && (
           <div
-            id='advanced-options-panel'
+            id={advancedPanelId}
             className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-[#0c1222] p-4'
           >
             {/* Employment Allowance */}
@@ -293,7 +294,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formatCurrency(formData.pensionContribution)}
                 onChange={(e) => setPensionContribution(parseCurrency(e.target.value))}
                 placeholder='£0'
-                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
               />
             </Field>
             {formData.pensionContribution > 0 && (
@@ -321,7 +322,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formatCurrency(formData.companyCarBIK)}
                 onChange={(e) => setCompanyCarBIK(parseCurrency(e.target.value))}
                 placeholder='£0'
-                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
               />
             </Field>
 
@@ -332,7 +333,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formatCurrency(formData.lossesBroughtForward)}
                 onChange={(e) => setLossesBroughtForward(parseCurrency(e.target.value))}
                 placeholder='£0'
-                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
               />
             </Field>
 
@@ -346,7 +347,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   setMinimumSalaryRequirement(val === 0 ? undefined : val);
                 }}
                 placeholder='£0'
-                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+                className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
               />
             </Field>
           </div>
@@ -367,7 +368,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               setYourSetupSalary(val === 0 ? undefined : val);
             }}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
         <Field label='Your Current Dividends' hint='Annual dividends'>
@@ -379,7 +380,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               setYourSetupDividends(val === 0 ? undefined : val);
             }}
             placeholder='£0'
-            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-600 focus:border-cyan-500'
+            className='border-white/[0.08] bg-[#1e293b] font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500'
           />
         </Field>
       </Section>

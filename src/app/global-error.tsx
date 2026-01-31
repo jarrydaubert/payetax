@@ -52,7 +52,7 @@ export default function GlobalError({
               <button
                 type='button'
                 onClick={() => reset()}
-                className='relative inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 font-medium text-sm text-white transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] before:absolute before:inset-0 before:rounded-full before:p-[1px] before:bg-gradient-to-r before:from-cyan-500 before:to-emerald-500 before:content-[""] before:-z-10 after:absolute after:inset-[1px] after:rounded-full after:bg-slate-900 after:content-[""] after:-z-10'
+                className='relative inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 font-medium text-sm text-white transition-all before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-gradient-to-r before:from-cyan-500 before:to-emerald-500 before:p-[1px] before:content-[""] after:absolute after:inset-[1px] after:-z-10 after:rounded-full after:bg-slate-900 after:content-[""] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]'
               >
                 <RotateCcw className='size-3.5' />
                 Try again

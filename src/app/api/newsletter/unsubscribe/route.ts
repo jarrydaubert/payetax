@@ -1,18 +1,30 @@
 // src/app/api/newsletter/unsubscribe/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { z } from 'zod';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const audienceId = process.env.RESEND_AUDIENCE_ID;
 
-export async function GET(request: NextRequest) {
-  const email = request.nextUrl.searchParams.get('email');
+const emailSchema = z.string().email('Invalid email address');
 
-  if (!email) {
+export async function GET(request: NextRequest) {
+  const emailParam = request.nextUrl.searchParams.get('email');
+
+  if (!emailParam) {
     return new NextResponse(renderUnsubscribePage('Missing email parameter', false), {
       headers: { 'Content-Type': 'text/html' },
     });
   }
+
+  const emailResult = emailSchema.safeParse(emailParam);
+  if (!emailResult.success) {
+    return new NextResponse(renderUnsubscribePage('Invalid email format', false), {
+      headers: { 'Content-Type': 'text/html' },
+    });
+  }
+
+  const email = emailResult.data;
 
   if (!(resend && audienceId)) {
     return new NextResponse(renderUnsubscribePage('Service not configured', false), {

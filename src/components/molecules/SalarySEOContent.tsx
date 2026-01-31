@@ -18,7 +18,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
       {/* Take-Home Pay Breakdown */}
       <div>
         <h2 className='mb-3 font-semibold text-base text-foreground'>Take-Home Pay Breakdown</h2>
-        <p className='leading-relaxed text-muted-foreground'>
+        <p className='text-muted-foreground leading-relaxed'>
           With a gross annual salary of{' '}
           <strong className='text-foreground'>£{formattedSalary}</strong> in the UK for the 2025-26
           tax year, your take-home pay will be approximately{' '}
@@ -39,7 +39,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
           Tax and National Insurance Deductions
         </h3>
         <ul className='space-y-2 text-muted-foreground'>
-          <li className='flex justify-between border-b border-border/50 pb-2'>
+          <li className='flex justify-between border-border/50 border-b pb-2'>
             <span>
               <strong className='text-foreground'>Income Tax:</strong>
             </span>
@@ -50,7 +50,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
               </span>
             </span>
           </li>
-          <li className='flex justify-between border-b border-border/50 pb-2'>
+          <li className='flex justify-between border-border/50 border-b pb-2'>
             <span>
               <strong className='text-foreground'>National Insurance:</strong>
             </span>
@@ -87,7 +87,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
         <h3 className='mb-3 font-semibold text-base text-foreground'>
           Is £{formattedSalary} a Good Salary in 2025?
         </h3>
-        <p className='leading-relaxed text-muted-foreground'>
+        <p className='text-muted-foreground leading-relaxed'>
           A £{formattedSalary} salary puts you{' '}
           {salary > 100000 && (
             <strong className='text-foreground'>in the top 5% of UK earners</strong>

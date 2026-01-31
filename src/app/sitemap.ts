@@ -168,7 +168,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: post.featured ? 0.9 : 0.8, // Featured posts get higher priority
     }));
-  } catch (_error) {}
+  } catch (_error) {
+    // Silently fail - fallback content will be used below
+  }
 
   let categoryPages: SitemapEntry[] = [];
   try {
@@ -179,7 +181,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
-  } catch (_error) {}
+  } catch (_error) {
+    // Silently fail - fallback content will be used below
+  }
 
   // Fallbacks (derived from sample data if fetch fails)
   if (blogPosts.length === 0 && categoryPages.length === 0) {

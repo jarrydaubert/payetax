@@ -177,7 +177,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             </div>
 
             {/* Sidebar - Editor's Picks (mt-12 aligns with Latest Articles content) */}
-            <aside className='hidden lg:block lg:mt-12'>
+            <aside className='hidden lg:mt-12 lg:block'>
               <EditorsPicksSticky posts={editorsPicks} />
             </aside>
           </div>
