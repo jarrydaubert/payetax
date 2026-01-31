@@ -66,37 +66,7 @@ describe('SalaryQuickResults', () => {
     { amount: 35000, label: '£5k more' },
   ];
 
-  describe('Heading and Description', () => {
-    it('should render the main heading with salary', () => {
-      render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
-      );
-
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        '£30,000 Salary After Tax'
-      );
-    });
-
-    it('should format salary with commas', () => {
-      render(
-        <SalaryQuickResults salary={125000} results={mockResults} comparisons={mockComparisons} />
-      );
-
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-        '£125,000 Salary After Tax'
-      );
-    });
-
-    it('should display tax year description', () => {
-      render(
-        <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
-      );
-
-      expect(
-        screen.getByText('UK take-home pay calculator for 2025-26 tax year')
-      ).toBeInTheDocument();
-    });
-  });
+  // Note: h1 heading moved to SalaryCalculatorPage parent component
 
   describe('Monthly Take-Home Display', () => {
     it('should display monthly take-home pay prominently', () => {
@@ -330,7 +300,6 @@ describe('SalaryQuickResults', () => {
 
       render(<SalaryQuickResults salary={0} results={zeroResults} comparisons={[]} />);
 
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('£0 Salary After Tax');
       // Effective rate would be NaN (0/0), which gets displayed as "NaN%"
       expect(screen.getByText('NaN%')).toBeInTheDocument();
     });
@@ -415,7 +384,7 @@ describe('SalaryQuickResults', () => {
         <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />
       );
 
-      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+      // h1 is rendered in parent SalaryCalculatorPage; this component has h2
       expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
     });
 

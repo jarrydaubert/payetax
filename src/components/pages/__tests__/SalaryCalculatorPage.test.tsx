@@ -139,7 +139,7 @@ describe('SalaryCalculatorPage', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Customize Your Calculation')).toBeInTheDocument();
-        expect(screen.getByText('Related Salary Calculations')).toBeInTheDocument();
+        // Note: "Related Salary Calculations" section was removed; comparisons now in SalaryQuickResults
       });
     });
   });
@@ -242,62 +242,8 @@ describe('SalaryCalculatorPage', () => {
     });
   });
 
-  describe('Related Searches', () => {
-    it('should render related salary links', async () => {
-      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
-
-      await waitFor(() => {
-        expect(screen.getByText(/£30,000 salary/)).toBeInTheDocument();
-        expect(screen.getByText(/£70,000 salary/)).toBeInTheDocument();
-      });
-    });
-
-    it('should filter related salaries within range', async () => {
-      const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
-      );
-
-      await waitFor(() => {
-        const links = container.querySelectorAll('a[href^="/calculator/"]');
-        const relatedLinks = Array.from(links).filter((link) =>
-          link.textContent?.includes('salary')
-        );
-        expect(relatedLinks.length).toBeGreaterThan(0);
-      });
-    });
-
-    it('should link to correct calculator URLs', async () => {
-      const { container } = render(
-        <SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />
-      );
-
-      await waitFor(() => {
-        const link = container.querySelector('a[href="/calculator/30000-after-tax"]');
-        expect(link).toBeInTheDocument();
-        expect(link?.textContent).toContain('£30,000 salary');
-      });
-    });
-
-    it('should exclude current salary from related salary calculation links', async () => {
-      const { container } = render(
-        <SalaryCalculatorPage salary={50000} initialResults={createMockResults(50000) as any} />
-      );
-
-      await waitFor(() => {
-        const links = container.querySelectorAll('a[href="/calculator/50000-after-tax"]');
-        expect(links.length).toBe(0);
-      });
-    });
-
-    it('should exclude salaries within £5k range', async () => {
-      render(<SalaryCalculatorPage salary={45000} initialResults={mockResults as any} />);
-
-      await waitFor(() => {
-        const links = screen.queryAllByText(/£40,000 salary/);
-        expect(links.length).toBe(0);
-      });
-    });
-  });
+  // Note: Related Searches section was removed from SalaryCalculatorPage
+  // Salary comparisons are now handled in SalaryQuickResults component
 
   describe('Accessibility', () => {
     it('should have proper semantic sections', async () => {
@@ -352,7 +298,8 @@ describe('SalaryCalculatorPage', () => {
       );
 
       await waitFor(() => {
-        const grid = container.querySelector('.grid.lg\\:grid-cols-2');
+        // Grid layout changed from lg:grid-cols-2 to lg:grid-cols-[400px_1fr]
+        const grid = container.querySelector('.grid');
         expect(grid).toBeInTheDocument();
       });
     });

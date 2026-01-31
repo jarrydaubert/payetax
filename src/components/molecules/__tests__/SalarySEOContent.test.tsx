@@ -120,8 +120,8 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(screen.getByText(/Income Tax:/)).toBeInTheDocument();
-      expect(screen.getByText(/£3,486.*per year/)).toBeInTheDocument();
-      expect(screen.getByText(/11.6% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/£3,486\/year/)).toBeInTheDocument();
+      expect(screen.getByText(/\(11.6%\)/)).toBeInTheDocument();
     });
 
     it('should calculate income tax percentage correctly', () => {
@@ -133,7 +133,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={50000} results={mockResults} />);
 
       // 7486 / 50000 = 14.972% ≈ 15.0%
-      expect(screen.getByText(/15.0% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/\(15.0%\)/)).toBeInTheDocument();
     });
 
     it('should display National Insurance amount and percentage', () => {
@@ -141,8 +141,8 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(screen.getByText(/National Insurance:/)).toBeInTheDocument();
-      expect(screen.getByText(/£2,274.*per year/)).toBeInTheDocument();
-      expect(screen.getByText(/7.6% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/£2,274\/year/)).toBeInTheDocument();
+      expect(screen.getByText(/\(7.6%\)/)).toBeInTheDocument();
     });
 
     it('should calculate National Insurance percentage correctly', () => {
@@ -153,29 +153,25 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={50000} results={mockResults} />);
 
       // 5274 / 50000 = 10.548% ≈ 10.5%
-      expect(screen.getByText(/10.5% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/\(10.5%\)/)).toBeInTheDocument();
     });
 
-    it('should display total deductions including student loan', () => {
-      const mockResults = createMockResults({
-        studentLoan: { ...createMockResults().studentLoan, annually: 500 },
-      });
+    it('should display total deductions (income tax + NI)', () => {
+      const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(screen.getByText(/Total Deductions:/)).toBeInTheDocument();
-      // 3486 + 2274 + 500 = 6260
-      expect(screen.getByText(/£6,260.*per year/)).toBeInTheDocument();
+      // 3486 + 2274 = 5760
+      expect(screen.getByText(/£5,760\/year/)).toBeInTheDocument();
     });
 
-    it('should calculate effective tax rate correctly (excludes student loan)', () => {
-      const mockResults = createMockResults({
-        studentLoan: { ...createMockResults().studentLoan, annually: 1000 },
-      });
+    it('should calculate effective tax rate correctly', () => {
+      const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       // Effective rate = (3486 + 2274) / 30000 = 19.2%
-      // Student loan is NOT included in effective rate
-      expect(screen.getByText(/19.2% effective rate/)).toBeInTheDocument();
+      // Check for the percentage in the Total Deductions line
+      expect(screen.getByText(/\(19.2%\)/)).toBeInTheDocument();
     });
   });
 
@@ -372,8 +368,8 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={12000} results={mockResults} />);
 
       expect(screen.getByText(/Income Tax:/)).toBeInTheDocument();
-      expect(screen.getAllByText(/£0/).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(/0.0% of gross/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/£0\/year/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/\(0.0%\)/).length).toBeGreaterThanOrEqual(1);
     });
 
     it('should handle zero National Insurance', () => {
@@ -383,16 +379,16 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(screen.getByText(/National Insurance:/)).toBeInTheDocument();
-      expect(screen.getAllByText(/0.0% of gross/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/\(0.0%\)/).length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should use prose styling classes', () => {
+    it('should use correct styling classes', () => {
       const mockResults = createMockResults();
       const { container } = render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       const wrapper = container.firstChild;
-      expect(wrapper).toHaveClass('prose');
-      expect(wrapper).toHaveClass('prose-sm');
+      expect(wrapper).toHaveClass('space-y-6');
+      expect(wrapper).toHaveClass('text-sm');
     });
   });
 
@@ -405,7 +401,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={33333} results={mockResults} />);
 
       // 4166.6 / 33333 = 12.5% (exactly)
-      expect(screen.getByText(/12.5% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/\(12.5%\)/)).toBeInTheDocument();
     });
 
     it('should round percentages correctly (not truncate)', () => {
@@ -416,19 +412,18 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       // 3499 / 30000 = 11.663% → should round to 11.7%
-      expect(screen.getByText(/11.7% of gross/)).toBeInTheDocument();
+      expect(screen.getByText(/\(11.7%\)/)).toBeInTheDocument();
     });
 
-    it('should calculate total deductions correctly with all components', () => {
+    it('should calculate total deductions correctly (income tax + NI)', () => {
       const mockResults = createMockResults({
         incomeTax: { ...createMockResults().incomeTax, annually: 5000 },
         nationalInsurance: { ...createMockResults().nationalInsurance, annually: 3000 },
-        studentLoan: { ...createMockResults().studentLoan, annually: 2000 },
       });
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      // 5000 + 3000 + 2000 = 10,000
-      expect(screen.getByText(/£10,000.*per year/)).toBeInTheDocument();
+      // 5000 + 3000 = 8,000 (student loan not included in display)
+      expect(screen.getByText(/£8,000\/year/)).toBeInTheDocument();
     });
   });
 });
