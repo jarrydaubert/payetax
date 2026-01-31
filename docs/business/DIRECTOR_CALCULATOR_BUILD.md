@@ -433,3 +433,64 @@ Be brutal. Tell me what's weak.
 | Gemini | ✅ | ✅ | Approved with validation note |
 
 **Consensus:** Product is sound. Execute noted improvements, then ship.
+
+---
+
+## Implementation Status
+
+**Last Updated:** 2026-01-31
+
+### ✅ Fully Implemented
+
+| Feature | Notes |
+|---------|-------|
+| Region selector | rUK / Scotland with correct tax band logic |
+| Profit input | With guidance text |
+| Already Taken (split) | YTD Salary, YTD Dividends, YTD Drawings |
+| Other personal income | Affects tax bands and PA taper |
+| Year-end month | Drives key dates calculation |
+| Losses brought forward | Reduces CT liability |
+| Employment Allowance | With eligibility warning (soft) |
+| Student Loan plans | All plans including stacking |
+| Company Pension | With "already deducted" checkbox |
+| Benefits in Kind | With Class 1A warning |
+| Other PAYE employment | NI from £0 when threshold used |
+| Minimum salary requirement | Floors optimization |
+| 4-strategy comparison | All Salary, Optimal, All Dividends, Your Setup |
+| Interactive slider | Live updates, strategy card clickable |
+| Two Pots (monthly) | CT pot + Personal pot with disclaimer |
+| Key Dates | CT payment, CT return, SA deadline |
+| All core tax calculations | IT, NI, CT, DT, Student Loans |
+| Scottish 6-band income tax | UK dividend rates preserved |
+| PA taper (£100k-£125,140) | Full 60% effective rate handling |
+| Marginal relief for CT | £50k-£250k profit range |
+| Comprehensive warnings | 16+ warning types, 3 severities |
+| Accuracy & Scope panel | Transparent limitations |
+
+### ⚠️ Implemented Differently Than Spec
+
+| Spec Says | What We Built | Reasoning |
+|-----------|---------------|-----------|
+| EA "eligibility gate needed" | Soft warning when EA selected | Gate would block legitimate users; warning educates |
+| Breakdown: "Gross → Tax → Net" flow | Comparison table by strategy | Strategy comparison more useful for decision-making |
+
+### ❌ Not Yet Implemented
+
+| Feature | Priority | Notes |
+|---------|----------|-------|
+| Dividend timing optimizer | Future | "Declare £Y before April 5 to save £Z" |
+| Safe Extraction Mode | Future | Max take-home while keeping runway |
+| Household optimizer | Future | Spouse salary/dividends, HICBC impact |
+| Dividend voucher generation | Future | Document automation |
+| Xero/FreeAgent integration | Future | Real data pull |
+
+### Implementation Notes
+
+**hasOtherPAYEEmployment Logic:**
+When `hasOtherPAYEEmployment: true`, employee NI is calculated from £0 (not from Primary Threshold) because the threshold is assumed to be used by the other employer. This increases NI liability and reduces take-home.
+
+**isPensionAlreadyDeducted Logic:**
+When checked, `pensionContribution: 0` is passed to strategy comparison to avoid double-counting pension as both a profit deduction and an explicit input.
+
+**ytdDrawings Logic:**
+Separate from YTD salary/dividends to track director's loan account activity. Triggers DLA warnings when drawings exceed available profit.
