@@ -343,15 +343,17 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       );
       expect(otResult.taxFreeAmount).toBeGreaterThanOrEqual(0);
 
-      // NT - No tax (calculator may not fully implement)
+      // NT - No tax (all income at 0% rate, allowance irrelevant)
       const ntResult = calculateTax(
         createInput({
           salary: 30000,
           taxCode: 'NT',
         })
       );
-      // NT should give full salary as allowance, but calculator may use default
-      expect(ntResult.taxFreeAmount).toBeGreaterThanOrEqual(12570);
+      // NT uses band override (0% rate on all income), allowance is 0 because it's not used
+      expect(ntResult.taxFreeAmount).toBe(0);
+      // NT should result in zero tax
+      expect(ntResult.incomeTax.annually).toBe(0);
 
       // K100 - Should be negative allowance but calculator may handle differently
       const k100Result = calculateTax(

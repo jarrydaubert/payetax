@@ -75,25 +75,130 @@ function roundToPence(value: number): number {
 
 // ============================================================================
 // HELPER FUNCTIONS - Extracted for maintainability
-// Exported for testing. calculateTax() will be incrementally refactored to use these.
+// Exported for testing. Used by calculateTax() for consistent behavior.
 // ============================================================================
 
 /**
- * Parse tax code to determine personal allowance
- * HMRC tax code number × 10 = annual tax-free allowance
+ * Result of parsing a UK HMRC tax code.
+ *
+ * Tax codes control how much tax-free allowance an employee receives.
+ * Special codes override normal progressive band calculations.
+ *
+ * @see https://www.gov.uk/tax-codes
+ */
+export interface TaxCodeParseResult {
+  /** Personal allowance amount. Negative for K-codes (adds to taxable income). */
+  allowance: number;
+  /**
+   * Special tax code that overrides normal band calculations:
+   * - 'BR': All income taxed at basic rate (20%)
+   * - 'D0': All income taxed at higher rate (40%)
+   * - 'D1': All income taxed at additional rate (45%)
+   * - 'NT': No tax deducted
+   * - null: Use normal progressive bands
+   */
+  bandOverride: 'BR' | 'D0' | 'D1' | 'NT' | null;
+  /** Whether this is a K-code (benefits/underpayment exceed allowance) */
+  isKCode: boolean;
+  /** Whether W1/M1/X suffix present (non-cumulative/emergency basis) */
+  isEmergency: boolean;
+}
+
+/**
+ * Parse UK HMRC tax code into its components.
+ *
+ * Handles all standard HMRC tax code formats:
+ * - Standard codes: 1257L, 1100T, 1000M (number × 10 = allowance)
+ * - Scottish/Welsh prefixes: S1257L, C1257L (same calculation, different rates)
+ * - K-codes: K100, SK500 (NEGATIVE allowance - adds to taxable income)
+ * - Special codes: BR, D0, D1, NT, 0T (override normal band logic)
+ * - Emergency suffixes: W1, M1, X (non-cumulative basis - not modeled here)
+ *
+ * @param taxCode - The HMRC tax code string (e.g., "1257L", "K100", "BR")
+ * @param defaultAllowance - Fallback allowance if code cannot be parsed
+ * @returns Parsed tax code components for use in calculations
+ *
+ * @example
+ * parseTaxCode("1257L", 12570) // { allowance: 12570, bandOverride: null, isKCode: false }
+ * parseTaxCode("K100", 12570)  // { allowance: -1000, bandOverride: null, isKCode: true }
+ * parseTaxCode("BR", 12570)    // { allowance: 0, bandOverride: 'BR', isKCode: false }
+ */
+export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCodeParseResult {
+  const result: TaxCodeParseResult = {
+    allowance: defaultAllowance,
+    bandOverride: null,
+    isKCode: false,
+    isEmergency: false,
+  };
+
+  if (!taxCode?.trim()) return result;
+
+  const code = taxCode.toUpperCase().trim();
+
+  // Check for emergency/non-cumulative suffixes (W1, M1, X)
+  // These indicate HMRC doesn't have full year info - each period calculated independently
+  // Note: We flag but don't model non-cumulative basis (would need period-by-period tracking)
+  result.isEmergency = /[WM]1$|X$/.test(code);
+  const codeWithoutEmergency = code.replace(/[WM]1$|X$/, '');
+
+  // Remove Scottish (S) or Welsh (C) prefix - affects which tax rates to use, not allowance
+  const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
+
+  // Handle special codes that override normal band calculations
+  // These codes mean ALL income is taxed at a specific rate (no allowance)
+  if (codeWithoutPrefix === 'BR') {
+    return { ...result, allowance: 0, bandOverride: 'BR' };
+  }
+  if (codeWithoutPrefix === 'D0') {
+    return { ...result, allowance: 0, bandOverride: 'D0' };
+  }
+  if (codeWithoutPrefix === 'D1') {
+    return { ...result, allowance: 0, bandOverride: 'D1' };
+  }
+  if (codeWithoutPrefix === 'NT') {
+    return { ...result, allowance: 0, bandOverride: 'NT' };
+  }
+  // 0T = zero allowance but normal progressive bands (often used when HMRC reviewing)
+  if (codeWithoutPrefix === '0T') {
+    return { ...result, allowance: 0 };
+  }
+
+  // Handle K-codes: Kxxx means NEGATIVE allowance (adds to taxable income)
+  // Used when benefits-in-kind or previous underpayments exceed personal allowance
+  // Example: K100 means add £1,000 to taxable income
+  if (codeWithoutPrefix.startsWith('K')) {
+    const numericPart = Number.parseInt(codeWithoutPrefix.substring(1), 10);
+    if (!Number.isNaN(numericPart)) {
+      return { ...result, allowance: -(numericPart * 10), isKCode: true };
+    }
+    // Invalid K-code format - fall through to default
+  }
+
+  // Standard tax codes: number followed by optional letter (L, M, N, T, etc.)
+  // The number × 10 = annual tax-free allowance
+  // Example: 1257L = £12,570 allowance (the standard personal allowance)
+  const standardMatch = codeWithoutPrefix.match(/^(\d+)[LMNTKX]?$/);
+  if (standardMatch?.[1]) {
+    const numericPart = Number.parseInt(standardMatch[1], 10);
+    if (!Number.isNaN(numericPart)) {
+      return { ...result, allowance: numericPart * 10 };
+    }
+  }
+
+  // Unrecognized format - return default allowance
+  return result;
+}
+
+/**
+ * @deprecated Use parseTaxCode() instead for comprehensive tax code handling.
+ * This function doesn't handle K-codes, BR/D0/D1/NT, or emergency codes.
  */
 export function parsePersonalAllowanceFromTaxCode(
   taxCode: string,
   defaultAllowance: number
 ): number {
-  if (!taxCode.trim()) return defaultAllowance;
-
-  // Remove Scottish/Welsh prefix (S/C) - only affects which rates to use
-  const cleanTaxCode = taxCode.replace(/^[A-Za-z]/, '');
-  // Extract numeric portion, removing suffix letters (L, T, etc.)
-  const numericPart = Number.parseInt(cleanTaxCode.replace(/[A-Za-z]$/g, ''), 10);
-
-  return Number.isNaN(numericPart) ? defaultAllowance : numericPart * 10;
+  // Delegate to new function for backwards compatibility
+  return parseTaxCode(taxCode, defaultAllowance).allowance;
 }
 
 /**
@@ -572,35 +677,14 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 3. Calculate tax-free allowance (annual and monthly)
   // ---------------
 
-  // Start with standard personal allowance
-  let annualTaxFreeAmount = taxRates.personalAllowance;
+  // Parse tax code using comprehensive parser that handles all HMRC code types
+  // This correctly handles K-codes (negative allowance), BR/D0/D1/NT (band overrides), and emergency codes
+  const taxCodeResult = parseTaxCode(input.taxCode, taxRates.personalAllowance);
+  let annualTaxFreeAmount = taxCodeResult.allowance;
 
-  // Parse tax code to determine actual personal allowance (HMRC tax code system)
-  // If no tax code provided, use standard personal allowance from tax rates
-  if (input.taxCode.trim()) {
-    // HMRC Tax Code Parsing Algorithm:
-    // Tax codes contain a numeric part that represents 1/10th of the tax-free allowance
-    // Examples:
-    // - "1257L" = £12,570 personal allowance (1257 × 10)
-    // - "S1257L" = £12,570 for Scottish taxpayer (S prefix ignored for calculation)
-    // - "1100L" = £11,000 reduced allowance (common for high earners)
-    // - "BR" = Basic rate all pay (no personal allowance, handled elsewhere)
-
-    // Step 1: Remove Scottish prefix (S) if present - this only affects which rates to use, not the allowance
-    const cleanTaxCode = input.taxCode.replace(/^[A-Za-z]/, '');
-
-    // Step 2: Extract the numeric portion, removing suffix letters (L, T, etc.)
-    // Suffix letters indicate special circumstances but don't affect the allowance amount
-    const numericPart = Number.parseInt(cleanTaxCode.replace(/[A-Za-z]$/g, ''), 10);
-
-    // Step 3: Convert to annual allowance if we have a valid number
-    if (!Number.isNaN(numericPart)) {
-      // The HMRC rule: tax code number × 10 = annual tax-free allowance
-      // This allows for precise allowance adjustments (e.g., 1250 = £12,500)
-      annualTaxFreeAmount = numericPart * 10;
-    }
-    // If parsing fails, we fall back to the standard personal allowance from tax rates
-  }
+  // Store band override for use in tax calculation section
+  // BR = all at basic rate, D0 = all at higher rate, D1 = all at additional rate, NT = no tax
+  const taxCodeBandOverride = taxCodeResult.bandOverride;
 
   // High Income Personal Allowance Reduction (HMRC "60% Tax Trap")
   // Above £100,000 income, personal allowance is reduced by £1 for every £2 of income
@@ -744,144 +828,165 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   if (monthlyTaxableIncome > 0) {
     let remainingMonthlyIncome = monthlyTaxableIncome;
 
-    // CRITICAL: Scottish vs Standard UK Tax Band Calculation
-    // The two systems use fundamentally different approaches:
-    //
-    // SCOTTISH SYSTEM (absolute thresholds):
-    // - 19% Starter Rate: £0 - £2,306 of TOTAL income
-    // - 20% Basic Rate: £2,307 - £13,991 of TOTAL income
-    // - 21% Intermediate: £13,992 - £31,092 of TOTAL income
-    // - Bands are absolute ranges from £0 (like staircases)
-    //
-    // STANDARD UK SYSTEM (cumulative above personal allowance):
-    // - 20% Basic Rate: £0 - £37,700 of TAXABLE income (after personal allowance)
-    // - 40% Higher Rate: £37,701 - £125,140 of TAXABLE income
-    // - Bands are ranges above the personal allowance threshold
+    // Handle special tax codes that override normal band calculations
+    // These codes tax ALL income at a single rate, ignoring progressive bands
+    if (taxCodeBandOverride) {
+      const overrideRates: Record<'BR' | 'D0' | 'D1' | 'NT', { rate: number; name: string }> = {
+        BR: { rate: 20, name: 'Basic Rate (BR code)' },
+        D0: { rate: 40, name: 'Higher Rate (D0 code)' },
+        D1: { rate: 45, name: 'Additional Rate (D1 code)' },
+        NT: { rate: 0, name: 'No Tax (NT code)' },
+      };
 
-    if (isScottish) {
-      // SCOTTISH TAX CALCULATION ALGORITHM
-      // Scottish bands apply to TOTAL taxable income (not cumulative above personal allowance)
-      // This means we need to calculate which portions fall into which absolute bands
-
-      // Convert annual band thresholds to monthly equivalents for consistent processing
-      // Example: Annual threshold £2,306 becomes monthly threshold £192.17
-      const monthlyBoundaries = [
-        0, // Always start from £0
-        ...taxRates.bands.map((band) => band.threshold / 12), // Convert each threshold to monthly
-        Number.POSITIVE_INFINITY, // Top band has no upper limit
-      ];
-
-      // Process each Scottish tax band in order
-      for (let i = 0; i < taxRates.bands.length; i++) {
-        const band = taxRates.bands[i];
-        if (!band) continue;
-        const lowerBound = monthlyBoundaries[i] ?? 0; // Start of this band
-        const upperBound = monthlyBoundaries[i + 1] ?? Number.POSITIVE_INFINITY; // Start of next band (or infinity)
-
-        // Calculate how much taxable income falls within this specific band
-        // We compare:
-        // 1. The width of this band (upperBound - lowerBound)
-        // 2. How much income we still need to process (remainingMonthlyIncome)
-        // Take the smaller of the two
-        const monthlyIncomeInBand = Math.max(
-          0, // Cannot have negative income in a band
-          Math.min(
-            upperBound - lowerBound, // Maximum possible income for this band
-            remainingMonthlyIncome // Actual remaining income to be taxed
-          )
-        );
-
-        // Only calculate tax if there's income in this band
-        if (monthlyIncomeInBand > 0) {
-          // Apply this band's tax rate to the income within it
-          const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
-
-          // Accumulate total monthly tax
-          monthlyTax += monthlyTaxForBand;
-
-          // Scale back to annual for results output (UI displays annual figures)
-          const annualIncomeInBand = monthlyIncomeInBand * 12;
-
-          // Record this band's contribution for tax breakdown display
-          taxBands.push({
-            name: band.name, // e.g., "Scottish Starter Rate (19%)"
-            rate: band.rate, // e.g., 19
-            amount: annualIncomeInBand, // Annual amount of income taxed at this rate
-          });
-
-          // Reduce remaining income
-          remainingMonthlyIncome -= monthlyIncomeInBand;
-        }
-
-        // If no more income to tax, break out of loop
-        if (remainingMonthlyIncome <= 0) break;
-      }
-    } else {
-      // STANDARD UK TAX CALCULATION ALGORITHM
-      // Standard UK bands apply CUMULATIVELY above the personal allowance
-      // This is the "traditional" system used in England, Wales, and Northern Ireland
-      //
-      // Key difference from Scottish: bands are "stacked" on top of each other
-      // Example with £50,000 taxable income:
-      // - First £37,700: 20% basic rate
-      // - Next £12,300: 40% higher rate
-      // Each band only applies to income WITHIN that band's range
-
-      let previousMonthlyThreshold = 0; // Track cumulative band positions
-
-      // Process each standard UK tax band sequentially
-      for (let i = 0; i < taxRates.bands.length; i++) {
-        const band = taxRates.bands[i];
-        if (!band) continue;
-
-        // Convert annual band threshold to monthly equivalent
-        // Example: £37,700 annual basic rate threshold = £3,141.67 monthly
-        const monthlyThreshold = band.threshold / 12;
-
-        // Calculate the "width" of this tax band
-        // This is how much income can be taxed at this band's rate
-        // Example: Basic rate width = £3,141.67 - £0 = £3,141.67
-        const monthlyBandWidth = monthlyThreshold - previousMonthlyThreshold;
-
-        // Determine how much of the taxpayer's income falls into this band
-        // Takes the minimum of:
-        // 1. How much income is left to be taxed
-        // 2. How much this band can accommodate
-        const monthlyIncomeInBand = Math.min(remainingMonthlyIncome, monthlyBandWidth);
-
-        // Only process bands that have taxable income
-        if (monthlyIncomeInBand > 0) {
-          // Apply this band's tax rate to the income portion within it
-          // Example: £1,000 in basic rate band = £1,000 × 20% = £200 tax
-          const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
-
-          // Accumulate total monthly tax from all bands
-          monthlyTax += monthlyTaxForBand;
-
-          // Convert back to annual for results display consistency
-          const annualIncomeInBand = monthlyIncomeInBand * 12;
-
-          // Record this band's contribution for tax breakdown UI
-          taxBands.push({
-            name: band.name, // e.g., "Basic Rate (20%)", "Higher Rate (40%)"
-            rate: band.rate, // e.g., 20, 40, 45
-            amount: annualIncomeInBand, // Annual income amount taxed at this rate
-          });
-
-          // Remove processed income from remaining total
-          // This ensures we don't double-tax the same income
-          remainingMonthlyIncome -= monthlyIncomeInBand;
-        }
-
-        // Early exit optimization: if all income has been processed, stop
-        // This prevents unnecessary loop iterations for lower earners
-        if (remainingMonthlyIncome <= 0) break;
-
-        // Update threshold for next band calculation
-        // This builds the "cumulative" nature of standard UK bands
-        previousMonthlyThreshold = monthlyThreshold;
-      }
+      const override = overrideRates[taxCodeBandOverride];
+      monthlyTax = roundToPence((monthlyTaxableIncome * override.rate) / 100);
+      taxBands.push({
+        name: override.name,
+        rate: override.rate,
+        amount: annualTaxableIncome, // All income taxed at this single rate
+      });
     }
+    // Normal progressive tax calculation (only if no band override)
+    else {
+      // CRITICAL: Scottish vs Standard UK Tax Band Calculation
+      // The two systems use fundamentally different approaches:
+      //
+      // SCOTTISH SYSTEM (absolute thresholds):
+      // - 19% Starter Rate: £0 - £2,306 of TOTAL income
+      // - 20% Basic Rate: £2,307 - £13,991 of TOTAL income
+      // - 21% Intermediate: £13,992 - £31,092 of TOTAL income
+      // - Bands are absolute ranges from £0 (like staircases)
+      //
+      // STANDARD UK SYSTEM (cumulative above personal allowance):
+      // - 20% Basic Rate: £0 - £37,700 of TAXABLE income (after personal allowance)
+      // - 40% Higher Rate: £37,701 - £125,140 of TAXABLE income
+      // - Bands are ranges above the personal allowance threshold
+
+      if (isScottish) {
+        // SCOTTISH TAX CALCULATION ALGORITHM
+        // Scottish bands apply to TOTAL taxable income (not cumulative above personal allowance)
+        // This means we need to calculate which portions fall into which absolute bands
+
+        // Convert annual band thresholds to monthly equivalents for consistent processing
+        // Example: Annual threshold £2,306 becomes monthly threshold £192.17
+        const monthlyBoundaries = [
+          0, // Always start from £0
+          ...taxRates.bands.map((band) => band.threshold / 12), // Convert each threshold to monthly
+          Number.POSITIVE_INFINITY, // Top band has no upper limit
+        ];
+
+        // Process each Scottish tax band in order
+        for (let i = 0; i < taxRates.bands.length; i++) {
+          const band = taxRates.bands[i];
+          if (!band) continue;
+          const lowerBound = monthlyBoundaries[i] ?? 0; // Start of this band
+          const upperBound = monthlyBoundaries[i + 1] ?? Number.POSITIVE_INFINITY; // Start of next band (or infinity)
+
+          // Calculate how much taxable income falls within this specific band
+          // We compare:
+          // 1. The width of this band (upperBound - lowerBound)
+          // 2. How much income we still need to process (remainingMonthlyIncome)
+          // Take the smaller of the two
+          const monthlyIncomeInBand = Math.max(
+            0, // Cannot have negative income in a band
+            Math.min(
+              upperBound - lowerBound, // Maximum possible income for this band
+              remainingMonthlyIncome // Actual remaining income to be taxed
+            )
+          );
+
+          // Only calculate tax if there's income in this band
+          if (monthlyIncomeInBand > 0) {
+            // Apply this band's tax rate to the income within it
+            const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
+
+            // Accumulate total monthly tax
+            monthlyTax += monthlyTaxForBand;
+
+            // Scale back to annual for results output (UI displays annual figures)
+            const annualIncomeInBand = monthlyIncomeInBand * 12;
+
+            // Record this band's contribution for tax breakdown display
+            taxBands.push({
+              name: band.name, // e.g., "Scottish Starter Rate (19%)"
+              rate: band.rate, // e.g., 19
+              amount: annualIncomeInBand, // Annual amount of income taxed at this rate
+            });
+
+            // Reduce remaining income
+            remainingMonthlyIncome -= monthlyIncomeInBand;
+          }
+
+          // If no more income to tax, break out of loop
+          if (remainingMonthlyIncome <= 0) break;
+        }
+      } else {
+        // STANDARD UK TAX CALCULATION ALGORITHM
+        // Standard UK bands apply CUMULATIVELY above the personal allowance
+        // This is the "traditional" system used in England, Wales, and Northern Ireland
+        //
+        // Key difference from Scottish: bands are "stacked" on top of each other
+        // Example with £50,000 taxable income:
+        // - First £37,700: 20% basic rate
+        // - Next £12,300: 40% higher rate
+        // Each band only applies to income WITHIN that band's range
+
+        let previousMonthlyThreshold = 0; // Track cumulative band positions
+
+        // Process each standard UK tax band sequentially
+        for (let i = 0; i < taxRates.bands.length; i++) {
+          const band = taxRates.bands[i];
+          if (!band) continue;
+
+          // Convert annual band threshold to monthly equivalent
+          // Example: £37,700 annual basic rate threshold = £3,141.67 monthly
+          const monthlyThreshold = band.threshold / 12;
+
+          // Calculate the "width" of this tax band
+          // This is how much income can be taxed at this band's rate
+          // Example: Basic rate width = £3,141.67 - £0 = £3,141.67
+          const monthlyBandWidth = monthlyThreshold - previousMonthlyThreshold;
+
+          // Determine how much of the taxpayer's income falls into this band
+          // Takes the minimum of:
+          // 1. How much income is left to be taxed
+          // 2. How much this band can accommodate
+          const monthlyIncomeInBand = Math.min(remainingMonthlyIncome, monthlyBandWidth);
+
+          // Only process bands that have taxable income
+          if (monthlyIncomeInBand > 0) {
+            // Apply this band's tax rate to the income portion within it
+            // Example: £1,000 in basic rate band = £1,000 × 20% = £200 tax
+            const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
+
+            // Accumulate total monthly tax from all bands
+            monthlyTax += monthlyTaxForBand;
+
+            // Convert back to annual for results display consistency
+            const annualIncomeInBand = monthlyIncomeInBand * 12;
+
+            // Record this band's contribution for tax breakdown UI
+            taxBands.push({
+              name: band.name, // e.g., "Basic Rate (20%)", "Higher Rate (40%)"
+              rate: band.rate, // e.g., 20, 40, 45
+              amount: annualIncomeInBand, // Annual income amount taxed at this rate
+            });
+
+            // Remove processed income from remaining total
+            // This ensures we don't double-tax the same income
+            remainingMonthlyIncome -= monthlyIncomeInBand;
+          }
+
+          // Early exit optimization: if all income has been processed, stop
+          // This prevents unnecessary loop iterations for lower earners
+          if (remainingMonthlyIncome <= 0) break;
+
+          // Update threshold for next band calculation
+          // This builds the "cumulative" nature of standard UK bands
+          previousMonthlyThreshold = monthlyThreshold;
+        }
+      }
+    } // Close the else block for taxCodeBandOverride check
   }
 
   // Round monthly tax to pence for accuracy
@@ -952,9 +1057,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Convert employer threshold to monthly
   const monthlyEmployerThreshold = employerRates.secondary.threshold / 12;
 
-  if (monthlyGrossSalary > monthlyEmployerThreshold) {
+  // Employer NI is calculated on employment income only (not rental, pension income, etc.)
+  if (monthlyEmploymentIncome > monthlyEmployerThreshold) {
     monthlyEmployerNI =
-      ((monthlyGrossSalary - monthlyEmployerThreshold) * employerRates.secondary.rate) / 100;
+      ((monthlyEmploymentIncome - monthlyEmployerThreshold) * employerRates.secondary.rate) / 100;
   }
 
   // Calculate annual employer NI (for output)
@@ -975,10 +1081,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       // Convert annual threshold to monthly
       const monthlyLoanThreshold = loanRates.threshold / 12;
 
-      // Student loan is calculated on gross salary, not adjusted salary
+      // Student loan via PAYE is calculated on employment income only
+      // Other income (rental, dividends, etc.) is handled via Self Assessment
       // This matches how student loan is calculated on payslips
-      if (monthlyGrossSalary > monthlyLoanThreshold) {
-        monthlyStudentLoan += ((monthlyGrossSalary - monthlyLoanThreshold) * loanRates.rate) / 100;
+      if (monthlyEmploymentIncome > monthlyLoanThreshold) {
+        monthlyStudentLoan +=
+          ((monthlyEmploymentIncome - monthlyLoanThreshold) * loanRates.rate) / 100;
       }
     }
   }
