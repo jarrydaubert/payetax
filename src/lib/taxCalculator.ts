@@ -649,6 +649,25 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // ---------------
   // 2.5. Calculate additional income from other sources
   // ---------------
+  //
+  // CRITICAL: We maintain TWO income buckets for HMRC compliance:
+  //
+  // 1. employmentIncome - Subject to:
+  //    - Income Tax (via PAYE bands)
+  //    - Employee National Insurance (Class 1)
+  //    - Employer National Insurance (Class 1)
+  //    - Student Loan deductions via PAYE
+  //
+  // 2. additionalIncome (rental, pensions, investments) - Subject to:
+  //    - Income Tax only (via PAYE bands)
+  //    - NO National Insurance (not employment earnings)
+  //    - NO Student Loan via PAYE (handled via Self Assessment)
+  //
+  // Both contribute to totalGrossIncome for:
+  //    - Personal Allowance £100k taper calculation
+  //    - Tax band threshold determination
+  //    - Marriage Allowance eligibility
+  //
   let additionalIncome = 0;
   let employmentIncome = annualGrossSalary; // Primary salary
 
@@ -657,19 +676,19 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       const sourceAnnual = convertPeriodToAnnual(source.amount, source.period, input.hoursPerWeek);
 
       if (source.type === 'employment') {
-        // Additional employment income - subject to NI if under SPA
         employmentIncome += sourceAnnual;
       } else {
-        // Other income (pensions, rental, etc.) - taxable but no NI
+        // Rental, pension, investment income - taxable but no NI/SL via PAYE
         additionalIncome += sourceAnnual;
       }
     }
   }
 
-  // Total gross income for tax purposes
+  // totalGrossIncome: Used for allowance tapers and tax band calculations
+  // This is the "Adjusted Net Income" concept for PA taper purposes
   const totalGrossIncome = employmentIncome + additionalIncome;
 
-  // Then derive monthly amounts from annual (this ensures consistency)
+  // Monthly equivalents for payslip-style calculations
   const monthlyGrossSalary = totalGrossIncome / 12;
   const monthlyEmploymentIncome = employmentIncome / 12;
 
@@ -1000,6 +1019,14 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // ---------------
   // 7. Calculate National Insurance contributions (monthly calculation)
   // ---------------
+  //
+  // IMPORTANT: NI is levied on EMPLOYMENT income only, NOT total income.
+  // This is a fundamental HMRC rule - rental income, investment income, and
+  // pension income are NOT subject to National Insurance contributions.
+  //
+  // We use monthlyEmploymentIncome (not monthlyGrossSalary which includes all sources)
+  // to ensure NI is calculated correctly for people with multiple income types.
+  //
 
   let monthlyNationalInsurance = 0;
 
@@ -1020,8 +1047,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const monthlyPrimaryThreshold = niRates.primary.threshold / 12;
     const monthlyUpperThreshold = niRates.upper.threshold / 12;
 
-    // NI is ONLY calculated on employment income (not pensions, rental, etc.)
-    // Use employment income adjusted for pension contributions
+    // NI base: Employment income minus pension (salary sacrifice reduces NI liability)
     const monthlyTaxableAdjustedEmploymentIncome =
       monthlyEmploymentIncome - monthlyPensionContribution;
 
@@ -1071,6 +1097,16 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // ---------------
   // 9. Calculate Student Loan repayments (monthly calculation)
   // ---------------
+  //
+  // IMPORTANT: Student Loan via PAYE is calculated on EMPLOYMENT income only.
+  //
+  // For employees with non-employment income (rental, dividends, investments):
+  // - PAYE deducts SL based on employment earnings only (what we calculate here)
+  // - Additional SL on other income is collected via Self Assessment tax return
+  //
+  // This is why we use monthlyEmploymentIncome, not monthlyGrossSalary.
+  // If we used total income, we'd double-count income that HMRC handles via SA.
+  //
 
   let monthlyStudentLoan = 0;
 
@@ -1083,9 +1119,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       // Convert annual threshold to monthly
       const monthlyLoanThreshold = loanRates.threshold / 12;
 
-      // Student loan via PAYE is calculated on employment income only
-      // Other income (rental, dividends, etc.) is handled via Self Assessment
-      // This matches how student loan is calculated on payslips
+      // SL repayment = 9% (or 6% for PG) of employment income above threshold
       if (monthlyEmploymentIncome > monthlyLoanThreshold) {
         monthlyStudentLoan +=
           ((monthlyEmploymentIncome - monthlyLoanThreshold) * loanRates.rate) / 100;
