@@ -1,6 +1,6 @@
 # Director Pay Calculator — Product Spec
 
-> **Vision:** The seamless go-to calculator for ALL your UK limited company director needs.
+> **Vision:** The most transparent DIY salary/dividend optimizer for single-director UK limited companies.
 
 **Position:** DIY optimization tool that empowers directors to understand their tax position, flags complexity, and hands off to accountants when needed.
 

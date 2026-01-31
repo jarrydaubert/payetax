@@ -146,10 +146,10 @@ export function StrategyComparisonTable() {
                   : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]'
               )}
             >
-              {/* Recommended Badge */}
+              {/* Highest Take-Home Badge */}
               {isRecommended && (
                 <span className='absolute -top-2 right-3 rounded-full bg-emerald-500 px-2 py-0.5 font-medium text-white text-xs'>
-                  Recommended
+                  Highest Take-Home
                 </span>
               )}
 

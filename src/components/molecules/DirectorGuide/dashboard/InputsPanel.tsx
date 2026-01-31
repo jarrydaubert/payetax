@@ -190,7 +190,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           />
         </Field>
 
-        <Field label='Other Drawings' hint="Director's loan or other withdrawals">
+        <Field label='Other Drawings' hint='Non-dividend withdrawals (e.g. director loan)'>
           <Input
             type='text'
             value={formatCurrency(formData.ytdDrawings)}

@@ -32,6 +32,7 @@ export type WarningType =
   | 'PAYMENTS_ON_ACCOUNT'
   | 'EA_ELIGIBILITY_CHECK'
   | 'BIK_CLASS_1A_WARNING'
+  | 'LOSSES_ELIGIBILITY'
   // Educational
   | 'PA_TAPER'
   | 'HICBC'
@@ -40,7 +41,8 @@ export type WarningType =
   | 'PENSION_TAPER'
   | 'POTENTIAL_DLA'
   | 'HIGH_COMPLEXITY'
-  | 'MORTGAGE_IMPACT';
+  | 'MORTGAGE_IMPACT'
+  | 'MID_YEAR_ASSUMPTION';
 
 export interface Warning {
   type: WarningType;
@@ -61,6 +63,8 @@ export interface WarningInput {
   hasEmploymentAllowance?: boolean;
   hasChildren?: boolean;
   taxYear?: TaxYear;
+  lossesCarriedForward?: number;
+  isMidYear?: boolean;
 }
 
 // ============================================================================
@@ -213,6 +217,16 @@ export function getWarnings(input: WarningInput): Warning[] {
     });
   }
 
+  // Losses carried forward eligibility check
+  if (input.lossesCarriedForward && input.lossesCarriedForward > 0) {
+    warnings.push({
+      type: 'LOSSES_ELIGIBILITY',
+      severity: 'soft',
+      message:
+        'Trading losses can only be carried forward against future profits of the same trade. Verify eligibility with your accountant.',
+    });
+  }
+
   // ========================================================================
   // EDUCATIONAL WARNINGS
   // ========================================================================
@@ -309,6 +323,16 @@ export function getWarnings(input: WarningInput): Warning[] {
       type: 'MORTGAGE_IMPACT',
       severity: 'educational',
       message: `A salary of £${salary.toLocaleString()} is tax-efficient but may affect mortgage affordability calculations, which typically require higher proven income.`,
+    });
+  }
+
+  // Mid-year assumption note
+  if (input.isMidYear) {
+    warnings.push({
+      type: 'MID_YEAR_ASSUMPTION',
+      severity: 'educational',
+      message:
+        'Calculations assume uniform extraction throughout the year. Actual tax may vary if salary or dividends are taken in irregular amounts.',
     });
   }
 
