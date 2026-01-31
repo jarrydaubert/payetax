@@ -506,7 +506,7 @@ Writing a blog post about [topic] to [target audience benefit]
 
 **Resources:**
 - Content calendar: [link]
-- SEO guidelines: guides/BLOG_GUIDE.md
+- SEO guidelines: blog/BLOG_GUIDE.md
 ```
 
 ---

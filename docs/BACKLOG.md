@@ -9,6 +9,12 @@
 
 > Keep these as reminders - not one-time tasks
 
+### Monthly: Review Marketing Skills Repo
+- Check https://github.com/coreyhaines31/marketingskills for updates
+- Compare VERSIONS.md against our local skills in `.claude/skills/`
+- Pull in new versions if 2+ skills updated or major version bump
+- Consider adding new skills that become relevant (e.g., ab-test-setup, email-sequence)
+
 ### After Each HMRC/Gov Budget Change
 - Review ALL blog posts for outdated tax rates, thresholds, and allowances
 - Update `publishedAt` / `updatedAt` dates on affected posts

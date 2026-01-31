@@ -68,14 +68,16 @@ interface EditorsPicksListProps {
 function EditorsPicksList({ posts }: EditorsPicksListProps) {
   return (
     <div className='rounded-xl border border-slate-700/50 bg-slate-800/50 p-5'>
-      <h2 className='mb-4 font-display font-semibold text-lg text-white'>Editor&apos;s Picks</h2>
+      <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
+        Editor&apos;s Picks
+      </h2>
 
       <ol className='space-y-4'>
         {posts.map((post, index) => (
           <li key={post.slug}>
             <Link href={`/blog/${post.slug}`} className='group flex items-start gap-3'>
               {/* Number */}
-              <span className='flex-shrink-0 font-bold font-display text-2xl text-slate-600 transition-colors group-hover:text-cyan-500'>
+              <span className='flex-shrink-0 font-bold font-display text-2xl text-cyan-500/50 transition-colors group-hover:text-cyan-500'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 

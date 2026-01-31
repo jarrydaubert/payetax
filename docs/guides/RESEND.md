@@ -210,5 +210,5 @@ Wait 1 minute and retry. If testing, use different IP or clear rate limit store.
 
 ## Related Docs
 
-- [BLOG_GUIDE.md](../guides/BLOG_GUIDE.md) - Newsletter section with publishing workflow
+- [BLOG_GUIDE.md](../blog/BLOG_GUIDE.md) - Newsletter section with publishing workflow
 - [SENTRY_LOGGING.md](../guides/SENTRY_LOGGING.md) - Error monitoring setup

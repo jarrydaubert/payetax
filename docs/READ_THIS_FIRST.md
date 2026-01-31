@@ -6,7 +6,7 @@
 
 ## The Uncomfortable Truth
 
-PayeTax has excellent infrastructure. HMRC-compliant calculations. 150+ programmatic SEO pages. Clean UI. Comprehensive test coverage.
+You've built something. Maybe it's good. Maybe it's excellent. Clean UI. Solid features. Comprehensive test coverage.
 
 **Stripe dashboard: £0**
 
@@ -72,13 +72,43 @@ The market pays for **painkillers**.
 
 | Vitamin | Painkiller |
 |---------|------------|
-| "Calculate your tax" | "Save £8,000 on your director compensation" |
-| Free calculator for everyone | Tool that solves expensive problems |
-| Generic information | Specific, actionable guidance that saves real money |
+| "Track your [thing]" | "Save [specific amount] on [specific problem]" |
+| Free tool for everyone | Tool that solves expensive problems |
+| Generic information | Specific, actionable guidance that saves real money or time |
 
 **Free tools drive traffic. Painkillers drive revenue.**
 
 The free calculator stays free. But the money comes from solving expensive problems for people who will pay.
+
+---
+
+## The Idea Filter
+
+Before you commit to any idea, run it through this:
+
+| Question | Required Answer |
+|----------|-----------------|
+| Is this a painkiller or a vitamin? | Painkiller |
+| Can I build something 10x better than what exists? | Yes |
+| Am I competing against billion-dollar incumbents? | No |
+| Do I have a genuine unfair advantage? | Yes |
+| Will customers pay real money (not "would they like it")? | Yes |
+
+If you can't answer correctly on all five, keep looking.
+
+### The 90 Ideas Rule
+
+Most founders pick from 1-3 ideas. That's not enough.
+
+Write down 3 new ideas every day for 30 days. At the end, you have 90. Filter ruthlessly. The right idea is worth waiting for.
+
+### The Shallow Trap
+
+If the gap between your product and the incumbent is small — if users could get 80% of the value by using the existing tool differently — nobody will switch. Nobody will pay.
+
+Ask: "Could [platform I'm building on] add this as a feature tomorrow?" If yes, you're building on sand.
+
+**Don't marry the idea before you've dated.**
 
 ---
 
@@ -107,9 +137,9 @@ Not all AI business models are equal. Here's how they compare:
 - **Levels.io:** $3.5M/year, 90%+ margins, no employees
 - **N8N:** Side project → $2.5B valuation
 
-**PayeTax's path:** Free calculator (SEO/traffic) → SME Director Tools (SaaS revenue)
+**The path:** Free tool (SEO/traffic) → Paid features for specific avatar (SaaS revenue)
 
-This is exactly why the SME Director Optimizer is the right move. Not another free feature.
+This is exactly why monetization matters. Not another free feature.
 
 ---
 
@@ -123,12 +153,11 @@ Current: "UK taxpayers" (65 million people)
 
 | Avatar | Pain Level | Willingness to Pay |
 |--------|------------|-------------------|
-| Employee checking tax | Low | £0 |
-| **SME Director (£60k-£150k)** | High | £19-49/month |
-| **Accountant with SME clients** | High | £49-199/month |
-| High earner in £100k trap | High | £19/month |
+| Casual browser | Low | £0 |
+| **[Your specific avatar]** | High | £19-49/month |
+| **[B2B buyer who serves your avatar]** | High | £49-199/month |
 
-The SME Director is the avatar. One person. One problem. One solution.
+Pick one avatar. One person. One problem. One solution.
 
 ---
 
@@ -138,7 +167,7 @@ The SME Director is the avatar. One person. One problem. One solution.
 
 If your Stripe dashboard shows £0, you're not monetizing.
 
-A tool that saves users £8,000/year could charge £19/month. That's a 420x ROI for the customer.
+A tool that saves users real money or time could charge £19-49/month. Calculate the ROI for the customer — if it's 10x+, you're undercharging.
 
 **Find ways to capture value. Stop leaving money on the table.**
 
@@ -157,16 +186,17 @@ Not "researching." Not "preparing." **Posting. Uploading. DMing.**
 
 | If avatar is... | Channel is... |
 |-----------------|---------------|
-| SME Directors | LinkedIn |
-| Accountants | LinkedIn + AccountingWeb |
-| High earners | SEO content |
+| B2B professionals | LinkedIn |
+| Developers | Twitter/X + GitHub |
+| Consumers | TikTok or YouTube |
+| Niche professionals | Industry forums + LinkedIn |
 
 Don't do YouTube AND TikTok AND LinkedIn AND Twitter. Pick one. Master it.
 
 ### Content That Works
 
-Wrong: "Check out PayeTax's new feature!"
-Right: "I saved £8,229 by switching from salary to dividends. Here's the math."
+Wrong: "Check out my new feature!"
+Right: "I [achieved specific result] by [doing specific thing]. Here's how."
 
 **Lead with value. Show the tool in action. Don't sell—demonstrate.**
 
@@ -195,6 +225,60 @@ Monthly:
 
 ---
 
+## The 45-Minute Rule
+
+Minimum 45 minutes on distribution. Every day. First thing. Time-blocked. Non-negotiable.
+
+Not at the end of the day when you're tired. Not "when I have time." Before you write a single line of code.
+
+If you don't have customers, this is the most important thing you can do.
+
+---
+
+## The Four Distribution Methods
+
+| Method | Speed | Cost | Best For |
+|--------|-------|------|----------|
+| **Cold DMs** | Fast | Free | First 10 customers + testimonials |
+| **Organic content** | Slow | Free | Trust + compounding |
+| **Micro influencers** | Medium | Cheap | Arbitrage (500-20k followers) |
+| **SEO** | Slowest | Free | Long-term asset |
+
+**Cold DMs get you started. The others scale.**
+
+### When Something Works, Triple Down
+
+Most people find something that works and then... do it once.
+
+If you spent months experimenting and finally found a format that got views, engagement, customers — why would you only do it once?
+
+80% of your effort becomes what's working. 20% stays experimental.
+
+### The 9:1 Rule
+
+In communities (Discord, Reddit, Facebook groups, Slack):
+
+**9 value posts for every 1 selling post.**
+
+If you're just pitching without providing value, you'll get banned. If you're genuinely helpful, people DM you for advice. That's when you sell.
+
+### Problem Keywords, Not Product Keywords
+
+Wrong: "best [product category]"
+Right: "how to [solve specific problem]"
+
+People search for problems, not products. Write content that solves the problem, then introduce your product as the solution.
+
+### Start Now. Not When It's Ready.
+
+The longer you delay distribution, the higher the risk you're building something nobody wants.
+
+If you can't get customers now, that's valuable information. Pivot early.
+
+If you hide in your code editor for 12 months, you've wasted the one resource you can never get back: time.
+
+---
+
 ## Enable Monetization
 
 ### Accountant Referrals
@@ -219,31 +303,31 @@ Before building any paid feature:
 
 | Don't Build | Why |
 |-------------|-----|
-| More free calculator features | Doesn't generate revenue |
-| Tinder for tax | Nobody asked |
-| AI chat integration | Complexity without clear monetization |
-| Mobile app | Web works fine, app is expensive |
+| More free features | Doesn't generate revenue |
+| Features nobody asked for | Validation before building |
+| AI chat integration (unless validated) | Complexity without clear monetization |
+| Mobile app (unless validated) | Web works fine, app is expensive |
 
-**Build only what SME Directors will pay for.**
+**Build only what your avatar will pay for.**
 
 ---
 
 ## Success Metrics
 
 ### 30 Days
-- Monetization enabled (all 3 features live)
+- Monetization enabled (something to buy)
 - 1 distribution post per day
-- SME Director landing page with waitlist
+- Landing page with waitlist or checkout
 
 ### 90 Days
-- 500+ waitlist signups for Director Optimizer
-- First paying customer (any tier)
-- £500 MRR
+- First paying customer (any amount)
+- Consistent distribution cadence
+- Clear signal on what's working
 
 ### 6 Months
-- £1,000 MRR
-- 100+ Pro subscribers
-- Clear demand signal for Tool #2
+- £1,000 MRR (or equivalent validation)
+- Repeatable acquisition channel
+- Clear demand signal for next product/feature
 
 ---
 
@@ -285,13 +369,4 @@ You don't need permission. You need to start.
 
 ---
 
-## Related Docs
-
-| Document | Purpose |
-|----------|---------|
-| [MONETIZATION.md](./MONETIZATION.md) | Revenue strategy |
-| [DIRECTOR_GUIDE_POSITIONING.md](./DIRECTOR_GUIDE_POSITIONING.md) | Current product direction |
-
----
-
-*Adapted from David Ondrej's "How to build AI SaaS", "Why you're stuck at $0 MRR", and "The only AI business worth building" threads. The originals are worth reading in full.*
+*Adapted from David Ondrej's "How to build AI SaaS", "Why you're stuck at $0 MRR", "The only AI business worth building", "10 AI startup ideas that will waste your life", and "How to get your first 100 users" threads. The originals are worth reading in full.*

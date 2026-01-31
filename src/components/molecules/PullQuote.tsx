@@ -21,8 +21,8 @@ export function PullQuote({ text, attribution, className }: PullQuoteProps) {
     <aside
       role='note'
       className={cn(
-        'relative my-8 py-6 pl-6',
-        'border-gradient-to-b border-l-4 from-cyan-500 to-emerald-500',
+        'relative my-8 rounded-r-2xl border-l-4 p-6 md:p-8',
+        'bg-gradient-to-br from-cyan-500/10 to-emerald-500/5',
         className
       )}
       style={{
@@ -30,11 +30,11 @@ export function PullQuote({ text, attribution, className }: PullQuoteProps) {
       }}
     >
       <blockquote>
-        <p className='font-display font-medium text-lg text-white md:text-xl lg:text-2xl'>
+        <p className='font-display font-medium text-lg text-white leading-relaxed md:text-xl lg:text-2xl'>
           &ldquo;{text}&rdquo;
         </p>
         <footer className='mt-4'>
-          <cite className='text-slate-400 text-sm not-italic'>— {attribution}</cite>
+          <cite className='text-slate-500 text-sm not-italic'>— {attribution}</cite>
         </footer>
       </blockquote>
     </aside>

@@ -78,7 +78,7 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-3 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>•</span>
+            <span>|</span>
             <time dateTime={post.publishedAt}>
               {new Date(post.publishedAt).toLocaleDateString('en-GB', {
                 day: 'numeric',
@@ -147,7 +147,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>•</span>
+            <span>|</span>
             <time dateTime={post.publishedAt}>
               {new Date(post.publishedAt).toLocaleDateString('en-GB', {
                 day: 'numeric',
@@ -217,7 +217,7 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>•</span>
+            <span>|</span>
             <time dateTime={post.publishedAt}>
               {new Date(post.publishedAt).toLocaleDateString('en-GB', {
                 day: 'numeric',

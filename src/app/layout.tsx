@@ -12,7 +12,6 @@ import { Toaster } from 'sonner';
 
 import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
-import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
 import { inter, spaceGrotesk } from './fonts';
@@ -100,12 +99,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Suspense fallback={null}>
             <Analytics />
           </Suspense>
-          <ErrorBoundary>
-            <Layout>{children}</Layout>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <Toaster position='top-right' richColors expand={true} closeButton />
-          </ErrorBoundary>
+          <Layout>{children}</Layout>
+          <Toaster position='top-right' richColors expand={true} closeButton />
           {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
           <VercelAnalytics />
           <SpeedInsights />

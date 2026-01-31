@@ -21,12 +21,14 @@ const EXAMPLE_SALARIES = [30000, 50000, 70000, 100000, 150000];
 function calculateTax(
   salary: number,
   bands: typeof scottishRates.bands,
-  personalAllowance: number
+  personalAllowance: number,
+  paReductionThreshold: number,
+  paReductionRate: number
 ): number {
   // Handle personal allowance reduction for high earners
   let effectiveAllowance = personalAllowance;
-  if (salary > 100000) {
-    const reduction = Math.floor((salary - 100000) / 2);
+  if (salary > paReductionThreshold) {
+    const reduction = Math.floor((salary - paReductionThreshold) * paReductionRate);
     effectiveAllowance = Math.max(0, personalAllowance - reduction);
   }
 
@@ -71,9 +73,17 @@ export function ScottishTaxCalculatorClient() {
     const scottishTax = calculateTax(
       salaryNum,
       scottishRates.bands,
-      scottishRates.personalAllowance
+      scottishRates.personalAllowance,
+      scottishRates.personalAllowanceReductionThreshold,
+      scottishRates.personalAllowanceReductionRate
     );
-    const englishTax = calculateTax(salaryNum, englishRates.bands, englishRates.personalAllowance);
+    const englishTax = calculateTax(
+      salaryNum,
+      englishRates.bands,
+      englishRates.personalAllowance,
+      englishRates.personalAllowanceReductionThreshold,
+      englishRates.personalAllowanceReductionRate
+    );
 
     setComparison({
       scottishTax,
@@ -87,12 +97,16 @@ export function ScottishTaxCalculatorClient() {
     const scottishTax = calculateTax(
       salaryValue,
       scottishRates.bands,
-      scottishRates.personalAllowance
+      scottishRates.personalAllowance,
+      scottishRates.personalAllowanceReductionThreshold,
+      scottishRates.personalAllowanceReductionRate
     );
     const englishTax = calculateTax(
       salaryValue,
       englishRates.bands,
-      englishRates.personalAllowance
+      englishRates.personalAllowance,
+      englishRates.personalAllowanceReductionThreshold,
+      englishRates.personalAllowanceReductionRate
     );
     setComparison({
       scottishTax,

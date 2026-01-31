@@ -24,20 +24,6 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
 
   return (
     <div className='lg:sticky lg:top-24 lg:self-start'>
-      <h1
-        className={cn(
-          'mb-2 font-bold',
-          TYPOGRAPHY.TEXT_2XL,
-          `sm:${TYPOGRAPHY.TEXT_3XL}`,
-          `lg:${TYPOGRAPHY.TEXT_4XL}`
-        )}
-      >
-        £{formattedSalary} Salary After Tax
-      </h1>
-      <p className={cn('text-muted-foreground', SPACING.MB_6)}>
-        UK take-home pay calculator for 2025-26 tax year
-      </p>
-
       <Card className={cn(SPACING.P_6, 'sm:p-8')}>
         <div className={SPACING.SPACE_Y_6}>
           {/* Main Take-Home */}

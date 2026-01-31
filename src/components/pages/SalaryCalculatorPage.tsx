@@ -173,20 +173,24 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           <h1
             className={cn(
               'font-bold font-display tracking-tight',
-              SPACING.MB_6,
               TYPOGRAPHY.TEXT_3XL,
               'sm:text-4xl'
             )}
           >
             £{formattedSalary} After Tax UK 2025-26
           </h1>
+          <p className={cn('text-muted-foreground', SPACING.MB_8)}>
+            UK take-home pay calculator for 2025-26 tax year
+          </p>
 
-          <div className={cn('grid lg:grid-cols-2', SPACING.GAP_6)}>
+          <div className='grid gap-8 lg:grid-cols-[400px_1fr] lg:items-start'>
             {/* Quick Results Card */}
             <SalaryQuickResults salary={salary} results={results} comparisons={comparisons} />
 
             {/* SEO Content */}
-            <SalarySEOContent salary={salary} results={results} />
+            <div className='rounded-lg border border-border bg-card p-6'>
+              <SalarySEOContent salary={salary} results={results} />
+            </div>
           </div>
         </div>
       </section>
@@ -203,33 +207,6 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
             </p>
           </div>
           <CalculatorContent />
-        </div>
-      </section>
-
-      {/* Related Searches (SEO) */}
-      <section className='py-8 sm:py-12'>
-        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}>
-          <h2 className={cn('font-semibold', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>
-            Related Salary Calculations
-          </h2>
-          <div className={cn('flex flex-wrap', SPACING.GAP_2)}>
-            {[25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 90000, 100000]
-              .filter((s) => Math.abs(s - salary) > 5000 && Math.abs(s - salary) <= 30000)
-              .map((relatedSalary) => (
-                <Link
-                  key={relatedSalary}
-                  href={`/calculator/${relatedSalary}-after-tax`}
-                  className={cn(
-                    'rounded-md bg-muted transition-colors hover:bg-muted/80',
-                    SPACING.PX_4,
-                    SPACING.PY_2,
-                    TYPOGRAPHY.TEXT_SM
-                  )}
-                >
-                  £{relatedSalary.toLocaleString('en-GB')} salary
-                </Link>
-              ))}
-          </div>
         </div>
       </section>
 

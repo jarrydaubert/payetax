@@ -230,6 +230,11 @@ function CarouselSlide({ post, isActive }: CarouselSlideProps) {
           background: `linear-gradient(135deg, ${categoryConfig.color}15 0%, ${categoryConfig.color}05 50%, #0f172a 100%)`,
         }}
       >
+        {/* Subtle glow effect */}
+        <div
+          className='absolute top-1/4 right-1/4 h-64 w-64 rounded-full blur-3xl opacity-20'
+          style={{ backgroundColor: categoryConfig.color }}
+        />
         {/* Subtle pattern overlay */}
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.03)_0%,transparent_50%)]' />
         <div className='absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent' />

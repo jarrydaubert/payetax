@@ -1,5 +1,6 @@
 'use client';
 
+import './globals.css';
 import * as Sentry from '@sentry/nextjs';
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
@@ -51,16 +52,16 @@ export default function GlobalError({
               <button
                 type='button'
                 onClick={() => reset()}
-                className='inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+                className='relative inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 font-medium text-sm text-white transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] before:absolute before:inset-0 before:rounded-full before:p-[1px] before:bg-gradient-to-r before:from-cyan-500 before:to-emerald-500 before:content-[""] before:-z-10 after:absolute after:inset-[1px] after:rounded-full after:bg-slate-900 after:content-[""] after:-z-10'
               >
-                <RotateCcw className='size-4' />
+                <RotateCcw className='size-3.5' />
                 Try again
               </button>
               <a
                 href='/'
-                className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+                className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-medium text-sm transition-all hover:border-white/20 hover:bg-white/10'
               >
-                <Home className='size-4' />
+                <Home className='size-3.5' />
                 Go home
               </a>
             </div>

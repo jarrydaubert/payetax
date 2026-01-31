@@ -11,7 +11,7 @@
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
 | **Understand the codebase?** | [`ARCHITECTURE.md`](./guides/ARCHITECTURE.md) |
 | **Check tech stack?** | [`TECH_STACK.md`](./guides/TECH_STACK.md) |
-| **Write blog content?** | [`BLOG_GUIDE.md`](./guides/BLOG_GUIDE.md) |
+| **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
@@ -39,11 +39,14 @@ docs/
 │   ├── CASE_STUDY_RECRUITER.md
 │   └── COMPETITOR_GAP_ANALYSIS.md
 │
-├── guides/                # Developer guides (9)
+├── blog/                  # Blog content & strategy (2)
+│   ├── BLOG_GUIDE.md
+│   └── UPCOMING_POSTS.md
+│
+├── guides/                # Developer guides (8)
 │   ├── ARCHITECTURE.md
 │   ├── TECH_STACK.md
 │   ├── TESTING.md
-│   ├── BLOG_GUIDE.md
 │   ├── CONTENT_PHILOSOPHY.md
 │   ├── STYLING-GUIDELINES.md
 │   ├── SENTRY_LOGGING.md

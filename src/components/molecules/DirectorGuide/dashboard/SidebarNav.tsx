@@ -16,8 +16,6 @@ import {
   HelpCircle,
   Mail,
   MapPin,
-  Printer,
-  RotateCcw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -26,19 +24,9 @@ interface SidebarNavProps {
   collapsed?: boolean;
   onToggle?: () => void;
   onEmailResults?: () => void;
-  onReset?: () => void;
 }
 
-export function SidebarNav({
-  collapsed = false,
-  onToggle,
-  onEmailResults,
-  onReset,
-}: SidebarNavProps) {
-  const handlePrint = () => {
-    window.print();
-  };
-
+export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: SidebarNavProps) {
   return (
     <nav
       className={cn(
@@ -73,34 +61,6 @@ export function SidebarNav({
       >
         <Mail className='size-5 shrink-0' />
         {!collapsed && <span className='font-medium text-sm'>Email Results</span>}
-      </button>
-
-      {/* Print */}
-      <button
-        type='button'
-        onClick={handlePrint}
-        className={cn(
-          'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-        )}
-        title='Print'
-      >
-        <Printer className='size-5 shrink-0' />
-        {!collapsed && <span className='font-medium text-sm'>Print</span>}
-      </button>
-
-      {/* Reset */}
-      <button
-        type='button'
-        onClick={onReset}
-        className={cn(
-          'mb-1 flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-        )}
-        title='Reset'
-      >
-        <RotateCcw className='size-5 shrink-0' />
-        {!collapsed && <span className='font-medium text-sm'>Reset</span>}
       </button>
 
       {/* Divider */}
@@ -165,23 +125,7 @@ export function SidebarNav({
         {!collapsed && <span className='font-medium text-sm'>Tax Guides</span>}
       </Link>
 
-      {/* Spacer */}
-      <div className='flex-1' />
-
-      {/* Help */}
-      <Link
-        href='/about'
-        className={cn(
-          'flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
-          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-        )}
-        title='Help & About'
-      >
-        <HelpCircle className='size-5 shrink-0' />
-        {!collapsed && <span className='font-medium text-sm'>Help</span>}
-      </Link>
-
-      {/* Collapse/Expand toggle */}
+      {/* Collapse/Expand toggle - positioned after Tax Guides */}
       {onToggle && (
         <button
           type='button'
@@ -200,6 +144,22 @@ export function SidebarNav({
           {!collapsed && <span className='font-medium text-sm'>Collapse</span>}
         </button>
       )}
+
+      {/* Spacer */}
+      <div className='flex-1' />
+
+      {/* Help */}
+      <Link
+        href='/about'
+        className={cn(
+          'flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-400',
+          collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+        )}
+        title='Help & About'
+      >
+        <HelpCircle className='size-5 shrink-0' />
+        {!collapsed && <span className='font-medium text-sm'>Help</span>}
+      </Link>
     </nav>
   );
 }

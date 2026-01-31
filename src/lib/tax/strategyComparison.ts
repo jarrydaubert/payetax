@@ -38,6 +38,10 @@ export interface StrategyInput {
   yourSetupDividends?: number; // User's current dividends for comparison
   minimumSalaryRequirement?: number; // Minimum salary needed (e.g., for mortgage)
   hasOtherPAYEEmployment?: boolean; // If true, NI threshold already used by other employer
+  // Already taken this year (reduces available for optimization)
+  ytdSalary?: number; // Gross salary already taken via PAYE
+  ytdDividends?: number; // Dividends already declared
+  ytdDrawings?: number; // Other drawings (director's loan)
 }
 
 export interface StrategyResult {
@@ -65,6 +69,8 @@ export interface YourSetupResult extends StrategyResult {
 
 export interface StrategyComparison {
   grossProfit: number;
+  alreadyTaken: number; // Total YTD salary + dividends + drawings
+  availableForExtraction: number; // grossProfit - alreadyTaken (floored at 0)
   strategies: {
     allSalary: StrategyResult;
     optimalMix: StrategyResult;
@@ -146,10 +152,19 @@ export function calculateStrategyComparison(
   const hasOtherPAYE = input.hasOtherPAYEEmployment ?? false;
   const lossesBroughtForward = input.lossesBroughtForward ?? 0;
 
+  // Calculate YTD amounts already taken
+  const ytdSalary = input.ytdSalary ?? 0;
+  const ytdDividends = input.ytdDividends ?? 0;
+  const ytdDrawings = input.ytdDrawings ?? 0;
+  const alreadyTaken = ytdSalary + ytdDividends + ytdDrawings;
+
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
   const netRevenue = input.includesVat ? input.revenue / (1 + VAT_RATE) : input.revenue;
   const grossProfitBeforePension = netRevenue - input.expenses;
   const grossProfit = Math.max(0, grossProfitBeforePension - pensionContribution);
+
+  // Available for extraction (profit minus what's already been taken)
+  const availableForExtraction = Math.max(0, grossProfit - alreadyTaken);
 
   // Calculate each strategy
   const allSalary = calculateAllSalaryStrategy(
@@ -225,6 +240,8 @@ export function calculateStrategyComparison(
 
   return {
     grossProfit: round(grossProfitBeforePension),
+    alreadyTaken: round(alreadyTaken),
+    availableForExtraction: round(availableForExtraction),
     strategies,
     recommended,
     savingsVsAllSalary: round(savingsVsAllSalary),

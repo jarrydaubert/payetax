@@ -71,6 +71,10 @@ export function TaxPots() {
 
   const personalTotal = values.incomeTax + values.dividendTax + values.studentLoan;
 
+  // Monthly set-aside amounts (annual ÷ 12)
+  const monthlyCompanyPot = Math.round(values.corporationTax / 12);
+  const monthlyPersonalPot = Math.round(personalTotal / 12);
+
   return (
     <div className='space-y-6'>
       <div className='grid gap-6 md:grid-cols-2'>
@@ -86,9 +90,9 @@ export function TaxPots() {
               <span className='font-mono'>{formatCurrency(values.corporationTax)}</span>
             </div>
             <div className='flex justify-between border-white/5 border-t pt-2'>
-              <span className='font-medium text-slate-100'>Total</span>
+              <span className='font-medium text-slate-100'>Monthly</span>
               <span className='font-mono font-semibold text-cyan-400'>
-                {formatCurrency(values.corporationTax)}
+                {formatCurrency(monthlyCompanyPot)}/mo
               </span>
             </div>
           </div>
@@ -116,14 +120,20 @@ export function TaxPots() {
               </div>
             )}
             <div className='flex justify-between border-white/5 border-t pt-2'>
-              <span className='font-medium text-slate-100'>Total</span>
+              <span className='font-medium text-slate-100'>Monthly</span>
               <span className='font-mono font-semibold text-purple-400'>
-                {formatCurrency(personalTotal)}
+                {formatCurrency(monthlyPersonalPot)}/mo
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Disclaimer per spec */}
+      <p className='text-center text-slate-600 text-xs'>
+        Recommended set-aside for budgeting — not HMRC payment amounts. See Key Dates for actual due
+        dates.
+      </p>
     </div>
   );
 }

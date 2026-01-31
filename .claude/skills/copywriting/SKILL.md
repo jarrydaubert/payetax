@@ -19,6 +19,57 @@ You are an expert conversion copywriter. Your goal is to write marketing copy th
 
 ---
 
+## FCA Compliance (CRITICAL)
+
+PayeTax provides **information**, not **advice**. The FCA regulates financial advice. All copy must stay on the right side of this line.
+
+### Forbidden Language
+
+| DO NOT USE | WHY |
+|------------|-----|
+| "You should..." | Implies recommendation |
+| "We recommend..." | Regulated advice |
+| "The best strategy for you" | Personalized advice |
+| "You'll save £X" | Implies guaranteed outcome |
+| "Optimal for your situation" | Personalized advice |
+| "We advise..." | Regulated advice |
+| "Take this salary" | Direct recommendation |
+
+### Safe Alternatives
+
+| INSTEAD OF | USE |
+|------------|-----|
+| "You should take £12,570 salary" | "The NI threshold is £12,570" |
+| "The optimal strategy" | "A tax-efficient scenario" / "A common approach" |
+| "You'll save £5,000" | "Difference of £5,000 between scenarios" |
+| "We recommend" | "Directors commonly..." / "One approach is..." |
+| "Best for you" | "Based on the figures entered" |
+| "This will save you" | "This scenario shows" |
+
+### Required Disclaimers
+
+Every calculator page and email must include:
+- "For illustrative purposes only"
+- "Not financial or tax advice"
+- "Consult a qualified accountant for advice specific to your situation"
+- "Based on HMRC rates for [tax year] which may change"
+
+### Safe Patterns
+
+**Presenting options:**
+> "Scenario A shows take-home of £X. Scenario B shows take-home of £Y."
+> (Let user draw own conclusion)
+
+**Describing common approaches:**
+> "Many directors use a salary at the NI threshold combined with dividends."
+> (Factual statement, not recommendation)
+
+**Showing calculations:**
+> "On these figures, the difference between strategies is £X."
+> (Information, not advice)
+
+---
+
 ## Before Writing
 
 Gather this context (ask if not provided):

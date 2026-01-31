@@ -102,7 +102,6 @@ export function DirectorDashboard() {
           <SidebarNav
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
-            onReset={handleReset}
             onEmailResults={() => setEmailDialogOpen(true)}
           />
         }

@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import { BlogNav } from '@/components/molecules/BlogNav';
 import { PullQuote } from '@/components/molecules/PullQuote';
 import { AllPostsGrid } from '@/components/organisms/AllPostsGrid';
-import { BlogCarousel } from '@/components/organisms/BlogCarousel';
 import { DeepDives } from '@/components/organisms/DeepDives';
 import { EditorsPicksSticky } from '@/components/organisms/EditorsPicks';
 import { LatestArticles } from '@/components/organisms/LatestArticles';
@@ -16,7 +15,6 @@ import {
   getBlogPostsCount,
   getDeepDives,
   getEditorsPicks,
-  getFeaturedPosts,
   getLatestPosts,
 } from '@/lib/blog';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
@@ -97,16 +95,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
 
   // Fetch all data in parallel for magazine layout
-  const [carouselPosts, editorsPicks, deepDives, totalPosts] = await Promise.all([
-    getFeaturedPosts(), // For hero carousel
+  const [editorsPicks, deepDives, totalPosts, latestPosts] = await Promise.all([
     getEditorsPicks(5), // For sidebar
     getDeepDives(6), // For deep dives section
     getBlogPostsCount(), // Total count for pagination
+    getLatestPosts(5), // For latest articles section
   ]);
-
-  // Get carousel slugs to exclude from latest articles
-  const carouselSlugs = carouselPosts.map((p) => p.slug);
-  const latestPosts = await getLatestPosts(5, carouselSlugs);
 
   // Get paginated posts for All Posts section
   const paginatedPosts = await getBlogPosts({
@@ -162,14 +156,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
       {/* Magazine-style layout */}
       <div className='min-h-screen bg-slate-950'>
-        {/* Hero Carousel - Full width */}
-        <BlogCarousel posts={carouselPosts} />
-
-        {/* Category Navigation */}
-        <div className='container mx-auto max-w-7xl px-4 pt-8'>
-          <BlogNav />
-        </div>
-
         {/* Main Content with Sidebar */}
         <div className='container mx-auto max-w-7xl px-4 py-12'>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
@@ -183,10 +169,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
               {/* Deep Dives */}
               <DeepDives posts={deepDives} />
+
+              {/* Category Navigation - Below Deep Dives */}
+              <div className='pt-4'>
+                <BlogNav />
+              </div>
             </div>
 
-            {/* Sidebar - Editor's Picks */}
-            <aside className='hidden lg:block'>
+            {/* Sidebar - Editor's Picks (mt-12 aligns with Latest Articles content) */}
+            <aside className='hidden lg:block lg:mt-12'>
               <EditorsPicksSticky posts={editorsPicks} />
             </aside>
           </div>
@@ -195,11 +186,22 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <div className='mt-12 lg:hidden'>
             <EditorsPicksSticky posts={editorsPicks} />
           </div>
+        </div>
 
+        {/* All Posts Section - Server-side pagination */}
+        <div className='border-slate-800 border-t'>
+          <AllPostsGrid
+            posts={paginatedPosts}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalPosts={totalPosts}
+          />
+        </div>
+
+        {/* CTAs - Below All Posts */}
+        <div className='container mx-auto max-w-7xl px-4 py-16'>
           {/* Newsletter CTA */}
-          <div className='mt-16'>
-            <NewsletterCTA />
-          </div>
+          <NewsletterCTA />
 
           {/* Calculator CTA */}
           <div className='mt-8 text-center'>
@@ -225,16 +227,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               </svg>
             </a>
           </div>
-        </div>
-
-        {/* All Posts Section - Server-side pagination */}
-        <div className='border-slate-800 border-t'>
-          <AllPostsGrid
-            posts={paginatedPosts}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalPosts={totalPosts}
-          />
         </div>
       </div>
     </>

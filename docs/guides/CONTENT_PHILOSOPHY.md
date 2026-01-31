@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document complements BLOG_GUIDE.md with a social-first content philosophy. While BLOG_GUIDE.md covers SEO, YMYL compliance, and publishing workflows, this guide focuses on **how to write content that stops the scroll and builds genuine audience trust**.
+This document complements [BLOG_GUIDE.md](../blog/BLOG_GUIDE.md) with a social-first content philosophy. While BLOG_GUIDE.md covers SEO, YMYL compliance, and publishing workflows, this guide focuses on **how to write content that stops the scroll and builds genuine audience trust**.
 
 The core insight: a brilliant tax insight doesn't automatically become great content. The writing matters as much as the information.
 

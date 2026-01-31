@@ -12,54 +12,58 @@
  * Blog categories with styling and metadata
  * Keys MUST match the category values in MDX frontmatter
  */
+// Brand color for all category badges
+const BRAND_COLOR = '#06b6d4'; // Cyan-500
+const BRAND_TEXT = '#020617'; // Slate-950 (dark)
+
 export const BLOG_CATEGORIES = {
   // Tax Guides group
   'salary-guides': {
     key: 'salary-guides',
     label: 'Salary Guides',
     slug: 'salary-guides',
-    color: '#f59e0b', // Amber
-    textColor: '#000000',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   'tax-basics': {
     key: 'tax-basics',
     label: 'Tax Basics',
     slug: 'tax-basics',
-    color: '#10b981', // Emerald
-    textColor: '#000000',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   'tax-planning': {
     key: 'tax-planning',
     label: 'Tax Planning',
     slug: 'tax-planning',
-    color: '#8b5cf6', // Violet
-    textColor: '#ffffff',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   'tax-tips': {
     key: 'tax-tips',
     label: 'Tax Tips',
     slug: 'tax-tips',
-    color: '#06b6d4', // Cyan
-    textColor: '#000000',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   'tax-comparison': {
     key: 'tax-comparison',
     label: 'Tax Comparison',
     slug: 'tax-comparison',
-    color: '#ec4899', // Pink
-    textColor: '#ffffff',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   'tax-tools': {
     key: 'tax-tools',
     label: 'Tax Tools',
     slug: 'tax-tools',
-    color: '#14b8a6', // Teal
-    textColor: '#000000',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Tax Guides',
   },
   // Student Loans
@@ -67,8 +71,8 @@ export const BLOG_CATEGORIES = {
     key: 'student-loans',
     label: 'Student Loans',
     slug: 'student-loans',
-    color: '#3b82f6', // Blue
-    textColor: '#ffffff',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'Student Loans',
   },
   // News group
@@ -76,16 +80,16 @@ export const BLOG_CATEGORIES = {
     key: 'tax-changes',
     label: 'Tax Changes',
     slug: 'tax-changes',
-    color: '#ef4444', // Red
-    textColor: '#ffffff',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'News',
   },
   'tax-deadlines': {
     key: 'tax-deadlines',
     label: 'Tax Deadlines',
     slug: 'tax-deadlines',
-    color: '#f97316', // Orange
-    textColor: '#000000',
+    color: BRAND_COLOR,
+    textColor: BRAND_TEXT,
     navGroup: 'News',
   },
 } as const;

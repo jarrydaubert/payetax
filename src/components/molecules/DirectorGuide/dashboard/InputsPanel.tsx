@@ -7,15 +7,7 @@
  */
 'use client';
 
-import {
-  ChevronDown,
-  ChevronUp,
-  Crown,
-  FileDown,
-  HelpCircle,
-  RotateCcw,
-  Share2,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, HelpCircle, RotateCcw } from 'lucide-react';
 import { useId, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -390,11 +382,16 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       {/* Spacer */}
       <div className='flex-1' />
 
-      {/* Quick Actions */}
-      <div className='mt-6 space-y-2'>
-        <QuickAction icon={RotateCcw} label='Reset' onClick={handleReset} />
-        <QuickAction icon={FileDown} label='Export PDF' disabled isPro />
-        <QuickAction icon={Share2} label='Share' disabled isPro />
+      {/* Reset Button */}
+      <div className='mt-6'>
+        <button
+          type='button'
+          onClick={handleReset}
+          className='flex w-full items-center gap-3 rounded-lg border border-white/[0.04] bg-[#1e293b] px-3 py-2 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-[#273548] hover:text-slate-200'
+        >
+          <RotateCcw className='size-4 text-cyan-500' />
+          <span className='flex-1'>Reset</span>
+        </button>
       </div>
     </aside>
   );
@@ -441,37 +438,5 @@ function Tip({ content }: { content: string }) {
         <p className='text-xs'>{content}</p>
       </TooltipContent>
     </Tooltip>
-  );
-}
-
-function QuickAction({
-  icon: Icon,
-  label,
-  onClick,
-  disabled,
-  isPro,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  isPro?: boolean;
-}) {
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        'flex w-full items-center gap-3 rounded-lg border border-white/[0.04] bg-[#1e293b] px-3 py-2 text-left text-slate-400 text-sm transition-all',
-        disabled
-          ? 'cursor-not-allowed opacity-50'
-          : 'hover:border-white/[0.08] hover:bg-[#273548] hover:text-slate-200'
-      )}
-    >
-      <Icon className='size-4 text-cyan-500' />
-      <span className='flex-1'>{label}</span>
-      {isPro && <Crown className='size-3 text-amber-500' />}
-    </button>
   );
 }

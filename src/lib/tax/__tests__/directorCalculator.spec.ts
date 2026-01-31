@@ -849,51 +849,73 @@ describe('Warning Triggers', () => {
 
 describe('Outputs', () => {
   describe('Strategy Cards', () => {
-    it('should output 4 strategy cards', () => {
-      const _profit = 100000;
-      // const strategies = calculateAllStrategies(profit);
-      // expect(strategies).toHaveLength(4);
-      // expect(strategies.map(s => s.name)).toEqual([
-      //   'All Salary',
-      //   'Highest Take-Home',
-      //   'All Dividends',
-      //   'Your Setup'
-      // ]);
+    const createInput = (profit: number, overrides = {}) => ({
+      region: 'rUK' as const,
+      revenue: profit,
+      includesVat: false,
+      expenses: 0,
+      ...overrides,
+    });
+
+    it('should output 3 strategies + Your Setup when compare inputs provided', () => {
+      const input = createInput(100000, {
+        yourSetupSalary: 30000,
+        yourSetupDividends: 40000,
+      });
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      expect(result.strategies.allSalary).toBeDefined();
+      expect(result.strategies.optimalMix).toBeDefined();
+      expect(result.strategies.allDividends).toBeDefined();
+      expect(result.strategies.yourSetup).toBeDefined();
+      expect(result.strategies.allSalary.name).toBe('All Salary');
+      expect(result.strategies.optimalMix.name).toBe('Optimal Mix');
+      expect(result.strategies.allDividends.name).toBe('All Dividends');
+      expect(result.strategies.yourSetup?.name).toBe('Your Setup');
     });
 
     it('should show salary, dividends, total tax, effective rate, net take-home on each card', () => {
-      const _profit = 100000;
-      // const card = calculateOptimal(profit);
-      // expect(card).toHaveProperty('salary');
-      // expect(card).toHaveProperty('dividends');
-      // expect(card).toHaveProperty('totalTax');
-      // expect(card).toHaveProperty('effectiveRate');
-      // expect(card).toHaveProperty('netTakeHome');
+      const input = createInput(100000);
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      const card = result.strategies.optimalMix;
+      expect(card).toHaveProperty('salary');
+      expect(card).toHaveProperty('dividends');
+      expect(card).toHaveProperty('totalPersonalTax');
+      expect(card).toHaveProperty('effectiveRate');
+      expect(card).toHaveProperty('takeHome');
     });
 
-    it('should highlight Highest Take-Home card as recommended', () => {
-      const _profit = 100000;
-      // const strategies = calculateAllStrategies(profit);
-      // const optimal = strategies.find(s => s.name === 'Highest Take-Home');
-      // expect(optimal.isHighlighted).toBe(true);
+    it('should identify recommended strategy based on highest take-home', () => {
+      const input = createInput(100000);
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      // The recommended strategy should have the highest take-home
+      const strategies = [
+        { key: 'allSalary', takeHome: result.strategies.allSalary.takeHome },
+        { key: 'optimalMix', takeHome: result.strategies.optimalMix.takeHome },
+        { key: 'allDividends', takeHome: result.strategies.allDividends.takeHome },
+      ];
+      const best = strategies.reduce((a, b) => (a.takeHome > b.takeHome ? a : b));
+      expect(result.recommended).toBe(best.key);
     });
 
-    it('should pre-populate Your Setup with optimal values', () => {
-      const _profit = 100000;
-      // const optimal = calculateOptimal(profit);
-      // const yourSetup = getYourSetupDefaults(profit);
-      // expect(yourSetup.salary).toBe(optimal.salary);
-      // expect(yourSetup.dividends).toBe(optimal.dividends);
+    it('should calculate Your Setup delta vs optimal', () => {
+      const input = createInput(100000, {
+        yourSetupSalary: 50000, // Suboptimal high salary
+        yourSetupDividends: 30000,
+      });
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      expect(result.strategies.yourSetup?.deltaVsOptimal).toBeDefined();
+      // deltaVsOptimal = optimalTakeHome - yourSetupTakeHome
+      // Positive means Your Setup gets less take-home than optimal
+      expect(result.strategies.yourSetup?.deltaVsOptimal).toBeGreaterThan(0);
     });
 
-    it('should turn Your Setup card RED when inputs exceed profit', () => {
-      const _input = {
-        profit: 50000,
-        compareSalary: 30000,
-        compareDividends: 40000,
-      };
-      // expect(getYourSetupCardStyle(input)).toBe('red');
-      // expect(getYourSetupWarning(input)).toContain('Director\'s Loan');
+    it('should flag exceedsProfit when Your Setup inputs exceed available profit', () => {
+      const input = createInput(50000, {
+        yourSetupSalary: 30000,
+        yourSetupDividends: 40000, // Total ~75k cost > 50k profit
+      });
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      expect(result.strategies.yourSetup?.exceedsProfit).toBe(true);
     });
   });
 
@@ -2349,57 +2371,83 @@ describe('RUTHLESS: Negative and Zero Value Attacks', () => {
 
   it('should not crash on zero profit', () => {
     // BUG: Division by zero in effective rate calculation
-    const _input = { profit: 0 };
-    // expect(() => calculateAllStrategies(input)).not.toThrow();
-    // expect(calculateEffectiveRate(input)).toBe(0); // Not NaN or Infinity
+    const input = {
+      region: 'rUK' as const,
+      revenue: 0,
+      includesVat: false,
+      expenses: 0,
+    };
+    expect(() => calculateStrategyComparison(input, TAX_YEAR)).not.toThrow();
+    const result = calculateStrategyComparison(input, TAX_YEAR);
+    expect(result.strategies.optimalMix.takeHome).toBe(0);
   });
 
   it('should not crash on negative profit', () => {
     // BUG: Negative values cause NaN or crash
-    const _input = { profit: -50000 };
-    // expect(() => calculateAllStrategies(input)).not.toThrow();
+    const input = {
+      region: 'rUK' as const,
+      revenue: 0,
+      includesVat: false,
+      expenses: 50000, // Creates negative profit
+    };
+    expect(() => calculateStrategyComparison(input, TAX_YEAR)).not.toThrow();
   });
 
   it('should not crash on zero salary', () => {
     // BUG: Zero salary causes division by zero
-    const _salary = 0;
-    // expect(calculateIncomeTax(salary, 'rUK')).toBe(0);
-    // expect(calculateEmployeeNI(salary)).toBe(0);
+    const salary = 0;
+    expect(calculateIncomeTax(salary, 'rUK', TAX_YEAR).incomeTax).toBe(0);
+    expect(calculateEmployeeNI(salary, TAX_YEAR).employeeNI).toBe(0);
+    expect(calculateEmployerNI(salary, TAX_YEAR).employerNI).toBe(0);
   });
 
   it('should not crash on zero dividends', () => {
     // BUG: Zero dividends causes issues in split calculation
-    const _dividends = 0;
-    // expect(calculateDividendTax(dividends, 30000)).toBe(0);
+    const dividends = 0;
+    const result = calculateDividendTax(dividends, 30000, TAX_YEAR);
+    expect(result.dividendTax).toBe(0);
   });
 
   it('should not allow negative tax (become a credit)', () => {
     // BUG: Edge case combinations produce negative tax
     // This would be a security issue - users could get "refunds"
-    const inputs = [{ profit: 1 }, { profit: 100, salary: 100 }, { profit: 12570, salary: 12570 }];
-    for (const _input of inputs) {
-      // const result = calculateAllTaxes(input);
-      // expect(result.totalTax).toBeGreaterThanOrEqual(0);
-      // expect(result.incomeTax).toBeGreaterThanOrEqual(0);
-      // expect(result.employeeNI).toBeGreaterThanOrEqual(0);
-      // expect(result.employerNI).toBeGreaterThanOrEqual(0);
-      // expect(result.corporationTax).toBeGreaterThanOrEqual(0);
+    const salaries = [1, 100, 12570, 50000];
+    for (const salary of salaries) {
+      const incomeTax = calculateIncomeTax(salary, 'rUK', TAX_YEAR);
+      const employeeNI = calculateEmployeeNI(salary, TAX_YEAR);
+      const employerNI = calculateEmployerNI(salary, TAX_YEAR);
+      expect(incomeTax.incomeTax).toBeGreaterThanOrEqual(0);
+      expect(employeeNI.employeeNI).toBeGreaterThanOrEqual(0);
+      expect(employerNI.employerNI).toBeGreaterThanOrEqual(0);
     }
   });
 
   it('should handle net take-home never exceeding gross profit', () => {
     // BUG: Net somehow greater than gross (math error)
     const profits = [1000, 10000, 50000, 100000, 500000];
-    for (const _profit of profits) {
-      // const result = calculateOptimal({ profit });
-      // expect(result.netTakeHome).toBeLessThanOrEqual(profit);
+    for (const profit of profits) {
+      const input = {
+        region: 'rUK' as const,
+        revenue: profit,
+        includesVat: false,
+        expenses: 0,
+      };
+      const result = calculateStrategyComparison(input, TAX_YEAR);
+      expect(result.strategies.optimalMix.takeHome).toBeLessThanOrEqual(profit);
+      expect(result.strategies.allSalary.takeHome).toBeLessThanOrEqual(profit);
+      expect(result.strategies.allDividends.takeHome).toBeLessThanOrEqual(profit);
     }
   });
 
   it('should not crash on extremely small profit (£0.01)', () => {
     // BUG: Very small values cause precision issues or division by zero
-    const _input = { profit: 0.01 };
-    // expect(() => calculateAllStrategies(input)).not.toThrow();
+    const input = {
+      region: 'rUK' as const,
+      revenue: 0.01,
+      includesVat: false,
+      expenses: 0,
+    };
+    expect(() => calculateStrategyComparison(input, TAX_YEAR)).not.toThrow();
   });
 });
 

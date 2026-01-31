@@ -461,6 +461,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 yourSetupDividends: formData.yourSetupDividends,
                 minimumSalaryRequirement: formData.minimumSalaryRequirement,
                 hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
+                // YTD amounts (for available extraction calculation and warnings)
+                ytdSalary: formData.ytdSalary,
+                ytdDividends: formData.ytdDividends,
+                ytdDrawings: formData.ytdDrawings,
               },
               CURRENT_TAX_YEAR
             );

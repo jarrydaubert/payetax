@@ -342,6 +342,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <li>• Marriage Allowance transfers</li>
               <li>• IR35 status considerations</li>
               <li>• Pension carry-forward from previous years</li>
+              <li>• MPAA (Money Purchase Annual Allowance) - £10k limit if pension accessed</li>
               <li>• Dividend timing (declaration vs payment date)</li>
             </ul>
           </div>
