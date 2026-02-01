@@ -31,9 +31,6 @@
 
 - [ ] Add `UNSUBSCRIBE_SECRET` to Vercel production/preview env vars (random 32+ char string)
 - Without this, unsubscribe tokens use a default secret (less secure)
-- [ ] Add `NEXT_PUBLIC_AHREFS_KEY` to Vercel production/preview env vars
-- Value: `QVltTEcUkJo80YKtGhAvrg` (migrated from hardcoded value in AhrefsAnalytics.tsx)
-- Without this, Ahrefs analytics won't load
 
 ### Monetization
 > Stripe = £0. Fix that first. See `docs/business/MONETIZATION.md`.
