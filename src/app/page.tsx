@@ -62,6 +62,7 @@ export default function HomePage() {
       <DeferredContent
         timeout={0}
         rootMargin='100px'
+        forceRenderOnHash='#tax-calculator'
         fallback={<div className='min-h-[100px]' aria-hidden='true' />}
       >
         <HomePageContent />

@@ -111,8 +111,11 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         // Already on home - scroll directly or wait for element
         if (!scrollToCalculator()) {
           waitForElementAndScroll();
+          // Trigger hashchange so DeferredContent can render the calculator section even if it's deferred.
+          window.location.hash = CALCULATOR_ID;
+          return;
         }
-        // Update hash for bookmarking/sharing
+        // Update hash for bookmarking/sharing (no extra history entry)
         window.history.replaceState(null, '', CALCULATOR_HASH);
       } else {
         // Navigate to home with hash - HomePageContent handles scroll via hashchange

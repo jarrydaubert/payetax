@@ -10,6 +10,11 @@ interface DeferredContentProps {
   rootMargin?: string;
   /** Fallback timeout in ms to ensure content loads even without scroll (default: 2000ms) */
   timeout?: number;
+  /**
+   * Force render when the current URL hash matches one of these values.
+   * Useful when content is deferred but must be reachable via in-page navigation (e.g. navbar anchor links).
+   */
+  forceRenderOnHash?: string | string[];
 }
 
 /**
@@ -24,11 +29,27 @@ export function DeferredContent({
   fallback,
   rootMargin = '200px',
   timeout = 2000,
+  forceRenderOnHash,
 }: DeferredContentProps) {
   const [shouldRender, setShouldRender] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const hashTargets = Array.isArray(forceRenderOnHash)
+      ? forceRenderOnHash
+      : forceRenderOnHash
+        ? [forceRenderOnHash]
+        : [];
+
+    const hashMatches = () =>
+      hashTargets.length > 0 && hashTargets.includes(window.location.hash);
+
+    // If the user arrived via an anchor link, render immediately so scrolling can work.
+    if (hashMatches()) {
+      setShouldRender(true);
+      return;
+    }
+
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     // Fallback timer - only set if timeout > 0
@@ -37,6 +58,14 @@ export function DeferredContent({
         setShouldRender(true);
       }, timeout);
     }
+
+    // If hash changes to a forced target later (e.g. navbar click), render immediately.
+    const onHashChange = () => {
+      if (hashMatches()) {
+        setShouldRender(true);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
 
     // Intersection Observer - load when approaching viewport
     const observer = new IntersectionObserver(
@@ -56,10 +85,11 @@ export function DeferredContent({
     }
 
     return () => {
+      window.removeEventListener('hashchange', onHashChange);
       observer.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [rootMargin, timeout]);
+  }, [rootMargin, timeout, forceRenderOnHash]);
 
   if (!shouldRender) {
     return <div ref={ref}>{fallback}</div>;
