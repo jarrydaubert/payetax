@@ -29,13 +29,12 @@ const nextConfig: NextConfig = {
     // ppr: 'incremental', // Disabled - requires canary version
 
     // Optimize specific package imports for better tree-shaking
+    // Note: lucide-react, lodash-es, date-fns are optimized by default in Next.js 16
+    // Only include packages not in the default list
     optimizePackageImports: [
-      'lucide-react',
       '@headlessui/react',
-      'zustand',
       'react-hook-form',
-      'zod',
-      'framer-motion', // Tree-shake animation library
+      'framer-motion',
       'react-markdown',
       '@mdx-js/react',
       '@mdx-js/loader',
@@ -45,26 +44,23 @@ const nextConfig: NextConfig = {
       'rehype-autolink-headings',
       'rehype-slug',
       'remark-gfm',
-      '@sentry/nextjs', // Tree-shake Sentry
     ],
-    // Enable for memory-intensive builds (recommended for large apps)
-    webpackMemoryOptimizations: true,
-    // Note: instrumentationHook is now enabled by default in Next.js 15.5+
 
-    // NEW: Next.js 16 - Fine-grained stale time control for ISR
-    // Default stale time for pages with revalidate
+    // Stale times for client-side router cache (experimental - monitor for issues)
+    // Can be disabled if caching causes stale data problems
     staleTimes: {
-      dynamic: 30, // Dynamic routes stay fresh for 30s
-      static: 180, // Static routes stay fresh for 3 minutes
+      dynamic: 30,
+      static: 180,
     },
   },
 
-  // Turbopack configuration (stable for dev, alpha for prod)
-  // Note: Custom webpack plugins may not apply in Turbopack prod (alpha)
-  // RE-ENABLED: Fixed with optimized Lucide imports (direct paths vs barrel exports)
+  // Turbopack configuration (used for dev, webpack used for prod builds via --webpack flag)
   turbopack: {
     rules: {
-      '*.svg': ['@svgr/webpack'],
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
     },
   },
 
@@ -85,9 +81,8 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Disable source maps in production for better performance
-  // Enable temporarily when debugging production issues
-  productionBrowserSourceMaps: false,
+  // Enable source maps for Sentry error tracking (deleted after upload via Sentry config)
+  productionBrowserSourceMaps: true,
 
   // Advanced webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
@@ -163,14 +158,6 @@ const nextConfig: NextConfig = {
             value: 'nosniff',
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
@@ -189,10 +176,11 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             // Note: 'unsafe-eval' only in dev for React source maps, removed in production for security
+            // Added: object-src, base-uri, form-action, frame-ancestors for comprehensive protection
             value:
               process.env.NODE_ENV === 'development'
-                ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';"
-                : "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self';",
+                ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
+                : "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://analytics.ahrefs.com https://giscus.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io https://analytics.ahrefs.com https://giscus.app; frame-src 'self' https://giscus.app; worker-src 'self' blob:; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
           },
         ],
       },
@@ -240,6 +228,11 @@ const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
     excludeDebugStatements: true,
     excludeReplayShadowDom: true,
     excludeReplayIframe: true,
+  },
+
+  // Delete source maps after upload to Sentry (don't expose in production)
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
   },
 });
 

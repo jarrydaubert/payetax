@@ -1,11 +1,7 @@
-// src/app/compliance/CompliancePageClient.tsx
-'use client';
+// src/app/compliance/CompliancePageContent.tsx
+// Server Component - all presentational, no hooks/handlers
 
-import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
-import Award from 'lucide-react/dist/esm/icons/award.js';
-import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
-import ExternalLink from 'lucide-react/dist/esm/icons/external-link.js';
-import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import { AlertTriangle, Award, CheckCircle, ExternalLink, Shield } from 'lucide-react';
 import { GradientText } from '@/components/atoms/GradientText';
 import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { PageHero } from '@/components/molecules/PageHero';
@@ -22,7 +18,7 @@ import {
 } from '@/constants/pages/compliancePageData';
 import { cn } from '@/lib/utils';
 
-export function CompliancePageClient() {
+export function CompliancePageContent() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero */}
@@ -63,7 +59,6 @@ export function CompliancePageClient() {
                 <Card
                   key={feature.title}
                   className={cn(
-                    SURFACES.BORDER_PRIMARY,
                     'bg-gradient-to-br',
                     feature.color,
                     SPACING.P_8,
@@ -204,7 +199,7 @@ export function CompliancePageClient() {
         links={[
           {
             text: 'support@payetax.co.uk',
-            href: 'mailto:support@payetax.co.uk?subject=Compliance Question',
+            href: `mailto:support@payetax.co.uk?subject=${encodeURIComponent('Compliance Question')}`,
             type: 'email',
           },
         ]}

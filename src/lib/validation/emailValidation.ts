@@ -20,32 +20,42 @@ import { z } from 'zod';
 export const EmailSchema = z.string().email('Please enter a valid email address');
 
 /**
- * Tax year string validation (e.g., "2025-2026" or "2025-26")
+ * Tax year string validation
+ * Constrained to prevent HTML injection when interpolated into emails
+ * Accepts: "2024-25", "2025-26", "2024-2025", "2025-2026" patterns
  */
-export const TaxYearStringSchema = z.string().optional();
+export const TaxYearStringSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2,4}$/, 'Invalid tax year format')
+  .optional();
 
 // ============================================================================
 // PAYE CALCULATOR EMAIL SCHEMAS
 // ============================================================================
 
+// Reasonable bounds for PAYE values (prevents abuse/garbage)
+const payeMoneyField = z.number().finite().min(0).max(10_000_000);
+const payeRateField = z.number().finite().min(0).max(100);
+
 /**
  * Pay period values for tax calculation results
+ * All monetary fields bounded 0-10M
  */
 export const PayPeriodValuesSchema = z.object({
-  annually: z.number(),
-  monthly: z.number(),
-  weekly: z.number().optional(),
-  daily: z.number().optional(),
-  hourly: z.number().optional(),
+  annually: payeMoneyField,
+  monthly: payeMoneyField,
+  weekly: payeMoneyField.optional(),
+  daily: payeMoneyField.optional(),
+  hourly: payeMoneyField.optional(),
 });
 
 /**
  * Tax band breakdown for results
  */
 export const TaxBandSchema = z.object({
-  name: z.string(),
-  rate: z.number(),
-  amount: z.number(),
+  name: z.string().max(50),
+  rate: payeRateField,
+  amount: payeMoneyField,
 });
 
 /**
@@ -58,9 +68,9 @@ export const PayeResultsSchema = z.object({
   pensionContribution: PayPeriodValuesSchema,
   studentLoan: PayPeriodValuesSchema,
   netPay: PayPeriodValuesSchema,
-  taxFreeAmount: z.number().optional(),
-  taxableIncome: z.number().optional(),
-  employerNI: z.number().optional(),
+  taxFreeAmount: payeMoneyField.optional(),
+  taxableIncome: payeMoneyField.optional(),
+  employerNI: payeMoneyField.optional(),
   taxBands: z.array(TaxBandSchema).optional(),
 });
 
@@ -78,25 +88,31 @@ export const SendResultsRequestSchema = z.object({
 // DIRECTOR CALCULATOR EMAIL SCHEMAS
 // ============================================================================
 
+// Reasonable bounds for director calculator values (prevents abuse/garbage)
+const MAX_MONEY = 10_000_000; // £10M max
+const moneyField = z.number().finite().min(0).max(MAX_MONEY);
+const rateField = z.number().finite().min(0).max(100);
+
 /**
  * Director strategy results for email
+ * All monetary fields bounded 0-10M, rates 0-100%
  */
 export const DirectorStrategySchema = z.object({
-  name: z.string(),
-  salary: z.number(),
-  dividends: z.number(),
-  pension: z.number(),
-  companyCarBIK: z.number(),
-  employerNI: z.number(),
-  employeeNI: z.number(),
-  incomeTax: z.number(),
-  corporationTax: z.number(),
-  dividendTax: z.number(),
-  studentLoan: z.number(),
-  totalPersonalTax: z.number(),
-  companyCost: z.number(),
-  takeHome: z.number(),
-  effectiveRate: z.number(),
+  name: z.string().max(100),
+  salary: moneyField,
+  dividends: moneyField,
+  pension: moneyField,
+  companyCarBIK: moneyField,
+  employerNI: moneyField,
+  employeeNI: moneyField,
+  incomeTax: moneyField,
+  corporationTax: moneyField,
+  dividendTax: moneyField,
+  studentLoan: moneyField,
+  totalPersonalTax: moneyField,
+  companyCost: moneyField,
+  takeHome: moneyField,
+  effectiveRate: rateField,
 });
 
 /**
@@ -114,10 +130,10 @@ export const AllStrategiesSchema = z.object({
 export const SendDirectorResultsRequestSchema = z.object({
   email: EmailSchema,
   results: z.object({
-    grossProfit: z.number(),
+    grossProfit: moneyField,
     strategies: AllStrategiesSchema,
     recommended: z.enum(['allSalary', 'optimalMix', 'allDividends']),
-    savingsVsAllSalary: z.number(),
+    savingsVsAllSalary: moneyField,
   }),
   taxYear: TaxYearStringSchema,
 });

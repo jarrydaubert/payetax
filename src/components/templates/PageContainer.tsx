@@ -1,41 +1,56 @@
 /**
- * src/components/ui/PageContainer.tsx
+ * src/components/templates/PageContainer.tsx
  *
- * A standardized page container with consistent styling and layout
- * Used across about, privacy, and feedback pages to maintain design consistency
- * FIXED: Now includes proper navbar spacing to prevent content overlap
+ * A standardized page container with consistent styling and layout.
+ * Used for content pages (about, privacy, etc.) to maintain design consistency.
+ *
+ * Spacing architecture:
+ * - SimpleNavbar includes a spacer div (h-16 sm:h-20) for fixed navbar clearance
+ * - This container adds content padding (py-8 sm:py-12) below that spacer
+ * - Set includeNavbarSpacing=true only for pages WITHOUT the navbar spacer
  */
-
-'use client';
 
 import type React from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Props for the PageContainer component
- */
+/** Supported max-width variants */
+type MaxWidthVariant = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '5xl' | '6xl' | '7xl';
+
+/** Maps maxWidth prop to Tailwind class (defined outside component for performance) */
+const MAX_WIDTH_CLASS: Record<MaxWidthVariant, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl',
+};
+
 interface PageContainerProps {
   /** Page content */
   children: React.ReactNode;
   /** Optional additional CSS classes */
   className?: string;
   /** Maximum width variant for the container */
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '5xl' | '6xl' | '7xl';
+  maxWidth?: MaxWidthVariant;
   /** Whether to use glass styling (default: true) */
   glass?: boolean;
   /** ID for targeting with CSS or accessibility */
   id?: string;
-  /** Whether to add extra top padding for pages with headers (default: true) */
+  /**
+   * Whether to add extra top padding for navbar clearance.
+   * Default: false (assumes SimpleNavbar spacer handles this)
+   * Set to true only for pages that don't use SimpleNavbar's spacer
+   */
   includeNavbarSpacing?: boolean;
 }
 
 /**
  * Standard page container with consistent styling
- * Used across about, privacy, and feedback pages to maintain design consistency
- * NOW INCLUDES: Proper navbar spacing to prevent content going behind fixed navbar
- *
- * @param props Component props
- * @returns Standardized page container component
+ * Server Component - no client-side hooks needed
  */
 const PageContainer: React.FC<PageContainerProps> = ({
   children,
@@ -43,47 +58,17 @@ const PageContainer: React.FC<PageContainerProps> = ({
   maxWidth = '5xl',
   glass = true,
   id,
-  includeNavbarSpacing = true,
+  includeNavbarSpacing = false,
 }) => {
-  /**
-   * Maps the maxWidth prop to the corresponding Tailwind class
-   * @returns Tailwind max-width class
-   */
-  const getMaxWidthClass = (): string => {
-    switch (maxWidth) {
-      case 'sm':
-        return 'max-w-sm';
-      case 'md':
-        return 'max-w-md';
-      case 'lg':
-        return 'max-w-lg';
-      case 'xl':
-        return 'max-w-xl';
-      case '2xl':
-        return 'max-w-2xl';
-      case '4xl':
-        return 'max-w-4xl';
-      case '5xl':
-        return 'max-w-5xl';
-      case '6xl':
-        return 'max-w-6xl';
-      case '7xl':
-        return 'max-w-7xl';
-      default:
-        return 'max-w-5xl';
-    }
-  };
-
   return (
     <div
       id={id}
       className={cn(
-        'container mx-auto px-2 sm:px-4 md:px-6',
-        // FIXED: Add proper navbar spacing to prevent overlap
-        includeNavbarSpacing
-          ? 'pt-24 pb-8 sm:pt-28 sm:pb-12' // Top padding for navbar clearance
-          : 'py-8 sm:py-12', // Original padding for non-navbar pages
-        getMaxWidthClass(),
+        // Use explicit max-width instead of `container` class for clarity
+        'mx-auto w-full px-2 sm:px-4 md:px-6',
+        // Padding: extra top only when navbar spacer is absent
+        includeNavbarSpacing ? 'pt-24 pb-8 sm:pt-28 sm:pb-12' : 'py-8 sm:py-12',
+        MAX_WIDTH_CLASS[maxWidth],
         className,
       )}
     >

@@ -1,10 +1,16 @@
 // src/types/blog.ts
 /**
  * Types for the custom blog system
- * Native Next.js 16 MDX-based blog types
+ * Uses next-mdx-remote for MDX compilation and rendering
  */
 
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
+
+/**
+ * ISO 8601 date string (e.g., "2025-01-15")
+ * Used for publishedAt, updatedAt fields
+ */
+export type ISODateString = string;
 
 /**
  * Frontmatter structure for MDX blog posts
@@ -15,11 +21,11 @@ export interface BlogPostFrontmatter {
   title: string;
   slug: string;
   excerpt: string;
-  publishedAt: string; // ISO date string
+  publishedAt: ISODateString;
   category: string; // category slug
 
   // Optional fields
-  updatedAt?: string; // ISO date string
+  updatedAt?: ISODateString;
   featured?: boolean;
   editorsPick?: boolean; // Show in Editor's Picks sidebar
   deepDive?: boolean; // Show in Deep Dives section
@@ -51,6 +57,9 @@ export interface BlogPost extends BlogPostFrontmatter {
 
 /**
  * Category structure for blog organization
+ *
+ * Note: Also exported from blog.config.ts (inferred from Zod schema).
+ * The `count` field is populated at runtime when querying posts.
  */
 export interface BlogCategory {
   name: string;
@@ -71,6 +80,8 @@ export interface BlogPaginationOptions {
   featured?: boolean;
   searchQuery?: string;
   sortBy?: BlogSortOption;
+  /** When true, returns { posts, pagination } object instead of just posts array */
+  paginated?: boolean;
 }
 
 /**
@@ -87,19 +98,18 @@ export interface PaginatedBlogResponse {
 }
 
 /**
- * Structure for related posts
+ * Structure for related posts - derived from BlogPostFrontmatter to avoid drift
  */
-export interface RelatedPost {
-  title: string;
-  slug: string;
-  excerpt: string;
-  publishedAt: string;
-  readTime?: string;
-  category: string;
-}
+export type RelatedPost = Pick<
+  BlogPostFrontmatter,
+  'title' | 'slug' | 'excerpt' | 'publishedAt' | 'readTime' | 'category'
+>;
 
 /**
  * Blog configuration that will be stored in a config file
+ *
+ * Note: Also exported from blog.config.ts (inferred from Zod schema).
+ * Keep in sync with BlogConfigSchema for consistency.
  */
 export interface BlogConfig {
   postsPerPage: number;
@@ -134,14 +144,27 @@ export function isValidBlogPost(data: unknown): data is BlogPostFrontmatter {
 export type BlogSortOption = 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc';
 
 /**
- * Error types for blog operations
+ * Error codes for blog operations
+ */
+export type BlogErrorCode =
+  | 'POST_NOT_FOUND'
+  | 'INVALID_FRONTMATTER'
+  | 'FILE_READ_ERROR'
+  | 'PARSE_ERROR';
+
+/**
+ * Error class for blog operations with typed error codes
  */
 export class BlogError extends Error {
   constructor(
     message: string,
-    public code: 'POST_NOT_FOUND' | 'INVALID_FRONTMATTER' | 'FILE_READ_ERROR' | 'PARSE_ERROR',
+    public code: BlogErrorCode,
+    public details?: unknown,
+    options?: ErrorOptions,
   ) {
-    super(message);
+    super(message, options);
     this.name = 'BlogError';
+    // Fix prototype chain for instanceof reliability across transpilation
+    Object.setPrototypeOf(this, BlogError.prototype);
   }
 }

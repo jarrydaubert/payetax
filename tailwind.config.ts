@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 
 const config: Config = {
   darkMode: 'class',
-  content: ['./src/components/**/*.{js,ts,jsx,tsx,mdx}', './src/app/**/*.{js,ts,jsx,tsx,mdx}'],
+  // Note: Tailwind v4 has automatic content detection - no content array needed
   theme: {
     extend: {
       /**
@@ -64,15 +64,17 @@ const config: Config = {
         'separator-foreground':
           'linear-gradient(to right, transparent, hsl(var(--color-foreground) / 0.3), transparent)',
       },
+      // Note: Semantic colors (primary, secondary, muted, accent, destructive, card, popover,
+      // background, foreground, border, input, ring) are defined in CSS @theme inline
+      // Only extend with colors NOT in @theme
       colors: {
-        // New design system colors (payetax-web mockup)
+        // New design system colors (payetax-web mockup) - not in @theme yet
         deep: 'var(--bg-deep)',
         dark: 'var(--bg-dark)',
         'card-new': 'var(--bg-card-new)',
         'text-primary-new': 'var(--text-primary-new)',
         'text-secondary-new': 'var(--text-secondary-new)',
         'text-dim': 'var(--text-dim)',
-        // Border colors
         'border-subtle': 'var(--border-subtle)',
         'border-light': 'var(--border-light)',
         cyan: {
@@ -82,49 +84,6 @@ const config: Config = {
         emerald: {
           DEFAULT: 'var(--brand-emerald)',
           brand: 'var(--brand-emerald)',
-        },
-        // Brand colors - maintain identity across themes
-        brand: {
-          DEFAULT: 'var(--color-brand)',
-          accent: 'var(--color-brand-accent)',
-          'gradient-start': 'var(--color-brand-gradient-start)',
-          'gradient-end': 'var(--color-brand-gradient-end)',
-          cyan: 'var(--brand-cyan)',
-          emerald: 'var(--brand-emerald)',
-        },
-        // Semantic colors
-        border: 'var(--color-border)',
-        input: 'var(--color-input)',
-        ring: 'var(--color-ring)',
-        background: 'var(--color-background)',
-        foreground: 'var(--color-foreground)',
-        primary: {
-          DEFAULT: 'var(--color-primary)',
-          foreground: 'var(--color-primary-foreground)',
-        },
-        secondary: {
-          DEFAULT: 'var(--color-secondary)',
-          foreground: 'var(--color-secondary-foreground)',
-        },
-        destructive: {
-          DEFAULT: 'var(--color-destructive)',
-          foreground: 'var(--color-destructive-foreground)',
-        },
-        muted: {
-          DEFAULT: 'var(--color-muted)',
-          foreground: 'var(--color-muted-foreground)',
-        },
-        accent: {
-          DEFAULT: 'var(--color-accent)',
-          foreground: 'var(--color-accent-foreground)',
-        },
-        popover: {
-          DEFAULT: 'var(--color-popover)',
-          foreground: 'var(--color-popover-foreground)',
-        },
-        card: {
-          DEFAULT: 'var(--color-card)',
-          foreground: 'var(--color-card-foreground)',
         },
       },
       fontFamily: {
@@ -195,6 +154,7 @@ const config: Config = {
         'slide-in-from-bottom': 'slideInFromBottom 0.5s ease-out',
         'slide-in': 'slideIn 0.3s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
+        wiggle: 'wiggle 1s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -241,20 +201,27 @@ const config: Config = {
             transform: 'scale(1)',
           },
         },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
       },
       spacing: {
-        0.5: '0.125rem', // 2px - micro-adjustments for pixel-perfect layouts
+        // Note: 0.5 (0.125rem) is included in Tailwind's default spacing scale
         18: '4.5rem', // 72px
         88: '22rem', // 352px
         128: '32rem', // 512px
       },
+      zIndex: {
+        // Custom z-index values used in Z_INDEX design tokens
+        // Fills gaps in Tailwind's default scale (0, 10, 20, 30, 40, 50)
+        35: '35', // Cookie banners, prompts
+        45: '45', // Modal dialogs
+        60: '60', // Toast notifications (highest)
+      },
     },
   },
-  plugins: [
-    // Typography plugin for prose styling in MDX blog posts
-    // Provides beautiful default styles for headings, paragraphs, lists, code blocks, etc.
-    require('@tailwindcss/typography'),
-  ],
+  // Note: @tailwindcss/typography is loaded via @plugin in globals.css (Tailwind v4 CSS-first)
 };
 
 export default config;

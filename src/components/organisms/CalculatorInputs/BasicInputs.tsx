@@ -7,21 +7,27 @@ import { useId } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
-import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/atoms/ui/checkbox';
+import { Input } from '@/components/atoms/ui/input';
+import { Label } from '@/components/atoms/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/atoms/ui/select';
+import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
+
+/** State Pension Age threshold - employees over SPA don't pay NI */
+const STATE_PENSION_AGE = 66;
+
+/** Tax code validation: letters, numbers, optional K prefix, max 10 chars */
+const TAX_CODE_REGEX = /^[A-Z0-9]{0,10}$/;
 
 export function BasicInputs() {
   // Use optimized selectors - extract only input state and actions
@@ -43,20 +49,26 @@ export function BasicInputs() {
     setAllowancesDeductions,
   } = useCalculatorActions();
 
+  // Generate unique IDs for accessibility
   const salaryId = useId();
   const payPeriodId = useId();
+  const payPeriodLabelId = `${payPeriodId}-label`;
   const taxYearId = useId();
   const taxCodeId = useId();
   const regionId = useId();
+  const regionLabelId = `${regionId}-label`;
   const marriedId = useId();
   const partnerWageId = useId();
   const blindId = useId();
   const ageId = useId();
+  const ageLabelId = `${ageId}-label`;
   const payNoNIId = useId();
   const studentLoanId = useId();
+  const studentLoanLabelId = `${studentLoanId}-label`;
   const postgraduateAddonId = useId();
   const allowancesId = useId();
   const pensionTypeId = useId();
+  const pensionTypeLabelId = `${pensionTypeId}-label`;
   const pensionId = useId();
 
   const payPeriodOptions = [
@@ -81,7 +93,7 @@ export function BasicInputs() {
     { value: 'plan1' as const, label: 'Plan 1 (pre-Sept 2012)' },
     { value: 'plan2' as const, label: 'Plan 2 (Sept 2012+)' },
     { value: 'plan4' as const, label: 'Plan 4 (Scotland)' },
-    { value: 'plan5' as const, label: 'Plan 5 (2023+)' },
+    { value: 'plan5' as const, label: 'Plan 5 (from 2023/24)' },
     { value: 'postgrad' as const, label: 'Postgraduate only' },
   ];
 
@@ -99,6 +111,9 @@ export function BasicInputs() {
     input.studentLoanPlans.includes('postgrad') &&
     input.studentLoanPlans.length === 2;
 
+  // Determine if user is over State Pension Age (for NI exemption)
+  const isOverStatePensionAge = input.age !== undefined && input.age >= STATE_PENSION_AGE;
+
   const handleUndergraduateLoanChange = (value: string) => {
     if (value === 'none') {
       setStudentLoanPlans('none');
@@ -112,15 +127,34 @@ export function BasicInputs() {
     }
   };
 
-  const handlePostgraduateToggle = (checked: boolean) => {
+  const handlePostgraduateToggle = (checked: boolean | 'indeterminate') => {
+    // Guard against indeterminate state
+    if (checked !== true) {
+      if (undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad') {
+        // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
+        setStudentLoanPlans([undergraduateLoan as any]);
+      }
+      return;
+    }
+
     if (undergraduateLoan === 'none' || undergraduateLoan === 'postgrad') return;
 
-    if (checked) {
-      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
-      setStudentLoanPlans([undergraduateLoan as any, 'postgrad']);
-    } else {
-      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
-      setStudentLoanPlans([undergraduateLoan as any]);
+    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
+    setStudentLoanPlans([undergraduateLoan as any, 'postgrad']);
+  };
+
+  /**
+   * Normalize tax code input:
+   * - Uppercase
+   * - Remove spaces
+   * - Strip invalid characters
+   * - Cap at 10 characters
+   */
+  const handleTaxCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.toUpperCase().replace(/\s+/g, '');
+    // Only allow valid tax code characters
+    if (TAX_CODE_REGEX.test(raw)) {
+      setTaxCode(raw);
     }
   };
 
@@ -132,11 +166,10 @@ export function BasicInputs() {
       className={SPACING.SPACE_Y_3}
     >
       {/* Heading */}
-      {/* IMPORTANT: Uses TEXT_LG to match other section headings (ResultsTable, PeriodSelectorCard)
-          Ensures visual consistency across calculator interface */}
       <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
         Enter Income Tax Details
       </h3>
+
       {/* Salary and Pay Period on one line */}
       <div className={cn('flex items-center', SPACING.GAP_3)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
@@ -161,7 +194,11 @@ export function BasicInputs() {
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger id={payPeriodId} className='w-[140px]' aria-label='Select pay period'>
+            <SelectTrigger
+              id={payPeriodId}
+              className='w-[140px]'
+              aria-labelledby={payPeriodLabelId}
+            >
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -172,13 +209,14 @@ export function BasicInputs() {
               ))}
             </SelectContent>
           </Select>
+          {/* Hidden label for screen readers */}
+          <span id={payPeriodLabelId} className='sr-only'>
+            Pay period
+          </span>
         </div>
       </div>
 
-      {/* IMPORTANT: Tax Year width must be 170px minimum
-          Calendar icon (16px) + gap (8px) + text "2025-2026" (~80px) + 
-          dropdown arrow (~20px) + padding (~24px) = ~148px required.
-          Using 170px provides comfortable spacing without text wrapping. */}
+      {/* Tax Year */}
       <div className={cn('flex items-center', SPACING.GAP_3)}>
         <div className={cn('flex items-center whitespace-nowrap', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='taxYear' />
@@ -207,9 +245,10 @@ export function BasicInputs() {
           id={taxCodeId}
           type='text'
           value={input.taxCode}
-          onChange={(e) => setTaxCode(e.target.value.toUpperCase())}
+          onChange={handleTaxCodeChange}
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
           className='w-[100px] uppercase'
+          maxLength={10}
         />
       </div>
 
@@ -217,12 +256,16 @@ export function BasicInputs() {
       <div className={cn('flex items-center', SPACING.GAP_3)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='region' />
-          <Label htmlFor={regionId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label
+            id={regionLabelId}
+            htmlFor={regionId}
+            className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
+          >
             Region
           </Label>
         </div>
         <Select value={input.region} onValueChange={setRegion}>
-          <SelectTrigger id={regionId} className='w-[175px]' aria-label='Select tax region'>
+          <SelectTrigger id={regionId} className='w-[175px]' aria-labelledby={regionLabelId}>
             <SelectValue placeholder='Select region' />
           </SelectTrigger>
           <SelectContent>
@@ -247,7 +290,7 @@ export function BasicInputs() {
             <Checkbox
               id={marriedId}
               checked={input.isMarried}
-              onCheckedChange={setIsMarried}
+              onCheckedChange={(v) => setIsMarried(v === true)}
               data-testid='married-checkbox'
             />
           </div>
@@ -257,7 +300,11 @@ export function BasicInputs() {
             <Label htmlFor={blindId} className={TYPOGRAPHY.TEXT_SM}>
               Blind
             </Label>
-            <Checkbox id={blindId} checked={input.isBlind} onCheckedChange={setIsBlind} />
+            <Checkbox
+              id={blindId}
+              checked={input.isBlind}
+              onCheckedChange={(v) => setIsBlind(v === true)}
+            />
           </div>
 
           <div className={cn('flex items-center', SPACING.GAP_1_5)}>
@@ -265,7 +312,11 @@ export function BasicInputs() {
             <Label htmlFor={payNoNIId} className={TYPOGRAPHY.TEXT_SM}>
               I pay no NI
             </Label>
-            <Checkbox id={payNoNIId} checked={input.payNoNI} onCheckedChange={setPayNoNI} />
+            <Checkbox
+              id={payNoNIId}
+              checked={input.payNoNI}
+              onCheckedChange={(v) => setPayNoNI(v === true)}
+            />
           </div>
         </div>
       </fieldset>
@@ -291,44 +342,42 @@ export function BasicInputs() {
         </div>
       )}
 
-      {/* Age - Dropdown for HMRC NI thresholds */}
+      {/* Age - Dropdown for State Pension Age (affects NI) */}
       <div className={cn('flex items-center', SPACING.GAP_3)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='age' />
-          <Label htmlFor={ageId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label
+            id={ageLabelId}
+            htmlFor={ageId}
+            className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
+          >
             Age
           </Label>
         </div>
         <Select
-          value={
-            !input.age || input.age < 65
-              ? 'under-65'
-              : input.age >= 65 && input.age < 75
-                ? '65-74'
-                : '75-plus'
-          }
+          value={isOverStatePensionAge ? 'over-spa' : 'under-spa'}
           onValueChange={(value) => {
-            // Set representative age for each bracket
-            // Age affects personal allowance and NI calculations
-            if (value === 'under-65')
-              setAge(undefined); // Working age (no age allowance)
-            else if (value === '65-74')
-              setAge(70); // Gets £3,660 age allowance, auto-exempt from NI if 66+
-            else setAge(76); // Gets £3,960 age allowance, auto-exempt from NI
+            // Store a representative age for calculation purposes
+            // Under SPA: undefined (standard NI applies)
+            // Over SPA: 67 (NI exempt - employees don't pay NI after State Pension Age)
+            if (value === 'under-spa') {
+              setAge(undefined);
+            } else {
+              setAge(67); // Representative age over State Pension Age
+            }
           }}
         >
           <SelectTrigger
             id={ageId}
-            className='w-[120px]'
+            className='w-[180px]'
             data-testid='age-select'
-            aria-label='Select age range'
+            aria-labelledby={ageLabelId}
           >
             <SelectValue placeholder='Select age range' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='under-65'>Under 65</SelectItem>
-            <SelectItem value='65-74'>65-74</SelectItem>
-            <SelectItem value='75-plus'>Over 75</SelectItem>
+            <SelectItem value='under-spa'>Under State Pension Age</SelectItem>
+            <SelectItem value='over-spa'>State Pension Age or over</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -338,7 +387,11 @@ export function BasicInputs() {
         <div className={cn('flex items-center', SPACING.GAP_3)}>
           <div className={cn('flex items-center', SPACING.GAP_1_5)}>
             <LabelTooltip fieldName='studentLoanPlan' />
-            <Label htmlFor={studentLoanId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+            <Label
+              id={studentLoanLabelId}
+              htmlFor={studentLoanId}
+              className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
+            >
               Student Loan
             </Label>
           </div>
@@ -346,7 +399,7 @@ export function BasicInputs() {
             <SelectTrigger
               id={studentLoanId}
               className='w-[200px]'
-              aria-label='Select student loan plan'
+              aria-labelledby={studentLoanLabelId}
               data-testid='student-loan-select'
             >
               <SelectValue placeholder='Select student loan' />
@@ -414,7 +467,7 @@ export function BasicInputs() {
             <SelectTrigger
               id={pensionTypeId}
               className='w-[70px] shrink-0'
-              aria-label='Select pension contribution type'
+              aria-labelledby={pensionTypeLabelId}
               data-testid='pension-type-select'
             >
               <SelectValue>
@@ -438,6 +491,10 @@ export function BasicInputs() {
               </SelectItem>
             </SelectContent>
           </Select>
+          {/* Hidden label for screen readers */}
+          <span id={pensionTypeLabelId} className='sr-only'>
+            Pension contribution type
+          </span>
 
           {/* Input field */}
           <NumberInput

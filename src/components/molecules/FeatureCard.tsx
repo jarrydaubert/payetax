@@ -7,8 +7,6 @@
  * @module components/molecules/FeatureCard
  */
 
-'use client';
-
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
 import type { Route } from 'next';

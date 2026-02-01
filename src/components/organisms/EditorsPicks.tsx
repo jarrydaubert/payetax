@@ -26,7 +26,7 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
   const displayedPosts = posts.slice(0, 5);
 
   return (
-    <aside className={cn('', className)}>
+    <aside className={cn(className)}>
       {/* Desktop/Tablet: Regular display */}
       <div className='hidden md:block'>
         <EditorsPicksList posts={displayedPosts} />
@@ -34,7 +34,10 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
 
       {/* Mobile: Native accordion using details/summary (zero CLS) */}
       <details className='group md:hidden'>
-        <summary className='flex cursor-pointer items-center justify-between rounded-lg bg-slate-800/50 p-4 text-white hover:bg-slate-800/70'>
+        <summary
+          className='flex cursor-pointer items-center justify-between rounded-lg bg-slate-800/50 p-4 text-white hover:bg-slate-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+          aria-label="Toggle Editor's Picks section"
+        >
           <span className='font-display font-semibold'>Editor&apos;s Picks</span>
           <span className='text-slate-400 transition-transform group-open:rotate-180'>
             <svg
@@ -54,7 +57,8 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
           </span>
         </summary>
         <div className='mt-2'>
-          <EditorsPicksList posts={displayedPosts} />
+          {/* Hide heading on mobile since summary already says "Editor's Picks" */}
+          <EditorsPicksList posts={displayedPosts} showHeading={false} />
         </div>
       </details>
     </aside>
@@ -63,19 +67,27 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
 
 interface EditorsPicksListProps {
   posts: BlogPost[];
+  /** Whether to show the h2 heading (default: true, set false in mobile accordion) */
+  showHeading?: boolean;
 }
 
-function EditorsPicksList({ posts }: EditorsPicksListProps) {
+function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) {
   return (
     <div className='rounded-xl border border-slate-700/50 bg-slate-800/50 p-5'>
-      <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
-        Editor&apos;s Picks
-      </h2>
+      {showHeading && (
+        <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
+          Editor&apos;s Picks
+        </h2>
+      )}
 
       <ol className='space-y-4'>
         {posts.map((post, index) => (
           <li key={post.slug}>
-            <Link href={`/blog/${post.slug}`} className='group flex items-start gap-3'>
+            <Link
+              href={`/blog/${post.slug}`}
+              className='group flex items-start gap-3'
+              prefetch={false}
+            >
               {/* Number */}
               <span className='flex-shrink-0 font-bold font-display text-2xl text-cyan-500/50 transition-colors group-hover:text-cyan-500'>
                 {String(index + 1).padStart(2, '0')}
@@ -86,7 +98,9 @@ function EditorsPicksList({ posts }: EditorsPicksListProps) {
                 <h3 className='line-clamp-2 font-medium text-sm text-white transition-colors group-hover:text-cyan-400'>
                   {post.title}
                 </h3>
-                <span className='mt-1 text-slate-500 text-xs'>{post.readTime}</span>
+                {post.readTime && (
+                  <span className='mt-1 text-slate-500 text-xs'>{post.readTime}</span>
+                )}
               </div>
             </Link>
           </li>

@@ -4,9 +4,9 @@
  * Server Action for feedback form submission
  * React 19 pattern: Replaces API route with server action
  * Uses Next.js 16 after() API for non-blocking email sends
- * Used with useActionState hook for optimistic UI updates
  */
 
+import { headers } from 'next/headers';
 import { after } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimit';
@@ -14,35 +14,62 @@ import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// Max message length to prevent abuse (10KB)
+const MAX_MESSAGE_LENGTH = 10000;
+
 export interface FeedbackFormState {
   success: boolean;
   error?: string;
   message?: string;
 }
 
+/** Safely extract string from FormData (handles null/File) */
+function getString(formData: FormData, key: string): string {
+  const value = formData.get(key);
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+/** Escape HTML to prevent injection in email */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Get client IP from headers (Vercel securely sets x-forwarded-for) */
+async function getClientIp(): Promise<string> {
+  const headersList = await headers();
+  // Vercel/Cloudflare set these securely at the edge
+  const forwardedFor = headersList.get('x-forwarded-for');
+  const realIp = headersList.get('x-real-ip');
+  const cfIp = headersList.get('cf-connecting-ip');
+
+  // x-forwarded-for can be comma-separated; take the first (client) IP
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(',')[0];
+    if (firstIp) return firstIp.trim();
+  }
+
+  return cfIp || realIp || 'unknown';
+}
+
 /**
  * Submit feedback form server action
  * React 19 useActionState compatible
- *
- * @param _prevState - Previous form state (from useActionState) - unused but required for useActionState signature
- * @param formData - Form data from the submission
- * @returns Promise<FeedbackFormState> - New state with success/error
  */
-// biome-ignore lint/suspicious/useAwait: Server action must be async for Next.js, await is in after() callback
 export async function submitFeedback(
   _prevState: FeedbackFormState,
   formData: FormData,
 ): Promise<FeedbackFormState> {
-  // Extract form data
-  const email = formData.get('email') as string;
-  const message = formData.get('message') as string;
-  const url = formData.get('url') as string;
-  const userAgent = formData.get('userAgent') as string;
-  const timestamp = formData.get('timestamp') as string;
-
-  // IP address will be extracted from headers in production
-  // For server actions, we'll use a placeholder and rely on Resend's logging
-  const ipAddress = 'server-action';
+  // Safely extract form data
+  const email = getString(formData, 'email');
+  const message = getString(formData, 'message');
+  const url = getString(formData, 'url');
+  const userAgent = getString(formData, 'userAgent');
+  const timestamp = getString(formData, 'timestamp');
 
   // Validate using Zod schema
   const validationResult = validateFeedbackForm({ email, message });
@@ -50,11 +77,19 @@ export async function submitFeedback(
   if (!validationResult.success) {
     const zodErrors = validationResult.error.flatten().fieldErrors;
     const firstError = zodErrors.email?.[0] || zodErrors.message?.[0] || 'Invalid form data';
+    return { success: false, error: firstError };
+  }
+
+  // Cap message length to prevent abuse
+  if (message.length > MAX_MESSAGE_LENGTH) {
     return {
       success: false,
-      error: firstError,
+      error: `Message too long. Please keep it under ${MAX_MESSAGE_LENGTH.toLocaleString()} characters.`,
     };
   }
+
+  // Get real client IP for rate limiting
+  const ipAddress = await getClientIp();
 
   // Check rate limit (10 requests per minute per IP)
   if (!checkRateLimit(ipAddress)) {
@@ -64,32 +99,26 @@ export async function submitFeedback(
     };
   }
 
-  // Early exit if Resend not configured
+  // Early exit if Resend not configured (don't leak implementation details)
   if (!resend) {
+    console.error('Feedback submission failed: RESEND_API_KEY not configured');
     return {
       success: false,
-      error: 'Server configuration error. Please check environment variables.',
+      error: 'Something went wrong. Please try again later.',
     };
   }
 
-  // Escape HTML to prevent XSS in email
-  const escapeHtml = (str: string) =>
-    str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-
+  // Escape ALL values interpolated into HTML (including timestamp, userAgent, IP)
   const safeMessage = escapeHtml(message);
   const safeEmail = email ? escapeHtml(email) : 'Not provided';
   const safeUrl = url ? escapeHtml(url) : 'N/A';
+  const safeTimestamp = escapeHtml(timestamp || new Date().toLocaleString());
+  const safeUserAgent = escapeHtml((userAgent || 'N/A').slice(0, 200));
+  const safeIp = escapeHtml(ipAddress);
 
-  // Validate Resend is configured before scheduling email
   const resendClient = resend;
 
-  // Next.js 16 after() API: Send email AFTER response is returned to user
-  // This makes the feedback submission feel instant while email sends in background
+  // Send email AFTER response is returned (non-blocking)
   after(async () => {
     if (!resendClient) return;
     try {
@@ -110,9 +139,9 @@ export async function submitFeedback(
 
             <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 0 0 10px 0;"><strong>📧 Email:</strong> ${safeEmail}</p>
-              <p style="margin: 0 0 10px 0;"><strong>📅 Timestamp:</strong> ${timestamp || new Date().toLocaleString()}</p>
+              <p style="margin: 0 0 10px 0;"><strong>📅 Timestamp:</strong> ${safeTimestamp}</p>
               <p style="margin: 0 0 10px 0;"><strong>🌐 Page URL:</strong> ${safeUrl}</p>
-              <p style="margin: 0;"><strong>🖥️ IP Address:</strong> ${ipAddress}</p>
+              <p style="margin: 0;"><strong>🖥️ IP Address:</strong> ${safeIp}</p>
             </div>
 
             <div style="background: white; padding: 20px; border-left: 4px solid #7c3aed; margin: 20px 0;">
@@ -122,7 +151,7 @@ export async function submitFeedback(
 
             <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
               <p style="margin: 0; font-size: 12px; color: #6b7280;"><strong>User Agent:</strong></p>
-              <p style="margin: 5px 0 0 0; font-size: 11px; color: #9ca3af; font-family: monospace;">${(userAgent || 'N/A').slice(0, 200)}...</p>
+              <p style="margin: 5px 0 0 0; font-size: 11px; color: #9ca3af; font-family: monospace;">${safeUserAgent}...</p>
             </div>
 
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
@@ -151,7 +180,6 @@ Submitted via PayeTax.co.uk`,
     }
   });
 
-  // Return success immediately - email sends in background
   return {
     success: true,
     message: 'Thanks! Your feedback has been sent to the team.',

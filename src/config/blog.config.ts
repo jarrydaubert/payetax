@@ -4,10 +4,10 @@
  * Defines categories, settings, and other blog-related configuration
  *
  * Uses Zod for runtime validation to ensure configuration integrity (PAYTAX-128)
+ * Constants use `satisfies z.infer<...>` for compile-time type checking
  */
 
 import { z } from 'zod';
-import type { BlogCategory, BlogConfig } from '@/types/blog';
 
 /**
  * Zod Schema for Blog Brand
@@ -28,23 +28,55 @@ export const BlogBrandSchema = z.object({
 /**
  * Zod Schema for Blog Category
  * Validates category structure and slug format
+ *
+ * Note: `count` field exists on BlogCategory in types/blog.ts but is populated
+ * at runtime when querying posts, not stored in config.
  */
 export const BlogCategorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase kebab-case'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters').optional(),
 });
 
 /**
  * Zod Schema for Blog Configuration
- * Validates the main blog config structure
+ * Validates the main blog config structure with uniqueness constraints
  */
-export const BlogConfigSchema = z.object({
-  postsPerPage: z.number().int().min(1).max(50, 'Posts per page must be between 1 and 50'),
-  featuredPostsCount: z.number().int().min(1).max(10, 'Featured posts must be between 1 and 10'),
-  relatedPostsCount: z.number().int().min(1).max(10, 'Related posts must be between 1 and 10'),
-  categories: z.array(BlogCategorySchema).min(1, 'At least one category is required'),
-});
+export const BlogConfigSchema = z
+  .object({
+    postsPerPage: z.number().int().min(1).max(50, 'Posts per page must be between 1 and 50'),
+    featuredPostsCount: z.number().int().min(1).max(10, 'Featured posts must be between 1 and 10'),
+    relatedPostsCount: z.number().int().min(1).max(10, 'Related posts must be between 1 and 10'),
+    categories: z.array(BlogCategorySchema).min(1, 'At least one category is required'),
+  })
+  .superRefine((val, ctx) => {
+    // Validate unique category slugs
+    const slugs = val.categories.map((c) => c.slug);
+    const duplicateSlugs = slugs.filter((s, i) => slugs.indexOf(s) !== i);
+    if (duplicateSlugs.length > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['categories'],
+        message: `Duplicate category slugs: ${[...new Set(duplicateSlugs)].join(', ')}`,
+      });
+    }
+
+    // Validate unique category names
+    const names = val.categories.map((c) => c.name);
+    const duplicateNames = names.filter((n, i) => names.indexOf(n) !== i);
+    if (duplicateNames.length > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['categories'],
+        message: `Duplicate category names: ${[...new Set(duplicateNames)].join(', ')}`,
+      });
+    }
+  });
+
+// Infer types from Zod schemas for single source of truth
+export type BlogBrand = z.infer<typeof BlogBrandSchema>;
+export type BlogCategory = z.infer<typeof BlogCategorySchema>;
+export type BlogConfig = z.infer<typeof BlogConfigSchema>;
 
 /**
  * Blog brand identity
@@ -60,13 +92,13 @@ export const BLOG_BRAND = {
   url: 'https://payetax.co.uk/blog',
   logo: '/logo.png',
   socialImage: '/images/blog/taxinsights-og.jpg',
-};
+} satisfies BlogBrand;
 
 /**
  * Available blog categories
  * These replace the categories that were previously managed in Strapi
  */
-export const BLOG_CATEGORIES: BlogCategory[] = [
+export const BLOG_CATEGORIES = [
   {
     name: 'Tax Basics',
     slug: 'tax-basics',
@@ -127,30 +159,40 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     slug: 'tax-deadlines',
     description: 'Important UK tax deadlines and what you need to do before them',
   },
-];
+] satisfies BlogCategory[];
+
+/** Category slug union type for type-safe lookups */
+export type CategorySlug = (typeof BLOG_CATEGORIES)[number]['slug'];
+
+/** Pre-built map for O(1) category lookups by slug */
+const CATEGORY_BY_SLUG = new Map(BLOG_CATEGORIES.map((c) => [c.slug, c] as const));
 
 /**
  * Main blog configuration
  */
-export const BLOG_CONFIG: BlogConfig = {
+export const BLOG_CONFIG = {
   postsPerPage: 12,
   featuredPostsCount: 3,
   relatedPostsCount: 3,
   categories: BLOG_CATEGORIES,
-};
+} satisfies BlogConfig;
 
 /**
- * Helper function to get a category by slug
+ * Helper function to get a category by slug (O(1) Map lookup)
+ * @overload When slug is a known CategorySlug, returns BlogCategory
+ * @overload When slug is an unknown string, returns BlogCategory | undefined
  */
+export function getCategoryBySlug(slug: CategorySlug): BlogCategory;
+export function getCategoryBySlug(slug: string): BlogCategory | undefined;
 export function getCategoryBySlug(slug: string): BlogCategory | undefined {
-  return BLOG_CATEGORIES.find((category) => category.slug === slug);
+  return CATEGORY_BY_SLUG.get(slug);
 }
 
 /**
- * Helper function to validate if a category slug exists
+ * Helper function to validate if a category slug exists (O(1) Map lookup)
  */
-export function isValidCategory(slug: string): boolean {
-  return BLOG_CATEGORIES.some((category) => category.slug === slug);
+export function isValidCategory(slug: string): slug is CategorySlug {
+  return CATEGORY_BY_SLUG.has(slug);
 }
 
 /**
@@ -186,28 +228,28 @@ export const BLOG_SEO_DEFAULTS = {
 /**
  * Runtime Validation (PAYTAX-128)
  * Validates configuration on module load to catch errors early
+ *
+ * - Runs in development and production builds
+ * - Skip with SKIP_CONFIG_VALIDATION=true (e.g., for edge runtime testing)
+ * - Detailed logging only in development
  */
-if (process.env.NODE_ENV !== 'test') {
+const shouldValidate =
+  process.env.NODE_ENV !== 'test' && process.env.SKIP_CONFIG_VALIDATION !== 'true';
+
+if (shouldValidate) {
+  const isDev = process.env.NODE_ENV === 'development';
+
   // Validate blog brand
   const brandResult = BlogBrandSchema.safeParse(BLOG_BRAND);
   if (!brandResult.success) {
-    console.error('❌ Blog brand configuration is invalid:', brandResult.error.issues);
+    if (isDev) console.error('❌ Blog brand configuration is invalid:', brandResult.error.issues);
     throw new Error('Invalid blog brand configuration');
   }
 
-  // Validate blog config
+  // Validate blog config (includes category uniqueness checks via superRefine)
   const configResult = BlogConfigSchema.safeParse(BLOG_CONFIG);
   if (!configResult.success) {
-    console.error('❌ Blog configuration is invalid:', configResult.error.issues);
+    if (isDev) console.error('❌ Blog configuration is invalid:', configResult.error.issues);
     throw new Error('Invalid blog configuration');
-  }
-
-  // Validate all categories
-  for (const category of BLOG_CATEGORIES) {
-    const categoryResult = BlogCategorySchema.safeParse(category);
-    if (!categoryResult.success) {
-      console.error(`❌ Blog category "${category.name}" is invalid:`, categoryResult.error.issues);
-      throw new Error(`Invalid blog category: ${category.name}`);
-    }
   }
 }

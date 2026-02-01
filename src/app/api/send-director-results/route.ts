@@ -1,4 +1,5 @@
 // src/app/api/send-director-results/route.ts
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimit';
@@ -8,7 +9,34 @@ import {
   SendDirectorResultsRequestSchema,
 } from '@/lib/validation/emailValidation';
 
+export const runtime = 'nodejs';
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const MAX_BODY_SIZE = 50 * 1024; // 50KB
+
+// TODO: Apply escapeHtml to all string interpolations in email templates
+// (strategy.name, taxYear, generatedDate, etc.) for full HTML injection protection.
+// Currently relying on Zod schema constraints (strategy.name max 100 chars,
+// taxYear regex validated) but should add escaping for defense in depth.
+
+/** Get client identifier - always returns a key */
+function getClientIdentifier(request: NextRequest): string {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(',')[0];
+    if (firstIp) return firstIp.trim();
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp;
+
+  // Fallback: hash of user-agent
+  const ua = request.headers.get('user-agent') || 'unknown';
+  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
 
 // Tax year constants for 2025-26
 const TAX_THRESHOLDS = {
@@ -30,6 +58,65 @@ interface AllStrategies {
   allSalary: DirectorStrategy;
   optimalMix: DirectorStrategy;
   allDividends: DirectorStrategy;
+}
+
+/** Generate plain text email for deliverability */
+function generateDirectorEmailText(
+  grossProfit: number,
+  strategies: AllStrategies,
+  recommended: 'allSalary' | 'optimalMix' | 'allDividends',
+  savingsVsAllSalary: number,
+  taxYear?: string,
+): string {
+  const strategy = strategies[recommended];
+  const year = taxYear || '2025-26';
+
+  return `
+DIRECTOR TAX STRATEGY REPORT - PayeTax
+${year}
+${'='.repeat(50)}
+
+EXECUTIVE SUMMARY
+-----------------
+Gross Profit: ${formatCurrency(grossProfit)}
+Recommended Strategy: ${strategy.name}
+Take-Home Pay: ${formatCurrency(strategy.takeHome)}
+Effective Tax Rate: ${strategy.effectiveRate.toFixed(1)}%
+Savings vs All-Salary: ${formatCurrency(savingsVsAllSalary)}
+
+RECOMMENDED EXTRACTION
+----------------------
+Salary: ${formatCurrency(strategy.salary)} (${formatCurrency(strategy.salary / 12)}/mo)
+Dividends: ${formatCurrency(strategy.dividends)} (${formatCurrency(strategy.dividends / 12)}/mo)
+${strategy.pension > 0 ? `Pension: ${formatCurrency(strategy.pension)} (${formatCurrency(strategy.pension / 12)}/mo)` : ''}
+
+TAXES
+-----
+Corporation Tax: ${formatCurrency(strategy.corporationTax)}
+Employer NI: ${formatCurrency(strategy.employerNI)}
+Income Tax: ${formatCurrency(strategy.incomeTax)}
+Employee NI: ${formatCurrency(strategy.employeeNI)}
+Dividend Tax: ${formatCurrency(strategy.dividendTax)}
+${strategy.studentLoan > 0 ? `Student Loan: ${formatCurrency(strategy.studentLoan)}` : ''}
+Total Tax: ${formatCurrency(strategy.corporationTax + strategy.employerNI + strategy.totalPersonalTax)}
+
+MONTHLY SET-ASIDE POTS
+----------------------
+Company Tax Pot: ${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}/mo
+Personal Tax Pot: ${formatCurrency(strategy.totalPersonalTax / 12)}/mo (for Self Assessment)
+
+KEY DATES
+---------
+Self Assessment Deadline: 31 January 2027
+Corporation Tax Due: 9 months + 1 day after year-end
+PAYE/NI Payments: 22nd of each month (electronic)
+
+${'='.repeat(50)}
+This calculation uses official HMRC rates for ${year}.
+For professional tax advice, please consult a qualified accountant.
+
+Recalculate: https://payetax.co.uk/tools/director-guide
+`.trim();
 }
 
 function generateDirectorEmailHtml(
@@ -410,41 +497,52 @@ function generateDirectorEmailHtml(
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting: 5 emails per minute per client
+  const clientId = getClientIdentifier(request);
+  if (!checkRateLimit(clientId, { max: 5, window: 60000 })) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429 },
+    );
+  }
+
+  if (!resend) {
+    console.error('[send-director-results] Resend not configured');
+    return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
+  }
+
+  // Read body with size limit
+  let rawBody: string;
   try {
-    // Rate limiting: 5 emails per minute per IP
-    const ipAddress =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
+    rawBody = await request.text();
+  } catch {
+    return NextResponse.json({ error: 'Failed to read request body' }, { status: 400 });
+  }
 
-    if (!checkRateLimit(ipAddress, { max: 5, window: 60000 })) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 },
-      );
-    }
+  if (rawBody.length > MAX_BODY_SIZE) {
+    return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
+  }
 
-    // Check for Resend API key
-    if (!resend) {
-      console.error('[send-director-results] Resend not configured');
-      return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
-    }
+  // Parse JSON
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-    // Parse and validate request body
-    const body = await request.json();
-    const validationResult = SendDirectorResultsRequestSchema.safeParse(body);
+  const validationResult = SendDirectorResultsRequestSchema.safeParse(body);
+  if (!validationResult.success) {
+    return NextResponse.json(
+      { error: 'Invalid request data', details: validationResult.error.flatten() },
+      { status: 400 },
+    );
+  }
 
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: validationResult.error.flatten() },
-        { status: 400 },
-      );
-    }
+  const { email, results, taxYear } = validationResult.data;
+  const recommendedStrategy = results.strategies[results.recommended];
 
-    const { email, results, taxYear } = validationResult.data;
-    const recommendedStrategy = results.strategies[results.recommended];
-
-    // Generate email HTML
+  try {
     const html = generateDirectorEmailHtml(
       results.grossProfit,
       results.strategies,
@@ -453,22 +551,30 @@ export async function POST(request: NextRequest) {
       taxYear,
     );
 
-    // Send email
+    const text = generateDirectorEmailText(
+      results.grossProfit,
+      results.strategies,
+      results.recommended,
+      results.savingsVsAllSalary,
+      taxYear,
+    );
+
     const { error } = await resend.emails.send({
       from: 'PayeTax <noreply@payetax.co.uk>',
       to: email,
       subject: `Director Tax Strategy Report - ${formatCurrency(recommendedStrategy.takeHome)} Take-Home`,
       html,
+      text,
     });
 
     if (error) {
-      console.error('Resend error:', error);
+      console.error('[send-director-results] Resend error:', error);
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Send director results error:', error);
+    console.error('[send-director-results] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

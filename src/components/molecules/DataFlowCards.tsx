@@ -4,10 +4,10 @@
  * Displays a grid of data flow cards showing how data moves through the system.
  * Used on privacy page to explain where data goes (or doesn't go).
  *
+ * Server Component - no hooks or event handlers needed.
+ *
  * @module components/molecules/DataFlowCards
  */
-
-'use client';
 
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';

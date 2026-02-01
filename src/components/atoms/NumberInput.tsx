@@ -1,31 +1,36 @@
-// src/components/atoms/NumberInput.tsx
 /**
  * Enhanced number input component with formatting and controls
  *
  * Provides a customizable input field for numeric values with support for:
  * - Currency formatting with prefix/suffix
  * - Decimal precision control
- * - Increment/decrement controls
+ * - Increment/decrement controls (spinbutton semantics)
  * - Focus behavior customization
- * - Full accessibility support
+ * - Full accessibility support including reduced motion
  *
  * @module components/atoms/NumberInput
  */
 
-import { motion } from 'framer-motion';
-import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { ChangeEvent, FocusEvent, InputHTMLAttributes, KeyboardEvent } from 'react';
+import { forwardRef, memo, useCallback, useEffect, useId, useState } from 'react';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn, formatNumber, parseFormattedValue } from '@/lib/utils';
 
 /**
  * Props for the NumberInput component
  */
-interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+interface NumberInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   /** Current numeric value */
   value: number;
-  /** Callback when value changes */
+  /**
+   * Callback when value is committed (on blur, Enter, or control click)
+   * Note: This fires on commit, not every keystroke. For live updates, use onValueChange
+   */
   onChange: (value: number) => void;
+  /** Optional callback for live value changes during typing */
+  onValueChange?: (value: number) => void;
   /** Number of decimal places to display */
   decimals?: number;
   /** Optional prefix (e.g., currency symbol) */
@@ -36,353 +41,396 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
   clearOnFocus?: boolean;
   /** Whether to show increment/decrement controls */
   showControls?: boolean;
-  /** React ref for the input element */
-  ref?: React.Ref<HTMLInputElement>;
+  /** Minimum allowed value (default: 0) */
+  min?: number;
+  /** Maximum allowed value */
+  max?: number;
+  /** Step size for controls/arrow keys (default: 1, or 10^-decimals for decimals) */
+  step?: number;
 }
 
 /**
- * Enhanced number input component with formatting and controls
+ * Enhanced number input with formatting and spinbutton controls
  * Supports currency, percentage, and standard number inputs with accessibility features
- *
- * Performance: Memoized with React 19, uses useCallback/useMemo for optimal re-render prevention
- *
- * @param props - Component props including value, onChange, and formatting options
- * @returns A numeric input field with formatting and optional controls
  */
-const NumberInput = memo(function NumberInput({
-  value,
-  onChange,
-  decimals = 0,
-  className,
-  prefix,
-  suffix,
-  clearOnFocus = true,
-  showControls = false,
-  disabled,
-  id,
-  onFocus,
-  onBlur,
-  onKeyDown,
-  ref,
-  ...props
-}: NumberInputProps) {
-  // Internal state for the displayed value
-  const [displayValue, setDisplayValue] = useState<string>('');
-
-  // State for tracking focus
-  const [isFocused, setIsFocused] = useState<boolean>(false);
-
-  // Generate unique IDs for accessibility if not provided
-  const inputId = useMemo(
-    () => id || `number-input-${Math.random().toString(36).substring(2, 9)}`,
-    [id],
-  );
-  const controlsId = `${inputId}-controls`;
-  const incrementId = `${inputId}-increment`;
-  const decrementId = `${inputId}-decrement`;
-
-  // Format the initial value
-  useEffect(() => {
-    // Only update display value when not focused to prevent cursor jumping
-    if (!isFocused) {
-      setDisplayValue(formatNumber(value, decimals));
-    }
-  }, [value, decimals, isFocused]);
-
-  /**
-   * Handle focus event - clear field for better UX if configured
-   */
-  const handleFocus = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(true);
-
-      // Force clear the field completely for better UX
-      if (clearOnFocus) {
-        e.target.value = '';
-        setDisplayValue('');
-      }
-
-      // Call original onFocus if provided
-      if (onFocus) {
-        onFocus(e);
-      }
+const NumberInput = memo(
+  forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
+    {
+      value,
+      onChange,
+      onValueChange,
+      decimals = 0,
+      className,
+      prefix,
+      suffix,
+      clearOnFocus = true,
+      showControls = false,
+      disabled,
+      id,
+      min = 0,
+      max,
+      step,
+      onFocus,
+      onBlur,
+      onKeyDown,
+      ...props
     },
-    [clearOnFocus, onFocus],
-  );
+    ref,
+  ) {
+    // Internal state for the displayed value
+    const [displayValue, setDisplayValue] = useState<string>('');
+    const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  /**
-   * Handle blur event - parse and format the current input value
-   */
-  const handleBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(false);
+    // SSR-safe ID generation
+    const reactId = useId();
+    const inputId = id ?? `number-input-${reactId}`;
+    const controlsId = `${inputId}-controls`;
 
-      // Parse and format the current input value
-      const numericValue = parseFormattedValue(e.target.value);
+    // Respect reduced motion preferences
+    const prefersReducedMotion = useReducedMotion();
 
-      // Update the displayed value
-      setDisplayValue(formatNumber(numericValue, decimals));
+    // Calculate default step based on decimals
+    const effectiveStep = step ?? (decimals > 0 ? 10 ** -decimals : 1);
 
-      // Notify parent of the change
-      onChange(numericValue);
-
-      // Call original onBlur if provided
-      if (onBlur) {
-        onBlur(e);
+    // Format the initial value
+    useEffect(() => {
+      // Only update display value when not focused to prevent cursor jumping
+      if (!isFocused) {
+        setDisplayValue(formatNumber(value, decimals));
       }
-    },
-    [decimals, onChange, onBlur],
-  );
+    }, [value, decimals, isFocused]);
 
-  /**
-   * Handle input change - format with thousand separators while typing
-   */
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const inputValue = e.target.value;
+    /**
+     * Clamp value to min/max bounds
+     */
+    const clampValue = useCallback(
+      (val: number): number => {
+        let clamped = val;
+        if (min !== undefined) clamped = Math.max(min, clamped);
+        if (max !== undefined) clamped = Math.min(max, clamped);
+        return clamped;
+      },
+      [min, max],
+    );
 
-      // If empty, just clear
-      if (inputValue === '') {
-        setDisplayValue('');
-        return;
-      }
+    /**
+     * Handle focus event - clear field for better UX if configured
+     */
+    const handleFocus = useCallback(
+      (e: FocusEvent<HTMLInputElement>) => {
+        setIsFocused(true);
 
-      // Allow decimal point and comma for numbers with decimals
-      if (decimals > 0) {
-        // Remove all non-numeric characters except decimal point
-        const cleaned = inputValue.replace(/[^\d.]/g, '');
-
-        // Prevent multiple decimal points
-        const parts = cleaned.split('.');
-        if (parts.length > 2) {
-          return; // Don't allow more than one decimal point
+        if (clearOnFocus) {
+          // Use state only, don't mutate DOM directly
+          setDisplayValue('');
         }
 
-        // Format integer part with commas, preserve decimal part
-        if (parts.length === 2) {
+        onFocus?.(e);
+      },
+      [clearOnFocus, onFocus],
+    );
+
+    /**
+     * Handle blur event - parse and format the current input value
+     */
+    const handleBlur = useCallback(
+      (e: FocusEvent<HTMLInputElement>) => {
+        setIsFocused(false);
+
+        const parsed = parseFormattedValue(e.target.value);
+        const clamped = clampValue(parsed);
+
+        setDisplayValue(formatNumber(clamped, decimals));
+
+        // Only notify if value actually changed
+        if (clamped !== value) {
+          onChange(clamped);
+        }
+
+        onBlur?.(e);
+      },
+      [decimals, onChange, onBlur, clampValue, value],
+    );
+
+    /**
+     * Handle input change - format with thousand separators while typing
+     */
+    const handleChange = useCallback(
+      (e: ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+
+        if (inputValue === '') {
+          setDisplayValue('');
+          onValueChange?.(0);
+          return;
+        }
+
+        // Allow negative sign at start if min < 0
+        const allowNegative = min < 0;
+
+        if (decimals > 0) {
+          // Remove all non-numeric characters except decimal point (and minus if allowed)
+          const cleanPattern = allowNegative ? /[^\d.-]/g : /[^\d.]/g;
+          let cleaned = inputValue.replace(cleanPattern, '');
+
+          // Only allow one minus at the start
+          if (allowNegative && cleaned.includes('-')) {
+            const isNegative = cleaned.startsWith('-');
+            cleaned = cleaned.replace(/-/g, '');
+            if (isNegative) cleaned = `-${cleaned}`;
+          }
+
+          // Prevent multiple decimal points
+          const parts = cleaned.split('.');
+          if (parts.length > 2) return;
+
+          // Clamp decimal digits
+          const decimalPart = parts[1];
+          if (parts.length === 2 && decimalPart && decimalPart.length > decimals) {
+            parts[1] = decimalPart.slice(0, decimals);
+          }
+
+          // Format integer part with commas
           const integerPart = parts[0] || '';
-          const decimalPart = parts[1] || '';
-          // Thousand separator regex: \B = non-word boundary, (?=(\d{3})+(?!\d)) = lookahead for groups of 3 digits
-          // Example: "1234567" -> "1,234,567"
-          const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          setDisplayValue(`${formattedInteger}.${decimalPart}`);
+          const isNegative = integerPart.startsWith('-');
+          const absInteger = isNegative ? integerPart.slice(1) : integerPart;
+          const formattedInteger = absInteger.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          const finalInteger = isNegative ? `-${formattedInteger}` : formattedInteger;
+
+          const formatted = parts.length === 2 ? `${finalInteger}.${parts[1] ?? ''}` : finalInteger;
+
+          setDisplayValue(formatted);
+          onValueChange?.(parseFormattedValue(formatted));
         } else {
-          // No decimal point yet, just format with commas
-          const formattedInteger = cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          setDisplayValue(formattedInteger);
+          // For integers
+          const cleanPattern = allowNegative ? /[^\d-]/g : /[^\d]/g;
+          let cleaned = inputValue.replace(cleanPattern, '');
+
+          // Only allow one minus at the start
+          if (allowNegative && cleaned.includes('-')) {
+            const isNegative = cleaned.startsWith('-');
+            cleaned = cleaned.replace(/-/g, '');
+            if (isNegative) cleaned = `-${cleaned}`;
+          }
+
+          const isNegative = cleaned.startsWith('-');
+          const absValue = isNegative ? cleaned.slice(1) : cleaned;
+          const formattedValue = absValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          const formatted = isNegative ? `-${formattedValue}` : formattedValue;
+
+          setDisplayValue(formatted);
+          onValueChange?.(parseFormattedValue(formatted));
         }
-      } else {
-        // For integers: Remove all non-numeric characters
-        const cleaned = inputValue.replace(/[^\d]/g, '');
+      },
+      [decimals, min, onValueChange],
+    );
 
-        // Format with thousand separators as user types
-        const formattedValue = cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-        // Update display value with formatted number
-        setDisplayValue(formattedValue);
-      }
-    },
-    [decimals],
-  );
-
-  /**
-   * Handle keydown events - for Enter key and arrow controls
-   */
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // Allow Enter key to trigger blur (apply formatting)
-      if (e.key === 'Enter') {
-        e.currentTarget.blur();
-      }
-
-      // Increment/decrement with arrow keys when controls are enabled
-      if (showControls) {
-        const step = e.shiftKey ? 10 : 1;
-
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          const newValue = parseFormattedValue(displayValue) + step;
-          onChange(newValue);
-          setDisplayValue(String(newValue));
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          const newValue = Math.max(0, parseFormattedValue(displayValue) - step);
-          onChange(newValue);
-          setDisplayValue(String(newValue));
+    /**
+     * Handle keydown events - Enter key and arrow controls
+     */
+    const handleKeyDown = useCallback(
+      (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+          e.currentTarget.blur();
         }
-      }
 
-      // Call original onKeyDown if provided
-      if (onKeyDown) {
-        onKeyDown(e);
-      }
-    },
-    [displayValue, onChange, onKeyDown, showControls],
-  );
+        if (showControls) {
+          const multiplier = e.shiftKey ? 10 : 1;
+          const currentValue = parseFormattedValue(displayValue);
 
-  /**
-   * Handle increment button click - increase value by 1
-   */
-  const handleIncrement = useCallback(() => {
-    if (disabled) return;
-    const currentValue = parseFormattedValue(displayValue);
-    const newValue = currentValue + 1;
-    setDisplayValue(String(newValue));
-    onChange(newValue);
-  }, [disabled, displayValue, onChange]);
+          if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const newValue = clampValue(currentValue + effectiveStep * multiplier);
+            setDisplayValue(formatNumber(newValue, decimals));
+            onChange(newValue);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const newValue = clampValue(currentValue - effectiveStep * multiplier);
+            setDisplayValue(formatNumber(newValue, decimals));
+            onChange(newValue);
+          }
+        }
 
-  /**
-   * Handle decrement button click - decrease value by 1, min 0
-   */
-  const handleDecrement = useCallback(() => {
-    if (disabled) return;
-    const currentValue = parseFormattedValue(displayValue);
-    const newValue = Math.max(0, currentValue - 1);
-    setDisplayValue(String(newValue));
-    onChange(newValue);
-  }, [disabled, displayValue, onChange]);
+        onKeyDown?.(e);
+      },
+      [displayValue, onChange, onKeyDown, showControls, clampValue, effectiveStep, decimals],
+    );
 
-  return (
-    <div className={cn('relative flex items-center', disabled && 'opacity-60')}>
-      {/* Prefix (e.g., currency symbol) */}
-      {prefix && (
-        <span
-          className='pointer-events-none absolute left-3 z-10 text-foreground/70'
-          aria-hidden='true'
-        >
-          {prefix}
-        </span>
-      )}
+    /**
+     * Handle increment button click
+     */
+    const handleIncrement = useCallback(() => {
+      if (disabled) return;
+      const currentValue = parseFormattedValue(displayValue);
+      const newValue = clampValue(currentValue + effectiveStep);
+      setDisplayValue(formatNumber(newValue, decimals));
+      onChange(newValue);
+    }, [disabled, displayValue, onChange, clampValue, effectiveStep, decimals]);
 
-      {/* Main input field */}
-      <input
-        ref={ref}
-        type='text'
-        inputMode='decimal'
-        id={inputId}
-        value={displayValue}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        aria-labelledby={props['aria-labelledby']}
-        aria-describedby={props['aria-describedby']}
-        aria-invalid={props['aria-invalid']}
-        aria-required={props['aria-required'] || props.required}
-        aria-controls={showControls ? controlsId : undefined}
-        className={cn(
-          'glass-input w-full px-3 py-2 backdrop-blur-glass-sm',
-          'rounded-lg border-glass shadow-glass-sm',
-          'focus:glow-sm focus:outline-none focus:ring-1 focus:ring-primary',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'placeholder:text-foreground/50',
-          'transition-all duration-200',
-          'bg-glass-deep text-foreground',
-          TYPOGRAPHY.TEXT_SM,
-          prefix && 'pl-7',
-          suffix && 'pr-7',
-          showControls && 'pr-16',
-          isFocused && 'glow-sm',
-          className,
+    /**
+     * Handle decrement button click
+     */
+    const handleDecrement = useCallback(() => {
+      if (disabled) return;
+      const currentValue = parseFormattedValue(displayValue);
+      const newValue = clampValue(currentValue - effectiveStep);
+      setDisplayValue(formatNumber(newValue, decimals));
+      onChange(newValue);
+    }, [disabled, displayValue, onChange, clampValue, effectiveStep, decimals]);
+
+    // Motion variants respecting reduced motion
+    const controlsAnimation = prefersReducedMotion
+      ? {}
+      : {
+          initial: { opacity: 0, x: 4 },
+          animate: { opacity: disabled ? 0.3 : 1, x: 0 },
+          transition: { duration: 0.2 },
+        };
+
+    const buttonAnimation = prefersReducedMotion
+      ? {}
+      : {
+          whileHover: { scale: disabled ? 1 : 1.05 },
+          whileTap: { scale: disabled ? 1 : 0.95 },
+        };
+
+    return (
+      <div className={cn('relative flex items-center', disabled && 'opacity-60')}>
+        {prefix && (
+          <span
+            className='pointer-events-none absolute left-3 z-10 text-foreground/70'
+            aria-hidden='true'
+          >
+            {prefix}
+          </span>
         )}
-        {...props}
-      />
 
-      {/* Suffix (e.g., percentage symbol) */}
-      {suffix && (
-        <span
-          className='pointer-events-none absolute right-3 z-10 text-foreground/70'
-          aria-hidden='true'
-        >
-          {suffix}
-        </span>
-      )}
-
-      {/* Increment/decrement controls */}
-      {showControls && (
-        <motion.fieldset
-          id={controlsId}
-          initial={{ opacity: 0, x: 4 }}
-          animate={{ opacity: disabled ? 0.3 : 1, x: 0 }}
-          transition={{ duration: 0.2 }}
+        <input
+          ref={ref}
+          type='text'
+          inputMode='decimal'
+          role='spinbutton'
+          id={inputId}
+          value={displayValue}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          aria-valuenow={value}
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuetext={
+            prefix || suffix
+              ? `${prefix ?? ''}${formatNumber(value, decimals)}${suffix ?? ''}`
+              : undefined
+          }
           className={cn(
-            'absolute inset-y-1 right-1 flex flex-col border-l',
-            'border-glass',
-            'bg-glass-deep backdrop-blur-glass-sm',
-            'overflow-hidden rounded-r-md',
-            'shadow-sm',
-            disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
+            'glass-input w-full px-3 py-2 backdrop-blur-glass-sm',
+            'rounded-lg border-glass shadow-glass-sm',
+            'focus:glow-sm focus:outline-none focus:ring-1 focus:ring-primary',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            'placeholder:text-foreground/50',
+            'transition-all duration-200',
+            'bg-glass-deep text-foreground',
+            TYPOGRAPHY.TEXT_SM,
+            prefix && 'pl-7',
+            suffix && 'pr-7',
+            showControls && 'pr-16',
+            isFocused && 'glow-sm',
+            className,
           )}
-          aria-label='Value controls'
-        >
-          <motion.button
-            id={incrementId}
-            type='button'
-            onClick={handleIncrement}
-            disabled={disabled}
-            whileHover={{ scale: disabled ? 1 : 1.05 }}
-            whileTap={{ scale: disabled ? 1 : 0.95 }}
-            className={cn(
-              'flex flex-1 items-center justify-center px-2',
-              'text-foreground transition-colors hover:bg-glass',
-              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
-            )}
-            aria-label='Increment value'
-            aria-controls={inputId}
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='12'
-              height='12'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              aria-hidden='true'
-            >
-              <path d='M18 15l-6-6-6 6' />
-            </svg>
-          </motion.button>
-          <motion.button
-            id={decrementId}
-            type='button'
-            onClick={handleDecrement}
-            disabled={disabled}
-            whileHover={{ scale: disabled ? 1 : 1.05 }}
-            whileTap={{ scale: disabled ? 1 : 0.95 }}
-            className={cn(
-              'flex flex-1 items-center justify-center px-2',
-              'text-foreground transition-colors hover:bg-glass',
-              'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
-            )}
-            aria-label='Decrement value'
-            aria-controls={inputId}
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='12'
-              height='12'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              aria-hidden='true'
-            >
-              <path d='M6 9l6 6 6-6' />
-            </svg>
-          </motion.button>
-        </motion.fieldset>
-      )}
-    </div>
-  );
-});
+          {...props}
+        />
 
-// Set display name for better debugging in React DevTools
+        {suffix && (
+          <span
+            className='pointer-events-none absolute right-3 z-10 text-foreground/70'
+            aria-hidden='true'
+          >
+            {suffix}
+          </span>
+        )}
+
+        {showControls && (
+          <motion.div
+            id={controlsId}
+            role='group'
+            aria-label='Value controls'
+            {...controlsAnimation}
+            className={cn(
+              'absolute inset-y-1 right-1 flex flex-col border-l',
+              'border-glass',
+              'bg-glass-deep backdrop-blur-glass-sm',
+              'overflow-hidden rounded-r-md',
+              'shadow-sm',
+              disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
+            )}
+          >
+            <motion.button
+              type='button'
+              onClick={handleIncrement}
+              disabled={disabled}
+              {...buttonAnimation}
+              className={cn(
+                'flex flex-1 items-center justify-center px-2',
+                'text-foreground transition-colors hover:bg-glass',
+                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
+              )}
+              aria-label='Increment value'
+              aria-controls={inputId}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                width='12'
+                height='12'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M18 15l-6-6-6 6' />
+              </svg>
+            </motion.button>
+            <motion.button
+              type='button'
+              onClick={handleDecrement}
+              disabled={disabled}
+              {...buttonAnimation}
+              className={cn(
+                'flex flex-1 items-center justify-center px-2',
+                'text-foreground transition-colors hover:bg-glass',
+                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
+              )}
+              aria-label='Decrement value'
+              aria-controls={inputId}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                width='12'
+                height='12'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M6 9l6 6 6-6' />
+              </svg>
+            </motion.button>
+          </motion.div>
+        )}
+      </div>
+    );
+  }),
+);
+
 NumberInput.displayName = 'NumberInput';
 
 export default NumberInput;
+export type { NumberInputProps };

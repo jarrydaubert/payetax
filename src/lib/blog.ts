@@ -58,12 +58,17 @@ function convertMDXPost(post: ReturnType<typeof getMDXPosts>[0]): BlogPost {
 
 /**
  * Get all published posts (cached)
+ * Returns posts sorted by publishedAt desc (newest first) as the canonical order
  */
 const getAllCachedPosts = unstable_cache(
-  (): Promise<BlogPost[]> => {
+  // biome-ignore lint/suspicious/useAwait: unstable_cache requires async function
+  async (): Promise<BlogPost[]> => {
     const posts = getMDXPosts();
     // All posts in /content/blog are published
-    return Promise.resolve(posts.map(convertMDXPost));
+    // Sort by publishedAt desc as canonical order
+    return posts
+      .map(convertMDXPost)
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   },
   ['blog-all-posts'],
   { revalidate: 3600, tags: ['blog'] },
@@ -105,10 +110,10 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
     filtered = filtered.filter((post) => post.category === options.category);
   }
 
-  // Filter by tag
+  // Filter by tag (case-insensitive to handle frontmatter inconsistencies)
   if (options.tag) {
-    const tag = options.tag;
-    filtered = filtered.filter((post) => post.tags?.includes(tag));
+    const tagLower = options.tag.toLowerCase();
+    filtered = filtered.filter((post) => post.tags?.some((t) => t.toLowerCase() === tagLower));
   }
 
   // Filter by featured status
@@ -116,13 +121,15 @@ function filterPosts(posts: BlogPost[], options: BlogPaginationOptions): BlogPos
     filtered = filtered.filter((post) => post.featured === options.featured);
   }
 
-  // Filter by search query (title or excerpt)
+  // Filter by search query (title, excerpt, and tags)
   if (options.searchQuery) {
     const query = options.searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (post) =>
-        post.title.toLowerCase().includes(query) || post.excerpt.toLowerCase().includes(query),
-    );
+    filtered = filtered.filter((post) => {
+      const inTitle = post.title.toLowerCase().includes(query);
+      const inExcerpt = post.excerpt.toLowerCase().includes(query);
+      const inTags = (post.tags ?? []).some((t) => t.toLowerCase().includes(query));
+      return inTitle || inExcerpt || inTags;
+    });
   }
 
   return filtered;
@@ -181,8 +188,9 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
   // Paginate posts
   const paginatedPosts = paginatePosts(posts, page, pageSize);
 
-  // Return simple array if not explicitly requesting pagination
-  if (!('paginated' in options)) {
+  // Return simple array if not explicitly requesting pagination object
+  // Note: Check value, not just presence, to avoid surprising behavior with { paginated: false }
+  if (options.paginated !== true) {
     return paginatedPosts;
   }
 
@@ -285,12 +293,15 @@ export async function getBlogPostsCount(category?: string): Promise<number> {
 
 /**
  * Get featured blog posts (array)
+ * Falls back to most recent posts if no featured posts exist
  */
 export async function getFeaturedPosts(): Promise<BlogPost[]> {
+  // getAllCachedPosts returns posts sorted by publishedAt desc
   const allPosts = await getAllCachedPosts();
   const featuredPosts = allPosts.filter((post) => post.featured === true);
 
   if (featuredPosts.length === 0) {
+    // Fallback: most recent posts (already sorted)
     return allPosts.slice(0, BLOG_CONFIG.featuredPostsCount);
   }
 
@@ -308,9 +319,10 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
 /**
  * Get editor's picks posts
  * Primary: Posts with editorsPick: true frontmatter
- * Fallback: Most recent posts if insufficient picks
+ * Fallback: Most recent posts if insufficient picks (allPosts is sorted by publishedAt desc)
  */
 export async function getEditorsPicks(limit: number = 5): Promise<BlogPost[]> {
+  // getAllCachedPosts returns posts sorted by publishedAt desc
   const allPosts = await getAllCachedPosts();
 
   // Filter for editor's picks
@@ -360,11 +372,13 @@ export async function getDeepDives(limit: number = 6): Promise<BlogPost[]> {
 
 /**
  * Get latest posts (excluding featured/carousel posts)
+ * Posts are sorted by publishedAt desc (newest first)
  */
 export async function getLatestPosts(
   limit: number = 5,
   excludeSlugs: string[] = [],
 ): Promise<BlogPost[]> {
+  // getAllCachedPosts returns posts sorted by publishedAt desc
   const allPosts = await getAllCachedPosts();
   const excludeSet = new Set(excludeSlugs);
 
@@ -398,7 +412,11 @@ export async function getRelatedPosts(
       return { post, score };
     })
     .filter((item) => item.score > 0) // Only include posts with some relevance
-    .sort((a, b) => b.score - a.score) // Sort by score
+    .sort((a, b) => {
+      // Sort by score, then by recency as tie-breaker
+      if (b.score !== a.score) return b.score - a.score;
+      return new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime();
+    })
     .slice(0, limit);
 
   // Convert to RelatedPost format

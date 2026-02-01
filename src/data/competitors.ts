@@ -152,18 +152,19 @@ export const COMPETITORS: Competitor[] = [
     name: 'GOV.UK HMRC Calculator',
     shortName: 'GOV.UK',
     url: 'https://www.gov.uk/estimate-income-tax',
+    // Verified 2025-01: GOV.UK "Estimate your Income Tax" includes NI, pension, and student loans
     description:
-      'The official government self-assessment calculator for estimating your Income Tax.',
+      'The official government calculator for estimating Income Tax, National Insurance, and take-home pay.',
     strengths: [
       'Official government source',
       'Authoritative HMRC data',
       'Free to use',
-      'Covers self-assessment scenarios',
+      'Includes pension and student loan deductions',
     ],
     weaknesses: [
       'Dated, cluttered interface',
       'Poor mobile experience',
-      'Self-assessment focus only',
+      'Limited scenario options',
       'No real-time calculations',
       'No What-If comparisons',
       'Requires multiple page loads',
@@ -171,8 +172,8 @@ export const COMPETITORS: Competitor[] = [
     features: {
       takeHomePay: true,
       scottishRates: false,
-      studentLoans: false,
-      pension: false,
+      studentLoans: true, // Verified: supports student loan repayment estimates
+      pension: true, // Verified: supports pension contribution deductions
       whatIf: false,
       mobileFirst: false,
       adFree: true,
@@ -183,13 +184,13 @@ export const COMPETITORS: Competitor[] = [
       'What-If salary scenarios',
       'Instant real-time results',
       'Scottish rates support',
-      'Student loan calculations',
-      'Pension contribution options',
+      'Multiple student loan plans',
+      'Advanced pension options',
     ],
     bestFor: [
-      'Self-assessment tax returns',
-      'Official documentation needs',
-      'Complex self-employed scenarios',
+      'Official HMRC estimates',
+      'Basic take-home calculations',
+      'Government documentation needs',
     ],
     category: 'standalone',
     targetKeywords: ['gov.uk tax calculator alternative', 'hmrc calculator alternative'],
@@ -199,6 +200,7 @@ export const COMPETITORS: Competitor[] = [
     name: 'The Salary Calculator',
     shortName: 'Salary Calc',
     url: 'https://www.thesalarycalculator.co.uk/',
+    // Verified 2025-01: Has tax year selector and 2025/2024 comparison calculator
     description: 'Long-established, feature-rich UK salary calculator with extensive options.',
     strengths: [
       'Comprehensive feature set',
@@ -206,28 +208,27 @@ export const COMPETITORS: Competitor[] = [
       'Maternity/paternity pay',
       'Detailed breakdown options',
       'Long track record',
+      'Year-on-year comparison tool',
     ],
     weaknesses: [
       'Dated visual design',
       'Complex, overwhelming interface',
       'Poor mobile experience',
-      'Calculation discrepancies reported',
-      'No What-If comparisons',
     ],
     features: {
       takeHomePay: true,
       scottishRates: true,
       studentLoans: true,
       pension: true,
-      whatIf: false,
+      whatIf: false, // Year comparison exists but not scenario-based What-If
       mobileFirst: false,
       adFree: true,
-      historicYears: false,
+      historicYears: true, // Verified: has tax year selector
     },
     payeTaxAdvantages: [
       'Modern, clean design',
       'Simpler, intuitive UX',
-      'What-If salary scenarios',
+      'Real scenario What-If comparisons',
       'Mobile-first responsive',
       'Real-time calculations',
       'Verified HMRC accuracy',
@@ -245,6 +246,7 @@ export const COMPETITORS: Competitor[] = [
     name: 'ListenToTaxman',
     shortName: 'LTTM',
     url: 'https://listentotaxman.com/',
+    // Verified 2025-01: Supports historic years back to 1999
     description:
       'Popular UK tax calculator known for its straightforward approach and detailed breakdowns.',
     strengths: [
@@ -252,10 +254,11 @@ export const COMPETITORS: Competitor[] = [
       'Simple interface',
       'Quick calculations',
       'Established brand (15+ years)',
+      'Historic years back to 1999',
     ],
     weaknesses: [
       'Outdated design',
-      'Heavy ad placement',
+      'Ad-supported experience',
       'No What-If comparisons',
       'Limited mobile optimization',
       'Basic feature set',
@@ -268,7 +271,7 @@ export const COMPETITORS: Competitor[] = [
       whatIf: false,
       mobileFirst: false,
       adFree: false,
-      historicYears: false,
+      historicYears: true, // Verified: supports back to 1999
     },
     payeTaxAdvantages: [
       '100% ad-free experience',
@@ -291,6 +294,7 @@ export const COMPETITORS: Competitor[] = [
     name: 'SalaryBot',
     shortName: 'SalaryBot',
     url: 'https://salarybot.co.uk/',
+    // Verified 2025-01: Has tax year selector with multiple years
     description:
       'Clean UK salary calculator with a focus on simplicity and take-home pay estimates.',
     strengths: [
@@ -298,10 +302,10 @@ export const COMPETITORS: Competitor[] = [
       'Quick results',
       'Simple to use',
       'Mobile-friendly design',
+      'Multiple tax years',
     ],
     weaknesses: [
       'Limited features',
-      'No historic tax years',
       'Basic pension options only',
       'No What-If comparisons',
       'Fewer detailed breakdowns',
@@ -314,14 +318,14 @@ export const COMPETITORS: Competitor[] = [
       whatIf: false,
       mobileFirst: true,
       adFree: true,
-      historicYears: false,
+      historicYears: true, // Verified: has tax year selector
     },
     payeTaxAdvantages: [
       'What-If salary scenarios',
-      'Historic tax years support',
       'More detailed breakdowns',
       'Pension optimization tools',
       'Tax trap calculations',
+      'Privacy-first design',
     ],
     bestFor: ['Quick calculations', 'Mobile users', 'Simple salary estimates'],
     category: 'standalone',

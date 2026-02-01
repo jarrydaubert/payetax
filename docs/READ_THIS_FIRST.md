@@ -1,6 +1,8 @@
 # READ THIS FIRST
 
 > Stop adding features nobody asked for. Start distribution.
+>
+> **The one exception:** Only build what removes a blocker to acquisition, activation, retention, or monetization.
 
 ---
 
@@ -42,7 +44,7 @@ Zero times anything is zero.
 
 This is avoidance dressed as work ethic.
 
-**Every hour spent adding feature #17 instead of distributing is functionally equivalent to scrolling TikTok.** Both feel productive. Neither moves the needle.
+**Every hour spent adding feature #17 instead of distributing is optimizing for comfort, not growth.** It feels productive. It doesn't move the needle.
 
 ### The Identity Shift
 
@@ -58,9 +60,11 @@ The business doesn't care about your identity. It only cares about its needs.
 
 If you've never actually tried distribution—if you've been hiding behind your code editor, adding features nobody asked for, telling yourself you're "almost ready"—then you don't have a product problem.
 
-**You have a courage problem.**
+**You have a data deficit.**
 
-The product is done. Now do the other half of the work.
+Without distribution, you have no feedback. No validation. No signal on what's working. The product might be done—but you won't know until you ship it to real users.
+
+Distribution is how you get product feedback. Now do the other half of the work.
 
 ---
 
@@ -131,12 +135,6 @@ Not all AI business models are equal. Here's how they compare:
 - Highest acquisition multiples
 - MRR/ARR built into the model
 
-**Case studies:**
-- **Base44:** 250k users → acquired for $80M cash (6 months)
-- **Lovable:** $100M ARR in 8 months (faster than OpenAI)
-- **Levels.io:** $3.5M/year, 90%+ margins, no employees
-- **N8N:** Side project → $2.5B valuation
-
 **The path:** Free tool (SEO/traffic) → Paid features for specific avatar (SaaS revenue)
 
 This is exactly why monetization matters. Not another free feature.
@@ -153,11 +151,13 @@ Current: "UK taxpayers" (65 million people)
 
 | Avatar | Pain Level | Willingness to Pay |
 |--------|------------|-------------------|
-| Casual browser | Low | £0 |
-| **[Your specific avatar]** | High | £19-49/month |
-| **[B2B buyer who serves your avatar]** | High | £49-199/month |
+| Casual browser checking take-home | Low | £0 |
+| **£100k-£125k earner losing personal allowance** | High | £19-49/month |
+| **Accountant needing quick client calculations** | High | £49-199/month |
 
 Pick one avatar. One person. One problem. One solution.
+
+**Current PayeTax focus:** The £100k-£125k employee who doesn't realize they're paying 60% marginal tax and could save £3k-£9k/year with pension optimization.
 
 ---
 
@@ -331,6 +331,142 @@ Before building any paid feature:
 
 ---
 
+## Definition of Done (PayeTax)
+
+Before you ban new features, define the minimal sellable product:
+
+| Requirement | Status |
+|-------------|--------|
+| **Accurate core logic** (verified against HMRC sources) | ✅ |
+| **3 landing pages** for top pain scenarios | ⬜ |
+| **1 paid offer** with clear ROI | ⬜ |
+| **1 referral flow** (accountants/advisers) | ⬜ |
+| **Analytics + event tracking** (funnel visibility) | ⬜ |
+| **2+ testimonials** or case studies | ⬜ |
+
+Until these boxes are checked, don't add new calculator features.
+
+---
+
+## PayeTax Avatars (Pick One)
+
+| Avatar | Pain Point | Willingness to Pay |
+|--------|------------|-------------------|
+| **£100k-£140k employee** with bonus + pension choices | "I'm losing my personal allowance and don't know how to optimize" | £19-49/month |
+| **Ltd company director** paying salary/dividends | "What's the optimal split? Am I overpaying?" | £29-79/month |
+| **Contractor worried about IR35** | "How much should I really be taking home?" | £29-49/month |
+| **High earner with student loan + childcare** | "I'm hitting multiple thresholds and can't untangle them" | £19-49/month |
+| **Accountant/adviser (B2B)** | "I need quick calculations for client meetings" | £49-199/month |
+
+**Current focus:** £100k-£140k employee (the "tax trap" avatar)
+
+---
+
+## The Offer Template
+
+Every paid feature needs this structure:
+
+| Component | PayeTax Example |
+|-----------|-----------------|
+| **Outcome** | "Save £3,000-£9,000/year by optimizing pension contributions" |
+| **Who** | PAYE employees earning £100k-£125k |
+| **Mechanism** | Calculator + optimizer + downloadable report |
+| **Proof** | 3 worked examples showing real savings |
+| **Price** | £29/month (anchored to £3k+ annual savings = 100x ROI) |
+
+If you can't fill in this template, you don't have an offer.
+
+---
+
+## The Funnel (PayeTax)
+
+```
+SEO/Social Hook
+     ↓
+Single-purpose landing page (e.g., /100k-tax-trap)
+     ↓
+Calculator pre-filled for scenario (e.g., /calculator/115000-after-tax)
+     ↓
+Result page with "Optimize This" CTA
+     ↓
+Email capture OR Paid checkout OR Accountant referral
+```
+
+**Every distribution effort drives to a specific scenario page—not the homepage.**
+
+---
+
+## Distribution Content That Converts (PayeTax)
+
+Feature announcements don't work. These do:
+
+| Hook | Landing Page |
+|------|--------------|
+| "£115k salary → how to keep your full personal allowance" | `/blog/100k-tax-trap-avoid-60-percent-tax-2025` |
+| "Scotland vs England at £75k: the real difference is £2,082" | `/blog/scottish-vs-english-tax-rates-2026-comparison` |
+| "Dividend vs salary: the one chart every director needs" | `/blog/director-salary-dividends-guide-2025-26` |
+| "The childcare cliff at £100k (and how to avoid it)" | `/blog/[childcare-threshold-guide]` |
+| "Student loan + £100k = 71% marginal rate. Here's the math." | `/blog/100k-tax-trap-avoid-60-percent-tax-2025#student-loans` |
+
+**Lead with the problem. Show the numbers. Link to the solution.**
+
+---
+
+## The Experiment Loop
+
+Distribution isn't "post every day"—it's **run experiments**.
+
+### Weekly Framework
+
+| Component | Example |
+|-----------|---------|
+| **Hypothesis** | "5 LinkedIn posts about the £100k tax trap will drive 100+ clicks to /calculator/110000-after-tax" |
+| **Metric** | Click-through rate to calculator |
+| **Threshold** | 20+ clicks/day average |
+| **Duration** | 7 days |
+| **Kill criteria** | <10 clicks/day by day 4 |
+| **Next iteration** | If fails: test different hook. If succeeds: double down. |
+
+### Example Experiments
+
+1. **Hook test:** "60% tax" vs "lose your personal allowance" vs "£5,028 extra tax"
+2. **Format test:** Thread vs single post vs carousel
+3. **CTA test:** "Calculate yours" vs "See the breakdown" vs "Are you affected?"
+
+**Run one experiment per week. Kill losers fast. Scale winners.**
+
+---
+
+## Distribution Instrumentation
+
+Track these weekly:
+
+| Metric | Target | Current |
+|--------|--------|---------|
+| Landing page → Calculator CTR | >30% | ? |
+| Calculator completion rate | >60% | ? |
+| Result page → CTA click | >10% | ? |
+| CTA → Conversion (email/paid) | >5% | ? |
+
+### Pre-filled Scenario URLs
+
+Create trackable URLs for each campaign:
+
+- `/calculator/110000-after-tax?utm_source=linkedin&utm_campaign=tax-trap`
+- `/calculator/115000-after-tax?utm_source=twitter&utm_campaign=pension-optimizer`
+- `/calculator/75000-after-tax?utm_source=linkedin&utm_campaign=scotland-comparison`
+
+**Every post drives to a specific scenario. Measure which converts.**
+
+### Weekly Retro
+
+1. Which scenario had the best conversion?
+2. Which hook got the most clicks?
+3. Double down on winners. Kill losers.
+4. Update this doc with learnings.
+
+---
+
 ## The Test
 
 Read this document. Then ask yourself:
@@ -360,10 +496,10 @@ Those are the ones who will actually make money.
 
 | "But I don't have..." | Reality |
 |-----------------------|---------|
-| A following | Neither did N8N, Base44, or Midjourney at launch |
-| Time | Stripe, WhatsApp, Twitter were built while founders had 9-to-5s |
-| Technical skills | AI agents write 80-95% of code for successful founders now |
-| Investors | Vectal, Agent Zero, Base44, Midjourney — all bootstrapped |
+| A following | Every successful product started with zero followers |
+| Time | Many successful SaaS products were built nights/weekends |
+| Technical skills | AI tools now handle 80%+ of implementation |
+| Investors | Most profitable solo products are bootstrapped |
 
 You don't need permission. You need to start.
 

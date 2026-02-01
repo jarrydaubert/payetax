@@ -40,20 +40,12 @@ interface BlogPageProps {
 export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
-  const totalPosts = await getBlogPostsCount();
-  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
 
   // Self-referential canonical URL (page 1 = /blog, page 2+ = /blog?page=N)
   const canonicalUrl = page > 1 ? `${SITE_URL}/blog?page=${page}` : `${SITE_URL}/blog`;
 
-  // Build link hints for prev/next
-  const links: { prev?: string; next?: string } = {};
-  if (page > 1) {
-    links.prev = page === 2 ? `${SITE_URL}/blog` : `${SITE_URL}/blog?page=${page - 1}`;
-  }
-  if (page < totalPages) {
-    links.next = `${SITE_URL}/blog?page=${page + 1}`;
-  }
+  // Note: rel="prev/next" link hints removed - Next.js `other` field outputs <meta> not <link>
+  // If needed in future, use a custom <head> component to render actual <link> tags
 
   const title =
     page > 1 ? `TaxInsights by PayeTax | Page ${page}` : 'TaxInsights by PayeTax | UK Tax Guidance';
@@ -67,10 +59,6 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
     alternates: {
       canonical: canonicalUrl,
     },
-    other: {
-      ...(links.prev && { 'link-prev': links.prev }),
-      ...(links.next && { 'link-next': links.next }),
-    },
     openGraph: {
       title,
       description:
@@ -78,14 +66,14 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
       url: canonicalUrl,
       type: 'website',
       siteName: 'TaxInsights by PayeTax',
-      images: ['/images/blog/taxinsights-og.jpg'],
+      images: [`${SITE_URL}/images/blog/taxinsights-og.jpg`],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description:
         'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, and practical financial insights.',
-      images: ['/images/blog/taxinsights-og.jpg'],
+      images: [`${SITE_URL}/images/blog/taxinsights-og.jpg`],
     },
   };
 }

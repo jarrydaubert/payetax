@@ -4,12 +4,15 @@
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
+
+const CALCULATOR_ID = 'tax-calculator';
+const CALCULATOR_HASH = `#${CALCULATOR_ID}`;
 
 /**
  * Navigation bar with new design system (Cyan/Emerald theme)
@@ -29,72 +32,99 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const pathname = usePathname();
   const router = useRouter();
 
+  // Refs for cleanup of async operations
+  const observerRef = useRef<MutationObserver | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+
   const links = [
-    { href: '/#tax-calculator', label: 'Calculator' },
+    { href: `/${CALCULATOR_HASH}`, label: 'Calculator' },
     { href: '/tools/director-guide', label: 'Director Guide' },
     { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About' },
   ] as const;
 
-  const scrollToCalculator = () => {
-    const element = document.getElementById('tax-calculator');
+  /** Clean up any pending observers/timeouts */
+  const cleanupWait = useCallback(() => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => cleanupWait, [cleanupWait]);
+
+  /** Scroll to calculator element, returns true if successful */
+  const scrollToCalculator = useCallback(() => {
+    const element = document.getElementById(CALCULATOR_ID);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return true;
     }
     return false;
-  };
+  }, []);
 
-  const waitForElementAndScroll = () => {
-    // Try immediately first
+  /**
+   * Wait for calculator element and scroll when found
+   * Uses MutationObserver with proper cleanup
+   */
+  const waitForElementAndScroll = useCallback(() => {
+    // Clean up any previous wait
+    cleanupWait();
+
+    // Try immediately
     if (scrollToCalculator()) return;
 
-    // Wait for navigation to complete
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        // Check again after navigation
-        if (scrollToCalculator()) return;
-
-        // Scroll down to trigger DeferredContent's IntersectionObserver
-        // (DeferredContent has timeout=0, so it only renders when scrolled into view)
-        window.scrollTo({ top: window.innerHeight, behavior: 'instant' });
-
-        // Watch for calculator to be added to DOM
-        const observer = new MutationObserver((_mutations, obs) => {
-          if (scrollToCalculator()) {
-            obs.disconnect();
-          }
-        });
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
-
-        // Safety timeout to prevent infinite observation
-        setTimeout(() => observer.disconnect(), 5000);
-      }, 100);
-    });
-  };
-
-  const handleCalculatorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setIsMobileMenuOpen(false);
-
-    if (pathname === '/') {
-      // Try to scroll; if calculator hasn't rendered yet, trigger lazy loading
-      if (!scrollToCalculator()) {
-        waitForElementAndScroll();
+    // Watch for calculator to be added to DOM
+    observerRef.current = new MutationObserver(() => {
+      if (scrollToCalculator()) {
+        cleanupWait();
       }
-    } else {
-      router.push('/');
-      waitForElementAndScroll();
-    }
-  };
+    });
 
-  const handleMobileLinkClick = () => {
+    observerRef.current.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Safety timeout to prevent infinite observation (5s)
+    timeoutRef.current = window.setTimeout(cleanupWait, 5000);
+  }, [cleanupWait, scrollToCalculator]);
+
+  /**
+   * Handle calculator link click
+   * Respects modifier keys for native behavior (open in new tab, etc.)
+   */
+  const handleCalculatorClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // Allow native behavior for modifier keys (Cmd/Ctrl+click, etc.)
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+        return;
+      }
+
+      e.preventDefault();
+      setIsMobileMenuOpen(false);
+
+      if (pathname === '/') {
+        // Already on home - scroll directly or wait for element
+        if (!scrollToCalculator()) {
+          waitForElementAndScroll();
+        }
+        // Update hash for bookmarking/sharing
+        window.history.replaceState(null, '', CALCULATOR_HASH);
+      } else {
+        // Navigate to home with hash - HomePageContent handles scroll via hashchange
+        router.push(`/${CALCULATOR_HASH}`);
+      }
+    },
+    [pathname, router, scrollToCalculator, waitForElementAndScroll],
+  );
+
+  const handleMobileLinkClick = useCallback(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, []);
 
   return (
     <>
@@ -146,15 +176,16 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         </div>
 
         {/* Desktop Utilities */}
-        <div className='hidden items-center justify-end gap-2 md:flex'>
+        <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
           <FeedbackDialog />
           <Link
-            href='/#tax-calculator'
+            href={`/${CALCULATOR_HASH}`}
             onClick={handleCalculatorClick}
             className={cn(
               'rounded-full border border-transparent px-5 py-2.5 font-semibold text-[0.85rem] text-text-primary-new transition-all duration-300',
               '[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]',
               'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-deep',
             )}
           >
             Open Calculator

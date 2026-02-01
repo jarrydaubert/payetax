@@ -1,127 +1,13 @@
 import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'node:util';
 import { toHaveNoViolations } from 'jest-axe';
 
 // Extend Jest matchers with jest-axe accessibility matchers
 expect.extend(toHaveNoViolations);
 
-// Polyfill TextEncoder/TextDecoder for Node.js (required by Next.js modules)
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+// Note: TextEncoder/TextDecoder and Fetch API polyfills (Request/Response/Headers)
+// are in jest.setup.fetch.js which runs via setupFiles before module imports
 
-// Polyfill Request/Response for Next.js web APIs
-// These are basic polyfills - for full Web APIs, tests should use proper environment
-if (typeof global.Response === 'undefined') {
-  global.Response = class Response {
-    constructor(body, init) {
-      this.body = body;
-      this.init = init || {};
-      this.status = this.init.status || 200;
-      this.statusText = this.init.statusText || '';
-      this.headers = new Headers(this.init.headers || {});
-      this.ok = this.status >= 200 && this.status < 300;
-    }
-
-    static json(data, init) {
-      return new Response(JSON.stringify(data), {
-        ...init,
-        headers: {
-          'content-type': 'application/json',
-          ...(init?.headers || {}),
-        },
-      });
-    }
-
-    async json() {
-      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body;
-    }
-
-    async text() {
-      return typeof this.body === 'string' ? this.body : JSON.stringify(this.body);
-    }
-  };
-}
-
-if (typeof global.Request === 'undefined') {
-  global.Request = class Request {
-    constructor(url, init) {
-      this.url = url;
-      this.method = init?.method || 'GET';
-      this.headers = new Headers(init?.headers || {});
-      this.body = init?.body;
-    }
-
-    async json() {
-      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body;
-    }
-  };
-}
-
-if (typeof global.Headers === 'undefined') {
-  global.Headers = class Headers {
-    constructor(init) {
-      this.map = new Map();
-      if (init) {
-        if (init instanceof Headers) {
-          for (const [key, value] of init.entries()) {
-            this.set(key, value);
-          }
-        } else if (Array.isArray(init)) {
-          for (const [key, value] of init) {
-            this.set(key, value);
-          }
-        } else {
-          for (const [key, value] of Object.entries(init)) {
-            this.set(key, value);
-          }
-        }
-      }
-    }
-
-    get(name) {
-      return this.map.get(name.toLowerCase()) || null;
-    }
-
-    set(name, value) {
-      this.map.set(name.toLowerCase(), String(value));
-    }
-
-    has(name) {
-      return this.map.has(name.toLowerCase());
-    }
-
-    delete(name) {
-      this.map.delete(name.toLowerCase());
-    }
-
-    forEach(callback) {
-      for (const [key, value] of this.map.entries()) {
-        callback(value, key, this);
-      }
-    }
-
-    entries() {
-      return this.map.entries();
-    }
-
-    keys() {
-      return this.map.keys();
-    }
-
-    values() {
-      return this.map.values();
-    }
-
-    [Symbol.iterator]() {
-      return this.map.entries();
-    }
-  };
-}
-
-// Optional: configure or set up a testing framework before each test
-// Add global test utilities, mocks, or configurations here
-
-// Mock Next.js router
+// Mock Next.js router (App Router)
 jest.mock('next/navigation', () => ({
   useRouter() {
     return {
@@ -139,14 +25,20 @@ jest.mock('next/navigation', () => ({
   usePathname() {
     return '';
   },
+  redirect: jest.fn(),
+  notFound: jest.fn(),
 }));
 
 // Mock Next.js dynamic imports
+// Returns a placeholder component - actual components should be mocked individually in tests
 jest.mock('next/dynamic', () => {
-  return function dynamic(fn) {
-    const Component = fn();
-    Component.displayName = 'DynamicComponent';
-    return Component;
+  return function dynamic(_dynamicImport, options) {
+    const PlaceholderComponent = () => null;
+    PlaceholderComponent.displayName = options?.loading
+      ? 'DynamicComponentLoading'
+      : 'DynamicComponent';
+    PlaceholderComponent.preload = jest.fn();
+    return PlaceholderComponent;
   };
 });
 
@@ -157,6 +49,11 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
+// Also set on window for libraries that access it directly
+if (typeof window !== 'undefined') {
+  window.ResizeObserver = global.ResizeObserver;
+}
+
 // Mock IntersectionObserver (not available in jsdom)
 global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
@@ -164,7 +61,11 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
-// Mock window.matchMedia (not available in jsdom, only needed in browser environments)
+if (typeof window !== 'undefined') {
+  window.IntersectionObserver = global.IntersectionObserver;
+}
+
+// Mock window.matchMedia (not available in jsdom)
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -187,13 +88,10 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// Mock console methods in tests to avoid noise
+// Console handling: Allow errors through (important for finance app correctness)
+// Only mute warnings to reduce noise from third-party libraries
 global.console = {
   ...console,
-  // uncomment to ignore a specific log level
-  // log: jest.fn(),
-  // debug: jest.fn(),
-  // info: jest.fn(),
   warn: jest.fn(),
-  error: jest.fn(),
+  // error is NOT mocked - real errors should surface in tests
 };

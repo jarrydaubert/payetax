@@ -2,18 +2,28 @@
 
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
 import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
 import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import { Spinner } from '@/components/ui/spinner';
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata } from '@/lib/metadata';
-import { cn } from '@/lib/utils';
 
 // Dynamic import for interactive content - hero is server-rendered for fast LCP
-const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'));
+// Using loading option for predictable fallback behavior (vs relying on outer Suspense)
+const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'), {
+  loading: () => (
+    <div
+      className='flex min-h-[400px] items-center justify-center p-8'
+      role='status'
+      aria-live='polite'
+    >
+      <div className='flex flex-col items-center gap-3'>
+        <div className='size-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
+        <p className='text-muted-foreground text-sm'>Loading calculator...</p>
+      </div>
+    </div>
+  ),
+});
 
 /**
  * Enhanced metadata for the homepage with tax calculator
@@ -54,20 +64,7 @@ export default function HomePage() {
         rootMargin='100px'
         fallback={<div className='min-h-[100px]' aria-hidden='true' />}
       >
-        <Suspense
-          fallback={
-            <div className='flex min-h-[400px] items-center justify-center p-8'>
-              <div className='flex flex-col items-center gap-3'>
-                <Spinner className='size-8' />
-                <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                  Loading calculator...
-                </p>
-              </div>
-            </div>
-          }
-        >
-          <HomePageContent />
-        </Suspense>
+        <HomePageContent />
       </DeferredContent>
 
       {/* Landing page sections: Features, How It Works, FAQ, Final CTA */}

@@ -2,8 +2,17 @@
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 /**
+ * Escape a value for CSV: wrap in quotes and escape internal quotes
+ * This ensures values with commas, currency symbols, or quotes import correctly
+ */
+function escapeCSV(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+/**
  * Export tax calculation results to CSV
  * CSV always includes all timeframes for maximum data export
+ * Values are quoted to handle currency formatting with commas
  * Returns true when download is initiated
  */
 export function exportToCSV(results: TaxCalculationResults): boolean {
@@ -13,34 +22,58 @@ export function exportToCSV(results: TaxCalculationResults): boolean {
   });
 
   // Build CSV content with all timeframes
-  let csv = 'Category,Yearly,Monthly,4-Weekly,Fortnightly,Weekly,Daily,Hourly\n';
+  // Header row (quoted for consistency)
+  let csv = `${[
+    'Category',
+    'Yearly',
+    'Monthly',
+    '4-Weekly',
+    'Fortnightly',
+    'Weekly',
+    'Daily',
+    'Hourly',
+  ]
+    .map(escapeCSV)
+    .join(',')}\n`;
 
   const addRow = (label: string, annually: number) => {
-    csv += `${label},${formatter.format(annually)},${formatter.format(annually / 12)},${formatter.format(annually / 13)},${formatter.format(annually / 26)},${formatter.format(annually / 52)},${formatter.format(annually / 260)},${formatter.format(annually / 1950)}\n`;
+    const values = [
+      label,
+      formatter.format(annually),
+      formatter.format(annually / 12),
+      formatter.format(annually / 13),
+      formatter.format(annually / 26),
+      formatter.format(annually / 52),
+      formatter.format(annually / 260),
+      formatter.format(annually / 1950),
+    ];
+    csv += `${values.map(escapeCSV).join(',')}\n`;
   };
 
+  // Use positive values for amounts (consistent with print view)
+  // Deductions are labelled as such, no need for negative signs
   addRow('Gross Pay', results.grossSalary.annually);
   addRow('Tax-Free Allowance', results.taxFreeAmount);
   addRow('Total Taxable', results.taxableIncome);
-  addRow('Total Tax Due', -results.incomeTax.annually);
+  addRow('Income Tax', results.incomeTax.annually);
 
   // Tax band breakdown
   for (const band of results.taxBands) {
-    addRow(`  ${band.rate}% Rate`, -band.amount);
+    addRow(`  ${band.rate}% Rate`, band.amount);
   }
 
   if (results.studentLoan.annually > 0) {
-    addRow('Student Loan', -results.studentLoan.annually);
+    addRow('Student Loan', results.studentLoan.annually);
   }
 
-  addRow('National Insurance', -results.nationalInsurance.annually);
+  addRow('National Insurance', results.nationalInsurance.annually);
 
   if (results.pensionContribution.annually > 0) {
-    addRow('Pension [You]', -results.pensionContribution.annually);
+    addRow('Pension Contribution', results.pensionContribution.annually);
   }
 
-  addRow('Pension [HMRC Relief]', 0);
   addRow('Net Pay', results.netPay.annually);
+  addRow('Employer NI', results.employerNI);
 
   // Download
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

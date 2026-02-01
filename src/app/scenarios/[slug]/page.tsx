@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const scenario = getScenarioBySlug(slug);
 
   if (!scenario) {
-    return {};
+    return { robots: { index: false, follow: false } };
   }
 
   return generateMetadataHelper({
@@ -188,7 +188,7 @@ export default async function ScenarioPage({ params }: PageProps) {
         />
       ))}
 
-      <div className='min-h-screen bg-background'>
+      <div className='min-h-dvh bg-background'>
         {/* Hero Section */}
         <section className='relative overflow-hidden py-8 sm:py-12'>
           <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent' />
@@ -203,13 +203,13 @@ export default async function ScenarioPage({ params }: PageProps) {
                     Home
                   </Link>
                 </li>
-                <li>/</li>
+                <li aria-hidden='true'>/</li>
                 <li>
                   <Link href={'/scenarios' as Route} className='hover:text-primary'>
                     Scenarios
                   </Link>
                 </li>
-                <li>/</li>
+                <li aria-hidden='true'>/</li>
                 <li className='font-medium text-foreground'>£{formattedSalary}</li>
               </ol>
             </nav>
@@ -225,7 +225,9 @@ export default async function ScenarioPage({ params }: PageProps) {
                   'border',
                 )}
               >
-                <span className='mr-2'>{categoryInfo.icon}</span>
+                <span className='mr-2' aria-hidden='true'>
+                  {categoryInfo.icon}
+                </span>
                 <span className={cn(TYPOGRAPHY.TEXT_SM, 'font-medium', colors.text)}>
                   {categoryInfo.name}
                 </span>
@@ -271,15 +273,14 @@ export default async function ScenarioPage({ params }: PageProps) {
                 '[&>li]:mb-2',
               )}
             >
-              {scenario.explanation.split('\n\n').map((paragraph) => {
-                const paragraphKey = paragraph.slice(0, 50).replace(/\s+/g, '-');
+              {scenario.explanation.split('\n\n').map((paragraph, index) => {
                 if (paragraph.startsWith('**') && paragraph.includes(':')) {
                   // It's a heading
                   const parts = paragraph.split(':');
                   const heading = parts[0] ?? '';
                   const rest = parts.slice(1);
                   return (
-                    <div key={`explanation-${paragraphKey}`} className={SPACING.MB_4}>
+                    <div key={`explanation-${scenario.slug}-${index}`} className={SPACING.MB_4}>
                       <h3 className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold', SPACING.MB_2)}>
                         {heading.replace(/\*\*/g, '')}:
                       </h3>
@@ -288,7 +289,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                   );
                 }
                 return (
-                  <p key={`explanation-${paragraphKey}`} className='whitespace-pre-line'>
+                  <p key={`explanation-${scenario.slug}-${index}`} className='whitespace-pre-line'>
                     {paragraph}
                   </p>
                 );
@@ -308,26 +309,27 @@ export default async function ScenarioPage({ params }: PageProps) {
                     '[&>li]:mb-1',
                   )}
                 >
-                  {scenario.optimization.split('\n\n').map((paragraph) => {
-                    const paragraphKey = paragraph.slice(0, 50).replace(/\s+/g, '-');
+                  {scenario.optimization.split('\n\n').map((paragraph, index) => {
                     if (paragraph.startsWith('**')) {
                       return (
-                        <p key={`opt-${paragraphKey}`} className='font-semibold'>
+                        <p key={`opt-${scenario.slug}-${index}`} className='font-semibold'>
                           {paragraph.replace(/\*\*/g, '')}
                         </p>
                       );
                     }
                     if (paragraph.startsWith('- ')) {
                       return (
-                        <ul key={`opt-${paragraphKey}`}>
-                          {paragraph.split('\n').map((item) => (
-                            <li key={item.slice(0, 30)}>{item.replace(/^- /, '')}</li>
+                        <ul key={`opt-${scenario.slug}-${index}`}>
+                          {paragraph.split('\n').map((item, itemIndex) => (
+                            <li key={`opt-item-${scenario.slug}-${index}-${itemIndex}`}>
+                              {item.replace(/^- /, '')}
+                            </li>
                           ))}
                         </ul>
                       );
                     }
                     return (
-                      <p key={`opt-${paragraphKey}`} className='whitespace-pre-line'>
+                      <p key={`opt-${scenario.slug}-${index}`} className='whitespace-pre-line'>
                         {paragraph}
                       </p>
                     );
@@ -420,6 +422,6 @@ function formatBlogTitle(slug: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .replace(/Uk/g, 'UK')
     .replace(/Hmrc/g, 'HMRC')
-    .replace(/2025 26/g, '2025-26')
-    .replace(/2026/g, '2026');
+    .replace(/Ni\b/g, 'NI')
+    .replace(/2025 26/g, '2025-26');
 }

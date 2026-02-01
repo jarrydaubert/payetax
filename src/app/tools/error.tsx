@@ -2,7 +2,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 
 export default function ToolsError({
   error,
@@ -13,8 +14,13 @@ export default function ToolsError({
 }) {
   const errorId = useId().replace(/:/g, '');
   const [showDebug, setShowDebug] = useState(false);
+  const capturedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent duplicate captures on Fast Refresh / rerenders
+    if (capturedRef.current) return;
+    capturedRef.current = true;
+
     Sentry.captureException(error, {
       tags: { error_boundary: 'tools', error_id: errorId },
       contexts: { error_details: { digest: error.digest, error_id: errorId } },
@@ -23,9 +29,12 @@ export default function ToolsError({
 
   return (
     <div className='flex min-h-[70vh] flex-col items-center justify-center p-6'>
-      <div className='w-full max-w-md text-center'>
+      <div className='w-full max-w-md text-center' role='alert'>
         {/* Icon */}
-        <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'>
+        <div
+          className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'
+          aria-hidden='true'
+        >
           <span className='font-display text-4xl'>!</span>
         </div>
 
@@ -44,16 +53,16 @@ export default function ToolsError({
             onClick={() => reset()}
             className='inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
           >
-            <RotateCcw className='size-4' />
+            <RotateCcw className='size-4' aria-hidden='true' />
             Try again
           </button>
-          <a
+          <Link
             href='/'
             className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
           >
-            <Home className='size-4' />
+            <Home className='size-4' aria-hidden='true' />
             Go home
-          </a>
+          </Link>
         </div>
 
         {/* Error reference - subtle */}
@@ -65,10 +74,12 @@ export default function ToolsError({
             <button
               type='button'
               onClick={() => setShowDebug(!showDebug)}
+              aria-expanded={showDebug}
               className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
             >
               <ChevronDown
                 className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
+                aria-hidden='true'
               />
               Debug info
             </button>

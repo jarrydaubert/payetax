@@ -7,8 +7,6 @@
  * @module components/molecules/StatsGrid
  */
 
-'use client';
-
 import type { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/atoms/ui/card';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';

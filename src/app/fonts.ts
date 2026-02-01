@@ -1,38 +1,29 @@
 // src/app/fonts.ts
 /**
- * Font configuration for the application
- * Professional typography system optimized for performance and Core Web Vitals
+ * Font configuration using variable fonts for optimal performance
  *
  * Design System:
- * - Space Grotesk: Headings, logo, display text (600-700 weight)
- * - Inter: Body text, UI elements (300-600 weight)
+ * - Space Grotesk: Headings, logo, display text
+ * - Inter: Body text, UI elements
+ *
+ * Variable fonts = single file per subset (fewer requests, better caching)
+ * Fallbacks help reduce CLS during font load
  */
 
 import { Inter, Space_Grotesk } from 'next/font/google';
 
-/**
- * Space Grotesk for headings and display text
- * Modern geometric sans-serif with personality
- */
+/** Space Grotesk for headings and display text */
 export const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space-grotesk',
-  display: 'swap',
-  preload: true,
-  weight: ['400', '500', '600', '700'],
   fallback: ['system-ui', 'sans-serif'],
+  // weight omitted = variable font (single file, all weights 400-700)
 });
 
-/**
- * Inter font with optimized loading and subset configuration
- * Professional, highly readable font that works excellent across all devices
- * Improves CLS (Cumulative Layout Shift) and LCP (Largest Contentful Paint)
- */
+/** Inter for body text and UI elements */
 export const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
-  preload: true,
   fallback: [
     'Helvetica Neue',
     '-apple-system',
@@ -42,5 +33,5 @@ export const inter = Inter({
     'system-ui',
     'sans-serif',
   ],
-  weight: ['300', '400', '500', '600', '700'],
+  // weight omitted = variable font (single file, all weights 100-900)
 });

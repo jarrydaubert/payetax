@@ -22,8 +22,7 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
-import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/atoms/ui/card';
 import {
   Table,
   TableBody,
@@ -31,7 +30,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/atoms/ui/table';
+import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
@@ -58,7 +58,8 @@ interface ResultRowData {
   isSubRow?: boolean;
 }
 
-const periodOptions: Record<string, number> = {
+// Period options with type safety
+const PERIOD_OPTIONS = {
   Yearly: 1,
   Monthly: 12,
   '4-Weekly': 13,
@@ -66,7 +67,19 @@ const periodOptions: Record<string, number> = {
   Weekly: 52,
   Daily: 260,
   Hourly: 1950,
-};
+} as const;
+
+type Period = keyof typeof PERIOD_OPTIONS;
+
+const ALL_PERIODS: Period[] = [
+  'Yearly',
+  'Monthly',
+  '4-Weekly',
+  'Fortnightly',
+  'Weekly',
+  'Daily',
+  'Hourly',
+];
 
 /**
  * What If Comparison Display
@@ -82,7 +95,7 @@ export function WhatIfComparisonDisplay({
   const allowancesDeductions = useCalculatorStore((state) => state.input.allowancesDeductions);
   const shouldReduceMotion = useMotionPreference();
 
-  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
+  const [visiblePeriods, setVisiblePeriods] = React.useState<Period[]>([
     'Yearly',
     'Monthly',
     'Weekly',
@@ -96,34 +109,28 @@ export function WhatIfComparisonDisplay({
   // Enable mouse drag scrolling for better UX
   useMouseDragScroll(containerRef);
 
-  const handlePeriodToggle = React.useCallback(
-    (period: string) => {
-      const newPeriods = visiblePeriods.includes(period)
-        ? visiblePeriods.filter((p) => p !== period)
-        : (() => {
-            const allPeriods = [
-              'Yearly',
-              'Monthly',
-              '4-Weekly',
-              'Fortnightly',
-              'Weekly',
-              'Daily',
-              'Hourly',
-            ];
-            const combined = [...visiblePeriods, period];
-            return allPeriods.filter((p) => combined.includes(p));
-          })();
-      setVisiblePeriods(newPeriods);
-    },
-    [visiblePeriods],
-  );
+  // Unique ID for accessibility
+  const scrollHintId = React.useId();
+
+  // Stable callback using functional state update
+  const handlePeriodToggle = React.useCallback((period: string) => {
+    setVisiblePeriods((prev) => {
+      const typedPeriod = period as Period;
+      if (prev.includes(typedPeriod)) {
+        return prev.filter((p) => p !== typedPeriod);
+      }
+      // Maintain order by filtering ALL_PERIODS
+      return ALL_PERIODS.filter((p) => prev.includes(p) || p === typedPeriod);
+    });
+  }, []);
 
   const calculatePercentage = React.useCallback((amount: number, total: number): string => {
     if (total === 0) return '0.0%';
     return `${Math.abs((amount / total) * 100).toFixed(1)}%`;
   }, []);
 
-  const studentLoans = studentLoanPlans !== 'none' ? studentLoanPlans : [];
+  // Normalize studentLoanPlans to array (defensive, even though type is correct)
+  const studentLoans = Array.isArray(studentLoanPlans) ? studentLoanPlans : [];
 
   const currentGross = currentResults.grossSalary.annually;
   const whatIfGross = whatIfResults.grossSalary.annually;
@@ -133,105 +140,126 @@ export function WhatIfComparisonDisplay({
   const taxDeltaAnnual = whatIfResults.incomeTax.annually - currentResults.incomeTax.annually;
   const grossDeltaAnnual = whatIfGross - currentGross;
 
-  // Build table rows
-  const tableRows: ResultRowData[] = [
-    {
-      category: 'Gross Pay',
-      icon: PoundSterling,
-      currentAnnual: currentGross,
-      whatIfAnnual: whatIfGross,
-      percentage: '100%',
-      color: 'text-foreground',
-    },
-    {
-      category: 'Tax-Free Allowance',
-      icon: Shield,
-      currentAnnual: currentResults.taxFreeAmount,
-      whatIfAnnual: whatIfResults.taxFreeAmount,
-      percentage: calculatePercentage(currentResults.taxFreeAmount, currentGross),
-      color: 'text-foreground',
-    },
-    {
-      category: 'Total Taxable',
-      icon: Scale,
-      currentAnnual: currentResults.taxableIncome,
-      whatIfAnnual: whatIfResults.taxableIncome,
-      percentage: calculatePercentage(currentResults.taxableIncome, currentGross),
-      color: 'text-foreground',
-    },
-    {
-      category: 'Total Tax Due',
-      icon: Calculator,
-      currentAnnual: currentResults.incomeTax.annually,
-      whatIfAnnual: whatIfResults.incomeTax.annually,
-      percentage: calculatePercentage(currentResults.incomeTax.annually, currentGross),
-      color: 'text-destructive',
-    },
-    // Tax Band Breakdown (Current)
-    ...currentResults.taxBands.map((band, idx) => ({
-      category: `${band.rate}% Rate (Current)`,
-      icon: Percent,
-      currentAnnual: band.amount,
-      whatIfAnnual: whatIfResults.taxBands[idx]?.amount || 0,
-      percentage: calculatePercentage(band.amount, currentGross),
-      color: 'text-destructive',
-      isSubRow: true,
-    })),
-    // Student Loans
-    ...(studentLoans.length > 0
-      ? [
-          {
-            category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
-            icon: GraduationCap,
-            currentAnnual: currentResults.studentLoan.annually,
-            whatIfAnnual: whatIfResults.studentLoan.annually,
-            percentage: calculatePercentage(currentResults.studentLoan.annually, currentGross),
-            color: 'text-destructive',
-          },
-        ]
-      : []),
-    {
-      category: 'National Insurance',
-      icon: CreditCard,
-      currentAnnual: currentResults.nationalInsurance.annually,
-      whatIfAnnual: whatIfResults.nationalInsurance.annually,
-      percentage: calculatePercentage(currentResults.nationalInsurance.annually, currentGross),
-      color: 'text-amber-600 dark:text-yellow-400',
-    },
-    {
-      category: 'Pension [You]',
-      icon: PiggyBank,
-      currentAnnual: currentResults.pensionContribution.annually,
-      whatIfAnnual: whatIfResults.pensionContribution.annually,
-      percentage: calculatePercentage(currentResults.pensionContribution.annually, currentGross),
-      color: 'text-accent-foreground',
-    },
-    {
-      category: 'Allowances/Deductions',
-      icon: Coins,
-      currentAnnual: allowancesDeductions,
-      whatIfAnnual: allowancesDeductions,
-      percentage: calculatePercentage(allowancesDeductions, currentGross),
-      color: 'text-teal-600 dark:text-teal-400',
-    },
-    {
-      category: 'Net Pay',
-      icon: Wallet,
-      currentAnnual: currentResults.netPay.annually,
-      whatIfAnnual: whatIfResults.netPay.annually,
-      percentage: calculatePercentage(currentResults.netPay.annually, currentGross),
-      color: 'text-green-600 dark:text-green-400',
-      isHighlight: true,
-    },
-    {
-      category: 'Employers NI',
-      icon: Building,
-      currentAnnual: currentResults.employerNI,
-      whatIfAnnual: whatIfResults.employerNI,
-      percentage: calculatePercentage(currentResults.employerNI, currentGross),
-      color: 'text-muted-foreground',
-    },
-  ];
+  // Build rate-keyed map for what-if tax bands (robust against different band orders/lengths)
+  const whatIfBandsByRate = React.useMemo(() => {
+    const map = new Map<number, number>();
+    for (const band of whatIfResults.taxBands) {
+      map.set(band.rate, band.amount);
+    }
+    return map;
+  }, [whatIfResults.taxBands]);
+
+  // Build table rows (memoized to avoid rebuild on every render)
+  const tableRows = React.useMemo<ResultRowData[]>(() => {
+    return [
+      {
+        category: 'Gross Pay',
+        icon: PoundSterling,
+        currentAnnual: currentGross,
+        whatIfAnnual: whatIfGross,
+        percentage: '100%',
+        color: 'text-foreground',
+      },
+      {
+        category: 'Tax-Free Allowance',
+        icon: Shield,
+        currentAnnual: currentResults.taxFreeAmount,
+        whatIfAnnual: whatIfResults.taxFreeAmount,
+        percentage: calculatePercentage(currentResults.taxFreeAmount, currentGross),
+        color: 'text-foreground',
+      },
+      {
+        category: 'Total Taxable',
+        icon: Scale,
+        currentAnnual: currentResults.taxableIncome,
+        whatIfAnnual: whatIfResults.taxableIncome,
+        percentage: calculatePercentage(currentResults.taxableIncome, currentGross),
+        color: 'text-foreground',
+      },
+      {
+        category: 'Total Tax Due',
+        icon: Calculator,
+        currentAnnual: currentResults.incomeTax.annually,
+        whatIfAnnual: whatIfResults.incomeTax.annually,
+        percentage: calculatePercentage(currentResults.incomeTax.annually, currentGross),
+        color: 'text-destructive',
+      },
+      // Tax Band Breakdown - match by rate, not array index
+      ...currentResults.taxBands.map((band) => ({
+        category: `${band.rate}% Rate`,
+        icon: Percent,
+        currentAnnual: band.amount,
+        whatIfAnnual: whatIfBandsByRate.get(band.rate) ?? 0,
+        percentage: calculatePercentage(band.amount, currentGross),
+        color: 'text-destructive',
+        isSubRow: true,
+      })),
+      // Student Loans
+      ...(studentLoans.length > 0
+        ? [
+            {
+              category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
+              icon: GraduationCap,
+              currentAnnual: currentResults.studentLoan.annually,
+              whatIfAnnual: whatIfResults.studentLoan.annually,
+              percentage: calculatePercentage(currentResults.studentLoan.annually, currentGross),
+              color: 'text-destructive',
+            },
+          ]
+        : []),
+      {
+        category: 'National Insurance',
+        icon: CreditCard,
+        currentAnnual: currentResults.nationalInsurance.annually,
+        whatIfAnnual: whatIfResults.nationalInsurance.annually,
+        percentage: calculatePercentage(currentResults.nationalInsurance.annually, currentGross),
+        color: 'text-amber-600 dark:text-yellow-400',
+      },
+      {
+        category: 'Pension [You]',
+        icon: PiggyBank,
+        currentAnnual: currentResults.pensionContribution.annually,
+        whatIfAnnual: whatIfResults.pensionContribution.annually,
+        percentage: calculatePercentage(currentResults.pensionContribution.annually, currentGross),
+        color: 'text-accent-foreground',
+      },
+      {
+        category: 'Allowances/Deductions',
+        icon: Coins,
+        currentAnnual: allowancesDeductions,
+        // Note: Allowances are input-based and don't change between scenarios in this context
+        whatIfAnnual: allowancesDeductions,
+        percentage: calculatePercentage(allowancesDeductions, currentGross),
+        color: 'text-teal-600 dark:text-teal-400',
+      },
+      {
+        category: 'Net Pay',
+        icon: Wallet,
+        currentAnnual: currentResults.netPay.annually,
+        whatIfAnnual: whatIfResults.netPay.annually,
+        percentage: calculatePercentage(currentResults.netPay.annually, currentGross),
+        color: 'text-green-600 dark:text-green-400',
+        isHighlight: true,
+      },
+      {
+        category: 'Employers NI',
+        icon: Building,
+        currentAnnual: currentResults.employerNI,
+        whatIfAnnual: whatIfResults.employerNI,
+        percentage: calculatePercentage(currentResults.employerNI, currentGross),
+        color: 'text-muted-foreground',
+      },
+    ];
+  }, [
+    currentResults,
+    whatIfResults,
+    currentGross,
+    whatIfGross,
+    whatIfBandsByRate,
+    studentLoans,
+    allowancesDeductions,
+    calculatePercentage,
+  ]);
 
   return (
     <motion.div
@@ -278,7 +306,7 @@ export function WhatIfComparisonDisplay({
                   )}
                 >
                   {netPayDeltaMonthly >= 0 ? '+' : ''}
-                  {formatCurrency(netPayDeltaMonthly)}
+                  {formatCurrency(netPayDeltaMonthly, 0)}
                 </span>
               </div>
               <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per month</span>
@@ -297,7 +325,7 @@ export function WhatIfComparisonDisplay({
                 ) : null}
                 <span className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>
                   {grossDeltaAnnual >= 0 ? '+' : ''}
-                  {formatCurrency(grossDeltaAnnual)}
+                  {formatCurrency(grossDeltaAnnual, 0)}
                 </span>
               </div>
               <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per year</span>
@@ -326,7 +354,7 @@ export function WhatIfComparisonDisplay({
                   )}
                 >
                   {taxDeltaAnnual >= 0 ? '+' : ''}
-                  {formatCurrency(taxDeltaAnnual)}
+                  {formatCurrency(taxDeltaAnnual, 0)}
                 </span>
               </div>
               <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>per year</span>
@@ -340,17 +368,17 @@ export function WhatIfComparisonDisplay({
                 <>
                   With this change, you&apos;d take home{' '}
                   <span className='font-semibold text-emerald'>
-                    {formatCurrency(Math.abs(netPayDeltaMonthly))} more
+                    {formatCurrency(Math.abs(netPayDeltaMonthly), 0)} more
                   </span>{' '}
-                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12))} per year).
+                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12), 0)} per year).
                 </>
               ) : (
                 <>
                   With this change, you&apos;d take home{' '}
                   <span className='font-semibold text-destructive'>
-                    {formatCurrency(Math.abs(netPayDeltaMonthly))} less
+                    {formatCurrency(Math.abs(netPayDeltaMonthly), 0)} less
                   </span>{' '}
-                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12))} per year).
+                  each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12), 0)} per year).
                 </>
               )}
             </p>
@@ -360,7 +388,7 @@ export function WhatIfComparisonDisplay({
 
       {/* Period Selection */}
       <PeriodSelectorCard
-        periods={Object.keys(periodOptions)}
+        periods={ALL_PERIODS}
         visiblePeriods={visiblePeriods}
         onPeriodToggle={handlePeriodToggle}
       />
@@ -370,18 +398,26 @@ export function WhatIfComparisonDisplay({
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
+        {/* Screen reader hint for scrollable region */}
+        <div id={scrollHintId} className='sr-only'>
+          Horizontally scrollable table. Use swipe, scroll, or click and drag to view all columns.
+        </div>
+
         <Card className='overflow-hidden'>
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling */}
           <section
             ref={containerRef}
-            className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth active:cursor-grabbing'
+            tabIndex={0}
+            className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
               WebkitOverflowScrolling: 'touch',
             }}
-            aria-label='What If comparison table - scrollable horizontally'
+            aria-label='What If comparison table'
+            aria-describedby={scrollHintId}
           >
-            <Table aria-label='What If comparison results'>
+            <Table>
               <TableHeader>
                 <TableRow className='bg-card hover:bg-card'>
                   <TableHead
@@ -392,9 +428,10 @@ export function WhatIfComparisonDisplay({
                   </TableHead>
                   <TableHead
                     scope='col'
-                    className='sticky top-0 z-10 min-w-[50px] bg-card text-right font-semibold'
+                    className='sticky top-0 z-10 min-w-[60px] bg-card text-right font-semibold'
+                    title='Percentage of current gross salary'
                   >
-                    %
+                    % of Gross
                   </TableHead>
                   {visiblePeriods.map((period) => (
                     <TableHead
@@ -443,9 +480,9 @@ export function WhatIfComparisonDisplay({
                         row.isHighlight ? 'border-t-2 border-t-primary bg-primary/5' : ''
                       }`}
                     >
-                      {/* Category */}
+                      {/* Category - use bg-card for consistency with header */}
                       <TableCell
-                        className={`${row.color} ${row.isHighlight ? 'font-bold' : ''} sticky left-0 z-10 bg-background`}
+                        className={`${row.color} ${row.isHighlight ? 'font-bold' : ''} sticky left-0 z-10 bg-card`}
                       >
                         <div
                           className={`flex items-center ${SPACING.GAP_2} ${row.isSubRow ? 'pl-6 sm:pl-8' : ''}`}
@@ -469,7 +506,7 @@ export function WhatIfComparisonDisplay({
 
                       {/* Period Values (Current vs What If) */}
                       {visiblePeriods.map((period) => {
-                        const divisor = periodOptions[period] ?? 1;
+                        const divisor = PERIOD_OPTIONS[period];
                         const currentValue = row.currentAnnual / divisor;
                         const whatIfValue = row.whatIfAnnual / divisor;
 
@@ -479,14 +516,14 @@ export function WhatIfComparisonDisplay({
                             <TableCell
                               className={`bg-blue-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
-                              {formatCurrency(currentValue)}
+                              {formatCurrency(currentValue, 0)}
                             </TableCell>
 
                             {/* What If Value */}
                             <TableCell
                               className={`bg-purple-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
-                              {formatCurrency(whatIfValue)}
+                              {formatCurrency(whatIfValue, 0)}
                             </TableCell>
                           </React.Fragment>
                         );
@@ -503,13 +540,15 @@ export function WhatIfComparisonDisplay({
       {/* Footer Notes */}
       <div className={`mt-4 flex flex-col items-center ${SPACING.GAP_2}`}>
         <p className={`text-center text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
-          *Blue columns show your current scenario. Purple columns show your "What If" scenario.
+          Blue columns show your current scenario. Purple columns show your "What If" scenario.
+          Values rounded to nearest pound.
         </p>
         {showRightIndicator && (
           <div
             className={`flex items-center ${SPACING.GAP_2} rounded-full bg-primary/5 px-3 py-1.5 font-medium text-muted-foreground ${TYPOGRAPHY.TEXT_XS} md:hidden`}
           >
-            <span>👈 Swipe to see all periods</span>
+            <span aria-hidden='true'>👈</span>
+            <span>Swipe to see all periods</span>
           </div>
         )}
       </div>

@@ -1,4 +1,3 @@
-// src/components/molecules/DirectorGuide/dashboard/DashboardLayout.tsx
 /**
  * Dashboard Layout - 4-panel layout matching the original mockup
  *
@@ -19,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const INPUTS_PANEL_WIDTH = 280;
@@ -41,6 +40,84 @@ interface DashboardLayoutProps {
   className?: string;
 }
 
+/**
+ * Mobile drawer component with proper dialog semantics
+ */
+function MobileDrawer({
+  isOpen,
+  onClose,
+  title,
+  children,
+  variant = 'default',
+}: {
+  isOpen: boolean;
+  onClose?: () => void;
+  title: string;
+  children: ReactNode;
+  variant?: 'default' | 'education';
+}) {
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap and keyboard handling
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Lock body scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Focus the close button on open
+    closeButtonRef.current?.focus();
+
+    // Handle Escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const bgColor = variant === 'education' ? 'bg-slate-900' : 'bg-slate-950';
+
+  return (
+    <div
+      ref={drawerRef}
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby={`drawer-title-${variant}`}
+      className={cn('fixed inset-0 z-50 flex flex-col lg:hidden', bgColor)}
+    >
+      <div className='flex items-center justify-between border-white/[0.04] border-b px-4 py-3'>
+        <h2 id={`drawer-title-${variant}`} className='font-semibold text-lg text-slate-100'>
+          {title}
+        </h2>
+        {onClose && (
+          <button
+            ref={closeButtonRef}
+            type='button'
+            onClick={onClose}
+            className='rounded p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
+            aria-label={`Close ${title.toLowerCase()} panel`}
+          >
+            <X className='size-5' />
+          </button>
+        )}
+      </div>
+      <div className='flex-1 overflow-y-auto'>{children}</div>
+    </div>
+  );
+}
+
 export function DashboardLayout({
   sidebar,
   inputs,
@@ -56,9 +133,23 @@ export function DashboardLayout({
   onToggleMobileEducation,
   className,
 }: DashboardLayoutProps) {
+  // Memoize toggle handlers for stable references
+  const handleToggleMobileInputs = useCallback(() => {
+    onToggleMobileInputs?.();
+  }, [onToggleMobileInputs]);
+
+  const handleToggleMobileEducation = useCallback(() => {
+    onToggleMobileEducation?.();
+  }, [onToggleMobileEducation]);
+
   return (
     <>
-      <div className={cn('flex h-dvh overflow-hidden bg-[#020617]', className)}>
+      <div
+        className={cn('flex h-dvh overflow-hidden bg-slate-950', className)}
+        // Prevent interaction with background when drawer is open
+        aria-hidden={mobileInputsOpen || mobileEducationOpen}
+        inert={mobileInputsOpen || mobileEducationOpen ? true : undefined}
+      >
         {/* Sidebar - hidden on mobile */}
         <div className='shrink-0 max-md:hidden'>{sidebar}</div>
 
@@ -85,10 +176,10 @@ export function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <div className='relative min-w-0 flex-1 overflow-y-auto bg-[#020617]'>
+        <div className='relative min-w-0 flex-1 overflow-y-auto bg-slate-950'>
           {/* Mobile header with logo */}
-          <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-[#020617]/95 px-4 py-3 backdrop-blur-sm lg:hidden'>
-            <Link href='/' className='group'>
+          <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 py-3 backdrop-blur-sm lg:hidden'>
+            <Link href='/' className='group' aria-label='PayeTax Home'>
               <span className='font-semibold text-[1.2rem] text-slate-100 tracking-[-0.03em]'>
                 paye
                 <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
@@ -125,7 +216,7 @@ export function DashboardLayout({
 
         {/* Education panel - collapsible, desktop only */}
         <div
-          className='relative shrink-0 overflow-hidden border-white/[0.04] border-l bg-[#0f172a] transition-[width] duration-200 ease-out max-lg:hidden'
+          className='relative shrink-0 overflow-hidden border-white/[0.04] border-l bg-slate-900 transition-[width] duration-200 ease-out max-lg:hidden'
           style={{ width: educationCollapsed ? 0 : EDUCATION_PANEL_WIDTH }}
           aria-hidden={educationCollapsed}
           inert={educationCollapsed ? true : undefined}
@@ -147,41 +238,33 @@ export function DashboardLayout({
       </div>
 
       {/* Mobile: FAB to open inputs */}
-      {onToggleMobileInputs && (
+      {onToggleMobileInputs && !mobileInputsOpen && !mobileEducationOpen && (
         <button
           type='button'
-          onClick={onToggleMobileInputs}
-          className='fixed right-6 bottom-6 z-50 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 p-4 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          onClick={handleToggleMobileInputs}
+          className='fixed right-6 bottom-6 z-40 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 p-4 shadow-lg transition-transform hover:scale-105 lg:hidden'
           aria-label='Open calculator inputs'
         >
-          <Calculator className='size-6 text-[#020617]' />
+          <Calculator className='size-6 text-slate-950' />
         </button>
       )}
 
       {/* Mobile: Full-screen inputs drawer */}
-      {mobileInputsOpen && (
-        <div className='fixed inset-0 z-50 flex flex-col bg-[#020617] lg:hidden'>
-          <div className='flex items-center justify-between border-white/[0.04] border-b px-4 py-3'>
-            <h2 className='font-semibold text-lg text-slate-100'>Your Numbers</h2>
-            <button
-              type='button'
-              onClick={onToggleMobileInputs}
-              className='rounded p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
-              aria-label='Close inputs panel'
-            >
-              <X className='size-5' />
-            </button>
-          </div>
-          <div className='flex-1 overflow-y-auto'>{inputs}</div>
-        </div>
-      )}
+      <MobileDrawer
+        isOpen={mobileInputsOpen}
+        onClose={handleToggleMobileInputs}
+        title='Your Numbers'
+        variant='default'
+      >
+        {inputs}
+      </MobileDrawer>
 
       {/* Mobile: FAB to show education */}
-      {onToggleMobileEducation && !mobileInputsOpen && (
+      {onToggleMobileEducation && !mobileInputsOpen && !mobileEducationOpen && (
         <button
           type='button'
-          onClick={onToggleMobileEducation}
-          className='fixed bottom-6 left-6 z-50 rounded-full border border-white/10 bg-slate-800 p-3 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          onClick={handleToggleMobileEducation}
+          className='fixed bottom-6 left-6 z-40 rounded-full border border-white/10 bg-slate-800 p-3 shadow-lg transition-transform hover:scale-105 lg:hidden'
           aria-label='Show learn panel'
         >
           <BookOpen className='size-5 text-cyan-500' />
@@ -189,22 +272,14 @@ export function DashboardLayout({
       )}
 
       {/* Mobile: Education drawer */}
-      {mobileEducationOpen && (
-        <div className='fixed inset-0 z-50 flex flex-col bg-[#0f172a] lg:hidden'>
-          <div className='flex items-center justify-between border-white/[0.04] border-b px-4 py-3'>
-            <h2 className='font-semibold text-lg text-slate-100'>Learn</h2>
-            <button
-              type='button'
-              onClick={onToggleMobileEducation}
-              className='rounded p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
-              aria-label='Close learn panel'
-            >
-              <X className='size-5' />
-            </button>
-          </div>
-          <div className='flex-1 overflow-y-auto'>{education}</div>
-        </div>
-      )}
+      <MobileDrawer
+        isOpen={mobileEducationOpen}
+        onClose={handleToggleMobileEducation}
+        title='Learn'
+        variant='education'
+      >
+        {education}
+      </MobileDrawer>
     </>
   );
 }

@@ -4,12 +4,15 @@
  */
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 :root {
-  /* Typography - Variable fonts with fluid base size */
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  /* Typography - Wire design tokens to Next.js font variables */
+  /* --font-inter and --font-space-grotesk are set by next/font in layout.tsx */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* Fluid base for app-wide consistency */
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   --radius: 0.625rem;
 
   /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
@@ -203,7 +206,7 @@
 }
 
 .bento-title {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-primary-new);
@@ -239,7 +242,7 @@
 }
 
 .section-title {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -289,7 +292,7 @@
 }
 
 .feature-card h3 {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -335,14 +338,14 @@
   background: var(--brand-gradient-new);
   border-radius: 50%;
   color: var(--bg-deep);
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 auto 1.25rem;
 }
 
 .step-card h3 {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -386,7 +389,7 @@
 }
 
 .faq-question {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -408,7 +411,7 @@
 }
 
 .final-cta h2 {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
   max-width: 600px;
@@ -439,7 +442,7 @@
 }
 
 .footer-brand {
-  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary-new);
@@ -695,8 +698,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: oklch(var(--primary));
-  color: oklch(var(--primary-foreground));
+  background: var(--primary);
+  color: var(--primary-foreground);
   border-radius: var(--radius);
   text-decoration: none;
   font-weight: 500;
@@ -726,7 +729,7 @@
 
 /* Focus States */
 *:focus-visible {
-  outline: 2px solid oklch(var(--ring));
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
@@ -829,8 +832,8 @@
 /* High Contrast Mode */
 @media (prefers-contrast: high) {
   :root {
-    --background: 0 0 0;
-    --foreground: 1 0 0;
+    --background: oklch(0 0 0);
+    --foreground: oklch(1 0 0);
   }
 }
 

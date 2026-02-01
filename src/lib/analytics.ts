@@ -3,11 +3,27 @@
  * Analytics tracking utilities for PayeTax
  * Includes event tracking, performance monitoring, and SEO analytics
  *
+ * IMPORTANT: This module has NO side effects on import.
+ * Call initCoreWebVitals() from Analytics.tsx after consent is granted.
+ *
+ * GA4 notes:
+ * - Parameters are flattened (no custom_parameters wrapper)
+ * - Use short, consistent param names (category, label, source, target)
+ * - Register custom dimensions in GA4 admin for reporting
+ *
  * @module lib/analytics
  */
 
 import { areCookiesAccepted } from '@/lib/cookieUtils';
 import { addBreadcrumb } from '@/lib/sentry';
+
+/** High-signal events that warrant Sentry breadcrumbs */
+const HIGH_SIGNAL_ACTIONS = new Set([
+  'calculator_error',
+  'export_failed',
+  'newsletter_subscribe_failed',
+  'affiliate_click',
+]);
 
 // Types for analytics events
 export type SEOActionType =
@@ -33,9 +49,9 @@ export interface SEOAnalyticsData {
   target?: string;
   action_type?: string;
   page_path?: string;
-  user_agent?: string;
   timestamp?: string;
   destination?: string;
+  // Note: user_agent removed - GA captures device info automatically, raw UA is a privacy concern
 }
 
 /**
@@ -51,43 +67,41 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
       return;
     }
 
-    // Enhanced data object with browser info
-    const enhancedData = {
-      ...data,
-      page_path: typeof window !== 'undefined' ? window.location.pathname : '',
-      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-      timestamp: new Date().toISOString(),
-    };
+    const pagePath = typeof window !== 'undefined' ? window.location.pathname : '';
 
     // Console logging for development
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
-      console.log('🔍 SEO Analytics:', action, enhancedData);
+      console.log('🔍 SEO Analytics:', action, data);
     }
 
-    // Add breadcrumb for Sentry error tracking
-    addBreadcrumb('analytics', {
-      message: `SEO action: ${action}`,
-      level: 'info',
-      data: {
-        action,
-        source: data.source,
-        target: data.target,
-        page_path: enhancedData.page_path,
-      },
-    });
-
-    // Track with Google Analytics if available
-    if (window?.gtag) {
-      window.gtag('event', action, {
-        event_category: 'seo_actions',
-        event_label: data.source || 'unknown',
-        custom_parameters: enhancedData,
+    // Only breadcrumb high-signal events to avoid Sentry noise
+    if (HIGH_SIGNAL_ACTIONS.has(action)) {
+      addBreadcrumb('analytics', {
+        message: `SEO action: ${action}`,
+        level: 'info',
+        data: {
+          action,
+          source: data.source,
+          target: data.target,
+          page_path: pagePath,
+        },
       });
     }
 
-    // Track with other analytics providers here
-    // Example: Mixpanel, Amplitude, etc.
+    // Track with Google Analytics if available
+    // GA4: flatten all params (no custom_parameters wrapper)
+    if (window?.gtag) {
+      window.gtag('event', action, {
+        category: 'seo_actions',
+        label: data.source || 'unknown',
+        source: data.source,
+        target: data.target,
+        action_type: data.action_type,
+        destination: data.destination,
+        page_path: pagePath,
+      });
+    }
   } catch (error) {
     console.warn('Analytics tracking error:', error);
   }
@@ -110,25 +124,28 @@ export function trackEvent(event: AnalyticsEvent): void {
       console.log('📊 Analytics Event:', event);
     }
 
-    // Add breadcrumb for Sentry error tracking
-    addBreadcrumb('analytics', {
-      message: `Analytics event: ${event.action}`,
-      level: 'info',
-      data: {
-        action: event.action,
-        category: event.category,
-        label: event.label,
-        value: event.value,
-      },
-    });
+    // Only breadcrumb high-signal events to avoid Sentry noise
+    if (HIGH_SIGNAL_ACTIONS.has(event.action)) {
+      addBreadcrumb('analytics', {
+        message: `Analytics event: ${event.action}`,
+        level: 'info',
+        data: {
+          action: event.action,
+          category: event.category,
+          label: event.label,
+          value: event.value,
+        },
+      });
+    }
 
     // Track with Google Analytics if available
+    // GA4: flatten all params (no custom_parameters wrapper)
     if (window?.gtag) {
       window.gtag('event', event.action, {
-        event_category: event.category || 'general',
-        event_label: event.label,
+        category: event.category || 'general',
+        label: event.label,
         value: event.value,
-        custom_parameters: event.custom_data,
+        ...(event.custom_data ?? {}),
       });
     }
   } catch (error) {
@@ -175,6 +192,9 @@ export function trackCalculatorUsage(calculation_type: string, salary_range?: st
 /**
  * Track page views
  *
+ * @deprecated Prefer using Analytics.tsx for pageview tracking to avoid duplicates.
+ * This function is kept for edge cases where manual pageview tracking is needed.
+ *
  * @param page_path - The path of the page being viewed
  * @param page_title - The title of the page
  */
@@ -185,18 +205,22 @@ export function trackPageView(page_path: string, page_title?: string): void {
       return;
     }
 
+    // Guard against missing GA ID
+    const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+    if (!(GA_ID && window?.gtag)) {
+      return;
+    }
+
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
       console.log('📄 Page View:', page_path, page_title);
     }
 
-    // Track with Google Analytics if available
-    if (window?.gtag) {
-      window.gtag('config', process.env.NEXT_PUBLIC_GA_ID || '', {
-        page_path,
-        page_title,
-      });
-    }
+    window.gtag('config', GA_ID, {
+      page_path,
+      page_title,
+      send_page_view: true,
+    });
   } catch (error) {
     console.warn('Page view tracking error:', error);
   }
@@ -278,7 +302,9 @@ export function trackPerformanceMetric(
 
 /**
  * Track Core Web Vitals and page performance metrics
- * Exported for testing and manual triggering
+ *
+ * Call this from Analytics.tsx after consent is granted.
+ * Do NOT call on module load (avoid side effects).
  */
 export function trackCoreWebVitals(): void {
   try {
@@ -306,23 +332,25 @@ export function trackCoreWebVitals(): void {
       }
     }
 
-    // Track First Contentful Paint (FCP) - use the actual FCP metric
+    // Track First Contentful Paint (FCP)
     const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
     if (fcpEntry?.startTime) {
       trackPerformanceMetric('first_contentful_paint', fcpEntry.startTime);
     }
 
     // Track Largest Contentful Paint (LCP) if available
-    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
+    if ('PerformanceObserver' in window) {
       try {
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1] as PerformanceEntry & {
+            startTime: number;
             renderTime?: number;
             loadTime?: number;
           };
           if (lastEntry) {
-            const lcp = lastEntry.renderTime || lastEntry.loadTime || 0;
+            // startTime is the canonical LCP value; renderTime/loadTime are fallbacks
+            const lcp = lastEntry.startTime ?? lastEntry.renderTime ?? lastEntry.loadTime ?? 0;
             if (lcp > 0) {
               trackPerformanceMetric('largest_contentful_paint', lcp);
             }
@@ -339,19 +367,28 @@ export function trackCoreWebVitals(): void {
   }
 }
 
-// Initialize analytics on client-side (non-blocking)
-if (typeof window !== 'undefined') {
-  // Use requestIdleCallback to avoid blocking main thread, fallback to setTimeout
+/**
+ * Initialize Core Web Vitals tracking (non-blocking)
+ *
+ * Call this from Analytics.tsx once after consent is granted.
+ * Uses requestIdleCallback to avoid blocking main thread.
+ */
+export function initCoreWebVitals(): void {
+  if (typeof window === 'undefined') return;
+
   const windowWithIdleCallback = window as Window & {
     requestIdleCallback?: (callback: () => void) => number;
   };
-  if ('requestIdleCallback' in window && windowWithIdleCallback.requestIdleCallback) {
+
+  if (windowWithIdleCallback.requestIdleCallback) {
     windowWithIdleCallback.requestIdleCallback(() => {
       trackCoreWebVitals();
     });
   } else {
-    window.addEventListener('load', () => {
-      setTimeout(trackCoreWebVitals, 0);
-    });
+    // Fallback for Safari
+    setTimeout(trackCoreWebVitals, 0);
   }
 }
+
+// NOTE: No module-level side effects!
+// Analytics.tsx should call initCoreWebVitals() after consent is granted.

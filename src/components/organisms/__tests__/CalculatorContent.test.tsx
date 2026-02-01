@@ -286,7 +286,7 @@ describe('CalculatorContent Component', () => {
       );
       fireEvent.click(summary);
 
-      expect(container.textContent).toMatch(/Scotland has 5 tax bands/i);
+      expect(container.textContent).toMatch(/Scotland.*has 6 tax bands/i);
       expect(container.textContent).toMatch(/England.*Wales.*NI.*has 3 tax bands/i);
     });
 
@@ -300,16 +300,13 @@ describe('CalculatorContent Component', () => {
     });
 
     it('should list student loan plan thresholds', () => {
-      render(<CalculatorContent />);
+      const { container } = render(<CalculatorContent />);
 
       const summary = screen.getByText(/How do student loan repayments work with PAYE\?/i);
       fireEvent.click(summary);
 
-      expect(screen.getByText(/Plan 1/i)).toBeInTheDocument();
-      expect(screen.getByText(/Plan 2/i)).toBeInTheDocument();
-      expect(screen.getByText(/Plan 4/i)).toBeInTheDocument();
-      expect(screen.getByText(/Plan 5/i)).toBeInTheDocument();
-      expect(screen.getByText(/Postgraduate/i)).toBeInTheDocument();
+      // Check that all plan types are mentioned in the content
+      expect(container.textContent).toMatch(/Plan 1.*Plan 2.*Plan 4.*Plan 5.*Postgraduate/s);
     });
 
     it('should link to student loan guide', () => {

@@ -3,6 +3,9 @@
  * IndexNow API integration for faster search engine indexing
  * Submits URLs to Bing, Yandex, and other IndexNow-supporting search engines
  *
+ * SECURITY: This endpoint requires authentication via X-IndexNow-Secret header
+ * to prevent abuse (spam submissions, rate limit exhaustion).
+ *
  * @see https://www.indexnow.org/
  */
 
@@ -13,30 +16,97 @@ import { checkRateLimit } from '@/lib/rateLimit';
 const MAX_URLS = 100;
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
 const ALLOWED_HOST = 'payetax.co.uk';
+const FETCH_TIMEOUT_MS = 10000; // 10 seconds
+
+// Allowed URL path prefixes (only index actual content pages)
+const ALLOWED_PATH_PREFIXES = [
+  '/',
+  '/blog/',
+  '/alternatives/',
+  '/vs/',
+  '/calculator/',
+  '/tools/',
+  '/scenarios/',
+  '/about',
+  '/privacy',
+  '/compliance',
+];
 
 /**
- * Validate URL format and domain
+ * Verify request authentication
+ */
+function isAuthenticated(request: NextRequest): boolean {
+  const secret = process.env.INDEXNOW_SUBMIT_SECRET;
+  if (!secret) {
+    // In development, allow unauthenticated if no secret configured
+    return process.env.NODE_ENV === 'development';
+  }
+  return request.headers.get('x-indexnow-secret') === secret;
+}
+
+/**
+ * Validate URL format, domain, and path
+ * - Must be HTTPS only
+ * - Must be payetax.co.uk domain
+ * - No fragments, no auth info
+ * - Must match allowed path prefixes
  */
 function isValidPayetaxUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     return (
-      (parsed.protocol === 'https:' || parsed.protocol === 'http:') &&
-      (parsed.host === ALLOWED_HOST || parsed.host === `www.${ALLOWED_HOST}`)
+      parsed.protocol === 'https:' &&
+      (parsed.host === ALLOWED_HOST || parsed.host === `www.${ALLOWED_HOST}`) &&
+      parsed.hash === '' &&
+      parsed.username === '' &&
+      parsed.password === '' &&
+      ALLOWED_PATH_PREFIXES.some(
+        (prefix) => parsed.pathname === prefix || parsed.pathname.startsWith(prefix),
+      )
     );
   } catch {
     return false;
   }
 }
 
-export async function POST(request: NextRequest) {
-  // Rate limiting: 10 requests per minute per IP
-  const ipAddress =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown';
+/**
+ * Get client IP with better fallback than "unknown"
+ */
+function getClientIdentifier(request: NextRequest): string {
+  // Vercel sets x-forwarded-for securely at the edge
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const firstIp = forwarded.split(',')[0]?.trim();
+    if (firstIp) return firstIp;
+  }
 
-  if (!checkRateLimit(ipAddress)) {
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  // Fallback: hash of user-agent + accept to avoid single "unknown" bucket
+  const ua = request.headers.get('user-agent') || '';
+  const accept = request.headers.get('accept') || '';
+  const hash = `anon-${Buffer.from(ua + accept)
+    .toString('base64')
+    .slice(0, 16)}`;
+  return hash;
+}
+
+export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = crypto.randomUUID().slice(0, 8);
+
+  // Authentication check
+  if (!isAuthenticated(request)) {
+    console.warn(`[IndexNow:${requestId}] Unauthorized request rejected`);
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Rate limiting: 10 requests per minute per IP
+  const clientId = getClientIdentifier(request);
+
+  if (!checkRateLimit(clientId)) {
+    console.warn(`[IndexNow:${requestId}] Rate limited: ${clientId}`);
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },
@@ -44,16 +114,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Check body size before parsing
-    const contentLength = request.headers.get('content-length');
-    if (contentLength && Number.parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    // Read body as text first to enforce size limit properly
+    const rawBody = await request.text();
+    if (rawBody.length > MAX_BODY_SIZE) {
       return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
     }
 
-    const { urls } = await request.json();
+    let data: unknown;
+    try {
+      data = JSON.parse(rawBody);
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+
+    const urls = (data as { urls?: unknown }).urls;
 
     // Validate URLs array
-    if (!(urls && Array.isArray(urls)) || urls.length === 0) {
+    if (!Array.isArray(urls) || urls.length === 0) {
       return NextResponse.json({ error: 'URLs array is required' }, { status: 400 });
     }
 
@@ -70,17 +147,19 @@ export async function POST(request: NextRequest) {
     );
     if (invalidUrls.length > 0) {
       return NextResponse.json(
-        { error: 'All URLs must be valid payetax.co.uk URLs' },
+        {
+          error: 'All URLs must be valid HTTPS payetax.co.uk URLs',
+          invalidCount: invalidUrls.length,
+        },
         { status: 400 },
       );
     }
 
-    // IndexNow key should be stored in environment variables
-    // Generate one at https://www.bing.com/indexnow
+    // IndexNow key from environment
     const indexNowKey = process.env.INDEXNOW_KEY;
 
     if (!indexNowKey) {
-      console.warn('INDEXNOW_KEY not configured - skipping IndexNow submission');
+      console.warn(`[IndexNow:${requestId}] INDEXNOW_KEY not configured`);
       return NextResponse.json(
         {
           success: false,
@@ -97,40 +176,64 @@ export async function POST(request: NextRequest) {
       urlList: urls,
     };
 
-    // Submit to IndexNow API (shared by Bing, Yandex, etc.)
-    const response = await fetch('https://api.indexnow.org/indexnow', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'PayeTax/2.0.1 (https://payetax.co.uk)',
-      },
-      body: JSON.stringify(payload),
-    });
+    // Submit to IndexNow API with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-    if (!response.ok) {
-      // Log details server-side only
-      const errorText = await response.text();
-      console.error('IndexNow submission failed:', response.status, errorText);
-      // Return generic error to client (security: don't expose implementation details)
+    let response: Response;
+    try {
+      response = await fetch('https://api.indexnow.org/indexnow', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'PayeTax/2.0.1 (https://payetax.co.uk)',
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeout);
+      const isTimeout = fetchError instanceof Error && fetchError.name === 'AbortError';
+      console.error(`[IndexNow:${requestId}] Fetch failed: ${isTimeout ? 'timeout' : fetchError}`);
       return NextResponse.json(
-        { success: false, error: 'Failed to submit URLs to search engines' },
-        { status: 500 },
+        { success: false, error: 'Failed to reach IndexNow service' },
+        { status: 502 },
       );
     }
+
+    clearTimeout(timeout);
+
+    const latency = Date.now() - startTime;
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `[IndexNow:${requestId}] Submission failed | status=${response.status} | latency=${latency}ms | error=${errorText}`,
+      );
+      return NextResponse.json(
+        { success: false, error: 'Failed to submit URLs to search engines' },
+        { status: 502 },
+      );
+    }
+
+    // biome-ignore lint/suspicious/noConsole: Structured logging for observability
+    console.log(
+      `[IndexNow:${requestId}] Success | urls=${urls.length} | latency=${latency}ms | client=${clientId.slice(0, 8)}`,
+    );
+
     return NextResponse.json({
       success: true,
       submitted: urls.length,
       message: `Successfully submitted ${urls.length} URLs to IndexNow`,
     });
   } catch (error) {
-    // Log details server-side only
-    console.error('IndexNow error:', error);
-    // Return generic error to client (security: don't expose implementation details)
+    const latency = Date.now() - startTime;
+    console.error(`[IndexNow:${requestId}] Error | latency=${latency}ms |`, error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// Health check endpoint (no config exposure for security)
+// Minimal health check - no service details exposed
 export function GET() {
-  return NextResponse.json({ status: 'ok', service: 'IndexNow' });
+  return NextResponse.json({ status: 'ok' });
 }

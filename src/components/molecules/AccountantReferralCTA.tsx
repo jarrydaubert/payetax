@@ -1,8 +1,7 @@
-// src/components/molecules/AccountantReferralCTA.tsx
 'use client';
 
 import { AlertTriangle, ArrowRight, Sparkles, X } from 'lucide-react';
-import { useCallback, useId, useState } from 'react';
+import { type FormEvent, useCallback, useId, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
@@ -38,9 +37,26 @@ interface ComplexSituation {
   description: string;
 }
 
+/** Salary range buckets for analytics and API */
+type SalaryRange = '75k-100k' | '100k-125k' | '125k+';
+
+/**
+ * Get salary range bucket for analytics and API payload
+ * Extracted to avoid logic duplication
+ */
+function getSalaryRange(salary: number): SalaryRange {
+  if (salary >= 125_140) return '125k+';
+  if (salary >= 100_000) return '100k-125k';
+  return '75k-100k';
+}
+
 /**
  * Analyzes a tax situation and returns complexity info if applicable.
  * Returns null if the situation isn't complex enough to warrant expert help.
+ *
+ * Note: Scottish high earners (>125k) are grouped with additional-rate
+ * since the planning strategies overlap. Scottish-specific messaging
+ * only shows for the 75k-125k band.
  */
 function analyzeComplexity(situation: TaxSituation): ComplexSituation | null {
   const { salary, isScottish, effectiveTaxRate } = situation;
@@ -55,7 +71,7 @@ function analyzeComplexity(situation: TaxSituation): ComplexSituation | null {
     };
   }
 
-  // Additional rate taxpayer (£125,140+)
+  // Additional rate taxpayer (£125,140+) - includes Scottish additional rate
   if (salary > 125_140) {
     return {
       reason: 'additional-rate',
@@ -65,7 +81,7 @@ function analyzeComplexity(situation: TaxSituation): ComplexSituation | null {
     };
   }
 
-  // Scottish high earner with multiple bands
+  // Scottish high earner with multiple bands (75k-125k only)
   if (isScottish && salary >= 75_000) {
     return {
       reason: 'scottish-high',
@@ -75,7 +91,7 @@ function analyzeComplexity(situation: TaxSituation): ComplexSituation | null {
     };
   }
 
-  // High earner but not in trap (£75k-£100k)
+  // High earner but not in trap (£75k-£100k) - only if high effective rate
   if (salary >= 75_000 && effectiveTaxRate > 25) {
     return {
       reason: 'high-earner',
@@ -102,6 +118,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const complexity = analyzeComplexity(situation);
+  const salaryRange = getSalaryRange(situation.salary);
 
   const handleDismiss = useCallback(() => {
     setIsDismissed(true);
@@ -118,35 +135,26 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
       action: 'referral_cta_clicked',
       category: 'monetization',
       label: complexity?.reason ?? 'unknown',
-      custom_data: {
-        salary_range:
-          situation.salary >= 125_140
-            ? '125k+'
-            : situation.salary >= 100_000
-              ? '100k-125k'
-              : '75k-100k',
-      },
+      custom_data: { salary_range: salaryRange },
     });
-  }, [complexity?.reason, situation.salary]);
+  }, [complexity?.reason, salaryRange]);
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!email || isSubmitting) return;
+      if (!email) return;
 
+      // Snapshot email at submit time for toast message
+      const submittedEmail = email;
       setIsSubmitting(true);
+
       try {
         const response = await fetch('/api/referral/lead', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email,
-            salaryRange:
-              situation.salary >= 125_140
-                ? '125k+'
-                : situation.salary >= 100_000
-                  ? '100k-125k'
-                  : '75k-100k',
+            email: submittedEmail,
+            salaryRange,
             reason: complexity?.reason,
             isScottish: situation.isScottish,
           }),
@@ -161,6 +169,8 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
             category: 'monetization',
             label: complexity?.reason ?? 'unknown',
           });
+        } else if (response.status === 429) {
+          toast.error('Too many requests. Please try again in a few minutes.');
         } else {
           toast.error('Something went wrong. Please try again.');
         }
@@ -170,7 +180,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         setIsSubmitting(false);
       }
     },
-    [email, isSubmitting, situation, complexity?.reason],
+    [email, salaryRange, situation.isScottish, complexity?.reason],
   );
 
   // Don't show if no complex situation or dismissed
@@ -186,26 +196,31 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         className,
       )}
     >
-      {/* Dismiss button */}
+      {/* Dismiss button - meets 44px touch target via padding */}
       <button
         type='button'
         onClick={handleDismiss}
-        className='absolute top-3 right-3 text-muted-foreground hover:text-foreground'
-        aria-label='Dismiss'
+        className={cn(
+          'absolute top-2 right-2 p-2 text-muted-foreground transition-colors',
+          'hover:text-foreground',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'rounded-md',
+        )}
+        aria-label='Dismiss recommendation'
       >
-        <X className={ICON_SIZES.SIZE_4} />
+        <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
       </button>
 
       {showForm ? (
         // Lead capture form
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='flex items-center gap-2'>
-            <Sparkles className={cn(ICON_SIZES.SIZE_5, 'text-amber-500')} />
+            <Sparkles className={cn(ICON_SIZES.SIZE_5, 'text-amber-500')} aria-hidden='true' />
             <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>Get Expert Tax Advice</h3>
           </div>
           <p className='text-muted-foreground text-sm'>
             Enter your email and a UK tax specialist will contact you with personalized advice for
-            your situation. No obligation, completely free consultation.
+            your situation. No obligation, free initial consultation.
           </p>
           <div className='space-y-2'>
             <Label htmlFor={emailInputId}>Email address</Label>
@@ -216,16 +231,22 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
                 placeholder='you@example.com'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
                 required
                 className='flex-1'
+                autoComplete='email'
               />
-              <Button type='submit' disabled={isSubmitting}>
+              <Button type='submit' disabled={isSubmitting || !email}>
                 {isSubmitting ? 'Sending...' : 'Get Advice'}
               </Button>
             </div>
           </div>
           <p className='text-muted-foreground text-xs'>
-            We&apos;ll connect you with a vetted UK tax specialist. Your data is never sold.
+            We&apos;ll connect you with a trusted UK tax specialist. See our{' '}
+            <a href='/privacy' className='underline hover:text-foreground'>
+              privacy policy
+            </a>{' '}
+            for how we handle your data.
           </p>
         </form>
       ) : (
@@ -233,7 +254,8 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-start gap-3'>
             <AlertTriangle
-              className={cn(ICON_SIZES.SIZE_6, 'mt-0.5 flex-shrink-0 text-amber-500')}
+              className={cn(ICON_SIZES.SIZE_6, 'mt-0.5 shrink-0 text-amber-500')}
+              aria-hidden='true'
             />
             <div>
               <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>{complexity.headline}</h3>
@@ -248,7 +270,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
             className='shrink-0 border-amber-500/30 hover:bg-amber-500/10'
           >
             Talk to an Expert
-            <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
+            <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} aria-hidden='true' />
           </Button>
         </div>
       )}

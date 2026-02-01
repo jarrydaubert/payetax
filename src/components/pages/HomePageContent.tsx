@@ -3,31 +3,59 @@
 // Hero and landing sections are server-rendered in page.tsx
 'use client';
 
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useLayoutEffect } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
+import { SPACING } from '@/constants/designTokens';
 import { useCalculatorStore } from '@/store/calculatorStore';
+
+const CALCULATOR_HASH = '#tax-calculator';
+const CALCULATOR_ID = 'tax-calculator';
+
+/** Scroll to calculator element, returns true if successful */
+function scrollToCalculator(): boolean {
+  const el = document.getElementById(CALCULATOR_ID);
+  if (!el) return false;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return true;
+}
 
 const HomePageContent = memo(function HomePageContent() {
   const init = useCalculatorStore((state) => state.init);
 
+  // Initialize store (already idempotent - safe under Strict Mode)
   useEffect(() => {
     init();
   }, [init]);
 
-  // Handle hash navigation from other pages (e.g., /blog -> /#tax-calculator)
+  // Handle initial hash navigation (useLayoutEffect to avoid flicker)
+  useLayoutEffect(() => {
+    if (window.location.hash !== CALCULATOR_HASH) return;
+
+    // Try immediately; if element isn't mounted yet, retry next frame
+    if (scrollToCalculator()) return;
+
+    const raf = requestAnimationFrame(() => {
+      scrollToCalculator();
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Handle hash changes after initial load (e.g., in-page nav)
   useEffect(() => {
-    if (window.location.hash === '#tax-calculator') {
-      // Small delay to ensure DOM is ready after hydration
-      setTimeout(() => {
-        const element = document.getElementById('tax-calculator');
-        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
+    const onHashChange = () => {
+      if (window.location.hash === CALCULATOR_HASH) {
+        // RAF allows React layout updates to flush first
+        requestAnimationFrame(() => scrollToCalculator());
+      }
+    };
+
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   return (
-    // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for deep linking from navbar /#tax-calculator
-    <section id='tax-calculator' className='relative z-[1] bg-deep py-12 md:py-16 lg:py-20'>
+    <section id={CALCULATOR_ID} className={`relative z-[1] bg-deep ${SPACING.PY_SECTION_LG}`}>
       <CalculatorContainer />
     </section>
   );

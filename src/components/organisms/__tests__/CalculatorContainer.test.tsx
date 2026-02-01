@@ -288,7 +288,7 @@ describe('CalculatorContainer Component', () => {
         screen.getByRole('button', { name: /Print tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Export results to CSV file/i }),
+        screen.getByRole('button', { name: /Download results as CSV file/i }),
       ).toBeInTheDocument();
     });
 
@@ -300,7 +300,7 @@ describe('CalculatorContainer Component', () => {
         screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: /Export results to CSV file/i }),
+        screen.queryByRole('button', { name: /Download results as CSV file/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -315,7 +315,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
+      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
       fireEvent.click(button);
 
       expect(exportToCSV).toHaveBeenCalledWith(mockResults);
@@ -327,7 +327,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
+      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
       fireEvent.click(button);
 
       expect(toast.success).toHaveBeenCalledWith('CSV exported successfully!');
@@ -341,7 +341,7 @@ describe('CalculatorContainer Component', () => {
 
       render(<CalculatorContainer />);
 
-      const button = screen.getByRole('button', { name: /Export results to CSV file/i });
+      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
       fireEvent.click(button);
 
       expect(toast.error).toHaveBeenCalledWith('Failed to export CSV');
@@ -353,7 +353,7 @@ describe('CalculatorContainer Component', () => {
 
       // Export button shouldn't be visible
       expect(
-        screen.queryByRole('button', { name: /Export results to CSV file/i }),
+        screen.queryByRole('button', { name: /Download results as CSV file/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -466,7 +466,7 @@ describe('CalculatorContainer Component', () => {
         screen.getByRole('button', { name: /Print tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Export results to CSV file/i }),
+        screen.getByRole('button', { name: /Download results as CSV file/i }),
       ).toBeInTheDocument();
     });
   });

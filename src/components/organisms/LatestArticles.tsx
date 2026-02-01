@@ -3,13 +3,22 @@
  * Latest Articles Section
  *
  * Asymmetric 2-column grid with one large featured card and stacked small cards.
- * Responsive: single column on mobile, 50/50 on tablet, 60/40 on desktop.
+ * Responsive:
+ * - Mobile: single column
+ * - Tablet (md): 2-column equal grid
+ * - Desktop (lg): 60/40 asymmetric with featured spanning all rows
+ *
+ * Note: Displays exactly 4 small cards (lg:row-span-4 is tied to this constraint).
+ * If changing the count, update row-span accordingly.
  *
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
 
 import { ArticleCardLarge, ArticleCardSmall } from '@/components/molecules/ArticleCard';
 import type { BlogPost } from '@/types/blog';
+
+/** Number of small cards to display (row-span is tied to this) */
+const SMALL_CARDS_COUNT = 4;
 
 interface LatestArticlesProps {
   posts: BlogPost[];
@@ -18,31 +27,35 @@ interface LatestArticlesProps {
 export function LatestArticles({ posts }: LatestArticlesProps) {
   if (posts.length === 0) return null;
 
-  const [featuredPost, ...smallPosts] = posts;
-  const displayedSmallPosts = smallPosts.slice(0, 4);
+  // Sort by publishedAt descending to ensure latest post is featured
+  // This is defensive - upstream should already sort, but we guarantee it here
+  const sortedPosts = [...posts].sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+  );
+
+  const [featuredPost, ...smallPosts] = sortedPosts;
+  const displayedSmallPosts = smallPosts.slice(0, SMALL_CARDS_COUNT);
 
   return (
-    <section aria-labelledby='latest-articles-heading'>
-      {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
-      <h2
-        id='latest-articles-heading'
-        className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'
-      >
+    // Use aria-label instead of aria-labelledby to avoid static ID issues
+    <section aria-label='Latest articles'>
+      <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
         Latest Articles
       </h2>
 
-      <div className='grid gap-6 lg:grid-cols-[1.6fr_1fr]'>
-        {/* Large featured card */}
+      {/* Grid: single column -> 2-col equal (md) -> 60/40 asymmetric (lg) */}
+      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]'>
+        {/* Large featured card - spans all rows on desktop */}
         {featuredPost && (
-          <div className='lg:row-span-4'>
+          <div className='md:col-span-2 lg:col-span-1 lg:row-span-4'>
             <ArticleCardLarge post={featuredPost} />
           </div>
         )}
 
-        {/* Stacked small cards */}
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-1'>
+        {/* Stacked small cards - 2-col grid on tablet, single col on desktop */}
+        <div className='grid gap-4 sm:grid-cols-2 md:col-span-2 lg:col-span-1 lg:grid-cols-1'>
           {displayedSmallPosts.map((post) => (
-            <ArticleCardSmall key={post.slug} post={post} />
+            <ArticleCardSmall key={post.slug || post.id} post={post} />
           ))}
         </div>
       </div>

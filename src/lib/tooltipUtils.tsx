@@ -16,7 +16,7 @@ import type { TooltipContent } from '@/config/inputTooltips';
  * Displays:
  * - Title (bold)
  * - Description (small text)
- * - HMRC guidance (if available, with border separator)
+ * - Additional note (if available, with border separator)
  *
  * @param content - Tooltip content object from config
  * @returns Formatted React node for tooltip display
@@ -26,11 +26,9 @@ export function formatTooltipText(content: TooltipContent): React.ReactNode {
     <div className='space-y-1'>
       <div className='font-semibold'>{content.title}</div>
       <div className='text-xs'>{content.description}</div>
-      {content.hmrc && (
-        <div className='border-primary-foreground/20 border-t pt-1 text-xs opacity-90'>
-          {content.hmrc.split('\n').map((line) => (
-            <div key={line}>{line}</div>
-          ))}
+      {content.note && (
+        <div className='whitespace-pre-line border-primary-foreground/20 border-t pt-1 text-xs opacity-90'>
+          {content.note}
         </div>
       )}
     </div>

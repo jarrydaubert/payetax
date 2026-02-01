@@ -1,8 +1,6 @@
 // src/app/tools/national-insurance-calculator/page.tsx
-import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
+import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { NICalculatorClient } from './NICalculatorClient';
-
-const BASE_URL = 'https://payetax.co.uk';
 
 export const metadata = generateBaseMetadata({
   title: 'National Insurance Calculator 2025-26 | NI Rates & Thresholds',
@@ -22,19 +20,19 @@ export default function NICalculatorPage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: BASE_URL,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Tools',
-        item: `${BASE_URL}/tools`,
+        item: `${SITE_URL}/tools`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'National Insurance Calculator',
-        item: `${BASE_URL}/tools/national-insurance-calculator`,
+        item: `${SITE_URL}/tools/national-insurance-calculator`,
       },
     ],
   };
@@ -45,6 +43,7 @@ export default function NICalculatorPage() {
     name: 'UK National Insurance Calculator',
     description:
       'Calculate employee and employer National Insurance contributions for 2025-26. Covers all NI categories and thresholds.',
+    url: `${SITE_URL}/tools/national-insurance-calculator`,
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web Browser',
     offers: {
@@ -52,11 +51,7 @@ export default function NICalculatorPage() {
       price: '0',
       priceCurrency: 'GBP',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '124',
-    },
+    // Note: aggregateRating removed - only add when backed by real, verifiable reviews
   };
 
   return (

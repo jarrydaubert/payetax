@@ -1,14 +1,38 @@
 import { cva, type VariantProps } from 'class-variance-authority';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
-function Empty({ className, ...props }: React.ComponentProps<'div'>) {
+export type EmptyProps = ComponentPropsWithoutRef<'div'>;
+
+/**
+ * Empty state container with dashed border
+ *
+ * @example
+ * ```tsx
+ * <Empty>
+ *   <EmptyHeader>
+ *     <EmptyMedia variant="icon">
+ *       <SearchIcon />
+ *     </EmptyMedia>
+ *     <EmptyTitle>No results found</EmptyTitle>
+ *     <EmptyDescription>Try adjusting your search terms</EmptyDescription>
+ *   </EmptyHeader>
+ *   <EmptyContent>
+ *     <Button>Clear filters</Button>
+ *   </EmptyContent>
+ * </Empty>
+ * ```
+ */
+function Empty({ className, ...props }: EmptyProps) {
   return (
     <div
       data-slot='empty'
       className={cn(
-        'flex min-w-0 flex-1 flex-col items-center justify-center gap-6 text-balance rounded-lg border-dashed p-6 text-center md:p-12',
+        'flex min-w-0 flex-1 flex-col items-center justify-center gap-6 text-balance rounded-lg p-6 text-center md:p-12',
+        // Dashed border - requires both border width and style
+        'border border-border border-dashed',
         className,
       )}
       {...props}
@@ -16,7 +40,9 @@ function Empty({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function EmptyHeader({ className, ...props }: React.ComponentProps<'div'>) {
+export type EmptyHeaderProps = ComponentPropsWithoutRef<'div'>;
+
+function EmptyHeader({ className, ...props }: EmptyHeaderProps) {
   return (
     <div
       data-slot='empty-header'
@@ -32,7 +58,13 @@ const emptyMediaVariants = cva(
     variants: {
       variant: {
         default: 'bg-transparent',
-        icon: "bg-muted text-foreground flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6",
+        icon: cn(
+          'flex size-10 shrink-0 items-center justify-center rounded-lg',
+          // Muted background with muted-foreground for proper contrast
+          'bg-muted text-muted-foreground',
+          // Auto-size SVGs unless explicitly sized
+          "[&_svg:not([class*='size-'])]:size-6",
+        ),
       },
     },
     defaultVariants: {
@@ -41,24 +73,30 @@ const emptyMediaVariants = cva(
   },
 );
 
-function EmptyMedia({
-  className,
-  variant = 'default',
-  ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof emptyMediaVariants>) {
+export type EmptyMediaProps = ComponentPropsWithoutRef<'div'> &
+  VariantProps<typeof emptyMediaVariants>;
+
+function EmptyMedia({ className, variant = 'default', ...props }: EmptyMediaProps) {
   return (
     <div
-      data-slot='empty-icon'
+      data-slot='empty-media'
       data-variant={variant}
-      className={cn(emptyMediaVariants({ variant, className }))}
+      // CVA: merge className separately, not as a variant option
+      className={cn(emptyMediaVariants({ variant }), className)}
       {...props}
     />
   );
 }
 
-function EmptyTitle({ className, ...props }: React.ComponentProps<'div'>) {
+export type EmptyTitleProps = ComponentPropsWithoutRef<'h3'>;
+
+/**
+ * Empty state title - renders as h3 for semantic structure
+ * Override with different heading level via asChild pattern if needed
+ */
+function EmptyTitle({ className, ...props }: EmptyTitleProps) {
   return (
-    <div
+    <h3
       data-slot='empty-title'
       className={cn('font-medium tracking-tight', TYPOGRAPHY.TEXT_LG, className)}
       {...props}
@@ -66,12 +104,18 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
+export type EmptyDescriptionProps = ComponentPropsWithoutRef<'p'>;
+
+/**
+ * Empty state description - renders as p for semantic correctness
+ */
+function EmptyDescription({ className, ...props }: EmptyDescriptionProps) {
   return (
-    <div
+    <p
       data-slot='empty-description'
       className={cn(
-        'text-muted-foreground [&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4',
+        'text-muted-foreground',
+        '[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4',
         TYPOGRAPHY.TEXT_SM,
         className,
       )}
@@ -80,7 +124,9 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
   );
 }
 
-function EmptyContent({ className, ...props }: React.ComponentProps<'div'>) {
+export type EmptyContentProps = ComponentPropsWithoutRef<'div'>;
+
+function EmptyContent({ className, ...props }: EmptyContentProps) {
   return (
     <div
       data-slot='empty-content'

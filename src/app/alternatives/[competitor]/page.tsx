@@ -5,6 +5,11 @@ import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
 import { AlternativePageContent } from './AlternativePageContent';
 
+const SITE_URL = 'https://payetax.co.uk';
+
+// Only allow statically generated paths - unknown slugs return 404
+export const dynamicParams = false;
+
 interface PageProps {
   params: Promise<{ competitor: string }>;
 }
@@ -33,19 +38,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `${competitor.name} Alternative | PayeTax UK Tax Calculator`;
   const description = `Looking for an alternative to ${competitor.name}? Compare with PayeTax - modern, ad-free, and privacy-first UK tax calculator with What-If scenarios.`;
+  const url = `${SITE_URL}/alternatives/${slug}`;
 
   return {
     title,
     description,
-    keywords: `${competitor.name.toLowerCase()} alternative, uk tax calculator alternative, ${competitor.shortName.toLowerCase()} alternative, paye calculator, take home pay calculator`,
     alternates: {
-      canonical: `https://payetax.co.uk/alternatives/${slug}`,
+      canonical: url,
     },
     openGraph: {
       title,
       description,
-      url: `https://payetax.co.uk/alternatives/${slug}`,
-      type: 'article',
+      url,
+      type: 'website',
       siteName: 'PayeTax',
     },
     twitter: {
@@ -64,31 +69,16 @@ export default async function AlternativePage({ params }: PageProps) {
     notFound();
   }
 
-  const title = `${competitor.name} Alternative | PayeTax UK Tax Calculator`;
-  const description = `Looking for an alternative to ${competitor.name}? Compare with PayeTax - modern, ad-free, and privacy-first UK tax calculator with What-If scenarios.`;
+  const url = `${SITE_URL}/alternatives/${slug}`;
 
   return (
     <>
       <StructuredData
-        type='article'
-        articleData={{
-          title,
-          description,
-          url: `https://payetax.co.uk/alternatives/${slug}`,
-          imageUrl: 'https://payetax.co.uk/images/og-image.png',
-          publishDate: '2025-01-01T00:00:00Z',
-          authorName: 'PayeTax',
-        }}
-      />
-      <StructuredData
         type='breadcrumb'
         breadcrumbs={[
-          { name: 'Home', url: 'https://payetax.co.uk' },
-          { name: 'Alternatives', url: 'https://payetax.co.uk/alternatives' },
-          {
-            name: `${competitor.name} Alternative`,
-            url: `https://payetax.co.uk/alternatives/${slug}`,
-          },
+          { name: 'Home', url: SITE_URL },
+          { name: 'Alternatives', url: `${SITE_URL}/alternatives` },
+          { name: `${competitor.name} Alternative`, url },
         ]}
       />
       <AlternativePageContent competitor={competitor} />

@@ -1,91 +1,74 @@
-// src/components/ui/CookieBanner.tsx
+// src/components/organisms/CookieBanner.tsx
 'use client';
 
 import { Cookie } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import '@/types/gtag';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
+import { clearCookieConsent, getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
 import { safeSetItem } from '@/lib/safeStorage';
 import { cn } from '@/lib/utils';
+
+/**
+ * Persist consent choice and notify listeners
+ * Analytics.tsx listens to this event to update gtag consent
+ */
+function persistConsent(value: 'accepted' | 'declined'): void {
+  safeSetItem('cookie-consent', value);
+  safeSetItem('cookie-consent-timestamp', new Date().toISOString());
+  // Notify Analytics.tsx and other listeners (storage event only fires in other tabs)
+  document.dispatchEvent(new Event('cookieConsentUpdated'));
+}
 
 const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    try {
-      // Check if localStorage is available (for SSR and privacy mode compatibility)
-      if (typeof window === 'undefined' || !window.localStorage) {
-        return;
-      }
+    // SSR guard
+    if (typeof window === 'undefined') return;
 
+    try {
       const consent = getCookieConsent();
       const expired = isConsentExpired();
 
-      // Show banner if no consent has been given or if consent has expired
+      // If consent expired, clear stored values and treat as no consent
+      if (expired) {
+        clearCookieConsent();
+      }
+
+      // Show banner if no consent or expired (short delay to avoid hydration flash)
       if (consent === null || expired) {
-        if (expired) {
-        }
-        const timer = setTimeout(() => setShowBanner(true), 1000);
+        const timer = setTimeout(() => setShowBanner(true), 500);
         return () => clearTimeout(timer);
       }
     } catch (error) {
       console.warn('Failed to check cookie consent status:', error);
-      // Fallback: show banner after delay if localStorage fails
-      const timer = setTimeout(() => setShowBanner(true), 2000);
+      // Fallback: show banner if localStorage fails
+      const timer = setTimeout(() => setShowBanner(true), 500);
       return () => clearTimeout(timer);
     }
   }, []);
 
   const acceptCookies = useCallback(() => {
     try {
-      // Store consent preference
-      safeSetItem('cookie-consent', 'accepted');
-      safeSetItem('cookie-consent-timestamp', new Date().toISOString());
-
-      setShowBanner(false);
-
-      // Update Google Analytics consent if available
-      if (window?.gtag) {
-        try {
-          window.gtag('consent', 'update', {
-            analytics_storage: 'granted',
-          });
-        } catch (gtagError) {
-          console.warn('Failed to update gtag consent:', gtagError);
-        }
-      }
+      persistConsent('accepted');
     } catch (error) {
       console.error('Failed to accept cookies:', error);
-      // Still hide banner to prevent it from being stuck
+    } finally {
+      // Always hide banner to prevent it from being stuck
       setShowBanner(false);
     }
   }, []);
 
   const declineCookies = useCallback(() => {
     try {
-      // Store decline preference
-      safeSetItem('cookie-consent', 'declined');
-      safeSetItem('cookie-consent-timestamp', new Date().toISOString());
-
-      setShowBanner(false);
-
-      // Update Google Analytics consent if available
-      if (window?.gtag) {
-        try {
-          window.gtag('consent', 'update', {
-            analytics_storage: 'denied',
-          });
-        } catch (gtagError) {
-          console.warn('Failed to update gtag consent:', gtagError);
-        }
-      }
+      persistConsent('declined');
     } catch (error) {
       console.error('Failed to decline cookies:', error);
-      // Still hide banner to prevent it from being stuck
+    } finally {
+      // Always hide banner to prevent it from being stuck
       setShowBanner(false);
     }
   }, []);
@@ -140,9 +123,9 @@ const CookieBanner: React.FC = () => {
             onClick={acceptCookies}
             size='touch'
             className='min-w-[140px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
-            data-testid='cookie-accept-all'
+            data-testid='cookie-accept-analytics'
           >
-            Accept All
+            Accept Analytics
           </Button>
         </CardFooter>
       </Card>

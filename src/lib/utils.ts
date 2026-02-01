@@ -107,6 +107,31 @@ export function parseFormattedValue(value: string): number {
 }
 
 /**
+ * Parses a money input string to an integer (whole pounds).
+ * Handles various formats: "£50,000", "50000", "50 000", "$50,000.00", etc.
+ * Use this for salary/income inputs where decimals aren't meaningful.
+ *
+ * @param value - The input string to parse (e.g., "£50,000" or "50000")
+ * @returns Parsed integer value (0 if invalid or empty)
+ *
+ * @example
+ * parseMoneyInput("£50,000") // 50000
+ * parseMoneyInput("50 000")  // 50000
+ * parseMoneyInput("50000.50") // 50001 (rounds)
+ * parseMoneyInput("")         // 0
+ */
+export function parseMoneyInput(value: string): number {
+  if (!value || typeof value !== 'string') return 0;
+
+  // Strip everything except digits and decimal point
+  const cleaned = value.replace(/[^\d.]/g, '');
+  if (!cleaned) return 0;
+
+  const num = Number.parseFloat(cleaned);
+  return Number.isNaN(num) ? 0 : Math.round(num);
+}
+
+/**
  * Formats an ISO date string to a localized date string.
  *
  * @param dateString - ISO date string to format

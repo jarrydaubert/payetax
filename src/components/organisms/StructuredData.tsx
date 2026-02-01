@@ -97,17 +97,23 @@ interface FAQPageSchema {
   }>;
 }
 
-interface ArticleSchema {
+/**
+ * BlogPosting schema for blog articles
+ * Note: Using BlogPosting instead of generic Article per Google's recommendation
+ * articleBody intentionally omitted - bloats HTML and not needed for rich results
+ */
+interface BlogPostingSchema {
   '@context': 'https://schema.org';
-  '@type': 'Article';
+  '@type': 'BlogPosting';
   headline: string;
   description: string;
   image: string | string[];
   datePublished: string;
   dateModified?: string;
   author: {
-    '@type': 'Person';
+    '@type': 'Person' | 'Organization';
     name: string;
+    url?: string;
   };
   publisher: {
     '@type': 'Organization';
@@ -115,16 +121,22 @@ interface ArticleSchema {
     logo: {
       '@type': 'ImageObject';
       url: string;
+      width?: number;
+      height?: number;
     };
   };
   mainEntityOfPage: {
     '@type': 'WebPage';
     '@id': string;
   };
-  articleBody?: string;
   wordCount?: number;
   inLanguage?: string;
   articleSection?: string;
+  isPartOf?: {
+    '@type': 'Blog';
+    name: string;
+    url: string;
+  };
 }
 
 interface FinancialServiceSchema {
@@ -337,7 +349,7 @@ export type SchemaType =
   | SoftwareApplicationSchema
   | BreadcrumbListSchema
   | FAQPageSchema
-  | ArticleSchema
+  | BlogPostingSchema
   | FinancialServiceSchema
   | HowToSchema
   | PersonSchema
@@ -496,6 +508,11 @@ const HOW_TO_DATA: HowToSchema = {
 /**
  * Generate Dataset schema with dynamic tax values from TAX_RATES
  * This ensures all tax values come from the single source of truth
+ *
+ * WARNING: Only use this schema if you have a real, publicly accessible dataset.
+ * The distribution endpoint must exist and return the described data.
+ *
+ * TODO: Create /api/tax-rates endpoint before enabling distribution field
  */
 function generateDatasetData(): DatasetSchema {
   const rates = TAX_RATES['2025-2026'];
@@ -515,8 +532,10 @@ function generateDatasetData(): DatasetSchema {
     description:
       'Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the 2025-26 tax year',
     url: SITE_URL,
-    datePublished: '2025-01-01',
-    dateModified: '2025-10-03',
+    // Note: Omitting datePublished/dateModified to avoid stale hardcoded values
+    // Add these back when we have a versioning system for tax data
+    datePublished: '2025-04-06', // Tax year start
+    dateModified: '2025-04-06', // Update when rates change
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
     creator: {
       '@type': 'Organization',
@@ -574,14 +593,8 @@ function generateDatasetData(): DatasetSchema {
         description: `NI on income above ${formatCurrency(niRates.upper.threshold)}`,
       },
     ],
-    distribution: [
-      {
-        '@type': 'DataDownload',
-        encodingFormat: 'application/json',
-        contentUrl: `${SITE_URL}/api/tax-rates`,
-        description: 'Tax rates and calculation data in JSON format',
-      },
-    ],
+    // IMPORTANT: distribution removed - /api/tax-rates endpoint does not exist
+    // Re-add when endpoint is implemented to avoid schema spam
     temporalCoverage: '2025-04-06/2026-04-05',
     spatialCoverage: {
       '@type': 'Place',
@@ -627,28 +640,27 @@ export interface StructuredDataProps {
   breadcrumbs?: Array<{ name: string; url: string }>;
   /** FAQ data for FAQ schema */
   faqs?: FAQItem[];
-  /** Article metadata for article schema */
+  /** Article metadata for BlogPosting schema */
   articleData?: {
     /** Article title */
     title: string;
     /** Article description */
     description: string;
-    /** Full URL to the article */
+    /** Full URL to the article (must be absolute) */
     url: string;
-    /** URL to the article's featured image */
+    /** URL to the article's featured image (must be absolute) */
     imageUrl: string;
-    /** ISO date string for when the article was published */
+    /** ISO 8601 date string for when the article was published */
     publishDate: string;
-    /** ISO date string for when the article was last modified */
+    /** ISO 8601 date string for when the article was last modified */
     modifiedDate?: string;
-    /** Name of the article's author */
+    /** Name of the article's author (use "PayeTax Editorial Team" for org author) */
     authorName?: string;
-    /** Full article body text (for SEO) */
-    articleBody?: string;
     /** Word count of the article */
     wordCount?: number;
     /** Article section/category */
     articleSection?: string;
+    // Note: articleBody intentionally omitted - bloats HTML, not needed for rich results
   };
   /** Expert person data */
   expert?: {
@@ -760,17 +772,21 @@ export function StructuredData({
     case 'article': {
       if (!articleData) return null;
 
+      // Use BlogPosting for better SEO (more specific than generic Article)
+      // Note: articleBody intentionally omitted - bloats HTML, not needed for rich results
       schemaData = {
         '@context': 'https://schema.org',
-        '@type': 'Article',
+        '@type': 'BlogPosting',
         headline: articleData.title,
         description: articleData.description,
         image: articleData.imageUrl,
         datePublished: articleData.publishDate,
         dateModified: articleData.modifiedDate || articleData.publishDate,
         author: {
-          '@type': 'Person',
+          // Use Organization for editorial team, Person for named authors
+          '@type': articleData.authorName === 'PayeTax Editorial Team' ? 'Organization' : 'Person',
           name: articleData.authorName || 'PayeTax',
+          url: SITE_URL,
         },
         publisher: {
           '@type': 'Organization',
@@ -778,6 +794,8 @@ export function StructuredData({
           logo: {
             '@type': 'ImageObject',
             url: LOGO_URL,
+            width: 192,
+            height: 192,
           },
         },
         mainEntityOfPage: {
@@ -785,10 +803,14 @@ export function StructuredData({
           '@id': articleData.url,
         },
         inLanguage: 'en-GB',
-        ...(articleData.articleBody && { articleBody: articleData.articleBody }),
+        isPartOf: {
+          '@type': 'Blog',
+          name: 'PayeTax Blog',
+          url: `${SITE_URL}/blog`,
+        },
         ...(articleData.wordCount && { wordCount: articleData.wordCount }),
         ...(articleData.articleSection && { articleSection: articleData.articleSection }),
-      } as ArticleSchema;
+      } as BlogPostingSchema;
       break;
     }
 
@@ -940,12 +962,16 @@ export function StructuredData({
   // If we couldn't build valid schema data, return null
   if (!schemaData) return null;
 
+  // Escape </script> to prevent XSS if content-managed fields contain it
+  // This is standard practice for JSON-LD even when we "control" the data
+  const safeJson = JSON.stringify(schemaData).replace(/<\/script/gi, '<\\/script');
+
   // Render as regular script tag for SSR (critical for SEO)
   return (
     <script
       type='application/ld+json'
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - we control the JSON schema data, not user input
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON escaped, we control schema data
+      dangerouslySetInnerHTML={{ __html: safeJson }}
     />
   );
 }

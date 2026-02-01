@@ -4,18 +4,22 @@
  * Shows when user is offline and page isn't cached
  */
 
-'use client';
-
 import { CheckCircle, Wifi } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
+import { BackButton } from './BackButton';
+
+// Prevent indexing of utility/fallback pages
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function OfflinePage() {
   return (
-    <div className='flex min-h-screen items-center justify-center pt-20'>
-      <div className='container mx-auto max-w-2xl px-4 text-center'>
+    <div className='flex min-h-dvh items-center justify-center pt-20'>
+      <main className='container mx-auto max-w-2xl px-4 text-center'>
         <div className='glass-card p-8 md:p-16'>
           {/* Offline Icon */}
           <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
@@ -72,9 +76,7 @@ export default function OfflinePage() {
 
           {/* Actions */}
           <div className='space-y-4'>
-            <Button onClick={() => window.history.back()} variant='default' size='lg'>
-              Go Back
-            </Button>
+            <BackButton />
 
             <div>
               <Link
@@ -94,7 +96,7 @@ export default function OfflinePage() {
             </p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

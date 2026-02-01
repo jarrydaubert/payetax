@@ -1,9 +1,9 @@
 // src/app/tools/national-insurance-calculator/NICalculatorClient.tsx
 'use client';
 
-import { ArrowRight, Calculator, HelpCircle, Info, Shield } from 'lucide-react';
+import { ArrowRight, Calculator, ChevronDown, HelpCircle, Info, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -67,19 +67,19 @@ function formatCurrency(amount: number): string {
 }
 
 export function NICalculatorClient() {
+  const inputId = useId();
   const [salary, setSalary] = useState<string>('');
   const [category, setCategory] = useState<NICategory>('A');
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [result, setResult] = useState<{
     employee: number;
     employer: number;
     total: number;
   } | null>(null);
 
-  const handleCalculate = () => {
-    const salaryNum = parseFloat(salary.replace(/,/g, ''));
-    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
-
-    const ni = calculateNI(salaryNum, category);
+  // Shared calculation logic with optional category override
+  const runCalculation = (salaryValue: number, categoryOverride?: NICategory) => {
+    const ni = calculateNI(salaryValue, categoryOverride ?? category);
     setResult({
       employee: ni.employee,
       employer: ni.employer,
@@ -87,14 +87,27 @@ export function NICalculatorClient() {
     });
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Normalize: strip everything except digits
+    const salaryNum = Number(salary.replace(/[^\d]/g, ''));
+    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
+    runCalculation(salaryNum);
+  };
+
   const handleQuickCalculate = (salaryValue: number) => {
-    setSalary(salaryValue.toString());
-    const ni = calculateNI(salaryValue, category);
-    setResult({
-      employee: ni.employee,
-      employer: ni.employer,
-      total: ni.employee + ni.employer,
-    });
+    setSalary(salaryValue.toLocaleString());
+    runCalculation(salaryValue);
+  };
+
+  const handleCategoryChange = (newCategory: NICategory) => {
+    setCategory(newCategory);
+    if (salary) {
+      const salaryNum = Number(salary.replace(/[^\d]/g, ''));
+      if (!Number.isNaN(salaryNum) && salaryNum > 0) {
+        runCalculation(salaryNum, newCategory);
+      }
+    }
   };
 
   return (
@@ -132,25 +145,29 @@ export function NICalculatorClient() {
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <div className='flex gap-3'>
+            <form onSubmit={handleSubmit} className='flex gap-3'>
+              <label htmlFor={inputId} className='sr-only'>
+                Annual salary
+              </label>
               <div className='relative flex-1'>
                 <span className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
                   £
                 </span>
                 <Input
+                  id={inputId}
                   type='text'
                   placeholder='50,000'
                   value={salary}
                   onChange={(e) => setSalary(e.target.value)}
                   className='pl-7 font-mono text-lg'
-                  onKeyDown={(e) => e.key === 'Enter' && handleCalculate()}
-                  aria-label='Annual salary'
+                  autoComplete='off'
+                  spellCheck={false}
                 />
               </div>
-              <Button onClick={handleCalculate} size='lg'>
+              <Button type='submit' size='lg' disabled={!salary.trim()}>
                 Calculate
               </Button>
-            </div>
+            </form>
 
             {/* NI Category Selection */}
             <fieldset>
@@ -160,12 +177,10 @@ export function NICalculatorClient() {
                   <button
                     key={cat.code}
                     type='button'
-                    onClick={() => {
-                      setCategory(cat.code);
-                      if (salary) handleCalculate();
-                    }}
+                    onClick={() => handleCategoryChange(cat.code)}
                     className={cn(
                       'rounded-lg border px-4 py-2 text-sm transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                       category === cat.code
                         ? 'border-primary bg-primary/10 font-medium text-primary'
                         : 'hover:border-primary hover:bg-primary/5',
@@ -177,15 +192,49 @@ export function NICalculatorClient() {
                 ))}
                 <button
                   type='button'
-                  className='rounded-lg border px-4 py-2 text-muted-foreground text-sm hover:border-primary hover:bg-primary/5'
-                  onClick={() => {
-                    // Show all categories (could be a modal in future)
-                    alert(NI_CATEGORIES.map((c) => `${c.code}: ${c.description}`).join('\n'));
-                  }}
+                  className={cn(
+                    'rounded-lg border px-4 py-2 text-muted-foreground text-sm',
+                    'hover:border-primary hover:bg-primary/5',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  )}
+                  onClick={() => setShowAllCategories(!showAllCategories)}
+                  aria-expanded={showAllCategories}
                 >
-                  More...
+                  More
+                  <ChevronDown
+                    className={cn(
+                      'ml-1 inline-block size-4 transition-transform',
+                      showAllCategories && 'rotate-180',
+                    )}
+                  />
                 </button>
               </div>
+
+              {/* Expanded categories */}
+              {showAllCategories && (
+                <div className='mt-3 rounded-lg border bg-muted/50 p-3'>
+                  <div className='flex flex-wrap gap-2'>
+                    {NI_CATEGORIES.filter((c) => !c.common).map((cat) => (
+                      <button
+                        key={cat.code}
+                        type='button'
+                        onClick={() => handleCategoryChange(cat.code)}
+                        className={cn(
+                          'rounded-lg border px-3 py-1.5 text-sm transition-colors',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                          category === cat.code
+                            ? 'border-primary bg-primary/10 font-medium text-primary'
+                            : 'hover:border-primary hover:bg-primary/5',
+                        )}
+                        title={cat.description}
+                      >
+                        {cat.code}: {cat.description}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <p className='mt-2 text-muted-foreground text-sm'>
                 Most employees are Category A. Check your payslip for your NI category.
               </p>
@@ -205,6 +254,7 @@ export function NICalculatorClient() {
                     className={cn(
                       'rounded-full border px-3 py-1 font-mono text-sm transition-colors',
                       'hover:border-primary hover:bg-primary/5',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                     )}
                   >
                     £{exampleSalary.toLocaleString()}
@@ -249,6 +299,16 @@ export function NICalculatorClient() {
                 <p className='text-muted-foreground text-sm'>Employment cost to employer</p>
               </div>
             </div>
+
+            {/* Annualized estimate disclosure */}
+            <p className='mt-4 text-center text-muted-foreground text-xs'>
+              This is an annualized estimate. NI is calculated per pay period in practice, which may
+              differ slightly.{' '}
+              <Link href='/' className='text-primary hover:underline'>
+                Use the full calculator
+              </Link>{' '}
+              for payslip-accurate figures.
+            </p>
           </CardContent>
         </Card>
       )}

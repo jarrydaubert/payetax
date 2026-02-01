@@ -4,27 +4,31 @@
  * Tooltip icon that appears next to labels (not wrapping inputs).
  * Shows HMRC-style guidance on hover.
  *
+ * Note: Parent component should wrap with TooltipProvider for optimal performance.
+ *
  * @module components/atoms/LabelTooltip
  */
 
 import { HelpCircle } from 'lucide-react';
-import { memo } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { getTooltipContent, type TooltipContent as TooltipData } from '@/config/inputTooltips';
+import { memo, useId } from 'react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  getTooltipContent,
+  type TooltipContent as TooltipData,
+  type TooltipFieldName,
+} from '@/config/inputTooltips';
 import { COMPONENT_GUIDELINES } from '@/constants/designTokens';
 import { formatTooltipText } from '@/lib/tooltipUtils';
 
 interface LabelTooltipProps {
   /** The field name (matches key in INPUT_TOOLTIPS config) */
-  fieldName: string;
+  fieldName: TooltipFieldName | (string & {});
   /** Optional custom tooltip content (overrides config) */
   customContent?: TooltipData;
 }
 
 /**
  * LabelTooltip - Shows help icon next to label
- *
- * Performance: Memoized with React 19 - static content, no need to re-render
  *
  * @example
  * ```tsx
@@ -38,6 +42,9 @@ export const LabelTooltip = memo(function LabelTooltip({
   fieldName,
   customContent,
 }: LabelTooltipProps) {
+  const reactId = useId();
+  const tooltipId = `label-tooltip-${fieldName}-${reactId}`;
+
   // Get tooltip content from config or use custom
   const tooltipContent = customContent || getTooltipContent(fieldName);
 
@@ -50,29 +57,29 @@ export const LabelTooltip = memo(function LabelTooltip({
   }
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type='button'
-            className='inline-flex flex-shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
-            aria-label={`Help for ${tooltipContent.title}`}
-            data-testid={`tooltip-trigger-${fieldName}`}
-          >
-            <HelpCircle className={COMPONENT_GUIDELINES.TOOLTIPS.iconCompact} />
-          </button>
-        </TooltipTrigger>
-
-        <TooltipContent
-          side='top'
-          align='center'
-          className='max-w-xs'
-          sideOffset={8}
-          data-testid={`tooltip-content-${fieldName}`}
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type='button'
+          className='inline-flex flex-shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
+          aria-label={`Help for ${tooltipContent.title}`}
+          aria-describedby={tooltipId}
+          data-testid={`tooltip-trigger-${fieldName}`}
         >
-          {formatTooltipText(tooltipContent)}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          <HelpCircle className={COMPONENT_GUIDELINES.TOOLTIPS.iconCompact} aria-hidden='true' />
+        </button>
+      </TooltipTrigger>
+
+      <TooltipContent
+        id={tooltipId}
+        side='top'
+        align='center'
+        className='max-w-xs'
+        sideOffset={8}
+        data-testid={`tooltip-content-${fieldName}`}
+      >
+        {formatTooltipText(tooltipContent)}
+      </TooltipContent>
+    </Tooltip>
   );
 });

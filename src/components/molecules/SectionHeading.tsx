@@ -9,8 +9,6 @@
  * @module components/molecules/SectionHeading
  */
 
-'use client';
-
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 import { Badge } from '@/components/atoms/ui/badge';

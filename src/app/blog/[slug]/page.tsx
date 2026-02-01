@@ -21,14 +21,21 @@ import { cn } from '@/lib/utils';
 // Cache blog post fetch to deduplicate calls between generateMetadata and page component
 const getCachedBlogPost = cache((slug: string) => getBlogPostBySlug(slug));
 
+/** Normalize image URL - handles both relative and absolute paths */
+function getAbsoluteImageUrl(image: string | undefined): string | undefined {
+  if (!image) return undefined;
+  return image.startsWith('http') ? image : `${SITE_URL}${image}`;
+}
+
 // Next.js 16: Route segment config for optimized blog posts
-export const dynamic = 'force-static'; // Pre-render all blog posts at build time
-export const dynamicParams = true; // Allow new posts to be created at runtime
+export const dynamic = 'force-static'; // Static generation with ISR
+export const dynamicParams = true; // Unknown slugs generated on-demand (not just at build time)
 export const revalidate = 86400; // ISR: Revalidate every 24 hours for fresh tax content
 
-// Generate static params for all blog posts at build time
+// Generate static params for blog posts at build time
+// Note: With dynamicParams=true, slugs not in this list are generated on-demand
 export async function generateStaticParams() {
-  const posts = await getBlogPosts({ pageSize: 1000 });
+  const posts = await getBlogPosts({ pageSize: 1000 }); // Cap at 1000; beyond this uses on-demand generation
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -45,6 +52,9 @@ export async function generateMetadata({
   if (!post) {
     return { title: 'Post Not Found | PayeTax Blog' };
   }
+
+  // Normalize image URL once for consistent usage
+  const imageUrl = getAbsoluteImageUrl(post.image);
 
   return {
     // Use seoTitle for shorter, optimized title tags (avoids SEO title length issues)
@@ -63,13 +73,13 @@ export async function generateMetadata({
       modifiedTime: post.updatedAt,
       authors: post.author ? [post.author] : undefined,
       tags: post.tags,
-      images: post.image ? [{ url: post.image, alt: post.imageAlt || post.title }] : undefined,
+      images: imageUrl ? [{ url: imageUrl, alt: post.imageAlt || post.title }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title: post.seoTitle || post.title,
       description: post.seoDescription || post.excerpt,
-      images: post.image ? [post.image] : undefined,
+      images: imageUrl ? [imageUrl] : undefined,
     },
   };
 }
@@ -111,13 +121,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     .trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
+  // Normalize image URL for consistent usage across metadata and JSON-LD
+  const imageUrl = getAbsoluteImageUrl(post.image);
+
   // Generate Article structured data for SEO
   const articleStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.seoDescription || post.excerpt,
-    image: post.image ? `${SITE_URL}${post.image}` : undefined,
+    image: imageUrl,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt || post.publishedAt,
     author: {

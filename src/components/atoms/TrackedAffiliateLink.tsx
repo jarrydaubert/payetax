@@ -38,7 +38,7 @@ export function TrackedAffiliateLink({
     <a
       href={url}
       target='_blank'
-      rel={isAffiliate ? 'noopener sponsored' : 'noopener noreferrer'}
+      rel={isAffiliate ? 'nofollow noopener noreferrer sponsored' : 'noopener noreferrer'}
       onClick={handleClick}
       className={className}
     >

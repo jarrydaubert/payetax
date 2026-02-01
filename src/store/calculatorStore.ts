@@ -1,3 +1,5 @@
+'use client';
+
 // src/store/calculatorStore.ts
 /**
  * UK Tax Calculator - Zustand State Management Store
@@ -179,7 +181,8 @@ const getCurrentTaxYear = (): TaxYear => {
 };
 
 // Get salary range for privacy-safe analytics
-const getSalaryRange = (salary: number): string => {
+const getSalaryRange = (salary: number): string | null => {
+  if (salary <= 0) return null; // Don't track empty/zero salary
   if (salary < 25000) return 'under_25k';
   if (salary < 35000) return '25k_35k';
   if (salary < 50000) return '35k_50k';
@@ -436,14 +439,27 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = BooleanSchema.safeParse(isScottish);
 
           if (!validated.success) {
-            console.warn(
-              '[Calculator] Invalid isScottish:',
-              validated.error.issues[0]?.message ?? 'Validation failed',
-            );
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(
+                '[Calculator] Invalid isScottish:',
+                validated.error.issues[0]?.message ?? 'Validation failed',
+              );
+            }
             return;
           }
 
-          set((state) => ({ input: { ...state.input, isScottish: validated.data } }));
+          // Keep region and isScottish in sync to prevent impossible states
+          set((state) => ({
+            input: {
+              ...state.input,
+              isScottish: validated.data,
+              region: validated.data
+                ? 'Scotland'
+                : state.input.region === 'Scotland'
+                  ? 'England'
+                  : state.input.region,
+            },
+          }));
         },
         setIsMarried: (isMarried) => {
           // Validate boolean using extracted schema
@@ -527,18 +543,29 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, payNoNI: validated.data } }));
         },
         setPensionContribution: (pensionContribution) => {
-          // Validate pension contribution
-          const validated = z
-            .number()
-            .min(0, 'Pension contribution must be positive')
-            .max(100, 'Pension contribution cannot exceed 100%')
-            .safeParse(pensionContribution);
+          const { input } = get();
+
+          // Validate based on contribution type
+          const schema =
+            input.pensionContributionType === 'percentage'
+              ? z
+                  .number()
+                  .min(0, 'Pension contribution must be positive')
+                  .max(100, 'Pension percentage cannot exceed 100%')
+              : z
+                  .number()
+                  .min(0, 'Pension contribution must be positive')
+                  .max(10_000_000, 'Pension amount exceeds maximum');
+
+          const validated = schema.safeParse(pensionContribution);
 
           if (!validated.success) {
-            console.warn(
-              '[Calculator] Invalid pension contribution:',
-              validated.error.issues[0]?.message ?? 'Validation failed',
-            );
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(
+                '[Calculator] Invalid pension contribution:',
+                validated.error.issues[0]?.message ?? 'Validation failed',
+              );
+            }
             return;
           }
 
@@ -795,16 +822,18 @@ export const useCalculatorStore = create<CalculatorState>()(
               },
             });
 
-            // Analytics tracking (privacy-safe: no exact salary)
+            // Analytics tracking (privacy-safe: no exact salary, skip if no salary)
             const salaryRange = getSalaryRange(input.salary);
-            trackCalculatorEvent('calculate', {
-              tax_year: input.taxYear,
-              region: input.region,
-              has_student_loan: input.studentLoanPlans !== 'none',
-              has_pension: input.pensionContribution > 0,
-              salary_range: salaryRange,
-            });
-            trackCalculatorUsage('paye', salaryRange);
+            if (salaryRange) {
+              trackCalculatorEvent('calculate', {
+                tax_year: input.taxYear,
+                region: input.region,
+                has_student_loan: input.studentLoanPlans !== 'none',
+                has_pension: input.pensionContribution > 0,
+                salary_range: salaryRange,
+              });
+              trackCalculatorUsage('paye', salaryRange);
+            }
           } catch (error) {
             // Log calculation errors for debugging
             console.error('Tax calculation error:', error);

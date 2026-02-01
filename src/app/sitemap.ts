@@ -6,6 +6,9 @@ import { getAllScenarioSlugs } from '@/data/scenarios';
 import { getAllUseCaseSlugs } from '@/data/useCases';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 
+// Revalidate daily - blog content can change
+export const revalidate = 86400;
+
 type SitemapFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
 
 interface SitemapEntry {
@@ -15,83 +18,90 @@ interface SitemapEntry {
   priority: number;
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://payetax.co.uk';
-  const currentDate = new Date().toISOString();
+// Use env var for preview deployments, fallback to production
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'https://payetax.co.uk');
 
-  // Static pages
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = SITE_URL;
+  // Use a stable date for static pages (update when content actually changes)
+  // This prevents unnecessary recrawls from search engines
+  const staticPagesDate = '2025-01-15T00:00:00.000Z';
+
+  // Static pages - use stable date (update when content changes)
   const staticPages: SitemapEntry[] = [
     {
       url: `${baseUrl}/`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'weekly',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'daily',
-      priority: 0.95, // TaxInsights is a major publication
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
       url: `${baseUrl}/compliance`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
-    // Competitor comparison pages
     {
       url: `${baseUrl}/best-uk-tax-calculators`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/alternatives`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
-    // Tool landing pages
     {
       url: `${baseUrl}/tools/tax-code-decoder`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/tools/scottish-tax-calculator`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/tools/national-insurance-calculator`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/tools/marriage-allowance-calculator`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
     {
       url: `${baseUrl}/tools/director-guide`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.85,
     },
@@ -149,12 +159,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const salaryPages: SitemapEntry[] = allSalaries.map((salary) => {
-    const volume = highVolumeSalaries[salary] || 50; // Default low volume for unlisted
+    const volume = highVolumeSalaries[salary] || 50;
     return {
       url: `${baseUrl}/calculator/${salary}-after-tax`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly' as SitemapFrequency,
-      // Priority based on search volume (0.65-0.9 range)
       priority: Math.min(0.9, 0.65 + volume / 2000),
     };
   });
@@ -177,7 +186,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const categories = await getBlogCategories();
     categoryPages = categories.map((category) => ({
       url: `${baseUrl}/blog/category/${category.slug}`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
@@ -190,13 +199,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     blogPosts = [
       {
         url: `${baseUrl}/blog/understanding-uk-tax-codes`,
-        lastModified: currentDate,
+        lastModified: staticPagesDate,
         changeFrequency: 'monthly',
         priority: 0.8,
       },
       {
         url: `${baseUrl}/blog/beginners-guide-to-uk-taxation`,
-        lastModified: currentDate,
+        lastModified: staticPagesDate,
         changeFrequency: 'monthly',
         priority: 0.8,
       },
@@ -204,31 +213,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categoryPages = [
       {
         url: `${baseUrl}/blog/category/tax-basics`,
-        lastModified: currentDate,
+        lastModified: staticPagesDate,
         changeFrequency: 'weekly',
         priority: 0.7,
       },
       {
         url: `${baseUrl}/blog/category/tax-tips`,
-        lastModified: currentDate,
+        lastModified: staticPagesDate,
         changeFrequency: 'weekly',
         priority: 0.7,
       },
     ];
   }
 
-  // Competitor comparison pages (dynamic)
+  // Competitor comparison pages
   const competitorSlugs = getAllCompetitorSlugs();
   const competitorPages: SitemapEntry[] = competitorSlugs.flatMap((slug) => [
     {
       url: `${baseUrl}/alternatives/${slug}`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly' as SitemapFrequency,
       priority: 0.75,
     },
     {
       url: `${baseUrl}/vs/${slug}`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly' as SitemapFrequency,
       priority: 0.7,
     },
@@ -237,17 +246,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Scenario pages (tax optimization guides)
   const scenarioSlugs = getAllScenarioSlugs();
   const scenarioPages: SitemapEntry[] = [
-    // Scenario hub
     {
       url: `${baseUrl}/scenarios`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'weekly' as SitemapFrequency,
       priority: 0.85,
     },
-    // Individual scenarios
     ...scenarioSlugs.map((slug) => ({
       url: `${baseUrl}/scenarios/${slug}`,
-      lastModified: currentDate,
+      lastModified: staticPagesDate,
       changeFrequency: 'monthly' as SitemapFrequency,
       priority: 0.8,
     })),
@@ -257,7 +264,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const useCaseSlugs = getAllUseCaseSlugs();
   const useCasePages: SitemapEntry[] = useCaseSlugs.map((slug) => ({
     url: `${baseUrl}/best-for/${slug}`,
-    lastModified: currentDate,
+    lastModified: staticPagesDate,
     changeFrequency: 'monthly' as SitemapFrequency,
     priority: 0.8,
   }));

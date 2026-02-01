@@ -4,10 +4,10 @@
  * Displays side-by-side comparison cards (Do vs Don't, Good vs Bad, etc.)
  * Used on privacy page to show what we do vs don't do.
  *
+ * Server Component - no hooks or event handlers needed.
+ *
  * @module components/molecules/ComparisonCards
  */
-
-'use client';
 
 import type { LucideIcon } from 'lucide-react';
 import { CheckCircle, UserX } from 'lucide-react';

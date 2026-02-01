@@ -3,7 +3,7 @@
 
 import { ArrowRight, Calculator, Info, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -59,6 +59,7 @@ function formatCurrency(amount: number): string {
 }
 
 export function ScottishTaxCalculatorClient() {
+  const inputId = useId();
   const [salary, setSalary] = useState<string>('');
   const [comparison, setComparison] = useState<{
     scottishTax: number;
@@ -66,25 +67,22 @@ export function ScottishTaxCalculatorClient() {
     difference: number;
   } | null>(null);
 
-  const handleCalculate = () => {
-    const salaryNum = parseFloat(salary.replace(/,/g, ''));
-    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
-
+  // Shared comparison logic
+  const runComparison = (salaryValue: number) => {
     const scottishTax = calculateTax(
-      salaryNum,
+      salaryValue,
       scottishRates.bands,
       scottishRates.personalAllowance,
       scottishRates.personalAllowanceReductionThreshold,
       scottishRates.personalAllowanceReductionRate,
     );
     const englishTax = calculateTax(
-      salaryNum,
+      salaryValue,
       englishRates.bands,
       englishRates.personalAllowance,
       englishRates.personalAllowanceReductionThreshold,
       englishRates.personalAllowanceReductionRate,
     );
-
     setComparison({
       scottishTax,
       englishTax,
@@ -92,27 +90,17 @@ export function ScottishTaxCalculatorClient() {
     });
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Normalize: strip everything except digits
+    const salaryNum = Number(salary.replace(/[^\d]/g, ''));
+    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
+    runComparison(salaryNum);
+  };
+
   const handleQuickCalculate = (salaryValue: number) => {
-    setSalary(salaryValue.toString());
-    const scottishTax = calculateTax(
-      salaryValue,
-      scottishRates.bands,
-      scottishRates.personalAllowance,
-      scottishRates.personalAllowanceReductionThreshold,
-      scottishRates.personalAllowanceReductionRate,
-    );
-    const englishTax = calculateTax(
-      salaryValue,
-      englishRates.bands,
-      englishRates.personalAllowance,
-      englishRates.personalAllowanceReductionThreshold,
-      englishRates.personalAllowanceReductionRate,
-    );
-    setComparison({
-      scottishTax,
-      englishTax,
-      difference: scottishTax - englishTax,
-    });
+    setSalary(salaryValue.toLocaleString());
+    runComparison(salaryValue);
   };
 
   return (
@@ -149,25 +137,29 @@ export function ScottishTaxCalculatorClient() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='flex gap-3'>
+          <form onSubmit={handleSubmit} className='flex gap-3'>
+            <label htmlFor={inputId} className='sr-only'>
+              Annual salary
+            </label>
             <div className='relative flex-1'>
               <span className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
                 £
               </span>
               <Input
+                id={inputId}
                 type='text'
                 placeholder='50,000'
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
                 className='pl-7 font-mono text-lg'
-                onKeyDown={(e) => e.key === 'Enter' && handleCalculate()}
-                aria-label='Annual salary'
+                autoComplete='off'
+                spellCheck={false}
               />
             </div>
-            <Button onClick={handleCalculate} size='lg'>
+            <Button type='submit' size='lg' disabled={!salary.trim()}>
               Compare
             </Button>
-          </div>
+          </form>
 
           {/* Quick Examples */}
           <div className='mt-4'>
@@ -181,6 +173,7 @@ export function ScottishTaxCalculatorClient() {
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   )}
                 >
                   £{exampleSalary.toLocaleString()}
@@ -285,6 +278,7 @@ export function ScottishTaxCalculatorClient() {
                 {scottishRates.bands.map((band, index) => {
                   const prevThreshold =
                     index === 0 ? 0 : (scottishRates.bands[index - 1]?.threshold ?? 0);
+                  // Use exact thresholds (half-open intervals [prev+1, threshold])
                   const startIncome = scottishRates.personalAllowance + prevThreshold + 1;
                   const endIncome =
                     band.threshold === Number.POSITIVE_INFINITY
@@ -292,13 +286,16 @@ export function ScottishTaxCalculatorClient() {
                       : scottishRates.personalAllowance + band.threshold;
 
                   return (
-                    <tr key={band.name} className='border-border/50 border-b last:border-0'>
+                    <tr
+                      key={`${band.name}-${index}`}
+                      className='border-border/50 border-b last:border-0'
+                    >
                       <td className='px-4 py-3'>{band.name}</td>
                       <td className='px-4 py-3 font-medium font-mono'>{band.rate}%</td>
                       <td className='px-4 py-3 text-muted-foreground'>
                         {endIncome
-                          ? `£${startIncome.toLocaleString()} - £${endIncome.toLocaleString()}`
-                          : `Over £${startIncome.toLocaleString()}`}
+                          ? `£${startIncome.toLocaleString()} to £${endIncome.toLocaleString()}`
+                          : `Over £${(startIncome - 1).toLocaleString()}`}
                       </td>
                     </tr>
                   );

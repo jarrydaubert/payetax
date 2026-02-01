@@ -2,7 +2,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 
 export default function BlogPostError({
   error,
@@ -11,15 +12,29 @@ export default function BlogPostError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const errorId = useId().replace(/:/g, '');
+  const fallbackId = useId().replace(/:/g, '');
+  const debugPanelId = useId();
   const [showDebug, setShowDebug] = useState(false);
+  const capturedRef = useRef<string | null>(null);
+  const sentryEventIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    Sentry.captureException(error, {
-      tags: { error_boundary: 'blog-post', error_id: errorId },
-      contexts: { error_details: { digest: error.digest, error_id: errorId } },
+    // Guard against duplicate captures (dev/Strict Mode can remount)
+    const key = error.digest ?? `${error.name}:${error.message}`;
+    if (capturedRef.current === key) return;
+    capturedRef.current = key;
+
+    const eventId = Sentry.captureException(error, {
+      tags: { error_boundary: 'blog-post' },
+      contexts: { error_details: { digest: error.digest } },
     });
-  }, [error, errorId]);
+
+    // Store Sentry event ID for display
+    sentryEventIdRef.current = typeof eventId === 'string' ? eventId : null;
+  }, [error]);
+
+  // Prefer error.digest (Next.js correlation), then Sentry eventId, then fallback
+  const displayId = error.digest ?? sentryEventIdRef.current ?? fallbackId;
 
   return (
     <div className='flex min-h-[60vh] flex-col items-center justify-center p-6'>
@@ -47,23 +62,25 @@ export default function BlogPostError({
             <RotateCcw className='size-4' />
             Try again
           </button>
-          <a
+          <Link
             href='/'
             className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
           >
             <Home className='size-4' />
             Go home
-          </a>
+          </Link>
         </div>
 
-        {/* Error reference */}
-        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+        {/* Error reference - shows digest (Next.js), Sentry eventId, or fallback */}
+        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {displayId.slice(-8)}</p>
 
         {/* Dev Debug */}
         {process.env.NODE_ENV === 'development' && (
           <div className='mt-6'>
             <button
               type='button'
+              aria-expanded={showDebug}
+              aria-controls={debugPanelId}
               onClick={() => setShowDebug(!showDebug)}
               className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
             >
@@ -73,7 +90,10 @@ export default function BlogPostError({
               Debug info
             </button>
             {showDebug && (
-              <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
+              <div
+                id={debugPanelId}
+                className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'
+              >
                 <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
                   {error.message}
                   {'\n\n'}

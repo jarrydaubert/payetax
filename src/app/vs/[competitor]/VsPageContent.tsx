@@ -1,11 +1,7 @@
 // src/app/vs/[competitor]/VsPageContent.tsx
-'use client';
-
 import { ArrowRight, Calculator, Scale } from 'lucide-react';
-import type { Route } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
 import { Badge } from '@/components/atoms/ui/badge';
 import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
@@ -16,12 +12,54 @@ import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/d
 import type { Competitor } from '@/data/competitors';
 import { PAYETAX_INFO } from '@/data/competitors';
 import { cn } from '@/lib/utils';
+import { CompetitorCTAButton } from './CompetitorCTAButton';
 
 interface VsPageContentProps {
   competitor: Competitor;
 }
 
+/**
+ * Joins array items with "and", showing ellipsis when truncated.
+ * @param items - Array of strings to join
+ * @param maxItems - Maximum items to show before truncating
+ */
+function joinWithAnd(items: string[], maxItems = 2): string {
+  const safe = items.filter(Boolean);
+  if (safe.length === 0) return '';
+
+  const first = safe[0];
+  if (safe.length === 1 && first) return first;
+
+  const subset = safe.slice(0, maxItems);
+  const hasMore = safe.length > maxItems;
+
+  if (subset.length === 2) {
+    const base = `${subset[0]} and ${subset[1]}`;
+    return hasMore ? `${base}, and more` : base;
+  }
+
+  const last = subset.at(-1);
+  if (!last) return '';
+  const base = `${subset.slice(0, -1).join(', ')}, and ${last}`;
+  return hasMore ? `${base}, and more` : base;
+}
+
+/**
+ * Converts first character to lowercase for sentence fragments.
+ * Preserves case for acronyms (all caps words like "VAT", "IR35").
+ */
+function toSentenceFragment(str: string): string {
+  if (!str) return str;
+  const firstWord = str.split(' ')[0];
+  if (firstWord && firstWord === firstWord.toUpperCase() && firstWord.length > 1) {
+    return str;
+  }
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
 export function VsPageContent({ competitor }: VsPageContentProps) {
+  const competitorBestFor = toSentenceFragment(joinWithAnd(competitor.bestFor, 2));
+
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
@@ -55,11 +93,11 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                 calculations happen in your browser for complete privacy.
               </p>
               <p className='text-muted-foreground'>
-                <strong className='text-foreground'>{competitor.name}</strong> is better for{' '}
-                {competitor.bestFor.slice(0, 2).join(' and ').toLowerCase()}.
+                <strong className='text-foreground'>{competitor.name}</strong> is better suited for{' '}
+                {competitorBestFor}.
               </p>
               <p className='font-medium text-foreground'>
-                Both use official HMRC rates and will give you accurate results.
+                Both are designed to follow official HMRC rates for UK tax calculations.
               </p>
             </div>
           </Card>
@@ -104,7 +142,10 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                   <ul className={SPACING.SPACE_Y_2}>
                     {PAYETAX_INFO.strengths.map((strength) => (
                       <li key={strength} className={cn('flex items-start', SPACING.GAP_2)}>
-                        <span className='text-green-600 dark:text-green-400'>+</span>
+                        <span className='sr-only'>Strength:</span>
+                        <span className='text-green-600 dark:text-green-400' aria-hidden='true'>
+                          +
+                        </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{strength}</span>
                       </li>
                     ))}
@@ -151,7 +192,10 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                   <ul className={SPACING.SPACE_Y_2}>
                     {competitor.strengths.map((strength) => (
                       <li key={strength} className={cn('flex items-start', SPACING.GAP_2)}>
-                        <span className='text-green-600 dark:text-green-400'>+</span>
+                        <span className='sr-only'>Strength:</span>
+                        <span className='text-green-600 dark:text-green-400' aria-hidden='true'>
+                          +
+                        </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{strength}</span>
                       </li>
                     ))}
@@ -165,7 +209,10 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                   <ul className={SPACING.SPACE_Y_2}>
                     {competitor.weaknesses.slice(0, 4).map((weakness) => (
                       <li key={weakness} className={cn('flex items-start', SPACING.GAP_2)}>
-                        <span className='text-amber-600 dark:text-amber-400'>-</span>
+                        <span className='sr-only'>Weakness:</span>
+                        <span className='text-amber-600 dark:text-amber-400' aria-hidden='true'>
+                          −
+                        </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{weakness}</span>
                       </li>
                     ))}
@@ -187,11 +234,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
               </div>
 
               <div className={SPACING.MT_6}>
-                <Button asChild variant='outline' className='w-full'>
-                  <TrackedAffiliateLink competitor={competitor} pageType='vs'>
-                    Visit {competitor.shortName}
-                  </TrackedAffiliateLink>
-                </Button>
+                <CompetitorCTAButton competitor={competitor} />
               </div>
             </Card>
           </div>
@@ -205,8 +248,8 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
           <Card className={cn(SPACING.MT_8, SPACING.P_8)}>
             <div className={SPACING.SPACE_Y_4}>
               <p className='text-muted-foreground'>
-                Both PayeTax and {competitor.name} will give you accurate UK tax calculations based
-                on official HMRC rates. The main differences come down to user experience, features,
+                Both PayeTax and {competitor.name} aim to provide UK tax calculations based on
+                official HMRC rates. The main differences come down to user experience, features,
                 and design philosophy.
               </p>
               <p className='text-muted-foreground'>
@@ -216,7 +259,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
               </p>
               <p className='text-muted-foreground'>
                 <strong className='text-foreground'>Choose {competitor.shortName}</strong> if you
-                specifically need {competitor.bestFor.slice(0, 2).join(' or ').toLowerCase()}.
+                specifically need {competitorBestFor}.
               </p>
             </div>
           </Card>
@@ -248,7 +291,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                 </Link>
               </Button>
               <Button asChild variant='outline' size='lg'>
-                <Link href={'/best-uk-tax-calculators' as Route}>
+                <Link href='/best-uk-tax-calculators'>
                   Compare All Calculators
                   <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
                 </Link>

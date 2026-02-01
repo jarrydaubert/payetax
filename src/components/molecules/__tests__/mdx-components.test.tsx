@@ -74,8 +74,8 @@ describe('mdx-components', () => {
             <span>Complex</span> Content
           </H1>,
         );
-        // Should generate empty id for non-string children
-        expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('id', '');
+        // getNodeText() recursively extracts text from React nodes
+        expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('id', 'complex-content');
       });
 
       it('should have correct styling classes', () => {
@@ -369,10 +369,9 @@ describe('mdx-components', () => {
     });
 
     it('should handle undefined src', () => {
-      render(<Img src={undefined} alt='No source' />);
-      const img = screen.getByRole('img');
-      // Next.js Image converts undefined to empty string
-      expect(img).toBeInTheDocument();
+      const { container } = render(<Img src={undefined} alt='No source' />);
+      // Returns null for invalid/empty src to prevent next/image errors
+      expect(container.querySelector('figure')).not.toBeInTheDocument();
     });
 
     it('should have correct image styling', () => {
@@ -411,7 +410,8 @@ describe('mdx-components', () => {
 
     it('should handle empty string', () => {
       render(<H1>{''}</H1>);
-      expect(screen.getByRole('heading')).toHaveAttribute('id', '');
+      // Empty text returns undefined id (no id attribute) to avoid invalid HTML
+      expect(screen.getByRole('heading')).not.toHaveAttribute('id');
     });
   });
 
@@ -442,8 +442,10 @@ describe('mdx-components', () => {
       expect(mdxComponents).toHaveProperty('img');
     });
 
-    it('should have 23 components total', () => {
-      expect(Object.keys(mdxComponents)).toHaveLength(23);
+    it('should have 24 components total', () => {
+      // 24 components: h1-h6, p, ul, ol, li, a, strong, em, code, blockquote,
+      // table, thead, tbody, tr, th, td, hr, img, caption
+      expect(Object.keys(mdxComponents)).toHaveLength(24);
     });
   });
 });

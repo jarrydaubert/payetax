@@ -24,8 +24,12 @@
 import { Smartphone, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { BREAKPOINTS } from '@/constants/ui';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { cn } from '@/lib/utils';
+
+/** Versioned storage key - increment version to show prompt again after redesigns */
+const DISMISS_KEY = 'landscapePrompt:dismissed:v1';
 
 interface LandscapePromptProps {
   /**
@@ -51,22 +55,18 @@ interface LandscapePromptProps {
  */
 export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     // Check if user has dismissed before (localStorage)
-    const dismissed = safeGetItem('landscape-prompt-dismissed');
-    if (dismissed === 'true') {
-      setIsDismissed(true);
-      return;
-    }
+    const dismissed = safeGetItem(DISMISS_KEY) === 'true';
+    if (dismissed) return;
 
-    // Check if we're on mobile and in portrait mode
+    // Check if we're on mobile (< md breakpoint) and in portrait mode
+    // Use BREAKPOINTS.MD - 1 to match Tailwind's md:hidden behavior (md starts at 768px)
     const checkOrientation = () => {
-      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+      const isMobile = window.matchMedia(`(max-width: ${BREAKPOINTS.MD - 1}px)`).matches;
       const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-
-      setIsVisible(isMobile && isPortrait && !isDismissed);
+      setIsVisible(isMobile && isPortrait);
     };
 
     // Initial check
@@ -74,30 +74,32 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
 
     // Listen for orientation changes
     const mediaQuery = window.matchMedia('(orientation: portrait)');
-    const handleOrientationChange = () => checkOrientation();
 
     // Modern browsers
     if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleOrientationChange);
+      mediaQuery.addEventListener('change', checkOrientation);
     }
     // Legacy browsers
     else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleOrientationChange);
+      mediaQuery.addListener(checkOrientation);
     }
+
+    // Also listen for resize as fallback (iOS Safari, foldables, split view)
+    window.addEventListener('resize', checkOrientation, { passive: true });
 
     return () => {
       if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleOrientationChange);
+        mediaQuery.removeEventListener('change', checkOrientation);
       } else if (mediaQuery.removeListener) {
-        mediaQuery.removeListener(handleOrientationChange);
+        mediaQuery.removeListener(checkOrientation);
       }
+      window.removeEventListener('resize', checkOrientation);
     };
-  }, [isDismissed]);
+  }, []);
 
   const handleDismiss = () => {
-    setIsDismissed(true);
+    safeSetItem(DISMISS_KEY, 'true');
     setIsVisible(false);
-    safeSetItem('landscape-prompt-dismissed', 'true');
     onDismiss?.();
   };
 
@@ -106,15 +108,16 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
   }
 
   return (
-    <output
+    <div
+      role='status'
+      aria-live='polite'
+      aria-atomic='true'
       className={cn(
         'fixed inset-0 z-40 flex items-center justify-center md:hidden',
         'fade-in animate-in duration-500',
         'pointer-events-none', // Allow clicks through to content
         className,
       )}
-      aria-live='polite'
-      aria-label='Rotate device for better viewing of results'
     >
       <div
         className={cn(
@@ -124,14 +127,10 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
           'shadow-lg dark:bg-primary/10',
         )}
       >
-        {/* Animated Phone Icon */}
+        {/* Animated Phone Icon - uses animate-wiggle from Tailwind config */}
         <div className='flex-shrink-0'>
           <Smartphone
-            className={cn(
-              ICON_SIZES.SIZE_8,
-              'text-primary',
-              'animate-[wiggle_1s_ease-in-out_infinite]',
-            )}
+            className={cn(ICON_SIZES.SIZE_8, 'text-primary', 'animate-wiggle')}
             aria-hidden='true'
           />
         </div>
@@ -148,31 +147,19 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
 
         {/* Dismiss Button */}
         <button
+          type='button'
           onClick={handleDismiss}
           className={cn(
             'flex-shrink-0 rounded-md p-1',
             'text-muted-foreground hover:text-foreground',
             'transition-colors duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
           )}
           aria-label='Dismiss landscape prompt'
-          type='button'
         >
           <X className={ICON_SIZES.SIZE_5} aria-hidden='true' />
         </button>
       </div>
-
-      <style jsx>{`
-        @keyframes wiggle {
-          0%,
-          100% {
-            transform: rotate(-3deg);
-          }
-          50% {
-            transform: rotate(3deg);
-          }
-        }
-      `}</style>
-    </output>
+    </div>
   );
 }

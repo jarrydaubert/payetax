@@ -13,6 +13,12 @@ import { cn } from '@/lib/utils';
 /**
  * SEO-optimized content section below calculator
  * Includes FAQ, tax facts, and comparison tables for Answer Engine Optimization (AEO)
+ *
+ * IMPORTANT: All tax figures must match src/constants/taxRates.ts
+ * When updating, verify against:
+ * - TAX_RATES['2025-2026'].nationalInsurance.employee.A.primary.rate (8%)
+ * - TAX_RATES['2025-2026'].studentLoan thresholds
+ * - SCOTTISH_TAX_RATES['2025-2026'].bands (6 bands, top rate 48%)
  */
 export function CalculatorContent() {
   return (
@@ -48,6 +54,7 @@ export function CalculatorContent() {
           </div>
 
           <div className={SPACING.SPACE_Y_4}>
+            {/* £30k example - calculated using 2025-26 rates from taxRates.ts */}
             <FAQItem question='How much tax do I pay on £30,000 in UK 2025?'>
               <p>
                 <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for 2025-26:
@@ -57,16 +64,16 @@ export function CalculatorContent() {
                   <strong>Income Tax</strong>: £3,486 (20% on £17,430 taxable income)
                 </li>
                 <li>
-                  <strong>National Insurance</strong>: £2,620 (12% on £17,430)
+                  <strong>National Insurance</strong>: £1,394 (8% on earnings above £12,570)
                 </li>
                 <li>
-                  <strong>Total Deductions</strong>: £6,106
+                  <strong>Total Deductions</strong>: £4,880
                 </li>
                 <li>
-                  <strong>Take-Home Pay</strong>: £23,894/year or £1,991/month
+                  <strong>Take-Home Pay</strong>: £25,120/year or £2,093/month
                 </li>
               </ul>
-              <a href='#calculator' className='inline-block text-primary'>
+              <a href='#tax-calculator' className='inline-block text-primary'>
                 Calculate your exact salary →
               </a>
             </FAQItem>
@@ -93,6 +100,7 @@ export function CalculatorContent() {
               </ul>
             </FAQItem>
 
+            {/* NI rate updated to 8% for 2025-26 */}
             <FAQItem question='How is PAYE tax calculated in the UK?'>
               <p>
                 PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
@@ -107,7 +115,7 @@ export function CalculatorContent() {
                   rate (£50,271-£125,140), 45% additional rate (£125,140+)
                 </li>
                 <li>
-                  <strong>Add National Insurance</strong>: 12% on £12,571-£50,270, then 2% above
+                  <strong>Add National Insurance</strong>: 8% on £12,571-£50,270, then 2% above
                 </li>
                 <li>
                   <strong>Deduct pension contributions</strong> (if applicable)
@@ -119,6 +127,7 @@ export function CalculatorContent() {
               <p>Your employer reports this to HMRC through Real Time Information (RTI).</p>
             </FAQItem>
 
+            {/* Scotland: 6 bands for 2025-26 (19%, 20%, 21%, 42%, 45%, 48%) */}
             <FAQItem question="What's the difference between Scottish and English tax rates?">
               <p>
                 Scotland has different income tax bands but the same National Insurance and personal
@@ -127,7 +136,7 @@ export function CalculatorContent() {
               <p className='font-medium'>Key differences for 2025-26:</p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
-                  <strong>Scotland</strong> has 5 tax bands (19%, 20%, 21%, 42%, 47%)
+                  <strong>Scotland</strong> has 6 tax bands (19%, 20%, 21%, 42%, 45%, 48%)
                 </li>
                 <li>
                   <strong>England/Wales/NI</strong> has 3 tax bands (20%, 40%, 45%)
@@ -143,6 +152,7 @@ export function CalculatorContent() {
               </Link>
             </FAQItem>
 
+            {/* Student loan thresholds updated to 2025-26 from taxRates.ts */}
             <FAQItem question='How do student loan repayments work with PAYE?'>
               <p>
                 Student loan repayments are deducted automatically through PAYE if you earn above
@@ -150,13 +160,13 @@ export function CalculatorContent() {
               </p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
-                  <strong>Plan 1</strong>: 9% on earnings above £24,990
+                  <strong>Plan 1</strong>: 9% on earnings above £26,065
                 </li>
                 <li>
-                  <strong>Plan 2</strong>: 9% on earnings above £27,295
+                  <strong>Plan 2</strong>: 9% on earnings above £28,470
                 </li>
                 <li>
-                  <strong>Plan 4</strong> (Scotland): 9% on earnings above £31,395
+                  <strong>Plan 4</strong> (Scotland): 9% on earnings above £32,745
                 </li>
                 <li>
                   <strong>Plan 5</strong>: 9% on earnings above £25,000
@@ -165,7 +175,10 @@ export function CalculatorContent() {
                   <strong>Postgraduate</strong>: 6% on earnings above £21,000
                 </li>
               </ul>
-              <p>You can have multiple plans and repay to each simultaneously.</p>
+              <p>
+                If you have both an undergraduate and postgraduate loan, you repay 9% above your
+                undergraduate threshold plus 6% above the postgraduate threshold.
+              </p>
               <Link
                 href='/blog/student-loan-repayment-changes-2025-26'
                 className='inline-block text-primary'
@@ -176,19 +189,25 @@ export function CalculatorContent() {
 
             <FAQItem question='How does pension tax relief work?'>
               <p>
-                Pension contributions are deducted <strong>before</strong> tax is calculated,
-                reducing your taxable income. This means you get tax relief automatically.
+                Pension tax relief depends on how your pension is set up. With{' '}
+                <strong>salary sacrifice</strong> or <strong>net pay arrangements</strong>,
+                contributions are deducted before tax. With <strong>relief at source</strong>, your
+                provider reclaims 20% basic rate automatically (higher rate relief claimed via Self
+                Assessment).
               </p>
-              <p className='font-medium'>Example on £50,000 salary with 5% pension:</p>
+              <p className='font-medium'>
+                Example on £50,000 salary with 5% pension (salary sacrifice):
+              </p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>Pension contribution: £2,500 (5% of £50,000)</li>
-                <li>Taxable income: £37,500 (£50,000 - £12,570 allowance)</li>
-                <li>Tax saved: £500 (20% of £2,500)</li>
+                <li>Taxable income: £34,930 (£50,000 - £2,500 pension - £12,570 allowance)</li>
+                <li>Tax saved: £500 (20% of £2,500 at basic rate)</li>
                 <li>Net cost of pension: £2,000 (£2,500 - £500 tax relief)</li>
               </ul>
               <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
             </FAQItem>
 
+            {/* Blind Person's Allowance updated to £3,130 for 2025-26 */}
             <FAQItem question='What tax reliefs are available to reduce my tax bill?'>
               <p>
                 The UK offers several tax reliefs that can reduce your tax bill. Here are the main
@@ -207,7 +226,7 @@ export function CalculatorContent() {
                   contributions
                 </li>
                 <li>
-                  <strong>Blind Person&apos;s Allowance</strong>: Extra £3,070 tax-free income
+                  <strong>Blind Person&apos;s Allowance</strong>: Extra £3,130 tax-free income
                 </li>
                 <li>
                   <strong>Gift Aid</strong>: Tax relief on charitable donations

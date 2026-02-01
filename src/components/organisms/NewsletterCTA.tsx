@@ -12,8 +12,10 @@
 
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import type { FormEvent } from 'react';
 import { useCallback, useId, useState } from 'react';
 
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface NewsletterCTAProps {
@@ -32,17 +34,15 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       // Bot check - honeypot should be empty
-      if (honeypot) {
-        // Silently ignore bot submissions
-        setStatus('success');
-        return;
-      }
+      // Silently no-op to avoid polluting conversion metrics
+      if (honeypot) return;
 
-      if (!email) return;
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) return;
 
       setStatus('loading');
       setErrorMessage('');
@@ -51,12 +51,20 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
         const response = await fetch('/api/newsletter/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email: trimmedEmail }),
         });
 
         if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'Failed to subscribe');
+          // Safely parse error - API may return non-JSON (edge errors, HTML, etc.)
+          const text = await response.text();
+          let message = 'Failed to subscribe';
+          try {
+            const data = JSON.parse(text) as { error?: string };
+            message = data.error ?? message;
+          } catch {
+            // Non-JSON response; keep default message
+          }
+          throw new Error(message);
         }
 
         setStatus('success');
@@ -95,13 +103,18 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
           HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.
         </p>
 
-        {status === 'success' ? (
-          <div className='rounded-lg bg-white/20 p-4 backdrop-blur-sm'>
-            <p className='font-medium text-white'>
-              Thanks! Check your inbox to confirm your subscription.
-            </p>
-          </div>
-        ) : (
+        {/* Status region for SR announcements */}
+        <div aria-live='polite' aria-atomic='true'>
+          {status === 'success' && (
+            <div className={cn('rounded-lg bg-white/20 backdrop-blur-sm', SPACING.P_4)}>
+              <p className='font-medium text-white'>
+                Thanks! Check your inbox to confirm your subscription.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {status !== 'success' && (
           <form onSubmit={handleSubmit} className='mx-auto max-w-md'>
             <div className='flex flex-col gap-3 sm:flex-row'>
               <label htmlFor={emailId} className='sr-only'>
@@ -116,12 +129,15 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                 placeholder='Enter your email'
                 required
                 disabled={status === 'loading'}
+                autoComplete='email'
+                inputMode='email'
                 className={cn(
                   'flex-1 rounded-lg border-0 bg-white/20 px-4 py-3',
                   'text-white placeholder:text-white/60',
                   'focus:outline-none focus:ring-2 focus:ring-white/50',
                   'disabled:opacity-50',
                 )}
+                aria-invalid={status === 'error'}
                 aria-describedby={status === 'error' ? errorId : undefined}
               />
 
@@ -148,8 +164,8 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                 )}
               >
                 {status === 'loading' ? (
-                  <span className='flex items-center gap-2'>
-                    <Loader2 className='h-4 w-4 animate-spin' />
+                  <span className={cn('flex items-center', SPACING.GAP_2)}>
+                    <Loader2 className={cn(ICON_SIZES.SIZE_4, 'animate-spin')} />
                     Subscribing...
                   </span>
                 ) : (
@@ -159,12 +175,16 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
             </div>
 
             {status === 'error' && (
-              <p id={errorId} className='mt-3 text-sm text-white/90' role='alert'>
+              <p
+                id={errorId}
+                className={cn(SPACING.MT_3, TYPOGRAPHY.TEXT_SM, 'text-white/90')}
+                role='alert'
+              >
                 {errorMessage}
               </p>
             )}
 
-            <p className='mt-4 text-white/70 text-xs'>
+            <p className={cn(SPACING.MT_4, TYPOGRAPHY.TEXT_XS, 'text-white/70')}>
               We respect your privacy.{' '}
               <Link href='/privacy' className='underline hover:text-white'>
                 Privacy Policy

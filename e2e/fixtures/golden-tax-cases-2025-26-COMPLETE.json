@@ -1,11 +1,22 @@
 {
   "version": "2025-2026",
   "generatedAt": "2025-11-19T16:43:03.406Z",
-  "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
+  "description": "Golden master test cases for E2E regression testing. Expected values sourced from official HMRC testing spreadsheet.",
+  "source": {
+    "origin": "HMRC Testing Spreadsheet 2025-26",
+    "note": "DO NOT MODIFY expected values - these are the HMRC source of truth"
+  },
   "metadata": {
     "personalAllowance": 12570,
     "niPrimaryThreshold": 12570,
-    "niPrimaryRate": 8
+    "niPrimaryRate": 8,
+    "tolerances": {
+      "incomeTax": "10p (1 decimal place)",
+      "employeeNI": "10p (1 decimal place)",
+      "netPay": "10p (1 decimal place)",
+      "studentLoan": "1p (2 decimal places)",
+      "pension": "1p (2 decimal places)"
+    }
   },
   "cases": [
     {

@@ -1,95 +1,94 @@
 # GitLab CI/CD Pipeline for PayeTax - OPTIMIZED for Free Tier
-# Target: < 100 minutes/month (75% reduction from 400 minute limit)
+# Target: < 100 minutes/month (staying well under 400 minute limit)
 #
-# Strategy: Skip CI on main (Vercel handles everything), validate MRs only
+# Strategy: Run validation on MRs only, Vercel handles main branch
 
 stages:
   - validate
 
-# Shared cache configuration
+# Prevent pipelines for pushes/tags; run ONLY for merge requests
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - when: never
+
+variables:
+  # Bun cache directory
+  BUN_INSTALL_CACHE_DIR: "$CI_PROJECT_DIR/.bun-cache"
+
+# Cache bun dependencies - shared across all branches until bun.lock changes
 cache:
-  key: "${CI_COMMIT_REF_SLUG}"
+  key:
+    files:
+      - bun.lock
   paths:
-    - .npm/
+    - .bun-cache/
+    - node_modules/
+  policy: pull-push
 
 # ──────────────────────────────────────────────────────────
 # OPTIMIZATION STRATEGY:
 # ──────────────────────────────────────────────────────────
 # 1. NO CI ON MAIN - Vercel handles all validation on push
-# 2. Lightweight MR validation only (no tests, Vercel runs those)
-# 3. Skip dependency installation when cache is warm
-# 4. Skip security scans (GitHub Dependabot handles this)
-# 5. Run only critical checks: typecheck + lint
+# 2. Lightweight MR validation only (typecheck + lint)
+# 3. Bun for fast dependency installation
+# 4. Cache shared across branches (keyed to bun.lock)
+# 5. Interruptible - stops old jobs when new commits push
 # ──────────────────────────────────────────────────────────
 
-# Single job: Fast validation for merge requests only
 mr_validation:
   stage: validate
-  image: node:20-alpine
+  # Keep CI Bun version aligned with package.json "packageManager" (bun@1.3.x).
+  image: oven/bun:1.3-debian
+  interruptible: true
   script:
-    - echo "⚡ Quick MR validation (no CI on main - Vercel handles it)"
-    # Use cache if available, otherwise install (faster with warm cache)
-    - npm ci --cache .npm --prefer-offline --quiet
-    # Critical checks only
-    - npm run typecheck           # TypeScript (~30-60 sec)
-    - npx biome check .           # Linting (~20-30 sec)
-    - echo "✅ Validation passed! Vercel will handle build + tests on merge."
-  cache:
-    paths:
-      - .npm/
-  only:
-    - merge_requests  # ONLY on MRs, NEVER on main
+    - echo "⚡ Quick MR validation (typecheck + lint)"
+    - bun --version
+    # Install dependencies (fast with warm cache)
+    - bun install --frozen-lockfile
+    # Critical checks only - use package.json scripts
+    - bun run typecheck
+    - bun run lint
+    - echo "✅ Validation passed! Vercel handles build + deploy."
   timeout: 5 minutes
-
-# ──────────────────────────────────────────────────────────
-# WHY THIS WORKS:
-# ──────────────────────────────────────────────────────────
-# ✅ Vercel validates EVERYTHING on push to main:
-#    - Build succeeds/fails
-#    - Tests run (npm run build includes validation)
-#    - Deployment succeeds/fails
-#    - All automatic, zero GitLab minutes used
-#
-# ✅ GitHub Dependabot (free, external):
-#    - Security vulnerability scanning
-#    - Dependency updates
-#    - Zero GitLab minutes used
-#
-# ✅ This pipeline ONLY validates MR syntax:
-#    - TypeScript compiles
-#    - Linting passes
-#    - Fast feedback for contributors
-#    - ~1.5 min per MR
-# ──────────────────────────────────────────────────────────
-
-# ⏱️  NEW ESTIMATED MONTHLY USAGE (FREE TIER: 400 MIN)
-# ──────────────────────────────────────────────────────────
-# Main pushes (252x/month):
-#   - ZERO minutes (no CI on main!)
-# 
-# Merge requests (25x/month):
-#   - Quick validation: ~1.5 min × 25 = 37.5 min
-#
-# Total: ~38 minutes/month ✅ (90% reduction!)
-# Buffer: 362 minutes remaining
-# ──────────────────────────────────────────────────────────
+  rules:
+    # Skip for docs-only changes
+    - changes:
+        - "**/*.md"
+        - "content/**/*.mdx"
+        - "docs/**"
+        - ".github/**"
+      when: never
+    - when: on_success
 
 # ──────────────────────────────────────────────────────────
 # WHAT RUNS WHERE:
 # ──────────────────────────────────────────────────────────
-# 
+#
 # LOCAL (Manual):
-# - bun run fix-all (lint, format, typecheck)
-# - bun run test:no-coverage (quick tests)
+#   bun run fix-all       - lint, format, typecheck
+#   bun run test          - unit tests with coverage
+#   bun run test:e2e      - Playwright E2E tests
 #
-# GITLAB CI (This File):
-# ✅ MRs only: Typecheck + lint (contributor validation)
+# GITLAB CI (This File - MRs only):
+#   ✅ Typecheck (tsc --noEmit)
+#   ✅ Lint (biome check .)
+#   ⏱️  ~1-2 min per MR
 #
-# VERCEL (Automatic):
-# ✅ Every push: Build + tests + deploy
-# ✅ Main branch: Production deployment
-# ✅ MRs: Preview deployments
+# VERCEL (Automatic - every push):
+#   ✅ Build validation (next build)
+#   ✅ Preview deployments (MRs)
+#   ✅ Production deployment (main)
 #
 # GITHUB (External, Free):
-# ✅ Dependabot: Security scanning + updates
+#   ✅ Dependabot: Security scanning + dependency updates
+#
+# ──────────────────────────────────────────────────────────
+
+# ⏱️  ESTIMATED MONTHLY USAGE (FREE TIER: 400 MIN)
+# ──────────────────────────────────────────────────────────
+# Main pushes: ZERO minutes (no CI, workflow rules block it)
+# Merge requests (~25/month): ~1.5 min × 25 = ~38 minutes
+# Buffer: 360+ minutes remaining
 # ──────────────────────────────────────────────────────────

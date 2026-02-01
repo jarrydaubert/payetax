@@ -14,9 +14,17 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
+// Max payload size (1MB - webhooks shouldn't be larger)
+const MAX_PAYLOAD_SIZE = 1024 * 1024;
+
 const LINEAR_API_KEY = process.env.LINEAR_API_KEY;
 const SENTRY_WEBHOOK_SECRET = process.env.SENTRY_WEBHOOK_SECRET;
 const LINEAR_TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYTAX';
+
+// Cache team ID to avoid lookup on every request
+let cachedTeamId: string | null = null;
 
 interface SentryWebhookPayload {
   action: string;
@@ -68,31 +76,52 @@ interface SentryWebhookPayload {
 
 /**
  * Verify Sentry webhook signature using HMAC-SHA256 with timing-safe comparison
+ * Uses raw bytes to ensure exact payload match
  */
-function verifySignature(rawBody: string, signature: string, secret: string): boolean {
-  const hmac = createHmac('sha256', secret);
-  hmac.update(rawBody, 'utf8');
-  const digest = hmac.digest('hex');
+function verifySignature(bodyBuffer: Buffer, signature: string, secret: string): boolean {
+  const digest = createHmac('sha256', secret).update(bodyBuffer).digest('hex');
+  const normalizedSig = signature.trim().toLowerCase();
 
   // Use timing-safe comparison to prevent timing attacks
-  if (digest.length !== signature.length) return false;
-  return timingSafeEqual(Buffer.from(digest, 'utf8'), Buffer.from(signature, 'utf8'));
+  if (digest.length !== normalizedSig.length) return false;
+  return timingSafeEqual(Buffer.from(digest, 'utf8'), Buffer.from(normalizedSig, 'utf8'));
+}
+
+/** Get team ID with caching */
+async function getTeamId(linear: LinearClient): Promise<string> {
+  if (cachedTeamId) return cachedTeamId;
+
+  const teams = await linear.teams();
+  const team = teams.nodes.find((t) => t.key === LINEAR_TEAM_KEY);
+  if (!team) throw new Error(`Team ${LINEAR_TEAM_KEY} not found`);
+
+  cachedTeamId = team.id;
+  return cachedTeamId;
 }
 
 export async function POST(request: NextRequest) {
-  // Require webhook secret to be configured (security: prevent unauthorized requests)
+  // Require webhook secret to be configured
   if (!SENTRY_WEBHOOK_SECRET) {
-    console.error('SENTRY_WEBHOOK_SECRET not configured');
+    console.error('[sentry-webhook] SENTRY_WEBHOOK_SECRET not configured');
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
   }
 
-  // Get raw body for signature verification
-  const rawBody = await request.text();
+  // Check payload size before reading
+  const contentLength = request.headers.get('content-length');
+  if (contentLength && Number.parseInt(contentLength, 10) > MAX_PAYLOAD_SIZE) {
+    return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+  }
+
+  // Get raw body as bytes for signature verification
+  const bodyBuffer = Buffer.from(await request.arrayBuffer());
+  if (bodyBuffer.length > MAX_PAYLOAD_SIZE) {
+    return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+  }
 
   // Verify webhook signature (mandatory)
   const sentrySignature = request.headers.get('sentry-hook-signature');
-  if (!(sentrySignature && verifySignature(rawBody, sentrySignature, SENTRY_WEBHOOK_SECRET))) {
-    console.error('Invalid Sentry webhook signature');
+  if (!(sentrySignature && verifySignature(bodyBuffer, sentrySignature, SENTRY_WEBHOOK_SECRET))) {
+    console.error('[sentry-webhook] Invalid signature');
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
@@ -103,48 +132,44 @@ export async function POST(request: NextRequest) {
   }
 
   if (!LINEAR_API_KEY) {
-    console.error('LINEAR_API_KEY not configured');
+    console.error('[sentry-webhook] LINEAR_API_KEY not configured');
     return NextResponse.json({ error: 'Linear not configured' }, { status: 500 });
   }
 
+  // Parse JSON with explicit error handling
+  let payload: SentryWebhookPayload;
   try {
-    const payload: SentryWebhookPayload = JSON.parse(rawBody);
+    payload = JSON.parse(bodyBuffer.toString('utf8'));
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
 
-    // Only create issues for new errors (not resolved, ignored, etc.)
-    if (payload.action !== 'created' && payload.action !== 'triggered') {
-      return NextResponse.json({ status: 'ignored', reason: `Action: ${payload.action}` });
-    }
+  // Only create issues for NEW errors (not triggered/resolved/etc.)
+  // Note: 'triggered' happens on regressions/alerts and would create duplicates
+  if (payload.action !== 'created') {
+    return NextResponse.json({ status: 'ignored', reason: `Action: ${payload.action}` });
+  }
 
-    const { issue, event } = payload.data;
+  const { issue, event } = payload.data;
 
-    if (!issue) {
-      return NextResponse.json({ status: 'ignored', reason: 'No issue data' });
-    }
+  if (!issue) {
+    return NextResponse.json({ status: 'ignored', reason: 'No issue data' });
+  }
 
-    // Build issue title
+  try {
+    const linear = new LinearClient({ apiKey: LINEAR_API_KEY });
+    const teamId = await getTeamId(linear);
+
+    // Build issue with Sentry ID in description for potential future deduplication
     const title = `🐛 Sentry: ${issue.title.slice(0, 100)}`;
-
-    // Build issue description with all relevant details
     const description = buildDescription(issue, event);
 
-    // Create Linear issue
-    const linear = new LinearClient({ apiKey: LINEAR_API_KEY });
-
-    // Get team ID
-    const teams = await linear.teams();
-    const team = teams.nodes.find((t) => t.key === LINEAR_TEAM_KEY);
-
-    if (!team) {
-      console.error(`Team ${LINEAR_TEAM_KEY} not found`);
-      return NextResponse.json({ error: 'Team not found' }, { status: 500 });
-    }
-
     const createdIssue = await linear.createIssue({
-      teamId: team.id,
+      teamId,
       title,
       description,
       priority: getPriority(issue.level, Number.parseInt(issue.count, 10)),
-      labelIds: [], // Could add 'bug' label if configured
+      labelIds: [],
     });
 
     if (!createdIssue.success) {
@@ -153,13 +178,18 @@ export async function POST(request: NextRequest) {
 
     const linearIssue = await createdIssue.issue;
 
+    // biome-ignore lint/suspicious/noConsole: Webhook logging for observability
+    console.info(
+      `[sentry-webhook] Created Linear issue ${linearIssue?.identifier} for Sentry ${issue.shortId}`,
+    );
+
     return NextResponse.json({
       status: 'created',
       linearIssue: linearIssue?.identifier,
       sentryIssue: issue.shortId,
     });
   } catch (error) {
-    console.error('Sentry webhook error:', error);
+    console.error('[sentry-webhook] Error:', error, { sentryIssue: issue.shortId });
     return NextResponse.json({ error: 'Failed to process webhook' }, { status: 500 });
   }
 }

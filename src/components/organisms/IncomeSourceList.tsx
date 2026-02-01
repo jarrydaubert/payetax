@@ -4,16 +4,20 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Badge } from '@/components/atoms/ui/badge';
+import { Button } from '@/components/atoms/ui/button';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/atoms/ui/collapsible';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/atoms/ui/select';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
@@ -25,6 +29,31 @@ import {
   useCalculatorActions,
   useCalculatorStore,
 } from '@/store/calculatorStore';
+
+// Type-safe income types derived from INCOME_TYPE_LABELS
+const INCOME_TYPES = Object.keys(INCOME_TYPE_LABELS) as IncomeSource['type'][];
+
+/** Runtime type guard for income type values from Select */
+function isIncomeType(value: string): value is IncomeSource['type'] {
+  return (INCOME_TYPES as string[]).includes(value);
+}
+
+// Pay period options - defined outside component for stability
+const PAY_PERIOD_OPTIONS = [
+  { value: PERIODS.ANNUALLY, label: 'Annually' },
+  { value: PERIODS.MONTHLY, label: 'Monthly' },
+  { value: PERIODS.FOUR_WEEKLY, label: '4-Weekly' },
+  { value: PERIODS.FORTNIGHTLY, label: 'Fortnightly' },
+  { value: PERIODS.WEEKLY, label: 'Weekly' },
+] as const;
+
+// Valid period values for runtime validation
+const VALID_PERIODS = new Set(Object.values(PERIODS));
+
+/** Runtime type guard for pay period values from Select */
+function isValidPeriod(value: string): value is IncomeSource['period'] {
+  return VALID_PERIODS.has(value as IncomeSource['period']);
+}
 
 export function IncomeSourceList() {
   const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
@@ -39,20 +68,12 @@ export function IncomeSourceList() {
     }
   }, [incomeSources.length]);
 
-  const payPeriodOptions = [
-    { value: PERIODS.ANNUALLY, label: 'Annually' },
-    { value: PERIODS.MONTHLY, label: 'Monthly' },
-    { value: PERIODS.FOUR_WEEKLY, label: '4-Weekly' },
-    { value: PERIODS.FORTNIGHTLY, label: 'Fortnightly' },
-    { value: PERIODS.WEEKLY, label: 'Weekly' },
-  ];
-
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className='flex items-center justify-between'>
         <CollapsibleTrigger
           className={cn(
-            'group flex items-center font-medium transition-colors hover:text-primary',
+            'group flex items-center rounded-md font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             SPACING.GAP_2,
             TYPOGRAPHY.TEXT_SM,
           )}
@@ -84,9 +105,10 @@ export function IncomeSourceList() {
             <motion.div
               key={source.id}
               layout={!shouldReduceMotion}
-              initial={shouldReduceMotion ? {} : { opacity: 0, height: 0, scale: 0.8 }}
-              animate={shouldReduceMotion ? {} : { opacity: 1, height: 'auto', scale: 1 }}
-              exit={shouldReduceMotion ? {} : { opacity: 0, height: 0, scale: 0.8 }}
+              // Simplified animation: opacity + scale only (no height for performance)
+              initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+              animate={shouldReduceMotion ? {} : { opacity: 1, scale: 1 }}
+              exit={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
               transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
               className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
             >
@@ -101,13 +123,14 @@ export function IncomeSourceList() {
                   {index + 1}
                 </Badge>
 
-                {/* Income Type */}
+                {/* Income Type - with runtime type guard */}
                 <div className='min-w-0 flex-1'>
                   <Select
                     value={source.type}
-                    onValueChange={(type: IncomeSource['type']) =>
-                      updateIncomeSource(source.id, { type })
-                    }
+                    onValueChange={(value) => {
+                      if (!isIncomeType(value)) return;
+                      updateIncomeSource(source.id, { type: value });
+                    }}
                   >
                     <SelectTrigger
                       className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
@@ -129,9 +152,9 @@ export function IncomeSourceList() {
                 <Button
                   variant='ghost'
                   size='icon'
-                  className='h-9 w-9 shrink-0'
+                  className='h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive'
                   onClick={() => removeIncomeSource(source.id)}
-                  aria-label='Remove income source'
+                  aria-label={`Remove income source ${index + 1}`}
                 >
                   <Trash2 className={ICON_SIZES.SIZE_4} />
                 </Button>
@@ -143,17 +166,19 @@ export function IncomeSourceList() {
                   value={source.amount}
                   onChange={(amount) => updateIncomeSource(source.id, { amount })}
                   prefix='£'
-                  decimals={2}
-                  placeholder='0.00'
+                  decimals={0}
+                  placeholder='0'
                   min={0}
                   className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
                 />
 
+                {/* Period - with runtime type guard */}
                 <Select
                   value={source.period}
-                  onValueChange={(period) =>
-                    updateIncomeSource(source.id, { period: period as typeof source.period })
-                  }
+                  onValueChange={(value) => {
+                    if (!isValidPeriod(value)) return;
+                    updateIncomeSource(source.id, { period: value });
+                  }}
                 >
                   <SelectTrigger
                     className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
@@ -162,7 +187,7 @@ export function IncomeSourceList() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {payPeriodOptions.map((option) => (
+                    {PAY_PERIOD_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>
@@ -179,7 +204,7 @@ export function IncomeSourceList() {
           variant='outline'
           onClick={addIncomeSource}
           className='w-full'
-          disabled={incomeSources.length >= 10} // Reasonable limit
+          disabled={incomeSources.length >= 10}
         >
           <Plus className={cn('mr-2', ICON_SIZES.SIZE_4)} />
           Add Income Source

@@ -1,14 +1,106 @@
 // src/app/api/send-results/route.ts
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimit';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
-import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
+import {
+  type SendResultsRequest,
+  SendResultsRequestSchema,
+} from '@/lib/validation/emailValidation';
+
+export const runtime = 'nodejs';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const MAX_BODY_SIZE = 50 * 1024; // 50KB
 
-function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): string {
+// Type for results based on Zod schema (avoid casting)
+type EmailResults = SendResultsRequest['results'];
+
+/** Escape HTML to prevent injection */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Get client identifier - always returns a key */
+function getClientIdentifier(request: NextRequest): string {
+  // Prefer Cloudflare's header (most reliable)
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp;
+
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(',')[0];
+    if (firstIp) return firstIp.trim();
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  // Fallback: hash of user-agent
+  const ua = request.headers.get('user-agent') || 'unknown';
+  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
+
+/** Generate plain text email for deliverability */
+function generateEmailText(results: EmailResults, taxYear?: string): string {
+  const effectiveRate =
+    results.grossSalary.annually > 0
+      ? (
+          ((results.incomeTax.annually + results.nationalInsurance.annually) /
+            results.grossSalary.annually) *
+          100
+        ).toFixed(1)
+      : '0';
+
+  const year = taxYear || '2025-26';
+
+  let text = `
+YOUR UK TAX CALCULATION - PayeTax
+${year}
+${'='.repeat(40)}
+
+TAKE-HOME PAY: ${formatCurrency(results.netPay.annually)}/year
+(${effectiveRate}% effective tax rate)
+
+BREAKDOWN
+---------
+Gross Salary:       ${formatCurrency(results.grossSalary.annually)}  (${formatCurrency(results.grossSalary.monthly)}/mo)
+Income Tax:         -${formatCurrency(results.incomeTax.annually)}  (-${formatCurrency(results.incomeTax.monthly)}/mo)
+National Insurance: -${formatCurrency(results.nationalInsurance.annually)}  (-${formatCurrency(results.nationalInsurance.monthly)}/mo)`;
+
+  if (results.pensionContribution.annually > 0) {
+    text += `
+Pension:           -${formatCurrency(results.pensionContribution.annually)}  (-${formatCurrency(results.pensionContribution.monthly)}/mo)`;
+  }
+
+  if (results.studentLoan.annually > 0) {
+    text += `
+Student Loan:      -${formatCurrency(results.studentLoan.annually)}  (-${formatCurrency(results.studentLoan.monthly)}/mo)`;
+  }
+
+  text += `
+---------
+Take-Home Pay:      ${formatCurrency(results.netPay.annually)}  (${formatCurrency(results.netPay.monthly)}/mo)
+
+${'='.repeat(40)}
+This calculation uses official HMRC rates for ${year}.
+For professional tax advice, consult a qualified accountant.
+
+Calculate again: https://payetax.co.uk
+`;
+
+  return text.trim();
+}
+
+function generateEmailHtml(results: EmailResults, taxYear?: string): string {
+  // Escape taxYear for safe HTML interpolation
+  const safeTaxYear = taxYear ? escapeHtml(taxYear) : '';
   const effectiveRate =
     results.grossSalary.annually > 0
       ? (
@@ -20,7 +112,7 @@ function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): st
 
   return `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +125,7 @@ function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): st
       <h1 style="margin: 0; font-size: 24px; color: #020617;">
         <span style="color: #020617;">paye</span><span style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">tax</span>
       </h1>
-      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">UK Tax Calculator${taxYear ? ` - ${taxYear}` : ''}</p>
+      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">UK Tax Calculator${safeTaxYear ? ` - ${safeTaxYear}` : ''}</p>
     </div>
 
     <!-- Main Card -->
@@ -111,7 +203,7 @@ function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): st
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
       <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-        This calculation uses official HMRC rates${taxYear ? ` for ${taxYear}` : ''}.
+        This calculation uses official HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}.
         <br>For professional tax advice, consult a qualified accountant.
       </p>
       <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
@@ -127,42 +219,57 @@ function generateEmailHtml(results: TaxCalculationResults, taxYear?: string): st
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting: 5 emails per minute per client
+  const clientId = getClientIdentifier(request);
+  if (!checkRateLimit(clientId, { max: 5, window: 60000 })) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429 },
+    );
+  }
+
+  if (!resend) {
+    console.error('[send-results] Resend not configured');
+    return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
+  }
+
+  // Read body with size limit
+  let rawBody: string;
   try {
-    // Rate limiting: 5 emails per minute per IP
-    const ipAddress =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
+    rawBody = await request.text();
+  } catch {
+    return NextResponse.json({ error: 'Failed to read request body' }, { status: 400 });
+  }
 
-    if (!checkRateLimit(ipAddress, { max: 5, window: 60000 })) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 },
-      );
-    }
+  if (rawBody.length > MAX_BODY_SIZE) {
+    return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
+  }
 
-    if (!resend) {
-      console.error('[send-results] Resend not configured');
-      return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
-    }
+  // Parse JSON
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-    const body = await request.json();
-    const validation = SendResultsRequestSchema.safeParse(body);
+  const validation = SendResultsRequestSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: 'Invalid request', details: validation.error.flatten() },
+      { status: 400 },
+    );
+  }
 
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.flatten() },
-        { status: 400 },
-      );
-    }
+  const { email, results, taxYear } = validation.data;
 
-    const { email, results, taxYear } = validation.data;
-
+  try {
     const { error } = await resend.emails.send({
       from: 'PayeTax <noreply@payetax.co.uk>',
       to: email,
       subject: `Your UK Tax Calculation - ${formatCurrency(results.netPay.annually)} take-home`,
-      html: generateEmailHtml(results as TaxCalculationResults, taxYear),
+      html: generateEmailHtml(results, taxYear),
+      text: generateEmailText(results, taxYear),
     });
 
     if (error) {

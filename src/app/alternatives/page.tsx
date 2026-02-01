@@ -1,8 +1,5 @@
 // src/app/alternatives/page.tsx
-'use client';
-
 import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
-import type { Route } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { Button } from '@/components/atoms/ui/button';
@@ -15,6 +12,9 @@ import { COMPETITORS } from '@/data/competitors';
 import { cn } from '@/lib/utils';
 
 export default function AlternativesIndexPage() {
+  // Sort competitors alphabetically for consistent ordering
+  const sortedCompetitors = [...COMPETITORS].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
@@ -45,7 +45,9 @@ export default function AlternativesIndexPage() {
           />
           <div className={cn('grid gap-6 md:grid-cols-3', SPACING.MT_8)}>
             <Card className={cn(SPACING.P_6, 'text-center')}>
-              <div className={cn('text-4xl', SPACING.MB_4)}>📺</div>
+              <div className={cn('text-4xl', SPACING.MB_4)} aria-hidden='true'>
+                📺
+              </div>
               <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>Too Many Ads</h3>
               <p className='text-muted-foreground'>
                 Pop-ups, banners, and intrusive ads that slow everything down and distract from what
@@ -54,7 +56,9 @@ export default function AlternativesIndexPage() {
             </Card>
 
             <Card className={cn(SPACING.P_6, 'text-center')}>
-              <div className={cn('text-4xl', SPACING.MB_4)}>🐌</div>
+              <div className={cn('text-4xl', SPACING.MB_4)} aria-hidden='true'>
+                🐌
+              </div>
               <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>Slow & Clunky</h3>
               <p className='text-muted-foreground'>
                 Multiple page loads, poor mobile experience, and interfaces that feel stuck in 2010.
@@ -62,7 +66,9 @@ export default function AlternativesIndexPage() {
             </Card>
 
             <Card className={cn(SPACING.P_6, 'text-center')}>
-              <div className={cn('text-4xl', SPACING.MB_4)}>🔒</div>
+              <div className={cn('text-4xl', SPACING.MB_4)} aria-hidden='true'>
+                🔒
+              </div>
               <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>
                 Privacy Concerns
               </h3>
@@ -99,7 +105,7 @@ export default function AlternativesIndexPage() {
             align='center'
           />
           <div className={cn('grid gap-8 md:grid-cols-2 lg:grid-cols-3', SPACING.MT_8)}>
-            {COMPETITORS.map((competitor) => (
+            {sortedCompetitors.map((competitor) => (
               <CompetitorCard
                 key={competitor.slug}
                 competitor={competitor}
@@ -126,7 +132,8 @@ export default function AlternativesIndexPage() {
               Ready to Try Something Better?
             </h2>
             <p className={cn('mx-auto max-w-xl text-muted-foreground', SPACING.MB_8)}>
-              Try the modern approach: cleaner, faster, and more private tax calculations.
+              Calculations run entirely in your browser — no account needed, no data sent to
+              servers.
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>
@@ -136,7 +143,7 @@ export default function AlternativesIndexPage() {
                 </Link>
               </Button>
               <Button asChild variant='outline' size='lg'>
-                <Link href={'/best-uk-tax-calculators' as Route}>
+                <Link href='/best-uk-tax-calculators'>
                   Compare All Calculators
                   <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
                 </Link>

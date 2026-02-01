@@ -1,10 +1,10 @@
-// src/components/molecules/ArticleCard.tsx
 /**
  * Article Card Components
  *
- * Two variants for the blog redesign:
+ * Three variants for the blog redesign:
  * - ArticleCardLarge: Featured card with large image (16:10 aspect ratio)
  * - ArticleCardSmall: Compact card with square thumbnail
+ * - ArticleCardDeepDive: 3-column grid cards
  *
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
@@ -13,25 +13,93 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { BLOG_CATEGORIES, type CategoryKey } from '@/constants/blogCategories';
-import { getCategoryBlurDataUrl, getCategoryFallbackSvg } from '@/lib/blog/imageFallback';
+import { getPostBlurDataUrl, getPostImageSrc } from '@/lib/blog/imageFallback';
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/blog';
 
 interface ArticleCardProps {
   post: BlogPost;
   className?: string;
+  /** Mark as priority for LCP optimization (use sparingly - above fold only) */
+  priority?: boolean;
 }
+
+/**
+ * Type guard for CategoryKey
+ * Returns true if the value is a valid category key
+ */
+function isCategoryKey(value: unknown): value is CategoryKey {
+  return typeof value === 'string' && value in BLOG_CATEGORIES;
+}
+
+/**
+ * Normalize category to a valid CategoryKey with fallback
+ */
+function normalizeCategoryKey(category: string | undefined): CategoryKey {
+  if (isCategoryKey(category)) {
+    return category;
+  }
+  // Could log invalid categories here for monitoring
+  return 'tax-basics';
+}
+
+/**
+ * Derived UI model for article cards
+ * Extracts common logic to avoid duplication across variants
+ */
+function deriveCardModel(post: BlogPost) {
+  const categoryKey = normalizeCategoryKey(post.category);
+  const categoryConfig = BLOG_CATEGORIES[categoryKey];
+
+  return {
+    categoryKey,
+    categoryConfig,
+    imageSrc: getPostImageSrc(post.image, categoryKey),
+    blurDataUrl: getPostBlurDataUrl(post.image, categoryKey),
+    href: `/blog/${post.slug}` as const,
+    alt: post.imageAlt ?? post.title,
+    // Format date server-side to avoid hydration mismatches
+    formattedDate: formatPublishedDate(post.publishedAt),
+    formattedDateShort: formatPublishedDateShort(post.publishedAt),
+  };
+}
+
+/**
+ * Format date for display (full format: "1 Feb 2026")
+ * Uses fixed locale to avoid hydration mismatches
+ */
+function formatPublishedDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC', // Use UTC to avoid timezone shifts
+  });
+}
+
+/**
+ * Format date for compact display (short format: "1 Feb")
+ */
+function formatPublishedDateShort(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  });
+}
+
+/** Common focus styles for card links */
+const focusStyles =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-xl';
 
 /**
  * Large Article Card
  * Used as the featured card in the Latest Articles grid
  */
-export function ArticleCardLarge({ post, className }: ArticleCardProps) {
-  const categoryKey = (post.category as CategoryKey) || 'tax-basics';
-  const categoryConfig = BLOG_CATEGORIES[categoryKey] ?? BLOG_CATEGORIES['tax-basics'];
-
-  const imageSrc = post.image ?? getCategoryFallbackSvg(categoryKey);
-  const blurDataUrl = getCategoryBlurDataUrl(categoryKey);
+export function ArticleCardLarge({ post, className, priority = false }: ArticleCardProps) {
+  const { categoryConfig, imageSrc, blurDataUrl, href, alt, formattedDate } = deriveCardModel(post);
 
   return (
     <article
@@ -42,17 +110,18 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
         className,
       )}
     >
-      <Link href={`/blog/${post.slug}`} className='block'>
+      <Link href={href} className={cn('block', focusStyles)}>
         {/* Image container - 16:10 aspect ratio */}
         <div className='relative aspect-[16/10] overflow-hidden'>
           <Image
             src={imageSrc}
-            alt={post.imageAlt ?? post.title}
+            alt={alt}
             fill
             className='object-cover transition-transform duration-300 group-hover:scale-105'
             sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 60vw'
             placeholder='blur'
             blurDataURL={blurDataUrl}
+            priority={priority}
           />
 
           {/* Category badge */}
@@ -78,14 +147,8 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-3 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>|</span>
-            <time dateTime={post.publishedAt}>
-              {new Date(post.publishedAt).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </time>
+            <span aria-hidden='true'>|</span>
+            <time dateTime={post.publishedAt}>{formattedDate}</time>
           </div>
         </div>
       </Link>
@@ -98,11 +161,8 @@ export function ArticleCardLarge({ post, className }: ArticleCardProps) {
  * Used for stacked cards in the Latest Articles grid
  */
 export function ArticleCardSmall({ post, className }: ArticleCardProps) {
-  const categoryKey = (post.category as CategoryKey) || 'tax-basics';
-  const categoryConfig = BLOG_CATEGORIES[categoryKey] ?? BLOG_CATEGORIES['tax-basics'];
-
-  const imageSrc = post.image ?? getCategoryFallbackSvg(categoryKey);
-  const blurDataUrl = getCategoryBlurDataUrl(categoryKey);
+  const { categoryConfig, imageSrc, blurDataUrl, href, alt, formattedDateShort } =
+    deriveCardModel(post);
 
   return (
     <article
@@ -113,15 +173,15 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
         className,
       )}
     >
-      <Link href={`/blog/${post.slug}`} className='flex gap-4 p-3'>
+      <Link href={href} className={cn('flex gap-4 p-3', focusStyles)}>
         {/* Thumbnail - square */}
-        <div className='relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md'>
+        <div className='relative size-20 shrink-0 overflow-hidden rounded-md'>
           <Image
             src={imageSrc}
-            alt={post.imageAlt ?? post.title}
+            alt={alt}
             fill
             className='object-cover transition-transform duration-300 group-hover:scale-105'
-            sizes='(max-width: 768px) 80px, 80px'
+            sizes='80px'
             placeholder='blur'
             blurDataURL={blurDataUrl}
           />
@@ -147,13 +207,8 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>|</span>
-            <time dateTime={post.publishedAt}>
-              {new Date(post.publishedAt).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short',
-              })}
-            </time>
+            <span aria-hidden='true'>|</span>
+            <time dateTime={post.publishedAt}>{formattedDateShort}</time>
           </div>
         </div>
       </Link>
@@ -166,11 +221,8 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
  * Used in the Deep Dives section - 3 column equal grid
  */
 export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
-  const categoryKey = (post.category as CategoryKey) || 'tax-basics';
-  const categoryConfig = BLOG_CATEGORIES[categoryKey] ?? BLOG_CATEGORIES['tax-basics'];
-
-  const imageSrc = post.image ?? getCategoryFallbackSvg(categoryKey);
-  const blurDataUrl = getCategoryBlurDataUrl(categoryKey);
+  const { categoryConfig, imageSrc, blurDataUrl, href, alt, formattedDateShort } =
+    deriveCardModel(post);
 
   return (
     <article
@@ -181,12 +233,12 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
         className,
       )}
     >
-      <Link href={`/blog/${post.slug}`} className='block'>
+      <Link href={href} className={cn('block', focusStyles)}>
         {/* Image container - 16:10 aspect ratio */}
         <div className='relative aspect-[16/10] overflow-hidden'>
           <Image
             src={imageSrc}
-            alt={post.imageAlt ?? post.title}
+            alt={alt}
             fill
             className='object-cover transition-transform duration-300 group-hover:scale-105'
             sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'
@@ -217,18 +269,11 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
           {/* Meta */}
           <div className='flex items-center gap-2 text-slate-500 text-xs'>
             <span>{post.readTime}</span>
-            <span>|</span>
-            <time dateTime={post.publishedAt}>
-              {new Date(post.publishedAt).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short',
-              })}
-            </time>
+            <span aria-hidden='true'>|</span>
+            <time dateTime={post.publishedAt}>{formattedDateShort}</time>
           </div>
         </div>
       </Link>
     </article>
   );
 }
-
-export default ArticleCardLarge;

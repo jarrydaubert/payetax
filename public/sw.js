@@ -1,20 +1,20 @@
-// Enhanced Service Worker for PayeTax - UK PAYE Tax Calculator
-// Optimized for 2025 PWA best practices with advanced caching strategies
+// Service Worker for PayeTax - UK PAYE Tax Calculator
+// Optimized for 2025 PWA best practices
 
 const CACHE_NAME = 'payetax-v4.9.6';
 const STATIC_CACHE_NAME = 'payetax-static-v4.9.6';
 const API_CACHE_NAME = 'payetax-api-v4.9.6';
 
-// Helper function to log only in development
+// Max entries per cache (cheaper than size-based eviction)
+const MAX_CACHE_ENTRIES = 100;
+const MAX_STATIC_ENTRIES = 200;
+
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 const devLog = (...args) => {
-  if (isDev) {
-    console.log('[SW]', ...args);
-  }
+  if (isDev) console.log('[SW]', ...args);
 };
 
-// Assets to cache immediately on install
-// Only truly critical static assets (not frequently changing pages)
+// Assets to precache on install
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
@@ -22,24 +22,15 @@ const PRECACHE_ASSETS = [
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
-  // Note: /blog, /about, /privacy, /compliance are cached on first visit (stale-while-revalidate)
-  // This keeps precache small and fast
 ];
 
-// Assets to cache on first access
-const _CACHE_ON_NAVIGATE = [
-  /^https:\/\/payetax\.co\.uk\/.*$/,
-  /^https:\/\/fonts\.googleapis\.com\/.*$/,
-  /^https:\/\/fonts\.gstatic\.com\/.*$/,
-];
-
-// API endpoints to cache with different strategies
+// API endpoints with special caching
 const API_ENDPOINTS = ['/api/feedback'];
 
-// Network-first resources (always try network first)
-const NETWORK_FIRST = ['/api/', '/blog/category/', '/_next/static/chunks/'];
+// Network-first resources
+const NETWORK_FIRST = ['/blog/category/', '/_next/static/chunks/'];
 
-// Cache-first resources (serve from cache if available)
+// Cache-first resources (static assets)
 const CACHE_FIRST = [
   '/images/',
   '/icons/',
@@ -54,18 +45,16 @@ const CACHE_FIRST = [
 
 // Install event - precache essential assets
 self.addEventListener('install', (event) => {
-  devLog(`[SW] Installing service worker ${CACHE_NAME}`);
+  devLog(`Installing service worker ${CACHE_NAME}`);
 
   event.waitUntil(
     (async () => {
       try {
-        const cache = await caches.open(CACHE_NAME);
-        devLog('[SW] Precaching core assets');
+        const cache = await caches.open(STATIC_CACHE_NAME);
+        devLog('Precaching core assets');
         await cache.addAll(PRECACHE_ASSETS);
-        devLog('[SW] Precache complete');
-
-        // Skip waiting to activate immediately
-        await self.skipWaiting();
+        devLog('Precache complete');
+        // Note: NOT calling skipWaiting() - let user control when to activate via prompt
       } catch (error) {
         devLog('Precache failed:', error);
       }
@@ -79,7 +68,7 @@ self.addEventListener('activate', (event) => {
 
   event.waitUntil(
     (async () => {
-      // Clean up old caches (keep only current version caches)
+      // Clean up old caches
       const cacheNames = await caches.keys();
       const currentCaches = [CACHE_NAME, STATIC_CACHE_NAME, API_CACHE_NAME];
 
@@ -96,19 +85,14 @@ self.addEventListener('activate', (event) => {
 
       devLog(`Cleaned up ${oldCaches.length} old cache(s)`);
 
-      // Enable navigation preload for faster perceived load
+      // Enable navigation preload
       if (self.registration.navigationPreload) {
         await self.registration.navigationPreload.enable();
         devLog('Navigation preload enabled');
       }
 
-      // Enforce cache size limits (prevent iOS quota issues)
-      await enforceMaxCacheSize(CACHE_NAME, 50 * 1024 * 1024); // 50 MB
-      await enforceMaxCacheSize(STATIC_CACHE_NAME, 25 * 1024 * 1024); // 25 MB
-
-      // Take control of all open clients
-      await self.clients.claim();
-      devLog('Service worker activated and controlling all clients');
+      // Note: NOT calling clients.claim() - new SW waits until user accepts update
+      devLog('Service worker activated');
     })(),
   );
 });
@@ -118,13 +102,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const { url, method } = request;
 
-  // Only handle GET requests
   if (method !== 'GET') return;
-
-  // Skip non-HTTP(S) requests
   if (!url.startsWith('http')) return;
 
-  // Skip external domains that have CSP restrictions
+  // Skip analytics/tracking domains
   const skipDomains = [
     'googletagmanager.com',
     'google-analytics.com',
@@ -133,51 +114,38 @@ self.addEventListener('fetch', (event) => {
     'analytics.ahrefs.com',
   ];
 
-  if (skipDomains.some((domain) => url.includes(domain))) {
-    // Let browser handle these requests normally without SW intervention
-    return;
-  }
+  if (skipDomains.some((domain) => url.includes(domain))) return;
 
-  // For navigation requests with preload, always use navigation handler
-  // This prevents "preloadResponse cancelled" warnings
+  // Navigation with preload
   if (request.mode === 'navigate' && event.preloadResponse) {
     event.respondWith(handleNavigationWithPreload(request, event));
     return;
   }
 
-  // Determine caching strategy based on URL
-  if (shouldUseNetworkFirst(url)) {
+  // Determine strategy - check API first (before network-first which includes /api/)
+  if (isAPIEndpoint(url)) {
+    event.respondWith(apiCacheStrategy(request));
+  } else if (shouldUseNetworkFirst(url)) {
     event.respondWith(networkFirstStrategy(request));
   } else if (shouldUseCacheFirst(url)) {
     event.respondWith(cacheFirstStrategy(request));
-  } else if (isAPIEndpoint(url)) {
-    event.respondWith(apiCacheStrategy(request));
   } else {
     event.respondWith(staleWhileRevalidateStrategy(request));
   }
 });
 
-// Handle navigation requests with preload - dedicated handler to prevent cancellation warnings
+// Navigation with preload
 async function handleNavigationWithPreload(request, event) {
   try {
-    // Always await preloadResponse to prevent cancellation
     const preloadResponse = await event.preloadResponse;
 
     if (preloadResponse) {
       devLog('Using navigation preload for:', request.url);
-
-      // Clone BEFORE returning (response body can only be used once)
       const responseToCache = preloadResponse.clone();
-
-      // Cache asynchronously
-      caches.open(CACHE_NAME).then((cache) => {
-        cache.put(request, responseToCache);
-      });
-
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
       return preloadResponse;
     }
 
-    // Preload returned null, fall back to fetch
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME);
@@ -185,61 +153,43 @@ async function handleNavigationWithPreload(request, event) {
     }
     return networkResponse;
   } catch (error) {
-    devLog('Navigation preload/fetch failed, trying cache:', error);
+    devLog('Navigation failed, trying cache:', error);
     const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    // Return offline page as last resort
-    return caches.match('/');
+    return cachedResponse || caches.match('/');
   }
 }
 
-// Network-first strategy (for dynamic content)
+// Network-first strategy
 async function networkFirstStrategy(request) {
   try {
     const networkResponse = await fetch(request);
-
-    // Cache successful responses
     if (networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, networkResponse.clone());
+      enforceMaxEntries(CACHE_NAME, MAX_CACHE_ENTRIES);
     }
-
     return networkResponse;
   } catch (error) {
     devLog('Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
-
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-
-    // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
-      return caches.match('/');
-    }
-
+    if (cachedResponse) return cachedResponse;
+    if (request.mode === 'navigate') return caches.match('/');
     throw error;
   }
 }
 
-// Cache-first strategy (for static assets)
+// Cache-first strategy
 async function cacheFirstStrategy(request) {
   const cachedResponse = await caches.match(request);
-
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+  if (cachedResponse) return cachedResponse;
 
   try {
     const networkResponse = await fetch(request);
-
     if (networkResponse.ok) {
       const cache = await caches.open(STATIC_CACHE_NAME);
       cache.put(request, networkResponse.clone());
+      enforceMaxEntries(STATIC_CACHE_NAME, MAX_STATIC_ENTRIES);
     }
-
     return networkResponse;
   } catch (error) {
     devLog('Cache-first failed:', error);
@@ -247,7 +197,7 @@ async function cacheFirstStrategy(request) {
   }
 }
 
-// Stale-while-revalidate strategy (for general content)
+// Stale-while-revalidate strategy
 async function staleWhileRevalidateStrategy(request) {
   const cache = await caches.open(CACHE_NAME);
   const cachedResponse = await cache.match(request);
@@ -256,130 +206,78 @@ async function staleWhileRevalidateStrategy(request) {
     .then((networkResponse) => {
       if (networkResponse.ok) {
         cache.put(request, networkResponse.clone());
+        enforceMaxEntries(CACHE_NAME, MAX_CACHE_ENTRIES);
       }
       return networkResponse;
     })
-    .catch((error) => {
-      devLog('[SW] Network request failed:', error);
-      return cachedResponse;
-    });
+    .catch(() => cachedResponse);
 
-  // Return cached response immediately, network response when available
   return cachedResponse || fetchPromise;
 }
 
-// API-specific caching strategy
+// API caching strategy
 async function apiCacheStrategy(request) {
   try {
     const networkResponse = await fetch(request);
-
     if (networkResponse.ok) {
       const cache = await caches.open(API_CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }
-
     return networkResponse;
   } catch (error) {
-    // For API requests, try cache as fallback
     const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
+    if (cachedResponse) return cachedResponse;
     throw error;
   }
 }
 
-// Cache size management - prevent quota issues on iOS
-async function enforceMaxCacheSize(cacheName, maxSize) {
+// Enforce max entries (cheap eviction - no blob reading)
+async function enforceMaxEntries(cacheName, maxEntries) {
   try {
     const cache = await caches.open(cacheName);
     const keys = await cache.keys();
 
-    let totalSize = 0;
-    const entries = [];
-
-    // Calculate total size and collect entries with timestamps
-    for (const request of keys) {
-      const response = await cache.match(request);
-      if (response) {
-        const blob = await response.blob();
-        const size = blob.size;
-        totalSize += size;
-
-        // Get last-modified or use current time
-        const lastModified = response.headers.get('last-modified')
-          ? new Date(response.headers.get('last-modified')).getTime()
-          : Date.now();
-
-        entries.push({ request, size, lastModified });
-      }
-    }
-
-    // If over limit, delete oldest entries
-    if (totalSize > maxSize) {
-      // Sort by oldest first
-      entries.sort((a, b) => a.lastModified - b.lastModified);
-
-      let deletedSize = 0;
-      for (const entry of entries) {
-        if (totalSize - deletedSize <= maxSize) break;
-
-        await cache.delete(entry.request);
-        deletedSize += entry.size;
-        devLog(`Deleted ${entry.request.url} (${(entry.size / 1024).toFixed(1)} KB)`);
-      }
-
-      devLog(
-        `Cache cleanup: removed ${(deletedSize / 1024 / 1024).toFixed(1)} MB from ${cacheName}`,
-      );
+    if (keys.length > maxEntries) {
+      // Delete oldest entries (first in cache)
+      const toDelete = keys.slice(0, keys.length - maxEntries);
+      await Promise.all(toDelete.map((key) => cache.delete(key)));
+      devLog(`Evicted ${toDelete.length} entries from ${cacheName}`);
     }
   } catch (error) {
-    devLog('Cache size enforcement failed:', error);
+    devLog('Cache eviction failed:', error);
   }
 }
 
-// Helper functions to determine caching strategy
+// Helper functions
 function shouldUseNetworkFirst(url) {
-  return NETWORK_FIRST.some((pattern) => {
-    if (typeof pattern === 'string') {
-      return url.includes(pattern);
-    }
-    return pattern.test(url);
-  });
+  return NETWORK_FIRST.some((pattern) =>
+    typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url),
+  );
 }
 
 function shouldUseCacheFirst(url) {
-  return CACHE_FIRST.some((pattern) => {
-    if (typeof pattern === 'string') {
-      return url.includes(pattern);
-    }
-    return pattern.test(url);
-  });
+  return CACHE_FIRST.some((pattern) =>
+    typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url),
+  );
 }
 
 function isAPIEndpoint(url) {
   return API_ENDPOINTS.some((endpoint) => url.includes(endpoint));
 }
 
-// Handle background sync for offline form submissions
+// Background sync for offline submissions
 self.addEventListener('sync', (event) => {
   if (event.tag === 'feedback-sync') {
     event.waitUntil(syncFeedback());
   }
 });
 
-// Background sync for feedback forms
 async function syncFeedback() {
-  try {
-    // Get pending feedback from IndexedDB (would need to be implemented)
-    devLog('[SW] Syncing offline feedback submissions');
-    // Implementation would go here
-  } catch (error) {
-    devLog('Background sync failed:', error);
-  }
+  devLog('Syncing offline feedback submissions');
+  // Implementation would go here
 }
 
-// Handle push notifications (for future features)
+// Push notifications
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
@@ -388,78 +286,56 @@ self.addEventListener('push', (event) => {
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
     vibrate: [200, 100, 200],
-    data: {
-      url: '/',
-    },
-    actions: [
-      {
-        action: 'open-calculator',
-        title: 'Open Calculator',
-        icon: '/favicon-32x32.png',
-      },
-    ],
+    data: { url: '/' },
   };
 
   event.waitUntil(self.registration.showNotification('PayeTax Tax Calculator', options));
 });
 
-// Handle notification clicks
+// Notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-
   const targetUrl = event.notification.data?.url || '/';
 
   event.waitUntil(
     self.clients.matchAll().then((clients) => {
-      // Check if the app is already open
       const client = clients.find((c) => c.url === targetUrl && 'focus' in c);
-
-      if (client) {
-        return client.focus();
-      }
-
-      // Open new window/tab
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(targetUrl);
-      }
+      if (client) return client.focus();
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
     }),
   );
 });
 
-// Periodic background sync (for cache updates)
+// Periodic background sync (experimental - progressive enhancement)
 self.addEventListener('periodicsync', (event) => {
   if (event.tag === 'update-cache') {
     event.waitUntil(updateCriticalAssets());
   }
 });
 
-// Update critical assets in background
 async function updateCriticalAssets() {
   try {
     const cache = await caches.open(CACHE_NAME);
-
-    // Update critical pages
     const criticalPages = ['/', '/blog'];
+
     await Promise.all(
       criticalPages.map(async (page) => {
         try {
           const response = await fetch(page);
-          if (response.ok) {
-            await cache.put(page, response);
-          }
+          if (response.ok) await cache.put(page, response);
         } catch (error) {
-          devLog('[SW] Failed to update page:', page, error);
+          devLog('Failed to update:', page);
         }
       }),
     );
 
-    devLog('[SW] Critical assets updated');
+    devLog('Critical assets updated');
   } catch (error) {
     devLog('Periodic sync failed:', error);
   }
 }
 
-// Handle messages from the main thread
+// Handle messages from main thread
 self.addEventListener('message', (event) => {
   try {
     if (event.data?.type === 'GET_VERSION') {
@@ -467,13 +343,12 @@ self.addEventListener('message', (event) => {
         event.ports[0].postMessage({ version: CACHE_NAME });
       }
     } else if (event.data?.type === 'SKIP_WAITING') {
+      // User accepted update - now skip waiting
       self.skipWaiting();
     }
   } catch (err) {
-    // Silently fail - some browsers block postMessage
-    devLog('[SW] Message handling failed:', err);
+    devLog('Message handling failed:', err);
   }
 });
 
-// Log service worker load (dev only via devLog helper)
-devLog(`[SW] Service Worker ${CACHE_NAME} loaded successfully`);
+devLog(`Service Worker ${CACHE_NAME} loaded`);

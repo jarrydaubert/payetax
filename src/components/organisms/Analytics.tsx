@@ -3,19 +3,20 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { useCallback, useEffect, useState } from 'react';
-import { safeGetItem } from '@/lib/safeStorage';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { initCoreWebVitals } from '@/lib/analytics';
+import { areCookiesAccepted } from '@/lib/cookieUtils';
+
+import type { GtagFunction } from '@/types/gtag';
 
 // GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
-
-import type { GtagFunction } from '@/types/gtag';
 
 // Track consent status in window object for persistence
 declare global {
   interface Window {
     gtag?: GtagFunction;
-    dataLayer: Record<string, unknown>[];
+    dataLayer: unknown[];
     consentMode: {
       isConsentGiven: boolean;
     };
@@ -36,15 +37,18 @@ export function Analytics() {
 
   /**
    * Update consent settings in Google Analytics
+   * Only toggles analytics_storage - ad/personalization remain denied
+   * since we only ask for analytics consent in our cookie banner
    */
   const updateConsent = useCallback((hasConsent: boolean) => {
     if (typeof window === 'undefined' || !window.gtag) return;
 
-    window.gtag?.('consent', 'update', {
+    window.gtag('consent', 'update', {
       analytics_storage: hasConsent ? 'granted' : 'denied',
-      ad_storage: hasConsent ? 'granted' : 'denied',
-      functionality_storage: hasConsent ? 'granted' : 'denied',
-      personalization_storage: hasConsent ? 'granted' : 'denied',
+      // Keep ad-related storage denied - we only have analytics consent
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
     });
 
     // Store in window for other components to access
@@ -56,11 +60,15 @@ export function Analytics() {
   /**
    * Track SEO-relevant metrics
    * - Time on page
-   * - Scroll depth
+   * - Scroll depth (fires once per 25/50/75/100 threshold)
    * - Engagement events
+   *
+   * Always returns a cleanup function for consistent effect usage
    */
-  const trackSEOMetrics = useCallback(() => {
-    if (typeof window === 'undefined' || !window.gtag) return;
+  const trackSEOMetrics = useCallback((): (() => void) => {
+    if (typeof window === 'undefined' || !window.gtag) {
+      return () => {}; // No-op cleanup
+    }
 
     // Track time on page
     const startTime = Date.now();
@@ -75,8 +83,10 @@ export function Analytics() {
       }
     };
 
-    // Track scroll depth
-    let maxScrollPercentage = 0;
+    // Track scroll depth - only fire once per threshold
+    const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
+    const sentThresholds = new Set<number>();
+
     const trackScrollDepth = () => {
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = document.documentElement.clientHeight;
@@ -86,28 +96,21 @@ export function Analytics() {
 
       const scrollPercentage = Math.floor((scrollTop / (scrollHeight - clientHeight)) * 100);
 
-      if (scrollPercentage > maxScrollPercentage) {
-        maxScrollPercentage = scrollPercentage;
-
-        // Track at 25%, 50%, 75%, and 100% scroll depths
-        if (
-          (maxScrollPercentage >= 25 && maxScrollPercentage < 50) ||
-          (maxScrollPercentage >= 50 && maxScrollPercentage < 75) ||
-          (maxScrollPercentage >= 75 && maxScrollPercentage < 100) ||
-          maxScrollPercentage === 100
-        ) {
-          const scrollLabel = `${Math.floor(maxScrollPercentage / 25) * 25}%`;
+      // Fire once per threshold crossed
+      for (const threshold of SCROLL_THRESHOLDS) {
+        if (scrollPercentage >= threshold && !sentThresholds.has(threshold)) {
+          sentThresholds.add(threshold);
           window.gtag?.('event', 'scroll_depth', {
             event_category: 'engagement',
-            event_label: scrollLabel,
-            value: maxScrollPercentage,
+            event_label: `${threshold}%`,
+            value: threshold,
           });
         }
       }
     };
 
-    // Add event listeners
-    window.addEventListener('scroll', trackScrollDepth);
+    // Add event listeners (passive scroll for performance)
+    window.addEventListener('scroll', trackScrollDepth, { passive: true });
     window.addEventListener('beforeunload', trackTimeSpent);
 
     // Clean up on page navigation
@@ -118,59 +121,58 @@ export function Analytics() {
     };
   }, [pathname]);
 
+  // Track whether we've initialized Core Web Vitals (only do once)
+  const vitalsInitialized = useRef(false);
+
   // Initialize analytics when component mounts
+  // Note: consent 'default' is already set in the inline Script (runs earlier)
+  // This effect only needs to check stored consent and update if granted
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!(isLoaded && window?.gtag)) return;
 
-    // Initialize consent mode
-    if (window?.gtag) {
-      // Default to denied consent until user accepts
-      window.gtag?.('consent', 'default', {
-        analytics_storage: 'denied',
-        ad_storage: 'denied',
-        functionality_storage: 'denied',
-        personalization_storage: 'denied',
-        security_storage: 'granted', // Always allowed for security
-      });
+    // Check if user previously gave consent (respects 12-month expiry)
+    const hasConsent = areCookiesAccepted();
 
-      // Check if user previously gave consent
-      const hasConsent = safeGetItem('cookie-consent') === 'accepted';
+    // Store in window for other components to access
+    window.consentMode = {
+      isConsentGiven: hasConsent,
+    };
 
-      // Store in window for other components to access
-      window.consentMode = {
-        isConsentGiven: hasConsent,
-      };
+    // Update consent if previously given
+    if (hasConsent) {
+      updateConsent(true);
 
-      // Update consent if previously given
-      if (hasConsent) {
-        updateConsent(true);
+      // Initialize Core Web Vitals tracking (only once per session)
+      if (!vitalsInitialized.current) {
+        vitalsInitialized.current = true;
+        initCoreWebVitals();
       }
     }
   }, [isLoaded, updateConsent]);
 
   // Track page views when pathname or search params change
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!(isLoaded && GA_MEASUREMENT_ID)) return;
 
-    // Only track page views if consent is given
-    const hasConsent = safeGetItem('cookie-consent') === 'accepted';
+    // Only track page views if consent is given (respects 12-month expiry)
+    const hasConsent = areCookiesAccepted();
     if (!(hasConsent && window.gtag)) return;
 
     // Construct full URL for tracking
     const searchParamsString = searchParams?.toString();
     const url = pathname + (searchParamsString ? `?${searchParamsString}` : '');
 
-    // Track page view
-    window.gtag?.('config', GA_MEASUREMENT_ID, {
+    // Track page view (removed cookie_flags - let GA use default first-party behavior)
+    window.gtag('config', GA_MEASUREMENT_ID, {
       page_path: url,
       send_page_view: true,
-      anonymize_ip: true, // Enhanced privacy compliance
-      cookie_flags: 'SameSite=None;Secure', // Enhanced cookie security
-      transport_type: 'beacon', // Improves tracking reliability
+      anonymize_ip: true,
+      transport_type: 'beacon',
     });
 
-    // Track additional SEO metrics
-    trackSEOMetrics();
+    // Track additional SEO metrics and return cleanup
+    const cleanup = trackSEOMetrics();
+    return cleanup;
   }, [pathname, searchParams, isLoaded, trackSEOMetrics]);
 
   // Handle storage events for consent changes from other tabs
@@ -188,7 +190,7 @@ export function Analytics() {
     };
 
     const handleConsentUpdate = () => {
-      const newConsent = safeGetItem('cookie-consent') === 'accepted';
+      const newConsent = areCookiesAccepted();
       updateConsent(newConsent);
     };
 
@@ -201,37 +203,46 @@ export function Analytics() {
     };
   }, [isLoaded, updateConsent]);
 
+  // Don't render if GA_MEASUREMENT_ID is not configured
+  if (!GA_MEASUREMENT_ID) {
+    return null;
+  }
+
   return (
     <>
-      {/* Google Analytics Script */}
+      {/* Google Analytics Script - static id prevents duplicate script injection */}
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
       <Script
+        id='ga-script'
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy='afterInteractive'
         onLoad={() => setIsLoaded(true)}
       />
 
-      {/* Google Analytics Initialization */}
-      <Script strategy='afterInteractive'>
+      {/* Google Analytics Initialization - static id prevents duplicate execution */}
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
+      <Script id='ga-init' strategy='afterInteractive'>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           
-          // Initialize with consent mode
+          // Initialize with consent mode v2 (all denied by default)
           gtag('consent', 'default', {
             'analytics_storage': 'denied',
             'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
             'functionality_storage': 'denied',
-            'security_storage': 'granted',
-            'personalization_storage': 'denied'
+            'personalization_storage': 'denied',
+            'security_storage': 'granted'
           });
           
-          // Configure GA with detailed settings
+          // Configure GA (page_view disabled - we track manually after consent check)
           gtag('config', '${GA_MEASUREMENT_ID}', {
             send_page_view: false,
             anonymize_ip: true,
             cookie_domain: 'payetax.co.uk',
-            cookie_flags: 'SameSite=None;Secure',
             transport_type: 'beacon'
           });
         `}

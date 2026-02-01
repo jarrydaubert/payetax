@@ -10,9 +10,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { compileMDX } from 'next-mdx-remote/rsc';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
+// Note: rehypeAutolinkHeadings removed - custom heading components in mdx-components.tsx
+// already render anchor links with Hash icons, so using both creates duplicates
 import remarkGfm from 'remark-gfm';
 import { mdxComponents } from '@/components/molecules/mdx-components';
 import type { BlogPostFrontmatter } from '@/types/blog';
@@ -151,17 +152,10 @@ async function compileMDXInternal(content: string) {
       mdxOptions: {
         remarkPlugins: [remarkGfm],
         rehypePlugins: [
-          rehypeSlug,
+          rehypeSlug, // Adds id attributes to headings
           [rehypePrettyCode, REHYPE_PRETTY_CODE_OPTIONS],
-          [
-            rehypeAutolinkHeadings,
-            {
-              properties: {
-                className: ['subheading-anchor'],
-                ariaLabel: 'Link to section',
-              },
-            },
-          ],
+          // Note: rehypeAutolinkHeadings intentionally omitted
+          // Custom heading components in mdx-components.tsx handle anchor links
         ],
       },
     },
@@ -252,31 +246,35 @@ export interface FAQItem {
  * Parses markdown to find FAQ headings and their answers
  *
  * Supported patterns:
- * - ### Question here? (followed by paragraph answer)
- * - **Question here?** (followed by paragraph answer)
+ * - ### or #### Question (with or without ?)
+ * - **Question** (with or without ?)
  * - FAQ sections with headers like "Frequently Asked Questions"
+ * - Optional blank line between question and answer
  */
 export function extractFAQs(content: string): FAQItem[] {
   const faqs: FAQItem[] = [];
+  const seenQuestions = new Set<string>();
 
   // Find FAQ section - look for common FAQ header patterns
   const faqSectionRegex =
-    /(?:^#{1,3}\s*(?:FAQ|Frequently Asked Questions|Common Questions)[^\n]*\n)([\s\S]*?)(?=^#{1,2}\s|$)/gim;
+    /(?:^#{1,3}\s*(?:FAQ|Frequently Asked Questions|Common Questions)[^\n]*\n)([\s\S]*?)(?=^#{1,2}\s[^#]|$)/gim;
   const faqSections = content.match(faqSectionRegex);
 
   if (faqSections) {
     for (const section of faqSections) {
-      // Pattern 1: ### Question? followed by answer paragraphs
-      const headingPattern = /^###\s*(.+\?)\s*\n\n([\s\S]*?)(?=\n###|\n---|\n##|$)/gm;
+      // Pattern 1: ### or #### Question (optional ?) followed by answer
+      // Allows optional blank line between heading and answer
+      const headingPattern =
+        /^#{3,4}\s*(.+?)\s*\n(?:\n)?([\s\S]*?)(?=\n#{3,4}\s|\n---|\n#{1,2}\s[^#]|$)/gm;
       let match = headingPattern.exec(section);
       while (match) {
         const questionMatch = match[1];
         const answerMatch = match[2];
         if (questionMatch && answerMatch) {
           const question = questionMatch.trim();
-          // Clean the answer: remove markdown formatting, limit length
           const answer = cleanMarkdownForSchema(answerMatch.trim());
-          if (question && answer) {
+          if (question && answer && !seenQuestions.has(question.toLowerCase())) {
+            seenQuestions.add(question.toLowerCase());
             faqs.push({ question, answer });
           }
         }
@@ -286,8 +284,10 @@ export function extractFAQs(content: string): FAQItem[] {
   }
 
   // Also look for bold question patterns throughout the document
-  // Pattern: **Question here?** followed by answer
-  const boldQuestionPattern = /^\*\*([^*]+\?)\*\*\s*\n\n([\s\S]*?)(?=\n\*\*[^*]+\?|\n###|\n##|$)/gm;
+  // Pattern: **Question** (optional ?) followed by answer
+  // Allows optional blank line between question and answer
+  const boldQuestionPattern =
+    /^\*\*([^*]+?)\*\*\s*\n(?:\n)?([\s\S]*?)(?=\n\*\*[^*]+\*\*|\n#{2,4}\s|$)/gm;
   let boldMatch = boldQuestionPattern.exec(content);
   while (boldMatch) {
     const questionMatch = boldMatch[1];
@@ -295,7 +295,8 @@ export function extractFAQs(content: string): FAQItem[] {
     if (questionMatch && answerMatch) {
       const question = questionMatch.trim();
       const answer = cleanMarkdownForSchema(answerMatch.trim());
-      if (question && answer && !faqs.some((f) => f.question === question)) {
+      if (question && answer && !seenQuestions.has(question.toLowerCase())) {
+        seenQuestions.add(question.toLowerCase());
         faqs.push({ question, answer });
       }
     }
@@ -305,39 +306,47 @@ export function extractFAQs(content: string): FAQItem[] {
   return faqs;
 }
 
+/** Google recommends FAQ answers under 320 characters for best display */
+const FAQ_ANSWER_MAX_LENGTH = 320;
+
 /**
  * Clean markdown content for use in schema.org structured data
  * Removes formatting while preserving readable text
  */
 function cleanMarkdownForSchema(text: string): string {
-  return (
-    text
-      // Remove code blocks
-      .replace(/```[\s\S]*?```/g, '')
-      // Remove inline code
-      .replace(/`[^`]+`/g, '')
-      // Remove bold/italic
-      .replace(/\*\*([^*]+)\*\*/g, '$1')
-      .replace(/\*([^*]+)\*/g, '$1')
-      .replace(/__([^_]+)__/g, '$1')
-      .replace(/_([^_]+)_/g, '$1')
-      // Remove links but keep text
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      // Remove images
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
-      // Remove HTML tags
-      .replace(/<[^>]+>/g, '')
-      // Remove blockquotes marker
-      .replace(/^>\s*/gm, '')
-      // Remove list markers
-      .replace(/^[-*+]\s+/gm, '')
-      .replace(/^\d+\.\s+/gm, '')
-      // Collapse multiple newlines to single space
-      .replace(/\n+/g, ' ')
-      // Collapse multiple spaces
-      .replace(/\s+/g, ' ')
-      // Limit length for schema (Google recommends under 320 chars)
-      .trim()
-      .slice(0, 500)
-  );
+  const cleaned = text
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove inline code
+    .replace(/`[^`]+`/g, '')
+    // Remove bold/italic
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    // Remove links but keep text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Remove images
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
+    // Remove HTML tags
+    .replace(/<[^>]+>/g, '')
+    // Remove blockquotes marker
+    .replace(/^>\s*/gm, '')
+    // Remove list markers
+    .replace(/^[-*+]\s+/gm, '')
+    .replace(/^\d+\.\s+/gm, '')
+    // Collapse multiple newlines to single space
+    .replace(/\n+/g, ' ')
+    // Collapse multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Limit length for schema, try to break at word boundary
+  if (cleaned.length <= FAQ_ANSWER_MAX_LENGTH) return cleaned;
+
+  const truncated = cleaned.slice(0, FAQ_ANSWER_MAX_LENGTH);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > FAQ_ANSWER_MAX_LENGTH * 0.8
+    ? `${truncated.slice(0, lastSpace)}...`
+    : `${truncated}...`;
 }

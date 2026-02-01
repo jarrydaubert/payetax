@@ -3,7 +3,7 @@
 import './globals.css';
 import * as Sentry from '@sentry/nextjs';
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function GlobalError({
   error,
@@ -12,15 +12,25 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const errorId = useId().replace(/:/g, '');
+  const [sentryEventId, setSentryEventId] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
+  const capturedRef = useRef<string | null>(null);
+
+  // Best correlation ID: digest (from Next.js) > Sentry event ID
+  const displayId = error.digest || sentryEventId || 'unknown';
 
   useEffect(() => {
-    Sentry.captureException(error, {
-      tags: { error_boundary: 'global', error_id: errorId },
-      contexts: { error_details: { digest: error.digest, error_id: errorId } },
+    // Prevent double-capture (React strict mode, re-renders, retry attempts)
+    const errorKey = `${error.digest ?? ''}:${error.message}`;
+    if (capturedRef.current === errorKey) return;
+    capturedRef.current = errorKey;
+
+    const eventId = Sentry.captureException(error, {
+      tags: { error_boundary: 'global' },
+      contexts: { error_details: { digest: error.digest } },
     });
-  }, [error, errorId]);
+    setSentryEventId(eventId);
+  }, [error]);
 
   return (
     <html lang='en'>
@@ -66,8 +76,10 @@ export default function GlobalError({
               </a>
             </div>
 
-            {/* Error reference - subtle */}
-            <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+            {/* Error reference - actionable for support */}
+            <p className='mt-8 font-mono text-white/30 text-xs'>
+              Error ID: {displayId.length > 12 ? displayId.slice(-12) : displayId}
+            </p>
 
             {/* Dev Debug - only in development */}
             {process.env.NODE_ENV === 'development' && (

@@ -8,6 +8,9 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const config = {
+  // Test isolation - clear mock state between tests to prevent pollution
+  clearMocks: true,
+
   // Performance optimizations
   maxWorkers: process.env.CI ? 2 : '50%', // Use 50% of CPU cores locally, 2 in CI
   workerIdleMemoryLimit: '512MB', // Kill workers using too much memory
@@ -15,9 +18,14 @@ const config = {
   coverageProvider: 'v8', // v8 is faster than babel
   coverageDirectory: '<rootDir>/audit-outputs/coverage',
   testEnvironment: 'jsdom',
+  // Fix for modern ESM libraries (MSW, fetch polyfills) that use package.json "exports" field.
+  // Without this, Jest/JSDOM forces "browser" export which may lack Node polyfills needed in tests.
+  // See: https://mswjs.io/docs/migrations/1.x-to-2.x
   testEnvironmentOptions: {
     customExportConditions: [''],
   },
+  // Setup files - fetch polyfills must run before modules are imported
+  setupFiles: ['<rootDir>/jest.setup.fetch.js'],
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleDirectories: ['node_modules', '<rootDir>/'],
@@ -28,7 +36,7 @@ const config = {
     '<rootDir>/src/lib/__tests__/__mocks__/',
     '<rootDir>/.contentlayer/',
   ],
-  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?|next-mdx-remote)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?|next-mdx-remote|github-slugger)/)'],
   moduleNameMapper: {
     // Mock Contentlayer generated files (must be first to catch before other patterns)
     '^contentlayer/generated$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
@@ -44,6 +52,8 @@ const config = {
       '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
     // Mock next-mdx-remote to avoid ESM parsing issues
     '^next-mdx-remote/rsc$': '<rootDir>/src/lib/__tests__/__mocks__/next-mdx-remote.mock.tsx',
+    // Mock github-slugger (ESM-only package)
+    '^github-slugger$': '<rootDir>/src/lib/__tests__/__mocks__/github-slugger.mock.ts',
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/src/$1',
   },

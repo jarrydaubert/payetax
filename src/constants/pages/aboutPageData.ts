@@ -10,8 +10,6 @@
  * @created PAYTAX-109 Phase 4 - Data Extraction
  */
 
-'use client';
-
 import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle.js';
 import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.js';
 import Award from 'lucide-react/dist/esm/icons/award.js';

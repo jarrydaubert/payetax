@@ -1,49 +1,62 @@
-// src/components/atoms/PeriodCheckbox.tsx
 'use client';
 
-import { memo } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { useId } from 'react';
+import { Checkbox } from '@/components/atoms/ui/checkbox';
+import { Label } from '@/components/atoms/ui/label';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface PeriodCheckboxProps {
+  /**
+   * The period label to display (e.g., 'Yearly', 'Monthly', 'Weekly')
+   */
   period: string;
+  /**
+   * Whether the checkbox is checked
+   */
   checked: boolean;
-  onCheckedChange: () => void;
+  /**
+   * Callback when checked state changes
+   * Receives the new boolean value (not indeterminate)
+   */
+  onCheckedChange: (checked: boolean) => void;
 }
 
 /**
  * Checkbox component for selecting display periods in the results table.
- * Follows atomic design pattern - single responsibility for period selection UI.
  *
- * Performance: Memoized with React 19 - simple component, cheap to memoize
+ * Uses useId() for stable, unique IDs that work with SSR.
+ * Not memoized - parent should use useCallback for onCheckedChange if needed.
+ *
+ * @example
+ * ```tsx
+ * <PeriodCheckbox
+ *   period="Monthly"
+ *   checked={showMonthly}
+ *   onCheckedChange={setShowMonthly}
+ * />
+ * ```
  */
-export const PeriodCheckbox = memo(function PeriodCheckbox({
-  period,
-  checked,
-  onCheckedChange,
-}: PeriodCheckboxProps) {
-  const checkboxId = `period-${period}`;
+export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheckboxProps) {
+  // useId generates stable, unique IDs that work with SSR
+  const id = useId();
+  const checkboxId = `${id}-period-${period.toLowerCase()}`;
 
   return (
     <div className={cn('flex items-center', SPACING.GAP_2)}>
       <Checkbox
         id={checkboxId}
         checked={checked}
-        onCheckedChange={(checked) => {
-          // Only toggle if checked is boolean (not "indeterminate")
-          if (typeof checked === 'boolean') {
-            onCheckedChange();
+        onCheckedChange={(state) => {
+          // Forward boolean values only (filter out 'indeterminate')
+          if (typeof state === 'boolean') {
+            onCheckedChange(state);
           }
         }}
       />
-      <Label
-        htmlFor={checkboxId}
-        className={cn('cursor-pointer select-none font-normal', TYPOGRAPHY.TEXT_SM)}
-      >
+      <Label htmlFor={checkboxId} className={cn('cursor-pointer font-normal', TYPOGRAPHY.TEXT_SM)}>
         {period}
       </Label>
     </div>
   );
-});
+}

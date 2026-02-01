@@ -66,11 +66,22 @@ export function getIncomeBreakdownData(
 }
 
 /**
+ * Canonical category keys for tax liability chart.
+ * Used to ensure consistency between data generation and chart rendering.
+ */
+export type TaxLiabilityCategory =
+  | 'Income Tax'
+  | 'National Insurance'
+  | 'Student Loan'
+  | 'Pension'
+  | 'Net Pay';
+
+/**
  * Tax Liability Chart Data
  * Shows breakdown of where gross income goes (taxes, NI, pension, net pay)
  */
 export interface TaxLiabilityData {
-  category: string;
+  category: TaxLiabilityCategory;
   amount: number;
   percentage: number;
   color: string;
@@ -87,47 +98,52 @@ export function getTaxLiabilityData(
   const buildData = (res: TaxCalculationResults): TaxLiabilityData[] => {
     const gross = res.grossSalary.annually;
 
-    return [
+    const data: TaxLiabilityData[] = [
       {
-        category: 'Income Tax',
+        category: 'Income Tax' as const,
         amount: res.incomeTax.annually,
         percentage: (res.incomeTax.annually / gross) * 100,
         color: 'hsl(var(--chart-3))',
         label: formatCurrency(res.incomeTax.annually),
       },
       {
-        category: 'National Insurance',
+        category: 'National Insurance' as const,
         amount: res.nationalInsurance.annually,
         percentage: (res.nationalInsurance.annually / gross) * 100,
         color: 'hsl(var(--chart-4))',
         label: formatCurrency(res.nationalInsurance.annually),
       },
-      ...(res.studentLoan.annually > 0
-        ? [
-            {
-              category: 'Student Loan',
-              amount: res.studentLoan.annually,
-              percentage: (res.studentLoan.annually / gross) * 100,
-              color: 'hsl(var(--chart-5))',
-              label: formatCurrency(res.studentLoan.annually),
-            },
-          ]
-        : []),
+    ];
+
+    // Only include student loan if there's a balance
+    if (res.studentLoan.annually > 0) {
+      data.push({
+        category: 'Student Loan' as const,
+        amount: res.studentLoan.annually,
+        percentage: (res.studentLoan.annually / gross) * 100,
+        color: 'hsl(var(--chart-5))',
+        label: formatCurrency(res.studentLoan.annually),
+      });
+    }
+
+    data.push(
       {
-        category: 'Pension',
+        category: 'Pension' as const,
         amount: res.pensionContribution.annually,
         percentage: (res.pensionContribution.annually / gross) * 100,
         color: 'hsl(var(--chart-2))',
         label: formatCurrency(res.pensionContribution.annually),
       },
       {
-        category: 'Net Pay',
+        category: 'Net Pay' as const,
         amount: res.netPay.annually,
         percentage: (res.netPay.annually / gross) * 100,
         color: 'hsl(var(--chart-6))',
         label: formatCurrency(res.netPay.annually),
       },
-    ];
+    );
+
+    return data;
   };
 
   return {

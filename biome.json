@@ -224,13 +224,19 @@
         "*.config.js",
         "instrumentation.ts",
         "jest.setup.js",
+        "jest.setup.fetch.js",
         "public/**/*.js"
       ],
       "linter": {
         "rules": {
           "suspicious": {
             "useAwait": "off",
-            "noConsole": "off"
+            "noConsole": "off",
+            "useIterableCallbackReturn": "off"
+          },
+          "correctness": {
+            "noUnusedFunctionParameters": "off",
+            "noUnusedVariables": "off"
           }
         }
       }

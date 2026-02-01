@@ -1,8 +1,6 @@
 // src/app/tools/tax-code-decoder/page.tsx
-import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
+import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { TaxCodeDecoderClient } from './TaxCodeDecoderClient';
-
-const BASE_URL = 'https://payetax.co.uk';
 
 export const metadata = generateBaseMetadata({
   title: 'UK Tax Code Decoder | What Does My Tax Code Mean?',
@@ -22,19 +20,19 @@ export default function TaxCodeDecoderPage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: BASE_URL,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Tools',
-        item: `${BASE_URL}/tools`,
+        item: `${SITE_URL}/tools`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Tax Code Decoder',
-        item: `${BASE_URL}/tools/tax-code-decoder`,
+        item: `${SITE_URL}/tools/tax-code-decoder`,
       },
     ],
   };
@@ -45,6 +43,7 @@ export default function TaxCodeDecoderPage() {
     name: 'UK Tax Code Decoder',
     description:
       'Free tool to decode and explain UK HMRC tax codes. Understand what your tax code means instantly.',
+    url: `${SITE_URL}/tools/tax-code-decoder`,
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web Browser',
     offers: {
@@ -52,11 +51,7 @@ export default function TaxCodeDecoderPage() {
       price: '0',
       priceCurrency: 'GBP',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '156',
-    },
+    // Note: aggregateRating removed - only add when backed by real, verifiable reviews
   };
 
   return (

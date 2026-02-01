@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Spinner } from '@/components/ui/spinner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
@@ -73,63 +74,65 @@ export function CalculatorInputsSection({
   };
 
   return (
-    <div className={SPACING.SPACE_Y_4}>
-      <BasicInputs />
+    <TooltipProvider delayDuration={200}>
+      <div className={SPACING.SPACE_Y_4}>
+        <BasicInputs />
 
-      {/* Calculate and Reset buttons */}
-      <div className={cn('flex', SPACING.GAP_2)}>
-        <Button
-          onClick={handleCalculate}
-          disabled={isCalculating}
-          size='lg'
-          className='flex-1'
-          data-testid='calculate-button'
-        >
-          {isCalculating ? (
-            <>
-              <Spinner className={cn('mr-2', ICON_SIZES.SIZE_5)} />
-              Calculating...
-            </>
-          ) : (
-            <>
-              <Calculator className={cn('mr-2', ICON_SIZES.SIZE_5)} />
-              Calculate
-            </>
-          )}
-        </Button>
-
-        <Button onClick={handleReset} variant='outline' size='lg'>
-          <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
-          Reset
-        </Button>
-      </div>
-
-      {/* What If Collapsible Section */}
-      <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
-        <CollapsibleTrigger asChild>
+        {/* Calculate and Reset buttons */}
+        <div className={cn('flex', SPACING.GAP_2)}>
           <Button
-            variant='outline'
+            onClick={handleCalculate}
+            disabled={isCalculating}
             size='lg'
-            className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
-            data-testid='what-if-trigger'
+            className='flex-1'
+            data-testid='calculate-button'
           >
-            <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>
-              <span>Compare Scenarios</span>
-              <ChevronDown
-                className={cn(
-                  ICON_SIZES.SIZE_5,
-                  `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`,
-                )}
-              />
-            </div>
+            {isCalculating ? (
+              <>
+                <Spinner className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+                Calculating...
+              </>
+            ) : (
+              <>
+                <Calculator className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+                Calculate
+              </>
+            )}
           </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className='pt-4'>
-            <WhatIfInputs onCompare={onWhatIfCalculate} />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
+
+          <Button onClick={handleReset} variant='outline' size='lg'>
+            <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+            Reset
+          </Button>
+        </div>
+
+        {/* What If Collapsible Section */}
+        <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant='outline'
+              size='lg'
+              className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
+              data-testid='what-if-trigger'
+            >
+              <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>
+                <span>Compare Scenarios</span>
+                <ChevronDown
+                  className={cn(
+                    ICON_SIZES.SIZE_5,
+                    `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`,
+                  )}
+                />
+              </div>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className='pt-4'>
+              <WhatIfInputs onCompare={onWhatIfCalculate} />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    </TooltipProvider>
   );
 }

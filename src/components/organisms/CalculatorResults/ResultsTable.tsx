@@ -106,7 +106,9 @@ export function ResultsTable({
 
   // Marriage allowance eligibility check
   const marriageAllowanceEligible = React.useMemo(() => {
-    if (!(isMarried && partnerGrossWage)) return false;
+    // Must be married - partnerGrossWage can be 0 (that's a valid eligible case!)
+    if (!isMarried) return false;
+    if (partnerGrossWage == null) return false;
 
     // Check if user already has M code (already claiming)
     const hasMarriageCode = taxCode.toUpperCase().includes('M');
@@ -136,10 +138,8 @@ export function ResultsTable({
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
   const previousYearLabel = currentYearStart - 1; // 2024
 
-  // Format the previous year row label
-  const previousYearRowLabel = previousYearResults
-    ? `Net Change from ${previousYearLabel}`
-    : `Net Change from ${previousYearLabel}`;
+  // Format the previous year row label (only used when previousYearResults exists)
+  const previousYearRowLabel = `Net Change from ${previousYearLabel}`;
 
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
@@ -333,15 +333,20 @@ export function ResultsTable({
       color: 'text-muted-foreground',
       isHighlight: false,
     },
-    {
-      category: previousYearRowLabel,
-      icon: TrendingUp,
-      annual: yearChange,
-      whatIfAnnual: whatIfYearChange,
-      percentage: yearChangePercentage,
-      color: yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive',
-      isHighlight: false,
-    },
+    // Only show year change row when we have previous year data
+    ...(previousYearResults
+      ? [
+          {
+            category: previousYearRowLabel,
+            icon: TrendingUp,
+            annual: yearChange,
+            whatIfAnnual: whatIfYearChange,
+            percentage: yearChangePercentage,
+            color: yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive',
+            isHighlight: false,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -376,19 +381,17 @@ export function ResultsTable({
 
           {/* 
             IMPORTANT: This container has scroll-behavior: smooth for regular scrolling UX
-            The useMouseDragScroll hook handles this correctly by using scrollTo({ behavior: 'instant' })
+            The useMouseDragScroll hook handles this correctly by using scrollTo({ behavior: 'auto' })
             during drag operations. If drag scroll breaks, check the hook implementation - it MUST use
             scrollTo() method, NOT direct scrollLeft assignment! See useMouseDragScroll.ts for details.
-            
-            Note: Using div instead of section here because we need the ref for scroll functionality
-            and the combination of ref + scroll behavior works better with div. The role='region'
-            and aria-label provide the necessary semantic meaning for screen readers.
           */}
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling of overflow container */}
           <section
             ref={containerRef}
-            className='w-full cursor-grab overflow-x-auto scroll-smooth active:cursor-grabbing'
+            tabIndex={0}
+            className='w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
             style={{
-              scrollbarWidth: 'auto', // Changed from 'thin' to 'auto' for better visibility
+              scrollbarWidth: 'auto',
               scrollbarColor: 'hsl(var(--muted-foreground)) hsl(var(--muted))',
               WebkitOverflowScrolling: 'touch',
               scrollBehavior: 'smooth',

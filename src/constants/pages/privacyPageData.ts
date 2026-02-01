@@ -6,11 +6,11 @@
  *
  * All data is validated via Zod schemas at build time using the `satisfies` pattern.
  *
+ * Server-compatible module - no 'use client' needed for static data.
+ *
  * @module constants/pages/privacyPageData
  * @created PAYTAX-109 Phase 4 - Data Extraction
  */
-
-'use client';
 
 import type { LucideIcon } from 'lucide-react';
 import Database from 'lucide-react/dist/esm/icons/database.js';

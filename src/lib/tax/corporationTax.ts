@@ -159,9 +159,12 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
  * Use this when you just need the tax amount without the full breakdown.
  *
  * @param taxableProfit - Company's taxable profit
+ * @param _taxYear - Tax year (reserved for future use when rates change)
  * @returns Corporation Tax due (rounded to pence)
  */
-export function getCorporationTax(taxableProfit: number): number {
+export function getCorporationTax(taxableProfit: number, _taxYear?: string): number {
+  // Note: taxYear parameter reserved for future use when CT rates become year-dependent
+  // Currently CT rates are stable since April 2023 reform
   return calculateCorporationTax(taxableProfit).corporationTax;
 }
 

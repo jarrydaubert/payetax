@@ -1,23 +1,24 @@
 /**
  * Table Drag Scroll Styles
  * 
- * Prevents text selection on all table descendants when drag scrolling is enabled.
- * This ensures smooth drag-to-scroll behavior without text highlighting interfering.
+ * Prevents text selection ONLY during active drag scrolling.
+ * Users can still select/copy table text when not dragging.
+ * 
+ * The .is-dragging class is added/removed by useMouseDragScroll hook.
  */
 
-.table-drag-scroll,
-.table-drag-scroll * {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-}
-
-/* Ensure cursor shows grab state on all table elements */
+/* Default: allow text selection, show grab cursor */
 .table-drag-scroll {
   cursor: grab;
 }
 
-.table-drag-scroll:active {
+/* Only disable selection while actively dragging */
+.table-drag-scroll.is-dragging,
+.table-drag-scroll.is-dragging * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.table-drag-scroll.is-dragging {
   cursor: grabbing;
 }

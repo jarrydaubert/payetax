@@ -7,8 +7,6 @@
  * @module components/molecules/ContactFooter
  */
 
-'use client';
-
 import type { Route } from 'next';
 import Link from 'next/link';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';

@@ -2,15 +2,21 @@
 'use client';
 
 import { Calculator } from 'lucide-react';
-import { useCallback, useId, useState } from 'react';
+import { type FormEvent, useId, useState } from 'react';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/atoms/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/atoms/ui/card';
+import { Input } from '@/components/atoms/ui/input';
+import { Label } from '@/components/atoms/ui/label';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { ComparisonValueSchema } from '@/lib/validation';
 
 interface ComparisonInputsProps {
@@ -19,45 +25,56 @@ interface ComparisonInputsProps {
   className?: string;
 }
 
+/** Labels for each comparison mode */
+const MODE_LABELS: Record<ComparisonMode, string> = {
+  percentage: 'Percentage Increase',
+  amount: 'Amount Increase',
+  total: 'New Total Salary',
+};
+
+/** Placeholders for each mode (no commas - cleaner for text input) */
+const MODE_PLACEHOLDERS: Record<ComparisonMode, string> = {
+  percentage: '10',
+  amount: '5000',
+  total: '45000',
+};
+
+/**
+ * Parse a "money-ish" string: strips £, commas, spaces
+ * Returns NaN if not a valid number
+ */
+function parseMoneyish(raw: string): number {
+  const normalized = raw.replace(/[,\s£%]/g, '');
+  const n = Number(normalized);
+  return Number.isFinite(n) ? n : Number.NaN;
+}
+
 export function ComparisonInputs({ currentSalary, onCompare, className }: ComparisonInputsProps) {
   const [mode, setMode] = useState<ComparisonMode>('percentage');
   const [value, setValue] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const inputId = useId();
 
-  const handleCompare = useCallback(() => {
-    const numValue = parseFloat(value);
+  const inputId = useId();
+  const radioGroupId = useId();
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    const numValue = parseMoneyish(value);
     if (Number.isNaN(numValue)) {
       setError('Please enter a valid number');
       return;
     }
 
-    // Validate based on mode
+    // Let Zod be the single source of validation truth
     try {
-      const validationData: Record<string, unknown> = { mode, value: numValue };
+      // Build validation data based on mode
+      const validationData = {
+        mode,
+        value: numValue,
+        [mode]: numValue, // Add mode-specific key (percentage/amount/total)
+      };
 
-      // Add mode-specific validation
-      if (mode === 'percentage') {
-        validationData.percentage = numValue;
-        if (numValue < 0.01 || numValue > 1000) {
-          setError('Percentage must be between 0.01% and 1000%');
-          return;
-        }
-      } else if (mode === 'amount') {
-        validationData.amount = numValue;
-        if (numValue < 1 || numValue > 10000000) {
-          setError('Amount must be between £1 and £10M');
-          return;
-        }
-      } else if (mode === 'total') {
-        validationData.total = numValue;
-        if (numValue < 1 || numValue > 10000000) {
-          setError('Total salary must be between £1 and £10M');
-          return;
-        }
-      }
-
-      // Validate with Zod
       ComparisonValueSchema.parse(validationData);
 
       // Clear any previous errors
@@ -71,41 +88,18 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
       });
     } catch (err) {
       if (err instanceof z.ZodError) {
-        setError(err.issues[0]?.message || 'Invalid input');
+        setError(err.issues[0]?.message ?? 'Invalid input');
+      } else {
+        // Handle unexpected errors
+        setError('Something went wrong. Please try again.');
       }
     }
-  }, [value, mode, currentSalary, onCompare]);
-
-  const getPlaceholder = useCallback(() => {
-    switch (mode) {
-      case 'percentage':
-        return '10';
-      case 'amount':
-        return '5,000';
-      case 'total':
-        return '45,000';
-      default:
-        return '';
-    }
-  }, [mode]);
-
-  const getLabel = useCallback(() => {
-    switch (mode) {
-      case 'percentage':
-        return 'Percentage Increase';
-      case 'amount':
-        return 'Amount Increase';
-      case 'total':
-        return 'New Total Salary';
-      default:
-        return '';
-    }
-  }, [mode]);
+  };
 
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className={`flex items-center ${SPACING.GAP_2}`}>
+        <CardTitle className={cn('flex items-center', SPACING.GAP_2)}>
           <Calculator className={ICON_SIZES.SIZE_5} />
           Compare Salary Scenarios
         </CardTitle>
@@ -114,118 +108,100 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           {formatCurrency(currentSalary, 0)}
         </CardDescription>
       </CardHeader>
-      <CardContent className={SPACING.SPACE_Y_4}>
-        {/* Mode Selection */}
-        <div className={SPACING.SPACE_Y_3}>
-          <Label className={TYPOGRAPHY.TEXT_SM}>Comparison Type</Label>
-          <div className={`grid ${SPACING.GAP_2} sm:grid-cols-3`}>
-            <label
-              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
-                mode === 'percentage'
-                  ? 'border-primary bg-primary/5 font-medium'
-                  : 'border-border hover:border-primary/50'
-              }`}
+      <CardContent>
+        <form onSubmit={handleSubmit} className={SPACING.SPACE_Y_4}>
+          {/* Mode Selection - proper fieldset/legend for a11y */}
+          <fieldset className={SPACING.SPACE_Y_3}>
+            <legend id={radioGroupId} className={cn('font-medium', TYPOGRAPHY.TEXT_SM)}>
+              Comparison Type
+            </legend>
+            <div
+              className={cn('grid sm:grid-cols-3', SPACING.GAP_2)}
+              role='radiogroup'
+              aria-labelledby={radioGroupId}
             >
-              <input
-                type='radio'
-                name='comparison-mode'
-                value='percentage'
-                checked={mode === 'percentage'}
-                onChange={() => setMode('percentage')}
-                className='sr-only'
-              />
-              Percentage
-              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>e.g., 10%</span>
-            </label>
-            <label
-              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
-                mode === 'amount'
-                  ? 'border-primary bg-primary/5 font-medium'
-                  : 'border-border hover:border-primary/50'
-              }`}
-            >
-              <input
-                type='radio'
-                name='comparison-mode'
-                value='amount'
-                checked={mode === 'amount'}
-                onChange={() => setMode('amount')}
-                className='sr-only'
-              />
-              £ Amount
-              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
-                e.g., +£5k
-              </span>
-            </label>
-            <label
-              className={`cursor-pointer rounded-lg border-2 p-3 ${TYPOGRAPHY.TEXT_SM} transition-colors ${
-                mode === 'total'
-                  ? 'border-primary bg-primary/5 font-medium'
-                  : 'border-border hover:border-primary/50'
-              }`}
-            >
-              <input
-                type='radio'
-                name='comparison-mode'
-                value='total'
-                checked={mode === 'total'}
-                onChange={() => setMode('total')}
-                className='sr-only'
-              />
-              New Total
-              <span className={`block text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
-                e.g., £45k
-              </span>
-            </label>
-          </div>
-        </div>
+              {(['percentage', 'amount', 'total'] as const).map((m) => (
+                <label
+                  key={m}
+                  className={cn(
+                    'cursor-pointer rounded-lg border-2 p-3 transition-colors',
+                    'focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+                    TYPOGRAPHY.TEXT_SM,
+                    mode === m
+                      ? 'border-primary bg-primary/5 font-medium'
+                      : 'border-border hover:border-primary/50',
+                  )}
+                >
+                  <input
+                    type='radio'
+                    name='comparison-mode'
+                    value={m}
+                    checked={mode === m}
+                    onChange={() => setMode(m)}
+                    className='sr-only'
+                  />
+                  {m === 'percentage' && 'Percentage'}
+                  {m === 'amount' && '£ Amount'}
+                  {m === 'total' && 'New Total'}
+                  <span className={cn('block text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                    {m === 'percentage' && 'e.g., 10%'}
+                    {m === 'amount' && 'e.g., +£5k'}
+                    {m === 'total' && 'e.g., £45k'}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
-        {/* Value Input */}
-        <div className={SPACING.SPACE_Y_2}>
-          <Label htmlFor='comparison-value' className={TYPOGRAPHY.TEXT_SM}>
-            {getLabel()}
-          </Label>
-          <div className='relative'>
-            {mode === 'percentage' && (
-              <span className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'>
-                %
-              </span>
+          {/* Value Input */}
+          <div className={SPACING.SPACE_Y_2}>
+            <Label htmlFor={inputId} className={TYPOGRAPHY.TEXT_SM}>
+              {MODE_LABELS[mode]}
+            </Label>
+            <div className='relative'>
+              {mode === 'percentage' && (
+                <span className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground'>
+                  %
+                </span>
+              )}
+              {(mode === 'amount' || mode === 'total') && (
+                <span className='pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
+                  £
+                </span>
+              )}
+              <Input
+                id={inputId}
+                type='text'
+                inputMode='decimal'
+                autoComplete='off'
+                value={value}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  // Clear error when user types
+                  if (error) setError('');
+                }}
+                placeholder={MODE_PLACEHOLDERS[mode]}
+                className={mode !== 'percentage' ? 'pl-8' : 'pr-8'}
+                aria-invalid={!!error}
+                aria-describedby={error ? `${inputId}-error` : undefined}
+              />
+            </div>
+            {error && (
+              <p
+                id={`${inputId}-error`}
+                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
+                role='alert'
+              >
+                {error}
+              </p>
             )}
-            {(mode === 'amount' || mode === 'total') && (
-              <span className='absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'>
-                £
-              </span>
-            )}
-            <Input
-              id={inputId}
-              type='number'
-              value={value}
-              onChange={(e) => {
-                setValue(e.target.value);
-                // Clear error when user types
-                if (error) setError('');
-              }}
-              placeholder={getPlaceholder()}
-              className={mode !== 'percentage' ? 'pl-8' : 'pr-8'}
-              aria-invalid={!!error}
-              aria-describedby={error ? `${inputId}-error` : undefined}
-            />
           </div>
-          {error && (
-            <p
-              id={`${inputId}-error`}
-              className={`${TYPOGRAPHY.TEXT_SM} text-destructive`}
-              role='alert'
-            >
-              {error}
-            </p>
-          )}
-        </div>
 
-        {/* Compare Button */}
-        <Button onClick={handleCompare} className='w-full' disabled={!value || !!error}>
-          Compare Salaries
-        </Button>
+          {/* Compare Button - only disabled when empty, not when error exists */}
+          <Button type='submit' className='w-full' disabled={!value.trim()}>
+            Compare Salaries
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

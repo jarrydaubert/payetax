@@ -1,11 +1,36 @@
 // src/components/organisms/LandingPageSections.tsx
 // Landing page sections: Features, How It Works, FAQ, Final CTA
-// Matches payetax-web design system
+// Server Component - no hooks/state/effects, maximizes SEO/LCP
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-const features = [
+// ============================================================================
+// Types for content arrays (enables type safety and JSON-LD generation)
+// ============================================================================
+
+interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface Step {
+  number: number;
+  title: string;
+  description: string;
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
+// ============================================================================
+// Content Data
+// ============================================================================
+
+const features: Feature[] = [
   {
     icon: '📈',
     title: 'See Where Every Pound Goes',
@@ -16,13 +41,13 @@ const features = [
     icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
     title: 'Accurate for Scottish Residents',
     description:
-      'Scottish residents pay different rates. Select your region for the right numbers — using official Revenue Scotland rates.',
+      'Scottish residents pay different income tax rates set by the Scottish Parliament. Select your region for the right numbers.',
   },
   {
     icon: '🔒',
     title: 'Your Salary Stays Private',
     description:
-      'All calculations happen in your browser. We never see, store, or share your salary.',
+      'All calculations happen locally in your browser. Your salary is never sent to our servers.',
   },
   {
     icon: '🎓',
@@ -34,7 +59,7 @@ const features = [
     icon: '💰',
     title: 'Pension Relief',
     description:
-      'See how £1,000 in pension contributions can save you £400 in tax. Supports salary sacrifice schemes.',
+      'See how £1,000 in pension contributions can save you up to £400 in tax. Supports salary sacrifice schemes.',
   },
   {
     icon: '📊',
@@ -44,7 +69,7 @@ const features = [
   },
 ];
 
-const steps = [
+const steps: Step[] = [
   {
     number: 1,
     title: 'Enter your salary',
@@ -62,7 +87,7 @@ const steps = [
   },
 ];
 
-export const faqs = [
+export const faqs: FAQ[] = [
   {
     question: 'Is PayeTax free to use?',
     answer:
@@ -86,7 +111,7 @@ export const faqs = [
   {
     question: 'Is my salary data safe?',
     answer:
-      'Your salary is yours alone. We never see it. All calculations happen in your browser — nothing is sent to our servers, stored, or shared.',
+      'Your salary is yours alone. All calculations happen locally in your browser — nothing is sent to our servers, stored, or shared.',
   },
   {
     question: 'What deductions are included?',
@@ -94,6 +119,10 @@ export const faqs = [
       'PayeTax calculates income tax (by band), National Insurance contributions, student loan repayments (all plan types), and pension contributions with tax relief.',
   },
 ];
+
+// ============================================================================
+// Section Components
+// ============================================================================
 
 export function FeaturesSection() {
   return (
@@ -109,7 +138,10 @@ export function FeaturesSection() {
       <div className='features-grid'>
         {features.map((feature) => (
           <div key={feature.title} className='feature-card'>
-            <div className='feature-icon'>{feature.icon}</div>
+            {/* Emoji is decorative - screen readers should skip it */}
+            <div className='feature-icon' aria-hidden='true'>
+              {feature.icon}
+            </div>
             <h3>{feature.title}</h3>
             <p>{feature.description}</p>
           </div>

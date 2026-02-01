@@ -22,7 +22,7 @@ async function globalSetup(config: FullConfig) {
     await page.waitForTimeout(1500);
 
     // Accept cookies using the data-testid
-    const acceptButton = page.getByTestId('cookie-accept-all');
+    const acceptButton = page.getByTestId('cookie-accept-analytics');
     if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await acceptButton.click();
       await page.waitForTimeout(500);

@@ -1,9 +1,7 @@
 // src/app/tools/director-guide/page.tsx
 
 import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
-import { generateMetadata as generateBaseMetadata } from '@/lib/metadata';
-
-const BASE_URL = 'https://payetax.co.uk';
+import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 
 export const metadata = generateBaseMetadata({
   title: 'Director Pay Dashboard | Salary & Dividend Calculator 2025-26',
@@ -23,19 +21,19 @@ export default function DirectorGuidePage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: BASE_URL,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Tools',
-        item: `${BASE_URL}/tools`,
+        item: `${SITE_URL}/tools`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Director Guide',
-        item: `${BASE_URL}/tools/director-guide`,
+        item: `${SITE_URL}/tools/director-guide`,
       },
     ],
   };
@@ -46,6 +44,7 @@ export default function DirectorGuidePage() {
     name: 'Director Salary & Dividend Calculator',
     description:
       'Calculate the optimal salary and dividend mix for UK company directors. Shows Corporation Tax, Employer NI, and personal tax to set aside.',
+    url: `${SITE_URL}/tools/director-guide`,
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web Browser',
     offers: {
@@ -55,6 +54,7 @@ export default function DirectorGuidePage() {
     },
   };
 
+  // FAQ schema - uses softer language to avoid over-specific claims that may drift
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -64,7 +64,7 @@ export default function DirectorGuidePage() {
         name: 'What is the optimal salary for a company director in 2025-26?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'For most directors, £12,570 per year (£1,047/month) is optimal. This uses your full Personal Allowance (tax-free), qualifies you for State Pension credits, while minimising Employer NI.',
+          text: 'A common strategy for single-director companies is to pay salary up to the Personal Allowance threshold. This uses your tax-free allowance while qualifying for State Pension credits. The optimal amount depends on your specific circumstances, including Employment Allowance eligibility.',
         },
       },
       {
@@ -72,15 +72,15 @@ export default function DirectorGuidePage() {
         name: 'Are dividends better than salary for directors?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Generally yes. Dividends are taxed at 8.75% (basic rate) vs 20% income tax + 8% employee NI + 15% employer NI for salary. However, you need profit to pay dividends, and a small salary builds State Pension credits.',
+          text: 'Dividends are often more tax-efficient than additional salary because they avoid National Insurance. However, you need company profits to pay dividends, and a minimum salary helps build State Pension credits. The best mix depends on your total income and circumstances.',
         },
       },
       {
         '@type': 'Question',
-        name: 'How much Employer NI do I pay on director salary?',
+        name: 'How is Employer NI calculated on director salary?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: "In 2025-26, Employer NI is 15% on salary above £5,000. For a £12,570 salary, that's approximately £1,135 per year.",
+          text: 'Employer NI is charged on salary above the Secondary Threshold. Directors use an annual earnings period, so NI is calculated on total annual salary rather than per pay period. Companies eligible for Employment Allowance may offset some or all of this cost.',
         },
       },
     ],

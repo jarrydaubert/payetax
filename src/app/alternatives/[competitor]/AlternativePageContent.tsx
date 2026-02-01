@@ -1,11 +1,7 @@
 // src/app/alternatives/[competitor]/AlternativePageContent.tsx
-'use client';
-
 import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
-import type { Route } from 'next';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
 import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
 import { TwoColumnComparison } from '@/components/molecules/ComparisonTable';
@@ -15,12 +11,19 @@ import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { Competitor } from '@/data/competitors';
 import { cn } from '@/lib/utils';
+import { CompetitorLink } from './CompetitorLink';
 
 interface AlternativePageContentProps {
   competitor: Competitor;
 }
 
 export function AlternativePageContent({ competitor }: AlternativePageContentProps) {
+  // Safe defaults for optional arrays
+  const strengths = competitor.strengths ?? [];
+  const weaknesses = competitor.weaknesses ?? [];
+  const bestFor = competitor.bestFor ?? [];
+  const advantages = competitor.payeTaxAdvantages ?? [];
+
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
@@ -51,8 +54,8 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
           />
           <div className={SPACING.MT_8}>
             <ProsCons
-              pros={competitor.strengths}
-              cons={competitor.weaknesses}
+              pros={strengths}
+              cons={weaknesses}
               prosTitle={`What ${competitor.shortName} Does Well`}
               consTitle='Where It Falls Short'
             />
@@ -75,18 +78,20 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
       </section>
 
       {/* PayeTax Advantages */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_SM}>
-          <SectionHeading
-            title={`Why Choose PayeTax Over ${competitor.shortName}`}
-            subtitle='Key advantages that make a difference'
-            align='center'
-          />
-          <div className={SPACING.MT_8}>
-            <AdvantagesList items={competitor.payeTaxAdvantages} title='PayeTax Advantages' />
+      {advantages.length > 0 && (
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER_SM}>
+            <SectionHeading
+              title={`Why Choose PayeTax Over ${competitor.shortName}`}
+              subtitle='Key advantages that make a difference'
+              align='center'
+            />
+            <div className={SPACING.MT_8}>
+              <AdvantagesList items={advantages} title='PayeTax Advantages' />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Who Should Use What */}
       <section className={LAYOUT.SECTION_TINTED_ACCENT}>
@@ -103,23 +108,38 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
               </h3>
               <ul className={SPACING.SPACE_Y_3}>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
-                  <span className='text-primary'>✓</span>
+                  <span className='sr-only'>Advantage:</span>
+                  <span className='text-primary' aria-hidden='true'>
+                    ✓
+                  </span>
                   <span>Quick, clean calculations without distractions</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
-                  <span className='text-primary'>✓</span>
+                  <span className='sr-only'>Advantage:</span>
+                  <span className='text-primary' aria-hidden='true'>
+                    ✓
+                  </span>
                   <span>What-If salary comparison scenarios</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
-                  <span className='text-primary'>✓</span>
+                  <span className='sr-only'>Advantage:</span>
+                  <span className='text-primary' aria-hidden='true'>
+                    ✓
+                  </span>
                   <span>100% ad-free, privacy-first experience</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
-                  <span className='text-primary'>✓</span>
+                  <span className='sr-only'>Advantage:</span>
+                  <span className='text-primary' aria-hidden='true'>
+                    ✓
+                  </span>
                   <span>Modern, mobile-first design</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
-                  <span className='text-primary'>✓</span>
+                  <span className='sr-only'>Advantage:</span>
+                  <span className='text-primary' aria-hidden='true'>
+                    ✓
+                  </span>
                   <span>Instant real-time results</span>
                 </li>
               </ul>
@@ -130,26 +150,14 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                 Choose {competitor.shortName} if you need:
               </h3>
               <ul className={SPACING.SPACE_Y_3}>
-                {competitor.bestFor.map((item) => (
+                {bestFor.map((item) => (
                   <li key={item} className={cn('flex items-start', SPACING.GAP_3)}>
                     <span className='text-muted-foreground'>•</span>
                     <span className='text-muted-foreground'>{item}</span>
                   </li>
                 ))}
               </ul>
-              <div className={SPACING.MT_6}>
-                <TrackedAffiliateLink
-                  competitor={competitor}
-                  pageType='alternative'
-                  className={cn(
-                    'inline-flex items-center text-muted-foreground transition-colors hover:text-foreground',
-                    TYPOGRAPHY.TEXT_SM,
-                    SPACING.GAP_1,
-                  )}
-                >
-                  Visit {competitor.shortName}
-                </TrackedAffiliateLink>
-              </div>
+              <CompetitorLink competitor={competitor} />
             </Card>
           </div>
         </div>
@@ -166,11 +174,11 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>
-              Same Accuracy, Better Experience
+              Built on Official HMRC Rates
             </h2>
             <p className={cn('mx-auto max-w-xl text-muted-foreground', SPACING.MB_8)}>
-              PayeTax uses the same official HMRC rates as {competitor.name}, but with a modern,
-              ad-free interface and unique What-If comparison features.
+              PayeTax is built around official HMRC rates and guidance, with a modern, ad-free
+              interface and unique What-If comparison features you won't find elsewhere.
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>
@@ -180,7 +188,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                 </Link>
               </Button>
               <Button asChild variant='outline' size='lg'>
-                <Link href={'/best-uk-tax-calculators' as Route}>
+                <Link href='/best-uk-tax-calculators'>
                   Compare All Calculators
                   <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
                 </Link>

@@ -1,8 +1,6 @@
 // src/app/about/page.tsx
-'use client';
 
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right.js';
-import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import { ArrowRight, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { ContactFooter } from '@/components/molecules/ContactFooter';
@@ -178,7 +176,7 @@ export default function AboutPage() {
         links={[
           {
             text: 'support@payetax.co.uk',
-            href: 'mailto:support@payetax.co.uk?subject=Feedback',
+            href: `mailto:support@payetax.co.uk?subject=${encodeURIComponent('Feedback')}`,
             type: 'email',
           },
         ]}

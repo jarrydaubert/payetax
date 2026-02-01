@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { Card } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   ANIMATION_GESTURES,
   ANIMATION_TRANSITIONS,
@@ -15,14 +15,24 @@ import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
+/** Supported visual variants for result cards */
+type ResultCardVariant = 'default' | 'success' | 'warning' | 'info';
+
 interface ResultCardProps {
   label: string;
   value: string;
   icon?: LucideIcon;
-  variant?: 'default' | 'success' | 'warning' | 'info';
+  variant?: ResultCardVariant;
   className?: string;
+  /**
+   * Animation delay in seconds
+   * @deprecated Prefer parent container stagger (ANIMATION_CONTAINER_VARIANTS) over per-card delay
+   */
   delay?: number;
-  /** Tooltip text to explain what this metric means */
+  /**
+   * Tooltip text to explain what this metric means
+   * Note: Parent must wrap with TooltipProvider for tooltips to work
+   */
   tooltip?: string;
   /** Enable scroll-triggered reveal animation (default: false for backward compatibility) */
   revealOnScroll?: boolean;
@@ -45,7 +55,7 @@ const variantStyles = {
     card: '',
     icon: 'text-primary',
   },
-};
+} as const satisfies Record<ResultCardVariant, { card: string; icon: string }>;
 
 /**
  * Result card molecule for displaying key metrics
@@ -76,16 +86,33 @@ export const ResultCard = memo(function ResultCard({
   const styles = variantStyles[variant];
   const shouldReduceMotion = useMotionPreference();
 
-  const cardContent = (
-    <Card className={cn(SPACING.P_4, tooltip && 'cursor-help', styles.card)}>
+  // Card visual content
+  const cardVisual = (
+    <Card className={cn(SPACING.P_4, styles.card)}>
       <div className={SPACING.SPACE_Y_2}>
         <div className='flex items-center justify-between'>
           <p className={cn('font-medium text-foreground/80', TYPOGRAPHY.TEXT_SM)}>{label}</p>
-          {Icon && <Icon className={cn(ICON_SIZES.SIZE_4, styles.icon)} />}
+          {Icon && <Icon className={cn(ICON_SIZES.SIZE_4, styles.icon)} aria-hidden='true' />}
         </div>
         <p className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{value}</p>
       </div>
     </Card>
+  );
+
+  // When tooltip exists, wrap in focusable button for keyboard accessibility
+  // The button is unstyled and acts as the tooltip trigger
+  const cardContent = tooltip ? (
+    <button
+      type='button'
+      className={cn(
+        'w-full cursor-help text-left',
+        'rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      )}
+    >
+      {cardVisual}
+    </button>
+  ) : (
+    cardVisual
   );
 
   // Animation props based on reveal mode and motion preference
@@ -115,24 +142,26 @@ export const ResultCard = memo(function ResultCard({
         };
 
   // Gesture animations (PAYTAX-75: Framer Motion Maximization)
+  // Disable hover scale when tooltip exists to avoid jitter/position recalculation
   const gestureProps = shouldReduceMotion
     ? {}
-    : {
-        whileHover: ANIMATION_GESTURES.hoverGentle,
-        whileTap: ANIMATION_GESTURES.tapGentle,
-      };
+    : tooltip
+      ? { whileTap: ANIMATION_GESTURES.tapGentle } // No hover scale with tooltip
+      : {
+          whileHover: ANIMATION_GESTURES.hoverGentle,
+          whileTap: ANIMATION_GESTURES.tapGentle,
+        };
 
   return (
     <motion.div {...animationProps} {...gestureProps} className={className}>
       {tooltip ? (
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
-            <TooltipContent className='max-w-xs' side='top'>
-              <p>{tooltip}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        // Note: Parent must wrap with TooltipProvider for this to work
+        <Tooltip>
+          <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
+          <TooltipContent className='max-w-xs' side='top'>
+            <p>{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
       ) : (
         cardContent
       )}

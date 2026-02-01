@@ -3,9 +3,9 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeftRight, ChevronDown } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/ui/button';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import {
   type ComparisonInput,
@@ -29,34 +29,53 @@ export function SalaryComparisonSection({
   currentResults,
   className,
 }: SalaryComparisonSectionProps) {
-  const contentId = useId();
+  // Generate stable IDs for accessibility - sanitize useId() colons for DOM compatibility
+  const rawId = useId();
+  const buttonId = `salary-compare-btn-${rawId.replace(/:/g, '')}`;
+  const contentId = `salary-compare-content-${rawId.replace(/:/g, '')}`;
+
   const [isOpen, setIsOpen] = useState(false);
   const [comparisonResults, setComparisonResults] = useState<ComparisonResults | null>(null);
 
-  const handleCompare = (comparisonInput: ComparisonInput) => {
-    try {
-      const results = calculateComparison(currentInput, comparisonInput);
-      if (!results) {
-        toast.error('Comparison failed: Invalid input values');
-        return;
+  // Stable callback - only recreate when currentInput changes
+  const handleCompare = useCallback(
+    (comparisonInput: ComparisonInput) => {
+      try {
+        const results = calculateComparison(currentInput, comparisonInput);
+        if (!results) {
+          toast.error('Comparison failed: Invalid input values');
+          return;
+        }
+        setComparisonResults(results);
+      } catch {
+        // Error already logged by calculateComparison if needed
+        toast.error('Comparison failed: Please check your input values');
       }
-      setComparisonResults(results);
-    } catch (error) {
-      console.error('[SalaryComparisonSection] Comparison error:', error);
-      toast.error('Comparison failed: Please check your input values');
-    }
-  };
+    },
+    [currentInput],
+  );
+
+  // Handle toggle with optional results reset
+  const handleToggle = useCallback(() => {
+    setIsOpen((prev) => {
+      const next = !prev;
+      // Optionally clear stale results when closing
+      // Uncomment if you want fresh state on each open:
+      // if (!next) setComparisonResults(null);
+      return next;
+    });
+  }, []);
 
   return (
     <div className={cn(SPACING.SPACE_Y_4, className)}>
       {/* Toggle Button */}
       <Button
+        id={buttonId}
         variant='outline'
         className='w-full justify-between'
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         aria-expanded={isOpen}
         aria-controls={contentId}
-        disabled={!currentResults}
       >
         <span className={cn('flex items-center', SPACING.GAP_2)}>
           <ArrowLeftRight className={ICON_SIZES.SIZE_4} />
@@ -76,6 +95,8 @@ export function SalaryComparisonSection({
         {isOpen && (
           <motion.div
             id={contentId}
+            role='region'
+            aria-labelledby={buttonId}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -88,25 +109,20 @@ export function SalaryComparisonSection({
               onCompare={handleCompare}
             />
 
-            {/* Results */}
+            {/* Results - simpler animation without nested AnimatePresence */}
             {comparisonResults && (
-              <AnimatePresence mode='wait'>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                  className={SPACING.SPACE_Y_4}
-                >
-                  <MarginalRateInsight
-                    increase={comparisonResults.increase}
-                    netDiff={comparisonResults.netDiff}
-                    marginalRate={comparisonResults.marginalRate}
-                    effectiveRate={comparisonResults.effectiveRate}
-                  />
-                  <ComparisonResultsTable results={comparisonResults} />
-                </motion.div>
-              </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className={SPACING.SPACE_Y_4}
+              >
+                <MarginalRateInsight
+                  increase={comparisonResults.increase}
+                  netDiff={comparisonResults.netDiff}
+                />
+                <ComparisonResultsTable results={comparisonResults} />
+              </motion.div>
             )}
           </motion.div>
         )}

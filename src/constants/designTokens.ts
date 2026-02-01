@@ -328,14 +328,14 @@ export const Z_INDEX = {
  * ADDED IN PAYTAX-109 for standardized containers and sections
  */
 export const LAYOUT = {
-  /** Standard container: centered with max-width and horizontal padding */
-  CONTAINER: 'container mx-auto max-w-7xl px-4',
+  /** Standard container: centered with max-width and responsive padding */
+  CONTAINER: 'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8',
   /** Medium container for focused content */
-  CONTAINER_MD: 'container mx-auto max-w-6xl px-4',
+  CONTAINER_MD: 'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8',
   /** Small container for narrow content (forms, articles) */
-  CONTAINER_SM: 'container mx-auto max-w-4xl px-4',
+  CONTAINER_SM: 'container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8',
   /** Extra small container for very focused content */
-  CONTAINER_XS: 'container mx-auto max-w-2xl px-4',
+  CONTAINER_XS: 'container mx-auto max-w-2xl px-4 sm:px-6 lg:px-8',
 
   /** Full-height page wrapper */
   PAGE_WRAPPER: 'min-h-screen',
@@ -378,6 +378,18 @@ export const LAYOUT = {
   MAX_W_3XL: 'max-w-3xl',
   /** 5XL max width for wide sections (64rem / 1024px) */
   MAX_W_5XL: 'max-w-5xl',
+} as const;
+
+/**
+ * ARBITRARY VALUE EXCEPTIONS
+ *
+ * These tokens use Tailwind arbitrary values (bracket syntax) because:
+ * 1. No standard Tailwind utility exists for the exact value needed
+ * 2. The value is component-specific and doesn't warrant a theme extension
+ *
+ * If a pattern here is used in 3+ places, consider adding to tailwind.config.ts instead.
+ */
+export const ARBITRARY = {
   // Table-specific widths
   /** Results table label column width (195px) - sticky first column */
   TABLE_LABEL_WIDTH: 'w-[195px]',
@@ -391,8 +403,11 @@ export const LAYOUT = {
 export const SURFACES = {
   /** Standard border for all surfaces - darker, consistent with calculator section */
   BORDER_STANDARD: 'border border-primary/20',
-  /** Standard card border with subtle primary tint (DEPRECATED: use BORDER_STANDARD) */
-  BORDER_PRIMARY: 'border-primary/20',
+  /**
+   * @deprecated Use BORDER_STANDARD instead (includes 'border' prefix)
+   * Will be removed in next major version
+   */
+  _DEPRECATED_BORDER_PRIMARY: 'border-primary/20',
   /** Border with top separator */
   BORDER_TOP_DIVIDER: 'border-t border-primary/10',
 
@@ -485,8 +500,13 @@ export const SHADOWS = {
   GLOW_PURPLE: 'shadow-lg shadow-purple-500/50',
   /** Success glow - for positive actions */
   GLOW_SUCCESS: 'shadow-lg shadow-green-500/40',
-  /** Custom category filter glow */
+  /**
+   * Custom category filter glow - uses arbitrary value
+   * @see ARBITRARY.GLOW_ACCENT for the raw value
+   * TODO: Consider adding to tailwind.config.ts as shadow-accent-glow
+   */
   GLOW_ACCENT: 'shadow-[0_0_20px_rgba(168,85,247,0.4)]',
+  /** Hover state for accent glow */
   GLOW_ACCENT_HOVER: 'shadow-[0_0_30px_rgba(168,85,247,0.6)]',
 } as const;
 
@@ -535,48 +555,68 @@ export const COMPONENT_GUIDELINES = {
 // TypeScript Types for Type-Safe Token Usage
 // ============================================================================
 
-/**
- * Type-safe typography token keys
- * @example type MyComponent = { size: TypographyToken } // Enforces valid tokens
- */
-export type TypographyToken = keyof typeof TYPOGRAPHY;
+// Token Keys (for "select from enum" logic)
+/** Type-safe typography token keys */
+export type TypographyKey = keyof typeof TYPOGRAPHY;
+/** Type-safe spacing token keys */
+export type SpacingKey = keyof typeof SPACING;
+/** Type-safe icon size token keys */
+export type IconSizeKey = keyof typeof ICON_SIZES;
+/** Type-safe layout token keys */
+export type LayoutKey = keyof typeof LAYOUT;
+/** Type-safe color token keys */
+export type ColorKey = keyof typeof COLORS;
+/** Type-safe shadow token keys */
+export type ShadowKey = keyof typeof SHADOWS;
 
-/**
- * Type-safe spacing token keys
- */
-export type SpacingToken = keyof typeof SPACING;
+// Token Values (for className usage - actual Tailwind class strings)
+/** Type-safe typography class strings */
+export type TypographyClass = (typeof TYPOGRAPHY)[TypographyKey];
+/** Type-safe spacing class strings */
+export type SpacingClass = (typeof SPACING)[SpacingKey];
+/** Type-safe icon size class strings */
+export type IconSizeClass = (typeof ICON_SIZES)[IconSizeKey];
+/** Type-safe layout class strings */
+export type LayoutClass = (typeof LAYOUT)[LayoutKey];
+/** Type-safe color class strings */
+export type ColorClass = (typeof COLORS)[ColorKey];
+/** Type-safe shadow class strings */
+export type ShadowClass = (typeof SHADOWS)[ShadowKey];
 
-/**
- * Type-safe icon size token keys
- */
-export type IconSizeToken = keyof typeof ICON_SIZES;
+// Legacy aliases (for backwards compatibility)
+/** @deprecated Use TypographyKey instead */
+export type TypographyToken = TypographyKey;
+/** @deprecated Use SpacingKey instead */
+export type SpacingToken = SpacingKey;
+/** @deprecated Use IconSizeKey instead */
+export type IconSizeToken = IconSizeKey;
+/** @deprecated Use LayoutKey instead */
+export type LayoutToken = LayoutKey;
+/** @deprecated Use ColorKey instead */
+export type ColorToken = ColorKey;
+/** @deprecated Use ShadowKey instead */
+export type ShadowToken = ShadowKey;
 
-/**
- * Type-safe layout token keys
- */
-export type LayoutToken = keyof typeof LAYOUT;
+/** Union of all token keys */
+export type DesignTokenKey =
+  | TypographyKey
+  | SpacingKey
+  | IconSizeKey
+  | LayoutKey
+  | ColorKey
+  | ShadowKey;
 
-/**
- * Type-safe color token keys
- */
-export type ColorToken = keyof typeof COLORS;
+/** Union of all token class strings */
+export type DesignTokenClass =
+  | TypographyClass
+  | SpacingClass
+  | IconSizeClass
+  | LayoutClass
+  | ColorClass
+  | ShadowClass;
 
-/**
- * Type-safe shadow token keys
- */
-export type ShadowToken = keyof typeof SHADOWS;
-
-/**
- * Union type for all design tokens
- * Enables type-safe usage across all token categories
- */
-export type DesignToken =
-  | TypographyToken
-  | SpacingToken
-  | IconSizeToken
-  | LayoutToken
-  | ColorToken
-  | ShadowToken;
+/** @deprecated Use DesignTokenKey instead */
+export type DesignToken = DesignTokenKey;
 
 /**
  * CSS Custom Properties for dynamic theming

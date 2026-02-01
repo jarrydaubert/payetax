@@ -1,12 +1,10 @@
-// src/components/ui/alert.tsx
-
 import { cva, type VariantProps } from 'class-variance-authority';
-import type * as React from 'react';
+import * as React from 'react';
 import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
-  'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
+  'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:-translate-y-[3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
   {
     variants: {
       variant: {
@@ -20,59 +18,58 @@ const alertVariants = cva(
         info: 'border-blue-500/50 bg-blue-50 text-blue-900 dark:border-blue-500/50 dark:bg-blue-950/30 dark:text-blue-400 [&>svg]:text-blue-600 dark:[&>svg]:text-blue-400',
       },
     },
-    defaultVariants: {
-      variant: 'default',
-    },
+    defaultVariants: { variant: 'default' },
   },
 );
 
-const Alert = ({
-  ref,
-  className,
-  variant,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement> &
+type AlertProps = React.ComponentPropsWithoutRef<'div'> &
   VariantProps<typeof alertVariants> & {
-    ref?: React.Ref<HTMLDivElement>;
-  }) => (
-  <div
-    ref={ref}
-    role='alert'
-    aria-live='polite'
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
+    role?: 'alert' | 'status';
+  };
+
+const Alert = React.forwardRef<React.ElementRef<'div'>, AlertProps>(
+  ({ className, variant, role, ...props }, ref) => {
+    // Sensible default: only destructive interrupts
+    const computedRole = role ?? (variant === 'destructive' ? 'alert' : 'status');
+
+    return (
+      <div
+        ref={ref}
+        role={computedRole}
+        aria-live={computedRole === 'status' ? 'polite' : undefined}
+        className={cn(alertVariants({ variant }), className)}
+        {...props}
+      />
+    );
+  },
 );
 Alert.displayName = 'Alert';
 
-const AlertTitle = ({
-  ref,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLHeadingElement> & {
-  ref?: React.Ref<HTMLParagraphElement>;
-}) => (
-  <h5
-    ref={ref}
-    className={cn('font-medium leading-none tracking-tight', 'mb-1', className)}
-    {...props}
-  />
+type AlertTitleProps = React.ComponentPropsWithoutRef<'h5'>;
+
+const AlertTitle = React.forwardRef<React.ElementRef<'h5'>, AlertTitleProps>(
+  ({ className, ...props }, ref) => (
+    <h5
+      ref={ref}
+      className={cn('mb-1 font-medium leading-none tracking-tight', className)}
+      {...props}
+    />
+  ),
 );
 AlertTitle.displayName = 'AlertTitle';
 
-const AlertDescription = ({
-  ref,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement> & {
-  ref?: React.Ref<HTMLParagraphElement>;
-}) => (
-  <div
-    ref={ref}
-    className={cn(TYPOGRAPHY.TEXT_SM, '[&_p]:leading-relaxed', className)}
-    {...props}
-  />
+type AlertDescriptionProps = React.ComponentPropsWithoutRef<'div'>;
+
+const AlertDescription = React.forwardRef<React.ElementRef<'div'>, AlertDescriptionProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(TYPOGRAPHY.TEXT_SM, '[&_p]:leading-relaxed', className)}
+      {...props}
+    />
+  ),
 );
 AlertDescription.displayName = 'AlertDescription';
 
-export { Alert, AlertTitle, AlertDescription };
+export { Alert, AlertTitle, AlertDescription, alertVariants };
+export type { AlertProps, AlertTitleProps, AlertDescriptionProps };

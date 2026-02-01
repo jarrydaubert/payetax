@@ -33,8 +33,9 @@ import * as React from 'react';
  * - Direct assignment (`element.scrollLeft = value`) was being IGNORED/BATCHED when the
  *   container had `scroll-behavior: smooth` CSS property
  * - This caused the scroll to appear to update in logs but not actually move on screen
- * - The scrollTo() method with `behavior: 'instant'` properly overrides smooth scrolling
+ * - The scrollTo() method with `behavior: 'auto'` properly overrides smooth scrolling
  *   and ensures immediate, reliable scroll updates during drag operations
+ * - Note: 'auto' is the standard value; 'instant' was non-standard and may not work in all browsers
  *
  * **DO NOT change back to direct assignment** - it will break drag scrolling on elements
  * with smooth scrolling enabled!
@@ -99,8 +100,8 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
       startPosRef.current = { x: e.pageX, y: e.pageY };
       scrollPosRef.current = { left: element.scrollLeft, top: element.scrollTop };
 
-      // Ensure cursor shows grabbing state
-      element.style.cursor = 'grabbing';
+      // Add dragging class for CSS styling (cursor, user-select)
+      element.classList.add('is-dragging');
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -130,12 +131,13 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
 
       // CRITICAL: Use scrollTo() method instead of direct assignment (element.scrollLeft = value)
       // Direct assignment fails when container has scroll-behavior: smooth CSS property
-      // The scrollTo() method with behavior: 'instant' properly overrides smooth scrolling
+      // The scrollTo() method with behavior: 'auto' properly overrides smooth scrolling
       // and ensures immediate scroll updates during drag. DO NOT change to direct assignment!
+      // Note: 'auto' is the standard value (not 'instant' which is non-standard)
       element.scrollTo({
         left: newScrollLeft,
         top: newScrollTop,
-        behavior: 'instant',
+        behavior: 'auto',
       });
 
       if (hasMoved && Math.abs(deltaX) > 10) {
@@ -154,7 +156,9 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
 
       isDraggingRef.current = false;
       hasMoved = false;
-      element.style.cursor = 'grab';
+
+      // Remove dragging class to restore normal cursor and text selection
+      element.classList.remove('is-dragging');
     };
     element.addEventListener('pointerdown', handlePointerDown);
     element.addEventListener('pointermove', handlePointerMove, { passive: false }); // passive:false needed for preventDefault

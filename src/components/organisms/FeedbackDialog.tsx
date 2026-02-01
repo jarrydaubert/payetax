@@ -2,7 +2,7 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
-import { useActionState, useEffect, useId, useState, useTransition } from 'react';
+import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { COLORS, ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
@@ -48,11 +48,18 @@ export function FeedbackDialog() {
     { success: false },
   );
 
-  // React 19: useTransition for wrapping async actions
-  const [_isTransitioning, startTransition] = useTransition();
+  // Track which state we've already handled to prevent duplicate side effects
+  const lastHandledState = useRef<FeedbackFormState | null>(null);
 
-  // Handle server action response
+  // Handle server action response (once per unique state change)
   useEffect(() => {
+    // Skip if we've already handled this exact state
+    if (state === lastHandledState.current) return;
+    // Skip initial state
+    if (!(state.success || state.error)) return;
+
+    lastHandledState.current = state;
+
     if (state.success) {
       // Track successful feedback submission
       trackEvent({
@@ -107,8 +114,8 @@ export function FeedbackDialog() {
 
   /**
    * React 19: Form submission with server action
-   * Uses FormData API for progressive enhancement
-   * Wraps formAction in startTransition to properly update isPending state
+   * Client validates first, then calls formAction directly
+   * Note: userAgent, timestamp, and IP are extracted server-side from headers
    */
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,21 +125,15 @@ export function FeedbackDialog() {
       return;
     }
 
-    // Create FormData with all necessary fields
+    // Create FormData with only necessary fields
+    // (timestamp, userAgent, IP are extracted server-side for accuracy/security)
     const formDataToSubmit = new FormData();
     formDataToSubmit.append('email', formData.email);
     formDataToSubmit.append('message', formData.message);
     formDataToSubmit.append('url', window.location.href);
-    formDataToSubmit.append('userAgent', navigator.userAgent);
-    formDataToSubmit.append('timestamp', new Date().toISOString());
-    // Note: IP address will be extracted server-side from request headers
-    formDataToSubmit.append('ipAddress', 'client'); // Placeholder, extracted server-side
 
-    // Call server action inside startTransition to properly update isPending
-    // This ensures React tracks the async operation and isPending updates correctly
-    startTransition(() => {
-      formAction(formDataToSubmit);
-    });
+    // Call server action directly - useActionState handles pending state
+    formAction(formDataToSubmit);
   };
 
   return (
@@ -141,12 +142,14 @@ export function FeedbackDialog() {
         <button
           type='button'
           className={cn(
-            'flex min-h-[44px] items-center px-4 py-2.5 font-medium text-muted-foreground transition-colors hover:text-foreground',
+            'flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
+            'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             SPACING.GAP_2,
             TYPOGRAPHY.TEXT_SM,
           )}
+          aria-haspopup='dialog'
         >
-          <MessageSquare className={ICON_SIZES.SIZE_4} />
+          <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
           Feedback
         </button>
       </DialogTrigger>
@@ -191,7 +194,7 @@ export function FeedbackDialog() {
                   messageLength < minLength
                     ? 'text-destructive'
                     : messageLength > maxLength - 100
-                      ? 'text-amber-600 dark:text-amber-400'
+                      ? COLORS.WARNING
                       : 'text-muted-foreground',
                 )}
                 aria-live='polite'

@@ -4,30 +4,68 @@ import type { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
+// Input constraints to prevent abuse and layout issues
+const MAX_TITLE_LENGTH = 70;
+const MAX_DESCRIPTION_LENGTH = 150;
+const MAX_SALARY = 10_000_000;
+
+/**
+ * Clamp text to maximum length, adding ellipsis if truncated
+ */
+function clampText(text: string, maxLength: number): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+  return `${trimmed.slice(0, maxLength - 1)}…`;
+}
+
+/**
+ * Parse and validate a money value from query param
+ * Returns null if invalid or out of bounds
+ */
+function parseMoney(value: string | null): number | null {
+  if (!value) return null;
+  // Remove currency symbols, commas, spaces
+  const cleaned = value.replace(/[£,\s]/g, '');
+  const num = Number.parseFloat(cleaned);
+  if (!Number.isFinite(num)) return null;
+  if (num < 0 || num > MAX_SALARY) return null;
+  return num;
+}
+
+/**
+ * Format a number as GBP currency
+ */
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+// Cache headers for CDN - OG images are expensive to generate
+const CACHE_HEADERS = {
+  'Cache-Control': 'public, immutable, s-maxage=31536000, stale-while-revalidate=86400',
+};
+
 export function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
-  // Get parameters
-  const salary = searchParams.get('salary');
-  const takeHome = searchParams.get('takeHome');
-  const title = searchParams.get('title') || 'UK Tax Calculator';
-  const description = searchParams.get('description') || 'Calculate your take-home pay instantly';
+  // Get and validate parameters with constraints
+  const rawTitle = searchParams.get('title') || 'UK Tax Calculator';
+  const rawDescription =
+    searchParams.get('description') || 'Calculate your take-home pay instantly';
 
-  // Format currency
-  const formatCurrency = (value: string | null) => {
-    if (!value) return null;
-    const num = Number.parseFloat(value);
-    if (Number.isNaN(num)) return null;
-    return new Intl.NumberFormat('en-GB', {
-      style: 'currency',
-      currency: 'GBP',
-      maximumFractionDigits: 0,
-    }).format(num);
-  };
+  const title = clampText(rawTitle, MAX_TITLE_LENGTH);
+  const description = clampText(rawDescription, MAX_DESCRIPTION_LENGTH);
 
-  const formattedSalary = formatCurrency(salary);
-  const formattedTakeHome = formatCurrency(takeHome);
-  const hasResults = formattedSalary && formattedTakeHome;
+  // Parse salary values with validation
+  const salary = parseMoney(searchParams.get('salary'));
+  const takeHome = parseMoney(searchParams.get('takeHome'));
+
+  const formattedSalary = salary !== null ? formatCurrency(salary) : null;
+  const formattedTakeHome = takeHome !== null ? formatCurrency(takeHome) : null;
+  const hasResults = Boolean(formattedSalary && formattedTakeHome);
 
   return new ImageResponse(
     <div
@@ -86,9 +124,11 @@ export function GET(request: NextRequest) {
                 color: '#f8fafc',
                 marginBottom: '24px',
                 lineHeight: 1.2,
+                maxWidth: '100%',
+                overflow: 'hidden',
               }}
             >
-              Your Tax Calculation
+              {title !== 'UK Tax Calculator' ? title : 'Your Tax Calculation'}
             </h1>
 
             <div
@@ -159,6 +199,8 @@ export function GET(request: NextRequest) {
                 color: '#f8fafc',
                 marginBottom: '24px',
                 lineHeight: 1.2,
+                maxWidth: '100%',
+                overflow: 'hidden',
               }}
             >
               {title}
@@ -170,6 +212,7 @@ export function GET(request: NextRequest) {
                 color: '#94a3b8',
                 maxWidth: '80%',
                 lineHeight: 1.4,
+                overflow: 'hidden',
               }}
             >
               {description}
@@ -196,6 +239,7 @@ export function GET(request: NextRequest) {
     {
       width: 1200,
       height: 630,
+      headers: CACHE_HEADERS,
     },
   );
 }

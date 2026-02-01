@@ -11,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+} from '@/components/atoms/ui/table';
+import { SPACING } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { ComparisonResults } from '@/lib/salaryComparison';
@@ -40,22 +40,31 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
   const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef);
   useMouseDragScroll(containerRef);
 
-  const renderDiff = React.useCallback((diff: number, isPositive: boolean = diff > 0) => {
+  // Unique ID for accessibility
+  const scrollHintId = React.useId();
+
+  /**
+   * Render a difference cell with appropriate direction indicator
+   * @param diff - The signed difference (new - current)
+   * @param higherIsBetter - true if positive diff is good (e.g., gross salary), false if bad (e.g., tax)
+   */
+  const renderDiff = React.useCallback((diff: number, higherIsBetter: boolean) => {
     if (diff === 0) return <span className='text-muted-foreground'>—</span>;
 
-    const isGain = isPositive;
+    // Determine if this is a gain (good outcome) based on direction preference
+    const isGain = higherIsBetter ? diff > 0 : diff < 0;
+    const amount = Math.abs(diff);
+
     return (
       <div
         className={cn(
-          `flex items-center ${SPACING.GAP_1}`,
+          'flex items-center justify-end',
+          SPACING.GAP_1,
           isGain ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400',
         )}
       >
-        {isGain ? <ArrowUp className='size-3' /> : <ArrowDown className='size-3' />}
-        <span className='font-medium'>
-          {isGain ? '+' : ''}
-          {formatCurrency(diff, 0)}
-        </span>
+        {isGain ? <ArrowUp className='size-4' /> : <ArrowDown className='size-4' />}
+        <span className='font-medium'>{formatCurrency(amount, 0)}</span>
       </div>
     );
   }, []);
@@ -66,29 +75,46 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
       <ScrollIndicator direction='left' visible={showLeftIndicator} />
       <ScrollIndicator direction='right' visible={showRightIndicator} />
 
+      {/* Screen reader hint for scrollable region */}
+      <div id={scrollHintId} className='sr-only'>
+        Horizontally scrollable table. Use swipe, scroll, or click and drag to view all columns.
+      </div>
+
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling */}
       <section
         ref={containerRef}
-        className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border active:cursor-grabbing'
+        tabIndex={0}
+        className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
         style={{
           scrollbarWidth: 'thin',
           scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
           WebkitOverflowScrolling: 'touch',
         }}
-        aria-label='Salary comparison results - scrollable'
+        aria-label='Salary comparison results'
+        aria-describedby={scrollHintId}
       >
-        <Table aria-label='Salary comparison results'>
+        <Table>
           <TableHeader>
             <TableRow>
-              <TableHead scope='col' className='sticky top-0 z-10 w-[30%] bg-background'>
+              <TableHead scope='col' className='sticky top-0 z-10 min-w-[120px] bg-background'>
                 Metric
               </TableHead>
-              <TableHead scope='col' className='sticky top-0 z-10 bg-background text-right'>
+              <TableHead
+                scope='col'
+                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+              >
                 Current
               </TableHead>
-              <TableHead scope='col' className='sticky top-0 z-10 bg-background text-right'>
+              <TableHead
+                scope='col'
+                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+              >
                 New
               </TableHead>
-              <TableHead scope='col' className='sticky top-0 z-10 bg-background text-right'>
+              <TableHead
+                scope='col'
+                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+              >
                 Difference
               </TableHead>
             </TableRow>
@@ -97,10 +123,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* Gross Salary */}
             <TableRow>
               <TableCell className='font-medium'>Gross Salary</TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(currentResults.grossSalary.annually, 0)}
               </TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(newResults.grossSalary.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(grossDiff, true)}</TableCell>
@@ -109,10 +135,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* Income Tax */}
             <TableRow>
               <TableCell className='font-medium'>Income Tax</TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(currentResults.incomeTax.annually, 0)}
               </TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(newResults.incomeTax.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(taxDiff, false)}</TableCell>
@@ -121,10 +147,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* National Insurance */}
             <TableRow>
               <TableCell className='font-medium'>National Insurance</TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(currentResults.nationalInsurance.annually, 0)}
               </TableCell>
-              <TableCell className='text-right'>
+              <TableCell className='whitespace-nowrap text-right'>
                 {formatCurrency(newResults.nationalInsurance.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(niDiff, false)}</TableCell>
@@ -134,10 +160,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {(studentLoanDiff !== 0 || currentResults.studentLoan.annually > 0) && (
               <TableRow>
                 <TableCell className='font-medium'>Student Loan</TableCell>
-                <TableCell className='text-right'>
+                <TableCell className='whitespace-nowrap text-right'>
                   {formatCurrency(currentResults.studentLoan.annually, 0)}
                 </TableCell>
-                <TableCell className='text-right'>
+                <TableCell className='whitespace-nowrap text-right'>
                   {formatCurrency(newResults.studentLoan.annually, 0)}
                 </TableCell>
                 <TableCell className='text-right'>{renderDiff(studentLoanDiff, false)}</TableCell>
@@ -148,49 +174,48 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {(pensionDiff !== 0 || currentResults.pensionContribution.annually > 0) && (
               <TableRow>
                 <TableCell className='font-medium'>Pension</TableCell>
-                <TableCell className='text-right'>
+                <TableCell className='whitespace-nowrap text-right'>
                   {formatCurrency(currentResults.pensionContribution.annually, 0)}
                 </TableCell>
-                <TableCell className='text-right'>
+                <TableCell className='whitespace-nowrap text-right'>
                   {formatCurrency(newResults.pensionContribution.annually, 0)}
                 </TableCell>
                 <TableCell className='text-right'>{renderDiff(pensionDiff, false)}</TableCell>
               </TableRow>
             )}
 
-            {/* Net Pay (highlighted) */}
+            {/* Net Pay (highlighted) - reuses renderDiff for consistency */}
             <TableRow className='border-t-2 bg-muted/30'>
               <TableCell className='font-bold'>Take-Home Pay</TableCell>
-              <TableCell className='text-right font-semibold'>
+              <TableCell className='whitespace-nowrap text-right font-semibold'>
                 {formatCurrency(currentResults.netPay.annually, 0)}
               </TableCell>
-              <TableCell className='text-right font-semibold'>
+              <TableCell className='whitespace-nowrap text-right font-semibold'>
                 {formatCurrency(newResults.netPay.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>
-                <div className={`flex items-center justify-end ${SPACING.GAP_1}`}>
-                  {netDiff > 0 ? (
-                    <div
-                      className={`flex items-center ${SPACING.GAP_1} text-green-600 dark:text-green-400`}
-                    >
-                      <ArrowUp className={ICON_SIZES.SIZE_4} />
-                      <span className={`font-bold ${TYPOGRAPHY.TEXT_LG}`}>
-                        +{formatCurrency(netDiff, 0)}
-                      </span>
-                    </div>
-                  ) : netDiff < 0 ? (
-                    <div
-                      className={`flex items-center ${SPACING.GAP_1} text-amber-600 dark:text-amber-400`}
-                    >
-                      <ArrowDown className={ICON_SIZES.SIZE_4} />
-                      <span className={`font-bold ${TYPOGRAPHY.TEXT_LG}`}>
-                        {formatCurrency(netDiff, 0)}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className='text-muted-foreground'>—</span>
-                  )}
-                </div>
+                {netDiff === 0 ? (
+                  <span className='text-muted-foreground'>—</span>
+                ) : (
+                  <div
+                    className={cn(
+                      'flex items-center justify-end',
+                      SPACING.GAP_1,
+                      netDiff > 0
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-amber-600 dark:text-amber-400',
+                    )}
+                  >
+                    {netDiff > 0 ? (
+                      <ArrowUp className='size-5' />
+                    ) : (
+                      <ArrowDown className='size-5' />
+                    )}
+                    <span className='font-bold text-lg'>
+                      {formatCurrency(Math.abs(netDiff), 0)}
+                    </span>
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           </TableBody>

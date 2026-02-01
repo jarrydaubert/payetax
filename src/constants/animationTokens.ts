@@ -11,7 +11,7 @@ import type { Transition, Variants } from 'framer-motion';
 
 /**
  * Standard animation durations in seconds
- * Based on Material Design motion guidelines
+ * Inspired by Material Design motion guidelines
  */
 export const ANIMATION_DURATIONS = {
   /** Very fast animations (100ms) - micro-interactions */
@@ -49,28 +49,28 @@ export const ANIMATION_EASINGS = {
 export const ANIMATION_SPRINGS = {
   /** Standard spring - balanced stiffness and damping */
   DEFAULT: {
-    type: 'spring' as const,
+    type: 'spring',
     stiffness: 300,
     damping: 30,
-  },
+  } satisfies Transition,
   /** Gentle spring - soft, subtle bounce */
   GENTLE: {
-    type: 'spring' as const,
+    type: 'spring',
     stiffness: 200,
     damping: 25,
-  },
+  } satisfies Transition,
   /** Bouncy spring - emphasized bounce effect */
   BOUNCY: {
-    type: 'spring' as const,
+    type: 'spring',
     stiffness: 400,
     damping: 10,
-  },
+  } satisfies Transition,
   /** Stiff spring - quick, minimal bounce */
   STIFF: {
-    type: 'spring' as const,
+    type: 'spring',
     stiffness: 500,
     damping: 40,
-  },
+  } satisfies Transition,
 } as const;
 
 /**
@@ -191,23 +191,32 @@ export const ANIMATION_CONTAINER_VARIANTS = {
 
 /**
  * Standard gesture animations for interactive elements
+ *
+ * For finance/tax UI, subtle scales (1.02-1.03) are preferred to avoid
+ * layout jitter. Reserve stronger scales (1.05+) for CTAs and marketing.
  */
 export const ANIMATION_GESTURES = {
-  /** Standard hover effect - slight scale up */
+  /** Standard hover effect - subtle scale for professional UI */
   hover: {
-    scale: 1.05,
+    scale: 1.02,
     transition: { duration: ANIMATION_DURATIONS.FAST },
   },
 
   /** Gentle hover effect - minimal scale */
   hoverGentle: {
-    scale: 1.02,
+    scale: 1.01,
     transition: { duration: ANIMATION_DURATIONS.FAST },
   },
 
-  /** Strong hover effect - emphasized scale */
+  /** Strong hover effect - for CTAs and marketing elements */
   hoverStrong: {
-    scale: 1.1,
+    scale: 1.05,
+    transition: { duration: ANIMATION_DURATIONS.FAST },
+  },
+
+  /** Fade hover effect - opacity only, good for reduced motion or dense UI */
+  hoverFade: {
+    opacity: 0.85,
     transition: { duration: ANIMATION_DURATIONS.FAST },
   },
 
@@ -263,6 +272,10 @@ export const ANIMATION_TRANSITIONS = {
 /**
  * Helper to create transition with reduced motion support
  *
+ * Forces instant transition (type: 'tween', duration: 0) when reduced motion
+ * is enabled. This ensures springs and layout animations also respect the
+ * preference, since `duration: 0` alone is ignored by springs.
+ *
  * @param shouldReduceMotion - Whether to reduce/disable animation
  * @param transition - The transition configuration to use
  * @returns Modified transition respecting motion preferences
@@ -277,7 +290,8 @@ export function getAccessibleTransition(
   transition: Transition,
 ): Transition {
   if (shouldReduceMotion) {
-    return { duration: 0 };
+    // Force tween with zero duration - springs ignore duration alone
+    return { type: 'tween', duration: 0, delay: 0 };
   }
   return transition;
 }
@@ -285,8 +299,13 @@ export function getAccessibleTransition(
 /**
  * Helper to get accessible animation props
  *
+ * Returns undefined when reduced motion is enabled, allowing parent variants
+ * or inherited motion props to take precedence. This is cleaner than returning
+ * an empty object which could override parent values.
+ *
  * @param shouldReduceMotion - Whether to reduce/disable animation
- * @returns Empty object if motion should be reduced, otherwise undefined
+ * @param animation - The animation object to conditionally apply
+ * @returns The animation object, or undefined if motion should be reduced
  *
  * @example
  * ```typescript
@@ -299,9 +318,6 @@ export function getAccessibleTransition(
 export function getAccessibleAnimation<T>(
   shouldReduceMotion: boolean,
   animation: T,
-): T | Record<string, never> {
-  if (shouldReduceMotion) {
-    return {};
-  }
-  return animation;
+): T | undefined {
+  return shouldReduceMotion ? undefined : animation;
 }

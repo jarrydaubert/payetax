@@ -1,7 +1,6 @@
 // src/components/molecules/Footer.tsx
 // Simplified footer matching payetax-web design system
 
-import type { Route } from 'next';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -24,18 +23,18 @@ export function Footer({ className }: FooterProps) {
   return (
     <div className={cn('footer-new', className)}>
       <div className='footer-content-new'>
-        {/* Brand */}
-        <div className='footer-brand'>
+        {/* Brand - links back to home */}
+        <Link href='/' className='footer-brand'>
           paye<span>tax</span>
-        </div>
+        </Link>
 
-        {/* Links */}
+        {/* Links - no `as Route` casts; routes validated by typedRoutes in next.config */}
         <nav className='footer-links-new' aria-label='Footer navigation'>
           <Link href='/blog'>Blog</Link>
-          <Link href={'/scenarios' as Route}>Scenarios</Link>
+          <Link href='/scenarios'>Scenarios</Link>
           <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
-          <Link href={'/tools/scottish-tax-calculator' as Route}>Scottish Tax</Link>
-          <Link href={'/tools/director-guide' as Route}>Director Guide</Link>
+          <Link href='/tools/scottish-tax-calculator'>Scottish Tax</Link>
+          <Link href='/tools/director-guide'>Director Guide</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
           <Link href='/compliance'>Compliance</Link>

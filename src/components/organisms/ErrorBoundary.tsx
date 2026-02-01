@@ -1,12 +1,34 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Copy, Home, RefreshCw, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
+
+/** Known benign errors that shouldn't be reported to Sentry */
+const BENIGN_ERROR_PATTERNS = [
+  'ResizeObserver loop limit exceeded',
+  'ResizeObserver loop completed with undelivered notifications',
+  'Loading chunk', // Dynamic import failures (usually network issues)
+  'ChunkLoadError',
+] as const;
+
+/** Check if error should be filtered out */
+function isBenignError(error: Error | null): boolean {
+  if (!error?.message) return false;
+  return BENIGN_ERROR_PATTERNS.some((pattern) => error.message.includes(pattern));
+}
+
+/**
+ * Show debug info only when explicitly enabled via env var
+ * NODE_ENV alone is unreliable in client bundles (always 'production' in deployed builds)
+ */
+const SHOW_DEBUG =
+  process.env.NEXT_PUBLIC_SHOW_DEBUG_ERRORS === 'true' && process.env.NODE_ENV === 'development';
 
 interface Props {
   children: React.ReactNode;
@@ -44,24 +66,29 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Filter out known benign errors (ResizeObserver, chunk loading, etc.)
+    if (isBenignError(error)) {
+      // Reset immediately for transient errors
+      this.resetError();
+      return;
+    }
 
-    // Capture exception in Sentry with additional context
-    const eventId = Sentry.captureException(error, {
-      contexts: {
-        react: {
-          componentStack: errorInfo.componentStack,
-        },
-      },
-      tags: {
-        error_boundary: 'component',
-      },
-      level: 'error',
+    // Only log in development to avoid third-party log collector noise
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
+
+    // Capture exception in Sentry with scoped context
+    Sentry.withScope((scope) => {
+      scope.setTag('error_boundary', 'component');
+      scope.setContext('react', {
+        componentStack: errorInfo.componentStack,
+      });
+      scope.setLevel('error');
+
+      const eventId = Sentry.captureException(error);
+      this.setState({ eventId });
     });
-
-    // Store Sentry event ID for user reference
-    this.setState({ eventId });
   }
 
   resetError = () => {
@@ -89,6 +116,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
 }
 
 function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+
+  // Focus heading on mount for keyboard accessibility
+  React.useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
   // Generate stable particle data to avoid infinite re-renders
   const particles = React.useMemo(
     () =>
@@ -102,16 +136,27 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
     [],
   );
 
+  const handleCopyEventId = () => {
+    if (eventId) {
+      navigator.clipboard.writeText(eventId);
+      toast.success('Error reference copied to clipboard');
+    }
+  };
+
+  const handleHardRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
       {/* Animated background - dark gradient for both themes */}
       <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 dark:from-slate-950 dark:via-red-950 dark:to-slate-950'>
-        <div className='absolute inset-0'>
-          {/* Floating error particles */}
+        {/* Floating error particles - hidden for reduced motion */}
+        <div className='absolute inset-0 motion-reduce:hidden'>
           {particles.map((particle) => (
             <div
               key={`error-particle-${particle.id}`}
-              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20 dark:bg-red-500 dark:opacity-10'
+              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20 motion-reduce:animate-none dark:bg-red-500 dark:opacity-10'
               style={{
                 left: `${particle.left}%`,
                 top: `${particle.top}%`,
@@ -134,7 +179,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             SHADOWS.XXL,
           )}
         >
-          {/* Error icon with animation */}
+          {/* Error icon with animation - respects reduced motion */}
           <div className={cn('relative inline-block', SPACING.MB_8)}>
             <div
               className={cn(
@@ -146,18 +191,27 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               )}
             >
               <AlertTriangle
-                className={cn('animate-pulse text-red-400', ICON_SIZES.SIZE_8, 'md:size-10')}
+                className={cn(
+                  'text-red-400',
+                  'animate-pulse motion-reduce:animate-none',
+                  ICON_SIZES.SIZE_8,
+                  'md:size-10',
+                )}
+                aria-hidden='true'
               />
             </div>
-            <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20' />
+            <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20 motion-reduce:animate-none' />
           </div>
 
-          {/* Heading - responsive typography */}
+          {/* Heading - responsive typography, focusable for a11y */}
           <h1
+            ref={headingRef}
+            tabIndex={-1}
             className={cn(
-              'font-bold text-foreground',
+              'font-bold text-foreground outline-none',
               TYPOGRAPHY.TEXT_3XL,
-              `md:${TYPOGRAPHY.TEXT_4XL}`,
+              // Use literal string - dynamic template breaks Tailwind extraction
+              'md:text-4xl',
               SPACING.MB_6,
             )}
           >
@@ -170,7 +224,8 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               'mx-auto max-w-2xl leading-relaxed',
               'text-muted-foreground',
               TYPOGRAPHY.TEXT_LG,
-              `md:${TYPOGRAPHY.TEXT_XL}`,
+              // Use literal string - dynamic template breaks Tailwind extraction
+              'md:text-xl',
               SPACING.MB_8,
             )}
           >
@@ -211,7 +266,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             </ul>
           </div>
 
-          {/* Event ID display */}
+          {/* Event ID display with copy button */}
           {eventId && (
             <div
               className={cn(
@@ -223,11 +278,21 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 SPACING.MB_8,
               )}
             >
-              <strong className='text-white dark:text-white/90'>Error Reference:</strong>
-              <br />
+              <div className={cn('flex items-center justify-between', SPACING.MB_2)}>
+                <strong className='text-white dark:text-white/90'>Error Reference:</strong>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={handleCopyEventId}
+                  className='h-7 text-white/70 hover:text-white'
+                  aria-label='Copy error reference to clipboard'
+                >
+                  <Copy className={ICON_SIZES.SIZE_4} />
+                </Button>
+              </div>
               <code
                 className={cn(
-                  'break-all font-mono',
+                  'block break-all font-mono',
                   'text-purple-300 dark:text-purple-400',
                   TYPOGRAPHY.TEXT_XS,
                 )}
@@ -244,7 +309,11 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
           {/* Action buttons - responsive layout */}
           <div
-            className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4, SPACING.MB_8)}
+            className={cn(
+              'flex flex-col justify-center sm:flex-row sm:flex-wrap',
+              SPACING.GAP_4,
+              SPACING.MB_8,
+            )}
           >
             <Button
               type='button'
@@ -252,13 +321,18 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               size='lg'
               className='bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600'
             >
-              <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+              <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
               Try Again
+            </Button>
+
+            <Button type='button' onClick={handleHardRefresh} variant='outline' size='lg'>
+              <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
+              Refresh Page
             </Button>
 
             <Button asChild variant='outline' size='lg'>
               <Link href='/'>
-                <Home className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+                <Home className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
                 Go Home
               </Link>
             </Button>
@@ -270,8 +344,8 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             {eventId ? `#${eventId.slice(-8)}` : 'N/A'}
           </p>
 
-          {/* Development mode error details */}
-          {process.env.NODE_ENV === 'development' && error && (
+          {/* Development mode error details - only when explicitly enabled */}
+          {SHOW_DEBUG && error && (
             <details className='mx-auto max-w-4xl text-left'>
               <summary
                 className={cn(

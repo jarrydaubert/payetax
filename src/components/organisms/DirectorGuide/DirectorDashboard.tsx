@@ -29,17 +29,23 @@ import {
   SummaryCards,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
+import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { SPACING } from '@/constants/designTokens';
 import {
   trackGuideReset,
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
+import { cn } from '@/lib/utils';
 import {
   useDirectorFormData,
   useDirectorGuideActions,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
+
+/** Debounce delay for auto-calculate (ms) */
+const CALCULATE_DEBOUNCE_MS = 200;
 
 export function DirectorDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Icon menu collapsed by default
@@ -64,7 +70,7 @@ export function DirectorDashboard() {
     }
   }, []);
 
-  // Auto-calculate when inputs change
+  // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
   useEffect(() => {
     const canCalculate =
       formData.region !== undefined &&
@@ -73,14 +79,15 @@ export function DirectorDashboard() {
       formData.expenses !== undefined &&
       formData.expenses >= 0;
 
-    if (canCalculate) {
-      calculate();
-    }
+    if (!canCalculate) return;
+
+    const timer = window.setTimeout(() => calculate(), CALCULATE_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
   }, [formData.region, formData.revenue, formData.expenses, calculate]);
 
-  // Track results shown (once per session)
+  // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
-    if (comparison && comparison.grossProfit > 0 && !hasTrackedResults.current) {
+    if (comparison && !hasTrackedResults.current) {
       trackResultsShown(comparison.grossProfit, 'normal');
       hasTrackedResults.current = true;
     }
@@ -93,7 +100,8 @@ export function DirectorDashboard() {
     reset();
   }, [reset]);
 
-  const hasResults = comparison && comparison.grossProfit > 0;
+  // Show results when calculation is complete (even for 0 or negative profit)
+  const hasResults = Boolean(comparison);
 
   return (
     <TooltipProvider>
@@ -146,8 +154,19 @@ export function DirectorDashboard() {
                 </div>
 
                 {/* Email CTA Banner */}
-                <div className='mt-8 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 p-6'>
-                  <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
+                <div
+                  className={cn(
+                    'rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10',
+                    SPACING.MT_8,
+                    SPACING.P_6,
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'flex flex-col items-center justify-between sm:flex-row',
+                      SPACING.GAP_4,
+                    )}
+                  >
                     <div className='text-center sm:text-left'>
                       <h3 className='mb-1 font-semibold text-lg text-slate-100'>
                         Save this breakdown for your records
@@ -157,14 +176,13 @@ export function DirectorDashboard() {
                         your accountant.
                       </p>
                     </div>
-                    <button
-                      type='button'
+                    <Button
                       onClick={() => setEmailDialogOpen(true)}
-                      className='flex shrink-0 items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-[#020617] text-sm transition-opacity hover:opacity-90'
+                      className='flex shrink-0 items-center gap-2 bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-[#020617] hover:opacity-90'
                     >
-                      <Mail className='size-4' />
+                      <Mail className='size-4' aria-hidden='true' />
                       Email My Results
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -182,8 +200,16 @@ export function DirectorDashboard() {
                     Enter your company profit on the left to see exactly how much you could take
                     home. We&apos;ll show you the tax-efficient split and when to pay yourself.
                   </p>
-                  <div className='flex items-center justify-center gap-2 text-slate-600 text-sm'>
-                    <span className='size-2 animate-pulse rounded-full bg-cyan-500' />
+                  <div
+                    className={cn(
+                      'flex items-center justify-center text-slate-600 text-sm',
+                      SPACING.GAP_2,
+                    )}
+                  >
+                    <span
+                      className='size-2 rounded-full bg-cyan-500 motion-safe:animate-pulse'
+                      aria-hidden='true'
+                    />
                     Enter your figures to get started
                   </div>
                 </div>

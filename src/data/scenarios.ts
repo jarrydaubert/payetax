@@ -130,7 +130,7 @@ export const SCENARIOS: Scenario[] = [
       salary: 100000,
       pensionPercent: 0,
     },
-    explanation: `At £100,000, you're at the threshold of the UK's most punishing tax zone. For every £2 you earn above this point, you lose £1 of your personal allowance (£12,570). Combined with 40% tax and 2% NI, this creates an effective 60% tax rate on income between £100,001 and £125,140.
+    explanation: `At £100,000, you're at the threshold of the UK's most punishing tax zone. For every £2 you earn above this point, you lose £1 of your personal allowance (£12,570). This creates an effective 60% income tax rate on income between £100,001 and £125,140 (40% tax + 20% from lost allowance). Including 2% employee NI, your effective marginal rate is approximately 62%.
 
 At exactly £100k, you still have your full personal allowance. But even a small pay rise could push you into the trap, making pension contributions a powerful tool for staying below the threshold.`,
     optimization: `**Strategy: Salary Sacrifice to Pension**
@@ -551,14 +551,14 @@ At £60k, you're not yet in the personal allowance taper, so the focus is on max
     explanation: `Congratulations on your first job! At £25,000, here's what to expect:
 
 **Your Take-Home Pay:**
-- Annual: ~£20,932
-- Monthly: ~£1,744
-- Weekly: ~£403
+- Annual: ~£21,520
+- Monthly: ~£1,793
+- Weekly: ~£414
 
 **What Gets Deducted:**
 - Income tax: ~£2,486/year (basic rate 20% on earnings above £12,570)
-- National Insurance: ~£1,582/year (8% on earnings above £12,570)
-- Total deductions: ~£4,068 (16.3% of gross)
+- National Insurance: ~£994/year (8% on earnings above £12,570)
+- Total deductions: ~£3,480 (13.9% of gross)
 
 You'll receive your first payslip showing gross pay, tax, NI, and net pay. Your tax code will likely be 1257L - this means you have the standard £12,570 personal allowance.`,
     optimization: `**First Job Financial Priorities**
@@ -579,7 +579,7 @@ At £25k, focus on building good financial habits rather than complex tax optimi
       {
         question: 'What is take-home pay on a £25k salary?',
         answer:
-          "After tax and NI, you'll take home approximately £20,932 per year, or £1,744 per month. This is about 83.7% of your gross salary.",
+          "After tax and NI, you'll take home approximately £21,520 per year, or £1,793 per month. This is about 86.1% of your gross salary.",
       },
       {
         question: 'Why is my tax code 1257L?',

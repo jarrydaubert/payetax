@@ -1,13 +1,11 @@
-// src/app/privacy/PrivacyPageClient.tsx
-'use client';
+// src/app/privacy/PrivacyPageContent.tsx
+// Server Component - all presentational, no hooks/handlers
 
-import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
-import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
-import Cookie from 'lucide-react/dist/esm/icons/cookie.js';
-import Eye from 'lucide-react/dist/esm/icons/eye.js';
-import Lock from 'lucide-react/dist/esm/icons/lock.js';
-import Shield from 'lucide-react/dist/esm/icons/shield.js';
-import X from 'lucide-react/dist/esm/icons/x.js';
+import { Calendar, CheckCircle, Cookie, Eye, Lock, Shield, X } from 'lucide-react';
+
+// Last updated date - update when privacy policy changes
+const PRIVACY_LAST_UPDATED = 'October 4, 2025';
+
 import { GradientText } from '@/components/atoms/GradientText';
 import { ComparisonCards } from '@/components/molecules/ComparisonCards';
 import { DataFlowCards } from '@/components/molecules/DataFlowCards';
@@ -23,7 +21,7 @@ import {
 } from '@/constants/pages/privacyPageData';
 import { cn } from '@/lib/utils';
 
-export function PrivacyPageClient() {
+export function PrivacyPageContent() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero Section */}
@@ -50,7 +48,7 @@ export function PrivacyPageClient() {
           )}
         >
           <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-          <span>Last updated: October 4, 2025</span>
+          <span>Last updated: {PRIVACY_LAST_UPDATED}</span>
         </div>
       </section>
 

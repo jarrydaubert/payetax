@@ -2,21 +2,28 @@
  * GOLDEN MASTER E2E TEST SUITE - HMRC Reference Implementation
  *
  * This is the ONE SOURCE OF TRUTH for tax calculation accuracy.
- * Every test case is verified against official HMRC guidance.
+ * Test cases sourced from official HMRC testing spreadsheet (2025-26).
  *
  * ============================================================================
- * ZERO FALSE POSITIVES - Penny-Accurate Assertions
+ * REGRESSION-ACCURATE ASSERTIONS (10p tolerance)
  * ============================================================================
  *
- * Uses .toBeCloseTo(value, 2) for all monetary values.
- * Tests will ONLY fail when calculations are genuinely wrong.
+ * Uses .toBeCloseTo(value, 1) for income tax, NI, and net pay to handle
+ * monthly/weekly calculation rounding differences.
+ * Uses .toBeCloseTo(value, 2) for student loan and pension (penny-accurate).
+ *
+ * Tests fail LOUD when:
+ * - Calculations drift beyond tolerance
+ * - UI extraction fails (no silent zeros)
+ * - Expected rows are missing from results
  *
  * ============================================================================
  * DATA-DRIVEN TESTING
  * ============================================================================
  *
- * All scenarios defined in golden-tax-cases-2025-26.json.
- * When tax rates change: update JSON only, tests automatically adapt.
+ * All scenarios defined in golden-tax-cases-2025-26-COMPLETE.json.
+ * Expected values sourced from HMRC testing spreadsheet - DO NOT MODIFY.
+ * When tax rates change: regenerate JSON from HMRC source, tests adapt.
  *
  * ============================================================================
  * COVERAGE (24 SCENARIOS)
@@ -28,75 +35,158 @@
  * Pension: 10%, 40% salary sacrifice
  * Marriage Allowance: Transfer scenarios
  * Special Codes: BR, K100, 1257L M1 (emergency)
- * HICBC: Full withdrawal, 50% taper, pension avoidance ⚠️ CRITICAL
+ * HICBC: Full withdrawal, 50% taper, pension avoidance
  * Edge Cases: Exact thresholds
  *
  * Priority: CRITICAL - This file determines user trust
  */
 
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import goldenCases from './fixtures/golden-tax-cases-2025-26-COMPLETE.json';
 
-test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', () => {
-  test.beforeEach(async ({ page }) => {
-    const timestamp = Date.now();
-    await page.goto(`/?t=${timestamp}#tax-calculator`);
-    await page.waitForLoadState('networkidle');
+// ============================================================================
+// EXTRACTION HELPERS - Fail loud, not silent
+// ============================================================================
 
-    // CRITICAL: Wait longer for page to fully load
-    await page.waitForTimeout(1500);
+interface ExtractionError extends Error {
+  availableRows?: string[];
+  searchedLabel?: string;
+}
 
-    // Dismiss cookie banner if it appears - using test ID (consistent with global-setup)
-    // NOTE: Global setup should handle this, but we check anyway for reliability
-    const acceptCookiesButton = page.getByTestId('cookie-accept-all');
-    const cookieBannerVisible = await acceptCookiesButton
-      .isVisible({ timeout: 2000 })
-      .catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
-      // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('🍪 Cookie banner dismissed in golden master test');
-    }
-  });
+/**
+ * Extract numeric value from results table - THROWS on failure.
+ * This ensures we never get false passes from silent zeros.
+ */
+async function getTableValueOrThrow(
+  page: Page,
+  label: string,
+  options: { optional?: boolean } = {},
+): Promise<number> {
+  const resultsTable = page.getByTestId('results-table');
 
-  // Helper: Extract numeric value from results table
-  async function getTableValue(page: any, label: string): Promise<number> {
-    try {
-      // Try multiple selectors to find the row
-      const row = page.locator(`tr:has-text("${label}")`).first();
-      await row.waitFor({ state: 'visible', timeout: 5000 });
+  // Get all row labels for debugging
+  const allRows = resultsTable.locator('tr');
+  const rowCount = await allRows.count();
+  const availableLabels: string[] = [];
 
-      // Get the yearly value (3rd column)
-      const cells = row.locator('td');
-      const count = await cells.count();
-
-      if (count >= 3) {
-        const yearlyCell = cells.nth(2);
-        const text = await yearlyCell.textContent();
-        const value = Number.parseFloat(text?.replace(/[£,]/g, '') || '0');
-        return value;
-      }
-
-      return 0;
-    } catch (_error) {
-      return 0;
+  for (let i = 0; i < rowCount; i++) {
+    const rowText = await allRows.nth(i).locator('td').first().textContent();
+    if (rowText?.trim()) {
+      availableLabels.push(rowText.trim());
     }
   }
 
+  // Find the target row
+  const row = resultsTable.locator(`tr:has-text("${label}")`).first();
+  const rowExists = await row.isVisible({ timeout: 2000 }).catch(() => false);
+
+  if (!rowExists) {
+    if (options.optional) {
+      return 0; // Optional rows can return 0
+    }
+    const error: ExtractionError = new Error(
+      `❌ EXTRACTION FAILED: Row "${label}" not found in results table.\n` +
+        `Available rows: [${availableLabels.join(', ')}]`,
+    );
+    error.availableRows = availableLabels;
+    error.searchedLabel = label;
+    throw error;
+  }
+
+  // Get the yearly value (3rd column)
+  const cells = row.locator('td');
+  const count = await cells.count();
+
+  if (count < 3) {
+    throw new Error(
+      `❌ EXTRACTION FAILED: Row "${label}" has only ${count} cells, expected at least 3.`,
+    );
+  }
+
+  const yearlyCell = cells.nth(2);
+  const text = await yearlyCell.textContent();
+
+  if (!text) {
+    throw new Error(`❌ EXTRACTION FAILED: Row "${label}" yearly cell is empty.`);
+  }
+
+  const cleanedText = text.replace(/[£,]/g, '').trim();
+  const value = Number.parseFloat(cleanedText);
+
+  if (Number.isNaN(value)) {
+    throw new Error(`❌ EXTRACTION FAILED: Row "${label}" value "${text}" is not a valid number.`);
+  }
+
+  return value;
+}
+
+/**
+ * Wait for calculator results to be ready.
+ * More reliable than fixed timeouts.
+ */
+async function waitForCalculatorResults(page: Page): Promise<void> {
+  const resultsTable = page.getByTestId('results-table');
+  await expect(resultsTable).toBeVisible({ timeout: 10000 });
+
+  // Wait for at least one numeric value to appear in the table
+  // This indicates calculations have completed
+  await expect(
+    resultsTable
+      .locator('td')
+      .filter({ hasText: /£[\d,]+(\.\d{2})?/ })
+      .first(),
+  ).toBeVisible({ timeout: 5000 });
+}
+
+/**
+ * Wait for input to be processed.
+ * Waits for any loading indicators to disappear.
+ */
+async function waitForInputProcessed(page: Page): Promise<void> {
+  // Wait for any spinners or loading states to clear
+  const spinner = page.locator('[data-loading="true"], .animate-spin');
+  const hasSpinner = await spinner.isVisible({ timeout: 500 }).catch(() => false);
+  if (hasSpinner) {
+    await expect(spinner).toBeHidden({ timeout: 5000 });
+  }
+}
+
+// ============================================================================
+// TEST SUITE
+// ============================================================================
+
+test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
+  test.beforeEach(async ({ page }) => {
+    const timestamp = Date.now();
+    await page.goto(`/?t=${timestamp}#tax-calculator`, { waitUntil: 'domcontentloaded' });
+
+    // Wait for calculator to be interactive
+    const salaryInput = page.getByTestId('salary-input');
+    await expect(salaryInput).toBeVisible({ timeout: 10000 });
+
+    // Dismiss cookie banner if visible (global-setup should handle this, but verify)
+    const acceptCookiesButton = page.getByTestId('cookie-accept-analytics');
+    const cookieBannerVisible = await acceptCookiesButton
+      .isVisible({ timeout: 1000 })
+      .catch(() => false);
+    if (cookieBannerVisible) {
+      await acceptCookiesButton.click();
+      await expect(acceptCookiesButton).toBeHidden({ timeout: 2000 });
+    }
+  });
+
   // ========================================================================
-  // DATA-DRIVEN TESTS - ONE LOOP TO RULE THEM ALL
+  // DATA-DRIVEN TESTS
   // ========================================================================
 
   for (const scenario of goldenCases.cases) {
-    // Mark tests with known issues as fixme so they don't fail the suite
     const testFn = scenario.knownIssue ? test.fixme : test;
 
-    testFn(`${scenario.id} – ${scenario.description}`, async ({ page }) => {
+    testFn(`${scenario.id} – ${scenario.description}`, async ({ page }, testInfo) => {
       // biome-ignore lint/suspicious/noConsole: Test progress tracking
       console.log(`\n💰 ${scenario.id}: ${scenario.description}`);
 
-      // Display known issue warning
       if (scenario.knownIssue) {
         // biome-ignore lint/suspicious/noConsole: Important bug tracking
         console.log(`⚠️  KNOWN ISSUE: ${scenario.knownIssue}`);
@@ -106,59 +196,51 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
       const expected = scenario.expected;
 
       // ====================================================================
-      // INPUT PHASE: Fill calculator form
+      // INPUT PHASE
       // ====================================================================
 
       // 1. Salary (always present)
       const salaryInput = page.getByTestId('salary-input');
       await salaryInput.fill(input.salary.toString());
-      await page.waitForTimeout(300);
+      await waitForInputProcessed(page);
 
       // 2. Tax Code (if not default)
       if (input.taxCode && input.taxCode !== '1257L') {
-        const taxCodeInput = page.getByRole('textbox', { name: /tax code/i });
+        const taxCodeInput = page.getByTestId('tax-code-input');
         const exists = await taxCodeInput.isVisible({ timeout: 2000 }).catch(() => false);
         if (exists) {
-          await taxCodeInput.click();
           await taxCodeInput.fill(input.taxCode);
-          await page.waitForTimeout(300);
+          await waitForInputProcessed(page);
         }
       }
 
       // 3. Region (if not England)
       if (input.region && input.region !== 'England') {
-        const regionButton = page.locator('button').filter({ hasText: /england|scotland|wales/i });
-        const exists = await regionButton.isVisible({ timeout: 2000 }).catch(() => false);
+        const regionSelect = page.getByTestId('region-select');
+        const exists = await regionSelect.isVisible({ timeout: 2000 }).catch(() => false);
         if (exists) {
-          await regionButton.click();
-          await page.waitForTimeout(200);
+          await regionSelect.click();
           await page.getByRole('option', { name: input.region }).click();
-          await page.waitForTimeout(300);
+          await waitForInputProcessed(page);
         }
       }
 
       // 4. Pension (if specified)
       if (input.pensionPercent && input.pensionPercent > 0) {
-        // Pension type defaults to 'percentage', so just fill the input
         const pensionInput = page.getByTestId('pension-input');
         const pensionVisible = await pensionInput.isVisible({ timeout: 2000 }).catch(() => false);
         if (pensionVisible) {
-          await pensionInput.click();
-          await page.waitForTimeout(200);
           await pensionInput.clear();
-          await page.waitForTimeout(200);
           await pensionInput.fill(input.pensionPercent.toString());
-          await page.waitForTimeout(200);
-          await pensionInput.blur(); // Trigger onChange
-          await page.waitForTimeout(800); // Extra wait for state to update
+          await pensionInput.blur();
+          await waitForInputProcessed(page);
         }
       }
 
-      // 5. Student Loan (if specified) - Select + optional postgraduate checkbox
+      // 5. Student Loan (if specified)
       if (input.studentLoan && input.studentLoan !== 'none') {
         const loans = Array.isArray(input.studentLoan) ? input.studentLoan : [input.studentLoan];
 
-        // Determine undergraduate loan (first non-postgrad, or 'postgrad' if only postgrad)
         const undergraduateLoan =
           loans.includes('postgrad') && loans.length === 1
             ? 'postgrad'
@@ -166,13 +248,14 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
 
         const hasPostgrad = loans.includes('postgrad') && loans.length === 2;
 
-        try {
-          // Select undergraduate loan from dropdown
-          const studentLoanSelect = page.getByTestId('student-loan-select');
-          await studentLoanSelect.click({ timeout: 2000 });
-          await page.waitForTimeout(300);
+        const studentLoanSelect = page.getByTestId('student-loan-select');
+        const selectExists = await studentLoanSelect
+          .isVisible({ timeout: 2000 })
+          .catch(() => false);
 
-          // Map loan to option text
+        if (selectExists) {
+          await studentLoanSelect.click();
+
           const optionMap: Record<string, RegExp> = {
             plan1: /Plan 1.*pre-Sept 2012/i,
             plan2: /Plan 2.*Sept 2012/i,
@@ -183,74 +266,70 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
 
           const optionPattern = optionMap[undergraduateLoan] || new RegExp(undergraduateLoan, 'i');
           await page.getByRole('option', { name: optionPattern }).click();
-          await page.waitForTimeout(300);
+          await waitForInputProcessed(page);
 
-          // If has postgraduate add-on, check the checkbox
           if (hasPostgrad) {
             const postgraduateCheckbox = page.getByTestId('postgraduate-addon-checkbox');
-            await postgraduateCheckbox.check({ timeout: 2000 });
-            await page.waitForTimeout(300);
+            await postgraduateCheckbox.check();
+            await waitForInputProcessed(page);
           }
-        } catch (_error) {
-          // Failed to set student loan - test will fail on assertion
         }
       }
 
       // 6. Marriage Allowance (if specified)
       if (input.isMarried) {
-        try {
-          const marriedCheckbox = page.getByLabel(/married/i);
-          await marriedCheckbox.check({ timeout: 2000 });
-          await page.waitForTimeout(300);
+        const marriedCheckbox = page.getByTestId('married-checkbox');
+        const exists = await marriedCheckbox.isVisible({ timeout: 2000 }).catch(() => false);
+        if (exists) {
+          await marriedCheckbox.check();
+          await waitForInputProcessed(page);
 
           if (input.partnerSalary) {
-            // Use role to avoid tooltip collision
-            const partnerInput = page.getByRole('textbox', { name: /partner.*wage/i });
-            await partnerInput.fill(input.partnerSalary.toString());
-            await page.waitForTimeout(300);
+            const partnerInput = page.getByTestId('partner-salary-input');
+            const partnerExists = await partnerInput
+              .isVisible({ timeout: 2000 })
+              .catch(() => false);
+            if (partnerExists) {
+              await partnerInput.fill(input.partnerSalary.toString());
+              await waitForInputProcessed(page);
+            }
           }
-        } catch (_error) {}
+        }
       }
 
-      // 7. Children (for HICBC) - if your calculator supports this
+      // 7. Children (for HICBC)
       if (input.childrenUnder18) {
-        const childrenInput = page.getByLabel(/children/i);
+        const childrenInput = page.getByTestId('children-input');
         const exists = await childrenInput.isVisible({ timeout: 2000 }).catch(() => false);
         if (exists) {
           await childrenInput.fill(input.childrenUnder18.toString());
-          await page.waitForTimeout(300);
+          await waitForInputProcessed(page);
         }
       }
 
       // ====================================================================
-      // CALCULATE: Click button and wait for results
+      // CALCULATE
       // ====================================================================
 
       const calculateButton = page.getByTestId('calculate-button');
       await calculateButton.click();
-
-      // Wait for results table to appear
-      const resultsTable = page.getByTestId('results-table');
-      await expect(resultsTable).toBeVisible({ timeout: 10000 });
-      await page.waitForTimeout(1000); // Let animations settle
+      await waitForCalculatorResults(page);
 
       // ====================================================================
-      // EXTRACT PHASE: Read calculated values
+      // EXTRACT (with explicit failure on missing rows)
       // ====================================================================
 
       const results = {
-        incomeTax: await getTableValue(page, 'Total Tax Due'),
-        employeeNI: await getTableValue(page, 'National Insurance'),
-        netPay: await getTableValue(page, 'Net Pay'),
-        pension: await getTableValue(page, 'Pension'),
-        studentLoan: await getTableValue(page, 'Student Loan'),
+        incomeTax: await getTableValueOrThrow(page, 'Total Tax Due'),
+        employeeNI: await getTableValueOrThrow(page, 'National Insurance'),
+        netPay: await getTableValueOrThrow(page, 'Net Pay'),
+        pension: await getTableValueOrThrow(page, 'Pension', { optional: true }),
+        studentLoan: await getTableValueOrThrow(page, 'Student Loan', { optional: true }),
       };
 
       // ====================================================================
-      // ASSERT PHASE: Penny-accurate verification (2 decimal places)
+      // ASSERT (10p tolerance for tax/NI/net, penny for student loan/pension)
       // ====================================================================
-
-      // CRITICAL: Use .toBeCloseTo() with 1 decimal to handle monthly/weekly calculation rounding
 
       if (expected.incomeTax !== undefined) {
         expect(results.incomeTax, '❌ Income Tax mismatch').toBeCloseTo(expected.incomeTax, 1);
@@ -296,12 +375,26 @@ test.describe('HMRC Golden Master 2025/26 – Penny-Accurate Regression Suite', 
       }
 
       // ====================================================================
-      // VISUAL VERIFICATION: Screenshot for debugging
+      // AUDIT TRAIL: Attach screenshot and debug info
       // ====================================================================
 
-      await page.screenshot({
-        path: `audit-outputs/test-results/golden-${scenario.id}.png`,
-        fullPage: false,
+      const screenshotPath = `audit-outputs/test-results/golden-${scenario.id}.png`;
+      await page.screenshot({ path: screenshotPath, fullPage: false });
+
+      // Attach to test report for debugging
+      await testInfo.attach('screenshot', {
+        path: screenshotPath,
+        contentType: 'image/png',
+      });
+
+      await testInfo.attach('input-params', {
+        body: JSON.stringify(input, null, 2),
+        contentType: 'application/json',
+      });
+
+      await testInfo.attach('extracted-results', {
+        body: JSON.stringify(results, null, 2),
+        contentType: 'application/json',
       });
 
       // biome-ignore lint/suspicious/noConsole: Test completion
@@ -322,11 +415,11 @@ test.afterAll(() => {
   // biome-ignore lint/suspicious/noConsole: Test summary
   console.log('='.repeat(70));
   // biome-ignore lint/suspicious/noConsole: Test summary
-  console.log(`✅ ${goldenCases.cases.length} HMRC-verified scenarios tested`);
+  console.log(`✅ ${goldenCases.cases.length} HMRC-sourced scenarios tested`);
   // biome-ignore lint/suspicious/noConsole: Test summary
-  console.log('✅ All calculations match official guidance to the penny');
+  console.log('✅ Regression-accurate within 10p (tax/NI/net) or penny (loans/pension)');
   // biome-ignore lint/suspicious/noConsole: Test summary
-  console.log('✅ Zero false positives - tests only fail when genuinely wrong');
+  console.log('✅ Extraction failures throw explicitly - no silent zeros');
   // biome-ignore lint/suspicious/noConsole: Test summary
   console.log(`${'='.repeat(70)}\n`);
 });

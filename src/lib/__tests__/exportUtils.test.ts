@@ -67,6 +67,7 @@ describe('exportUtils', () => {
     taxCode: '1257L',
     isScottish: false,
     pensionReliefAtSource: 0,
+    employerNI: 5765.98,
   };
 
   describe('exportToCSV', () => {
@@ -109,9 +110,10 @@ describe('exportUtils', () => {
       exportToCSV(mockResults);
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
-      expect(blobContent).toContain(
-        'Category,Yearly,Monthly,4-Weekly,Fortnightly,Weekly,Daily,Hourly',
-      );
+      // Headers are now quoted for proper CSV escaping
+      expect(blobContent).toContain('"Category"');
+      expect(blobContent).toContain('"Yearly"');
+      expect(blobContent).toContain('"Monthly"');
     });
 
     it('includes gross pay in CSV', () => {
@@ -138,12 +140,12 @@ describe('exportUtils', () => {
       expect(blobContent).toContain('£37,430.00');
     });
 
-    it('includes total tax with negative sign', () => {
+    it('includes income tax with positive value', () => {
       exportToCSV(mockResults);
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
-      expect(blobContent).toContain('Total Tax Due');
-      expect(blobContent).toContain('-£7,486.00');
+      expect(blobContent).toContain('Income Tax');
+      expect(blobContent).toContain('£7,486.00');
     });
 
     it('includes tax bands breakdown', () => {
@@ -151,7 +153,7 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       expect(blobContent).toContain('20% Rate');
-      expect(blobContent).toContain('-£7,486.00');
+      expect(blobContent).toContain('£7,486.00');
     });
 
     it('includes National Insurance', () => {
@@ -159,15 +161,15 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       expect(blobContent).toContain('National Insurance');
-      expect(blobContent).toContain('-£4,182.16');
+      expect(blobContent).toContain('£4,182.16');
     });
 
     it('includes pension contribution when present', () => {
       exportToCSV(mockResults);
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
-      expect(blobContent).toContain('Pension [You]');
-      expect(blobContent).toContain('-£2,500.00');
+      expect(blobContent).toContain('Pension Contribution');
+      expect(blobContent).toContain('£2,500.00');
     });
 
     it('skips pension contribution when zero', () => {
@@ -188,7 +190,7 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       const lines = blobContent.split('\n');
-      const pensionLine = lines.find((line: string) => line.startsWith('Pension [You]'));
+      const pensionLine = lines.find((line: string) => line.includes('Pension Contribution'));
       expect(pensionLine).toBeUndefined();
     });
 
@@ -210,7 +212,7 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       expect(blobContent).toContain('Student Loan');
-      expect(blobContent).toContain('-£1,200.00');
+      expect(blobContent).toContain('£1,200.00');
     });
 
     it('skips student loan when zero', () => {
@@ -235,7 +237,8 @@ describe('exportUtils', () => {
 
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       const lines = blobContent.split('\n');
-      const grossPayLine = lines.find((line: string) => line.startsWith('Gross Pay'));
+      // Lines are now quoted, so search for the content within quotes
+      const grossPayLine = lines.find((line: string) => line.includes('"Gross Pay"'));
 
       expect(grossPayLine).toContain('£50,000.00'); // Yearly
       expect(grossPayLine).toContain('£4,166.67'); // Monthly (50000/12)
@@ -293,8 +296,9 @@ describe('exportUtils', () => {
       const blobContent = (global.Blob as jest.Mock).mock.calls[0][0][0];
       expect(blobContent).toContain('20% Rate');
       expect(blobContent).toContain('40% Rate');
-      expect(blobContent).toContain('-£5,000.00');
-      expect(blobContent).toContain('-£3,000.00');
+      // Values are now positive (labels indicate deductions)
+      expect(blobContent).toContain('£5,000.00');
+      expect(blobContent).toContain('£3,000.00');
     });
   });
 

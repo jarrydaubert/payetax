@@ -13,9 +13,21 @@ import Link from 'next/link';
 
 import { BlogPagination } from '@/components/molecules/BlogPagination';
 import { BLOG_CATEGORIES, type CategoryKey } from '@/constants/blogCategories';
+import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCategoryBlurDataUrl, getCategoryFallbackSvg } from '@/lib/blog/imageFallback';
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/blog';
+
+/** Number of images to prioritize for LCP */
+const PRIORITY_IMAGE_COUNT = 3;
+
+/** Validate and normalize category key with fallback */
+function getValidCategoryKey(category: string | undefined): CategoryKey {
+  if (category && category in BLOG_CATEGORIES) {
+    return category as CategoryKey;
+  }
+  return 'tax-basics';
+}
 
 interface AllPostsGridProps {
   posts: BlogPost[];
@@ -27,33 +39,37 @@ interface AllPostsGridProps {
 export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: AllPostsGridProps) {
   if (posts.length === 0) {
     return (
-      <div className='py-16 text-center'>
-        <p className='text-lg text-slate-400'>No articles found.</p>
+      <div className={cn('text-center', SPACING.PY_16)}>
+        <p className={cn('text-slate-400', TYPOGRAPHY.TEXT_LG)}>No articles found.</p>
       </div>
     );
   }
 
   return (
-    <section aria-labelledby='all-posts-heading' className='py-12'>
-      <div className='container mx-auto max-w-7xl px-4'>
+    <section aria-labelledby='all-posts-heading' className={SPACING.PY_12}>
+      <div className={LAYOUT.CONTAINER}>
         {/* Section Header */}
-        <div className='mb-8 flex items-center justify-between'>
+        <div className={cn('flex items-center justify-between', SPACING.MB_8)}>
           {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
-            className='font-display font-semibold text-white text-xl md:text-2xl'
+            className={cn(
+              'font-display font-semibold text-white',
+              TYPOGRAPHY.TEXT_XL,
+              'md:text-2xl',
+            )}
           >
             All Articles
           </h2>
-          <p className='text-slate-400 text-sm'>
-            {totalPosts} article{totalPosts !== 1 ? 's' : ''}
+          <p className={cn('text-slate-400', TYPOGRAPHY.TEXT_SM)}>
+            {totalPosts.toLocaleString('en-GB')} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
 
         {/* Posts Grid */}
-        <div className='mb-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-          {posts.map((post) => (
-            <PostCard key={post.slug} post={post} />
+        <div className={cn('grid sm:grid-cols-2 lg:grid-cols-3', SPACING.GAP_6, SPACING.MB_12)}>
+          {posts.map((post, idx) => (
+            <PostCard key={post.slug} post={post} priority={idx < PRIORITY_IMAGE_COUNT} />
           ))}
         </div>
 
@@ -66,14 +82,26 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
 
 interface PostCardProps {
   post: BlogPost;
+  /** Whether to prioritize this image for LCP */
+  priority?: boolean;
 }
 
-function PostCard({ post }: PostCardProps) {
-  const categoryKey = (post.category as CategoryKey) || 'tax-basics';
-  const categoryConfig = BLOG_CATEGORIES[categoryKey] ?? BLOG_CATEGORIES['tax-basics'];
+function PostCard({ post, priority = false }: PostCardProps) {
+  // Validate category key once with fallback
+  const categoryKey = getValidCategoryKey(post.category);
+  const categoryConfig = BLOG_CATEGORIES[categoryKey];
 
   const imageSrc = post.image ?? getCategoryFallbackSvg(categoryKey);
   const blurDataUrl = getCategoryBlurDataUrl(categoryKey);
+
+  // Format date deterministically (UTC to avoid server/client mismatch)
+  const publishedDate = new Date(post.publishedAt);
+  const formattedDate = publishedDate.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 
   return (
     <article
@@ -92,8 +120,8 @@ function PostCard({ post }: PostCardProps) {
             fill
             className='object-cover transition-transform duration-300 group-hover:scale-105'
             sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-            loading='lazy'
-            placeholder='blur'
+            priority={priority}
+            placeholder={blurDataUrl ? 'blur' : 'empty'}
             blurDataURL={blurDataUrl}
           />
 
@@ -110,24 +138,28 @@ function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Content */}
-        <div className='p-4'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-white transition-colors group-hover:text-cyan-400'>
+        <div className={SPACING.P_4}>
+          <h3
+            className={cn(
+              'line-clamp-2 font-display font-semibold text-white transition-colors group-hover:text-cyan-400',
+              SPACING.MB_2,
+              TYPOGRAPHY.TEXT_BASE,
+            )}
+          >
             {post.title}
           </h3>
 
-          <p className='mb-3 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
+          <p className={cn('line-clamp-2 text-slate-400', SPACING.MB_3, TYPOGRAPHY.TEXT_SM)}>
+            {post.excerpt}
+          </p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-slate-500 text-xs'>
+          <div
+            className={cn('flex items-center text-slate-500', SPACING.GAP_2, TYPOGRAPHY.TEXT_XS)}
+          >
             <span>{post.readTime}</span>
-            <span>•</span>
-            <time dateTime={post.publishedAt}>
-              {new Date(post.publishedAt).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </time>
+            <span aria-hidden='true'>•</span>
+            <time dateTime={post.publishedAt}>{formattedDate}</time>
           </div>
         </div>
       </Link>

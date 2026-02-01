@@ -27,7 +27,7 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-type EligibilityStatus = 'eligible' | 'not_eligible' | 'maybe';
+type EligibilityStatus = 'eligible' | 'not_eligible';
 
 interface EligibilityResult {
   status: EligibilityStatus;
@@ -89,12 +89,16 @@ export function MarriageAllowanceClient() {
   const [recipientIncome, setRecipientIncome] = useState<string>('');
   const [result, setResult] = useState<EligibilityResult | null>(null);
 
-  const handleCheck = () => {
-    const transferor = parseFloat(transferorIncome.replace(/,/g, '')) || 0;
-    const recipient = parseFloat(recipientIncome.replace(/,/g, '')) || 0;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Normalize: strip everything except digits
+    const transferor = Number(transferorIncome.replace(/[^\d]/g, ''));
+    const recipient = Number(recipientIncome.replace(/[^\d]/g, ''));
 
     setResult(checkEligibility(transferor, recipient));
   };
+
+  const isFormValid = transferorIncome.trim() && recipientIncome.trim();
 
   return (
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
@@ -148,7 +152,7 @@ export function MarriageAllowanceClient() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='space-y-4'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='grid gap-4 md:grid-cols-2'>
               <div>
                 <label htmlFor={transferorId} className='mb-2 block font-medium text-sm'>
@@ -165,6 +169,8 @@ export function MarriageAllowanceClient() {
                     value={transferorIncome}
                     onChange={(e) => setTransferorIncome(e.target.value)}
                     className='pl-7 font-mono'
+                    autoComplete='off'
+                    spellCheck={false}
                   />
                 </div>
                 <p className='mt-1 text-muted-foreground text-xs'>
@@ -186,6 +192,8 @@ export function MarriageAllowanceClient() {
                     value={recipientIncome}
                     onChange={(e) => setRecipientIncome(e.target.value)}
                     className='pl-7 font-mono'
+                    autoComplete='off'
+                    spellCheck={false}
                   />
                 </div>
                 <p className='mt-1 text-muted-foreground text-xs'>
@@ -193,10 +201,10 @@ export function MarriageAllowanceClient() {
                 </p>
               </div>
             </div>
-            <Button onClick={handleCheck} size='lg' className='w-full'>
+            <Button type='submit' size='lg' className='w-full' disabled={!isFormValid}>
               Check Eligibility
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
 
@@ -291,7 +299,7 @@ export function MarriageAllowanceClient() {
                   <li>• You must be married or in a civil partnership</li>
                   <li>• The saving is a tax reduction, not a refund</li>
                   <li>• Apply on GOV.UK - it&apos;s free and takes 5 minutes</li>
-                  <li>• Can backdate claims to 6 April 2021</li>
+                  <li>• You can usually backdate claims for up to 4 tax years</li>
                 </ul>
               </div>
             </div>
@@ -331,9 +339,9 @@ export function MarriageAllowanceClient() {
           <div>
             <h3 className='mb-2 font-semibold'>What if my partner is Scottish?</h3>
             <p className='text-muted-foreground'>
-              The higher earner must pay tax at 20% (basic rate). Scottish taxpayers have a 19%
-              starter rate and 20% basic rate, so they still qualify if earning between £15,398 and{' '}
-              {formatCurrency(BASIC_RATE_LIMIT)}.
+              Scottish taxpayers can still qualify for Marriage Allowance. The higher earner must
+              not be a higher-rate taxpayer. Scottish tax bands differ from rUK, so check the
+              current Scottish thresholds on GOV.UK if your partner pays Scottish income tax.
             </p>
           </div>
           <div>

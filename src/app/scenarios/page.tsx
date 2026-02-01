@@ -21,6 +21,9 @@ import {
 import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
+// Display format for tax year - update when TAX_YEARS changes in taxRates.ts
+const CURRENT_TAX_YEAR_DISPLAY = '2025-26';
+
 export const metadata: Metadata = generateMetadataHelper({
   title: 'Tax Scenarios & Calculators | UK Tax Planning Guides',
   description:
@@ -61,7 +64,7 @@ const categoryStyles: Record<string, { gradient: string; icon: string; border: s
 
 export default function ScenariosPage() {
   return (
-    <div className='min-h-screen bg-background'>
+    <div className='min-h-dvh bg-background'>
       {/* Hero Section */}
       <section className='relative overflow-hidden py-16 sm:py-24'>
         <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5' />
@@ -88,7 +91,7 @@ export default function ScenariosPage() {
             <div className={cn('grid grid-cols-3', SPACING.GAP_4, 'mx-auto max-w-lg')}>
               <QuickStat value={SCENARIOS.length.toString()} label='Scenarios' />
               <QuickStat value='£100k-£500k' label='Salary Range' />
-              <QuickStat value='2025-26' label='Tax Year' />
+              <QuickStat value={CURRENT_TAX_YEAR_DISPLAY} label='Tax Year' />
             </div>
           </div>
         </div>
@@ -165,7 +168,7 @@ function CategorySection({ category }: { category: ScenarioCategoryInfo }) {
     <div>
       {/* Category Header */}
       <div className={cn('flex items-center', SPACING.GAP_3, SPACING.MB_6)}>
-        <span className='text-3xl' role='img' aria-label={category.name}>
+        <span className='text-3xl' aria-hidden='true'>
           {styles.icon}
         </span>
         <div>
@@ -225,7 +228,7 @@ function ScenarioCard({
 
           {/* Title */}
           <h3 className={cn(TYPOGRAPHY.TEXT_BASE, 'font-semibold leading-tight', SPACING.MB_2)}>
-            {scenario.title.replace(/£[\d,]+[k]?\s/g, '')}
+            {scenario.title.replace(/^£[\d,]+k?\s+/i, '').trim()}
           </h3>
 
           {/* Description */}

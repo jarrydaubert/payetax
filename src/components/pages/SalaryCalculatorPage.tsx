@@ -1,54 +1,92 @@
 // src/components/pages/SalaryCalculatorPage.tsx
 // Main component for salary-specific landing pages
+//
+// Architecture note: `results` is frozen to `initialResults` intentionally for SEO.
+// Structured data uses the SSR snapshot for deterministic indexing by Googlebot.
+// The interactive calculator (CalculatorContent) uses store state separately.
 
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
 import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
+import { TAX_YEARS } from '@/constants/taxRates';
+
+// Current tax year is the first in the TAX_YEARS array (newest first)
+// Non-null assertion safe: TAX_YEARS always has at least one element
+const CURRENT_TAX_YEAR = TAX_YEARS[0]!;
+
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
+/** Format tax year for display (e.g., "2025-2026" -> "2025-26") */
+function formatTaxYearDisplay(taxYear: string): string {
+  const [start, end] = taxYear.split('-');
+  return `${start}-${end?.slice(-2) ?? ''}`;
+}
+
 // Blog posts that exist for specific salaries
-const SALARY_BLOG_POSTS: Record<number, { slug: string; title: string }> = {
-  40000: {
-    slug: 'what-40k-salary-actually-looks-like-uk-2025',
-    title: 'What a £40k Salary Actually Looks Like',
-  },
-  50000: {
-    slug: 'what-50k-salary-actually-looks-like-uk-2025',
-    title: 'What a £50k Salary Actually Looks Like',
-  },
-  60000: {
-    slug: 'what-60k-salary-actually-looks-like-uk-2025',
-    title: 'What a £60k Salary Actually Looks Like',
-  },
-  70000: {
-    slug: 'what-70k-salary-actually-looks-like-uk-2025',
-    title: 'What a £70k Salary Actually Looks Like',
-  },
-  80000: {
-    slug: 'what-80k-salary-actually-looks-like-uk-2025',
-    title: 'What a £80k Salary Actually Looks Like',
-  },
-  100000: {
-    slug: 'what-100k-salary-actually-looks-like-uk-2025',
-    title: 'What a £100k Salary Actually Looks Like',
-  },
-};
+const SALARY_BLOG_POSTS = new Map<number, { slug: string; title: string }>([
+  [
+    40000,
+    {
+      slug: 'what-40k-salary-actually-looks-like-uk-2025',
+      title: 'What a £40k Salary Actually Looks Like',
+    },
+  ],
+  [
+    50000,
+    {
+      slug: 'what-50k-salary-actually-looks-like-uk-2025',
+      title: 'What a £50k Salary Actually Looks Like',
+    },
+  ],
+  [
+    60000,
+    {
+      slug: 'what-60k-salary-actually-looks-like-uk-2025',
+      title: 'What a £60k Salary Actually Looks Like',
+    },
+  ],
+  [
+    70000,
+    {
+      slug: 'what-70k-salary-actually-looks-like-uk-2025',
+      title: 'What a £70k Salary Actually Looks Like',
+    },
+  ],
+  [
+    80000,
+    {
+      slug: 'what-80k-salary-actually-looks-like-uk-2025',
+      title: 'What an £80k Salary Actually Looks Like',
+    },
+  ],
+  [
+    100000,
+    {
+      slug: 'what-100k-salary-actually-looks-like-uk-2025',
+      title: 'What a £100k Salary Actually Looks Like',
+    },
+  ],
+]);
 
 // Generate salary-specific FAQs
-function generateSalaryFAQs(salary: number, results: TaxCalculationResults) {
+function generateSalaryFAQs(
+  salary: number,
+  results: TaxCalculationResults,
+  taxYearDisplay: string,
+) {
   const formattedSalary = salary.toLocaleString('en-GB');
   const faqs = [
     {
       question: `How much tax do I pay on a £${formattedSalary} salary in the UK?`,
-      answer: `On a £${formattedSalary} salary in the UK for 2025-26, you pay £${results.incomeTax.annually.toLocaleString('en-GB')} in income tax and £${results.nationalInsurance.annually.toLocaleString('en-GB')} in National Insurance, leaving you with £${results.netPay.annually.toLocaleString('en-GB')} take-home pay per year.`,
+      answer: `On a £${formattedSalary} salary in the UK for ${taxYearDisplay}, you pay £${results.incomeTax.annually.toLocaleString('en-GB')} in income tax and £${results.nationalInsurance.annually.toLocaleString('en-GB')} in National Insurance, leaving you with £${results.netPay.annually.toLocaleString('en-GB')} take-home pay per year.`,
     },
     {
       question: `What is the monthly take-home pay on £${formattedSalary}?`,
@@ -64,7 +102,7 @@ function generateSalaryFAQs(salary: number, results: TaxCalculationResults) {
   if (salary >= 100000 && salary <= 125140) {
     faqs.push({
       question: `How does the £100k tax trap affect a £${formattedSalary} salary?`,
-      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective 60% marginal tax rate between £100,000 and £125,140. Consider pension contributions to reduce your adjusted net income below £100,000.`,
+      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective marginal tax rate of around 60% between £100,000 and £125,140 for most employees in England, Wales, and Northern Ireland. Consider pension contributions to reduce your adjusted net income below £100,000.`,
     });
   }
 
@@ -79,6 +117,7 @@ interface SalaryCalculatorPageProps {
 
 export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculatorPageProps) {
   // Use SSR results immediately - no "Loading..." state for Googlebot
+  // Note: This is intentionally frozen for deterministic structured data indexing
   const [results] = useState<TaxCalculationResults>(initialResults);
   const setSalary = useCalculatorStore((state) => state.setSalary);
   const calculate = useCalculatorStore((state) => state.calculate);
@@ -86,42 +125,53 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
   // Sync store on mount for interactive calculator
   useEffect(() => {
     setSalary(salary);
-    calculate();
+    // Use queueMicrotask to ensure calculate reads updated salary
+    queueMicrotask(() => calculate());
   }, [salary, setSalary, calculate]);
 
   const formattedSalary = salary.toLocaleString('en-GB');
+  const taxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR);
 
   // Generate comparison salaries
-  const comparisons = [
-    { amount: salary - 10000, label: '£10k less' },
-    { amount: salary - 5000, label: '£5k less' },
-    { amount: salary + 5000, label: '£5k more' },
-    { amount: salary + 10000, label: '£10k more' },
-  ].filter((c) => c.amount >= 20000 && c.amount <= 500000);
+  const comparisons = useMemo(
+    () =>
+      [
+        { amount: salary - 10000, label: '£10k less' },
+        { amount: salary - 5000, label: '£5k less' },
+        { amount: salary + 5000, label: '£5k more' },
+        { amount: salary + 10000, label: '£10k more' },
+      ].filter((c) => c.amount >= 20000 && c.amount <= 500000),
+    [salary],
+  );
 
-  // Generate structured data for SEO
+  // Generate structured data for SEO (use #tax-calculator to match homepage)
   const breadcrumbItems = [
     { name: 'Home', url: 'https://payetax.co.uk/' },
-    { name: 'Calculator', url: 'https://payetax.co.uk/#calculator' },
+    { name: 'Calculator', url: 'https://payetax.co.uk/#tax-calculator' },
     {
       name: `£${formattedSalary} Salary`,
       url: `https://payetax.co.uk/calculator/${salary}-after-tax`,
     },
   ];
 
-  const salaryFAQs = generateSalaryFAQs(salary, results);
+  // Memoize FAQ generation
+  const salaryFAQs = useMemo(
+    () => generateSalaryFAQs(salary, results, taxYearDisplay),
+    [salary, results, taxYearDisplay],
+  );
 
   // Find related blog post for this salary
-  const relatedBlogPost = SALARY_BLOG_POSTS[salary];
+  const relatedBlogPost = SALARY_BLOG_POSTS.get(salary);
 
   // Find nearby salary blog posts (within £20k range)
-  const nearbyBlogPosts = Object.entries(SALARY_BLOG_POSTS)
-    .filter(([s]) => {
-      const blogSalary = parseInt(s, 10);
-      return blogSalary !== salary && Math.abs(blogSalary - salary) <= 20000;
-    })
-    .slice(0, 3)
-    .map(([, post]) => post);
+  const nearbyBlogPosts = useMemo(
+    () =>
+      Array.from(SALARY_BLOG_POSTS.entries())
+        .filter(([blogSalary]) => blogSalary !== salary && Math.abs(blogSalary - salary) <= 20000)
+        .slice(0, 3)
+        .map(([, post]) => post),
+    [salary],
+  );
 
   return (
     <div className='min-h-screen bg-background'>
@@ -142,9 +192,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
       {/* Hero Section with Instant Answer */}
       <section className={cn('relative overflow-hidden', 'py-8 sm:py-12')}>
         <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent' />
-        <div
-          className={cn('container relative mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}
-        >
+        <div className={cn('container relative mx-auto max-w-7xl', SPACING.PX_RESPONSIVE)}>
           {/* Breadcrumbs */}
           <nav className={SPACING.MB_4} aria-label='Breadcrumb'>
             <ol
@@ -160,7 +208,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
               </li>
               <li>/</li>
               <li>
-                <Link href='/#calculator' className='hover:text-primary'>
+                <Link href='/#tax-calculator' className='hover:text-primary'>
                   Calculator
                 </Link>
               </li>
@@ -177,10 +225,10 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
               'sm:text-4xl',
             )}
           >
-            £{formattedSalary} After Tax UK 2025-26
+            £{formattedSalary} After Tax UK {taxYearDisplay}
           </h1>
           <p className={cn('text-muted-foreground', SPACING.MB_8)}>
-            UK take-home pay calculator for 2025-26 tax year
+            UK take-home pay calculator for {taxYearDisplay} tax year
           </p>
 
           <div className='grid gap-8 lg:grid-cols-[400px_1fr] lg:items-start'>
@@ -188,7 +236,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
             <SalaryQuickResults salary={salary} results={results} comparisons={comparisons} />
 
             {/* SEO Content */}
-            <div className='rounded-lg border border-border bg-card p-6'>
+            <div className={cn(SURFACES.CARD_ROUNDED)}>
               <SalarySEOContent salary={salary} results={results} />
             </div>
           </div>
@@ -197,7 +245,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
 
       {/* Full Calculator Section */}
       <section className={cn('bg-muted/30', 'py-8 sm:py-12')}>
-        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}>
+        <div className={cn('container mx-auto max-w-7xl', SPACING.PX_RESPONSIVE)}>
           <div className={cn('text-center', SPACING.MB_8)}>
             <h2 className={cn('font-bold', SPACING.MB_2, TYPOGRAPHY.TEXT_2XL)}>
               Customize Your Calculation
@@ -213,7 +261,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
       {/* Related Reading (Blog Links) */}
       {(relatedBlogPost || nearbyBlogPosts.length > 0) && (
         <section className={cn('bg-muted/20', 'py-8 sm:py-12')}>
-          <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4, 'sm:px-6 lg:px-8')}>
+          <div className={cn('container mx-auto max-w-7xl', SPACING.PX_RESPONSIVE)}>
             <h2 className={cn('font-semibold', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>
               Related Reading
             </h2>
@@ -222,8 +270,8 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                 <Link
                   href={`/blog/${relatedBlogPost.slug}`}
                   className={cn(
-                    'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block',
+                    SURFACES.SHAPE_ROUNDED_LG,
+                    'block border border-border bg-card p-4 transition-colors hover:bg-muted/50',
                   )}
                 >
                   <span className={cn('font-medium text-primary', TYPOGRAPHY.TEXT_SM)}>
@@ -242,8 +290,8 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                   key={post.slug}
                   href={`/blog/${post.slug}`}
                   className={cn(
-                    'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block',
+                    SURFACES.SHAPE_ROUNDED_LG,
+                    'block border border-border bg-card p-4 transition-colors hover:bg-muted/50',
                   )}
                 >
                   <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_BASE)}>{post.title}</h3>
@@ -257,8 +305,8 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                 <Link
                   href='/blog/100k-tax-trap-avoid-60-percent-tax-2025'
                   className={cn(
-                    'rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50',
-                    'block',
+                    SURFACES.SHAPE_ROUNDED_LG,
+                    'block border border-border bg-card p-4 transition-colors hover:bg-muted/50',
                   )}
                 >
                   <span className={cn('font-medium text-destructive', TYPOGRAPHY.TEXT_SM)}>

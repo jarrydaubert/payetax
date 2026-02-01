@@ -6,14 +6,14 @@ import { useId, useState } from 'react';
 import { toast } from 'sonner';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/atoms/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/atoms/ui/select';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import { WhatIfValueSchema } from '@/lib/validation';
@@ -39,6 +39,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   const { setWhatIfType, setWhatIfValue, calculateWhatIf, clearWhatIf } = useCalculatorActions();
   const [error, setError] = useState<string>('');
   const typeSelectId = useId();
+  const typeLabelId = `${typeSelectId}-label`;
   const valueInputId = useId();
 
   const handleCompare = () => {
@@ -123,7 +124,8 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
         {/* Change Type Dropdown */}
         <div>
           <label
-            htmlFor='what-if-type'
+            id={typeLabelId}
+            htmlFor={typeSelectId}
             className={cn('block font-medium text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_SM)}
           >
             Change Type
@@ -137,7 +139,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
                 id={typeSelectId}
                 data-testid='what-if-type-select'
                 className='w-full'
-                aria-label='Select what-if calculation type'
+                aria-labelledby={typeLabelId}
               >
                 <SelectValue />
               </SelectTrigger>

@@ -3,7 +3,7 @@
 
 import { AlertCircle, ArrowRight, CheckCircle, HelpCircle, Info, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,14 +14,17 @@ import { cn } from '@/lib/utils';
 const EXAMPLE_CODES = ['1257L', 'BR', 'S1257L', 'K100', '1000M', 'D0', '0T', '1257L W1'];
 
 export function TaxCodeDecoderClient() {
+  const inputId = useId();
   const [code, setCode] = useState('');
   const [result, setResult] = useState<TaxCodeDecoded | null>(null);
 
   const handleDecode = (codeToUse?: string) => {
     const inputCode = codeToUse || code;
-    if (!inputCode.trim()) return;
-    setCode(inputCode);
-    setResult(decodeTaxCode(inputCode));
+    // Normalize: trim, collapse whitespace, uppercase
+    const normalized = inputCode.trim().replace(/\s+/g, ' ').toUpperCase();
+    if (!normalized) return;
+    setCode(normalized);
+    setResult(decodeTaxCode(normalized));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -60,16 +63,22 @@ export function TaxCodeDecoderClient() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className='flex gap-3'>
+            <label htmlFor={inputId} className='sr-only'>
+              Tax code
+            </label>
             <Input
+              id={inputId}
               type='text'
               placeholder='e.g., 1257L'
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => setCode(e.target.value)}
               className='flex-1 font-mono text-lg uppercase'
               maxLength={10}
-              aria-label='Tax code'
+              autoComplete='off'
+              autoCorrect='off'
+              spellCheck={false}
             />
-            <Button type='submit' size='lg'>
+            <Button type='submit' size='lg' disabled={!code.trim()}>
               Decode
             </Button>
           </form>
@@ -86,6 +95,7 @@ export function TaxCodeDecoderClient() {
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   )}
                 >
                   {exampleCode}
@@ -157,8 +167,11 @@ export function TaxCodeDecoderClient() {
             {/* Details */}
             {result.details.length > 0 && (
               <div className='space-y-2'>
-                {result.details.map((detail) => (
-                  <div key={detail} className='flex items-start gap-2 text-muted-foreground'>
+                {result.details.map((detail, index) => (
+                  <div
+                    key={`detail-${index}-${detail.slice(0, 20)}`}
+                    className='flex items-start gap-2 text-muted-foreground'
+                  >
                     <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
                     <span>{detail}</span>
                   </div>
@@ -169,9 +182,9 @@ export function TaxCodeDecoderClient() {
             {/* Warnings */}
             {result.warnings.length > 0 && (
               <div className='space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20'>
-                {result.warnings.map((warning) => (
+                {result.warnings.map((warning, index) => (
                   <div
-                    key={warning}
+                    key={`warning-${index}-${warning.slice(0, 20)}`}
                     className='flex items-start gap-2 text-amber-800 dark:text-amber-200'
                   >
                     <AlertCircle className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0')} />

@@ -170,13 +170,15 @@ export const TAX_RATES: Record<
           secondary: { threshold: 9100, rate: 13.8 },
         },
         H: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
         },
         J: {
           secondary: { threshold: 9100, rate: 13.8 },
         },
         M: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
         },
         Z: {
           secondary: { threshold: 9100, rate: 13.8 },
@@ -255,13 +257,15 @@ export const TAX_RATES: Record<
           secondary: { threshold: 9100, rate: 13.8 },
         },
         H: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
         },
         J: {
           secondary: { threshold: 9100, rate: 13.8 },
         },
         M: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
         },
         Z: {
           secondary: { threshold: 9100, rate: 13.8 },
@@ -337,13 +341,15 @@ export const TAX_RATES: Record<
           secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
         },
         H: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 15 }, // UST = £50,270
         },
         J: {
           secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
         },
         M: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
+          secondary: { threshold: 50270, rate: 15 }, // UST = £50,270
         },
         Z: {
           secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
@@ -392,8 +398,8 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Starter rate', rate: 19, threshold: 2162 }, // £12,571-£14,732 total income
       { name: 'Basic rate', rate: 20, threshold: 13118 }, // £14,733-£25,688 total income
       { name: 'Intermediate rate', rate: 21, threshold: 31092 }, // £25,689-£43,662 total income
-      { name: 'Higher rate', rate: 41, threshold: 112570 }, // £43,663-£125,140 total income (corrected from 42%)
-      { name: 'Top rate', rate: 46, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income (corrected from 47%)
+      { name: 'Higher rate', rate: 42, threshold: 112570 }, // £43,663-£125,140 total income
+      { name: 'Top rate', rate: 47, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
@@ -448,16 +454,22 @@ export const SCOTTISH_TAX_RATES: Record<
 };
 
 // ============================================================================
-// DIVIDEND TAX RATES (2024-25 onwards)
+// DIVIDEND TAX RATES (2024-25 and 2025-26)
 // ============================================================================
 //
 // Dividend tax rates for UK shareholders. These rates apply after the
 // dividend allowance and are based on the individual's income tax band.
 //
+// IMPORTANT: Rates may change in future tax years (e.g., 2026-27 Budget proposals).
+// For the dividend allowance, always use TAX_RATES[year].dividendAllowance (year-specific).
+//
 // @see https://www.gov.uk/tax-on-dividends
 
 export const DIVIDEND_RATES = {
-  /** Tax-free dividend allowance (reduced from £1,000 in 2023-24) */
+  /**
+   * @deprecated Use TAX_RATES[year].dividendAllowance instead (varies by year)
+   * 2023-24: £1,000 | 2024-25+: £500
+   */
   ALLOWANCE: 500,
 
   /** Basic rate (8.75%) - for income within basic rate band */

@@ -4,19 +4,81 @@ import { Resend } from 'resend';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
 
+export const runtime = 'nodejs';
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Email to receive lead notifications - configure via environment variable
-const PARTNER_NOTIFICATION_EMAIL = process.env.REFERRAL_PARTNER_EMAIL || 'support@payetax.co.uk';
+// Email to receive lead notifications - REQUIRED in production
+const PARTNER_NOTIFICATION_EMAIL = process.env.REFERRAL_PARTNER_EMAIL;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+const MAX_BODY_SIZE = 2048; // 2KB is plenty for a lead form
 
 const ReferralLeadSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   salaryRange: z.enum(['75k-100k', '100k-125k', '125k+']),
   reason: z.enum(['tax-trap', 'high-earner', 'scottish-high', 'additional-rate']),
   isScottish: z.boolean(),
+  consent: z.boolean().refine((val) => val === true, {
+    message: 'You must consent to being contacted',
+  }),
+  source: z.string().max(100).optional(),
 });
 
 type ReferralLead = z.infer<typeof ReferralLeadSchema>;
+
+/** Escape HTML to prevent injection */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Get client identifier - never returns shared bucket */
+function getClientIdentifier(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const firstIp = forwarded.split(',')[0]?.trim();
+    if (firstIp) return `ip:${firstIp}`;
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return `ip:${realIp}`;
+
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return `ip:${cfIp}`;
+
+  // Fallback: hash of user-agent to avoid shared bucket
+  const ua = request.headers.get('user-agent') || 'unknown';
+  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
+
+/** Basic origin check for CSRF protection */
+function isValidOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+
+  if (!(origin || referer)) return true; // Same-origin/non-browser
+
+  const allowedHosts = ['payetax.co.uk', 'www.payetax.co.uk', 'localhost:3000'];
+
+  const checkHost = (url: string) => {
+    try {
+      const parsed = new URL(url);
+      return allowedHosts.some((h) => parsed.host === h || parsed.host.endsWith(`.${h}`));
+    } catch {
+      return false;
+    }
+  };
+
+  if (origin && checkHost(origin)) return true;
+  if (referer && checkHost(referer)) return true;
+
+  return false;
+}
 
 function getReasonLabel(reason: ReferralLead['reason']): string {
   const labels: Record<ReferralLead['reason'], string> = {
@@ -28,8 +90,14 @@ function getReasonLabel(reason: ReferralLead['reason']): string {
   return labels[reason];
 }
 
-function generatePartnerNotificationEmail(lead: ReferralLead): string {
-  return `
+function generatePartnerNotificationEmail(lead: ReferralLead): { html: string; text: string } {
+  const safeEmail = escapeHtml(lead.email);
+  const safeSalaryRange = escapeHtml(lead.salaryRange);
+  const safeReason = escapeHtml(getReasonLabel(lead.reason));
+  const safeRegion = lead.isScottish ? 'Scotland' : 'England/Wales/NI';
+  const safeSource = lead.source ? escapeHtml(lead.source) : 'Direct';
+
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,40 +115,66 @@ function generatePartnerNotificationEmail(lead: ReferralLead): string {
       <table style="width: 100%; border-collapse: collapse;">
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Email</td>
-          <td style="padding: 12px 0; color: #020617;"><a href="mailto:${lead.email}" style="color: #06b6d4;">${lead.email}</a></td>
+          <td style="padding: 12px 0; color: #020617;"><a href="mailto:${encodeURIComponent(lead.email)}" style="color: #06b6d4;">${safeEmail}</a></td>
         </tr>
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Salary Range</td>
-          <td style="padding: 12px 0; color: #020617;">${lead.salaryRange}</td>
+          <td style="padding: 12px 0; color: #020617;">${safeSalaryRange}</td>
         </tr>
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Situation</td>
-          <td style="padding: 12px 0; color: #020617;">${getReasonLabel(lead.reason)}</td>
+          <td style="padding: 12px 0; color: #020617;">${safeReason}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Region</td>
+          <td style="padding: 12px 0; color: #020617;">${safeRegion}</td>
         </tr>
         <tr>
-          <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Region</td>
-          <td style="padding: 12px 0; color: #020617;">${lead.isScottish ? 'Scotland' : 'England/Wales/NI'}</td>
+          <td style="padding: 12px 0; color: #64748b; font-weight: 600;">Source</td>
+          <td style="padding: 12px 0; color: #020617;">${safeSource}</td>
         </tr>
       </table>
 
       <div style="margin-top: 24px; padding: 16px; background: #f0fdf4; border-radius: 8px;">
         <p style="margin: 0; color: #166534; font-size: 14px;">
-          <strong>Recommended action:</strong> Reach out within 24 hours. This lead has actively requested tax advice through PayeTax.
+          <strong>Recommended action:</strong> Reach out within 24 hours. This lead has actively requested tax advice and consented to contact.
         </p>
       </div>
     </div>
 
     <div style="text-align: center; margin-top: 24px; color: #94a3b8; font-size: 12px;">
-      <p>PayeTax Referral Program</p>
+      <p>PayeTax Referral Program • Submitted ${new Date().toISOString()}</p>
     </div>
   </div>
 </body>
 </html>
 `;
+
+  const text = `
+New Tax Advice Lead - PayeTax
+=============================
+
+A PayeTax user has requested professional tax advice.
+
+Email: ${lead.email}
+Salary Range: ${lead.salaryRange}
+Situation: ${getReasonLabel(lead.reason)}
+Region: ${safeRegion}
+Source: ${lead.source || 'Direct'}
+
+Recommended action: Reach out within 24 hours.
+This lead has actively requested tax advice and consented to contact.
+
+Submitted: ${new Date().toISOString()}
+`.trim();
+
+  return { html, text };
 }
 
-function generateUserConfirmationEmail(lead: ReferralLead): string {
-  return `
+function generateUserConfirmationEmail(lead: ReferralLead): { html: string; text: string } {
+  const safeReason = escapeHtml(getReasonLabel(lead.reason));
+
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -92,7 +186,7 @@ function generateUserConfirmationEmail(lead: ReferralLead): string {
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
     <div style="text-align: center; margin-bottom: 32px;">
       <h1 style="margin: 0; font-size: 24px; color: #020617;">
-        <span style="color: #020617;">paye</span><span style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">tax</span>
+        <span style="color: #020617;">paye</span><span style="color: #0d9488;">tax</span>
       </h1>
     </div>
 
@@ -105,7 +199,7 @@ function generateUserConfirmationEmail(lead: ReferralLead): string {
 
       <div style="padding: 16px; background: #f8fafc; border-radius: 8px; margin: 24px 0;">
         <p style="margin: 0 0 8px; color: #64748b; font-size: 14px; font-weight: 600;">Your situation:</p>
-        <p style="margin: 0; color: #020617;">${getReasonLabel(lead.reason)}</p>
+        <p style="margin: 0; color: #020617;">${safeReason}</p>
       </div>
 
       <p style="margin: 0; color: #64748b; font-size: 14px;">
@@ -133,65 +227,121 @@ function generateUserConfirmationEmail(lead: ReferralLead): string {
 </body>
 </html>
 `;
+
+  const text = `
+Thanks for your interest!
+========================
+
+We've received your request for professional tax advice. A qualified UK tax specialist will be in touch within 24-48 hours to discuss your situation.
+
+Your situation: ${getReasonLabel(lead.reason)}
+
+In the meantime, you can continue using PayeTax to explore different salary scenarios.
+
+Visit: https://payetax.co.uk
+
+---
+This email was sent because you requested tax advice through PayeTax.
+Privacy: https://payetax.co.uk/privacy
+`.trim();
+
+  return { html, text };
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!isValidOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+  }
+
+  // Rate limiting: 3 leads per hour per client
+  const clientId = getClientIdentifier(request);
+  if (!checkRateLimit(clientId, { max: 3, window: 3600000 })) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429 },
+    );
+  }
+
+  // Check configuration
+  if (!resend) {
+    console.error('[referral/lead] Resend not configured');
+    return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
+  }
+
+  if (!PARTNER_NOTIFICATION_EMAIL) {
+    if (IS_PRODUCTION) {
+      console.error('[referral/lead] REFERRAL_PARTNER_EMAIL not configured in production');
+      return NextResponse.json({ error: 'Lead service not configured' }, { status: 503 });
+    }
+    console.warn('[referral/lead] Using fallback support@ email - set REFERRAL_PARTNER_EMAIL');
+  }
+
+  const partnerEmail = PARTNER_NOTIFICATION_EMAIL || 'support@payetax.co.uk';
+
+  // Read body with size limit
+  let rawBody: string;
   try {
-    // Rate limiting: 3 leads per hour per IP
-    const ipAddress =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
+    rawBody = await request.text();
+  } catch {
+    return NextResponse.json({ error: 'Failed to read request body' }, { status: 400 });
+  }
 
-    if (!checkRateLimit(ipAddress, { max: 3, window: 3600000 })) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 },
-      );
-    }
+  if (rawBody.length > MAX_BODY_SIZE) {
+    return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
+  }
 
-    if (!resend) {
-      console.error('[referral/lead] Resend not configured');
-      return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
-    }
+  // Parse JSON
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-    const body = await request.json();
-    const validation = ReferralLeadSchema.safeParse(body);
+  // Validate with Zod
+  const validation = ReferralLeadSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: 'Invalid request', details: validation.error.flatten() },
+      { status: 400 },
+    );
+  }
 
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.flatten() },
-        { status: 400 },
-      );
-    }
+  const lead = validation.data;
 
-    const lead = validation.data;
+  // Generate emails with HTML escaping
+  const partnerEmailContent = generatePartnerNotificationEmail(lead);
+  const userEmailContent = generateUserConfirmationEmail(lead);
 
-    // Send notification to partner/business
-    const partnerEmailResult = await resend.emails.send({
-      from: 'PayeTax Leads <noreply@payetax.co.uk>',
-      to: PARTNER_NOTIFICATION_EMAIL,
-      subject: `New Tax Advice Lead - ${lead.salaryRange} - ${getReasonLabel(lead.reason)}`,
-      html: generatePartnerNotificationEmail(lead),
-    });
-
-    if (partnerEmailResult.error) {
-      console.error('[referral/lead] Partner notification error:', partnerEmailResult.error);
-      // Continue anyway - don't fail the user request
-    }
-
-    // Send confirmation to user
+  try {
+    // Send user confirmation (core UX - must succeed)
     const userEmailResult = await resend.emails.send({
       from: 'PayeTax <noreply@payetax.co.uk>',
       to: lead.email,
       subject: 'Your Tax Advice Request - PayeTax',
-      html: generateUserConfirmationEmail(lead),
+      html: userEmailContent.html,
+      text: userEmailContent.text,
     });
 
     if (userEmailResult.error) {
       console.error('[referral/lead] User confirmation error:', userEmailResult.error);
       return NextResponse.json({ error: 'Failed to send confirmation email' }, { status: 500 });
     }
+
+    // Send partner notification (fire-and-forget - don't block user)
+    resend.emails
+      .send({
+        from: 'PayeTax Leads <noreply@payetax.co.uk>',
+        to: partnerEmail,
+        replyTo: lead.email,
+        subject: `New Tax Advice Lead - ${lead.salaryRange} - ${getReasonLabel(lead.reason)}`,
+        html: partnerEmailContent.html,
+        text: partnerEmailContent.text,
+      })
+      .catch((err) => {
+        console.error('[referral/lead] Partner notification error:', err);
+      });
 
     return NextResponse.json({ success: true });
   } catch (error) {

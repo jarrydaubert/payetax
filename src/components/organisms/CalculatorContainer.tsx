@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 // MONETIZATION: Disabled until partner agreements in place
 // import { AccountantReferralCTA } from '@/components/molecules/AccountantReferralCTA';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
@@ -58,7 +57,12 @@ export function CalculatorContainer() {
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [portalMounted, setPortalMounted] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const calcScrollTimeoutRef = React.useRef<number | null>(null);
+  const whatIfScrollTimeoutRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
+
+  // SR-only live region message (event-driven, not region-driven)
+  const [liveMessage, setLiveMessage] = React.useState('');
 
   // Derive showResults from results state
   const showResults = !!results;
@@ -66,6 +70,14 @@ export function CalculatorContainer() {
   // Enable portal after mount (document not available during SSR)
   React.useEffect(() => {
     setPortalMounted(true);
+  }, []);
+
+  // Cleanup timeouts on unmount to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
+      if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
+    };
   }, []);
 
   // Lightweight scroll listener only for scroll-to-top button
@@ -81,7 +93,7 @@ export function CalculatorContainer() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
   };
 
   const handleCalculate = () => {
@@ -92,22 +104,38 @@ export function CalculatorContainer() {
       calculatePreviousYear();
     });
 
+    // Announce for screen readers (event-driven)
+    setLiveMessage('Tax calculation complete. Results updated.');
+
+    // Clear any pending scroll timeout
+    if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
+
     // Only scroll to results on mobile (desktop has everything visible)
-    setTimeout(() => {
+    calcScrollTimeoutRef.current = window.setTimeout(() => {
       if (window.innerWidth < BREAKPOINTS.LG) {
         resultsRef.current?.scrollIntoView({
-          behavior: 'smooth',
+          behavior: shouldReduceMotion ? 'auto' : 'smooth',
           block: 'start',
         });
       }
     }, TIMERS.CALC_SCROLL);
   };
 
-  const handleWhatIfCalculate = () => {
+  /**
+   * Handle post-calculation UI for what-if scenarios
+   * Note: Actual calculation happens in CalculatorInputsSection
+   */
+  const handleWhatIfPostCalculateUI = () => {
+    // Announce for screen readers
+    setLiveMessage('Scenarios compared. Check the results table.');
+
+    // Clear any pending scroll timeout
+    if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
+
     // Scroll to results and show feedback
-    setTimeout(() => {
+    whatIfScrollTimeoutRef.current = window.setTimeout(() => {
       resultsRef.current?.scrollIntoView({
-        behavior: 'smooth',
+        behavior: shouldReduceMotion ? 'auto' : 'smooth',
         block: 'start',
       });
       toast.success('Scenarios compared!', {
@@ -185,7 +213,9 @@ export function CalculatorContainer() {
   };
 
   return (
+    // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation from hero/CTAs
     <div
+      id='tax-calculator'
       className={cn(
         'mx-auto flex w-full max-w-[1800px] flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
         SPACING.GAP_3,
@@ -206,7 +236,8 @@ export function CalculatorContainer() {
           className={cn(
             'mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
             TYPOGRAPHY.TEXT_4XL,
-            `md:${TYPOGRAPHY.TEXT_5XL}`,
+            // Use literal string for responsive - dynamic template strings break Tailwind extraction
+            'md:text-5xl',
           )}
         >
           UK Tax Calculator
@@ -229,7 +260,6 @@ export function CalculatorContainer() {
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
             className='order-4 scroll-mt-6 lg:order-2 lg:col-span-2'
             role='region'
-            aria-live='polite'
             aria-label='Tax calculation results summary'
           >
             <ResultsSummaryCards results={results} taxYear={input.taxYear} />
@@ -254,6 +284,11 @@ export function CalculatorContainer() {
         )}
       </AnimatePresence>
 
+      {/* SR-only live region for announcing state changes (event-driven) */}
+      <div aria-live='polite' aria-atomic='true' className='sr-only'>
+        {liveMessage}
+      </div>
+
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card
         className={cn(
@@ -264,7 +299,7 @@ export function CalculatorContainer() {
       >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
-          onWhatIfCalculate={handleWhatIfCalculate}
+          onWhatIfCalculate={handleWhatIfPostCalculateUI}
         />
       </Card>
 
@@ -297,9 +332,9 @@ export function CalculatorContainer() {
 
             {/* Data Visualization Charts */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, delay: 0.2 }}
               className={SPACING.MT_6}
             >
               <ChartsContainer
@@ -311,9 +346,10 @@ export function CalculatorContainer() {
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+            transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
               'order-6 flex h-full items-center justify-center rounded-lg border border-dashed text-center lg:order-3',
               'p-12',
@@ -338,10 +374,10 @@ export function CalculatorContainer() {
       <AnimatePresence mode='wait'>
         {showResults && results && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
             className={cn('order-8 flex flex-col items-center lg:col-span-2', SPACING.GAP_4)}
           >
             {/* Email Results Form */}
@@ -351,26 +387,27 @@ export function CalculatorContainer() {
               className='w-full max-w-md'
             />
 
-            {/* Print and Export Buttons */}
-            <div className={cn('flex justify-center md:gap-3', SPACING.GAP_2)}>
-              <Button
-                variant='outline'
-                size='lg'
+            {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
+            <div className='flex items-center justify-center gap-4 text-muted-foreground text-sm'>
+              <button
+                type='button'
                 onClick={handlePrint}
+                className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                 aria-label='Print tax calculation results'
               >
-                <Printer className={cn('mr-2', ICON_SIZES.SIZE_4)} />
+                <Printer className='h-3.5 w-3.5' />
                 Print
-              </Button>
-              <Button
-                variant='outline'
-                size='lg'
+              </button>
+              <span className='text-border'>|</span>
+              <button
+                type='button'
                 onClick={handleExport}
-                aria-label='Export results to CSV file'
+                className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                aria-label='Download results as CSV file'
               >
-                <FileDown className={cn('mr-2', ICON_SIZES.SIZE_4)} />
-                Export CSV
-              </Button>
+                <FileDown className='h-3.5 w-3.5' />
+                Download CSV
+              </button>
             </div>
           </motion.div>
         )}
@@ -382,13 +419,15 @@ export function CalculatorContainer() {
           <AnimatePresence>
             {showScrollTop && (
               <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
+                exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.8 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
                 onClick={scrollToTop}
                 className={cn(
-                  'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  // Only add hover scale when motion is allowed
+                  !shouldReduceMotion && 'transition-transform hover:scale-110',
                   ICON_SIZES.SIZE_12,
                 )}
                 aria-label='Scroll to top'

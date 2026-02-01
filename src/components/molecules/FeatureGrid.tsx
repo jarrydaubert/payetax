@@ -7,8 +7,6 @@
  * @module components/molecules/FeatureGrid
  */
 
-'use client';
-
 import { cn } from '@/lib/utils';
 import { type Feature, FeatureCard } from './FeatureCard';
 import { SectionHeading, type SectionHeadingProps } from './SectionHeading';
