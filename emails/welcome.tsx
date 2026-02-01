@@ -1,14 +1,13 @@
 // emails/welcome.tsx
 // Welcome email sent to new newsletter subscribers
 
-import crypto from 'node:crypto';
+import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://payetax.co.uk';
-const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET || 'payetax-newsletter-secret';
 
 // ============================================================================
 // SECURITY HELPERS
@@ -26,17 +25,8 @@ const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET || 'payetax-newsletter
  * - For truly opaque tokens, would need server-side token storage
  */
 export function generateUnsubscribeToken(email: string): string {
-  // SECURITY: Require secret in production
-  if (!UNSUBSCRIBE_SECRET && process.env.NODE_ENV === 'production') {
-    throw new Error('UNSUBSCRIBE_SECRET is required in production');
-  }
-  const secret = UNSUBSCRIBE_SECRET || 'payetax-dev-secret-do-not-use-in-prod';
-
-  const data = `${email}:${Date.now()}`;
-  const hmac = crypto.createHmac('sha256', secret);
-  hmac.update(data);
-  const signature = hmac.digest('hex').slice(0, 32); // 128 bits
-  return Buffer.from(`${data}:${signature}`).toString('base64url');
+  const secret = resolveUnsubscribeSecret();
+  return createUnsubscribeToken(email, secret);
 }
 
 // ============================================================================

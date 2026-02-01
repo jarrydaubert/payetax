@@ -4,11 +4,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 import {
-  generateUnsubscribeToken,
   generateWelcomeEmailHtml,
   generateWelcomeEmailText,
 } from '@/../emails/welcome';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
 
 // Explicit Node.js runtime (Resend SDK requires Node APIs)
 export const runtime = 'nodejs';
@@ -141,6 +141,16 @@ export async function POST(request: NextRequest) {
   const { email } = validation.data;
 
   try {
+    // Ensure unsubscribe token signing is configured before doing any work in production.
+    // (In dev/test we allow a safe fallback to keep local flows working.)
+    let unsubscribeSecret: string;
+    try {
+      unsubscribeSecret = resolveUnsubscribeSecret();
+    } catch (err) {
+      console.error('[newsletter/subscribe] Unsubscribe signing not configured:', err);
+      return NextResponse.json({ error: 'Newsletter not configured' }, { status: 503 });
+    }
+
     // Try to create contact directly (skip the extra GET call)
     // Resend returns an error if contact already exists - we handle that as success
     const { error } = await resend.contacts.create({
@@ -164,7 +174,7 @@ export async function POST(request: NextRequest) {
     // Only send welcome email for NEW subscribers
     if (!isAlreadySubscribed) {
       // Generate unsubscribe URL with signed token
-      const unsubscribeToken = generateUnsubscribeToken(email);
+      const unsubscribeToken = createUnsubscribeToken(email, unsubscribeSecret);
       const unsubscribeUrl = `https://payetax.co.uk/api/newsletter/unsubscribe?token=${unsubscribeToken}`;
 
       // Send welcome email with both HTML and plain-text (fire and forget)

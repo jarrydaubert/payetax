@@ -1,7 +1,7 @@
 // emails/new-blog-post.tsx
 // Newsletter email template matching the calculator results email style
 
-import crypto from 'node:crypto';
+import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
 
 // ============================================================================
 // CONFIGURATION
@@ -9,8 +9,6 @@ import crypto from 'node:crypto';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://payetax.co.uk';
 const ALLOWED_HOSTS = ['payetax.co.uk', 'www.payetax.co.uk'];
-// Use environment variable for signing unsubscribe tokens
-const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET || 'payetax-newsletter-secret';
 
 // ============================================================================
 // SECURITY HELPERS
@@ -48,13 +46,8 @@ function safeUrl(raw: string): string {
  * This prevents abuse (unsubscribing other people) and avoids leaking email in URLs.
  */
 function generateUnsubscribeToken(email: string): string {
-  const data = `${email}:${Date.now()}`;
-  const hmac = crypto.createHmac('sha256', UNSUBSCRIBE_SECRET);
-  hmac.update(data);
-  const signature = hmac.digest('hex').slice(0, 16);
-  // Base64 encode the data + signature
-  const token = Buffer.from(`${data}:${signature}`).toString('base64url');
-  return token;
+  const secret = resolveUnsubscribeSecret();
+  return createUnsubscribeToken(email, secret);
 }
 
 /**

@@ -1,10 +1,9 @@
 // src/app/api/newsletter/unsubscribe/route.ts
 
-import crypto from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { resolveUnsubscribeSecret, verifyUnsubscribeToken } from '@/lib/newsletter/unsubscribeToken';
 
 export const runtime = 'nodejs';
 
@@ -14,11 +13,6 @@ const audienceId = process.env.RESEND_AUDIENCE_ID;
 // SECURITY: Require secret in production, use dev fallback only in development
 const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-
-// Token validity: 30 days (in milliseconds)
-const TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
-
-const emailSchema = z.string().email('Invalid email address');
 
 // Security headers for all responses
 const SECURITY_HEADERS = {
@@ -59,54 +53,6 @@ function getClientIdentifier(request: NextRequest): string {
   return `anon-${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
-/**
- * Verify and decode an unsubscribe token.
- * Returns the email if valid, null otherwise.
- */
-function verifyUnsubscribeToken(token: string, secret: string): string | null {
-  try {
-    // Decode base64url token
-    const decoded = Buffer.from(token, 'base64url').toString('utf-8');
-    const parts = decoded.split(':');
-
-    if (parts.length !== 3) return null;
-
-    const [email, timestampStr, signature] = parts;
-    if (!(email && timestampStr && signature)) return null;
-
-    const timestamp = Number.parseInt(timestampStr, 10);
-    if (Number.isNaN(timestamp)) return null;
-
-    // Check token age (30 days max)
-    const age = Date.now() - timestamp;
-    if (age > TOKEN_MAX_AGE_MS || age < 0) return null;
-
-    // Verify signature (use full 32-char hex = 128 bits for security)
-    const data = `${email}:${timestampStr}`;
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(data);
-    const expectedSignature = hmac.digest('hex').slice(0, 32);
-
-    // Handle legacy 16-char signatures during transition
-    const sigToCompare =
-      signature.length === 16 ? expectedSignature.slice(0, 16) : expectedSignature;
-
-    // Timing-safe comparison
-    if (signature.length !== sigToCompare.length) return null;
-    const sigBuffer = Buffer.from(signature, 'utf8');
-    const expectedBuffer = Buffer.from(sigToCompare, 'utf8');
-    if (!crypto.timingSafeEqual(sigBuffer, expectedBuffer)) return null;
-
-    // Validate email format
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) return null;
-
-    return email;
-  } catch {
-    return null;
-  }
-}
-
 export async function GET(request: NextRequest) {
   // SECURITY: Require secret in production
   if (!UNSUBSCRIBE_SECRET) {
@@ -121,7 +67,8 @@ export async function GET(request: NextRequest) {
     console.warn('[newsletter/unsubscribe] Using dev fallback secret - set UNSUBSCRIBE_SECRET');
   }
 
-  const secret = UNSUBSCRIBE_SECRET || 'payetax-dev-secret-do-not-use-in-prod';
+  // In production, we return 503 above. In dev/test, allow a safe fallback secret.
+  const secret = UNSUBSCRIBE_SECRET || resolveUnsubscribeSecret();
 
   // Rate limiting: 5 unsubscribe attempts per minute per client
   const clientId = getClientIdentifier(request);
