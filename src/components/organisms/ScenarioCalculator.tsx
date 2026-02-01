@@ -23,7 +23,7 @@ import {
 } from '@/components/atoms/ui/select';
 import { Switch } from '@/components/atoms/ui/switch';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { type StudentLoanPlan, TAX_YEARS } from '@/constants/taxRates';
+import { type StudentLoanPlan, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import type { ScenarioDefaults } from '@/data/scenarios';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -39,11 +39,21 @@ function isStudentLoanValue(v: string): v is StudentLoanValue {
   return (STUDENT_LOAN_VALUES as readonly string[]).includes(v);
 }
 
+export interface ScenarioCalculatorInputs {
+  salary: number;
+  pensionPercent: number;
+  studentLoan: StudentLoanValue;
+  isScottish: boolean;
+  taxYear: TaxYear;
+}
+
 interface ScenarioCalculatorProps {
   /** Scenario defaults to pre-fill */
   defaults: ScenarioDefaults;
   /** Callback when results change */
   onResultsChange?: (results: TaxCalculationResults) => void;
+  /** Callback when inputs change (used by scenario pages for optimization comparisons) */
+  onInputsChange?: (inputs: ScenarioCalculatorInputs) => void;
   /** Category for styling */
   category?: 'tax-trap' | 'student-loan' | 'life-stage' | 'scottish';
 }
@@ -51,6 +61,7 @@ interface ScenarioCalculatorProps {
 export function ScenarioCalculator({
   defaults,
   onResultsChange,
+  onInputsChange,
   category = 'life-stage',
 }: ScenarioCalculatorProps) {
   // Generate unique IDs for form fields
@@ -72,12 +83,28 @@ export function ScenarioCalculator({
     onResultsChangeRef.current = onResultsChange;
   }, [onResultsChange]);
 
+  // Notify parent when inputs change (lifted state without fully controlling the form)
+  const onInputsChangeRef = useRef(onInputsChange);
+  useEffect(() => {
+    onInputsChangeRef.current = onInputsChange;
+  }, [onInputsChange]);
+
+  useEffect(() => {
+    onInputsChangeRef.current?.({
+      salary,
+      pensionPercent,
+      studentLoan,
+      isScottish,
+      taxYear: CURRENT_TAX_YEAR as TaxYear,
+    });
+  }, [salary, pensionPercent, studentLoan, isScottish]);
+
   // Compute results with useMemo (pure function of state)
   const results = useMemo(() => {
     return calculateTax({
       salary,
       payPeriod: 'annually',
-      taxYear: CURRENT_TAX_YEAR,
+      taxYear: CURRENT_TAX_YEAR as TaxYear,
       taxCode: isScottish ? 'S1257L' : '1257L',
       isScottish,
       isMarried: false,
