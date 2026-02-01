@@ -85,13 +85,6 @@
 - [ ] Compute actual net saving: `recipientSaving - transferorAdditionalTax`
 - [ ] Show "estimated saving: £X" instead of fixed "£252"
 
-### ScenarioPageClient Optimization Uses Wrong Defaults
-> Optimized comparison hardcodes England settings, ignoring scenario context
-
-- [ ] `tax-trap` optimization path hardcodes `taxCode: '1257L'`, `isScottish: false`
-- [ ] Should use scenario's actual region/settings, only changing pension fields
-- [ ] Affects Scottish scenarios, student loan scenarios
-
 ---
 
 ## P1 - Approved Features
