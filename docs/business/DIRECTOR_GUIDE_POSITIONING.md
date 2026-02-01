@@ -100,7 +100,7 @@ No wizard, no gates - everything visible at once. Pros work fast, beginners lear
 | Education panel | Explains concepts before asking for numbers |
 | Jargon tooltips | Every term defined in plain English |
 | Two Pots visual | Company vs Personal tax - makes it concrete |
-| Monthly Take-Home + Two Pots | Clear "what hits my bank" vs "what to set aside" |
+| "Safe Monthly Draw" | What you can actually spend, not theoretical max |
 | Key dates + calendar | Never miss a deadline |
 | Strategy comparison | See all options, understand tradeoffs |
 

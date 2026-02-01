@@ -106,7 +106,7 @@ export function SummaryCards({ className }: SummaryCardsProps) {
 
   const cards = [
     {
-      label: 'Monthly Take-Home',
+      label: 'Safe Monthly Draw',
       value: hasResults ? formatCurrency(Math.floor(values.takeHome / 12)) : '—',
       subtext: 'After all taxes (illustrative)',
       highlight: true,

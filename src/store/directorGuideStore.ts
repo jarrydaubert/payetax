@@ -441,30 +441,48 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
             const results = calculateDirectorScenario(input, CURRENT_TAX_YEAR);
 
-            // Strategy comparison (includes all advanced inputs)
-            const strategyComparison = calculateStrategyComparison(
+            const commonStrategyInput = {
+              region: formData.region,
+              revenue: formData.revenue,
+              includesVat: formData.includesVat,
+              expenses: formData.expenses,
+              lossesBroughtForward: formData.lossesBroughtForward,
+              otherIncome: formData.otherIncome,
+              employmentAllowance: formData.hasEmploymentAllowance,
+              studentLoanPlans:
+                formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
+              pensionContribution: formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution,
+              companyCarBIK: formData.companyCarBIK,
+              minimumSalaryRequirement: formData.minimumSalaryRequirement,
+              hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
+              // YTD amounts (for available extraction calculation and warnings)
+              ytdSalary: formData.ytdSalary,
+              ytdDividends: formData.ytdDividends,
+              ytdDrawings: formData.ytdDrawings,
+            };
+
+            // Strategy comparison (includes all advanced inputs).
+            // Spec: "Your Setup" should be pre-populated with the optimal values so the user can edit to compare.
+            // To avoid overriding user-provided values, we only default when the fields are empty.
+            const baseComparison = calculateStrategyComparison(
               {
-                region: formData.region,
-                revenue: formData.revenue,
-                includesVat: formData.includesVat,
-                expenses: formData.expenses,
-                lossesBroughtForward: formData.lossesBroughtForward,
-                otherIncome: formData.otherIncome,
-                employmentAllowance: formData.hasEmploymentAllowance,
-                studentLoanPlans:
-                  formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
-                pensionContribution: formData.isPensionAlreadyDeducted
-                  ? 0
-                  : formData.pensionContribution,
-                companyCarBIK: formData.companyCarBIK,
+                ...commonStrategyInput,
                 yourSetupSalary: formData.yourSetupSalary,
                 yourSetupDividends: formData.yourSetupDividends,
-                minimumSalaryRequirement: formData.minimumSalaryRequirement,
-                hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
-                // YTD amounts (for available extraction calculation and warnings)
-                ytdSalary: formData.ytdSalary,
-                ytdDividends: formData.ytdDividends,
-                ytdDrawings: formData.ytdDrawings,
+              },
+              CURRENT_TAX_YEAR,
+            );
+
+            const derivedYourSetupSalary =
+              formData.yourSetupSalary ?? baseComparison.strategies.optimalMix.salary;
+            const derivedYourSetupDividends =
+              formData.yourSetupDividends ?? baseComparison.strategies.optimalMix.dividends;
+
+            const strategyComparison = calculateStrategyComparison(
+              {
+                ...commonStrategyInput,
+                yourSetupSalary: derivedYourSetupSalary,
+                yourSetupDividends: derivedYourSetupDividends,
               },
               CURRENT_TAX_YEAR,
             );
@@ -474,6 +492,11 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               strategyComparison,
               isCalculating: false,
               sliderSalary: null, // Reset slider on new calculation
+              formData: {
+                ...formData,
+                yourSetupSalary: derivedYourSetupSalary,
+                yourSetupDividends: derivedYourSetupDividends,
+              },
             });
           } catch (error) {
             console.error('Director calculation error:', error);

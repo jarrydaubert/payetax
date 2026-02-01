@@ -106,15 +106,10 @@ This input mixes multiple concepts (gross salary, net salary, dividends, drawing
 
 ### Optimization Approach
 
-Current implementation uses a small, high-signal set of salary points (not a full search):
-
-1. Build a candidate list of salaries:
-   - Personal Allowance (typically ~12,570)
-   - Lower Earnings Limit (typically ~6,500) for NI credits
-   - Optional Minimum Salary floor (e.g., mortgage/visa requirement)
-2. For each candidate, compute full outcomes (Income Tax, NI, CT, dividend tax, student loans, etc.)
-3. Pick the candidate that yields the highest take-home value
-4. Label the winner as "Highest Take-Home" (descriptive, not advisory)
+1. Test salary/dividend combinations across valid range (0 to sensible cap)
+2. For each combination, calculate all taxes
+3. Find combination with highest net take-home
+4. Label as "Highest Take-Home" (factual, not advisory)
 
 **Slider rationale:** Capped at upper earnings limit because above this, salary is rarely tax-efficient. Users can model higher via "Your Setup".
 
@@ -141,7 +136,6 @@ Current implementation uses a small, high-signal set of salary points (not a ful
 | £2k unearned income rule for student loans | May overstate SL when dividends ≤£2k (CSLM16035) | Yes — in Accuracy panel |
 | Class 1A NI on BIK | Company cost understated by 15% of BIK value | Yes — warning on BIK input |
 | Plan 5 student loans | Not applicable until April 2026 | Yes — note in SL options |
-| Plan 5 UI toggle | Engine supports Plan 5, but director-guide UI currently doesn't expose it | Yes — treat as a UI gap |
 | Associated companies CT threshold division | CT may be understated for groups | Yes — in Accuracy panel |
 | Short accounting periods | Assumes 12 months | Yes — in Accuracy panel |
 | Marriage Allowance transfer | Could shift optimal by small amount | Yes — in Accuracy panel |
@@ -175,7 +169,7 @@ Replace "illegal dividend" with conditional language:
 **Your Setup behaviour:**
 - Shows difference vs optimal (e.g., "+£1,200 more tax" or "Matches optimal")
 - If inputs exceed available profit → card turns RED with DLA warning
-- Card appears only after user enters "Your current salary" and/or "Your current dividends" (not pre-populated)
+- Pre-populated with optimal values; user edits to compare
 
 ### Interactive Salary Slider
 
@@ -183,7 +177,6 @@ Replace "illegal dividend" with conditional language:
 - Live updates all figures as user drags
 - Starts at optimal position
 - Strategy cards clickable to jump slider to that position
-- Note: Slider is an exploration UI. The "Highest Take-Home" badge is based on the strategy comparison model, not an exhaustive slider search.
 
 ### Detail Breakdowns
 

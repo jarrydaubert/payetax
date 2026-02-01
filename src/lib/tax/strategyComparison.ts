@@ -106,14 +106,6 @@ export interface StrategyComparison {
 const VAT_RATE = 0.2;
 
 // Helper to get tax year specific values
-function getPersonalAllowance(taxYear: TaxYear): number {
-  return TAX_RATES[taxYear].personalAllowance;
-}
-
-function getLowerEarningsLimit(taxYear: TaxYear): number {
-  return TAX_RATES[taxYear].nationalInsurance.lowerEarningsLimit;
-}
-
 function getEmploymentAllowance(taxYear: TaxYear): number {
   return TAX_RATES[taxYear].nationalInsurance.employmentAllowance;
 }
@@ -520,32 +512,61 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
     return createEmptyResult('Optimal Mix');
   }
 
-  const personalAllowance = getPersonalAllowance(taxYear); // £12,570
-  const lowerEarningsLimit = getLowerEarningsLimit(taxYear); // £6,500
+  // Spec: test salary/dividend combinations across the valid range.
+  // In this model, dividends are determined by the remaining post-salary profit,
+  // so we can sweep salary across a range and compute the resulting dividends/taxes.
+  //
+  // Performance: Cap search at the NI Upper Earnings Limit (UEL) or gross profit.
+  // Use a two-stage search: coarse sweep + local refinement around the best point.
+  const uel = TAX_RATES[taxYear].nationalInsurance.employee.A.upper.threshold;
+  const maxSalary = Math.min(uel, grossProfit);
+  const minSalary = Math.max(0, minimumSalary);
 
-  // Build list of salary options to test
-  const salaryOptions = [personalAllowance, lowerEarningsLimit];
-
-  // Add minimum salary requirement if it's higher than existing options
-  if (minimumSalary > 0 && minimumSalary > personalAllowance) {
-    salaryOptions.push(minimumSalary);
+  // Guard: if the minimum salary is above what can be afforded, clamp to max.
+  if (minSalary >= maxSalary) {
+    return scenarioToStrategyResult(
+      calculateSalaryScenarioInternal(maxSalary, opts),
+      pension,
+      companyCarBIK,
+      grossProfit,
+    );
   }
 
-  // Calculate take-home for all salary options
-  const scenarios = salaryOptions.map((targetSalary) => {
-    // If minimum salary is set, enforce it as the floor
-    const effectiveSalary = Math.max(targetSalary, minimumSalary);
-    return calculateSalaryScenarioInternal(effectiveSalary, opts);
-  });
+  const coarseStep = 100; // £100 granularity is cheap and good enough for threshold-driven tax.
+  let bestSalary = minSalary;
+  let bestScenario = calculateSalaryScenarioInternal(bestSalary, opts);
 
-  // Pick the scenario with highest take-home
-  // In most cases, £12,570 (PA) salary wins because:
-  // - Extra salary saves more in CT than it costs in Employer NI
-  // - £6,070 extra salary saves ~£1,500 CT (25%) but costs only ~£910 Employer NI (15%)
-  // With EA, the advantage is even larger since Employer NI is offset
-  const bestScenario = scenarios.reduce((best, current) =>
-    current.takeHome > best.takeHome ? current : best,
-  );
+  for (let s = minSalary; s <= maxSalary; s += coarseStep) {
+    const scenario = calculateSalaryScenarioInternal(s, opts);
+    if (scenario.takeHome > bestScenario.takeHome) {
+      bestScenario = scenario;
+      bestSalary = s;
+    }
+  }
+
+  // Refinement: search +/- £2,000 around the coarse winner in £10 steps.
+  const refineWindow = 2000;
+  const refineStep = 10;
+  const start = Math.max(minSalary, bestSalary - refineWindow);
+  const end = Math.min(maxSalary, bestSalary + refineWindow);
+
+  for (let s = start; s <= end; s += refineStep) {
+    const scenario = calculateSalaryScenarioInternal(s, opts);
+    if (scenario.takeHome > bestScenario.takeHome) {
+      bestScenario = scenario;
+    }
+  }
+
+  // Final refinement: +/- £200 in £1 steps for exactness around threshold edges.
+  const fineWindow = 200;
+  const fineStart = Math.max(minSalary, bestScenario.salary - fineWindow);
+  const fineEnd = Math.min(maxSalary, bestScenario.salary + fineWindow);
+  for (let s = fineStart; s <= fineEnd; s += 1) {
+    const scenario = calculateSalaryScenarioInternal(s, opts);
+    if (scenario.takeHome > bestScenario.takeHome) {
+      bestScenario = scenario;
+    }
+  }
 
   const {
     salary,
@@ -580,6 +601,37 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
     totalPersonalTax: round(totalPersonalTax),
     companyCost: round(companyCost),
     takeHome: round(takeHome),
+    effectiveRate: round(effectiveRate),
+  };
+}
+
+function scenarioToStrategyResult(
+  scenario: ReturnType<typeof calculateSalaryScenarioInternal>,
+  pension: number,
+  companyCarBIK: number,
+  grossProfit: number,
+): StrategyResult {
+  const totalPersonalTax =
+    scenario.incomeTax + scenario.employeeNI + scenario.dividendTax + scenario.studentLoan;
+  const companyCost = scenario.salary + scenario.employerNI + scenario.corporationTax;
+  const effectiveRate =
+    grossProfit > 0 ? ((grossProfit - scenario.takeHome) / grossProfit) * 100 : 0;
+
+  return {
+    name: 'Optimal Mix',
+    salary: round(scenario.salary),
+    dividends: round(scenario.dividends),
+    pension: round(pension),
+    companyCarBIK: round(companyCarBIK),
+    employerNI: round(scenario.employerNI),
+    employeeNI: round(scenario.employeeNI),
+    incomeTax: round(scenario.incomeTax),
+    corporationTax: round(scenario.corporationTax),
+    dividendTax: round(scenario.dividendTax),
+    studentLoan: round(scenario.studentLoan),
+    totalPersonalTax: round(totalPersonalTax),
+    companyCost: round(companyCost),
+    takeHome: round(scenario.takeHome),
     effectiveRate: round(effectiveRate),
   };
 }
