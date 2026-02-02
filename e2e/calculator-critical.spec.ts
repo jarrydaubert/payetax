@@ -61,7 +61,7 @@ test.describe('Calculator critical @critical', () => {
     expect(hasOverflow).toBe(false);
   });
 
-  test('Breakdown table renders and marginal responds to student loan @critical', async ({
+  test('Payslip table renders and marginal responds to student loan @critical', async ({
     page,
   }) => {
     await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
@@ -70,7 +70,7 @@ test.describe('Calculator critical @critical', () => {
     await page.getByTestId('salary-input').fill('30000');
     await page.getByTestId('calculate-button').click();
     await expect(page.getByTestId('results-table')).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: 'Breakdown' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Payslip' })).toBeVisible();
 
     const marginalCard = page.getByRole('button', { name: /Marginal Tax Rate/i });
     const baseMarginalText = (await marginalCard.textContent()) ?? '';

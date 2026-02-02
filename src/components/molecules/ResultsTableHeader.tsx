@@ -31,7 +31,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             TYPOGRAPHY.TEXT_LG,
           )}
         >
-          Breakdown
+          Payslip
         </TableHead>
         <TableHead
           className={cn(

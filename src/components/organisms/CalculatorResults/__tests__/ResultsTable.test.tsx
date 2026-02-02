@@ -87,7 +87,7 @@ describe('ResultsTable Component', () => {
       const headers = screen.getAllByRole('columnheader');
       const headerTexts = headers.map((h) => h.textContent);
 
-      expect(headerTexts).toContain('Breakdown');
+      expect(headerTexts).toContain('Payslip');
       expect(headerTexts).toContain('%');
       expect(headerTexts).toContain('Yearly');
       expect(headerTexts).toContain('Monthly');
