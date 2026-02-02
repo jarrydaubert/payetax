@@ -328,6 +328,7 @@ export function CalculatorContainer() {
               isMarried={input.isMarried}
               partnerGrossWage={input.partnerGrossWage}
               taxCode={input.taxCode}
+              isScottish={input.region === 'Scotland'}
             />
 
             {/* Data Visualization Charts */}

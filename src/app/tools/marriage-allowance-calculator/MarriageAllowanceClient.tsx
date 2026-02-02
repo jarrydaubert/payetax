@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES } from '@/constants/taxRates';
+import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn } from '@/lib/utils';
 
 const TAX_YEAR = '2025-2026' as const;
@@ -70,8 +71,13 @@ function checkEligibility(transferorIncome: number, recipientIncome: number): El
     };
   }
 
-  // Calculate actual saving based on recipient's income
-  const saving = TAX_SAVING;
+  const savingResult = calculateMarriageAllowanceNetSaving({
+    recipientIncome,
+    transferorIncome,
+    taxYear: TAX_YEAR,
+    region: 'rUK',
+  });
+  const saving = Math.round(savingResult?.netSaving ?? TAX_SAVING);
 
   return {
     ...baseResult,

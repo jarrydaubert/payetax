@@ -47,6 +47,7 @@ interface ResultsTableProps {
   isMarried?: boolean;
   partnerGrossWage?: number;
   taxCode?: string;
+  isScottish?: boolean;
 }
 
 interface ResultRowData {
@@ -83,6 +84,7 @@ export function ResultsTable({
   isMarried = false,
   partnerGrossWage = 0,
   taxCode = '1257L',
+  isScottish = false,
 }: ResultsTableProps) {
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
@@ -455,6 +457,7 @@ export function ResultsTable({
             partnerSalary={partnerGrossWage}
             hasMarriageCode={false}
             taxYear={taxYear as TaxYear}
+            isScottish={isScottish}
           />
         </div>
       )}

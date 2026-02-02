@@ -21,7 +21,8 @@ import { ExternalLink, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface MarriageAllowanceAlertProps {
@@ -31,6 +32,8 @@ interface MarriageAllowanceAlertProps {
   partnerSalary: number;
   /** Whether user already has M code in tax code */
   hasMarriageCode: boolean;
+  /** Whether Scottish income tax rates apply */
+  isScottish?: boolean;
   /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
   taxYear?: TaxYear;
 }
@@ -48,6 +51,7 @@ export function MarriageAllowanceAlert({
   userSalary,
   partnerSalary,
   hasMarriageCode,
+  isScottish = false,
   taxYear = TAX_YEARS[0],
 }: MarriageAllowanceAlertProps) {
   // Don't show if they already have the M code
@@ -55,16 +59,22 @@ export function MarriageAllowanceAlert({
     return null;
   }
 
-  // Get tax rates for the specified tax year
   const effectiveTaxYear = taxYear ?? '2025-2026';
-  const taxRates = TAX_RATES[effectiveTaxYear];
-  if (!taxRates) return null;
-  const basicBand = taxRates.bands[0];
-  if (!basicBand) return null;
-  const personalAllowance = taxRates.personalAllowance;
-  const higherRateThreshold = personalAllowance + basicBand.threshold;
-  const marriageAllowanceTransfer = taxRates.marriageAllowance;
-  const basicRate = basicBand.rate;
+  const saving = calculateMarriageAllowanceNetSaving({
+    recipientIncome: userSalary,
+    transferorIncome: partnerSalary,
+    taxYear: effectiveTaxYear,
+    region: isScottish ? 'scotland' : 'rUK',
+  });
+
+  if (!saving) return null;
+
+  const {
+    netSaving,
+    personalAllowance,
+    higherRateThreshold,
+    transferAmount,
+  } = saving;
 
   // User must be a basic rate taxpayer (between PA and higher rate threshold)
   if (userSalary <= personalAllowance || userSalary > higherRateThreshold) {
@@ -72,12 +82,11 @@ export function MarriageAllowanceAlert({
   }
 
   // Partner must earn less than Personal Allowance
-  if (partnerSalary >= personalAllowance) {
+  if (partnerSalary >= personalAllowance || partnerSalary < 0) {
     return null;
   }
 
-  // Calculate potential annual saving (marriage allowance × basic rate)
-  const annualSaving = (marriageAllowanceTransfer * basicRate) / 100;
+  const annualSaving = Math.round(netSaving);
   const monthlySaving = annualSaving / 12;
 
   return (
@@ -101,14 +110,15 @@ export function MarriageAllowanceAlert({
           </AlertTitle>
           <AlertDescription className='text-pink-800/90 dark:text-pink-200/90'>
             Based on your partner's income of {formatCurrency(partnerSalary, 0)}, you may be
-            eligible to receive Marriage Allowance. This could save you up to{' '}
+            eligible to receive Marriage Allowance. Estimated net saving:{' '}
             <span className='font-bold text-pink-600 dark:text-pink-400'>
               {formatCurrency(annualSaving, 0)} per year
             </span>{' '}
             ({formatCurrency(monthlySaving, 0)}/month) in tax.
             <span className={cn('block', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
-              Your partner can transfer 10% of their Personal Allowance (£1,260) to you, which would
-              update your tax code to include an 'M' suffix.
+              Your partner can transfer 10% of their Personal Allowance (
+              {formatCurrency(transferAmount, 0)}) to you, which would update your tax code to
+              include an 'M' suffix.
             </span>
           </AlertDescription>
         </div>

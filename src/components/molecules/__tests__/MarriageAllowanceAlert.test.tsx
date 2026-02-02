@@ -85,6 +85,32 @@ describe('MarriageAllowanceAlert', () => {
       expect(screen.getByText('You May Qualify for Marriage Allowance')).toBeInTheDocument();
     });
 
+    it('should NOT show alert for Scottish user above higher rate threshold', () => {
+      const { container } = render(
+        <MarriageAllowanceAlert
+          userSalary={50000} // Above Scottish higher rate threshold (~£43.7k)
+          partnerSalary={8000}
+          hasMarriageCode={false}
+          isScottish={true}
+        />,
+      );
+
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('should show alert for Scottish user below higher rate threshold', () => {
+      render(
+        <MarriageAllowanceAlert
+          userSalary={40000}
+          partnerSalary={8000}
+          hasMarriageCode={false}
+          isScottish={true}
+        />,
+      );
+
+      expect(screen.getByText('You May Qualify for Marriage Allowance')).toBeInTheDocument();
+    });
+
     it('should show alert when partner earns £1 below Personal Allowance', () => {
       render(
         <MarriageAllowanceAlert
@@ -104,7 +130,7 @@ describe('MarriageAllowanceAlert', () => {
         <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
       );
 
-      // Marriage allowance = £1,260, basic rate = 20%, so savings = £252/year
+      // Marriage allowance = £1,260, basic rate = 20%, so net saving = £252/year
       expect(screen.getByText(/£252 per year/)).toBeInTheDocument();
     });
 
@@ -114,6 +140,15 @@ describe('MarriageAllowanceAlert', () => {
       );
 
       expect(screen.getByText(/£21\/month/)).toBeInTheDocument();
+    });
+
+    it('should reduce net saving when partner income is near Personal Allowance', () => {
+      render(
+        <MarriageAllowanceAlert userSalary={35000} partnerSalary={12000} hasMarriageCode={false} />,
+      );
+
+      // Partner income near PA reduces net saving below £252
+      expect(screen.getByText(/£114 per year/)).toBeInTheDocument();
     });
 
     it('should format partner income correctly', () => {
