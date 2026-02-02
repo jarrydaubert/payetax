@@ -51,7 +51,7 @@ describe('HomePageContent Component', () => {
     const { container } = render(<HomePageContent />);
 
     const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toHaveClass('py-12', 'md:py-16', 'lg:py-20');
+    expect(calculatorSection).toHaveClass('py-16', 'md:py-20', 'lg:py-24');
   });
 
   it('should have z-index for layering above background', () => {

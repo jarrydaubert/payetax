@@ -64,17 +64,17 @@ describe('analytics', () => {
 
       trackSEOAction(action, data);
 
-      expect(mockGtag).toHaveBeenCalledWith('event', action, {
-        event_category: 'seo_actions',
-        event_label: 'blog',
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        action,
+        expect.objectContaining({
+          category: 'seo_actions',
+          label: 'blog',
           source: 'blog',
           target: 'https://example.com',
-          page_path: expect.any(String),
-          user_agent: 'Test User Agent',
-          timestamp: expect.any(String),
+          page_path: '/',
         }),
-      });
+      );
     });
 
     it('logs to console in development mode', () => {
@@ -87,12 +87,7 @@ describe('analytics', () => {
       expect(consoleLogSpy).toHaveBeenCalledWith(
         '🔍 SEO Analytics:',
         action,
-        expect.objectContaining({
-          source: 'calculator',
-          page_path: expect.any(String),
-          user_agent: 'Test User Agent',
-          timestamp: expect.any(String),
-        }),
+        { source: 'calculator' },
       );
     });
 
@@ -128,7 +123,7 @@ describe('analytics', () => {
         'event',
         'navigation',
         expect.objectContaining({
-          event_label: 'unknown',
+          label: 'unknown',
         }),
       );
     });
@@ -141,9 +136,7 @@ describe('analytics', () => {
         'event',
         'form_interaction',
         expect.objectContaining({
-          custom_parameters: expect.objectContaining({
-            page_path: expect.any(String),
-          }),
+          page_path: '/',
         }),
       );
     });
@@ -161,10 +154,9 @@ describe('analytics', () => {
       trackEvent(event);
 
       expect(mockGtag).toHaveBeenCalledWith('event', 'button_click', {
-        event_category: 'engagement',
-        event_label: 'Calculate Tax',
+        category: 'engagement',
+        label: 'Calculate Tax',
         value: 1,
-        custom_parameters: undefined,
       });
     });
 
@@ -175,7 +167,7 @@ describe('analytics', () => {
         'event',
         'test_action',
         expect.objectContaining({
-          event_category: 'general',
+          category: 'general',
         }),
       );
     });
@@ -215,7 +207,7 @@ describe('analytics', () => {
         'event',
         'custom_event',
         expect.objectContaining({
-          custom_parameters: customData,
+          ...customData,
         }),
       );
     });
@@ -225,45 +217,56 @@ describe('analytics', () => {
     it('tracks calculate action', () => {
       trackCalculatorEvent('calculate', { salary: 50000 });
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_action', {
-        event_category: 'calculator',
-        event_label: 'calculate',
-        value: undefined,
-        custom_parameters: { salary: 50000 },
-      });
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_action',
+        expect.objectContaining({
+          category: 'calculator',
+          label: 'calculate',
+          salary: 50000,
+        }),
+      );
     });
 
     it('tracks reset action', () => {
       trackCalculatorEvent('reset');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_action', {
-        event_category: 'calculator',
-        event_label: 'reset',
-        value: undefined,
-        custom_parameters: undefined,
-      });
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_action',
+        expect.objectContaining({
+          category: 'calculator',
+          label: 'reset',
+        }),
+      );
     });
 
     it('tracks update action', () => {
       trackCalculatorEvent('update', { field: 'salary' });
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_action', {
-        event_category: 'calculator',
-        event_label: 'update',
-        value: undefined,
-        custom_parameters: { field: 'salary' },
-      });
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_action',
+        expect.objectContaining({
+          category: 'calculator',
+          label: 'update',
+          field: 'salary',
+        }),
+      );
     });
 
     it('tracks error action', () => {
       trackCalculatorEvent('error', { message: 'Invalid input' });
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_action', {
-        event_category: 'calculator',
-        event_label: 'error',
-        value: undefined,
-        custom_parameters: { message: 'Invalid input' },
-      });
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_action',
+        expect.objectContaining({
+          category: 'calculator',
+          label: 'error',
+          message: 'Invalid input',
+        }),
+      );
     });
   });
 
@@ -271,29 +274,31 @@ describe('analytics', () => {
     it('tracks calculator usage with salary range', () => {
       trackCalculatorUsage('paye', '50000-75000');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_usage', {
-        event_category: 'engagement',
-        event_label: 'paye',
-        value: undefined,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_usage',
+        expect.objectContaining({
+          category: 'engagement',
+          label: 'paye',
           salary_range: '50000-75000',
           timestamp: expect.any(String),
         }),
-      });
+      );
     });
 
     it('tracks calculator usage without salary range', () => {
       trackCalculatorUsage('self_employed');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'calculator_usage', {
-        event_category: 'engagement',
-        event_label: 'self_employed',
-        value: undefined,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'calculator_usage',
+        expect.objectContaining({
+          category: 'engagement',
+          label: 'self_employed',
           salary_range: undefined,
           timestamp: expect.any(String),
         }),
-      });
+      );
     });
   });
 
@@ -305,6 +310,7 @@ describe('analytics', () => {
       expect(mockGtag).toHaveBeenCalledWith('config', 'GA-TEST-123', {
         page_path: '/calculator',
         page_title: 'Tax Calculator',
+        send_page_view: true,
       });
     });
 
@@ -315,6 +321,7 @@ describe('analytics', () => {
       expect(mockGtag).toHaveBeenCalledWith('config', 'GA-TEST-123', {
         page_path: '/about',
         page_title: undefined,
+        send_page_view: true,
       });
     });
 
@@ -345,7 +352,7 @@ describe('analytics', () => {
       process.env.NEXT_PUBLIC_GA_ID = '';
       trackPageView('/test');
 
-      expect(mockGtag).toHaveBeenCalledWith('config', '', expect.any(Object));
+      expect(mockGtag).not.toHaveBeenCalled();
       process.env.NEXT_PUBLIC_GA_ID = originalGaId;
     });
   });
@@ -354,43 +361,52 @@ describe('analytics', () => {
     it('tracks form submit', () => {
       trackFormInteraction('contact_form', 'submit', 'email');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'form_interaction', {
-        event_category: 'seo_actions',
-        event_label: 'contact_form',
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'form_interaction',
+        expect.objectContaining({
+          category: 'seo_actions',
+          label: 'contact_form',
           source: 'contact_form',
           action_type: 'submit',
           target: 'email',
+          page_path: '/',
         }),
-      });
+      );
     });
 
     it('tracks form focus', () => {
       trackFormInteraction('calculator_form', 'focus', 'salary');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'form_interaction', {
-        event_category: 'seo_actions',
-        event_label: 'calculator_form',
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'form_interaction',
+        expect.objectContaining({
+          category: 'seo_actions',
+          label: 'calculator_form',
           source: 'calculator_form',
           action_type: 'focus',
           target: 'salary',
+          page_path: '/',
         }),
-      });
+      );
     });
 
     it('tracks form interaction without field name', () => {
       trackFormInteraction('feedback_form', 'open');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'form_interaction', {
-        event_category: 'seo_actions',
-        event_label: 'feedback_form',
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'form_interaction',
+        expect.objectContaining({
+          category: 'seo_actions',
+          label: 'feedback_form',
           source: 'feedback_form',
           action_type: 'open',
           target: undefined,
+          page_path: '/',
         }),
-      });
+      );
     });
   });
 
@@ -398,42 +414,48 @@ describe('analytics', () => {
     it('tracks performance metric with default unit', () => {
       trackPerformanceMetric('page_load', 1250);
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'page_load',
-        value: 1250,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'page_load',
+          value: 1250,
           unit: 'ms',
           timestamp: expect.any(String),
         }),
-      });
+      );
     });
 
     it('tracks performance metric with custom unit', () => {
       trackPerformanceMetric('bundle_size', 2.5, 'MB');
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'bundle_size',
-        value: 2.5,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'bundle_size',
+          value: 2.5,
           unit: 'MB',
           timestamp: expect.any(String),
         }),
-      });
+      );
     });
 
     it('tracks zero value metrics', () => {
       trackPerformanceMetric('cache_hits', 0);
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'cache_hits',
-        value: 0,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'cache_hits',
+          value: 0,
           unit: 'ms',
         }),
-      });
+      );
     });
   });
 
@@ -469,32 +491,38 @@ describe('analytics', () => {
 
       trackCoreWebVitals();
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'page_load_time',
-        value: 2000,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'page_load_time',
+          value: 2000,
           unit: 'ms',
         }),
-      });
+      );
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'dom_content_loaded',
-        value: 1500,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'dom_content_loaded',
+          value: 1500,
           unit: 'ms',
         }),
-      });
+      );
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'time_to_interactive',
-        value: 1000,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'time_to_interactive',
+          value: 1000,
           unit: 'ms',
         }),
-      });
+      );
     });
 
     it('tracks First Contentful Paint', () => {
@@ -503,14 +531,16 @@ describe('analytics', () => {
 
       trackCoreWebVitals();
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
-        event_category: 'performance',
-        event_label: 'first_contentful_paint',
-        value: 800,
-        custom_parameters: expect.objectContaining({
+      expect(mockGtag).toHaveBeenCalledWith(
+        'event',
+        'performance_metric',
+        expect.objectContaining({
+          category: 'performance',
+          label: 'first_contentful_paint',
+          value: 800,
           unit: 'ms',
         }),
-      });
+      );
     });
 
     it('does not track when window is undefined', () => {

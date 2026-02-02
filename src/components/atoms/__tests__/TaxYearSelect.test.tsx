@@ -209,7 +209,7 @@ describe('TaxYearSelect Component', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />);
 
       const button = screen.getByRole('combobox');
-      expect(button).toHaveClass('focus-visible:ring-1');
+      expect(button).toHaveClass('focus-visible:ring-2');
       expect(button).toHaveClass('focus-visible:ring-ring');
     });
   });

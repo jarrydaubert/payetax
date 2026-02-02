@@ -8,7 +8,10 @@
 
 :root {
   /* Typography - Wire design tokens to Next.js font variables */
-  /* --font-inter and --font-space-grotesk are set by next/font in layout.tsx */
+  /* --font-inter and --font-space-grotesk are set by next/font when enabled */
+  --font-inter: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-space-grotesk: ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
@@ -1120,4 +1123,3 @@
     display: none !important;
   }
 }
-

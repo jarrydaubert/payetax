@@ -111,6 +111,7 @@ export function IncomeSourceList() {
               exit={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
               transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
               className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
+              data-testid={`income-source-${index}`}
             >
               <div className={cn('flex items-center', SPACING.GAP_2)}>
                 <Badge
@@ -132,12 +133,13 @@ export function IncomeSourceList() {
                       updateIncomeSource(source.id, { type: value });
                     }}
                   >
-                    <SelectTrigger
-                      className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
-                      aria-label='Select income type'
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
+                  <SelectTrigger
+                    className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
+                    aria-label='Select income type'
+                    data-testid={`income-source-${index}-type`}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
                     <SelectContent>
                       {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
@@ -170,6 +172,7 @@ export function IncomeSourceList() {
                   placeholder='0'
                   min={0}
                   className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
+                  data-testid={`income-source-${index}-amount`}
                 />
 
                 {/* Period - with runtime type guard */}
@@ -183,6 +186,7 @@ export function IncomeSourceList() {
                   <SelectTrigger
                     className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
                     aria-label='Select pay period'
+                    data-testid={`income-source-${index}-period`}
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -205,6 +209,7 @@ export function IncomeSourceList() {
           onClick={addIncomeSource}
           className='w-full'
           disabled={incomeSources.length >= 10}
+          data-testid='add-income-source'
         >
           <Plus className={cn('mr-2', ICON_SIZES.SIZE_4)} />
           Add Income Source

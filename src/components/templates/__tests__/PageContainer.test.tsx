@@ -158,23 +158,23 @@ describe('PageContainer Component', () => {
   });
 
   describe('Navbar Spacing', () => {
-    it('should include navbar spacing by default', () => {
+    it('should not include navbar spacing by default (SimpleNavbar spacer handles it)', () => {
       const { container } = render(
         <PageContainer>
           <div>Spaced content</div>
         </PageContainer>,
       );
-      expect(container.firstChild).toHaveClass('pt-24');
-    });
-
-    it('should exclude navbar spacing when includeNavbarSpacing=false', () => {
-      const { container } = render(
-        <PageContainer includeNavbarSpacing={false}>
-          <div>No navbar spacing</div>
-        </PageContainer>,
-      );
       expect(container.firstChild).toHaveClass('py-8');
       expect(container.firstChild).not.toHaveClass('pt-24');
+    });
+
+    it('should include navbar spacing when includeNavbarSpacing=true', () => {
+      const { container } = render(
+        <PageContainer includeNavbarSpacing={true}>
+          <div>Extra navbar spacing</div>
+        </PageContainer>,
+      );
+      expect(container.firstChild).toHaveClass('pt-24');
     });
   });
 

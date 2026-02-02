@@ -258,7 +258,7 @@ describe('TaxTrapInlineAlert', () => {
     it('should use warning variant for Alert', () => {
       const { container } = render(<TaxTrapInlineAlert salary={110000} suggestedPension={10000} />);
 
-      const alert = container.querySelector('[role="alert"]');
+      const alert = container.querySelector('[role="status"]');
       expect(alert).toHaveClass('border-2');
     });
 
@@ -335,10 +335,10 @@ describe('TaxTrapInlineAlert', () => {
       expect(dismissButton).toHaveAttribute('aria-label', 'Dismiss tax trap alert');
     });
 
-    it('should have role="alert" on the Alert component', () => {
+    it('should have role="status" on the Alert component (non-destructive)', () => {
       const { container } = render(<TaxTrapInlineAlert salary={110000} suggestedPension={10000} />);
 
-      const alert = container.querySelector('[role="alert"]');
+      const alert = container.querySelector('[role="status"]');
       expect(alert).toBeInTheDocument();
     });
 

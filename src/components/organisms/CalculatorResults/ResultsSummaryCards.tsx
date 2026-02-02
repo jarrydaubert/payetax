@@ -10,16 +10,26 @@ import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/an
 import { SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { calculateTax, type TaxCalculationInput, type TaxCalculationResults } from '@/lib/taxCalculator';
+import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultsSummaryCardsProps {
   results: TaxCalculationResults;
   /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
   taxYear?: TaxYear;
+  /**
+   * Original calculator input (used to compute a dynamic marginal tax rate).
+   * When omitted, we fall back to a simple band-based approximation.
+   */
+  input?: TaxCalculationInput;
 }
 
-export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: ResultsSummaryCardsProps) {
+export function ResultsSummaryCards({
+  results,
+  taxYear = TAX_YEARS[0],
+  input,
+}: ResultsSummaryCardsProps) {
   const shouldReduceMotion = useMotionPreference();
 
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
@@ -36,18 +46,48 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
   const paReductionThreshold = taxRates?.personalAllowanceReductionThreshold ?? 100000; // £100,000
   const higherRateThreshold = personalAllowance + (higherBand?.threshold ?? 112570); // £125,140
 
-  // Calculate marginal tax rate: for every extra £1, how much do you keep?
-  // This shows which tax band you're in
-  const marginalRate = useMemo(() => {
-    const salary = results.grossSalary.annually;
+  // Marginal tax rate: approximate tax/NI/SL rate on the next bit of salary.
+  // Prefer dynamic calculation from the user's actual input; fall back to a band approximation.
+  const marginalTaxRate = useMemo(() => {
+    // Dynamic: compute tax delta for a small salary increase (annualized) to reflect user settings.
+    if (input) {
+      const deltaAnnual = 100; // Larger than £1 to reduce rounding noise while staying "marginal".
+      const deltaInInputPeriod = convertAnnualToPeriod(
+        deltaAnnual,
+        input.payPeriod,
+        input.hoursPerWeek,
+      );
 
-    // Tax bands for England/Wales (2025-26) - using constants from taxRates.ts
-    if (salary <= personalAllowance) return 0; // No tax
-    if (salary <= basicRateThreshold) return 67.25; // 20% tax + 8% NI + 4.75% pension relief = keep 67.25%
-    if (salary <= paReductionThreshold) return 57.25; // 40% tax + 2% NI = keep 57.25%
-    if (salary <= higherRateThreshold) return 37.25; // 60% effective (allowance taper) + 2% NI = keep 37.25%
-    return 52.75; // 45% additional rate + 2% NI = keep 52.75%
+      const bumped = calculateTax({
+        ...input,
+        salary: input.salary + deltaInInputPeriod,
+      });
+
+      const baseTax =
+        results.incomeTax.annually +
+        results.nationalInsurance.annually +
+        results.studentLoan.annually;
+      const bumpedTax =
+        bumped.incomeTax.annually + bumped.nationalInsurance.annually + bumped.studentLoan.annually;
+
+      const deltaTax = bumpedTax - baseTax;
+      const rate = (deltaTax / deltaAnnual) * 100;
+      // Clamp for display sanity.
+      return Math.min(100, Math.max(0, rate));
+    }
+
+    // Fallback approximation: band-based marginal tax+NI (ignores pension, student loan, etc.)
+    const salary = results.grossSalary.annually;
+    if (salary <= personalAllowance) return 0;
+    if (salary <= basicRateThreshold) return 28; // 20% IT + 8% NI (2025-26) in basic band
+    if (salary <= paReductionThreshold) return 42; // 40% IT + 2% NI
+    if (salary <= higherRateThreshold) return 62; // 60% effective + 2% NI
+    return 47; // 45% IT + 2% NI
   }, [
+    input,
+    results.incomeTax.annually,
+    results.nationalInsurance.annually,
+    results.studentLoan.annually,
     results.grossSalary.annually,
     personalAllowance,
     basicRateThreshold,
@@ -109,12 +149,12 @@ export function ResultsSummaryCards({ results, taxYear = TAX_YEARS[0] }: Results
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
             label='Marginal Tax Rate'
-            value={`${(100 - marginalRate).toFixed(1)}%`}
+            value={`${marginalTaxRate.toFixed(1)}%`}
             icon={TrendingUp}
             variant='info'
             delay={0.2}
             className='md:col-span-2 lg:col-span-1'
-            tooltip='The percentage of tax you pay on each additional £1 you earn. This depends on which tax band you are in and helps you understand the value of pay rises or bonuses.'
+            tooltip="An estimate of the tax/NI (and student loan, if applicable) you'd pay on additional salary. Calculated by increasing your salary by £100/year and measuring the change."
           />
         </motion.div>
       </motion.section>

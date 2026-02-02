@@ -29,14 +29,14 @@ describe('Alert Component', () => {
       expect(icon).toBeInTheDocument();
     });
 
-    it('should have alert role', () => {
+    it('should have status role by default', () => {
       render(
         <Alert>
           <AlertTitle>Title</AlertTitle>
         </Alert>,
       );
 
-      const alert = screen.getByRole('alert');
+      const alert = screen.getByRole('status');
       expect(alert).toBeInTheDocument();
     });
   });
@@ -268,7 +268,7 @@ describe('Alert Component', () => {
         </Alert>,
       );
 
-      const alert = screen.getByRole('alert');
+      const alert = screen.getByRole('status');
       expect(alert).toBeInTheDocument();
       expect(alert).toHaveTextContent('Important Alert');
     });

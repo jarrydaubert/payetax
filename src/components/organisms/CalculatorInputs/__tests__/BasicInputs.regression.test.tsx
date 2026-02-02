@@ -64,7 +64,7 @@ describe('BasicInputs - Regression Tests', () => {
       render(<BasicInputs />);
 
       // Find pension input - it should show decimal value
-      const pensionInputs = screen.getAllByRole('textbox');
+      const pensionInputs = screen.getAllByRole('spinbutton');
       const pensionInput = pensionInputs.find(
         (input) =>
           (input as HTMLInputElement).value.includes('5.5') ||

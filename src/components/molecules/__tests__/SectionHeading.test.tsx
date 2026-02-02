@@ -80,13 +80,14 @@ describe('SectionHeading', () => {
 
     it('should apply badge variant', () => {
       render(<SectionHeading title='Title' badge={{ text: 'Test', variant: 'secondary' }} />);
-      const badge = screen.getByText('Test').closest('div');
+      const badge = screen.getByText('Test').parentElement as HTMLElement | null;
+      expect(badge).toBeInTheDocument();
       expect(badge).toHaveClass('bg-secondary');
     });
 
     it('should use outline variant by default', () => {
       render(<SectionHeading title='Title' badge={{ text: 'Test' }} />);
-      const badge = screen.getByText('Test').closest('div');
+      const badge = screen.getByText('Test').parentElement as HTMLElement | null;
       // Outline variant doesn't have bg-primary class
       expect(badge).not.toHaveClass('bg-primary');
     });
@@ -113,7 +114,7 @@ describe('SectionHeading', () => {
 
     it('should center badge when align is center', () => {
       render(<SectionHeading title='Title' badge={{ text: 'Badge' }} align='center' />);
-      const badgeContainer = screen.getByText('Badge').closest('div')?.parentElement;
+      const badgeContainer = screen.getByText('Badge').parentElement?.parentElement as HTMLElement | null;
       expect(badgeContainer).toHaveClass('justify-center');
     });
   });
@@ -178,7 +179,7 @@ describe('SectionHeading', () => {
   describe('Design Tokens', () => {
     it('should use design tokens for spacing', () => {
       render(<SectionHeading title='Title' badge={{ icon: Rocket, text: 'Test' }} />);
-      const badge = screen.getByText('Test').closest('div');
+      const badge = screen.getByText('Test').parentElement as HTMLElement | null;
       expect(badge).toHaveClass('gap-2');
     });
 

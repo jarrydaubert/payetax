@@ -15,7 +15,7 @@ import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
-import { inter, spaceGrotesk } from './fonts';
+import { inter, spaceGrotesk } from '@/app/fonts';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payetax.co.uk'),

@@ -483,6 +483,15 @@ export interface TaxCalculationInput {
   hoursPerWeek: number;
   /** Additional income sources beyond primary employment */
   incomeSources?: IncomeSource[];
+  /**
+   * Non-taxable allowances paid to you (annual total).
+   *
+   * Intended for payslip items that increase take-home but are NOT taxed/NI'd
+   * (e.g., "Home Base", reimbursed expenses shown as non-taxable).
+   *
+   * This does not change taxable income or NI - it is added to net pay only.
+   */
+  allowancesDeductions?: number;
 }
 
 /**
@@ -542,7 +551,7 @@ export interface TaxCalculationResults {
  * 5. **Progressive Taxation**: Apply income tax bands (20%, 40%, 45% or Scottish rates)
  * 6. **National Insurance**: Calculate employee and employer contributions
  * 7. **Student Loans**: Apply income-contingent repayments
- * 8. **Net Pay**: Final take-home calculation with post-tax benefits
+ * 8. **Net Pay**: Final take-home calculation (adds non-taxable allowances if provided)
  *
  * ### HMRC Formula Implementation
  *
@@ -684,8 +693,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
   }
 
-  // totalGrossIncome: Used for allowance tapers and tax band calculations
-  // This is the "Adjusted Net Income" concept for PA taper purposes
+  // totalGrossIncome: Used for tax band calculations and as the base for adjusted net income
+  // Adjusted net income (for PA taper) is calculated later after pension contributions
   const totalGrossIncome = employmentIncome + additionalIncome;
 
   // Monthly equivalents for payslip-style calculations
@@ -693,7 +702,32 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const monthlyEmploymentIncome = employmentIncome / 12;
 
   // ---------------
-  // 3. Calculate tax-free allowance (annual and monthly)
+  // 3. Calculate pre-tax deductions (pension and allowances)
+  // ---------------
+
+  // Calculate annual and monthly pension contribution
+  let annualPensionContribution = 0;
+  let monthlyPensionContribution = 0;
+
+  if (input.pensionContribution > 0) {
+    if (input.pensionContributionType === 'percentage') {
+      // Percentage of PRIMARY employment salary (not other income sources)
+      // Pension contributions are typically on employment earnings only
+      annualPensionContribution = annualGrossSalary * (input.pensionContribution / 100);
+      monthlyPensionContribution = annualPensionContribution / 12; // Derive from annual for consistency
+    } else {
+      // Fixed amount (normalize from input period to annual and monthly)
+      annualPensionContribution = convertPeriodToAnnual(
+        input.pensionContribution,
+        input.payPeriod,
+        input.hoursPerWeek,
+      );
+      monthlyPensionContribution = annualPensionContribution / 12;
+    }
+  }
+
+  // ---------------
+  // 4. Calculate tax-free allowance (annual and monthly)
   // ---------------
 
   // Parse tax code using comprehensive parser that handles all HMRC code types
@@ -706,17 +740,18 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const taxCodeBandOverride = taxCodeResult.bandOverride;
 
   // High Income Personal Allowance Reduction (HMRC "60% Tax Trap")
-  // Above £100,000 TOTAL income, personal allowance is reduced by £1 for every £2 of income
+  // Above £100,000 ADJUSTED NET income, personal allowance is reduced by £1 for every £2 of income
   // This creates an effective 60% tax rate between £100k-£125k (40% income tax + 20% lost allowance)
-  // IMPORTANT: Uses totalGrossIncome (all sources) not just primary salary
-  if (totalGrossIncome > taxRates.personalAllowanceReductionThreshold) {
+  // IMPORTANT: Pension contributions reduce adjusted net income, so they can restore allowance
+  const adjustedNetIncome = Math.max(0, totalGrossIncome - annualPensionContribution);
+  if (adjustedNetIncome > taxRates.personalAllowanceReductionThreshold) {
     // Calculate the allowance reduction using HMRC formula:
-    // Reduction = (Total Income - £100,000) ÷ 2
+    // Reduction = (Adjusted Net Income - £100,000) ÷ 2
     // The Math.floor and ×2 ensure we follow HMRC's rounding rules (round down to nearest £2)
     const reduction = Math.min(
       annualTaxFreeAmount, // Cannot reduce below zero
       Math.floor(
-        ((totalGrossIncome - taxRates.personalAllowanceReductionThreshold) *
+        ((adjustedNetIncome - taxRates.personalAllowanceReductionThreshold) *
           taxRates.personalAllowanceReductionRate) / // Rate is 0.5 (50% of excess)
           2, // Divide by 2 for the "£1 reduction per £2 income\" rule
       ) * 2, // Multiply back by 2 to ensure even pound amounts (HMRC requirement)
@@ -797,31 +832,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   // Calculate monthly tax-free amount for payslip calculation
   const monthlyTaxFreeAmount = annualTaxFreeAmount / 12;
-
-  // ---------------
-  // 4. Calculate pre-tax deductions (pension and allowances)
-  // ---------------
-
-  // Calculate annual and monthly pension contribution
-  let annualPensionContribution = 0;
-  let monthlyPensionContribution = 0;
-
-  if (input.pensionContribution > 0) {
-    if (input.pensionContributionType === 'percentage') {
-      // Percentage of PRIMARY employment salary (not other income sources)
-      // Pension contributions are typically on employment earnings only
-      annualPensionContribution = annualGrossSalary * (input.pensionContribution / 100);
-      monthlyPensionContribution = annualPensionContribution / 12; // Derive from annual for consistency
-    } else {
-      // Fixed amount (normalize from input period to annual and monthly)
-      annualPensionContribution = convertPeriodToAnnual(
-        input.pensionContribution,
-        input.payPeriod,
-        input.hoursPerWeek,
-      );
-      monthlyPensionContribution = annualPensionContribution / 12;
-    }
-  }
 
   // ---------------
   // 5. Calculate adjusted salary and taxable income (annual and monthly)
@@ -1137,9 +1147,16 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 10. Calculate Net Pay (monthly calculation)
   // ---------------
 
+  // Non-taxable allowances (annual) - add to net pay only, not taxable pay.
+  const monthlyNonTaxableAllowances = roundToPence((input.allowancesDeductions ?? 0) / 12);
+
   // Monthly net pay
   const monthlyNetPay =
-    monthlyTaxableAdjustedSalary - monthlyTax - monthlyNationalInsurance - monthlyStudentLoan;
+    monthlyTaxableAdjustedSalary -
+    monthlyTax -
+    monthlyNationalInsurance -
+    monthlyStudentLoan +
+    monthlyNonTaxableAllowances;
 
   // Annual net pay (for output)
   const annualNetPay = monthlyNetPay * 12;

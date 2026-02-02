@@ -249,6 +249,7 @@ export function BasicInputs() {
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
           className='w-[100px] uppercase'
           maxLength={10}
+          data-testid='tax-code-input'
         />
       </div>
 
@@ -265,7 +266,12 @@ export function BasicInputs() {
           </Label>
         </div>
         <Select value={input.region} onValueChange={setRegion}>
-          <SelectTrigger id={regionId} className='w-[175px]' aria-labelledby={regionLabelId}>
+          <SelectTrigger
+            id={regionId}
+            className='w-[175px]'
+            aria-labelledby={regionLabelId}
+            data-testid='region-select'
+          >
             <SelectValue placeholder='Select region' />
           </SelectTrigger>
           <SelectContent>
@@ -338,12 +344,13 @@ export function BasicInputs() {
             placeholder='0.00'
             min={0}
             className='flex-1'
+            data-testid='partner-salary-input'
           />
         </div>
       )}
 
       {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn('flex items-center', SPACING.GAP_3)}>
+      <div className={cn('flex items-center', SPACING.GAP_3, SPACING.MT_2)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='age' />
           <Label
@@ -369,7 +376,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className='w-[180px]'
+            className='min-w-[220px] flex-1'
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
@@ -433,12 +440,12 @@ export function BasicInputs() {
         )}
       </div>
 
-      {/* Allowances/Deductions */}
+      {/* Non-taxable allowances */}
       <div className={cn('flex items-center', SPACING.GAP_3)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='allowancesDeductions' />
           <Label htmlFor={allowancesId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
-            Allowances/Deductions
+            Non-taxable allowance(s)
           </Label>
         </div>
         <NumberInput
@@ -450,6 +457,7 @@ export function BasicInputs() {
           placeholder='0.00'
           min={0}
           className='flex-1'
+          data-testid='non-taxable-allowances-input'
         />
       </div>
 

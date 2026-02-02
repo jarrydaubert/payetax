@@ -451,7 +451,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               employmentAllowance: formData.hasEmploymentAllowance,
               studentLoanPlans:
                 formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans : undefined,
-              pensionContribution: formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution,
+              pensionContribution: formData.isPensionAlreadyDeducted
+                ? 0
+                : formData.pensionContribution,
               companyCarBIK: formData.companyCarBIK,
               minimumSalaryRequirement: formData.minimumSalaryRequirement,
               hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,

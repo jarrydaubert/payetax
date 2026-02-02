@@ -307,7 +307,7 @@ export function ResultsTable({
       isHighlight: false,
     },
     {
-      category: 'Allowances/Deductions',
+      category: 'Non-taxable allowance(s)',
       icon: Coins,
       annual: allowancesAmount,
       whatIfAnnual: whatIfResults ? allowancesAmount : undefined,

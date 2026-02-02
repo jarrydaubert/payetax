@@ -65,13 +65,31 @@ async function getTableValueOrThrow(
 ): Promise<number> {
   const resultsTable = page.getByTestId('results-table');
 
+  // Resolve the "Yearly" column index from the header so we don't couple the
+  // extractor to whether the first cell is a <td> or <th>.
+  const headerRow = resultsTable.locator('thead tr').first();
+  const headerCells = headerRow.locator('th');
+  const headerCount = await headerCells.count();
+  let yearlyColumnIndex = 2; // label, %, yearly
+  for (let i = 0; i < headerCount; i++) {
+    const text = (await headerCells.nth(i).textContent())?.trim() ?? '';
+    if (text === 'Yearly') {
+      yearlyColumnIndex = i;
+      break;
+    }
+  }
+
   // Get all row labels for debugging
   const allRows = resultsTable.locator('tr');
   const rowCount = await allRows.count();
   const availableLabels: string[] = [];
 
   for (let i = 0; i < rowCount; i++) {
-    const rowText = await allRows.nth(i).locator('td').first().textContent();
+    const rowText = await allRows
+      .nth(i)
+      .locator(':scope > th, :scope > td')
+      .first()
+      .textContent();
     if (rowText?.trim()) {
       availableLabels.push(rowText.trim());
     }
@@ -94,17 +112,19 @@ async function getTableValueOrThrow(
     throw error;
   }
 
-  // Get the yearly value (3rd column)
-  const cells = row.locator('td');
+  // Get the yearly value (column index resolved from header)
+  const cells = row.locator(':scope > th, :scope > td');
   const count = await cells.count();
 
-  if (count < 3) {
+  if (count <= yearlyColumnIndex) {
     throw new Error(
-      `❌ EXTRACTION FAILED: Row "${label}" has only ${count} cells, expected at least 3.`,
+      `❌ EXTRACTION FAILED: Row "${label}" has only ${count} cells, expected at least ${
+        yearlyColumnIndex + 1
+      }.`,
     );
   }
 
-  const yearlyCell = cells.nth(2);
+  const yearlyCell = cells.nth(yearlyColumnIndex);
   const text = await yearlyCell.textContent();
 
   if (!text) {

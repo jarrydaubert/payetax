@@ -41,8 +41,7 @@ export function DeferredContent({
         ? [forceRenderOnHash]
         : [];
 
-    const hashMatches = () =>
-      hashTargets.length > 0 && hashTargets.includes(window.location.hash);
+    const hashMatches = () => hashTargets.length > 0 && hashTargets.includes(window.location.hash);
 
     // If the user arrived via an anchor link, render immediately so scrolling can work.
     if (hashMatches()) {

@@ -140,7 +140,8 @@ describe('ResultsSummaryCards Component', () => {
       const zeroValues = screen.getAllByText('£0.00');
       expect(zeroValues.length).toBeGreaterThan(0);
 
-      expect(screen.getByText('0.0%')).toBeInTheDocument(); // Effective rate
+      // Effective + marginal rates should both be 0.0% when salary is 0
+      expect(screen.getAllByText('0.0%').length).toBeGreaterThanOrEqual(2);
     });
 
     it('should handle high salary with correct formatting', () => {

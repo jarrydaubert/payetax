@@ -190,8 +190,8 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
       />,
     );
 
-    // Find the Allowances/Deductions row
-    const allowancesRow = screen.getByText('Allowances/Deductions').closest('tr');
+    // Find the non-taxable allowance(s) row
+    const allowancesRow = screen.getByText('Non-taxable allowance(s)').closest('tr');
     expect(allowancesRow).toBeInTheDocument();
 
     // Both columns should show £2,000 since allowances are the same in both scenarios
@@ -308,7 +308,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
     expect(screen.getByText('Employment Income')).toBeInTheDocument();
     expect(screen.getByText('Other Income (No NI)')).toBeInTheDocument();
     expect(screen.getByText('Pension')).toBeInTheDocument();
-    expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+    expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
     expect(screen.getByText('Net Pay')).toBeInTheDocument();
   });
 

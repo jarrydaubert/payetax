@@ -165,7 +165,7 @@ describe('MarriageAllowanceAlert', () => {
         <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
       );
 
-      const alert = container.querySelector('[role="alert"]');
+      const alert = container.querySelector('[role="status"]');
       expect(alert).toHaveClass('border-pink-500/30');
     });
 

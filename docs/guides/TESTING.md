@@ -6,6 +6,10 @@
 
 Tests should catch real bugs, not test implementation details or TypeScript types.
 
+See also:
+- `docs/guides/BUG_CATALOG.md` (bug classes)
+- `docs/guides/TESTING_MATRIX.md` (quality gates + coverage targets)
+
 ---
 
 ## Running Tests
@@ -26,6 +30,10 @@ bun fix-all             # Lint + typecheck + format
 - 20 scenarios against HMRC-verified values
 - Penny-accurate assertions
 - Fixture: `e2e/fixtures/golden-tax-cases-2025-26-COMPLETE.json`
+
+Note:
+- Treat the golden master suite as a regression oracle.
+- “HMRC verified” should mean we can point to the original HMRC source data used to build the fixture.
 
 ---
 
@@ -48,3 +56,12 @@ bun fix-all             # Lint + typecheck + format
 ```bash
 bun run fix-all && bun run build && bun run test
 ```
+
+Recommended PR gate (fast, high-signal):
+- `bun run test:no-coverage`
+- `bun run build`
+- Playwright (chromium):
+  - `e2e/smoke.spec.ts`
+  - `e2e/calculator-critical.spec.ts`
+  - `e2e/payslip-regression.spec.ts`
+  - `e2e/golden-master-PERFECT.spec.ts`

@@ -289,7 +289,7 @@ Profit → Salary Cost Deduction → Pension Deduction → Taxable Profit → CT
 
 ## Monetization Approach
 
-### Free Core (Trust + SEO + Shareability)
+### Free Core (Trust + SEO)
 
 Full calculator with no gates. Accuracy is never paywalled.
 
@@ -405,7 +405,7 @@ Review this product spec through these lenses:
    - What would make an accountant roll their eyes?
 
 4. PRODUCT-MARKET FIT
-   - Would you use this? Share it?
+   - Would you use this?
    - What's the killer feature?
    - What's the biggest gap vs competitors?
 

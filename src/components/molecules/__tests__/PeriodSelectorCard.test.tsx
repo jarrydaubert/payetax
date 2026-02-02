@@ -100,9 +100,10 @@ describe('PeriodSelectorCard', () => {
         />,
       );
 
-      // Card component should have these classes
-      const card = container.querySelector('.border-primary\\/20');
+      // Card component should use the shared Card base styling
+      const card = container.firstChild as HTMLElement | null;
       expect(card).toBeInTheDocument();
+      expect(card).toHaveClass('border', 'border-border', 'bg-card');
     });
   });
 

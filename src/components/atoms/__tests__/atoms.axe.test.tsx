@@ -32,7 +32,7 @@ describe('Atoms Components - Accessibility', () => {
           customContent={{
             title: 'Custom Title',
             description: 'Custom description',
-            hmrc: 'Custom HMRC guidance',
+            note: 'Custom guidance note',
           }}
         >
           <input type='number' aria-label='Custom Input' />

@@ -38,6 +38,7 @@ const config = {
   ],
   transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?|next-mdx-remote|github-slugger)/)'],
   moduleNameMapper: {
+    '^@testing-library/react$': '<rootDir>/src/test/testing-library.tsx',
     // Mock Contentlayer generated files (must be first to catch before other patterns)
     '^contentlayer/generated$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
     '^\\./.contentlayer/generated(.*)$':

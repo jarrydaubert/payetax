@@ -97,15 +97,15 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
 
       expect(input).toHaveAttribute('placeholder', '10');
 
       await user.click(screen.getByRole('radio', { name: /amount/i }));
-      expect(input).toHaveAttribute('placeholder', '5,000');
+      expect(input).toHaveAttribute('placeholder', '5000');
 
       await user.click(screen.getByRole('radio', { name: /new total/i }));
-      expect(input).toHaveAttribute('placeholder', '45,000');
+      expect(input).toHaveAttribute('placeholder', '45000');
     });
   });
 
@@ -114,17 +114,17 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '10');
 
-      expect(input).toHaveValue(10);
+      expect(input).toHaveValue('10');
     });
 
     it('should clear error when user types new valid value', async () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       // First type invalid value that's out of range
       await user.type(input, '0.001');
 
@@ -148,26 +148,26 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0.001');
 
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/percentage must be between/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/at least 0\.01%/i);
     });
 
     it('should validate percentage range (0.01 - 1000)', async () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0.001');
 
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/percentage must be between/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/at least 0\.01%/i);
     });
 
     it('should validate amount range', async () => {
@@ -176,13 +176,13 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /amount/i }));
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0');
 
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/amount must be between/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/positive/i);
     });
 
     it('should validate total range', async () => {
@@ -191,20 +191,20 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /new total/i }));
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0');
 
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/total salary must be between/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/positive/i);
     });
 
     it('should accept valid percentage', async () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '10');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -223,7 +223,7 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /amount/i }));
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '5000');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -242,7 +242,7 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /new total/i }));
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '50000');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -267,7 +267,7 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '10');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -278,7 +278,7 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '15');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -297,14 +297,14 @@ describe('ComparisonInputs', () => {
     it('should have label for input', () => {
       render(<ComparisonInputs {...defaultProps} />);
       expect(screen.getByText(/percentage increase/i)).toBeInTheDocument();
-      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
     it('should have aria-invalid on input when error exists', async () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0.001');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -317,7 +317,7 @@ describe('ComparisonInputs', () => {
       const user = userEvent.setup();
       render(<ComparisonInputs {...defaultProps} />);
 
-      const input = screen.getByRole('spinbutton');
+      const input = screen.getByRole('textbox');
       await user.type(input, '0.001');
 
       const button = screen.getByRole('button', { name: /compare/i });
@@ -326,7 +326,7 @@ describe('ComparisonInputs', () => {
       const errorId = input.getAttribute('aria-describedby');
       expect(errorId).toBeTruthy();
       expect(document.getElementById(errorId as string)).toHaveTextContent(
-        /percentage must be between/i,
+        /at least 0\.01%/i,
       );
     });
   });
@@ -334,7 +334,7 @@ describe('ComparisonInputs', () => {
   describe('Currency Symbol Display', () => {
     it('should show % symbol in percentage mode', () => {
       render(<ComparisonInputs {...defaultProps} />);
-      const container = screen.getByRole('spinbutton').parentElement;
+      const container = screen.getByRole('textbox').parentElement;
       expect(container).toHaveTextContent('%');
     });
 
@@ -344,7 +344,7 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /amount/i }));
 
-      const container = screen.getByRole('spinbutton').parentElement;
+      const container = screen.getByRole('textbox').parentElement;
       expect(container).toHaveTextContent('£');
     });
 
@@ -354,7 +354,7 @@ describe('ComparisonInputs', () => {
 
       await user.click(screen.getByRole('radio', { name: /new total/i }));
 
-      const container = screen.getByRole('spinbutton').parentElement;
+      const container = screen.getByRole('textbox').parentElement;
       expect(container).toHaveTextContent('£');
     });
   });

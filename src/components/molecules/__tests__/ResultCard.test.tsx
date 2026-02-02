@@ -103,8 +103,9 @@ describe('ResultCard Component', () => {
     it('should have card border styling', () => {
       const { container } = render(<ResultCard label='Label' value='Value' />);
 
-      const card = container.querySelector('.border-primary\\/20');
+      const card = container.querySelector('.border');
       expect(card).toBeInTheDocument();
+      expect(card).toHaveClass('border-border');
     });
 
     it('should have card padding', () => {

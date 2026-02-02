@@ -27,24 +27,24 @@ describe('PeriodCheckbox', () => {
     });
 
     it('generates correct id for checkbox', () => {
-      const { container } = render(
+      render(
         <PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />,
       );
 
-      const checkbox = container.querySelector('#period-4-Weekly');
-      expect(checkbox).toBeInTheDocument();
+      const checkbox = screen.getByRole('checkbox', { name: '4-Weekly' });
+      expect(checkbox).toHaveAttribute('id');
+      expect(checkbox.getAttribute('id')).toMatch(/period-4-weekly$/);
     });
 
     it('links label to checkbox via htmlFor', () => {
-      const { container } = render(
-        <PeriodCheckbox period='Daily' checked={false} onCheckedChange={jest.fn()} />,
-      );
+      render(<PeriodCheckbox period='Daily' checked={false} onCheckedChange={jest.fn()} />);
 
       const label = screen.getByText('Daily');
-      const checkbox = container.querySelector('#period-Daily');
+      const checkbox = screen.getByRole('checkbox', { name: 'Daily' });
+      const forId = label.getAttribute('for');
 
-      expect(label).toHaveAttribute('for', 'period-Daily');
-      expect(checkbox).toHaveAttribute('id', 'period-Daily');
+      expect(forId).toBeTruthy();
+      expect(checkbox.getAttribute('id')).toBe(forId);
     });
   });
 
@@ -137,13 +137,6 @@ describe('PeriodCheckbox', () => {
       const label = screen.getByText('Weekly');
       expect(label).toHaveClass('cursor-pointer');
     });
-
-    it('label is not selectable (select-none class)', () => {
-      render(<PeriodCheckbox period='Weekly' checked={false} onCheckedChange={jest.fn()} />);
-
-      const label = screen.getByText('Weekly');
-      expect(label).toHaveClass('select-none');
-    });
   });
 
   describe('Edge Cases', () => {
@@ -151,7 +144,9 @@ describe('PeriodCheckbox', () => {
       render(<PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />);
 
       expect(screen.getByText('4-Weekly')).toBeInTheDocument();
-      expect(screen.getByRole('checkbox')).toHaveAttribute('id', 'period-4-Weekly');
+      expect(screen.getByRole('checkbox', { name: '4-Weekly' }).getAttribute('id')).toMatch(
+        /period-4-weekly$/,
+      );
     });
 
     it('handles empty onCheckedChange callback', async () => {

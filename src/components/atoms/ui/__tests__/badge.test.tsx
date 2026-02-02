@@ -13,7 +13,7 @@ describe('Badge', () => {
     it('should render badge as a div element', () => {
       const { container } = render(<Badge>Test</Badge>);
       const badge = container.firstChild;
-      expect(badge?.nodeName).toBe('DIV');
+      expect(badge?.nodeName).toBe('SPAN');
     });
   });
 

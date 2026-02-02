@@ -1,7 +1,10 @@
 // emails/new-blog-post.tsx
 // Newsletter email template matching the calculator results email style
 
-import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
+import {
+  createUnsubscribeToken,
+  resolveUnsubscribeSecret,
+} from '@/lib/newsletter/unsubscribeToken';
 
 // ============================================================================
 // CONFIGURATION

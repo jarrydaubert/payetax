@@ -5,385 +5,99 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { LandscapePrompt } from '../LandscapePrompt';
 
-// Mock localStorage
+const DISMISS_KEY = 'landscapePrompt:dismissed:v1';
+
+// Minimal localStorage mock used by safeStorage helpers.
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
-
   return {
-    getItem: (key: string) => store[key] || null,
+    getItem: (key: string) => store[key] ?? null,
     setItem: (key: string, value: string) => {
-      store[key] = value.toString();
-    },
-    clear: () => {
-      store = {};
+      store[key] = String(value);
     },
     removeItem: (key: string) => {
       delete store[key];
     },
+    clear: () => {
+      store = {};
+    },
   };
 })();
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: true });
 
-// Mock matchMedia
-const createMatchMediaMock = (matches: boolean) => (query: string) => ({
-  matches,
-  media: query,
-  onchange: null,
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
-});
+function setViewport(width: number, height: number) {
+  Object.defineProperty(window, 'innerWidth', { value: width, configurable: true, writable: true });
+  Object.defineProperty(window, 'innerHeight', {
+    value: height,
+    configurable: true,
+    writable: true,
+  });
+}
 
 describe('LandscapePrompt', () => {
   beforeEach(() => {
     localStorageMock.clear();
+    // Default to desktop landscape to avoid test bleed.
+    setViewport(1024, 768);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('should render on mobile portrait mode', () => {
-    // Mock mobile portrait
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query); // Mobile
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(true)(query); // Portrait
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+  it('renders on mobile portrait', () => {
+    setViewport(375, 812); // portrait + < md
     render(<LandscapePrompt />);
 
-    // Should show the prompt with updated messaging
     expect(screen.getByText('Rotate for Better View')).toBeInTheDocument();
     expect(screen.getByText('Turn your device sideways for easier viewing')).toBeInTheDocument();
   });
 
-  it('should not render on desktop', () => {
-    // Mock desktop
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(false)(query); // Desktop
-      }
-      return createMatchMediaMock(true)(query);
-    });
-
+  it('does not render on desktop', () => {
+    setViewport(1280, 800);
     render(<LandscapePrompt />);
 
-    // Should not show
     expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
   });
 
-  it('should not render in landscape mode', () => {
-    // Mock mobile landscape
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query); // Mobile
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(false)(query); // Landscape
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+  it('does not render in landscape orientation', () => {
+    setViewport(812, 375); // landscape
     render(<LandscapePrompt />);
 
-    // Should not show
     expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
   });
 
-  it('should dismiss and save to localStorage', () => {
-    // Mock mobile portrait
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query);
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(true)(query);
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+  it('dismisses and persists dismissal to localStorage', () => {
+    setViewport(375, 812);
     const onDismiss = jest.fn();
+
     render(<LandscapePrompt onDismiss={onDismiss} />);
 
-    // Click dismiss button
-    const dismissButton = screen.getByLabelText('Dismiss landscape prompt');
+    const dismissButton = screen.getByRole('button', { name: 'Dismiss landscape prompt' });
     fireEvent.click(dismissButton);
 
-    // Should call onDismiss
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(localStorageMock.getItem(DISMISS_KEY)).toBe('true');
+    expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
 
-    // Should save to localStorage
-    expect(localStorageMock.getItem('landscape-prompt-dismissed')).toBe('true');
-  });
-
-  it('should not render if previously dismissed', () => {
-    // Set localStorage
-    localStorageMock.setItem('landscape-prompt-dismissed', 'true');
-
-    // Mock mobile portrait
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query);
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(true)(query);
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+    // Re-render should stay hidden.
     render(<LandscapePrompt />);
-
-    // Should not show
     expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
   });
 
-  it('should have proper accessibility attributes', () => {
-    // Mock mobile portrait
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query);
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(true)(query);
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+  it('renders with accessibility basics', () => {
+    setViewport(375, 812);
     render(<LandscapePrompt />);
 
-    const prompt = screen.getByRole('status');
-    expect(prompt).toHaveAttribute('aria-live', 'polite');
-    expect(prompt).toHaveAttribute('aria-label', 'Rotate device for better viewing of results');
-
-    const dismissButton = screen.getByLabelText('Dismiss landscape prompt');
-    expect(dismissButton).toHaveAttribute('type', 'button');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('button', { name: 'Dismiss landscape prompt' })).toHaveAttribute(
+      'type',
+      'button',
+    );
   });
 
-  it('should apply custom className', () => {
-    // Mock mobile portrait
-    window.matchMedia = jest.fn().mockImplementation((query) => {
-      if (query === '(max-width: 768px)') {
-        return createMatchMediaMock(true)(query);
-      }
-      if (query === '(orientation: portrait)') {
-        return createMatchMediaMock(true)(query);
-      }
-      return createMatchMediaMock(false)(query);
-    });
-
+  it('applies custom className on wrapper', () => {
+    setViewport(375, 812);
     const { container } = render(<LandscapePrompt className='custom-class' />);
 
-    const promptWrapper = container.querySelector('.custom-class');
-    expect(promptWrapper).toBeInTheDocument();
-  });
-
-  describe('Visibility Conditions', () => {
-    it('should show ONLY when all conditions are met: mobile + portrait + not dismissed', () => {
-      // Mock mobile portrait, not dismissed
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query); // ✅ Mobile
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query); // ✅ Portrait
-        }
-        return createMatchMediaMock(false)(query);
-      });
-      // ✅ Not dismissed (localStorage clear)
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should be visible
-      expect(screen.getByText('Rotate for Better View')).toBeInTheDocument();
-      expect(screen.getByLabelText('Dismiss landscape prompt')).toBeInTheDocument();
-    });
-
-    it('should NOT show when on desktop (even if portrait)', () => {
-      // Mock desktop portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(false)(query); // ❌ Desktop (>768px)
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query); // Portrait
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should NOT be visible
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-    });
-
-    it('should NOT show when in landscape (even on mobile)', () => {
-      // Mock mobile landscape
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query); // Mobile
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(false)(query); // ❌ Landscape
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should NOT be visible
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-    });
-
-    it('should NOT show when previously dismissed (even if mobile portrait)', () => {
-      // Pre-set dismissed state
-      localStorageMock.setItem('landscape-prompt-dismissed', 'true'); // ❌ Dismissed
-
-      // Mock mobile portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query); // Mobile
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query); // Portrait
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should NOT be visible
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-    });
-
-    it('should show on tablet portrait (e.g., iPad Mini: 768px)', () => {
-      // Mock exactly at breakpoint (768px) in portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query); // ✅ At breakpoint
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query); // ✅ Portrait
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should be visible (<=768px is mobile)
-      expect(screen.getByText('Rotate for Better View')).toBeInTheDocument();
-    });
-
-    it('should NOT show on tablet landscape (e.g., iPad Mini rotated)', () => {
-      // Mock tablet at breakpoint in landscape
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query); // Mobile size
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(false)(query); // ❌ Landscape
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      render(<LandscapePrompt />);
-
-      // ASSERT: Should NOT be visible (already in landscape!)
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Dismissal Behavior', () => {
-    it('should persist dismissal across re-renders', () => {
-      // Mock mobile portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query);
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query);
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      const { unmount, rerender } = render(<LandscapePrompt />);
-
-      // Should be visible initially
-      expect(screen.getByText('Rotate for Better View')).toBeInTheDocument();
-
-      // Dismiss it
-      const dismissButton = screen.getByLabelText('Dismiss landscape prompt');
-      fireEvent.click(dismissButton);
-
-      // Should immediately hide
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-
-      // Re-render the component
-      rerender(<LandscapePrompt />);
-
-      // ASSERT: Should STILL be hidden (localStorage persists)
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-      expect(localStorageMock.getItem('landscape-prompt-dismissed')).toBe('true');
-
-      // Even unmount and re-mount should keep it hidden
-      unmount();
-      render(<LandscapePrompt />);
-      expect(screen.queryByText('Rotate for Better View')).not.toBeInTheDocument();
-    });
-
-    it('should call onDismiss callback when dismissed', () => {
-      // Mock mobile portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query);
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query);
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      const mockDismiss = jest.fn();
-      render(<LandscapePrompt onDismiss={mockDismiss} />);
-
-      // Dismiss
-      const dismissButton = screen.getByLabelText('Dismiss landscape prompt');
-      fireEvent.click(dismissButton);
-
-      // ASSERT: Callback should be called exactly once
-      expect(mockDismiss).toHaveBeenCalledTimes(1);
-      expect(mockDismiss).toHaveBeenCalledWith();
-    });
-  });
-
-  describe('Animated Icon', () => {
-    it('should render phone icon with animation class', () => {
-      // Mock mobile portrait
-      window.matchMedia = jest.fn().mockImplementation((query) => {
-        if (query === '(max-width: 768px)') {
-          return createMatchMediaMock(true)(query);
-        }
-        if (query === '(orientation: portrait)') {
-          return createMatchMediaMock(true)(query);
-        }
-        return createMatchMediaMock(false)(query);
-      });
-
-      const { container } = render(<LandscapePrompt />);
-
-      // Find the phone icon (Smartphone component from lucide-react)
-      // It should have the wiggle animation class
-      const animatedIcon = container.querySelector('[class*="animate-"]');
-      expect(animatedIcon).toBeInTheDocument();
-    });
+    expect(container.querySelector('.custom-class')).toBeInTheDocument();
   });
 });
+

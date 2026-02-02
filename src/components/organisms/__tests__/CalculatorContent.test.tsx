@@ -324,9 +324,7 @@ describe('CalculatorContent Component', () => {
       const summary = screen.getByText(/How does pension tax relief work\?/i);
       fireEvent.click(summary);
 
-      expect(container.textContent).toMatch(
-        /Pension contributions are deducted.*before.*tax is calculated/i,
-      );
+      expect(container.textContent).toMatch(/contributions are deducted before tax/i);
     });
 
     it('should show contact link in FAQ footer', () => {

@@ -724,6 +724,17 @@ describe('Tax Calculator', () => {
       expect(result.taxFreeAmount).toBe(7570);
     });
 
+    it('restores personal allowance when pension reduces adjusted net income', () => {
+      const input = createBasicInput(110000, {
+        pensionContribution: 10000,
+        pensionContributionType: 'amount',
+      });
+      const result = calculateTax(input);
+
+      // Pension reduces adjusted net income to £100,000, so full PA should apply
+      expect(result.taxFreeAmount).toBe(12570);
+    });
+
     it('reduces personal allowance to zero at £125,140', () => {
       const input = createBasicInput(125140);
       const result = calculateTax(input);

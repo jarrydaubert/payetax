@@ -204,9 +204,9 @@
         "taxCode": "BR"
       },
       "expected": {
-        "incomeTax": 2486.04,
+        "incomeTax": 5000.04,
         "employeeNI": 994.44,
-        "netPay": 21519.52
+        "netPay": 19005.52
       },
       "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
@@ -220,9 +220,9 @@
         "taxCode": "K100"
       },
       "expected": {
-        "incomeTax": 8060.04,
+        "incomeTax": 8859.96,
         "employeeNI": 2194.44,
-        "netPay": 29745.52
+        "netPay": 28945.6
       },
       "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"
@@ -343,8 +343,8 @@
       "expected": {
         "incomeTax": 7485.96,
         "employeeNI": 2994.36,
-        "studentLoanRepayment": 3783.45,
-        "netPay": 35736.23
+        "studentLoanRepayment": 3677.76,
+        "netPay": 35841.92
       },
       "generatedAt": "2025-11-19T16:43:03.406Z",
       "taxYear": "2025-2026"

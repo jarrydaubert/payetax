@@ -3,12 +3,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { generateWelcomeEmailHtml, generateWelcomeEmailText } from '@/../emails/welcome';
 import {
-  generateWelcomeEmailHtml,
-  generateWelcomeEmailText,
-} from '@/../emails/welcome';
+  createUnsubscribeToken,
+  resolveUnsubscribeSecret,
+} from '@/lib/newsletter/unsubscribeToken';
 import { checkRateLimit } from '@/lib/rateLimit';
-import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
+import { isValidRequestOrigin } from '@/lib/security/origin';
 
 // Explicit Node.js runtime (Resend SDK requires Node APIs)
 export const runtime = 'nodejs';
@@ -51,40 +52,9 @@ function getClientIdentifier(request: NextRequest): string {
   return `anon-${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
-/** Basic origin check for CSRF protection */
-function isValidOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-
-  // Allow requests with no origin (same-origin, non-browser)
-  if (!(origin || referer)) return true;
-
-  const allowedHosts = ['payetax.co.uk', 'www.payetax.co.uk', 'localhost:3000'];
-
-  if (origin) {
-    try {
-      const url = new URL(origin);
-      return allowedHosts.some((h) => url.host === h || url.host.endsWith(`.${h}`));
-    } catch {
-      return false;
-    }
-  }
-
-  if (referer) {
-    try {
-      const url = new URL(referer);
-      return allowedHosts.some((h) => url.host === h || url.host.endsWith(`.${h}`));
-    } catch {
-      return false;
-    }
-  }
-
-  return false;
-}
-
 export async function POST(request: NextRequest) {
   // Basic CSRF check
-  if (!isValidOrigin(request)) {
+  if (!isValidRequestOrigin(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
   }
 

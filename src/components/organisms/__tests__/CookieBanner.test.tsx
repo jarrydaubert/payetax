@@ -52,7 +52,7 @@ describe('CookieBanner Component', () => {
       jest.advanceTimersByTime(1000);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
       });
     });
@@ -79,10 +79,10 @@ describe('CookieBanner Component', () => {
       jest.advanceTimersByTime(1000);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
       });
 
-      const acceptButton = screen.getByRole('button', { name: /Accept All/i });
+      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
       fireEvent.click(acceptButton);
 
       await waitFor(() => {
@@ -99,10 +99,10 @@ describe('CookieBanner Component', () => {
       jest.advanceTimersByTime(1000);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
       });
 
-      const acceptButton = screen.getByRole('button', { name: /Accept All/i });
+      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
       fireEvent.click(acceptButton);
 
       expect(localStorage.getItem('cookie-consent')).toBe('accepted');
@@ -179,10 +179,10 @@ describe('CookieBanner Component', () => {
       jest.advanceTimersByTime(1000);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
       });
 
-      const acceptButton = screen.getByRole('button', { name: /Accept All/i });
+      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
       const declineButton = screen.getByRole('button', { name: /Essential Only/i });
 
       expect(acceptButton).toBeInTheDocument();

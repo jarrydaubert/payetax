@@ -3,6 +3,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { isValidRequestOrigin } from '@/lib/security/origin';
 import { formatCurrency } from '@/lib/utils';
 import {
   type SendResultsRequest,
@@ -219,6 +220,11 @@ function generateEmailHtml(results: EmailResults, taxYear?: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection check (origin/referer allowlist).
+  if (!isValidRequestOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+  }
+
   // Rate limiting: 5 emails per minute per client
   const clientId = getClientIdentifier(request);
   if (!checkRateLimit(clientId, { max: 5, window: 60000 })) {

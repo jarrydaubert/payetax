@@ -448,7 +448,7 @@ export function printResults({
                 'purple-text',
               )}
               ${row(
-                'Allowances/Deductions',
+                'Non-taxable allowance(s)',
                 allowancesDeductions,
                 calculatePercentage(allowancesDeductions, grossAnnual),
                 whatIfResults ? allowancesDeductions : undefined,

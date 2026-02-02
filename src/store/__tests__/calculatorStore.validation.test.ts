@@ -332,20 +332,31 @@ describe('Calculator Store Validation', () => {
     it('should reject negative pension contribution', () => {
       const { setPensionContribution } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      const before = useCalculatorStore.getState().input.pensionContribution;
 
       setPensionContribution(-5);
 
+      // Invalid updates are ignored; in development we also warn.
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(before);
       expect(consoleSpy).toHaveBeenCalled();
+      process.env.NODE_ENV = originalEnv;
       consoleSpy.mockRestore();
     });
 
     it('should reject pension contribution over 100%', () => {
       const { setPensionContribution } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      const before = useCalculatorStore.getState().input.pensionContribution;
 
       setPensionContribution(101);
 
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(before);
       expect(consoleSpy).toHaveBeenCalled();
+      process.env.NODE_ENV = originalEnv;
       consoleSpy.mockRestore();
     });
   });

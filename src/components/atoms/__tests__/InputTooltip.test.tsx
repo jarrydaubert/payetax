@@ -112,7 +112,7 @@ describe('InputTooltip Component', () => {
       const customContent = {
         title: 'Custom Title',
         description: 'Custom description',
-        hmrc: 'Custom HMRC guidance',
+        note: 'Custom guidance note',
       };
 
       render(
@@ -194,6 +194,8 @@ describe('InputTooltip Component', () => {
 
   describe('Warning Logs', () => {
     it('should warn when field not found in config', () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       render(
@@ -207,6 +209,7 @@ describe('InputTooltip Component', () => {
       );
 
       consoleSpy.mockRestore();
+      process.env.NODE_ENV = originalEnv;
     });
   });
 });

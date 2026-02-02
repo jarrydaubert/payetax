@@ -262,7 +262,7 @@ export function CalculatorContainer() {
             role='region'
             aria-label='Tax calculation results summary'
           >
-            <ResultsSummaryCards results={results} taxYear={input.taxYear} />
+            <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
 
             {/* MONETIZATION: Accountant referral CTA disabled until partner agreements in place
             <AccountantReferralCTA

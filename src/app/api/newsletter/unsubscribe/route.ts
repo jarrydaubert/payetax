@@ -2,8 +2,11 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import {
+  resolveUnsubscribeSecret,
+  verifyUnsubscribeToken,
+} from '@/lib/newsletter/unsubscribeToken';
 import { checkRateLimit } from '@/lib/rateLimit';
-import { resolveUnsubscribeSecret, verifyUnsubscribeToken } from '@/lib/newsletter/unsubscribeToken';
 
 export const runtime = 'nodejs';
 

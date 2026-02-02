@@ -125,7 +125,7 @@ describe('Button Component', () => {
       render(<Button>Focus me</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('focus-visible:outline-none');
-      expect(button).toHaveClass('focus-visible:ring-1');
+      expect(button).toHaveClass('focus-visible:ring-2');
     });
   });
 

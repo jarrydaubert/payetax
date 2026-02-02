@@ -124,9 +124,9 @@ export const INPUT_TOOLTIPS = {
   },
 
   allowancesDeductions: {
-    title: 'Other Allowances/Deductions',
-    description: 'Additional annual allowances or deductions',
-    note: 'E.g., professional subscriptions, uniform costs',
+    title: 'Non-taxable Allowance(s)',
+    description: 'Extra pay shown as non-taxable on your payslip',
+    note: "Only include items your employer marks as non-taxable (e.g., reimbursed expenses or 'Home Base'). This adds to take-home but does not reduce taxable income.",
   },
 
   // What If Inputs

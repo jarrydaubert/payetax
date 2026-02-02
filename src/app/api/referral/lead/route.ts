@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { isValidRequestOrigin } from '@/lib/security/origin';
 
 export const runtime = 'nodejs';
 
@@ -54,30 +55,6 @@ function getClientIdentifier(request: NextRequest): string {
   // Fallback: hash of user-agent to avoid shared bucket
   const ua = request.headers.get('user-agent') || 'unknown';
   return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
-}
-
-/** Basic origin check for CSRF protection */
-function isValidOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-
-  if (!(origin || referer)) return true; // Same-origin/non-browser
-
-  const allowedHosts = ['payetax.co.uk', 'www.payetax.co.uk', 'localhost:3000'];
-
-  const checkHost = (url: string) => {
-    try {
-      const parsed = new URL(url);
-      return allowedHosts.some((h) => parsed.host === h || parsed.host.endsWith(`.${h}`));
-    } catch {
-      return false;
-    }
-  };
-
-  if (origin && checkHost(origin)) return true;
-  if (referer && checkHost(referer)) return true;
-
-  return false;
 }
 
 function getReasonLabel(reason: ReferralLead['reason']): string {
@@ -250,7 +227,7 @@ Privacy: https://payetax.co.uk/privacy
 
 export async function POST(request: NextRequest) {
   // CSRF protection
-  if (!isValidOrigin(request)) {
+  if (!isValidRequestOrigin(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
   }
 

@@ -26,6 +26,69 @@
 
 ## P0 - Revenue & Trust
 
+### Testing & Coverage Reality Check (2026-02-02)
+> Capture the current state so we don’t “feel” safe without evidence.
+> Mantra: **"What bug will this test find?"** (see `docs/guides/TESTING.md`)
+
+**Current (Jest coverage run on 2026-02-02):**
+- Statements/Lines: **57.63%** (27,947 / 48,487)
+- Branches: **76.90%** (1,848 / 2,403)
+- Functions: **62.36%** (406 / 651)
+- Note: Playwright E2E coverage is NOT counted in Jest coverage numbers.
+
+**Known gaps / risks:**
+- API routes have ~0 unit coverage (email endpoints, newsletter, referral, webhook, OG, IndexNow)
+- Director Guide has no Playwright E2E flows (only unit-level coverage)
+- Rounding trust: only a small number of payslip-style regression locks exist
+- “Golden master” is a strong regression oracle, but HMRC source provenance isn’t stored in-repo
+
+**Plan (test-first for every blocker):**
+- [ ] For each go-live blocker, add 1 targeted test that would catch it, then implement the fix
+- [ ] Decide PR gates (fast): `bun run test:no-coverage` + `bun run build` + `bun run test:e2e:critical`
+- [ ] Bring `bun test` (coverage) back to a reliable gate:
+  - Option A: add high-signal tests for the highest-risk 0%-covered code (API routes)
+  - Option B: narrow coverage scope/thresholds so it reflects business-risk code instead of marketing pages
+
+### Blog Numbers Audit (Calculator-Verified)
+> Numbers only. Use `src/lib/taxCalculator.ts` + `src/constants/taxRates.ts` as source of truth.
+> Update any factual sentence if it becomes incorrect after recalculation.
+
+- [x] `content/blog/100k-company-profit-director-take-home-2025-26.mdx`
+- [x] `content/blog/100k-tax-trap-avoid-60-percent-tax-2025.mdx`
+- [x] `content/blog/autumn-budget-2025-uk-tax-changes-explained.mdx`
+- [x] `content/blog/beginners-guide-to-uk-taxation.mdx`
+- [x] `content/blog/director-salary-dividends-guide-2025-26.mdx`
+- [x] `content/blog/director-salary-vs-dividends-comparison-2025-26.mdx`
+- [x] `content/blog/director-tax-deadlines-2025-26.mdx`
+- [x] `content/blog/frozen-tax-thresholds-stealth-tax-2026.mdx`
+- [x] `content/blog/higher-rate-taxpayer-guide-uk-2025.mdx`
+- [x] `content/blog/how-much-tax-will-i-pay-uk-2025.mdx`
+- [x] `content/blog/how-national-insurance-works-uk-2025.mdx`
+- [ ] `content/blog/marriage-allowance-uk-2025-guide.mdx`
+- [ ] `content/blog/pension-tax-relief-uk-2025-guide.mdx`
+- [ ] `content/blog/salary-sacrifice-explained-2025-26.mdx`
+- [ ] `content/blog/scottish-vs-english-tax-rates-2026-comparison.mdx`
+- [ ] `content/blog/self-assessment-deadline-january-2026-what-you-need-to-know.mdx`
+- [ ] `content/blog/setting-up-limited-company-uk-2025-26.mdx`
+- [ ] `content/blog/spring-statement-2026-uk-what-to-expect.mdx`
+- [ ] `content/blog/student-loan-repayment-changes-2025-26.mdx`
+- [ ] `content/blog/uk-tax-calculator-2025-complete-guide.mdx`
+- [ ] `content/blog/uk-tax-changes-2025-complete-guide.mdx`
+- [ ] `content/blog/understanding-the-uk-tax-system-2025.mdx`
+- [ ] `content/blog/understanding-uk-tax-codes.mdx`
+- [x] `content/blog/what-100k-salary-actually-looks-like-uk-2025.mdx`
+- [x] `content/blog/what-40k-salary-actually-looks-like-uk-2025.mdx`
+- [x] `content/blog/what-50k-salary-actually-looks-like-uk-2025.mdx`
+- [x] `content/blog/what-60k-salary-actually-looks-like-uk-2025.mdx`
+- [x] `content/blog/what-70k-salary-actually-looks-like-uk-2025.mdx`
+- [x] `content/blog/what-80k-salary-actually-looks-like-uk-2025.mdx`
+- [ ] `content/blog/year-end-tax-planning-2025-26-complete-checklist.mdx`
+
+### Director Guide Go-Live (Spec-First)
+> Go-live blockers and acceptance criteria are tracked in `docs/business/DIRECTOR_GUIDE_GO_LIVE_PLAN.md`.
+
+- [ ] Execute the spec-first go-live plan (VAT warning-only, Survival Mode panel, VAT warnings ungated, Plan 5 gating, analytics wiring, email de-drift, `/tools` breadcrumb fix)
+
 ### Environment Variables Needed
 > New security features require env vars
 
@@ -122,7 +185,7 @@
 
 - [ ] Import thresholds from `src/constants/taxRates.ts` instead of hardcoding
 - [ ] Ensure email template updates automatically when rates change
-- [ ] Apply escapeHtml to all string interpolations (strategy.name, taxYear, generatedDate)
+- [ ] Apply escapeHtml to all string interpolations (strategy.name, taxYear, generatedDate) (treat as real HTML injection risk, not just defense-in-depth)
 - [ ] Compute Self Assessment deadline dynamically from taxYear (currently hardcoded "31 Jan 2027")
 
 ### Email Endpoints - Trust Boundary
@@ -131,6 +194,26 @@
 - [ ] Consider implementing signed payload pattern for email endpoints
 - [ ] Alternative: Recompute results server-side from minimal inputs (grossSalary, taxCode, etc.)
 - [ ] This prevents users from forging "official" looking tax reports with fabricated numbers
+
+### Rate Limiting Coverage Gaps
+> Some endpoints are not rate-limited (by design today). Confirm that's acceptable.
+
+- [ ] Decide whether to add rate limiting to `/api/og` (currently none) to prevent abuse (expensive image generation)
+- [ ] Decide whether to add rate limiting to `/api/sentry-webhook` (currently signature-only; no per-IP throttle)
+
+### Security Audit Claim Fixups (Documentation)
+> Keep internal security docs accurate: not all routes are Zod-validated, and body limits vary by route.
+
+- [ ] Document per-route validation approach (Zod vs manual vs token verification) to avoid future audit overclaims
+- [ ] Document per-route body size limits (e.g., sentry-webhook 1MB vs others 1-50KB; GET endpoints N/A)
+- [ ] Document that `bun audit` requires network access; avoid claiming "no vulnerabilities" without a live run
+
+### Audit / Verification Hygiene
+> Keep internal docs and tests consistent so third-party audits don't drift.
+
+- [ ] Fix `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` header comment mismatch for Student Loan Plan 4 threshold (comment says £31,395 but `taxRates.ts` uses £32,745 for 2025-26)
+- [ ] Replace `as any` casts in `src/components/organisms/CalculatorInputs/BasicInputs.tsx` with proper typing (remove biome-ignore if possible)
+- [ ] Add a repeatable bundle-size verification step (e.g., build + analyzer report) so claims like “-571KB” are evidence-backed
 
 ### Design Tokens - Shadow Accent Glow
 > TODO in `src/constants/designTokens.ts:506`

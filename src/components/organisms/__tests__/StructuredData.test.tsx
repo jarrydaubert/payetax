@@ -129,7 +129,8 @@ describe('StructuredData Component', () => {
 
       if (script?.textContent) {
         const data = JSON.parse(script.textContent);
-        expect(data['@type']).toBe('Article');
+        // We use BlogPosting for article pages to match schema.org guidance for blogs.
+        expect(data['@type']).toBe('BlogPosting');
         expect(data.headline).toBe('Tax Guide');
       }
     });

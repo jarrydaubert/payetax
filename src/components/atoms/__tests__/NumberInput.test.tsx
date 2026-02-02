@@ -11,7 +11,7 @@ describe('NumberInput Component', () => {
 
       render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
       await user.clear(input);
       await user.type(input, '123.45');
 
@@ -24,7 +24,7 @@ describe('NumberInput Component', () => {
 
       render(<NumberInput value={0} onChange={mockOnChange} decimals={0} />);
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
       await user.clear(input);
       await user.type(input, '1234567');
 
@@ -38,7 +38,7 @@ describe('NumberInput Component', () => {
 
       render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
       await user.clear(input);
       await user.type(input, '12345.67');
 
@@ -52,7 +52,7 @@ describe('NumberInput Component', () => {
 
       render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
       await user.clear(input);
       await user.type(input, '100.');
 
@@ -70,7 +70,7 @@ describe('NumberInput Component', () => {
   describe('Rendering', () => {
     it('should render with initial value', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
       expect(input).toBeInTheDocument();
       expect(input.value).toBe('1,000');
     });
@@ -95,7 +95,7 @@ describe('NumberInput Component', () => {
   describe('Value Changes', () => {
     it('should call onChange when user types a value and blurs', () => {
       render(<NumberInput value={0} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: '500' } });
@@ -106,7 +106,7 @@ describe('NumberInput Component', () => {
 
     it('should handle decimal values when decimals prop is set', () => {
       render(<NumberInput value={0} onChange={mockOnChange} decimals={2} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: '10.50' } });
@@ -117,7 +117,7 @@ describe('NumberInput Component', () => {
 
     it('should handle formatted values with commas', () => {
       render(<NumberInput value={0} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: '1,000' } });
@@ -128,7 +128,7 @@ describe('NumberInput Component', () => {
 
     it('should handle invalid input gracefully', () => {
       render(<NumberInput value={100} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: 'abc' } });
@@ -142,7 +142,7 @@ describe('NumberInput Component', () => {
   describe('Focus Behavior', () => {
     it('should clear value on focus when clearOnFocus is true', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} clearOnFocus={true} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       fireEvent.focus(input);
 
@@ -151,7 +151,7 @@ describe('NumberInput Component', () => {
 
     it('should not clear value on focus when clearOnFocus is false', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} clearOnFocus={false} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       fireEvent.focus(input);
 
@@ -162,7 +162,7 @@ describe('NumberInput Component', () => {
       const { rerender } = render(
         <NumberInput value={1000} onChange={mockOnChange} decimals={2} />,
       );
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: '500' } });
@@ -245,7 +245,7 @@ describe('NumberInput Component', () => {
   describe('Disabled State', () => {
     it('should not allow changes when disabled', () => {
       render(<NumberInput value={100} onChange={mockOnChange} disabled={true} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       fireEvent.change(input, { target: { value: '200' } });
 
@@ -268,14 +268,14 @@ describe('NumberInput Component', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', () => {
       render(<NumberInput value={100} onChange={mockOnChange} aria-label='Test input' />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       expect(input).toHaveAttribute('aria-label', 'Test input');
     });
 
     it('should support keyboard navigation when controls are enabled', () => {
       render(<NumberInput value={10} onChange={mockOnChange} showControls={true} />);
-      const input = screen.getByRole('textbox');
+      const input = screen.getByRole('spinbutton');
 
       // Arrow up should increment
       fireEvent.keyDown(input, { key: 'ArrowUp' });
@@ -301,21 +301,21 @@ describe('NumberInput Component', () => {
   describe('Edge Cases', () => {
     it('should handle zero value', () => {
       render(<NumberInput value={0} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       expect(input.value).toBe('0');
     });
 
     it('should handle negative values', () => {
       render(<NumberInput value={-100} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       expect(input.value).toBe('-100');
     });
 
     it('should handle very large numbers', () => {
       render(<NumberInput value={1000000} onChange={mockOnChange} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       // Should format with commas
       expect(input.value).toBe('1,000,000');
@@ -323,7 +323,7 @@ describe('NumberInput Component', () => {
 
     it('should handle decimal precision correctly', () => {
       render(<NumberInput value={10.555} onChange={mockOnChange} decimals={2} />);
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       // Should round to 2 decimal places
       expect(input.value).toBe('10.56');

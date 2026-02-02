@@ -103,7 +103,7 @@ describe('LabelTooltip Component', () => {
       const customContent = {
         title: 'Custom Title',
         description: 'Custom description for testing',
-        hmrc: 'Custom HMRC guidance text',
+        note: 'Custom guidance note',
       };
 
       render(<LabelTooltip fieldName='salary' customContent={customContent} />);
@@ -115,7 +115,7 @@ describe('LabelTooltip Component', () => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');
         expect(tooltipContent).toHaveTextContent('Custom Title');
         expect(tooltipContent).toHaveTextContent('Custom description for testing');
-        expect(tooltipContent).toHaveTextContent('Custom HMRC guidance text');
+        expect(tooltipContent).toHaveTextContent('Custom guidance note');
       });
     });
 
@@ -124,7 +124,7 @@ describe('LabelTooltip Component', () => {
       const customContent = {
         title: 'Override Title',
         description: 'Override description',
-        hmrc: 'Override HMRC',
+        note: 'Override note',
       };
 
       render(<LabelTooltip fieldName='salary' customContent={customContent} />);

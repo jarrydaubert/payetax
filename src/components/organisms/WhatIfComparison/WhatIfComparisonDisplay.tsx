@@ -224,7 +224,7 @@ export function WhatIfComparisonDisplay({
         color: 'text-accent-foreground',
       },
       {
-        category: 'Allowances/Deductions',
+        category: 'Non-taxable allowance(s)',
         icon: Coins,
         currentAnnual: allowancesDeductions,
         // Note: Allowances are input-based and don't change between scenarios in this context

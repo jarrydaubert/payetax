@@ -158,7 +158,7 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
       <table>
         <tbody>
           <ResultTableRow
-            category='Allowances/Deductions'
+            category='Non-taxable allowance(s)'
             icon={PiggyBank}
             annual={0}
             whatIfAnnual={0}

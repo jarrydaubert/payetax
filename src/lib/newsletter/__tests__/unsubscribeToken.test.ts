@@ -1,9 +1,9 @@
 // src/lib/newsletter/__tests__/unsubscribeToken.test.ts
 
 import {
-  TOKEN_MAX_AGE_MS,
   createUnsubscribeToken,
   resolveUnsubscribeSecret,
+  TOKEN_MAX_AGE_MS,
   verifyUnsubscribeToken,
 } from '@/lib/newsletter/unsubscribeToken';
 
@@ -51,4 +51,3 @@ describe('unsubscribeToken', () => {
     expect(resolveUnsubscribeSecret({ NODE_ENV: 'development' } as NodeJS.ProcessEnv)).toBeTruthy();
   });
 });
-

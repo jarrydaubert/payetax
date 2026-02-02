@@ -87,7 +87,7 @@ describe('ResultsTable Component', () => {
       const headers = screen.getAllByRole('columnheader');
       const headerTexts = headers.map((h) => h.textContent);
 
-      expect(headerTexts).toContain('Payslip');
+      expect(headerTexts).toContain('Breakdown');
       expect(headerTexts).toContain('%');
       expect(headerTexts).toContain('Yearly');
       expect(headerTexts).toContain('Monthly');
@@ -377,14 +377,14 @@ describe('ResultsTable Component', () => {
     it('should render allowances row', () => {
       render(<ResultsTable results={mockResults} allowancesDeductions='1000' />);
 
-      expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+      expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
       expect(screen.getAllByText(/£1,000/).length).toBeGreaterThan(0);
     });
 
     it('should default to 0 when allowances not provided', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+      expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
     });
 
     it('should handle allowances as number', () => {
@@ -865,8 +865,7 @@ describe('ResultsTable Component', () => {
     it('should show 0.0% and £0.00 when no previous year data', () => {
       render(<ResultsTable results={mockResults} previousYearResults={null} />);
 
-      const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
-      expect(yearChangeRow?.textContent).toMatch(/0\.0%/);
+      expect(screen.queryByText(/Net Change from/i)).not.toBeInTheDocument();
     });
 
     it('should calculate percentage change correctly', () => {
@@ -889,7 +888,7 @@ describe('ResultsTable Component', () => {
       // £312 / £30,000 * 100 = 1.04%
       render(<ResultsTable results={mockResults} allowancesDeductions={312} />);
 
-      const allowanceRow = screen.getByText('Allowances/Deductions').closest('tr');
+      const allowanceRow = screen.getByText('Non-taxable allowance(s)').closest('tr');
       expect(allowanceRow?.textContent).toMatch(/1\.0%/);
     });
 
@@ -909,7 +908,7 @@ describe('ResultsTable Component', () => {
     it('should show 0.0% for zero allowances', () => {
       render(<ResultsTable results={mockResults} allowancesDeductions={0} />);
 
-      const allowanceRow = screen.getByText('Allowances/Deductions').closest('tr');
+      const allowanceRow = screen.getByText('Non-taxable allowance(s)').closest('tr');
       expect(allowanceRow?.textContent).toMatch(/0\.0%/);
     });
   });
@@ -1042,7 +1041,7 @@ describe('ResultsTable Component', () => {
       );
 
       expect(screen.getByText('Student Loan')).toBeInTheDocument();
-      expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+      expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
       expect(screen.getByText(/Net Change from/i)).toBeInTheDocument();
     });
 

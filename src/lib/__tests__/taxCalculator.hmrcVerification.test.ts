@@ -126,6 +126,29 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       //      Total = £53,703
       expect(result.incomeTax.annually).toBeCloseTo(53703, 0);
     });
+
+    it('should add non-taxable allowances to net pay (without changing tax/NI)', () => {
+      const base = createInput({
+        salary: 49131,
+        payPeriod: 'monthly',
+        pensionContribution: 4,
+        pensionContributionType: 'percentage',
+      });
+
+      const withoutAllowance = calculateTax(base);
+      const withAllowance = calculateTax({ ...base, allowancesDeductions: 312 });
+
+      // Allowance is annual input; £312/year = £26/month
+      expect(withAllowance.netPay.monthly - withoutAllowance.netPay.monthly).toBeCloseTo(26, 2);
+      expect(withAllowance.netPay.annually - withoutAllowance.netPay.annually).toBeCloseTo(312, 2);
+
+      // Taxes should be unchanged by non-taxable allowances
+      expect(withAllowance.incomeTax.monthly).toBeCloseTo(withoutAllowance.incomeTax.monthly, 2);
+      expect(withAllowance.nationalInsurance.monthly).toBeCloseTo(
+        withoutAllowance.nationalInsurance.monthly,
+        2,
+      );
+    });
   });
 
   describe('Personal Allowance Tapering Edge Cases', () => {
@@ -504,6 +527,97 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       } else {
         expect(higherBand?.amount).toBeCloseTo(3892, 0); // Tax amount
       }
+    });
+  });
+
+  describe('Tax Code Overrides (TAX-CODE-OVERRIDES)', () => {
+    it('BR: taxes all income at 20% with no personal allowance', () => {
+      const result = calculateTax(createInput({ salary: 25000, taxCode: 'BR' }));
+
+      // Bug class: TAX-CODE-OVERRIDES
+      // BR should remove the personal allowance and apply a flat 20%.
+      expect(result.taxFreeAmount).toBe(0);
+      expect(result.incomeTax.annually).toBeCloseTo(5000.04, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(994.44, 2);
+      expect(result.netPay.annually).toBeCloseTo(19005.52, 2);
+    });
+
+    it('K100: applies a negative allowance (adds to taxable income)', () => {
+      const result = calculateTax(createInput({ salary: 40000, taxCode: 'K100' }));
+
+      // Bug class: TAX-CODE-OVERRIDES
+      // K100 means -£1,000 allowance, so taxable income increases.
+      expect(result.taxFreeAmount).toBe(-1000);
+      expect(result.incomeTax.annually).toBeCloseTo(8859.96, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(2194.44, 2);
+      expect(result.netPay.annually).toBeCloseTo(28945.6, 1);
+    });
+
+    it('D0: taxes all income at 40% with no personal allowance', () => {
+      const result = calculateTax(createInput({ salary: 50000, taxCode: 'D0' }));
+
+      // Bug class: TAX-CODE-OVERRIDES
+      expect(result.taxFreeAmount).toBe(0);
+      expect(result.incomeTax.annually).toBeCloseTo(20000.04, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(2994.36, 2);
+    });
+  });
+
+  describe('Multiple Student Loans (MULTI-LOAN)', () => {
+    it('Plan 2 + Postgraduate are both applied and summed (PAYE basis)', () => {
+      const result = calculateTax(
+        createInput({ salary: 50000, studentLoanPlans: ['plan2', 'postgrad'] }),
+      );
+
+      // Bug class: CALC-DRIFT / ROUNDING
+      // Expected values derived from current rules and rounding:
+      // Plan 2: 9% above £28,470 + Postgrad: 6% above £21,000 (both via PAYE on employment income).
+      expect(result.studentLoan.annually).toBeCloseTo(3677.76, 2);
+      expect(result.netPay.annually).toBeCloseTo(35841.92, 2);
+    });
+  });
+
+  describe('Multi-Income Separation (MULTI-INCOME)', () => {
+    it('does not apply NI or PAYE student loans to non-employment income', () => {
+      const base = calculateTax(createInput({ salary: 30000, studentLoanPlans: ['plan2'] }));
+      const withRental = calculateTax(
+        createInput({
+          salary: 30000,
+          studentLoanPlans: ['plan2'],
+          incomeSources: [{ id: 'rental-1', type: 'rental', amount: 10000, period: 'annually' }],
+        }),
+      );
+
+      // Bug class: MULTI-INCOME
+      // NI and student loans via PAYE should only be based on employment income.
+      expect(withRental.nationalInsurance.annually).toBeCloseTo(base.nationalInsurance.annually, 2);
+      expect(withRental.studentLoan.annually).toBeCloseTo(base.studentLoan.annually, 2);
+
+      // But gross + income tax should increase with additional taxable income.
+      // Note: grossSalary represents primary employment salary. Total income is in incomeBreakdown.
+      expect(withRental.grossSalary.annually).toBe(30000);
+      expect(withRental.incomeBreakdown?.total).toBe(40000);
+      expect(withRental.incomeTax.annually).toBeGreaterThan(base.incomeTax.annually);
+    });
+  });
+
+  describe('Non-Taxable Allowances (NET-ONLY)', () => {
+    it('increases net pay only (no impact on taxable income/IT/NI/SL)', () => {
+      const base = calculateTax(createInput({ salary: 49131, pensionContribution: 4 }));
+      const withAllowance = calculateTax(
+        createInput({
+          salary: 49131,
+          pensionContribution: 4,
+          allowancesDeductions: 312,
+        }),
+      );
+
+      // Bug class: ROUNDING / CALC-DRIFT
+      expect(withAllowance.taxableIncome).toBeCloseTo(base.taxableIncome, 2);
+      expect(withAllowance.incomeTax.annually).toBeCloseTo(base.incomeTax.annually, 2);
+      expect(withAllowance.nationalInsurance.annually).toBeCloseTo(base.nationalInsurance.annually, 2);
+      expect(withAllowance.studentLoan.annually).toBeCloseTo(base.studentLoan.annually, 2);
+      expect(withAllowance.netPay.annually).toBeCloseTo(base.netPay.annually + 312, 2);
     });
   });
 });

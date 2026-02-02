@@ -4,6 +4,10 @@ import { toHaveNoViolations } from 'jest-axe';
 // Extend Jest matchers with jest-axe accessibility matchers
 expect.extend(toHaveNoViolations);
 
+// Many components (Analytics, etc.) read NEXT_PUBLIC_* env vars at module init time.
+// Provide stable defaults in Jest to avoid tests depending on local developer env.
+process.env.NEXT_PUBLIC_GA_ID ||= 'G-ABCDEFGHIJ';
+
 // Note: TextEncoder/TextDecoder and Fetch API polyfills (Request/Response/Headers)
 // are in jest.setup.fetch.js which runs via setupFiles before module imports
 
@@ -69,16 +73,34 @@ if (typeof window !== 'undefined') {
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: jest.fn(), // deprecated
-      removeListener: jest.fn(), // deprecated
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    })),
+    value: jest.fn().mockImplementation((query) => {
+      // Basic, dynamic-ish matchMedia mock for common queries used in this codebase.
+      // Keeps unit tests closer to real behavior (e.g., LandscapePrompt).
+      const maxWidth = /\(max-width:\s*(\d+)px\)/i.exec(query)?.[1];
+      const minWidth = /\(min-width:\s*(\d+)px\)/i.exec(query)?.[1];
+
+      const isPortrait =
+        typeof window.innerWidth === 'number' &&
+        typeof window.innerHeight === 'number' &&
+        window.innerHeight >= window.innerWidth;
+
+      let matches = false;
+      if (maxWidth) matches = window.innerWidth <= Number(maxWidth);
+      if (minWidth) matches = window.innerWidth >= Number(minWidth);
+      if (/\(orientation:\s*portrait\)/i.test(query)) matches = isPortrait;
+      if (/\(orientation:\s*landscape\)/i.test(query)) matches = !isPortrait;
+
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(), // deprecated
+        removeListener: jest.fn(), // deprecated
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      };
+    }),
   });
 
   // Mock window.scrollTo (not available in jsdom, used by motion-dom animations)

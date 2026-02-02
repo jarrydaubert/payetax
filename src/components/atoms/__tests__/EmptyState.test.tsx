@@ -67,7 +67,7 @@ describe('EmptyState Components', () => {
       render(<EmptyMedia>Icon</EmptyMedia>);
 
       const element = screen.getByText('Icon');
-      expect(element).toHaveAttribute('data-slot', 'empty-icon');
+      expect(element).toHaveAttribute('data-slot', 'empty-media');
       expect(element).toHaveAttribute('data-variant', 'default');
       expect(element).toHaveClass('bg-transparent');
     });

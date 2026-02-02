@@ -1,7 +1,10 @@
 // emails/welcome.tsx
 // Welcome email sent to new newsletter subscribers
 
-import { createUnsubscribeToken, resolveUnsubscribeSecret } from '@/lib/newsletter/unsubscribeToken';
+import {
+  createUnsubscribeToken,
+  resolveUnsubscribeSecret,
+} from '@/lib/newsletter/unsubscribeToken';
 
 // ============================================================================
 // CONFIGURATION

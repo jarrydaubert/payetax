@@ -46,7 +46,7 @@ describe('ChartsSkeleton', () => {
       const { container } = render(<ChartsSkeleton />);
 
       const gridContainer = container.firstChild as HTMLElement;
-      expect(gridContainer).toHaveClass('md:grid-cols-2');
+      expect(gridContainer).toHaveClass('lg:grid-cols-2');
     });
 
     it('should have proper spacing between cards', () => {
@@ -57,13 +57,7 @@ describe('ChartsSkeleton', () => {
       expect(gridContainer.className).toMatch(/gap-/);
     });
 
-    it('should have top margin for spacing from content above', () => {
-      const { container } = render(<ChartsSkeleton />);
-
-      const gridContainer = container.firstChild as HTMLElement;
-      // Uses SPACING.MT_6 which is mt-6
-      expect(gridContainer.className).toMatch(/mt-/);
-    });
+    // Note: spacing above is handled by the parent ChartsContainer / page layout.
   });
 
   describe('Accessibility', () => {

@@ -122,7 +122,7 @@ describe('BasicInputs Component', () => {
 
     it('should render allowances/deductions input', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Allowances/Deductions')).toBeInTheDocument();
+      expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
     });
 
     it('should render pension combined type + amount', () => {

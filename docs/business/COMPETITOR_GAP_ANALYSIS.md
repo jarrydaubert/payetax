@@ -150,9 +150,9 @@ The killer differentiator is **set-aside guidance**. No competitor does this. Us
 
 Target "how to" and "explained" queries, not just "calculator" queries.
 
-### 3. Create shareable accountant resource
+### 3. Create an accountant-friendly resource
 
-Accountants will share because it saves them time explaining basics. This is free distribution.
+Make it easy for accountants to point clients to one canonical explainer that reduces back-and-forth.
 
 ### 4. Consider comparison pages later
 
