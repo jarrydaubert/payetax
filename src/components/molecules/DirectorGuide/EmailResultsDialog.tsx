@@ -9,7 +9,7 @@
 'use client';
 
 import { Mail } from 'lucide-react';
-import { type FormEvent, useId, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES } from '@/constants/designTokens';
 import type { TaxYear } from '@/constants/taxRates';
+import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 
@@ -53,6 +54,12 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
   const inputRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      trackEmailOpened();
+    }
+  }, [open]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,6 +122,7 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
       toast.success('Results sent!', {
         description: `Check your inbox at ${normalizedEmail}`,
       });
+      trackEmailSent();
       onOpenChange(false);
       setEmail('');
     } catch (error) {

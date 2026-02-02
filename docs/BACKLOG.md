@@ -70,8 +70,8 @@
 - [x] `content/blog/scottish-vs-english-tax-rates-2026-comparison.mdx`
 - [x] `content/blog/self-assessment-deadline-january-2026-what-you-need-to-know.mdx`
 - [x] `content/blog/setting-up-limited-company-uk-2025-26.mdx`
-- [ ] `content/blog/spring-statement-2026-uk-what-to-expect.mdx`
-- [ ] `content/blog/student-loan-repayment-changes-2025-26.mdx`
+- [x] `content/blog/spring-statement-2026-uk-what-to-expect.mdx`
+- [x] `content/blog/student-loan-repayment-changes-2025-26.mdx`
 - [ ] `content/blog/uk-tax-calculator-2025-complete-guide.mdx`
 - [ ] `content/blog/uk-tax-changes-2025-complete-guide.mdx`
 - [ ] `content/blog/understanding-the-uk-tax-system-2025.mdx`
@@ -321,6 +321,17 @@
 - [ ] Replace hardcoded rgba in `SHADOWS.GLOW_ACCENT` with CSS variable (`rgb(var(--accent-rgb)/0.4)`)
 - [ ] Add compile-time guard in audit script to catch invalid Tailwind classes (like z-35 before fix)
 - [ ] Create semantic tokens layer (`TEXT_BODY`, `TEXT_LABEL`, `CARD`, `PANEL`) composed from primitives
+
+### Chrome Extension for Backlink (SEO)
+> Chrome Web Store has DR 90+ and gives dofollow "developer website" link
+
+- [ ] Create minimal Chrome extension tied to PayeTax
+- [ ] One-time $5 registration fee
+- [ ] Must provide genuine utility to pass review (can be simple)
+- [ ] Ideas: popup calculator, tax code lookup, "what's my take-home" new tab
+- [ ] After publish: verify link is dofollow via page source
+- [ ] Guide: https://developer.chrome.com/docs/extensions/get-started
+- [ ] Dashboard: https://chrome.google.com/webstore/devdashboard
 
 ### FAQ/AEO Architecture - Server-Rendered Schema & Single Source of Truth
 > CalculatorContent.tsx FAQ section has structural issues for SEO/AEO

@@ -140,6 +140,51 @@ export function trackResultsCopied(): void {
 }
 
 /**
+ * Track when a calculation run is triggered.
+ * Note: values are bucketed for privacy (no raw revenue/expenses).
+ */
+export function trackCalculationRun(params: {
+  revenue: number;
+  expenses: number;
+  region: 'scotland' | 'rUK';
+  includesVat: boolean;
+}): void {
+  trackEvent({
+    action: 'guide_calculation_run',
+    category: 'director_guide',
+    label: 'auto',
+    custom_data: {
+      region: params.region,
+      includes_vat: params.includesVat,
+      revenue_bucket: bucketValue(params.revenue),
+      expenses_bucket: bucketValue(params.expenses),
+    },
+  });
+}
+
+/**
+ * Track email dialog opened.
+ */
+export function trackEmailOpened(): void {
+  trackEvent({
+    action: 'guide_email_opened',
+    category: 'director_guide',
+    label: 'dialog_open',
+  });
+}
+
+/**
+ * Track successful email send.
+ */
+export function trackEmailSent(): void {
+  trackEvent({
+    action: 'guide_email_sent',
+    category: 'director_guide',
+    label: 'success',
+  });
+}
+
+/**
  * Track warning displayed
  */
 export function trackWarningShown(warningType: string): void {

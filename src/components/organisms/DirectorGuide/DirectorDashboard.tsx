@@ -34,6 +34,7 @@ import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SPACING } from '@/constants/designTokens';
 import {
+  trackCalculationRun,
   trackGuideReset,
   trackGuideStarted,
   trackResultsShown,
@@ -62,6 +63,7 @@ export function DirectorDashboard() {
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
+  const lastTrackedCalcSignature = useRef<string | null>(null);
 
   // Track page load (once)
   useEffect(() => {
@@ -82,9 +84,23 @@ export function DirectorDashboard() {
 
     if (!canCalculate) return;
 
+    // Track once per distinct input set (avoid spamming analytics while typing).
+    const signature = `${formData.region}|${formData.revenue}|${formData.expenses}|${String(
+      formData.includesVat,
+    )}`;
+    if (lastTrackedCalcSignature.current !== signature) {
+      trackCalculationRun({
+        revenue: formData.revenue,
+        expenses: formData.expenses,
+        region: formData.region,
+        includesVat: formData.includesVat,
+      });
+      lastTrackedCalcSignature.current = signature;
+    }
+
     const timer = window.setTimeout(() => calculate(), CALCULATE_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [formData.region, formData.revenue, formData.expenses, calculate]);
+  }, [formData.region, formData.revenue, formData.expenses, formData.includesVat, calculate]);
 
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {

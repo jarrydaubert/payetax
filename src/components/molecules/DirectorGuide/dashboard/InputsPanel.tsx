@@ -118,6 +118,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <Field label='Annual Revenue' hint='Total invoiced before expenses' id={ids.revenue}>
           <Input
             id={ids.revenue}
+            data-testid='director-revenue-input'
             type='text'
             value={formatCurrency(formData.revenue)}
             onChange={(e) => actions.setRevenue(parseCurrency(e.target.value))}
@@ -129,6 +130,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <div className='flex items-center gap-2'>
           <Checkbox
             id={ids.includesVat}
+            data-testid='director-includes-vat-checkbox'
             checked={formData.includesVat}
             onCheckedChange={(checked) => actions.setIncludesVat(checked === true)}
             className='border-white/20 data-[state=checked]:bg-cyan-500'
@@ -142,6 +144,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <Field label='Business Expenses' hint='Excluding your salary' id={ids.expenses}>
           <Input
             id={ids.expenses}
+            data-testid='director-expenses-input'
             type='text'
             value={formatCurrency(formData.expenses)}
             onChange={(e) => actions.setExpenses(parseCurrency(e.target.value))}
@@ -160,6 +163,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           >
             <SelectTrigger
               id={ids.region}
+              data-testid='director-region-select'
               className='border-white/[0.08] bg-slate-800 text-slate-100'
             >
               <SelectValue placeholder='Select region' />

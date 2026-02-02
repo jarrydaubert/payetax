@@ -6,7 +6,9 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { trackWarningShown } from '@/lib/directorGuideAnalytics';
 import { cn } from '@/lib/utils';
 import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
 
@@ -120,6 +122,18 @@ export function EducationPanel({ className }: EducationPanelProps) {
     if (!a.isCritical && b.isCritical) return 1;
     return 0;
   });
+
+  // Analytics: record which warnings were actually rendered (once per warning id).
+  const trackedWarningIds = useRef<Set<string>>(new Set());
+  const warningIdsKey = sortedWarnings.map((w) => w.id).join('|');
+  useEffect(() => {
+    for (const w of sortedWarnings) {
+      if (!trackedWarningIds.current.has(w.id)) {
+        trackWarningShown(w.id);
+        trackedWarningIds.current.add(w.id);
+      }
+    }
+  }, [warningIdsKey]);
 
   return (
     <aside className={cn('flex h-full flex-col bg-slate-900 p-6', className)}>
