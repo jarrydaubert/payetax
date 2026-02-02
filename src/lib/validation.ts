@@ -249,10 +249,10 @@ export const WhatIfTypeSchema = z.enum(['percentage', 'amount', 'total']);
  * Validates UK HMRC tax codes with comprehensive format support
  *
  * Valid formats:
- * - Standard: 1257L, S1257L (Scottish)
- * - K codes: K100, SK200 (negative allowance)
- * - Special: BR, D0, D1, NT, 0T
- * - Emergency: 1257L M1, 1257L W1, 1257L X
+ * - Standard: 1257L, S1257L (Scottish), C1257L (Welsh)
+ * - K codes: K100, SK200, CK100 (negative allowance)
+ * - Special: BR, D0, D1, NT, 0T (also valid with prefixes: SBR, SD0, SNT, CBR, etc.)
+ * - Emergency: 1257L M1, 1257L W1, 1257L X (suffix can follow prefixed special codes too, e.g. SD0W1)
  *
  * Handles:
  * - Case insensitive (auto-converted to uppercase)
@@ -267,25 +267,26 @@ export const TaxCodeSchema = z
   .pipe(
     z.string().refine(
       (code) => {
-        // Special codes
-        const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-        if (specialCodes.includes(code)) return true;
-
         // Remove emergency suffix (W1, M1, X) with optional space before validation
         const codeWithoutEmergency = code.replace(/\s*(W1|M1|X)$/, '');
 
-        // Standard format: optional S prefix, numbers, optional letter suffix
-        const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
+        // Allow Scottish (S) and Welsh (C) prefixes.
+        const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
+
+        // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
+        const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+        if (specialCodes.includes(codeWithoutPrefix)) return true;
+
+        // Standard format: numbers, optional letter suffix.
+        const standardPattern = /^[0-9]+[LMNPTX]?$/;
 
         // K codes (negative allowance)
-        const kCodePattern = /^S?K[0-9]+$/;
+        const kCodePattern = /^K[0-9]+$/;
 
-        return (
-          standardPattern.test(codeWithoutEmergency) || kCodePattern.test(codeWithoutEmergency)
-        );
+        return standardPattern.test(codeWithoutPrefix) || kCodePattern.test(codeWithoutPrefix);
       },
       {
-        message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100, 1257L W1)',
+        message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, C1257L, K100, SD0W1)',
       },
     ),
   )

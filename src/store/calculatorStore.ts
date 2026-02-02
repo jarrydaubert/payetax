@@ -371,19 +371,23 @@ export const useCalculatorStore = create<CalculatorState>()(
               .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase()) // Remove ALL spaces, trim, uppercase
               .refine(
                 (code) => {
-                  // Special codes
-                  const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-                  if (specialCodes.includes(code)) return true;
-
                   // Remove emergency suffix (W1, M1, X) before validation
                   const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
 
-                  // Standard format or K codes
-                  const standardPattern = /^S?[0-9]+[LMNPTX]?$/;
-                  const kCodePattern = /^S?K[0-9]+$/;
+                  // Support Scottish (S) and Welsh (C) prefixes.
+                  // Note: prefix does not change allowance logic; it affects which tax rates apply.
+                  const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
+
+                  // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
+                  const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+                  if (specialCodes.includes(codeWithoutPrefix)) return true;
+
+                  // Standard format or K codes.
+                  const standardPattern = /^[0-9]+[LMNPTX]?$/;
+                  const kCodePattern = /^K[0-9]+$/;
+
                   return (
-                    standardPattern.test(codeWithoutEmergency) ||
-                    kCodePattern.test(codeWithoutEmergency)
+                    standardPattern.test(codeWithoutPrefix) || kCodePattern.test(codeWithoutPrefix)
                   );
                 },
                 { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' },

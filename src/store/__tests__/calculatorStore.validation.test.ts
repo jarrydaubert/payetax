@@ -160,7 +160,26 @@ describe('Calculator Store Validation', () => {
   describe('setTaxCode', () => {
     it('should accept valid tax codes', () => {
       const { setTaxCode } = useCalculatorStore.getState();
-      const validCodes = ['1257L', 'S1257L', 'K100', 'BR', 'D0', 'NT', '0T'];
+      const validCodes = [
+        '1257L',
+        'S1257L',
+        'C1257L',
+        'K100',
+        'SK100',
+        'CK100',
+        'BR',
+        'D0',
+        'D1',
+        'NT',
+        '0T',
+        'SBR',
+        'SD0',
+        'SD1',
+        'SNT',
+        'CBR',
+        'C0T',
+        'SD0W1',
+      ];
 
       for (const code of validCodes) {
         setTaxCode(code);
