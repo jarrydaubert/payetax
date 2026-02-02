@@ -14,6 +14,12 @@
 
 import { expect, test, type Page } from '@playwright/test';
 
+function parsePercent(text: string): number {
+  const match = text.match(/(\d+(\.\d+)?)%/);
+  if (!match) throw new Error(`Could not parse % from: ${text}`);
+  return Number.parseFloat(match[1] ?? 'NaN');
+}
+
 function parseGBP(text: string): number {
   const cleaned = text.replace(/[£,]/g, '').trim();
   const n = Number.parseFloat(cleaned);
@@ -71,6 +77,12 @@ test.describe('Payslip regression @rounding', () => {
     expect(await getTableValue(page, 'Pension', 'Monthly')).toBeCloseTo(163.77, 2);
     expect(await getTableValue(page, 'Non-taxable allowance(s)', 'Monthly')).toBeCloseTo(26.0, 2);
     expect(await getTableValue(page, 'Net Pay', 'Monthly')).toBeCloseTo(3149.24, 2);
+
+    // Regression lock: salary sacrifice should reduce marginal tax/NI on the "next £100".
+    // For this scenario, marginal should be ~26.9% (not ~28% basic band, and definitely not a higher figure).
+    const marginalCard = page.getByRole('button', { name: /Marginal Tax Rate/i });
+    const marginalText = (await marginalCard.textContent()) ?? '';
+    const marginal = parsePercent(marginalText);
+    expect(marginal).toBeCloseTo(26.9, 1);
   });
 });
-

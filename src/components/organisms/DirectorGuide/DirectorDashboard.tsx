@@ -75,24 +75,27 @@ export function DirectorDashboard() {
 
   // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
   useEffect(() => {
-    const canCalculate =
-      formData.region !== undefined &&
-      formData.revenue !== undefined &&
-      formData.revenue >= 0 &&
-      formData.expenses !== undefined &&
-      formData.expenses >= 0;
+    const region = formData.region;
+    const revenue = formData.revenue;
+    const expenses = formData.expenses;
 
-    if (!canCalculate) return;
+    if (
+      region === undefined ||
+      revenue === undefined ||
+      revenue < 0 ||
+      expenses === undefined ||
+      expenses < 0
+    ) {
+      return;
+    }
 
     // Track once per distinct input set (avoid spamming analytics while typing).
-    const signature = `${formData.region}|${formData.revenue}|${formData.expenses}|${String(
-      formData.includesVat,
-    )}`;
+    const signature = `${region}|${revenue}|${expenses}|${String(formData.includesVat)}`;
     if (lastTrackedCalcSignature.current !== signature) {
       trackCalculationRun({
-        revenue: formData.revenue,
-        expenses: formData.expenses,
-        region: formData.region,
+        revenue,
+        expenses,
+        region,
         includesVat: formData.includesVat,
       });
       lastTrackedCalcSignature.current = signature;

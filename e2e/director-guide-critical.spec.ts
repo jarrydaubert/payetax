@@ -10,12 +10,23 @@
 
 import { expect, test } from '@playwright/test';
 
+function formatGBP(value: number): string {
+  return `£${value.toLocaleString('en-GB')}`;
+}
+
 test.describe('Director Guide critical @critical', () => {
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded' });
 
-    await page.getByTestId('director-revenue-input').fill('100000');
-    await page.getByTestId('director-expenses-input').fill('20000');
+    const revenueInput = page.getByTestId('director-revenue-input');
+    const expensesInput = page.getByTestId('director-expenses-input');
+
+    await revenueInput.fill('100000');
+    await expensesInput.fill('20000');
+
+    // Guard against controlled-currency inputs sometimes missing the onChange (flaky in CI when typing fast).
+    await expect(revenueInput).toHaveValue(formatGBP(100000));
+    await expect(expensesInput).toHaveValue(formatGBP(20000));
 
     await page.getByTestId('director-region-select').click();
     await page.getByRole('option', { name: 'England' }).click();
@@ -46,8 +57,13 @@ test.describe('Director Guide critical @critical', () => {
     await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded' });
 
     // Zero profit: Survival Mode.
-    await page.getByTestId('director-revenue-input').fill('90000');
-    await page.getByTestId('director-expenses-input').fill('90000');
+    const revenueInput = page.getByTestId('director-revenue-input');
+    const expensesInput = page.getByTestId('director-expenses-input');
+
+    await revenueInput.fill('90000');
+    await expensesInput.fill('90000');
+    await expect(revenueInput).toHaveValue(formatGBP(90000));
+    await expect(expensesInput).toHaveValue(formatGBP(90000));
 
     await page.getByTestId('director-region-select').click();
     await page.getByRole('option', { name: 'England' }).click();
@@ -59,4 +75,3 @@ test.describe('Director Guide critical @critical', () => {
     await expect(page.getByText('VAT Registration Required')).toBeVisible();
   });
 });
-

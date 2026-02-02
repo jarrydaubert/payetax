@@ -49,6 +49,18 @@ async function getYearlyTableValue(page: Page, label: string): Promise<number> {
 }
 
 test.describe('Calculator critical @critical', () => {
+  test('Age select text is not visually truncated in the side panel @critical', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
+
+    const ageTrigger = page.getByTestId('age-select');
+    await expect(ageTrigger).toBeVisible();
+
+    // If the trigger is too narrow, the selected value will truncate with ellipsis (scrollWidth > clientWidth).
+    const hasOverflow = await ageTrigger.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(hasOverflow).toBe(false);
+  });
+
   test('Breakdown table renders and marginal responds to student loan @critical', async ({
     page,
   }) => {

@@ -349,8 +349,9 @@ export function BasicInputs() {
         </div>
       )}
 
-      {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn('flex items-center', SPACING.GAP_3, SPACING.MT_2)}>
+      {/* Age - Dropdown for State Pension Age (affects NI)
+          Column layout avoids truncation in narrow side-panels. */}
+      <div className={cn('flex flex-col', SPACING.GAP_2, SPACING.MT_4)}>
         <div className={cn('flex items-center', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='age' />
           <Label
@@ -376,7 +377,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className='min-w-[220px] flex-1'
+            className='w-full'
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
