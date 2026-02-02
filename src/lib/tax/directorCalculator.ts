@@ -49,7 +49,6 @@ import { getEmployerNI } from './employerNI';
 export const DEFAULT_SALARY = TAX_RATES['2025-2026'].personalAllowance;
 
 /** VAT standard rate (20%) */
-export const VAT_RATE = 0.2;
 
 /** Threshold above which Payments on Account apply */
 export const POA_THRESHOLD = 1000;
@@ -106,11 +105,10 @@ export function calculateDirectorScenario(
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
 
-  // Step 1: Adjust revenue for VAT if included
+  // Step 1: Revenue for calculations
+  // Spec: VAT status is warnings/education only (do NOT adjust revenue in calculations).
   const grossRevenue = input.revenue;
-  const netRevenue = input.includesVat
-    ? roundToPence(input.revenue / (1 + VAT_RATE))
-    : input.revenue;
+  const netRevenue = input.revenue;
 
   // Step 2: Calculate gross profit
   const grossProfit = roundToPence(netRevenue - input.expenses);

@@ -136,13 +136,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <Label htmlFor={ids.includesVat} className='cursor-pointer text-slate-400 text-sm'>
             Revenue includes VAT
           </Label>
-          <Tip content='If checked, we divide by 1.2 (standard 20% VAT) to calculate net revenue for tax purposes' />
+          <Tip content='Used for VAT threshold warnings/education only. We do not adjust your revenue for tax calculations.' />
         </div>
-        {formData.includesVat && (formData.revenue ?? 0) > 0 && (
-          <p className='text-slate-500 text-xs'>
-            Net revenue: £{Math.round((formData.revenue ?? 0) / 1.2).toLocaleString()}
-          </p>
-        )}
 
         <Field label='Business Expenses' hint='Excluding your salary' id={ids.expenses}>
           <Input

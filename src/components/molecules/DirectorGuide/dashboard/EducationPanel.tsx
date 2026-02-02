@@ -265,7 +265,9 @@ function buildWarnings(ctx: WarningContext): Warning[] {
   const isOverdrawn = hasResults && alreadyTaken > grossExtraction;
   const hasDrawings = formData.ytdDrawings > 0;
   const hasDividends = hasResults && (comparison?.strategies.optimalMix.dividends ?? 0) > 0;
-  const hasPlan5 = formData.studentLoanPlans.includes('plan5' as never);
+  const vatNote = formData.includesVat
+    ? ' (If your turnover figure includes VAT, HMRC thresholds use VAT-exclusive taxable turnover — treat this as an estimate.)'
+    : '';
 
   return [
     // CRITICAL warnings first
@@ -297,17 +299,10 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       show: isOverdrawn && !hasDrawings,
     },
     {
-      id: 'survival-mode',
-      title: 'No Profit Yet',
-      description:
-        "Without distributable profits, you cannot legally pay dividends. Money taken may be a Director's Loan (must be repaid or face S455 tax). Consider minimal salary only until profitable.",
-      show: comparison !== null && comparison.grossProfit <= 0,
-    },
-    {
       id: 'vat-mandatory',
       title: 'VAT Registration Required',
-      description: `Revenue exceeds £${VAT_THRESHOLD.toLocaleString()} threshold. VAT registration is mandatory within 30 days of exceeding.`,
-      show: hasResults && revenue >= VAT_THRESHOLD,
+      description: `Revenue exceeds £${VAT_THRESHOLD.toLocaleString()} threshold. VAT registration is mandatory within 30 days of exceeding.${vatNote}`,
+      show: revenue >= VAT_THRESHOLD,
     },
     {
       id: 'pa-taper',
@@ -334,8 +329,8 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'vat-approaching',
       title: 'VAT Threshold Approaching',
-      description: `Revenue approaching £${VAT_THRESHOLD.toLocaleString()} VAT threshold. Monitor closely and consider voluntary registration.`,
-      show: hasResults && revenue >= VAT_APPROACHING && revenue < VAT_THRESHOLD,
+      description: `Revenue approaching £${VAT_THRESHOLD.toLocaleString()} VAT threshold. Monitor closely and consider voluntary registration.${vatNote}`,
+      show: revenue >= VAT_APPROACHING && revenue < VAT_THRESHOLD,
     },
     {
       id: 'pension-taper',
@@ -394,13 +389,6 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       description:
         'Student loan repayments may be calculated on total income (including dividends) via Self Assessment. Rules depend on your circumstances.',
       show: formData.studentLoanPlans.length > 0,
-    },
-    {
-      id: 'plan5',
-      title: 'Plan 5 Student Loan Note',
-      description:
-        'Plan 5 student loans start from April 2026 and are not yet included in calculations.',
-      show: hasPlan5, // Only show if user actually has Plan 5
     },
     {
       id: 'bik',

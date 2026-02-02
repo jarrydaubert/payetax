@@ -13,3 +13,4 @@ export { InputsPanel } from './InputsPanel';
 export { MoneyFlowChart } from './MoneyFlowChart';
 export { SidebarNav } from './SidebarNav';
 export { SummaryCards } from './SummaryCards';
+export { SurvivalModePanel } from './SurvivalModePanel';

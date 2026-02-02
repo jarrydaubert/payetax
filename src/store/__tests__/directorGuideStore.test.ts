@@ -158,6 +158,14 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.studentLoanPlans).not.toContain('plan1');
     });
 
+    it('should not allow Plan 5 into state (not active for 2025-26)', () => {
+      useDirectorGuideStore.getState().toggleStudentLoanPlan('plan5');
+      expect(useDirectorGuideStore.getState().formData.studentLoanPlans).not.toContain('plan5');
+
+      useDirectorGuideStore.getState().setStudentLoanPlans(['plan1', 'plan5']);
+      expect(useDirectorGuideStore.getState().formData.studentLoanPlans).toEqual(['plan1']);
+    });
+
     it('should set pension contribution', () => {
       useDirectorGuideStore.getState().setPensionContribution(10000);
       expect(useDirectorGuideStore.getState().formData.pensionContribution).toBe(10000);

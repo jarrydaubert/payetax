@@ -569,7 +569,7 @@ describe('Tax Calculations', () => {
 // PILLAR 2: OPTIMIZATION TESTS
 // =============================================================================
 
-describe('Strategy Optimization', () => {
+  describe('Strategy Optimization', () => {
   describe('Strategy Comparison', () => {
     // Helper to create a standard input with given profit
     const createInput = (profit: number, overrides = {}) => ({
@@ -640,6 +640,20 @@ describe('Strategy Optimization', () => {
       const result = calculateStrategyComparison(input, TAX_YEAR);
       // deltaVsOptimal: positive means paying MORE tax than optimal
       expect(result.strategies.yourSetup?.deltaVsOptimal).toBeGreaterThan(0);
+    });
+
+    it('should treat VAT status as warning-only (includesVat does not change results)', () => {
+      const base = createInput(100000);
+      const withVatFlag = { ...base, includesVat: true };
+      const withoutVatFlag = { ...base, includesVat: false };
+
+      const a = calculateStrategyComparison(withVatFlag, TAX_YEAR);
+      const b = calculateStrategyComparison(withoutVatFlag, TAX_YEAR);
+
+      // If this ever regresses, it will silently change profit and all downstream strategy outputs.
+      expect(a.grossProfit).toBe(b.grossProfit);
+      expect(a.strategies.optimalMix.takeHome).toBe(b.strategies.optimalMix.takeHome);
+      expect(a.recommended).toBe(b.recommended);
     });
   });
 

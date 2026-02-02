@@ -295,12 +295,15 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setStudentLoanPlans: (plans) => {
+          // Spec: Plan 5 is not active for 2025-26; don't allow it to enter state (can appear via stale persisted data).
+          const sanitized = plans.filter((p) => p !== 'plan5');
           set((state) => ({
-            formData: { ...state.formData, studentLoanPlans: plans },
+            formData: { ...state.formData, studentLoanPlans: sanitized },
           }));
         },
 
         toggleStudentLoanPlan: (plan) => {
+          if (plan === 'plan5') return;
           set((state) => {
             const current = state.formData.studentLoanPlans;
             const newPlans = current.includes(plan)
@@ -537,6 +540,11 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
         onRehydrateStorage: () => (state, error) => {
           if (error || !state) return;
+
+          // Defensive cleanup: prevent stale persisted Plan 5 from appearing in UI/state for 2025-26.
+          if (state.formData.studentLoanPlans.includes('plan5')) {
+            state.setStudentLoanPlans(state.formData.studentLoanPlans);
+          }
 
           // Check for expiry (7 days) or tax year mismatch
           const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;

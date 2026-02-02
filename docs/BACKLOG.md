@@ -64,12 +64,12 @@
 - [x] `content/blog/higher-rate-taxpayer-guide-uk-2025.mdx`
 - [x] `content/blog/how-much-tax-will-i-pay-uk-2025.mdx`
 - [x] `content/blog/how-national-insurance-works-uk-2025.mdx`
-- [ ] `content/blog/marriage-allowance-uk-2025-guide.mdx`
-- [ ] `content/blog/pension-tax-relief-uk-2025-guide.mdx`
-- [ ] `content/blog/salary-sacrifice-explained-2025-26.mdx`
-- [ ] `content/blog/scottish-vs-english-tax-rates-2026-comparison.mdx`
-- [ ] `content/blog/self-assessment-deadline-january-2026-what-you-need-to-know.mdx`
-- [ ] `content/blog/setting-up-limited-company-uk-2025-26.mdx`
+- [x] `content/blog/marriage-allowance-uk-2025-guide.mdx`
+- [x] `content/blog/pension-tax-relief-uk-2025-guide.mdx`
+- [x] `content/blog/salary-sacrifice-explained-2025-26.mdx`
+- [x] `content/blog/scottish-vs-english-tax-rates-2026-comparison.mdx`
+- [x] `content/blog/self-assessment-deadline-january-2026-what-you-need-to-know.mdx`
+- [x] `content/blog/setting-up-limited-company-uk-2025-26.mdx`
 - [ ] `content/blog/spring-statement-2026-uk-what-to-expect.mdx`
 - [ ] `content/blog/student-loan-repayment-changes-2025-26.mdx`
 - [ ] `content/blog/uk-tax-calculator-2025-complete-guide.mdx`

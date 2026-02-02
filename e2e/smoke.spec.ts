@@ -33,6 +33,13 @@ test.describe('Smoke Tests', () => {
     ).toBeVisible();
   });
 
+  test('Tools landing page loads @smoke', async ({ page }) => {
+    await page.goto('/tools');
+    await expect(page.locator('h1')).toContainText(/tools/i);
+    await expect(page.getByTestId('tools-link-director-guide')).toBeVisible();
+    await expect(page.getByTestId('tools-link-tax-code-decoder')).toBeVisible();
+  });
+
   test('About page loads @smoke', async ({ page }) => {
     await page.goto('/about');
     await expect(page.locator('h1')).toBeVisible();

@@ -66,7 +66,7 @@ export function CoreInputs() {
                 onCheckedChange={(checked) => setIncludesVat(checked === true)}
               />
               <Label htmlFor={vatId} className='text-sm'>
-                Includes VAT (we&apos;ll deduct 20%)
+                Revenue includes VAT (warnings only)
               </Label>
             </div>
           </div>

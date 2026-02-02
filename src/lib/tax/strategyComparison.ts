@@ -103,8 +103,6 @@ export interface StrategyComparison {
 // CONSTANTS
 // ============================================================================
 
-const VAT_RATE = 0.2;
-
 // Helper to get tax year specific values
 function getEmploymentAllowance(taxYear: TaxYear): number {
   return TAX_RATES[taxYear].nationalInsurance.employmentAllowance;
@@ -161,8 +159,8 @@ export function calculateStrategyComparison(
 
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
   const pensionContribution = input.pensionContribution ?? 0;
-  const netRevenue = input.includesVat ? input.revenue / (1 + VAT_RATE) : input.revenue;
-  const grossProfitBeforePension = netRevenue - input.expenses;
+  // Spec: VAT status is warnings/education only (do NOT adjust revenue in calculations).
+  const grossProfitBeforePension = input.revenue - input.expenses;
   const grossProfit = Math.max(0, grossProfitBeforePension - pensionContribution);
 
   // Available for extraction (profit minus what's already been taken)

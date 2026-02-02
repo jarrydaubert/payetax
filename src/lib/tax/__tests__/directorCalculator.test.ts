@@ -120,7 +120,7 @@ describe('Director Calculator', () => {
     });
 
     describe('VAT handling', () => {
-      it('should deduct VAT when includesVat is true', () => {
+      it('should not adjust revenue when includesVat is true (warning-only)', () => {
         const inputWithVat: DirectorInput = {
           ...defaultInput,
           revenue: 120000,
@@ -128,12 +128,12 @@ describe('Director Calculator', () => {
         };
         const result = calculateDirectorScenario(inputWithVat);
 
-        // 120000 / 1.2 = 100000 net revenue
-        expect(result.netRevenue).toBe(100000);
+        // Spec: VAT status is warnings/education only (no /1.2 adjustment).
+        expect(result.netRevenue).toBe(120000);
         expect(result.grossRevenue).toBe(120000);
       });
 
-      it('should not deduct VAT when includesVat is false', () => {
+      it('should not adjust revenue when includesVat is false', () => {
         const inputWithoutVat: DirectorInput = {
           ...defaultInput,
           revenue: 100000,
@@ -333,8 +333,8 @@ describe('Director Calculator', () => {
        * - Already taken: £0
        *
        * Expected:
-       * - Net revenue: £100,000 (VAT removed)
-       * - Gross profit: £80,000
+       * - Revenue is NOT adjusted for VAT (warning-only)
+       * - Gross profit: £100,000 (120,000 - 20,000)
        */
       it('should match the golden example calculations', () => {
         const goldenInput: DirectorInput = {
@@ -355,31 +355,31 @@ describe('Director Calculator', () => {
         if (isNormalMode(result)) {
           // Revenue and profit
           expect(result.grossRevenue).toBe(120000);
-          expect(result.netRevenue).toBe(100000); // VAT removed
-          expect(result.grossProfit).toBe(80000); // 100000 - 20000
+          expect(result.netRevenue).toBe(120000); // VAT warning-only
+          expect(result.grossProfit).toBe(100000); // 120000 - 20000
 
           // Extraction amounts
           expect(result.salary).toBe(12570);
           expect(result.employerNI).toBeCloseTo(1135.5, 1);
 
-          // Taxable profit = 80000 - 12570 - 1135.5 = 66294.5
-          expect(result.taxableProfit).toBeCloseTo(66294.5, 1);
+          // Taxable profit = 100000 - 12570 - 1135.5 = 86294.5
+          expect(result.taxableProfit).toBeCloseTo(86294.5, 1);
 
           // Corporation Tax (marginal relief applies)
-          expect(result.corporationTax).toBeGreaterThan(12000);
-          expect(result.corporationTax).toBeLessThan(17000);
+          expect(result.corporationTax).toBeGreaterThan(15000);
+          expect(result.corporationTax).toBeLessThan(25000);
 
           // Company tax pot (CT + Employer NI)
-          expect(result.companyTaxPot).toBeGreaterThan(13000);
-          expect(result.companyTaxPot).toBeLessThan(18000);
+          expect(result.companyTaxPot).toBeGreaterThan(16000);
+          expect(result.companyTaxPot).toBeLessThan(26000);
 
           // Dividends should be substantial
-          expect(result.dividendsAvailable).toBeGreaterThan(45000);
+          expect(result.dividendsAvailable).toBeGreaterThan(55000);
 
           // Personal tax (dividend tax) should be significant
-          // With ~£50k dividends, some will be in higher rate band
+          // With ~£60k dividends, some will be in higher rate band
           expect(result.dividendTax).toBeGreaterThan(3000);
-          expect(result.dividendTax).toBeLessThan(10000);
+          expect(result.dividendTax).toBeLessThan(20000);
 
           // POA should apply (dividend tax > £1000)
           expect(result.includesPOA).toBe(true);
@@ -390,7 +390,7 @@ describe('Director Calculator', () => {
           expect(result.averageMonthlyPay).toBeLessThan(6000);
           // Personal tax with POA: ~£7,500 × 1.5 / 12 = ~£940/mo
           expect(result.personalTaxMonthly).toBeGreaterThan(500);
-          expect(result.personalTaxMonthly).toBeLessThan(1500);
+          expect(result.personalTaxMonthly).toBeLessThan(2000);
         }
       });
     });

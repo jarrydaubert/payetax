@@ -27,6 +27,7 @@ import {
   MoneyFlowChart,
   SidebarNav,
   SummaryCards,
+  SurvivalModePanel,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
 import { Button } from '@/components/ui/button';
@@ -88,7 +89,7 @@ export function DirectorDashboard() {
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
     if (comparison && !hasTrackedResults.current) {
-      trackResultsShown(comparison.grossProfit, 'normal');
+      trackResultsShown(comparison.grossProfit, comparison.grossProfit <= 0 ? 'survival' : 'normal');
       hasTrackedResults.current = true;
     }
   }, [comparison]);
@@ -101,7 +102,8 @@ export function DirectorDashboard() {
   }, [reset]);
 
   // Show results when calculation is complete (even for 0 or negative profit)
-  const hasResults = Boolean(comparison);
+  const hasComparison = Boolean(comparison);
+  const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
 
   return (
     <TooltipProvider>
@@ -127,31 +129,40 @@ export function DirectorDashboard() {
             </div>
 
             {/* Results */}
-            {hasResults ? (
+            {hasComparison ? (
               <div className='space-y-6'>
-                {/* Summary Cards */}
-                <SummaryCards />
+                {isSurvivalMode ? (
+                  <>
+                    <SurvivalModePanel />
+                    <KeyDates />
+                  </>
+                ) : (
+                  <>
+                    {/* Summary Cards */}
+                    <SummaryCards />
 
-                {/* Salary Slider */}
-                <SalarySlider />
+                    {/* Salary Slider */}
+                    <SalarySlider />
 
-                {/* Strategy Comparison Table */}
-                <StrategyComparisonTable />
+                    {/* Strategy Comparison Table */}
+                    <StrategyComparisonTable />
 
-                {/* Detail Cards (2x2 grid) */}
-                <DetailCards />
+                    {/* Detail Cards (2x2 grid) */}
+                    <DetailCards />
 
-                {/* Two Pots - Company vs Personal */}
-                <TaxPots />
+                    {/* Two Pots - Company vs Personal */}
+                    <TaxPots />
 
-                {/* Pension Gap Warning */}
-                <PensionGapWarning />
+                    {/* Pension Gap Warning */}
+                    <PensionGapWarning />
 
-                {/* Money Flow + Key Dates */}
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <MoneyFlowChart />
-                  <KeyDates />
-                </div>
+                    {/* Money Flow + Key Dates */}
+                    <div className='grid gap-4 md:grid-cols-2'>
+                      <MoneyFlowChart />
+                      <KeyDates />
+                    </div>
+                  </>
+                )}
 
                 {/* Email CTA Banner */}
                 <div
