@@ -250,8 +250,8 @@ export const mdxComponents = {
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
       className={cn(
-        'glass-card-inner rounded-lg border-primary/50 border-l-4 px-6',
-        'my-8 flex items-center [&_p]:mb-0',
+        'rounded-lg border-l-4 border-primary/50 bg-card/80 backdrop-blur-sm',
+        'my-8 px-6 [&_p:last-child]:mb-0',
         SPACING.PY_4,
       )}
       {...props}
@@ -260,10 +260,40 @@ export const mdxComponents = {
     </blockquote>
   ),
 
+  // Callout component for examples, warnings, tips
+  Callout: ({
+    children,
+    type = 'info',
+    ...props
+  }: React.ComponentPropsWithoutRef<'div'> & {
+    type?: 'info' | 'warning' | 'example' | 'tip';
+  }) => {
+    const styles = {
+      info: 'border-primary/50 bg-primary/5',
+      warning: 'border-amber-500/50 bg-amber-500/5',
+      example: 'border-emerald-500/50 bg-emerald-500/5',
+      tip: 'border-blue-500/50 bg-blue-500/5',
+    };
+
+    return (
+      <div
+        className={cn(
+          'my-6 rounded-lg border-l-4 p-4',
+          styles[type],
+          '[&_p:first-child]:mt-0 [&_p:last-child]:mb-0',
+          '[&_ul]:mb-0 [&_ol]:mb-0',
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  },
+
   // Enhanced tables
   table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => (
     <div className='my-8 overflow-x-auto rounded-lg border border-foreground/20'>
-      <table className='glass-card-inner min-w-full backdrop-blur-sm' {...props}>
+      <table className='glass-card-inner min-w-[640px] w-full backdrop-blur-sm' {...props}>
         {children}
       </table>
     </div>
