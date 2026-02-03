@@ -12,7 +12,7 @@ Summary counts:
 - updatedAt missing: 0
 - Citation artifacts present: 0
 - Employer NI mismatch: 0
-- State Pension figure to verify: 1
+- State Pension figure verified: 1
 
 |Post|Canonical|SEO Desc|UpdatedAt|TL;DR|FAQ|/tools|/calculator|Cites|Emp NI|State Pension|
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -26,7 +26,7 @@ Summary counts:
 |frozen-tax-thresholds-stealth-tax-2026.mdx|✅|✅|✅|✅|✅|✅|✅|✅|—|—|
 |higher-rate-taxpayer-guide-uk-2025.mdx|✅|✅|✅|✅|✅|✅|✅|✅|—|—|
 |how-much-tax-will-i-pay-uk-2025.mdx|✅|✅|✅|✅|✅|✅|✅|✅|—|—|
-|how-national-insurance-works-uk-2025.mdx|✅|✅|✅|✅|✅|✅|✅|✅|✅|⚠️|
+|how-national-insurance-works-uk-2025.mdx|✅|✅|✅|✅|✅|✅|✅|✅|✅|✅|
 |marriage-allowance-uk-2025-guide.mdx|✅|✅|✅|✅|✅|✅|✅|✅|—|—|
 |pension-tax-relief-uk-2025-guide.mdx|✅|✅|✅|✅|✅|✅|✅|✅|✅|—|
 |salary-sacrifice-explained-2025-26.mdx|✅|✅|✅|✅|✅|✅|✅|✅|✅|—|
