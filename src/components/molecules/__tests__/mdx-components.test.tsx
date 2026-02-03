@@ -273,9 +273,9 @@ describe('mdx-components', () => {
       expect(blockquote).toHaveClass('border-l-4', 'border-primary/50');
     });
 
-    it('should have glass card styling', () => {
+    it('should have card styling', () => {
       render(<Blockquote>Glass quote</Blockquote>);
-      expect(screen.getByRole('blockquote')).toHaveClass('glass-card-inner');
+      expect(screen.getByRole('blockquote')).toHaveClass('bg-card/80', 'backdrop-blur-sm');
     });
   });
 
@@ -309,9 +309,9 @@ describe('mdx-components', () => {
       expect(screen.getAllByRole('cell')).toHaveLength(4);
     });
 
-    it('should have glass card styling on table', () => {
+    it('should have card styling on table', () => {
       renderTable();
-      expect(screen.getByRole('table')).toHaveClass('glass-card-inner');
+      expect(screen.getByRole('table')).toHaveClass('bg-card/80', 'backdrop-blur-sm');
     });
 
     it('should style table headers', () => {
@@ -432,6 +432,7 @@ describe('mdx-components', () => {
       expect(mdxComponents).toHaveProperty('em');
       expect(mdxComponents).toHaveProperty('code');
       expect(mdxComponents).toHaveProperty('blockquote');
+      expect(mdxComponents).toHaveProperty('Callout');
       expect(mdxComponents).toHaveProperty('table');
       expect(mdxComponents).toHaveProperty('thead');
       expect(mdxComponents).toHaveProperty('tbody');
@@ -442,10 +443,10 @@ describe('mdx-components', () => {
       expect(mdxComponents).toHaveProperty('img');
     });
 
-    it('should have 24 components total', () => {
-      // 24 components: h1-h6, p, ul, ol, li, a, strong, em, code, blockquote,
-      // table, thead, tbody, tr, th, td, hr, img, caption
-      expect(Object.keys(mdxComponents)).toHaveLength(24);
+    it('should have 25 components total', () => {
+      // 25 components: h1-h6, p, ul, ol, li, a, strong, em, code, blockquote,
+      // Callout, table, thead, tbody, tr, th, td, hr, img, caption
+      expect(Object.keys(mdxComponents)).toHaveLength(25);
     });
   });
 });
