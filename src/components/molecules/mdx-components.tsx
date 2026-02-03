@@ -292,8 +292,15 @@ export const mdxComponents = {
 
   // Enhanced tables
   table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => (
-    <div className='my-8 overflow-x-auto rounded-lg border border-foreground/20'>
-      <table className='glass-card-inner min-w-[640px] w-full backdrop-blur-sm' {...props}>
+    <div className='not-prose my-8 overflow-x-auto rounded-lg border border-foreground/20 bg-card/40'>
+      <table
+        className={cn(
+          'min-w-[640px] w-full bg-card/80 backdrop-blur-sm',
+          '[&_th:last-child]:text-right [&_td:last-child]:text-right',
+          '[&_td:last-child]:tabular-nums [&_td:last-child]:whitespace-nowrap',
+        )}
+        {...props}
+      >
         {children}
       </table>
     </div>
@@ -304,7 +311,7 @@ export const mdxComponents = {
     </thead>
   ),
   tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => (
-    <tbody className='divide-y divide-foreground/10' {...props}>
+    <tbody className='divide-y divide-foreground/10 [&_tr:nth-child(even)]:bg-foreground/5' {...props}>
       {children}
     </tbody>
   ),
@@ -328,7 +335,7 @@ export const mdxComponents = {
   ),
   td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
     <td
-      className={cn('text-foreground/90', SPACING.PX_6, SPACING.PY_4)}
+      className={cn('text-foreground/90 tabular-nums', SPACING.PX_6, SPACING.PY_4)}
       style={{ fontSize: 'var(--blog-font-size-sm)' }}
       {...props}
     >
