@@ -15,13 +15,6 @@
 - Pull in new versions if 2+ skills updated or major version bump
 - Consider adding new skills that become relevant (e.g., ab-test-setup, email-sequence)
 
-### After Each HMRC/Gov Budget Change
-- Review ALL blog posts for outdated tax rates, thresholds, and allowances
-- Update `publishedAt` / `updatedAt` dates on affected posts
-- Check director-related posts especially (salary thresholds, dividend allowance, CT rates)
-- Verify calculator constants in `src/constants/taxRates.ts` are updated first
-- Key posts to check: director guides, £100k tax trap, Scottish rates comparison, student loans
-
 ---
 
 ## P0 - Revenue & Trust
@@ -38,7 +31,6 @@
 
 **Known gaps / risks:**
 - API routes have ~0 unit coverage (email endpoints, newsletter, referral, webhook, OG, IndexNow)
-- Director Guide has no Playwright E2E flows (only unit-level coverage)
 - Rounding trust: only a small number of payslip-style regression locks exist
 - “Golden master” is a strong regression oracle, but HMRC source provenance isn’t stored in-repo
 
@@ -48,46 +40,6 @@
 - [ ] Bring `bun test` (coverage) back to a reliable gate:
   - Option A: add high-signal tests for the highest-risk 0%-covered code (API routes)
   - Option B: narrow coverage scope/thresholds so it reflects business-risk code instead of marketing pages
-
-### Blog Numbers Audit (Calculator-Verified)
-> Numbers only. Use `src/lib/taxCalculator.ts` + `src/constants/taxRates.ts` as source of truth.
-> Update any factual sentence if it becomes incorrect after recalculation.
-
-- [x] `content/blog/100k-company-profit-director-take-home-2025-26.mdx`
-- [x] `content/blog/100k-tax-trap-avoid-60-percent-tax-2025.mdx`
-- [x] `content/blog/autumn-budget-2025-uk-tax-changes-explained.mdx`
-- [x] `content/blog/beginners-guide-to-uk-taxation.mdx`
-- [x] `content/blog/director-salary-dividends-guide-2025-26.mdx`
-- [x] `content/blog/director-salary-vs-dividends-comparison-2025-26.mdx`
-- [x] `content/blog/director-tax-deadlines-2025-26.mdx`
-- [x] `content/blog/frozen-tax-thresholds-stealth-tax-2026.mdx`
-- [x] `content/blog/higher-rate-taxpayer-guide-uk-2025.mdx`
-- [x] `content/blog/how-much-tax-will-i-pay-uk-2025.mdx`
-- [x] `content/blog/how-national-insurance-works-uk-2025.mdx`
-- [x] `content/blog/marriage-allowance-uk-2025-guide.mdx`
-- [x] `content/blog/pension-tax-relief-uk-2025-guide.mdx`
-- [x] `content/blog/salary-sacrifice-explained-2025-26.mdx`
-- [x] `content/blog/scottish-vs-english-tax-rates-2026-comparison.mdx`
-- [x] `content/blog/self-assessment-deadline-january-2026-what-you-need-to-know.mdx`
-- [x] `content/blog/setting-up-limited-company-uk-2025-26.mdx`
-- [x] `content/blog/spring-statement-2026-uk-what-to-expect.mdx`
-- [x] `content/blog/student-loan-repayment-changes-2025-26.mdx`
-- [ ] `content/blog/uk-tax-calculator-2025-complete-guide.mdx`
-- [ ] `content/blog/uk-tax-changes-2025-complete-guide.mdx`
-- [ ] `content/blog/understanding-the-uk-tax-system-2025.mdx`
-- [ ] `content/blog/understanding-uk-tax-codes.mdx`
-- [x] `content/blog/what-100k-salary-actually-looks-like-uk-2025.mdx`
-- [x] `content/blog/what-40k-salary-actually-looks-like-uk-2025.mdx`
-- [x] `content/blog/what-50k-salary-actually-looks-like-uk-2025.mdx`
-- [x] `content/blog/what-60k-salary-actually-looks-like-uk-2025.mdx`
-- [x] `content/blog/what-70k-salary-actually-looks-like-uk-2025.mdx`
-- [x] `content/blog/what-80k-salary-actually-looks-like-uk-2025.mdx`
-- [ ] `content/blog/year-end-tax-planning-2025-26-complete-checklist.mdx`
-
-### Director Guide Go-Live (Spec-First)
-> Go-live blockers and acceptance criteria are tracked in `docs/business/DIRECTOR_GUIDE_GO_LIVE_PLAN.md`.
-
-- [ ] Execute the spec-first go-live plan (VAT warning-only, Survival Mode panel, VAT warnings ungated, Plan 5 gating, analytics wiring, email de-drift, `/tools` breadcrumb fix)
 
 ### Environment Variables Needed
 > New security features require env vars
@@ -125,25 +77,7 @@
 ### Missing Tests
 > New pro tool files have NO test coverage - high risk
 
-- [ ] Implement tests in `src/lib/tax/__tests__/directorCalculator.spec.ts`
 - [ ] Tighten golden example tolerances (currently ±30%, should be ±£100)
-- [ ] Test other income scenarios (band consumption, PA taper)
-
-### Tax Code Validation - Welsh & Scottish Prefixes
-> Current validation rejects valid Welsh and Scottish tax codes
-
-- [ ] Add Welsh `C` prefix support (e.g., `C1257L`)
-- [ ] Add prefixed special codes: `SBR`, `SD0`, `SD1`, `SNT`, `CBR`, etc.
-- [ ] Consider delegating to `decodeTaxCode()` if already robust
-- [ ] Test: `C1257L`, `SBR`, `SD0W1`, `CK100`
-
-### Marriage Allowance Net-Saving Calculation
-> Current calculation oversimplified - can show wrong savings
-
-- [ ] Transferor near PA (£11,310-£12,570) loses partial benefit - net saving < £252
-- [ ] Scottish recipient has different higher-rate threshold
-- [ ] Compute actual net saving: `recipientSaving - transferorAdditionalTax`
-- [ ] Show "estimated saving: £X" instead of fixed "£252"
 
 ---
 
@@ -166,7 +100,6 @@
 - [ ] Consider using Next.js `opengraph-image.tsx` file convention for dynamic generation
 
 ### Tools Directory Audit
-- [ ] Create `/tools/page.tsx` index page
 - [ ] Add navigation links to orphaned tools (marriage-allowance, NI calculator)
 - [ ] Update MarriageAllowanceAlert to link to internal tool instead of gov.uk
 
@@ -179,14 +112,6 @@
 - [ ] Wrap `compileMDXContent` with `unstable_cache` keyed by `slug` + `updatedAt`
 - [ ] Set `revalidate: 86400` to match ISR window
 - [ ] Avoid recompiling MDX when post content hasn't changed
-
-### Director Email Template - Use taxRates.ts
-> `send-director-results/route.ts` has hardcoded `TAX_THRESHOLDS` that can drift from source of truth
-
-- [ ] Import thresholds from `src/constants/taxRates.ts` instead of hardcoding
-- [ ] Ensure email template updates automatically when rates change
-- [ ] Apply escapeHtml to all string interpolations (strategy.name, taxYear, generatedDate) (treat as real HTML injection risk, not just defense-in-depth)
-- [ ] Compute Self Assessment deadline dynamically from taxYear (currently hardcoded "31 Jan 2027")
 
 ### Email Endpoints - Trust Boundary
 > Both `/api/send-results` and `/api/send-director-results` accept client-computed results
@@ -228,24 +153,8 @@
 ### Golden Master Test IDs
 > E2E tests updated to use testids but some may not exist in UI components
 
-- [ ] Verify these test IDs exist in calculator components:
-  - `region-select` - region dropdown
-  - `tax-code-input` - tax code field
-  - `married-checkbox` - marriage allowance toggle
-  - `partner-salary-input` - partner salary field
-  - `children-input` - children count for HICBC
-- [ ] Add missing test IDs to respective components
+- [ ] Add missing `children-input` test ID for HICBC children count input
 - [ ] Run `bun run test:e2e` to verify golden master passes
-
-### Blog Post Calculator Verification
-> Scottish vs English tax blog updated with manual calculations - should verify against live calculator
-
-- [ ] Run calculator for £25k, £35k, £50k, £75k, £100k, £150k (both Scotland and England)
-- [ ] Compare outputs against blog post figures
-- [ ] Update blog if any discrepancies found
-- [ ] Consider adding "Verified with PayeTax Calculator" badge/note
-
-
 
 ### PWA Install Documentation
 > Users may not know they can install PayeTax as an app for offline use
@@ -293,14 +202,6 @@
 - [ ] Or hide income source inputs until core calculation is correct
 - [ ] Verify: other income affects PA taper, dividend allowance consumption, student loan threshold
 
-### formatBlogTitle Regex Issues
-> Word boundary issues in title formatting
-
-- [ ] `.replace(/2026/g, '2026')` is a no-op - remove or fix
-- [ ] `.replace(/Uk/g, 'UK')` can mangle words like "Dukes" → "DUKes"
-- [ ] Use word boundaries: `/\bUk\b/g`
-- [ ] File: `src/lib/blog/utils.ts` or similar
-
 ### Tax Rates Data Model Improvements
 > Reduce drift and prevent silent math bugs
 
@@ -323,15 +224,42 @@
 - [ ] Create semantic tokens layer (`TEXT_BODY`, `TEXT_LABEL`, `CARD`, `PANEL`) composed from primitives
 
 ### Chrome Extension for Backlink (SEO)
-> Chrome Web Store has DR 90+ and gives dofollow "developer website" link
+> Chrome Web Store has DR 99+ and gives dofollow "developer website" link. Competition is very low - no dedicated UK PAYE calculator extensions as of 2026.
 
-- [ ] Create minimal Chrome extension tied to PayeTax
-- [ ] One-time $5 registration fee
-- [ ] Must provide genuine utility to pass review (can be simple)
-- [ ] Ideas: popup calculator, tax code lookup, "what's my take-home" new tab
+**Why this works for PayeTax:**
+- High-authority dofollow backlink from DR 99+ domain (confirmed on live pages like Grammarly's in 2026)
+- Referral traffic from store → trackable in GA
+- Organic discovery (people search store for tax tools)
+- Seasonal spikes around tax year end (January–April) and job changes
+- User conversion funnel: free extension → upsell full web app
+
+**Suggested extension (popup-based, Manifest V3):**
+- Inputs: Salary (annual/monthly/weekly), tax code (default 1257L), pension %, student loan plan, Scottish toggle
+- Outputs: Tax, NI, take-home, effective rate (2025/26 rates)
+- Quick presets: "Minimum wage", "Average UK salary"
+- Traffic boosters:
+  - Button: "Use full version on our website"
+  - Footer: "Powered by PayeTax – advanced features at payetax.co.uk"
+  - Complex cases: "For dividends/self-employment, try our full calculator"
+
+**Listing optimization:**
+- Title: "UK PAYE Tax Calculator 2025/26 – Take Home Pay & NI"
+- Description: Keyword-rich, mention accuracy, updates, link to full site
+- Screenshots/video: Demo calculations
+- Category: Productivity or Finance
+
+**Launch steps:**
+- [ ] Pay $5 one-time fee at Chrome Web Store Developer Dashboard
+- [ ] Build basic HTML/JS/CSS popup (port logic from existing calculator)
+- [ ] Optimize listing with keywords and screenshots
+- [ ] Submit for review (days to weeks)
 - [ ] After publish: verify link is dofollow via page source
-- [ ] Guide: https://developer.chrome.com/docs/extensions/get-started
-- [ ] Dashboard: https://chrome.google.com/webstore/devdashboard
+- [ ] Promote on X, Reddit (r/UKPersonalFinance), LinkedIn
+- [ ] Update yearly for new tax rates → renewed interest
+
+**Resources:**
+- Guide: https://developer.chrome.com/docs/extensions/get-started
+- Dashboard: https://chrome.google.com/webstore/devdashboard
 
 ### FAQ/AEO Architecture - Server-Rendered Schema & Single Source of Truth
 > CalculatorContent.tsx FAQ section has structural issues for SEO/AEO
