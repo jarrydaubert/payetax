@@ -17,7 +17,31 @@
  * - Carry forward from previous years
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+async function getTableValueByHeader(
+  page: Page,
+  rowLabel: string,
+  headerLabel: string,
+): Promise<number> {
+  const headers = page.locator('table thead th');
+  const headerTexts = await headers.allTextContents();
+  const headerIndex = headerTexts.findIndex((text) =>
+    text.trim().toLowerCase().includes(headerLabel.toLowerCase()),
+  );
+
+  if (headerIndex < 0) {
+    throw new Error(`Header "${headerLabel}" not found in results table`);
+  }
+
+  const dataIndex = Math.max(0, headerIndex - 1);
+  const row = page.locator(`tr:has-text("${rowLabel}")`).first();
+  const cells = row.locator('td');
+  const cellText = await cells.nth(dataIndex).textContent();
+  const numeric = Number.parseFloat(cellText?.replace(/[£,]/g, '') || '0');
+
+  return numeric;
+}
 
 test.describe('Pension Limits - Annual Allowance Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -52,11 +76,8 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
     // Verify pension shows in results
-    const pensionRow = page.locator('tr:has-text("Pension")').first();
-    const pensionCells = pensionRow.locator('td');
-    const pensionText = await pensionCells.nth(2).textContent();
-
-    expect(pensionText).toContain('60,000');
+    const pensionValue = await getTableValueByHeader(page, 'Pension', 'Yearly');
+    expect(pensionValue).toBeCloseTo(60000, 0);
   });
 
   test('BREACH: £100k salary with £65k pension (exceeds £60k limit by £5k)', async ({ page }) => {
@@ -145,10 +166,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
     // Verify taxable income is reduced
-    const taxRow = page.locator('tr:has-text("Total Tax Due")').first();
-    const taxCells = taxRow.locator('td');
-    const taxText = await taxCells.nth(2).textContent();
-    const tax = Number.parseFloat(taxText?.replace(/[£,]/g, '') || '0');
+    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
 
     // Should be £3,486 (same as £30k salary with no pension)
     expect(tax).toBeCloseTo(3486, 0);

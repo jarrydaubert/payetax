@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function OfflinePage() {
   return (
     <div className='flex min-h-dvh items-center justify-center pt-20'>
-      <main className='container mx-auto max-w-2xl px-4 text-center'>
+      <div className='container mx-auto max-w-2xl px-4 text-center'>
         <div className='glass-card p-8 md:p-16'>
           {/* Offline Icon */}
           <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
@@ -89,14 +89,14 @@ export default function OfflinePage() {
           </div>
 
           {/* Connection Status */}
-          <div className='mt-8 rounded-lg border border-blue-500/20 bg-blue-500/10 p-4'>
-            <p className={cn('text-blue-500', TYPOGRAPHY.TEXT_SM)}>
+          <div className='mt-8 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4'>
+            <p className={cn('text-blue-200', TYPOGRAPHY.TEXT_SM)}>
               💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
               show the latest tax rates.
             </p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

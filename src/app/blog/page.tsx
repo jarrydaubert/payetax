@@ -146,6 +146,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className='min-h-screen bg-slate-950'>
         {/* Main Content with Sidebar */}
         <div className='container mx-auto max-w-7xl px-4 py-12'>
+          <h1 className='sr-only'>TaxInsights by PayeTax</h1>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
             {/* Main Content Column */}
             <div className='space-y-12'>
@@ -165,9 +166,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             </div>
 
             {/* Sidebar - Editor's Picks (mt-12 aligns with Latest Articles content) */}
-            <aside className='hidden lg:mt-12 lg:block'>
+            <div className='hidden lg:mt-12 lg:block'>
               <EditorsPicksSticky posts={editorsPicks} />
-            </aside>
+            </div>
           </div>
 
           {/* Mobile Editor's Picks - Below main content */}

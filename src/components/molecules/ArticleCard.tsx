@@ -145,7 +145,7 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
           <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-3 text-slate-500 text-xs'>
+          <div className='flex items-center gap-3 text-slate-400 text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>
@@ -205,7 +205,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           </h3>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-slate-500 text-xs'>
+          <div className='flex items-center gap-2 text-slate-400 text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>
@@ -267,7 +267,7 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
           <p className='mb-3 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-slate-500 text-xs'>
+          <div className='flex items-center gap-2 text-slate-400 text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>

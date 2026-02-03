@@ -10,7 +10,32 @@
  * - Single parent vs couple
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+async function getTableValueByHeader(
+  page: Page,
+  rowLabel: string,
+  headerLabel: string,
+): Promise<number> {
+  const headers = page.locator('table thead th');
+  const headerTexts = await headers.allTextContents();
+  const headerIndex = headerTexts.findIndex((text) =>
+    text.trim().toLowerCase().includes(headerLabel.toLowerCase()),
+  );
+
+  if (headerIndex < 0) {
+    throw new Error(`Header "${headerLabel}" not found in results table`);
+  }
+
+  // Table rows use a label column first; data cells start after that.
+  const dataIndex = Math.max(0, headerIndex - 1);
+  const row = page.locator(`tr:has-text("${rowLabel}")`).first();
+  const cells = row.locator('td');
+  const cellText = await cells.nth(dataIndex).textContent();
+  const numeric = Number.parseFloat(cellText?.replace(/[£,]/g, '') || '0');
+
+  return numeric;
+}
 
 test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
   test.beforeEach(async ({ page }) => {
@@ -38,10 +63,7 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
     // Expected: £11,432 tax (£60k - £12,570 PA = £47,430 taxable)
-    const taxRow = page.locator('tr:has-text("Total Tax Due")').first();
-    const taxCells = taxRow.locator('td');
-    const taxText = await taxCells.nth(2).textContent();
-    const tax = Number.parseFloat(taxText?.replace(/[£,]/g, '') || '0');
+    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
 
     expect(tax).toBeCloseTo(11432, 0);
   });
@@ -105,12 +127,9 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
-    // Verify pension reduces taxable income
-    const pensionRow = page.locator('tr:has-text("Pension")').first();
-    const pensionCells = pensionRow.locator('td');
-    const pensionText = await pensionCells.nth(2).textContent();
-
-    expect(pensionText).toContain('5,000');
+    // Verify pension shows in results table (Yearly column)
+    const pensionValue = await getTableValueByHeader(page, 'Pension', 'Yearly');
+    expect(pensionValue).toBeCloseTo(5000, 0);
   });
 
   test('HICBC: Edge case - exactly £50k (0% charge)', async ({ page }) => {
@@ -119,10 +138,7 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
-    const taxRow = page.locator('tr:has-text("Total Tax Due")').first();
-    const taxCells = taxRow.locator('td');
-    const taxText = await taxCells.nth(2).textContent();
-    const tax = Number.parseFloat(taxText?.replace(/[£,]/g, '') || '0');
+    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
 
     // £50k: £7,486 tax
     expect(tax).toBeCloseTo(7486, 0);

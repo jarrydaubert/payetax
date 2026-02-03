@@ -34,7 +34,7 @@ export function PullQuote({ text, attribution, className }: PullQuoteProps) {
           &ldquo;{text}&rdquo;
         </p>
         <footer className='mt-4'>
-          <cite className='text-slate-500 text-sm not-italic'>— {attribution}</cite>
+          <cite className='text-slate-400 text-sm not-italic'>— {attribution}</cite>
         </footer>
       </blockquote>
     </aside>

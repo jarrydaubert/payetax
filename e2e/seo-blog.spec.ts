@@ -75,27 +75,18 @@ test.describe('Essential SEO Tests', () => {
       console.log('✅ Structured data schema verified');
     });
 
-    test('should have visible calculator section', async ({ page }) => {
+    test('should have primary calculator CTA', async ({ page }) => {
       // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('🔍 Checking calculator section visibility...');
+      console.log('🔍 Checking calculator CTA visibility...');
 
-      // Check that calculator section is visible
-      await expect(page.locator('[data-testid="calculator-section"]')).toBeVisible({
-        timeout: 10000,
-      });
+      const calculatorCta = page.getByRole('link', { name: /open calculator/i });
+      await expect(calculatorCta).toBeVisible({ timeout: 10000 });
 
-      // Check for tax-related content or headings
-      const taxContent = page.getByText(/tax|calculator|paye|national insurance/i);
-      const contentCount = await taxContent.count();
+      const href = (await calculatorCta.getAttribute('href')) ?? '';
+      expect(href).toMatch(/\/calculator|#tax-calculator/);
 
       // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log(`📊 Found ${contentCount} tax-related content elements`);
-
-      // Should have tax-related content visible on homepage
-      expect(contentCount).toBeGreaterThan(0);
-
-      // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('✅ Calculator section and content visible');
+      console.log('✅ Calculator CTA present');
     });
   });
 

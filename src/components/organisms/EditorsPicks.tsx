@@ -26,7 +26,7 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
   const displayedPosts = posts.slice(0, 5);
 
   return (
-    <aside className={cn(className)}>
+    <div className={cn(className)}>
       {/* Desktop/Tablet: Regular display */}
       <div className='hidden md:block'>
         <EditorsPicksList posts={displayedPosts} />
@@ -61,7 +61,7 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
           <EditorsPicksList posts={displayedPosts} showHeading={false} />
         </div>
       </details>
-    </aside>
+    </div>
   );
 }
 
@@ -99,7 +99,7 @@ function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) 
                   {post.title}
                 </h3>
                 {post.readTime && (
-                  <span className='mt-1 text-slate-500 text-xs'>{post.readTime}</span>
+                  <span className='mt-1 text-slate-400 text-xs'>{post.readTime}</span>
                 )}
               </div>
             </Link>

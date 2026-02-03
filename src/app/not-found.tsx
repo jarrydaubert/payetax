@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <main className='grid min-h-dvh place-items-center bg-background px-6'>
+    <div className='grid min-h-dvh place-items-center bg-background px-6'>
       <div className='text-center'>
         <h1 className='font-medium text-xl tracking-tight'>
           <span className='text-gradient-new'>404</span>
@@ -29,6 +29,6 @@ export default function NotFound() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

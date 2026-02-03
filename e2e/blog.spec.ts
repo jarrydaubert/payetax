@@ -22,16 +22,16 @@ test.describe('Blog', () => {
   });
 
   test('category filtering works', async ({ page }) => {
-    // Find and click a category
-    const categoryButton = page
-      .locator('button')
-      .filter({ hasText: /Tax Basics|Tax Tips/i })
+    // Find and click a category group link
+    const categoryLink = page
+      .locator('a')
+      .filter({ hasText: /Tax Guides|Student Loans|News/i })
       .first();
-    await categoryButton.click();
+    await categoryLink.click();
 
-    // Verify URL updated
-    await page.waitForURL(/category=/, { timeout: 5000 });
-    expect(page.url()).toContain('category=');
+    // Verify URL updated to category route
+    await page.waitForURL(/\/blog\/category\//, { timeout: 5000 });
+    expect(page.url()).toContain('/blog/category/');
   });
 
   test('can navigate to individual blog post', async ({ page }) => {
@@ -39,17 +39,17 @@ test.describe('Blog', () => {
     await firstPost.click();
 
     await expect(page).toHaveURL(/\/blog\/.+/);
-    await expect(page.locator('article, main')).toBeVisible();
+    await expect(page.getByRole('article')).toBeVisible();
   });
 
   test('All Posts resets filter', async ({ page }) => {
     // Apply a filter first
-    const categoryButton = page.locator('button').filter({ hasText: /Tax/i }).first();
-    await categoryButton.click();
-    await page.waitForURL(/category=/);
+    const categoryLink = page.locator('a').filter({ hasText: /Tax Guides|News/i }).first();
+    await categoryLink.click();
+    await page.waitForURL(/\/blog\/category\//);
 
-    // Click All Posts
-    await page.locator('button:has-text("All Posts")').click();
+    // Click All Articles
+    await page.locator('a:has-text("All Articles")').click();
 
     // URL should not have category param
     await expect(page).toHaveURL(/\/blog$/);

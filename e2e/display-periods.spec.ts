@@ -11,7 +11,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Display Periods', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#tax-calculator');
     await page.waitForLoadState('networkidle');
 
     // Enter salary to show results

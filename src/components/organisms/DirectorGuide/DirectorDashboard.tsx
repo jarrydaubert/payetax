@@ -79,13 +79,13 @@ export function DirectorDashboard() {
     const revenue = formData.revenue;
     const expenses = formData.expenses;
 
-    if (
-      region === undefined ||
-      revenue === undefined ||
-      revenue < 0 ||
-      expenses === undefined ||
-      expenses < 0
-    ) {
+    if (region === undefined) {
+      return;
+    }
+    if (revenue === undefined || expenses === undefined) {
+      return;
+    }
+    if (revenue < 0 || expenses < 0) {
       return;
     }
 

@@ -2,19 +2,19 @@
 
 > Optimized commands and skills for PayeTax development.
 >
-> **Full generic documentation:** See [`docs/SKILLS_AND_COMMANDS.md`](../../docs/SKILLS_AND_COMMANDS.md) for a reusable guide.
+> **Full documentation:** See `docs/SKILLS_AND_COMMANDS.md` for the canonical guide.
 
 ## Philosophy
 
-**Commands** = Explicit workflow actions (you invoke them)
-**Skills** = Contextual knowledge (auto-activated when relevant)
+**Commands** = explicit workflow actions (you invoke them)  
+**Skills** = contextual knowledge (load before a task)
 
 ---
 
-## Commands (7)
+## Commands (8)
 
 | Command | Purpose | Use When |
-|---------|---------|----------|
+| --- | --- | --- |
 | `/plan` | Architecture planning | Designing features, major changes |
 | `/audit` | Deep code review | Reviewing systems, refactoring |
 | `/cleanup` | Project housekeeping | Finding duplicates, orphans, junk |
@@ -22,12 +22,13 @@
 | `/test` | Test engineering | Writing tests, coverage gaps |
 | `/security` | Security review | OWASP checklist, vulnerability audit |
 | `/finance` | UK tax compliance | Verifying HMRC accuracy |
+| `/compliance` | UK GDPR + PECR + ASA/CAP audit | Privacy, cookie consent, claims |
 
 ### Usage Examples
 
 ```bash
 # Plan a new feature
-/plan pension-contributions
+/plan self-employed calculator
 
 # Audit the calculator
 /audit calculator
@@ -43,77 +44,78 @@
 /test tax-calculations
 
 # Security review
-/security input-validation
+/security api
 
 # Verify HMRC compliance
 /finance scotland
+
+# Privacy & consent compliance audit
+/compliance
 ```
 
 ---
 
-## Skills (19)
+## Skills (Installed)
 
-Skills provide expert knowledge that activates contextually when you discuss relevant topics.
+Skills provide expert knowledge that you load before a task.
 
-### Security & Code Quality
+### Code & Quality
 
-| Skill | Activates When Discussing |
-|-------|--------------------------|
-| `nextjs-best-practices` | Next.js patterns, React 19, TypeScript, modernization |
-| `vercel-react-best-practices` | React/Next.js performance, 45 optimization rules from Vercel |
-| `accessibility` | WCAG, a11y, screen readers, keyboard nav |
-| `performance` | Core Web Vitals, LCP, bundle size, optimization |
+| Skill | Use When |
+| --- | --- |
+| `engineering` | Next.js/React/TypeScript performance and patterns |
+| `accessibility` | WCAG 2.2 AA, screen readers, keyboard nav |
 
-### SEO & Marketing
+### Marketing & Copy
 
-| Skill | Activates When Discussing |
-|-------|--------------------------|
-| `seo-audit` | Technical SEO, meta tags, crawlability |
-| `programmatic-seo` | Salary pages, pSEO, scaling content |
-| `schema-markup` | Structured data, JSON-LD, rich snippets |
-| `content-marketing` | Blog posts, social media, UK tax content |
-| `analytics-tracking` | GA4, Vercel Analytics, tracking, conversions |
-| `competitor-alternatives` | Competitor comparison pages, "vs" content, positioning |
-| `social-content` | Twitter/LinkedIn content, seasonal tax posts, viral content |
-| `free-tool-strategy` | Engineering as marketing, calculator optimization |
+| Skill | Use When |
+| --- | --- |
+| `copywriting` | Writing new marketing copy |
+| `copy-editing` | Editing or polishing existing copy |
+| `marketing-ideas` | Growth idea generation |
+| `marketing-psychology` | Persuasion and behavioral models |
+| `social-content` | LinkedIn/Twitter content |
 
-### Conversion & Copy
+### SEO & Content
 
-| Skill | Activates When Discussing |
-|-------|--------------------------|
-| `page-cro` | Calculator UX, conversion optimization |
-| `copywriting` | Landing page copy, headlines, CTAs |
-| `copy-editing` | Reviewing/improving existing copy, seven sweeps |
-| `marketing-psychology` | Mental models, persuasion, user behavior |
-| `marketing-ideas` | Growth tactics, 140 marketing strategies |
+| Skill | Use When |
+| --- | --- |
+| `seo-audit` | Technical/on-page SEO audit |
+| `content-strategy` | Topic clusters, content planning |
+| `programmatic-seo` | Scaled page generation |
+| `schema-markup` | JSON-LD and rich snippets |
+| `analytics-tracking` | GA4/Vercel events and measurement |
 
-### Design & Monetization
+### Conversion & Growth
 
-| Skill | Activates When Discussing |
-|-------|--------------------------|
-| `ui-design` | Design system consistency, tokens, typography, hardcoded values |
-| `pricing-strategy` | Monetization, freemium, premium features, revenue models |
+| Skill | Use When |
+| --- | --- |
+| `page-cro` | Conversion optimization |
+| `competitor-alternatives` | "vs" / alternatives pages |
+| `free-tool-strategy` | Free tool growth strategy |
+| `pricing-strategy` | Monetization and packaging |
 
 ---
 
-## When Skills Activate
+## When Skills Activate (Examples)
 
-**Example conversations:**
+> "How should I optimize LCP on the homepage?"  
+→ `engineering`
 
-> "How should I optimize the LCP for the calculator page?"
-→ `performance` skill activates
+> "Audit the calculator for WCAG issues"  
+→ `accessibility`
 
-> "I want to create a blog post about the £100k tax trap"
-→ `content-marketing` skill activates
+> "Write hero copy for the new tool"  
+→ `copywriting`
 
-> "Are the salary pages following SEO best practices?"
-→ `programmatic-seo` + `seo-audit` skills activate
+> "Plan a 3-month blog cluster for self-employed tax"  
+→ `content-strategy`
 
-> "What structured data should we add for salary pages?"
-→ `schema-markup` skill activates
+> "Review salary pages for canonical/meta issues"  
+→ `seo-audit`
 
-> "Is the calculator accessible for screen readers?"
-→ `accessibility` skill activates
+> "Create a PayeTax vs GOV.UK page outline"  
+→ `competitor-alternatives`
 
 ---
 
@@ -121,28 +123,23 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 
 ### Feature Development
 ```bash
-/plan pension-contributions    # Design
-# Implement...
-/finance pension               # Verify HMRC accuracy
-/test pension                  # Write tests
-# Skills auto-activate for a11y, perf during review
+/plan self-employed calculator
+# implement
+/finance
+/test tax-calculations
 ```
 
 ### Tax Year Update (April)
 ```bash
-/finance                       # Full compliance check
-/test tax-calculations         # Verify all tests pass
-# content-marketing skill for seasonal content
-# programmatic-seo skill for salary page updates
+/finance
+/test tax-calculations
+# content-strategy for tax-year announcement post
 ```
 
 ### SEO Improvements
 ```bash
-# Just discuss SEO and relevant skills activate:
-# - seo-audit for technical checks
-# - programmatic-seo for salary pages
-# - schema-markup for structured data
-# - analytics-tracking for measurement
+# load seo-audit + programmatic-seo + schema-markup
+# audit or expand salary pages
 ```
 
 ---
@@ -152,59 +149,29 @@ Skills provide expert knowledge that activates contextually when you discuss rel
 ```
 .claude/
 ├── commands/
-│   ├── audit.md       # Code review
-│   ├── cleanup.md     # Housekeeping
-│   ├── debug.md       # Debugging
-│   ├── finance.md     # UK tax compliance
-│   ├── plan.md        # Architecture
-│   ├── security.md    # Security review
-│   └── test.md        # Testing
+│   ├── audit.md
+│   ├── cleanup.md
+│   ├── compliance.md
+│   ├── debug.md
+│   ├── finance.md
+│   ├── plan.md
+│   ├── security.md
+│   └── test.md
 └── skills/
-    ├── accessibility/       # WCAG 2.2 AA
-    ├── analytics-tracking/  # GA4, tracking
-    ├── competitor-alternatives/ # Comparison pages
-    ├── content-marketing/   # Blog, social
-    ├── copy-editing/        # Seven sweeps editing
-    ├── copywriting/         # Landing page copy
-    ├── free-tool-strategy/  # Engineering as marketing
-    ├── marketing-ideas/     # 140 growth tactics
-    ├── marketing-psychology/ # Mental models
-    ├── nextjs-best-practices/ # Modern patterns
-    ├── page-cro/            # Conversion
-    ├── performance/         # Core Web Vitals
-    ├── pricing-strategy/    # Monetization
-    ├── programmatic-seo/    # Salary pages
-    ├── schema-markup/       # Structured data
-    ├── seo-audit/           # Technical SEO
-    ├── social-content/      # Twitter/LinkedIn
-    ├── ui-design/           # Design system audit
-    └── vercel-react-best-practices/ # 45 Vercel perf rules
-```
-
----
-
-## Priorities Covered
-
-| Priority | How It's Covered |
-|----------|------------------|
-| **Security** | `/security` command + skills auto-activate |
-| **Coding Standards** | `nextjs-best-practices` skill |
-| **SEO** | `seo-audit`, `programmatic-seo`, `schema-markup` skills |
-| **Marketing/Analytics** | `content-marketing`, `analytics-tracking`, `page-cro` skills |
-
----
-
-## Adding New Skills
-
-Create a new directory with `SKILL.md`:
-
-```markdown
----
-name: skill-name
-description: When this skill should activate...
----
-
-# Skill Title
-
-Expert knowledge content here...
+    ├── accessibility/
+    ├── analytics-tracking/
+    ├── competitor-alternatives/
+    ├── content-strategy/
+    ├── copy-editing/
+    ├── copywriting/
+    ├── engineering/
+    ├── free-tool-strategy/
+    ├── marketing-ideas/
+    ├── marketing-psychology/
+    ├── page-cro/
+    ├── pricing-strategy/
+    ├── programmatic-seo/
+    ├── schema-markup/
+    ├── seo-audit/
+    └── social-content/
 ```

@@ -155,7 +155,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
 
           {/* Meta */}
           <div
-            className={cn('flex items-center text-slate-500', SPACING.GAP_2, TYPOGRAPHY.TEXT_XS)}
+            className={cn('flex items-center text-slate-400', SPACING.GAP_2, TYPOGRAPHY.TEXT_XS)}
           >
             <span>{post.readTime}</span>
             <span aria-hidden='true'>•</span>

@@ -30,7 +30,7 @@ export function BlogNav({ activeGroup, className }: BlogNavProps) {
         className={cn(
           'whitespace-nowrap rounded-full px-4 py-2 font-medium text-sm transition-colors',
           !activeGroup
-            ? 'bg-cyan-500 text-white'
+            ? 'bg-cyan-400 text-slate-950'
             : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
         )}
         aria-current={!activeGroup ? 'page' : undefined}
@@ -46,7 +46,7 @@ export function BlogNav({ activeGroup, className }: BlogNavProps) {
           className={cn(
             'whitespace-nowrap rounded-full px-4 py-2 font-medium text-sm transition-colors',
             activeGroup === group.slug
-              ? 'bg-cyan-500 text-white'
+              ? 'bg-cyan-400 text-slate-950'
               : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
           )}
           aria-current={activeGroup === group.slug ? 'page' : undefined}

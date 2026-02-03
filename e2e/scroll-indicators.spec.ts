@@ -10,7 +10,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Scroll Indicators', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#tax-calculator');
     await page.waitForLoadState('networkidle');
     await page.getByTestId('salary-input').fill('50000');
     await page.getByTestId('calculate-button').click();

@@ -8,25 +8,36 @@
  * - Email flow regressions (dialog opens and POST succeeds)
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, test } from '@playwright/test';
 
-function formatGBP(value: number): string {
-  return `£${value.toLocaleString('en-GB')}`;
+function parseCurrency(value: string): number {
+  return Number.parseFloat(value.replace(/[^0-9.-]/g, '') || '0');
+}
+
+async function expectNumericValue(input: Locator, expected: number): Promise<void> {
+  await expect.poll(async () => parseCurrency(await input.inputValue())).toBe(expected);
+}
+
+async function fillCurrencyInput(input: Locator, value: number): Promise<void> {
+  await expect(input).toBeEditable();
+  await input.fill('');
+  await input.type(String(value));
+  await input.blur();
 }
 
 test.describe('Director Guide critical @critical', () => {
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
-    await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded' });
+    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
 
     const revenueInput = page.getByTestId('director-revenue-input');
     const expensesInput = page.getByTestId('director-expenses-input');
 
-    await revenueInput.fill('100000');
-    await expensesInput.fill('20000');
+    await fillCurrencyInput(revenueInput, 100000);
+    await fillCurrencyInput(expensesInput, 20000);
 
     // Guard against controlled-currency inputs sometimes missing the onChange (flaky in CI when typing fast).
-    await expect(revenueInput).toHaveValue(formatGBP(100000));
-    await expect(expensesInput).toHaveValue(formatGBP(20000));
+    await expectNumericValue(revenueInput, 100000);
+    await expectNumericValue(expensesInput, 20000);
 
     await page.getByTestId('director-region-select').click();
     await page.getByRole('option', { name: 'England' }).click();
@@ -54,16 +65,16 @@ test.describe('Director Guide critical @critical', () => {
   });
 
   test('Survival mode: shows Survival panel and VAT warning (ungated) @critical', async ({ page }) => {
-    await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded' });
+    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
 
     // Zero profit: Survival Mode.
     const revenueInput = page.getByTestId('director-revenue-input');
     const expensesInput = page.getByTestId('director-expenses-input');
 
-    await revenueInput.fill('90000');
-    await expensesInput.fill('90000');
-    await expect(revenueInput).toHaveValue(formatGBP(90000));
-    await expect(expensesInput).toHaveValue(formatGBP(90000));
+    await fillCurrencyInput(revenueInput, 90000);
+    await fillCurrencyInput(expensesInput, 90000);
+    await expectNumericValue(revenueInput, 90000);
+    await expectNumericValue(expensesInput, 90000);
 
     await page.getByTestId('director-region-select').click();
     await page.getByRole('option', { name: 'England' }).click();

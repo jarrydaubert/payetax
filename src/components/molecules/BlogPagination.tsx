@@ -116,7 +116,7 @@ export function BlogPagination({
         <span
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'cursor-not-allowed bg-slate-800/30 text-slate-500',
+            'cursor-not-allowed bg-slate-800/30 text-slate-400',
             'border border-slate-700/30',
           )}
           aria-disabled='true'
@@ -131,7 +131,7 @@ export function BlogPagination({
           typeof page === 'string' ? (
             <span
               key={page}
-              className='flex h-10 w-10 items-center justify-center text-slate-500'
+              className='flex h-10 w-10 items-center justify-center text-slate-400'
               aria-hidden='true'
               role='presentation'
             >
@@ -177,7 +177,7 @@ export function BlogPagination({
         <span
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'cursor-not-allowed bg-slate-800/30 text-slate-500',
+            'cursor-not-allowed bg-slate-800/30 text-slate-400',
             'border border-slate-700/30',
           )}
           aria-disabled='true'
