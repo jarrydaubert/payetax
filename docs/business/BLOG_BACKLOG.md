@@ -4,7 +4,6 @@ Todo-only list. Remove items as they are verified/fixed.
 
 - `content/blog/autumn-budget-2025-uk-tax-changes-explained.mdx`
 - `content/blog/beginners-guide-to-uk-taxation.mdx`
-- `content/blog/director-tax-deadlines-2025-26.mdx`
 - `content/blog/frozen-tax-thresholds-stealth-tax-2026.mdx`
 - `content/blog/higher-rate-taxpayer-guide-uk-2025.mdx`
 - `content/blog/how-much-tax-will-i-pay-uk-2025.mdx`
