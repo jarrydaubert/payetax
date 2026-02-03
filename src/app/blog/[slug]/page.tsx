@@ -354,8 +354,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   // Improved typography for desktop readability
                   'prose-headings:font-bold prose-headings:text-foreground',
                   'prose-p:text-foreground/90 prose-p:leading-relaxed',
-                  'prose-a:text-primary prose-a:font-semibold prose-a:no-underline hover:prose-a:underline',
-                  'prose-a:[&_strong]:text-inherit prose-a:[&_strong]:font-semibold',
                   'prose-strong:font-semibold prose-strong:text-foreground',
                   'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
                   'prose-li:marker:text-primary/60',
