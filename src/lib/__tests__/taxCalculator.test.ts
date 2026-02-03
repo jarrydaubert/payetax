@@ -14,6 +14,12 @@
  * 7. **Data Structure Validation** - Result completeness and mathematical consistency
  * 8. **Edge Case Handling** - Boundary conditions and error scenarios
  *
+ * ### Bug Classes Covered:
+ * - CALC-DRIFT
+ * - ROUNDING
+ * - TAX-CODE-OVERRIDES
+ * - MULTI-INCOME
+ *
  * ### HMRC Compliance:
  * All test values are calculated using official HMRC rates for the 2024-2025 tax year:
  * - Personal Allowance: £12,570
@@ -856,6 +862,90 @@ describe('Tax Calculator', () => {
 
       // 1000L = 1000 × 10 = £10,000 personal allowance
       expect(result.taxFreeAmount).toBe(10000);
+    });
+  });
+
+  describe('Additional Income Sources', () => {
+    // Bug Class: MULTI-INCOME - Non-employment income should not affect NI/SL
+    it('applies income tax to non-employment income without changing NI or SL', () => {
+      const baseInput = createBasicInput(40000);
+      const baseResult = calculateTax(baseInput);
+
+      const inputWithRental = createBasicInput(40000, {
+        incomeSources: [
+          {
+            id: 'rental-1',
+            type: 'rental',
+            label: 'Rental Income',
+            amount: 10000,
+            period: 'annually',
+          },
+        ],
+      });
+      const rentalResult = calculateTax(inputWithRental);
+
+      expect(rentalResult.incomeTax.annually).toBeGreaterThan(baseResult.incomeTax.annually);
+      expect(rentalResult.nationalInsurance.annually).toBeCloseTo(
+        baseResult.nationalInsurance.annually,
+        2,
+      );
+      expect(rentalResult.studentLoan.annually).toBeCloseTo(baseResult.studentLoan.annually, 2);
+      expect(rentalResult.incomeBreakdown).toEqual({
+        employment: 40000,
+        nonEmployment: 10000,
+        total: 50000,
+      });
+    });
+
+    // Bug Class: MULTI-INCOME - Additional employment income should affect NI/SL
+    it('treats additional employment income as NI/SL-bearing', () => {
+      const baseInput = createBasicInput(30000, { studentLoanPlans: ['plan2'] });
+      const baseResult = calculateTax(baseInput);
+
+      const inputWithSecondJob = createBasicInput(30000, {
+        studentLoanPlans: ['plan2'],
+        incomeSources: [
+          {
+            id: 'job-2',
+            type: 'employment',
+            label: 'Second Job',
+            amount: 10000,
+            period: 'annually',
+          },
+        ],
+      });
+      const secondJobResult = calculateTax(inputWithSecondJob);
+
+      expect(secondJobResult.nationalInsurance.annually).toBeGreaterThan(
+        baseResult.nationalInsurance.annually,
+      );
+      expect(secondJobResult.studentLoan.annually).toBeGreaterThan(
+        baseResult.studentLoan.annually,
+      );
+      expect(secondJobResult.incomeBreakdown).toEqual({
+        employment: 40000,
+        nonEmployment: 0,
+        total: 40000,
+      });
+    });
+
+    // Bug Class: MULTI-INCOME - Total income should drive PA taper even if extra income is non-employment
+    it('reduces personal allowance when non-employment income pushes total above £100k', () => {
+      const input = createBasicInput(90000, {
+        incomeSources: [
+          {
+            id: 'rental-high',
+            type: 'rental',
+            label: 'Rental Income',
+            amount: 20000,
+            period: 'annually',
+          },
+        ],
+      });
+      const result = calculateTax(input);
+
+      // £110k adjusted net income -> £5,000 PA reduction (12,570 - 5,000)
+      expect(result.taxFreeAmount).toBe(7570);
     });
   });
 
