@@ -24,6 +24,8 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
       className={cn(
         'rounded-lg border border-amber-200/50 bg-amber-50/50 p-4',
         'dark:border-amber-900/30 dark:bg-amber-950/20',
+        TYPOGRAPHY.TEXT_BASE,
+        'md:text-lg',
         className,
       )}
       role='note'
@@ -34,7 +36,7 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
           className={cn(ICON_SIZES.SIZE_5, 'shrink-0 text-amber-600 dark:text-amber-400')}
           aria-hidden='true'
         />
-        <div className={cn('space-y-2', TYPOGRAPHY.TEXT_SM)}>
+        <div className='space-y-2'>
           <p id={headingId} className='font-medium text-amber-800 dark:text-amber-200'>
             Important: This is for informational purposes only
           </p>
