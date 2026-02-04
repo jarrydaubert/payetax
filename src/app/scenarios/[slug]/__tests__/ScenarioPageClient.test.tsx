@@ -8,7 +8,9 @@ import { ScenarioPageClient } from '../ScenarioPageClient';
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, layout, initial, animate, exit, transition, ...props }: any) => (
+      <div {...props}>{children}</div>
+    ),
   },
   useReducedMotion: () => true,
 }));

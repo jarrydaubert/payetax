@@ -1,238 +1,319 @@
 ---
 name: analytics-tracking
-description: When discussing analytics, tracking, GA4, Vercel Analytics, conversion tracking, event tracking, UTM parameters, or measurement. Use for setting up, auditing, or optimizing analytics implementation on PayeTax.
+version: 1.0.0
+description: When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions "set up tracking," "GA4," "Google Analytics," "conversion tracking," "event tracking," "UTM parameters," "tag manager," "GTM," "analytics implementation," or "tracking plan." For A/B test measurement, see ab-test-setup.
 ---
 
-# Analytics Tracking for PayeTax
+# Analytics Tracking
 
-You are an expert in analytics implementation. Your goal is to help PayeTax track meaningful metrics that inform product and marketing decisions.
+You are an expert in analytics implementation and measurement. Your goal is to help set up tracking that provides actionable insights for marketing and product decisions.
 
-## PayeTax Analytics Context
+## Initial Assessment
 
-**Current Stack:**
-- Vercel Analytics (Web Vitals, page views)
-- Vercel Speed Insights
-- Potentially GA4 or similar
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-**Key Conversions:**
-1. Calculator usage (completed calculation)
-2. Return visits
-3. Share/save actions
-4. Blog → Calculator journey
+Before implementing tracking, understand:
+
+1. **Business Context** - What decisions will this data inform? What are key conversions?
+2. **Current State** - What tracking exists? What tools are in use?
+3. **Technical Context** - What's the tech stack? Any privacy/compliance requirements?
+
+---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
+
+---
 
 ## Core Principles
 
-### 1. Track for Decisions
-Every event should inform a decision:
-- "Should we simplify inputs?" → Track input abandonment
-- "Which content drives calculator usage?" → Track blog → calculator flow
-- "Is the calculator fast enough?" → Track Core Web Vitals
-
-### 2. Privacy First
-PayeTax handles financial data:
-- Never track actual salary inputs
-- Never track calculation results
-- Track behavior patterns, not personal data
-- GDPR/UK GDPR compliant
-
-### 3. Start Simple
-Don't over-instrument:
-- Core conversions first
-- Add detail when you have questions
+### 1. Track for Decisions, Not Data
+- Every event should inform a decision
+- Avoid vanity metrics
 - Quality > quantity of events
 
-## Essential Events for PayeTax
+### 2. Start with the Questions
+- What do you need to know?
+- What actions will you take based on this data?
+- Work backwards to what you need to track
 
-### Calculator Events
+### 3. Name Things Consistently
+- Naming conventions matter
+- Establish patterns before implementing
+- Document everything
 
-| Event | Trigger | Properties | Purpose |
-|-------|---------|------------|---------|
-| `calculator_viewed` | Calculator loads | `page_type`, `source` | Awareness |
-| `calculation_started` | First input entered | `input_type` | Engagement |
-| `calculation_completed` | Results shown | `has_pension`, `has_student_loan`, `region` | Conversion |
-| `period_changed` | Toggle yearly/monthly | `period` | Feature usage |
-| `what_if_used` | What-if section opened | - | Feature discovery |
-| `result_shared` | Share button clicked | `method` | Virality |
+### 4. Maintain Data Quality
+- Validate implementation
+- Monitor for issues
+- Clean data > more data
 
-### Content Events
+---
 
-| Event | Trigger | Properties | Purpose |
-|-------|---------|------------|---------|
-| `blog_article_viewed` | Article loads | `category`, `slug` | Content performance |
-| `scroll_depth` | 25/50/75/100% scroll | `depth`, `page` | Engagement |
-| `cta_clicked` | Calculator CTA in blog | `location`, `article` | Content → conversion |
-| `salary_page_viewed` | Salary page loads | `salary_amount` | pSEO performance |
+## Tracking Plan Framework
 
-### Technical Events
+### Structure
 
-| Event | Trigger | Properties | Purpose |
-|-------|---------|------------|---------|
-| `web_vital_lcp` | LCP measured | `value`, `page` | Performance |
-| `web_vital_inp` | INP measured | `value`, `page` | Performance |
-| `error_occurred` | JS error | `error_type`, `page` | Reliability |
+```
+Event Name | Category | Properties | Trigger | Notes
+---------- | -------- | ---------- | ------- | -----
+```
 
-## Event Naming Convention
+### Event Types
 
-**Format:** `object_action`
-- `calculator_completed` not `completed_calculation`
-- `blog_viewed` not `view_blog`
+| Type | Examples |
+|------|----------|
+| Pageviews | Automatic, enhanced with metadata |
+| User Actions | Button clicks, form submissions, feature usage |
+| System Events | Signup completed, purchase, subscription changed |
+| Custom Conversions | Goal completions, funnel stages |
+
+**For comprehensive event lists**: See [references/event-library.md](references/event-library.md)
+
+---
+
+## Event Naming Conventions
+
+### Recommended Format: Object-Action
+
+```
+signup_completed
+button_clicked
+form_submitted
+article_read
+checkout_payment_completed
+```
+
+### Best Practices
 - Lowercase with underscores
-- Specific but concise
+- Be specific: `cta_hero_clicked` vs. `button_clicked`
+- Include context in properties, not event name
+- Avoid spaces and special characters
+- Document decisions
 
-## Implementation Patterns
+---
 
-### Vercel Analytics
+## Essential Events
 
-```typescript
-// Already automatic for page views and Web Vitals
-// Custom events via @vercel/analytics
-import { track } from '@vercel/analytics';
+### Marketing Site
 
-track('calculation_completed', {
-  has_pension: true,
-  region: 'scotland'
+| Event | Properties |
+|-------|------------|
+| cta_clicked | button_text, location |
+| form_submitted | form_type |
+| signup_completed | method, source |
+| demo_requested | - |
+
+### Product/App
+
+| Event | Properties |
+|-------|------------|
+| onboarding_step_completed | step_number, step_name |
+| feature_used | feature_name |
+| purchase_completed | plan, value |
+| subscription_cancelled | reason |
+
+**For full event library by business type**: See [references/event-library.md](references/event-library.md)
+
+---
+
+## Event Properties
+
+### Standard Properties
+
+| Category | Properties |
+|----------|------------|
+| Page | page_title, page_location, page_referrer |
+| User | user_id, user_type, account_id, plan_type |
+| Campaign | source, medium, campaign, content, term |
+| Product | product_id, product_name, category, price |
+
+### Best Practices
+- Use consistent property names
+- Include relevant context
+- Don't duplicate automatic properties
+- Avoid PII in properties
+
+---
+
+## GA4 Implementation
+
+### Quick Setup
+
+1. Create GA4 property and data stream
+2. Install gtag.js or GTM
+3. Enable enhanced measurement
+4. Configure custom events
+5. Mark conversions in Admin
+
+### Custom Event Example
+
+```javascript
+gtag('event', 'signup_completed', {
+  'method': 'email',
+  'plan': 'free'
 });
 ```
 
-### GA4 (if using)
+**For detailed GA4 implementation**: See [references/ga4-implementation.md](references/ga4-implementation.md)
 
-```typescript
-// gtag approach
-gtag('event', 'calculation_completed', {
-  has_pension: true,
-  region: 'scotland'
-});
+---
 
-// Or via GTM dataLayer
+## Google Tag Manager
+
+### Container Structure
+
+| Component | Purpose |
+|-----------|---------|
+| Tags | Code that executes (GA4, pixels) |
+| Triggers | When tags fire (page view, click) |
+| Variables | Dynamic values (click text, data layer) |
+
+### Data Layer Pattern
+
+```javascript
 dataLayer.push({
-  event: 'calculation_completed',
-  has_pension: true,
-  region: 'scotland'
+  'event': 'form_submitted',
+  'form_name': 'contact',
+  'form_location': 'footer'
 });
 ```
 
-### Privacy-Safe Tracking
+**For detailed GTM implementation**: See [references/gtm-implementation.md](references/gtm-implementation.md)
 
-```typescript
-// DON'T track actual values
-track('calculation_completed', {
-  salary: 50000,  // ❌ Never track actual salary
-  tax: 7486       // ❌ Never track results
-});
+---
 
-// DO track behavior patterns
-track('calculation_completed', {
-  salary_bracket: '40k-60k',  // ✅ Anonymized range
-  has_pension: true,           // ✅ Boolean feature usage
-  region: 'england'            // ✅ Regional preference
-});
-```
-
-## UTM Strategy for PayeTax
+## UTM Parameter Strategy
 
 ### Standard Parameters
 
-| Parameter | Usage | Example |
-|-----------|-------|---------|
-| `utm_source` | Traffic origin | `google`, `twitter`, `newsletter` |
-| `utm_medium` | Marketing medium | `organic`, `social`, `email` |
-| `utm_campaign` | Campaign name | `tax_year_2025`, `scottish_budget` |
-| `utm_content` | Content variant | `hero_cta`, `blog_footer` |
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| utm_source | Traffic source | google, newsletter |
+| utm_medium | Marketing medium | cpc, email, social |
+| utm_campaign | Campaign name | spring_sale |
+| utm_content | Differentiate versions | hero_cta |
+| utm_term | Paid search keywords | running+shoes |
 
-### Naming Convention
+### Naming Conventions
+- Lowercase everything
+- Use underscores or hyphens consistently
+- Be specific but concise: `blog_footer_cta`, not `cta1`
+- Document all UTMs in a spreadsheet
 
+---
+
+## Debugging and Validation
+
+### Testing Tools
+
+| Tool | Use For |
+|------|---------|
+| GA4 DebugView | Real-time event monitoring |
+| GTM Preview Mode | Test triggers before publish |
+| Browser Extensions | Tag Assistant, dataLayer Inspector |
+
+### Validation Checklist
+
+- [ ] Events firing on correct triggers
+- [ ] Property values populating correctly
+- [ ] No duplicate events
+- [ ] Works across browsers and mobile
+- [ ] Conversions recorded correctly
+- [ ] No PII leaking
+
+### Common Issues
+
+| Issue | Check |
+|-------|-------|
+| Events not firing | Trigger config, GTM loaded |
+| Wrong values | Variable path, data layer structure |
+| Duplicate events | Multiple containers, trigger firing twice |
+
+---
+
+## Privacy and Compliance
+
+### Considerations
+- Cookie consent required in EU/UK/CA
+- No PII in analytics properties
+- Data retention settings
+- User deletion capabilities
+
+### Implementation
+- Use consent mode (wait for consent)
+- IP anonymization
+- Only collect what you need
+- Integrate with consent management platform
+
+---
+
+## Output Format
+
+### Tracking Plan Document
+
+```markdown
+# [Site/Product] Tracking Plan
+
+## Overview
+- Tools: GA4, GTM
+- Last updated: [Date]
+
+## Events
+
+| Event Name | Description | Properties | Trigger |
+|------------|-------------|------------|---------|
+| signup_completed | User completes signup | method, plan | Success page |
+
+## Custom Dimensions
+
+| Name | Scope | Parameter |
+|------|-------|-----------|
+| user_type | User | user_type |
+
+## Conversions
+
+| Conversion | Event | Counting |
+|------------|-------|----------|
+| Signup | signup_completed | Once per session |
 ```
-utm_source=twitter
-utm_medium=social
-utm_campaign=2025_tax_year_launch
-utm_content=thread_cta
-```
 
-- All lowercase
-- Underscores for spaces
-- Date prefix for campaigns
-- Descriptive content tags
+---
 
-## Key Metrics to Monitor
+## Task-Specific Questions
 
-### Calculator Health
-- **Completion rate**: Calculations completed / page views
-- **Feature adoption**: % using pension, student loan options
-- **Regional split**: England vs Scotland usage
-- **Return rate**: Users who calculate multiple times
+1. What tools are you using (GA4, Mixpanel, etc.)?
+2. What key actions do you want to track?
+3. What decisions will this data inform?
+4. Who implements - dev team or marketing?
+5. Are there privacy/consent requirements?
+6. What's already tracked?
 
-### Content Performance
-- **Blog → Calculator rate**: CTA clicks / article views
-- **Salary page effectiveness**: Calculator usage from salary pages
-- **Content engagement**: Scroll depth, time on page
+---
 
-### Technical Health
-- **LCP by page type**: Homepage, calculator, blog
-- **Error rate**: JS errors / sessions
-- **INP on calculator**: Input responsiveness
+## Tool Integrations
 
-## Conversion Funnels
+For implementation, see the [tools registry](../../tools/REGISTRY.md). Key analytics tools:
 
-### Primary Funnel
-```
-Landing Page View
-    ↓
-Calculator View
-    ↓
-First Input Entered
-    ↓
-Calculation Completed
-    ↓
-[Optional] Adjusted/Re-calculated
-    ↓
-[Goal] Share or Bookmark
-```
+| Tool | Best For | MCP | Guide |
+|------|----------|:---:|-------|
+| **GA4** | Web analytics, Google ecosystem | ✓ | [ga4.md](../../tools/integrations/ga4.md) |
+| **Mixpanel** | Product analytics, event tracking | - | [mixpanel.md](../../tools/integrations/mixpanel.md) |
+| **Amplitude** | Product analytics, cohort analysis | - | [amplitude.md](../../tools/integrations/amplitude.md) |
+| **PostHog** | Open-source analytics, session replay | - | [posthog.md](../../tools/integrations/posthog.md) |
+| **Segment** | Customer data platform, routing | - | [segment.md](../../tools/integrations/segment.md) |
 
-### Content Funnel
-```
-Organic Search
-    ↓
-Blog Article View
-    ↓
-Scroll to 50%+
-    ↓
-CTA Click
-    ↓
-Calculator Completed
-```
+---
 
-## Dashboard Recommendations
+## Related Skills
 
-### Weekly Review
-- Total calculations
-- Completion rate trend
-- Top traffic sources
-- Top performing content
-- Core Web Vitals
-
-### Monthly Review
-- Feature adoption rates
-- Regional breakdown
-- New vs returning users
-- Content → conversion paths
-
-## Privacy Compliance
-
-### Required
-- [ ] Cookie consent banner (if using cookies)
-- [ ] Privacy policy mentions analytics
-- [ ] No PII in events
-- [ ] Data retention policy
-
-### Best Practices
-- Anonymous by default
-- Aggregate, don't individual-track
-- Allow opt-out
-- Document what's tracked
-
-## Key Files
-
-- `src/app/layout.tsx` - Analytics provider
-- `src/lib/analytics.ts` - Tracking utilities (if exists)
-- `vercel.json` - Vercel Analytics config
-- Privacy policy page
+- **ab-test-setup**: For experiment tracking
+- **seo-audit**: For organic traffic analysis
+- **page-cro**: For conversion optimization (uses this data)

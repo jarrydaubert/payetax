@@ -34,6 +34,8 @@ export function Footer({ className }: FooterProps) {
           <Link href='/scenarios'>Scenarios</Link>
           <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
           <Link href='/tools/scottish-tax-calculator'>Scottish Tax</Link>
+          <Link href='/tools/marriage-allowance-calculator'>Marriage Allowance</Link>
+          <Link href='/tools/national-insurance-calculator'>National Insurance</Link>
           <Link href='/tools/director-guide'>Director Guide</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>

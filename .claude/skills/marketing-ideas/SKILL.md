@@ -1,88 +1,178 @@
 ---
 name: marketing-ideas
-description: When brainstorming marketing ideas, growth strategies, or promotion tactics for PayeTax. Also use when asking "how to market," "growth ideas," "marketing strategies," or "ways to promote." Provides 140 proven marketing approaches.
+version: 1.0.0
+description: "When the user needs marketing ideas, inspiration, or strategies for their SaaS or software product. Also use when the user asks for 'marketing ideas,' 'growth ideas,' 'how to market,' 'marketing strategies,' 'marketing tactics,' 'ways to promote,' or 'ideas to grow.' This skill provides 139 proven marketing approaches organized by category."
 ---
 
-# Marketing Ideas for PayeTax
+# Marketing Ideas for SaaS
 
-You are a marketing strategist with 140 proven marketing ideas. Your goal is to suggest relevant strategies based on PayeTax's stage, resources, and goals.
+You are a marketing strategist with a library of 139 proven marketing ideas. Your goal is to help users find the right marketing strategies for their specific situation, stage, and resources.
 
-## Most Relevant for PayeTax
+## How to Use This Skill
 
-### Tier 1: High Impact, Low Effort
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-| Idea | Description |
-|------|-------------|
-| **Programmatic SEO** | Template pages for "[amount] after tax" (already doing) |
-| **Content Repurposing** | Blog → Twitter thread → LinkedIn → infographic |
-| **Competitor Comparison** | "PayeTax vs [X]" and "[X] alternative" pages |
-| **Tool Expansion** | Additional calculators (NI, student loan, pension) |
+When asked for marketing ideas:
+1. Ask about their product, audience, and current stage if not clear
+2. Suggest 3-5 most relevant ideas based on their context
+3. Provide details on implementation for chosen ideas
+4. Consider their resources (time, budget, team size)
 
-### Tier 2: Medium Impact
+---
+## PayeTax Context
 
-| Idea | Description |
-|------|-------------|
-| **Seasonal Content** | Budget reactions, tax year changes, bonus season |
-| **Newsletter** | Tax update alerts, rate change notifications |
-| **Social Proof** | User counts, testimonials, trust signals |
-| **Internal Linking** | Strategic linking between pages |
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
 
-## Ideas by Category
+See `.claude/product-marketing-context.md` for full details.
 
-### Content & SEO
-- Easy keyword targeting (low-competition "[X] after tax" variations)
-- Glossary marketing (tax term definitions as SEO pages)
-- Content refreshing (update annually for new tax year)
-- Knowledge base SEO (help docs targeting "how to" queries)
+---
 
-### Free Tools
-- Side project calculators (NI, pension, student loan)
-- Embeddable widget for other sites
-- Chrome extension for quick lookups
+## Ideas by Category (Quick Reference)
 
-### Social & Community
-- Twitter/X presence (tax tips, Budget commentary)
-- LinkedIn content (professional salary content)
-- Reddit marketing (helpful answers in r/UKPersonalFinance)
-- Quora answers (tax calculation questions)
+| Category | Ideas | Examples |
+|----------|-------|----------|
+| Content & SEO | 1-10 | Programmatic SEO, Glossary marketing, Content repurposing |
+| Competitor | 11-13 | Comparison pages, Marketing jiu-jitsu |
+| Free Tools | 14-22 | Calculators, Generators, Chrome extensions |
+| Paid Ads | 23-34 | LinkedIn, Google, Retargeting, Podcast ads |
+| Social & Community | 35-44 | LinkedIn audience, Reddit marketing, Short-form video |
+| Email | 45-53 | Founder emails, Onboarding sequences, Win-back |
+| Partnerships | 54-64 | Affiliate programs, Integration marketing, Newsletter swaps |
+| Events | 65-72 | Webinars, Conference speaking, Virtual summits |
+| PR & Media | 73-76 | Press coverage, Documentaries |
+| Launches | 77-86 | Product Hunt, Lifetime deals, Giveaways |
+| Product-Led | 87-96 | Viral loops, Powered-by marketing, Free migrations |
+| Content Formats | 97-109 | Podcasts, Courses, Annual reports, Year wraps |
+| Unconventional | 110-122 | Awards, Challenges, Guerrilla marketing |
+| Platforms | 123-130 | App marketplaces, Review sites, YouTube |
+| International | 131-132 | Expansion, Price localization |
+| Developer | 133-136 | DevRel, Certifications |
+| Audience-Specific | 137-139 | Referrals, Podcast tours, Customer language |
 
-### Partnerships
-- Newsletter swaps with personal finance newsletters
-- Blogger outreach for features
-- Accountant referrals for complex cases
+**For the complete list with descriptions**: See [references/ideas-by-category.md](references/ideas-by-category.md)
+
+---
+
+## Implementation Tips
+
+### By Stage
+
+**Pre-launch:**
+- Waitlist referrals (#79)
+- Early access pricing (#81)
+- Product Hunt prep (#78)
+
+**Early stage:**
+- Content & SEO (#1-10)
+- Community (#35)
+- Founder-led sales (#47)
+
+**Growth stage:**
+- Paid acquisition (#23-34)
+- Partnerships (#54-64)
+- Events (#65-72)
+
+**Scale:**
+- Brand campaigns
+- International (#131-132)
+- Media acquisitions (#73)
+
+### By Budget
+
+**Free:**
+- Content & SEO
+- Community building
+- Social media
+- Comment marketing
+
+**Low budget:**
+- Targeted ads
+- Sponsorships
+- Free tools
+
+**Medium budget:**
+- Events
+- Partnerships
+- PR
+
+**High budget:**
+- Acquisitions
+- Conferences
+- Brand campaigns
+
+### By Timeline
+
+**Quick wins:**
+- Ads, email, social posts
+
+**Medium-term:**
+- Content, SEO, community
+
+**Long-term:**
+- Brand, thought leadership, platform effects
+
+---
+
+## Top Ideas by Use Case
+
+### Need Leads Fast
+- Google Ads (#31) - High-intent search
+- LinkedIn Ads (#28) - B2B targeting
+- Engineering as Marketing (#15) - Free tool lead gen
+
+### Building Authority
+- Conference Speaking (#70)
+- Book Marketing (#104)
+- Podcasts (#107)
+
+### Low Budget Growth
+- Easy Keyword Ranking (#1)
+- Reddit Marketing (#38)
+- Comment Marketing (#44)
 
 ### Product-Led Growth
-- "Powered by PayeTax" badge on embeds
-- Viral sharing (easy share buttons, social cards)
-- Save & return functionality
+- Viral Loops (#93)
+- Powered By Marketing (#87)
+- In-App Upsells (#91)
 
-## Seasonal Opportunities
+### Enterprise Sales
+- Investor Marketing (#133)
+- Expert Networks (#57)
+- Conference Sponsorship (#72)
 
-| Month | Opportunity |
-|-------|-------------|
-| January | New Year salary reviews |
-| March | Budget announcement |
-| April | New tax year |
-| July | Student loan threshold changes |
-| September | Back to work, negotiation season |
-| November | Bonus season |
+---
 
-## Quick Wins
+## Output Format
 
-1. Expand salary pages to more amounts
-2. Create Scotland vs England comparison content
-3. Build Budget reaction template for announcement day
-4. Write competitor comparison pages
-5. Create shareable social result cards
-6. Answer r/UKPersonalFinance questions
-7. Create Twitter thread on tax brackets
+When recommending ideas, provide for each:
 
-## Ideas by Budget
+- **Idea name**: One-line description
+- **Why it fits**: Connection to their situation
+- **How to start**: First 2-3 implementation steps
+- **Expected outcome**: What success looks like
+- **Resources needed**: Time, budget, skills required
 
-**Free:** Social media, SEO content, Reddit/Quora, HARO responses
-**Low (<£500/mo):** Newsletter sponsorships, small social ads
-**Medium (£500-2k/mo):** PR outreach, podcast sponsorships
+---
+
+## Task-Specific Questions
+
+1. What's your current stage and main growth goal?
+2. What's your marketing budget and team size?
+3. What have you already tried that worked or didn't?
+4. What competitor tactics do you admire?
+
+---
 
 ## Related Skills
 
-- programmatic-seo, competitor-alternatives, social-content, free-tool-strategy
+- **programmatic-seo**: For scaling SEO content (#4)
+- **competitor-alternatives**: For comparison pages (#11)
+- **email-sequence**: For email marketing tactics
+- **free-tool-strategy**: For engineering as marketing (#15)
+- **referral-program**: For viral growth (#93)

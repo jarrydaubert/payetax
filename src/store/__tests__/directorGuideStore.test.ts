@@ -298,8 +298,7 @@ describe('DirectorGuideStore', () => {
       }
     });
 
-    it('should auto-fill Your Setup values from optimal mix when empty', () => {
-      // Bug caught: leaving comparison inputs undefined after calculate.
+    it('should keep Your Setup empty when not provided', () => {
       const store = useDirectorGuideStore.getState();
       store.setRegion('rUK');
       store.setRevenue(100000);
@@ -308,8 +307,9 @@ describe('DirectorGuideStore', () => {
       store.calculate();
 
       const state = useDirectorGuideStore.getState();
-      expect(state.formData.yourSetupSalary).toBe(12570);
-      expect(state.formData.yourSetupDividends).toBe(50000);
+      expect(state.formData.yourSetupSalary).toBeUndefined();
+      expect(state.formData.yourSetupDividends).toBeUndefined();
+      expect(state.strategyComparison?.strategies.yourSetup).toBeUndefined();
     });
 
     it('should respect user-provided Your Setup values', () => {

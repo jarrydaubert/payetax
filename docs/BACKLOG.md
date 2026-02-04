@@ -7,20 +7,14 @@
 ---
 
 ## Phase 1 — Go-live blockers (P0)
-
-- [ ] For each go-live blocker, add a targeted test, then implement the fix
-
 ---
 
 ## Phase 2 — Product polish (pre-ship)
 
 ### OG images + internal links
-- [ ] Create `public/images/og/compliance.jpg`
-- [ ] Create `public/images/og/privacy.jpg`
 - [ ] Audit other pages for missing OG images
 - [ ] Consider Next.js `opengraph-image.tsx` for dynamic generation
-- [ ] Add nav links to marriage-allowance and NI calculators
-- [ ] Update MarriageAllowanceAlert to link to internal tool
+- [ ] Add footer links to marriage-allowance and NI calculators
 
 ### Structured data + analytics
 - [ ] Create `/api/tax-rates` endpoint and use it in structured data

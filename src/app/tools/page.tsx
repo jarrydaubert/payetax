@@ -1,5 +1,6 @@
 // src/app/tools/page.tsx
 import Link from 'next/link';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import PageContainer from '@/components/templates/PageContainer';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 
@@ -13,15 +14,6 @@ export const metadata = generateBaseMetadata({
 });
 
 export default function ToolsPage() {
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Tools', item: `${SITE_URL}/tools` },
-    ],
-  };
-
   const tools = [
     {
       href: '/tools/director-guide',
@@ -52,10 +44,25 @@ export default function ToolsPage() {
 
   return (
     <>
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Tools', url: `${SITE_URL}/tools` },
+        ]}
+      />
+      <StructuredData
+        type='itemlist'
+        itemList={{
+          listName: 'PayeTax Tools',
+          listDescription: 'Free UK tax tools and calculators.',
+          items: tools.map((tool, index) => ({
+            name: tool.title,
+            url: `${SITE_URL}${tool.href}`,
+            description: tool.description,
+            position: index + 1,
+          })),
+        }}
       />
 
       <PageContainer maxWidth='5xl'>

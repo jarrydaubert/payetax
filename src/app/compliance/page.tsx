@@ -5,7 +5,7 @@ import { StructuredData } from '@/components/organisms/StructuredData';
 import { SITE_URL } from '@/lib/metadata';
 import { CompliancePageContent } from './CompliancePageContent';
 
-const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
+const OG_IMAGE = `${SITE_URL}/images/og/compliance.jpg`;
 
 export const metadata: Metadata = {
   title: 'HMRC Compliance & Data Sources | PayeTax',

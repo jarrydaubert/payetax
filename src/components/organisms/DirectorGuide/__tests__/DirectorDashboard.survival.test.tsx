@@ -8,6 +8,10 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackResultsShown: jest.fn(),
 }));
 
+jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
+  DirectorGuideWelcomeDialog: () => null,
+}));
+
 function createEmptyComparison(grossProfit: number) {
   const emptyStrategy = {
     name: '—',

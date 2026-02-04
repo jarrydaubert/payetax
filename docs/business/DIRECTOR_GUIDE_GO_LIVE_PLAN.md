@@ -13,6 +13,7 @@ Purpose: define the go-live scope and non-goals. Implementation tasks belong in 
 ## Release Plan (Phased)
 
 **Phase 1 — P0 blockers**
+Status: complete (email endpoints recompute server-side + tests, CI gates, required prod envs set).
 - Email endpoints recompute server-side + tests
 - CI gates for build + tests
 - Required env vars in production

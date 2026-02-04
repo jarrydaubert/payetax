@@ -73,6 +73,19 @@ export default function ScenariosPage() {
           { name: 'Scenarios', url: `${SITE_URL}/scenarios` },
         ]}
       />
+      <StructuredData
+        type='itemlist'
+        itemList={{
+          listName: 'UK Tax Scenarios',
+          listDescription: 'Real UK tax situations with pre-calculated examples.',
+          items: SCENARIOS.map((scenario, index) => ({
+            name: scenario.title,
+            url: `${SITE_URL}/scenarios/${scenario.slug}`,
+            description: scenario.description,
+            position: index + 1,
+          })),
+        }}
+      />
       <div className='min-h-dvh bg-background'>
         {/* Hero Section */}
         <section className='relative overflow-hidden py-16 sm:py-24'>

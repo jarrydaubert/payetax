@@ -42,7 +42,6 @@ const nextConfig: NextConfig = {
       'next-mdx-remote',
       'recharts',
       'rehype-pretty-code',
-      'rehype-autolink-headings',
       'rehype-slug',
       'remark-gfm',
     ],

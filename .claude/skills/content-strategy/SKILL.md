@@ -37,6 +37,18 @@ Gather this context (ask if not provided):
 - What content gaps exist in your market?
 
 ---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
+
+---
 
 ## Searchable vs Shareable
 
@@ -74,9 +86,9 @@ Every piece of content must be searchable, shareable, or both. Prioritize in tha
 
 **Use-Case Content**
 Formula: [persona] + [use-case]. Targets long-tail keywords.
-- "Tax calculator for contractors"
-- "Take-home pay for Scottish residents"
-- "Salary breakdown for £50k earners"
+- "Project management for designers"
+- "Task tracking for developers"
+- "Client collaboration for freelancers"
 
 **Hub and Spoke**
 Hub = comprehensive overview. Spokes = related subtopics.
@@ -88,11 +100,11 @@ Hub = comprehensive overview. Spokes = related subtopics.
 ```
 Create hub first, then build spokes. Interlink strategically.
 
-**Note:** Most content works fine under `/blog`. Only use dedicated hub/spoke URL structures for major topics with layered depth.
+**Note:** Most content works fine under `/blog`. Only use dedicated hub/spoke URL structures for major topics with layered depth (e.g., Atlassian's `/agile` guide). For typical blog posts, `/blog/post-title` is sufficient.
 
 **Template Libraries**
 High-intent keywords + product adoption.
-- Target searches like "tax calculation template"
+- Target searches like "marketing plan template"
 - Provide immediate standalone value
 - Show how product enhances the template
 
@@ -115,7 +127,7 @@ High-intent keywords + product adoption.
 Structure: Challenge → Solution → Results → Key learnings
 
 **Meta Content**
-Behind-the-scenes transparency.
+Behind-the-scenes transparency. "How We Got Our First $5k MRR," "Why We Chose Debt Over VC."
 
 For programmatic content at scale, see **programmatic-seo** skill.
 
@@ -124,6 +136,8 @@ For programmatic content at scale, see **programmatic-seo** skill.
 ## Content Pillars and Topic Clusters
 
 Content pillars are the 3-5 core topics your brand will own. Each pillar spawns a cluster of related content.
+
+Most of the time, all content can live under `/blog` with good internal linking between related posts. Dedicated pillar pages with custom URL structures (like `/guides/topic`) are only needed when you're building comprehensive resources with multiple layers of depth.
 
 ### How to Identify Pillars
 
@@ -167,38 +181,113 @@ Map topics to the buyer's journey using proven keyword modifiers:
 ### Awareness Stage
 Modifiers: "what is," "how to," "guide to," "introduction to"
 
+Example: If customers ask about project management basics:
+- "What is Agile Project Management"
+- "Guide to Sprint Planning"
+- "How to Run a Standup Meeting"
+
 ### Consideration Stage
 Modifiers: "best," "top," "vs," "alternatives," "comparison"
+
+Example: If customers evaluate multiple tools:
+- "Best Project Management Tools for Remote Teams"
+- "Asana vs Trello vs Monday"
+- "Basecamp Alternatives"
 
 ### Decision Stage
 Modifiers: "pricing," "reviews," "demo," "trial," "buy"
 
+Example: If pricing comes up in sales calls:
+- "Project Management Tool Pricing Comparison"
+- "How to Choose the Right Plan"
+- "[Product] Reviews"
+
 ### Implementation Stage
 Modifiers: "templates," "examples," "tutorial," "how to use," "setup"
+
+Example: If support tickets show implementation struggles:
+- "Project Template Library"
+- "Step-by-Step Setup Tutorial"
+- "How to Use [Feature]"
 
 ---
 
 ## Content Ideation Sources
 
 ### 1. Keyword Data
-Analyze for topic clusters, buyer stage, search intent, quick wins, content gaps.
+
+If user provides keyword exports (Ahrefs, SEMrush, GSC), analyze for:
+- Topic clusters (group related keywords)
+- Buyer stage (awareness/consideration/decision/implementation)
+- Search intent (informational, commercial, transactional)
+- Quick wins (low competition + decent volume + high relevance)
+- Content gaps (keywords competitors rank for that you don't)
+
+Output as prioritized table:
+| Keyword | Volume | Difficulty | Buyer Stage | Content Type | Priority |
 
 ### 2. Call Transcripts
-Extract questions, pain points, objections, language patterns, competitor mentions.
+
+If user provides sales or customer call transcripts, extract:
+- Questions asked → FAQ content or blog posts
+- Pain points → problems in their own words
+- Objections → content to address proactively
+- Language patterns → exact phrases to use (voice of customer)
+- Competitor mentions → what they compared you to
+
+Output content ideas with supporting quotes.
 
 ### 3. Survey Responses
-Mine for open-ended responses, common themes, resource requests, content preferences.
+
+If user provides survey data, mine for:
+- Open-ended responses (topics and language)
+- Common themes (30%+ mention = high priority)
+- Resource requests (what they wish existed)
+- Content preferences (formats they want)
 
 ### 4. Forum Research
-Use web search: `site:reddit.com [topic]`, `site:quora.com [topic]`
-Extract: FAQs, misconceptions, debates, problems being solved, terminology.
+
+Use web search to find content ideas:
+
+**Reddit:** `site:reddit.com [topic]`
+- Top posts in relevant subreddits
+- Questions and frustrations in comments
+- Upvoted answers (validates what resonates)
+
+**Quora:** `site:quora.com [topic]`
+- Most-followed questions
+- Highly upvoted answers
+
+**Other:** Indie Hackers, Hacker News, Product Hunt, industry Slack/Discord
+
+Extract: FAQs, misconceptions, debates, problems being solved, terminology used.
 
 ### 5. Competitor Analysis
-Find their content: `site:competitor.com/blog`
-Identify opportunities: topics you can cover better, angles they're missing, outdated content.
+
+Use web search to analyze competitor content:
+
+**Find their content:** `site:competitor.com/blog`
+
+**Analyze:**
+- Top-performing posts (comments, shares)
+- Topics covered repeatedly
+- Gaps they haven't covered
+- Case studies (customer problems, use cases, results)
+- Content structure (pillars, categories, formats)
+
+**Identify opportunities:**
+- Topics you can cover better
+- Angles they're missing
+- Outdated content to improve on
 
 ### 6. Sales and Support Input
-Common objections, repeated questions, support ticket patterns, success stories.
+
+Extract from customer-facing teams:
+- Common objections
+- Repeated questions
+- Support ticket patterns
+- Success stories
+- Feature requests and underlying problems
 
 ---
 
@@ -206,12 +295,35 @@ Common objections, repeated questions, support ticket patterns, success stories.
 
 Score each idea on four factors:
 
-| Factor | Weight | Questions |
-|--------|--------|-----------|
-| Customer Impact | 40% | How frequently does this come up? How emotionally charged? |
-| Content-Market Fit | 30% | Aligns with product? Unique insights? Leads to product interest? |
-| Search Potential | 20% | Volume? Competition? Growing or declining? |
-| Resource Requirements | 10% | Have expertise? What assets needed? |
+### 1. Customer Impact (40%)
+- How frequently did this topic come up in research?
+- What percentage of customers face this challenge?
+- How emotionally charged was this pain point?
+- What's the potential LTV of customers with this need?
+
+### 2. Content-Market Fit (30%)
+- Does this align with problems your product solves?
+- Can you offer unique insights from customer research?
+- Do you have customer stories to support this?
+- Will this naturally lead to product interest?
+
+### 3. Search Potential (20%)
+- What's the monthly search volume?
+- How competitive is this topic?
+- Are there related long-tail opportunities?
+- Is search interest growing or declining?
+
+### 4. Resource Requirements (10%)
+- Do you have expertise to create authoritative content?
+- What additional research is needed?
+- What assets (graphics, data, examples) will you need?
+
+### Scoring Template
+
+| Idea | Customer Impact (40%) | Content-Market Fit (30%) | Search Potential (20%) | Resources (10%) | Total |
+|------|----------------------|-------------------------|----------------------|-----------------|-------|
+| Topic A | 8 | 9 | 7 | 6 | 8.0 |
+| Topic B | 6 | 7 | 9 | 8 | 7.1 |
 
 ---
 
@@ -228,7 +340,7 @@ When creating a content strategy, provide:
 For each recommended piece:
 - Topic/title
 - Searchable, shareable, or both
-- Content type
+- Content type (use-case, hub/spoke, thought leadership, etc.)
 - Target keyword and buyer stage
 - Why this topic (customer research backing)
 
@@ -237,9 +349,20 @@ Visual or structured representation of how content interconnects.
 
 ---
 
+## Task-Specific Questions
+
+1. What patterns emerge from your last 10 customer conversations?
+2. What questions keep coming up in sales calls?
+3. Where are competitors' content efforts falling short?
+4. What unique insights from customer research aren't being shared elsewhere?
+5. Which existing content drives the most conversions, and why?
+
+---
+
 ## Related Skills
 
 - **copywriting**: For writing individual content pieces
 - **seo-audit**: For technical SEO and on-page optimization
 - **programmatic-seo**: For scaled content generation
+- **email-sequence**: For email-based content
 - **social-content**: For social media content

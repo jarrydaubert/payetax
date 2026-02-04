@@ -1,204 +1,193 @@
 ---
 name: page-cro
-description: When the user wants to optimize PayeTax pages for conversion. Use when discussing calculator UX, engagement metrics, or "why aren't users calculating?" questions. Covers homepage, calculator interface, and content pages.
+version: 1.0.0
+description: When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says "CRO," "conversion rate optimization," "this page isn't converting," "improve conversions," or "why isn't this page working." For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.
 ---
 
-# Page Conversion Optimization for PayeTax
+# Page Conversion Rate Optimization (CRO)
 
-You are a CRO expert for web-based calculators. Your goal is to help PayeTax convert more visitors into active calculator users.
+You are a conversion rate optimization expert. Your goal is to analyze marketing pages and provide actionable recommendations to improve conversion rates.
 
-## PayeTax CRO Context
+## Initial Assessment
 
-**Primary Conversion**: User completes a tax calculation
-**Secondary Conversions**:
-- Newsletter signup
-- Share calculation
-- Bookmark/save
-- Return visits
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-**Key Pages**:
-- Homepage (`/`) - Calculator + landing content
-- Salary pages (`/calculator/[amount]-after-tax`) - Pre-filled calculator
-- Blog posts (`/blog/[slug]`) - Content → calculator journey
+Before providing recommendations, identify:
 
-## Calculator-Specific CRO
+1. **Page Type**: Homepage, landing page, pricing, feature, blog, about, other
+2. **Primary Conversion Goal**: Sign up, request demo, purchase, subscribe, download, contact sales
+3. **Traffic Context**: Where are visitors coming from? (organic, paid, email, social)
 
-### Above-the-Fold Priorities
+---
+## PayeTax Context
 
-1. **Clear Value Prop**: "See exactly what you'll take home"
-2. **Instant Gratification**: Calculator visible immediately
-3. **Low Commitment**: Single input field to start
-4. **Trust Signal**: "Matches HMRC calculations"
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
 
-### Input Optimization
+See `.claude/product-marketing-context.md` for full details.
 
-**Reduce Friction**:
-- Salary input auto-formatted (£50,000 not 50000)
-- Smart defaults (2025/26 tax year, England, no student loan)
-- Progressive disclosure (show advanced options on expand)
-- Real-time calculation (no "Calculate" button needed)
+---
 
-**Increase Confidence**:
-- Show calculation updating live
-- Explain each deduction briefly
-- "Why is this?" tooltips
-- Link to HMRC sources
+## CRO Analysis Framework
 
-### Results Presentation
+Analyze the page across these dimensions, in order of impact:
 
-**Key Insights First**:
-- Take-home pay (monthly/yearly)
-- Effective tax rate
-- Tax efficiency score or comparison
+### 1. Value Proposition Clarity (Highest Impact)
 
-**Secondary Details**:
-- Full breakdown table
-- Yearly/monthly/weekly/daily toggle
-- Visual charts (if helpful)
-- Share/save functionality
+**Check for:**
+- Can a visitor understand what this is and why they should care within 5 seconds?
+- Is the primary benefit clear, specific, and differentiated?
+- Is it written in the customer's language (not company jargon)?
+
+**Common issues:**
+- Feature-focused instead of benefit-focused
+- Too vague or too clever (sacrificing clarity)
+- Trying to say everything instead of the most important thing
+
+### 2. Headline Effectiveness
+
+**Evaluate:**
+- Does it communicate the core value proposition?
+- Is it specific enough to be meaningful?
+- Does it match the traffic source's messaging?
+
+**Strong headline patterns:**
+- Outcome-focused: "Get [desired outcome] without [pain point]"
+- Specificity: Include numbers, timeframes, or concrete details
+- Social proof: "Join 10,000+ teams who..."
+
+### 3. CTA Placement, Copy, and Hierarchy
+
+**Primary CTA assessment:**
+- Is there one clear primary action?
+- Is it visible without scrolling?
+- Does the button copy communicate value, not just action?
+  - Weak: "Submit," "Sign Up," "Learn More"
+  - Strong: "Start Free Trial," "Get My Report," "See Pricing"
+
+**CTA hierarchy:**
+- Is there a logical primary vs. secondary CTA structure?
+- Are CTAs repeated at key decision points?
+
+### 4. Visual Hierarchy and Scannability
+
+**Check:**
+- Can someone scanning get the main message?
+- Are the most important elements visually prominent?
+- Is there enough white space?
+- Do images support or distract from the message?
+
+### 5. Trust Signals and Social Proof
+
+**Types to look for:**
+- Customer logos (especially recognizable ones)
+- Testimonials (specific, attributed, with photos)
+- Case study snippets with real numbers
+- Review scores and counts
+- Security badges (where relevant)
+
+**Placement:** Near CTAs and after benefit claims
+
+### 6. Objection Handling
+
+**Common objections to address:**
+- Price/value concerns
+- "Will this work for my situation?"
+- Implementation difficulty
+- "What if it doesn't work?"
+
+**Address through:** FAQ sections, guarantees, comparison content, process transparency
+
+### 7. Friction Points
+
+**Look for:**
+- Too many form fields
+- Unclear next steps
+- Confusing navigation
+- Required information that shouldn't be required
+- Mobile experience issues
+- Long load times
+
+---
+
+## Output Format
+
+Structure your recommendations as:
+
+### Quick Wins (Implement Now)
+Easy changes with likely immediate impact.
+
+### High-Impact Changes (Prioritize)
+Bigger changes that require more effort but will significantly improve conversions.
+
+### Test Ideas
+Hypotheses worth A/B testing rather than assuming.
+
+### Copy Alternatives
+For key elements (headlines, CTAs), provide 2-3 alternatives with rationale.
+
+---
 
 ## Page-Specific Frameworks
 
 ### Homepage CRO
+- Clear positioning for cold visitors
+- Quick path to most common conversion
+- Handle both "ready to buy" and "still researching"
 
-**Hero Section**:
-- H1: Clear, benefit-focused
-- Calculator: Immediately usable
-- Trust: "Used by X,000+ UK taxpayers" / "HMRC-accurate"
+### Landing Page CRO
+- Message match with traffic source
+- Single CTA (remove navigation if possible)
+- Complete argument on one page
 
-**Below Hero**:
-- Quick wins (what users learn)
-- Features list (what calculator includes)
-- Testimonials or trust signals
-- FAQ for objection handling
+### Pricing Page CRO
+- Clear plan comparison
+- Recommended plan indication
+- Address "which plan is right for me?" anxiety
 
-**Audit Questions**:
-- Can users calculate in < 10 seconds?
-- Is the primary benefit obvious?
-- Are trust signals visible?
-- Is there a clear path for non-ready visitors (blog)?
-
-### Salary Page CRO
-
-**Intent Match**:
-- Users searching "[X] after tax" want immediate answer
-- Pre-fill the salary, show the result
-- Full breakdown below the fold
-
-**Conversion Path**:
-1. Show their answer immediately (above fold)
-2. Invite customization ("Adjust for your situation")
-3. Upsell full calculator features
-4. Related content for exploration
+### Feature Page CRO
+- Connect feature to benefit
+- Use cases and examples
+- Clear path to try/buy
 
 ### Blog Post CRO
+- Contextual CTAs matching content topic
+- Inline CTAs at natural stopping points
 
-**Contextual CTAs**:
-- Inline: "Calculate your own take-home pay"
-- Sidebar: Calculator widget
-- End of post: Full calculator embed
-- Exit intent: "Before you go, calculate..."
-
-**Content → Calculator Bridge**:
-- Blog explains concept
-- Calculator applies it personally
-- Make the connection explicit
-
-## Common CRO Issues
-
-### Calculator-Specific Problems
-
-| Issue | Symptom | Fix |
-|-------|---------|-----|
-| Overwhelming inputs | High bounce on calculator | Progressive disclosure |
-| No clear start point | Low engagement | Single salary input first |
-| Results confusing | Users don't scroll | Lead with take-home pay |
-| Mobile friction | Low mobile conversion | Larger inputs, sticky results |
-| No next action | Users leave after result | Share/save/explore CTAs |
-
-### Trust Issues
-
-| Issue | Symptom | Fix |
-|-------|---------|-----|
-| "Is this accurate?" | Users don't trust results | HMRC badge, source links |
-| "When was this updated?" | Doubt about currency | Show tax year prominently |
-| "Who built this?" | Anonymity concerns | About page, founder visibility |
+---
 
 ## Experiment Ideas
 
-### Quick Tests
+When recommending experiments, consider tests for:
+- Hero section (headline, visual, CTA)
+- Trust signals and social proof placement
+- Pricing presentation
+- Form optimization
+- Navigation and UX
 
-1. **Headline A/B**: "UK Tax Calculator" vs "See Your Take-Home Pay"
-2. **CTA Copy**: "Calculate" vs "Show My Take-Home" vs "Calculate Now"
-3. **Input Order**: Salary first vs tax code first
-4. **Default Tax Year**: Current vs selectable
+**For comprehensive experiment ideas by page type**: See [references/experiments.md](references/experiments.md)
 
-### Bigger Tests
+---
 
-1. **Calculator Position**: Top vs after value prop
-2. **Results Format**: Table vs visual breakdown
-3. **Mobile Layout**: Stacked vs tabbed
-4. **Trust Placement**: Hero vs results section
+## Task-Specific Questions
 
-## Metrics to Track
+1. What's your current conversion rate and goal?
+2. Where is traffic coming from?
+3. What does your signup/purchase flow look like after this page?
+4. Do you have user research, heatmaps, or session recordings?
+5. What have you already tried?
 
-### Calculator Engagement
-- Calculation completion rate
-- Time to first calculation
-- Inputs per session
-- Return calculations
+---
 
-### Content Journey
-- Blog → Calculator click-through
-- Salary page → Full calculator conversion
-- Pages per session
-- Return visitor rate
+## Related Skills
 
-### Technical
-- LCP (calculator load time)
-- INP (input responsiveness)
-- Mobile vs desktop conversion gap
-
-## Analysis Framework
-
-When auditing PayeTax pages:
-
-1. **5-Second Test**: Can you understand what this page does?
-2. **First Click**: What do most users do first?
-3. **Friction Audit**: Where might users get stuck?
-4. **Mobile Check**: Does it work on phone?
-5. **Trust Check**: Would you believe these numbers?
-
-## Output Format
-
-### CRO Audit Report
-
-```markdown
-## Page: [Page Name]
-
-### Current State
-- Primary CTA: [Description]
-- Conversion goal: [What success looks like]
-- Key friction points: [List]
-
-### Quick Wins
-1. [Change] - Expected impact: [X%]
-2. [Change] - Expected impact: [X%]
-
-### Test Recommendations
-| Hypothesis | Control | Variant | Metric |
-|------------|---------|---------|--------|
-| [Theory] | [Current] | [New] | [KPI] |
-
-### Priority Order
-1. [Highest impact, lowest effort]
-2. [Next priority]
-...
-```
-
-## Related Files
-
-- `src/app/page.tsx` - Homepage
-- `src/components/organisms/CalculatorContainer.tsx` - Calculator
-- `src/components/organisms/CalculatorInputs/` - Input fields
-- `src/components/organisms/CalculatorResults/` - Results display
+- **signup-flow-cro**: If the issue is in the signup process itself
+- **form-cro**: If forms on the page need optimization
+- **popup-cro**: If considering popups as part of the strategy
+- **copywriting**: If the page needs a complete copy rewrite
+- **ab-test-setup**: To properly test recommended changes

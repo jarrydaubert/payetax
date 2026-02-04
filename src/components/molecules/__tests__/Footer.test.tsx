@@ -88,12 +88,28 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/tools/scottish-tax-calculator');
     });
 
+    it('should render Marriage Allowance link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Marriage Allowance/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/tools/marriage-allowance-calculator');
+    });
+
+    it('should render National Insurance link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /National Insurance/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/tools/national-insurance-calculator');
+    });
+
     it('should have navigation links', () => {
       render(<Footer />);
 
       const links = screen.getAllByRole('link');
       // Includes brand link + nav links
-      expect(links.length).toBeGreaterThanOrEqual(9);
+      expect(links.length).toBeGreaterThanOrEqual(11);
     });
   });
 

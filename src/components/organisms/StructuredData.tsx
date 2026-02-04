@@ -84,6 +84,23 @@ interface BreadcrumbListSchema {
   }>;
 }
 
+interface ItemListSchema {
+  '@context': 'https://schema.org';
+  '@type': 'ItemList';
+  name: string;
+  description?: string;
+  itemListElement: Array<{
+    '@type': 'ListItem';
+    position: number;
+    item: {
+      '@type': 'Thing';
+      name: string;
+      url: string;
+      description?: string;
+    };
+  }>;
+}
+
 interface FAQPageSchema {
   '@context': 'https://schema.org';
   '@type': 'FAQPage';
@@ -348,6 +365,7 @@ export type SchemaType =
   | WebsiteSchema
   | SoftwareApplicationSchema
   | BreadcrumbListSchema
+  | ItemListSchema
   | FAQPageSchema
   | BlogPostingSchema
   | FinancialServiceSchema
@@ -625,6 +643,7 @@ export interface StructuredDataProps {
     | 'website'
     | 'calculator'
     | 'breadcrumb'
+    | 'itemlist'
     | 'faq'
     | 'article'
     | 'financialservice'
@@ -638,6 +657,17 @@ export interface StructuredDataProps {
   data?: SchemaType;
   /** Breadcrumb data for breadcrumb schema */
   breadcrumbs?: Array<{ name: string; url: string }>;
+  /** Item list data */
+  itemList?: {
+    listName: string;
+    listDescription?: string;
+    items: Array<{
+      name: string;
+      url: string;
+      description?: string;
+      position?: number;
+    }>;
+  };
   /** FAQ data for FAQ schema */
   faqs?: FAQItem[];
   /** Article metadata for BlogPosting schema */
@@ -712,6 +742,7 @@ export function StructuredData({
   type,
   data,
   breadcrumbs,
+  itemList,
   faqs,
   articleData,
   expert,
@@ -748,6 +779,28 @@ export function StructuredData({
           item: item.url,
         })),
       } as BreadcrumbListSchema;
+      break;
+    }
+
+    case 'itemlist': {
+      if (!(itemList?.items?.length && itemList.listName)) return null;
+
+      schemaData = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: itemList.listName,
+        ...(itemList.listDescription && { description: itemList.listDescription }),
+        itemListElement: itemList.items.map((item, index) => ({
+          '@type': 'ListItem',
+          position: item.position ?? index + 1,
+          item: {
+            '@type': 'Thing',
+            name: item.name,
+            url: item.url,
+            ...(item.description && { description: item.description }),
+          },
+        })),
+      } as ItemListSchema;
       break;
     }
 

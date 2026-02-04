@@ -1,309 +1,230 @@
 ---
 name: copywriting
-description: When writing, rewriting, or improving marketing copy for PayeTax pages — homepage, landing pages, feature pages, or blog content. Also use when the user says "write copy for," "improve this copy," "headline help," or "CTA copy." For editing existing copy, see copy-editing skill.
+version: 1.0.0
+description: When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," or "CTA copy." For email copy, see email-sequence. For popup copy, see popup-cro.
 ---
 
-# Copywriting for PayeTax
+# Copywriting
 
-You are an expert conversion copywriter. Your goal is to write marketing copy that is clear, compelling, and drives action — specifically for a UK tax calculator audience.
-
-## PayeTax Context
-
-**Product:** Free UK PAYE tax calculator
-**Audience:** UK employees checking take-home pay
-**Primary action:** Complete a tax calculation
-**Secondary actions:** Share results, sign up for alerts, explore salary pages
-
-**Voice:** Helpful, trustworthy, straightforward — like a knowledgeable friend who understands UK tax
-**Avoid:** Jargon, complexity, anything that feels like HMRC bureaucracy
-
----
-
-## FCA Compliance (CRITICAL)
-
-PayeTax provides **information**, not **advice**. The FCA regulates financial advice. All copy must stay on the right side of this line.
-
-### Forbidden Language
-
-| DO NOT USE | WHY |
-|------------|-----|
-| "You should..." | Implies recommendation |
-| "We recommend..." | Regulated advice |
-| "The best strategy for you" | Personalized advice |
-| "You'll save £X" | Implies guaranteed outcome |
-| "Optimal for your situation" | Personalized advice |
-| "We advise..." | Regulated advice |
-| "Take this salary" | Direct recommendation |
-
-### Safe Alternatives
-
-| INSTEAD OF | USE |
-|------------|-----|
-| "You should take £12,570 salary" | "The NI threshold is £12,570" |
-| "The optimal strategy" | "A tax-efficient scenario" / "A common approach" |
-| "You'll save £5,000" | "Difference of £5,000 between scenarios" |
-| "We recommend" | "Directors commonly..." / "One approach is..." |
-| "Best for you" | "Based on the figures entered" |
-| "This will save you" | "This scenario shows" |
-
-### Required Disclaimers
-
-Every calculator page and email must include:
-- "For illustrative purposes only"
-- "Not financial or tax advice"
-- "Consult a qualified accountant for advice specific to your situation"
-- "Based on HMRC rates for [tax year] which may change"
-
-### Safe Patterns
-
-**Presenting options:**
-> "Scenario A shows take-home of £X. Scenario B shows take-home of £Y."
-> (Let user draw own conclusion)
-
-**Describing common approaches:**
-> "Many directors use a salary at the NI threshold combined with dividends."
-> (Factual statement, not recommendation)
-
-**Showing calculations:**
-> "On these figures, the difference between strategies is £X."
-> (Information, not advice)
-
----
+You are an expert conversion copywriter. Your goal is to write marketing copy that is clear, compelling, and drives action.
 
 ## Before Writing
+
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
 Gather this context (ask if not provided):
 
 ### 1. Page Purpose
-- Homepage, landing page, salary page, blog post?
-- What's the ONE primary action?
-- What's the secondary action?
+- What type of page? (homepage, landing page, pricing, feature, about)
+- What is the ONE primary action you want visitors to take?
 
-### 2. Audience Segment
-- Salary range (affects messaging)
-- Employed vs self-employed
-- England/Wales vs Scotland
-- New to UK tax vs experienced
+### 2. Audience
+- Who is the ideal customer?
+- What problem are they trying to solve?
+- What objections or hesitations do they have?
+- What language do they use to describe their problem?
 
-### 3. Traffic Source
-- Organic search (what query?)
-- Social media
-- Direct/returning visitor
-- Referral
+### 3. Product/Offer
+- What are you selling or offering?
+- What makes it different from alternatives?
+- What's the key transformation or outcome?
+- Any proof points (numbers, testimonials, case studies)?
+
+### 4. Context
+- Where is traffic coming from? (ads, organic, email)
+- What do visitors already know before arriving?
+
+---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
 
 ---
 
 ## Copywriting Principles
 
 ### Clarity Over Cleverness
-Tax is confusing enough. Don't add to it.
-- Every sentence should have one job
-- Remove words that don't add meaning
-- Explain terms if you must use them
+If you have to choose between clear and creative, choose clear.
 
 ### Benefits Over Features
-| Feature | Benefit |
-|---------|---------|
-| HMRC-accurate calculations | Know exactly what you'll take home |
-| Instant results | Get your answer in seconds |
-| No signup required | Check your salary right now |
-| Scottish tax support | Accurate whether you're in Edinburgh or London |
+Features: What it does. Benefits: What that means for the customer.
 
 ### Specificity Over Vagueness
-| Vague | Specific |
-|-------|----------|
-| See your take-home pay | See exactly what £50,000 puts in your pocket |
-| Quick calculator | Get your result in 3 seconds |
-| Accurate | Matches HMRC to the penny |
+- Vague: "Save time on your workflow"
+- Specific: "Cut your weekly reporting from 4 hours to 15 minutes"
 
-### Customer Language
-People search for:
-- "£X after tax"
-- "What will I take home"
-- "How much tax on £X"
-- "Tax on X salary"
+### Customer Language Over Company Language
+Use words your customers use. Mirror voice-of-customer from reviews, interviews, support tickets.
 
-Use their words, not tax professional jargon.
+### One Idea Per Section
+Each section should advance one argument. Build a logical flow down the page.
 
 ---
 
-## Headline Formulas for PayeTax
+## Writing Style Rules
 
-### Value Proposition Headlines
+### Core Principles
 
-**"[Achieve outcome] in [timeframe]"**
-- "See your take-home pay in seconds"
-- "Know exactly what you'll earn, instantly"
+1. **Simple over complex** — "Use" not "utilize," "help" not "facilitate"
+2. **Specific over vague** — Avoid "streamline," "optimize," "innovative"
+3. **Active over passive** — "We generate reports" not "Reports are generated"
+4. **Confident over qualified** — Remove "almost," "very," "really"
+5. **Show over tell** — Describe the outcome instead of using adverbs
+6. **Honest over sensational** — Never fabricate statistics or testimonials
 
-**"[Number] [people] use [product] to [outcome]"**
-- "10,000+ UK taxpayers check their take-home here"
+### Quick Quality Check
 
-**"The [adjective] way to [outcome]"**
-- "The fastest way to see what you'll actually earn"
-- "The most accurate UK tax calculator"
+- Jargon that could confuse outsiders?
+- Sentences trying to do too much?
+- Passive voice constructions?
+- Exclamation points? (remove them)
+- Marketing buzzwords without substance?
 
-### Problem-Solution Headlines
+For thorough line-by-line review, use the **copy-editing** skill after your draft.
 
-**"Stop [pain]. Start [pleasure]."**
-- "Stop guessing. See your exact take-home pay."
+---
 
-**"Never [unpleasant event] again"**
-- "Never wonder 'what will I actually earn?' again"
+## Best Practices
 
-### Salary Page Headlines
+### Be Direct
+Get to the point. Don't bury the value in qualifications.
 
-For `/calculator/50000-after-tax`:
-- "£50,000 Salary After Tax (2025/26)"
-- "What You'll Take Home on £50,000"
-- "£50,000 After Tax: Your Complete Breakdown"
+❌ Slack lets you share files instantly, from documents to images, directly in your conversations
+
+✅ Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
+
+### Use Rhetorical Questions
+Questions engage readers and make them think about their own situation.
+- "Hate returning stuff to Amazon?"
+- "Tired of chasing approvals?"
+
+### Use Analogies When Helpful
+Analogies make abstract concepts concrete and memorable.
+
+### Pepper in Humor (When Appropriate)
+Puns and wit make copy memorable—but only if it fits the brand and doesn't undermine clarity.
+
+---
+
+## Page Structure Framework
+
+### Above the Fold
+
+**Headline**
+- Your single most important message
+- Communicate core value proposition
+- Specific > generic
+
+**Example formulas:**
+- "{Achieve outcome} without {pain point}"
+- "The {category} for {audience}"
+- "Never {unpleasant event} again"
+- "{Question highlighting main pain point}"
+
+**For comprehensive headline formulas**: See [references/copy-frameworks.md](references/copy-frameworks.md)
+
+**For natural transition phrases**: See [references/natural-transitions.md](references/natural-transitions.md)
+
+**Subheadline**
+- Expands on headline
+- Adds specificity
+- 1-2 sentences max
+
+**Primary CTA**
+- Action-oriented button text
+- Communicate what they get: "Start Free Trial" > "Sign Up"
+
+### Core Sections
+
+| Section | Purpose |
+|---------|---------|
+| Social Proof | Build credibility (logos, stats, testimonials) |
+| Problem/Pain | Show you understand their situation |
+| Solution/Benefits | Connect to outcomes (3-5 key benefits) |
+| How It Works | Reduce perceived complexity (3-4 steps) |
+| Objection Handling | FAQ, comparisons, guarantees |
+| Final CTA | Recap value, repeat CTA, risk reversal |
+
+**For detailed section types and page templates**: See [references/copy-frameworks.md](references/copy-frameworks.md)
 
 ---
 
 ## CTA Copy Guidelines
 
-### Weak CTAs (avoid):
-- Calculate
-- Submit
-- See Results
-- Learn More
+**Weak CTAs (avoid):**
+- Submit, Sign Up, Learn More, Click Here, Get Started
 
-### Strong CTAs:
-- See My Take-Home Pay
-- Show What I'll Earn
-- Calculate My Salary
-- Get My Breakdown
+**Strong CTAs (use):**
+- Start Free Trial
+- Get [Specific Thing]
+- See [Product] in Action
+- Create Your First [Thing]
+- Download the Guide
 
-### CTA Formula:
-[Action Verb] + [What They Get]
-- "Show My Take-Home Pay"
-- "See My Tax Breakdown"
-- "Calculate My Salary"
+**Formula:** [Action Verb] + [What They Get] + [Qualifier if needed]
+
+Examples:
+- "Start My Free Trial"
+- "Get the Complete Checklist"
+- "See Pricing for My Team"
 
 ---
 
 ## Page-Specific Guidance
 
-### Homepage Copy
+### Homepage
+- Serve multiple audiences without being generic
+- Lead with broadest value proposition
+- Provide clear paths for different visitor intents
 
-**Above the fold:**
-- Clear headline stating value
-- Calculator immediately visible
-- Trust signal ("HMRC-accurate")
+### Landing Page
+- Single message, single CTA
+- Match headline to ad/traffic source
+- Complete argument on one page
 
-**Supporting sections:**
-- How it works (3 steps max)
-- Key features as benefits
-- Trust signals (accuracy, updates)
-- FAQ for common questions
+### Pricing Page
+- Help visitors choose the right plan
+- Address "which is right for me?" anxiety
+- Make recommended plan obvious
 
-### Salary Page Copy (`/calculator/[amount]-after-tax`)
+### Feature Page
+- Connect feature → benefit → outcome
+- Show use cases and examples
+- Clear path to try or buy
 
-**Unique intro per salary level:**
-- £30,000: "A £30,000 salary puts you above the UK median..."
-- £50,000: "On £50,000, you're in the higher rate bracket..."
-- £100,000: "At £100,000, your personal allowance starts to taper..."
-
-**Include:**
-- Monthly/weekly/daily breakdown
-- Tax breakdown (income tax, NI)
-- Comparison to UK average
-- Related salary links (±£5,000)
-- Tax efficiency tips (if relevant to bracket)
-
-### Blog Post Copy
-
-**Topics that work:**
-- Tax year changes ("What's changing in April 2025")
-- The £100k trap explained
-- Scottish vs English tax comparison
-- Student loan impact on take-home
-- Pension contributions and tax relief
-
-**Structure:**
-- Hook with the problem/question
-- Clear, scannable sections
-- Calculator CTA inline
-- Summary/takeaway
+### About Page
+- Tell the story of why you exist
+- Connect mission to customer benefit
+- Still include a CTA
 
 ---
 
-## Writing for Tax Brackets
+## Voice and Tone
 
-Adapt messaging to salary level:
+Before writing, establish:
 
-### Basic Rate (£12,571-£50,270)
-- Focus: Straightforward calculation
-- Tone: Accessible, no complexity
-- Highlight: What you actually take home
+**Formality level:**
+- Casual/conversational
+- Professional but friendly
+- Formal/enterprise
 
-### Higher Rate (£50,271-£125,140)
-- Focus: Tax efficiency awareness
-- Tone: Slightly more sophisticated
-- Highlight: Pension opportunities, marginal rates
+**Brand personality:**
+- Playful or serious?
+- Bold or understated?
+- Technical or accessible?
 
-### Additional Rate (£125,140+)
-- Focus: Complex tax situation
-- Tone: Professional, detailed
-- Highlight: Personal allowance taper, planning opportunities
-
-### The £100k-£125k Band
-- Focus: The "60% tax trap"
-- Tone: Helpful warning
-- Highlight: Effective marginal rate, pension sacrifice
-
----
-
-## Trust-Building Copy
-
-### Accuracy claims:
-- "Matches HMRC calculations"
-- "Updated for 2025/26 tax year"
-- "Based on official tax rates"
-- "Verified against HMRC examples"
-
-### Transparency:
-- "Here's exactly how we calculated this"
-- "Based on tax code 1257L"
-- "Assumes you're employed (PAYE)"
-- "Does not include [X] — add that separately"
-
----
-
-## Section Types for Landing Pages
-
-Don't just list features. Mix section types:
-
-1. **Hero** - Clear value proposition + calculator
-2. **Social proof** - User count, trust signals
-3. **How it works** - 3 simple steps
-4. **Benefits** - What they get (not features)
-5. **FAQ** - Address objections
-6. **Related tools** - Other calculators
-7. **CTA** - Repeat the main action
-
----
-
-## Common Messaging by Use Case
-
-### "I got a job offer"
-- "See exactly what £X means in your pocket"
-- "Compare salary offers side by side"
-- "Know your real pay before you accept"
-
-### "I'm negotiating salary"
-- "What's £5,000 more actually worth?"
-- "See the real difference between offers"
-- "Negotiate with your take-home in mind"
-
-### "Tax year is changing"
-- "What's your new take-home in April?"
-- "See how 2025/26 changes affect you"
-- "Compare this year vs next year"
-
-### "I moved to Scotland"
-- "Scottish tax rates are different"
-- "See your take-home with Scottish rates"
-- "England vs Scotland: See the difference"
+Maintain consistency, but adjust intensity:
+- Headlines can be bolder
+- Body copy should be clearer
+- CTAs should be action-oriented
 
 ---
 
@@ -313,26 +234,30 @@ When writing copy, provide:
 
 ### Page Copy
 Organized by section:
-- Headline
-- Subheadline
-- Body copy
-- CTAs
-- Supporting sections
+- Headline, Subheadline, CTA
+- Section headers and body copy
+- Secondary CTAs
+
+### Annotations
+For key elements, explain:
+- Why you made this choice
+- What principle it applies
 
 ### Alternatives
 For headlines and CTAs, provide 2-3 options:
-- Option A: [copy] — [why it works]
-- Option B: [copy] — [why it works]
+- Option A: [copy] — [rationale]
+- Option B: [copy] — [rationale]
 
-### Meta Content
+### Meta Content (if relevant)
 - Page title (for SEO)
-- Meta description (for CTR)
+- Meta description
 
 ---
 
 ## Related Skills
 
-- **copy-editing**: For polishing existing copy
-- **page-cro**: For broader page optimization
-- **seo-audit**: For SEO-focused copy decisions
-- **marketing-psychology**: For persuasion principles
+- **copy-editing**: For polishing existing copy (use after your draft)
+- **page-cro**: If page structure/strategy needs work, not just copy
+- **email-sequence**: For email copywriting
+- **popup-cro**: For popup and modal copy
+- **ab-test-setup**: To test copy variations

@@ -1,245 +1,266 @@
 ---
 name: competitor-alternatives
-description: When creating competitor comparison or alternative pages for SEO and positioning. Also use when discussing "[Calculator] vs PayeTax," "PayeTax alternative to [X]," or competitive positioning against other UK tax calculators. Covers comparison pages, alternative pages, and competitive content strategy.
+version: 1.0.0
+description: "When the user wants to create competitor comparison or alternative pages for SEO and sales enablement. Also use when the user mentions 'alternative page,' 'vs page,' 'competitor comparison,' 'comparison page,' '[Product] vs [Product],' '[Product] alternative,' or 'competitive landing pages.' Covers four formats: singular alternative, plural alternatives, you vs competitor, and competitor vs competitor. Emphasizes deep research, modular content architecture, and varied section types beyond feature tables."
 ---
 
-# Competitor & Alternative Pages for PayeTax
+# Competitor & Alternative Pages
 
-You are an expert in creating competitor comparison and alternative pages. Your goal is to build pages that rank for competitive search terms and position PayeTax effectively against other UK tax calculators.
+You are an expert in creating competitor comparison and alternative pages. Your goal is to build pages that rank for competitive search terms, provide genuine value to evaluators, and position your product effectively.
 
-## PayeTax Competitive Context
+## Initial Assessment
 
-**PayeTax strengths:**
-- Modern, mobile-first design
-- Fast, clean UX
-- HMRC-accurate calculations
-- Scottish tax support
-- Programmatic salary pages
-- Free, no signup required
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-**PayeTax positioning:**
-- The modern UK tax calculator
-- Fast, accurate, no-nonsense
-- Built for mobile-first generation
+Before creating competitor pages, understand:
+
+1. **Your Product**
+   - Core value proposition
+   - Key differentiators
+   - Ideal customer profile
+   - Pricing model
+   - Strengths and honest weaknesses
+
+2. **Competitive Landscape**
+   - Direct competitors
+   - Indirect/adjacent competitors
+   - Market positioning of each
+   - Search volume for competitor terms
+
+3. **Goals**
+   - SEO traffic capture
+   - Sales enablement
+   - Conversion from competitor users
+   - Brand positioning
+
+---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
 
 ---
 
-## UK Tax Calculator Competitors
+## Core Principles
 
-### Primary Competitors
+### 1. Honesty Builds Trust
+- Acknowledge competitor strengths
+- Be accurate about your limitations
+- Don't misrepresent competitor features
+- Readers are comparing—they'll verify claims
 
-| Competitor | Strengths | Weaknesses |
-|------------|-----------|------------|
-| **GOV.UK Calculator** | Official, authoritative | Basic, poor UX, slow |
-| **MoneySavingExpert** | High trust, traffic | Cluttered, ad-heavy |
-| **The Salary Calculator** | Feature-rich, established | Dated design, complex |
-| **Salary Calculator UK** | Good SEO | Basic design |
-| **Reed Salary Calculator** | Recruitment integration | Limited features |
-| **Which? Tax Calculator** | Trusted brand | Behind paywall features |
+### 2. Depth Over Surface
+- Go beyond feature checklists
+- Explain *why* differences matter
+- Include use cases and scenarios
+- Show, don't just tell
 
-### Comparison Angles
+### 3. Help Them Decide
+- Different tools fit different needs
+- Be clear about who you're best for
+- Be clear about who competitor is best for
+- Reduce evaluation friction
 
-**PayeTax vs GOV.UK:**
-- Better UX, same accuracy
-- Mobile-optimized
-- Clearer breakdown
-- No government bureaucracy feel
-
-**PayeTax vs MoneySavingExpert:**
-- Cleaner, no ads
-- Faster results
-- Modern design
-- Focused (calculator only, not buried in content)
-
-**PayeTax vs The Salary Calculator:**
-- Modern, mobile-first design
-- Simpler UX (less overwhelming)
-- Faster
-- Same accuracy, better presentation
+### 4. Modular Content Architecture
+- Competitor data should be centralized
+- Updates propagate to all pages
+- Single source of truth per competitor
 
 ---
 
 ## Page Formats
 
-### Format 1: "[Competitor] Alternative"
+### Format 1: [Competitor] Alternative (Singular)
 
-**URL:** `/alternatives/[competitor]`
-**Example:** `/alternatives/gov-uk-calculator`
+**Search intent**: User is actively looking to switch from a specific competitor
 
-**Target keywords:**
-- "GOV.UK tax calculator alternative"
-- "Alternative to HMRC calculator"
-- "Better than [Competitor]"
+**URL pattern**: `/alternatives/[competitor]` or `/[competitor]-alternative`
 
-**Page structure:**
-1. Why people look for alternatives (validate pain)
-2. PayeTax as the alternative (positioning)
-3. Feature comparison
-4. Who should switch
-5. CTA
+**Target keywords**: "[Competitor] alternative", "alternative to [Competitor]", "switch from [Competitor]"
 
-**Example intro:**
-> Looking for an alternative to the GOV.UK tax calculator? You're not alone. While the official calculator is accurate, many find it slow, confusing, and not mobile-friendly. PayeTax gives you the same HMRC-accurate results with a modern, instant experience.
+**Page structure**:
+1. Why people look for alternatives (validate their pain)
+2. Summary: You as the alternative (quick positioning)
+3. Detailed comparison (features, service, pricing)
+4. Who should switch (and who shouldn't)
+5. Migration path
+6. Social proof from switchers
+7. CTA
 
 ---
 
-### Format 2: "PayeTax vs [Competitor]"
+### Format 2: [Competitor] Alternatives (Plural)
 
-**URL:** `/vs/[competitor]`
-**Example:** `/vs/salary-calculator`
+**Search intent**: User is researching options, earlier in journey
 
-**Target keywords:**
-- "PayeTax vs Salary Calculator"
-- "PayeTax compared to [X]"
-- "Which UK tax calculator is best"
+**URL pattern**: `/alternatives/[competitor]-alternatives`
 
-**Page structure:**
-1. TL;DR summary
+**Target keywords**: "[Competitor] alternatives", "best [Competitor] alternatives", "tools like [Competitor]"
+
+**Page structure**:
+1. Why people look for alternatives (common pain points)
+2. What to look for in an alternative (criteria framework)
+3. List of alternatives (you first, but include real options)
+4. Comparison table (summary)
+5. Detailed breakdown of each alternative
+6. Recommendation by use case
+7. CTA
+
+**Important**: Include 4-7 real alternatives. Being genuinely helpful builds trust and ranks better.
+
+---
+
+### Format 3: You vs [Competitor]
+
+**Search intent**: User is directly comparing you to a specific competitor
+
+**URL pattern**: `/vs/[competitor]` or `/compare/[you]-vs-[competitor]`
+
+**Target keywords**: "[You] vs [Competitor]", "[Competitor] vs [You]"
+
+**Page structure**:
+1. TL;DR summary (key differences in 2-3 sentences)
 2. At-a-glance comparison table
-3. Detailed comparison by category
-4. Who PayeTax is best for
+3. Detailed comparison by category (Features, Pricing, Support, Ease of use, Integrations)
+4. Who [You] is best for
 5. Who [Competitor] is best for (be honest)
+6. What customers say (testimonials from switchers)
+7. Migration support
+8. CTA
+
+---
+
+### Format 4: [Competitor A] vs [Competitor B]
+
+**Search intent**: User comparing two competitors (not you directly)
+
+**URL pattern**: `/compare/[competitor-a]-vs-[competitor-b]`
+
+**Page structure**:
+1. Overview of both products
+2. Comparison by category
+3. Who each is best for
+4. The third option (introduce yourself)
+5. Comparison table (all three)
 6. CTA
 
----
-
-### Format 3: "Best UK Tax Calculators"
-
-**URL:** `/best-uk-tax-calculators`
-
-**Target keywords:**
-- "Best UK tax calculator"
-- "UK tax calculator comparison"
-- "Which tax calculator UK"
-
-**Page structure:**
-1. What makes a good tax calculator
-2. List of top calculators (PayeTax first, but fair)
-3. Comparison table
-4. Recommendation by use case
-5. CTA
-
-**Tone:** Objective guide — you're one option among several, but positioned well.
+**Why this works**: Captures search traffic for competitor terms, positions you as knowledgeable.
 
 ---
 
-## Comparison Dimensions
+## Essential Sections
 
-When comparing calculators, cover:
+### TL;DR Summary
+Start every page with a quick summary for scanners—key differences in 2-3 sentences.
 
-### Accuracy
-- HMRC compliance
-- Tax year currency
-- Edge case handling (Scottish, £100k taper)
+### Paragraph Comparisons
+Go beyond tables. For each dimension, write a paragraph explaining the differences and when each matters.
 
-### Speed & UX
-- Load time
-- Mobile experience
-- Result clarity
-- Number of steps
+### Feature Comparison
+For each category: describe how each handles it, list strengths and limitations, give bottom line recommendation.
 
-### Features
-- Basic tax calculation
-- NI breakdown
-- Student loan
-- Pension adjustments
-- Scottish rates
-- Multiple tax years
+### Pricing Comparison
+Include tier-by-tier comparison, what's included, hidden costs, and total cost calculation for sample team size.
 
-### Trust
-- Data handling
-- No signup required
-- Transparent methodology
-- Source citations
+### Who It's For
+Be explicit about ideal customer for each option. Honest recommendations build trust.
 
-### Design
-- Modern vs dated
-- Mobile-first vs desktop
-- Clean vs cluttered
-- Ad-free vs ad-heavy
+### Migration Section
+Cover what transfers, what needs reconfiguration, support offered, and quotes from customers who switched.
+
+**For detailed templates**: See [references/templates.md](references/templates.md)
 
 ---
 
-## Comparison Table Template
+## Content Architecture
 
-| Feature | PayeTax | [Competitor] |
-|---------|---------|--------------|
-| HMRC Accurate | ✓ | ✓ |
-| Mobile-First | ✓ | ✗ |
-| Instant Results | ✓ | Slow |
-| Scottish Rates | ✓ | ✓ |
-| Student Loan | ✓ | Limited |
-| No Signup | ✓ | ✓ |
-| Ad-Free | ✓ | ✗ |
-| Modern Design | ✓ | Dated |
-| Salary Pages | ✓ | ✗ |
+### Centralized Competitor Data
+Create a single source of truth for each competitor with:
+- Positioning and target audience
+- Pricing (all tiers)
+- Feature ratings
+- Strengths and weaknesses
+- Best for / not ideal for
+- Common complaints (from reviews)
+- Migration notes
+
+**For data structure and examples**: See [references/content-architecture.md](references/content-architecture.md)
 
 ---
 
-## Honest Positioning
+## Research Process
 
-**Be fair about competitors:**
-- Acknowledge their strengths
-- Don't misrepresent features
-- Users will verify claims
+### Deep Competitor Research
 
-**Be honest about PayeTax:**
-- Highlight genuine strengths
-- Don't claim features you don't have
-- Focus on what makes you better for specific users
+For each competitor, gather:
 
-**Example honest comparison:**
-> The Salary Calculator offers more advanced features like pension and bonus calculations. However, if you want a fast, clean answer to "what will I take home?" PayeTax gets you there in seconds with a modern, mobile-friendly experience.
+1. **Product research**: Sign up, use it, document features/UX/limitations
+2. **Pricing research**: Current pricing, what's included, hidden costs
+3. **Review mining**: G2, Capterra, TrustRadius for common praise/complaint themes
+4. **Customer feedback**: Talk to customers who switched (both directions)
+5. **Content research**: Their positioning, their comparison pages, their changelog
+
+### Ongoing Updates
+
+- **Quarterly**: Verify pricing, check for major feature changes
+- **When notified**: Customer mentions competitor change
+- **Annually**: Full refresh of all competitor data
 
 ---
 
 ## SEO Considerations
 
-### Target Keywords
+### Keyword Targeting
 
-| Page Type | Keywords |
-|-----------|----------|
-| Alternative page | "[X] alternative", "better than [X]" |
-| Vs page | "[You] vs [X]", "[X] vs [You]" |
-| Best-of page | "best UK tax calculator", "tax calculator comparison" |
+| Format | Primary Keywords |
+|--------|-----------------|
+| Alternative (singular) | [Competitor] alternative, alternative to [Competitor] |
+| Alternatives (plural) | [Competitor] alternatives, best [Competitor] alternatives |
+| You vs Competitor | [You] vs [Competitor], [Competitor] vs [You] |
+| Competitor vs Competitor | [A] vs [B], [B] vs [A] |
 
 ### Internal Linking
-- Link between comparison pages
-- Link from blog posts mentioning competitors
-- Link from FAQ sections
+- Link between related competitor pages
+- Link from feature pages to relevant comparisons
+- Create hub page linking to all competitor content
 
 ### Schema Markup
-Consider FAQ schema for common comparison questions.
+Consider FAQ schema for common questions like "What is the best alternative to [Competitor]?"
 
 ---
 
-## Content Ideas
+## Output Format
 
-### Blog Posts
-- "Why I switched from GOV.UK calculator to PayeTax"
-- "UK Tax Calculators Compared: 2025 Guide"
-- "What makes a tax calculator accurate?"
+### Competitor Data File
+Complete competitor profile in YAML format for use across all comparison pages.
 
-### FAQ Content
-- "Is PayeTax as accurate as GOV.UK?"
-- "Why use PayeTax instead of [Competitor]?"
-- "Which UK tax calculator is most accurate?"
+### Page Content
+For each page: URL, meta tags, full page copy organized by section, comparison tables, CTAs.
+
+### Page Set Plan
+Recommended pages to create with priority order based on search volume.
 
 ---
 
-## Questions to Consider
+## Task-Specific Questions
 
-1. What do users complain about with competitors?
-2. What search terms are people using?
-3. What genuine advantages does PayeTax have?
-4. Where are competitors genuinely better (be honest)?
-5. What would make someone switch to PayeTax?
+1. What are common reasons people switch to you?
+2. Do you have customer quotes about switching?
+3. What's your pricing vs. competitors?
+4. Do you offer migration support?
 
 ---
 
 ## Related Skills
 
-- **programmatic-seo**: For building comparison pages at scale
-- **copywriting**: For writing comparison copy
-- **seo-audit**: For optimizing comparison pages
-- **page-cro**: For conversion optimization on comparison pages
+- **programmatic-seo**: For building competitor pages at scale
+- **copywriting**: For writing compelling comparison copy
+- **seo-audit**: For optimizing competitor pages
+- **schema-markup**: For FAQ and comparison schema

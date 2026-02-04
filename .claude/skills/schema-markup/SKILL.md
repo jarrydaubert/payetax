@@ -1,301 +1,188 @@
 ---
 name: schema-markup
-description: When the user wants to add, fix, or verify structured data on PayeTax. Use when discussing rich snippets, Google search features, or JSON-LD implementation. PayeTax has extensive structured data - this skill helps maintain and expand it.
+version: 1.0.0
+description: When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions "schema markup," "structured data," "JSON-LD," "rich snippets," "schema.org," "FAQ schema," "product schema," "review schema," or "breadcrumb schema." For broader SEO issues, see seo-audit.
 ---
 
-# Schema Markup for PayeTax
+# Schema Markup
 
-You are an expert in structured data implementation. Your goal is to help PayeTax maximize rich snippet opportunities and ensure structured data accuracy.
+You are an expert in structured data and schema markup. Your goal is to implement schema.org markup that helps search engines understand content and enables rich results in search.
 
-## PayeTax Schema Context
+## Initial Assessment
 
-**Current Implementation**: `src/components/organisms/StructuredData.tsx`
-**Validation**: Google Rich Results Test, Schema.org Validator
-**Goal**: Rich snippets for calculator, FAQ, and blog content
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-## Implemented Schema Types
+Before implementing schema, understand:
 
-### Organization Schema
-Applied to: All pages
-Purpose: Brand knowledge panel
+1. **Page Type** - What kind of page? What's the primary content? What rich results are possible?
+
+2. **Current State** - Any existing schema? Errors in implementation? Which rich results already appearing?
+
+3. **Goals** - Which rich results are you targeting? What's the business value?
+
+---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
+
+---
+
+## Core Principles
+
+### 1. Accuracy First
+- Schema must accurately represent page content
+- Don't markup content that doesn't exist
+- Keep updated when content changes
+
+### 2. Use JSON-LD
+- Google recommends JSON-LD format
+- Easier to implement and maintain
+- Place in `<head>` or end of `<body>`
+
+### 3. Follow Google's Guidelines
+- Only use markup Google supports
+- Avoid spam tactics
+- Review eligibility requirements
+
+### 4. Validate Everything
+- Test before deploying
+- Monitor Search Console
+- Fix errors promptly
+
+---
+
+## Common Schema Types
+
+| Type | Use For | Required Properties |
+|------|---------|-------------------|
+| Organization | Company homepage/about | name, url |
+| WebSite | Homepage (search box) | name, url |
+| Article | Blog posts, news | headline, image, datePublished, author |
+| Product | Product pages | name, image, offers |
+| SoftwareApplication | SaaS/app pages | name, offers |
+| FAQPage | FAQ content | mainEntity (Q&A array) |
+| HowTo | Tutorials | name, step |
+| BreadcrumbList | Any page with breadcrumbs | itemListElement |
+| LocalBusiness | Local business pages | name, address |
+| Event | Events, webinars | name, startDate, location |
+
+**For complete JSON-LD examples**: See [references/schema-examples.md](references/schema-examples.md)
+
+---
+
+## Quick Reference
+
+### Organization (Company Page)
+Required: name, url
+Recommended: logo, sameAs (social profiles), contactPoint
+
+### Article/BlogPosting
+Required: headline, image, datePublished, author
+Recommended: dateModified, publisher, description
+
+### Product
+Required: name, image, offers (price + availability)
+Recommended: sku, brand, aggregateRating, review
+
+### FAQPage
+Required: mainEntity (array of Question/Answer pairs)
+
+### BreadcrumbList
+Required: itemListElement (array with position, name, item)
+
+---
+
+## Multiple Schema Types
+
+You can combine multiple schema types on one page using `@graph`:
 
 ```json
 {
-  "@type": "Organization",
-  "name": "PayeTax",
-  "url": "https://payetax.co.uk",
-  "logo": "https://payetax.co.uk/logo.png",
-  "sameAs": ["https://x.com/PayeTaxUK"]
-}
-```
-
-### Website Schema
-Applied to: Homepage
-Purpose: Sitelinks search box
-
-```json
-{
-  "@type": "WebSite",
-  "name": "PayeTax",
-  "url": "https://payetax.co.uk",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://payetax.co.uk/calculator/{search_term_string}-after-tax",
-    "query-input": "required name=search_term_string"
-  }
-}
-```
-
-### SoftwareApplication Schema
-Applied to: Calculator pages
-Purpose: Software rich result
-
-```json
-{
-  "@type": "SoftwareApplication",
-  "name": "PayeTax UK Tax Calculator",
-  "operatingSystem": "Web",
-  "applicationCategory": "FinanceApplication",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "GBP"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "X"
-  }
-}
-```
-
-### FinancialService Schema
-Applied to: Homepage
-Purpose: Local business features
-
-```json
-{
-  "@type": "FinancialService",
-  "name": "PayeTax Tax Calculator",
-  "serviceType": "Tax Calculator",
-  "areaServed": {
-    "@type": "Country",
-    "name": "United Kingdom"
-  }
-}
-```
-
-### HowTo Schema
-Applied to: Calculator, How-to blog posts
-Purpose: How-to rich snippet
-
-```json
-{
-  "@type": "HowTo",
-  "name": "How to Calculate Your UK Take-Home Pay",
-  "step": [
-    {
-      "@type": "HowToStep",
-      "name": "Enter your gross salary",
-      "text": "Input your annual gross salary in pounds"
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Select your tax code",
-      "text": "Choose your tax code (default 1257L)"
-    }
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "Organization", ... },
+    { "@type": "WebSite", ... },
+    { "@type": "BreadcrumbList", ... }
   ]
 }
 ```
 
-### FAQPage Schema
-Applied to: FAQ sections, blog posts with Q&A
-Purpose: FAQ rich snippet
+---
 
+## Validation and Testing
+
+### Tools
+- **Google Rich Results Test**: https://search.google.com/test/rich-results
+- **Schema.org Validator**: https://validator.schema.org/
+- **Search Console**: Enhancements reports
+
+### Common Errors
+
+**Missing required properties** - Check Google's documentation for required fields
+
+**Invalid values** - Dates must be ISO 8601, URLs fully qualified, enumerations exact
+
+**Mismatch with page content** - Schema doesn't match visible content
+
+---
+
+## Implementation
+
+### Static Sites
+- Add JSON-LD directly in HTML template
+- Use includes/partials for reusable schema
+
+### Dynamic Sites (React, Next.js)
+- Component that renders schema
+- Server-side rendered for SEO
+- Serialize data to JSON-LD
+
+### CMS / WordPress
+- Plugins (Yoast, Rank Math, Schema Pro)
+- Theme modifications
+- Custom fields to structured data
+
+---
+
+## Output Format
+
+### Schema Implementation
 ```json
+// Full JSON-LD code block
 {
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How much tax do I pay on £50,000?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "On a £50,000 salary in 2025/26, you'll pay approximately £7,486 in income tax..."
-      }
-    }
-  ]
+  "@context": "https://schema.org",
+  "@type": "...",
+  // Complete markup
 }
 ```
 
-### Article Schema
-Applied to: Blog posts
-Purpose: Article rich result
+### Testing Checklist
+- [ ] Validates in Rich Results Test
+- [ ] No errors or warnings
+- [ ] Matches page content
+- [ ] All required properties included
 
-```json
-{
-  "@type": "Article",
-  "headline": "Article Title",
-  "datePublished": "2025-01-20",
-  "dateModified": "2025-01-20",
-  "author": {
-    "@type": "Organization",
-    "name": "PayeTax"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "PayeTax"
-  }
-}
-```
+---
 
-### BreadcrumbList Schema
-Applied to: All pages
-Purpose: Breadcrumb rich snippet
+## Task-Specific Questions
 
-```json
-{
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://payetax.co.uk"},
-    {"@type": "ListItem", "position": 2, "name": "Calculator", "item": "https://payetax.co.uk/calculator"},
-    {"@type": "ListItem", "position": 3, "name": "£50,000 After Tax"}
-  ]
-}
-```
+1. What type of page is this?
+2. What rich results are you hoping to achieve?
+3. What data is available to populate the schema?
+4. Is there existing schema on the page?
+5. What's your tech stack?
 
-### Dataset Schema
-Applied to: Tax rates page, calculator
-Purpose: Dataset rich result
+---
 
-```json
-{
-  "@type": "Dataset",
-  "name": "UK Income Tax Rates 2025/26",
-  "description": "Official UK income tax rates and thresholds for the 2025/26 tax year",
-  "creator": {"@type": "Organization", "name": "PayeTax"},
-  "temporal": "2025-04-06/2026-04-05",
-  "spatialCoverage": "United Kingdom"
-}
-```
+## Related Skills
 
-## Schema Opportunities
-
-### Not Yet Implemented
-
-| Type | Page | Benefit |
-|------|------|---------|
-| `Review` | Calculator | Star ratings in SERP |
-| `VideoObject` | Blog posts with video | Video rich result |
-| `Event` | Tax deadline pages | Event listing |
-| `MonetaryAmount` | Salary pages | Salary rich result |
-
-### Salary Page Enhanced Schema
-
-```json
-{
-  "@type": "WebPage",
-  "name": "£50,000 After Tax UK 2025",
-  "description": "Calculate what £50,000 salary gives you after tax...",
-  "mainEntity": {
-    "@type": "MonetaryAmount",
-    "currency": "GBP",
-    "value": 50000,
-    "name": "Gross Annual Salary"
-  },
-  "about": {
-    "@type": "FinancialProduct",
-    "name": "UK PAYE Tax Calculation",
-    "feesAndCommissionsSpecification": "Income Tax: £7,486, NI: £2,994"
-  }
-}
-```
-
-## Validation Checklist
-
-### Before Deploy
-- [ ] Valid JSON-LD syntax
-- [ ] No duplicate types on same page
-- [ ] Required properties present
-- [ ] Passes Rich Results Test
-- [ ] Matches visible page content
-
-### After Deploy
-- [ ] Indexed by Google (Search Console)
-- [ ] No errors in Enhancements report
-- [ ] Rich results appearing in SERP
-- [ ] No manual actions
-
-## Common Issues
-
-### FAQ Schema
-- **Issue**: FAQ not showing in SERP
-- **Cause**: Questions too long, not genuine FAQ
-- **Fix**: Keep questions under 100 chars, answer under 300
-
-### Article Schema
-- **Issue**: Missing author
-- **Cause**: Author not specified
-- **Fix**: Use Organization as author if no personal author
-
-### Aggregate Rating
-- **Issue**: No rating showing
-- **Cause**: Need real reviews
-- **Fix**: Implement review collection or remove
-
-## Implementation Pattern
-
-### In StructuredData.tsx
-```tsx
-export function StructuredData({ type, data }) {
-  const schemas = {
-    organization: generateOrganizationSchema(),
-    calculator: generateSoftwareAppSchema(),
-    faq: generateFAQSchema(data.questions),
-    article: generateArticleSchema(data),
-    salary: generateSalaryPageSchema(data.amount),
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(schemas[type], null, 0),
-      }}
-    />
-  );
-}
-```
-
-### Page Usage
-```tsx
-// In page component
-<StructuredData type="calculator" />
-<StructuredData type="faq" data={{ questions: faqItems }} />
-```
-
-## Testing Tools
-
-1. **Google Rich Results Test**: https://search.google.com/test/rich-results
-2. **Schema.org Validator**: https://validator.schema.org/
-3. **Google Search Console**: Enhancements report
-4. **Structured Data Testing Tool**: (legacy, still useful)
-
-## Annual Maintenance
-
-### Tax Year Transition (April)
-- [ ] Update Dataset temporal property
-- [ ] Verify HowTo steps still accurate
-- [ ] Update FAQ answers with new figures
-- [ ] Check SoftwareApplication description
-
-### Rate Changes
-- [ ] Update any hardcoded amounts in FAQ
-- [ ] Verify Dataset description
-- [ ] Check Article dateModified
-
-## Related Files
-
-- `src/components/organisms/StructuredData.tsx` - Main implementation
-- `src/lib/metadata.ts` - Page metadata (works with schema)
-- `src/app/layout.tsx` - Global schema inclusion
+- **seo-audit**: For overall SEO including schema review
+- **programmatic-seo**: For templated schema at scale

@@ -1,5 +1,6 @@
 ---
 name: seo-audit
+version: 1.0.0
 description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 ---
 
@@ -8,6 +9,9 @@ description: When the user wants to audit, review, or diagnose SEO issues on the
 You are an expert in search engine optimization. Your goal is to identify SEO issues and provide actionable recommendations to improve organic search performance.
 
 ## Initial Assessment
+
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
 Before auditing, understand:
 
@@ -25,6 +29,18 @@ Before auditing, understand:
    - Full site audit or specific pages?
    - Technical + on-page, or one focus area?
    - Access to Search Console / analytics?
+
+---
+## PayeTax Context
+
+**Product:** Free UK PAYE tax calculator at payetax.uk
+**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
+**Audience:** UK employees, job seekers, directors, HR professionals
+**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
+**Voice:** Clear, confident, numbers-focused, British English
+**Constraints:** No user accounts, no ads, must match HMRC accuracy
+
+See `.claude/product-marketing-context.md` for full details.
 
 ---
 
@@ -347,6 +363,13 @@ Same format as above
 
 ---
 
+## References
+
+- [AI Writing Detection](references/ai-writing-detection.md): Common AI writing patterns to avoid (em dashes, overused phrases, filler words)
+- [AEO & GEO Patterns](references/aeo-geo-patterns.md): Content patterns optimized for answer engines and AI citation
+
+---
+
 ## Tools Referenced
 
 **Free Tools**
@@ -365,9 +388,8 @@ Same format as above
 
 ---
 
-## Questions to Ask
+## Task-Specific Questions
 
-If you need more context:
 1. What pages/keywords matter most?
 2. Do you have Search Console access?
 3. Any recent changes or migrations?

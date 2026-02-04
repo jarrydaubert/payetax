@@ -17,7 +17,8 @@
  */
 'use client';
 
-import { ExternalLink, Heart } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
+import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
@@ -118,7 +119,7 @@ export function MarriageAllowanceAlert({
           </AlertDescription>
         </div>
 
-        {/* HMRC Link Button */}
+        {/* Marriage Allowance Calculator Link */}
         <Button
           asChild
           size='sm'
@@ -127,10 +128,10 @@ export function MarriageAllowanceAlert({
             SPACING.GAP_2,
           )}
         >
-          <a href='https://www.gov.uk/marriage-allowance' target='_blank' rel='noopener noreferrer'>
-            Check Eligibility on GOV.UK
-            <ExternalLink className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-          </a>
+          <Link href='/tools/marriage-allowance-calculator'>
+            Open Marriage Allowance Calculator
+            <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          </Link>
         </Button>
       </div>
     </Alert>

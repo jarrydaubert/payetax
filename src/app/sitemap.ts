@@ -27,9 +27,8 @@ const SITE_URL =
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
-  // Use a stable date for static pages (update when content actually changes)
-  // This prevents unnecessary recrawls from search engines
-  const staticPagesDate = '2025-01-15T00:00:00.000Z';
+  // Use build date to avoid stale lastModified signals
+  const staticPagesDate = new Date().toISOString();
 
   // Static pages - use stable date (update when content changes)
   const staticPages: SitemapEntry[] = [
@@ -74,6 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: staticPagesDate,
       changeFrequency: 'monthly',
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tools`,
+      lastModified: staticPagesDate,
+      changeFrequency: 'monthly',
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/tools/tax-code-decoder`,

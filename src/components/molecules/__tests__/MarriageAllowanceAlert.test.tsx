@@ -172,15 +172,13 @@ describe('MarriageAllowanceAlert', () => {
       expect(screen.getByText(/update your tax code to include an 'M' suffix/)).toBeInTheDocument();
     });
 
-    it('should display GOV.UK link with correct attributes', () => {
+    it('should link to the Marriage Allowance calculator', () => {
       render(
         <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
       );
 
-      const link = screen.getByRole('link', { name: /Check Eligibility on GOV.UK/i });
-      expect(link).toHaveAttribute('href', 'https://www.gov.uk/marriage-allowance');
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      const link = screen.getByRole('link', { name: /Open Marriage Allowance Calculator/i });
+      expect(link).toHaveAttribute('href', '/tools/marriage-allowance-calculator');
     });
 
     it('should render Heart icon', () => {

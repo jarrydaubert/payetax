@@ -16,8 +16,10 @@ import {
   getServerEnv,
   isFeatureEnabled,
   PublicEnvSchema,
+  RequiredProductionEnvSchema,
   ServerEnvSchema,
   validateEnv,
+  validateProductionEnv,
   validatePublicEnv,
   validateServerEnv,
 } from '../env';
@@ -25,17 +27,23 @@ import {
 describe('Environment Variable Validation', () => {
   // Store original env vars to restore after tests
   const originalEnv = { ...process.env };
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     // Reset to original state
     process.env = { ...originalEnv };
     // Clear problematic env vars that might have invalid values
     process.env.INDEXNOW_KEY = undefined;
+    process.env.RESEND_API_KEY = undefined;
+    process.env.RESEND_AUDIENCE_ID = undefined;
+    process.env.NEXT_PUBLIC_SITE_URL = undefined;
   });
 
   afterEach(() => {
     // Restore original env vars
     process.env = originalEnv;
+    consoleErrorSpy.mockRestore();
   });
 
   // ============================================================================
@@ -148,6 +156,13 @@ describe('Environment Variable Validation', () => {
         expect(result.success).toBe(true);
       });
 
+      it('should accept valid Resend audience ID', () => {
+        const result = ServerEnvSchema.safeParse({
+          RESEND_AUDIENCE_ID: 'aud_abc123def456',
+        });
+        expect(result.success).toBe(true);
+      });
+
       it('should accept valid IndexNow key (UUID)', () => {
         const result = ServerEnvSchema.safeParse({
           INDEXNOW_KEY: '123e4567-e89b-12d3-a456-426614174000',
@@ -224,6 +239,13 @@ describe('Environment Variable Validation', () => {
         });
         expect(result.success).toBe(false);
       });
+
+      it('should reject empty Resend audience ID if provided', () => {
+        const result = ServerEnvSchema.safeParse({
+          RESEND_AUDIENCE_ID: '',
+        });
+        expect(result.success).toBe(false);
+      });
     });
   });
 
@@ -270,6 +292,26 @@ describe('Environment Variable Validation', () => {
         server: {
           NODE_ENV: 'invalid',
         },
+      });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('RequiredProductionEnvSchema', () => {
+    it('should accept required production env vars', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+        RESEND_API_KEY: 're_test123',
+        RESEND_AUDIENCE_ID: 'aud_test123',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject missing required production env vars', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: undefined,
+        RESEND_API_KEY: undefined,
+        RESEND_AUDIENCE_ID: undefined,
       });
       expect(result.success).toBe(false);
     });
@@ -349,6 +391,30 @@ describe('Environment Variable Validation', () => {
       process.env.NEXT_PUBLIC_GA_ID = 'INVALID';
 
       expect(() => validateEnv()).toThrow();
+    });
+  });
+
+  describe('validateProductionEnv', () => {
+    it('should validate required production env vars from process.env', () => {
+      process.env.NEXT_PUBLIC_SITE_URL = 'https://payetax.co.uk';
+      process.env.RESEND_API_KEY = 're_test123';
+      process.env.RESEND_AUDIENCE_ID = 'aud_test123';
+
+      const env = validateProductionEnv();
+
+      expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://payetax.co.uk');
+      expect(env.RESEND_API_KEY).toBe('re_test123');
+      expect(env.RESEND_AUDIENCE_ID).toBe('aud_test123');
+    });
+
+    it('should throw when required production env vars are missing', () => {
+      process.env.NEXT_PUBLIC_SITE_URL = undefined;
+      process.env.RESEND_API_KEY = undefined;
+      process.env.RESEND_AUDIENCE_ID = undefined;
+
+      expect(() => validateProductionEnv()).toThrow(
+        'Missing or invalid required production environment variables',
+      );
     });
   });
 

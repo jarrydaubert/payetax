@@ -14,6 +14,9 @@ auto = true
 # Registry configuration
 registry = "https://registry.npmjs.org/"
 
+[install.security]
+scanner = "@bun-security-scanner/osv"
+
 [install.scopes]
 # Add custom registries for scoped packages if needed
 # "@myorg" = "https://custom-registry.example.com"

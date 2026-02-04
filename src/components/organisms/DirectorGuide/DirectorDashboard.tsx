@@ -30,6 +30,7 @@ import {
   SurvivalModePanel,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
+import { DirectorGuideWelcomeDialog } from '@/components/molecules/DirectorGuide/WelcomeDialog';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SPACING } from '@/constants/designTokens';
@@ -290,6 +291,7 @@ export function DirectorDashboard() {
         comparison={comparison}
         emailInput={emailInput}
       />
+      <DirectorGuideWelcomeDialog />
     </TooltipProvider>
   );
 }

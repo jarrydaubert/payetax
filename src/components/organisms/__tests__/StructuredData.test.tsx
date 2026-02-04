@@ -92,6 +92,37 @@ describe('StructuredData Component', () => {
     });
   });
 
+  describe('ItemList Schema', () => {
+    it('should render item list JSON-LD with items', () => {
+      const itemList = {
+        listName: 'Tools',
+        listDescription: 'Test tools',
+        items: [
+          {
+            name: 'Tool One',
+            url: 'https://payetax.co.uk/tools/tool-one',
+            description: 'First tool',
+          },
+          {
+            name: 'Tool Two',
+            url: 'https://payetax.co.uk/tools/tool-two',
+          },
+        ],
+      };
+
+      const { container } = render(<StructuredData type='itemlist' itemList={itemList} />);
+
+      const script = container.querySelector('script[type="application/ld+json"]');
+      expect(script).toBeInTheDocument();
+
+      if (script?.textContent) {
+        const data = JSON.parse(script.textContent);
+        expect(data['@type']).toBe('ItemList');
+        expect(data.itemListElement).toHaveLength(2);
+      }
+    });
+  });
+
   describe('FAQ Schema', () => {
     it('should render FAQ JSON-LD with questions', () => {
       const faqs = [
@@ -215,6 +246,15 @@ describe('StructuredData Component', () => {
       const { container } = render(<StructuredData type='faq' />);
 
       // Component returns null when FAQ questions are missing
+      const script = container.querySelector('script[type="application/ld+json"]');
+      expect(script).not.toBeInTheDocument();
+    });
+
+    it('should return null for item list without items', () => {
+      const { container } = render(
+        <StructuredData type='itemlist' itemList={{ listName: 'Empty', items: [] }} />,
+      );
+
       const script = container.querySelector('script[type="application/ld+json"]');
       expect(script).not.toBeInTheDocument();
     });

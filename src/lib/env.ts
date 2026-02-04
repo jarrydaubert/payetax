@@ -55,6 +55,7 @@ export const ServerEnvSchema = z.object({
     .string()
     .min(1, 'Resend API key is required for email functionality')
     .optional(),
+  RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter').optional(),
 
   // Sentry Build Configuration
   SENTRY_AUTH_TOKEN: z.string().optional(),
@@ -91,9 +92,16 @@ export const EnvSchema = z.object({
   server: ServerEnvSchema,
 });
 
+export const RequiredProductionEnvSchema = z.object({
+  NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
+  RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
+  RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter'),
+});
+
 export type PublicEnv = z.infer<typeof PublicEnvSchema>;
 export type ServerEnv = z.infer<typeof ServerEnvSchema>;
 export type Env = z.infer<typeof EnvSchema>;
+export type RequiredProductionEnv = z.infer<typeof RequiredProductionEnvSchema>;
 
 /**
  * Validates public environment variables (safe to use in browser)
@@ -127,6 +135,7 @@ export function validatePublicEnv(): PublicEnv {
 export function validateServerEnv(): ServerEnv {
   const result = ServerEnvSchema.safeParse({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,
@@ -158,6 +167,28 @@ export function validateEnv(): Env {
     public: validatePublicEnv(),
     server: validateServerEnv(),
   };
+}
+
+/**
+ * Validates required environment variables for production
+ * @returns Validated required production environment variables
+ * @throws Error if required variables are missing or invalid
+ */
+export function validateProductionEnv(): RequiredProductionEnv {
+  const result = RequiredProductionEnvSchema.safeParse({
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+  });
+
+  if (!result.success) {
+    console.error('❌ Production environment validation failed:', result.error.issues);
+    throw new Error(
+      `Missing or invalid required production environment variables: ${result.error.issues.map((i) => i.message).join(', ')}`,
+    );
+  }
+
+  return result.data;
 }
 
 /**
@@ -206,10 +237,9 @@ export function isFeatureEnabled(feature: 'PWA' | 'ANALYTICS'): boolean {
 if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
   // Server-side validation only in production
   try {
-    validateEnv();
+    validateProductionEnv();
   } catch (error) {
-    console.error('❌ Environment validation failed at startup:', error);
-    // Don't throw - allow app to start but log the error
-    // This prevents deployment failures due to optional env vars
+    console.error('❌ Required production env validation failed at startup:', error);
+    throw error;
   }
 }

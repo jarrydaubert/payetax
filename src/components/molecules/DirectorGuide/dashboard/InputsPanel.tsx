@@ -6,8 +6,9 @@
  */
 'use client';
 
-import { ChevronDown, ChevronUp, HelpCircle, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { useId, useState } from 'react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,7 +20,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { type StudentLoanPlan, TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import type { Region } from '@/lib/validation/directorValidation';
@@ -36,7 +36,6 @@ const rates = TAX_RATES[TAX_YEAR];
 if (!rates) {
   throw new Error(`Tax rates not found for year: ${TAX_YEAR}`);
 }
-const EMPLOYMENT_ALLOWANCE = rates.nationalInsurance.employmentAllowance;
 
 // Shared input styling
 const INPUT_CLASS =
@@ -117,7 +116,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     <aside className={cn('flex h-full flex-col overflow-y-auto bg-slate-900 p-5', className)}>
       {/* Section: Core Inputs */}
       <Section title='Your Company'>
-        <Field label='Annual Revenue' hint='Total invoiced before expenses' id={ids.revenue}>
+        <Field
+          label='Annual Revenue'
+          hint='Total invoiced before expenses'
+          id={ids.revenue}
+          tooltipFieldName='directorRevenue'
+        >
           <Input
             id={ids.revenue}
             data-testid='director-revenue-input'
@@ -141,10 +145,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <Label htmlFor={ids.includesVat} className='cursor-pointer text-slate-400 text-sm'>
             Revenue includes VAT
           </Label>
-          <Tip content='Used for VAT threshold warnings/education only. We do not adjust your revenue for tax calculations.' />
+          <LabelTooltip fieldName='directorIncludesVat' />
         </div>
 
-        <Field label='Business Expenses' hint='Excluding your salary' id={ids.expenses}>
+        <Field
+          label='Business Expenses'
+          hint='Excluding your salary'
+          id={ids.expenses}
+          tooltipFieldName='directorExpenses'
+        >
           <Input
             id={ids.expenses}
             data-testid='director-expenses-input'
@@ -157,7 +166,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           />
         </Field>
 
-        <Field label='Income Tax Region' hint='Scotland has different tax bands' id={ids.region}>
+        <Field
+          label='Income Tax Region'
+          hint='Scotland has different tax bands'
+          id={ids.region}
+          tooltipFieldName='region'
+        >
           <Select
             value={selectedCountry}
             onValueChange={(v) => {
@@ -182,7 +196,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           </Select>
         </Field>
 
-        <Field label='Company Year-End' hint='For key tax dates' id={ids.yearEnd}>
+        <Field
+          label='Company Year-End'
+          hint='For key tax dates'
+          id={ids.yearEnd}
+          tooltipFieldName='directorYearEnd'
+        >
           <Select
             value={formData.yearEndMonth}
             onValueChange={(v) => actions.setYearEndMonth(v as YearEndMonth)}
@@ -206,7 +225,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       {/* Section: Already Taken */}
       <Section title='Already Taken This Year'>
-        <Field label='YTD Salary' hint='Gross salary via PAYE' id={ids.ytdSalary}>
+        <Field
+          label='YTD Salary'
+          hint='Gross salary via PAYE'
+          id={ids.ytdSalary}
+          tooltipFieldName='directorYtdSalary'
+        >
           <Input
             id={ids.ytdSalary}
             type='text'
@@ -218,7 +242,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           />
         </Field>
 
-        <Field label='YTD Dividends' hint='Dividends declared' id={ids.ytdDividends}>
+        <Field
+          label='YTD Dividends'
+          hint='Dividends declared'
+          id={ids.ytdDividends}
+          tooltipFieldName='directorYtdDividends'
+        >
           <Input
             id={ids.ytdDividends}
             type='text'
@@ -234,6 +263,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           label='Other Drawings'
           hint='Non-dividend withdrawals (e.g. director loan)'
           id={ids.ytdDrawings}
+          tooltipFieldName='directorYtdDrawings'
         >
           <Input
             id={ids.ytdDrawings}
@@ -249,7 +279,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       {/* Section: Your Situation */}
       <Section title='Your Situation'>
-        <Field label='Other Personal Income' hint='Employment, rental, etc.' id={ids.otherIncome}>
+        <Field
+          label='Other Personal Income'
+          hint='Employment, rental, etc.'
+          id={ids.otherIncome}
+          tooltipFieldName='directorOtherIncome'
+        >
           <Input
             id={ids.otherIncome}
             type='text'
@@ -267,7 +302,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             <Label htmlFor={ids.otherPaye} className='text-slate-400 text-sm'>
               Other PAYE employment?
             </Label>
-            <Tip content='If yes, your NI calculations may differ from shown. We assume this is your only PAYE source.' />
+            <LabelTooltip fieldName='directorOtherPAYE' />
           </div>
           <Switch
             id={ids.otherPaye}
@@ -302,9 +337,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 <Label htmlFor={ids.employmentAllowance} className='text-slate-400 text-sm'>
                   Employment Allowance
                 </Label>
-                <Tip
-                  content={`£${EMPLOYMENT_ALLOWANCE.toLocaleString()} offset. Not available if you are the only employee/director.`}
-                />
+                <LabelTooltip fieldName='directorEmploymentAllowance' />
               </div>
               <Switch
                 id={ids.employmentAllowance}
@@ -318,7 +351,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             <fieldset className='space-y-2'>
               <legend className='flex items-center gap-2 text-slate-400 text-sm'>
                 Student Loans
-                <Tip content='Applied to total income (salary + dividends) via Self Assessment' />
+                <LabelTooltip fieldName='directorStudentLoans' />
               </legend>
               <div className='grid grid-cols-2 gap-2'>
                 {(['plan1', 'plan2', 'plan4', 'postgrad'] as StudentLoanPlan[]).map((plan) => {
@@ -344,7 +377,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </fieldset>
 
             {/* Pension Contribution */}
-            <Field label='Employer Pension' hint='Reduces taxable profit' id={ids.pension}>
+            <Field
+              label='Employer Pension'
+              hint='Reduces taxable profit'
+              id={ids.pension}
+              tooltipFieldName='directorPension'
+            >
               <Input
                 id={ids.pension}
                 type='text'
@@ -371,12 +409,17 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 >
                   Already deducted from profit figure
                 </Label>
-                <Tip content="Check this if your profit figure already includes the pension deduction. We won't subtract it again." />
+                <LabelTooltip fieldName='directorPensionDeducted' />
               </div>
             )}
 
             {/* Company Car BIK */}
-            <Field label='Company Car BIK' hint='Taxable benefit amount' id={ids.carBik}>
+            <Field
+              label='Company Car BIK'
+              hint='Taxable benefit amount'
+              id={ids.carBik}
+              tooltipFieldName='directorCompanyCar'
+            >
               <Input
                 id={ids.carBik}
                 type='text'
@@ -393,6 +436,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               label='Losses Brought Forward'
               hint='Trading losses from prior years'
               id={ids.losses}
+              tooltipFieldName='directorLosses'
             >
               <Input
                 id={ids.losses}
@@ -410,6 +454,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               label='Minimum Salary'
               hint='Floor for mortgage or visa applications'
               id={ids.minSalary}
+              tooltipFieldName='directorMinimumSalary'
             >
               <Input
                 id={ids.minSalary}
@@ -433,7 +478,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <p className='mb-3 text-slate-500 text-xs'>
           Enter your current salary and dividends to see how it compares to the baseline mix.
         </p>
-        <Field label='Your Current Salary' hint='Annual gross salary' id={ids.yourSalary}>
+        <Field
+          label='Your Current Salary'
+          hint='Annual gross salary'
+          id={ids.yourSalary}
+          tooltipFieldName='directorYourSalary'
+        >
           <Input
             id={ids.yourSalary}
             type='text'
@@ -447,7 +497,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             aria-describedby={getHintId(ids.yourSalary)}
           />
         </Field>
-        <Field label='Your Current Dividends' hint='Annual dividends' id={ids.yourDividends}>
+        <Field
+          label='Your Current Dividends'
+          hint='Annual dividends'
+          id={ids.yourDividends}
+          tooltipFieldName='directorYourDividends'
+        >
           <Input
             id={ids.yourDividends}
             type='text'
@@ -498,20 +553,25 @@ function Field({
   label,
   hint,
   id,
+  tooltipFieldName,
   children,
 }: {
   label: string;
   hint?: string;
   id?: string;
+  tooltipFieldName?: string;
   children: React.ReactNode;
 }) {
   const hintId = hint ? getHintId(id) : undefined;
 
   return (
     <div className='space-y-1.5'>
-      <Label htmlFor={id} className='text-slate-400 text-sm'>
-        {label}
-      </Label>
+      <div className='flex items-center gap-2'>
+        <Label htmlFor={id} className='text-slate-400 text-sm'>
+          {label}
+        </Label>
+        {tooltipFieldName && <LabelTooltip fieldName={tooltipFieldName} />}
+      </div>
       {children}
       {hint && (
         <p id={hintId} className='text-slate-600 text-xs'>
@@ -519,24 +579,5 @@ function Field({
         </p>
       )}
     </div>
-  );
-}
-
-function Tip({ content }: { content: string }) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type='button'
-          className='inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-900'
-          aria-label='More information'
-        >
-          <HelpCircle className='size-3.5 cursor-help text-slate-600' />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent className='max-w-xs bg-slate-800 text-slate-200'>
-        <p className='text-xs'>{content}</p>
-      </TooltipContent>
-    </Tooltip>
   );
 }

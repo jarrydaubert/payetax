@@ -18,8 +18,11 @@ jest.mock('next/navigation', () => ({
 jest.mock('next/script', () => ({
   __esModule: true,
   default: ({ children, onLoad, ...props }: any) => {
-    // Simulate script loading immediately (works under fake timers too)
-    onLoad?.();
+    const { useEffect } = require('react');
+    // Simulate script loading after mount to avoid setState during render
+    useEffect(() => {
+      onLoad?.();
+    }, [onLoad]);
     return children ? <script {...props}>{children}</script> : <script {...props} />;
   },
 }));

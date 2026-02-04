@@ -2,7 +2,7 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
-import { useActionState, useEffect, useId, useRef, useState } from 'react';
+import { startTransition, useActionState, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
@@ -133,7 +133,9 @@ export function FeedbackDialog() {
     formDataToSubmit.append('url', window.location.href);
 
     // Call server action directly - useActionState handles pending state
-    formAction(formDataToSubmit);
+    startTransition(() => {
+      formAction(formDataToSubmit);
+    });
   };
 
   return (

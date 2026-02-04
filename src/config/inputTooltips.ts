@@ -141,6 +141,115 @@ export const INPUT_TOOLTIPS = {
     description: 'The amount of change to model',
     note: 'Positive for increase, negative for decrease',
   },
+
+  // Director Guide Inputs
+  directorRevenue: {
+    title: 'Annual Revenue',
+    description: 'Total company revenue for the year before expenses',
+    note: 'Use your expected turnover or last 12 months of sales',
+  },
+
+  directorIncludesVat: {
+    title: 'Revenue Includes VAT',
+    description: 'Indicate if your revenue figure includes VAT',
+    note: 'We do not remove VAT in calculations; it only affects VAT warnings',
+  },
+
+  directorExpenses: {
+    title: 'Business Expenses',
+    description: 'Allowable company expenses excluding your own salary',
+    note: 'Include overheads, contractors, software, rent, and other costs',
+  },
+
+  directorYearEnd: {
+    title: 'Company Year-End',
+    description: 'Your company accounting period end date',
+    note: 'Used to estimate corporation tax deadlines and key dates',
+  },
+
+  directorYtdSalary: {
+    title: 'YTD Salary',
+    description: 'Salary already paid to you in this tax year',
+    note: 'We subtract this from your remaining salary allowance',
+  },
+
+  directorYtdDividends: {
+    title: 'YTD Dividends',
+    description: 'Dividends already declared this tax year',
+    note: 'Reduces the remaining dividend headroom for the year',
+  },
+
+  directorYtdDrawings: {
+    title: 'Other Drawings',
+    description: 'Withdrawals not treated as salary or dividends',
+    note: "Often director's loan account movements or ad-hoc withdrawals",
+  },
+
+  directorOtherIncome: {
+    title: 'Other Personal Income',
+    description: 'Personal income outside the company',
+    note: 'Employment, rental, or investment income affects dividend tax bands',
+  },
+
+  directorOtherPAYE: {
+    title: 'Other PAYE Employment',
+    description: 'Whether you have another PAYE job elsewhere',
+    note: 'If yes, NI calculations may differ from these estimates',
+  },
+
+  directorEmploymentAllowance: {
+    title: 'Employment Allowance',
+    description: 'Claim the Employment Allowance against Employer NI',
+    note: "Not available if you're the only director/employee in most cases",
+  },
+
+  directorStudentLoans: {
+    title: 'Student Loans',
+    description: 'Student loan plans you repay via Self Assessment',
+    note: "Plan 1: Before Sept 2012 (England/Wales)\nPlan 2: After Sept 2012 (England/Wales)\nPlan 4: Scotland\nPostgraduate: Master's or PhD loan",
+  },
+
+  directorPension: {
+    title: 'Employer Pension',
+    description: 'Company pension contributions paid on your behalf',
+    note: 'These reduce company profit and corporation tax',
+  },
+
+  directorPensionDeducted: {
+    title: 'Pension Already Deducted',
+    description: 'Whether your profit figure already includes pension costs',
+    note: 'Check this to avoid deducting the pension twice',
+  },
+
+  directorCompanyCar: {
+    title: 'Company Car BIK',
+    description: 'Taxable Benefit-in-Kind value of a company car',
+    note: 'Use the P11D benefit amount for the year',
+  },
+
+  directorLosses: {
+    title: 'Losses Brought Forward',
+    description: 'Trading losses carried forward from prior years',
+    note: 'Offsets taxable profit before corporation tax',
+  },
+
+  directorMinimumSalary: {
+    title: 'Minimum Salary',
+    description: 'Minimum salary you want to take regardless of tax efficiency',
+    note: 'Useful for mortgage, visa, or income proof requirements',
+  },
+
+  directorYourSalary: {
+    title: 'Your Current Salary',
+    description: 'Your existing annual salary from the company',
+    note: 'Used to compare your mix against the recommended option',
+  },
+
+  directorYourDividends: {
+    title: 'Your Current Dividends',
+    description: 'Your existing annual dividends from the company',
+    note: 'Used to compare your mix against the recommended option',
+  },
 } as const;
 
 /** Type-safe field name for tooltips - ensures compile-time validation */

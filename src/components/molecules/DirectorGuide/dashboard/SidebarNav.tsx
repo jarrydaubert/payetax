@@ -28,13 +28,19 @@ interface SidebarNavProps {
 
 // Shared styles for nav items
 const baseItemClass =
-  'flex items-center rounded-[10px] text-slate-500 transition-all hover:bg-slate-800 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950';
+  'flex min-h-10 w-full items-center rounded-[10px] py-2.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950';
 
 const getItemClass = (collapsed: boolean, isActive = false) =>
   cn(
     baseItemClass,
-    collapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5',
+    collapsed ? 'justify-center px-0' : 'gap-3 px-3',
     isActive && 'bg-slate-800/50 text-cyan-400',
+  );
+
+const getLabelClass = (collapsed: boolean) =>
+  cn(
+    'block max-w-[160px] overflow-hidden whitespace-nowrap font-medium text-sm transition-all duration-200',
+    collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
   );
 
 // NavLink component for DRY
@@ -59,7 +65,7 @@ function NavLink({
       aria-current={isActive ? 'page' : undefined}
     >
       <Icon className='size-5 shrink-0' aria-hidden='true' />
-      {!collapsed && <span className='font-medium text-sm'>{label}</span>}
+      <span className={getLabelClass(collapsed)}>{label}</span>
     </Link>
   );
 }
@@ -93,7 +99,7 @@ function NavButton({
       aria-label={collapsed ? label : undefined}
     >
       <Icon className='size-5 shrink-0' aria-hidden='true' />
-      {!collapsed && <span className='font-medium text-sm'>{label}</span>}
+      <span className={getLabelClass(collapsed)}>{label}</span>
     </button>
   );
 }
@@ -111,26 +117,45 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
     <nav
       className={cn(
         'relative flex h-full flex-col border-white/[0.04] border-r bg-slate-950 py-4 transition-[width,padding] duration-200 ease-out',
-        collapsed ? 'w-14 items-center px-2' : 'w-48 px-3',
+        collapsed ? 'w-14 px-2' : 'w-48 px-3',
       )}
       aria-label='Sidebar navigation'
     >
       {/* Logo */}
       <Link
         href='/'
-        className='mb-4 flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
+        className={cn(
+          'mb-4 flex items-center rounded-[12px] border border-white/[0.08] bg-slate-900/60 text-slate-100 transition-colors hover:bg-slate-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+          collapsed ? 'size-12 justify-center p-0' : 'min-h-12 w-full gap-3 px-3 py-2.5',
+        )}
         aria-label='PayeTax Home'
       >
-        P
+        <span className='flex size-9 items-center justify-center rounded-[11px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'>
+          P
+        </span>
+        <span
+          className={cn(
+            'block max-w-[160px] overflow-hidden whitespace-nowrap font-semibold text-[0.95rem] text-slate-100 tracking-[-0.02em] transition-all duration-200',
+            collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
+          )}
+        >
+          paye
+          <span className='bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent'>
+            tax
+          </span>
+        </span>
       </Link>
 
       {/* Section: Actions */}
       <section aria-label='Actions'>
-        {!collapsed && (
-          <div className='mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider'>
-            Actions
-          </div>
-        )}
+        <div
+          className={cn(
+            'mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider transition-opacity duration-200',
+            collapsed && 'opacity-0',
+          )}
+        >
+          Actions
+        </div>
 
         {/* Email Results - disabled when no handler */}
         <NavButton
@@ -148,11 +173,14 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
 
       {/* Section: Tools */}
       <section aria-label='Tools'>
-        {!collapsed && (
-          <div className='mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider'>
-            Tools
-          </div>
-        )}
+        <div
+          className={cn(
+            'mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider transition-opacity duration-200',
+            collapsed && 'opacity-0',
+          )}
+        >
+          Tools
+        </div>
 
         <NavLink
           href='/'
@@ -201,10 +229,9 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
           ) : (
             <ChevronLeft className='size-5 shrink-0' aria-hidden='true' />
           )}
-          {!collapsed && <span className='font-medium text-sm'>Collapse</span>}
+          <span className={getLabelClass(collapsed)}>{collapsed ? 'Expand' : 'Collapse'}</span>
         </button>
       )}
-
       {/* Spacer */}
       <div className='flex-1' />
 
