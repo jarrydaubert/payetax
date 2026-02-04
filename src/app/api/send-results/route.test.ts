@@ -10,6 +10,7 @@
  */
 
 import { NextRequest } from 'next/server';
+
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(),
 }));
@@ -40,25 +41,30 @@ function buildRequest(
   });
 }
 
-const validResults = {
-  grossSalary: { annually: 50000, monthly: 4166.67 },
-  incomeTax: { annually: 5000, monthly: 416.67 },
-  nationalInsurance: { annually: 4000, monthly: 333.33 },
-  pensionContribution: { annually: 0, monthly: 0 },
-  studentLoan: { annually: 0, monthly: 0 },
-  netPay: { annually: 41000, monthly: 3416.67 },
-};
-
 const validPayload = {
   email: 'test@payetax.co.uk',
-  results: validResults,
-  taxYear: '2025-2026',
+  input: {
+    salary: 50000,
+    payPeriod: 'annually',
+    taxYear: '2025-2026',
+    taxCode: '1257L',
+    isScottish: false,
+    isMarried: false,
+    partnerGrossWage: 0,
+    isBlind: false,
+    age: 30,
+    payNoNI: false,
+    pensionContribution: 0,
+    pensionContributionType: 'percentage',
+    studentLoanPlans: 'none',
+    niCategory: 'A',
+    hoursPerWeek: 40,
+    allowancesDeductions: 0,
+    incomeSources: [],
+  },
 };
 
-async function loadRoute(
-  envOverrides: Record<string, string | undefined> = {},
-  rateLimit = true,
-) {
+async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');

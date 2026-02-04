@@ -27,9 +27,7 @@ describe('PeriodCheckbox', () => {
     });
 
     it('generates correct id for checkbox', () => {
-      render(
-        <PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />,
-      );
+      render(<PeriodCheckbox period='4-Weekly' checked={false} onCheckedChange={jest.fn()} />);
 
       const checkbox = screen.getByRole('checkbox', { name: '4-Weekly' });
       expect(checkbox).toHaveAttribute('id');

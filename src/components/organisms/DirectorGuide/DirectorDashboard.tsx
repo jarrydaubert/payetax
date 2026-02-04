@@ -40,6 +40,7 @@ import {
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
 import { cn } from '@/lib/utils';
+import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
   useDirectorFormData,
   useDirectorGuideActions,
@@ -60,6 +61,32 @@ export function DirectorDashboard() {
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
   const { calculate, reset } = useDirectorGuideActions();
+
+  const emailInput: DirectorEmailInput | null =
+    comparison &&
+    formData.region !== undefined &&
+    formData.revenue !== undefined &&
+    formData.expenses !== undefined
+      ? {
+          region: formData.region,
+          revenue: formData.revenue,
+          includesVat: formData.includesVat,
+          expenses: formData.expenses,
+          lossesBroughtForward: formData.lossesBroughtForward,
+          otherIncome: formData.otherIncome,
+          employmentAllowance: formData.hasEmploymentAllowance,
+          studentLoanPlans: formData.studentLoanPlans,
+          pensionContribution: formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution,
+          companyCarBIK: formData.companyCarBIK,
+          minimumSalaryRequirement: formData.minimumSalaryRequirement,
+          hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
+          ytdSalary: formData.ytdSalary,
+          ytdDividends: formData.ytdDividends,
+          ytdDrawings: formData.ytdDrawings,
+          yourSetupSalary: formData.yourSetupSalary,
+          yourSetupDividends: formData.yourSetupDividends,
+        }
+      : null;
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
@@ -98,12 +125,15 @@ export function DirectorDashboard() {
 
     const timer = window.setTimeout(() => calculate(), CALCULATE_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [formData.region, formData.revenue, formData.expenses, formData.includesVat, calculate]);
+  }, [formData, calculate]);
 
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
     if (comparison && !hasTrackedResults.current) {
-      trackResultsShown(comparison.grossProfit, comparison.grossProfit <= 0 ? 'survival' : 'normal');
+      trackResultsShown(
+        comparison.grossProfit,
+        comparison.grossProfit <= 0 ? 'survival' : 'normal',
+      );
       hasTrackedResults.current = true;
     }
   }, [comparison]);
@@ -258,6 +288,7 @@ export function DirectorDashboard() {
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
         comparison={comparison}
+        emailInput={emailInput}
       />
     </TooltipProvider>
   );

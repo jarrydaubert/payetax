@@ -241,6 +241,11 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface HowToStepItem {
+  name: string;
+  text: string;
+}
+
 /**
  * Extract FAQ sections from MDX content for schema.org FAQPage markup
  * Parses markdown to find FAQ headings and their answers
@@ -306,6 +311,88 @@ export function extractFAQs(content: string): FAQItem[] {
   return faqs;
 }
 
+const HOW_TO_STEP_MIN_COUNT = 3;
+const HOW_TO_STEP_MAX_COUNT = 12;
+const HOW_TO_STEP_MAX_LENGTH = 300;
+
+/**
+ * Extract HowTo steps from MDX content for schema.org HowTo markup
+ *
+ * Supported patterns:
+ * - ### Step 1: Do something
+ * - **Step 1: Do something**
+ * - **Step 1**: Do something
+ * - Step 1: Do something
+ */
+export function extractHowToSteps(content: string): HowToStepItem[] {
+  const lines = content.split('\n');
+  const steps: HowToStepItem[] = [];
+  const seenSteps = new Set<string>();
+
+  let currentStep: { name: string; textLines: string[] } | null = null;
+
+  const pushStep = () => {
+    if (!currentStep) return;
+
+    const name = currentStep.name.trim();
+    const text = cleanMarkdownForSchema(
+      currentStep.textLines.join('\n').trim(),
+      HOW_TO_STEP_MAX_LENGTH,
+    );
+    const finalText = text || name;
+    const dedupeKey = name.toLowerCase();
+
+    if (name && !seenSteps.has(dedupeKey)) {
+      seenSteps.add(dedupeKey);
+      steps.push({ name, text: finalText });
+    }
+
+    currentStep = null;
+  };
+
+  const getStepName = (line: string): string | null => {
+    const headingMatch = line.match(/^#{3,4}\s*Step\s*\d+:\s*(.+?)\s*$/i);
+    if (headingMatch?.[1]) return headingMatch[1].trim();
+
+    const boldInlineMatch = line.match(/^\*\*Step\s*\d+:\s*(.+?)\*\*\s*$/i);
+    if (boldInlineMatch?.[1]) return boldInlineMatch[1].trim();
+
+    const boldColonOutsideMatch = line.match(/^\*\*Step\s*\d+\*\*:\s*(.+?)\s*$/i);
+    if (boldColonOutsideMatch?.[1]) return boldColonOutsideMatch[1].trim();
+
+    const plainMatch = line.match(/^Step\s*\d+:\s*(.+?)\s*$/i);
+    if (plainMatch?.[1]) return plainMatch[1].trim();
+
+    return null;
+  };
+
+  for (const line of lines) {
+    const stepName = getStepName(line);
+    if (stepName) {
+      pushStep();
+      currentStep = { name: stepName, textLines: [] };
+      continue;
+    }
+
+    if (currentStep) {
+      if (/^##\s+/.test(line)) {
+        pushStep();
+        continue;
+      }
+
+      currentStep.textLines.push(line);
+    }
+  }
+
+  pushStep();
+
+  if (steps.length < HOW_TO_STEP_MIN_COUNT) {
+    return [];
+  }
+
+  return steps.slice(0, HOW_TO_STEP_MAX_COUNT);
+}
+
 /** Google recommends FAQ answers under 320 characters for best display */
 const FAQ_ANSWER_MAX_LENGTH = 320;
 
@@ -313,7 +400,7 @@ const FAQ_ANSWER_MAX_LENGTH = 320;
  * Clean markdown content for use in schema.org structured data
  * Removes formatting while preserving readable text
  */
-function cleanMarkdownForSchema(text: string): string {
+function cleanMarkdownForSchema(text: string, maxLength = FAQ_ANSWER_MAX_LENGTH): string {
   const cleaned = text
     // Remove code blocks
     .replace(/```[\s\S]*?```/g, '')
@@ -342,11 +429,9 @@ function cleanMarkdownForSchema(text: string): string {
     .trim();
 
   // Limit length for schema, try to break at word boundary
-  if (cleaned.length <= FAQ_ANSWER_MAX_LENGTH) return cleaned;
+  if (cleaned.length <= maxLength) return cleaned;
 
-  const truncated = cleaned.slice(0, FAQ_ANSWER_MAX_LENGTH);
+  const truncated = cleaned.slice(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
-  return lastSpace > FAQ_ANSWER_MAX_LENGTH * 0.8
-    ? `${truncated.slice(0, lastSpace)}...`
-    : `${truncated}...`;
+  return lastSpace > maxLength * 0.8 ? `${truncated.slice(0, lastSpace)}...` : `${truncated}...`;
 }

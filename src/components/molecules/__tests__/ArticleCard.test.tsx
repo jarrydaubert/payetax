@@ -1,18 +1,23 @@
 import { render, screen } from '@/test/testing-library';
-
-import { ArticleCardDeepDive, ArticleCardLarge, ArticleCardSmall } from '../ArticleCard';
 import type { BlogPost } from '@/types/blog';
+import { ArticleCardDeepDive, ArticleCardLarge, ArticleCardSmall } from '../ArticleCard';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt = '', src = '', fill: _fill, priority: _priority, blurDataURL: _blurDataURL }: {
+  default: ({
+    alt = '',
+    src = '',
+    fill: _fill,
+    priority: _priority,
+    blurDataURL: _blurDataURL,
+  }: {
     alt?: string;
     src?: string;
     fill?: boolean;
     priority?: boolean;
     blurDataURL?: string;
   }) => (
-    // eslint-disable-next-line @next/next/no-img-element
+    // biome-ignore lint/performance/noImgElement: test mock for next/image
     <img alt={alt} src={src} />
   ),
 }));

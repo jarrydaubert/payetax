@@ -114,7 +114,8 @@ describe('SectionHeading', () => {
 
     it('should center badge when align is center', () => {
       render(<SectionHeading title='Title' badge={{ text: 'Badge' }} align='center' />);
-      const badgeContainer = screen.getByText('Badge').parentElement?.parentElement as HTMLElement | null;
+      const badgeContainer = screen.getByText('Badge').parentElement
+        ?.parentElement as HTMLElement | null;
       expect(badgeContainer).toHaveClass('justify-center');
     });
   });

@@ -84,11 +84,9 @@ describe('analytics', () => {
 
       trackSEOAction(action, data);
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '🔍 SEO Analytics:',
-        action,
-        { source: 'calculator' },
-      );
+      expect(consoleLogSpy).toHaveBeenCalledWith('🔍 SEO Analytics:', action, {
+        source: 'calculator',
+      });
     });
 
     it('does not log to console in production mode', () => {

@@ -10,8 +10,8 @@ function makeRequest(headersInit: Record<string, string | undefined>) {
 
 describe('security/origin', () => {
   describe('isValidRequestOrigin', () => {
-    test('allows requests with no origin/referer (same-origin, non-browser)', () => {
-      expect(isValidRequestOrigin(makeRequest({}))).toBe(true);
+    test('rejects requests with no origin/referer by default', () => {
+      expect(isValidRequestOrigin(makeRequest({}))).toBe(false);
     });
 
     test('allows https origin on allowlist', () => {
@@ -25,7 +25,9 @@ describe('security/origin', () => {
     });
 
     test('uses referer when origin is absent', () => {
-      expect(isValidRequestOrigin(makeRequest({ referer: 'https://payetax.co.uk/tools' }))).toBe(true);
+      expect(isValidRequestOrigin(makeRequest({ referer: 'https://payetax.co.uk/tools' }))).toBe(
+        true,
+      );
       expect(isValidRequestOrigin(makeRequest({ referer: 'https://evil.com/tools' }))).toBe(false);
     });
   });
@@ -56,4 +58,3 @@ describe('security/origin', () => {
     });
   });
 });
-

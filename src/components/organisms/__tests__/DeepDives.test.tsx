@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
-
-import { DeepDives } from '../DeepDives';
 import type { BlogPost } from '@/types/blog';
+import { DeepDives } from '../DeepDives';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -19,7 +18,7 @@ jest.mock('next/image', () => ({
     priority?: boolean;
     blurDataURL?: string;
   }) => (
-    // eslint-disable-next-line @next/next/no-img-element
+    // biome-ignore lint/performance/noImgElement: test mock for next/image
     <img alt={alt} src={src} {...props} />
   ),
 }));

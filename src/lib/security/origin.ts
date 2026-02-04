@@ -1,8 +1,11 @@
 // src/lib/security/origin.ts
 
-import { type NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-type HeaderSource = Pick<NextRequest, 'headers'> | { headers: Headers } | { headers: { get(name: string): string | null } };
+type HeaderSource =
+  | Pick<NextRequest, 'headers'>
+  | { headers: Headers }
+  | { headers: { get(name: string): string | null } };
 
 function parseHost(urlLike: string): string | null {
   try {
@@ -46,11 +49,13 @@ export function getDefaultCsrfAllowedHosts(): string[] {
 export function isValidRequestOrigin(
   request: HeaderSource,
   allowedHosts: string[] = getDefaultCsrfAllowedHosts(),
+  options: { allowMissingOrigin?: boolean } = {},
 ): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
+  const allowMissingOrigin = options.allowMissingOrigin ?? false;
 
-  if (!(origin || referer)) return true;
+  if (!(origin || referer)) return allowMissingOrigin;
 
   if (origin) {
     const host = parseHost(origin);
@@ -66,4 +71,3 @@ export function isValidRequestOrigin(
 
   return false;
 }
-

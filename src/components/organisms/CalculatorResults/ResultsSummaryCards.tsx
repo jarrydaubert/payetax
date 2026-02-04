@@ -10,8 +10,12 @@ import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/an
 import { SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { calculateTax, type TaxCalculationInput, type TaxCalculationResults } from '@/lib/taxCalculator';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
+import {
+  calculateTax,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
+} from '@/lib/taxCalculator';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultsSummaryCardsProps {

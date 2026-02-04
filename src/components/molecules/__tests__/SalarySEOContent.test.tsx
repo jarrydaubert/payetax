@@ -271,9 +271,7 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(
-        screen.getByText(/This is around the UK median full-time salary/),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/This is around the UK median full-time salary/)).toBeInTheDocument();
     });
   });
 

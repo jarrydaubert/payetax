@@ -36,9 +36,7 @@ describe('MarginalRateInsight', () => {
     });
 
     it('should display a visual indicator showing the marginal rate proportion', () => {
-      const { container } = render(
-        <MarginalRateInsight increase={10000} netDiff={6000} />,
-      );
+      const { container } = render(<MarginalRateInsight increase={10000} netDiff={6000} />);
 
       // Verify there's a visual progress element representing the rate
       const progressBar = container.querySelector('[style*="width: 60%"]');
@@ -79,9 +77,7 @@ describe('MarginalRateInsight', () => {
     });
 
     it('should format large currency amounts correctly', () => {
-      const { container } = render(
-        <MarginalRateInsight increase={1000000} netDiff={600000} />,
-      );
+      const { container } = render(<MarginalRateInsight increase={1000000} netDiff={600000} />);
 
       // Verify large amounts are displayed with proper formatting
       expect(container.textContent).toContain('£1,000,000');
@@ -109,9 +105,7 @@ describe('MarginalRateInsight', () => {
     });
 
     it('should be keyboard accessible', () => {
-      const { container } = render(
-        <MarginalRateInsight increase={10000} netDiff={6000} />,
-      );
+      const { container } = render(<MarginalRateInsight increase={10000} netDiff={6000} />);
 
       // Component should render all content without requiring mouse interaction
       expect(container.textContent).toBeTruthy();

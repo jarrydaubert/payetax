@@ -10,8 +10,8 @@
  */
 
 import { NextRequest } from 'next/server';
-import { POST } from './route';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { POST } from './route';
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(),
@@ -118,7 +118,7 @@ describe('/api/indexnow POST', () => {
   it('returns a configured message when IndexNow key is missing', async () => {
     process.env.NODE_ENV = 'production';
     process.env.INDEXNOW_SUBMIT_SECRET = 'secret';
-    delete process.env.INDEXNOW_KEY;
+    process.env.INDEXNOW_KEY = undefined;
 
     const request = buildRequest(
       { urls: ['https://payetax.co.uk/blog/valid'] },

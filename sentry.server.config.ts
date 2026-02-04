@@ -127,6 +127,8 @@ Sentry.init({
           'authorization',
           'nationalInsuranceNumber',
           'taxCode',
+          'salary',
+          'pensionContribution',
         ];
         for (const field of sensitiveFields) {
           if (field in sanitized) {
@@ -134,6 +136,38 @@ Sentry.init({
           }
         }
         event.request.data = sanitized;
+      }
+    }
+
+    // Scrub context data that might contain PII
+    if (event.contexts) {
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'password',
+        'token',
+        'secret',
+        'apiKey',
+        'authorization',
+        'nationalInsuranceNumber',
+        'taxCode',
+        'salary',
+        'pensionContribution',
+      ];
+
+      for (const [key, value] of Object.entries(event.contexts)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const sanitized = { ...(value as Record<string, unknown>) };
+          for (const field of sensitiveFields) {
+            if (field in sanitized) {
+              sanitized[field] = '[Filtered]';
+            }
+          }
+          (event.contexts as Record<string, unknown>)[key] = sanitized;
+        }
       }
     }
 
@@ -190,6 +224,32 @@ Sentry.init({
       }
     }
 
+    // Scrub breadcrumb data fields
+    if (breadcrumb.data && typeof breadcrumb.data === 'object') {
+      const data = breadcrumb.data as Record<string, unknown>;
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'password',
+        'token',
+        'secret',
+        'apiKey',
+        'authorization',
+        'nationalInsuranceNumber',
+        'taxCode',
+        'salary',
+        'pensionContribution',
+      ];
+      for (const field of sensitiveFields) {
+        if (field in data) {
+          data[field] = '[Filtered]';
+        }
+      }
+    }
+
     return breadcrumb;
   },
 
@@ -233,6 +293,8 @@ Sentry.init({
         'authorization',
         'nationalInsuranceNumber',
         'taxCode',
+        'salary',
+        'pensionContribution',
       ];
       for (const field of sensitiveFields) {
         if (field in sanitized) {

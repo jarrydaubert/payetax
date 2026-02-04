@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { type StudentLoanPlan, TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { type StudentLoanPlan, TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import type { Region } from '@/lib/validation/directorValidation';
 import {
@@ -31,7 +31,7 @@ import {
 
 // Tax year configuration - should be centralized elsewhere
 // TODO: Move to app config/store so all panels share the same year
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear;
 const rates = TAX_RATES[TAX_YEAR];
 if (!rates) {
   throw new Error(`Tax rates not found for year: ${TAX_YEAR}`);
@@ -41,6 +41,8 @@ const EMPLOYMENT_ALLOWANCE = rates.nationalInsurance.employmentAllowance;
 // Shared input styling
 const INPUT_CLASS =
   'border-white/[0.08] bg-slate-800 font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500';
+
+const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
 
 interface InputsPanelProps {
   onReset?: () => void;
@@ -124,6 +126,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setRevenue(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.revenue)}
           />
         </Field>
 
@@ -150,6 +153,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setExpenses(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.expenses)}
           />
         </Field>
 
@@ -165,6 +169,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               id={ids.region}
               data-testid='director-region-select'
               className='border-white/[0.08] bg-slate-800 text-slate-100'
+              aria-describedby={getHintId(ids.region)}
             >
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
@@ -185,6 +190,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             <SelectTrigger
               id={ids.yearEnd}
               className='border-white/[0.08] bg-slate-800 text-slate-100'
+              aria-describedby={getHintId(ids.yearEnd)}
             >
               <SelectValue placeholder='Select year-end' />
             </SelectTrigger>
@@ -208,6 +214,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setYtdSalary(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.ytdSalary)}
           />
         </Field>
 
@@ -219,6 +226,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setYtdDividends(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.ytdDividends)}
           />
         </Field>
 
@@ -234,6 +242,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setYtdDrawings(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.ytdDrawings)}
           />
         </Field>
       </Section>
@@ -248,6 +257,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onChange={(e) => actions.setOtherIncome(parseCurrency(e.target.value))}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.otherIncome)}
           />
         </Field>
 
@@ -305,11 +315,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </div>
 
             {/* Student Loans */}
-            <div className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <Label className='text-slate-400 text-sm'>Student Loans</Label>
+            <fieldset className='space-y-2'>
+              <legend className='flex items-center gap-2 text-slate-400 text-sm'>
+                Student Loans
                 <Tip content='Applied to total income (salary + dividends) via Self Assessment' />
-              </div>
+              </legend>
               <div className='grid grid-cols-2 gap-2'>
                 {(['plan1', 'plan2', 'plan4', 'postgrad'] as StudentLoanPlan[]).map((plan) => {
                   const checkboxId = `${baseId}-loan-${plan}`;
@@ -331,7 +341,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   );
                 })}
               </div>
-            </div>
+            </fieldset>
 
             {/* Pension Contribution */}
             <Field label='Employer Pension' hint='Reduces taxable profit' id={ids.pension}>
@@ -342,6 +352,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 onChange={(e) => actions.setPensionContribution(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.pension)}
               />
             </Field>
             {formData.pensionContribution > 0 && (
@@ -373,6 +384,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 onChange={(e) => actions.setCompanyCarBIK(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.carBik)}
               />
             </Field>
 
@@ -389,6 +401,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 onChange={(e) => actions.setLossesBroughtForward(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.losses)}
               />
             </Field>
 
@@ -408,6 +421,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 }}
                 placeholder='£0'
                 className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.minSalary)}
               />
             </Field>
           </div>
@@ -430,6 +444,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             }}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.yourSalary)}
           />
         </Field>
         <Field label='Your Current Dividends' hint='Annual dividends' id={ids.yourDividends}>
@@ -443,6 +458,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             }}
             placeholder='£0'
             className={INPUT_CLASS}
+            aria-describedby={getHintId(ids.yourDividends)}
           />
         </Field>
       </Section>
@@ -489,13 +505,19 @@ function Field({
   id?: string;
   children: React.ReactNode;
 }) {
+  const hintId = hint ? getHintId(id) : undefined;
+
   return (
     <div className='space-y-1.5'>
       <Label htmlFor={id} className='text-slate-400 text-sm'>
         {label}
       </Label>
       {children}
-      {hint && <p className='text-slate-600 text-xs'>{hint}</p>}
+      {hint && (
+        <p id={hintId} className='text-slate-600 text-xs'>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

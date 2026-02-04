@@ -44,7 +44,10 @@ test.describe('Blog', () => {
 
   test('All Posts resets filter', async ({ page }) => {
     // Apply a filter first
-    const categoryLink = page.locator('a').filter({ hasText: /Tax Guides|News/i }).first();
+    const categoryLink = page
+      .locator('a')
+      .filter({ hasText: /Tax Guides|News/i })
+      .first();
     await categoryLink.click();
     await page.waitForURL(/\/blog\/category\//);
 

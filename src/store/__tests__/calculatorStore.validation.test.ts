@@ -223,33 +223,6 @@ describe('Calculator Store Validation', () => {
     });
   });
 
-  describe('Other income helpers', () => {
-    it('should update isOnlyIncome flag', () => {
-      const { setIsOnlyIncome } = useCalculatorStore.getState();
-
-      setIsOnlyIncome(false);
-
-      expect(useCalculatorStore.getState().input.isOnlyIncome).toBe(false);
-    });
-
-    it('should accept valid other income estimate', () => {
-      const { setOtherIncomeEstimate } = useCalculatorStore.getState();
-
-      setOtherIncomeEstimate(2500);
-
-      expect(useCalculatorStore.getState().input.otherIncomeEstimate).toBe(2500);
-    });
-
-    it('should reject negative other income estimate', () => {
-      const { setOtherIncomeEstimate } = useCalculatorStore.getState();
-      const initial = useCalculatorStore.getState().input.otherIncomeEstimate;
-
-      setOtherIncomeEstimate(-10);
-
-      expect(useCalculatorStore.getState().input.otherIncomeEstimate).toBe(initial);
-    });
-  });
-
   describe('setRegion', () => {
     it('should accept valid regions', () => {
       const { setRegion } = useCalculatorStore.getState();

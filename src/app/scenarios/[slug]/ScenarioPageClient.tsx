@@ -125,18 +125,13 @@ export function ScenarioPageClient({ scenario }: ScenarioPageClientProps) {
 
   if (!results) {
     return (
-      <section
-        className={cn(LAYOUT.CONTAINER, SPACING.PY_8)}
-        aria-busy='true'
-        role='status'
-        aria-live='polite'
-      >
+      <output className={cn(LAYOUT.CONTAINER, SPACING.PY_8)} aria-busy='true' aria-live='polite'>
         <span className='sr-only'>Loading calculator...</span>
         <div
           aria-hidden='true'
           className='h-96 animate-pulse rounded-lg bg-muted motion-reduce:animate-none'
         />
-      </section>
+      </output>
     );
   }
 

@@ -10,6 +10,7 @@
  */
 
 import { NextRequest } from 'next/server';
+
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(),
 }));
@@ -40,43 +41,31 @@ function buildRequest(
   });
 }
 
-const baseStrategy = {
-  name: 'All salary',
-  salary: 10000,
-  dividends: 0,
-  pension: 0,
-  companyCarBIK: 0,
-  employerNI: 0,
-  employeeNI: 0,
-  incomeTax: 0,
-  corporationTax: 0,
-  dividendTax: 0,
-  studentLoan: 0,
-  totalPersonalTax: 0,
-  companyCost: 10000,
-  takeHome: 10000,
-  effectiveRate: 10,
-};
-
 const validPayload = {
   email: 'director@payetax.co.uk',
-  results: {
-    grossProfit: 100000,
-    strategies: {
-      allSalary: baseStrategy,
-      optimalMix: { ...baseStrategy, name: 'Baseline Mix' },
-      allDividends: { ...baseStrategy, name: 'All dividends' },
-    },
-    recommended: 'optimalMix',
-    savingsVsAllSalary: 1000,
+  input: {
+    region: 'rUK',
+    revenue: 100000,
+    includesVat: false,
+    expenses: 20000,
+    lossesBroughtForward: 0,
+    otherIncome: 0,
+    employmentAllowance: false,
+    studentLoanPlans: [],
+    pensionContribution: 0,
+    companyCarBIK: 0,
+    minimumSalaryRequirement: 0,
+    hasOtherPAYEEmployment: false,
+    ytdSalary: 0,
+    ytdDividends: 0,
+    ytdDrawings: 0,
+    yourSetupSalary: 0,
+    yourSetupDividends: 0,
   },
   taxYear: '2025-2026',
 };
 
-async function loadRoute(
-  envOverrides: Record<string, string | undefined> = {},
-  rateLimit = true,
-) {
+async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');

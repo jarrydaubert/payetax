@@ -41,7 +41,9 @@ function collectText(node: unknown, buffer: string[] = []): string[] {
     return buffer;
   }
   if (Array.isArray(node)) {
-    node.forEach((child) => collectText(child, buffer));
+    for (const child of node) {
+      collectText(child, buffer);
+    }
     return buffer;
   }
   if (typeof node === 'object' && 'props' in (node as { props?: unknown })) {
@@ -55,7 +57,9 @@ function collectText(node: unknown, buffer: string[] = []): string[] {
 
 function buildRequest(search: Record<string, string>) {
   const url = new URL('https://payetax.co.uk/api/og');
-  Object.entries(search).forEach(([key, value]) => url.searchParams.set(key, value));
+  for (const [key, value] of Object.entries(search)) {
+    url.searchParams.set(key, value);
+  }
   return new NextRequest(url);
 }
 

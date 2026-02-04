@@ -64,7 +64,6 @@ const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
 const logCalculatorWarning = (...args: unknown[]) => {
   if (shouldLogWarnings) {
-    // biome-ignore lint/suspicious/noConsole: dev-only diagnostics
     console.warn(...args);
   }
 };
@@ -142,10 +141,6 @@ interface CalculatorInput {
   allowancesDeductions: number;
   /** Additional income sources (pensions, rental, etc.) */
   incomeSources: IncomeSource[];
-  /** Whether salary is the only income source */
-  isOnlyIncome: boolean;
-  /** Optional estimated additional income (annual) */
-  otherIncomeEstimate: number;
 }
 
 // Interface for calculation results
@@ -190,8 +185,6 @@ interface CalculatorState {
   setNiCategory: (category: NICategory) => void;
   setHoursPerWeek: (hours: number) => void;
   setAllowancesDeductions: (amount: number) => void;
-  setIsOnlyIncome: (isOnlyIncome: boolean) => void;
-  setOtherIncomeEstimate: (amount: number) => void;
   setInput: (partial: Partial<CalculatorInput>) => void;
 
   // Income Sources Management
@@ -270,8 +263,6 @@ const defaultInput: CalculatorInput = {
   hoursPerWeek: 40,
   allowancesDeductions: 0,
   incomeSources: [],
-  isOnlyIncome: true,
-  otherIncomeEstimate: 0,
 };
 
 // Create the calculator store
@@ -734,37 +725,6 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
           set((state) => ({ input: { ...state.input, allowancesDeductions: validated.data } }));
         },
-        setIsOnlyIncome: (isOnlyIncome) => {
-          const validated = BooleanSchema.safeParse(isOnlyIncome);
-
-          if (!validated.success) {
-            logCalculatorWarning(
-              '[Calculator] Invalid isOnlyIncome:',
-              validated.error.issues[0]?.message ?? 'Validation failed',
-            );
-            return;
-          }
-
-          set((state) => ({ input: { ...state.input, isOnlyIncome: validated.data } }));
-        },
-        setOtherIncomeEstimate: (otherIncomeEstimate) => {
-          const validated = z
-            .number()
-            .min(0, 'Other income estimate cannot be negative')
-            .max(10_000_000, 'Other income estimate exceeds maximum')
-            .finite('Other income estimate must be a valid number')
-            .safeParse(otherIncomeEstimate);
-
-          if (!validated.success) {
-            logCalculatorWarning(
-              '[Calculator] Invalid other income estimate:',
-              validated.error.issues[0]?.message ?? 'Validation failed',
-            );
-            return;
-          }
-
-          set((state) => ({ input: { ...state.input, otherIncomeEstimate: validated.data } }));
-        },
         setInput: (partial) => {
           set((state) => ({
             input: { ...state.input, ...partial },
@@ -1087,9 +1047,6 @@ export const useCalculatorStore = create<CalculatorState>()(
               ...state?.input,
               // Ensure new fields have defaults if missing in persisted state
               incomeSources: state?.input?.incomeSources ?? [],
-              isOnlyIncome: state?.input?.isOnlyIncome ?? currentState.input.isOnlyIncome,
-              otherIncomeEstimate:
-                state?.input?.otherIncomeEstimate ?? currentState.input.otherIncomeEstimate,
             },
           };
         },
@@ -1152,8 +1109,6 @@ export const useCalculatorActions = () =>
       setNiCategory: state.setNiCategory,
       setHoursPerWeek: state.setHoursPerWeek,
       setAllowancesDeductions: state.setAllowancesDeductions,
-      setIsOnlyIncome: state.setIsOnlyIncome,
-      setOtherIncomeEstimate: state.setOtherIncomeEstimate,
       setInput: state.setInput,
       addIncomeSource: state.addIncomeSource,
       updateIncomeSource: state.updateIncomeSource,

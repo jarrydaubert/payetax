@@ -9,6 +9,8 @@
  */
 
 import { z } from 'zod';
+import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
+import { CurrencyAmountSchema, DirectorTaxYearSchema, RegionSchema } from './directorValidation';
 
 // ============================================================================
 // SHARED SCHEMAS
@@ -17,7 +19,10 @@ import { z } from 'zod';
 /**
  * Email address validation - reusable across all email-related schemas
  */
-export const EmailSchema = z.string().email('Please enter a valid email address');
+export const EmailSchema = z
+  .string()
+  .email('Please enter a valid email address')
+  .max(254, 'Email must be 254 characters or less');
 
 /**
  * Tax year string validation
@@ -36,6 +41,30 @@ export const TaxYearStringSchema = z
 // Reasonable bounds for PAYE values (prevents abuse/garbage)
 const payeMoneyField = z.number().finite().min(0).max(10_000_000);
 const payeRateField = z.number().finite().min(0).max(100);
+const payeAllowanceField = z.number().finite().min(-1_000_000).max(1_000_000);
+
+const payePeriods = Object.values(PERIODS) as [string, ...string[]];
+const payeTaxYears = TAX_YEARS as [string, ...string[]];
+
+const StudentLoanPlanSchema = z.enum(['plan1', 'plan2', 'plan4', 'plan5', 'postgrad']);
+const StudentLoanSelectionSchema = z
+  .union([
+    z.literal('none'),
+    z.array(StudentLoanPlanSchema).max(2, 'Maximum 2 student loans allowed'),
+  ])
+  .refine(
+    (value) => value === 'none' || new Set(value).size === value.length,
+    'Duplicate student loan plans not allowed',
+  );
+
+const IncomeSourceTypeSchema = z.enum([
+  'employment',
+  'pension',
+  'statePension',
+  'rental',
+  'investment',
+  'other',
+]);
 
 /**
  * Pay period values for tax calculation results
@@ -75,12 +104,45 @@ export const PayeResultsSchema = z.object({
 });
 
 /**
+ * Input schema for PAYE email requests (server recomputes results)
+ */
+export const PayeEmailInputSchema = z.object({
+  salary: payeMoneyField,
+  payPeriod: z.enum(payePeriods),
+  taxYear: z.enum(payeTaxYears),
+  taxCode: z.string().max(20),
+  isScottish: z.boolean(),
+  isMarried: z.boolean(),
+  partnerGrossWage: payeMoneyField,
+  isBlind: z.boolean(),
+  age: z.number().int().min(0).max(120).optional(),
+  payNoNI: z.boolean(),
+  pensionContribution: payeMoneyField,
+  pensionContributionType: z.enum(['percentage', 'amount']),
+  studentLoanPlans: StudentLoanSelectionSchema,
+  niCategory: z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']),
+  hoursPerWeek: z.number().min(1).max(168).finite(),
+  allowancesDeductions: payeAllowanceField,
+  incomeSources: z
+    .array(
+      z.object({
+        type: IncomeSourceTypeSchema,
+        amount: payeMoneyField,
+        period: z.enum(payePeriods),
+        label: z.string().max(100).optional(),
+        id: z.string().max(100).optional(),
+      }),
+    )
+    .max(10, 'Maximum 10 income sources allowed')
+    .optional(),
+});
+
+/**
  * Request body for /api/send-results
  */
 export const SendResultsRequestSchema = z.object({
   email: EmailSchema,
-  results: PayeResultsSchema,
-  taxYear: TaxYearStringSchema,
+  input: PayeEmailInputSchema,
   subscribeToAlerts: z.boolean().optional(),
 });
 
@@ -125,17 +187,35 @@ export const AllStrategiesSchema = z.object({
 });
 
 /**
+ * Input schema for director email requests (server recomputes results)
+ */
+export const DirectorEmailInputSchema = z.object({
+  region: RegionSchema,
+  revenue: CurrencyAmountSchema,
+  includesVat: z.boolean(),
+  expenses: CurrencyAmountSchema,
+  lossesBroughtForward: CurrencyAmountSchema.optional(),
+  otherIncome: CurrencyAmountSchema.optional(),
+  employmentAllowance: z.boolean().optional(),
+  studentLoanPlans: z.array(StudentLoanPlanSchema).max(2).optional(),
+  pensionContribution: CurrencyAmountSchema.optional(),
+  companyCarBIK: CurrencyAmountSchema.optional(),
+  minimumSalaryRequirement: CurrencyAmountSchema.optional(),
+  hasOtherPAYEEmployment: z.boolean().optional(),
+  ytdSalary: CurrencyAmountSchema.optional(),
+  ytdDividends: CurrencyAmountSchema.optional(),
+  ytdDrawings: CurrencyAmountSchema.optional(),
+  yourSetupSalary: CurrencyAmountSchema.optional(),
+  yourSetupDividends: CurrencyAmountSchema.optional(),
+});
+
+/**
  * Request body for /api/send-director-results
  */
 export const SendDirectorResultsRequestSchema = z.object({
   email: EmailSchema,
-  results: z.object({
-    grossProfit: moneyField,
-    strategies: AllStrategiesSchema,
-    recommended: z.enum(['allSalary', 'optimalMix', 'allDividends']),
-    savingsVsAllSalary: moneyField,
-  }),
-  taxYear: TaxYearStringSchema,
+  input: DirectorEmailInputSchema,
+  taxYear: DirectorTaxYearSchema.optional(),
 });
 
 // ============================================================================
@@ -185,8 +265,10 @@ export const ReferralLeadRequestSchema = z.object({
 export type PayPeriodValues = z.infer<typeof PayPeriodValuesSchema>;
 export type TaxBand = z.infer<typeof TaxBandSchema>;
 export type PayeResults = z.infer<typeof PayeResultsSchema>;
+export type PayeEmailInput = z.infer<typeof PayeEmailInputSchema>;
 export type SendResultsRequest = z.infer<typeof SendResultsRequestSchema>;
 export type DirectorStrategy = z.infer<typeof DirectorStrategySchema>;
+export type DirectorEmailInput = z.infer<typeof DirectorEmailInputSchema>;
 export type SendDirectorResultsRequest = z.infer<typeof SendDirectorResultsRequestSchema>;
 export type NewsletterSubscribeRequest = z.infer<typeof NewsletterSubscribeRequestSchema>;
 export type SalaryRange = z.infer<typeof SalaryRangeSchema>;

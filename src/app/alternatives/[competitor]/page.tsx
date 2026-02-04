@@ -6,6 +6,7 @@ import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
 import { AlternativePageContent } from './AlternativePageContent';
 
 const SITE_URL = 'https://payetax.co.uk';
+const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 // Only allow statically generated paths - unknown slugs return 404
 export const dynamicParams = false;
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `${competitor.name} Alternative | PayeTax UK Tax Calculator`;
-  const description = `Looking for an alternative to ${competitor.name}? Compare with PayeTax - modern, ad-free, and privacy-first UK tax calculator with What-If scenarios.`;
+  const description = `Looking for an alternative to ${competitor.name}? Compare with PayeTax - a privacy-first UK tax calculator with no display ads and What-If salary comparisons.`;
   const url = `${SITE_URL}/alternatives/${slug}`;
 
   return {
@@ -52,11 +53,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url,
       type: 'website',
       siteName: 'PayeTax',
+      images: [OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${competitor.name} Alternative`,
       description,
+      images: [OG_IMAGE],
     },
   };
 }

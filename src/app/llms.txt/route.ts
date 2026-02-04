@@ -51,13 +51,13 @@ export async function GET() {
 
   const llmsTxt = `# PayeTax
 
-> Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with all calculations running client-side.
+> Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with interactive calculations in your browser.
 
 Last updated: ${lastUpdated}
 
 PayeTax is a comprehensive UK tax calculator providing accurate PAYE calculations using official HMRC rates. The calculator supports England, Wales, Northern Ireland, and Scottish tax systems, with features including student loan repayments (all plans), pension contributions, marriage allowance, and blind person's allowance.
 
-All calculations are performed entirely in your browser with zero data collection or server-side storage. The tool is free, requires no registration, and tax rates are updated when HMRC publishes changes.
+Interactive calculations run in your browser and tax inputs aren't stored; some pages precompute results server-side for SEO or email delivery. The tool is free, requires no registration, and tax rates are updated when HMRC publishes changes.
 
 ## Main Pages
 
@@ -65,7 +65,7 @@ All calculations are performed entirely in your browser with zero data collectio
 - [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides and HMRC updates with ${posts.length} articles across ${categories.length} categories
 - [About](https://payetax.co.uk/about): Mission, values, and technology behind PayeTax
 - [Compliance](https://payetax.co.uk/compliance): HMRC compliance, current tax rates, and data sources
-- [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy - client-side calculations, zero data collection
+- [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy - in-browser calculations, no stored salary inputs
 
 ## Tools
 
@@ -92,7 +92,7 @@ ${blogSections}
 - Framework: Next.js 16, React 19, TypeScript
 - Hosting: Vercel Edge Network
 - Performance: Lighthouse 95+ (mobile), 100 (desktop)
-- Privacy: Client-side calculations only, zero data collection
+- Privacy: Interactive calculations in-browser; tax inputs aren't stored; optional anonymized analytics
 - Accessibility: WCAG 2.1 AA compliant
 - PWA: Installable progressive web app
 

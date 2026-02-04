@@ -64,3 +64,23 @@ See `CLAUDE.md` and `docs/guides/` for details:
 - `TESTING.md`
 - `ARCHITECTURE.md`
 - `LINEAR.md`
+
+## Skills (Agent Reference)
+
+Skill docs live in `.claude/skills/`:
+- `.claude/skills/accessibility/SKILL.md`
+- `.claude/skills/analytics-tracking/SKILL.md`
+- `.claude/skills/competitor-alternatives/SKILL.md`
+- `.claude/skills/content-strategy/SKILL.md`
+- `.claude/skills/copy-editing/SKILL.md`
+- `.claude/skills/copywriting/SKILL.md`
+- `.claude/skills/engineering/SKILL.md`
+- `.claude/skills/free-tool-strategy/SKILL.md`
+- `.claude/skills/marketing-ideas/SKILL.md`
+- `.claude/skills/marketing-psychology/SKILL.md`
+- `.claude/skills/page-cro/SKILL.md`
+- `.claude/skills/pricing-strategy/SKILL.md`
+- `.claude/skills/programmatic-seo/SKILL.md`
+- `.claude/skills/schema-markup/SKILL.md`
+- `.claude/skills/seo-audit/SKILL.md`
+- `.claude/skills/social-content/SKILL.md`

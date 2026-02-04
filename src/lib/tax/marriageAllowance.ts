@@ -14,8 +14,7 @@ function getRateContext(taxYear: TaxYear, region: MarriageAllowanceRegion): TaxR
   if (!rates) return null;
 
   const higherBandIndex = rates.bands.findIndex((band) => band.rate >= 40);
-  const preHigherBand =
-    higherBandIndex > 0 ? rates.bands[higherBandIndex - 1] : rates.bands[0];
+  const preHigherBand = higherBandIndex > 0 ? rates.bands[higherBandIndex - 1] : rates.bands[0];
   if (!preHigherBand) return null;
 
   return {

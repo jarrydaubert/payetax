@@ -8,6 +8,7 @@ import { DeepDives } from '@/components/organisms/DeepDives';
 import { EditorsPicksSticky } from '@/components/organisms/EditorsPicks';
 import { LatestArticles } from '@/components/organisms/LatestArticles';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getCurrentQuote } from '@/constants/pullQuotes';
 import {
@@ -140,6 +141,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         type='application/ld+json'
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogStructuredData) }}
+      />
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Blog', url: `${SITE_URL}/blog` },
+        ]}
       />
 
       {/* Magazine-style layout */}

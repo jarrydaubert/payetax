@@ -9,6 +9,7 @@
 import { ArrowRight, Calculator } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import Link from 'next/link';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import {
@@ -18,7 +19,7 @@ import {
   type Scenario,
   type ScenarioCategoryInfo,
 } from '@/data/scenarios';
-import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
 // Display format for tax year - update when TAX_YEARS changes in taxRates.ts
@@ -64,73 +65,82 @@ const categoryStyles: Record<string, { gradient: string; icon: string; border: s
 
 export default function ScenariosPage() {
   return (
-    <div className='min-h-dvh bg-background'>
-      {/* Hero Section */}
-      <section className='relative overflow-hidden py-16 sm:py-24'>
-        <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5' />
-        <div className={cn(LAYOUT.CONTAINER, 'relative')}>
-          <div className='mx-auto max-w-3xl text-center'>
-            <h1
-              className={cn(
-                TYPOGRAPHY.TEXT_4XL,
-                'sm:text-5xl',
-                'font-bold tracking-tight',
-                SPACING.MB_4,
-              )}
-            >
-              <span className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text text-transparent'>
-                Tax Scenarios
-              </span>
-            </h1>
-            <p className={cn(TYPOGRAPHY.TEXT_LG, 'text-muted-foreground', SPACING.MB_8)}>
-              Real UK tax situations with pre-calculated examples. Find your scenario, see the
-              numbers, and learn how to optimize your tax.
-            </p>
+    <>
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Scenarios', url: `${SITE_URL}/scenarios` },
+        ]}
+      />
+      <div className='min-h-dvh bg-background'>
+        {/* Hero Section */}
+        <section className='relative overflow-hidden py-16 sm:py-24'>
+          <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5' />
+          <div className={cn(LAYOUT.CONTAINER, 'relative')}>
+            <div className='mx-auto max-w-3xl text-center'>
+              <h1
+                className={cn(
+                  TYPOGRAPHY.TEXT_4XL,
+                  'sm:text-5xl',
+                  'font-bold tracking-tight',
+                  SPACING.MB_4,
+                )}
+              >
+                <span className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text text-transparent'>
+                  Tax Scenarios
+                </span>
+              </h1>
+              <p className={cn(TYPOGRAPHY.TEXT_LG, 'text-muted-foreground', SPACING.MB_8)}>
+                Real UK tax situations with pre-calculated examples. Find your scenario, see the
+                numbers, and learn how to optimize your tax.
+              </p>
 
-            {/* Quick Stats */}
-            <div className={cn('grid grid-cols-3', SPACING.GAP_4, 'mx-auto max-w-lg')}>
-              <QuickStat value={SCENARIOS.length.toString()} label='Scenarios' />
-              <QuickStat value='£100k-£500k' label='Salary Range' />
-              <QuickStat value={CURRENT_TAX_YEAR_DISPLAY} label='Tax Year' />
+              {/* Quick Stats */}
+              <div className={cn('grid grid-cols-3', SPACING.GAP_4, 'mx-auto max-w-lg')}>
+                <QuickStat value={SCENARIOS.length.toString()} label='Scenarios' />
+                <QuickStat value='£100k-£500k' label='Salary Range' />
+                <QuickStat value={CURRENT_TAX_YEAR_DISPLAY} label='Tax Year' />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Scenario Categories */}
-      <section className={cn(LAYOUT.CONTAINER, SPACING.PY_12)}>
-        <div className={SPACING.SPACE_Y_16}>
-          {SCENARIO_CATEGORIES.map((category) => (
-            <CategorySection key={category.slug} category={category} />
-          ))}
-        </div>
-      </section>
+        {/* Scenario Categories */}
+        <section className={cn(LAYOUT.CONTAINER, SPACING.PY_12)}>
+          <div className={SPACING.SPACE_Y_16}>
+            {SCENARIO_CATEGORIES.map((category) => (
+              <CategorySection key={category.slug} category={category} />
+            ))}
+          </div>
+        </section>
 
-      {/* CTA Section */}
-      <section className='bg-muted/30 py-16'>
-        <div className={cn(LAYOUT.CONTAINER, 'text-center')}>
-          <Calculator className={cn(ICON_SIZES.SIZE_12, 'mx-auto mb-4 text-primary')} />
-          <h2 className={cn(TYPOGRAPHY.TEXT_2XL, 'font-bold', SPACING.MB_3)}>
-            Can't Find Your Scenario?
-          </h2>
-          <p className={cn(TYPOGRAPHY.TEXT_BASE, 'text-muted-foreground', SPACING.MB_6)}>
-            Use our full calculator to enter your details and get a personalized breakdown.
-          </p>
-          <Link
-            href='/#calculator'
-            className={cn(
-              'inline-flex items-center',
-              SPACING.GAP_2,
-              'rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground',
-              'transition-colors hover:bg-primary/90',
-            )}
-          >
-            Open Calculator
-            <ArrowRight className='size-4' />
-          </Link>
-        </div>
-      </section>
-    </div>
+        {/* CTA Section */}
+        <section className='bg-muted/30 py-16'>
+          <div className={cn(LAYOUT.CONTAINER, 'text-center')}>
+            <Calculator className={cn(ICON_SIZES.SIZE_12, 'mx-auto mb-4 text-primary')} />
+            <h2 className={cn(TYPOGRAPHY.TEXT_2XL, 'font-bold', SPACING.MB_3)}>
+              Can't Find Your Scenario?
+            </h2>
+            <p className={cn(TYPOGRAPHY.TEXT_BASE, 'text-muted-foreground', SPACING.MB_6)}>
+              Use our full calculator to enter your details and get a personalized breakdown.
+            </p>
+            <Link
+              href='/#calculator'
+              className={cn(
+                'inline-flex items-center',
+                SPACING.GAP_2,
+                'rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground',
+                'transition-colors hover:bg-primary/90',
+              )}
+            >
+              Open Calculator
+              <ArrowRight className='size-4' />
+            </Link>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }
 

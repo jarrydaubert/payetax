@@ -10,12 +10,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
-
+import { inter, spaceGrotesk } from '@/app/fonts';
 import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
-import { inter, spaceGrotesk } from '@/app/fonts';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payetax.co.uk'),
@@ -77,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           'min-h-screen bg-background text-foreground',
         )}
       >
+        <StructuredData type='organization' />
         {/* Ahrefs Web Analytics - Only loads after user accepts cookies */}
         <AhrefsAnalytics />
 

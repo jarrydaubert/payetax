@@ -1,6 +1,7 @@
 // src/app/tools/director-guide/page.tsx
 
 import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 
 export const metadata = generateBaseMetadata({
@@ -13,30 +14,11 @@ export const metadata = generateBaseMetadata({
 });
 
 export default function DirectorGuidePage() {
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Tools',
-        item: `${SITE_URL}/tools`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: 'Director Guide',
-        item: `${SITE_URL}/tools/director-guide`,
-      },
-    ],
-  };
+  const breadcrumbItems = [
+    { name: 'Home', url: SITE_URL },
+    { name: 'Tools', url: `${SITE_URL}/tools` },
+    { name: 'Director Guide', url: `${SITE_URL}/tools/director-guide` },
+  ];
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -52,57 +34,33 @@ export default function DirectorGuidePage() {
       price: '0',
       priceCurrency: 'GBP',
     },
-  };
+  } as const;
 
   // FAQ schema - uses softer language to avoid over-specific claims that may drift
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'How do salary and dividends compare for company directors in 2025-26?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Salary uses your Personal Allowance and can help build State Pension credits, while dividends are often taxed at different rates. The right mix depends on profits, Employment Allowance eligibility, and your wider income.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Are dividends better than salary for directors?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Dividends can be more tax-efficient than additional salary because they avoid National Insurance. However, dividends must be paid from profits, and salary can help build State Pension credits. The mix depends on your total income and circumstances.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How is Employer NI calculated on director salary?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Employer NI is charged on salary above the Secondary Threshold. Directors use an annual earnings period, so NI is calculated on total annual salary rather than per pay period. Companies eligible for Employment Allowance may offset some or all of this cost.',
-        },
-      },
-    ],
-  };
+  const faqItems = [
+    {
+      question: 'How do salary and dividends compare for company directors in 2025-26?',
+      answer:
+        'Salary uses your Personal Allowance and can help build State Pension credits, while dividends are often taxed at different rates. The right mix depends on profits, Employment Allowance eligibility, and your wider income.',
+    },
+    {
+      question: 'Are dividends better than salary for directors?',
+      answer:
+        'Dividends can be more tax-efficient than additional salary because they avoid National Insurance. However, dividends must be paid from profits, and salary can help build State Pension credits. The mix depends on your total income and circumstances.',
+    },
+    {
+      question: 'How is Employer NI calculated on director salary?',
+      answer:
+        'Employer NI is charged on salary above the Secondary Threshold. Directors use an annual earnings period, so NI is calculated on total annual salary rather than per pay period. Companies eligible for Employment Allowance may offset some or all of this cost.',
+    },
+  ];
 
   return (
     <>
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-      />
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
+      <StructuredData type='calculator' data={softwareSchema} />
+      <StructuredData type='faq' faqs={faqItems} />
+      <StructuredData type='dataset' />
       <DirectorDashboard />
     </>
   );

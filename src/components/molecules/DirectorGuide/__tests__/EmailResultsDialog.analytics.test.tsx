@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
+import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import { EmailResultsDialog } from '../EmailResultsDialog';
 
 jest.mock('sonner', () => ({
@@ -95,6 +96,26 @@ describe('EmailResultsDialog analytics', () => {
       savingsVsAllSalary: 0,
     };
 
+    const directorEmailInput: DirectorEmailInput = {
+      region: 'rUK',
+      revenue: 100000,
+      includesVat: false,
+      expenses: 20000,
+      lossesBroughtForward: 0,
+      otherIncome: 0,
+      employmentAllowance: false,
+      studentLoanPlans: [],
+      pensionContribution: 0,
+      companyCarBIK: 0,
+      minimumSalaryRequirement: 0,
+      hasOtherPAYEEmployment: false,
+      ytdSalary: 0,
+      ytdDividends: 0,
+      ytdDrawings: 0,
+      yourSetupSalary: 0,
+      yourSetupDividends: 0,
+    };
+
     // Mock fetch success.
     global.fetch = jest.fn(async () => ({
       ok: true,
@@ -102,12 +123,19 @@ describe('EmailResultsDialog analytics', () => {
       json: async () => ({ ok: true }),
     })) as unknown as typeof fetch;
 
-    render(<EmailResultsDialog open={true} onOpenChange={onOpenChange} comparison={comparison} />);
+    render(
+      <EmailResultsDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        comparison={comparison}
+        emailInput={directorEmailInput}
+      />,
+    );
 
     expect(trackEmailOpened).toHaveBeenCalledTimes(1);
 
-    const emailInput = screen.getByLabelText('Email address');
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    const emailField = screen.getByLabelText('Email address');
+    fireEvent.change(emailField, { target: { value: 'test@example.com' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'Send Results' }));
 

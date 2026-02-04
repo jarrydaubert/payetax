@@ -199,7 +199,7 @@ If you also have self-employed income, you'll need to file a Self Assessment tax
       },
       {
         title: 'Quick Calculations',
-        description: 'Fast, ad-free results for busy professionals',
+        description: 'Fast results with no display ads for busy professionals',
         icon: 'clock',
       },
     ],

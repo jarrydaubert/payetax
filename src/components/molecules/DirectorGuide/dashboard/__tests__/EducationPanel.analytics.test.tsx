@@ -11,7 +11,9 @@ jest.mock('@/lib/directorGuideAnalytics', () => {
   };
 });
 
-function setDirectorGuideState(partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>) {
+function setDirectorGuideState(
+  partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>,
+) {
   useDirectorGuideStore.setState(partial as never);
 }
 
@@ -42,4 +44,3 @@ describe('EducationPanel warning analytics', () => {
     expect(trackWarningShown).toHaveBeenCalledWith('vat-mandatory');
   });
 });
-

@@ -12,15 +12,8 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES } from '@/constants/designTokens';
-import type { TaxYear } from '@/constants/taxRates';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
-
-// Format tax year for display (e.g., "2025-2026" -> "2025-26")
-const formatTaxYearForEmail = (year: TaxYear): string => {
-  const [start, end] = year.split('-');
-  return `${start}-${end?.slice(-2) ?? ''}`;
-};
+import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 
 // Mask email for privacy (j***@domain.com)
 const maskEmail = (email: string): string => {
@@ -31,27 +24,11 @@ const maskEmail = (email: string): string => {
 };
 
 interface EmailResultsFormProps {
-  results: TaxCalculationResults;
-  taxYear?: TaxYear;
+  input: PayeEmailInput;
   className?: string;
 }
 
-// Minimal payload - only what the email template actually needs
-interface EmailPayload {
-  grossSalary: { annually: number; monthly: number };
-  netPay: { annually: number; monthly: number };
-  incomeTax: { annually: number; monthly: number };
-  nationalInsurance: { annually: number; monthly: number };
-  pensionContribution: { annually: number; monthly: number };
-  studentLoan: { annually: number; monthly: number };
-  taxBands: Array<{ name: string; rate: number; amount: number }>;
-}
-
-export function EmailResultsForm({
-  results,
-  taxYear = '2025-2026',
-  className,
-}: EmailResultsFormProps) {
+export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -86,33 +63,13 @@ export function EmailResultsForm({
     setIsLoading(true);
 
     try {
-      // Build minimal payload - only fields the email template needs
-      const payload: EmailPayload = {
-        grossSalary: {
-          annually: results.grossSalary.annually,
-          monthly: results.grossSalary.monthly,
-        },
-        netPay: {
-          annually: results.netPay.annually,
-          monthly: results.netPay.monthly,
-        },
-        incomeTax: {
-          annually: results.incomeTax.annually,
-          monthly: results.incomeTax.monthly,
-        },
-        nationalInsurance: {
-          annually: results.nationalInsurance.annually,
-          monthly: results.nationalInsurance.monthly,
-        },
-        pensionContribution: {
-          annually: results.pensionContribution.annually,
-          monthly: results.pensionContribution.monthly,
-        },
-        studentLoan: {
-          annually: results.studentLoan.annually,
-          monthly: results.studentLoan.monthly,
-        },
-        taxBands: results.taxBands,
+      const sanitizedInput: PayeEmailInput = {
+        ...input,
+        incomeSources: input.incomeSources?.map(({ type, amount, period }) => ({
+          type,
+          amount,
+          period,
+        })),
       };
 
       const response = await fetch('/api/send-results', {
@@ -120,8 +77,7 @@ export function EmailResultsForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: normalizedEmail,
-          results: payload,
-          taxYear: formatTaxYearForEmail(taxYear),
+          input: sanitizedInput,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -164,12 +120,11 @@ export function EmailResultsForm({
 
   if (isSent) {
     return (
-      <div
+      <output
         className={cn(
           'flex items-center justify-between gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-emerald-400 text-sm',
           className,
         )}
-        role='status'
         aria-live='polite'
       >
         <div className='flex items-center gap-2'>
@@ -186,7 +141,7 @@ export function EmailResultsForm({
         >
           <RotateCcw className={ICON_SIZES.SIZE_4} aria-hidden='true' />
         </Button>
-      </div>
+      </output>
     );
   }
 

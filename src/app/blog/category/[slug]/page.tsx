@@ -37,10 +37,19 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
+  const rawPage = resolvedSearchParams.page;
+  const pageValue = Array.isArray(rawPage) ? rawPage[0] : rawPage;
+  const page = Math.max(1, Number.parseInt(pageValue ?? '1', 10) || 1);
+  const canonicalBase = `${SITE_URL}/blog/category/${slug}`;
+  const canonicalUrl = page > 1 ? `${canonicalBase}?page=${page}` : canonicalBase;
+  const ogImage = `${SITE_URL}/images/og-image.png`;
 
   // Check if it's a nav group first
   const navGroup = getNavGroupBySlug(slug);
@@ -50,8 +59,9 @@ export async function generateMetadata({
     return {
       title,
       description,
-      alternates: { canonical: `${SITE_URL}/blog/category/${slug}` },
-      openGraph: { title, description, url: `${SITE_URL}/blog/category/${slug}` },
+      alternates: { canonical: canonicalUrl },
+      openGraph: { title, description, url: canonicalUrl, images: [ogImage] },
+      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
     };
   }
 
@@ -67,8 +77,9 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/blog/category/${slug}` },
-    openGraph: { title, description, url: `${SITE_URL}/blog/category/${slug}` },
+    alternates: { canonical: canonicalUrl },
+    openGraph: { title, description, url: canonicalUrl, images: [ogImage] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
   };
 }
 

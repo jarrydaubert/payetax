@@ -4,9 +4,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
+import { Alert, AlertDescription, AlertTitle } from '@/components/atoms/ui/alert';
 import { Badge } from '@/components/atoms/ui/badge';
 import { Button } from '@/components/atoms/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/atoms/ui/alert';
 import {
   Collapsible,
   CollapsibleContent,
@@ -93,6 +93,9 @@ export function IncomeSourceList() {
           )}
         </CollapsibleTrigger>
       </div>
+      <p className={cn('mt-1 text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+        Add other income here if you have anything besides your main salary.
+      </p>
 
       <CollapsibleContent className={cn('pt-3', SPACING.SPACE_Y_3)}>
         {incomeSources.length === 0 && (
@@ -144,13 +147,13 @@ export function IncomeSourceList() {
                       updateIncomeSource(source.id, { type: value });
                     }}
                   >
-                  <SelectTrigger
-                    className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
-                    aria-label='Select income type'
-                    data-testid={`income-source-${index}-type`}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
+                    <SelectTrigger
+                      className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
+                      aria-label='Select income type'
+                      data-testid={`income-source-${index}-type`}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {Object.entries(INCOME_TYPE_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>

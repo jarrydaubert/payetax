@@ -51,10 +51,7 @@ function buildRequest(
   });
 }
 
-async function loadRoute(
-  envOverrides: Record<string, string | undefined> = {},
-  rateLimit = true,
-) {
+async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');
@@ -97,7 +94,10 @@ describe('/api/newsletter/subscribe POST', () => {
 
   it('rate limits when the limiter denies the client', async () => {
     const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' }, false);
-    const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk' },
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -107,7 +107,10 @@ describe('/api/newsletter/subscribe POST', () => {
 
   it('returns 503 when Resend is not configured', async () => {
     const POST = await loadRoute({ RESEND_API_KEY: undefined, RESEND_AUDIENCE_ID: 'aud' });
-    const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk' },
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -117,7 +120,10 @@ describe('/api/newsletter/subscribe POST', () => {
 
   it('returns 503 when audience is not configured', async () => {
     const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: undefined });
-    const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk' },
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -148,7 +154,10 @@ describe('/api/newsletter/subscribe POST', () => {
   it('returns success without sending a welcome email when contact exists', async () => {
     contactsCreateMock.mockResolvedValue({ error: { message: 'already exists' } });
     const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
-    const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk' },
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -165,7 +174,10 @@ describe('/api/newsletter/subscribe POST', () => {
       RESEND_AUDIENCE_ID: 'aud',
       UNSUBSCRIBE_SECRET: 'secret',
     });
-    const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk' },
+    );
     const response = await POST(request);
     const json = await response.json();
 

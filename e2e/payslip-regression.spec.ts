@@ -12,7 +12,7 @@
  *   systems can happen). This test is intended as a regression lock for our behavior.
  */
 
-import { expect, test, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 function parsePercent(text: string): number {
   const match = text.match(/(\d+(\.\d+)?)%/);
@@ -27,7 +27,11 @@ function parseGBP(text: string): number {
   return n;
 }
 
-async function getTableValue(page: Page, label: string, period: 'Monthly' | 'Yearly'): Promise<number> {
+async function getTableValue(
+  page: Page,
+  label: string,
+  period: 'Monthly' | 'Yearly',
+): Promise<number> {
   const table = page.getByTestId('results-table');
   const headerRow = table.locator('thead tr').first();
   const headers = headerRow.locator('th');

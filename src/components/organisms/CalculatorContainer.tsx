@@ -17,6 +17,7 @@ import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
+import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import {
   useCalculatorActions,
   useCalculatorResults,
@@ -66,6 +67,27 @@ export function CalculatorContainer() {
 
   // Derive showResults from results state
   const showResults = !!results;
+  const emailInput: PayeEmailInput = {
+    salary: input.salary,
+    payPeriod: input.payPeriod,
+    taxYear: input.taxYear,
+    taxCode: input.taxCode,
+    isScottish: input.isScottish,
+    isMarried: input.isMarried,
+    partnerGrossWage: input.partnerGrossWage,
+    isBlind: input.isBlind,
+    age: input.age,
+    payNoNI: input.payNoNI,
+    pensionContribution: input.pensionContribution,
+    pensionContributionType: input.pensionContributionType,
+    studentLoanPlans: input.studentLoanPlans,
+    niCategory: input.niCategory,
+    hoursPerWeek: input.hoursPerWeek,
+    allowancesDeductions: input.allowancesDeductions,
+    incomeSources: input.incomeSources?.length
+      ? input.incomeSources.map(({ type, amount, period }) => ({ type, amount, period }))
+      : undefined,
+  };
 
   // Enable portal after mount (document not available during SSR)
   React.useEffect(() => {
@@ -331,10 +353,12 @@ export function CalculatorContainer() {
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
               onApplyPensionOptimization={handleApplyPensionOptimization}
-              isMarried={input.isMarried}
-              partnerGrossWage={input.partnerGrossWage}
-              taxCode={input.taxCode}
-              isScottish={input.region === 'Scotland'}
+              marriageAllowance={{
+                isMarried: input.isMarried,
+                partnerGrossWage: input.partnerGrossWage,
+                taxCode: input.taxCode,
+                isScottish: input.region === 'Scotland',
+              }}
             />
 
             {/* Data Visualization Charts */}
@@ -388,11 +412,7 @@ export function CalculatorContainer() {
             className={cn('order-8 flex flex-col items-center lg:col-span-2', SPACING.GAP_4)}
           >
             {/* Email Results Form */}
-            <EmailResultsForm
-              results={results}
-              taxYear={input.taxYear}
-              className='w-full max-w-md'
-            />
+            <EmailResultsForm input={emailInput} className='w-full max-w-md' />
 
             {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
             <div className='flex items-center justify-center gap-4 text-muted-foreground text-sm'>

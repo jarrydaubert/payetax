@@ -18,7 +18,7 @@ describe('AhrefsAnalytics', () => {
     mockAreCookiesAccepted.mockReset();
   });
 
-  it('does not render without consent', async () => {
+  it('does not render without consent', () => {
     mockAreCookiesAccepted.mockReturnValue(false);
 
     const { container } = render(<AhrefsAnalytics />);

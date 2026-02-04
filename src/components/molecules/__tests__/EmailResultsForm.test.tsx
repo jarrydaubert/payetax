@@ -1,7 +1,6 @@
+import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { fireEvent, render, screen, waitFor } from '@/test/testing-library';
-
 import { EmailResultsForm } from '../EmailResultsForm';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
 const toastSuccess = jest.fn();
 const toastError = jest.fn();
@@ -13,30 +12,25 @@ jest.mock('sonner', () => ({
   },
 }));
 
-const makeResults = (): TaxCalculationResults => {
-  const periods = {
-    annually: 1000,
-    monthly: 100,
-    fourWeekly: 90,
-    fortnightly: 50,
-    weekly: 25,
-    daily: 5,
-    hourly: 1,
-  };
-
-  return {
-    grossSalary: { ...periods },
-    taxFreeAmount: 12570,
-    taxableIncome: 20000,
-    incomeTax: { ...periods },
-    nationalInsurance: { ...periods },
-    studentLoan: { ...periods },
-    pensionContribution: { ...periods },
-    employerNI: 100,
-    netPay: { ...periods },
-    taxBands: [{ name: 'Basic', rate: 20, amount: 2000 }],
-  };
-};
+const makeInput = (): PayeEmailInput => ({
+  salary: 50000,
+  payPeriod: 'annually',
+  taxYear: '2025-2026',
+  taxCode: '1257L',
+  isScottish: false,
+  isMarried: false,
+  partnerGrossWage: 0,
+  isBlind: false,
+  age: 30,
+  payNoNI: false,
+  pensionContribution: 0,
+  pensionContributionType: 'percentage',
+  studentLoanPlans: 'none',
+  niCategory: 'A',
+  hoursPerWeek: 40,
+  allowancesDeductions: 0,
+  incomeSources: [],
+});
 
 describe('EmailResultsForm', () => {
   const originalFetch = global.fetch;
@@ -50,7 +44,7 @@ describe('EmailResultsForm', () => {
   it('submits and shows sent confirmation', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
 
-    render(<EmailResultsForm results={makeResults()} />);
+    render(<EmailResultsForm input={makeInput()} />);
 
     const button = screen.getByRole('button', { name: /Email Results/i });
     expect(button).toBeDisabled();

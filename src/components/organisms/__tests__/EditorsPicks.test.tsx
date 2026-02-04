@@ -1,7 +1,6 @@
 import { render, screen } from '@/test/testing-library';
-
-import { EditorsPicks } from '../EditorsPicks';
 import type { BlogPost } from '@/types/blog';
+import { EditorsPicks } from '../EditorsPicks';
 
 const makePost = (index: number): BlogPost => ({
   id: `post-${index}`,
@@ -30,9 +29,7 @@ describe('EditorsPicks', () => {
 
     const { container } = render(<EditorsPicks posts={posts} />);
 
-    const summary = container.querySelector(
-      "summary[aria-label=\"Toggle Editor's Picks section\"]",
-    );
+    const summary = container.querySelector('summary[aria-label="Toggle Editor\'s Picks section"]');
     expect(summary).toBeInTheDocument();
   });
 });

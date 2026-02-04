@@ -96,8 +96,8 @@ export function SurvivalModePanel({ className }: { className?: string }) {
       </div>
 
       <div className='mt-4 text-slate-500 text-xs'>
-        Alternative: pay <span className='font-semibold text-slate-300'>{formatGBP(0)}</span> salary (no additional
-        company loss created by payroll), but you may miss an NI qualifying year.
+        Alternative: pay <span className='font-semibold text-slate-300'>{formatGBP(0)}</span> salary
+        (no additional company loss created by payroll), but you may miss an NI qualifying year.
       </div>
     </section>
   );

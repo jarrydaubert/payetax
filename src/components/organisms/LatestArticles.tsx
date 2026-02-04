@@ -44,7 +44,7 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
       </h2>
 
       {/* Grid: single column -> 2-col equal (md) -> 60/40 asymmetric (lg) */}
-      <ul className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]' role='list'>
+      <ul className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]'>
         {/* Large featured card - spans all rows on desktop */}
         {featuredPost && (
           <li className='md:col-span-2 lg:col-span-1 lg:row-span-4'>
@@ -54,10 +54,7 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
 
         {/* Small cards - auto-flow into right column on desktop */}
         {displayedSmallPosts.map((post) => (
-          <li
-            key={post.slug || post.id}
-            className='md:col-span-1 lg:col-span-1 lg:col-start-2'
-          >
+          <li key={post.slug || post.id} className='md:col-span-1 lg:col-span-1 lg:col-start-2'>
             <ArticleCardSmall post={post} />
           </li>
         ))}

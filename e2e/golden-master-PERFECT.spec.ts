@@ -85,11 +85,7 @@ async function getTableValueOrThrow(
   const availableLabels: string[] = [];
 
   for (let i = 0; i < rowCount; i++) {
-    const rowText = await allRows
-      .nth(i)
-      .locator(':scope > th, :scope > td')
-      .first()
-      .textContent();
+    const rowText = await allRows.nth(i).locator(':scope > th, :scope > td').first().textContent();
     if (rowText?.trim()) {
       availableLabels.push(rowText.trim());
     }

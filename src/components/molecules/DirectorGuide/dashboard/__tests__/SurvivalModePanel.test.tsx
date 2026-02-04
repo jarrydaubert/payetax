@@ -41,4 +41,3 @@ describe('DirectorGuide SurvivalModePanel', () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
-

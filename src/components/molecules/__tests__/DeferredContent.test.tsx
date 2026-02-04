@@ -32,11 +32,7 @@ describe('DeferredContent', () => {
     window.location.hash = '#target';
 
     render(
-      <DeferredContent
-        fallback={<div>Loading...</div>}
-        forceRenderOnHash='#target'
-        timeout={1000}
-      >
+      <DeferredContent fallback={<div>Loading...</div>} forceRenderOnHash='#target' timeout={1000}>
         <div>Anchored content</div>
       </DeferredContent>,
     );

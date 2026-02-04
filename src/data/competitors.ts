@@ -21,6 +21,14 @@ export interface CompetitorFeatures {
   historicYears: boolean;
 }
 
+export type CompetitorVerificationStatus = 'verified' | 'needs-review';
+
+export interface CompetitorVerification {
+  status: CompetitorVerificationStatus;
+  lastVerified: string | null;
+  notes?: string;
+}
+
 /**
  * Competitor category for grouping on hub pages
  */
@@ -55,6 +63,8 @@ export interface Competitor {
   weaknesses: string[];
   /** Feature availability */
   features: CompetitorFeatures;
+  /** Verification metadata */
+  verification: CompetitorVerification;
   /** Why PayeTax is better */
   payeTaxAdvantages: string[];
   /** Who this calculator is best for */
@@ -86,12 +96,12 @@ export const PAYETAX_INFO = {
   name: 'PayeTax',
   shortName: 'PayeTax',
   url: 'https://payetax.co.uk',
-  description: 'Modern, privacy-first UK tax calculator with What-If scenarios',
+  description: 'Privacy-first UK tax calculator with What-If salary comparisons',
   strengths: [
-    'Modern, mobile-first design',
-    'What-If salary comparison',
-    'Complete privacy (client-side)',
-    '100% ad-free',
+    'Mobile-first design',
+    'What-If salary comparisons (compare arbitrary salaries)',
+    "Tax inputs aren't stored (privacy-first analytics)",
+    'No display ads (affiliate links are tracked)',
     '3 historic tax years',
     'Instant real-time results',
   ],
@@ -99,7 +109,7 @@ export const PAYETAX_INFO = {
     'Privacy-conscious users',
     'Mobile users',
     'Salary comparison scenarios',
-    'Quick, clean calculations',
+    'Clean, focused calculations',
   ],
 };
 
@@ -140,6 +150,16 @@ export const COMPETITOR_CATEGORIES: CompetitorCategoryInfo[] = [
   },
 ];
 
+const VERIFIED_2025_01: CompetitorVerification = {
+  status: 'verified',
+  lastVerified: '2025-01',
+};
+
+const NEEDS_REVIEW: CompetitorVerification = {
+  status: 'needs-review',
+  lastVerified: null,
+};
+
 /**
  * Competitor data for all comparison pages
  */
@@ -152,7 +172,6 @@ export const COMPETITORS: Competitor[] = [
     name: 'GOV.UK HMRC Calculator',
     shortName: 'GOV.UK',
     url: 'https://www.gov.uk/estimate-income-tax',
-    // Verified 2025-01: GOV.UK "Estimate your Income Tax" includes NI, pension, and student loans
     description:
       'The official government calculator for estimating Income Tax, National Insurance, and take-home pay.',
     strengths: [
@@ -179,9 +198,13 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: {
+      ...VERIFIED_2025_01,
+      notes: 'Reviewed NI/pension/student loan support; confirm Scottish rates support.',
+    },
     payeTaxAdvantages: [
-      'Modern mobile-first design',
-      'What-If salary scenarios',
+      'Mobile-first design',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Instant real-time results',
       'Scottish rates support',
       'Multiple student loan plans',
@@ -200,7 +223,6 @@ export const COMPETITORS: Competitor[] = [
     name: 'The Salary Calculator',
     shortName: 'Salary Calc',
     url: 'https://www.thesalarycalculator.co.uk/',
-    // Verified 2025-01: Has tax year selector and 2025/2024 comparison calculator
     description: 'Long-established, feature-rich UK salary calculator with extensive options.',
     strengths: [
       'Comprehensive feature set',
@@ -225,11 +247,15 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: true, // Verified: has tax year selector
     },
+    verification: {
+      ...VERIFIED_2025_01,
+      notes: 'Tax year selector and year-on-year comparison reviewed.',
+    },
     payeTaxAdvantages: [
-      'Modern, clean design',
+      'Clean, focused design',
       'Simpler, intuitive UX',
-      'Real scenario What-If comparisons',
-      'Mobile-first responsive',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Mobile-first responsive design',
       'Real-time calculations',
       'Verified HMRC accuracy',
     ],
@@ -246,7 +272,6 @@ export const COMPETITORS: Competitor[] = [
     name: 'ListenToTaxman',
     shortName: 'LTTM',
     url: 'https://listentotaxman.com/',
-    // Verified 2025-01: Supports historic years back to 1999
     description:
       'Popular UK tax calculator known for its straightforward approach and detailed breakdowns.',
     strengths: [
@@ -273,13 +298,17 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: true, // Verified: supports back to 1999
     },
+    verification: {
+      ...VERIFIED_2025_01,
+      notes: 'Historic tax year support reviewed (back to 1999).',
+    },
     payeTaxAdvantages: [
-      '100% ad-free experience',
-      'What-If salary scenarios',
-      'Modern, responsive design',
-      'Faster calculations',
-      'Privacy-first approach',
-      'Better mobile experience',
+      'No display ads (affiliate links are tracked)',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Clean, responsive design',
+      'Real-time calculations',
+      'Privacy-first analytics',
+      'Mobile-first experience',
     ],
     bestFor: ['Users familiar with the brand', 'Quick tax estimates', 'Basic PAYE calculations'],
     category: 'standalone',
@@ -294,7 +323,6 @@ export const COMPETITORS: Competitor[] = [
     name: 'SalaryBot',
     shortName: 'SalaryBot',
     url: 'https://salarybot.co.uk/',
-    // Verified 2025-01: Has tax year selector with multiple years
     description:
       'Clean UK salary calculator with a focus on simplicity and take-home pay estimates.',
     strengths: [
@@ -320,12 +348,16 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: true, // Verified: has tax year selector
     },
+    verification: {
+      ...VERIFIED_2025_01,
+      notes: 'Tax year selector reviewed.',
+    },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'More detailed breakdowns',
       'Pension optimization tools',
       'Tax trap calculations',
-      'Privacy-first design',
+      'Privacy-first analytics',
     ],
     bestFor: ['Quick calculations', 'Mobile users', 'Simple salary estimates'],
     category: 'standalone',
@@ -361,13 +393,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: true,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      '100% ad-free experience',
-      'What-If salary scenarios',
-      'Faster, cleaner interface',
-      'Better mobile experience',
+      'No display ads (affiliate links are tracked)',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Cleaner, focused interface',
+      'Mobile-first experience',
       'UK-focused accuracy',
-      'Privacy-first design',
+      'Privacy-first analytics',
     ],
     bestFor: ['Multi-country tax needs', 'Detailed tax research', 'Historic calculations'],
     category: 'standalone',
@@ -402,13 +435,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: true,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'Modern, clean interface',
-      'What-If salary scenarios',
+      'Clean, focused interface',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Real-time calculations',
       'Mobile-first design',
-      'Ad-free experience',
-      'Faster results',
+      'No display ads (affiliate links are tracked)',
+      'Real-time results',
     ],
     bestFor: ['Self-employed calculations', 'Dividend tax planning', 'Multiple tax scenarios'],
     category: 'standalone',
@@ -444,13 +478,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'UK-focused accuracy',
       'All student loan plans',
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Detailed pension options',
       'Historic tax years',
-      'Privacy-first design',
+      'Privacy-first analytics',
     ],
     bestFor: [
       'International salary comparisons',
@@ -484,13 +519,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Full feature set',
       'Scottish tax support',
       'Student loan calculations',
-      'What-If scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Pension contributions',
-      'Modern mobile design',
+      'Mobile-first design',
     ],
     bestFor: ['Very quick estimates', 'Simple salary queries', 'Basic PAYE lookups'],
     category: 'standalone',
@@ -531,13 +567,17 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: {
+      ...NEEDS_REVIEW,
+      notes: 'Confirm historic tax year support and feature set.',
+    },
     payeTaxAdvantages: [
-      '100% ad-free experience',
+      'No display ads (affiliate links are tracked)',
       'Cleaner, focused interface',
-      'What-If salary scenarios',
-      'Faster results',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Real-time results',
       'No distractions',
-      'Privacy-first approach',
+      'Privacy-first analytics',
     ],
     bestFor: [
       'Users who want editorial content',
@@ -581,13 +621,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'No subscription required',
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'More calculation options',
       'Completely free access',
-      'Privacy-first approach',
-      'Faster, cleaner interface',
+      'Privacy-first analytics',
+      'Cleaner, focused interface',
     ],
     bestFor: ['Which? subscribers', 'Consumer advice seekers', 'Those researching tax topics'],
     category: 'consumer-finance',
@@ -623,13 +664,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Detailed tax breakdowns',
       'Historic tax years',
       'Pension optimization tools',
-      '100% ad-free',
-      'Privacy-first design',
+      'No display ads (affiliate links are tracked)',
+      'Privacy-first analytics',
     ],
     bestFor: ['Job seekers', 'Salary negotiation research', 'Quick take-home estimates'],
     category: 'consumer-finance',
@@ -669,8 +711,9 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'No software upsells',
       'Individual-focused design',
       'More detailed options',
@@ -711,13 +754,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Individual-focused',
       'No software upsells',
       'Historic tax years',
       'More detailed breakdowns',
-      'Privacy-first approach',
+      'Privacy-first analytics',
     ],
     bestFor: ['Xero users', 'Small business owners', 'Quick payroll estimates'],
     category: 'accounting-software',
@@ -752,13 +796,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Student loan calculations',
       'Individual-focused design',
       'No product upsells',
       'Historic tax years',
-      'Privacy-first approach',
+      'Privacy-first analytics',
     ],
     bestFor: ['QuickBooks users', 'Small business owners', 'Quick estimates'],
     category: 'accounting-software',
@@ -793,8 +838,9 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Consumer-friendly design',
       'Mobile-first experience',
       'More intuitive interface',
@@ -838,12 +884,13 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Full feature set',
       'Student loan support',
       'Pension calculations',
-      'What-If scenarios',
-      'Modern interface',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Clean interface',
       'Mobile-first design',
     ],
     bestFor: ['Corporate executives', 'High earners', 'Professional estimates'],
@@ -879,8 +926,9 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Student loan support',
       'No lead forms required',
       'Individual-focused',
@@ -921,12 +969,13 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Full calculation features',
       'Student loan plans',
       'Pension options',
-      'What-If scenarios',
-      'Modern design',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'Clean design',
       'Individual-focused',
     ],
     bestFor: ['Senior executives', 'Professional tax planning', 'Corporate users'],
@@ -962,12 +1011,13 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Scottish tax support',
       'Student loan calculations',
       'Pension options',
-      'Modern, clean interface',
+      'Clean interface',
       'No consultation required',
     ],
     bestFor: ['Corporate tax planning', 'High earners', 'Executive estimates'],
@@ -1003,8 +1053,9 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
-      'What-If salary scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'Student loan support',
       'Individual-focused design',
       'Mobile-first experience',
@@ -1049,13 +1100,17 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: {
+      ...NEEDS_REVIEW,
+      notes: 'Confirm student loan support and contractor feature set.',
+    },
     payeTaxAdvantages: [
       'Simple PAYE calculations',
-      'Clean, ad-free interface',
+      'Clean interface with no display ads (affiliate links are tracked)',
       'Student loan support',
       'Better for employees',
-      'Faster, simpler results',
-      'Privacy-first design',
+      'Simpler results',
+      'Privacy-first analytics',
     ],
     bestFor: ['IT contractors', 'Umbrella company users', 'IR35 assessments'],
     category: 'specialist',
@@ -1095,11 +1150,12 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Full PAYE support',
       'Student loan calculations',
       'Pension options',
-      'What-If scenarios',
+      'What-If salary comparisons (compare arbitrary salaries)',
       'No upsells',
       'Completely free',
     ],
@@ -1137,6 +1193,7 @@ export const COMPETITORS: Competitor[] = [
       adFree: true,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Simple PAYE focus',
       'Student loan support',
@@ -1182,13 +1239,14 @@ export const COMPETITORS: Competitor[] = [
       adFree: false,
       historicYears: false,
     },
+    verification: { ...NEEDS_REVIEW, notes: 'Needs external feature verification.' },
     payeTaxAdvantages: [
       'Full PAYE support',
       'Scottish tax rates',
       'Student loan calculations',
       'Pension options',
-      'What-If scenarios',
-      'Ad-free experience',
+      'What-If salary comparisons (compare arbitrary salaries)',
+      'No display ads (affiliate links are tracked)',
     ],
     bestFor: ['New freelancers', 'Self-employed estimates', 'Basic tax planning'],
     category: 'specialist',
@@ -1209,7 +1267,7 @@ export const FEATURE_LABELS: Record<keyof CompetitorFeatures, string> = {
   pension: 'Pension Contributions',
   whatIf: 'What-If Scenarios',
   mobileFirst: 'Mobile-First Design',
-  adFree: 'Ad-Free',
+  adFree: 'No Display Ads',
   historicYears: 'Historic Tax Years',
 };
 

@@ -9,12 +9,13 @@ import { cache } from 'react';
 
 import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
-import { compileMDXContent, extractFAQs } from '@/lib/mdx';
+import { compileMDXContent, extractFAQs, extractHowToSteps } from '@/lib/mdx';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
@@ -110,6 +111,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Extract FAQs from content for schema.org FAQPage markup
   const faqs = extractFAQs(post.content);
 
+  // Extract HowTo steps for instructional posts
+  const howToSteps = extractHowToSteps(post.content);
+
   // Calculate word count from content (strip markdown/HTML for accurate count)
   const plainText = post.content
     .replace(/```[\s\S]*?```/g, '') // Remove code blocks
@@ -122,105 +126,51 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
   // Normalize image URL for consistent usage across metadata and JSON-LD
-  const imageUrl = getAbsoluteImageUrl(post.image);
+  const imageUrl = getAbsoluteImageUrl(post.image) ?? LOGO_URL;
 
-  // Generate Article structured data for SEO
-  const articleStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
+  const authorName =
+    post.author && post.author !== 'PayeTax Team' ? post.author : 'PayeTax Editorial Team';
+
+  const articleData = {
+    title: post.title,
     description: post.seoDescription || post.excerpt,
-    image: imageUrl,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt || post.publishedAt,
-    author: {
-      '@type': 'Organization',
-      name: 'PayeTax',
-      url: SITE_URL,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'PayeTax',
-      url: SITE_URL,
-      logo: {
-        '@type': 'ImageObject',
-        url: LOGO_URL,
-      },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `${SITE_URL}/blog/${post.slug}`,
-    },
-    keywords: post.seoKeywords?.join(', '),
-    inLanguage: 'en-GB',
+    url: `${SITE_URL}/blog/${post.slug}`,
+    imageUrl,
+    publishDate: post.publishedAt,
+    modifiedDate: post.updatedAt || post.publishedAt,
+    authorName,
     wordCount,
     articleSection: post.category || 'Tax Tips',
   };
 
-  // Breadcrumb structured data
-  const breadcrumbStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Blog',
-        item: `${SITE_URL}/blog`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: post.title,
-        item: `${SITE_URL}/blog/${post.slug}`,
-      },
-    ],
-  };
+  const breadcrumbItems = [
+    { name: 'Home', url: SITE_URL },
+    { name: 'Blog', url: `${SITE_URL}/blog` },
+    { name: post.title, url: `${SITE_URL}/blog/${post.slug}` },
+  ];
 
-  // FAQ structured data for rich snippets (only if FAQs exist)
-  const faqStructuredData =
-    faqs.length > 0
-      ? {
+  const howToData =
+    howToSteps.length > 0
+      ? ({
           '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          mainEntity: faqs.map((faq) => ({
-            '@type': 'Question',
-            name: faq.question,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: faq.answer,
-            },
+          '@type': 'HowTo',
+          name: post.title,
+          description: post.seoDescription || post.excerpt,
+          ...(imageUrl ? { image: [imageUrl] } : {}),
+          step: howToSteps.map((step) => ({
+            '@type': 'HowToStep' as const,
+            name: step.name,
+            text: step.text,
           })),
-        }
+        } as const)
       : null;
 
   return (
     <>
-      {/* Structured Data */}
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
-      />
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
-      />
-      {/* FAQ Schema for rich snippets (conditionally rendered) */}
-      {faqStructuredData && (
-        <script
-          type='application/ld+json'
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
-        />
-      )}
+      <StructuredData type='article' articleData={articleData} />
+      <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
+      {faqs.length > 0 && <StructuredData type='faq' faqs={faqs} />}
+      {howToData && <StructuredData type='howto' data={howToData} />}
 
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>
@@ -357,9 +307,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   'prose-strong:font-semibold prose-strong:text-foreground',
                   'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
                   'prose-li:marker:text-primary/60',
-                  'prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:m-0 prose-blockquote:not-italic',
+                  'prose-blockquote:m-0 prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:not-italic',
                   'prose-table:m-0 prose-thead:border-0 prose-tr:border-0',
-                  'prose-th:p-0 prose-th:align-middle prose-td:p-0 prose-td:align-middle',
+                  'prose-td:p-0 prose-th:p-0 prose-td:align-middle prose-th:align-middle',
                   'prose-code:rounded prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none',
                   'prose-pre:border prose-pre:border-foreground/10 prose-pre:bg-foreground/5',
                   'md:prose-xl',

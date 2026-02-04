@@ -69,7 +69,9 @@ describe('Tax Calculator additional income handling', () => {
       incomeSources: [{ id: 'job2', type: 'employment', amount: 10000, period: 'annually' }],
     });
 
-    expect(withEmployment.nationalInsurance.annually).toBeGreaterThan(base.nationalInsurance.annually);
+    expect(withEmployment.nationalInsurance.annually).toBeGreaterThan(
+      base.nationalInsurance.annually,
+    );
     expect(withEmployment.incomeTax.annually).toBeGreaterThan(base.incomeTax.annually);
   });
 });

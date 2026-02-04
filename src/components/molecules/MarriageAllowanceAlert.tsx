@@ -69,12 +69,7 @@ export function MarriageAllowanceAlert({
 
   if (!saving) return null;
 
-  const {
-    netSaving,
-    personalAllowance,
-    higherRateThreshold,
-    transferAmount,
-  } = saving;
+  const { netSaving, personalAllowance, higherRateThreshold, transferAmount } = saving;
 
   // User must be a basic rate taxpayer (between PA and higher rate threshold)
   if (userSalary <= personalAllowance || userSalary > higherRateThreshold) {

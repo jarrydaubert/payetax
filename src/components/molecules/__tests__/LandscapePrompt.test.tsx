@@ -100,4 +100,3 @@ describe('LandscapePrompt', () => {
     expect(container.querySelector('.custom-class')).toBeInTheDocument();
   });
 });
-

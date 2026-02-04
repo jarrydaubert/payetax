@@ -1,4 +1,6 @@
 // src/app/tools/tax-code-decoder/page.tsx
+
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { TaxCodeDecoderClient } from './TaxCodeDecoderClient';
 
@@ -12,30 +14,11 @@ export const metadata = generateBaseMetadata({
 });
 
 export default function TaxCodeDecoderPage() {
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Tools',
-        item: `${SITE_URL}/tools`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: 'Tax Code Decoder',
-        item: `${SITE_URL}/tools/tax-code-decoder`,
-      },
-    ],
-  };
+  const breadcrumbItems = [
+    { name: 'Home', url: SITE_URL },
+    { name: 'Tools', url: `${SITE_URL}/tools` },
+    { name: 'Tax Code Decoder', url: `${SITE_URL}/tools/tax-code-decoder` },
+  ];
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -52,20 +35,13 @@ export default function TaxCodeDecoderPage() {
       priceCurrency: 'GBP',
     },
     // Note: aggregateRating removed - only add when backed by real, verifiable reviews
-  };
+  } as const;
 
   return (
     <>
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-      />
+      <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
+      <StructuredData type='calculator' data={softwareSchema} />
+      <StructuredData type='dataset' />
       <TaxCodeDecoderClient />
     </>
   );

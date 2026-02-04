@@ -73,6 +73,8 @@ function roundToPence(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+const AVERAGE_WEEKS_PER_MONTH = 4.333;
+
 // ============================================================================
 // HELPER FUNCTIONS - Extracted for maintainability
 // Exported for testing. Used by calculateTax() for consistent behavior.
@@ -1269,8 +1271,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       case PERIODS.HOURLY:
         // Special case for hourly rate
         if (input.hoursPerWeek > 0) {
-          // Monthly / (hours per week * 4.333 weeks per month)
-          const monthlyHours = input.hoursPerWeek * 4.333; // Average weeks per month
+          // Monthly / (hours per week * average weeks per month)
+          const monthlyHours = input.hoursPerWeek * AVERAGE_WEEKS_PER_MONTH;
           grossSalary[period] = roundToPence(monthlyGrossSalary / monthlyHours);
           incomeTax[period] = roundToPence(monthlyTax / monthlyHours);
           nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance / monthlyHours);

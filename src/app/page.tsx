@@ -6,22 +6,18 @@ import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
 import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import { generateMetadata } from '@/lib/metadata';
+import { generateMetadata, SITE_URL } from '@/lib/metadata';
 
 // Dynamic import for interactive content - hero is server-rendered for fast LCP
 // Using loading option for predictable fallback behavior (vs relying on outer Suspense)
 const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'), {
   loading: () => (
-    <div
-      className='flex min-h-[400px] items-center justify-center p-8'
-      role='status'
-      aria-live='polite'
-    >
+    <output className='flex min-h-[400px] items-center justify-center p-8' aria-live='polite'>
       <div className='flex flex-col items-center gap-3'>
         <div className='size-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
         <p className='text-muted-foreground text-sm'>Loading calculator...</p>
       </div>
-    </div>
+    </output>
   ),
 });
 
@@ -46,13 +42,13 @@ export default function HomePage() {
   return (
     <>
       {/* Structured data for SEO and AEO (rendered server-side) */}
-      <StructuredData type='organization' />
       <StructuredData type='website' />
       <StructuredData type='financialservice' />
       <StructuredData type='calculator' />
       <StructuredData type='howto' />
       <StructuredData type='dataset' />
       <StructuredData type='faq' faqs={faqs} />
+      <StructuredData type='breadcrumb' breadcrumbs={[{ name: 'Home', url: SITE_URL }]} />
 
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />

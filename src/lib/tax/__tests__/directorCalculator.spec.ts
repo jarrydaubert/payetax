@@ -507,24 +507,24 @@ describe('Tax Calculations', () => {
   describe('Student Loan Repayments', () => {
     it('should calculate Plan 1 repayments at 9% above £26,065', () => {
       const totalIncome = 50000; // salary + dividends
-      // Repayment = (50000 - 26065) * 0.09 = £2,154.15 → floor to £2,154
+      // Repayment = (50000 - 26065) * 0.09 = £2,154.15
       const result = getStudentLoanRepayment(totalIncome, ['plan1'], TAX_YEAR);
-      expect(result.plan1).toBe(2154); // floor((50000 - 26065) * 0.09)
-      expect(result.total).toBe(2154);
+      expect(result.plan1).toBeCloseTo(2154.15, 2);
+      expect(result.total).toBeCloseTo(2154.15, 2);
     });
 
     it('should calculate Plan 2 repayments at 9% above £28,470', () => {
       const totalIncome = 50000;
-      // Repayment = (50000 - 28470) * 0.09 = £1,937.70 → floor to £1,937
+      // Repayment = (50000 - 28470) * 0.09 = £1,937.70
       const result = getStudentLoanRepayment(totalIncome, ['plan2'], TAX_YEAR);
-      expect(result.plan2).toBe(1937);
+      expect(result.plan2).toBeCloseTo(1937.7, 2);
     });
 
     it('should calculate Plan 4 repayments at 9% above £32,745', () => {
       const totalIncome = 50000;
-      // Repayment = (50000 - 32745) * 0.09 = £1,552.95 → floor to £1,552
+      // Repayment = (50000 - 32745) * 0.09 = £1,552.95
       const result = getStudentLoanRepayment(totalIncome, ['plan4'], TAX_YEAR);
-      expect(result.plan4).toBe(1552);
+      expect(result.plan4).toBeCloseTo(1552.95, 2);
     });
 
     it('should calculate Postgraduate Loan at 6% above £21,000', () => {
@@ -536,13 +536,13 @@ describe('Tax Calculations', () => {
 
     it('should stack multiple student loan plans', () => {
       const totalIncome = 50000;
-      // Plan 2: floor((50000 - 28470) * 0.09) = £1,937
-      // Postgrad: floor((50000 - 21000) * 0.06) = £1,740
-      // Total: £3,677
+      // Plan 2: (50000 - 28470) * 0.09 = £1,937.70
+      // Postgrad: (50000 - 21000) * 0.06 = £1,740
+      // Total: £3,677.70
       const result = getStudentLoanRepayment(totalIncome, ['plan2', 'postgrad'], TAX_YEAR);
-      expect(result.plan2).toBe(1937);
-      expect(result.postgrad).toBe(1740);
-      expect(result.total).toBe(3677);
+      expect(result.plan2).toBeCloseTo(1937.7, 2);
+      expect(result.postgrad).toBeCloseTo(1740, 2);
+      expect(result.total).toBeCloseTo(3677.7, 2);
     });
 
     it('should calculate student loan on total income (salary + dividends + BIK)', () => {
@@ -569,7 +569,7 @@ describe('Tax Calculations', () => {
 // PILLAR 2: OPTIMIZATION TESTS
 // =============================================================================
 
-  describe('Strategy Optimization', () => {
+describe('Strategy Optimization', () => {
   describe('Strategy Comparison', () => {
     // Helper to create a standard input with given profit
     const createInput = (profit: number, overrides = {}) => ({
@@ -1148,13 +1148,13 @@ describe('Edge Cases', () => {
     // Test via getStudentLoanRepayment
     const totalIncome = 80000;
     const result = getStudentLoanRepayment(totalIncome, ['plan1', 'plan2', 'postgrad'], TAX_YEAR);
-    // Plan 1: (80000-26065)*0.09 = 4854.15 → 4854
-    // Plan 2: (80000-28470)*0.09 = 4637.70 → 4637
-    // Postgrad: (80000-21000)*0.06 = 3540.00 → 3540
-    expect(result.plan1).toBe(4854);
-    expect(result.plan2).toBe(4637);
-    expect(result.postgrad).toBe(3540);
-    expect(result.total).toBe(13031);
+    // Plan 1: (80000-26065)*0.09 = 4854.15
+    // Plan 2: (80000-28470)*0.09 = 4637.70
+    // Postgrad: (80000-21000)*0.06 = 3540.00
+    expect(result.plan1).toBeCloseTo(4854.15, 2);
+    expect(result.plan2).toBeCloseTo(4637.7, 2);
+    expect(result.postgrad).toBeCloseTo(3540, 2);
+    expect(result.total).toBeCloseTo(13031.85, 2);
   });
 
   it('should handle pension contribution reducing income below thresholds', () => {

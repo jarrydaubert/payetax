@@ -1,5 +1,5 @@
-import { GET } from '../route';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { GET } from '../route';
 
 jest.mock('@/lib/blog', () => ({
   getBlogPosts: jest.fn(),

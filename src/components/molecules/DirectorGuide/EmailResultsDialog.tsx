@@ -25,31 +25,24 @@ import type { TaxYear } from '@/constants/taxRates';
 import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
+import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 
 // TODO: Centralize tax year selection in app config
 const TAX_YEAR: TaxYear = '2025-2026';
-
-// Format tax year for display (e.g., "2025-2026" -> "2025-26")
-const formatTaxYearForEmail = (year: TaxYear): string => {
-  const [start, end] = year.split('-');
-  return `${start}-${end?.slice(-2) ?? ''}`;
-};
 
 interface EmailResultsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   comparison: StrategyComparison | null;
+  emailInput: DirectorEmailInput | null;
 }
 
-// Minimal payload for email - only what's needed for the template
-interface EmailPayload {
-  grossProfit: number;
-  strategies: StrategyComparison['strategies'];
-  recommended: StrategyComparison['recommended'];
-  savingsVsAllSalary: number;
-}
-
-export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResultsDialogProps) {
+export function EmailResultsDialog({
+  open,
+  onOpenChange,
+  comparison,
+  emailInput,
+}: EmailResultsDialogProps) {
   const emailInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState('');
@@ -70,7 +63,7 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
       return;
     }
 
-    if (!comparison) {
+    if (!(comparison && emailInput)) {
       toast.error('No results to send');
       return;
     }
@@ -80,21 +73,13 @@ export function EmailResultsDialog({ open, onOpenChange, comparison }: EmailResu
     setIsLoading(true);
 
     try {
-      // Build minimal payload - only what the email template needs
-      const payload: EmailPayload = {
-        grossProfit: comparison.grossProfit,
-        strategies: comparison.strategies,
-        recommended: comparison.recommended,
-        savingsVsAllSalary: comparison.savingsVsAllSalary,
-      };
-
       const response = await fetch('/api/send-director-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: normalizedEmail,
-          results: payload,
-          taxYear: formatTaxYearForEmail(TAX_YEAR),
+          input: emailInput,
+          taxYear: TAX_YEAR,
         }),
       });
 

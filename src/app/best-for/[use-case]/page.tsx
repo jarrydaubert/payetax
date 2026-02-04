@@ -1,8 +1,12 @@
 // src/app/best-for/[use-case]/page.tsx
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllUseCaseSlugs, getUseCaseBySlug } from '@/data/useCases';
+import { SITE_URL } from '@/lib/metadata';
 import { UseCasePageContent } from './UseCasePageContent';
+
+const OG_IMAGE = 'https://payetax.co.uk/images/og-image.png';
 
 interface PageProps {
   params: Promise<{ 'use-case': string }>;
@@ -46,11 +50,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: `https://payetax.co.uk/best-for/${slug}`,
       type: 'article',
       siteName: 'PayeTax',
+      images: [OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -63,5 +69,16 @@ export default async function UseCasePage({ params }: PageProps) {
     notFound();
   }
 
-  return <UseCasePageContent useCase={useCase} />;
+  return (
+    <>
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: useCase.title, url: `${SITE_URL}/best-for/${slug}` },
+        ]}
+      />
+      <UseCasePageContent useCase={useCase} />
+    </>
+  );
 }

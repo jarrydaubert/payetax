@@ -1,10 +1,11 @@
 // src/app/compliance/page.tsx
 
 import type { Metadata } from 'next';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { SITE_URL } from '@/lib/metadata';
 import { CompliancePageContent } from './CompliancePageContent';
 
-const OG_IMAGE = `${SITE_URL}/images/og/compliance.jpg`;
+const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 export const metadata: Metadata = {
   title: 'HMRC Compliance & Data Sources | PayeTax',
@@ -33,5 +34,16 @@ export const metadata: Metadata = {
 };
 
 export default function CompliancePage() {
-  return <CompliancePageContent />;
+  return (
+    <>
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Compliance', url: `${SITE_URL}/compliance` },
+        ]}
+      />
+      <CompliancePageContent />
+    </>
+  );
 }

@@ -80,10 +80,8 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
         Horizontally scrollable table. Use swipe, scroll, or click and drag to view all columns.
       </div>
 
-      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling */}
       <section
         ref={containerRef}
-        tabIndex={0}
         className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
         style={{
           scrollbarWidth: 'thin',

@@ -89,8 +89,9 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
             <div className={SPACING.SPACE_Y_4}>
               <p className='text-muted-foreground'>
                 <strong className='text-foreground'>PayeTax</strong> is best for users who want a
-                fast, modern, ad-free experience with unique What-If salary comparison features. All
-                calculations happen in your browser for complete privacy.
+                clean, no-display-ads experience with What-If salary comparisons (compare arbitrary
+                salaries). Interactive calculations run in your browser and tax inputs aren&apos;t
+                stored, though some pages are pre-rendered for SEO or email delivery.
               </p>
               <p className='text-muted-foreground'>
                 <strong className='text-foreground'>{competitor.name}</strong> is better suited for{' '}
@@ -253,9 +254,9 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                 and design philosophy.
               </p>
               <p className='text-muted-foreground'>
-                <strong className='text-foreground'>Choose PayeTax</strong> if you value a modern,
-                clean interface, want to compare different salary scenarios with What-If mode, and
-                prefer an ad-free, privacy-first experience.
+                <strong className='text-foreground'>Choose PayeTax</strong> if you value a clean
+                interface, want to compare arbitrary salary scenarios with What-If mode, and prefer
+                no display ads with privacy-first analytics.
               </p>
               <p className='text-muted-foreground'>
                 <strong className='text-foreground'>Choose {competitor.shortName}</strong> if you
@@ -277,11 +278,11 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
             )}
           >
             <h2 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_3XL, SPACING.MB_4)}>
-              Ready to Try the Modern Approach?
+              Ready to Try a Focused Approach?
             </h2>
             <p className={cn('mx-auto max-w-xl text-muted-foreground', SPACING.MB_8)}>
-              Experience the difference with PayeTax. Fast, clean, private, and packed with features
-              you won&apos;t find elsewhere.
+              Experience the difference with PayeTax. Clean, private, and packed with features you
+              won&apos;t find elsewhere.
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>

@@ -8,7 +8,7 @@
  * - Regression where additional income sources stop showing/being included in totals
  */
 
-import { expect, test, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 function parsePercent(text: string): number {
   const match = text.match(/(\d+(\.\d+)?)%/);
@@ -49,7 +49,9 @@ async function getYearlyTableValue(page: Page, label: string): Promise<number> {
 }
 
 test.describe('Calculator critical @critical', () => {
-  test('Age select text is not visually truncated in the side panel @critical', async ({ page }) => {
+  test('Age select text is not visually truncated in the side panel @critical', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
 

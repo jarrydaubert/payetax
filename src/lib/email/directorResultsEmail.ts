@@ -9,8 +9,8 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
-import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 import { formatCurrency } from '@/lib/utils';
+import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
 export function escapeHtml(str: string): string {
   return str

@@ -85,4 +85,3 @@ describe('Tax Calculator invariants', () => {
     expect(r.taxableIncome).toBeGreaterThan(40000);
   });
 });
-

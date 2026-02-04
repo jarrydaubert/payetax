@@ -32,4 +32,3 @@ export const inter: FontLike = Inter({
   ],
   // weight omitted = variable font (single file, all weights 100-900)
 });
-

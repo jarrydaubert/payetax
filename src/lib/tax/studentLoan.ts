@@ -53,13 +53,19 @@ export function getStudentLoanRepayment(
   for (const plan of plans) {
     const { threshold, rate } = rates[plan];
     if (totalIncome > threshold) {
-      const repayment = Math.floor((totalIncome - threshold) * (rate / 100));
+      const repayment = roundToPence((totalIncome - threshold) * (rate / 100));
       result[plan] = repayment;
       result.total += repayment;
     }
   }
 
+  result.total = roundToPence(result.total);
+
   return result;
+}
+
+function roundToPence(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 /**

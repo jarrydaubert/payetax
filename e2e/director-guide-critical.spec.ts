@@ -64,7 +64,9 @@ test.describe('Director Guide critical @critical', () => {
     await expect(page.getByLabel('Email address')).toBeHidden();
   });
 
-  test('Survival mode: shows Survival panel and VAT warning (ungated) @critical', async ({ page }) => {
+  test('Survival mode: shows Survival panel and VAT warning (ungated) @critical', async ({
+    page,
+  }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
 
     // Zero profit: Survival Mode.

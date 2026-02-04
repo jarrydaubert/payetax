@@ -40,7 +40,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
         }
         subtitle={[
           `${competitor.description}`,
-          "But if you're looking for something faster, cleaner, and more modern — PayeTax might be what you need.",
+          "But if you're looking for something cleaner and more focused — PayeTax might be what you need.",
         ]}
       />
 
@@ -119,21 +119,21 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
                   <span className='text-primary' aria-hidden='true'>
                     ✓
                   </span>
-                  <span>What-If salary comparison scenarios</span>
+                  <span>What-If salary comparisons (compare arbitrary salaries)</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
                   <span className='sr-only'>Advantage:</span>
                   <span className='text-primary' aria-hidden='true'>
                     ✓
                   </span>
-                  <span>100% ad-free, privacy-first experience</span>
+                  <span>No display ads (affiliate links are tracked)</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
                   <span className='sr-only'>Advantage:</span>
                   <span className='text-primary' aria-hidden='true'>
                     ✓
                   </span>
-                  <span>Modern, mobile-first design</span>
+                  <span>Mobile-first design</span>
                 </li>
                 <li className={cn('flex items-start', SPACING.GAP_3)}>
                   <span className='sr-only'>Advantage:</span>
@@ -177,8 +177,8 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
               Built on Official HMRC Rates
             </h2>
             <p className={cn('mx-auto max-w-xl text-muted-foreground', SPACING.MB_8)}>
-              PayeTax is built around official HMRC rates and guidance, with a modern, ad-free
-              interface and unique What-If comparison features you won't find elsewhere.
+              PayeTax is built around official HMRC rates and guidance, with a clean interface, no
+              display ads, and What-If salary comparisons you won&apos;t find elsewhere.
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>

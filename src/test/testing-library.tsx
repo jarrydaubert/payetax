@@ -1,10 +1,10 @@
-import type { ReactElement, ReactNode } from 'react';
 import {
   cleanup,
-  render as rtlRender,
   type RenderOptions,
   type RenderResult,
+  render as rtlRender,
 } from '@testing-library/react/pure';
+import type { ReactElement, ReactNode } from 'react';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 

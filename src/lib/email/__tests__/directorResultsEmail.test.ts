@@ -1,10 +1,10 @@
-import type { DirectorStrategy } from '@/lib/validation/emailValidation';
+import { TAX_RATES } from '@/constants/taxRates';
 import {
   escapeHtml,
   generateDirectorEmailHtml,
   getDirectorEmailThresholds,
 } from '@/lib/email/directorResultsEmail';
-import { TAX_RATES } from '@/constants/taxRates';
+import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
 describe('directorResultsEmail', () => {
   test('escapeHtml escapes dangerous characters', () => {
@@ -59,4 +59,3 @@ describe('directorResultsEmail', () => {
     expect(html).toContain('31 January 2027');
   });
 });
-

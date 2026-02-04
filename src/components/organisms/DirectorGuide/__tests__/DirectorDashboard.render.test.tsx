@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { DirectorDashboard } from '../DirectorDashboard';
 
@@ -34,8 +34,7 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
 }));
 
 jest.mock('@/components/molecules/DirectorGuide/EmailResultsDialog', () => ({
-  EmailResultsDialog: ({ open }: { open: boolean }) =>
-    open ? <div>Results Dialog</div> : null,
+  EmailResultsDialog: ({ open }: { open: boolean }) => (open ? <div>Results Dialog</div> : null),
 }));
 
 function createComparison(grossProfit: number) {
@@ -89,7 +88,9 @@ describe('DirectorDashboard (normal mode)', () => {
   });
 
   it('renders the main flow when comparison is available', () => {
-    useDirectorGuideStore.setState({ strategyComparison: createComparison(80000) as never } as never);
+    useDirectorGuideStore.setState({
+      strategyComparison: createComparison(80000) as never,
+    } as never);
 
     render(<DirectorDashboard />);
 
@@ -99,7 +100,9 @@ describe('DirectorDashboard (normal mode)', () => {
   });
 
   it('opens the email dialog when CTA is clicked', () => {
-    useDirectorGuideStore.setState({ strategyComparison: createComparison(80000) as never } as never);
+    useDirectorGuideStore.setState({
+      strategyComparison: createComparison(80000) as never,
+    } as never);
 
     render(<DirectorDashboard />);
     fireEvent.click(screen.getByText('Email My Results'));

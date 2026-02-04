@@ -1,7 +1,6 @@
-import { fireEvent, render, screen } from '@/test/testing-library';
-
-import { TrackedAffiliateLink } from '../TrackedAffiliateLink';
 import type { Competitor } from '@/data/competitors';
+import { fireEvent, render, screen } from '@/test/testing-library';
+import { TrackedAffiliateLink } from '../TrackedAffiliateLink';
 
 const trackAffiliateClick = jest.fn();
 
@@ -29,6 +28,7 @@ const baseCompetitor: Competitor = {
     adFree: false,
     historicYears: false,
   },
+  verification: { status: 'needs-review', lastVerified: null },
   payeTaxAdvantages: ['Advantage'],
   bestFor: ['Best for'],
 };

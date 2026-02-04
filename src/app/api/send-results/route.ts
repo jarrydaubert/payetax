@@ -2,21 +2,31 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { isValidRequestOrigin } from '@/lib/security/origin';
-import { formatCurrency } from '@/lib/utils';
 import {
-  type SendResultsRequest,
-  SendResultsRequestSchema,
-} from '@/lib/validation/emailValidation';
+  calculateTax,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
+} from '@/lib/taxCalculator';
+import { formatCurrency } from '@/lib/utils';
+import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
 
 export const runtime = 'nodejs';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+function formatErrorForLog(error: unknown): { name?: string; message?: string } {
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message };
+  }
+
+  return { message: 'Unknown error' };
+}
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
 
-// Type for results based on Zod schema (avoid casting)
-type EmailResults = SendResultsRequest['results'];
+type EmailResults = TaxCalculationResults;
 
 /** Escape HTML to prevent injection */
 function escapeHtml(str: string): string {
@@ -46,6 +56,12 @@ function getClientIdentifier(request: NextRequest): string {
   // Fallback: hash of user-agent
   const ua = request.headers.get('user-agent') || 'unknown';
   return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
+
+// Format tax year for display in emails (e.g., "2025-2026" -> "2025-26")
+function formatTaxYearForEmail(taxYear: string): string {
+  const [start, end] = taxYear.split('-');
+  return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
 /** Generate plain text email for deliverability */
@@ -270,25 +286,39 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { email, results, taxYear } = validation.data;
+  const { email, input } = validation.data;
+  const calculationInput: TaxCalculationInput = {
+    ...input,
+    payPeriod: input.payPeriod as PayPeriod,
+    taxYear: input.taxYear as TaxYear,
+    incomeSources: input.incomeSources?.map((source, index) => ({
+      id: source.id ?? `email-source-${index}`,
+      label: source.label,
+      type: source.type,
+      amount: source.amount,
+      period: source.period as PayPeriod,
+    })),
+  };
+  const results = calculateTax(calculationInput);
+  const taxYearLabel = formatTaxYearForEmail(input.taxYear);
 
   try {
     const { error } = await resend.emails.send({
       from: 'PayeTax <noreply@payetax.co.uk>',
       to: email,
       subject: `Your UK Tax Calculation - ${formatCurrency(results.netPay.annually)} take-home`,
-      html: generateEmailHtml(results, taxYear),
-      text: generateEmailText(results, taxYear),
+      html: generateEmailHtml(results, taxYearLabel),
+      text: generateEmailText(results, taxYearLabel),
     });
 
     if (error) {
-      console.error('[send-results] Resend error:', error);
+      console.error('[send-results] Resend error:', formatErrorForLog(error));
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[send-results] Error:', error);
+    console.error('[send-results] Error:', formatErrorForLog(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

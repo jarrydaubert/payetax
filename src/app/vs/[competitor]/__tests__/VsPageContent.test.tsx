@@ -20,7 +20,10 @@ describe('VsPageContent', () => {
 
     expect(screen.getByText('Quick Summary')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { level: 1, name: new RegExp(`PayeTax\\s+vs\\s+${competitor.name}`) }),
+      screen.getByRole('heading', {
+        level: 1,
+        name: new RegExp(`PayeTax\\s+vs\\s+${competitor.name}`),
+      }),
     ).toBeInTheDocument();
 
     const summary = screen.getByText(/is better suited for/i);

@@ -1,7 +1,6 @@
-import { render, screen } from '@/test/testing-library';
-
-import { CompetitorCard, PayeTaxCard } from '../CompetitorCard';
 import type { Competitor } from '@/data/competitors';
+import { render, screen } from '@/test/testing-library';
+import { CompetitorCard, PayeTaxCard } from '../CompetitorCard';
 
 const competitor: Competitor = {
   slug: 'example',
@@ -21,6 +20,7 @@ const competitor: Competitor = {
     adFree: false,
     historicYears: false,
   },
+  verification: { status: 'needs-review', lastVerified: null },
   payeTaxAdvantages: ['Better UI', 'More features'],
   bestFor: ['Simple cases'],
 };

@@ -13,6 +13,8 @@ function roundToPence(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+const AVERAGE_WEEKS_PER_MONTH = 4.333;
+
 const input: TaxCalculationInput = {
   salary: 49131,
   payPeriod: 'annually',
@@ -48,7 +50,7 @@ function allowanceForPeriod(period: string, annualAllowance: number, hoursPerWee
     case PERIODS.DAILY:
       return roundToPence(monthlyAllowance * PERIOD_CONVERSION_FACTORS.DAILY);
     case PERIODS.HOURLY: {
-      const monthlyHours = hoursPerWeek * 4.333;
+      const monthlyHours = hoursPerWeek * AVERAGE_WEEKS_PER_MONTH;
       return roundToPence(monthlyAllowance / monthlyHours);
     }
     default:

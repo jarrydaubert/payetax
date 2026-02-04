@@ -185,7 +185,7 @@ export function PayeTaxCard({ className }: PayeTaxCardProps) {
           <div>
             <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>PayeTax</h3>
             <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MT_1)}>
-              Modern, privacy-first UK tax calculator with What-If scenarios
+              Privacy-first UK tax calculator with What-If salary comparisons
             </p>
           </div>
           <Badge className='shrink-0 bg-primary text-primary-foreground'>
@@ -203,15 +203,15 @@ export function PayeTaxCard({ className }: PayeTaxCardProps) {
           <ul className={cn(SPACING.SPACE_Y_1)}>
             <li className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
               <span className='mr-2 text-primary'>✓</span>
-              What-If salary comparison (unique feature)
+              What-If salary comparisons (compare arbitrary salaries)
             </li>
             <li className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
               <span className='mr-2 text-primary'>✓</span>
-              100% ad-free, privacy-first
+              No display ads (affiliate links are tracked)
             </li>
             <li className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
               <span className='mr-2 text-primary'>✓</span>
-              Modern mobile-first design
+              Mobile-first design
             </li>
             <li className={cn('text-foreground', TYPOGRAPHY.TEXT_SM)}>
               <span className='mr-2 text-primary'>✓</span>3 historic tax years included

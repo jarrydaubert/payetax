@@ -919,9 +919,7 @@ describe('Tax Calculator', () => {
       expect(secondJobResult.nationalInsurance.annually).toBeGreaterThan(
         baseResult.nationalInsurance.annually,
       );
-      expect(secondJobResult.studentLoan.annually).toBeGreaterThan(
-        baseResult.studentLoan.annually,
-      );
+      expect(secondJobResult.studentLoan.annually).toBeGreaterThan(baseResult.studentLoan.annually);
       expect(secondJobResult.incomeBreakdown).toEqual({
         employment: 40000,
         nonEmployment: 0,

@@ -78,8 +78,7 @@ export function ChartsSkeleton({
 
   if (layout === 'sidebar') {
     return (
-      <div
-        role='status'
+      <output
         aria-live='polite'
         className={cn(SPACING.SPACE_Y_4, 'landscape:space-y-6', className)}
       >
@@ -87,14 +86,13 @@ export function ChartsSkeleton({
         {configs.map((config) => (
           <ChartSkeletonCard key={config.id} config={config} />
         ))}
-      </div>
+      </output>
     );
   }
 
   // Full-width layout - matches ChartsContainer grid
   return (
-    <div
-      role='status'
+    <output
       aria-live='polite'
       className={cn(
         'grid grid-cols-1',
@@ -109,6 +107,6 @@ export function ChartsSkeleton({
       {configs.map((config) => (
         <ChartSkeletonCard key={config.id} config={config} />
       ))}
-    </div>
+    </output>
   );
 }

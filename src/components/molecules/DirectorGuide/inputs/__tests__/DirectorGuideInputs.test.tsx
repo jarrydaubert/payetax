@@ -1,5 +1,5 @@
-import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { AlreadyTakenInputs } from '../AlreadyTakenInputs';
 import { CompanyCarInput } from '../CompanyCarInput';
@@ -17,7 +17,15 @@ jest.mock('@/components/ui/tooltip', () => ({
 }));
 
 jest.mock('@/components/ui/checkbox', () => ({
-  Checkbox: ({ id, checked, onCheckedChange }: { id?: string; checked?: boolean; onCheckedChange?: (value: boolean) => void }) => (
+  Checkbox: ({
+    id,
+    checked,
+    onCheckedChange,
+  }: {
+    id?: string;
+    checked?: boolean;
+    onCheckedChange?: (value: boolean) => void;
+  }) => (
     <input
       id={id}
       type='checkbox'
@@ -28,10 +36,20 @@ jest.mock('@/components/ui/checkbox', () => ({
 }));
 
 jest.mock('@/components/ui/select', () => {
-  const SelectContext = React.createContext<{ onValueChange?: (value: string) => void } | null>(null);
+  const SelectContext = React.createContext<{ onValueChange?: (value: string) => void } | null>(
+    null,
+  );
 
   return {
-    Select: ({ value, onValueChange, children }: { value?: string; onValueChange?: (value: string) => void; children: React.ReactNode }) => (
+    Select: ({
+      value,
+      onValueChange,
+      children,
+    }: {
+      value?: string;
+      onValueChange?: (value: string) => void;
+      children: React.ReactNode;
+    }) => (
       <SelectContext.Provider value={{ onValueChange }}>
         <div data-testid='select' data-value={value}>
           {children}
@@ -99,7 +117,9 @@ describe('Director Guide input components', () => {
     fireEvent.click(screen.getByText('Other date'));
     expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('other');
 
-    fireEvent.change(screen.getByPlaceholderText('MM-DD (e.g. 06-30)'), { target: { value: '06-30' } });
+    fireEvent.change(screen.getByPlaceholderText('MM-DD (e.g. 06-30)'), {
+      target: { value: '06-30' },
+    });
     expect(useDirectorGuideStore.getState().formData.yearEndCustom).toBe('06-30');
 
     fireEvent.click(screen.getByText("I don't know"));
@@ -129,9 +149,15 @@ describe('Director Guide input components', () => {
       </div>,
     );
 
-    fireEvent.change(screen.getByLabelText('Company Car (BIK Value)'), { target: { value: '3600' } });
-    fireEvent.change(screen.getByLabelText('Other Personal Income'), { target: { value: '12000' } });
-    fireEvent.change(screen.getByLabelText('Employer Pension Contribution'), { target: { value: '5000' } });
+    fireEvent.change(screen.getByLabelText('Company Car (BIK Value)'), {
+      target: { value: '3600' },
+    });
+    fireEvent.change(screen.getByLabelText('Other Personal Income'), {
+      target: { value: '12000' },
+    });
+    fireEvent.change(screen.getByLabelText('Employer Pension Contribution'), {
+      target: { value: '5000' },
+    });
 
     const state = useDirectorGuideStore.getState().formData;
     expect(state.companyCarBIK).toBe(3600);

@@ -1,12 +1,12 @@
-import type { ReactNode } from 'react';
 import { act, render } from '@testing-library/react';
-import { DirectorDashboard } from '../DirectorDashboard';
+import type { ReactNode } from 'react';
 import { trackCalculationRun } from '@/lib/directorGuideAnalytics';
 import {
   useDirectorFormData,
   useDirectorGuideActions,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
+import { DirectorDashboard } from '../DirectorDashboard';
 
 jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackGuideStarted: jest.fn(),

@@ -7,7 +7,6 @@
  * - ROUNDING: NI and student loan rounding changes
  */
 
-import { PERIODS } from '@/constants/taxRates';
 import {
   calculateAllowanceReduction,
   calculateIncomeTaxFromBands,

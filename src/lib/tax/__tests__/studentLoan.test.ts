@@ -26,10 +26,10 @@ describe('Student Loan Calculator', () => {
 
     it('calculates Plan 1 correctly', () => {
       // Plan 1 threshold is £26,065
-      // 9% of (£50,000 - £26,065) = 9% of £23,935 = £2,154.15 → £2,154 (floor)
+      // 9% of (£50,000 - £26,065) = 9% of £23,935 = £2,154.15
       const result = getStudentLoanRepayment(50000, ['plan1'], taxYear);
-      expect(result.plan1).toBe(2154);
-      expect(result.total).toBe(2154);
+      expect(result.plan1).toBeCloseTo(2154.15, 2);
+      expect(result.total).toBeCloseTo(2154.15, 2);
     });
 
     it('calculates postgrad loan at 6%', () => {
@@ -41,13 +41,13 @@ describe('Student Loan Calculator', () => {
     });
 
     it('calculates multiple loans together', () => {
-      // Plan 2: 9% of (£60,000 - £28,470) = £2,837.70 → £2,837
+      // Plan 2: 9% of (£60,000 - £28,470) = £2,837.70
       // Postgrad: 6% of (£60,000 - £21,000) = £2,340
-      // Total: £5,177
+      // Total: £5,177.70
       const result = getStudentLoanRepayment(60000, ['plan2', 'postgrad'], taxYear);
-      expect(result.plan2).toBe(2837);
-      expect(result.postgrad).toBe(2340);
-      expect(result.total).toBe(5177);
+      expect(result.plan2).toBeCloseTo(2837.7, 2);
+      expect(result.postgrad).toBeCloseTo(2340, 2);
+      expect(result.total).toBeCloseTo(5177.7, 2);
     });
 
     it('handles zero income', () => {

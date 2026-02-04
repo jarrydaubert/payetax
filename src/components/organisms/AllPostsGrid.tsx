@@ -73,7 +73,6 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
             SPACING.GAP_6,
             SPACING.MB_12,
           )}
-          role='list'
         >
           {posts.map((post, idx) => (
             <li key={post.slug} className='h-full'>

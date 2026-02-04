@@ -19,4 +19,3 @@ const systemFont: FontLike = { className: '', variable: '' };
 
 export const spaceGrotesk: FontLike = systemFont;
 export const inter: FontLike = systemFont;
-

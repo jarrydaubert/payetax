@@ -125,7 +125,6 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
   // Analytics: record which warnings were actually rendered (once per warning id).
   const trackedWarningIds = useRef<Set<string>>(new Set());
-  const warningIdsKey = sortedWarnings.map((w) => w.id).join('|');
   useEffect(() => {
     for (const w of sortedWarnings) {
       if (!trackedWarningIds.current.has(w.id)) {
@@ -133,7 +132,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
         trackedWarningIds.current.add(w.id);
       }
     }
-  }, [warningIdsKey]);
+  }, [sortedWarnings]);
 
   return (
     <aside className={cn('flex h-full flex-col bg-slate-900 p-6', className)}>
@@ -229,8 +228,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
           <div className='rounded-[10px] border border-amber-500/20 bg-amber-500/5 p-3'>
             <p className='text-amber-200 text-xs leading-relaxed'>
               <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
-              advice. Consult a qualified accountant for advice specific to your situation. Based
-              on HMRC rates for {TAX_YEAR} which may change.
+              advice. Consult a qualified accountant for advice specific to your situation. Based on
+              HMRC rates for {TAX_YEAR} which may change.
             </p>
           </div>
         </div>
@@ -289,8 +288,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'pension-gap',
       title: 'Inefficient Salary Zone',
-      description:
-        `Your salary is between £${SECONDARY_THRESHOLD.toLocaleString()} and £${LEL.toLocaleString()}. Employer NI applies here, but NI credits are not earned. NI credits typically require earnings around £${LEL.toLocaleString()} (illustrative).`,
+      description: `Your salary is between £${SECONDARY_THRESHOLD.toLocaleString()} and £${LEL.toLocaleString()}. Employer NI applies here, but NI credits are not earned. NI credits typically require earnings around £${LEL.toLocaleString()} (illustrative).`,
       show: hasResults && optimalSalary > SECONDARY_THRESHOLD && optimalSalary < LEL,
       isCritical: true,
     },
@@ -308,8 +306,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'overdrawn',
       title: 'Already Taken Too Much',
-      description:
-        'Your drawings may exceed the comparison baseline shown here.',
+      description: 'Your drawings may exceed the comparison baseline shown here.',
       // Show overdrawn only if NOT showing S455 (avoid duplication)
       show: isOverdrawn && !hasDrawings,
     },

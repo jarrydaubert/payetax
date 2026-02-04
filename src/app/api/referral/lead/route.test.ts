@@ -51,10 +51,7 @@ const validPayload = {
   source: 'test',
 };
 
-async function loadRoute(
-  envOverrides: Record<string, string | undefined> = {},
-  rateLimit = true,
-) {
+async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');

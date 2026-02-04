@@ -208,11 +208,41 @@ Sentry.init({
         'ssn',
         'nationalInsuranceNumber',
         'taxCode',
+        'salary',
+        'pensionContribution',
       ];
       for (const field of sensitiveFields) {
         sanitized[field] = undefined;
       }
       event.request.data = sanitized;
+    }
+
+    // Scrub context data that might contain PII
+    if (event.contexts) {
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'ssn',
+        'nationalInsuranceNumber',
+        'taxCode',
+        'salary',
+        'pensionContribution',
+      ];
+
+      for (const [key, value] of Object.entries(event.contexts)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const sanitized = { ...(value as Record<string, unknown>) };
+          for (const field of sensitiveFields) {
+            if (field in sanitized) {
+              sanitized[field] = '[Filtered]';
+            }
+          }
+          (event.contexts as Record<string, unknown>)[key] = sanitized;
+        }
+      }
     }
 
     // Add browser and device context
@@ -247,6 +277,28 @@ Sentry.init({
         breadcrumb.data.url = url.origin + url.pathname;
       } catch {
         // Invalid URL, keep as is
+      }
+    }
+
+    // Scrub breadcrumb data fields
+    if (breadcrumb.data && typeof breadcrumb.data === 'object') {
+      const data = breadcrumb.data as Record<string, unknown>;
+      const sensitiveFields = [
+        'email',
+        'name',
+        'phone',
+        'address',
+        'postcode',
+        'ssn',
+        'nationalInsuranceNumber',
+        'taxCode',
+        'salary',
+        'pensionContribution',
+      ];
+      for (const field of sensitiveFields) {
+        if (field in data) {
+          data[field] = '[Filtered]';
+        }
       }
     }
 
@@ -295,6 +347,8 @@ Sentry.init({
         'postcode',
         'nationalInsuranceNumber',
         'taxCode',
+        'salary',
+        'pensionContribution',
       ];
       for (const field of sensitiveFields) {
         if (field in sanitized) {

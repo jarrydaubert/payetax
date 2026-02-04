@@ -59,7 +59,7 @@ export function checkRateLimit(ip: string, config: RateLimitConfig = DEFAULT_CON
   }
 
   // Increment request count
-  rateLimitCache.set(ip, requests + 1);
+  rateLimitCache.set(ip, requests + 1, { ttl: config.window });
 
   return true; // Request allowed
 }

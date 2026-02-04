@@ -7,7 +7,9 @@
 import { CheckCircle, Wifi } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
+import { SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import { BackButton } from './BackButton';
 
@@ -18,85 +20,94 @@ export const metadata: Metadata = {
 
 export default function OfflinePage() {
   return (
-    <div className='flex min-h-dvh items-center justify-center pt-20'>
-      <div className='container mx-auto max-w-2xl px-4 text-center'>
-        <div className='glass-card p-8 md:p-16'>
-          {/* Offline Icon */}
-          <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
-            <Wifi className={`${ICON_SIZES.SIZE_10} text-amber-500`} aria-hidden='true' />
-          </div>
-
-          {/* Title */}
-          <h1 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
-            You're Offline
-          </h1>
-
-          {/* Description */}
-          <p className={cn('mb-8 text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
-            It looks like you're not connected to the internet. Don't worry - PayeTax works offline
-            too! Your previous calculations are still available.
-          </p>
-
-          {/* Features Available Offline */}
-          <div className='mb-8 rounded-lg border border-border bg-secondary/50 p-6'>
-            <h2 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
-              Available Offline:
-            </h2>
-            <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
-              <div className='flex items-center gap-3'>
-                <CheckCircle
-                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
-                  aria-hidden='true'
-                />
-                <span className='text-foreground/80'>Tax calculations</span>
-              </div>
-              <div className='flex items-center gap-3'>
-                <CheckCircle
-                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
-                  aria-hidden='true'
-                />
-                <span className='text-foreground/80'>Cached tax rates</span>
-              </div>
-              <div className='flex items-center gap-3'>
-                <CheckCircle
-                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
-                  aria-hidden='true'
-                />
-                <span className='text-foreground/80'>Previous results</span>
-              </div>
-              <div className='flex items-center gap-3'>
-                <CheckCircle
-                  className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
-                  aria-hidden='true'
-                />
-                <span className='text-foreground/80'>Saved calculations</span>
-              </div>
+    <>
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Offline', url: `${SITE_URL}/offline` },
+        ]}
+      />
+      <div className='flex min-h-dvh items-center justify-center pt-20'>
+        <div className='container mx-auto max-w-2xl px-4 text-center'>
+          <div className='glass-card p-8 md:p-16'>
+            {/* Offline Icon */}
+            <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
+              <Wifi className={`${ICON_SIZES.SIZE_10} text-amber-500`} aria-hidden='true' />
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className='space-y-4'>
-            <BackButton />
+            {/* Title */}
+            <h1 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
+              You're Offline
+            </h1>
 
-            <div>
-              <Link
-                href='/'
-                className='text-primary underline underline-offset-2 hover:text-primary/80'
-              >
-                Try Calculator Anyway
-              </Link>
-            </div>
-          </div>
-
-          {/* Connection Status */}
-          <div className='mt-8 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4'>
-            <p className={cn('text-blue-200', TYPOGRAPHY.TEXT_SM)}>
-              💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
-              show the latest tax rates.
+            {/* Description */}
+            <p className={cn('mb-8 text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}>
+              It looks like you're not connected to the internet. Don't worry - PayeTax works
+              offline too! Your previous calculations are still available.
             </p>
+
+            {/* Features Available Offline */}
+            <div className='mb-8 rounded-lg border border-border bg-secondary/50 p-6'>
+              <h2 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                Available Offline:
+              </h2>
+              <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
+                <div className='flex items-center gap-3'>
+                  <CheckCircle
+                    className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                    aria-hidden='true'
+                  />
+                  <span className='text-foreground/80'>Tax calculations</span>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <CheckCircle
+                    className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                    aria-hidden='true'
+                  />
+                  <span className='text-foreground/80'>Cached tax rates</span>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <CheckCircle
+                    className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                    aria-hidden='true'
+                  />
+                  <span className='text-foreground/80'>Previous results</span>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <CheckCircle
+                    className={`${ICON_SIZES.SIZE_5} flex-shrink-0 text-green-500`}
+                    aria-hidden='true'
+                  />
+                  <span className='text-foreground/80'>Saved calculations</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className='space-y-4'>
+              <BackButton />
+
+              <div>
+                <Link
+                  href='/'
+                  className='text-primary underline underline-offset-2 hover:text-primary/80'
+                >
+                  Try Calculator Anyway
+                </Link>
+              </div>
+            </div>
+
+            {/* Connection Status */}
+            <div className='mt-8 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4'>
+              <p className={cn('text-blue-200', TYPOGRAPHY.TEXT_SM)}>
+                💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync
+                and show the latest tax rates.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

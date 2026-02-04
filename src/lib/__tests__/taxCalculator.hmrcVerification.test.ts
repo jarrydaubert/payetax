@@ -615,7 +615,10 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Bug class: ROUNDING / CALC-DRIFT
       expect(withAllowance.taxableIncome).toBeCloseTo(base.taxableIncome, 2);
       expect(withAllowance.incomeTax.annually).toBeCloseTo(base.incomeTax.annually, 2);
-      expect(withAllowance.nationalInsurance.annually).toBeCloseTo(base.nationalInsurance.annually, 2);
+      expect(withAllowance.nationalInsurance.annually).toBeCloseTo(
+        base.nationalInsurance.annually,
+        2,
+      );
       expect(withAllowance.studentLoan.annually).toBeCloseTo(base.studentLoan.annually, 2);
       expect(withAllowance.netPay.annually).toBeCloseTo(base.netPay.annually + 312, 2);
     });

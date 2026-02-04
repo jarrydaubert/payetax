@@ -67,9 +67,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         ]}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -106,9 +104,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly', 'Monthly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -151,9 +147,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly', 'Monthly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -184,9 +178,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly', 'Monthly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -229,9 +221,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={allPeriods}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -284,9 +274,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly', 'Monthly', 'Weekly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -332,9 +320,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 
@@ -381,9 +367,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
         visiblePeriods={['Yearly']}
         onVisiblePeriodsChange={() => {}}
         taxYear='2025-2026'
-        isMarried={false}
-        partnerGrossWage={0}
-        taxCode='1257L'
+        marriageAllowance={{ isMarried: false, partnerGrossWage: 0, taxCode: '1257L' }}
       />,
     );
 

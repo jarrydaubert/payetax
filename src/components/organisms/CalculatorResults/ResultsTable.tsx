@@ -44,10 +44,12 @@ interface ResultsTableProps {
   taxYear?: string;
   onApplyPensionOptimization?: (amount: number) => void;
   // Marriage allowance detection
-  isMarried?: boolean;
-  partnerGrossWage?: number;
-  taxCode?: string;
-  isScottish?: boolean;
+  marriageAllowance?: {
+    isMarried?: boolean;
+    partnerGrossWage?: number;
+    taxCode?: string;
+    isScottish?: boolean;
+  };
 }
 
 interface ResultRowData {
@@ -81,11 +83,14 @@ export function ResultsTable({
   onVisiblePeriodsChange,
   taxYear,
   onApplyPensionOptimization,
-  isMarried = false,
-  partnerGrossWage = 0,
-  taxCode = '1257L',
-  isScottish = false,
+  marriageAllowance,
 }: ResultsTableProps) {
+  const {
+    isMarried = false,
+    partnerGrossWage = 0,
+    taxCode = '1257L',
+    isScottish = false,
+  } = marriageAllowance ?? {};
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
 
@@ -387,10 +392,8 @@ export function ResultsTable({
             during drag operations. If drag scroll breaks, check the hook implementation - it MUST use
             scrollTo() method, NOT direct scrollLeft assignment! See useMouseDragScroll.ts for details.
           */}
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling of overflow container */}
           <section
             ref={containerRef}
-            tabIndex={0}
             className='w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
             style={{
               scrollbarWidth: 'auto',

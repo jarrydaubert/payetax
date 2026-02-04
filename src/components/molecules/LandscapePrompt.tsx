@@ -108,8 +108,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
   }
 
   return (
-    <div
-      role='status'
+    <output
       aria-live='polite'
       aria-atomic='true'
       className={cn(
@@ -160,6 +159,6 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
           <X className={ICON_SIZES.SIZE_5} aria-hidden='true' />
         </button>
       </div>
-    </div>
+    </output>
   );
 }

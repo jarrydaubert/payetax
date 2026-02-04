@@ -17,8 +17,7 @@ import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_YEARS } from '@/constants/taxRates';
 
 // Current tax year is the first in the TAX_YEARS array (newest first)
-// Non-null assertion safe: TAX_YEARS always has at least one element
-const CURRENT_TAX_YEAR = TAX_YEARS[0]!;
+const CURRENT_TAX_YEAR = TAX_YEARS[0] ?? '2025-2026';
 
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
@@ -178,6 +177,8 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
       {/* Structured Data for SEO */}
       <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
       <StructuredData type='faq' faqs={salaryFAQs} />
+      <StructuredData type='calculator' />
+      <StructuredData type='dataset' />
       <StructuredData
         type='salarycalculation'
         salaryData={{
@@ -233,8 +234,8 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           <div className='mb-8 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-amber-200 text-xs'>
             <p>
               <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
-              advice. Consult a qualified accountant for advice specific to your situation. Based
-              on HMRC rates for {taxYearDisplay} which may change.
+              advice. Consult a qualified accountant for advice specific to your situation. Based on
+              HMRC rates for {taxYearDisplay} which may change.
             </p>
           </div>
 

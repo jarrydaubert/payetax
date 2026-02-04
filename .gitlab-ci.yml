@@ -31,7 +31,7 @@ cache:
 # OPTIMIZATION STRATEGY:
 # ──────────────────────────────────────────────────────────
 # 1. NO CI ON MAIN - Vercel handles all validation on push
-# 2. Lightweight MR validation only (typecheck + lint)
+# 2. MR validation gates: lint, typecheck, unit tests, build, and critical E2E
 # 3. Bun for fast dependency installation
 # 4. Cache shared across branches (keyed to bun.lock)
 # 5. Interruptible - stops old jobs when new commits push
@@ -43,15 +43,19 @@ mr_validation:
   image: oven/bun:1.3-debian
   interruptible: true
   script:
-    - echo "⚡ Quick MR validation (typecheck + lint)"
+    - echo "⚡ MR validation (lint + typecheck + unit tests + build + critical E2E)"
     - bun --version
     # Install dependencies (fast with warm cache)
     - bun install --frozen-lockfile
-    # Critical checks only - use package.json scripts
-    - bun run typecheck
+    # Validation gates - use package.json scripts
     - bun run lint
-    - echo "✅ Validation passed! Vercel handles build + deploy."
-  timeout: 5 minutes
+    - bun run typecheck
+    - bun run test:no-coverage
+    - bun run build
+    - bunx playwright install --with-deps
+    - bun run test:e2e:critical
+    - echo "✅ Validation passed!"
+  timeout: 30 minutes
   rules:
     # Skip for docs-only changes
     - changes:
@@ -72,9 +76,12 @@ mr_validation:
 #   bun run test:e2e      - Playwright E2E tests
 #
 # GITLAB CI (This File - MRs only):
-#   ✅ Typecheck (tsc --noEmit)
 #   ✅ Lint (biome check .)
-#   ⏱️  ~1-2 min per MR
+#   ✅ Typecheck (tsc --noEmit)
+#   ✅ Unit tests (jest --no-coverage)
+#   ✅ Build (next build)
+#   ✅ Critical E2E (Playwright smoke + golden)
+#   ⏱️  Heavier MR gate - adjust timeout/usage as needed
 #
 # VERCEL (Automatic - every push):
 #   ✅ Build validation (next build)
@@ -89,6 +96,6 @@ mr_validation:
 # ⏱️  ESTIMATED MONTHLY USAGE (FREE TIER: 400 MIN)
 # ──────────────────────────────────────────────────────────
 # Main pushes: ZERO minutes (no CI, workflow rules block it)
-# Merge requests (~25/month): ~1.5 min × 25 = ~38 minutes
-# Buffer: 360+ minutes remaining
+# Merge requests (~25/month): estimate depends on test/runtime
+# Buffer: monitor monthly usage
 # ──────────────────────────────────────────────────────────

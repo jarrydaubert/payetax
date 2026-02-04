@@ -325,9 +325,7 @@ describe('ComparisonInputs', () => {
 
       const errorId = input.getAttribute('aria-describedby');
       expect(errorId).toBeTruthy();
-      expect(document.getElementById(errorId as string)).toHaveTextContent(
-        /at least 0\.01%/i,
-      );
+      expect(document.getElementById(errorId as string)).toHaveTextContent(/at least 0\.01%/i);
     });
   });
 

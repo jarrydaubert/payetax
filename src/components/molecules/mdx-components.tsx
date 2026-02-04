@@ -250,7 +250,7 @@ export const mdxComponents = {
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
       className={cn(
-        'rounded-lg border-l-4 border-primary/50 bg-card/80 backdrop-blur-sm',
+        'rounded-lg border-primary/50 border-l-4 bg-card/80 backdrop-blur-sm',
         'my-8 px-6 [&_p:last-child]:mb-0',
         SPACING.PY_4,
       )}
@@ -281,7 +281,7 @@ export const mdxComponents = {
           'my-6 rounded-lg border-l-4 p-4',
           styles[type],
           '[&_p:first-child]:mt-0 [&_p:last-child]:mb-0',
-          '[&_ul]:mb-0 [&_ol]:mb-0',
+          '[&_ol]:mb-0 [&_ul]:mb-0',
         )}
         {...props}
       >
@@ -295,9 +295,9 @@ export const mdxComponents = {
     <div className='not-prose my-8 overflow-x-auto rounded-lg border border-foreground/20 bg-card/40'>
       <table
         className={cn(
-          'min-w-[640px] w-full bg-card/80 backdrop-blur-sm',
-          '[&_th:last-child]:text-right [&_td:last-child]:text-right',
-          '[&_td:last-child]:tabular-nums [&_td:last-child]:whitespace-nowrap',
+          'w-full min-w-[640px] bg-card/80 backdrop-blur-sm',
+          '[&_td:last-child]:text-right [&_th:last-child]:text-right',
+          '[&_td:last-child]:whitespace-nowrap [&_td:last-child]:tabular-nums',
         )}
         {...props}
       >
@@ -311,7 +311,10 @@ export const mdxComponents = {
     </thead>
   ),
   tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => (
-    <tbody className='divide-y divide-foreground/10 [&_tr:nth-child(even)]:bg-foreground/5' {...props}>
+    <tbody
+      className='divide-y divide-foreground/10 [&_tr:nth-child(even)]:bg-foreground/5'
+      {...props}
+    >
       {children}
     </tbody>
   ),

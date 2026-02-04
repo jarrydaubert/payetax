@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { EducationPanel } from '../EducationPanel';
 
-function setDirectorGuideState(partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>) {
+function setDirectorGuideState(
+  partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>,
+) {
   useDirectorGuideStore.setState(partial as never);
 }
 
@@ -110,9 +112,6 @@ describe('DirectorGuide EducationPanel', () => {
 
     render(<EducationPanel />);
 
-    expect(
-      screen.getByText(/turnover figure includes VAT/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/turnover figure includes VAT/i)).toBeInTheDocument();
   });
 });
-

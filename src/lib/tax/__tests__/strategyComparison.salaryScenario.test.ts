@@ -30,14 +30,7 @@ describe('Strategy Comparison helpers', () => {
         ? grossProfit
         : (grossProfit + ni.threshold * niRate) / (1 + niRate);
 
-    const result = calculateSalaryScenario(
-      targetSalary,
-      grossProfit,
-      'rUK',
-      TAX_YEAR,
-      0,
-      false,
-    );
+    const result = calculateSalaryScenario(targetSalary, grossProfit, 'rUK', TAX_YEAR, 0, false);
 
     expect(result.salary).toBeLessThanOrEqual(maxAffordable + 0.01);
   });
@@ -47,22 +40,8 @@ describe('Strategy Comparison helpers', () => {
     const grossProfit = 30000;
     const targetSalary = 30000;
 
-    const withoutEA = calculateSalaryScenario(
-      targetSalary,
-      grossProfit,
-      'rUK',
-      TAX_YEAR,
-      0,
-      false,
-    );
-    const withEA = calculateSalaryScenario(
-      targetSalary,
-      grossProfit,
-      'rUK',
-      TAX_YEAR,
-      0,
-      true,
-    );
+    const withoutEA = calculateSalaryScenario(targetSalary, grossProfit, 'rUK', TAX_YEAR, 0, false);
+    const withEA = calculateSalaryScenario(targetSalary, grossProfit, 'rUK', TAX_YEAR, 0, true);
 
     expect(withEA.employerNI).toBe(0);
     expect(withEA.takeHome).toBeGreaterThan(withoutEA.takeHome);
@@ -89,10 +68,7 @@ describe('Strategy Comparison helpers', () => {
 
   it('treats company car BIK as taxable income that reduces take-home', () => {
     // Bug caught: BIK omitted from income tax, overstating take-home.
-    const withoutBIK = calculateStrategyComparison(
-      { ...baseInput, revenue: 60000 },
-      TAX_YEAR,
-    );
+    const withoutBIK = calculateStrategyComparison({ ...baseInput, revenue: 60000 }, TAX_YEAR);
     const withBIK = calculateStrategyComparison(
       { ...baseInput, revenue: 60000, companyCarBIK: 10000 },
       TAX_YEAR,

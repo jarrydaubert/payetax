@@ -39,17 +39,16 @@ function buildRequest(
   urlBase = 'https://payetax.co.uk/api/newsletter/unsubscribe',
 ) {
   const url = new URL(urlBase);
-  Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, value);
+  }
   return new NextRequest(url, {
     method: 'GET',
     headers: new Headers(headers),
   });
 }
 
-async function loadRoute(
-  envOverrides: Record<string, string | undefined> = {},
-  rateLimit = true,
-) {
+async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');
@@ -118,9 +117,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
 
   it('rejects invalid tokens', async () => {
     const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
-    const { verifyUnsubscribeToken } = jest.requireMock(
-      '@/lib/newsletter/unsubscribeToken',
-    ) as {
+    const { verifyUnsubscribeToken } = jest.requireMock('@/lib/newsletter/unsubscribeToken') as {
       verifyUnsubscribeToken: jest.Mock;
     };
     verifyUnsubscribeToken.mockReturnValue(null);

@@ -2,22 +2,60 @@
 
 > **TODO list only.** Delete entries when done.
 > If Stripe = £0, monetization items come first.
+> Ordered by the Director Guide go-live plan (Phase 1 → Phase 3), then post-go-live priorities.
 
 ---
 
-## P0 - Revenue & Trust
-
-### Testing & Coverage
-> Mantra: **"What bug will this test find?"** (see `docs/guides/TESTING.md`)
+## Phase 1 — Go-live blockers (P0)
 
 - [ ] For each go-live blocker, add a targeted test, then implement the fix
-- [ ] Establish CI gates: `bun run test:no-coverage` + `bun run build` + `bun run test:e2e:critical`
-- [ ] Add unit coverage for remaining API routes (email, newsletter, referral, IndexNow)
-- [ ] Add more payslip-style regression locks and tighten tolerances where safe
-- [ ] Store HMRC source provenance alongside golden master data
 
-### Environment Variables
-- [ ] Add `UNSUBSCRIBE_SECRET` to Vercel prod/preview env vars
+---
+
+## Phase 2 — Product polish (pre-ship)
+
+### OG images + internal links
+- [ ] Create `public/images/og/compliance.jpg`
+- [ ] Create `public/images/og/privacy.jpg`
+- [ ] Audit other pages for missing OG images
+- [ ] Consider Next.js `opengraph-image.tsx` for dynamic generation
+- [ ] Add nav links to marriage-allowance and NI calculators
+- [ ] Update MarriageAllowanceAlert to link to internal tool
+
+### Structured data + analytics
+- [ ] Create `/api/tax-rates` endpoint and use it in structured data
+- [ ] Add: `pro_calculator_started`, `pro_calculator_completed`, `pro_strategy_selected`, `pro_calendar_downloaded`
+
+### PWA install + FAQ
+- [ ] Add `/install` page with platform instructions and screenshots
+- [ ] Add FAQ entry: "Can I use PayeTax offline?"
+- [ ] Consider install prompt/banner
+
+### Performance + token cleanup
+- [ ] Wrap `compileMDXContent` with `unstable_cache` keyed by `slug` + `updatedAt`
+- [ ] Match ISR window for revalidation
+- [ ] Add `shadow-accent-glow` to Tailwind config and update token usage
+
+### Security docs + audit hygiene
+- [ ] Document per-route validation approach
+- [ ] Document per-route body size limits
+- [ ] Document that `bun audit` requires network access
+- [ ] Fix `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` header comment for Plan 4 threshold
+- [ ] Add a repeatable bundle-size verification step
+
+---
+
+## Phase 3 — QA & ship
+
+- [ ] Run: `bun run test:no-coverage`
+- [ ] Run: `bun run build`
+- [ ] Run: `bun run test:e2e:critical`
+- [ ] Smoke: calculator, director guide, blog, OG previews
+- [ ] Push feature branch, prep release notes
+
+---
+
+## Post-go-live (Revenue & Trust follow-ups)
 
 ### Monetization
 > See `docs/business/MONETIZATION.md`
@@ -27,61 +65,12 @@
 - [ ] Secure a paying referral partner
 - [ ] Enable referral CTA in `src/components/organisms/CalculatorContainer.tsx`
 
----
+### Testing & Coverage
+> Mantra: **"What bug will this test find?"** (see `docs/guides/TESTING.md`)
 
-## P1 - Approved Features
-
-### Compare My Setup
-- [ ] Implement Always-On Custom Row (spec in `docs/business/DIRECTOR_CALCULATOR_BUILD.md`)
-
----
-
-## P2 - Product & UX
-
-### Missing OG Images
-- [ ] Create `public/images/og/compliance.jpg`
-- [ ] Create `public/images/og/privacy.jpg`
-- [ ] Audit other pages for missing OG images
-- [ ] Consider Next.js `opengraph-image.tsx` for dynamic generation
-
-### Tools Directory Audit
-- [ ] Add nav links to marriage-allowance and NI calculators
-- [ ] Update MarriageAllowanceAlert to link to internal tool
-
-### Analytics Events
-- [ ] Add: `pro_calculator_started`, `pro_calculator_completed`, `pro_strategy_selected`, `pro_calendar_downloaded`
-
-### Cache MDX Compilation
-- [ ] Wrap `compileMDXContent` with `unstable_cache` keyed by `slug` + `updatedAt`
-- [ ] Match ISR window for revalidation
-
-### Email Endpoints - Trust Boundary
-- [ ] Recompute results server-side from minimal inputs
-- [ ] Update email forms to submit inputs instead of results
-- [ ] Add tests for both email routes
-
-### Security Docs
-- [ ] Document per-route validation approach
-- [ ] Document per-route body size limits
-- [ ] Document that `bun audit` requires network access
-
-### Audit Hygiene
-- [ ] Fix `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` header comment for Plan 4 threshold
-- [ ] Add a repeatable bundle-size verification step
-
-### Design Tokens - Shadow Accent Glow
-- [ ] Add `shadow-accent-glow` to Tailwind config and update token usage
-
-### StructuredData - Tax Rates API
-- [ ] Create `/api/tax-rates` endpoint and use it in structured data
-
-### Golden Master Test IDs
-- [ ] Verify E2E test IDs exist; add missing ones as needed (e.g., HICBC children input)
-
-### PWA Install Documentation
-- [ ] Add `/install` page with platform instructions and screenshots
-- [ ] Add FAQ entry: "Can I use PayeTax offline?"
-- [ ] Consider install prompt/banner
+- [ ] Add unit coverage for remaining API routes (newsletter, referral, IndexNow)
+- [ ] Add more payslip-style regression locks and tighten tolerances where safe
+- [ ] Store HMRC source provenance alongside golden master data
 
 ### Calculator Store Cleanup
 - [ ] Extract Zod schemas to module scope to reduce churn
@@ -91,6 +80,13 @@
 ### Income Sources Accuracy
 - [ ] Verify other income affects PA taper, dividend allowance, and student loan thresholds
 - [ ] If not verified, hide or guard those inputs
+
+---
+
+## P1 - Approved Features
+
+### Compare My Setup
+- [ ] Implement Always-On Custom Row (spec in `docs/business/DIRECTOR_CALCULATOR_BUILD.md`)
 
 ---
 

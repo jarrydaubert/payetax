@@ -16,7 +16,17 @@ jest.mock('@/lib/tax/strategyComparison', () => {
 });
 
 jest.mock('@/components/ui/slider', () => ({
-  Slider: ({ value, onValueChange, min, max }: { value: number[]; onValueChange: (v: number[]) => void; min: number; max: number }) => (
+  Slider: ({
+    value,
+    onValueChange,
+    min,
+    max,
+  }: {
+    value: number[];
+    onValueChange: (v: number[]) => void;
+    min: number;
+    max: number;
+  }) => (
     <button
       type='button'
       data-testid='salary-slider'
@@ -58,7 +68,11 @@ function createComparison(overrides: Record<string, unknown> = {}) {
     availableForExtraction: 80000,
     strategies: {
       allSalary: createStrategy('All Salary', { takeHome: 32000 }),
-      optimalMix: createStrategy('Baseline Mix', { salary: 7000, takeHome: 36000, totalPersonalTax: 1500 }),
+      optimalMix: createStrategy('Baseline Mix', {
+        salary: 7000,
+        takeHome: 36000,
+        totalPersonalTax: 1500,
+      }),
       allDividends: createStrategy('All Dividends', { salary: 0, takeHome: 30000 }),
     },
     recommended: 'optimalMix' as const,
@@ -181,7 +195,11 @@ describe('Director Guide calculator components', () => {
       const comparison = createComparison({
         strategies: {
           allSalary: createStrategy('All Salary'),
-          optimalMix: createStrategy('Baseline Mix', { totalPersonalTax: 100, employerNI: 100, corporationTax: 100 }),
+          optimalMix: createStrategy('Baseline Mix', {
+            totalPersonalTax: 100,
+            employerNI: 100,
+            corporationTax: 100,
+          }),
           allDividends: createStrategy('All Dividends'),
           yourSetup: {
             ...createStrategy('Your Setup', { salary: 30000, dividends: 40000 }),
@@ -194,9 +212,7 @@ describe('Director Guide calculator components', () => {
       setStoreState({ strategyComparison: comparison as never, sliderSalary: 20000 });
 
       render(<StrategyComparisonTable />);
-      expect(
-        screen.getByText(/Pays £1,500 more tax than baseline per year/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Pays £1,500 more tax than baseline per year/i)).toBeInTheDocument();
       expect(screen.getByText('Your Setup')).toBeInTheDocument();
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
     });

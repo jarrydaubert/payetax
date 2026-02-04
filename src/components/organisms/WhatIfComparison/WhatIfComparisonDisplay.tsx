@@ -404,10 +404,8 @@ export function WhatIfComparisonDisplay({
         </div>
 
         <Card className='overflow-hidden'>
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex required for keyboard scrolling */}
           <section
             ref={containerRef}
-            tabIndex={0}
             className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
             style={{
               scrollbarWidth: 'thin',

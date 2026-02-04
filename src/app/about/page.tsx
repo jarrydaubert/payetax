@@ -17,13 +17,13 @@ import {
   ABOUT_UNIQUE_FEATURES,
   ABOUT_VALUES,
 } from '@/constants/pages/aboutPageData';
+import { SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
 export default function AboutPage() {
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Structured Data for SEO */}
-      <StructuredData type='organization' />
       <StructuredData
         type='person'
         expert={{
@@ -32,6 +32,13 @@ export default function AboutPage() {
           description: 'Creator of PayeTax, building privacy-first tax tools for UK taxpayers.',
           organization: 'PayeTax',
         }}
+      />
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'About', url: `${SITE_URL}/about` },
+        ]}
       />
 
       {/* Hero Section */}

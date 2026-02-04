@@ -10,8 +10,8 @@
  */
 
 import { createHmac } from 'node:crypto';
+import type { LinearClient } from '@linear/sdk';
 import { NextRequest } from 'next/server';
-import { LinearClient } from '@linear/sdk';
 import { checkRateLimit } from '@/lib/rateLimit';
 
 jest.mock('@linear/sdk', () => ({

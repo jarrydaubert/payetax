@@ -274,9 +274,7 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
 
       {/* Delta vs Optimal */}
       <div className='mt-3 rounded-lg bg-black/20 p-2 text-center text-sm'>
-        {isNearBaseline && (
-          <span className='text-emerald-400'>Within £10 of the baseline mix</span>
-        )}
+        {isNearBaseline && <span className='text-emerald-400'>Within £10 of the baseline mix</span>}
         {isCosting && (
           <span className='text-red-400'>
             Pays {formatCurrency(delta)} more tax than baseline per year

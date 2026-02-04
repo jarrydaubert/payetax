@@ -67,11 +67,15 @@ export {
 } from './directorValidation';
 // Email-related API validation
 export {
+  type DirectorEmailInput,
+  DirectorEmailInputSchema,
   type DirectorStrategy,
   DirectorStrategySchema,
   EmailSchema,
   type NewsletterSubscribeRequest,
   NewsletterSubscribeRequestSchema,
+  type PayeEmailInput,
+  PayeEmailInputSchema,
   type PayeResults,
   PayeResultsSchema,
   type PayPeriodValues,

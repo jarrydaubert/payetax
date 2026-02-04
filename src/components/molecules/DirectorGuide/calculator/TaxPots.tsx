@@ -131,8 +131,8 @@ export function TaxPots() {
 
       {/* Disclaimer per spec */}
       <p className='text-center text-slate-600 text-xs'>
-        Illustrative set-aside for budgeting — not HMRC payment amounts. See Key Dates for actual due
-        dates.
+        Illustrative set-aside for budgeting — not HMRC payment amounts. See Key Dates for actual
+        due dates.
       </p>
     </div>
   );

@@ -59,7 +59,9 @@ describe('DirectorDashboard (Survival Mode)', () => {
   });
 
   test('renders Survival Mode state and hides strategy UI when profit <= 0', () => {
-    useDirectorGuideStore.setState({ strategyComparison: createEmptyComparison(0) as never } as never);
+    useDirectorGuideStore.setState({
+      strategyComparison: createEmptyComparison(0) as never,
+    } as never);
 
     render(<DirectorDashboard />);
 
@@ -68,10 +70,7 @@ describe('DirectorDashboard (Survival Mode)', () => {
     expect(screen.getByText('Key Dates')).toBeInTheDocument();
 
     // These are only meaningful when there is positive profit.
-    expect(
-      screen.queryByText(/Drag to explore different salary levels/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Drag to explore different salary levels/i)).not.toBeInTheDocument();
     expect(screen.queryByText('Choose Your Strategy')).not.toBeInTheDocument();
   });
 });
-
