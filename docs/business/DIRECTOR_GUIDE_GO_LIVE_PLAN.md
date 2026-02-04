@@ -10,6 +10,26 @@ Purpose: define the go-live scope and non-goals. Implementation tasks belong in 
 - Survival-mode messaging for non-positive profit
 - Region-specific income tax bands
 
+## Release Plan (Phased)
+
+**Phase 1 — P0 blockers**
+- Email endpoints recompute server-side + tests
+- CI gates for build + tests
+- Required env vars in production
+
+**Phase 2 — Product polish**
+- OG images, tools nav, internal links
+- Structured data tax-rates API
+- Analytics events
+- PWA install page + FAQ
+- MDX cache + token cleanup
+- Security docs + audit hygiene
+
+**Phase 3 — QA & ship**
+- Run: `bun run test:no-coverage`, `bun run build`, `bun run test:e2e:critical`
+- Smoke: calculator, director guide, blog, OG previews
+- Push feature branch, prep release notes
+
 ## Out of Scope
 
 - Paid exports or tax packs
