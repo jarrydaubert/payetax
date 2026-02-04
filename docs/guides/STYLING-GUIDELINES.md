@@ -1,7 +1,5 @@
 # PayeTax Styling Guidelines
 
-**Status:** ✅ ENFORCED - No interpretation allowed
-
 ---
 
 ## 🎯 Core Philosophy
@@ -17,7 +15,7 @@
 
 ---
 
-## ✅ The Right Way (Priority Order)
+## ✅ The Right Way (Recommended Order)
 
 ### 1. shadcn/ui Components FIRST
 

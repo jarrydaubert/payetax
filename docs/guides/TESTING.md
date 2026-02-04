@@ -4,64 +4,38 @@
 
 > **"What bug will this test find?"**
 
-Tests should catch real bugs, not test implementation details or TypeScript types.
+Tests should catch real regressions in calculation, UX, or security behavior.
 
 See also:
-- `docs/guides/BUG_CATALOG.md` (bug classes)
-- `docs/guides/TESTING_MATRIX.md` (quality gates + coverage targets)
+- `docs/guides/BUG_CATALOG.md`
+- `docs/guides/TESTING_MATRIX.md`
 
 ---
 
 ## Running Tests
 
 ```bash
-bun test                # Unit tests with coverage
-bun test:no-coverage    # Unit tests (fast)
-bun test:e2e            # E2E tests (all browsers)
-bun test:dev            # E2E tests (Chrome only)
-bun fix-all             # Lint + typecheck + format
+bun run test                # Unit tests with coverage
+bun run test:no-coverage    # Unit tests (fast)
+bun run test:e2e            # E2E tests
+bun run test:dev            # E2E (single browser)
+bun run fix-all             # Lint + typecheck + format
 ```
 
 ---
 
 ## HMRC Verification
 
-**golden-master-PERFECT.spec.ts** is the authoritative source for calculation accuracy.
-- 20 scenarios against HMRC-verified values
-- Penny-accurate assertions
-- Fixture: `e2e/fixtures/golden-tax-cases-2025-26-COMPLETE.json`
+The golden master suite is the regression oracle for calculation accuracy.
+- Test file: `e2e/golden-master-PERFECT.spec.ts`
+- Fixtures: `e2e/fixtures/`
 
-Note:
-- Treat the golden master suite as a regression oracle.
-- “HMRC verified” should mean we can point to the original HMRC source data used to build the fixture.
+Keep HMRC values anchored to source documents and code references.
 
 ---
 
-## E2E Configuration
+## Quality Gates (Recommended)
 
-**Environment variables:**
-- `PLAYWRIGHT_BASE_URL` - Override base URL for preview deploys/staging
-
-**CI sharding:**
-- Uses blob reporter for merged reports across shards
-- Merge command: `npx playwright merge-reports --reporter html ./audit-outputs/blob-report`
-
-**Network throttling:**
-- Requires CDP, not browser args: `page.context().newCDPSession()` then `Network.emulateNetworkConditions`
-
----
-
-## Quality Gates
-
-```bash
-bun run fix-all && bun run build && bun run test
-```
-
-Recommended PR gate (fast, high-signal):
 - `bun run test:no-coverage`
 - `bun run build`
-- Playwright (chromium):
-  - `e2e/smoke.spec.ts`
-  - `e2e/calculator-critical.spec.ts`
-  - `e2e/payslip-regression.spec.ts`
-  - `e2e/golden-master-PERFECT.spec.ts`
+- Targeted Playwright suites for critical flows

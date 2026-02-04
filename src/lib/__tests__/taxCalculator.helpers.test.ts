@@ -15,6 +15,7 @@ import {
   calculatePensionAmount,
   calculateStudentLoanRepayments,
   convertToPeriods,
+  parsePersonalAllowanceFromTaxCode,
   parseTaxCode,
 } from '../taxCalculator';
 
@@ -46,6 +47,17 @@ describe('taxCalculator helpers', () => {
       expect(parseTaxCode('D1', 12570).bandOverride).toBe('D1');
       expect(parseTaxCode('NT', 12570).bandOverride).toBe('NT');
       expect(parseTaxCode('0T', 12570).allowance).toBe(0);
+    });
+  });
+
+  describe('parsePersonalAllowanceFromTaxCode', () => {
+    it('delegates to parseTaxCode for standard allowance parsing', () => {
+      // Bug caught: legacy helper drifting from parseTaxCode behavior.
+      expect(parsePersonalAllowanceFromTaxCode('1257L', 12570)).toBe(12570);
+    });
+
+    it('handles K-codes via negative allowance', () => {
+      expect(parsePersonalAllowanceFromTaxCode('K100', 12570)).toBe(-1000);
     });
   });
 

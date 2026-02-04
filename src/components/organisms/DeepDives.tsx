@@ -30,11 +30,13 @@ export function DeepDives({ posts }: DeepDivesProps) {
         Deep Dives
       </h2>
 
-      <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+      <ul className='grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3' role='list'>
         {displayedPosts.map((post) => (
-          <ArticleCardDeepDive key={post.slug} post={post} />
+          <li key={post.slug} className='h-full'>
+            <ArticleCardDeepDive post={post} />
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

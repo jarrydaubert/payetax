@@ -75,14 +75,12 @@ export function DirectorDashboard() {
 
   // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
   useEffect(() => {
-    const region = formData.region;
-    const revenue = formData.revenue;
-    const expenses = formData.expenses;
+    const { region, revenue, expenses, includesVat } = formData;
 
     if (region === undefined) {
       return;
     }
-    if (revenue === undefined || expenses === undefined) {
+    if (typeof revenue !== 'number' || typeof expenses !== 'number') {
       return;
     }
     if (revenue < 0 || expenses < 0) {
@@ -90,13 +88,13 @@ export function DirectorDashboard() {
     }
 
     // Track once per distinct input set (avoid spamming analytics while typing).
-    const signature = `${region}|${revenue}|${expenses}|${String(formData.includesVat)}`;
+    const signature = `${region}|${revenue}|${expenses}|${String(includesVat)}`;
     if (lastTrackedCalcSignature.current !== signature) {
       trackCalculationRun({
         revenue,
         expenses,
         region,
-        includesVat: formData.includesVat,
+        includesVat,
       });
       lastTrackedCalcSignature.current = signature;
     }

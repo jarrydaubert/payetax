@@ -1,11 +1,5 @@
 # Self-Employed (Sole Trader) Tax Calculator
 
-**Status:** Not Started  
-**Priority:** Medium  
-**Effort:** Medium (2-3 days)
-
----
-
 ## Problem
 
 - Current calculator is PAYE-only.
@@ -22,7 +16,7 @@ Create a dedicated self-employed tool page focused on sole traders (not limited 
 - Profit = income - expenses.
 - Income tax on profit using existing tax bands.
 - Class 2 NI: flat weekly rate above threshold.
-- Class 4 NI: 9%/2% bands above thresholds.
+- Class 4 NI: banded rates above thresholds.
 - Student loan repayment on profit.
 
 ## UI
@@ -36,7 +30,7 @@ Create a dedicated self-employed tool page focused on sole traders (not limited 
 ## Edge Cases
 
 - Profit <= personal allowance → no income tax.
-- Profit below Class 2 threshold → Class 2 = £0.
+- Profit below Class 2 threshold → Class 2 not due.
 - Scottish rates.
 - Negative profit → show £0 deductions, net loss.
 

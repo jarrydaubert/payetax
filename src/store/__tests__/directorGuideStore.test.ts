@@ -5,6 +5,8 @@
  * Post-merge: Removed step wizard tests, added strategy comparison tests.
  */
 
+import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
+import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '../directorGuideStore';
 
 // Mock the director calculator
@@ -58,6 +60,9 @@ jest.mock('@/lib/tax/strategyComparison', () => ({
     savingsVsAllSalary: 5000,
   }),
 }));
+
+const mockCalculateDirectorScenario = calculateDirectorScenario as jest.Mock;
+const mockCalculateStrategyComparison = calculateStrategyComparison as jest.Mock;
 
 describe('DirectorGuideStore', () => {
   beforeEach(() => {
@@ -171,6 +176,11 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.pensionContribution).toBe(10000);
     });
 
+    it('should set pension already deducted flag', () => {
+      useDirectorGuideStore.getState().setIsPensionAlreadyDeducted(true);
+      expect(useDirectorGuideStore.getState().formData.isPensionAlreadyDeducted).toBe(true);
+    });
+
     it('should set company car BIK', () => {
       useDirectorGuideStore.getState().setCompanyCarBIK(3600);
       expect(useDirectorGuideStore.getState().formData.companyCarBIK).toBe(3600);
@@ -184,6 +194,11 @@ describe('DirectorGuideStore', () => {
     it('should set year-end month', () => {
       useDirectorGuideStore.getState().setYearEndMonth('12');
       expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('12');
+    });
+
+    it('should set minimum salary requirement', () => {
+      useDirectorGuideStore.getState().setMinimumSalaryRequirement(25000);
+      expect(useDirectorGuideStore.getState().formData.minimumSalaryRequirement).toBe(25000);
     });
   });
 
@@ -204,6 +219,126 @@ describe('DirectorGuideStore', () => {
       const state = useDirectorGuideStore.getState();
       expect(state.results).not.toBeNull();
       expect(state.strategyComparison).not.toBeNull();
+    });
+
+    it('should pass already taken total and payroll flag to calculator', () => {
+      // Bug caught: misclassified payroll flag or incorrect totals used for warnings.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setYtdSalary(5000);
+      store.setYtdDividends(2000);
+      store.setYtdDrawings(1000);
+
+      store.calculate();
+
+      const input = mockCalculateDirectorScenario.mock.calls[0][0];
+      expect(input.alreadyTaken).toBe(8000);
+      expect(input.alreadyTakenViaPayroll).toBe(true);
+    });
+
+    it('should pass drawings-only as non-payroll already taken', () => {
+      // Bug caught: drawings treated as PAYE salary.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setYtdDrawings(1500);
+
+      store.calculate();
+
+      const input = mockCalculateDirectorScenario.mock.calls[0][0];
+      expect(input.alreadyTaken).toBe(1500);
+      expect(input.alreadyTakenViaPayroll).toBe(false);
+    });
+
+    it('should treat dividends-only as unknown payroll status', () => {
+      // Bug caught: dividends incorrectly flagging payroll usage.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setYtdDividends(2500);
+
+      store.calculate();
+
+      const input = mockCalculateDirectorScenario.mock.calls[0][0];
+      expect(input.alreadyTaken).toBe(2500);
+      expect(input.alreadyTakenViaPayroll).toBeNull();
+    });
+
+    it('should drop pension contribution when already deducted from profit', () => {
+      // Bug caught: double-counting pension reducing profit.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setPensionContribution(10000);
+      store.setIsPensionAlreadyDeducted(true);
+
+      store.calculate();
+
+      for (const call of mockCalculateStrategyComparison.mock.calls) {
+        expect(call[0].pensionContribution).toBe(0);
+      }
+    });
+
+    it('should pass pension contribution when not already deducted', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setPensionContribution(8000);
+
+      store.calculate();
+
+      for (const call of mockCalculateStrategyComparison.mock.calls) {
+        expect(call[0].pensionContribution).toBe(8000);
+      }
+    });
+
+    it('should auto-fill Your Setup values from optimal mix when empty', () => {
+      // Bug caught: leaving comparison inputs undefined after calculate.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+
+      store.calculate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.formData.yourSetupSalary).toBe(12570);
+      expect(state.formData.yourSetupDividends).toBe(50000);
+    });
+
+    it('should respect user-provided Your Setup values', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setYourSetupSalary(30000);
+      store.setYourSetupDividends(40000);
+
+      store.calculate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.formData.yourSetupSalary).toBe(30000);
+      expect(state.formData.yourSetupDividends).toBe(40000);
+    });
+
+    it('should pass other PAYE flag into strategy comparison', () => {
+      // Bug caught: NI thresholds not adjusted for other PAYE employment.
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setHasOtherPAYEEmployment(true);
+
+      store.calculate();
+
+      const call = mockCalculateStrategyComparison.mock.calls[0][0];
+      expect(call.hasOtherPAYEEmployment).toBe(true);
     });
   });
 

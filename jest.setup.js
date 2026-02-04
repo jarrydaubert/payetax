@@ -7,6 +7,7 @@ expect.extend(toHaveNoViolations);
 // Many components (Analytics, etc.) read NEXT_PUBLIC_* env vars at module init time.
 // Provide stable defaults in Jest to avoid tests depending on local developer env.
 process.env.NEXT_PUBLIC_GA_ID ||= 'G-ABCDEFGHIJ';
+process.env.NEXT_PUBLIC_AHREFS_KEY ||= 'ahrefs-test-key';
 
 // Note: TextEncoder/TextDecoder and Fetch API polyfills (Request/Response/Headers)
 // are in jest.setup.fetch.js which runs via setupFiles before module imports
@@ -44,6 +45,23 @@ jest.mock('next/dynamic', () => {
     PlaceholderComponent.preload = jest.fn();
     return PlaceholderComponent;
   };
+});
+
+// Mock lucide-react (ESM) to avoid Jest ESM parsing issues.
+// Provide a generic SVG component for all icon exports.
+jest.mock('lucide-react', () => {
+  const React = require('react');
+  const Icon = (props) => React.createElement('svg', { ...props, 'data-lucide': 'icon' });
+
+  return new Proxy(
+    { __esModule: true, default: Icon },
+    {
+      get(target, prop) {
+        if (prop in target) return target[prop];
+        return Icon;
+      },
+    },
+  );
 });
 
 // Mock ResizeObserver (not available in jsdom)

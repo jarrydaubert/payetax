@@ -67,11 +67,20 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
         </div>
 
         {/* Posts Grid */}
-        <div className={cn('grid sm:grid-cols-2 lg:grid-cols-3', SPACING.GAP_6, SPACING.MB_12)}>
+        <ul
+          className={cn(
+            'grid list-none p-0 sm:grid-cols-2 lg:grid-cols-3',
+            SPACING.GAP_6,
+            SPACING.MB_12,
+          )}
+          role='list'
+        >
           {posts.map((post, idx) => (
-            <PostCard key={post.slug} post={post} priority={idx < PRIORITY_IMAGE_COUNT} />
+            <li key={post.slug} className='h-full'>
+              <PostCard post={post} priority={idx < PRIORITY_IMAGE_COUNT} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Pagination */}
         <BlogPagination currentPage={currentPage} totalPages={totalPages} />

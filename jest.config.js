@@ -55,6 +55,8 @@ const config = {
     '^next-mdx-remote/rsc$': '<rootDir>/src/lib/__tests__/__mocks__/next-mdx-remote.mock.tsx',
     // Mock github-slugger (ESM-only package)
     '^github-slugger$': '<rootDir>/src/lib/__tests__/__mocks__/github-slugger.mock.ts',
+    // Mock lucide-react ESM icon modules
+    '^lucide-react/dist/esm/icons/.*$': '<rootDir>/src/test/lucide-icon.mock.tsx',
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
