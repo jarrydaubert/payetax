@@ -44,31 +44,24 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
       </h2>
 
       {/* Grid: single column -> 2-col equal (md) -> 60/40 asymmetric (lg) */}
-      <div
-        className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]'
-        role='list'
-        aria-label='Latest articles'
-      >
+      <ul className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]' role='list'>
         {/* Large featured card - spans all rows on desktop */}
         {featuredPost && (
-          <div className='md:col-span-2 lg:col-span-1 lg:row-span-4' role='listitem'>
+          <li className='md:col-span-2 lg:col-span-1 lg:row-span-4'>
             <ArticleCardLarge post={featuredPost} />
-          </div>
+          </li>
         )}
 
-        {/* Stacked small cards - 2-col grid on tablet, single col on desktop */}
-        <div
-          className='grid gap-4 sm:grid-cols-2 md:col-span-2 lg:col-span-1 lg:grid-cols-1'
-          role='list'
-          aria-label='Latest articles list'
-        >
-          {displayedSmallPosts.map((post) => (
-            <div key={post.slug || post.id} role='listitem'>
-              <ArticleCardSmall post={post} />
-            </div>
-          ))}
-        </div>
-      </div>
+        {/* Small cards - auto-flow into right column on desktop */}
+        {displayedSmallPosts.map((post) => (
+          <li
+            key={post.slug || post.id}
+            className='md:col-span-1 lg:col-span-1 lg:col-start-2'
+          >
+            <ArticleCardSmall post={post} />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

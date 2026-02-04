@@ -41,9 +41,8 @@ describe('LatestArticles', () => {
 
     render(<LatestArticles posts={posts} />);
 
-    // Outer list plus small-posts list
     const lists = screen.getAllByRole('list');
-    expect(lists.length).toBeGreaterThanOrEqual(2);
+    expect(lists).toHaveLength(1);
 
     // Featured + 4 small posts
     expect(screen.getAllByRole('listitem')).toHaveLength(5);

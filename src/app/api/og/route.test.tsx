@@ -8,11 +8,18 @@
  */
 
 import { NextRequest } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimit';
+
+jest.mock('@/lib/rateLimit', () => ({
+  checkRateLimit: jest.fn(() => true),
+}));
 
 type MockImageResponse = Response & {
   element?: unknown;
   options?: { headers?: Record<string, string> };
 };
+
+const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
 
 jest.mock('next/og', () => ({
   ImageResponse: class extends Response {
@@ -53,6 +60,10 @@ function buildRequest(search: Record<string, string>) {
 }
 
 describe('/api/og GET', () => {
+  beforeEach(() => {
+    mockCheckRateLimit.mockReturnValue(true);
+  });
+
   it('sets cache headers for OG responses', async () => {
     const { GET } = await import('./route');
     const response = (await GET(buildRequest({}))) as MockImageResponse;
@@ -80,5 +91,13 @@ describe('/api/og GET', () => {
     const text = collectText(response.element).join(' ');
     expect(text).toContain('UK Tax Calculator');
     expect(text).not.toContain('Gross Salary');
+  });
+
+  it('returns 429 when rate limited', async () => {
+    mockCheckRateLimit.mockReturnValue(false);
+    const { GET } = await import('./route');
+    const response = await GET(buildRequest({}));
+
+    expect(response.status).toBe(429);
   });
 });

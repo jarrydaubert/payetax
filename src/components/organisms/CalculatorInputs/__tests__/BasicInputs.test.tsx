@@ -21,6 +21,8 @@ describe('BasicInputs Component', () => {
   const mockSetAllowancesDeductions = jest.fn();
   const mockSetPensionContribution = jest.fn();
   const mockSetPensionContributionType = jest.fn();
+  const mockSetIsOnlyIncome = jest.fn();
+  const mockSetOtherIncomeEstimate = jest.fn();
 
   const defaultInput = {
     salary: 30000,
@@ -37,6 +39,8 @@ describe('BasicInputs Component', () => {
     allowancesDeductions: 0,
     pensionContribution: 0,
     pensionContributionType: 'percentage' as const,
+    isOnlyIncome: true,
+    otherIncomeEstimate: 0,
   };
 
   beforeEach(() => {
@@ -57,10 +61,12 @@ describe('BasicInputs Component', () => {
       setIsBlind: mockSetIsBlind,
       setAge: mockSetAge,
       setPayNoNI: mockSetPayNoNI,
-      setStudentLoanPlan: mockSetStudentLoanPlan,
+      setStudentLoanPlans: mockSetStudentLoanPlan,
       setAllowancesDeductions: mockSetAllowancesDeductions,
       setPensionContribution: mockSetPensionContribution,
       setPensionContributionType: mockSetPensionContributionType,
+      setIsOnlyIncome: mockSetIsOnlyIncome,
+      setOtherIncomeEstimate: mockSetOtherIncomeEstimate,
     });
   });
 
@@ -130,6 +136,12 @@ describe('BasicInputs Component', () => {
       expect(screen.getByText('Pension')).toBeInTheDocument();
     });
 
+    it('should render only-income toggle', () => {
+      render(<BasicInputs />);
+      expect(screen.getByText('Is this your only income?')).toBeInTheDocument();
+      expect(screen.getByTestId('only-income-toggle')).toBeInTheDocument();
+    });
+
     it('should NOT render hours per week field (removed)', () => {
       render(<BasicInputs />);
       expect(screen.queryByText('Hours Per Week')).not.toBeInTheDocument();
@@ -152,6 +164,21 @@ describe('BasicInputs Component', () => {
     });
   });
 
+  describe('Other Income Conditional', () => {
+    it('should show warning and estimate input when only income is false', () => {
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({ input: { ...defaultInput, isOnlyIncome: false } }),
+      );
+
+      render(<BasicInputs />);
+
+      expect(
+        screen.getByText(/Personal tax numbers may be too low if other income applies/i),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('other-income-estimate-input')).toBeInTheDocument();
+    });
+  });
+
   describe('Store Integration', () => {
     it('should call setTaxCode when tax code changes', () => {
       render(<BasicInputs />);
@@ -169,6 +196,15 @@ describe('BasicInputs Component', () => {
       fireEvent.change(taxCodeInput, { target: { value: 'br' } });
 
       expect(mockSetTaxCode).toHaveBeenCalledWith('BR');
+    });
+
+    it('should call setIsOnlyIncome when toggle is clicked', () => {
+      render(<BasicInputs />);
+
+      const toggle = screen.getByTestId('only-income-toggle');
+      fireEvent.click(toggle);
+
+      expect(mockSetIsOnlyIncome).toHaveBeenCalled();
     });
   });
 

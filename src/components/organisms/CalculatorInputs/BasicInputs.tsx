@@ -17,9 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/atoms/ui/select';
+import { Switch } from '@/components/atoms/ui/switch';
 import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { PERIODS } from '@/constants/taxRates';
+import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
@@ -47,6 +48,8 @@ export function BasicInputs() {
     setPensionContribution,
     setPensionContributionType,
     setAllowancesDeductions,
+    setIsOnlyIncome,
+    setOtherIncomeEstimate,
   } = useCalculatorActions();
 
   // Generate unique IDs for accessibility
@@ -70,6 +73,8 @@ export function BasicInputs() {
   const pensionTypeId = useId();
   const pensionTypeLabelId = `${pensionTypeId}-label`;
   const pensionId = useId();
+  const onlyIncomeId = useId();
+  const otherIncomeEstimateId = useId();
 
   const payPeriodOptions = [
     { value: PERIODS.ANNUALLY, label: 'Annually' },
@@ -97,6 +102,13 @@ export function BasicInputs() {
     { value: 'postgrad' as const, label: 'Postgraduate only' },
   ];
 
+  const STUDENT_LOAN_PLANS: StudentLoanPlan[] = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'];
+  const isStudentLoanPlan = (value: string): value is StudentLoanPlan =>
+    STUDENT_LOAN_PLANS.includes(value as StudentLoanPlan);
+  const isUndergraduatePlan = (
+    value: string,
+  ): value is Exclude<StudentLoanPlan, 'postgrad'> => value !== 'postgrad' && isStudentLoanPlan(value);
+
   // Determine undergraduate loan from store
   const undergraduateLoan =
     input.studentLoanPlans === 'none' || !Array.isArray(input.studentLoanPlans)
@@ -117,30 +129,31 @@ export function BasicInputs() {
   const handleUndergraduateLoanChange = (value: string) => {
     if (value === 'none') {
       setStudentLoanPlans('none');
-    } else if (value === 'postgrad') {
-      setStudentLoanPlans(['postgrad']);
-    } else {
-      // Undergraduate loan - check if we need to add postgrad
-      // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan selection
-      const newPlans = hasPostgraduateAddOn ? [value as any, 'postgrad'] : [value as any];
-      setStudentLoanPlans(newPlans);
+      return;
     }
+    if (value === 'postgrad') {
+      setStudentLoanPlans(['postgrad']);
+      return;
+    }
+    if (!isUndergraduatePlan(value)) return;
+
+    // Undergraduate loan - check if we need to add postgrad
+    const newPlans = hasPostgraduateAddOn ? [value, 'postgrad'] : [value];
+    setStudentLoanPlans(newPlans);
   };
 
   const handlePostgraduateToggle = (checked: boolean | 'indeterminate') => {
     // Guard against indeterminate state
     if (checked !== true) {
-      if (undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad') {
-        // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
-        setStudentLoanPlans([undergraduateLoan as any]);
+      if (isUndergraduatePlan(undergraduateLoan)) {
+        setStudentLoanPlans([undergraduateLoan]);
       }
       return;
     }
 
-    if (undergraduateLoan === 'none' || undergraduateLoan === 'postgrad') return;
+    if (!isUndergraduatePlan(undergraduateLoan)) return;
 
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for dynamic plan
-    setStudentLoanPlans([undergraduateLoan as any, 'postgrad']);
+    setStudentLoanPlans([undergraduateLoan, 'postgrad']);
   };
 
   /**
@@ -523,6 +536,54 @@ export function BasicInputs() {
       </div>
 
       {/* Additional Income Sources */}
+      <div className={cn('rounded-lg border border-input p-3', SPACING.SPACE_Y_2)}>
+        <div className='flex items-center justify-between'>
+          <Label htmlFor={onlyIncomeId} className={cn(TYPOGRAPHY.TEXT_SM, 'font-medium')}>
+            Is this your only income?
+          </Label>
+          <Switch
+            id={onlyIncomeId}
+            checked={input.isOnlyIncome}
+            onCheckedChange={(checked) => setIsOnlyIncome(checked)}
+            data-testid='only-income-toggle'
+            aria-label='This is my only income'
+          />
+        </div>
+        <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+          Toggle off if you have rental, pension, or other taxable income.
+        </p>
+
+        {!input.isOnlyIncome && (
+          <div className={cn('rounded-md border border-amber-500/20 bg-amber-500/10 p-3')}>
+            <p className={cn('text-amber-900 dark:text-amber-100', TYPOGRAPHY.TEXT_SM)}>
+              Personal tax numbers may be too low if other income applies.
+            </p>
+            <div className={cn('mt-3', SPACING.SPACE_Y_1)}>
+              <Label
+                htmlFor={otherIncomeEstimateId}
+                className={cn(TYPOGRAPHY.TEXT_SM, 'font-medium')}
+              >
+                Roughly how much other income? (annual)
+              </Label>
+              <NumberInput
+                id={otherIncomeEstimateId}
+                value={input.otherIncomeEstimate}
+                onChange={setOtherIncomeEstimate}
+                prefix='£'
+                decimals={2}
+                placeholder='0.00'
+                min={0}
+                max={10_000_000}
+                data-testid='other-income-estimate-input'
+              />
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                Redundancy: only amounts over £30,000 are taxable.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       <IncomeSourceList />
     </motion.div>
   );

@@ -77,10 +77,7 @@ export function DirectorDashboard() {
   useEffect(() => {
     const { region, revenue, expenses, includesVat } = formData;
 
-    if (region === undefined) {
-      return;
-    }
-    if (typeof revenue !== 'number' || typeof expenses !== 'number') {
+    if (region === undefined || revenue === undefined || expenses === undefined) {
       return;
     }
     if (revenue < 0 || expenses < 0) {

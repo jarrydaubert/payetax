@@ -16,6 +16,8 @@ describe('BasicInputs - Regression Tests', () => {
   const mockSetPensionContribution = jest.fn();
   const mockSetPensionContributionType = jest.fn();
   const mockSetPayPeriod = jest.fn();
+  const mockSetIsOnlyIncome = jest.fn();
+  const mockSetOtherIncomeEstimate = jest.fn();
 
   const defaultInput = {
     salary: 30000,
@@ -32,6 +34,8 @@ describe('BasicInputs - Regression Tests', () => {
     allowancesDeductions: 0,
     pensionContribution: 5.5,
     pensionContributionType: 'percentage' as const,
+    isOnlyIncome: true,
+    otherIncomeEstimate: 0,
   };
 
   beforeEach(() => {
@@ -52,10 +56,12 @@ describe('BasicInputs - Regression Tests', () => {
       setIsBlind: jest.fn(),
       setAge: jest.fn(),
       setPayNoNI: jest.fn(),
-      setStudentLoanPlan: jest.fn(),
+      setStudentLoanPlans: jest.fn(),
       setAllowancesDeductions: jest.fn(),
       setPensionContribution: mockSetPensionContribution,
       setPensionContributionType: mockSetPensionContributionType,
+      setIsOnlyIncome: mockSetIsOnlyIncome,
+      setOtherIncomeEstimate: mockSetOtherIncomeEstimate,
     });
   });
 

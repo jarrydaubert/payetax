@@ -1,11 +1,12 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
 import { Badge } from '@/components/atoms/ui/badge';
 import { Button } from '@/components/atoms/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/atoms/ui/alert';
 import {
   Collapsible,
   CollapsibleContent,
@@ -98,6 +99,16 @@ export function IncomeSourceList() {
           <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
             Add pension income, rental income, or other sources
           </p>
+        )}
+        {incomeSources.length > 0 && (
+          <Alert variant='warning'>
+            <AlertTriangle className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            <AlertTitle>Additional income accuracy</AlertTitle>
+            <AlertDescription>
+              Multiple income sources can affect personal allowance, tax bands, and student loans.
+              We&apos;re verifying these edge cases, so totals may be understated.
+            </AlertDescription>
+          </Alert>
         )}
 
         <AnimatePresence mode='popLayout'>

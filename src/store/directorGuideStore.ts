@@ -138,6 +138,7 @@ interface DirectorGuideActions {
 
   // Reset
   reset: () => void;
+  clearStaleState: () => void;
 }
 
 type DirectorGuideStore = DirectorGuideState & DirectorGuideActions;
@@ -520,6 +521,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           trackGuideReset();
           set({ ...defaultState });
         },
+        clearStaleState: () => {
+          set({ ...defaultState });
+        },
       }),
       {
         name: 'director-guide-storage',
@@ -557,7 +561,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
           if (isExpired || wrongTaxYear) {
             // Clear stale data
-            useDirectorGuideStore.getState().reset();
+            useDirectorGuideStore.getState().clearStaleState();
           }
         },
       },

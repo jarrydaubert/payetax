@@ -12,12 +12,18 @@
 import { createHmac } from 'node:crypto';
 import { NextRequest } from 'next/server';
 import { LinearClient } from '@linear/sdk';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 jest.mock('@linear/sdk', () => ({
   LinearClient: jest.fn(),
 }));
 
+jest.mock('@/lib/rateLimit', () => ({
+  checkRateLimit: jest.fn(() => true),
+}));
+
 const ORIGINAL_ENV = process.env;
+const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
 
 function signBody(body: string, secret: string): string {
   return createHmac('sha256', secret).update(Buffer.from(body)).digest('hex');
@@ -72,6 +78,7 @@ describe('/api/sentry-webhook POST', () => {
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+    mockCheckRateLimit.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -89,6 +96,19 @@ describe('/api/sentry-webhook POST', () => {
 
     expect(response.status).toBe(500);
     expect(json).toEqual({ error: 'Webhook not configured' });
+  });
+
+  it('returns 429 when rate limited', async () => {
+    mockCheckRateLimit.mockReturnValue(false);
+    const POST = await loadRoute({ SENTRY_WEBHOOK_SECRET: 'secret' });
+    const body = JSON.stringify(basePayload);
+    const signature = signBody(body, 'secret');
+    const request = buildRequest(body, { 'sentry-hook-signature': signature });
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(json).toEqual({ error: 'Too many requests' });
   });
 
   it('rejects invalid signatures', async () => {

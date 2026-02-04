@@ -13,11 +13,13 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
 // Max payload size (1MB - webhooks shouldn't be larger)
 const MAX_PAYLOAD_SIZE = 1024 * 1024;
+const RATE_LIMIT = { max: 30, window: 60000 };
 
 const LINEAR_API_KEY = process.env.LINEAR_API_KEY;
 const SENTRY_WEBHOOK_SECRET = process.env.SENTRY_WEBHOOK_SECRET;
@@ -74,6 +76,24 @@ interface SentryWebhookPayload {
   };
 }
 
+/** Get client identifier - always returns a key */
+function getClientIdentifier(request: NextRequest): string {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(',')[0];
+    if (firstIp) return firstIp.trim();
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp;
+
+  const ua = request.headers.get('user-agent') || 'unknown';
+  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
+
 /**
  * Verify Sentry webhook signature using HMAC-SHA256 with timing-safe comparison
  * Uses raw bytes to ensure exact payload match
@@ -104,6 +124,11 @@ export async function POST(request: NextRequest) {
   if (!SENTRY_WEBHOOK_SECRET) {
     console.error('[sentry-webhook] SENTRY_WEBHOOK_SECRET not configured');
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+  }
+
+  const clientId = getClientIdentifier(request);
+  if (!checkRateLimit(clientId, RATE_LIMIT)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   // Check payload size before reading

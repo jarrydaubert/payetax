@@ -60,6 +60,47 @@ import {
   WhatIfTypeSchema,
 } from '@/lib/validation';
 
+const shouldLogWarnings = process.env.NODE_ENV !== 'production';
+
+const logCalculatorWarning = (...args: unknown[]) => {
+  if (shouldLogWarnings) {
+    // biome-ignore lint/suspicious/noConsole: dev-only diagnostics
+    console.warn(...args);
+  }
+};
+
+const TAX_YEAR_INPUT_SCHEMA = z
+  .string()
+  .refine(
+    (year) => {
+      const shortFormat = /^\d{4}-\d{2}$/;
+      const longFormat = /^\d{4}-\d{4}$/;
+      return shortFormat.test(year) || longFormat.test(year);
+    },
+    {
+      message: 'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
+    },
+  )
+  .refine(
+    (year) => {
+      const parts = year.split('-');
+      if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
+
+      const start = Number.parseInt(parts[0], 10);
+      const endStr = parts[1];
+
+      if (Number.isNaN(start)) return false;
+
+      const end =
+        endStr.length === 2 ? Number.parseInt(`20${endStr}`, 10) : Number.parseInt(endStr, 10);
+
+      if (Number.isNaN(end)) return false;
+
+      return end === start + 1;
+    },
+    { message: 'Tax year must be consecutive (e.g., 2024-25)' },
+  );
+
 /**
  * Interface defining all inputs required for tax calculations
  * These values are collected from the UI and passed to the calculation engine
@@ -101,6 +142,10 @@ interface CalculatorInput {
   allowancesDeductions: number;
   /** Additional income sources (pensions, rental, etc.) */
   incomeSources: IncomeSource[];
+  /** Whether salary is the only income source */
+  isOnlyIncome: boolean;
+  /** Optional estimated additional income (annual) */
+  otherIncomeEstimate: number;
 }
 
 // Interface for calculation results
@@ -145,6 +190,9 @@ interface CalculatorState {
   setNiCategory: (category: NICategory) => void;
   setHoursPerWeek: (hours: number) => void;
   setAllowancesDeductions: (amount: number) => void;
+  setIsOnlyIncome: (isOnlyIncome: boolean) => void;
+  setOtherIncomeEstimate: (amount: number) => void;
+  setInput: (partial: Partial<CalculatorInput>) => void;
 
   // Income Sources Management
   addIncomeSource: () => void;
@@ -178,6 +226,12 @@ const getCurrentTaxYear = (): TaxYear => {
 
   // Otherwise, we're in the current tax year
   return `${currentYear}-${currentYear + 1}` as TaxYear;
+};
+
+const normalizeTaxYear = (value: string): TaxYear => {
+  const [start, endRaw] = value.split('-');
+  const end = endRaw?.length === 2 ? `20${endRaw}` : endRaw;
+  return `${start}-${end}` as TaxYear;
 };
 
 // Get salary range for privacy-safe analytics
@@ -216,6 +270,8 @@ const defaultInput: CalculatorInput = {
   hoursPerWeek: 40,
   allowancesDeductions: 0,
   incomeSources: [],
+  isOnlyIncome: true,
+  otherIncomeEstimate: 0,
 };
 
 // Create the calculator store
@@ -289,7 +345,7 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             if (!validated.success) {
               // Invalid pay period - just log and don't update state
-              console.warn(
+              logCalculatorWarning(
                 '[Calculator] Invalid pay period:',
                 validated.error.issues[0]?.message ?? 'Validation failed',
               );
@@ -299,62 +355,31 @@ export const useCalculatorStore = create<CalculatorState>()(
             set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
           } catch (error) {
             // Zod v4 can throw in some edge cases even with safeParse
-            console.warn('[Calculator] Pay period validation error:', error);
+            logCalculatorWarning('[Calculator] Pay period validation error:', error);
           }
         },
         setTaxYear: (taxYear) => {
-          // Validate tax year format - accept both YYYY-YY and YYYY-YYYY
           try {
-            const validated = z
-              .string()
-              .refine(
-                (year) => {
-                  // Accept both YYYY-YY and YYYY-YYYY formats
-                  const shortFormat = /^\d{4}-\d{2}$/;
-                  const longFormat = /^\d{4}-\d{4}$/;
-                  return shortFormat.test(year) || longFormat.test(year);
-                },
-                {
-                  message:
-                    'Tax year must be in format YYYY-YY or YYYY-YYYY (e.g., 2024-25, 2024-2025)',
-                },
-              )
-              .refine(
-                (year) => {
-                  const parts = year.split('-');
-                  if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
-
-                  const start = Number.parseInt(parts[0], 10);
-                  const endStr = parts[1];
-
-                  if (Number.isNaN(start)) return false;
-
-                  // Handle both 2-digit and 4-digit year formats
-                  const end =
-                    endStr.length === 2
-                      ? Number.parseInt(`20${endStr}`, 10)
-                      : Number.parseInt(endStr, 10);
-
-                  if (Number.isNaN(end)) return false;
-
-                  return end === start + 1;
-                },
-                { message: 'Tax year must be consecutive (e.g., 2024-25)' },
-              )
-              .safeParse(taxYear);
+            const validated = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYear);
 
             if (!validated.success) {
-              console.warn(
+              logCalculatorWarning(
                 '[Calculator] Invalid tax year:',
                 validated.error.issues[0]?.message ?? 'Validation failed',
               );
               return;
             }
 
-            set((state) => ({ input: { ...state.input, taxYear: validated.data as TaxYear } }));
+            const normalized = normalizeTaxYear(validated.data);
+            if (!TAX_RATES[normalized]) {
+              logCalculatorWarning('[Calculator] Unsupported tax year:', normalized);
+              return;
+            }
+
+            set((state) => ({ input: { ...state.input, taxYear: normalized } }));
           } catch (error) {
             // Zod v4 can throw in some edge cases even with safeParse
-            console.warn('[Calculator] Tax year validation error:', error);
+            logCalculatorWarning('[Calculator] Tax year validation error:', error);
           }
         },
         setTaxCode: (taxCode) => {
@@ -397,7 +422,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             if (!validated.success) {
               // Invalid tax code - just log and don't update state
               // This is expected user behavior, not an error
-              console.warn(
+              logCalculatorWarning(
                 '[Calculator] Invalid tax code:',
                 validated.error.issues[0]?.message ?? 'Validation failed',
               );
@@ -408,7 +433,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           } catch (error) {
             // Zod v4 can throw in some edge cases even with safeParse
             // This is expected user input validation, not an application error
-            console.warn('[Calculator] Tax code validation error:', error);
+            logCalculatorWarning('[Calculator] Tax code validation error:', error);
           }
         },
         setRegion: (region) => {
@@ -419,7 +444,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               .safeParse(region);
 
             if (!validated.success) {
-              console.warn(
+              logCalculatorWarning(
                 '[Calculator] Invalid region:',
                 validated.error.issues[0]?.message ?? 'Validation failed',
               );
@@ -435,7 +460,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             }));
           } catch (error) {
             // Zod v4 can throw in some edge cases even with safeParse
-            console.warn('[Calculator] Region validation error:', error);
+            logCalculatorWarning('[Calculator] Region validation error:', error);
           }
         },
         setIsScottish: (isScottish) => {
@@ -443,12 +468,10 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = BooleanSchema.safeParse(isScottish);
 
           if (!validated.success) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn(
-                '[Calculator] Invalid isScottish:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-            }
+            logCalculatorWarning(
+              '[Calculator] Invalid isScottish:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
             return;
           }
 
@@ -470,7 +493,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = BooleanSchema.safeParse(isMarried);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid isMarried:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -489,7 +512,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(partnerGrossWage);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid partner wage:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -502,7 +525,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = BooleanSchema.safeParse(isBlind);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid isBlind:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -522,7 +545,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               .safeParse(age);
 
             if (!validated.success) {
-              console.warn(
+              logCalculatorWarning(
                 '[Calculator] Invalid age:',
                 validated.error.issues[0]?.message ?? 'Validation failed',
               );
@@ -537,7 +560,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = BooleanSchema.safeParse(payNoNI);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid payNoNI:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -564,12 +587,10 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = schema.safeParse(pensionContribution);
 
           if (!validated.success) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn(
-                '[Calculator] Invalid pension contribution:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-            }
+            logCalculatorWarning(
+              '[Calculator] Invalid pension contribution:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
             return;
           }
 
@@ -580,7 +601,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = PensionContributionTypeSchema.safeParse(pensionContributionType);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid pension contribution type:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -597,7 +618,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(studentLoanPlans);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid student loan plans:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -608,7 +629,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (Array.isArray(validated.data)) {
             const unique = new Set(validated.data);
             if (unique.size !== validated.data.length) {
-              console.warn('[Calculator] Duplicate student loan plans not allowed');
+              logCalculatorWarning('[Calculator] Duplicate student loan plans not allowed');
               return;
             }
           }
@@ -622,7 +643,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(plan);
 
           if (!planValidated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid student loan plan:',
               planValidated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -654,7 +675,7 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             // Add plan (max 2)
             if (plansArray.length >= 2) {
-              console.warn('[Calculator] Maximum 2 student loans allowed');
+              logCalculatorWarning('[Calculator] Maximum 2 student loans allowed');
               return state;
             }
 
@@ -668,7 +689,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = NICategorySchema.safeParse(niCategory);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid NI category:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -687,7 +708,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(hoursPerWeek);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid hours per week:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -705,7 +726,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(allowancesDeductions);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid allowances/deductions:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -713,12 +734,48 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
           set((state) => ({ input: { ...state.input, allowancesDeductions: validated.data } }));
         },
+        setIsOnlyIncome: (isOnlyIncome) => {
+          const validated = BooleanSchema.safeParse(isOnlyIncome);
+
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid isOnlyIncome:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, isOnlyIncome: validated.data } }));
+        },
+        setOtherIncomeEstimate: (otherIncomeEstimate) => {
+          const validated = z
+            .number()
+            .min(0, 'Other income estimate cannot be negative')
+            .max(10_000_000, 'Other income estimate exceeds maximum')
+            .finite('Other income estimate must be a valid number')
+            .safeParse(otherIncomeEstimate);
+
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid other income estimate:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, otherIncomeEstimate: validated.data } }));
+        },
+        setInput: (partial) => {
+          set((state) => ({
+            input: { ...state.input, ...partial },
+          }));
+        },
 
         // Income Sources Management
         addIncomeSource: () => {
           // Guard: crypto.randomUUID is only available client-side
           if (typeof crypto === 'undefined' || typeof crypto.randomUUID !== 'function') {
-            console.warn('[Calculator] Cannot add income source during SSR');
+            logCalculatorWarning('[Calculator] Cannot add income source during SSR');
             return;
           }
 
@@ -742,7 +799,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           // Validate updates using schema
           const validated = IncomeSourceUpdateSchema.safeParse(updates);
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid income source update:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -911,7 +968,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const validated = WhatIfTypeSchema.safeParse(type);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid what-if type:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -932,7 +989,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             .safeParse(value);
 
           if (!validated.success) {
-            console.warn(
+            logCalculatorWarning(
               '[Calculator] Invalid what-if value:',
               validated.error.issues[0]?.message ?? 'Validation failed',
             );
@@ -953,7 +1010,7 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             // Don't calculate if no salary entered
             if (!currentSalary || currentSalary <= 0) {
-              console.warn('Cannot calculate What If: No current salary');
+              logCalculatorWarning('Cannot calculate What If: No current salary');
               return;
             }
             let newSalary: number;
@@ -1013,6 +1070,8 @@ export const useCalculatorStore = create<CalculatorState>()(
         storage: createJSONStorage(() => safeStorage),
         partialize: (state) => ({
           input: state.input,
+          _savedAt: Date.now(),
+          _taxYear: state.input.taxYear,
           // Don't persist calculation results
         }),
         merge: (
@@ -1028,8 +1087,31 @@ export const useCalculatorStore = create<CalculatorState>()(
               ...state?.input,
               // Ensure new fields have defaults if missing in persisted state
               incomeSources: state?.input?.incomeSources ?? [],
+              isOnlyIncome: state?.input?.isOnlyIncome ?? currentState.input.isOnlyIncome,
+              otherIncomeEstimate:
+                state?.input?.otherIncomeEstimate ?? currentState.input.otherIncomeEstimate,
             },
           };
+        },
+        onRehydrateStorage: () => (state, error) => {
+          if (error || !state) return;
+
+          const savedAt = (state as unknown as { _savedAt?: number })._savedAt;
+          const savedTaxYear = (state as unknown as { _taxYear?: string })._taxYear;
+          const currentTaxYear = getCurrentTaxYear();
+
+          const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+          const isExpired = savedAt && Date.now() - savedAt > THIRTY_DAYS_MS;
+          const wrongTaxYear = savedTaxYear && savedTaxYear !== currentTaxYear;
+
+          if (isExpired) {
+            useCalculatorStore.getState().reset();
+            return;
+          }
+
+          if (wrongTaxYear) {
+            useCalculatorStore.getState().setTaxYear(currentTaxYear);
+          }
         },
       },
     ),
@@ -1070,6 +1152,9 @@ export const useCalculatorActions = () =>
       setNiCategory: state.setNiCategory,
       setHoursPerWeek: state.setHoursPerWeek,
       setAllowancesDeductions: state.setAllowancesDeductions,
+      setIsOnlyIncome: state.setIsOnlyIncome,
+      setOtherIncomeEstimate: state.setOtherIncomeEstimate,
+      setInput: state.setInput,
       addIncomeSource: state.addIncomeSource,
       updateIncomeSource: state.updateIncomeSource,
       removeIncomeSource: state.removeIncomeSource,

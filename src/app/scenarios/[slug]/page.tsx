@@ -181,7 +181,7 @@ export default async function ScenarioPage({ params }: PageProps) {
       {/* Structured Data */}
       {structuredData.map((schema, index) => (
         <script
-          key={`structured-data-${String(schema?.['@type'] ?? index)}`}
+          key={`structured-data-${String(schema?.['@type'] ?? 'schema')}-${index}`}
           type='application/ld+json'
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}

@@ -119,7 +119,8 @@ describe('Calculator Store Validation', () => {
 
       for (const year of validYears) {
         setTaxYear(year);
-        expect(useCalculatorStore.getState().input.taxYear).toBe(year);
+        const normalized = year === '2024-25' ? '2024-2025' : '2025-2026';
+        expect(useCalculatorStore.getState().input.taxYear).toBe(normalized);
       }
     });
 
@@ -128,7 +129,7 @@ describe('Calculator Store Validation', () => {
 
       // Both formats should be valid
       setTaxYear('2024-25' as TaxYear);
-      expect(useCalculatorStore.getState().input.taxYear).toBe('2024-25');
+      expect(useCalculatorStore.getState().input.taxYear).toBe('2024-2025');
 
       setTaxYear('2024-2025' as TaxYear);
       expect(useCalculatorStore.getState().input.taxYear).toBe('2024-2025');
@@ -219,6 +220,33 @@ describe('Calculator Store Validation', () => {
 
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Other income helpers', () => {
+    it('should update isOnlyIncome flag', () => {
+      const { setIsOnlyIncome } = useCalculatorStore.getState();
+
+      setIsOnlyIncome(false);
+
+      expect(useCalculatorStore.getState().input.isOnlyIncome).toBe(false);
+    });
+
+    it('should accept valid other income estimate', () => {
+      const { setOtherIncomeEstimate } = useCalculatorStore.getState();
+
+      setOtherIncomeEstimate(2500);
+
+      expect(useCalculatorStore.getState().input.otherIncomeEstimate).toBe(2500);
+    });
+
+    it('should reject negative other income estimate', () => {
+      const { setOtherIncomeEstimate } = useCalculatorStore.getState();
+      const initial = useCalculatorStore.getState().input.otherIncomeEstimate;
+
+      setOtherIncomeEstimate(-10);
+
+      expect(useCalculatorStore.getState().input.otherIncomeEstimate).toBe(initial);
     });
   });
 

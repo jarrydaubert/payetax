@@ -1,6 +1,7 @@
 // src/app/api/og/route.tsx
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'edge';
 
@@ -8,6 +9,25 @@ export const runtime = 'edge';
 const MAX_TITLE_LENGTH = 70;
 const MAX_DESCRIPTION_LENGTH = 150;
 const MAX_SALARY = 10_000_000;
+const RATE_LIMIT = { max: 10, window: 60000 };
+
+/** Get client identifier - always returns a key */
+function getClientIdentifier(request: NextRequest): string {
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp;
+
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(',')[0];
+    if (firstIp) return firstIp.trim();
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  const ua = request.headers.get('user-agent') || 'unknown';
+  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
+}
 
 /**
  * Clamp text to maximum length, adding ellipsis if truncated
@@ -49,6 +69,11 @@ const CACHE_HEADERS = {
 };
 
 export function GET(request: NextRequest) {
+  const clientId = getClientIdentifier(request);
+  if (!checkRateLimit(clientId, RATE_LIMIT)) {
+    return new Response('Too many requests', { status: 429 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
 
   // Get and validate parameters with constraints

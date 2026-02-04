@@ -111,6 +111,17 @@ describe('CalculatorStore', () => {
     expect(state.input.taxCode).toBe('1250L');
   });
 
+  it('should update multiple fields with setInput', () => {
+    const { setInput } = useCalculatorStore.getState();
+
+    setInput({ salary: 42000, taxCode: '1250L', isMarried: true });
+
+    const state = useCalculatorStore.getState();
+    expect(state.input.salary).toBe(42000);
+    expect(state.input.taxCode).toBe('1250L');
+    expect(state.input.isMarried).toBe(true);
+  });
+
   it('should calculate tax when calculate is called', () => {
     const { setSalary, calculate } = useCalculatorStore.getState();
 

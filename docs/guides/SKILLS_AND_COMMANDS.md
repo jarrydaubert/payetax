@@ -1,6 +1,6 @@
 # Skills & Commands System
 
-A practical guide to using the PayeTax commands and skills stored in `.claude/`.
+A practical guide to using the PayeTax commands and skills stored in `.claude/`. ie ./.claude/skills/copywriting/SKILL.md (note the hidden .claude directory, not claude)
 
 ## Overview
 

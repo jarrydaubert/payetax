@@ -154,6 +154,19 @@ describe('IncomeSourceList Component', () => {
       expect(screen.getByText('2')).toBeInTheDocument();
     });
 
+    it('should show accuracy warning when income sources exist', async () => {
+      const user = userEvent.setup();
+      render(<IncomeSourceList />);
+
+      const trigger = screen.getByText('Additional Income Sources');
+      await user.click(trigger);
+
+      expect(screen.getByText('Additional income accuracy')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Multiple income sources can affect personal allowance/i),
+      ).toBeInTheDocument();
+    });
+
     it('should display all income sources when expanded', async () => {
       const user = userEvent.setup();
       render(<IncomeSourceList />);
