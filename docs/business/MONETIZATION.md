@@ -8,7 +8,11 @@ We don't capitalize on stress and confusion. The core calculator stays free. We 
 
 ## The Model
 
-Free calculator → Tax Pack (one-time) → Referrals → Optional widget (if demand).
+High‑intent traffic → calculator → paid outcome.
+
+1) **SEO → Calculator → Tax Pack**  
+2) **SEO → Calculator → Accountant referral**  
+3) **Lifecycle loops (email + content)** to keep users warm
 
 ---
 
@@ -56,3 +60,12 @@ Infrastructure:
 ## Widget (If Demand)
 
 A white‑label embed for accountants or platforms. Validate before building.
+
+---
+
+## Priorities
+
+- Nail conversion before scaling content.  
+- Tax Pack first; referrals second if partner quality isn’t proven.  
+- Build repeatable hooks (salary pages, tax‑trap, director scenarios) that feed the calculator.  
+- Keep blog output anchored to calculator CTAs.  

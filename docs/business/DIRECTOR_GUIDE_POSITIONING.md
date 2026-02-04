@@ -2,7 +2,7 @@
 
 > **Route:** `/tools/director-guide`
 > **Technical spec:** See `DIRECTOR_CALCULATOR_BUILD.md`
-> **Tax reference:** See `DIRECTOR_TAX_MATH.md`
+> **Tax logic:** `src/constants/taxRates.ts` and `src/lib/tax/`
 
 ---
 
@@ -22,6 +22,12 @@ The same calculator serves both:
 No wizard, no gates - everything visible at once. Pros work fast, beginners learn as they go.
 
 ---
+
+## Role in the Revenue Funnel
+
+- The calculator is the conversion engine; blog and SEO feed it.  
+- The Tax Pack is the primary paid outcome.  
+- Referrals are secondary and depend on partner quality.  
 
 ## The Real Problem
 
