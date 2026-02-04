@@ -16,6 +16,25 @@ High‑intent traffic → calculator → paid outcome.
 
 ---
 
+## Revenue Model (Evergreen)
+
+Define the funnel with variables and tune the leverage points:
+
+- **Traffic:** `sessions`
+- **Calculator engagement:** `start_rate`, `complete_rate`
+- **Tax Pack conversion:** `tax_pack_take_rate`, `tax_pack_price`
+- **Referral conversion:** `referral_intent_rate`, `referral_close_rate`, `referral_fee`
+- **Revenue:**
+  - `tax_pack_revenue = sessions × start_rate × complete_rate × tax_pack_take_rate × tax_pack_price`
+  - `referral_revenue = sessions × start_rate × complete_rate × referral_intent_rate × referral_close_rate × referral_fee`
+
+Primary levers:
+- Improve calculator completion and trust signals (biggest multiplier).
+- Make CTAs explicit and scenario‑specific (largest lift per change).
+- Keep blog output anchored to calculator conversion, not vanity traffic.
+
+---
+
 ## Free Calculator (Always Free)
 
 Includes:
