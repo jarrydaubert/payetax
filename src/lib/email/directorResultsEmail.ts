@@ -110,7 +110,7 @@ ${'='.repeat(50)}
 
 EXECUTIVE SUMMARY
 -----------------
-Recommended Strategy: ${strategy.name}
+Scenario Summary: ${strategy.name}
 Monthly Take-Home: ${formatCurrency(strategy.takeHome / 12)}
 Annual Take-Home: ${formatCurrency(strategy.takeHome)}
 Total Company Cost: ${formatCurrency(strategy.companyCost)}
@@ -121,7 +121,7 @@ COMPANY OVERVIEW
 ---------------
 Gross Profit Available: ${formatCurrency(grossProfit)}
 
-RECOMMENDED BREAKDOWN
+COMPARISON BREAKDOWN
 --------------------
 Salary: ${formatCurrency(strategy.salary)}
 Dividends: ${formatCurrency(strategy.dividends)}
@@ -138,7 +138,10 @@ Employer NI: ${formatCurrency(strategy.employerNI)}
 
 DISCLAIMERS
 ----------
-This is an estimate using official HMRC rates. For professional advice, consult a qualified accountant.
+For illustrative purposes only.
+Not financial or tax advice.
+Consult a qualified accountant for advice specific to your situation.
+Based on HMRC rates for ${year} which may change.
 
 Recalculate: https://payetax.co.uk/tools/director-guide
 `.trim();
@@ -156,7 +159,7 @@ export function generateDirectorEmailHtml(args: {
 
   const strategy = strategies[recommended];
   const safeStrategyName = escapeHtml(strategy.name);
-  const safeTaxYear = taxYear ? escapeHtml(taxYear) : '';
+  const safeTaxYear = escapeHtml(taxYear || '2025-26');
   const safeGeneratedDate =
     generatedDate ??
     new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -185,7 +188,7 @@ export function generateDirectorEmailHtml(args: {
 
     <!-- Executive Summary -->
     <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
-      <h2 style="margin: 0 0 8px; font-size: 20px; color: #020617;">Recommended Strategy</h2>
+      <h2 style="margin: 0 0 8px; font-size: 20px; color: #020617;">Scenario Summary</h2>
       <p style="margin: 0 0 24px; font-size: 28px; font-weight: 700; color: #10b981;">${safeStrategyName}</p>
 
       <div style="display: flex; gap: 16px; flex-wrap: wrap;">
@@ -346,8 +349,9 @@ export function generateDirectorEmailHtml(args: {
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
       <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-        This calculation uses official HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}. Calculations are estimates only.
-        <br><strong>For professional tax advice, please consult a qualified accountant.</strong>
+        For illustrative purposes only. Not financial or tax advice.
+        <br><strong>Consult a qualified accountant for advice specific to your situation.</strong>
+        <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
       </p>
       <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
         <a href="https://payetax.co.uk" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
@@ -360,4 +364,3 @@ export function generateDirectorEmailHtml(args: {
 </html>
 `.trim();
 }
-

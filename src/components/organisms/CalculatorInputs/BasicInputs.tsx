@@ -138,7 +138,10 @@ export function BasicInputs() {
     if (!isUndergraduatePlan(value)) return;
 
     // Undergraduate loan - check if we need to add postgrad
-    const newPlans = hasPostgraduateAddOn ? [value, 'postgrad'] : [value];
+    const undergraduatePlan = value as Exclude<StudentLoanPlan, 'postgrad'>;
+    const newPlans: StudentLoanPlan[] = hasPostgraduateAddOn
+      ? [undergraduatePlan, 'postgrad']
+      : [undergraduatePlan];
     setStudentLoanPlans(newPlans);
   };
 

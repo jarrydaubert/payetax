@@ -2,7 +2,7 @@
 /**
  * Survival Mode Panel
  *
- * Spec: profit <= 0 -> show a distinct state with a simple NI-credits recommendation.
+ * Spec: profit <= 0 -> show a distinct state with an NI-credits threshold example.
  * Avoid rendering the normal strategy comparison UI, which becomes misleading with no profit.
  */
 'use client';
@@ -28,17 +28,17 @@ export function SurvivalModePanel({ className }: { className?: string }) {
 
   if (!comparison || comparison.grossProfit > 0) return null;
 
-  const recommendedSalary = rates.nationalInsurance.lowerEarningsLimit; // ~£6,500 in 2025-26
+  const niCreditsSalary = rates.nationalInsurance.lowerEarningsLimit; // ~£6,500 in 2025-26
   const employerThreshold = rates.nationalInsurance.employer.A.secondary.threshold;
   const employerRate = rates.nationalInsurance.employer.A.secondary.rate / 100;
-  const employerNI = Math.max(0, (recommendedSalary - employerThreshold) * employerRate);
+  const employerNI = Math.max(0, (niCreditsSalary - employerThreshold) * employerRate);
 
   const pensionForProfit = formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution;
   const profitBeforeSalary =
     (formData.revenue ?? 0) - (formData.expenses ?? 0) - (pensionForProfit ?? 0);
 
   // Profit <= 0 means no distributable profit; paying salary can deepen the loss.
-  const companyLossIfPaySalary = Math.max(0, -(profitBeforeSalary - recommendedSalary - employerNI));
+  const companyLossIfPaySalary = Math.max(0, -(profitBeforeSalary - niCreditsSalary - employerNI));
 
   const noteIfOtherPAYE = formData.hasOtherPAYEEmployment
     ? 'If you have another PAYE job, NI may apply differently than shown here.'
@@ -65,11 +65,12 @@ export function SurvivalModePanel({ className }: { className?: string }) {
       </div>
 
       <div className='rounded-xl border border-white/[0.06] bg-[#0b1220]/40 p-4'>
-        <div className='mb-2 font-medium text-slate-100'>Recommended (for NI credits)</div>
+        <div className='mb-2 font-medium text-slate-100'>NI credits threshold (illustrative)</div>
         <div className='text-slate-400 text-sm'>
-          Pay yourself around <span className='font-semibold text-slate-200'>{formatGBP(recommendedSalary)}</span>{' '}
-          salary to preserve your National Insurance credit for the State Pension qualifying year
-          (even if it creates a company loss).
+          NI credits typically require earnings around{' '}
+          <span className='font-semibold text-slate-200'>{formatGBP(niCreditsSalary)}</span>. This
+          example shows the trade-off if you pay a salary to keep a qualifying year (even if it
+          creates a company loss).
         </div>
 
         <div className='mt-4 grid gap-3 md:grid-cols-3'>
@@ -82,7 +83,7 @@ export function SurvivalModePanel({ className }: { className?: string }) {
           <div className='rounded-lg border border-white/[0.06] bg-slate-950/40 p-3'>
             <div className='text-slate-500 text-xs'>Take-home (approx)</div>
             <div className='font-mono font-semibold text-emerald-300'>
-              {formatGBP(recommendedSalary)}
+              {formatGBP(niCreditsSalary)}
             </div>
           </div>
           <div className='rounded-lg border border-white/[0.06] bg-slate-950/40 p-3'>
@@ -101,4 +102,3 @@ export function SurvivalModePanel({ className }: { className?: string }) {
     </section>
   );
 }
-

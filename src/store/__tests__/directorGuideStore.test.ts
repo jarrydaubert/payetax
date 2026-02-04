@@ -42,7 +42,7 @@ jest.mock('@/lib/tax/strategyComparison', () => ({
         effectiveRate: 31,
       },
       optimalMix: {
-        name: 'Optimal Mix',
+        name: 'Baseline Mix',
         salary: 12570,
         dividends: 50000,
         takeHome: 60000,

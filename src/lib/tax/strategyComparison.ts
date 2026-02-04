@@ -3,7 +3,7 @@
  *
  * Compares three extraction strategies for company directors:
  * 1. All Salary - Take entire profit as salary
- * 2. Optimal Mix - Dynamic salary (£6,500 or £12,570) + dividends (tax efficient)
+ * 2. Baseline Mix - Dynamic salary (£6,500 or £12,570) + dividends (tax efficient)
  * 3. All Dividends - £0 salary, all dividends
  *
  * @module lib/tax/strategyComparison
@@ -507,7 +507,7 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
   const { grossProfit, taxYear, pension, companyCarBIK, minimumSalary = 0 } = opts;
 
   if (grossProfit <= 0) {
-    return createEmptyResult('Optimal Mix');
+    return createEmptyResult('Baseline Mix');
   }
 
   // Spec: test salary/dividend combinations across the valid range.
@@ -582,7 +582,7 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
   const companyCost = salary + employerNI + corporationTax;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
-  const name = 'Optimal Mix'; // FCA compliant - avoid advisory language like "Recommended"
+  const name = 'Baseline Mix'; // Avoid advisory language like "Recommended"
 
   return {
     name,
@@ -616,7 +616,7 @@ function scenarioToStrategyResult(
     grossProfit > 0 ? ((grossProfit - scenario.takeHome) / grossProfit) * 100 : 0;
 
   return {
-    name: 'Optimal Mix',
+    name: 'Baseline Mix',
     salary: round(scenario.salary),
     dividends: round(scenario.dividends),
     pension: round(pension),

@@ -243,9 +243,15 @@ export function CalculatorContainer() {
           UK Tax Calculator
         </h2>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-          Calculate your take-home pay with official HMRC rates. Fast, accurate, and completely
-          free.
+          Estimate your take-home pay with official HMRC rates. Fast and free.
         </p>
+        <div className='mx-auto mt-4 max-w-2xl rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-left text-amber-200 text-xs'>
+          <p>
+            <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
+            advice. Consult a qualified accountant for advice specific to your situation. Based on
+            HMRC rates for {input.taxYear} which may change.
+          </p>
+        </div>
       </div>
 
       {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}

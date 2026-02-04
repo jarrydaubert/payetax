@@ -200,7 +200,7 @@ describe('Dividend Tax Calculator', () => {
     });
 
     describe('Director scenario (golden examples)', () => {
-      it('should calculate correctly for typical Optimal Mix (£12,570 salary + dividends)', () => {
+      it('should calculate correctly for typical Baseline Mix (£12,570 salary + dividends)', () => {
         // Director with £12,570 salary and £52,000 dividends
         // PA fully used by salary, so only dividend allowance applies
         const result = calculateDividendTax(52000, 12570);

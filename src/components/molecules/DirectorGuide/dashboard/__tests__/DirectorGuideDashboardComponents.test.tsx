@@ -44,7 +44,7 @@ function createComparison(overrides: Record<string, unknown> = {}) {
     availableForExtraction: 80000,
     strategies: {
       allSalary: createStrategy('All Salary', { takeHome: 32000 }),
-      optimalMix: createStrategy('Optimal Mix', { salary: 12570, takeHome: 36000 }),
+      optimalMix: createStrategy('Baseline Mix', { salary: 12570, takeHome: 36000 }),
       allDividends: createStrategy('All Dividends', { salary: 0, takeHome: 30000 }),
     },
     recommended: 'optimalMix' as const,

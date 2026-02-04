@@ -27,15 +27,15 @@ export default function ServerHero({ className }: ServerHeroProps) {
 
       {/* Heading */}
       <h1 className='mx-auto mb-6 max-w-[900px] font-bold font-display text-[clamp(3rem,10vw,5.5rem)] text-text-primary-new leading-[1.05] tracking-[-0.04em]'>
-        See exactly what
+        See what
         <br />
         <span className='text-gradient-new'>you&apos;ll take home</span>
       </h1>
 
       {/* Tagline */}
       <p className='mx-auto mb-10 max-w-[580px] text-lg text-text-secondary-new leading-[1.8]'>
-        Free UK tax calculator with official HMRC rates. Know your exact take-home in 3 seconds.
-        Perfect for job offers, raise negotiations, or budget planning.
+        Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
+        on HMRC rates; results can vary with payslip timing and deductions.
       </p>
 
       {/* CTA Buttons */}
@@ -60,7 +60,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <div className='flex max-w-[900px] flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
-          { icon: CheckCircle, text: 'Matches your payslip' },
+          { icon: CheckCircle, text: 'HMRC rate-based estimates' },
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
@@ -74,10 +74,10 @@ export default function ServerHero({ className }: ServerHeroProps) {
       {/* Bento Grid */}
       <div className='bento-grid'>
         {[
-          { icon: '✅', title: 'HMRC Accurate', desc: 'Matches HMRC to the penny' },
-          { icon: '⚡', title: 'Instant Results', desc: 'Get your answer in 3 seconds' },
+          { icon: '✅', title: 'HMRC-Based', desc: 'Estimates built from HMRC rates' },
+          { icon: '⚡', title: 'Fast Results', desc: 'Get results in seconds' },
           { icon: '🔒', title: 'Private', desc: 'We never see your salary' },
-          { icon: '🇬🇧', title: 'UK Coverage', desc: 'Accurate for London or Edinburgh' },
+          { icon: '🇬🇧', title: 'UK Coverage', desc: 'Built for England, Wales, NI, and Scotland' },
         ].map((item) => (
           <div key={item.title} className='bento-item'>
             <div className='bento-icon'>{item.icon}</div>

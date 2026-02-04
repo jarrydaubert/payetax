@@ -219,11 +219,11 @@ export function DirectorDashboard() {
                     <Calculator className='size-10 text-cyan-500' />
                   </div>
                   <h2 className='mb-2 font-semibold text-lg text-slate-100'>
-                    Find your optimal salary & dividend mix
+                    Compare salary and dividend scenarios
                   </h2>
                   <p className='mb-6 text-slate-500'>
-                    Enter your company profit on the left to see exactly how much you could take
-                    home. We&apos;ll show you the tax-efficient split and when to pay yourself.
+                    Enter your company profit on the left to see estimated take-home and tax impact
+                    across common mixes.
                   </p>
                   <div
                     className={cn(

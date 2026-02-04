@@ -39,7 +39,7 @@ const features: Feature[] = [
   },
   {
     icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-    title: 'Accurate for Scottish Residents',
+    title: 'Scottish Rates Supported',
     description:
       'Scottish residents pay different income tax rates set by the Scottish Parliament. Select your region for the right numbers.',
   },
@@ -53,13 +53,13 @@ const features: Feature[] = [
     icon: '🎓',
     title: 'Student Loans',
     description:
-      'All plan types supported — Plan 1, 2, 4, 5, and Postgraduate. See exactly how much comes out each month.',
+      'All plan types supported — Plan 1, 2, 4, 5, and Postgraduate. See how much comes out each month.',
   },
   {
     icon: '💰',
     title: 'Pension Relief',
     description:
-      'See how £1,000 in pension contributions can save you up to £400 in tax. Supports salary sacrifice schemes.',
+      'See the estimated difference between £0 and £1,000 pension contributions (up to ~£400 at basic rate; varies by circumstances). Supports salary sacrifice schemes.',
   },
   {
     icon: '📊',
@@ -96,7 +96,7 @@ export const faqs: FAQ[] = [
   {
     question: 'How accurate is this compared to my payslip?',
     answer:
-      "PayeTax uses official HMRC tax tables — the same rates your employer's payroll system uses. Any small differences are usually from how tax builds up month-to-month, benefits in kind, or employer-specific deductions.",
+      "PayeTax uses official HMRC tax tables — the same rates your employer's payroll system uses. Differences can come from pay period timing, benefits in kind, or employer-specific deductions.",
   },
   {
     question: 'Does PayeTax support Scottish tax rates?',
@@ -201,7 +201,7 @@ export function FinalCTASection() {
       <h2>
         Stop guessing your take-home. <span className='text-gradient-new'>See it now.</span>
       </h2>
-      <p>Free, instant, and accurate — no signup required.</p>
+      <p>Free and fast — no signup required.</p>
       <Link
         href='#tax-calculator'
         className='group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient-new px-8 py-4 font-semibold text-base text-deep transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'

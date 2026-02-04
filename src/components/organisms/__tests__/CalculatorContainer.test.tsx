@@ -170,7 +170,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByText(/Calculate your take-home pay with official HMRC rates/i),
+        screen.getByText(/Estimate your take-home pay with official HMRC rates/i),
       ).toBeInTheDocument();
     });
 

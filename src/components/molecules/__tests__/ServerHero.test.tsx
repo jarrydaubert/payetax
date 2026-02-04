@@ -12,7 +12,7 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('See exactly what')).toBeInTheDocument();
+    expect(screen.getByText('See what')).toBeInTheDocument();
     expect(screen.getByText("you'll take home")).toBeInTheDocument();
   });
 
@@ -50,7 +50,7 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(screen.getByText('Official HMRC rates')).toBeInTheDocument();
-    expect(screen.getByText('Matches your payslip')).toBeInTheDocument();
+    expect(screen.getByText('HMRC rate-based estimates')).toBeInTheDocument();
     expect(screen.getByText('Your data stays private')).toBeInTheDocument();
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });
@@ -58,8 +58,8 @@ describe('ServerHero Component', () => {
   it('should render bento grid items', () => {
     render(<ServerHero />);
 
-    expect(screen.getByText('HMRC Accurate')).toBeInTheDocument();
-    expect(screen.getByText('Instant Results')).toBeInTheDocument();
+    expect(screen.getByText('HMRC-Based')).toBeInTheDocument();
+    expect(screen.getByText('Fast Results')).toBeInTheDocument();
     expect(screen.getByText('Private')).toBeInTheDocument();
     expect(screen.getByText('UK Coverage')).toBeInTheDocument();
   });

@@ -6,9 +6,9 @@ import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metada
 export const metadata = generateBaseMetadata({
   title: 'Director Pay Dashboard | Salary & Dividend Calculator 2025-26',
   description:
-    'Free calculator for UK company directors. Find the optimal salary and dividend mix to minimise tax. See exactly how much to pay yourself and set aside for tax.',
+    'Free calculator for UK company directors. Compare salary and dividend scenarios and see estimated tax to set aside.',
   keywords:
-    'director salary calculator, how much can I pay myself, dividend vs salary, limited company tax, director dividends, corporation tax calculator, employer NI, optimal salary',
+    'director salary calculator, salary vs dividends, limited company tax, director dividends, corporation tax calculator, employer NI',
   pathname: '/tools/director-guide',
 });
 
@@ -43,7 +43,7 @@ export default function DirectorGuidePage() {
     '@type': 'SoftwareApplication',
     name: 'Director Salary & Dividend Calculator',
     description:
-      'Calculate the optimal salary and dividend mix for UK company directors. Shows Corporation Tax, Employer NI, and personal tax to set aside.',
+      'Compare salary and dividend scenarios for UK company directors. Shows Corporation Tax, Employer NI, and personal tax to set aside.',
     url: `${SITE_URL}/tools/director-guide`,
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web Browser',
@@ -61,10 +61,10 @@ export default function DirectorGuidePage() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is the optimal salary for a company director in 2025-26?',
+        name: 'How do salary and dividends compare for company directors in 2025-26?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'A common strategy for single-director companies is to pay salary up to the Personal Allowance threshold. This uses your tax-free allowance while qualifying for State Pension credits. The optimal amount depends on your specific circumstances, including Employment Allowance eligibility.',
+          text: 'Salary uses your Personal Allowance and can help build State Pension credits, while dividends are often taxed at different rates. The right mix depends on profits, Employment Allowance eligibility, and your wider income.',
         },
       },
       {
@@ -72,7 +72,7 @@ export default function DirectorGuidePage() {
         name: 'Are dividends better than salary for directors?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dividends are often more tax-efficient than additional salary because they avoid National Insurance. However, you need company profits to pay dividends, and a minimum salary helps build State Pension credits. The best mix depends on your total income and circumstances.',
+          text: 'Dividends can be more tax-efficient than additional salary because they avoid National Insurance. However, dividends must be paid from profits, and salary can help build State Pension credits. The mix depends on your total income and circumstances.',
         },
       },
       {

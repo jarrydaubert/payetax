@@ -81,7 +81,7 @@ export function SalaryComparisonTable() {
             Salary Take-Home Comparison
           </h2>
           <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
-            See exactly how much you&apos;ll take home at different salary levels
+            See how much you&apos;ll take home at different salary levels
           </p>
         </div>
 

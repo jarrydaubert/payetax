@@ -106,7 +106,7 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
               below the UK median salary, but above minimum wage
             </strong>
           )}
-          . The UK median full-time salary is approximately £35,000 (2025 data).
+          . This is around the UK median full-time salary.
         </p>
       </div>
 

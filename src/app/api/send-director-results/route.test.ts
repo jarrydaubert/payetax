@@ -64,7 +64,7 @@ const validPayload = {
     grossProfit: 100000,
     strategies: {
       allSalary: baseStrategy,
-      optimalMix: { ...baseStrategy, name: 'Optimal mix' },
+      optimalMix: { ...baseStrategy, name: 'Baseline Mix' },
       allDividends: { ...baseStrategy, name: 'All dividends' },
     },
     recommended: 'optimalMix',

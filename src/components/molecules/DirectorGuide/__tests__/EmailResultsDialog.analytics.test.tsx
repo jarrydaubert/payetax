@@ -57,7 +57,7 @@ describe('EmailResultsDialog analytics', () => {
           effectiveRate: 0,
         },
         optimalMix: {
-          name: 'Optimal Mix',
+          name: 'Baseline Mix',
           salary: 0,
           dividends: 0,
           pension: 0,

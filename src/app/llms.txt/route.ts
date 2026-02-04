@@ -62,14 +62,14 @@ All calculations are performed entirely in your browser with zero data collectio
 ## Main Pages
 
 - [Calculator](https://payetax.co.uk): Main PAYE tax calculator with real-time calculations for income tax, NI, student loans, pensions, and take-home pay
-- [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides, HMRC updates, and financial advice with ${posts.length} articles across ${categories.length} categories
+- [Blog - TaxInsights](https://payetax.co.uk/blog): UK tax guides and HMRC updates with ${posts.length} articles across ${categories.length} categories
 - [About](https://payetax.co.uk/about): Mission, values, and technology behind PayeTax
 - [Compliance](https://payetax.co.uk/compliance): HMRC compliance, current tax rates, and data sources
 - [Privacy Policy](https://payetax.co.uk/privacy): Privacy policy - client-side calculations, zero data collection
 
 ## Tools
 
-- [Director Guide](https://payetax.co.uk/tools/director-guide): Salary vs dividend optimizer for UK company directors - compares extraction strategies, calculates optimal split
+- [Director Guide](https://payetax.co.uk/tools/director-guide): Salary vs dividend comparison tool for UK company directors - compares extraction scenarios and tax impact
 - [Tax Code Decoder](https://payetax.co.uk/tools/tax-code-decoder): Decode and understand your HMRC tax code - explains what each letter and number means
 - [Scottish Tax Calculator](https://payetax.co.uk/tools/scottish-tax-calculator): Dedicated calculator for Scottish 6-band income tax rates
 - [National Insurance Calculator](https://payetax.co.uk/tools/national-insurance-calculator): Calculate NI contributions for employees, employers, and self-employed

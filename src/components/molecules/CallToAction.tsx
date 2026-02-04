@@ -97,7 +97,7 @@ export default function CallToAction({
       icon: Calculator,
       title: 'Ready to Calculate?',
       description:
-        'Use our free UK tax calculator to see your exact take-home pay after tax, National Insurance, and deductions.',
+        'Use our free UK tax calculator to estimate your take-home pay after tax, National Insurance, and deductions.',
       primaryAction: {
         href: '/' as const,
         text: 'Start Calculating',

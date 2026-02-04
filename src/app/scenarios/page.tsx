@@ -114,7 +114,7 @@ export default function ScenariosPage() {
             Can't Find Your Scenario?
           </h2>
           <p className={cn(TYPOGRAPHY.TEXT_BASE, 'text-muted-foreground', SPACING.MB_6)}>
-            Use our full calculator to enter your exact details and get a personalized breakdown.
+            Use our full calculator to enter your details and get a personalized breakdown.
           </p>
           <Link
             href='/#calculator'

@@ -90,8 +90,10 @@ Student Loan:      -${formatCurrency(results.studentLoan.annually)}  (-${formatC
 Take-Home Pay:      ${formatCurrency(results.netPay.annually)}  (${formatCurrency(results.netPay.monthly)}/mo)
 
 ${'='.repeat(40)}
-This calculation uses official HMRC rates for ${year}.
-For professional tax advice, consult a qualified accountant.
+For illustrative purposes only.
+Not financial or tax advice.
+Consult a qualified accountant for advice specific to your situation.
+Based on HMRC rates for ${year} which may change.
 
 Calculate again: https://payetax.co.uk
 `;
@@ -101,7 +103,7 @@ Calculate again: https://payetax.co.uk
 
 function generateEmailHtml(results: EmailResults, taxYear?: string): string {
   // Escape taxYear for safe HTML interpolation
-  const safeTaxYear = taxYear ? escapeHtml(taxYear) : '';
+  const safeTaxYear = escapeHtml(taxYear || '2025-26');
   const effectiveRate =
     results.grossSalary.annually > 0
       ? (
@@ -204,8 +206,9 @@ function generateEmailHtml(results: EmailResults, taxYear?: string): string {
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
       <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-        This calculation uses official HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}.
-        <br>For professional tax advice, consult a qualified accountant.
+        For illustrative purposes only. Not financial or tax advice.
+        <br>Consult a qualified accountant for advice specific to your situation.
+        <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
       </p>
       <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
         <a href="https://payetax.co.uk" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>

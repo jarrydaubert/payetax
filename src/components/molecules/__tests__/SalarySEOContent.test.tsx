@@ -272,7 +272,7 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByText(/UK median full-time salary is approximately £35,000/),
+        screen.getByText(/This is around the UK median full-time salary/),
       ).toBeInTheDocument();
     });
   });

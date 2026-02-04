@@ -58,7 +58,7 @@ function createComparison(overrides: Record<string, unknown> = {}) {
     availableForExtraction: 80000,
     strategies: {
       allSalary: createStrategy('All Salary', { takeHome: 32000 }),
-      optimalMix: createStrategy('Optimal Mix', { salary: 7000, takeHome: 36000, totalPersonalTax: 1500 }),
+      optimalMix: createStrategy('Baseline Mix', { salary: 7000, takeHome: 36000, totalPersonalTax: 1500 }),
       allDividends: createStrategy('All Dividends', { salary: 0, takeHome: 30000 }),
     },
     recommended: 'optimalMix' as const,
@@ -113,7 +113,7 @@ describe('Director Guide calculator components', () => {
         strategyComparison: createComparison({
           strategies: {
             allSalary: createStrategy('All Salary'),
-            optimalMix: createStrategy('Optimal Mix', { salary: 7000 }),
+            optimalMix: createStrategy('Baseline Mix', { salary: 7000 }),
             allDividends: createStrategy('All Dividends'),
           },
         }) as never,
@@ -128,7 +128,7 @@ describe('Director Guide calculator components', () => {
         strategyComparison: createComparison({
           strategies: {
             allSalary: createStrategy('All Salary'),
-            optimalMix: createStrategy('Optimal Mix', { salary: 5500 }),
+            optimalMix: createStrategy('Baseline Mix', { salary: 5500 }),
             allDividends: createStrategy('All Dividends'),
           },
         }) as never,
@@ -143,7 +143,7 @@ describe('Director Guide calculator components', () => {
         strategyComparison: createComparison({
           strategies: {
             allSalary: createStrategy('All Salary'),
-            optimalMix: createStrategy('Optimal Mix', { salary: 0 }),
+            optimalMix: createStrategy('Baseline Mix', { salary: 0 }),
             allDividends: createStrategy('All Dividends'),
           },
         }) as never,
@@ -155,7 +155,7 @@ describe('Director Guide calculator components', () => {
   });
 
   describe('SalarySlider', () => {
-    it('initializes slider to optimal salary and updates on change', () => {
+    it('initializes slider to baseline salary and updates on change', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<SalarySlider />);
@@ -168,12 +168,12 @@ describe('Director Guide calculator components', () => {
   });
 
   describe('StrategyComparisonTable', () => {
-    it('renders strategies and optimal message when at optimal', () => {
+    it('renders strategies and baseline message when near baseline', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<StrategyComparisonTable />);
       expect(screen.getByText('Choose Your Strategy')).toBeInTheDocument();
-      expect(screen.getByText(/Optimal tax efficiency/i)).toBeInTheDocument();
+      expect(screen.getByText(/Closest to the baseline mix/i)).toBeInTheDocument();
       expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
     });
 
@@ -181,7 +181,7 @@ describe('Director Guide calculator components', () => {
       const comparison = createComparison({
         strategies: {
           allSalary: createStrategy('All Salary'),
-          optimalMix: createStrategy('Optimal Mix', { totalPersonalTax: 100, employerNI: 100, corporationTax: 100 }),
+          optimalMix: createStrategy('Baseline Mix', { totalPersonalTax: 100, employerNI: 100, corporationTax: 100 }),
           allDividends: createStrategy('All Dividends'),
           yourSetup: {
             ...createStrategy('Your Setup', { salary: 30000, dividends: 40000 }),
@@ -194,7 +194,9 @@ describe('Director Guide calculator components', () => {
       setStoreState({ strategyComparison: comparison as never, sliderSalary: 20000 });
 
       render(<StrategyComparisonTable />);
-      expect(screen.getByText(/more tax/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Pays £1,500 more tax than baseline per year/i),
+      ).toBeInTheDocument();
       expect(screen.getByText('Your Setup')).toBeInTheDocument();
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
     });
@@ -220,7 +222,7 @@ describe('Director Guide calculator components', () => {
       render(<TaxPots />);
       expect(screen.getByText('Company Tax Pot')).toBeInTheDocument();
       expect(screen.getByText('Personal Tax Pot')).toBeInTheDocument();
-      expect(screen.getByText(/Recommended set-aside/i)).toBeInTheDocument();
+      expect(screen.getByText(/Illustrative set-aside/i)).toBeInTheDocument();
     });
 
     it('uses slider scenario values when slider is active', () => {

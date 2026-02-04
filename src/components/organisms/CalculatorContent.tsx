@@ -74,7 +74,7 @@ export function CalculatorContent() {
                 </li>
               </ul>
               <a href='#tax-calculator' className='inline-block text-primary'>
-                Calculate your exact salary →
+                Calculate your salary →
               </a>
             </FAQItem>
 

@@ -88,9 +88,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
   // Learn cards - could be tailored based on user situation
   const learnCards = [
     {
-      title: 'Why £12,570 Salary?',
+      title: 'Why £12,570 matters',
       description:
-        'This is the Personal Allowance - in most cases, earn below this and pay zero income tax and employee NI. You also get NI credits for State Pension.',
+        'The Personal Allowance is £12,570. Earnings up to this are not subject to income tax; NI credits depend on earnings level.',
       show: true,
     },
     {
@@ -228,8 +228,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
           </div>
           <div className='rounded-[10px] border border-amber-500/20 bg-amber-500/5 p-3'>
             <p className='text-amber-200 text-xs leading-relaxed'>
-              <strong>Disclaimer:</strong> Illustrative only. Not financial advice. Always consult a
-              qualified accountant before making decisions.
+              <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
+              advice. Consult a qualified accountant for advice specific to your situation. Based
+              on HMRC rates for {TAX_YEAR} which may change.
             </p>
           </div>
         </div>
@@ -289,7 +290,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'pension-gap',
       title: 'Inefficient Salary Zone',
       description:
-        'Your salary is between £5,000 and £6,396. You are paying 15% Employer NI but NOT earning a State Pension credit. Consider increasing to ~£6,500 for the credit (~£8/month extra cost).',
+        `Your salary is between £${SECONDARY_THRESHOLD.toLocaleString()} and £${LEL.toLocaleString()}. Employer NI applies here, but NI credits are not earned. NI credits typically require earnings around £${LEL.toLocaleString()} (illustrative).`,
       show: hasResults && optimalSalary > SECONDARY_THRESHOLD && optimalSalary < LEL,
       isCritical: true,
     },
@@ -308,7 +309,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'overdrawn',
       title: 'Already Taken Too Much',
       description:
-        'You may have taken more than the recommended extraction this year. Speak to your accountant about options.',
+        'Your drawings may exceed the comparison baseline shown here.',
       // Show overdrawn only if NOT showing S455 (avoid duplication)
       show: isOverdrawn && !hasDrawings,
     },
@@ -343,21 +344,21 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'vat-approaching',
       title: 'VAT Threshold Approaching',
-      description: `Revenue approaching £${VAT_THRESHOLD.toLocaleString()} VAT threshold. Monitor closely and consider voluntary registration.${vatNote}`,
+      description: `Revenue approaching £${VAT_THRESHOLD.toLocaleString()} VAT threshold. Monitor closely; voluntary registration may be possible depending on your circumstances.${vatNote}`,
       show: revenue >= VAT_APPROACHING && revenue < VAT_THRESHOLD,
     },
     {
       id: 'pension-taper',
       title: 'Pension Annual Allowance Taper',
       description:
-        "With adjusted income near or above £240k, your Annual Allowance may be reduced from £60k down to £10k minimum. This is called the 'tapered annual allowance'. Speak to a financial adviser.",
+        "With adjusted income near or above £240k, your Annual Allowance may be reduced from £60k down to £10k minimum. This is called the 'tapered annual allowance'.",
       show: totalIncome >= PENSION_TAPER_THRESHOLD,
     },
     {
       id: 'pension-limit',
       title: 'Pension Annual Allowance',
       description:
-        'Contributions over £60k may incur tax charges. Rules are complex (carry forward, taper for high earners, MPAA). Check with a financial adviser.',
+        'Contributions over £60k may incur tax charges. Rules are complex (carry forward, taper for high earners, MPAA).',
       show: formData.pensionContribution > 60000,
     },
 
@@ -373,7 +374,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'payroll',
       title: 'Payroll Administration Required',
       description:
-        'Taking a salary means running payroll and submitting RTI to HMRC each payday. Consider payroll software or ask your accountant to set this up.',
+        'Taking a salary means running payroll and submitting RTI to HMRC each payday. Payroll software or an accountant can handle this.',
       show: hasResults && (comparison?.strategies.optimalMix.salary ?? 0) > 0,
     },
     {
@@ -394,7 +395,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'dla',
       title: "Possible Director's Loan",
       description:
-        "Money taken without payroll may create a Director's Loan balance depending on how it's treated in your accounts. Check with your accountant.",
+        "Money taken without payroll may create a Director's Loan balance depending on how it's treated in your accounts.",
       show: hasDrawings && !isOverdrawn, // Don't show if S455 already showing
     },
     {
@@ -422,14 +423,14 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'dividend-timing',
       title: 'Dividend Timing Matters',
       description:
-        'Dividends are taxed in the tax year they are declared (not paid). Board minutes and dividend vouchers are legally required. Consider timing around 5 April.',
+        'Dividends are taxed in the tax year they are declared (not paid). Board minutes and dividend vouchers are legally required. Timing around 5 April affects the tax year.',
       show: hasDividends,
     },
     {
       id: 'distributable',
       title: 'Verify Distributable Profits',
       description:
-        'Dividends can only be paid from distributable profits (retained earnings). Check your last filed accounts or ask your accountant for current position.',
+        'Dividends can only be paid from distributable profits (retained earnings). Your last filed accounts show retained earnings.',
       show: hasDividends,
     },
   ];

@@ -46,7 +46,7 @@ export async function generateMetadata({
   const navGroup = getNavGroupBySlug(slug);
   if (navGroup) {
     const title = `${navGroup.label} | TaxInsights by PayeTax`;
-    const description = `Expert ${navGroup.label.toLowerCase()} articles from TaxInsights. Clear UK tax advice with no jargon.`;
+    const description = `Expert ${navGroup.label.toLowerCase()} articles from TaxInsights. Clear UK tax guidance with no jargon.`;
     return {
       title,
       description,

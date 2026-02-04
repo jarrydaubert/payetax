@@ -37,7 +37,7 @@ export function TaxBreakdownTable() {
       <CardHeader>
         <CardTitle>Detailed Tax Breakdown</CardTitle>
         <CardDescription>
-          See exactly what you pay on each side (personal vs company)
+          See what you pay on each side (personal vs company)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -47,7 +47,7 @@ export function TaxBreakdownTable() {
               <TableRow>
                 <TableHead>Tax Type</TableHead>
                 <TableHead className='text-right'>All Salary</TableHead>
-                <TableHead className='text-right'>Optimal Mix</TableHead>
+              <TableHead className='text-right'>Baseline Mix</TableHead>
                 <TableHead className='text-right'>All Dividends</TableHead>
               </TableRow>
             </TableHeader>

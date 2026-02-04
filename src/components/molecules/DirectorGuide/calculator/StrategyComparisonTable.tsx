@@ -2,9 +2,9 @@
 /**
  * Strategy Comparison Cards - 3 selectable strategy cards
  *
- * All Salary | Optimal Mix (Recommended) | All Dividends
+ * All Salary | Baseline Mix (Comparison) | All Dividends
  * Selected card has cyan glow. Clicking a card updates the slider.
- * Dynamic message shows savings (green) or cost (red) vs optimal.
+ * Dynamic message shows savings (green) or cost (red) vs baseline.
  */
 'use client';
 
@@ -56,7 +56,7 @@ export function StrategyComparisonTable() {
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
-  // Calculate tax difference vs optimal
+  // Calculate tax difference vs baseline (optimal mix for these inputs)
   const optimalStrategy = comparison.strategies.optimalMix;
   const optimalTotalTax =
     optimalStrategy.totalPersonalTax + optimalStrategy.corporationTax + optimalStrategy.employerNI;
@@ -73,8 +73,8 @@ export function StrategyComparisonTable() {
   const taxDifference = currentTotalTax - optimalTotalTax;
   const taxPercentageMore = optimalTotalTax > 0 ? (taxDifference / optimalTotalTax) * 100 : 0;
 
-  const isAtOptimal = Math.abs(taxDifference) < 10; // Within £10 of optimal
-  const isCosting = taxDifference > 10; // Paying MORE tax than optimal
+  const isNearBaseline = Math.abs(taxDifference) < 10; // Within £10 of baseline
+  const isCosting = taxDifference > 10; // Paying more tax than baseline
 
   const strategies = [
     {
@@ -87,7 +87,7 @@ export function StrategyComparisonTable() {
       key: 'optimalMix' as const,
       data: comparison.strategies.optimalMix,
       icon: Split,
-      description: 'Tax-efficient split',
+      description: 'Comparison mix',
     },
     {
       key: 'allDividends' as const,
@@ -108,10 +108,13 @@ export function StrategyComparisonTable() {
       {/* Header with dynamic message */}
       <div>
         <h3 className='font-semibold text-slate-100'>Choose Your Strategy</h3>
-        {isAtOptimal && (
+        {isNearBaseline && (
           <p className='text-sm'>
-            <span className='font-medium text-emerald-400'>Optimal tax efficiency</span>
-            <span className='text-slate-500'> — this is your best option</span>
+            <span className='font-medium text-emerald-400'>Closest to the baseline mix</span>
+            <span className='text-slate-500'>
+              {' '}
+              — baseline is the lowest-tax mix for these inputs
+            </span>
           </p>
         )}
         {isCosting && (
@@ -121,7 +124,7 @@ export function StrategyComparisonTable() {
             </span>
             <span className='text-slate-500'>
               {' '}
-              than optimal ({formatCurrency(taxDifference)} extra)
+              than the baseline mix ({formatCurrency(taxDifference)} extra)
             </span>
           </p>
         )}
@@ -215,7 +218,7 @@ interface YourSetupCardProps {
 function YourSetupCard({ yourSetup }: YourSetupCardProps) {
   const totalTax = yourSetup.totalPersonalTax + yourSetup.corporationTax + yourSetup.employerNI;
   const delta = yourSetup.deltaVsOptimal;
-  const isOptimal = Math.abs(delta) < 10;
+  const isNearBaseline = Math.abs(delta) < 10;
   const isCosting = delta > 10;
   const isSaving = delta < -10;
 
@@ -271,15 +274,17 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
 
       {/* Delta vs Optimal */}
       <div className='mt-3 rounded-lg bg-black/20 p-2 text-center text-sm'>
-        {isOptimal && <span className='text-emerald-400'>Matches optimal - well done!</span>}
+        {isNearBaseline && (
+          <span className='text-emerald-400'>Within £10 of the baseline mix</span>
+        )}
         {isCosting && (
           <span className='text-red-400'>
-            Costs {formatCurrency(delta)} more than optimal per year
+            Pays {formatCurrency(delta)} more tax than baseline per year
           </span>
         )}
         {isSaving && (
           <span className='text-emerald-400'>
-            Saves {formatCurrency(Math.abs(delta))} vs our recommendation
+            Pays {formatCurrency(Math.abs(delta))} less tax than baseline per year
           </span>
         )}
       </div>

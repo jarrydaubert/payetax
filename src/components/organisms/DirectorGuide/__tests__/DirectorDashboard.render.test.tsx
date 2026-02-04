@@ -63,7 +63,7 @@ function createComparison(grossProfit: number) {
     availableForExtraction: grossProfit,
     strategies: {
       allSalary: { ...emptyStrategy, name: 'All Salary' },
-      optimalMix: { ...emptyStrategy, name: 'Optimal Mix' },
+      optimalMix: { ...emptyStrategy, name: 'Baseline Mix' },
       allDividends: { ...emptyStrategy, name: 'All Dividends' },
     },
     recommended: 'optimalMix' as const,
@@ -109,7 +109,7 @@ describe('DirectorDashboard (normal mode)', () => {
 
   it('shows the empty state when no comparison exists', () => {
     render(<DirectorDashboard />);
-    expect(screen.getByText(/Find your optimal salary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compare salary and dividend scenarios/i)).toBeInTheDocument();
     expect(screen.getByText(/Enter your figures to get started/i)).toBeInTheDocument();
   });
 });

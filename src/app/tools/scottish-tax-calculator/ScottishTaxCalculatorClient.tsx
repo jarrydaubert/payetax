@@ -120,7 +120,7 @@ export function ScottishTaxCalculatorClient() {
           Scottish Tax Calculator 2025-26
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-          Scotland has 6 income tax bands with different rates to the rest of the UK. See exactly
+          Scotland has 6 income tax bands with different rates to the rest of the UK. See how much
           how much tax you&apos;ll pay and compare with English rates.
         </p>
       </div>

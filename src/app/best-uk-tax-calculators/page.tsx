@@ -232,7 +232,7 @@ export default function BestUKTaxCalculatorsPage() {
               Ready to Calculate Your Take-Home Pay?
             </h2>
             <p className={cn('mx-auto max-w-xl text-muted-foreground', SPACING.MB_8)}>
-              Try PayeTax now — it&apos;s free, instant, and respects your privacy. No ads, no
+              Try PayeTax now — it&apos;s free, fast, and respects your privacy. No ads, no
               account required, just accurate UK tax calculations.
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>

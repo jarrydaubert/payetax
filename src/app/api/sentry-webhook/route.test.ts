@@ -48,6 +48,13 @@ async function loadRoute(envOverrides: Record<string, string | undefined> = {}) 
   return module.POST;
 }
 
+function setRateLimitResult(value: boolean) {
+  const mocked = jest.requireMock('@/lib/rateLimit') as {
+    checkRateLimit: jest.MockedFunction<typeof checkRateLimit>;
+  };
+  mocked.checkRateLimit.mockReturnValue(value);
+}
+
 const basePayload = {
   action: 'created',
   data: {
@@ -99,8 +106,8 @@ describe('/api/sentry-webhook POST', () => {
   });
 
   it('returns 429 when rate limited', async () => {
-    mockCheckRateLimit.mockReturnValue(false);
     const POST = await loadRoute({ SENTRY_WEBHOOK_SECRET: 'secret' });
+    setRateLimitResult(false);
     const body = JSON.stringify(basePayload);
     const signature = signBody(body, 'secret');
     const request = buildRequest(body, { 'sentry-hook-signature': signature });

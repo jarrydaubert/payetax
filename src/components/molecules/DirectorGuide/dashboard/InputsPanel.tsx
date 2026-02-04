@@ -417,7 +417,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       {/* Section: Compare My Setup */}
       <Section title='Compare My Setup'>
         <p className='mb-3 text-slate-500 text-xs'>
-          Enter your current salary and dividends to see how it compares to the optimal mix.
+          Enter your current salary and dividends to see how it compares to the baseline mix.
         </p>
         <Field label='Your Current Salary' hint='Annual gross salary' id={ids.yourSalary}>
           <Input

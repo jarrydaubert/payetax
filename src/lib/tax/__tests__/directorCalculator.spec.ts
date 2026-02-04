@@ -613,11 +613,11 @@ describe('Tax Calculations', () => {
       expect(result.strategies.optimalMix.salary).toBeLessThanOrEqual(12570);
     });
 
-    it('should label optimal as "Optimal Mix" (not advisory language)', () => {
+    it('should label optimal as "Baseline Mix" (not advisory language)', () => {
       const input = createInput(100000);
       const result = calculateStrategyComparison(input, TAX_YEAR);
       // Check it's not using "Recommended" or "You should" language
-      expect(result.strategies.optimalMix.name).toBe('Optimal Mix');
+      expect(result.strategies.optimalMix.name).toBe('Baseline Mix');
       expect(result.strategies.optimalMix.name).not.toContain('Recommend');
     });
 
@@ -862,7 +862,7 @@ describe('Outputs', () => {
       expect(result.strategies.allDividends).toBeDefined();
       expect(result.strategies.yourSetup).toBeDefined();
       expect(result.strategies.allSalary.name).toBe('All Salary');
-      expect(result.strategies.optimalMix.name).toBe('Optimal Mix');
+      expect(result.strategies.optimalMix.name).toBe('Baseline Mix');
       expect(result.strategies.allDividends.name).toBe('All Dividends');
       expect(result.strategies.yourSetup?.name).toBe('Your Setup');
     });

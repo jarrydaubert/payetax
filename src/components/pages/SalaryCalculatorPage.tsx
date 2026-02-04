@@ -102,7 +102,7 @@ function generateSalaryFAQs(
   if (salary >= 100000 && salary <= 125140) {
     faqs.push({
       question: `How does the £100k tax trap affect a £${formattedSalary} salary?`,
-      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective marginal tax rate of around 60% between £100,000 and £125,140 for most employees in England, Wales, and Northern Ireland. Consider pension contributions to reduce your adjusted net income below £100,000.`,
+      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective marginal tax rate of around 60% between £100,000 and £125,140 for most employees in England, Wales, and Northern Ireland. The impact depends on your circumstances.`,
     });
   }
 
@@ -230,6 +230,13 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           <p className={cn('text-muted-foreground', SPACING.MB_8)}>
             UK take-home pay calculator for {taxYearDisplay} tax year
           </p>
+          <div className='mb-8 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-amber-200 text-xs'>
+            <p>
+              <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
+              advice. Consult a qualified accountant for advice specific to your situation. Based
+              on HMRC rates for {taxYearDisplay} which may change.
+            </p>
+          </div>
 
           <div className='grid gap-8 lg:grid-cols-[400px_1fr] lg:items-start'>
             {/* Quick Results Card */}
@@ -251,7 +258,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
               Customize Your Calculation
             </h2>
             <p className='text-muted-foreground'>
-              Add student loans, pension contributions, and more for a precise calculation
+              Add student loans, pension contributions, and more for a more detailed estimate
             </p>
           </div>
           <CalculatorContent />

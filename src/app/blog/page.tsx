@@ -55,7 +55,7 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
     description:
       'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights for 2025-26. Clear explanations, no jargon.',
     keywords:
-      'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips, financial advice',
+      'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips',
     alternates: {
       canonical: canonicalUrl,
     },
@@ -194,7 +194,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
           {/* Calculator CTA */}
           <div className='mt-8 text-center'>
-            <p className='mb-4 text-slate-400'>Ready to see your exact take-home pay?</p>
+            <p className='mb-4 text-slate-400'>Ready to estimate your take-home pay?</p>
             <a
               href='/'
               className='inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-slate-900/50 px-6 py-3 font-medium text-cyan-400 transition-all hover:border-cyan-500/50 hover:bg-slate-800/50'

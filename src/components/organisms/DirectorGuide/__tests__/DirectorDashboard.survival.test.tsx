@@ -33,7 +33,7 @@ function createEmptyComparison(grossProfit: number) {
     availableForExtraction: 0,
     strategies: {
       allSalary: { ...emptyStrategy, name: 'All Salary' },
-      optimalMix: { ...emptyStrategy, name: 'Optimal Mix' },
+      optimalMix: { ...emptyStrategy, name: 'Baseline Mix' },
       allDividends: { ...emptyStrategy, name: 'All Dividends' },
     },
     recommended: 'optimalMix' as const,
