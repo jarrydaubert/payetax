@@ -1,6 +1,7 @@
 // src/app/blog/page.tsx
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { BlogNav } from '@/components/molecules/BlogNav';
 import { PullQuote } from '@/components/molecules/PullQuote';
 import { AllPostsGrid } from '@/components/organisms/AllPostsGrid';
@@ -12,6 +13,7 @@ import { StructuredData } from '@/components/organisms/StructuredData';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getCurrentQuote } from '@/constants/pullQuotes';
 import {
+  getBlogCategories,
   getBlogPosts,
   getBlogPostsCount,
   getDeepDives,
@@ -84,11 +86,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
 
   // Fetch all data in parallel for magazine layout
-  const [editorsPicks, deepDives, totalPosts, latestPosts] = await Promise.all([
+  const [editorsPicks, deepDives, totalPosts, latestPosts, categories] = await Promise.all([
     getEditorsPicks(5), // For sidebar
     getDeepDives(6), // For deep dives section
     getBlogPostsCount(), // Total count for pagination
     getLatestPosts(5), // For latest articles section
+    getBlogCategories(),
   ]);
 
   // Get paginated posts for All Posts section
@@ -171,6 +174,25 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               <div className='pt-4'>
                 <BlogNav />
               </div>
+
+              {/* Browse by Category */}
+              <section className='rounded-2xl border border-slate-800 bg-slate-900/40 p-6'>
+                <h2 className='font-semibold text-lg text-white'>Browse by Category</h2>
+                <p className='mt-1 text-slate-400 text-sm'>Jump straight to a topic.</p>
+                <div className='mt-4 flex flex-wrap gap-2'>
+                  {categories
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((category) => (
+                      <Link
+                        key={category.slug}
+                        href={`/blog/category/${category.slug}`}
+                        className='rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-slate-200 text-sm transition hover:border-slate-600 hover:text-white'
+                      >
+                        {category.name}
+                      </Link>
+                    ))}
+                </div>
+              </section>
             </div>
 
             {/* Sidebar - Editor's Picks (mt-12 aligns with Latest Articles content) */}

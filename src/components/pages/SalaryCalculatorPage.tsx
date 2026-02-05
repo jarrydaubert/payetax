@@ -29,6 +29,15 @@ function formatTaxYearDisplay(taxYear: string): string {
   return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
+const MIN_POPULAR_SALARY = 18000;
+const MAX_POPULAR_SALARY = 500000;
+
+function formatDeltaLabel(delta: number): string {
+  const amount = Math.abs(delta) / 1000;
+  const label = Number.isInteger(amount) ? amount.toString() : amount.toFixed(1);
+  return `£${label}k ${delta < 0 ? 'less' : 'more'}`;
+}
+
 // Blog posts that exist for specific salaries
 const SALARY_BLOG_POSTS = new Map<number, { slug: string; title: string }>([
   [
@@ -132,16 +141,21 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
   const taxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR);
 
   // Generate comparison salaries
-  const comparisons = useMemo(
-    () =>
-      [
-        { amount: salary - 10000, label: '£10k less' },
-        { amount: salary - 5000, label: '£5k less' },
-        { amount: salary + 5000, label: '£5k more' },
-        { amount: salary + 10000, label: '£10k more' },
-      ].filter((c) => c.amount >= 20000 && c.amount <= 500000),
-    [salary],
-  );
+  const comparisons = useMemo(() => {
+    const deltas =
+      salary <= 25000 ? [-10000, -5000, -1000, 1000, 5000, 10000] : [-10000, -5000, 5000, 10000];
+    const unique = new Map<number, number>();
+
+    for (const delta of deltas) {
+      const amount = salary + delta;
+      if (amount < MIN_POPULAR_SALARY || amount > MAX_POPULAR_SALARY) continue;
+      unique.set(amount, delta);
+    }
+
+    return Array.from(unique.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([amount, delta]) => ({ amount, label: formatDeltaLabel(delta) }));
+  }, [salary]);
 
   // Generate structured data for SEO (use #tax-calculator to match homepage)
   const breadcrumbItems = [

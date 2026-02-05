@@ -101,7 +101,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
       <Card className={cn(SPACING.MT_4, SPACING.P_4)}>
         <h2 className={cn('flex items-center font-semibold', SPACING.MB_3, SPACING.GAP_2)}>
           <TrendingUp className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-          Compare Similar Salaries
+          Popular Salaries Nearby
         </h2>
         <div className={cn('grid grid-cols-2', SPACING.GAP_2)}>
           {comparisons.map((comp) => (

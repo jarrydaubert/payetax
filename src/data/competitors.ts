@@ -222,7 +222,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'salary-calculator',
     name: 'The Salary Calculator',
     shortName: 'Salary Calc',
-    url: 'https://www.thesalarycalculator.co.uk/',
+    url: 'https://www.thesalarycalculator.co.uk/salary.php',
     description: 'Long-established, feature-rich UK salary calculator with extensive options.',
     strengths: [
       'Comprehensive feature set',
@@ -595,7 +595,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'which-calculator',
     name: 'Which? Tax Calculator',
     shortName: 'Which?',
-    url: 'https://www.which.co.uk/money/tax/income-tax/income-tax-calculator',
+    url: 'https://www.which.co.uk/money/tax/tax-calculators/income-tax-calculator-awJBX1Z23bjI',
     description:
       'Tax calculator from the trusted consumer rights organization Which?, known for impartial advice.',
     strengths: [
@@ -685,7 +685,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'sage-calculator',
     name: 'Sage Payroll Calculator',
     shortName: 'Sage',
-    url: 'https://www.sage.com/en-gb/payroll-calculator/',
+    url: 'https://www.sage.com/en-gb/blog/how-to-calculate-payroll-tax/',
     description:
       'Take-home pay calculator from Sage, a leading accounting and payroll software provider.',
     strengths: [
@@ -728,7 +728,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'xero-calculator',
     name: 'Xero UK Tax Calculator',
     shortName: 'Xero',
-    url: 'https://www.xero.com/uk/tools/payroll-calculator/',
+    url: 'https://www.xero.com/uk/calculators/income-tax-calculator/',
     description:
       'Payroll calculator from Xero, a popular cloud accounting platform for small businesses.',
     strengths: [
@@ -813,7 +813,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'brightpay',
     name: 'BrightPay Tax Calculator',
     shortName: 'BrightPay',
-    url: 'https://www.brightpay.co.uk/resources/free-paye-tax-calculator/',
+    url: 'https://www.brightpay.co.uk/',
     description: 'Free PAYE calculator from BrightPay, a UK payroll software provider.',
     strengths: [
       'Payroll-specific expertise',
@@ -943,7 +943,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'pwc-calculator',
     name: 'PwC Tax Calculator',
     shortName: 'PwC',
-    url: 'https://www.pwc.co.uk/services/tax/insights/income-tax-calculator.html',
+    url: 'https://taxsummaries.pwc.com/united-kingdom/individual/taxes-on-personal-income',
     description:
       'Tax tools from PricewaterhouseCoopers, one of the largest professional services firms.',
     strengths: [
@@ -986,7 +986,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'ey-calculator',
     name: 'EY Tax Calculator',
     shortName: 'EY',
-    url: 'https://www.ey.com/en_uk/tax/tax-calculators',
+    url: 'https://www.ey.com/en_uk/services/tax',
     description: 'Tax calculation resources from Ernst & Young, global professional services firm.',
     strengths: [
       'Big Four credibility',
@@ -1028,7 +1028,7 @@ export const COMPETITORS: Competitor[] = [
     slug: 'rsm-calculator',
     name: 'RSM Tax Calculator',
     shortName: 'RSM',
-    url: 'https://www.rsmuk.com/insights/tax-tools/income-tax-calculator',
+    url: 'https://www.rsmuk.com/what-we-offer/services/tax/tax-facts',
     description: 'Income tax calculator from RSM, a leading mid-tier accounting firm in the UK.',
     strengths: [
       'Professional accuracy',

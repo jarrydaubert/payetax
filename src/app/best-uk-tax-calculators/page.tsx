@@ -84,6 +84,36 @@ export default function BestUKTaxCalculatorsPage() {
           </div>
         </section>
 
+        {/* Direct Comparisons */}
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER}>
+            <SectionHeading
+              title='PayeTax vs Each Calculator'
+              subtitle='Deep-dive comparisons for every alternative'
+              align='center'
+            />
+            <div className={cn('grid gap-3 sm:grid-cols-2 lg:grid-cols-3', SPACING.MT_8)}>
+              {COMPETITORS.map((competitor) => (
+                <Link
+                  key={competitor.slug}
+                  href={`/vs/${competitor.slug}`}
+                  className={cn(
+                    'rounded-xl border border-white/[0.08] bg-[#0b1220]/40 px-4 py-3',
+                    'text-slate-200 text-sm transition hover:border-white/[0.14] hover:bg-[#0f172a]/50',
+                  )}
+                >
+                  PayeTax vs {competitor.name}
+                </Link>
+              ))}
+            </div>
+            <div className={cn('text-center', SPACING.MT_8)}>
+              <Button asChild variant='outline'>
+                <Link href='/alternatives'>Browse all alternatives</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Who Should Use What */}
         <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
           <div className={LAYOUT.CONTAINER}>

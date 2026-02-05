@@ -195,7 +195,7 @@ describe('SalaryQuickResults', () => {
       );
 
       expect(
-        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i }),
+        screen.getByRole('heading', { level: 2, name: /Popular Salaries Nearby/i }),
       ).toBeInTheDocument();
     });
 
@@ -308,7 +308,7 @@ describe('SalaryQuickResults', () => {
       render(<SalaryQuickResults salary={30000} results={mockResults} comparisons={[]} />);
 
       expect(
-        screen.getByRole('heading', { level: 2, name: /Compare Similar Salaries/i }),
+        screen.getByRole('heading', { level: 2, name: /Popular Salaries Nearby/i }),
       ).toBeInTheDocument();
       // Should still render the section but with no links
       const links = screen.queryAllByRole('link');

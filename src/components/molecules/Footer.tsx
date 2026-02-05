@@ -31,6 +31,7 @@ export function Footer({ className }: FooterProps) {
         {/* Links - no `as Route` casts; routes validated by typedRoutes in next.config */}
         <nav className='footer-links-new' aria-label='Footer navigation'>
           <Link href='/blog'>Blog</Link>
+          <Link href='/best-for'>Best For</Link>
           <Link href='/scenarios'>Scenarios</Link>
           <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
           <Link href='/tools/scottish-tax-calculator'>Scottish Tax</Link>
