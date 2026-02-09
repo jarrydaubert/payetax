@@ -135,10 +135,27 @@
     log('[PWA] Install prompt triggered - browser will show native UI');
   });
 
+  function hasActiveAnalyticsConsent() {
+    try {
+      const consent = window.localStorage.getItem('cookie-consent');
+      const timestamp = window.localStorage.getItem('cookie-consent-timestamp');
+      if (consent !== 'accepted' || !timestamp) return false;
+
+      const consentDate = new Date(timestamp);
+      if (Number.isNaN(consentDate.getTime())) return false;
+
+      // Keep in sync with cookieUtils.ts 12-month consent window.
+      const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
+      return Date.now() - consentDate.getTime() <= TWELVE_MONTHS_MS;
+    } catch {
+      return false;
+    }
+  }
+
   window.addEventListener('appinstalled', () => {
     log('[PWA] App was installed');
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'pwa_install', { event_category: 'PWA', event_label: 'App Installed' });
+    if (hasActiveAnalyticsConsent() && typeof window.gtag === 'function') {
+      window.gtag('event', 'pwa_install', { event_category: 'PWA', event_label: 'App Installed' });
     }
   });
 })();

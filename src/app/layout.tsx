@@ -41,6 +41,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+
   return (
     <html
       lang='en-GB'
@@ -78,18 +80,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )}
       >
         <StructuredData type='organization' />
-        {/* Ahrefs Web Analytics - Only loads after user accepts cookies */}
-        <AhrefsAnalytics />
+        {analyticsEnabled ? (
+          /* Ahrefs Web Analytics - Only loads after user accepts cookies */
+          <AhrefsAnalytics />
+        ) : null}
 
         <ThemeProvider>
-          <Suspense fallback={null}>
-            <Analytics />
-          </Suspense>
+          <Suspense fallback={null}>{analyticsEnabled ? <Analytics /> : null}</Suspense>
           <Layout>{children}</Layout>
           <Toaster position='top-right' richColors expand={true} closeButton />
-          {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
-          <VercelAnalytics />
-          <SpeedInsights />
+          {analyticsEnabled ? (
+            <>
+              {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
+              <VercelAnalytics />
+              <SpeedInsights />
+            </>
+          ) : null}
         </ThemeProvider>
 
         {/* Service Worker Registration - afterInteractive for non-blocking load */}

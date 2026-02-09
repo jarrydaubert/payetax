@@ -11,6 +11,7 @@ import type { GtagFunction } from '@/types/gtag';
 
 // GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
+const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
 
 // Track consent status in window object for persistence
 declare global {
@@ -203,8 +204,8 @@ export function Analytics() {
     };
   }, [isLoaded, updateConsent]);
 
-  // Don't render if GA_MEASUREMENT_ID is not configured
-  if (!GA_MEASUREMENT_ID) {
+  // Don't render when analytics are disabled or GA ID is missing.
+  if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID)) {
     return null;
   }
 

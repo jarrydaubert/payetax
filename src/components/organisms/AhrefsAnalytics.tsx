@@ -7,6 +7,7 @@ import { areCookiesAccepted } from '@/lib/cookieUtils';
 
 // Ahrefs Analytics Key - configure NEXT_PUBLIC_AHREFS_KEY in Vercel environment variables
 const AHREFS_KEY = process.env.NEXT_PUBLIC_AHREFS_KEY;
+const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
 
 /**
  * Consent-aware Ahrefs Analytics loader
@@ -48,8 +49,8 @@ export function AhrefsAnalytics() {
     };
   }, []);
 
-  // Don't render if no key configured or no consent
-  if (!(AHREFS_KEY && hasConsent)) {
+  // Don't render if analytics are disabled, no key is configured, or consent is missing.
+  if (!(ANALYTICS_ENABLED && AHREFS_KEY && hasConsent)) {
     return null;
   }
 

@@ -38,6 +38,8 @@ describe('Environment Variable Validation', () => {
     process.env.RESEND_API_KEY = undefined;
     process.env.RESEND_AUDIENCE_ID = undefined;
     process.env.NEXT_PUBLIC_SITE_URL = undefined;
+    process.env.NEXT_PUBLIC_GA_ID = undefined;
+    process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = undefined;
   });
 
   afterEach(() => {
@@ -303,6 +305,8 @@ describe('Environment Variable Validation', () => {
         NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
         RESEND_API_KEY: 're_test123',
         RESEND_AUDIENCE_ID: 'aud_test123',
+        NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
+        NEXT_PUBLIC_GA_ID: 'G-TEST123456',
       });
       expect(result.success).toBe(true);
     });
@@ -314,6 +318,28 @@ describe('Environment Variable Validation', () => {
         RESEND_AUDIENCE_ID: undefined,
       });
       expect(result.success).toBe(false);
+    });
+
+    it('should reject missing GA ID when analytics are enabled', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+        RESEND_API_KEY: 're_test123',
+        RESEND_AUDIENCE_ID: 'aud_test123',
+        NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
+        NEXT_PUBLIC_GA_ID: undefined,
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should allow missing GA ID when analytics are disabled', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+        RESEND_API_KEY: 're_test123',
+        RESEND_AUDIENCE_ID: 'aud_test123',
+        NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
+        NEXT_PUBLIC_GA_ID: undefined,
+      });
+      expect(result.success).toBe(true);
     });
   });
 
@@ -399,12 +425,15 @@ describe('Environment Variable Validation', () => {
       process.env.NEXT_PUBLIC_SITE_URL = 'https://payetax.co.uk';
       process.env.RESEND_API_KEY = 're_test123';
       process.env.RESEND_AUDIENCE_ID = 'aud_test123';
+      process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'true';
+      process.env.NEXT_PUBLIC_GA_ID = 'G-TEST123456';
 
       const env = validateProductionEnv();
 
       expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://payetax.co.uk');
       expect(env.RESEND_API_KEY).toBe('re_test123');
       expect(env.RESEND_AUDIENCE_ID).toBe('aud_test123');
+      expect(env.NEXT_PUBLIC_GA_ID).toBe('G-TEST123456');
     });
 
     it('should throw when required production env vars are missing', () => {
@@ -415,6 +444,16 @@ describe('Environment Variable Validation', () => {
       expect(() => validateProductionEnv()).toThrow(
         'Missing or invalid required production environment variables',
       );
+    });
+
+    it('should allow missing GA ID when analytics are disabled', () => {
+      process.env.NEXT_PUBLIC_SITE_URL = 'https://payetax.co.uk';
+      process.env.RESEND_API_KEY = 're_test123';
+      process.env.RESEND_AUDIENCE_ID = 'aud_test123';
+      process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'false';
+      process.env.NEXT_PUBLIC_GA_ID = undefined;
+
+      expect(() => validateProductionEnv()).not.toThrow();
     });
   });
 
@@ -498,6 +537,14 @@ describe('Environment Variable Validation', () => {
       const enabled = isFeatureEnabled('ANALYTICS');
 
       expect(enabled).toBe(false);
+    });
+
+    it('should default ANALYTICS to enabled when not set', () => {
+      process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = undefined;
+
+      const enabled = isFeatureEnabled('ANALYTICS');
+
+      expect(enabled).toBe(true);
     });
   });
 

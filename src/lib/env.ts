@@ -16,16 +16,17 @@
 
 import { z } from 'zod';
 
+const GA_ID_SCHEMA = z
+  .string()
+  .regex(/^G-[A-Z0-9]{10}$/i, 'Google Analytics ID must be in format G-XXXXXXXXXX');
+
 /**
  * Zod Schema for Public Environment Variables
  * These are exposed to the browser (NEXT_PUBLIC_* prefix)
  */
 export const PublicEnvSchema = z.object({
   // Analytics
-  NEXT_PUBLIC_GA_ID: z
-    .string()
-    .regex(/^G-[A-Z0-9]{10}$/i, 'Google Analytics ID must be in format G-XXXXXXXXXX')
-    .optional(),
+  NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
 
   // Error Monitoring
   NEXT_PUBLIC_SENTRY_DSN: z.string().url('Sentry DSN must be a valid URL').optional(),
@@ -92,11 +93,28 @@ export const EnvSchema = z.object({
   server: ServerEnvSchema,
 });
 
-export const RequiredProductionEnvSchema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
-  RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
-  RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter'),
-});
+export const RequiredProductionEnvSchema = z
+  .object({
+    NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
+    RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
+    RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter'),
+    NEXT_PUBLIC_ENABLE_ANALYTICS: z
+      .string()
+      .transform((val) => val === 'true')
+      .optional(),
+    NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
+  })
+  .superRefine((data, ctx) => {
+    const analyticsEnabled = data.NEXT_PUBLIC_ENABLE_ANALYTICS ?? true;
+    if (analyticsEnabled && !data.NEXT_PUBLIC_GA_ID) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'Google Analytics ID is required in production when analytics are enabled (set NEXT_PUBLIC_ENABLE_ANALYTICS=false to disable analytics).',
+        path: ['NEXT_PUBLIC_GA_ID'],
+      });
+    }
+  });
 
 export type PublicEnv = z.infer<typeof PublicEnvSchema>;
 export type ServerEnv = z.infer<typeof ServerEnvSchema>;
@@ -179,6 +197,8 @@ export function validateProductionEnv(): RequiredProductionEnv {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+    NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   });
 
   if (!result.success) {
@@ -222,7 +242,7 @@ export function isFeatureEnabled(feature: 'PWA' | 'ANALYTICS'): boolean {
     case 'PWA':
       return env.NEXT_PUBLIC_ENABLE_PWA === true;
     case 'ANALYTICS':
-      return env.NEXT_PUBLIC_ENABLE_ANALYTICS === true;
+      return env.NEXT_PUBLIC_ENABLE_ANALYTICS !== false;
     default:
       return false;
   }

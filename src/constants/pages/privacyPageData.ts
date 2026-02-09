@@ -98,7 +98,7 @@ export const PRIVACY_DONT_DO = [
  */
 export const PRIVACY_DO_DO = [
   'Calculate everything in your browser',
-  'Use privacy-focused analytics (Umami)',
+  'Use consent-based analytics (GA4 + Vercel)',
   'Respect Do Not Track settings',
   'Provide complete transparency',
   'Keep the site forever free',
@@ -129,6 +129,6 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
     iconColor: 'bg-primary/60',
     title: 'Analytics (Optional)',
     description:
-      'Privacy-focused Umami analytics tracks anonymous page views only if you consent. No personal data, no cross-site tracking.',
+      'Google Analytics 4 only runs after consent, while Vercel Analytics provides cookieless Web Vitals. No personal data, no cross-site tracking.',
   },
 ];
