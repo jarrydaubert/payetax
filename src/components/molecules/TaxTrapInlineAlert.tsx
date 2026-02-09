@@ -138,7 +138,7 @@ export function TaxTrapInlineAlert({
             onClick={handleApplyPension}
             size='sm'
             className={cn(
-              'w-full whitespace-nowrap bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 sm:w-auto',
+              'w-full whitespace-nowrap border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#d97706,#ea580c)_border-box] text-amber-700 shadow-sm hover:text-amber-800 sm:w-auto dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#d97706,#ea580c)_border-box] dark:text-amber-300 dark:hover:text-amber-200',
               SPACING.GAP_2,
             )}
           >

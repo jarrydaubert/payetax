@@ -262,7 +262,7 @@ describe('TaxTrapInlineAlert', () => {
       expect(alert).toHaveClass('border-2');
     });
 
-    it('should have gradient styling on pension button', () => {
+    it('should have gradient-border styling on pension button', () => {
       const mockCallback = jest.fn();
       render(
         <TaxTrapInlineAlert
@@ -273,8 +273,10 @@ describe('TaxTrapInlineAlert', () => {
       );
 
       const button = screen.getByRole('button', { name: /Add.*to Pension/i });
-      expect(button).toHaveClass('from-amber-600');
-      expect(button).toHaveClass('to-orange-600');
+      expect(button).toHaveClass('border-transparent');
+      expect(button).toHaveClass(
+        'bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#d97706,#ea580c)_border-box]',
+      );
     });
   });
 

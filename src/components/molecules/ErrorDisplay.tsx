@@ -2,6 +2,7 @@
 
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface ErrorDisplayProps {
   title?: string;
@@ -43,14 +44,16 @@ export function ErrorDisplay({
 
         {/* Actions */}
         <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center'>
-          <button
+          <Button
             type='button'
             onClick={() => reset()}
-            className='inline-flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-white transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+            size='touch'
+            variant='brandOutline'
+            className='rounded-full px-6'
           >
             <RotateCcw className='size-4' />
             Try again
-          </button>
+          </Button>
 
           {secondaryAction ? (
             <a

@@ -218,12 +218,14 @@ describe('WhatIfInputs', () => {
       expect(container).toHaveClass('from-purple-500/5');
     });
 
-    it('should apply gradient styling to Compare button', () => {
+    it('should apply gradient-border styling to Compare button', () => {
       render(<WhatIfInputs />);
 
       const button = screen.getByTestId('what-if-trigger');
-      expect(button).toHaveClass('from-purple-500');
-      expect(button).toHaveClass('to-pink-500');
+      expect(button).toHaveClass('border-transparent');
+      expect(button).toHaveClass(
+        'bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box]',
+      );
     });
   });
 

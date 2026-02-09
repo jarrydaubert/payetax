@@ -194,7 +194,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
         <Button
           onClick={handleCompare}
           size='lg'
-          className='flex-1 justify-center border-purple-500 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/50 hover:from-purple-600 hover:to-pink-600 dark:border-purple-400 dark:shadow-purple-400/50'
+          className='flex-1 justify-center border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300 dark:shadow-purple-400/20 dark:hover:shadow-purple-400/30'
           data-testid='what-if-trigger'
         >
           <Wand2 className={cn('mr-2', ICON_SIZES.SIZE_5)} />

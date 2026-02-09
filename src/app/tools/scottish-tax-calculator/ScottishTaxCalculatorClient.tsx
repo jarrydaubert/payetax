@@ -374,7 +374,7 @@ export function ScottishTaxCalculatorClient() {
           Get a full breakdown with NI, pension, and student loan calculations.
         </p>
         <Link href='/?scottish=true'>
-          <Button size='lg' className='bg-brand-gradient-new text-deep'>
+          <Button size='lg' variant='brandOutline'>
             Open Full Scottish Calculator
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

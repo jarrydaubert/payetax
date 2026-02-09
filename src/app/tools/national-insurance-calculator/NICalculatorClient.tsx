@@ -438,7 +438,7 @@ export function NICalculatorClient() {
           See your full take-home pay with tax, NI, pension, and student loans.
         </p>
         <Link href='/'>
-          <Button size='lg' className='bg-brand-gradient-new text-deep'>
+          <Button size='lg' variant='brandOutline'>
             Open Full Tax Calculator
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

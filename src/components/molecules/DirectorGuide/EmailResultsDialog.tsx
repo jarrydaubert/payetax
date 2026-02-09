@@ -185,11 +185,7 @@ export function EmailResultsDialog({
             >
               Cancel
             </Button>
-            <Button
-              type='submit'
-              disabled={isLoading || !email.trim()}
-              className='bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 hover:opacity-90'
-            >
+            <Button type='submit' variant='brandOutline' disabled={isLoading || !email.trim()}>
               {isLoading ? 'Sending...' : 'Send Results'}
             </Button>
           </div>

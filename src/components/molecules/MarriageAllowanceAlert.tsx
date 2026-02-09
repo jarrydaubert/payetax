@@ -124,7 +124,7 @@ export function MarriageAllowanceAlert({
           asChild
           size='sm'
           className={cn(
-            'w-full whitespace-nowrap bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 sm:w-auto',
+            'w-full whitespace-nowrap border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#db2777,#7e22ce)_border-box] text-pink-700 shadow-sm hover:text-pink-800 sm:w-auto dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#db2777,#7e22ce)_border-box] dark:text-pink-300 dark:hover:text-pink-200',
             SPACING.GAP_2,
           )}
         >

@@ -362,7 +362,8 @@ export function DirectorDashboard() {
                     </div>
                     <Button
                       onClick={() => setEmailDialogOpen(true)}
-                      className='flex shrink-0 items-center gap-2 bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-3 font-semibold text-[#020617] hover:opacity-90'
+                      variant='brandOutline'
+                      className='flex shrink-0 items-center gap-2 px-6 py-3 font-semibold'
                     >
                       <Mail className='size-4' aria-hidden='true' />
                       Email My Results

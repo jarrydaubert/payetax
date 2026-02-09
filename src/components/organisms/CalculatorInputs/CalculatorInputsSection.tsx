@@ -112,7 +112,7 @@ export function CalculatorInputsSection({
             <Button
               variant='outline'
               size='lg'
-              className='w-full border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-700 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10 dark:text-purple-400 dark:hover:from-purple-400/20 dark:hover:to-pink-400/20 dark:hover:text-purple-300'
+              className='w-full border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 hover:text-purple-800 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300 dark:hover:text-purple-200'
               data-testid='what-if-trigger'
             >
               <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>

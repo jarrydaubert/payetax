@@ -98,12 +98,7 @@ export default function PWAInstallBanner() {
           <Button type='button' variant='outline' size='sm' onClick={dismissBanner}>
             Not now
           </Button>
-          <Button
-            type='button'
-            size='sm'
-            onClick={handleInstallClick}
-            className='bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
-          >
+          <Button type='button' size='sm' onClick={handleInstallClick} variant='brandOutline'>
             Install app
           </Button>
         </CardFooter>

@@ -121,8 +121,9 @@ const CookieBanner: React.FC = () => {
           </Button>
           <Button
             onClick={acceptCookies}
+            variant='brandOutline'
             size='touch'
-            className='min-w-[140px] bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end hover:from-brand-gradient-start/90 hover:to-brand-gradient-end/90'
+            className='min-w-[140px]'
             data-testid='cookie-accept-analytics'
           >
             Accept Analytics

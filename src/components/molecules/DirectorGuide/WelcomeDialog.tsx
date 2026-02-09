@@ -86,11 +86,7 @@ export function DirectorGuideWelcomeDialog() {
         </div>
 
         <DialogFooter className='mt-6'>
-          <Button
-            type='button'
-            onClick={() => handleOpenChange(false)}
-            className='bg-gradient-to-r from-cyan-500 to-emerald-500 text-primary-foreground hover:opacity-90'
-          >
+          <Button type='button' onClick={() => handleOpenChange(false)} variant='brandOutline'>
             Got it, let&apos;s start
           </Button>
         </DialogFooter>

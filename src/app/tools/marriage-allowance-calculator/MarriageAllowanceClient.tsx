@@ -366,7 +366,7 @@ export function MarriageAllowanceClient() {
           See your full household tax breakdown with Marriage Allowance applied.
         </p>
         <Link href='/?marriageAllowance=receiving'>
-          <Button size='lg' className='bg-brand-gradient-new text-deep'>
+          <Button size='lg' variant='brandOutline'>
             Calculate with Marriage Allowance
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

@@ -245,10 +245,10 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={handleToggleMobileInputs}
-          className='fixed right-6 bottom-6 z-40 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 p-4 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          className='fixed right-6 bottom-6 z-40 rounded-full border border-transparent bg-[linear-gradient(rgba(2,6,23,0.95),rgba(2,6,23,0.95))_padding-box,linear-gradient(90deg,#06b6d4,#10b981)_border-box] p-4 shadow-lg transition-transform hover:scale-105 lg:hidden'
           aria-label='Open calculator inputs'
         >
-          <Calculator className='size-6 text-slate-950' />
+          <Calculator className='size-6 text-slate-200' />
         </button>
       )}
 

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { Button } from '@/components/ui/button';
 import { generateMetadata, SITE_URL } from '@/lib/metadata';
 
 export const metadata = generateMetadata({
@@ -72,12 +73,9 @@ export default function InstallPage() {
         </div>
 
         <div className='mt-12 flex flex-col items-center gap-3 text-center'>
-          <Link
-            href='/'
-            className='inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-3 font-semibold text-deep hover:opacity-90'
-          >
-            Open Calculator
-          </Link>
+          <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+            <Link href='/'>Open Calculator</Link>
+          </Button>
           <p className='text-muted-foreground text-sm'>
             If install is unavailable, your browser or device might not support PWA installation.
           </p>

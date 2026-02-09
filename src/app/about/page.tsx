@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import {
@@ -63,26 +64,26 @@ export default function AboutPage() {
             </p>
 
             <div className='mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
-              <Link
-                href='/'
-                className='inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-3 font-semibold text-deep transition-all hover:opacity-90 hover:shadow-lg'
+              <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+                <Link href='/'>
+                  Open Calculator
+                  <ArrowRight className='size-4' />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size='touch'
+                variant='outline'
+                className='rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card'
               >
-                Open Calculator
-                <ArrowRight className='size-4' />
-              </Link>
-              <Link
-                href='/compliance'
-                className='inline-flex items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/70 px-6 py-3 font-semibold text-foreground transition-colors hover:bg-card'
-              >
-                Compliance & Sources
-                <FileText className='size-4' />
-              </Link>
-              <a
-                href='/install'
-                className='inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-6 py-3 font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/20'
-              >
-                Install App
-              </a>
+                <Link href='/compliance'>
+                  Compliance & Sources
+                  <FileText className='size-4' />
+                </Link>
+              </Button>
+              <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+                <Link href='/install'>Install App</Link>
+              </Button>
             </div>
           </div>
 
@@ -295,20 +296,22 @@ export default function AboutPage() {
                 needing an accounting background.
               </p>
               <div className='mt-6 flex flex-wrap gap-3'>
-                <a
-                  href='mailto:support@payetax.co.uk?subject=About%20PayeTax%20feedback'
-                  className='inline-flex items-center gap-2 rounded-lg border border-border/70 bg-card/70 px-4 py-2 font-medium text-foreground text-sm hover:bg-card'
+                <Button
+                  asChild
+                  variant='outline'
+                  className='rounded-lg border-border/70 bg-card/70 hover:bg-card'
                 >
-                  <Mail className='size-4' />
-                  Send feedback
-                </a>
-                <a
-                  href='/install'
-                  className='inline-flex items-center gap-2 rounded-lg border border-cyan-500/35 bg-cyan-500/10 px-4 py-2 font-medium text-cyan-100 text-sm hover:bg-cyan-500/20'
-                >
-                  <Workflow className='size-4' />
-                  Install PayeTax
-                </a>
+                  <a href='mailto:support@payetax.co.uk?subject=About%20PayeTax%20feedback'>
+                    <Mail className='size-4' />
+                    Send feedback
+                  </a>
+                </Button>
+                <Button asChild variant='brandOutline' className='rounded-lg'>
+                  <Link href='/install'>
+                    <Workflow className='size-4' />
+                    Install PayeTax
+                  </Link>
+                </Button>
               </div>
             </Card>
           </div>
@@ -324,20 +327,23 @@ export default function AboutPage() {
             Use the calculator, compare outcomes, and keep control of your data.
           </p>
           <div className='mt-6 flex flex-col justify-center gap-3 sm:flex-row'>
-            <Link
-              href='/'
-              className='inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-3 font-semibold text-deep transition-all hover:opacity-90'
+            <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+              <Link href='/'>
+                Start Calculating
+                <ArrowRight className='size-4' />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size='touch'
+              variant='outline'
+              className='rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card'
             >
-              Start Calculating
-              <ArrowRight className='size-4' />
-            </Link>
-            <Link
-              href='/privacy'
-              className='inline-flex items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/70 px-6 py-3 font-semibold text-foreground transition-colors hover:bg-card'
-            >
-              Privacy Details
-              <Shield className='size-4' />
-            </Link>
+              <Link href='/privacy'>
+                Privacy Details
+                <Shield className='size-4' />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
