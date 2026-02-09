@@ -11,6 +11,7 @@ Focus: Director Guide calculator and related monetization.
 
 - `DIRECTOR_GUIDE_POSITIONING.md`
 - `DIRECTOR_CALCULATOR_BUILD.md`
+- `DIRECTOR_VARIABLE_INCOME_SPEC.md`
 - `DIRECTOR_TAX_MATH.md`
 - `DIRECTOR_TAX_PACK_SPEC.md`
 - `MONETIZATION.md`

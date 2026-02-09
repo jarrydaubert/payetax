@@ -69,6 +69,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
   const formData = useDirectorFormData();
   const actions = useDirectorGuideActions();
+  const isMonthlyMode = formData.mode === 'monthly';
 
   // Derive country selection from store region (single source of truth)
   const selectedCountry = formData.region ? regionToCountry[formData.region] : '';
@@ -91,7 +92,14 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
   // Generate unique IDs for fields
   const ids = {
+    mode: `${baseId}-mode`,
     revenue: `${baseId}-revenue`,
+    monthlyIncome: `${baseId}-monthly-income`,
+    monthlyExpenses: `${baseId}-monthly-expenses`,
+    contractStartMonth: `${baseId}-contract-start-month`,
+    cashInBank: `${baseId}-cash-in-bank`,
+    minimumMonthlyDraw: `${baseId}-minimum-monthly-draw`,
+    runwayMonths: `${baseId}-runway-months`,
     includesVat: `${baseId}-includes-vat`,
     expenses: `${baseId}-expenses`,
     region: `${baseId}-region`,
@@ -114,25 +122,207 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
   return (
     <aside className={cn('flex h-full flex-col overflow-y-auto bg-slate-900 p-5', className)}>
+      {/* Section: Mode */}
+      <Section title='Mode'>
+        <fieldset aria-labelledby={ids.mode}>
+          <legend id={ids.mode} className='sr-only'>
+            Input mode
+          </legend>
+          <div className='grid grid-cols-2 gap-2 rounded-lg border border-white/[0.04] bg-slate-950 p-1'>
+            <button
+              type='button'
+              onClick={() => actions.setMode('annual')}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm transition-colors',
+                !isMonthlyMode
+                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              aria-pressed={!isMonthlyMode}
+            >
+              Annual
+            </button>
+            <button
+              type='button'
+              onClick={() => actions.setMode('monthly')}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm transition-colors',
+                isMonthlyMode
+                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              aria-pressed={isMonthlyMode}
+            >
+              Monthly (Variable)
+            </button>
+          </div>
+        </fieldset>
+      </Section>
+
       {/* Section: Core Inputs */}
       <Section title='Your Company'>
-        <Field
-          label='Annual Revenue'
-          hint='Total invoiced before expenses'
-          id={ids.revenue}
-          tooltipFieldName='directorRevenue'
-        >
-          <Input
-            id={ids.revenue}
-            data-testid='director-revenue-input'
-            type='text'
-            value={formatCurrency(formData.revenue)}
-            onChange={(e) => actions.setRevenue(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.revenue)}
-          />
-        </Field>
+        {isMonthlyMode ? (
+          <>
+            <Field
+              label='Monthly Contract Income'
+              hint='Typical gross invoicing per month'
+              id={ids.monthlyIncome}
+              tooltipFieldName='directorMonthlyIncome'
+            >
+              <Input
+                id={ids.monthlyIncome}
+                type='text'
+                value={formatCurrency(formData.monthlyIncome)}
+                onChange={(e) => actions.setMonthlyIncome(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.monthlyIncome)}
+              />
+            </Field>
+
+            <Field
+              label='Monthly Business Expenses'
+              hint='Excluding director salary'
+              id={ids.monthlyExpenses}
+              tooltipFieldName='directorMonthlyExpenses'
+            >
+              <Input
+                id={ids.monthlyExpenses}
+                type='text'
+                value={formatCurrency(formData.monthlyExpenses)}
+                onChange={(e) => actions.setMonthlyExpenses(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.monthlyExpenses)}
+              />
+            </Field>
+
+            <Field
+              label='Contract Start Month'
+              hint='Used to project months remaining in this tax year'
+              id={ids.contractStartMonth}
+              tooltipFieldName='directorContractStartMonth'
+            >
+              <Select
+                value={String(formData.contractStartMonth)}
+                onValueChange={(value) => actions.setContractStartMonth(Number(value))}
+              >
+                <SelectTrigger
+                  id={ids.contractStartMonth}
+                  className='border-white/[0.08] bg-slate-800 text-slate-100'
+                  aria-describedby={getHintId(ids.contractStartMonth)}
+                >
+                  <SelectValue placeholder='Select month' />
+                </SelectTrigger>
+                <SelectContent className='border-slate-700 bg-slate-800'>
+                  <SelectItem value='4'>April</SelectItem>
+                  <SelectItem value='5'>May</SelectItem>
+                  <SelectItem value='6'>June</SelectItem>
+                  <SelectItem value='7'>July</SelectItem>
+                  <SelectItem value='8'>August</SelectItem>
+                  <SelectItem value='9'>September</SelectItem>
+                  <SelectItem value='10'>October</SelectItem>
+                  <SelectItem value='11'>November</SelectItem>
+                  <SelectItem value='12'>December</SelectItem>
+                  <SelectItem value='1'>January</SelectItem>
+                  <SelectItem value='2'>February</SelectItem>
+                  <SelectItem value='3'>March</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field
+              label='Cash In Bank'
+              hint='Current company cash available'
+              id={ids.cashInBank}
+              tooltipFieldName='directorCashInBank'
+            >
+              <Input
+                id={ids.cashInBank}
+                type='text'
+                value={formatCurrency(formData.cashInBank)}
+                onChange={(e) => actions.setCashInBank(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.cashInBank)}
+              />
+            </Field>
+
+            <Field
+              label='Minimum Monthly Draw'
+              hint='Your personal monthly floor'
+              id={ids.minimumMonthlyDraw}
+              tooltipFieldName='directorMinimumMonthlyDraw'
+            >
+              <Input
+                id={ids.minimumMonthlyDraw}
+                type='text'
+                value={formatCurrency(formData.minimumMonthlyDraw)}
+                onChange={(e) => actions.setMinimumMonthlyDraw(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.minimumMonthlyDraw)}
+              />
+            </Field>
+
+            <Field
+              label='Runway Target (months)'
+              hint='How long you want cash to last'
+              id={ids.runwayMonths}
+              tooltipFieldName='directorRunwayMonths'
+            >
+              <Input
+                id={ids.runwayMonths}
+                type='number'
+                min={0}
+                max={36}
+                value={String(formData.runwayMonths)}
+                onChange={(e) => actions.setRunwayMonths(Number(e.target.value))}
+                placeholder='3'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.runwayMonths)}
+              />
+            </Field>
+          </>
+        ) : (
+          <>
+            <Field
+              label='Annual Revenue'
+              hint='Total invoiced before expenses'
+              id={ids.revenue}
+              tooltipFieldName='directorRevenue'
+            >
+              <Input
+                id={ids.revenue}
+                data-testid='director-revenue-input'
+                type='text'
+                value={formatCurrency(formData.revenue)}
+                onChange={(e) => actions.setRevenue(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.revenue)}
+              />
+            </Field>
+
+            <Field
+              label='Business Expenses'
+              hint='Excluding your salary'
+              id={ids.expenses}
+              tooltipFieldName='directorExpenses'
+            >
+              <Input
+                id={ids.expenses}
+                data-testid='director-expenses-input'
+                type='text'
+                value={formatCurrency(formData.expenses)}
+                onChange={(e) => actions.setExpenses(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.expenses)}
+              />
+            </Field>
+          </>
+        )}
 
         <div className='flex items-center gap-2'>
           <Checkbox
@@ -147,24 +337,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           </Label>
           <LabelTooltip fieldName='directorIncludesVat' />
         </div>
-
-        <Field
-          label='Business Expenses'
-          hint='Excluding your salary'
-          id={ids.expenses}
-          tooltipFieldName='directorExpenses'
-        >
-          <Input
-            id={ids.expenses}
-            data-testid='director-expenses-input'
-            type='text'
-            value={formatCurrency(formData.expenses)}
-            onChange={(e) => actions.setExpenses(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.expenses)}
-          />
-        </Field>
 
         <Field
           label='Income Tax Region'

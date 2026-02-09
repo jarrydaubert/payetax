@@ -42,11 +42,12 @@ export function DetailCards({ className }: DetailCardsProps) {
 
   const values = useMemo(() => {
     if (!comparison || comparison.grossProfit <= 0) return null;
+    const scenarioProfit = comparison.grossProfitAfterPension ?? comparison.grossProfit;
 
     if (sliderSalary !== null && formData.region) {
       const scenario = calculateSalaryScenario(
         sliderSalary,
-        comparison.grossProfit - (formData.pensionContribution || 0),
+        scenarioProfit,
         formData.region,
         TAX_YEAR,
         formData.otherIncome,
@@ -64,7 +65,7 @@ export function DetailCards({ className }: DetailCardsProps) {
         incomeTax: scenario.incomeTax,
         corporationTax: scenario.corporationTax,
         dividendTax: scenario.dividendTax,
-        taxableProfit: comparison.grossProfit - scenario.salary - scenario.employerNI,
+        taxableProfit: scenarioProfit - scenario.salary - scenario.employerNI,
       };
     }
 
@@ -77,7 +78,7 @@ export function DetailCards({ className }: DetailCardsProps) {
       incomeTax: strategy.incomeTax,
       corporationTax: strategy.corporationTax,
       dividendTax: strategy.dividendTax,
-      taxableProfit: comparison.grossProfit - strategy.salary - strategy.employerNI,
+      taxableProfit: scenarioProfit - strategy.salary - strategy.employerNI,
     };
   }, [comparison, sliderSalary, selectedStrategy, formData]);
 

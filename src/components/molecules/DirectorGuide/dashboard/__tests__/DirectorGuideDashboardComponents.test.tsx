@@ -40,6 +40,7 @@ function createStrategy(name: string, overrides: Partial<Record<string, number |
 function createComparison(overrides: Record<string, unknown> = {}) {
   return {
     grossProfit: 80000,
+    grossProfitAfterPension: 80000,
     alreadyTaken: 0,
     availableForExtraction: 80000,
     strategies: {
@@ -113,6 +114,29 @@ describe('Director Guide dashboard components', () => {
 
       render(<SummaryCards />);
       expect(mockCalculateSalaryScenario).toHaveBeenCalled();
+    });
+
+    it('uses monthly safe draw output when in monthly mode', () => {
+      const current = useDirectorGuideStore.getState();
+      setStoreState({
+        strategyComparison: createComparison() as never,
+        formData: { ...current.formData, mode: 'monthly' },
+        monthlyModeOutput: {
+          monthsRemaining: 6,
+          projectedRevenue: 18000,
+          projectedExpenses: 6000,
+          taxBasedMonthlyDraw: 3200,
+          requiredBuffer: 4500,
+          cashBasedCeiling: 2000,
+          safeMonthlyDraw: 2200,
+          shortfall: 0,
+          hasBufferShortfall: false,
+          hasContractEndRisk: false,
+        } as never,
+      });
+
+      render(<SummaryCards />);
+      expect(screen.getByText('£2,200')).toBeInTheDocument();
     });
   });
 

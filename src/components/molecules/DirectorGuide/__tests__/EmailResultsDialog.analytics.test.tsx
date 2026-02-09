@@ -37,6 +37,7 @@ describe('EmailResultsDialog analytics', () => {
 
     const comparison: StrategyComparison = {
       grossProfit: 50000,
+      grossProfitAfterPension: 50000,
       alreadyTaken: 0,
       availableForExtraction: 0,
       strategies: {

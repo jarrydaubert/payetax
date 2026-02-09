@@ -45,7 +45,7 @@ export function SalarySlider() {
   if (!comparison || comparison.grossProfit <= 0) return null;
 
   // Max is UEL or gross profit, whichever is lower
-  const maxSalary = Math.min(UEL, comparison.grossProfit);
+  const maxSalary = Math.min(UEL, comparison.grossProfitAfterPension ?? comparison.grossProfit);
   const currentSalary = sliderSalary ?? comparison.strategies.optimalMix.salary;
 
   return (

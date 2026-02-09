@@ -216,3 +216,36 @@ export function trackGuideReset(): void {
     label: 'start_over',
   });
 }
+
+/**
+ * Track annual/monthly mode toggle.
+ */
+export function trackModeChanged(mode: 'annual' | 'monthly'): void {
+  trackEvent({
+    action: 'director_guide_mode_changed',
+    category: 'director_guide',
+    label: mode,
+  });
+}
+
+/**
+ * Track when a monthly safe draw is calculated.
+ */
+export function trackSafeDrawCalculated(): void {
+  trackEvent({
+    action: 'director_guide_safe_draw_calculated',
+    category: 'director_guide',
+    label: 'calculated',
+  });
+}
+
+/**
+ * Track when monthly buffer shortfall warning condition is reached.
+ */
+export function trackBufferShortfallShown(): void {
+  trackEvent({
+    action: 'director_guide_buffer_shortfall_shown',
+    category: 'director_guide',
+    label: 'shown',
+  });
+}

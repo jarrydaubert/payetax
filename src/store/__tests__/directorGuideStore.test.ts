@@ -33,6 +33,7 @@ jest.mock('@/lib/tax/directorCalculator', () => ({
 jest.mock('@/lib/tax/strategyComparison', () => ({
   calculateStrategyComparison: jest.fn().mockReturnValue({
     grossProfit: 80000,
+    grossProfitAfterPension: 80000,
     strategies: {
       allSalary: {
         name: 'All Salary',
@@ -67,12 +68,15 @@ const mockCalculateStrategyComparison = calculateStrategyComparison as jest.Mock
 describe('DirectorGuideStore', () => {
   beforeEach(() => {
     useDirectorGuideStore.getState().reset();
+    mockCalculateDirectorScenario.mockClear();
+    mockCalculateStrategyComparison.mockClear();
   });
 
   describe('Initial State', () => {
     it('should initialize with default values', () => {
       const state = useDirectorGuideStore.getState();
       expect(state.formData.region).toBeUndefined();
+      expect(state.formData.mode).toBe('annual');
       expect(state.formData.revenue).toBeUndefined();
       expect(state.formData.expenses).toBeUndefined();
       expect(state.formData.ytdSalary).toBe(0);
@@ -83,12 +87,22 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.pensionContribution).toBe(0);
       expect(state.formData.companyCarBIK).toBe(0);
       expect(state.formData.hasEmploymentAllowance).toBe(false);
+      expect(state.formData.monthlyIncome).toBe(0);
+      expect(state.formData.monthlyExpenses).toBe(0);
+      expect(state.formData.contractStartMonth).toBe(4);
+      expect(state.formData.runwayMonths).toBe(3);
       expect(state.results).toBeNull();
       expect(state.strategyComparison).toBeNull();
+      expect(state.monthlyModeOutput).toBeNull();
     });
   });
 
   describe('Form Data Actions', () => {
+    it('should set mode', () => {
+      useDirectorGuideStore.getState().setMode('monthly');
+      expect(useDirectorGuideStore.getState().formData.mode).toBe('monthly');
+    });
+
     it('should set region', () => {
       useDirectorGuideStore.getState().setRegion('scotland');
       expect(useDirectorGuideStore.getState().formData.region).toBe('scotland');
@@ -199,6 +213,24 @@ describe('DirectorGuideStore', () => {
     it('should set minimum salary requirement', () => {
       useDirectorGuideStore.getState().setMinimumSalaryRequirement(25000);
       expect(useDirectorGuideStore.getState().formData.minimumSalaryRequirement).toBe(25000);
+    });
+
+    it('should set monthly mode fields', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setMonthlyIncome(3000);
+      store.setMonthlyExpenses(1000);
+      store.setContractStartMonth(10);
+      store.setCashInBank(5000);
+      store.setMinimumMonthlyDraw(1200);
+      store.setRunwayMonths(4);
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.formData.monthlyIncome).toBe(3000);
+      expect(state.formData.monthlyExpenses).toBe(1000);
+      expect(state.formData.contractStartMonth).toBe(10);
+      expect(state.formData.cashInBank).toBe(5000);
+      expect(state.formData.minimumMonthlyDraw).toBe(1200);
+      expect(state.formData.runwayMonths).toBe(4);
     });
   });
 
@@ -339,6 +371,68 @@ describe('DirectorGuideStore', () => {
 
       const call = mockCalculateStrategyComparison.mock.calls[0][0];
       expect(call.hasOtherPAYEEmployment).toBe(true);
+    });
+
+    it('should project monthly inputs before strategy comparison', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setMode('monthly');
+      store.setRegion('rUK');
+      store.setMonthlyIncome(3000);
+      store.setMonthlyExpenses(1000);
+      store.setContractStartMonth(10); // 6 months remaining
+      store.setCashInBank(10000);
+      store.setMinimumMonthlyDraw(1000);
+      store.setRunwayMonths(3);
+
+      store.calculate();
+
+      const strategyInput = mockCalculateStrategyComparison.mock.calls[0][0];
+      expect(strategyInput.revenue).toBe(18000);
+      expect(strategyInput.expenses).toBe(6000);
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.monthlyModeOutput).not.toBeNull();
+      expect(state.monthlyModeOutput?.monthsRemaining).toBe(6);
+    });
+
+    it('should return a validation error for invalid monthly start month data', () => {
+      const store = useDirectorGuideStore.getState();
+      useDirectorGuideStore.setState({
+        formData: {
+          ...store.formData,
+          mode: 'monthly',
+          region: 'rUK',
+          monthlyIncome: 3000,
+          monthlyExpenses: 1000,
+          contractStartMonth: 13, // Simulate stale/corrupt persisted state
+        },
+      } as never);
+
+      store.calculate();
+
+      expect(useDirectorGuideStore.getState().error).toBe(
+        'Please select a valid contract start month',
+      );
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
+    });
+
+    it('should floor safe monthly draw to minimum draw when buffer is short', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setMode('monthly');
+      store.setRegion('rUK');
+      store.setMonthlyIncome(3000);
+      store.setMonthlyExpenses(1000);
+      store.setContractStartMonth(10); // 6 months
+      store.setCashInBank(0);
+      store.setMinimumMonthlyDraw(900);
+      store.setRunwayMonths(3);
+
+      store.calculate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.monthlyModeOutput).not.toBeNull();
+      expect(state.monthlyModeOutput?.safeMonthlyDraw).toBe(900);
+      expect(state.monthlyModeOutput?.hasBufferShortfall).toBe(true);
     });
   });
 

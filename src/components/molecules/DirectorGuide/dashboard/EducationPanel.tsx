@@ -10,7 +10,11 @@ import { useEffect, useRef } from 'react';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { trackWarningShown } from '@/lib/directorGuideAnalytics';
 import { cn } from '@/lib/utils';
-import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
+import {
+  useDirectorFormData,
+  useMonthlyModeOutput,
+  useStrategyComparison,
+} from '@/store/directorGuideStore';
 
 // Tax year configuration - single source
 const TAX_YEAR: TaxYear = '2025-2026';
@@ -45,9 +49,13 @@ interface EducationPanelProps {
 export function EducationPanel({ className }: EducationPanelProps) {
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
+  const monthlyModeOutput = useMonthlyModeOutput();
+  const isMonthlyMode = formData.mode === 'monthly';
 
   const hasResults = comparison !== null && comparison.grossProfit > 0;
-  const revenue = formData.revenue ?? 0;
+  const revenue = isMonthlyMode
+    ? (monthlyModeOutput?.projectedRevenue ?? 0)
+    : (formData.revenue ?? 0);
   const optimalSalary = comparison?.strategies?.optimalMix?.salary ?? 0;
 
   // Calculate total income for PA taper / HICBC warnings
@@ -83,6 +91,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
     personalTax,
     formData,
     comparison,
+    monthlyModeOutput,
+    isMonthlyMode,
   });
 
   // Learn cards - could be tailored based on user situation
@@ -178,7 +188,14 @@ export function EducationPanel({ className }: EducationPanelProps) {
             label='Region'
             value={formData.region === 'scotland' ? 'Scotland' : 'England/Wales/NI'}
           />
-          <AssumptionRow label='Trading Period' value='Full Year' />
+          <AssumptionRow
+            label='Trading Period'
+            value={
+              isMonthlyMode && monthlyModeOutput
+                ? `Monthly projection (${monthlyModeOutput.monthsRemaining} month${monthlyModeOutput.monthsRemaining === 1 ? '' : 's'} remaining)`
+                : 'Full Year'
+            }
+          />
           <AssumptionRow
             label='Other Income'
             value={formData.otherIncome > 0 ? `£${formData.otherIncome.toLocaleString()}` : 'None'}
@@ -208,7 +225,10 @@ export function EducationPanel({ className }: EducationPanelProps) {
             <ul className='space-y-1 text-slate-400 text-xs'>
               <li>• Compares salary vs dividend extraction strategies</li>
               <li>• Uses current HMRC rates (single source of truth)</li>
-              <li>• Assumes single director, 12-month period, standalone company</li>
+              <li>
+                • Assumes single director and standalone company
+                {isMonthlyMode ? ', with monthly run-rate projection' : ', with a full-year view'}
+              </li>
             </ul>
           </div>
           <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
@@ -252,6 +272,8 @@ interface WarningContext {
   personalTax: number;
   formData: ReturnType<typeof useDirectorFormData>;
   comparison: ReturnType<typeof useStrategyComparison>;
+  monthlyModeOutput: ReturnType<typeof useMonthlyModeOutput>;
+  isMonthlyMode: boolean;
 }
 
 interface Warning {
@@ -273,6 +295,8 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     personalTax,
     formData,
     comparison,
+    monthlyModeOutput,
+    isMonthlyMode,
   } = ctx;
 
   // Pre-compute conditions
@@ -285,6 +309,25 @@ function buildWarnings(ctx: WarningContext): Warning[] {
 
   return [
     // CRITICAL warnings first
+    {
+      id: 'monthly-buffer-shortfall',
+      title: 'Cash Buffer Shortfall',
+      description: monthlyModeOutput
+        ? `Current cash is below your required buffer by £${Math.round(
+            monthlyModeOutput.shortfall,
+          ).toLocaleString()}. Consider reducing drawings or increasing runway cash.`
+        : 'Current cash is below your required runway buffer.',
+      show: isMonthlyMode && Boolean(monthlyModeOutput?.hasBufferShortfall),
+      isCritical: true,
+    },
+    {
+      id: 'monthly-contract-end-risk',
+      title: 'Contract-End Risk',
+      description:
+        'Your runway target is at or above months remaining in this tax year. Plan for income gaps now.',
+      show: isMonthlyMode && Boolean(monthlyModeOutput?.hasContractEndRisk),
+      isCritical: true,
+    },
     {
       id: 'pension-gap',
       title: 'Inefficient Salary Zone',
@@ -360,6 +403,13 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     },
 
     // LOWER priority / informational
+    {
+      id: 'mid-year-assumption',
+      title: 'Mid-Year Projection Assumption',
+      description:
+        'Monthly mode projects a flat monthly run-rate through March. Real income timing may differ.',
+      show: isMonthlyMode,
+    },
     {
       id: 'self-assessment',
       title: 'Self Assessment Likely Required',

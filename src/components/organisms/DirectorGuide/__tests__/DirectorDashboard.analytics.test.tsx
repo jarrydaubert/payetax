@@ -4,6 +4,7 @@ import { trackCalculationRun } from '@/lib/directorGuideAnalytics';
 import {
   useDirectorFormData,
   useDirectorGuideActions,
+  useMonthlyModeOutput,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 import { DirectorDashboard } from '../DirectorDashboard';
@@ -13,11 +14,15 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackResultsShown: jest.fn(),
   trackGuideReset: jest.fn(),
   trackCalculationRun: jest.fn(),
+  trackModeChanged: jest.fn(),
+  trackSafeDrawCalculated: jest.fn(),
+  trackBufferShortfallShown: jest.fn(),
 }));
 
 jest.mock('@/store/directorGuideStore', () => ({
   useDirectorFormData: jest.fn(),
   useStrategyComparison: jest.fn(),
+  useMonthlyModeOutput: jest.fn(),
   useDirectorGuideActions: jest.fn(),
 }));
 
@@ -86,6 +91,7 @@ describe('DirectorDashboard analytics', () => {
     });
 
     (useStrategyComparison as unknown as jest.Mock).mockReturnValue(null);
+    (useMonthlyModeOutput as unknown as jest.Mock).mockReturnValue(null);
 
     (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
       calculate: mockCalculate,
@@ -98,6 +104,45 @@ describe('DirectorDashboard analytics', () => {
     expect(trackCalculationRun).toHaveBeenCalledWith({
       revenue: 100000,
       expenses: 20000,
+      region: 'rUK',
+      includesVat: false,
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(250);
+    });
+
+    expect(mockCalculate).toHaveBeenCalledTimes(1);
+  });
+
+  test('tracks projected revenue/expenses in monthly mode', () => {
+    const mockCalculate = jest.fn();
+
+    (useDirectorFormData as unknown as jest.Mock).mockReturnValue({
+      mode: 'monthly',
+      region: 'rUK',
+      includesVat: false,
+      monthlyIncome: 3000,
+      monthlyExpenses: 1000,
+      contractStartMonth: 10, // 6 months remaining
+      revenue: undefined,
+      expenses: undefined,
+    });
+
+    (useStrategyComparison as unknown as jest.Mock).mockReturnValue(null);
+    (useMonthlyModeOutput as unknown as jest.Mock).mockReturnValue(null);
+
+    (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
+      calculate: mockCalculate,
+      reset: jest.fn(),
+    });
+
+    render(<DirectorDashboard />);
+
+    expect(trackCalculationRun).toHaveBeenCalledTimes(1);
+    expect(trackCalculationRun).toHaveBeenCalledWith({
+      revenue: 18000,
+      expenses: 6000,
       region: 'rUK',
       includesVat: false,
     });

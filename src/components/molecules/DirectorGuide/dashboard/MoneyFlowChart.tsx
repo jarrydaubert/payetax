@@ -49,9 +49,7 @@ export function MoneyFlowChart() {
   const values = useMemo(() => {
     if (!comparison || comparison.grossProfit <= 0) return null;
 
-    // Use grossProfit directly - calculateSalaryScenario handles pension internally
-    // when passed as a parameter (it's treated as a cost that reduces taxable profit)
-    const profitForCalc = comparison.grossProfit;
+    const profitForCalc = comparison.grossProfitAfterPension ?? comparison.grossProfit;
 
     if (sliderSalary !== null) {
       const scenario = calculateSalaryScenario(
@@ -101,7 +99,7 @@ export function MoneyFlowChart() {
 
   if (!(values && comparison)) return null;
 
-  const grossProfit = comparison.grossProfit;
+  const grossProfit = comparison.grossProfitAfterPension ?? comparison.grossProfit;
 
   // Calculate actual take-home: salary take-home + dividends after dividend tax
   const actualTakeHome = values.personalTakeHome + (values.dividends - values.dividendTax);

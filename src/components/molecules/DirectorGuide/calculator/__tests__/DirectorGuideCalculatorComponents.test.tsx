@@ -64,6 +64,7 @@ function createStrategy(name: string, overrides: Partial<Record<string, number |
 function createComparison(overrides: Record<string, unknown> = {}) {
   return {
     grossProfit: 80000,
+    grossProfitAfterPension: 80000,
     alreadyTaken: 0,
     availableForExtraction: 80000,
     strategies: {

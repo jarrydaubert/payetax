@@ -87,6 +87,7 @@ export interface YourSetupResult extends StrategyResult {
 
 export interface StrategyComparison {
   grossProfit: number;
+  grossProfitAfterPension: number; // Used by scenario/slider calculations
   alreadyTaken: number; // Total YTD salary + dividends + drawings
   availableForExtraction: number; // grossProfit - alreadyTaken (floored at 0)
   strategies: {
@@ -216,6 +217,7 @@ export function calculateStrategyComparison(
 
   return {
     grossProfit: round(grossProfitBeforePension),
+    grossProfitAfterPension: round(grossProfit),
     alreadyTaken: round(alreadyTaken),
     availableForExtraction: round(availableForExtraction),
     strategies,

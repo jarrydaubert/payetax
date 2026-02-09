@@ -68,7 +68,6 @@ export function DirectorGuideWelcomeDialog() {
           <section>
             <h3 className='font-medium text-foreground'>Coming soon</h3>
             <ul className='mt-2 list-disc space-y-1 pl-5 text-muted-foreground'>
-              <li>Monthly income mode for new directors</li>
               <li>Downloadable tax pack</li>
               <li>Calendar reminders</li>
             </ul>

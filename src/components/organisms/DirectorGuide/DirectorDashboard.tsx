@@ -40,11 +40,13 @@ import {
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
+import { projectAnnualFromMonthly } from '@/lib/tax/variableIncome';
 import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
   useDirectorFormData,
   useDirectorGuideActions,
+  useMonthlyModeOutput,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
@@ -61,18 +63,36 @@ export function DirectorDashboard() {
 
   const formData = useDirectorFormData();
   const comparison = useStrategyComparison();
+  const monthlyModeOutput = useMonthlyModeOutput();
   const { calculate, reset } = useDirectorGuideActions();
+  const isMonthlyMode = formData.mode === 'monthly';
+
+  const projectedFromInputs = isMonthlyMode
+    ? projectAnnualFromMonthly({
+        monthlyIncome: formData.monthlyIncome,
+        monthlyExpenses: formData.monthlyExpenses,
+        contractStartMonth: formData.contractStartMonth,
+      })
+    : null;
+
+  const effectiveRevenue = isMonthlyMode
+    ? (monthlyModeOutput?.projectedRevenue ?? projectedFromInputs?.projectedRevenue)
+    : formData.revenue;
+  const effectiveExpenses = isMonthlyMode
+    ? (monthlyModeOutput?.projectedExpenses ?? projectedFromInputs?.projectedExpenses)
+    : formData.expenses;
 
   const emailInput: DirectorEmailInput | null =
     comparison &&
     formData.region !== undefined &&
-    formData.revenue !== undefined &&
-    formData.expenses !== undefined
+    effectiveRevenue !== undefined &&
+    effectiveExpenses !== undefined
       ? {
+          mode: formData.mode,
           region: formData.region,
-          revenue: formData.revenue,
+          revenue: effectiveRevenue,
           includesVat: formData.includesVat,
-          expenses: formData.expenses,
+          expenses: effectiveExpenses,
           lossesBroughtForward: formData.lossesBroughtForward,
           otherIncome: formData.otherIncome,
           employmentAllowance: formData.hasEmploymentAllowance,
@@ -86,6 +106,12 @@ export function DirectorDashboard() {
           ytdDrawings: formData.ytdDrawings,
           yourSetupSalary: formData.yourSetupSalary,
           yourSetupDividends: formData.yourSetupDividends,
+          monthlyIncome: formData.monthlyIncome,
+          monthlyExpenses: formData.monthlyExpenses,
+          contractStartMonth: formData.contractStartMonth,
+          cashInBank: formData.cashInBank,
+          minimumMonthlyDraw: formData.minimumMonthlyDraw,
+          runwayMonths: formData.runwayMonths,
         }
       : null;
 
@@ -103,17 +129,40 @@ export function DirectorDashboard() {
 
   // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
   useEffect(() => {
-    const { region, revenue, expenses, includesVat } = formData;
+    const { region, includesVat } = formData;
+    if (region === undefined) {
+      return;
+    }
 
-    if (region === undefined || revenue === undefined || expenses === undefined) {
+    const monthlyProjection =
+      formData.mode === 'monthly'
+        ? projectAnnualFromMonthly({
+            monthlyIncome: formData.monthlyIncome,
+            monthlyExpenses: formData.monthlyExpenses,
+            contractStartMonth: formData.contractStartMonth,
+          })
+        : null;
+
+    const revenue =
+      formData.mode === 'monthly' ? monthlyProjection?.projectedRevenue : formData.revenue;
+    const expenses =
+      formData.mode === 'monthly' ? monthlyProjection?.projectedExpenses : formData.expenses;
+
+    if (revenue === undefined || expenses === undefined) {
       return;
     }
     if (revenue < 0 || expenses < 0) {
       return;
     }
+    if (
+      formData.mode === 'monthly' &&
+      (!monthlyProjection || monthlyProjection.monthsRemaining <= 0)
+    ) {
+      return;
+    }
 
     // Track once per distinct input set (avoid spamming analytics while typing).
-    const signature = `${region}|${revenue}|${expenses}|${String(includesVat)}`;
+    const signature = `${formData.mode}|${region}|${revenue}|${expenses}|${String(includesVat)}`;
     if (lastTrackedCalcSignature.current !== signature) {
       trackCalculationRun({
         revenue,
@@ -183,6 +232,43 @@ export function DirectorDashboard() {
                   </>
                 ) : (
                   <>
+                    {isMonthlyMode && monthlyModeOutput && (
+                      <section className='rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4'>
+                        <h3 className='font-semibold text-emerald-300 text-sm uppercase tracking-wider'>
+                          Safe Monthly Draw
+                        </h3>
+                        <div className='mt-2 grid gap-3 md:grid-cols-3'>
+                          <div>
+                            <div className='text-slate-400 text-xs'>Recommended draw</div>
+                            <div className='font-mono font-semibold text-slate-100'>
+                              £{Math.round(monthlyModeOutput.safeMonthlyDraw).toLocaleString()}/mo
+                            </div>
+                          </div>
+                          <div>
+                            <div className='text-slate-400 text-xs'>Required buffer</div>
+                            <div className='font-mono font-semibold text-slate-100'>
+                              £{Math.round(monthlyModeOutput.requiredBuffer).toLocaleString()}
+                            </div>
+                          </div>
+                          <div>
+                            <div className='text-slate-400 text-xs'>Buffer status</div>
+                            <div
+                              className={cn(
+                                'font-medium',
+                                monthlyModeOutput.hasBufferShortfall
+                                  ? 'text-amber-300'
+                                  : 'text-emerald-300',
+                              )}
+                            >
+                              {monthlyModeOutput.hasBufferShortfall
+                                ? `Shortfall £${Math.round(monthlyModeOutput.shortfall).toLocaleString()}`
+                                : 'On track'}
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    )}
+
                     {/* Summary Cards */}
                     <SummaryCards />
 

@@ -161,6 +161,42 @@ export const INPUT_TOOLTIPS = {
     note: 'Include overheads, contractors, software, rent, and other costs',
   },
 
+  directorMonthlyIncome: {
+    title: 'Monthly Contract Income',
+    description: 'Typical gross monthly invoicing for your current contract(s)',
+    note: 'Used to project annual revenue for the remaining tax-year months',
+  },
+
+  directorMonthlyExpenses: {
+    title: 'Monthly Business Expenses',
+    description: 'Typical monthly company costs excluding your own salary',
+    note: 'Used with runway and cash buffer logic to estimate a safe monthly draw',
+  },
+
+  directorContractStartMonth: {
+    title: 'Contract Start Month',
+    description: 'Month your current revenue level started in this tax year',
+    note: 'We project from this month through March using a flat monthly assumption',
+  },
+
+  directorCashInBank: {
+    title: 'Cash In Bank',
+    description: 'Current company cash available to fund operations and drawings',
+    note: 'Use real cash, not retained earnings from accounts',
+  },
+
+  directorMinimumMonthlyDraw: {
+    title: 'Minimum Monthly Draw',
+    description: 'Minimum monthly amount you need personally',
+    note: 'Used as the personal floor when balancing buffer safety and tax outputs',
+  },
+
+  directorRunwayMonths: {
+    title: 'Runway Target',
+    description: 'Number of months of coverage you want in reserve',
+    note: 'Required buffer = runway months × (minimum draw + monthly expenses)',
+  },
+
   directorYearEnd: {
     title: 'Company Year-End',
     description: 'Your company accounting period end date',

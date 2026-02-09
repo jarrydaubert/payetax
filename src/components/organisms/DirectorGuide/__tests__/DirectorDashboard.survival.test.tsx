@@ -6,6 +6,9 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackGuideReset: jest.fn(),
   trackGuideStarted: jest.fn(),
   trackResultsShown: jest.fn(),
+  trackModeChanged: jest.fn(),
+  trackSafeDrawCalculated: jest.fn(),
+  trackBufferShortfallShown: jest.fn(),
 }));
 
 jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
@@ -33,6 +36,7 @@ function createEmptyComparison(grossProfit: number) {
 
   return {
     grossProfit,
+    grossProfitAfterPension: grossProfit,
     alreadyTaken: 0,
     availableForExtraction: 0,
     strategies: {

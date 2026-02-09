@@ -43,7 +43,7 @@ export function StrategyComparisonTable() {
 
     return calculateSalaryScenario(
       sliderSalary,
-      comparison.grossProfit - (formData.pensionContribution || 0),
+      comparison.grossProfitAfterPension ?? comparison.grossProfit,
       formData.region ?? 'rUK',
       TAX_YEAR,
       formData.otherIncome,

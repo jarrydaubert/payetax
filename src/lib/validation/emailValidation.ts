@@ -190,6 +190,7 @@ export const AllStrategiesSchema = z.object({
  * Input schema for director email requests (server recomputes results)
  */
 export const DirectorEmailInputSchema = z.object({
+  mode: z.enum(['annual', 'monthly']).optional(),
   region: RegionSchema,
   revenue: CurrencyAmountSchema,
   includesVat: z.boolean(),
@@ -207,6 +208,12 @@ export const DirectorEmailInputSchema = z.object({
   ytdDrawings: CurrencyAmountSchema.optional(),
   yourSetupSalary: CurrencyAmountSchema.optional(),
   yourSetupDividends: CurrencyAmountSchema.optional(),
+  monthlyIncome: CurrencyAmountSchema.optional(),
+  monthlyExpenses: CurrencyAmountSchema.optional(),
+  contractStartMonth: z.number().int().min(1).max(12).optional(),
+  cashInBank: CurrencyAmountSchema.optional(),
+  minimumMonthlyDraw: CurrencyAmountSchema.optional(),
+  runwayMonths: z.number().int().min(0).max(36).optional(),
 });
 
 /**

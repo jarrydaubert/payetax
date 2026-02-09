@@ -8,6 +8,40 @@ function setDirectorGuideState(
   useDirectorGuideStore.setState(partial as never);
 }
 
+function createComparison(grossProfit: number) {
+  const strategy = {
+    name: 'Baseline Mix',
+    salary: 0,
+    dividends: 0,
+    pension: 0,
+    companyCarBIK: 0,
+    employerNI: 0,
+    employeeNI: 0,
+    incomeTax: 0,
+    corporationTax: 0,
+    dividendTax: 0,
+    studentLoan: 0,
+    totalPersonalTax: 0,
+    companyCost: 0,
+    takeHome: 0,
+    effectiveRate: 0,
+  };
+
+  return {
+    grossProfit,
+    grossProfitAfterPension: grossProfit,
+    alreadyTaken: 0,
+    availableForExtraction: Math.max(0, grossProfit),
+    strategies: {
+      allSalary: { ...strategy, name: 'All Salary' },
+      optimalMix: { ...strategy, name: 'Baseline Mix' },
+      allDividends: { ...strategy, name: 'All Dividends' },
+    },
+    recommended: 'optimalMix' as const,
+    savingsVsAllSalary: 0,
+  };
+}
+
 describe('DirectorGuide EducationPanel', () => {
   beforeEach(() => {
     // Reset only what we touch in these tests to avoid analytics side effects from store.reset().
@@ -36,66 +70,7 @@ describe('DirectorGuide EducationPanel', () => {
 
   test('shows VAT approaching warning based on revenue even when profit is zero', () => {
     setDirectorGuideState({
-      strategyComparison: {
-        grossProfit: 0,
-        alreadyTaken: 0,
-        availableForExtraction: 0,
-        strategies: {
-          allSalary: {
-            name: 'All Salary',
-            salary: 0,
-            dividends: 0,
-            pension: 0,
-            companyCarBIK: 0,
-            employerNI: 0,
-            employeeNI: 0,
-            incomeTax: 0,
-            corporationTax: 0,
-            dividendTax: 0,
-            studentLoan: 0,
-            totalPersonalTax: 0,
-            companyCost: 0,
-            takeHome: 0,
-            effectiveRate: 0,
-          },
-          optimalMix: {
-            name: 'Baseline Mix',
-            salary: 0,
-            dividends: 0,
-            pension: 0,
-            companyCarBIK: 0,
-            employerNI: 0,
-            employeeNI: 0,
-            incomeTax: 0,
-            corporationTax: 0,
-            dividendTax: 0,
-            studentLoan: 0,
-            totalPersonalTax: 0,
-            companyCost: 0,
-            takeHome: 0,
-            effectiveRate: 0,
-          },
-          allDividends: {
-            name: 'All Dividends',
-            salary: 0,
-            dividends: 0,
-            pension: 0,
-            companyCarBIK: 0,
-            employerNI: 0,
-            employeeNI: 0,
-            incomeTax: 0,
-            corporationTax: 0,
-            dividendTax: 0,
-            studentLoan: 0,
-            totalPersonalTax: 0,
-            companyCost: 0,
-            takeHome: 0,
-            effectiveRate: 0,
-          },
-        },
-        recommended: 'optimalMix',
-        savingsVsAllSalary: 0,
-      },
+      strategyComparison: createComparison(0) as never,
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 86000 },
     });
 
@@ -113,5 +88,37 @@ describe('DirectorGuide EducationPanel', () => {
     render(<EducationPanel />);
 
     expect(screen.getByText(/turnover figure includes VAT/i)).toBeInTheDocument();
+  });
+
+  test('shows monthly-mode buffer and contract risk warnings', () => {
+    const current = useDirectorGuideStore.getState();
+    setDirectorGuideState({
+      strategyComparison: createComparison(5000) as never,
+      monthlyModeOutput: {
+        monthsRemaining: 2,
+        projectedRevenue: 12000,
+        projectedExpenses: 5000,
+        taxBasedMonthlyDraw: 1200,
+        requiredBuffer: 3600,
+        cashBasedCeiling: 0,
+        safeMonthlyDraw: 900,
+        shortfall: 1800,
+        hasBufferShortfall: true,
+        hasContractEndRisk: true,
+      } as never,
+      formData: {
+        ...current.formData,
+        mode: 'monthly',
+        monthlyIncome: 6000,
+        monthlyExpenses: 2500,
+      },
+    });
+
+    render(<EducationPanel />);
+
+    expect(screen.getByText('Cash Buffer Shortfall')).toBeInTheDocument();
+    expect(screen.getByText('Contract-End Risk')).toBeInTheDocument();
+    expect(screen.getByText('Mid-Year Projection Assumption')).toBeInTheDocument();
+    expect(screen.getByText(/Monthly projection \(2 months remaining\)/i)).toBeInTheDocument();
   });
 });

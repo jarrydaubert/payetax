@@ -8,6 +8,9 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackGuideStarted: jest.fn(),
   trackResultsShown: jest.fn(),
   trackCalculationRun: jest.fn(),
+  trackModeChanged: jest.fn(),
+  trackSafeDrawCalculated: jest.fn(),
+  trackBufferShortfallShown: jest.fn(),
 }));
 
 jest.mock('@/components/molecules/DirectorGuide/calculator', () => ({
@@ -62,6 +65,7 @@ function createComparison(grossProfit: number) {
 
   return {
     grossProfit,
+    grossProfitAfterPension: grossProfit,
     alreadyTaken: 0,
     availableForExtraction: grossProfit,
     strategies: {
@@ -101,6 +105,30 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText('Summary Cards')).toBeInTheDocument();
     expect(screen.getByText('Strategy Comparison')).toBeInTheDocument();
     expect(screen.getByText(/Save this breakdown for your records/i)).toBeInTheDocument();
+  });
+
+  it('shows monthly safe draw callout in monthly mode', () => {
+    const current = useDirectorGuideStore.getState();
+    useDirectorGuideStore.setState({
+      formData: { ...current.formData, mode: 'monthly' } as never,
+      strategyComparison: createComparison(80000) as never,
+      monthlyModeOutput: {
+        monthsRemaining: 6,
+        projectedRevenue: 18000,
+        projectedExpenses: 6000,
+        taxBasedMonthlyDraw: 3000,
+        requiredBuffer: 4500,
+        cashBasedCeiling: 2000,
+        safeMonthlyDraw: 2200,
+        shortfall: 0,
+        hasBufferShortfall: false,
+        hasContractEndRisk: false,
+      } as never,
+    } as never);
+
+    render(<DirectorDashboard />);
+    expect(screen.getByText('Safe Monthly Draw')).toBeInTheDocument();
+    expect(screen.getByText('Recommended draw')).toBeInTheDocument();
   });
 
   it('opens the email dialog when CTA is clicked', () => {

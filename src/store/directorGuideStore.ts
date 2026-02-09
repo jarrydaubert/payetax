@@ -13,10 +13,20 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
-import { trackGuideReset } from '@/lib/directorGuideAnalytics';
+import {
+  trackBufferShortfallShown,
+  trackGuideReset,
+  trackModeChanged,
+  trackSafeDrawCalculated,
+} from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
+import {
+  calculateSafeMonthlyDraw,
+  projectAnnualFromMonthly,
+  type SafeDrawResult,
+} from '@/lib/tax/variableIncome';
 import {
   CurrencyAmountSchema,
   type DirectorCalculationResult,
@@ -41,10 +51,23 @@ export type YearEndMonth = '03' | '12' | 'other' | 'unknown';
 /** Taken via payroll options */
 export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 
+/** Director guide input mode */
+export type DirectorGuideMode = 'annual' | 'monthly';
+
+/** Monthly-mode derived outputs */
+export interface MonthlyModeOutput extends SafeDrawResult {
+  monthsRemaining: number;
+  projectedRevenue: number;
+  projectedExpenses: number;
+}
+
 /**
  * Form data for the calculator
  */
 export interface DirectorFormData {
+  // Input mode
+  mode: DirectorGuideMode;
+
   // Core inputs
   region: Region | undefined;
   revenue: number | undefined;
@@ -74,6 +97,14 @@ export interface DirectorFormData {
   // Compare mode (Your Setup)
   yourSetupSalary: number | undefined;
   yourSetupDividends: number | undefined;
+
+  // Monthly mode
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  contractStartMonth: number; // 1-12
+  cashInBank: number;
+  minimumMonthlyDraw: number;
+  runwayMonths: number;
 }
 
 /**
@@ -86,6 +117,7 @@ interface DirectorGuideState {
   // Calculation results
   results: DirectorCalculationResult | null;
   strategyComparison: StrategyComparison | null;
+  monthlyModeOutput: MonthlyModeOutput | null;
   error: string | null;
 
   // UI state
@@ -99,6 +131,7 @@ interface DirectorGuideState {
  */
 interface DirectorGuideActions {
   // Core input setters
+  setMode: (mode: DirectorGuideMode) => void;
   setRegion: (region: Region) => void;
   setRevenue: (revenue: number) => void;
   setIncludesVat: (includesVat: boolean) => void;
@@ -129,6 +162,14 @@ interface DirectorGuideActions {
   setYourSetupSalary: (amount: number | undefined) => void;
   setYourSetupDividends: (amount: number | undefined) => void;
 
+  // Monthly mode setters
+  setMonthlyIncome: (amount: number) => void;
+  setMonthlyExpenses: (amount: number) => void;
+  setContractStartMonth: (month: number) => void;
+  setCashInBank: (amount: number) => void;
+  setMinimumMonthlyDraw: (amount: number) => void;
+  setRunwayMonths: (months: number) => void;
+
   // UI actions
   setSelectedStrategy: (strategy: 'allSalary' | 'optimalMix' | 'allDividends') => void;
   setSliderSalary: (salary: number | null) => void;
@@ -148,6 +189,7 @@ type DirectorGuideStore = DirectorGuideState & DirectorGuideActions;
 // ============================================================================
 
 const defaultFormData: DirectorFormData = {
+  mode: 'annual',
   region: undefined,
   revenue: undefined,
   includesVat: false,
@@ -168,12 +210,19 @@ const defaultFormData: DirectorFormData = {
   minimumSalaryRequirement: undefined,
   yourSetupSalary: undefined,
   yourSetupDividends: undefined,
+  monthlyIncome: 0,
+  monthlyExpenses: 0,
+  contractStartMonth: 4,
+  cashInBank: 0,
+  minimumMonthlyDraw: 0,
+  runwayMonths: 3,
 };
 
 const defaultState: DirectorGuideState = {
   formData: { ...defaultFormData },
   results: null,
   strategyComparison: null,
+  monthlyModeOutput: null,
   error: null,
   isCalculating: false,
   selectedStrategy: 'optimalMix',
@@ -194,6 +243,18 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
         // CORE INPUT SETTERS
         // ====================================================================
+
+        setMode: (mode) => {
+          set((state) => {
+            if (state.formData.mode === mode) return state;
+            if (typeof window !== 'undefined') {
+              trackModeChanged(mode);
+            }
+            return {
+              formData: { ...state.formData, mode },
+            };
+          });
+        },
 
         setRegion: (region) => {
           const validated = RegionSchema.safeParse(region);
@@ -391,6 +452,56 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         // ====================================================================
+        // MONTHLY MODE SETTERS
+        // ====================================================================
+
+        setMonthlyIncome: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, monthlyIncome: validated.data },
+          }));
+        },
+
+        setMonthlyExpenses: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, monthlyExpenses: validated.data },
+          }));
+        },
+
+        setContractStartMonth: (month) => {
+          if (!Number.isInteger(month) || month < 1 || month > 12) return;
+          set((state) => ({
+            formData: { ...state.formData, contractStartMonth: month },
+          }));
+        },
+
+        setCashInBank: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, cashInBank: validated.data },
+          }));
+        },
+
+        setMinimumMonthlyDraw: (amount) => {
+          const validated = CurrencyAmountSchema.safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, minimumMonthlyDraw: validated.data },
+          }));
+        },
+
+        setRunwayMonths: (months) => {
+          if (!Number.isInteger(months) || months < 0 || months > 36) return;
+          set((state) => ({
+            formData: { ...state.formData, runwayMonths: months },
+          }));
+        },
+
+        // ====================================================================
         // UI ACTIONS
         // ====================================================================
 
@@ -409,12 +520,35 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         calculate: () => {
           const { formData } = get();
 
-          // Validate required fields
-          if (
-            !formData.region ||
-            formData.revenue === undefined ||
-            formData.expenses === undefined
-          ) {
+          if (!formData.region) {
+            set({ error: 'Please select your region' });
+            return;
+          }
+
+          const isMonthlyMode = formData.mode === 'monthly';
+          const monthlyProjection = isMonthlyMode
+            ? projectAnnualFromMonthly({
+                monthlyIncome: formData.monthlyIncome,
+                monthlyExpenses: formData.monthlyExpenses,
+                contractStartMonth: formData.contractStartMonth,
+              })
+            : null;
+
+          if (isMonthlyMode && monthlyProjection && monthlyProjection.monthsRemaining <= 0) {
+            set({ error: 'Please select a valid contract start month' });
+            return;
+          }
+
+          const effectiveRevenue =
+            isMonthlyMode && monthlyProjection
+              ? monthlyProjection.projectedRevenue
+              : formData.revenue;
+          const effectiveExpenses =
+            isMonthlyMode && monthlyProjection
+              ? monthlyProjection.projectedExpenses
+              : formData.expenses;
+
+          if (effectiveRevenue === undefined || effectiveExpenses === undefined) {
             set({ error: 'Please fill in revenue, expenses, and region' });
             return;
           }
@@ -435,9 +569,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             // Main calculation (for survival mode detection)
             const input: DirectorInput = {
               region: formData.region,
-              revenue: formData.revenue,
+              revenue: effectiveRevenue,
               includesVat: formData.includesVat,
-              expenses: formData.expenses,
+              expenses: effectiveExpenses,
               alreadyTaken,
               alreadyTakenViaPayroll,
               confirmedSoleIncome: formData.otherIncome === 0,
@@ -447,9 +581,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
             const commonStrategyInput = {
               region: formData.region,
-              revenue: formData.revenue,
+              revenue: effectiveRevenue,
               includesVat: formData.includesVat,
-              expenses: formData.expenses,
+              expenses: effectiveExpenses,
               lossesBroughtForward: formData.lossesBroughtForward,
               otherIncome: formData.otherIncome,
               employmentAllowance: formData.hasEmploymentAllowance,
@@ -478,9 +612,33 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               CURRENT_TAX_YEAR,
             );
 
+            let monthlyModeOutput: MonthlyModeOutput | null = null;
+            if (isMonthlyMode && monthlyProjection) {
+              monthlyModeOutput = {
+                ...calculateSafeMonthlyDraw({
+                  annualTakeHome: strategyComparison.strategies.optimalMix.takeHome,
+                  monthsRemaining: monthlyProjection.monthsRemaining,
+                  cashInBank: formData.cashInBank,
+                  minimumMonthlyDraw: formData.minimumMonthlyDraw,
+                  runwayMonths: formData.runwayMonths,
+                  monthlyExpenses: formData.monthlyExpenses,
+                }),
+                monthsRemaining: monthlyProjection.monthsRemaining,
+                projectedRevenue: monthlyProjection.projectedRevenue,
+                projectedExpenses: monthlyProjection.projectedExpenses,
+              };
+              if (typeof window !== 'undefined') {
+                trackSafeDrawCalculated();
+                if (monthlyModeOutput.hasBufferShortfall) {
+                  trackBufferShortfallShown();
+                }
+              }
+            }
+
             set({
               results,
               strategyComparison,
+              monthlyModeOutput,
               isCalculating: false,
               sliderSalary: null, // Reset slider on new calculation
             });
@@ -498,7 +656,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         reset: () => {
-          trackGuideReset();
+          if (typeof window !== 'undefined') {
+            trackGuideReset();
+          }
           set({ ...defaultState });
         },
         clearStaleState: () => {
@@ -507,7 +667,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
       }),
       {
         name: 'director-guide-storage',
-        version: 3, // Bumped for YTD split (was alreadyTaken + takenViaPayroll)
+        version: 4, // Monthly mode fields + derived outputs
         storage: createJSONStorage(() => safeStorage),
         partialize: (state) => ({
           formData: state.formData,
@@ -517,7 +677,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         }),
         migrate: (persistedState, version) => {
           // Migration from older versions - clear and start fresh
-          if (version < 3) {
+          if (version < 4) {
             return { ...defaultState };
           }
           return persistedState as DirectorGuideState;
@@ -576,6 +736,13 @@ export function useStrategyComparison() {
 }
 
 /**
+ * Hook for monthly-mode calculated outputs
+ */
+export function useMonthlyModeOutput() {
+  return useDirectorGuideStore((state) => state.monthlyModeOutput);
+}
+
+/**
  * Hook for accessing selected strategy
  */
 export function useSelectedStrategy() {
@@ -610,6 +777,7 @@ export function useDirectorGuideActions() {
   return useDirectorGuideStore(
     useShallow((state) => ({
       // Core inputs
+      setMode: state.setMode,
       setRegion: state.setRegion,
       setRevenue: state.setRevenue,
       setIncludesVat: state.setIncludesVat,
@@ -635,6 +803,13 @@ export function useDirectorGuideActions() {
       // Compare mode
       setYourSetupSalary: state.setYourSetupSalary,
       setYourSetupDividends: state.setYourSetupDividends,
+      // Monthly mode
+      setMonthlyIncome: state.setMonthlyIncome,
+      setMonthlyExpenses: state.setMonthlyExpenses,
+      setContractStartMonth: state.setContractStartMonth,
+      setCashInBank: state.setCashInBank,
+      setMinimumMonthlyDraw: state.setMinimumMonthlyDraw,
+      setRunwayMonths: state.setRunwayMonths,
       // UI actions
       setSelectedStrategy: state.setSelectedStrategy,
       setSliderSalary: state.setSliderSalary,

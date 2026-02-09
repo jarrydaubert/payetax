@@ -13,6 +13,7 @@ import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
   useDirectorFormData,
+  useMonthlyModeOutput,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
@@ -39,6 +40,8 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
   const formData = useDirectorFormData();
+  const monthlyModeOutput = useMonthlyModeOutput();
+  const isMonthlyMode = formData.mode === 'monthly';
 
   // Extract only the fields we need to minimize re-renders
   const {
@@ -54,12 +57,12 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   const values = useMemo(() => {
     if (!comparison || comparison.grossProfit <= 0) return null;
 
-    // comparison.grossProfit already has pension deducted (in strategyComparison.ts)
-    // Pass it directly - don't subtract pension again
+    const scenarioProfit = comparison.grossProfitAfterPension ?? comparison.grossProfit;
+
     if (sliderSalary !== null) {
       const scenario = calculateSalaryScenario(
         sliderSalary,
-        comparison.grossProfit,
+        scenarioProfit,
         region ?? 'rUK',
         TAX_YEAR,
         otherIncome,
@@ -107,11 +110,27 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   const cards = [
     {
       label: 'Safe Monthly Draw',
-      value: hasResults ? formatCurrency(Math.floor(values.takeHome / 12)) : '—',
-      subtext: 'After all taxes (illustrative)',
+      value: hasResults
+        ? formatCurrency(
+            Math.floor(
+              isMonthlyMode && monthlyModeOutput
+                ? monthlyModeOutput.safeMonthlyDraw
+                : values.takeHome / 12,
+            ),
+          )
+        : '—',
+      subtext: isMonthlyMode
+        ? 'Cash-aware + tax-aware (projection)'
+        : 'After all taxes (illustrative)',
       highlight: true,
       ariaDescription: hasResults
-        ? `Monthly take-home pay of ${formatCurrency(Math.floor(values.takeHome / 12))}, calculated after all personal taxes`
+        ? `Monthly safe draw of ${formatCurrency(
+            Math.floor(
+              isMonthlyMode && monthlyModeOutput
+                ? monthlyModeOutput.safeMonthlyDraw
+                : values.takeHome / 12,
+            ),
+          )}`
         : 'No results available',
     },
     {
