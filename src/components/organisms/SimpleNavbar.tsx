@@ -158,7 +158,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             }
           }}
         >
-          <span className='font-display font-semibold text-[1.4rem] text-text-primary-new tracking-[-0.03em]'>
+          <span className='brand-wordmark text-[1.4rem] text-text-primary-new'>
             paye
             <span className='text-gradient-new'>tax</span>
           </span>

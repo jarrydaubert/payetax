@@ -279,7 +279,7 @@ export function SidebarNav({
         </span>
         <span
           className={cn(
-            'block max-w-[180px] overflow-hidden whitespace-nowrap font-semibold text-[0.9rem] text-slate-100 tracking-[-0.02em] transition-all duration-200 2xl:text-[0.95rem]',
+            'brand-wordmark block max-w-[180px] overflow-hidden whitespace-nowrap text-[0.9rem] text-slate-100 transition-all duration-200 2xl:text-[0.95rem]',
             collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
           )}
         >

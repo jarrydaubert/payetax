@@ -183,7 +183,7 @@ export function DashboardLayout({
           {/* Mobile header with logo */}
           <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 py-3 backdrop-blur-sm lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>
-              <span className='font-semibold text-[1.2rem] text-slate-100 tracking-[-0.03em]'>
+              <span className='brand-wordmark text-[1.2rem] text-slate-100'>
                 paye
                 <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
                   tax

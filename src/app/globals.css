@@ -160,6 +160,14 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* Shared PayeTax wordmark typography */
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
 /* New gradient background utility */
 .bg-brand-gradient-new {
   background: var(--brand-gradient-new);
