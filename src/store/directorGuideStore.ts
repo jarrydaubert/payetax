@@ -9,10 +9,11 @@
  * @see docs/business/DIRECTOR_TOOLS_MERGE_PLAN.md
  */
 
+import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
+import type { StudentLoanPlan } from '@/constants/taxRates';
 import {
   trackBufferShortfallShown,
   trackGuideReset,
@@ -23,12 +24,17 @@ import { safeStorage } from '@/lib/safeStorage';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
+  isDirectorStudentLoanPlanAvailable,
+  sanitizeDirectorStudentLoanPlans,
+} from '@/lib/tax/studentLoanPlans';
+import {
   calculateSafeMonthlyDraw,
-  projectAnnualFromMonthly,
+  resolveAnnualFinancials,
   type SafeDrawResult,
 } from '@/lib/tax/variableIncome';
 import {
   CurrencyAmountSchema,
+  DIRECTOR_TAX_YEARS,
   type DirectorCalculationResult,
   type DirectorInput,
   type Region,
@@ -39,7 +45,7 @@ import {
 // CONSTANTS
 // ============================================================================
 
-const CURRENT_TAX_YEAR: TaxYear = '2025-2026';
+const CURRENT_TAX_YEAR = DIRECTOR_TAX_YEARS[0];
 
 // ============================================================================
 // TYPES
@@ -99,8 +105,8 @@ export interface DirectorFormData {
   yourSetupDividends: number | undefined;
 
   // Monthly mode
-  monthlyIncome: number;
-  monthlyExpenses: number;
+  monthlyIncome: number | undefined;
+  monthlyExpenses: number | undefined;
   contractStartMonth: number; // 1-12
   cashInBank: number;
   minimumMonthlyDraw: number;
@@ -133,9 +139,9 @@ interface DirectorGuideActions {
   // Core input setters
   setMode: (mode: DirectorGuideMode) => void;
   setRegion: (region: Region) => void;
-  setRevenue: (revenue: number) => void;
+  setRevenue: (revenue: number | undefined) => void;
   setIncludesVat: (includesVat: boolean) => void;
-  setExpenses: (expenses: number) => void;
+  setExpenses: (expenses: number | undefined) => void;
   setLossesBroughtForward: (amount: number) => void;
 
   // Director situation setters (YTD amounts)
@@ -163,8 +169,8 @@ interface DirectorGuideActions {
   setYourSetupDividends: (amount: number | undefined) => void;
 
   // Monthly mode setters
-  setMonthlyIncome: (amount: number) => void;
-  setMonthlyExpenses: (amount: number) => void;
+  setMonthlyIncome: (amount: number | undefined) => void;
+  setMonthlyExpenses: (amount: number | undefined) => void;
   setContractStartMonth: (month: number) => void;
   setCashInBank: (amount: number) => void;
   setMinimumMonthlyDraw: (amount: number) => void;
@@ -210,8 +216,8 @@ const defaultFormData: DirectorFormData = {
   minimumSalaryRequirement: undefined,
   yourSetupSalary: undefined,
   yourSetupDividends: undefined,
-  monthlyIncome: 0,
-  monthlyExpenses: 0,
+  monthlyIncome: undefined,
+  monthlyExpenses: undefined,
   contractStartMonth: 4,
   cashInBank: 0,
   minimumMonthlyDraw: 0,
@@ -228,6 +234,59 @@ const defaultState: DirectorGuideState = {
   selectedStrategy: 'optimalMix',
   sliderSalary: null,
 };
+
+const PersistedDirectorStudentLoanPlanSchema = z.enum([
+  'plan1',
+  'plan2',
+  'plan4',
+  'plan5',
+  'postgrad',
+]);
+
+const PersistedDirectorFormDataSchema = z
+  .object({
+    mode: z.enum(['annual', 'monthly']).optional(),
+    region: RegionSchema.optional(),
+    revenue: CurrencyAmountSchema.optional(),
+    includesVat: z.boolean().optional(),
+    expenses: CurrencyAmountSchema.optional(),
+    lossesBroughtForward: CurrencyAmountSchema.optional(),
+    ytdSalary: CurrencyAmountSchema.optional(),
+    ytdDividends: CurrencyAmountSchema.optional(),
+    ytdDrawings: CurrencyAmountSchema.optional(),
+    otherIncome: CurrencyAmountSchema.optional(),
+    hasOtherPAYEEmployment: z.boolean().optional(),
+    yearEndMonth: z.enum(['03', '12', 'other', 'unknown']).optional(),
+    yearEndCustom: z.string().max(10).optional(),
+    studentLoanPlans: z
+      .array(PersistedDirectorStudentLoanPlanSchema)
+      .max(2)
+      .refine((plans) => new Set(plans).size === plans.length, 'Duplicate plans are not allowed')
+      .optional(),
+    pensionContribution: CurrencyAmountSchema.optional(),
+    isPensionAlreadyDeducted: z.boolean().optional(),
+    companyCarBIK: CurrencyAmountSchema.optional(),
+    hasEmploymentAllowance: z.boolean().optional(),
+    minimumSalaryRequirement: CurrencyAmountSchema.optional(),
+    yourSetupSalary: CurrencyAmountSchema.optional(),
+    yourSetupDividends: CurrencyAmountSchema.optional(),
+    monthlyIncome: CurrencyAmountSchema.optional(),
+    monthlyExpenses: CurrencyAmountSchema.optional(),
+    contractStartMonth: z.number().int().min(1).max(12).optional(),
+    cashInBank: CurrencyAmountSchema.optional(),
+    minimumMonthlyDraw: CurrencyAmountSchema.optional(),
+    runwayMonths: z.number().int().min(0).max(36).optional(),
+  })
+  .strict();
+
+const PersistedDirectorStoreSchema = z
+  .object({
+    formData: PersistedDirectorFormDataSchema.optional(),
+    selectedStrategy: z.enum(['allSalary', 'optimalMix', 'allDividends']).optional(),
+    _savedAt: z.number().int().positive().optional(),
+    _taxYear: z.string().optional(),
+  })
+  .passthrough();
 
 // ============================================================================
 // STORE
@@ -265,6 +324,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setRevenue: (revenue) => {
+          if (revenue === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, revenue: undefined },
+            }));
+            return;
+          }
           const validated = CurrencyAmountSchema.safeParse(revenue);
           if (!validated.success) return;
           set((state) => ({
@@ -279,6 +344,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setExpenses: (expenses) => {
+          if (expenses === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, expenses: undefined },
+            }));
+            return;
+          }
           const validated = CurrencyAmountSchema.safeParse(expenses);
           if (!validated.success) return;
           set((state) => ({
@@ -357,15 +428,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setStudentLoanPlans: (plans) => {
-          // Spec: Plan 5 is not active for 2025-26; don't allow it to enter state (can appear via stale persisted data).
-          const sanitized = plans.filter((p) => p !== 'plan5');
+          const sanitized = sanitizeDirectorStudentLoanPlans(plans, CURRENT_TAX_YEAR);
           set((state) => ({
             formData: { ...state.formData, studentLoanPlans: sanitized },
           }));
         },
 
         toggleStudentLoanPlan: (plan) => {
-          if (plan === 'plan5') return;
+          if (!isDirectorStudentLoanPlanAvailable(plan, CURRENT_TAX_YEAR)) return;
           set((state) => {
             const current = state.formData.studentLoanPlans;
             const newPlans = current.includes(plan)
@@ -456,6 +526,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setMonthlyIncome: (amount) => {
+          if (amount === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, monthlyIncome: undefined },
+            }));
+            return;
+          }
           const validated = CurrencyAmountSchema.safeParse(amount);
           if (!validated.success) return;
           set((state) => ({
@@ -464,6 +540,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         setMonthlyExpenses: (amount) => {
+          if (amount === undefined) {
+            set((state) => ({
+              formData: { ...state.formData, monthlyExpenses: undefined },
+            }));
+            return;
+          }
           const validated = CurrencyAmountSchema.safeParse(amount);
           if (!validated.success) return;
           set((state) => ({
@@ -526,27 +608,23 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           }
 
           const isMonthlyMode = formData.mode === 'monthly';
-          const monthlyProjection = isMonthlyMode
-            ? projectAnnualFromMonthly({
-                monthlyIncome: formData.monthlyIncome,
-                monthlyExpenses: formData.monthlyExpenses,
-                contractStartMonth: formData.contractStartMonth,
-              })
-            : null;
+          const annualizedFinancials = resolveAnnualFinancials({
+            mode: formData.mode,
+            revenue: formData.revenue,
+            expenses: formData.expenses,
+            monthlyIncome: formData.monthlyIncome,
+            monthlyExpenses: formData.monthlyExpenses,
+            contractStartMonth: formData.contractStartMonth,
+          });
+          const monthlyProjection = annualizedFinancials.monthlyProjection;
 
-          if (isMonthlyMode && monthlyProjection && monthlyProjection.monthsRemaining <= 0) {
+          if (annualizedFinancials.hasInvalidContractStartMonth) {
             set({ error: 'Please select a valid contract start month' });
             return;
           }
 
-          const effectiveRevenue =
-            isMonthlyMode && monthlyProjection
-              ? monthlyProjection.projectedRevenue
-              : formData.revenue;
-          const effectiveExpenses =
-            isMonthlyMode && monthlyProjection
-              ? monthlyProjection.projectedExpenses
-              : formData.expenses;
+          const effectiveRevenue = annualizedFinancials.revenue;
+          const effectiveExpenses = annualizedFinancials.expenses;
 
           if (effectiveRevenue === undefined || effectiveExpenses === undefined) {
             set({ error: 'Please fill in revenue, expenses, and region' });
@@ -678,31 +756,46 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         migrate: (persistedState, version) => {
           // Migration from older versions - clear and start fresh
           if (version < 4) {
-            return { ...defaultState };
+            return {
+              formData: { ...defaultFormData },
+              selectedStrategy: defaultState.selectedStrategy,
+              _savedAt: Date.now(),
+              _taxYear: CURRENT_TAX_YEAR,
+            };
           }
-          return persistedState as DirectorGuideState;
+          return persistedState;
+        },
+        merge: (persistedState, currentState) => {
+          const parsed = PersistedDirectorStoreSchema.safeParse(persistedState);
+          if (!parsed.success) {
+            return currentState;
+          }
+
+          const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+          const { formData, selectedStrategy, _savedAt, _taxYear } = parsed.data;
+          const isExpired = _savedAt && Date.now() - _savedAt > SEVEN_DAYS_MS;
+          const wrongTaxYear = _taxYear && _taxYear !== CURRENT_TAX_YEAR;
+
+          if (isExpired || wrongTaxYear) {
+            return currentState;
+          }
+
+          const sanitizedStudentLoans = formData?.studentLoanPlans
+            ? sanitizeDirectorStudentLoanPlans(formData.studentLoanPlans, CURRENT_TAX_YEAR)
+            : undefined;
+
+          return {
+            ...currentState,
+            formData: {
+              ...currentState.formData,
+              ...formData,
+              studentLoanPlans: sanitizedStudentLoans ?? currentState.formData.studentLoanPlans,
+            },
+            selectedStrategy: selectedStrategy ?? currentState.selectedStrategy,
+          };
         },
         onRehydrateStorage: () => (state, error) => {
           if (error || !state) return;
-
-          // Defensive cleanup: prevent stale persisted Plan 5 from appearing in UI/state for 2025-26.
-          if (state.formData.studentLoanPlans.includes('plan5')) {
-            state.setStudentLoanPlans(state.formData.studentLoanPlans);
-          }
-
-          // Check for expiry (7 days) or tax year mismatch
-          const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
-          const savedAt = (state as unknown as { _savedAt?: number })._savedAt;
-          const savedTaxYear = (state as unknown as { _taxYear?: string })._taxYear;
-
-          const isExpired = savedAt && Date.now() - savedAt > SEVEN_DAYS_MS;
-          const wrongTaxYear = savedTaxYear && savedTaxYear !== CURRENT_TAX_YEAR;
-
-          if (isExpired || wrongTaxYear) {
-            // Clear stale data
-            useDirectorGuideStore.getState().clearStaleState();
-          }
         },
       },
     ),
@@ -715,10 +808,24 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 // ============================================================================
 
 /**
- * Hook for accessing form data with shallow comparison
+ * Hook for accessing full form data.
  */
 export function useDirectorFormData() {
-  return useDirectorGuideStore(useShallow((state) => state.formData));
+  return useDirectorGuideStore((state) => state.formData);
+}
+
+/**
+ * Hook for accessing a single form value with minimal subscriptions.
+ */
+export function useDirectorFormValue<T>(selector: (formData: DirectorFormData) => T) {
+  return useDirectorGuideStore((state) => selector(state.formData));
+}
+
+/**
+ * Hook for accessing a shallow-compared form slice (object/array selections).
+ */
+export function useDirectorFormSlice<T>(selector: (formData: DirectorFormData) => T) {
+  return useDirectorGuideStore(useShallow((state) => selector(state.formData)));
 }
 
 /**

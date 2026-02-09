@@ -119,6 +119,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     return num ? Number(num) : 0;
   };
 
+  const parseCurrencyOptional = (value: string): number | undefined => {
+    const num = value.replace(/[^0-9]/g, '');
+    return num ? Number(num) : undefined;
+  };
+
   const handleReset = () => {
     if (onReset) {
       onReset();
@@ -210,7 +215,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.monthlyIncome}
                 type='text'
                 value={formatCurrency(formData.monthlyIncome)}
-                onChange={(e) => actions.setMonthlyIncome(parseCurrency(e.target.value))}
+                onChange={(e) => actions.setMonthlyIncome(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.monthlyIncome)}
@@ -227,7 +232,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.monthlyExpenses}
                 type='text'
                 value={formatCurrency(formData.monthlyExpenses)}
-                onChange={(e) => actions.setMonthlyExpenses(parseCurrency(e.target.value))}
+                onChange={(e) => actions.setMonthlyExpenses(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.monthlyExpenses)}
@@ -334,7 +339,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 data-testid='director-revenue-input'
                 type='text'
                 value={formatCurrency(formData.revenue)}
-                onChange={(e) => actions.setRevenue(parseCurrency(e.target.value))}
+                onChange={(e) => actions.setRevenue(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.revenue)}
@@ -352,7 +357,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 data-testid='director-expenses-input'
                 type='text'
                 value={formatCurrency(formData.expenses)}
-                onChange={(e) => actions.setExpenses(parseCurrency(e.target.value))}
+                onChange={(e) => actions.setExpenses(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.expenses)}

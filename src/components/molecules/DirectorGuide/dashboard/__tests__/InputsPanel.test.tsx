@@ -99,8 +99,8 @@ describe('DirectorGuide InputsPanel', () => {
         region: 'rUK',
         revenue: undefined,
         expenses: undefined,
-        monthlyIncome: 0,
-        monthlyExpenses: 0,
+        monthlyIncome: undefined,
+        monthlyExpenses: undefined,
         contractStartMonth: 4,
         cashInBank: 0,
         minimumMonthlyDraw: 0,
@@ -151,6 +151,39 @@ describe('DirectorGuide InputsPanel', () => {
     expect(state.cashInBank).toBe(5000);
     expect(state.minimumMonthlyDraw).toBe(900);
     expect(state.runwayMonths).toBe(5);
+  });
+
+  it('clears annual core inputs back to undefined', () => {
+    render(<InputsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Annual Revenue'), { target: { value: '125000' } });
+    fireEvent.change(screen.getByLabelText('Business Expenses'), { target: { value: '24000' } });
+    fireEvent.change(screen.getByLabelText('Annual Revenue'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('Business Expenses'), { target: { value: '' } });
+
+    const state = useDirectorGuideStore.getState().formData;
+    expect(state.revenue).toBeUndefined();
+    expect(state.expenses).toBeUndefined();
+  });
+
+  it('clears monthly core inputs back to undefined', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setMode('monthly');
+
+    render(<InputsPanel />);
+
+    fireEvent.change(screen.getByLabelText('Monthly Contract Income'), {
+      target: { value: '3250' },
+    });
+    fireEvent.change(screen.getByLabelText('Monthly Business Expenses'), {
+      target: { value: '1200' },
+    });
+    fireEvent.change(screen.getByLabelText('Monthly Contract Income'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('Monthly Business Expenses'), { target: { value: '' } });
+
+    const state = useDirectorGuideStore.getState().formData;
+    expect(state.monthlyIncome).toBeUndefined();
+    expect(state.monthlyExpenses).toBeUndefined();
   });
 
   it('delegates reset to parent callback when onReset is provided', () => {

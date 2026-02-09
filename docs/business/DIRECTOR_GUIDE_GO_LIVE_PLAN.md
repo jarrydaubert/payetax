@@ -41,5 +41,5 @@ Status: complete (email endpoints recompute server-side + tests, CI gates, requi
 ## References
 
 - `docs/business/DIRECTOR_CALCULATOR_BUILD.md`
-- `docs/business/DIRECTOR_TAX_MATH.md`
+- `docs/business/DIRECTOR_VARIABLE_INCOME_SPEC.md`
 - `src/constants/taxRates.ts`

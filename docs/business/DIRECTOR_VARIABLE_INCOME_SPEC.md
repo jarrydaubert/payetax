@@ -6,7 +6,7 @@
 - Core monthly logic is live in `src/lib/tax/variableIncome.ts` and wired into the Director Guide store + dashboard.
 - Safe monthly draw, buffer status, and monthly-mode warnings are implemented.
 - Analytics coverage and unit/component/store tests were added for monthly-mode flows.
-- Follow-up hardening items are tracked in `docs/BACKLOG.md` under **Director Guide monthly mode hardening**.
+- Follow-up hardening items are tracked in `docs/BACKLOG.md`.
 
 ## Purpose
 
@@ -108,8 +108,8 @@ Enable first‑time directors with uncertain income to answer: “What can I saf
 
 Add to DirectorGuide state (monthly mode only):
 - `mode: 'annual' | 'monthly'`
-- `monthlyIncome` (number)
-- `monthlyExpenses` (number)
+- `monthlyIncome` (`number | undefined`, blank until entered)
+- `monthlyExpenses` (`number | undefined`, blank until entered)
 - `contractStartMonth` (01–12)
 - `cashInBank` (number)
 - `minimumMonthlyDraw` (number)
@@ -124,6 +124,7 @@ Add to DirectorGuide state (monthly mode only):
 ## Edge Cases
 
 - `monthsRemaining <= 0` → show validation error
+- `monthlyIncome` or `monthlyExpenses` unset (`undefined`) → skip projection and wait for both values
 - `monthlyIncome = 0` → survival mode warning + safe draw = 0 or minimum only
 - Large cash buffer but low income → safe draw capped by tax‑based monthly draw
 - Already‑taken > projected profit → show existing “overdrawn” warnings
@@ -145,6 +146,6 @@ Add to DirectorGuide state (monthly mode only):
 
 ## Rollout Status
 
-- Monthly mode is enabled by default as part of the Director Guide calculator.
+- Monthly mode is available in the Director Guide calculator.
 - Default mode remains **Annual** to preserve first-load behavior.
 - Tooltip/help copy for projection assumptions is included in the monthly flow.

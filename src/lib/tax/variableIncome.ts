@@ -6,8 +6,8 @@
  */
 
 export interface MonthlyProjectionInput {
-  monthlyIncome: number;
-  monthlyExpenses: number;
+  monthlyIncome: number | undefined;
+  monthlyExpenses: number | undefined;
   contractStartMonth: number; // 1-12
 }
 
@@ -17,13 +17,29 @@ export interface MonthlyProjectionResult {
   projectedExpenses: number;
 }
 
+export interface AnnualizedFinancialInput {
+  mode: 'annual' | 'monthly';
+  revenue: number | undefined;
+  expenses: number | undefined;
+  monthlyIncome: number | undefined;
+  monthlyExpenses: number | undefined;
+  contractStartMonth: number;
+}
+
+export interface AnnualizedFinancialResult {
+  monthlyProjection: MonthlyProjectionResult | null;
+  revenue: number | undefined;
+  expenses: number | undefined;
+  hasInvalidContractStartMonth: boolean;
+}
+
 export interface SafeDrawInput {
   annualTakeHome: number;
   monthsRemaining: number;
   cashInBank: number;
   minimumMonthlyDraw: number;
   runwayMonths: number;
-  monthlyExpenses: number;
+  monthlyExpenses: number | undefined;
 }
 
 export interface SafeDrawResult {
@@ -42,9 +58,10 @@ function roundToPence(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-function sanitizeNonNegative(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, value);
+function sanitizeNonNegative(value: number | undefined): number {
+  const normalized = typeof value === 'number' ? value : 0;
+  if (!Number.isFinite(normalized)) return 0;
+  return Math.max(0, normalized);
 }
 
 /**
@@ -72,6 +89,45 @@ export function projectAnnualFromMonthly(input: MonthlyProjectionInput): Monthly
     monthsRemaining,
     projectedRevenue: roundToPence(monthlyIncome * monthsRemaining),
     projectedExpenses: roundToPence(monthlyExpenses * monthsRemaining),
+  };
+}
+
+/**
+ * Resolve annual revenue/expenses based on annual vs monthly mode.
+ * Monthly mode projects from contract month through March.
+ */
+export function resolveAnnualFinancials(
+  input: AnnualizedFinancialInput,
+): AnnualizedFinancialResult {
+  if (input.mode !== 'monthly') {
+    return {
+      monthlyProjection: null,
+      revenue: input.revenue,
+      expenses: input.expenses,
+      hasInvalidContractStartMonth: false,
+    };
+  }
+
+  if (input.monthlyIncome === undefined || input.monthlyExpenses === undefined) {
+    return {
+      monthlyProjection: null,
+      revenue: undefined,
+      expenses: undefined,
+      hasInvalidContractStartMonth: false,
+    };
+  }
+
+  const monthlyProjection = projectAnnualFromMonthly({
+    monthlyIncome: input.monthlyIncome,
+    monthlyExpenses: input.monthlyExpenses,
+    contractStartMonth: input.contractStartMonth,
+  });
+
+  return {
+    monthlyProjection,
+    revenue: monthlyProjection.projectedRevenue,
+    expenses: monthlyProjection.projectedExpenses,
+    hasInvalidContractStartMonth: monthlyProjection.monthsRemaining <= 0,
   };
 }
 

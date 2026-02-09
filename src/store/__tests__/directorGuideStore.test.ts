@@ -7,6 +7,7 @@
 
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
+import { DIRECTOR_TAX_YEARS } from '@/lib/validation/directorValidation';
 import { useDirectorGuideStore } from '../directorGuideStore';
 
 // Mock the director calculator
@@ -64,9 +65,11 @@ jest.mock('@/lib/tax/strategyComparison', () => ({
 
 const mockCalculateDirectorScenario = calculateDirectorScenario as jest.Mock;
 const mockCalculateStrategyComparison = calculateStrategyComparison as jest.Mock;
+const DIRECTOR_STORAGE_KEY = 'director-guide-storage';
 
 describe('DirectorGuideStore', () => {
   beforeEach(() => {
+    localStorage.clear();
     useDirectorGuideStore.getState().reset();
     mockCalculateDirectorScenario.mockClear();
     mockCalculateStrategyComparison.mockClear();
@@ -87,8 +90,8 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.pensionContribution).toBe(0);
       expect(state.formData.companyCarBIK).toBe(0);
       expect(state.formData.hasEmploymentAllowance).toBe(false);
-      expect(state.formData.monthlyIncome).toBe(0);
-      expect(state.formData.monthlyExpenses).toBe(0);
+      expect(state.formData.monthlyIncome).toBeUndefined();
+      expect(state.formData.monthlyExpenses).toBeUndefined();
       expect(state.formData.contractStartMonth).toBe(4);
       expect(state.formData.runwayMonths).toBe(3);
       expect(state.results).toBeNull();
@@ -113,6 +116,13 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.revenue).toBe(100000);
     });
 
+    it('should clear revenue', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setRevenue(100000);
+      store.setRevenue(undefined);
+      expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
+    });
+
     it('should reject negative revenue', () => {
       useDirectorGuideStore.getState().setRevenue(-5000);
       expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
@@ -126,6 +136,13 @@ describe('DirectorGuideStore', () => {
     it('should set expenses', () => {
       useDirectorGuideStore.getState().setExpenses(20000);
       expect(useDirectorGuideStore.getState().formData.expenses).toBe(20000);
+    });
+
+    it('should clear expenses', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setExpenses(20000);
+      store.setExpenses(undefined);
+      expect(useDirectorGuideStore.getState().formData.expenses).toBeUndefined();
     });
 
     it('should set includesVat', () => {
@@ -231,6 +248,18 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.cashInBank).toBe(5000);
       expect(state.formData.minimumMonthlyDraw).toBe(1200);
       expect(state.formData.runwayMonths).toBe(4);
+    });
+
+    it('should clear monthly income and expenses', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setMonthlyIncome(3000);
+      store.setMonthlyExpenses(1000);
+      store.setMonthlyIncome(undefined);
+      store.setMonthlyExpenses(undefined);
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.formData.monthlyIncome).toBeUndefined();
+      expect(state.formData.monthlyExpenses).toBeUndefined();
     });
   });
 
@@ -471,6 +500,77 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.otherIncome).toBe(0);
       expect(state.formData.studentLoanPlans).toEqual([]);
       expect(state.strategyComparison).toBeNull();
+    });
+  });
+
+  describe('Persisted State Hydration Guards', () => {
+    it('should ignore tampered persisted form data that fails schema validation', async () => {
+      useDirectorGuideStore.getState().setMonthlyIncome(2500);
+
+      localStorage.setItem(
+        DIRECTOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            formData: {
+              mode: 'monthly',
+              monthlyIncome: 4000,
+              contractStartMonth: 13,
+            },
+            selectedStrategy: 'allDividends',
+            _savedAt: Date.now(),
+            _taxYear: DIRECTOR_TAX_YEARS[0],
+          },
+          version: 4,
+        }),
+      );
+
+      await useDirectorGuideStore.persist.rehydrate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.formData.monthlyIncome).toBe(2500);
+      expect(state.selectedStrategy).toBe('optimalMix');
+    });
+
+    it('should sanitize disallowed student loan plans from persisted state', async () => {
+      localStorage.setItem(
+        DIRECTOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            formData: {
+              studentLoanPlans: ['plan1', 'plan5'],
+            },
+            _savedAt: Date.now(),
+            _taxYear: DIRECTOR_TAX_YEARS[0],
+          },
+          version: 4,
+        }),
+      );
+
+      await useDirectorGuideStore.persist.rehydrate();
+
+      expect(useDirectorGuideStore.getState().formData.studentLoanPlans).toEqual(['plan1']);
+    });
+
+    it('should ignore persisted state from the wrong tax year', async () => {
+      useDirectorGuideStore.getState().setRevenue(12345);
+
+      localStorage.setItem(
+        DIRECTOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            formData: {
+              revenue: 99999,
+            },
+            _savedAt: Date.now(),
+            _taxYear: '1900-1901',
+          },
+          version: 4,
+        }),
+      );
+
+      await useDirectorGuideStore.persist.rehydrate();
+
+      expect(useDirectorGuideStore.getState().formData.revenue).toBe(12345);
     });
   });
 });

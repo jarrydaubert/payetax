@@ -2,6 +2,7 @@ import {
   calculateSafeMonthlyDraw,
   getMonthsRemaining,
   projectAnnualFromMonthly,
+  resolveAnnualFinancials,
 } from '../variableIncome';
 
 describe('variableIncome helpers', () => {
@@ -31,6 +32,69 @@ describe('variableIncome helpers', () => {
       expect(result.monthsRemaining).toBe(6);
       expect(result.projectedRevenue).toBe(18000);
       expect(result.projectedExpenses).toBe(6000);
+    });
+  });
+
+  describe('resolveAnnualFinancials', () => {
+    it('returns annual values unchanged in annual mode', () => {
+      const result = resolveAnnualFinancials({
+        mode: 'annual',
+        revenue: 100000,
+        expenses: 20000,
+        monthlyIncome: 0,
+        monthlyExpenses: 0,
+        contractStartMonth: 4,
+      });
+
+      expect(result.monthlyProjection).toBeNull();
+      expect(result.revenue).toBe(100000);
+      expect(result.expenses).toBe(20000);
+      expect(result.hasInvalidContractStartMonth).toBe(false);
+    });
+
+    it('projects annual values in monthly mode', () => {
+      const result = resolveAnnualFinancials({
+        mode: 'monthly',
+        revenue: undefined,
+        expenses: undefined,
+        monthlyIncome: 3000,
+        monthlyExpenses: 1000,
+        contractStartMonth: 10,
+      });
+
+      expect(result.monthlyProjection?.monthsRemaining).toBe(6);
+      expect(result.revenue).toBe(18000);
+      expect(result.expenses).toBe(6000);
+      expect(result.hasInvalidContractStartMonth).toBe(false);
+    });
+
+    it('requires explicit monthly values in monthly mode', () => {
+      const result = resolveAnnualFinancials({
+        mode: 'monthly',
+        revenue: undefined,
+        expenses: undefined,
+        monthlyIncome: undefined,
+        monthlyExpenses: undefined,
+        contractStartMonth: 10,
+      });
+
+      expect(result.monthlyProjection).toBeNull();
+      expect(result.revenue).toBeUndefined();
+      expect(result.expenses).toBeUndefined();
+      expect(result.hasInvalidContractStartMonth).toBe(false);
+    });
+
+    it('flags invalid contract month in monthly mode', () => {
+      const result = resolveAnnualFinancials({
+        mode: 'monthly',
+        revenue: undefined,
+        expenses: undefined,
+        monthlyIncome: 3000,
+        monthlyExpenses: 1000,
+        contractStartMonth: 13,
+      });
+
+      expect(result.hasInvalidContractStartMonth).toBe(true);
     });
   });
 
