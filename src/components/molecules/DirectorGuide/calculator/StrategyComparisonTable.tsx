@@ -10,17 +10,19 @@
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
 import { useMemo } from 'react';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
+import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
 import { calculateSalaryScenario, type YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-const TAX_YEAR = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -34,7 +36,14 @@ export function StrategyComparisonTable() {
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    region: state.region,
+    otherIncome: state.otherIncome,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    studentLoanPlans: state.studentLoanPlans,
+    pensionContribution: state.pensionContribution,
+    companyCarBIK: state.companyCarBIK,
+  }));
   const { setSelectedStrategy, setSliderSalary } = useDirectorGuideActions();
 
   // Calculate current scenario based on slider position
@@ -98,6 +107,7 @@ export function StrategyComparisonTable() {
   ];
 
   const handleSelectStrategy = (key: 'allSalary' | 'optimalMix' | 'allDividends') => {
+    trackStrategySelected(key, comparison.recommended === key);
     setSelectedStrategy(key);
     const salary = comparison.strategies[key].salary;
     setSliderSalary(salary);

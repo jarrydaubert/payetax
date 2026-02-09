@@ -51,6 +51,7 @@ describe('sitemap', () => {
       expect.arrayContaining([
         expect.objectContaining({ url: 'https://example.com/' }),
         expect.objectContaining({ url: 'https://example.com/privacy' }),
+        expect.objectContaining({ url: 'https://example.com/install' }),
         expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.9 }),
         expect.objectContaining({ url: 'https://example.com/blog/category/tax-basics' }),
         expect.objectContaining({ url: 'https://example.com/alternatives/listentotaxman' }),

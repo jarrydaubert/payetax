@@ -11,6 +11,8 @@
 
 import { trackEvent } from '@/lib/analytics';
 
+type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
+
 /**
  * Bucket a revenue/profit value for privacy-safe analytics
  */
@@ -29,6 +31,13 @@ function bucketValue(value: number): string {
 export function trackGuideStarted(): void {
   trackEvent({
     action: 'guide_started',
+    category: 'director_guide',
+    label: 'page_load',
+  });
+
+  // New canonical naming for dashboard-level funnels.
+  trackEvent({
+    action: 'pro_calculator_started',
     category: 'director_guide',
     label: 'page_load',
   });
@@ -118,13 +127,50 @@ export function trackResultsShown(
   profit: number,
   mode: 'normal' | 'survival' | 'modified_survival',
 ): void {
+  const profitBucket = bucketValue(profit);
+
   trackEvent({
     action: 'guide_results_shown',
     category: 'director_guide',
     label: mode,
     custom_data: {
-      profit_bucket: bucketValue(profit),
+      profit_bucket: profitBucket,
     },
+  });
+
+  // New canonical naming for dashboard-level funnels.
+  trackEvent({
+    action: 'pro_calculator_completed',
+    category: 'director_guide',
+    label: mode,
+    custom_data: {
+      profit_bucket: profitBucket,
+    },
+  });
+}
+
+/**
+ * Track strategy card selection in the pro calculator.
+ */
+export function trackStrategySelected(strategy: StrategyKey, isRecommended: boolean): void {
+  trackEvent({
+    action: 'pro_strategy_selected',
+    category: 'director_guide',
+    label: strategy,
+    custom_data: {
+      recommended: isRecommended,
+    },
+  });
+}
+
+/**
+ * Track key-date calendar file downloads.
+ */
+export function trackCalendarDownloaded(): void {
+  trackEvent({
+    action: 'pro_calendar_downloaded',
+    category: 'director_guide',
+    label: 'ics',
   });
 }
 

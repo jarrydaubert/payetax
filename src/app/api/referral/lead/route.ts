@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { isValidRequestOrigin } from '@/lib/security/origin';
+import { ReferralLeadRequestSchema } from '@/lib/validation/emailValidation';
 
 export const runtime = 'nodejs';
 
@@ -15,16 +16,12 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const MAX_BODY_SIZE = 2048; // 2KB is plenty for a lead form
 
-const ReferralLeadSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  salaryRange: z.enum(['75k-100k', '100k-125k', '125k+']),
-  reason: z.enum(['tax-trap', 'high-earner', 'scottish-high', 'additional-rate']),
-  isScottish: z.boolean(),
+const ReferralLeadSchema = ReferralLeadRequestSchema.extend({
   consent: z.boolean().refine((val) => val === true, {
     message: 'You must consent to being contacted',
   }),
   source: z.string().max(100).optional(),
-});
+}).strict();
 
 type ReferralLead = z.infer<typeof ReferralLeadSchema>;
 

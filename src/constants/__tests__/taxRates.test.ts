@@ -3,7 +3,22 @@
  * Validates structure, completeness, and accuracy of HMRC tax data
  */
 
-import { DEFAULT_TAX_CODE, PERIODS, SCOTTISH_TAX_RATES, TAX_RATES, TAX_YEARS } from '../taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  CURRENT_TAX_YEAR_DISPLAY,
+  DEFAULT_TAX_CODE,
+  formatTaxYearDisplay,
+  PERIODS,
+  SCOTTISH_TAX_RATES,
+  TAX_RATES,
+  TAX_YEARS,
+} from '../taxRates';
+
+const getExpectedCurrentTaxYear = (date: Date): string => {
+  const year = date.getFullYear();
+  const taxYearStart = new Date(year, 3, 6); // 6 April
+  return date >= taxYearStart ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+};
 
 describe('Tax Rates Constants', () => {
   describe('Data Completeness', () => {
@@ -221,6 +236,21 @@ describe('Tax Rates Constants', () => {
       // Should be ordered newest to oldest
       expect(TAX_YEARS[0]).toBe('2025-2026');
       expect(TAX_YEARS[TAX_YEARS.length - 1]).toBe('2023-2024');
+    });
+
+    it('should keep CURRENT_TAX_YEAR and TAX_YEARS[0] aligned to today', () => {
+      const expectedCurrentTaxYear = getExpectedCurrentTaxYear(new Date());
+
+      expect(CURRENT_TAX_YEAR).toBe(expectedCurrentTaxYear);
+      expect(TAX_YEARS[0]).toBe(expectedCurrentTaxYear);
+    });
+
+    it('should expose centralized tax year display formatting', () => {
+      expect(formatTaxYearDisplay('2025-2026')).toBe('2025/2026');
+      expect(formatTaxYearDisplay('2025-2026', { separator: '-', shortEndYear: true })).toBe(
+        '2025-26',
+      );
+      expect(CURRENT_TAX_YEAR_DISPLAY).toBe(formatTaxYearDisplay(CURRENT_TAX_YEAR));
     });
   });
 

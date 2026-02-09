@@ -2,7 +2,6 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { z } from 'zod';
 import { generateWelcomeEmailHtml, generateWelcomeEmailText } from '@/../emails/welcome';
 import {
   createUnsubscribeToken,
@@ -10,6 +9,7 @@ import {
 } from '@/lib/newsletter/unsubscribeToken';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { isValidRequestOrigin } from '@/lib/security/origin';
+import { NewsletterSubscribeRequestSchema } from '@/lib/validation/emailValidation';
 
 // Explicit Node.js runtime (Resend SDK requires Node APIs)
 export const runtime = 'nodejs';
@@ -18,10 +18,6 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const audienceId = process.env.RESEND_AUDIENCE_ID;
 
 const MAX_BODY_SIZE = 1024; // 1KB is plenty for an email subscription
-
-const SubscribeSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-});
 
 /** Escape HTML to prevent injection (including single quotes for attributes) */
 function escapeHtml(str: string): string {
@@ -100,7 +96,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate with Zod
-  const validation = SubscribeSchema.safeParse(body);
+  const validation = NewsletterSubscribeRequestSchema.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
       { error: 'Invalid email address', details: validation.error.flatten() },

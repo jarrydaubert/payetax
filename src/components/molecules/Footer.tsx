@@ -38,6 +38,7 @@ export function Footer({ className }: FooterProps) {
           <Link href='/tools/marriage-allowance-calculator'>Marriage Allowance</Link>
           <Link href='/tools/national-insurance-calculator'>National Insurance</Link>
           <Link href='/tools/director-guide'>Director Guide</Link>
+          <a href='/install'>Install App</a>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
           <Link href='/compliance'>Compliance</Link>

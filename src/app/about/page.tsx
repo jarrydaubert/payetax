@@ -1,29 +1,23 @@
-// src/app/about/page.tsx
-
-import { ArrowRight, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle2, FileText, Mail, Shield, Sparkles, Workflow } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { ContactFooter } from '@/components/molecules/ContactFooter';
-import { FeatureGrid } from '@/components/molecules/FeatureGrid';
-import { PageHero } from '@/components/molecules/PageHero';
-import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
+import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import {
-  ABOUT_STATS,
-  ABOUT_TECH_STACK,
-  ABOUT_UNIQUE_FEATURES,
-  ABOUT_VALUES,
+  ABOUT_BUILD_PROMISES,
+  ABOUT_COMPARISON_ROWS,
+  ABOUT_HERO_STATS,
+  ABOUT_OPERATING_RULES,
+  ABOUT_TRUST_PILLARS,
 } from '@/constants/pages/aboutPageData';
 import { SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
 export default function AboutPage() {
   return (
-    <div className={LAYOUT.PAGE_WRAPPER}>
-      {/* Structured Data for SEO */}
+    <div className='relative overflow-hidden'>
       <StructuredData
         type='person'
         expert={{
@@ -41,153 +35,312 @@ export default function AboutPage() {
         ]}
       />
 
-      {/* Hero Section */}
-      <PageHero
-        badge={{ icon: Shield, text: 'About PayeTax' }}
-        title={
-          <>
-            <GradientText variant='brand-full' as='span'>
-              Built for Privacy
-            </GradientText>
-            <br />
-            <span className='text-foreground'>Designed for You</span>
-          </>
-        }
-        subtitle={[
-          "We're not here to collect your data. We're here to help you understand your take-home pay with zero compromises on privacy.",
-          'Free forever. No premium tiers. No paywalls. Just honest tax calculations built with care.',
-        ]}
+      <div
+        className='pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_15%,rgba(6,182,212,0.20),transparent_45%),radial-gradient(circle_at_88%_8%,rgba(16,185,129,0.16),transparent_40%),radial-gradient(circle_at_50%_78%,rgba(6,182,212,0.12),transparent_48%)]'
+        aria-hidden='true'
       />
 
-      {/* Stats Section */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER}>
-          <StatsGrid stats={ABOUT_STATS} columns={4} variant='elevated' />
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
-        <div className={LAYOUT.CONTAINER}>
-          <FeatureGrid
-            heading={{
-              badge: { icon: Shield, text: 'Our Values' },
-              title: 'What We Stand For',
-              subtitle: 'The principles that guide every decision we make',
-              align: 'center',
-            }}
-            features={ABOUT_VALUES}
-            columns={2}
-            variant='showcase'
-          />
-        </div>
-      </section>
-
-      {/* Unique Features Section */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER}>
-          <FeatureGrid
-            heading={{
-              title: 'What Makes Us Different',
-              subtitle: "Features you won't find in other tax calculators",
-              align: 'center',
-            }}
-            features={ABOUT_UNIQUE_FEATURES}
-            columns={3}
-            variant='showcase'
-          />
-        </div>
-      </section>
-
-      {/* Tech Stack Section */}
-      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
-        <div className={LAYOUT.CONTAINER}>
-          <FeatureGrid
-            heading={{
-              title: 'Why It Just Works',
-              subtitle: 'Built for accuracy, not profit',
-              align: 'center',
-            }}
-            features={ABOUT_TECH_STACK}
-            columns={3}
-            variant='default'
-          />
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_SM}>
-          <div className={LAYOUT.TEXT_CENTER}>
-            <Badge variant='outline' className={SPACING.MB_6}>
-              <Shield className={cn(ICON_SIZES.SIZE_3_5, 'mr-1.5')} />
-              The Creator
+      <section className='border-border/40 border-b py-24 md:py-28'>
+        <div className={LAYOUT.CONTAINER_MD}>
+          <div className='mx-auto max-w-4xl text-center'>
+            <Badge className='mb-4 border-cyan-500/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20'>
+              <Sparkles className='mr-1.5 size-3.5' />
+              About PayeTax
             </Badge>
-            <h2 className={cn(SPACING.MB_4, 'font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
-              Hey, I&apos;m Jarryd
-            </h2>
-            <div
-              className={cn(LAYOUT.CENTERED_CONTENT, SPACING.SPACE_Y_4, 'text-muted-foreground')}
-            >
-              <p className={TYPOGRAPHY.TEXT_LG}>
-                I built PayeTax because I was frustrated with existing tax calculators &mdash; they
-                were either riddled with ads, demanded my email, or felt stuck in 2010.
-              </p>
-              <p>
-                So I created the calculator I actually wanted to use: fast, private, accurate, and
-                genuinely free. Every feature exists because it solves a real problem I encountered
-                when trying to understand UK taxes.
-              </p>
+
+            <h1 className='font-bold text-4xl text-foreground tracking-tight md:text-6xl'>
+              Built to help you{' '}
+              <GradientText variant='brand-full' as='span'>
+                trust your numbers
+              </GradientText>
+              <br />
+              without trading your privacy
+            </h1>
+
+            <p className='mx-auto mt-5 max-w-3xl text-lg text-muted-foreground leading-relaxed md:text-xl'>
+              PayeTax exists because salary tools should answer real tax questions quickly and
+              clearly, not funnel you into ads, upsells, or data extraction loops.
+            </p>
+
+            <div className='mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+              <Link
+                href='/'
+                className='inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-3 font-semibold text-deep transition-all hover:opacity-90 hover:shadow-lg'
+              >
+                Open Calculator
+                <ArrowRight className='size-4' />
+              </Link>
+              <Link
+                href='/compliance'
+                className='inline-flex items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/70 px-6 py-3 font-semibold text-foreground transition-colors hover:bg-card'
+              >
+                Compliance & Sources
+                <FileText className='size-4' />
+              </Link>
+              <a
+                href='/install'
+                className='inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-6 py-3 font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/20'
+              >
+                Install App
+              </a>
             </div>
           </div>
 
-          <Card
-            className={cn(
-              LAYOUT.CENTERED_CONTENT,
-              SPACING.MT_12,
-              SURFACES.CARD_LARGE,
-              SURFACES.BG_GRADIENT_PRIMARY,
-            )}
-          >
-            <div className={cn(SPACING.SPACE_Y_4, LAYOUT.TEXT_CENTER)}>
-              <p className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
-                Why this matters
-              </p>
-              <p className='text-muted-foreground'>
-                Understanding your take-home pay shouldn&apos;t require sacrificing your privacy or
-                navigating subscription walls. Whether you&apos;re negotiating a raise, comparing
-                job offers, or just curious about your tax breakdown &mdash; you deserve a tool that
-                respects your time and data.
-              </p>
-              <p className='text-muted-foreground'>User-funded. Always free. Your data is yours.</p>
-            </div>
-          </Card>
+          <div className='mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            {ABOUT_HERO_STATS.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <Card
+                  key={stat.label}
+                  className='border-border/50 bg-card/70 p-4 backdrop-blur-sm transition-colors hover:border-cyan-500/30'
+                >
+                  <div className='mb-3 flex items-center gap-3'>
+                    <div
+                      className={cn(
+                        'flex size-10 items-center justify-center rounded-lg bg-gradient-to-br',
+                        stat.color,
+                      )}
+                    >
+                      <Icon className='size-5 text-white' />
+                    </div>
+                    <div className='font-semibold text-foreground text-xl'>{stat.value}</div>
+                  </div>
+                  <p className='font-semibold text-foreground text-sm'>{stat.label}</p>
+                  {stat.description && (
+                    <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
+                      {stat.description}
+                    </p>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-          {/* Try Calculator CTA */}
-          <div className={cn(SPACING.MT_12, LAYOUT.TEXT_CENTER)}>
+      <section className={cn(LAYOUT.SECTION, 'border-border/40 border-b')}>
+        <div className={LAYOUT.CONTAINER_MD}>
+          <div className='grid gap-8 lg:grid-cols-[1.2fr_1fr]'>
+            <div>
+              <Badge variant='outline' className='mb-4 border-emerald-500/40 text-emerald-200'>
+                Why We Exist
+              </Badge>
+              <h2 className='font-bold text-3xl text-foreground tracking-tight md:text-4xl'>
+                A tax calculator should reduce stress,
+                <br className='hidden md:block' />
+                not create more of it
+              </h2>
+              <div className='mt-5 space-y-4 text-muted-foreground leading-relaxed'>
+                <p>
+                  Most people do not need more financial noise. They need a reliable answer they can
+                  explain to themselves and act on.
+                </p>
+                <p>
+                  PayeTax is designed around that principle: fast calculations, understandable
+                  breakdowns, and a privacy posture that aligns with user trust.
+                </p>
+                <p>
+                  If we ever have to choose between growth tricks and user confidence, we pick user
+                  confidence.
+                </p>
+              </div>
+            </div>
+
+            <Card className='border-emerald-500/25 bg-emerald-500/10 p-6'>
+              <h3 className='font-semibold text-emerald-100 text-lg'>Non-negotiables</h3>
+              <ul className='mt-4 space-y-4'>
+                {ABOUT_OPERATING_RULES.map((rule) => {
+                  const Icon = rule.icon;
+                  return (
+                    <li key={rule.title} className='flex items-start gap-3'>
+                      <span className='mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-emerald-500/20'>
+                        <Icon className='size-4 text-emerald-300' />
+                      </span>
+                      <div>
+                        <p className='font-medium text-emerald-100'>{rule.title}</p>
+                        <p className='mt-1 text-emerald-100/80 text-sm leading-relaxed'>
+                          {rule.description}
+                        </p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_MD}>
+          <div className='text-center'>
+            <Badge variant='outline' className='mb-4 border-cyan-500/35 text-cyan-200'>
+              Trust, Explained
+            </Badge>
+            <h2 className='font-bold text-3xl text-foreground tracking-tight md:text-4xl'>
+              Proof, not just positioning
+            </h2>
+            <p className='mx-auto mt-3 max-w-3xl text-muted-foreground'>
+              The point is not to sound privacy-friendly. The point is to make trustworthy behavior
+              the default system behavior.
+            </p>
+          </div>
+
+          <div className='mt-10 grid gap-5 md:grid-cols-3'>
+            {ABOUT_TRUST_PILLARS.map((pillar) => {
+              const Icon = pillar.icon;
+              return (
+                <Card
+                  key={pillar.title}
+                  className={cn(
+                    'h-full rounded-2xl border p-5 transition-transform duration-200 hover:-translate-y-0.5',
+                    pillar.gradient?.border,
+                    pillar.gradient?.bg,
+                  )}
+                >
+                  <div className='mb-4 flex items-center justify-between'>
+                    <span className='rounded-md border border-white/10 bg-black/20 px-2 py-1 font-medium text-foreground text-xs'>
+                      {pillar.metric}
+                    </span>
+                    <Icon className={cn('size-5', pillar.gradient?.icon || 'text-foreground')} />
+                  </div>
+                  <h3 className='font-semibold text-foreground text-lg'>{pillar.title}</h3>
+                  <p className='mt-2 text-muted-foreground text-sm leading-relaxed'>
+                    {pillar.description}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className='border-border/40 border-y bg-gradient-to-br from-cyan-500/5 via-transparent to-emerald-500/5 py-14 md:py-20'>
+        <div className={LAYOUT.CONTAINER_MD}>
+          <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
+            <div>
+              <Badge variant='outline' className='border-cyan-500/35 text-cyan-200'>
+                Comparison
+              </Badge>
+              <h2 className='mt-3 font-bold text-3xl text-foreground tracking-tight'>
+                How PayeTax differs in practice
+              </h2>
+            </div>
+          </div>
+
+          <div className='overflow-x-auto rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm'>
+            <table className='w-full min-w-[780px] border-collapse'>
+              <thead>
+                <tr className='border-border/60 border-b text-left'>
+                  <th className='px-5 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                    Area
+                  </th>
+                  <th className='px-5 py-4 font-semibold text-cyan-200 text-xs uppercase tracking-wider'>
+                    PayeTax
+                  </th>
+                  <th className='px-5 py-4 font-semibold text-slate-300 text-xs uppercase tracking-wider'>
+                    Typical experience
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {ABOUT_COMPARISON_ROWS.map((row) => (
+                  <tr key={row.topic} className='border-border/40 border-b align-top last:border-0'>
+                    <td className='px-5 py-4 font-semibold text-foreground text-sm'>{row.topic}</td>
+                    <td className='px-5 py-4 text-cyan-50 text-sm leading-relaxed'>
+                      {row.payeTax}
+                    </td>
+                    <td className='px-5 py-4 text-slate-300 text-sm leading-relaxed'>
+                      {row.typical}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_MD}>
+          <div className='grid gap-8 lg:grid-cols-[1fr_1.1fr]'>
+            <Card className='border-border/60 bg-card/85 p-6'>
+              <Badge variant='outline' className='mb-4 border-emerald-500/35 text-emerald-200'>
+                Build Standards
+              </Badge>
+              <ul className='space-y-3'>
+                {ABOUT_BUILD_PROMISES.map((promise) => (
+                  <li key={promise} className='flex items-start gap-3'>
+                    <CheckCircle2 className='mt-0.5 size-4 shrink-0 text-emerald-400' />
+                    <span className='text-muted-foreground text-sm leading-relaxed'>{promise}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className='rounded-2xl border-cyan-500/25 bg-gradient-to-br from-cyan-500/15 to-emerald-500/10 p-6'>
+              <Badge className='mb-4 border-cyan-400/35 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/20'>
+                From Jarryd
+              </Badge>
+              <h3 className='font-semibold text-2xl text-foreground tracking-tight'>
+                I built the tool I wished existed
+              </h3>
+              <p className='mt-4 text-muted-foreground leading-relaxed'>
+                I kept running into salary calculators that were hard to trust or painful to use.
+                PayeTax started as a practical fix for that: fast numbers, transparent assumptions,
+                and no games.
+              </p>
+              <p className='mt-4 text-muted-foreground leading-relaxed'>
+                The goal is simple: give people enough clarity to make better pay decisions without
+                needing an accounting background.
+              </p>
+              <div className='mt-6 flex flex-wrap gap-3'>
+                <a
+                  href='mailto:support@payetax.co.uk?subject=About%20PayeTax%20feedback'
+                  className='inline-flex items-center gap-2 rounded-lg border border-border/70 bg-card/70 px-4 py-2 font-medium text-foreground text-sm hover:bg-card'
+                >
+                  <Mail className='size-4' />
+                  Send feedback
+                </a>
+                <a
+                  href='/install'
+                  className='inline-flex items-center gap-2 rounded-lg border border-cyan-500/35 bg-cyan-500/10 px-4 py-2 font-medium text-cyan-100 text-sm hover:bg-cyan-500/20'
+                >
+                  <Workflow className='size-4' />
+                  Install PayeTax
+                </a>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className='pb-24'>
+        <div className={cn(LAYOUT.CONTAINER_XS, LAYOUT.TEXT_CENTER)}>
+          <h2 className={cn('font-bold text-foreground tracking-tight', TYPOGRAPHY.TEXT_3XL)}>
+            Ready to pressure-test your next pay decision?
+          </h2>
+          <p className={cn(SPACING.MT_3, 'text-muted-foreground')}>
+            Use the calculator, compare outcomes, and keep control of your data.
+          </p>
+          <div className='mt-6 flex flex-col justify-center gap-3 sm:flex-row'>
             <Link
               href='/'
-              className='group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-8 py-4 font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-lg'
+              className='inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end px-6 py-3 font-semibold text-deep transition-all hover:opacity-90'
             >
-              Try the Calculator
-              <ArrowRight className='size-5 transition-transform group-hover:translate-x-1' />
+              Start Calculating
+              <ArrowRight className='size-4' />
+            </Link>
+            <Link
+              href='/privacy'
+              className='inline-flex items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/70 px-6 py-3 font-semibold text-foreground transition-colors hover:bg-card'
+            >
+              Privacy Details
+              <Shield className='size-4' />
             </Link>
           </div>
         </div>
       </section>
-
-      {/* Contact Footer */}
-      <ContactFooter
-        title='Questions or Feedback?'
-        description="We're always improving. If you have suggestions, found a bug, or just want to say hi, reach out!"
-        links={[
-          {
-            text: 'support@payetax.co.uk',
-            href: `mailto:support@payetax.co.uk?subject=${encodeURIComponent('Feedback')}`,
-            type: 'email',
-          },
-        ]}
-      />
     </div>
   );
 }

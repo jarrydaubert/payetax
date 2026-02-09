@@ -9,13 +9,14 @@ import { useId } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
-
-const TAX_YEAR_DISPLAY = '2025/26';
+import { CURRENT_TAX_YEAR_DISPLAY } from '@/constants/taxRates';
+import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function EmploymentAllowanceInput() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const hasEmploymentAllowance = useDirectorFormValue(
+    (formData) => formData.hasEmploymentAllowance,
+  );
   const { setHasEmploymentAllowance } = useDirectorGuideActions();
 
   const checkboxId = `${id}-ea`;
@@ -30,7 +31,7 @@ export function EmploymentAllowanceInput() {
           </TooltipTrigger>
           <TooltipContent>
             <p className='max-w-xs'>
-              £10,500 allowance against Employer NI for {TAX_YEAR_DISPLAY}.
+              £10,500 allowance against Employer NI for {CURRENT_TAX_YEAR_DISPLAY}.
               <strong className='mt-1 block text-amber-200'>
                 Not available to sole director companies
               </strong>
@@ -43,7 +44,7 @@ export function EmploymentAllowanceInput() {
       <div className='flex items-center gap-2 pt-1'>
         <Checkbox
           id={checkboxId}
-          checked={formData.hasEmploymentAllowance}
+          checked={hasEmploymentAllowance}
           onCheckedChange={(checked) => setHasEmploymentAllowance(checked === true)}
         />
         <Label htmlFor={checkboxId} className='font-normal text-sm'>

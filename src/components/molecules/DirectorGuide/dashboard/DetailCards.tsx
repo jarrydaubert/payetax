@@ -8,17 +8,17 @@
 'use client';
 
 import { useMemo } from 'react';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-const TAX_YEAR = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const DIVIDEND_ALLOWANCE = TAX_RATES[TAX_YEAR].dividendAllowance;
 
 function formatCurrency(amount: number): string {
@@ -38,7 +38,16 @@ export function DetailCards({ className }: DetailCardsProps) {
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    region: state.region,
+    otherIncome: state.otherIncome,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    studentLoanPlans: state.studentLoanPlans,
+    pensionContribution: state.pensionContribution,
+    companyCarBIK: state.companyCarBIK,
+    revenue: state.revenue,
+    expenses: state.expenses,
+  }));
 
   const values = useMemo(() => {
     if (!comparison || comparison.grossProfit <= 0) return null;

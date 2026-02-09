@@ -9,11 +9,11 @@ import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
+import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function CompanyCarInput() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const companyCarBIK = useDirectorFormValue((formData) => formData.companyCarBIK);
   const { setCompanyCarBIK } = useDirectorGuideActions();
 
   const inputId = `${id}-bik`;
@@ -44,7 +44,7 @@ export function CompanyCarInput() {
         <Input
           id={inputId}
           type='number'
-          value={formData.companyCarBIK || ''}
+          value={companyCarBIK || ''}
           onChange={(e) => setCompanyCarBIK(parseFloat(e.target.value) || 0)}
           placeholder='0'
         />

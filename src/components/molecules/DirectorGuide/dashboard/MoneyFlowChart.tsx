@@ -10,17 +10,16 @@
 
 import { BarChart3 } from 'lucide-react';
 import { useMemo } from 'react';
-import type { TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-// TODO: Centralize tax year selection in app config
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -34,7 +33,14 @@ export function MoneyFlowChart() {
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    region: state.region,
+    otherIncome: state.otherIncome,
+    pensionContribution: state.pensionContribution,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    studentLoanPlans: state.studentLoanPlans,
+    companyCarBIK: state.companyCarBIK,
+  }));
 
   // Extract only the fields we need to minimize re-renders
   const {

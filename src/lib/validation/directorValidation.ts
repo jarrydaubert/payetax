@@ -9,6 +9,11 @@
  */
 
 import { z } from 'zod';
+import { type StudentLoanPlan, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import {
+  DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS,
+  getAvailableDirectorStudentLoanPlans,
+} from '@/lib/tax/studentLoanPlans';
 
 // ============================================================================
 // ENUMS & CONSTANTS
@@ -25,7 +30,7 @@ export const REGIONS = ['scotland', 'rUK'] as const;
 /**
  * Valid tax years for calculation
  */
-export const DIRECTOR_TAX_YEARS = ['2024-2025', '2025-2026'] as const;
+export const DIRECTOR_TAX_YEARS = TAX_YEARS.slice(0, 2) as [TaxYear, TaxYear];
 
 /**
  * Calculation result modes
@@ -321,12 +326,6 @@ export function isNormalMode(result: DirectorCalculationResult): result is Direc
 // ============================================================================
 
 /**
- * Valid student loan plans for 2025-26 tax year
- * Note: Plan 5 is not valid until April 2026
- */
-const VALID_STUDENT_LOAN_PLANS = ['plan1', 'plan2', 'plan4', 'postgrad'] as const;
-
-/**
  * Input for strategy calculation validation
  */
 export interface StrategyValidationInput {
@@ -337,6 +336,7 @@ export interface StrategyValidationInput {
   alreadyTaken?: number;
   pensionContribution?: number;
   studentLoanPlans?: string[];
+  taxYear?: TaxYear;
   yearEndDate?: Date;
   lossesBroughtForward?: number;
   minimumSalaryRequired?: number;
@@ -370,6 +370,11 @@ export interface ValidationResult {
  */
 export function validateInput(input: StrategyValidationInput): ValidationResult {
   const errors: string[] = [];
+  const taxYear =
+    typeof input.taxYear === 'string' && TAX_YEARS.includes(input.taxYear as TaxYear)
+      ? (input.taxYear as TaxYear)
+      : DIRECTOR_TAX_YEARS[0];
+  const availableStudentLoanPlans = new Set(getAvailableDirectorStudentLoanPlans(taxYear));
 
   // Handle null/undefined input
   if (input === null || input === undefined) {
@@ -429,12 +434,18 @@ export function validateInput(input: StrategyValidationInput): ValidationResult 
       errors.push('Student loan plans must be an array');
     } else {
       for (const plan of input.studentLoanPlans) {
-        if (plan === 'plan5') {
-          errors.push('Plan 5 not available until 2026-27');
-        } else if (
-          !VALID_STUDENT_LOAN_PLANS.includes(plan as (typeof VALID_STUDENT_LOAN_PLANS)[number])
+        if (
+          !DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS.includes(
+            plan as (typeof DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS)[number],
+          )
         ) {
           errors.push(`Invalid student loan plan: ${plan}`);
+          continue;
+        }
+
+        const typedPlan = plan as StudentLoanPlan;
+        if (!availableStudentLoanPlans.has(typedPlan)) {
+          errors.push(`Student loan plan ${plan} is not available for ${taxYear}`);
         }
       }
     }

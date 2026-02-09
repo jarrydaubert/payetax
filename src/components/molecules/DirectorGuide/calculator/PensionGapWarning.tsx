@@ -11,14 +11,14 @@
 
 import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import {
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-const TAX_YEAR = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {

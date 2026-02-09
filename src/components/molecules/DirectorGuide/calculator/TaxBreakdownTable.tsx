@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
+import { useDirectorFormValue, useStrategyComparison } from '@/store/directorGuideStore';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -24,14 +24,12 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export function TaxBreakdownTable() {
-  const formData = useDirectorFormData();
+  const hasStudentLoans = useDirectorFormValue((formData) => formData.studentLoanPlans.length > 0);
   const comparison = useStrategyComparison();
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
   const { allSalary, optimalMix, allDividends } = comparison.strategies;
-  const hasStudentLoans = formData.studentLoanPlans.length > 0;
-
   return (
     <Card>
       <CardHeader>

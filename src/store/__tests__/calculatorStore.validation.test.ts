@@ -33,6 +33,8 @@ jest.mock('@/lib/taxCalculator', () => ({
 
 import { useCalculatorStore } from '../calculatorStore';
 
+const CALCULATOR_STORAGE_KEY = 'tax-calculator-storage';
+
 describe('Calculator Store Validation', () => {
   beforeEach(() => {
     // Reset store to initial state
@@ -549,6 +551,63 @@ describe('Calculator Store Validation', () => {
 
       setPayNoNI(true);
       expect(useCalculatorStore.getState().input.payNoNI).toBe(true);
+    });
+  });
+
+  describe('Persisted State Hydration Guards', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      useCalculatorStore.getState().reset();
+    });
+
+    it('should ignore tampered persisted input that fails schema validation', async () => {
+      const store = useCalculatorStore.getState();
+      store.setSalary(42000);
+      store.setTaxCode('1257L');
+      const baselineTaxYear = useCalculatorStore.getState().input.taxYear;
+
+      localStorage.setItem(
+        CALCULATOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            input: { salary: -1, taxCode: 'BR' },
+            _savedAt: Date.now(),
+            _taxYear: baselineTaxYear,
+          },
+          version: 0,
+        }),
+      );
+
+      await useCalculatorStore.persist.rehydrate();
+
+      const hydrated = useCalculatorStore.getState().input;
+      expect(hydrated.salary).toBe(42000);
+      expect(hydrated.taxCode).toBe('1257L');
+    });
+
+    it('should ignore expired persisted snapshots', async () => {
+      const THIRTY_DAYS_AND_ONE_MS = 30 * 24 * 60 * 60 * 1000 + 1;
+      const store = useCalculatorStore.getState();
+      store.setSalary(30000);
+      const baselineTaxYear = useCalculatorStore.getState().input.taxYear;
+
+      localStorage.setItem(
+        CALCULATOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            input: { salary: 90000, taxCode: 'BR' },
+            _savedAt: Date.now() - THIRTY_DAYS_AND_ONE_MS,
+            _taxYear: baselineTaxYear,
+          },
+          version: 0,
+        }),
+      );
+
+      await useCalculatorStore.persist.rehydrate();
+
+      const hydrated = useCalculatorStore.getState().input;
+      expect(hydrated.salary).toBe(30000);
+      expect(hydrated.taxCode).toBe('');
     });
   });
 });

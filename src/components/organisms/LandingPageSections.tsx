@@ -118,6 +118,11 @@ export const faqs: FAQ[] = [
     answer:
       'PayeTax calculates income tax (by band), National Insurance contributions, student loan repayments (all plan types), and pension contributions with tax relief.',
   },
+  {
+    question: 'Can I use PayeTax offline?',
+    answer:
+      'Yes. You can install PayeTax as an app and continue using cached pages and tools when your connection drops. Visit /install for setup steps.',
+  },
 ];
 
 // ============================================================================

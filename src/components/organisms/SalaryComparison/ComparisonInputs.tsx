@@ -3,7 +3,6 @@
 
 import { Calculator } from 'lucide-react';
 import { type FormEvent, useId, useState } from 'react';
-import { z } from 'zod';
 import { Button } from '@/components/atoms/ui/button';
 import {
   Card,
@@ -67,33 +66,21 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
     }
 
     // Let Zod be the single source of validation truth
-    try {
-      // Build validation data based on mode
-      const validationData = {
-        mode,
-        value: numValue,
-        [mode]: numValue, // Add mode-specific key (percentage/amount/total)
-      };
-
-      ComparisonValueSchema.parse(validationData);
-
-      // Clear any previous errors
-      setError('');
-
-      // Proceed with comparison
-      onCompare({
-        mode,
-        value: numValue,
-        currentSalary,
-      });
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        setError(err.issues[0]?.message ?? 'Invalid input');
-      } else {
-        // Handle unexpected errors
-        setError('Something went wrong. Please try again.');
-      }
+    const validation = ComparisonValueSchema.safeParse({ mode, value: numValue });
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message ?? 'Invalid input');
+      return;
     }
+
+    // Clear any previous errors
+    setError('');
+
+    // Proceed with comparison
+    onCompare({
+      mode,
+      value: numValue,
+      currentSalary,
+    });
   };
 
   return (

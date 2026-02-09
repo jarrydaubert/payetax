@@ -539,7 +539,6 @@ describe('Helper Functions', () => {
       if (result.success) {
         expect(result.data.mode).toBe('percentage');
         expect(result.data.value).toBe(5);
-        expect(result.data.percentage).toBe(5);
       }
     });
 
@@ -547,7 +546,7 @@ describe('Helper Functions', () => {
       const result = validateComparisonValue('amount', 5000, 5000);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.amount).toBe(5000);
+        expect(result.data.value).toBe(5000);
       }
     });
 
@@ -555,7 +554,7 @@ describe('Helper Functions', () => {
       const result = validateComparisonValue('total', 60000, 60000);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.total).toBe(60000);
+        expect(result.data.value).toBe(60000);
       }
     });
 
@@ -563,7 +562,7 @@ describe('Helper Functions', () => {
       const result = validateComparisonValue('percentage', 10);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.percentage).toBeUndefined();
+        expect(result.data.value).toBe(10);
       }
     });
 

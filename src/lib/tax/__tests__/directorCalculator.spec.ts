@@ -2053,7 +2053,7 @@ describe('Validation Edge Cases', () => {
       };
       const result = validateInput(input);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Plan 5 not available until 2026-27');
+      expect(result.errors).toContain('Student loan plan plan5 is not available for 2025-2026');
     });
 
     it('should handle NaN profit gracefully', () => {

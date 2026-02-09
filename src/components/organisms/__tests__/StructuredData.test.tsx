@@ -72,6 +72,29 @@ describe('StructuredData Component', () => {
     });
   });
 
+  describe('Dataset Schema', () => {
+    it('should include API distribution metadata for tax-rate downloads', () => {
+      const { container } = render(<StructuredData type='dataset' />);
+
+      const script = container.querySelector('script[type="application/ld+json"]');
+      expect(script).toBeInTheDocument();
+
+      if (script?.textContent) {
+        const data = JSON.parse(script.textContent);
+        expect(data['@type']).toBe('Dataset');
+        expect(data.distribution).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              '@type': 'DataDownload',
+              encodingFormat: 'application/json',
+              contentUrl: expect.stringContaining('/api/tax-rates'),
+            }),
+          ]),
+        );
+      }
+    });
+  });
+
   describe('Breadcrumb Schema', () => {
     it('should render breadcrumb JSON-LD with items', () => {
       const breadcrumbs = [

@@ -104,6 +104,14 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/tools/national-insurance-calculator');
     });
 
+    it('should render Install App link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Install App/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/install');
+    });
+
     it('should have navigation links', () => {
       render(<Footer />);
 

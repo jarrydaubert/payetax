@@ -22,14 +22,21 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Region } from '@/lib/validation/directorValidation';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   type YearEndMonth,
 } from '@/store/directorGuideStore';
 
 export function CoreInputs() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    revenue: state.revenue,
+    includesVat: state.includesVat,
+    expenses: state.expenses,
+    region: state.region,
+    yearEndMonth: state.yearEndMonth,
+    yearEndCustom: state.yearEndCustom,
+  }));
   const { setRegion, setRevenue, setIncludesVat, setExpenses, setYearEndMonth, setYearEndCustom } =
     useDirectorGuideActions();
 

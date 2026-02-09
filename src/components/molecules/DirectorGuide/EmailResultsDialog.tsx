@@ -21,14 +21,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES } from '@/constants/designTokens';
-import type { TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 
-// TODO: Centralize tax year selection in app config
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 interface EmailResultsDialogProps {
   open: boolean;

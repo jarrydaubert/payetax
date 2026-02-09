@@ -8,19 +8,18 @@
 
 import { useMemo } from 'react';
 import { GradientText } from '@/components/atoms/GradientText';
-import type { TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useMonthlyModeOutput,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-// TODO: Centralize tax year selection in app config
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 interface SummaryCardsProps {
   className?: string;
@@ -39,7 +38,15 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    mode: state.mode,
+    region: state.region,
+    otherIncome: state.otherIncome,
+    pensionContribution: state.pensionContribution,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    studentLoanPlans: state.studentLoanPlans,
+    companyCarBIK: state.companyCarBIK,
+  }));
   const monthlyModeOutput = useMonthlyModeOutput();
   const isMonthlyMode = formData.mode === 'monthly';
 
@@ -103,6 +110,12 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   ]);
 
   const hasResults = values !== null;
+  const monthlyDrawAmount = hasResults
+    ? isMonthlyMode && monthlyModeOutput
+      ? monthlyModeOutput.safeMonthlyDraw
+      : values.takeHome / 12
+    : null;
+  const monthlyDrawLabel = monthlyDrawAmount === null ? '—' : formatCurrency(monthlyDrawAmount);
 
   // Calculate net dividends for display (gross dividends - dividend tax)
   const netDividends = hasResults ? values.dividends - values.dividendTax : 0;
@@ -110,27 +123,13 @@ export function SummaryCards({ className }: SummaryCardsProps) {
   const cards = [
     {
       label: 'Safe Monthly Draw',
-      value: hasResults
-        ? formatCurrency(
-            Math.floor(
-              isMonthlyMode && monthlyModeOutput
-                ? monthlyModeOutput.safeMonthlyDraw
-                : values.takeHome / 12,
-            ),
-          )
-        : '—',
+      value: monthlyDrawLabel,
       subtext: isMonthlyMode
         ? 'Cash-aware + tax-aware (projection)'
         : 'After all taxes (illustrative)',
       highlight: true,
       ariaDescription: hasResults
-        ? `Monthly safe draw of ${formatCurrency(
-            Math.floor(
-              isMonthlyMode && monthlyModeOutput
-                ? monthlyModeOutput.safeMonthlyDraw
-                : values.takeHome / 12,
-            ),
-          )}`
+        ? `Monthly safe draw of ${monthlyDrawLabel}`
         : 'No results available',
     },
     {

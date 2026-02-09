@@ -13,4 +13,9 @@ describe('LandingPageSections', () => {
     const ctaLink = screen.getByRole('link', { name: /Show My Take Home Pay/i });
     expect(ctaLink).toHaveAttribute('href', '#tax-calculator');
   });
+
+  it('includes offline availability FAQ entry', () => {
+    render(<LandingPageSections />);
+    expect(screen.getByText('Can I use PayeTax offline?')).toBeInTheDocument();
+  });
 });

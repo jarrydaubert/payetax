@@ -9,11 +9,11 @@ import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
+import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function PensionInput() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const pensionContribution = useDirectorFormValue((formData) => formData.pensionContribution);
   const { setPensionContribution } = useDirectorGuideActions();
 
   const inputId = `${id}-pension`;
@@ -45,7 +45,7 @@ export function PensionInput() {
         <Input
           id={inputId}
           type='number'
-          value={formData.pensionContribution || ''}
+          value={pensionContribution || ''}
           onChange={(e) => setPensionContribution(parseFloat(e.target.value) || 0)}
           placeholder='0'
         />

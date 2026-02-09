@@ -4,16 +4,16 @@ import type { ReactNode } from 'react';
 // Note: metadataBase is set in root layout via lib/metadata.ts
 // Using relative URLs here works with the base URL
 export const metadata: Metadata = {
-  title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
+  title: 'About PayeTax | How We Build Privacy-First UK Tax Tools',
   description:
-    'Free UK PAYE tax calculator with complete privacy. Client-side calculations, zero data storage, instant results using official HMRC rates for 2025-26.',
+    'How PayeTax is built: privacy-first architecture, HMRC-aligned tax logic, and clear user-facing explanations for UK PAYE decisions.',
   alternates: {
     canonical: '/about',
   },
   openGraph: {
-    title: 'About PayeTax | Free UK Tax Calculator Built for Privacy',
+    title: 'About PayeTax | How We Build Privacy-First UK Tax Tools',
     description:
-      'The UK tax calculator that respects your privacy, delivers instant accuracy, and costs nothing. No compromises.',
+      'See how PayeTax approaches privacy, tax-rate accuracy, and product quality for UK PAYE calculations.',
     url: '/about',
     type: 'website',
     siteName: 'PayeTax',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'About PayeTax',
-    description: 'Free UK tax calculator built for privacy. No data collection, instant results.',
+    description: 'How PayeTax is built for privacy, accuracy, and clear UK tax outcomes.',
     // Must include images to prevent shallow merge from nuking parent images
     images: ['/images/og-image.png'],
   },

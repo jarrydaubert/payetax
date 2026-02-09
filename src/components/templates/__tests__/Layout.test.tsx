@@ -22,6 +22,11 @@ jest.mock('@/components/organisms/CookieBanner', () => ({
   default: () => <div data-testid='mock-cookie-banner'>Cookie Banner</div>,
 }));
 
+jest.mock('@/components/organisms/PWAInstallBanner', () => ({
+  __esModule: true,
+  default: () => <div data-testid='mock-pwa-install-banner'>PWA Install Banner</div>,
+}));
+
 describe('Layout Component', () => {
   it('should render children content', () => {
     render(
@@ -66,6 +71,16 @@ describe('Layout Component', () => {
     );
 
     expect(screen.getByTestId('mock-cookie-banner')).toBeInTheDocument();
+  });
+
+  it('should render pwa install banner', () => {
+    render(
+      <Layout>
+        <div>Content</div>
+      </Layout>,
+    );
+
+    expect(screen.getByTestId('mock-pwa-install-banner')).toBeInTheDocument();
   });
 
   it('should have skip-to-content link for accessibility', () => {

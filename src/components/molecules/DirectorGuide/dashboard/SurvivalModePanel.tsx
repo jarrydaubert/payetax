@@ -8,11 +8,11 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
-import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
-import { useDirectorFormData, useStrategyComparison } from '@/store/directorGuideStore';
+import { useDirectorFormSlice, useStrategyComparison } from '@/store/directorGuideStore';
 
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
 
 const formatGBP = (amount: number) =>
@@ -23,7 +23,13 @@ const formatGBP = (amount: number) =>
   }).format(Math.round(amount));
 
 export function SurvivalModePanel({ className }: { className?: string }) {
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    isPensionAlreadyDeducted: state.isPensionAlreadyDeducted,
+    pensionContribution: state.pensionContribution,
+    revenue: state.revenue,
+    expenses: state.expenses,
+    hasOtherPAYEEmployment: state.hasOtherPAYEEmployment,
+  }));
   const comparison = useStrategyComparison();
 
   if (!comparison || comparison.grossProfit > 0) return null;

@@ -9,11 +9,15 @@ import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
+import { useDirectorFormSlice, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function AlreadyTakenInputs() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const { ytdSalary, ytdDividends, ytdDrawings } = useDirectorFormSlice((formData) => ({
+    ytdSalary: formData.ytdSalary,
+    ytdDividends: formData.ytdDividends,
+    ytdDrawings: formData.ytdDrawings,
+  }));
   const { setYtdSalary, setYtdDividends, setYtdDrawings } = useDirectorGuideActions();
 
   const ytdSalaryId = `${id}-ytdSalary`;
@@ -40,7 +44,7 @@ export function AlreadyTakenInputs() {
           <Input
             id={ytdSalaryId}
             type='number'
-            value={formData.ytdSalary || ''}
+            value={ytdSalary || ''}
             onChange={(e) => setYtdSalary(Number.parseFloat(e.target.value) || 0)}
             placeholder='0'
           />
@@ -65,7 +69,7 @@ export function AlreadyTakenInputs() {
           <Input
             id={ytdDividendsId}
             type='number'
-            value={formData.ytdDividends || ''}
+            value={ytdDividends || ''}
             onChange={(e) => setYtdDividends(Number.parseFloat(e.target.value) || 0)}
             placeholder='0'
           />
@@ -92,7 +96,7 @@ export function AlreadyTakenInputs() {
           <Input
             id={ytdDrawingsId}
             type='number'
-            value={formData.ytdDrawings || ''}
+            value={ytdDrawings || ''}
             onChange={(e) => setYtdDrawings(Number.parseFloat(e.target.value) || 0)}
             placeholder='0'
           />

@@ -7,15 +7,16 @@
 'use client';
 
 import { useMemo } from 'react';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useSelectedStrategy,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-const TAX_YEAR = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -26,7 +27,14 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export function TaxPots() {
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    region: state.region,
+    otherIncome: state.otherIncome,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    studentLoanPlans: state.studentLoanPlans,
+    pensionContribution: state.pensionContribution,
+    companyCarBIK: state.companyCarBIK,
+  }));
   const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
   const sliderSalary = useSliderSalary();

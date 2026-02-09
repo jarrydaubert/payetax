@@ -9,11 +9,11 @@ import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDirectorFormData, useDirectorGuideActions } from '@/store/directorGuideStore';
+import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function OtherIncomeInput() {
   const id = useId();
-  const formData = useDirectorFormData();
+  const otherIncome = useDirectorFormValue((formData) => formData.otherIncome);
   const { setOtherIncome } = useDirectorGuideActions();
 
   const inputId = `${id}-otherIncome`;
@@ -38,7 +38,7 @@ export function OtherIncomeInput() {
         <Input
           id={inputId}
           type='number'
-          value={formData.otherIncome || ''}
+          value={otherIncome || ''}
           onChange={(e) => setOtherIncome(parseFloat(e.target.value) || 0)}
           placeholder='0'
         />

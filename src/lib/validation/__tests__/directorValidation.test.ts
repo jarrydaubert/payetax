@@ -558,7 +558,7 @@ describe('Constants', () => {
   });
 
   it('should export correct DIRECTOR_TAX_YEARS', () => {
-    expect(DIRECTOR_TAX_YEARS).toEqual(['2024-2025', '2025-2026']);
+    expect(DIRECTOR_TAX_YEARS).toEqual(['2025-2026', '2024-2025']);
   });
 
   it('should export correct CALCULATION_MODES', () => {

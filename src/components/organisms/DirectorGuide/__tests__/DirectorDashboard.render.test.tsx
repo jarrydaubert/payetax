@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { DirectorDashboard } from '../DirectorDashboard';
 
@@ -22,7 +23,24 @@ jest.mock('@/components/molecules/DirectorGuide/calculator', () => ({
 }));
 
 jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
-  DashboardLayout: ({ main }: { main: ReactNode }) => <div>{main}</div>,
+  DashboardLayout: ({
+    sidebar,
+    inputs,
+    main,
+    education,
+  }: {
+    sidebar: ReactNode;
+    inputs: ReactNode;
+    main: ReactNode;
+    education: ReactNode;
+  }) => (
+    <div>
+      {sidebar}
+      {inputs}
+      {main}
+      {education}
+    </div>
+  ),
   DetailCards: () => <div>Detail Cards</div>,
   EducationPanel: () => <div>Education Panel</div>,
   InputsPanel: ({ onReset }: { onReset: () => void }) => (
@@ -80,6 +98,7 @@ function createComparison(grossProfit: number) {
 
 describe('DirectorDashboard (normal mode)', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     const current = useDirectorGuideStore.getState();
     useDirectorGuideStore.setState({
       ...current,
@@ -146,5 +165,24 @@ describe('DirectorDashboard (normal mode)', () => {
     render(<DirectorDashboard />);
     expect(screen.getByText(/Compare salary and dividend scenarios/i)).toBeInTheDocument();
     expect(screen.getByText(/Enter your figures to get started/i)).toBeInTheDocument();
+  });
+
+  it('tracks one reset event for one reset click', () => {
+    const current = useDirectorGuideStore.getState();
+    useDirectorGuideStore.setState({
+      formData: {
+        ...current.formData,
+        region: 'rUK',
+        revenue: 90000,
+        expenses: 20000,
+      },
+    } as never);
+
+    render(<DirectorDashboard />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inputs Panel' }));
+
+    expect(trackGuideReset).toHaveBeenCalledTimes(1);
+    expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
   });
 });

@@ -140,11 +140,13 @@ export const PayeEmailInputSchema = z.object({
 /**
  * Request body for /api/send-results
  */
-export const SendResultsRequestSchema = z.object({
-  email: EmailSchema,
-  input: PayeEmailInputSchema,
-  subscribeToAlerts: z.boolean().optional(),
-});
+export const SendResultsRequestSchema = z
+  .object({
+    email: EmailSchema,
+    input: PayeEmailInputSchema,
+    subscribeToAlerts: z.boolean().optional(),
+  })
+  .strict();
 
 // ============================================================================
 // DIRECTOR CALCULATOR EMAIL SCHEMAS
@@ -219,11 +221,13 @@ export const DirectorEmailInputSchema = z.object({
 /**
  * Request body for /api/send-director-results
  */
-export const SendDirectorResultsRequestSchema = z.object({
-  email: EmailSchema,
-  input: DirectorEmailInputSchema,
-  taxYear: DirectorTaxYearSchema.optional(),
-});
+export const SendDirectorResultsRequestSchema = z
+  .object({
+    email: EmailSchema,
+    input: DirectorEmailInputSchema,
+    taxYear: DirectorTaxYearSchema.optional(),
+  })
+  .strict();
 
 // ============================================================================
 // NEWSLETTER SCHEMAS
@@ -232,9 +236,11 @@ export const SendDirectorResultsRequestSchema = z.object({
 /**
  * Request body for /api/newsletter/subscribe
  */
-export const NewsletterSubscribeRequestSchema = z.object({
-  email: EmailSchema,
-});
+export const NewsletterSubscribeRequestSchema = z
+  .object({
+    email: EmailSchema,
+  })
+  .strict();
 
 // ============================================================================
 // REFERRAL SCHEMAS
@@ -258,12 +264,14 @@ export const ReferralReasonSchema = z.enum([
 /**
  * Request body for /api/referral/lead
  */
-export const ReferralLeadRequestSchema = z.object({
-  email: EmailSchema,
-  salaryRange: SalaryRangeSchema,
-  reason: ReferralReasonSchema,
-  isScottish: z.boolean(),
-});
+export const ReferralLeadRequestSchema = z
+  .object({
+    email: EmailSchema,
+    salaryRange: SalaryRangeSchema,
+    reason: ReferralReasonSchema,
+    isScottish: z.boolean(),
+  })
+  .strict();
 
 // ============================================================================
 // TYPE EXPORTS

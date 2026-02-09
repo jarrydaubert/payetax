@@ -70,6 +70,28 @@ export interface TaxAllowance {
 
 // Available tax years (newest to oldest)
 export const TAX_YEARS: TaxYear[] = ['2025-2026', '2024-2025', '2023-2024'];
+export const CURRENT_TAX_YEAR: TaxYear = TAX_YEARS[0] as TaxYear;
+
+interface TaxYearDisplayOptions {
+  separator?: '-' | '/';
+  shortEndYear?: boolean;
+}
+
+/**
+ * Format tax year for display.
+ * Examples: "2025-2026" -> "2025/2026", "2025-26"
+ */
+export function formatTaxYearDisplay(
+  taxYear: string,
+  { separator = '/', shortEndYear = false }: TaxYearDisplayOptions = {},
+): string {
+  const [start, end] = taxYear.split('-');
+  if (!(start && end)) return taxYear;
+  const endDisplay = shortEndYear ? end.slice(-2) : end;
+  return `${start}${separator}${endDisplay}`;
+}
+
+export const CURRENT_TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR);
 
 // Standard UK Tax Rates (England, Wales, NI)
 export const TAX_RATES: Record<

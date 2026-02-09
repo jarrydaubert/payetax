@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { trackCalendarDownloaded, trackStrategySelected } from '@/lib/directorGuideAnalytics';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
+import { KeyDates } from '../KeyDates';
 import { PensionGapWarning } from '../PensionGapWarning';
 import { SalarySlider } from '../SalarySlider';
 import { StrategyComparisonTable } from '../StrategyComparisonTable';
@@ -38,7 +40,18 @@ jest.mock('@/components/ui/slider', () => ({
   ),
 }));
 
+jest.mock('@/lib/directorGuideAnalytics', () => ({
+  trackStrategySelected: jest.fn(),
+  trackCalendarDownloaded: jest.fn(),
+}));
+
 const mockCalculateSalaryScenario = calculateSalaryScenario as jest.Mock;
+const mockTrackStrategySelected = trackStrategySelected as jest.MockedFunction<
+  typeof trackStrategySelected
+>;
+const mockTrackCalendarDownloaded = trackCalendarDownloaded as jest.MockedFunction<
+  typeof trackCalendarDownloaded
+>;
 
 function createStrategy(name: string, overrides: Partial<Record<string, number | string>> = {}) {
   return {
@@ -107,6 +120,8 @@ describe('Director Guide calculator components', () => {
       sliderSalary: null,
     });
     mockCalculateSalaryScenario.mockReset();
+    mockTrackStrategySelected.mockClear();
+    mockTrackCalendarDownloaded.mockClear();
     mockCalculateSalaryScenario.mockReturnValue({
       salary: 20000,
       dividends: 15000,
@@ -216,6 +231,68 @@ describe('Director Guide calculator components', () => {
       expect(screen.getByText(/Pays £1,500 more tax than baseline per year/i)).toBeInTheDocument();
       expect(screen.getByText('Your Setup')).toBeInTheDocument();
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
+    });
+
+    it('tracks pro strategy selection when a card is clicked', () => {
+      setStoreState({ strategyComparison: createComparison() as never });
+
+      render(<StrategyComparisonTable />);
+      fireEvent.click(screen.getByRole('button', { name: /All Salary/i }));
+
+      expect(mockTrackStrategySelected).toHaveBeenCalledWith('allSalary', false);
+    });
+  });
+
+  describe('KeyDates', () => {
+    it('downloads an iCal file and tracks calendar download analytics', () => {
+      const current = useDirectorGuideStore.getState();
+      setStoreState({
+        formData: {
+          ...current.formData,
+          yearEndMonth: '03',
+          yearEndCustom: '',
+        },
+      });
+
+      const createObjectURLMock = jest.fn(() => 'blob:payetax-calendar');
+      const revokeObjectURLMock = jest.fn();
+      const originalCreateObjectURL = URL.createObjectURL;
+      const originalRevokeObjectURL = URL.revokeObjectURL;
+      Object.defineProperty(URL, 'createObjectURL', {
+        configurable: true,
+        writable: true,
+        value: createObjectURLMock,
+      });
+      Object.defineProperty(URL, 'revokeObjectURL', {
+        configurable: true,
+        writable: true,
+        value: revokeObjectURLMock,
+      });
+
+      const anchorClickSpy = jest
+        .spyOn(HTMLAnchorElement.prototype, 'click')
+        .mockImplementation(() => {});
+
+      try {
+        render(<KeyDates />);
+        fireEvent.click(screen.getByRole('button', { name: /Download \.ics/i }));
+
+        expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+        expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:payetax-calendar');
+        expect(mockTrackCalendarDownloaded).toHaveBeenCalledTimes(1);
+      } finally {
+        anchorClickSpy.mockRestore();
+        Object.defineProperty(URL, 'createObjectURL', {
+          configurable: true,
+          writable: true,
+          value: originalCreateObjectURL,
+        });
+        Object.defineProperty(URL, 'revokeObjectURL', {
+          configurable: true,
+          writable: true,
+          value: originalRevokeObjectURL,
+        });
+      }
     });
   });
 

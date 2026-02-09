@@ -14,20 +14,11 @@ import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
-import { TAX_YEARS } from '@/constants/taxRates';
-
-// Current tax year is the first in the TAX_YEARS array (newest first)
-const CURRENT_TAX_YEAR = TAX_YEARS[0] ?? '2025-2026';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
-
-/** Format tax year for display (e.g., "2025-2026" -> "2025-26") */
-function formatTaxYearDisplay(taxYear: string): string {
-  const [start, end] = taxYear.split('-');
-  return `${start}-${end?.slice(-2) ?? ''}`;
-}
 
 const MIN_POPULAR_SALARY = 18000;
 const MAX_POPULAR_SALARY = 500000;
@@ -138,7 +129,10 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
   }, [salary, setSalary, calculate]);
 
   const formattedSalary = salary.toLocaleString('en-GB');
-  const taxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR);
+  const taxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+    separator: '-',
+    shortEndYear: true,
+  });
 
   // Generate comparison salaries
   const comparisons = useMemo(() => {

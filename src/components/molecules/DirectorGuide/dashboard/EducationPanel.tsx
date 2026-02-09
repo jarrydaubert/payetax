@@ -7,17 +7,19 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
 import { trackWarningShown } from '@/lib/directorGuideAnalytics';
+import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
 import { cn } from '@/lib/utils';
 import {
-  useDirectorFormData,
+  type DirectorFormData,
+  useDirectorFormSlice,
   useMonthlyModeOutput,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
 // Tax year configuration - single source
-const TAX_YEAR: TaxYear = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
 
 // Validate rates exist at module load (fail fast in dev)
@@ -33,21 +35,54 @@ const PA_TAPER_END = PA_TAPER_THRESHOLD + PERSONAL_ALLOWANCE * 2; // 100,000 + 2
 const SECONDARY_THRESHOLD = rates.nationalInsurance.employer.A.secondary.threshold;
 const LEL = rates.nationalInsurance.lowerEarningsLimit;
 
-// Thresholds that should ideally be in taxRates.ts
-// TODO: Move these to TAX_RATES when we add BUSINESS_THRESHOLDS
-const VAT_THRESHOLD = 90000;
-const VAT_APPROACHING = 85000;
-const HICBC_START = 60000;
-const HICBC_END = 80000;
-const PENSION_TAPER_THRESHOLD = 240000;
-const PAYMENTS_ON_ACCOUNT_THRESHOLD = 1000;
+const {
+  vatRegistration: VAT_THRESHOLD,
+  vatApproaching: VAT_APPROACHING,
+  hicbcStart: HICBC_START,
+  hicbcEnd: HICBC_END,
+  pensionTaperWarning: PENSION_TAPER_THRESHOLD,
+  pensionAnnualAllowance: PENSION_ANNUAL_ALLOWANCE,
+  paymentsOnAccount: PAYMENTS_ON_ACCOUNT_THRESHOLD,
+  highProfitComplexity: HIGH_PROFIT_COMPLEXITY_THRESHOLD,
+} = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS;
 
 interface EducationPanelProps {
   className?: string;
 }
 
+type EducationPanelFormData = Pick<
+  DirectorFormData,
+  | 'mode'
+  | 'region'
+  | 'revenue'
+  | 'otherIncome'
+  | 'ytdSalary'
+  | 'ytdDividends'
+  | 'ytdDrawings'
+  | 'hasEmploymentAllowance'
+  | 'studentLoanPlans'
+  | 'includesVat'
+  | 'pensionContribution'
+  | 'companyCarBIK'
+  | 'hasOtherPAYEEmployment'
+>;
+
 export function EducationPanel({ className }: EducationPanelProps) {
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice<EducationPanelFormData>((formData) => ({
+    mode: formData.mode,
+    region: formData.region,
+    revenue: formData.revenue,
+    otherIncome: formData.otherIncome,
+    ytdSalary: formData.ytdSalary,
+    ytdDividends: formData.ytdDividends,
+    ytdDrawings: formData.ytdDrawings,
+    hasEmploymentAllowance: formData.hasEmploymentAllowance,
+    studentLoanPlans: formData.studentLoanPlans,
+    includesVat: formData.includesVat,
+    pensionContribution: formData.pensionContribution,
+    companyCarBIK: formData.companyCarBIK,
+    hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
+  }));
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
   const isMonthlyMode = formData.mode === 'monthly';
@@ -183,7 +218,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
           Assumptions
         </h3>
         <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
-          <AssumptionRow label='Tax Year' value='2025/26' />
+          <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
           <AssumptionRow
             label='Region'
             value={formData.region === 'scotland' ? 'Scotland' : 'England/Wales/NI'}
@@ -270,7 +305,7 @@ interface WarningContext {
   alreadyTaken: number;
   grossExtraction: number;
   personalTax: number;
-  formData: ReturnType<typeof useDirectorFormData>;
+  formData: EducationPanelFormData;
   comparison: ReturnType<typeof useStrategyComparison>;
   monthlyModeOutput: ReturnType<typeof useMonthlyModeOutput>;
   isMonthlyMode: boolean;
@@ -373,7 +408,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       title: 'High Profit Complexity',
       description:
         'At this profit level, an accountant could save you serious money with advanced strategies.',
-      show: hasResults && (comparison?.grossProfit ?? 0) > 250000,
+      show: hasResults && (comparison?.grossProfit ?? 0) > HIGH_PROFIT_COMPLEXITY_THRESHOLD,
     },
     {
       id: 'hicbc',
@@ -390,16 +425,14 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'pension-taper',
       title: 'Pension Annual Allowance Taper',
-      description:
-        "With adjusted income near or above £240k, your Annual Allowance may be reduced from £60k down to £10k minimum. This is called the 'tapered annual allowance'.",
+      description: `With adjusted income near or above £${(PENSION_TAPER_THRESHOLD / 1000).toFixed(0)}k, your Annual Allowance may be reduced from £${(PENSION_ANNUAL_ALLOWANCE / 1000).toFixed(0)}k down to £10k minimum. This is called the 'tapered annual allowance'.`,
       show: totalIncome >= PENSION_TAPER_THRESHOLD,
     },
     {
       id: 'pension-limit',
       title: 'Pension Annual Allowance',
-      description:
-        'Contributions over £60k may incur tax charges. Rules are complex (carry forward, taper for high earners, MPAA).',
-      show: formData.pensionContribution > 60000,
+      description: `Contributions over £${(PENSION_ANNUAL_ALLOWANCE / 1000).toFixed(0)}k may incur tax charges. Rules are complex (carry forward, taper for high earners, MPAA).`,
+      show: formData.pensionContribution > PENSION_ANNUAL_ALLOWANCE,
     },
 
     // LOWER priority / informational

@@ -63,6 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/install`,
+      lastModified: staticPagesDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: `${baseUrl}/best-uk-tax-calculators`,
       lastModified: staticPagesDate,
       changeFrequency: 'monthly',

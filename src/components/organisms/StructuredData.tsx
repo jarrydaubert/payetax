@@ -11,7 +11,7 @@
  */
 
 import type React from 'react';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 
 /**
@@ -523,37 +523,32 @@ const HOW_TO_DATA: HowToSchema = {
   ],
 };
 
-/**
- * Generate Dataset schema with dynamic tax values from TAX_RATES
- * This ensures all tax values come from the single source of truth
- *
- * WARNING: Only use this schema if you have a real, publicly accessible dataset.
- * The distribution endpoint must exist and return the described data.
- *
- * TODO: Create /api/tax-rates endpoint before enabling distribution field
- */
 function generateDatasetData(): DatasetSchema {
-  const rates = TAX_RATES['2025-2026'];
+  const rates = TAX_RATES[CURRENT_TAX_YEAR];
   const niRates = rates.nationalInsurance.employee.A;
   const basicBand = rates.bands[0];
   const higherBand = rates.bands[1];
   const additionalBand = rates.bands[2];
+  const [startYear, endYear] = CURRENT_TAX_YEAR.split('-');
+  const safeStartYear = startYear || CURRENT_TAX_YEAR.slice(0, 4);
+  const safeEndYear = endYear || String(Number(safeStartYear) + 1);
+  const shortEndYear = safeEndYear.slice(-2);
 
   // Calculate thresholds for descriptions
   const basicRateMax = rates.personalAllowance + (basicBand?.threshold ?? 0);
   const higherRateMax = rates.personalAllowance + (higherBand?.threshold ?? 0);
+  const datasetYearLabel = `${safeStartYear}-${shortEndYear}`;
+  const taxYearStartDate = `${safeStartYear}-04-06`;
+  const taxYearEndDate = `${safeEndYear}-04-05`;
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'UK Tax Rates Dataset 2025-26',
-    description:
-      'Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the 2025-26 tax year',
+    name: `UK Tax Rates Dataset ${datasetYearLabel}`,
+    description: `Official HMRC tax bands, National Insurance rates, and salary calculation examples for England, Wales, Scotland, and Northern Ireland for the ${datasetYearLabel} tax year`,
     url: SITE_URL,
-    // Note: Omitting datePublished/dateModified to avoid stale hardcoded values
-    // Add these back when we have a versioning system for tax data
-    datePublished: '2025-04-06', // Tax year start
-    dateModified: '2025-04-06', // Update when rates change
+    datePublished: taxYearStartDate,
+    dateModified: taxYearStartDate,
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
     creator: {
       '@type': 'Organization',
@@ -578,7 +573,7 @@ function generateDatasetData(): DatasetSchema {
         '@type': 'PropertyValue',
         name: 'Personal Allowance',
         value: formatCurrency(rates.personalAllowance),
-        description: 'Tax-free income threshold for 2025-26',
+        description: `Tax-free income threshold for ${datasetYearLabel}`,
       },
       {
         '@type': 'PropertyValue',
@@ -611,9 +606,15 @@ function generateDatasetData(): DatasetSchema {
         description: `NI on income above ${formatCurrency(niRates.upper.threshold)}`,
       },
     ],
-    // IMPORTANT: distribution removed - /api/tax-rates endpoint does not exist
-    // Re-add when endpoint is implemented to avoid schema spam
-    temporalCoverage: '2025-04-06/2026-04-05',
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        contentUrl: `${SITE_URL}/api/tax-rates`,
+        description: 'Machine-readable UK tax rates dataset JSON',
+      },
+    ],
+    temporalCoverage: `${taxYearStartDate}/${taxYearEndDate}`,
     spatialCoverage: {
       '@type': 'Place',
       name: 'United Kingdom',

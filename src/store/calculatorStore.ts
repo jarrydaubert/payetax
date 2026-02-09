@@ -100,6 +100,10 @@ const TAX_YEAR_INPUT_SCHEMA = z
     { message: 'Tax year must be consecutive (e.g., 2024-25)' },
   );
 
+const PAY_PERIOD_VALUES = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
+const STUDENT_LOAN_PLAN_VALUES = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
+const TAX_REGION_VALUES = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
+
 /**
  * Interface defining all inputs required for tax calculations
  * These values are collected from the UI and passed to the calculation engine
@@ -264,6 +268,57 @@ const defaultInput: CalculatorInput = {
   allowancesDeductions: 0,
   incomeSources: [],
 };
+
+const PersistedIncomeSourceSchema = z
+  .object({
+    id: z.string().min(1),
+    type: z.enum(['employment', 'pension', 'statePension', 'rental', 'investment', 'other']),
+    label: z.string().max(100).optional(),
+    amount: z.number().finite().nonnegative().max(10_000_000),
+    period: z.enum(PAY_PERIOD_VALUES),
+  })
+  .strict();
+
+const CalculatorInputPartialSchema = z
+  .object({
+    salary: z.number().finite().min(0).max(10_000_000).optional(),
+    payPeriod: z.enum(PAY_PERIOD_VALUES).optional(),
+    taxYear: TAX_YEAR_INPUT_SCHEMA.optional(),
+    taxCode: z.string().max(20).optional(),
+    region: z.enum(TAX_REGION_VALUES).optional(),
+    isScottish: z.boolean().optional(),
+    isMarried: z.boolean().optional(),
+    partnerGrossWage: z.number().finite().min(0).max(10_000_000).optional(),
+    isBlind: z.boolean().optional(),
+    age: z.number().int().min(0).max(120).optional(),
+    payNoNI: z.boolean().optional(),
+    studentLoanPlans: z
+      .union([
+        z.literal('none'),
+        z
+          .array(z.enum(STUDENT_LOAN_PLAN_VALUES))
+          .max(2)
+          .refine((plans) => {
+            return new Set(plans).size === plans.length;
+          }, 'Duplicate student loan plans not allowed'),
+      ])
+      .optional(),
+    pensionContribution: z.number().finite().min(0).max(10_000_000).optional(),
+    pensionContributionType: z.enum(['percentage', 'amount']).optional(),
+    niCategory: NICategorySchema.optional(),
+    hoursPerWeek: z.number().finite().min(1).max(168).optional(),
+    allowancesDeductions: z.number().finite().min(-1_000_000).max(1_000_000).optional(),
+    incomeSources: z.array(PersistedIncomeSourceSchema).max(10).optional(),
+  })
+  .strict();
+
+const PersistedCalculatorStoreSchema = z
+  .object({
+    input: CalculatorInputPartialSchema.optional(),
+    _savedAt: z.number().int().positive().optional(),
+    _taxYear: z.string().optional(),
+  })
+  .passthrough();
 
 // Create the calculator store
 export const useCalculatorStore = create<CalculatorState>()(
@@ -726,8 +781,26 @@ export const useCalculatorStore = create<CalculatorState>()(
           set((state) => ({ input: { ...state.input, allowancesDeductions: validated.data } }));
         },
         setInput: (partial) => {
+          const validated = CalculatorInputPartialSchema.safeParse(partial);
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid setInput payload:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
+          }
+
+          const { taxYear, ...validatedInput } = validated.data;
+          const nextInput: Partial<CalculatorInput> = { ...validatedInput };
+          if (taxYear) {
+            const normalizedTaxYear = normalizeTaxYear(taxYear);
+            if (TAX_RATES[normalizedTaxYear]) {
+              nextInput.taxYear = normalizedTaxYear;
+            }
+          }
+
           set((state) => ({
-            input: { ...state.input, ...partial },
+            input: { ...state.input, ...nextInput },
           }));
         },
 
@@ -1038,37 +1111,46 @@ export const useCalculatorStore = create<CalculatorState>()(
           persistedState: Partial<CalculatorState> | unknown,
           currentState: CalculatorState,
         ) => {
-          // Merge persisted state with defaults for new fields
-          const state = persistedState as Partial<CalculatorState> | undefined;
+          const parsed = PersistedCalculatorStoreSchema.safeParse(persistedState);
+          if (!parsed.success) {
+            return currentState;
+          }
+
+          const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+          const { input: persistedInput, _savedAt, _taxYear } = parsed.data;
+          if (_savedAt && Date.now() - _savedAt > THIRTY_DAYS_MS) {
+            return currentState;
+          }
+
+          let normalizedTaxYear = currentState.input.taxYear;
+          const taxYearCandidate = persistedInput?.taxYear ?? _taxYear;
+          if (typeof taxYearCandidate === 'string') {
+            const validatedTaxYear = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYearCandidate);
+            if (validatedTaxYear.success) {
+              const parsedTaxYear = normalizeTaxYear(validatedTaxYear.data);
+              normalizedTaxYear = TAX_RATES[parsedTaxYear]
+                ? parsedTaxYear
+                : currentState.input.taxYear;
+            }
+          }
+
+          if (_taxYear && normalizedTaxYear !== getCurrentTaxYear()) {
+            normalizedTaxYear = getCurrentTaxYear();
+          }
+
           return {
             ...currentState,
             input: {
               ...currentState.input,
-              ...state?.input,
+              ...persistedInput,
               // Ensure new fields have defaults if missing in persisted state
-              incomeSources: state?.input?.incomeSources ?? [],
+              incomeSources: persistedInput?.incomeSources ?? [],
+              taxYear: normalizedTaxYear,
             },
           };
         },
         onRehydrateStorage: () => (state, error) => {
           if (error || !state) return;
-
-          const savedAt = (state as unknown as { _savedAt?: number })._savedAt;
-          const savedTaxYear = (state as unknown as { _taxYear?: string })._taxYear;
-          const currentTaxYear = getCurrentTaxYear();
-
-          const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-          const isExpired = savedAt && Date.now() - savedAt > THIRTY_DAYS_MS;
-          const wrongTaxYear = savedTaxYear && savedTaxYear !== currentTaxYear;
-
-          if (isExpired) {
-            useCalculatorStore.getState().reset();
-            return;
-          }
-
-          if (wrongTaxYear) {
-            useCalculatorStore.getState().setTaxYear(currentTaxYear);
-          }
         },
       },
     ),

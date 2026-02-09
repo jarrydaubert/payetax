@@ -10,14 +10,14 @@
 import { MoveHorizontal } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Slider } from '@/components/ui/slider';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import {
   useDirectorGuideActions,
   useSliderSalary,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
 
-const TAX_YEAR = '2025-2026';
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const UEL = TAX_RATES[TAX_YEAR].nationalInsurance.employee.A.upper.threshold;
 
 export function SalarySlider() {

@@ -11,29 +11,6 @@
 
 ## Phase 2 — Product polish (pre-ship)
 
-### Director Guide monthly mode hardening
-- [ ] Fix Director Guide reset flow so one click triggers one reset path and one analytics reset event
-- [ ] Remove duplicate reset analytics tracking across `InputsPanel`, `DirectorDashboard`, and store actions
-- [ ] Replace broad form-state subscriptions with granular selectors (or shallow compare) to reduce unnecessary rerenders
-- [ ] Extract monthly projection math into one shared helper used by both dashboard render logic and store calculation logic
-- [ ] Replace `Math.floor` in safe monthly draw display with currency-consistent rounding
-- [ ] Centralize tax year display copy in a single source to avoid hardcoded year text drift
-- [ ] Add regression test coverage for reset behavior: single reset + single analytics event
-
-### OG images + internal links
-- [ ] Audit other pages for missing OG images
-- [ ] Consider Next.js `opengraph-image.tsx` for dynamic generation
-- [ ] Add footer links to marriage-allowance and NI calculators
-
-### Structured data + analytics
-- [ ] Create `/api/tax-rates` endpoint and use it in structured data
-- [ ] Add: `pro_calculator_started`, `pro_calculator_completed`, `pro_strategy_selected`, `pro_calendar_downloaded`
-
-### PWA install + FAQ
-- [ ] Add `/install` page with platform instructions and screenshots
-- [ ] Add FAQ entry: "Can I use PayeTax offline?"
-- [ ] Consider install prompt/banner
-
 ### Performance + token cleanup
 - [ ] Wrap `compileMDXContent` with `unstable_cache` keyed by `slug` + `updatedAt`
 - [ ] Match ISR window for revalidation

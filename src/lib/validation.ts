@@ -1,7 +1,7 @@
 // src/lib/validation.ts
 
 import { z } from 'zod';
-import { type PayPeriod, PERIODS } from '@/constants/taxRates';
+import { type PayPeriod, PERIODS, TAX_YEARS } from '@/constants/taxRates';
 
 /**
  * Valid pay periods derived from PERIODS constant (single source of truth)
@@ -9,6 +9,9 @@ import { type PayPeriod, PERIODS } from '@/constants/taxRates';
  */
 const PayPeriodValues = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
 export const PayPeriodSchema = z.enum(PayPeriodValues);
+const CalculatorTaxYearValues = TAX_YEARS as [string, ...string[]];
+const CalculatorRegionValues = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
+const StudentLoanValues = ['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 
 /**
  * ============================================================================
@@ -370,9 +373,9 @@ export const CalculatorInputSchema = z
       .optional(),
 
     // Tax configuration - using comprehensive TaxCodeSchema
-    taxCode: TaxCodeSchema.optional(),
-    taxYear: z.enum(['2024-25', '2025-26']),
-    region: z.enum(['england', 'scotland', 'wales']),
+    taxCode: TaxCodeSchema.or(z.literal('')).optional(),
+    taxYear: z.enum(CalculatorTaxYearValues),
+    region: z.enum(CalculatorRegionValues),
 
     // Pension contributions
     pensionContribution: z
@@ -402,7 +405,7 @@ export const CalculatorInputSchema = z
       .optional(),
 
     // Other allowances and deductions
-    studentLoan: z.enum(['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgraduate']).optional(),
+    studentLoan: z.enum(StudentLoanValues).optional(),
     childcare: z
       .number()
       .min(0, 'Childcare vouchers must be positive')
@@ -748,37 +751,39 @@ export type WhatIfValue = z.infer<typeof WhatIfValueSchema>;
  * // Valid percentage increase
  * ComparisonValueSchema.safeParse({
  *   mode: 'percentage',
- *   value: 5,
- *   percentage: 5
+ *   value: 5
  * }); // +5%
  *
  * // Valid amount increase
  * ComparisonValueSchema.safeParse({
  *   mode: 'amount',
- *   value: 5000,
- *   amount: 5000
+ *   value: 5000
  * }); // +£5k
  * ```
  */
-export const ComparisonValueSchema = z.object({
-  mode: z.enum(['percentage', 'amount', 'total']),
-  value: z.number().positive('Value must be positive'),
-  percentage: z
-    .number()
-    .min(0.01, 'Percentage must be at least 0.01%')
-    .max(1000, 'Percentage cannot exceed 1000%')
-    .optional(),
-  amount: z
-    .number()
-    .min(1, 'Amount must be at least £1')
-    .max(10000000, 'Amount cannot exceed £10M')
-    .optional(),
-  total: z
-    .number()
-    .min(1, 'Total salary must be at least £1')
-    .max(10000000, 'Total salary cannot exceed £10M')
-    .optional(),
-});
+export const ComparisonValueSchema = z.discriminatedUnion('mode', [
+  z.object({
+    mode: z.literal('percentage'),
+    value: z
+      .number()
+      .min(0.01, 'Percentage must be at least 0.01%')
+      .max(1000, 'Percentage cannot exceed 1000%'),
+  }),
+  z.object({
+    mode: z.literal('amount'),
+    value: z
+      .number()
+      .min(1, 'Amount must be at least £1')
+      .max(10000000, 'Amount cannot exceed £10M'),
+  }),
+  z.object({
+    mode: z.literal('total'),
+    value: z
+      .number()
+      .min(1, 'Total salary must be at least £1')
+      .max(10000000, 'Total salary cannot exceed £10M'),
+  }),
+]);
 
 export type ComparisonValue = z.infer<typeof ComparisonValueSchema>;
 
@@ -803,11 +808,10 @@ export function validateComparisonValue(
   value: number,
   modeValue?: number,
 ) {
-  const data: Record<string, unknown> = { mode, value };
-  if (mode === 'percentage' && modeValue !== undefined) data.percentage = modeValue;
-  if (mode === 'amount' && modeValue !== undefined) data.amount = modeValue;
-  if (mode === 'total' && modeValue !== undefined) data.total = modeValue;
-  return ComparisonValueSchema.safeParse(data);
+  return ComparisonValueSchema.safeParse({
+    mode,
+    value: modeValue ?? value,
+  });
 }
 
 /**

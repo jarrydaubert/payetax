@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import BackgroundElements from '@/components/atoms/BackgroundElements';
 import Footer from '@/components/molecules/Footer';
 import CookieBanner from '@/components/organisms/CookieBanner';
+import PWAInstallBanner from '@/components/organisms/PWAInstallBanner';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 
 interface LayoutProps {
@@ -67,6 +68,9 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
       {/* Cookie Banner - GDPR Compliance */}
       <Suspense fallback={null}>
         <CookieBanner />
+      </Suspense>
+      <Suspense fallback={null}>
+        <PWAInstallBanner />
       </Suspense>
     </div>
   );
