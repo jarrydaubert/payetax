@@ -75,7 +75,7 @@ describe('DirectorDashboard (Survival Mode)', () => {
 
     expect(screen.getByTestId('director-survival-mode')).toBeInTheDocument();
     expect(screen.getByText('Survival Mode')).toBeInTheDocument();
-    expect(screen.getByText('Key Dates')).toBeInTheDocument();
+    expect(screen.getAllByText('Key Dates').length).toBeGreaterThan(0);
 
     // These are only meaningful when there is positive profit.
     expect(screen.queryByText(/Drag to explore different salary levels/i)).not.toBeInTheDocument();

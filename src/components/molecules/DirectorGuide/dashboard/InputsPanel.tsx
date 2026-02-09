@@ -20,18 +20,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { type StudentLoanPlan, TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type StudentLoanPlan, TAX_RATES } from '@/constants/taxRates';
+import { getAvailableDirectorStudentLoanPlans } from '@/lib/tax/studentLoanPlans';
 import { cn } from '@/lib/utils';
 import type { Region } from '@/lib/validation/directorValidation';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   type YearEndMonth,
 } from '@/store/directorGuideStore';
 
-// Tax year configuration - should be centralized elsewhere
-// TODO: Move to app config/store so all panels share the same year
-const TAX_YEAR: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear;
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
 if (!rates) {
   throw new Error(`Tax rates not found for year: ${TAX_YEAR}`);
@@ -63,11 +62,46 @@ const regionToCountry: Record<Region, Country> = {
   scotland: 'scotland',
 };
 
+const STUDENT_LOAN_PLAN_SHORT_LABELS: Record<StudentLoanPlan, string> = {
+  plan1: 'Plan 1',
+  plan2: 'Plan 2',
+  plan4: 'Plan 4',
+  plan5: 'Plan 5',
+  postgrad: 'Postgrad',
+};
+
 export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const baseId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((formData) => ({
+    mode: formData.mode,
+    region: formData.region,
+    revenue: formData.revenue,
+    includesVat: formData.includesVat,
+    expenses: formData.expenses,
+    ytdSalary: formData.ytdSalary,
+    ytdDividends: formData.ytdDividends,
+    ytdDrawings: formData.ytdDrawings,
+    otherIncome: formData.otherIncome,
+    hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
+    yearEndMonth: formData.yearEndMonth,
+    studentLoanPlans: formData.studentLoanPlans,
+    pensionContribution: formData.pensionContribution,
+    isPensionAlreadyDeducted: formData.isPensionAlreadyDeducted,
+    companyCarBIK: formData.companyCarBIK,
+    hasEmploymentAllowance: formData.hasEmploymentAllowance,
+    lossesBroughtForward: formData.lossesBroughtForward,
+    minimumSalaryRequirement: formData.minimumSalaryRequirement,
+    yourSetupSalary: formData.yourSetupSalary,
+    yourSetupDividends: formData.yourSetupDividends,
+    monthlyIncome: formData.monthlyIncome,
+    monthlyExpenses: formData.monthlyExpenses,
+    contractStartMonth: formData.contractStartMonth,
+    cashInBank: formData.cashInBank,
+    minimumMonthlyDraw: formData.minimumMonthlyDraw,
+    runwayMonths: formData.runwayMonths,
+  }));
   const actions = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
 
@@ -86,8 +120,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   };
 
   const handleReset = () => {
+    if (onReset) {
+      onReset();
+      return;
+    }
     actions.reset();
-    onReset?.();
   };
 
   // Generate unique IDs for fields
@@ -153,7 +190,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               )}
               aria-pressed={isMonthlyMode}
             >
-              Monthly (Variable)
+              Monthly
             </button>
           </div>
         </fieldset>
@@ -526,7 +563,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 <LabelTooltip fieldName='directorStudentLoans' />
               </legend>
               <div className='grid grid-cols-2 gap-2'>
-                {(['plan1', 'plan2', 'plan4', 'postgrad'] as StudentLoanPlan[]).map((plan) => {
+                {getAvailableDirectorStudentLoanPlans(CURRENT_TAX_YEAR).map((plan) => {
                   const checkboxId = `${baseId}-loan-${plan}`;
                   return (
                     <div key={plan} className='flex items-center gap-2'>
@@ -537,10 +574,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                         className='border-white/20 data-[state=checked]:bg-cyan-500'
                       />
                       <Label htmlFor={checkboxId} className='cursor-pointer text-slate-500 text-xs'>
-                        {plan === 'plan1' && 'Plan 1'}
-                        {plan === 'plan2' && 'Plan 2'}
-                        {plan === 'plan4' && 'Plan 4'}
-                        {plan === 'postgrad' && 'Postgrad'}
+                        {STUDENT_LOAN_PLAN_SHORT_LABELS[plan]}
                       </Label>
                     </div>
                   );

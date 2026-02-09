@@ -1,12 +1,15 @@
 /**
- * Sidebar navigation with collapse/expand
+ * Sidebar navigation with collapse/expand and dashboard jump links.
  *
- * Shows icons + labels when expanded (192px), icons only when collapsed (48px).
- * Contains quick actions (email, print, reset) and links to related tools.
+ * - Expanded: workflow labels + quick actions
+ * - Collapsed: compact icon rail
+ * - Includes contextual jump menu for Director Guide sections
  */
 'use client';
 
 import {
+  AlertTriangle,
+  BarChart3,
   BookOpen,
   Calculator,
   ChevronLeft,
@@ -15,33 +18,68 @@ import {
   HelpCircle,
   Mail,
   MapPin,
+  RotateCcw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SidebarNavProps {
   collapsed?: boolean;
   onToggle?: () => void;
   onEmailResults?: () => void;
+  onReset?: () => void;
+  dashboardVariant?: 'normal' | 'survival';
 }
 
 // Shared styles for nav items
 const baseItemClass =
-  'flex min-h-10 w-full items-center rounded-[10px] py-2.5 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950';
+  'group flex min-h-9 w-full items-center rounded-[10px] border border-transparent py-2 text-slate-400 transition-[color,background-color,border-color] duration-150 hover:border-white/10 hover:bg-slate-800 hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:min-h-10 2xl:py-2.5';
 
 const getItemClass = (collapsed: boolean, isActive = false) =>
   cn(
     baseItemClass,
-    collapsed ? 'justify-center px-0' : 'gap-3 px-3',
-    isActive && 'bg-slate-800/50 text-cyan-400',
+    collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5 2xl:gap-3 2xl:px-3',
+    isActive &&
+      'border-cyan-500/25 bg-slate-800/70 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)]',
   );
 
 const getLabelClass = (collapsed: boolean) =>
   cn(
-    'block max-w-[160px] overflow-hidden whitespace-nowrap font-medium text-sm transition-all duration-200',
+    'block max-w-[182px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[0.9rem] tracking-[-0.01em] transition-all duration-200 2xl:max-w-[210px] 2xl:text-[0.97rem]',
     collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
   );
+
+const navIconClass = 'size-[18px] shrink-0 2xl:size-5';
+const sectionHeaderClass =
+  'mb-1.5 px-2.5 font-semibold text-[11px] text-slate-500 uppercase tracking-[0.16em] transition-opacity duration-200 2xl:mb-2 2xl:px-3';
+
+const NORMAL_WORKFLOW_ITEMS = [
+  { id: 'director-summary', label: 'Summary', icon: BarChart3 },
+  { id: 'director-slider', label: 'Salary Slider', icon: Calculator },
+  { id: 'director-strategy', label: 'Strategy Table', icon: FileSearch },
+  { id: 'director-details', label: 'Breakdowns', icon: BookOpen },
+  { id: 'director-key-dates', label: 'Money Flow', icon: MapPin },
+] as const;
+
+const SURVIVAL_WORKFLOW_ITEMS = [
+  { id: 'director-survival', label: 'Survival Plan', icon: AlertTriangle },
+  { id: 'director-key-dates', label: 'Key Dates', icon: MapPin },
+] as const;
+
+const TOOL_LINKS = [
+  { href: '/' as const, icon: Calculator, label: 'PAYE Calculator' },
+  { href: '/tools/tax-code-decoder' as const, icon: FileSearch, label: 'Tax Code Decoder' },
+  {
+    href: '/tools/scottish-tax-calculator' as const,
+    icon: MapPin,
+    label: 'Scottish Calculator',
+  },
+  { href: '/blog' as const, icon: BookOpen, label: 'Tax Guides' },
+] as const;
+
+const MAIN_SCROLL_ROOT_SELECTOR = '[data-director-scroll-root="true"]';
 
 // NavLink component for DRY
 function NavLink({
@@ -60,11 +98,12 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={cn(getItemClass(collapsed, isActive), 'mb-1')}
+      className={cn(getItemClass(collapsed, isActive), 'mb-0.5')}
       aria-label={collapsed ? label : undefined}
       aria-current={isActive ? 'page' : undefined}
+      title={collapsed ? label : undefined}
     >
-      <Icon className='size-5 shrink-0' aria-hidden='true' />
+      <Icon className={navIconClass} aria-hidden='true' />
       <span className={getLabelClass(collapsed)}>{label}</span>
     </Link>
   );
@@ -97,15 +136,60 @@ function NavButton({
         className,
       )}
       aria-label={collapsed ? label : undefined}
+      title={collapsed ? label : undefined}
     >
-      <Icon className='size-5 shrink-0' aria-hidden='true' />
+      <Icon className={navIconClass} aria-hidden='true' />
       <span className={getLabelClass(collapsed)}>{label}</span>
     </button>
   );
 }
 
-export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: SidebarNavProps) {
+function JumpButton({
+  icon: Icon,
+  label,
+  collapsed,
+  isActive,
+  onClick,
+}: {
+  icon: typeof Calculator;
+  label: string;
+  collapsed: boolean;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      className={cn(getItemClass(collapsed, isActive), 'mb-0.5')}
+      aria-label={collapsed ? label : undefined}
+      aria-current={isActive ? 'step' : undefined}
+      title={collapsed ? label : undefined}
+    >
+      <Icon className={navIconClass} aria-hidden='true' />
+      <span className={getLabelClass(collapsed)}>{label}</span>
+    </button>
+  );
+}
+
+export function SidebarNav({
+  collapsed = false,
+  onToggle,
+  onEmailResults,
+  onReset,
+  dashboardVariant,
+}: SidebarNavProps) {
   const pathname = usePathname();
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const workflowItems = useMemo(() => {
+    if (dashboardVariant === 'normal') {
+      return NORMAL_WORKFLOW_ITEMS;
+    }
+    if (dashboardVariant === 'survival') {
+      return SURVIVAL_WORKFLOW_ITEMS;
+    }
+    return [];
+  }, [dashboardVariant]);
 
   // Determine active state for each link
   const isActive = (href: string) => {
@@ -113,11 +197,69 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
     return pathname.startsWith(href);
   };
 
+  const scrollToSection = useCallback((sectionId: string) => {
+    const root = document.querySelector<HTMLElement>(MAIN_SCROLL_ROOT_SELECTOR);
+    const section = document.querySelector<HTMLElement>(`[data-director-section="${sectionId}"]`);
+    if (!(root && section)) return;
+
+    const rootRect = root.getBoundingClientRect();
+    const sectionRect = section.getBoundingClientRect();
+    const targetTop = sectionRect.top - rootRect.top + root.scrollTop - 16;
+
+    root.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
+    setActiveSectionId(sectionId);
+  }, []);
+
+  useEffect(() => {
+    if (workflowItems.length === 0) {
+      setActiveSectionId(null);
+      return;
+    }
+
+    setActiveSectionId(workflowItems[0].id);
+  }, [workflowItems]);
+
+  useEffect(() => {
+    if (workflowItems.length === 0 || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    const root = document.querySelector<HTMLElement>(MAIN_SCROLL_ROOT_SELECTOR);
+    if (!root) return;
+
+    const targets = workflowItems
+      .map((item) => document.querySelector<HTMLElement>(`[data-director-section="${item.id}"]`))
+      .filter((section): section is HTMLElement => Boolean(section));
+    if (targets.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const firstVisible = visible[0];
+        if (firstVisible) {
+          setActiveSectionId(firstVisible.target.id);
+        }
+      },
+      {
+        root,
+        rootMargin: '-18% 0px -58% 0px',
+        threshold: [0.15, 0.35, 0.6],
+      },
+    );
+
+    for (const target of targets) {
+      observer.observe(target);
+    }
+    return () => observer.disconnect();
+  }, [workflowItems]);
+
   return (
     <nav
       className={cn(
-        'relative flex h-full flex-col border-white/[0.04] border-r bg-slate-950 py-4 transition-[width,padding] duration-200 ease-out',
-        collapsed ? 'w-14 px-2' : 'w-48 px-3',
+        'relative flex h-full flex-col border-white/[0.04] border-r bg-slate-950 py-3 transition-[width,padding] duration-200 ease-out 2xl:py-4',
+        collapsed ? 'w-14 px-2' : 'w-[clamp(13.75rem,15vw,17rem)] px-2.5 2xl:px-3.5',
       )}
       aria-label='Sidebar navigation'
     >
@@ -126,7 +268,9 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         href='/'
         className={cn(
           'mb-4 flex items-center rounded-[12px] border border-white/[0.08] bg-slate-900/60 text-slate-100 transition-colors hover:bg-slate-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-          collapsed ? 'size-12 justify-center p-0' : 'min-h-12 w-full gap-3 px-3 py-2.5',
+          collapsed
+            ? 'size-12 justify-center p-0'
+            : 'mb-3 min-h-11 w-full gap-2.5 px-2.5 py-2 xl:mb-4 xl:min-h-12 xl:gap-3 xl:px-3 xl:py-2.5',
         )}
         aria-label='PayeTax Home'
       >
@@ -135,7 +279,7 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         </span>
         <span
           className={cn(
-            'block max-w-[160px] overflow-hidden whitespace-nowrap font-semibold text-[0.95rem] text-slate-100 tracking-[-0.02em] transition-all duration-200',
+            'block max-w-[180px] overflow-hidden whitespace-nowrap font-semibold text-[0.9rem] text-slate-100 tracking-[-0.02em] transition-all duration-200 2xl:text-[0.95rem]',
             collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
           )}
         >
@@ -146,16 +290,22 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
         </span>
       </Link>
 
+      {!collapsed && (
+        <div className='mb-3 rounded-[12px] border border-cyan-400/25 bg-gradient-to-br from-cyan-500/12 to-emerald-500/6 p-2.5 2xl:mb-4 2xl:p-3'>
+          <div className='font-semibold text-[11px] text-cyan-200 uppercase tracking-[0.16em]'>
+            Guide
+          </div>
+          <p className='mt-1 text-slate-300/90 text-xs leading-relaxed'>
+            {dashboardVariant
+              ? 'Use Workflow to jump between sections instantly.'
+              : 'Enter figures in the inputs panel to unlock scenario navigation.'}
+          </p>
+        </div>
+      )}
+
       {/* Section: Actions */}
       <section aria-label='Actions'>
-        <div
-          className={cn(
-            'mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider transition-opacity duration-200',
-            collapsed && 'opacity-0',
-          )}
-        >
-          Actions
-        </div>
+        <div className={cn(sectionHeaderClass, collapsed && 'opacity-0')}>Actions</div>
 
         {/* Email Results - disabled when no handler */}
         <NavButton
@@ -164,55 +314,53 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
           collapsed={collapsed}
           onClick={onEmailResults}
           disabled={!onEmailResults}
-          className='mb-1'
+          className='mb-0.5'
+        />
+        <NavButton
+          icon={RotateCcw}
+          label='Reset Guide'
+          collapsed={collapsed}
+          onClick={onReset}
+          disabled={!onReset}
+          className='mb-0.5'
         />
       </section>
 
-      {/* Visual divider - decorative, not semantic */}
-      <div className='my-3 h-px bg-white/[0.06]' aria-hidden='true' />
+      {workflowItems.length > 0 && (
+        <>
+          <div className='my-2.5 h-px bg-white/[0.06] 2xl:my-3' aria-hidden='true' />
+          <section aria-label='Workflow'>
+            <div className={cn(sectionHeaderClass, collapsed && 'opacity-0')}>Workflow</div>
+            {workflowItems.map((item) => (
+              <JumpButton
+                key={item.id}
+                icon={item.icon}
+                label={item.label}
+                collapsed={collapsed}
+                isActive={activeSectionId === item.id}
+                onClick={() => scrollToSection(item.id)}
+              />
+            ))}
+          </section>
+        </>
+      )}
+
+      <div className='my-2.5 h-px bg-white/[0.06] 2xl:my-3' aria-hidden='true' />
 
       {/* Section: Tools */}
       <section aria-label='Tools'>
-        <div
-          className={cn(
-            'mb-2 px-3 font-medium text-slate-600 text-xs uppercase tracking-wider transition-opacity duration-200',
-            collapsed && 'opacity-0',
-          )}
-        >
-          Tools
-        </div>
+        <div className={cn(sectionHeaderClass, collapsed && 'opacity-0')}>Tools</div>
 
-        <NavLink
-          href='/'
-          icon={Calculator}
-          label='PAYE Calculator'
-          collapsed={collapsed}
-          isActive={isActive('/')}
-        />
-
-        <NavLink
-          href='/tools/tax-code-decoder'
-          icon={FileSearch}
-          label='Tax Code Decoder'
-          collapsed={collapsed}
-          isActive={isActive('/tools/tax-code-decoder')}
-        />
-
-        <NavLink
-          href='/tools/scottish-tax-calculator'
-          icon={MapPin}
-          label='Scottish Calculator'
-          collapsed={collapsed}
-          isActive={isActive('/tools/scottish-tax-calculator')}
-        />
-
-        <NavLink
-          href='/blog'
-          icon={BookOpen}
-          label='Tax Guides'
-          collapsed={collapsed}
-          isActive={isActive('/blog')}
-        />
+        {TOOL_LINKS.map((item) => (
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            collapsed={collapsed}
+            isActive={isActive(item.href)}
+          />
+        ))}
       </section>
 
       {/* Collapse/Expand toggle */}
@@ -225,9 +373,9 @@ export function SidebarNav({ collapsed = false, onToggle, onEmailResults }: Side
           aria-expanded={!collapsed}
         >
           {collapsed ? (
-            <ChevronRight className='size-5 shrink-0' aria-hidden='true' />
+            <ChevronRight className={navIconClass} aria-hidden='true' />
           ) : (
-            <ChevronLeft className='size-5 shrink-0' aria-hidden='true' />
+            <ChevronLeft className={navIconClass} aria-hidden='true' />
           )}
           <span className={getLabelClass(collapsed)}>{collapsed ? 'Expand' : 'Collapse'}</span>
         </button>

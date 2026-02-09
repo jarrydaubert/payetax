@@ -1,9 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { usePathname } from 'next/navigation';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { DashboardLayout } from '../DashboardLayout';
 import { DetailCards } from '../DetailCards';
 import { MoneyFlowChart } from '../MoneyFlowChart';
+import { SidebarNav } from '../SidebarNav';
 import { SummaryCards } from '../SummaryCards';
 
 jest.mock('@/lib/tax/strategyComparison', () => {
@@ -13,6 +15,10 @@ jest.mock('@/lib/tax/strategyComparison', () => {
     calculateSalaryScenario: jest.fn(),
   };
 });
+
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn(),
+}));
 
 const mockCalculateSalaryScenario = calculateSalaryScenario as jest.Mock;
 
@@ -60,6 +66,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
 
 describe('Director Guide dashboard components', () => {
   beforeEach(() => {
+    (usePathname as jest.Mock).mockReturnValue('/');
     const current = useDirectorGuideStore.getState();
     setStoreState({
       ...current,
@@ -221,6 +228,76 @@ describe('Director Guide dashboard components', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       fireEvent.click(screen.getByLabelText('Close your numbers panel'));
       expect(handleMobileInputs).toHaveBeenCalled();
+    });
+  });
+
+  describe('SidebarNav', () => {
+    it('shows workflow links only when dashboard variant is available', () => {
+      const { rerender } = render(<SidebarNav />);
+      expect(screen.queryByText('Workflow')).not.toBeInTheDocument();
+
+      rerender(<SidebarNav dashboardVariant='normal' />);
+      expect(screen.getByText('Workflow')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Summary' })).toBeInTheDocument();
+    });
+
+    it('calls reset handler from actions', () => {
+      const handleReset = jest.fn();
+      render(<SidebarNav onReset={handleReset} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Reset Guide' }));
+      expect(handleReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('scrolls main container when workflow link is clicked', () => {
+      const mainScroll = document.createElement('div');
+      mainScroll.setAttribute('data-director-scroll-root', 'true');
+      Object.defineProperty(mainScroll, 'scrollTop', {
+        value: 180,
+        writable: true,
+      });
+      Object.defineProperty(mainScroll, 'scrollTo', {
+        value: jest.fn(),
+      });
+      Object.defineProperty(mainScroll, 'getBoundingClientRect', {
+        value: () => ({
+          top: 100,
+          left: 0,
+          right: 1000,
+          bottom: 800,
+          width: 1000,
+          height: 700,
+          x: 0,
+          y: 100,
+          toJSON: () => ({}),
+        }),
+      });
+      document.body.appendChild(mainScroll);
+
+      const section = document.createElement('section');
+      section.setAttribute('data-director-section', 'director-summary');
+      Object.defineProperty(section, 'getBoundingClientRect', {
+        value: () => ({
+          top: 360,
+          left: 0,
+          right: 1000,
+          bottom: 420,
+          width: 1000,
+          height: 60,
+          x: 0,
+          y: 360,
+          toJSON: () => ({}),
+        }),
+      });
+      document.body.appendChild(section);
+
+      render(<SidebarNav dashboardVariant='normal' />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Summary' }));
+
+      expect(mainScroll.scrollTo).toHaveBeenCalled();
+      mainScroll.remove();
+      section.remove();
     });
   });
 });

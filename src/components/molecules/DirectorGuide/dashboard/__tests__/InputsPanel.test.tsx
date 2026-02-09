@@ -115,7 +115,7 @@ describe('DirectorGuide InputsPanel', () => {
     expect(screen.getByLabelText('Annual Revenue')).toBeInTheDocument();
     expect(screen.queryByLabelText('Monthly Contract Income')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Monthly (Variable)' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
 
     expect(useDirectorGuideStore.getState().formData.mode).toBe('monthly');
     expect(screen.getByLabelText('Monthly Contract Income')).toBeInTheDocument();
@@ -151,5 +151,37 @@ describe('DirectorGuide InputsPanel', () => {
     expect(state.cashInBank).toBe(5000);
     expect(state.minimumMonthlyDraw).toBe(900);
     expect(state.runwayMonths).toBe(5);
+  });
+
+  it('delegates reset to parent callback when onReset is provided', () => {
+    const current = useDirectorGuideStore.getState();
+    setStoreState({
+      formData: {
+        ...current.formData,
+        revenue: 100000,
+      },
+    });
+    const onReset = jest.fn();
+
+    render(<InputsPanel onReset={onReset} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+
+    expect(onReset).toHaveBeenCalledTimes(1);
+    expect(useDirectorGuideStore.getState().formData.revenue).toBe(100000);
+  });
+
+  it('resets store directly when onReset is not provided', () => {
+    const current = useDirectorGuideStore.getState();
+    setStoreState({
+      formData: {
+        ...current.formData,
+        revenue: 100000,
+      },
+    });
+
+    render(<InputsPanel />);
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+
+    expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
   });
 });

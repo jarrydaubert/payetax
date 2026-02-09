@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { trackCalculationRun } from '@/lib/directorGuideAnalytics';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   useMonthlyModeOutput,
   useStrategyComparison,
@@ -20,7 +20,7 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
 }));
 
 jest.mock('@/store/directorGuideStore', () => ({
-  useDirectorFormData: jest.fn(),
+  useDirectorFormSlice: jest.fn(),
   useStrategyComparison: jest.fn(),
   useMonthlyModeOutput: jest.fn(),
   useDirectorGuideActions: jest.fn(),
@@ -71,6 +71,41 @@ jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
 }));
 
 describe('DirectorDashboard analytics', () => {
+  const mockFormSlice = (overrides: Record<string, unknown>) => {
+    const defaults = {
+      mode: 'annual',
+      region: undefined,
+      revenue: undefined,
+      includesVat: false,
+      expenses: undefined,
+      lossesBroughtForward: undefined,
+      ytdSalary: undefined,
+      ytdDividends: undefined,
+      ytdDrawings: undefined,
+      otherIncome: undefined,
+      hasOtherPAYEEmployment: false,
+      studentLoanPlans: [],
+      pensionContribution: undefined,
+      isPensionAlreadyDeducted: false,
+      companyCarBIK: undefined,
+      hasEmploymentAllowance: false,
+      minimumSalaryRequirement: undefined,
+      yourSetupSalary: undefined,
+      yourSetupDividends: undefined,
+      monthlyIncome: undefined,
+      monthlyExpenses: undefined,
+      contractStartMonth: undefined,
+      cashInBank: undefined,
+      minimumMonthlyDraw: undefined,
+      runwayMonths: undefined,
+    };
+
+    (useDirectorFormSlice as unknown as jest.Mock).mockImplementation(
+      (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({ ...defaults, ...overrides }),
+    );
+  };
+
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
@@ -83,7 +118,7 @@ describe('DirectorDashboard analytics', () => {
   test('tracks calculation_run once and schedules calculate when inputs become valid', () => {
     const mockCalculate = jest.fn();
 
-    (useDirectorFormData as unknown as jest.Mock).mockReturnValue({
+    mockFormSlice({
       region: 'rUK',
       revenue: 100000,
       expenses: 20000,
@@ -118,7 +153,7 @@ describe('DirectorDashboard analytics', () => {
   test('tracks projected revenue/expenses in monthly mode', () => {
     const mockCalculate = jest.fn();
 
-    (useDirectorFormData as unknown as jest.Mock).mockReturnValue({
+    mockFormSlice({
       mode: 'monthly',
       region: 'rUK',
       includesVat: false,

@@ -176,7 +176,10 @@ export function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <div className='relative min-w-0 flex-1 overflow-y-auto bg-slate-950'>
+        <div
+          data-director-scroll-root='true'
+          className='relative min-w-0 flex-1 overflow-y-auto bg-slate-950'
+        >
           {/* Mobile header with logo */}
           <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 py-3 backdrop-blur-sm lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>

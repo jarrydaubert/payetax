@@ -36,15 +36,14 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { SPACING } from '@/constants/designTokens';
 import {
   trackCalculationRun,
-  trackGuideReset,
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
-import { projectAnnualFromMonthly } from '@/lib/tax/variableIncome';
+import { resolveAnnualFinancials } from '@/lib/tax/variableIncome';
 import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
-  useDirectorFormData,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   useMonthlyModeOutput,
   useStrategyComparison,
@@ -61,26 +60,53 @@ export function DirectorDashboard() {
   const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
-  const formData = useDirectorFormData();
+  const formData = useDirectorFormSlice((state) => ({
+    mode: state.mode,
+    region: state.region,
+    revenue: state.revenue,
+    includesVat: state.includesVat,
+    expenses: state.expenses,
+    lossesBroughtForward: state.lossesBroughtForward,
+    ytdSalary: state.ytdSalary,
+    ytdDividends: state.ytdDividends,
+    ytdDrawings: state.ytdDrawings,
+    otherIncome: state.otherIncome,
+    hasOtherPAYEEmployment: state.hasOtherPAYEEmployment,
+    studentLoanPlans: state.studentLoanPlans,
+    pensionContribution: state.pensionContribution,
+    isPensionAlreadyDeducted: state.isPensionAlreadyDeducted,
+    companyCarBIK: state.companyCarBIK,
+    hasEmploymentAllowance: state.hasEmploymentAllowance,
+    minimumSalaryRequirement: state.minimumSalaryRequirement,
+    yourSetupSalary: state.yourSetupSalary,
+    yourSetupDividends: state.yourSetupDividends,
+    monthlyIncome: state.monthlyIncome,
+    monthlyExpenses: state.monthlyExpenses,
+    contractStartMonth: state.contractStartMonth,
+    cashInBank: state.cashInBank,
+    minimumMonthlyDraw: state.minimumMonthlyDraw,
+    runwayMonths: state.runwayMonths,
+  }));
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
   const { calculate, reset } = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
 
-  const projectedFromInputs = isMonthlyMode
-    ? projectAnnualFromMonthly({
-        monthlyIncome: formData.monthlyIncome,
-        monthlyExpenses: formData.monthlyExpenses,
-        contractStartMonth: formData.contractStartMonth,
-      })
-    : null;
+  const annualizedFromInputs = resolveAnnualFinancials({
+    mode: formData.mode,
+    revenue: formData.revenue,
+    expenses: formData.expenses,
+    monthlyIncome: formData.monthlyIncome,
+    monthlyExpenses: formData.monthlyExpenses,
+    contractStartMonth: formData.contractStartMonth,
+  });
 
   const effectiveRevenue = isMonthlyMode
-    ? (monthlyModeOutput?.projectedRevenue ?? projectedFromInputs?.projectedRevenue)
-    : formData.revenue;
+    ? (monthlyModeOutput?.projectedRevenue ?? annualizedFromInputs.revenue)
+    : annualizedFromInputs.revenue;
   const effectiveExpenses = isMonthlyMode
-    ? (monthlyModeOutput?.projectedExpenses ?? projectedFromInputs?.projectedExpenses)
-    : formData.expenses;
+    ? (monthlyModeOutput?.projectedExpenses ?? annualizedFromInputs.expenses)
+    : annualizedFromInputs.expenses;
 
   const emailInput: DirectorEmailInput | null =
     comparison &&
@@ -134,19 +160,17 @@ export function DirectorDashboard() {
       return;
     }
 
-    const monthlyProjection =
-      formData.mode === 'monthly'
-        ? projectAnnualFromMonthly({
-            monthlyIncome: formData.monthlyIncome,
-            monthlyExpenses: formData.monthlyExpenses,
-            contractStartMonth: formData.contractStartMonth,
-          })
-        : null;
+    const annualizedFinancials = resolveAnnualFinancials({
+      mode: formData.mode,
+      revenue: formData.revenue,
+      expenses: formData.expenses,
+      monthlyIncome: formData.monthlyIncome,
+      monthlyExpenses: formData.monthlyExpenses,
+      contractStartMonth: formData.contractStartMonth,
+    });
 
-    const revenue =
-      formData.mode === 'monthly' ? monthlyProjection?.projectedRevenue : formData.revenue;
-    const expenses =
-      formData.mode === 'monthly' ? monthlyProjection?.projectedExpenses : formData.expenses;
+    const revenue = annualizedFinancials.revenue;
+    const expenses = annualizedFinancials.expenses;
 
     if (revenue === undefined || expenses === undefined) {
       return;
@@ -154,10 +178,7 @@ export function DirectorDashboard() {
     if (revenue < 0 || expenses < 0) {
       return;
     }
-    if (
-      formData.mode === 'monthly' &&
-      (!monthlyProjection || monthlyProjection.monthsRemaining <= 0)
-    ) {
+    if (annualizedFinancials.hasInvalidContractStartMonth) {
       return;
     }
 
@@ -190,7 +211,6 @@ export function DirectorDashboard() {
 
   // Handle reset
   const handleReset = useCallback(() => {
-    trackGuideReset();
     hasTrackedResults.current = false;
     reset();
   }, [reset]);
@@ -207,6 +227,8 @@ export function DirectorDashboard() {
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
             onEmailResults={() => setEmailDialogOpen(true)}
+            onReset={handleReset}
+            dashboardVariant={hasComparison ? (isSurvivalMode ? 'survival' : 'normal') : undefined}
           />
         }
         inputs={<InputsPanel onReset={handleReset} />}
@@ -227,8 +249,12 @@ export function DirectorDashboard() {
               <div className='space-y-6'>
                 {isSurvivalMode ? (
                   <>
-                    <SurvivalModePanel />
-                    <KeyDates />
+                    <section data-director-section='director-survival' aria-label='Survival plan'>
+                      <SurvivalModePanel />
+                    </section>
+                    <section data-director-section='director-key-dates' aria-label='Key dates'>
+                      <KeyDates />
+                    </section>
                   </>
                 ) : (
                   <>
@@ -269,29 +295,45 @@ export function DirectorDashboard() {
                       </section>
                     )}
 
-                    {/* Summary Cards */}
-                    <SummaryCards />
+                    <section data-director-section='director-summary' aria-label='Summary cards'>
+                      <SummaryCards />
+                    </section>
 
-                    {/* Salary Slider */}
-                    <SalarySlider />
+                    <section data-director-section='director-slider' aria-label='Salary slider'>
+                      <SalarySlider />
+                    </section>
 
-                    {/* Strategy Comparison Table */}
-                    <StrategyComparisonTable />
+                    <section
+                      data-director-section='director-strategy'
+                      aria-label='Strategy comparison'
+                    >
+                      <StrategyComparisonTable />
+                    </section>
 
-                    {/* Detail Cards (2x2 grid) */}
-                    <DetailCards />
+                    <section
+                      data-director-section='director-details'
+                      aria-label='Detailed breakdowns'
+                    >
+                      <DetailCards />
+                    </section>
 
-                    {/* Two Pots - Company vs Personal */}
-                    <TaxPots />
+                    <section aria-label='Company and personal tax pots'>
+                      <TaxPots />
+                    </section>
 
-                    {/* Pension Gap Warning */}
-                    <PensionGapWarning />
+                    <section aria-label='Pension gap warning'>
+                      <PensionGapWarning />
+                    </section>
 
-                    {/* Money Flow + Key Dates */}
-                    <div className='grid gap-4 md:grid-cols-2'>
-                      <MoneyFlowChart />
-                      <KeyDates />
-                    </div>
+                    <section
+                      data-director-section='director-key-dates'
+                      aria-label='Money flow and key dates'
+                    >
+                      <div className='grid gap-4 md:grid-cols-2'>
+                        <MoneyFlowChart />
+                        <KeyDates />
+                      </div>
+                    </section>
                   </>
                 )}
 
