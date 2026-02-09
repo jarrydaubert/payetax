@@ -20,6 +20,25 @@ const SECURITY_THRESHOLDS = {
   low: 10, // Max 10 low vulnerabilities
 };
 
+function emptyAuditMetadata() {
+  return {
+    vulnerabilities: {
+      info: 0,
+      low: 0,
+      moderate: 0,
+      high: 0,
+      critical: 0,
+      total: 0,
+    },
+    dependencies: {
+      prod: 0,
+      dev: 0,
+      optional: 0,
+      total: 0,
+    },
+  };
+}
+
 function getCurrentTimestamp() {
   return new Date().toISOString();
 }
@@ -67,13 +86,24 @@ function checkOutdatedPackages() {
       try {
         if (stdout) {
           const outdated = JSON.parse(stdout);
-          const packages = Object.keys(outdated).map((name) => ({
-            name,
-            current: outdated[name].current,
-            wanted: outdated[name].wanted,
-            latest: outdated[name].latest,
-            type: outdated[name].type || 'dependencies',
-          }));
+          if (outdated?.error) {
+            resolve([]);
+            return;
+          }
+          const packages = Object.entries(outdated)
+            .filter(
+              ([, details]) =>
+                details &&
+                typeof details.current === 'string' &&
+                typeof details.latest === 'string',
+            )
+            .map(([name, details]) => ({
+              name,
+              current: details.current,
+              wanted: details.wanted,
+              latest: details.latest,
+              type: details.type || 'dependencies',
+            }));
           resolve(packages);
         } else {
           resolve([]);
@@ -81,6 +111,28 @@ function checkOutdatedPackages() {
       } catch (_e) {
         resolve([]);
       }
+    });
+  });
+}
+
+function runBunPmScan() {
+  return new Promise((resolve, reject) => {
+    exec('bun pm scan', (error, stdout = '', stderr = '') => {
+      const output = [stdout, stderr].filter(Boolean).join('\n');
+      const advisoriesMatch = output.match(/(\d+)\s+advisories?\s+found/i);
+      const advisories = advisoriesMatch ? Number(advisoriesMatch[1]) : 0;
+      const noAdvisories = /No advisories found/i.test(output);
+      const hasScanResult = noAdvisories || /advisories?\s+found/i.test(output);
+
+      if (error && !hasScanResult) {
+        reject(error);
+        return;
+      }
+
+      resolve({
+        advisories: noAdvisories ? 0 : advisories,
+        output,
+      });
     });
   });
 }
@@ -108,8 +160,10 @@ function generateSecurityReport(audit, history) {
 
   if (audit.outdatedPackages && audit.outdatedPackages.length > 0) {
     const criticalOutdated = audit.outdatedPackages.filter((pkg) => {
+      if (!(pkg.current && pkg.latest)) return false;
       const currentMajor = parseInt(pkg.current.split('.')[0], 10);
       const latestMajor = parseInt(pkg.latest.split('.')[0], 10);
+      if (Number.isNaN(currentMajor) || Number.isNaN(latestMajor)) return false;
       return latestMajor > currentMajor;
     });
 
@@ -178,31 +232,33 @@ async function runSecurityAudit() {
   return new Promise((resolve, reject) => {
     exec('npm audit --audit-level=info --json', async (_error, stdout, _stderr) => {
       try {
-        let auditData;
+        let auditData = null;
+        let scanSource = 'npm audit';
 
         if (stdout) {
           auditData = JSON.parse(stdout);
-        } else {
-          // If no vulnerabilities, npm audit returns empty
+        }
+
+        const npmSummary = auditData?.metadata?.vulnerabilities;
+        const npmDependencies = auditData?.metadata?.dependencies;
+        const npmAuditMissingData =
+          !(npmSummary && npmDependencies) || auditData?.error?.code === 'ENOLOCK';
+
+        if (npmAuditMissingData) {
+          // Bun projects may not have package-lock.json; fall back to Bun's scanner.
+          const bunScan = await runBunPmScan();
+          scanSource = 'bun pm scan';
           auditData = {
             vulnerabilities: {},
-            metadata: {
-              vulnerabilities: {
-                info: 0,
-                low: 0,
-                moderate: 0,
-                high: 0,
-                critical: 0,
-                total: 0,
-              },
-              dependencies: {
-                prod: 0,
-                dev: 0,
-                optional: 0,
-                total: 0,
-              },
-            },
+            metadata: emptyAuditMetadata(),
           };
+
+          if (bunScan.advisories > 0) {
+            // Bun scan doesn't expose severities in a stable machine-readable format;
+            // classify advisories as high to keep CI behavior conservative.
+            auditData.metadata.vulnerabilities.high = bunScan.advisories;
+            auditData.metadata.vulnerabilities.total = bunScan.advisories;
+          }
         }
 
         // Get outdated packages info
@@ -231,8 +287,9 @@ async function runSecurityAudit() {
 
         const audit = {
           timestamp: getCurrentTimestamp(),
-          summary: auditData.metadata.vulnerabilities,
-          dependencies: auditData.metadata.dependencies,
+          scanSource,
+          summary: auditData.metadata?.vulnerabilities || emptyAuditMetadata().vulnerabilities,
+          dependencies: auditData.metadata?.dependencies || emptyAuditMetadata().dependencies,
           vulnerabilities,
           outdatedPackages,
         };
