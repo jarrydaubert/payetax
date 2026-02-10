@@ -31,6 +31,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 
 - Run `bun run fix-all` when you touch TS/JS/CSS.
 - Run `bun run test:no-coverage` (or the smallest relevant test for your change).
+- Bugs: add a regression test when it fits.
 - If you cannot run tests, say so explicitly in the PR/summary.
 
 ## Security Checks (When Relevant)
