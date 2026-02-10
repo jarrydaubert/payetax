@@ -41,8 +41,7 @@ const getItemClass = (collapsed: boolean, isActive = false) =>
   cn(
     baseItemClass,
     collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5 2xl:gap-3 2xl:px-3',
-    isActive &&
-      'border-cyan-500/25 bg-slate-800/70 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)]',
+    isActive && 'border-cyan-500/25 bg-slate-800/70 text-cyan-300 shadow-cyan-inset',
   );
 
 const getLabelClass = (collapsed: boolean) =>

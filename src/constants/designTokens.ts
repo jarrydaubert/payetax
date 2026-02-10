@@ -500,10 +500,16 @@ export const SHADOWS = {
   GLOW_PURPLE: 'shadow-lg shadow-purple-500/50',
   /** Success glow - for positive actions */
   GLOW_SUCCESS: 'shadow-lg shadow-green-500/40',
+  /** Brand cyan glow for prominent CTA hover states */
+  GLOW_BRAND: 'shadow-brand-glow',
+  /** Cyan glow for selected dashboard cards */
+  GLOW_CYAN: 'shadow-cyan-glow',
+  /** Subtle inset cyan ring for active nav surfaces */
+  INSET_CYAN: 'shadow-cyan-inset',
   /** Custom category filter glow (Tailwind theme extension: shadow-accent-glow) */
   GLOW_ACCENT: 'shadow-accent-glow',
   /** Hover state for accent glow */
-  GLOW_ACCENT_HOVER: 'shadow-accent-glow-hover',
+  GLOW_ACCENT_HOVER: 'hover:shadow-accent-glow-hover',
 } as const;
 
 /**

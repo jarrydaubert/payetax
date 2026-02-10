@@ -18,6 +18,11 @@
 - [ ] Fix `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` header comment for Plan 4 threshold
 - [ ] Add a repeatable bundle-size verification step
 
+### Styling consistency sweep
+- [ ] Replace remaining hardcoded `slate-*`/`#...` page palette usage with semantic theme tokens where possible
+- [ ] Replace remaining arbitrary glow shadow classes with named Tailwind tokens (including cyan glow variants)
+- [ ] Audit remaining raw interactive controls (`<button>`, styled links) and migrate to shadcn `Button`/primitives or document exceptions
+
 ---
 
 ## Phase 3 — QA & ship
@@ -62,6 +67,16 @@
 
 ### Compare My Setup
 - [ ] Implement Always-On Custom Row (spec in `docs/business/DIRECTOR_CALCULATOR_BUILD.md`)
+
+### Director Guide - 90% Coverage
+- [ ] Add dual What-If controls: `Salary` (change extraction at current company performance) and `Company Revenue/Profit` (see how higher/lower company performance changes outputs)
+- [ ] Define a clear UX for the dual What-If flow so users always know which scenario they are editing (current vs simulated)
+- [ ] Ensure What-If revenue/profit updates all downstream outputs consistently (strategy cards, summary cards, detail cards, tax pots, warnings, key dates)
+- [ ] Unify slider/scenario math with baseline strategy math so advanced inputs are applied identically (`hasOtherPAYEEmployment`, `lossesBroughtForward`, `minimumSalaryRequirement`, etc.)
+- [ ] Add regression tests that compare baseline vs slider/What-If paths for the same inputs and fail on mismatches
+- [ ] Add a lightweight "Quick Start" path for first-time directors (minimum required inputs first, advanced fields progressive)
+- [ ] Update Welcome dialog copy to remove stale "Coming soon" items that are already live
+- [ ] Prioritize implementation of high-impact known limitations called out in Learn panel (start with Class 1A NI on BIK and associated-company CT threshold adjustments)
 
 ---
 

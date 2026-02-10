@@ -155,7 +155,7 @@ export function StrategyComparisonTable() {
               className={cn(
                 'relative rounded-xl border p-4 text-left transition-all',
                 isSelected
-                  ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                  ? 'border-cyan-500 bg-cyan-500/10 shadow-cyan-glow'
                   : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]',
               )}
             >

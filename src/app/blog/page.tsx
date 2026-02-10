@@ -10,6 +10,7 @@ import { EditorsPicksSticky } from '@/components/organisms/EditorsPicks';
 import { LatestArticles } from '@/components/organisms/LatestArticles';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { Button } from '@/components/ui/button';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getCurrentQuote } from '@/constants/pullQuotes';
 import {
@@ -225,26 +226,25 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           {/* Calculator CTA */}
           <div className='mt-8 text-center'>
             <p className='mb-4 text-slate-400'>Ready to estimate your take-home pay?</p>
-            <a
-              href='/'
-              className='inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-slate-900/50 px-6 py-3 font-medium text-cyan-400 transition-all hover:border-cyan-500/50 hover:bg-slate-800/50'
-            >
-              Try the Free Calculator
-              <svg
-                className='size-4'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-                aria-hidden='true'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 5l7 7-7 7'
-                />
-              </svg>
-            </a>
+            <Button asChild size='touch' variant='brandOutline' className='rounded-lg px-6'>
+              <Link href='/'>
+                Try the Free Calculator
+                <svg
+                  className='size-4'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                  aria-hidden='true'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 5l7 7-7 7'
+                  />
+                </svg>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

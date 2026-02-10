@@ -4,6 +4,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 // ============================================================================
 // Types for content arrays (enables type safety and JSON-LD generation)
@@ -207,13 +208,12 @@ export function FinalCTASection() {
         Stop guessing your take-home. <span className='text-gradient-new'>See it now.</span>
       </h2>
       <p>Free and fast — no signup required.</p>
-      <Link
-        href='#tax-calculator'
-        className='group relative inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 font-semibold text-base text-foreground transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:rounded-xl before:bg-gradient-to-r before:from-brand-gradient-start before:to-brand-gradient-end before:p-[1px] before:content-[""] after:absolute after:inset-[1px] after:-z-10 after:rounded-[calc(0.75rem-1px)] after:bg-[#020617] after:content-[""] hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.22)]'
-      >
-        Show My Take Home Pay
-        <ArrowRight className='h-[18px] w-[18px] transition-transform group-hover:translate-x-1' />
-      </Link>
+      <Button asChild size='touch' variant='brandOutline' className='group rounded-xl px-8'>
+        <Link href='#tax-calculator'>
+          Show My Take Home Pay
+          <ArrowRight className='h-[18px] w-[18px] transition-transform group-hover:translate-x-1' />
+        </Link>
+      </Button>
     </section>
   );
 }

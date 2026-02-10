@@ -181,18 +181,16 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         {/* Desktop Utilities */}
         <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
           <FeedbackDialog />
-          <Link
-            href={`/${CALCULATOR_HASH}`}
-            onClick={handleCalculatorClick}
-            className={cn(
-              'rounded-full border border-transparent px-5 py-2.5 font-semibold text-[0.85rem] text-text-primary-new transition-all duration-300',
-              '[background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box]',
-              'hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-deep',
-            )}
+          <Button
+            asChild
+            size='touch'
+            variant='brandOutline'
+            className='rounded-full px-5 py-2.5 text-[0.85rem] text-text-primary-new hover:scale-105'
           >
-            Open Calculator
-          </Link>
+            <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
+              Open Calculator
+            </Link>
+          </Button>
         </div>
 
         {/* Mobile Menu Button */}

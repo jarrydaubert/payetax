@@ -5,6 +5,7 @@
 import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { HeroCTA } from '@/components/molecules/HeroCTA';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface ServerHeroProps {
@@ -43,17 +44,24 @@ export default function ServerHero({ className }: ServerHeroProps) {
         <HeroCTA
           href='#tax-calculator'
           trackingLabel='hero_start_calculating'
-          className='group inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-8 py-4 font-semibold text-base text-text-primary-new transition-all duration-300 [background:linear-gradient(#020617,#020617)_padding-box,linear-gradient(135deg,#06b6d4,#10b981)_border-box] hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(6,182,212,0.3)]'
+          className={cn(
+            buttonVariants({ variant: 'brandOutline', size: 'touch' }),
+            'group rounded-xl px-8 text-text-primary-new hover:-translate-y-0.5',
+          )}
         >
           See My Take Home Pay
         </HeroCTA>
-        <Link
-          href='#features'
-          className='inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-8 py-4 font-medium text-base text-text-primary-new transition-all duration-300 hover:border-cyan/30 hover:bg-white/5'
+        <Button
+          asChild
+          variant='outline'
+          size='touch'
+          className='rounded-xl border-white/10 bg-transparent px-8 text-text-primary-new hover:border-cyan/30 hover:bg-white/5 hover:text-text-primary-new'
         >
-          See What&apos;s Included
-          <ChevronDown className='h-[18px] w-[18px]' />
-        </Link>
+          <Link href='#features'>
+            See What&apos;s Included
+            <ChevronDown className='h-[18px] w-[18px]' />
+          </Link>
+        </Button>
       </div>
 
       {/* Trust Strip */}

@@ -222,6 +222,9 @@ const config: Config = {
       boxShadow: {
         'accent-glow': '0 0 20px rgba(168, 85, 247, 0.4)',
         'accent-glow-hover': '0 0 30px rgba(168, 85, 247, 0.6)',
+        'brand-glow': '0 10px 30px rgba(6, 182, 212, 0.2)',
+        'cyan-glow': '0 0 20px rgba(6, 182, 212, 0.3)',
+        'cyan-inset': 'inset 0 0 0 1px rgba(34, 211, 238, 0.08)',
       },
     },
   },

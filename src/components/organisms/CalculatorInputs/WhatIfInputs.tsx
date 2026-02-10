@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/atoms/ui/select';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import { WhatIfValueSchema } from '@/lib/validation';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
@@ -194,7 +194,11 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
         <Button
           onClick={handleCompare}
           size='lg'
-          className='flex-1 justify-center border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300 dark:shadow-purple-400/20 dark:hover:shadow-purple-400/30'
+          className={cn(
+            'flex-1 justify-center border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300',
+            SHADOWS.GLOW_ACCENT,
+            SHADOWS.GLOW_ACCENT_HOVER,
+          )}
           data-testid='what-if-trigger'
         >
           <Wand2 className={cn('mr-2', ICON_SIZES.SIZE_5)} />
