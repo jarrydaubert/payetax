@@ -12,9 +12,7 @@ Focus: Director Guide calculator and related monetization.
 - `DIRECTOR_GUIDE_POSITIONING.md`
 - `DIRECTOR_CALCULATOR_BUILD.md`
 - `DIRECTOR_VARIABLE_INCOME_SPEC.md`
-- `DIRECTOR_TAX_PACK_SPEC.md`
 - `MONETIZATION.md`
-- `IDEAS.md`
 
 ## Reference
 
@@ -25,3 +23,5 @@ Focus: Director Guide calculator and related monetization.
 ## Rule
 
 If it’s work to be done, it lives in `docs/BACKLOG.md`.
+
+Go-live scope and long-term ideas are tracked in `docs/BACKLOG.md`.

@@ -6,7 +6,7 @@
  *
  * @module lib/tax/dividendTax
  * @see https://www.gov.uk/tax-on-dividends
- * @see docs/business/DIRECTOR_TOOLS_MATH.md
+ * @see src/constants/taxRates.ts
  *
  * ## Key Rules
  *

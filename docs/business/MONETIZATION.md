@@ -53,13 +53,23 @@ What it is:
 - Annual schedule (CSV)
 - Board minutes template (DOCX)
 - Dividend voucher template (DOCX)
+- One downloadable bundle (ZIP)
+
+Who it is for:
+- Directors who completed the Director Guide and want a clean export for records or accountant handoff.
+
+Flow:
+- User completes Director Guide and sees a Tax Pack CTA
+- Checkout via Stripe
+- Server verifies payment and returns export payload
+- Client generates documents and offers a bundle download
+- Recovery link supports re-download
 
 Technical stack:
 - Stripe Checkout
-- Edge functions for PDF/CSV/DOCX generation
+- Temporary storage for export payloads
+- PDF/CSV/DOCX generation via client-side or edge workers (based on bundle size)
 - Email delivery via Resend
-
-Full spec: `DIRECTOR_TAX_PACK_SPEC.md`
 
 ---
 

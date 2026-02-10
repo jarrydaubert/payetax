@@ -5,7 +5,7 @@
  * Ensures user inputs are valid before calculation.
  *
  * @module lib/validation/directorValidation
- * @see docs/business/DIRECTOR_TOOLS_BUILD.md
+ * @see docs/business/DIRECTOR_CALCULATOR_BUILD.md
  */
 
 import { z } from 'zod';

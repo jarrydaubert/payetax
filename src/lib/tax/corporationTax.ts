@@ -6,7 +6,7 @@
  *
  * @module lib/tax/corporationTax
  * @see https://www.gov.uk/corporation-tax-rates
- * @see docs/business/DIRECTOR_TOOLS_MATH.md
+ * @see src/constants/taxRates.ts
  */
 
 import { CT_RATES } from '@/constants/taxRates';

@@ -7,7 +7,7 @@
  *
  * @module lib/tax/employerNI
  * @see https://www.gov.uk/national-insurance-rates-letters
- * @see docs/business/DIRECTOR_TOOLS_MATH.md
+ * @see src/constants/taxRates.ts
  *
  * ## Key Points for Directors
  *

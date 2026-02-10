@@ -92,3 +92,9 @@
 ### FAQ/AEO Architecture
 - [ ] Server-render FAQ + schema
 - [ ] Derive numbers from `taxRates.ts` and calculations
+
+### Idea Inbox (Uncommitted)
+- [ ] Validate demand for an embeddable calculator widget (HR/recruiters/finance blogs) before building
+- [ ] Evaluate a lead magnet newsletter (checklist/guide) with explicit consent and unsubscribe compliance
+- [ ] Explore Marriage Allowance toggle with strict eligibility and regional handling
+- [ ] Explore PDF export with workings and a clear informational-use disclaimer

@@ -4,7 +4,7 @@
  * Tests the full director calculation orchestrator.
  * Includes the "golden example" from the BUILD spec.
  *
- * @see docs/business/DIRECTOR_TOOLS_BUILD.md (Golden Test section)
+ * @see docs/business/DIRECTOR_CALCULATOR_BUILD.md (Golden Test section)
  */
 
 import type { DirectorInput } from '@/lib/validation/directorValidation';
@@ -324,7 +324,7 @@ describe('Director Calculator', () => {
 
     describe('Golden Example (from BUILD spec)', () => {
       /**
-       * This is the golden test from DIRECTOR_TOOLS_BUILD.md
+       * This is the golden test from DIRECTOR_CALCULATOR_BUILD.md
        *
        * Input:
        * - Location: Scotland

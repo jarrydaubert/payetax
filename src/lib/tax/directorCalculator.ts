@@ -5,8 +5,8 @@
  * This is the main entry point that orchestrates the atomic calculation modules.
  *
  * @module lib/tax/directorCalculator
- * @see docs/business/DIRECTOR_TOOLS_BUILD.md
- * @see docs/business/DIRECTOR_TOOLS_MATH.md
+ * @see docs/business/DIRECTOR_CALCULATOR_BUILD.md
+ * @see src/constants/taxRates.ts
  *
  * ## Design Philosophy
  *
