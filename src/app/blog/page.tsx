@@ -2,6 +2,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { BlogNav } from '@/components/molecules/BlogNav';
 import { PullQuote } from '@/components/molecules/PullQuote';
 import { AllPostsGrid } from '@/components/organisms/AllPostsGrid';
@@ -44,9 +45,14 @@ interface BlogPageProps {
 export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
+  const totalPosts = await getBlogPostsCount();
+  const totalPages = Math.max(1, Math.ceil(totalPosts / POSTS_PER_PAGE));
+  const isOutOfRange = page > totalPages;
+  const canonicalPage = isOutOfRange ? 1 : page;
 
   // Self-referential canonical URL (page 1 = /blog, page 2+ = /blog?page=N)
-  const canonicalUrl = page > 1 ? `${SITE_URL}/blog?page=${page}` : `${SITE_URL}/blog`;
+  const canonicalUrl =
+    canonicalPage > 1 ? `${SITE_URL}/blog?page=${canonicalPage}` : `${SITE_URL}/blog`;
 
   // Note: rel="prev/next" link hints removed - Next.js `other` field outputs <meta> not <link>
   // If needed in future, use a custom <head> component to render actual <link> tags
@@ -63,6 +69,7 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
     alternates: {
       canonical: canonicalUrl,
     },
+    robots: isOutOfRange ? { index: false, follow: false } : undefined,
     openGraph: {
       title,
       description:
@@ -101,6 +108,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     pageSize: POSTS_PER_PAGE,
   });
   const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+
+  if (currentPage > Math.max(1, totalPages)) {
+    notFound();
+  }
 
   // Get current pull quote
   const pullQuote = getCurrentQuote();

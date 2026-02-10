@@ -15,6 +15,7 @@ import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
+import { SITE_URL } from '@/lib/metadata';
 
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
@@ -153,11 +154,11 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
 
   // Generate structured data for SEO (use #tax-calculator to match homepage)
   const breadcrumbItems = [
-    { name: 'Home', url: 'https://payetax.co.uk/' },
-    { name: 'Calculator', url: 'https://payetax.co.uk/#tax-calculator' },
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Calculator', url: `${SITE_URL}/#tax-calculator` },
     {
       name: `£${formattedSalary} Salary`,
-      url: `https://payetax.co.uk/calculator/${salary}-after-tax`,
+      url: `${SITE_URL}/calculator/${salary}-after-tax`,
     },
   ];
 
@@ -194,7 +195,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           netPay: results.netPay.annually,
           incomeTax: results.incomeTax.annually,
           nationalInsurance: results.nationalInsurance.annually,
-          url: `https://payetax.co.uk/calculator/${salary}-after-tax`,
+          url: `${SITE_URL}/calculator/${salary}-after-tax`,
         }}
       />
 

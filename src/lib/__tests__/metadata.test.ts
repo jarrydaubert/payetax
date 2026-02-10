@@ -185,9 +185,7 @@ describe('Metadata Module', () => {
     test('should include verification codes', () => {
       const metadata = generateMetadata({});
 
-      expect(metadata.verification?.google).toBe(
-        'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c',
-      );
+      expect(metadata.verification?.google).toBe('EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c');
       // Placeholder verification codes have been removed
       expect(metadata.verification?.other).toBeUndefined();
     });

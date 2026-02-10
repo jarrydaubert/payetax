@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { SITE_URL } from '@/lib/metadata';
 
-const OG_IMAGE = 'https://payetax.co.uk/best-uk-tax-calculators/opengraph-image';
+const OG_IMAGE = `${SITE_URL}/best-uk-tax-calculators/opengraph-image`;
 
 export const metadata: Metadata = {
   title: 'Best UK Tax Calculators 2026 | Compare Top PAYE Calculators',
@@ -10,13 +11,13 @@ export const metadata: Metadata = {
   keywords:
     'best uk tax calculator, uk tax calculator comparison, paye calculator 2026, take home pay calculator uk, salary calculator uk, tax calculator reviews',
   alternates: {
-    canonical: 'https://payetax.co.uk/best-uk-tax-calculators',
+    canonical: `${SITE_URL}/best-uk-tax-calculators`,
   },
   openGraph: {
     title: 'Best UK Tax Calculators 2026 | Compare Top PAYE Calculators',
     description:
       'Compare the best UK tax calculators for 2026. Honest reviews and feature comparisons to help you find the right tool.',
-    url: 'https://payetax.co.uk/best-uk-tax-calculators',
+    url: `${SITE_URL}/best-uk-tax-calculators`,
     type: 'article',
     siteName: 'PayeTax',
     images: [OG_IMAGE],

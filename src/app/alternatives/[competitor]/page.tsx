@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
+import { SITE_URL } from '@/lib/metadata';
 import { AlternativePageContent } from './AlternativePageContent';
 
-const SITE_URL = 'https://payetax.co.uk';
 const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 // Only allow statically generated paths - unknown slugs return 404

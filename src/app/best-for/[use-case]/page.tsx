@@ -6,7 +6,7 @@ import { getAllUseCaseSlugs, getUseCaseBySlug } from '@/data/useCases';
 import { SITE_URL } from '@/lib/metadata';
 import { UseCasePageContent } from './UseCasePageContent';
 
-const OG_IMAGE = 'https://payetax.co.uk/images/og-image.png';
+const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 interface PageProps {
   params: Promise<{ 'use-case': string }>;
@@ -42,12 +42,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description,
     keywords: useCase.searchIntent.join(', '),
     alternates: {
-      canonical: `https://payetax.co.uk/best-for/${slug}`,
+      canonical: `${SITE_URL}/best-for/${slug}`,
     },
     openGraph: {
       title,
       description,
-      url: `https://payetax.co.uk/best-for/${slug}`,
+      url: `${SITE_URL}/best-for/${slug}`,
       type: 'article',
       siteName: 'PayeTax',
       images: [OG_IMAGE],

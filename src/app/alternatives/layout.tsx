@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-
-const SITE_URL = 'https://payetax.co.uk';
+import { SITE_URL } from '@/lib/metadata';
 
 export const metadata: Metadata = {
   title: 'UK Tax Calculator Alternatives | PayeTax',

@@ -1,6 +1,7 @@
 // src/app/robots.ts
 
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/metadata';
 
 /**
  * Generates robots.txt via Next.js App Router metadata route
@@ -100,6 +101,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/',
       },
     ],
-    sitemap: 'https://payetax.co.uk/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

@@ -239,14 +239,14 @@ describe('SalarySEOContent', () => {
       const mockResults = createMockResults({ grossSalary: 35000 });
       render(<SalarySEOContent salary={35000} results={mockResults} />);
 
-      expect(screen.getByText(/around the UK median salary/)).toBeInTheDocument();
+      expect(screen.getByText(/around the UK median full-time salary/)).toBeInTheDocument();
     });
 
     it('should show "around the UK median" at boundary £30,000', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/around the UK median salary/)).toBeInTheDocument();
+      expect(screen.getByText(/around the UK median full-time salary/)).toBeInTheDocument();
     });
 
     it('should show "below the UK median" for salary < £30k', () => {
@@ -267,11 +267,11 @@ describe('SalarySEOContent', () => {
       ).toBeInTheDocument();
     });
 
-    it('should always mention UK median salary reference', () => {
+    it('should include median reference in the salary context band copy', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/This is around the UK median full-time salary/)).toBeInTheDocument();
+      expect(screen.getByText(/around the UK median full-time salary/)).toBeInTheDocument();
     });
   });
 

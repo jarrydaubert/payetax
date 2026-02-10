@@ -44,6 +44,7 @@ const PROGRAMMATIC_SALARIES = [
   210000, 220000, 225000, 230000, 240000, 250000, 275000, 300000, 325000, 350000, 375000, 400000,
   450000, 500000,
 ];
+const PROGRAMMATIC_SALARY_SET = new Set(PROGRAMMATIC_SALARIES);
 
 // High-priority salaries get enhanced content (richer descriptions, more FAQs)
 const HIGH_PRIORITY_SALARIES = [
@@ -95,8 +96,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { salary: salaryParam } = await params;
   const salary = parseSalary(salaryParam);
 
-  // Prevent indexing of invalid salary pages
-  if (!salary) {
+  // Prevent indexing of invalid or non-curated salary pages
+  if (!(salary && PROGRAMMATIC_SALARY_SET.has(salary))) {
     return { robots: { index: false, follow: false } };
   }
 
@@ -120,7 +121,7 @@ export default async function SalaryPage({ params }: PageProps) {
   const { salary: salaryParam } = await params;
   const salary = parseSalary(salaryParam);
 
-  if (!salary) {
+  if (!(salary && PROGRAMMATIC_SALARY_SET.has(salary))) {
     notFound();
   }
 

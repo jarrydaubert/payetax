@@ -90,23 +90,27 @@ export function SalarySEOContent({ salary, results }: SalarySEOContentProps) {
         <p className='text-muted-foreground leading-relaxed'>
           A £{formattedSalary} salary puts you{' '}
           {salary > 100000 && (
-            <strong className='text-foreground'>in the top 5% of UK earners</strong>
+            <strong className='text-foreground'>
+              in the top 5% of UK earners and well above the UK median full-time salary
+            </strong>
           )}
           {salary >= 70000 && salary <= 100000 && (
-            <strong className='text-foreground'>in the top 10% of UK earners</strong>
+            <strong className='text-foreground'>
+              in the top 10% of UK earners and above the UK median full-time salary
+            </strong>
           )}
           {salary >= 50000 && salary < 70000 && (
             <strong className='text-foreground'>well above the UK median salary</strong>
           )}
           {salary >= 30000 && salary < 50000 && (
-            <strong className='text-foreground'>around the UK median salary</strong>
+            <strong className='text-foreground'>around the UK median full-time salary</strong>
           )}
           {salary < 30000 && (
             <strong className='text-foreground'>
               below the UK median salary, but above minimum wage
             </strong>
           )}
-          . This is around the UK median full-time salary.
+          .
         </p>
       </div>
 

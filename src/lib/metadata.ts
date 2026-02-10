@@ -216,7 +216,7 @@ export function generateMetadata({
 
     // Verification codes for search engines
     verification: {
-      google: 'google-site-verification=EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c',
+      google: 'EPjH4MjD1wobgTVgXC61zwcyeGjT5M_gWL2OI8Vu08c',
     },
 
     // Other metadata

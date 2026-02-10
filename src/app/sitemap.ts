@@ -27,8 +27,8 @@ const SITE_URL =
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
-  // Use build date to avoid stale lastModified signals
-  const staticPagesDate = new Date().toISOString();
+  // Keep static routes stable; update this when static content is materially changed.
+  const staticPagesDate = '2026-02-10T00:00:00.000Z';
 
   // Static pages - use stable date (update when content changes)
   const staticPages: SitemapEntry[] = [

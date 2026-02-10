@@ -1,7 +1,7 @@
 // src/app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { generateMetadata as metadataGenerator } from '@/lib/metadata';
+import { generateMetadata as metadataGenerator, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import './globals.css';
 import '@/styles/table-drag-scroll.css';
@@ -18,7 +18,7 @@ import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://payetax.co.uk'),
+  metadataBase: new URL(SITE_URL),
   ...metadataGenerator({
     title: 'PayeTax - Free UK PAYE Tax Calculator 2025 | Salary & Take-Home Pay',
     description:
