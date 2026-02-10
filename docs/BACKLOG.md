@@ -11,11 +11,6 @@
 
 ## Phase 2 — Product polish (pre-ship)
 
-### Performance + token cleanup
-- [ ] Wrap `compileMDXContent` with `unstable_cache` keyed by `slug` + `updatedAt`
-- [ ] Match ISR window for revalidation
-- [ ] Add `shadow-accent-glow` to Tailwind config and update token usage
-
 ### Security docs + audit hygiene
 - [ ] Document per-route validation approach
 - [ ] Document per-route body size limits

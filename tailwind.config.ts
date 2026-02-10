@@ -219,6 +219,10 @@ const config: Config = {
         45: '45', // Modal dialogs
         60: '60', // Toast notifications (highest)
       },
+      boxShadow: {
+        'accent-glow': '0 0 20px rgba(168, 85, 247, 0.4)',
+        'accent-glow-hover': '0 0 30px rgba(168, 85, 247, 0.6)',
+      },
     },
   },
   // Note: @tailwindcss/typography is loaded via @plugin in globals.css (Tailwind v4 CSS-first)

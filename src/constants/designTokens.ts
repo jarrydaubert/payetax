@@ -500,14 +500,10 @@ export const SHADOWS = {
   GLOW_PURPLE: 'shadow-lg shadow-purple-500/50',
   /** Success glow - for positive actions */
   GLOW_SUCCESS: 'shadow-lg shadow-green-500/40',
-  /**
-   * Custom category filter glow - uses arbitrary value
-   * @see ARBITRARY.GLOW_ACCENT for the raw value
-   * TODO: Consider adding to tailwind.config.ts as shadow-accent-glow
-   */
-  GLOW_ACCENT: 'shadow-[0_0_20px_rgba(168,85,247,0.4)]',
+  /** Custom category filter glow (Tailwind theme extension: shadow-accent-glow) */
+  GLOW_ACCENT: 'shadow-accent-glow',
   /** Hover state for accent glow */
-  GLOW_ACCENT_HOVER: 'shadow-[0_0_30px_rgba(168,85,247,0.6)]',
+  GLOW_ACCENT_HOVER: 'shadow-accent-glow-hover',
 } as const;
 
 /**
