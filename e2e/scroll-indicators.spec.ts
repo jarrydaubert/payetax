@@ -6,7 +6,17 @@
  * - Mobile horizontal scroll broken
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+async function forceTableOverflow(page: Page) {
+  const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
+  for (const period of periods) {
+    const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
+    if (!(await checkbox.isChecked())) {
+      await checkbox.click();
+    }
+  }
+}
 
 test.describe('Scroll Indicators', () => {
   test.beforeEach(async ({ page }) => {
@@ -20,33 +30,27 @@ test.describe('Scroll Indicators', () => {
   test('shows scroll indicator when table overflows on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
 
-    // Enable all periods to force overflow
-    const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
-    for (const period of periods) {
-      const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-      if (!(await checkbox.isChecked())) {
-        await checkbox.click();
-      }
-    }
+    // Enable additional periods to force overflow.
+    await forceTableOverflow(page);
 
     // Table should be scrollable
-    const table = page.getByTestId('results-table');
-    const scrollContainer = table.locator('..');
+    const scrollContainer = page.getByTestId('results-table-container');
     const isScrollable = await scrollContainer.evaluate((el) => el.scrollWidth > el.clientWidth);
 
     expect(isScrollable).toBe(true);
   });
 
-  test('table is scrollable horizontally', async ({ page }) => {
+  test('table container exposes horizontal scrolling behavior', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
+    await forceTableOverflow(page);
 
-    const table = page.getByTestId('results-table');
-    const scrollContainer = table.locator('..');
+    const scrollContainer = page.getByTestId('results-table-container');
+    const containerState = await scrollContainer.evaluate((el) => ({
+      overflowX: window.getComputedStyle(el).overflowX,
+      hasHorizontalOverflow: el.scrollWidth > el.clientWidth,
+    }));
 
-    // Scroll right
-    await scrollContainer.evaluate((el) => el.scrollTo({ left: 100 }));
-    const scrollLeft = await scrollContainer.evaluate((el) => el.scrollLeft);
-
-    expect(scrollLeft).toBeGreaterThan(0);
+    expect(containerState.hasHorizontalOverflow).toBe(true);
+    expect(['auto', 'scroll']).toContain(containerState.overflowX);
   });
 });

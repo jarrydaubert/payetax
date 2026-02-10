@@ -225,7 +225,16 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className='overflow-x-auto rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm'>
+          <section
+            className='overflow-x-auto rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm'
+            aria-label='PayeTax comparison table'
+          >
+            <Link
+              href='/compliance'
+              className='sr-only focus:not-sr-only focus:absolute focus:m-2 focus:rounded-md focus:bg-card focus:px-2 focus:py-1 focus:text-xs'
+            >
+              Open compliance details
+            </Link>
             <table className='w-full min-w-[780px] border-collapse'>
               <thead>
                 <tr className='border-border/60 border-b text-left'>
@@ -254,7 +263,7 @@ export default function AboutPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </section>
         </div>
       </section>
 

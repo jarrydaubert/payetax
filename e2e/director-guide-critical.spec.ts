@@ -8,7 +8,7 @@
  * - Email flow regressions (dialog opens and POST succeeds)
  */
 
-import { expect, type Locator, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
 
 function parseCurrency(value: string): number {
   return Number.parseFloat(value.replace(/[^0-9.-]/g, '') || '0');
@@ -25,9 +25,19 @@ async function fillCurrencyInput(input: Locator, value: number): Promise<void> {
   await input.blur();
 }
 
+async function dismissWelcomeDialogIfPresent(page: Page): Promise<void> {
+  const dialog = page.getByRole('dialog', { name: 'Welcome to the Director Pay Calculator' });
+  const isVisible = await dialog.isVisible({ timeout: 1500 }).catch(() => false);
+  if (!isVisible) return;
+
+  await page.getByRole('button', { name: "Got it, let's start" }).click();
+  await expect(dialog).toBeHidden();
+}
+
 test.describe('Director Guide critical @critical', () => {
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await dismissWelcomeDialogIfPresent(page);
 
     const revenueInput = page.getByTestId('director-revenue-input');
     const expensesInput = page.getByTestId('director-expenses-input');
@@ -68,6 +78,7 @@ test.describe('Director Guide critical @critical', () => {
     page,
   }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await dismissWelcomeDialogIfPresent(page);
 
     // Zero profit: Survival Mode.
     const revenueInput = page.getByTestId('director-revenue-input');
