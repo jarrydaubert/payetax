@@ -84,7 +84,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
   return (
     <section
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-8 md:p-12',
+        'relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-8 md:p-12',
         className,
       )}
       aria-labelledby={headingId}
@@ -97,12 +97,12 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
       <div className='relative text-center'>
         <h2
           id={headingId}
-          className='mb-3 font-bold font-display text-2xl text-slate-100 md:text-3xl'
+          className='mb-3 font-bold font-display text-2xl text-foreground md:text-3xl'
         >
           Stay Updated on UK Tax Changes
         </h2>
 
-        <p className='mb-6 text-slate-300'>
+        <p className='mb-6 text-muted-foreground'>
           HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.
         </p>
 
@@ -140,9 +140,9 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
                 autoComplete='email'
                 inputMode='email'
                 className={cn(
-                  'h-11 flex-1 border-slate-700 bg-slate-950/70 px-4 text-slate-100',
-                  'placeholder:text-slate-400',
-                  'focus-visible:ring-cyan-500/60 focus-visible:ring-offset-slate-900',
+                  'h-11 flex-1 border-border bg-background/80 px-4 text-foreground',
+                  'placeholder:text-muted-foreground',
+                  'focus-visible:ring-ring/60 focus-visible:ring-offset-background',
                   'disabled:opacity-50 sm:min-w-0',
                 )}
                 aria-invalid={status === 'error'}
@@ -182,16 +182,16 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
             {status === 'error' && (
               <p
                 id={errorId}
-                className={cn(SPACING.MT_3, TYPOGRAPHY.TEXT_SM, 'text-red-200')}
+                className={cn(SPACING.MT_3, TYPOGRAPHY.TEXT_SM, 'text-destructive')}
                 role='alert'
               >
                 {errorMessage}
               </p>
             )}
 
-            <p className={cn(SPACING.MT_4, TYPOGRAPHY.TEXT_XS, 'text-slate-400')}>
+            <p className={cn(SPACING.MT_4, TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>
               We respect your privacy.{' '}
-              <Link href='/privacy' className='underline hover:text-slate-200'>
+              <Link href='/privacy' className='underline hover:text-foreground'>
                 Privacy Policy
               </Link>
               . Unsubscribe anytime.

@@ -239,7 +239,7 @@ export default function AboutPage() {
                   <th className='px-5 py-4 font-semibold text-cyan-200 text-xs uppercase tracking-wider'>
                     PayeTax
                   </th>
-                  <th className='px-5 py-4 font-semibold text-slate-300 text-xs uppercase tracking-wider'>
+                  <th className='px-5 py-4 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                     Typical experience
                   </th>
                 </tr>
@@ -251,7 +251,7 @@ export default function AboutPage() {
                     <td className='px-5 py-4 text-cyan-50 text-sm leading-relaxed'>
                       {row.payeTax}
                     </td>
-                    <td className='px-5 py-4 text-slate-300 text-sm leading-relaxed'>
+                    <td className='px-5 py-4 text-muted-foreground text-sm leading-relaxed'>
                       {row.typical}
                     </td>
                   </tr>
