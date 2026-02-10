@@ -31,7 +31,7 @@ function getAbsoluteImageUrl(image: string | undefined): string | undefined {
 // Next.js 16: Route segment config for optimized blog posts
 export const dynamic = 'force-static'; // Static generation with ISR
 export const dynamicParams = true; // Unknown slugs generated on-demand (not just at build time)
-export const revalidate = 86400; // ISR: Revalidate every 24 hours for fresh tax content
+export const revalidate = 3600; // ISR: Revalidate hourly to match blog data/cache freshness
 
 // Generate static params for blog posts at build time
 // Note: With dynamicParams=true, slugs not in this list are generated on-demand
@@ -103,7 +103,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   // Compile MDX content (returns function component)
-  const MDXContent = await compileMDXContent(post.content);
+  const MDXContent = await compileMDXContent(post.content, {
+    slug: post.slug,
+    updatedAt: post.updatedAt || post.publishedAt,
+  });
 
   // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3);

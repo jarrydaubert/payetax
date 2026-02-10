@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { unstable_cache } from 'next/cache';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
@@ -165,19 +166,47 @@ async function compileMDXInternal(content: string) {
   return () => result.content;
 }
 
+const getCachedCompiledMDX = unstable_cache(
+  async (slug: string, _updatedAt: string) => {
+    const post = getPostBySlug(slug);
+
+    if (!post) {
+      return null;
+    }
+
+    return await compileMDXInternal(post.content);
+  },
+  ['blog-mdx-compiled-content'],
+  { revalidate: 3600, tags: ['blog'] },
+);
+
 /**
  * Compile MDX content to React component
  * Uses Next.js 16 native MDX compilation with rehype/remark plugins
  * Returns the compiled MDX component
- *
- * NOTE: Caching disabled temporarily to fix serialization issues
- * React elements cannot be cached with unstable_cache
  */
-export async function compileMDXContent(content: string) {
+export async function compileMDXContent(
+  content: string,
+  cacheKey?: { slug: string; updatedAt: string },
+) {
   // Development: Performance monitoring
   const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
 
-  const result = await compileMDXInternal(content);
+  let result: Awaited<ReturnType<typeof compileMDXInternal>> | null;
+
+  if (cacheKey) {
+    try {
+      result = await getCachedCompiledMDX(cacheKey.slug, cacheKey.updatedAt);
+    } catch {
+      result = null;
+    }
+  } else {
+    result = null;
+  }
+
+  if (!result) {
+    result = await compileMDXInternal(content);
+  }
 
   // Development: Log performance metrics
   if (process.env.NODE_ENV === 'development' && startTime > 0) {
