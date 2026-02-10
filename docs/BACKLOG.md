@@ -20,7 +20,6 @@
 
 ### Styling consistency sweep
 - [ ] Replace remaining hardcoded `slate-*`/`#...` page palette usage with semantic theme tokens where possible
-- [ ] Replace remaining arbitrary glow shadow classes with named Tailwind tokens (including cyan glow variants)
 - [ ] Audit remaining raw interactive controls (`<button>`, styled links) and migrate to shadcn `Button`/primitives or document exceptions
 
 ---
