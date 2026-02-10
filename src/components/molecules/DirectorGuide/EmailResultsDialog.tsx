@@ -9,6 +9,7 @@
 'use client';
 
 import { Mail } from 'lucide-react';
+import Link from 'next/link';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -135,9 +136,9 @@ export function EmailResultsDialog({
           <DialogDescription className='text-slate-400'>
             We&apos;ll send your director pay breakdown to your inbox. Results are sent directly via
             email and not stored on our servers.{' '}
-            <a href='/privacy' className='text-cyan-400 underline hover:text-cyan-300'>
+            <Link href='/privacy' className='text-cyan-400 underline hover:text-cyan-300'>
               Privacy policy
-            </a>
+            </Link>
           </DialogDescription>
         </DialogHeader>
 

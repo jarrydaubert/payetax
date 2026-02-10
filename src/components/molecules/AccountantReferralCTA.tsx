@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, ArrowRight, Sparkles, X } from 'lucide-react';
+import Link from 'next/link';
 import { type FormEvent, useCallback, useId, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/atoms/ui/button';
@@ -243,9 +244,9 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
           </div>
           <p className='text-muted-foreground text-xs'>
             We&apos;ll connect you with a trusted UK tax specialist. See our{' '}
-            <a href='/privacy' className='underline hover:text-foreground'>
+            <Link href='/privacy' className='underline hover:text-foreground'>
               privacy policy
-            </a>{' '}
+            </Link>{' '}
             for how we handle your data.
           </p>
         </form>
