@@ -2,8 +2,9 @@
 /**
  * Google font configuration (next/font).
  *
- * This module must only be used when outbound network is available at build time
- * (e.g. Vercel). It is wired in via a webpack alias in `next.config.ts`.
+ * Legacy reference module.
+ * Active font gating now lives in `src/app/fonts.ts` so behavior is consistent
+ * across webpack and Turbopack builds.
  */
 
 import { Inter, Space_Grotesk } from 'next/font/google';

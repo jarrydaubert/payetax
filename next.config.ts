@@ -86,10 +86,6 @@ const nextConfig: NextConfig = {
 
   // Advanced webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
-    const useGoogleFonts =
-      (process.env.VERCEL === '1' || process.env.PAYETAX_ENABLE_GOOGLE_FONTS === '1') &&
-      process.env.PAYETAX_DISABLE_GOOGLE_FONTS !== '1';
-
     // Production-only optimizations
     if (!(dev || isServer)) {
       // Enhanced chunk splitting for better caching
@@ -145,7 +141,6 @@ const nextConfig: NextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve('./src'),
-      ...(useGoogleFonts ? { '@/app/fonts': path.resolve('./src/app/fonts.google.ts') } : {}),
     };
 
     return config;
