@@ -6,7 +6,7 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
 import { trackWarningShown } from '@/lib/directorGuideAnalytics';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
@@ -46,6 +46,8 @@ const {
   highProfitComplexity: HIGH_PROFIT_COMPLEXITY_THRESHOLD,
 } = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS;
 
+const SECTION_HEADING_CLASS = 'mb-3 font-semibold text-slate-500 text-xs uppercase tracking-wider';
+
 interface EducationPanelProps {
   className?: string;
 }
@@ -64,6 +66,7 @@ type EducationPanelFormData = Pick<
   | 'includesVat'
   | 'pensionContribution'
   | 'companyCarBIK'
+  | 'associatedCompaniesCount'
   | 'hasOtherPAYEEmployment'
 >;
 
@@ -81,6 +84,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
     includesVat: formData.includesVat,
     pensionContribution: formData.pensionContribution,
     companyCarBIK: formData.companyCarBIK,
+    associatedCompaniesCount: formData.associatedCompaniesCount,
     hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
   }));
   const comparison = useStrategyComparison();
@@ -115,58 +119,71 @@ export function EducationPanel({ className }: EducationPanelProps) {
       comparison.strategies.optimalMix.studentLoan
     : 0;
 
-  // Warning conditions
-  const warnings = buildWarnings({
-    hasResults,
-    revenue,
-    optimalSalary,
-    totalIncome,
+  const visibleLearnCards = useMemo(
+    () =>
+      [
+        {
+          title: 'Why £12,570 matters',
+          description:
+            'The Personal Allowance is £12,570. Earnings up to this are not subject to income tax; NI credits depend on earnings level.',
+          show: true,
+        },
+        {
+          title: 'What Are Dividends?',
+          description:
+            'Payments from company profits to shareholders, taxed at lower rates than salary. Must be paid from retained profits after Corporation Tax.',
+          show: hasResults && (comparison?.strategies.optimalMix.dividends ?? 0) > 0,
+        },
+        {
+          title: 'Corporation Tax',
+          description:
+            '19% on profits up to the small-profits limit, 25% at the main rate limit, with marginal relief in between. Associated companies can reduce these limits.',
+          show: true,
+        },
+        {
+          title: 'Employer Pension',
+          description:
+            'Tax-efficient: company deducts from CT, you pay no tax or NI. Annual allowance £60k (includes all contributions). Can carry forward unused allowance from previous 3 years.',
+          show: true,
+        },
+      ].filter((card) => card.show),
+    [comparison, hasResults],
+  );
+
+  const sortedWarnings = useMemo(() => {
+    const visibleWarnings = buildWarnings({
+      hasResults,
+      revenue,
+      optimalSalary,
+      totalIncome,
+      alreadyTaken,
+      grossExtraction,
+      personalTax,
+      formData,
+      comparison,
+      monthlyModeOutput,
+      isMonthlyMode,
+    }).filter((warning) => warning.show);
+
+    // Sort warnings: critical first, then by order
+    return visibleWarnings.sort((a, b) => {
+      if (a.isCritical && !b.isCritical) return -1;
+      if (!a.isCritical && b.isCritical) return 1;
+      return 0;
+    });
+  }, [
     alreadyTaken,
-    grossExtraction,
-    personalTax,
-    formData,
     comparison,
-    monthlyModeOutput,
+    formData,
+    grossExtraction,
+    hasResults,
     isMonthlyMode,
-  });
-
-  // Learn cards - could be tailored based on user situation
-  const learnCards = [
-    {
-      title: 'Why £12,570 matters',
-      description:
-        'The Personal Allowance is £12,570. Earnings up to this are not subject to income tax; NI credits depend on earnings level.',
-      show: true,
-    },
-    {
-      title: 'What Are Dividends?',
-      description:
-        'Payments from company profits to shareholders, taxed at lower rates than salary. Must be paid from retained profits after Corporation Tax.',
-      show: hasResults && (comparison?.strategies.optimalMix.dividends ?? 0) > 0,
-    },
-    {
-      title: 'Corporation Tax',
-      description:
-        '19% on profits up to £50k. Between £50k-£250k, marginal relief applies (26.5% on profits in this band). 25% above £250k.',
-      show: true,
-    },
-    {
-      title: 'Employer Pension',
-      description:
-        'Tax-efficient: company deducts from CT, you pay no tax or NI. Annual allowance £60k (includes all contributions). Can carry forward unused allowance from previous 3 years.',
-      show: true, // Always show for now
-    },
-  ];
-
-  const visibleLearnCards = learnCards.filter((card) => card.show);
-  const visibleWarnings = warnings.filter((w) => w.show);
-
-  // Sort warnings: critical first, then by order
-  const sortedWarnings = [...visibleWarnings].sort((a, b) => {
-    if (a.isCritical && !b.isCritical) return -1;
-    if (!a.isCritical && b.isCritical) return 1;
-    return 0;
-  });
+    monthlyModeOutput,
+    optimalSalary,
+    personalTax,
+    revenue,
+    totalIncome,
+  ]);
 
   // Analytics: record which warnings were actually rendered (once per warning id).
   const trackedWarningIds = useRef<Set<string>>(new Set());
@@ -180,25 +197,17 @@ export function EducationPanel({ className }: EducationPanelProps) {
   }, [sortedWarnings]);
 
   return (
-    <aside className={cn('flex h-full flex-col bg-slate-900 p-6', className)}>
-      {/* Learn Section */}
-      <section className='mb-8'>
-        <h3 className='mb-4 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider'>
-          Learn
-        </h3>
+    <aside className={cn('flex h-full flex-col bg-slate-900 p-5', className)}>
+      <PanelSection title='Learn'>
         <div className='space-y-3'>
           {visibleLearnCards.map((card) => (
             <LearnCard key={card.title} title={card.title} description={card.description} />
           ))}
         </div>
-      </section>
+      </PanelSection>
 
-      {/* Warnings Section */}
       {sortedWarnings.length > 0 && (
-        <section className='mb-8'>
-          <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
-            Warnings
-          </h3>
+        <PanelSection title='Warnings'>
           <div className='space-y-3'>
             {sortedWarnings.map((warning) => (
               <WarningCard
@@ -209,14 +218,10 @@ export function EducationPanel({ className }: EducationPanelProps) {
               />
             ))}
           </div>
-        </section>
+        </PanelSection>
       )}
 
-      {/* Assumptions Section */}
-      <section className='mb-8'>
-        <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
-          Assumptions
-        </h3>
+      <PanelSection title='Assumptions'>
         <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
           <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
           <AssumptionRow
@@ -244,16 +249,16 @@ export function EducationPanel({ className }: EducationPanelProps) {
             value={
               formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans.join(', ') : 'None'
             }
+          />
+          <AssumptionRow
+            label='Associated Companies'
+            value={String(formData.associatedCompaniesCount)}
             isLast
           />
         </div>
-      </section>
+      </PanelSection>
 
-      {/* Accuracy & Scope Section */}
-      <section>
-        <h3 className='mb-4 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
-          Accuracy & Scope
-        </h3>
+      <PanelSection title='Accuracy & Scope' className='mb-0'>
         <div className='space-y-3'>
           <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
             <div className='mb-2 font-medium text-slate-200 text-sm'>What this calculator does</div>
@@ -270,8 +275,6 @@ export function EducationPanel({ className }: EducationPanelProps) {
             <div className='mb-2 font-medium text-slate-200 text-sm'>Known limitations</div>
             <ul className='space-y-1 text-slate-400 text-xs'>
               <li>• Student loan £2k unearned income rule (may overstate)</li>
-              <li>• Class 1A NI on benefits in kind (company cost incomplete)</li>
-              <li>• Associated company CT threshold adjustments</li>
               <li>• Short accounting period adjustments</li>
               <li>• Marriage Allowance transfers</li>
               <li>• IR35 status considerations</li>
@@ -288,7 +291,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
             </p>
           </div>
         </div>
-      </section>
+      </PanelSection>
     </aside>
   );
 }
@@ -487,16 +490,16 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     },
     {
       id: 'bik',
-      title: 'Benefit in Kind - Company Cost Incomplete',
+      title: 'Benefit in Kind - Class 1A Included',
       description:
-        'The company also pays Class 1A NI (15%) on the BIK value. This is not included in our company cost calculation. Your actual costs will be higher.',
+        'Company cost includes estimated Class 1A NI on BIK. Confirm exact treatment with your accountant if benefits change mid-year.',
       show: formData.companyCarBIK > 0,
     },
     {
       id: 'other-paye',
       title: 'Other PAYE Employment',
       description:
-        'With another PAYE employment, your NI Primary Threshold may already be used elsewhere. Any salary from your company may be subject to NI differently than shown. Our calculations assume this is your only PAYE source.',
+        'With another PAYE employment, NI thresholds are typically used in that role first. This model applies NI from the first pound on director salary; confirm with payroll records.',
       show: formData.hasOtherPAYEEmployment,
     },
     {
@@ -523,6 +526,23 @@ function buildWarnings(ctx: WarningContext): Warning[] {
 interface LearnCardProps {
   title: string;
   description: string;
+}
+
+function PanelSection({
+  title,
+  children,
+  className,
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn('mb-5', className)}>
+      <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
+      {children}
+    </section>
+  );
 }
 
 function LearnCard({ title, description }: LearnCardProps) {

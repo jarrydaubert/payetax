@@ -9,20 +9,11 @@
 'use client';
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
-import { useMemo } from 'react';
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
-import { calculateSalaryScenario, type YourSetupResult } from '@/lib/tax/strategyComparison';
+import type { YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn } from '@/lib/utils';
-import {
-  useDirectorFormSlice,
-  useDirectorGuideActions,
-  useSelectedStrategy,
-  useSliderSalary,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
-
-const TAX_YEAR = CURRENT_TAX_YEAR;
+import { useDirectorGuideActions, useSelectedStrategy } from '@/store/directorGuideStore';
+import { useActiveDirectorScenario } from './useActiveDirectorScenario';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -33,35 +24,9 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export function StrategyComparisonTable() {
-  const comparison = useStrategyComparison();
   const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormSlice((state) => ({
-    region: state.region,
-    otherIncome: state.otherIncome,
-    hasEmploymentAllowance: state.hasEmploymentAllowance,
-    studentLoanPlans: state.studentLoanPlans,
-    pensionContribution: state.pensionContribution,
-    companyCarBIK: state.companyCarBIK,
-  }));
+  const { comparison, activeScenario } = useActiveDirectorScenario();
   const { setSelectedStrategy, setSliderSalary } = useDirectorGuideActions();
-
-  // Calculate current scenario based on slider position
-  const currentScenario = useMemo(() => {
-    if (!comparison || comparison.grossProfit <= 0 || sliderSalary === null) return null;
-
-    return calculateSalaryScenario(
-      sliderSalary,
-      comparison.grossProfitAfterPension ?? comparison.grossProfit,
-      formData.region ?? 'rUK',
-      TAX_YEAR,
-      formData.otherIncome,
-      formData.hasEmploymentAllowance,
-      formData.studentLoanPlans,
-      formData.pensionContribution,
-      formData.companyCarBIK,
-    );
-  }, [comparison, sliderSalary, formData]);
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
@@ -70,13 +35,8 @@ export function StrategyComparisonTable() {
   const optimalTotalTax =
     optimalStrategy.totalPersonalTax + optimalStrategy.corporationTax + optimalStrategy.employerNI;
 
-  const currentTotalTax = currentScenario
-    ? currentScenario.incomeTax +
-      currentScenario.employeeNI +
-      currentScenario.dividendTax +
-      currentScenario.studentLoan +
-      currentScenario.corporationTax +
-      currentScenario.employerNI
+  const currentTotalTax = activeScenario
+    ? activeScenario.totalPersonalTax + activeScenario.corporationTax + activeScenario.employerNI
     : optimalTotalTax;
 
   const taxDifference = currentTotalTax - optimalTotalTax;

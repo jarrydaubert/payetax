@@ -123,6 +123,19 @@ describe('DirectorGuide InputsPanel', () => {
     expect(screen.queryByLabelText('Annual Revenue')).not.toBeInTheDocument();
   });
 
+  it('uses quick start by default and reveals full sections on demand', () => {
+    render(<InputsPanel />);
+
+    expect(screen.queryByText('Already Taken This Year')).not.toBeInTheDocument();
+    expect(screen.getByText('Add More Detail')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Full Inputs' }));
+
+    expect(screen.getByText('Already Taken This Year')).toBeInTheDocument();
+    expect(screen.getByText('Your Situation')).toBeInTheDocument();
+    expect(screen.getByText('Compare My Setup')).toBeInTheDocument();
+  });
+
   it('updates monthly mode values, including contract month selection', () => {
     const store = useDirectorGuideStore.getState();
     store.setMode('monthly');

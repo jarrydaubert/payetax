@@ -203,6 +203,7 @@ export const DirectorEmailInputSchema = z.object({
   studentLoanPlans: z.array(StudentLoanPlanSchema).max(2).optional(),
   pensionContribution: CurrencyAmountSchema.optional(),
   companyCarBIK: CurrencyAmountSchema.optional(),
+  associatedCompaniesCount: z.number().int().min(1).max(50).optional(),
   minimumSalaryRequirement: CurrencyAmountSchema.optional(),
   hasOtherPAYEEmployment: z.boolean().optional(),
   ytdSalary: CurrencyAmountSchema.optional(),

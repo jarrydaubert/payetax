@@ -54,4 +54,15 @@ describe('AllPostsGrid', () => {
     expect(list).toBeInTheDocument();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
+
+  it('keeps pagination anchored to all-posts heading', () => {
+    const posts = [makePost({ id: 'post-1', slug: 'post-1', title: 'First' })];
+
+    render(<AllPostsGrid posts={posts} currentPage={1} totalPages={2} totalPosts={2} />);
+
+    expect(screen.getByRole('link', { name: /Next/i })).toHaveAttribute(
+      'href',
+      '/blog?page=2#all-posts-heading',
+    );
+  });
 });

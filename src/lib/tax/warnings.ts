@@ -209,11 +209,12 @@ export function getWarnings(input: WarningInput): Warning[] {
 
   // BIK Class 1A warning
   if (companyCarBIK > 0) {
-    const class1A = companyCarBIK * 0.15; // 15% Class 1A NI
+    const class1ARate = rates.nationalInsurance.class1A.rate / 100;
+    const class1A = companyCarBIK * class1ARate;
     warnings.push({
       type: 'BIK_CLASS_1A_WARNING',
       severity: 'soft',
-      message: `Your company car BIK of £${companyCarBIK.toLocaleString()} incurs ~£${class1A.toLocaleString()} Class 1A NI for the company (not shown in take-home).`,
+      message: `Your company car BIK of £${companyCarBIK.toLocaleString()} incurs ~£${Math.round(class1A).toLocaleString()} Class 1A NI for the company.`,
     });
   }
 

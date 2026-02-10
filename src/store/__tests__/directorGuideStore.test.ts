@@ -89,6 +89,7 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.studentLoanPlans).toEqual([]);
       expect(state.formData.pensionContribution).toBe(0);
       expect(state.formData.companyCarBIK).toBe(0);
+      expect(state.formData.associatedCompaniesCount).toBe(1);
       expect(state.formData.hasEmploymentAllowance).toBe(false);
       expect(state.formData.monthlyIncome).toBeUndefined();
       expect(state.formData.monthlyExpenses).toBeUndefined();
@@ -215,6 +216,18 @@ describe('DirectorGuideStore', () => {
     it('should set company car BIK', () => {
       useDirectorGuideStore.getState().setCompanyCarBIK(3600);
       expect(useDirectorGuideStore.getState().formData.companyCarBIK).toBe(3600);
+    });
+
+    it('should set associated companies count with bounds', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setAssociatedCompaniesCount(4);
+      expect(useDirectorGuideStore.getState().formData.associatedCompaniesCount).toBe(4);
+
+      store.setAssociatedCompaniesCount(0);
+      expect(useDirectorGuideStore.getState().formData.associatedCompaniesCount).toBe(1);
+
+      store.setAssociatedCompaniesCount(999);
+      expect(useDirectorGuideStore.getState().formData.associatedCompaniesCount).toBe(50);
     });
 
     it('should set employment allowance', () => {
@@ -400,6 +413,19 @@ describe('DirectorGuideStore', () => {
 
       const call = mockCalculateStrategyComparison.mock.calls[0][0];
       expect(call.hasOtherPAYEEmployment).toBe(true);
+    });
+
+    it('should pass associated company count into strategy comparison', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      store.setAssociatedCompaniesCount(3);
+
+      store.calculate();
+
+      const call = mockCalculateStrategyComparison.mock.calls[0][0];
+      expect(call.associatedCompaniesCount).toBe(3);
     });
 
     it('should project monthly inputs before strategy comparison', () => {

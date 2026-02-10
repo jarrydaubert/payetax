@@ -13,7 +13,6 @@
 import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { useShallow } from 'zustand/react/shallow';
 import type { StudentLoanPlan } from '@/constants/taxRates';
 import {
   trackBufferShortfallShown,
@@ -41,12 +40,15 @@ import {
   type Region,
   RegionSchema,
 } from '@/lib/validation/directorValidation';
+import { useShallow } from '@/lib/zustandShallow';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
 const CURRENT_TAX_YEAR = DIRECTOR_TAX_YEARS[0];
+export const DIRECTOR_PROFIT_WHAT_IF_MIN_PERCENT = -50;
+export const DIRECTOR_PROFIT_WHAT_IF_MAX_PERCENT = 100;
 
 // ============================================================================
 // TYPES
@@ -98,6 +100,7 @@ export interface DirectorFormData {
   pensionContribution: number;
   isPensionAlreadyDeducted: boolean; // If true, pension is already in profit figure
   companyCarBIK: number;
+  associatedCompaniesCount: number;
   hasEmploymentAllowance: boolean;
   minimumSalaryRequirement: number | undefined;
 
@@ -131,6 +134,7 @@ interface DirectorGuideState {
   isCalculating: boolean;
   selectedStrategy: 'allSalary' | 'optimalMix' | 'allDividends';
   sliderSalary: number | null;
+  profitWhatIfPercent: number;
 }
 
 /**
@@ -162,6 +166,7 @@ interface DirectorGuideActions {
   setPensionContribution: (amount: number) => void;
   setIsPensionAlreadyDeducted: (deducted: boolean) => void;
   setCompanyCarBIK: (amount: number) => void;
+  setAssociatedCompaniesCount: (count: number) => void;
   setHasEmploymentAllowance: (has: boolean) => void;
   setMinimumSalaryRequirement: (amount: number | undefined) => void;
 
@@ -180,6 +185,7 @@ interface DirectorGuideActions {
   // UI actions
   setSelectedStrategy: (strategy: 'allSalary' | 'optimalMix' | 'allDividends') => void;
   setSliderSalary: (salary: number | null) => void;
+  setProfitWhatIfPercent: (percent: number) => void;
 
   // Calculation
   calculate: () => void;
@@ -213,6 +219,7 @@ const defaultFormData: DirectorFormData = {
   pensionContribution: 0,
   isPensionAlreadyDeducted: false,
   companyCarBIK: 0,
+  associatedCompaniesCount: 1,
   hasEmploymentAllowance: false,
   minimumSalaryRequirement: undefined,
   yourSetupSalary: undefined,
@@ -234,6 +241,7 @@ const defaultState: DirectorGuideState = {
   isCalculating: false,
   selectedStrategy: 'optimalMix',
   sliderSalary: null,
+  profitWhatIfPercent: 0,
 };
 
 const PersistedDirectorStudentLoanPlanSchema = z.enum([
@@ -267,6 +275,7 @@ const PersistedDirectorFormDataSchema = z
     pensionContribution: CurrencyAmountSchema.optional(),
     isPensionAlreadyDeducted: z.boolean().optional(),
     companyCarBIK: CurrencyAmountSchema.optional(),
+    associatedCompaniesCount: z.number().int().min(1).max(50).optional(),
     hasEmploymentAllowance: z.boolean().optional(),
     minimumSalaryRequirement: CurrencyAmountSchema.optional(),
     yourSetupSalary: CurrencyAmountSchema.optional(),
@@ -470,6 +479,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           }));
         },
 
+        setAssociatedCompaniesCount: (count) => {
+          if (!Number.isFinite(count)) return;
+          const normalized = Math.max(1, Math.min(50, Math.floor(count)));
+          set((state) => ({
+            formData: { ...state.formData, associatedCompaniesCount: normalized },
+          }));
+        },
+
         setHasEmploymentAllowance: (has) => {
           set((state) => ({
             formData: { ...state.formData, hasEmploymentAllowance: has },
@@ -596,6 +613,15 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           set({ sliderSalary: salary });
         },
 
+        setProfitWhatIfPercent: (percent) => {
+          if (!Number.isFinite(percent)) return;
+          const normalized = Math.max(
+            DIRECTOR_PROFIT_WHAT_IF_MIN_PERCENT,
+            Math.min(DIRECTOR_PROFIT_WHAT_IF_MAX_PERCENT, Math.round(percent)),
+          );
+          set({ profitWhatIfPercent: normalized });
+        },
+
         // ====================================================================
         // CALCULATION
         // ====================================================================
@@ -672,6 +698,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
                 ? 0
                 : formData.pensionContribution,
               companyCarBIK: formData.companyCarBIK,
+              associatedCompaniesCount: formData.associatedCompaniesCount,
               minimumSalaryRequirement: formData.minimumSalaryRequirement,
               hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
               // YTD amounts (for available extraction calculation and warnings)
@@ -865,6 +892,13 @@ export function useSliderSalary() {
 }
 
 /**
+ * Hook for accessing company profit what-if adjustment percentage
+ */
+export function useProfitWhatIfPercent() {
+  return useDirectorGuideStore((state) => state.profitWhatIfPercent);
+}
+
+/**
  * Hook for accessing error state
  */
 export function useDirectorError() {
@@ -906,6 +940,7 @@ export function useDirectorGuideActions() {
       setPensionContribution: state.setPensionContribution,
       setIsPensionAlreadyDeducted: state.setIsPensionAlreadyDeducted,
       setCompanyCarBIK: state.setCompanyCarBIK,
+      setAssociatedCompaniesCount: state.setAssociatedCompaniesCount,
       setHasEmploymentAllowance: state.setHasEmploymentAllowance,
       setMinimumSalaryRequirement: state.setMinimumSalaryRequirement,
       // Compare mode
@@ -921,6 +956,7 @@ export function useDirectorGuideActions() {
       // UI actions
       setSelectedStrategy: state.setSelectedStrategy,
       setSliderSalary: state.setSliderSalary,
+      setProfitWhatIfPercent: state.setProfitWhatIfPercent,
       // Calculation
       calculate: state.calculate,
       reset: state.reset,

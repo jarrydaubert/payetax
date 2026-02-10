@@ -82,7 +82,11 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
         </ul>
 
         {/* Pagination */}
-        <BlogPagination currentPage={currentPage} totalPages={totalPages} />
+        <BlogPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          scrollToId='all-posts-heading'
+        />
       </div>
     </section>
   );

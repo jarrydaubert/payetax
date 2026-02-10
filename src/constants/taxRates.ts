@@ -123,6 +123,7 @@ export const TAX_RATES: Record<
         }
       >;
       employmentAllowance: number; // Annual EA that can offset employer NI
+      class1A: { rate: number }; // Class 1A NI rate (%) on taxable benefits in kind
       lowerEarningsLimit: number; // LEL - minimum for NI credits / State Pension qualification
     };
     studentLoan: {
@@ -207,6 +208,7 @@ export const TAX_RATES: Record<
         },
       },
       employmentAllowance: 5000, // £5,000 for 2023-24
+      class1A: { rate: 13.8 }, // Class 1A NI on benefits in kind
       lowerEarningsLimit: 6396, // £123/week × 52 = £6,396/year
     },
     studentLoan: {
@@ -294,6 +296,7 @@ export const TAX_RATES: Record<
         },
       },
       employmentAllowance: 5000, // £5,000 for 2024-25
+      class1A: { rate: 13.8 }, // Class 1A NI on benefits in kind
       lowerEarningsLimit: 6396, // £123/week × 52 = £6,396/year
     },
     studentLoan: {
@@ -378,6 +381,7 @@ export const TAX_RATES: Record<
         },
       },
       employmentAllowance: 10500, // Increased from £5,000 to £10,500 in Autumn Budget 2024
+      class1A: { rate: 15 }, // Class 1A NI on benefits in kind
       lowerEarningsLimit: 6500, // £125/week × 52 = £6,500/year (increased from £6,396)
     },
     studentLoan: {

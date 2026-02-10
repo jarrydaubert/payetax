@@ -103,6 +103,7 @@ export function BlogPagination({
       {safeCurrent > 1 ? (
         <Link
           href={getPageUrl(safeCurrent - 1)}
+          scroll={false}
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
@@ -141,6 +142,7 @@ export function BlogPagination({
             <Link
               key={page}
               href={getPageUrl(page)}
+              scroll={false}
               className={cn(
                 'flex h-10 w-10 items-center justify-center rounded-lg font-medium text-sm transition-colors',
                 page === safeCurrent
@@ -164,6 +166,7 @@ export function BlogPagination({
       {safeCurrent < totalPages ? (
         <Link
           href={getPageUrl(safeCurrent + 1)}
+          scroll={false}
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',

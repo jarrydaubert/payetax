@@ -32,5 +32,11 @@ describe('AboutPage', () => {
         name: /Install App/i,
       }),
     ).toHaveAttribute('href', '/install');
+
+    expect(
+      screen.getByRole('button', {
+        name: /Send feedback/i,
+      }),
+    ).toBeInTheDocument();
   });
 });

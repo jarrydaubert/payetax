@@ -11,12 +11,8 @@
 
 import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
-import {
-  useSelectedStrategy,
-  useSliderSalary,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 
@@ -29,15 +25,12 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export function PensionGapWarning() {
-  const comparison = useStrategyComparison();
-  const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
+  const { comparison, activeScenario } = useActiveDirectorScenario();
 
   const currentSalary = useMemo(() => {
-    if (sliderSalary !== null) return sliderSalary;
-    if (!comparison) return 0;
-    return comparison.strategies[selectedStrategy].salary;
-  }, [sliderSalary, comparison, selectedStrategy]);
+    if (!activeScenario) return 0;
+    return activeScenario.salary;
+  }, [activeScenario]);
 
   // Thresholds from tax rates
   const secondaryThreshold = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.threshold; // £5,000
@@ -56,7 +49,7 @@ export function PensionGapWarning() {
   const extraMonthlyCost =
     extraNeededForPension > 0 ? Math.round((extraNeededForPension * niRate) / 12) : 0;
 
-  if (!comparison || comparison.grossProfit <= 0) return null;
+  if (!comparison || comparison.grossProfit <= 0 || !activeScenario) return null;
 
   // Qualifies for pension - green success state
   if (qualifiesForPension) {

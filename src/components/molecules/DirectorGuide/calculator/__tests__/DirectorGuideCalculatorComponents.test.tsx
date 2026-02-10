@@ -19,23 +19,28 @@ jest.mock('@/lib/tax/strategyComparison', () => {
 
 jest.mock('@/components/ui/slider', () => ({
   Slider: ({
+    'data-testid': testId,
     value,
     onValueChange,
     min,
     max,
+    step,
   }: {
+    'data-testid'?: string;
     value: number[];
     onValueChange: (v: number[]) => void;
     min: number;
     max: number;
+    step?: number;
   }) => (
     <button
       type='button'
-      data-testid='salary-slider'
+      data-testid={testId ?? 'slider'}
       data-value={value?.[0]}
       data-min={min}
       data-max={max}
-      onClick={() => onValueChange([20000])}
+      data-step={step}
+      onClick={() => onValueChange([testId === 'director-profit-slider' ? 10 : 20000])}
     />
   ),
 }));
@@ -118,6 +123,7 @@ describe('Director Guide calculator components', () => {
       strategyComparison: null,
       selectedStrategy: 'optimalMix',
       sliderSalary: null,
+      profitWhatIfPercent: 0,
     });
     mockCalculateSalaryScenario.mockReset();
     mockTrackStrategySelected.mockClear();
@@ -185,15 +191,21 @@ describe('Director Guide calculator components', () => {
   });
 
   describe('SalarySlider', () => {
-    it('initializes slider to baseline salary and updates on change', () => {
+    it('initializes salary slider to baseline salary and updates on change', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<SalarySlider />);
-      const slider = screen.getByTestId('salary-slider');
+      const salarySlider = screen.getByTestId('director-salary-slider');
+      const profitSlider = screen.getByTestId('director-profit-slider');
 
-      expect(slider.getAttribute('data-value')).toBe('7000');
-      fireEvent.click(slider);
+      expect(salarySlider.getAttribute('data-value')).toBe('7000');
+      expect(profitSlider.getAttribute('data-value')).toBe('0');
+
+      fireEvent.click(salarySlider);
       expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
+
+      fireEvent.click(profitSlider);
+      expect(useDirectorGuideStore.getState().profitWhatIfPercent).toBe(10);
     });
   });
 

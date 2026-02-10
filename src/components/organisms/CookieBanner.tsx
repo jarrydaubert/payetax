@@ -116,12 +116,17 @@ const CookieBanner: React.FC = () => {
             'sm:gap-3',
           )}
         >
-          <Button onClick={declineCookies} variant='outline' size='touch' className='min-w-[140px]'>
+          <Button
+            onClick={declineCookies}
+            variant='outline'
+            size='touch'
+            className='min-w-[140px] border-border/70 bg-background/80 hover:bg-background'
+          >
             Essential Only
           </Button>
           <Button
             onClick={acceptCookies}
-            variant='brandOutline'
+            variant='accentOutline'
             size='touch'
             className='min-w-[140px]'
             data-testid='cookie-accept-analytics'

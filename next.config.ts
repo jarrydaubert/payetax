@@ -12,6 +12,21 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
+const isTruthy = (value: string | undefined) => value === '1' || value === 'true';
+
+const isVercelBuild =
+  isTruthy(process.env.VERCEL) ||
+  Boolean(process.env.VERCEL_ENV) ||
+  Boolean(process.env.VERCEL_URL);
+
+const useGoogleFonts =
+  !isTruthy(process.env.PAYETAX_DISABLE_GOOGLE_FONTS) &&
+  (isVercelBuild || isTruthy(process.env.PAYETAX_ENABLE_GOOGLE_FONTS));
+
+const fontAlias: Record<string, string> = useGoogleFonts
+  ? { '@/app/fonts': path.resolve('./src/app/fonts.google.ts') }
+  : {};
+
 const nextConfig: NextConfig = {
   // Expose app version to client
   env: {
@@ -56,6 +71,9 @@ const nextConfig: NextConfig = {
 
   // Turbopack configuration (used for dev, webpack used for prod builds via --webpack flag)
   turbopack: {
+    resolveAlias: {
+      ...fontAlias,
+    },
     rules: {
       '*.svg': {
         loaders: ['@svgr/webpack'],
@@ -141,6 +159,7 @@ const nextConfig: NextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve('./src'),
+      ...fontAlias,
     };
 
     return config;

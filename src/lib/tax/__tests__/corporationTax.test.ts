@@ -125,6 +125,24 @@ describe('Corporation Tax Calculator', () => {
       });
     });
 
+    describe('Associated company threshold adjustments', () => {
+      it('should split CT thresholds across associated companies', () => {
+        const singleCompany = calculateCorporationTax(40000);
+        const twoAssociatedCompanies = calculateCorporationTax(40000, 2);
+
+        expect(singleCompany.rateBand).toBe('small_profits');
+        expect(twoAssociatedCompanies.rateBand).toBe('marginal');
+        expect(twoAssociatedCompanies.corporationTax).toBeGreaterThan(singleCompany.corporationTax);
+      });
+
+      it('should treat £25,000 as small-profits limit when there are 2 companies', () => {
+        const result = calculateCorporationTax(25000, 2);
+
+        expect(result.rateBand).toBe('small_profits');
+        expect(result.corporationTax).toBe(4750);
+      });
+    });
+
     describe('Edge cases', () => {
       it('should return 0 for zero profit', () => {
         const result = calculateCorporationTax(0);
@@ -183,6 +201,10 @@ describe('Corporation Tax Calculator', () => {
       expect(getCorporationTax(40000)).toBe(7600);
       expect(getCorporationTax(300000)).toBe(75000);
       expect(getCorporationTax(0)).toBe(0);
+    });
+
+    it('should apply associated company adjustments when provided', () => {
+      expect(getCorporationTax(40000, undefined, 2)).toBeGreaterThan(getCorporationTax(40000));
     });
   });
 

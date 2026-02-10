@@ -9,17 +9,7 @@
 'use client';
 
 import { BarChart3 } from 'lucide-react';
-import { useMemo } from 'react';
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
-import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
-import {
-  useDirectorFormSlice,
-  useSelectedStrategy,
-  useSliderSalary,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
-
-const TAX_YEAR = CURRENT_TAX_YEAR;
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -30,99 +20,28 @@ const formatCurrency = (value: number) =>
   }).format(Math.abs(value));
 
 export function MoneyFlowChart() {
-  const comparison = useStrategyComparison();
-  const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormSlice((state) => ({
-    region: state.region,
-    otherIncome: state.otherIncome,
-    pensionContribution: state.pensionContribution,
-    hasEmploymentAllowance: state.hasEmploymentAllowance,
-    studentLoanPlans: state.studentLoanPlans,
-    companyCarBIK: state.companyCarBIK,
-  }));
+  const { comparison, activeScenario } = useActiveDirectorScenario();
 
-  // Extract only the fields we need to minimize re-renders
-  const {
-    region,
-    otherIncome,
-    pensionContribution,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    companyCarBIK,
-  } = formData;
-
-  const values = useMemo(() => {
-    if (!comparison || comparison.grossProfit <= 0) return null;
-
-    const profitForCalc = comparison.grossProfitAfterPension ?? comparison.grossProfit;
-
-    if (sliderSalary !== null) {
-      const scenario = calculateSalaryScenario(
-        sliderSalary,
-        profitForCalc,
-        region ?? 'rUK',
-        TAX_YEAR,
-        otherIncome,
-        hasEmploymentAllowance,
-        studentLoanPlans,
-        pensionContribution,
-        companyCarBIK,
-      );
-      return {
-        salary: scenario.salary,
-        dividends: scenario.dividends,
-        corporationTax: scenario.corporationTax,
-        employerNI: scenario.employerNI,
-        // Use the actual take-home from the scenario (salary - personal taxes)
-        personalTakeHome: scenario.takeHome,
-        dividendTax: scenario.dividendTax,
-        pension: scenario.pension,
-      };
-    }
-
-    const strategy = comparison.strategies[selectedStrategy];
-    return {
-      salary: strategy.salary,
-      dividends: strategy.dividends,
-      corporationTax: strategy.corporationTax,
-      employerNI: strategy.employerNI,
-      personalTakeHome: strategy.takeHome,
-      dividendTax: strategy.dividendTax,
-      pension: strategy.pension,
-    };
-  }, [
-    comparison,
-    sliderSalary,
-    selectedStrategy,
-    region,
-    otherIncome,
-    pensionContribution,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    companyCarBIK,
-  ]);
-
-  if (!(values && comparison)) return null;
+  if (!(activeScenario && comparison)) return null;
 
   const grossProfit = comparison.grossProfitAfterPension ?? comparison.grossProfit;
 
-  // Calculate actual take-home: salary take-home + dividends after dividend tax
-  const actualTakeHome = values.personalTakeHome + (values.dividends - values.dividendTax);
+  // takeHome is already net of personal taxes.
+  const actualTakeHome = activeScenario.takeHome;
 
   // Company-side taxes: Corporation Tax + Employer NI
-  const companyTaxes = values.corporationTax + values.employerNI;
+  const companyTaxes = activeScenario.corporationTax + activeScenario.employerNI;
 
   // What remains in the company after all extractions and taxes
   // Retained = Profit - Salary - ErNI - Dividends - CT - Pension
   const retained = Math.max(
     0,
     grossProfit -
-      values.salary -
-      values.employerNI -
-      values.dividends -
-      values.corporationTax -
-      values.pension,
+      activeScenario.salary -
+      activeScenario.employerNI -
+      activeScenario.dividends -
+      activeScenario.corporationTax -
+      activeScenario.pension,
   );
 
   // Helper to clamp percentages for display

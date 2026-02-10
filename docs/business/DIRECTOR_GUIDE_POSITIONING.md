@@ -105,6 +105,8 @@ No wizard, no gates - everything visible at once. Pros work fast, beginners lear
 |---------|----------------|
 | Education panel | Explains concepts before asking for numbers |
 | Jargon tooltips | Every term defined in plain English |
+| Quick Start path | First-time directors can start with minimum inputs and progressively add detail |
+| Dual what-if controls | Lets users test salary changes and business up/down scenarios in one place |
 | Two Pots visual | Company vs Personal tax - makes it concrete |
 | "Safe Monthly Draw" | What you can actually spend, not theoretical max |
 | Key dates + calendar | Never miss a deadline |

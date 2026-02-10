@@ -23,13 +23,26 @@ import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
+interface FeedbackDialogProps {
+  /** Trigger button label text */
+  triggerLabel?: string;
+  /** Trigger visual style */
+  triggerVariant?: 'inline' | 'outline';
+  /** Optional extra trigger classes */
+  triggerClassName?: string;
+}
+
 /**
  * Feedback dialog organism for collecting user feedback
  * React 19 features: useActionState for server action integration
  * Uses Zod validation for type-safe form validation
  * Design tokens: TEXT_SM for labels/text, SIZE_4 for icons, SPACE_Y_4/SPACE_Y_2 for form spacing
  */
-export function FeedbackDialog() {
+export function FeedbackDialog({
+  triggerLabel = 'Feedback',
+  triggerVariant = 'inline',
+  triggerClassName,
+}: FeedbackDialogProps = {}) {
   const emailId = useId();
   const messageId = useId();
   const [open, setOpen] = useState(false);
@@ -141,19 +154,32 @@ export function FeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button
-          type='button'
-          className={cn(
-            'flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
-            'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            SPACING.GAP_2,
-            TYPOGRAPHY.TEXT_SM,
-          )}
-          aria-haspopup='dialog'
-        >
-          <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-          Feedback
-        </button>
+        {triggerVariant === 'outline' ? (
+          <Button
+            type='button'
+            variant='outline'
+            className={cn('min-h-[44px]', SPACING.GAP_2, TYPOGRAPHY.TEXT_SM, triggerClassName)}
+            aria-haspopup='dialog'
+          >
+            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            {triggerLabel}
+          </Button>
+        ) : (
+          <button
+            type='button'
+            className={cn(
+              'flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
+              'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              SPACING.GAP_2,
+              TYPOGRAPHY.TEXT_SM,
+              triggerClassName,
+            )}
+            aria-haspopup='dialog'
+          >
+            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            {triggerLabel}
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent className='border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md'>
         <DialogHeader>

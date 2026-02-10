@@ -673,6 +673,23 @@
   }
 
   /**
+   * Shared gradient-border button surface.
+   * Keeps interior dark while preserving a clearly visible brand border.
+   */
+  .btn-brand-outline {
+    background:
+      linear-gradient(rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.88)) padding-box,
+      linear-gradient(90deg, var(--brand-gradient-start), var(--brand-gradient-end)) border-box;
+    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn-brand-outline:hover {
+    background:
+      linear-gradient(rgba(7, 14, 31, 0.94), rgba(7, 14, 31, 0.94)) padding-box,
+      linear-gradient(90deg, var(--brand-gradient-start), var(--brand-gradient-end)) border-box;
+  }
+
+  /**
    * Glass morphism effects
    * Used for cards and overlays with backdrop blur
    * Enhanced with OKLCH alpha support for better color consistency (2025)

@@ -39,6 +39,7 @@ if (!rates) {
 // Shared input styling
 const INPUT_CLASS =
   'border-white/[0.08] bg-slate-800 font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500';
+const SECTION_HEADING_CLASS = 'mb-3 font-semibold text-slate-500 text-xs uppercase tracking-wider';
 
 const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
 
@@ -73,6 +74,7 @@ const STUDENT_LOAN_PLAN_SHORT_LABELS: Record<StudentLoanPlan, string> = {
 export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const baseId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [quickStartMode, setQuickStartMode] = useState(true);
 
   const formData = useDirectorFormSlice((formData) => ({
     mode: formData.mode,
@@ -90,6 +92,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     pensionContribution: formData.pensionContribution,
     isPensionAlreadyDeducted: formData.isPensionAlreadyDeducted,
     companyCarBIK: formData.companyCarBIK,
+    associatedCompaniesCount: formData.associatedCompaniesCount,
     hasEmploymentAllowance: formData.hasEmploymentAllowance,
     lossesBroughtForward: formData.lossesBroughtForward,
     minimumSalaryRequirement: formData.minimumSalaryRequirement,
@@ -156,6 +159,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     pension: `${baseId}-pension`,
     pensionDeducted: `${baseId}-pension-deducted`,
     carBik: `${baseId}-car-bik`,
+    associatedCompanies: `${baseId}-associated-companies`,
     losses: `${baseId}-losses`,
     minSalary: `${baseId}-min-salary`,
     yourSalary: `${baseId}-your-salary`,
@@ -163,7 +167,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   };
 
   return (
-    <aside className={cn('flex h-full flex-col overflow-y-auto bg-slate-900 p-5', className)}>
+    <aside className={cn('flex h-full flex-col bg-slate-900 p-5', className)}>
       {/* Section: Mode */}
       <Section title='Mode'>
         <fieldset aria-labelledby={ids.mode}>
@@ -199,6 +203,43 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </button>
           </div>
         </fieldset>
+      </Section>
+
+      <Section title='Input Path'>
+        <fieldset aria-label='Input path'>
+          <div className='grid grid-cols-2 gap-2 rounded-lg border border-white/[0.04] bg-slate-950 p-1'>
+            <button
+              type='button'
+              onClick={() => setQuickStartMode(true)}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm transition-colors',
+                quickStartMode
+                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              aria-pressed={quickStartMode}
+            >
+              Quick Start
+            </button>
+            <button
+              type='button'
+              onClick={() => setQuickStartMode(false)}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm transition-colors',
+                !quickStartMode
+                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
+                  : 'text-slate-400 hover:text-slate-200',
+              )}
+              aria-pressed={!quickStartMode}
+            >
+              Full Inputs
+            </button>
+          </div>
+        </fieldset>
+        <p className='text-slate-500 text-xs'>
+          Quick Start shows minimum fields first. Full Inputs unlocks YTD, personal, and advanced
+          detail.
+        </p>
       </Section>
 
       {/* Section: Core Inputs */}
@@ -437,297 +478,338 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         </Field>
       </Section>
 
-      {/* Section: Already Taken */}
-      <Section title='Already Taken This Year'>
-        <Field
-          label='YTD Salary'
-          hint='Gross salary via PAYE'
-          id={ids.ytdSalary}
-          tooltipFieldName='directorYtdSalary'
-        >
-          <Input
-            id={ids.ytdSalary}
-            type='text'
-            value={formatCurrency(formData.ytdSalary)}
-            onChange={(e) => actions.setYtdSalary(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.ytdSalary)}
-          />
-        </Field>
-
-        <Field
-          label='YTD Dividends'
-          hint='Dividends declared'
-          id={ids.ytdDividends}
-          tooltipFieldName='directorYtdDividends'
-        >
-          <Input
-            id={ids.ytdDividends}
-            type='text'
-            value={formatCurrency(formData.ytdDividends)}
-            onChange={(e) => actions.setYtdDividends(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.ytdDividends)}
-          />
-        </Field>
-
-        <Field
-          label='Other Drawings'
-          hint='Non-dividend withdrawals (e.g. director loan)'
-          id={ids.ytdDrawings}
-          tooltipFieldName='directorYtdDrawings'
-        >
-          <Input
-            id={ids.ytdDrawings}
-            type='text'
-            value={formatCurrency(formData.ytdDrawings)}
-            onChange={(e) => actions.setYtdDrawings(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.ytdDrawings)}
-          />
-        </Field>
-      </Section>
-
-      {/* Section: Your Situation */}
-      <Section title='Your Situation'>
-        <Field
-          label='Other Personal Income'
-          hint='Employment, rental, etc.'
-          id={ids.otherIncome}
-          tooltipFieldName='directorOtherIncome'
-        >
-          <Input
-            id={ids.otherIncome}
-            type='text'
-            value={formatCurrency(formData.otherIncome)}
-            onChange={(e) => actions.setOtherIncome(parseCurrency(e.target.value))}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.otherIncome)}
-          />
-        </Field>
-
-        {/* Other PAYE Employment */}
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Label htmlFor={ids.otherPaye} className='text-slate-400 text-sm'>
-              Other PAYE employment?
-            </Label>
-            <LabelTooltip fieldName='directorOtherPAYE' />
-          </div>
-          <Switch
-            id={ids.otherPaye}
-            checked={formData.hasOtherPAYEEmployment}
-            onCheckedChange={actions.setHasOtherPAYEEmployment}
-            className='data-[state=checked]:bg-cyan-500'
-          />
-        </div>
-      </Section>
-
-      {/* Section: Advanced (collapsible) */}
-      <div className='mt-4'>
-        <button
-          type='button'
-          onClick={() => setAdvancedOpen(!advancedOpen)}
-          aria-expanded={advancedOpen}
-          aria-controls={ids.advancedPanel}
-          className='flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-slate-800 px-4 py-3 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-slate-700'
-        >
-          <span className='font-medium'>Advanced Options</span>
-          {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
-        </button>
-
-        {advancedOpen && (
-          <div
-            id={ids.advancedPanel}
-            className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-slate-950 p-4'
+      {quickStartMode ? (
+        <div className='mb-5 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4'>
+          <p className='text-cyan-200 text-xs'>
+            You can calculate with just company inputs + region. Add more detail any time for better
+            accuracy.
+          </p>
+          <button
+            type='button'
+            onClick={() => setQuickStartMode(false)}
+            className='mt-3 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-cyan-300 text-xs transition-colors hover:bg-cyan-500/20'
           >
-            {/* Employment Allowance */}
+            Add More Detail
+          </button>
+        </div>
+      ) : null}
+
+      {!quickStartMode ? (
+        <>
+          {/* Section: Already Taken */}
+          <Section title='Already Taken This Year'>
+            <Field
+              label='YTD Salary'
+              hint='Gross salary via PAYE'
+              id={ids.ytdSalary}
+              tooltipFieldName='directorYtdSalary'
+            >
+              <Input
+                id={ids.ytdSalary}
+                type='text'
+                value={formatCurrency(formData.ytdSalary)}
+                onChange={(e) => actions.setYtdSalary(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.ytdSalary)}
+              />
+            </Field>
+
+            <Field
+              label='YTD Dividends'
+              hint='Dividends declared'
+              id={ids.ytdDividends}
+              tooltipFieldName='directorYtdDividends'
+            >
+              <Input
+                id={ids.ytdDividends}
+                type='text'
+                value={formatCurrency(formData.ytdDividends)}
+                onChange={(e) => actions.setYtdDividends(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.ytdDividends)}
+              />
+            </Field>
+
+            <Field
+              label='Other Drawings'
+              hint='Non-dividend withdrawals (e.g. director loan)'
+              id={ids.ytdDrawings}
+              tooltipFieldName='directorYtdDrawings'
+            >
+              <Input
+                id={ids.ytdDrawings}
+                type='text'
+                value={formatCurrency(formData.ytdDrawings)}
+                onChange={(e) => actions.setYtdDrawings(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.ytdDrawings)}
+              />
+            </Field>
+          </Section>
+
+          {/* Section: Your Situation */}
+          <Section title='Your Situation'>
+            <Field
+              label='Other Personal Income'
+              hint='Employment, rental, etc.'
+              id={ids.otherIncome}
+              tooltipFieldName='directorOtherIncome'
+            >
+              <Input
+                id={ids.otherIncome}
+                type='text'
+                value={formatCurrency(formData.otherIncome)}
+                onChange={(e) => actions.setOtherIncome(parseCurrency(e.target.value))}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.otherIncome)}
+              />
+            </Field>
+
+            {/* Other PAYE Employment */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <Label htmlFor={ids.employmentAllowance} className='text-slate-400 text-sm'>
-                  Employment Allowance
+                <Label htmlFor={ids.otherPaye} className='text-slate-400 text-sm'>
+                  Other PAYE employment?
                 </Label>
-                <LabelTooltip fieldName='directorEmploymentAllowance' />
+                <LabelTooltip fieldName='directorOtherPAYE' />
               </div>
               <Switch
-                id={ids.employmentAllowance}
-                checked={formData.hasEmploymentAllowance}
-                onCheckedChange={actions.setHasEmploymentAllowance}
+                id={ids.otherPaye}
+                checked={formData.hasOtherPAYEEmployment}
+                onCheckedChange={actions.setHasOtherPAYEEmployment}
                 className='data-[state=checked]:bg-cyan-500'
               />
             </div>
+          </Section>
 
-            {/* Student Loans */}
-            <fieldset className='space-y-2'>
-              <legend className='flex items-center gap-2 text-slate-400 text-sm'>
-                Student Loans
-                <LabelTooltip fieldName='directorStudentLoans' />
-              </legend>
-              <div className='grid grid-cols-2 gap-2'>
-                {getAvailableDirectorStudentLoanPlans(CURRENT_TAX_YEAR).map((plan) => {
-                  const checkboxId = `${baseId}-loan-${plan}`;
-                  return (
-                    <div key={plan} className='flex items-center gap-2'>
-                      <Checkbox
-                        id={checkboxId}
-                        checked={formData.studentLoanPlans.includes(plan)}
-                        onCheckedChange={() => actions.toggleStudentLoanPlan(plan)}
-                        className='border-white/20 data-[state=checked]:bg-cyan-500'
-                      />
-                      <Label htmlFor={checkboxId} className='cursor-pointer text-slate-500 text-xs'>
-                        {STUDENT_LOAN_PLAN_SHORT_LABELS[plan]}
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            {/* Pension Contribution */}
-            <Field
-              label='Employer Pension'
-              hint='Reduces taxable profit'
-              id={ids.pension}
-              tooltipFieldName='directorPension'
+          {/* Section: Advanced (collapsible) */}
+          <div className='mt-4'>
+            <button
+              type='button'
+              onClick={() => setAdvancedOpen(!advancedOpen)}
+              aria-expanded={advancedOpen}
+              aria-controls={ids.advancedPanel}
+              className='flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-slate-800 px-4 py-3 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-slate-700'
             >
-              <Input
-                id={ids.pension}
-                type='text'
-                value={formatCurrency(formData.pensionContribution)}
-                onChange={(e) => actions.setPensionContribution(parseCurrency(e.target.value))}
-                placeholder='£0'
-                className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.pension)}
-              />
-            </Field>
-            {formData.pensionContribution > 0 && (
-              <div className='flex items-center gap-2'>
-                <Checkbox
-                  id={ids.pensionDeducted}
-                  checked={formData.isPensionAlreadyDeducted}
-                  onCheckedChange={(checked) =>
-                    actions.setIsPensionAlreadyDeducted(checked === true)
-                  }
-                  className='border-white/20 data-[state=checked]:bg-cyan-500'
-                />
-                <Label
-                  htmlFor={ids.pensionDeducted}
-                  className='cursor-pointer text-slate-400 text-sm'
+              <span className='font-medium'>Advanced Options</span>
+              {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
+            </button>
+
+            {advancedOpen && (
+              <div
+                id={ids.advancedPanel}
+                className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-slate-950 p-4'
+              >
+                {/* Employment Allowance */}
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <Label htmlFor={ids.employmentAllowance} className='text-slate-400 text-sm'>
+                      Employment Allowance
+                    </Label>
+                    <LabelTooltip fieldName='directorEmploymentAllowance' />
+                  </div>
+                  <Switch
+                    id={ids.employmentAllowance}
+                    checked={formData.hasEmploymentAllowance}
+                    onCheckedChange={actions.setHasEmploymentAllowance}
+                    className='data-[state=checked]:bg-cyan-500'
+                  />
+                </div>
+
+                {/* Student Loans */}
+                <fieldset className='space-y-2'>
+                  <legend className='flex items-center gap-2 text-slate-400 text-sm'>
+                    Student Loans
+                    <LabelTooltip fieldName='directorStudentLoans' />
+                  </legend>
+                  <div className='grid grid-cols-2 gap-2'>
+                    {getAvailableDirectorStudentLoanPlans(CURRENT_TAX_YEAR).map((plan) => {
+                      const checkboxId = `${baseId}-loan-${plan}`;
+                      return (
+                        <div key={plan} className='flex items-center gap-2'>
+                          <Checkbox
+                            id={checkboxId}
+                            checked={formData.studentLoanPlans.includes(plan)}
+                            onCheckedChange={() => actions.toggleStudentLoanPlan(plan)}
+                            className='border-white/20 data-[state=checked]:bg-cyan-500'
+                          />
+                          <Label
+                            htmlFor={checkboxId}
+                            className='cursor-pointer text-slate-500 text-xs'
+                          >
+                            {STUDENT_LOAN_PLAN_SHORT_LABELS[plan]}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                {/* Pension Contribution */}
+                <Field
+                  label='Employer Pension'
+                  hint='Reduces taxable profit'
+                  id={ids.pension}
+                  tooltipFieldName='directorPension'
                 >
-                  Already deducted from profit figure
-                </Label>
-                <LabelTooltip fieldName='directorPensionDeducted' />
+                  <Input
+                    id={ids.pension}
+                    type='text'
+                    value={formatCurrency(formData.pensionContribution)}
+                    onChange={(e) => actions.setPensionContribution(parseCurrency(e.target.value))}
+                    placeholder='£0'
+                    className={INPUT_CLASS}
+                    aria-describedby={getHintId(ids.pension)}
+                  />
+                </Field>
+                {formData.pensionContribution > 0 && (
+                  <div className='flex items-center gap-2'>
+                    <Checkbox
+                      id={ids.pensionDeducted}
+                      checked={formData.isPensionAlreadyDeducted}
+                      onCheckedChange={(checked) =>
+                        actions.setIsPensionAlreadyDeducted(checked === true)
+                      }
+                      className='border-white/20 data-[state=checked]:bg-cyan-500'
+                    />
+                    <Label
+                      htmlFor={ids.pensionDeducted}
+                      className='cursor-pointer text-slate-400 text-sm'
+                    >
+                      Already deducted from profit figure
+                    </Label>
+                    <LabelTooltip fieldName='directorPensionDeducted' />
+                  </div>
+                )}
+
+                {/* Company Car BIK */}
+                <Field
+                  label='Company Car BIK'
+                  hint='Taxable benefit amount'
+                  id={ids.carBik}
+                  tooltipFieldName='directorCompanyCar'
+                >
+                  <Input
+                    id={ids.carBik}
+                    type='text'
+                    value={formatCurrency(formData.companyCarBIK)}
+                    onChange={(e) => actions.setCompanyCarBIK(parseCurrency(e.target.value))}
+                    placeholder='£0'
+                    className={INPUT_CLASS}
+                    aria-describedby={getHintId(ids.carBik)}
+                  />
+                </Field>
+
+                <Field
+                  label='Associated Companies'
+                  hint='Total associated companies including this one (affects CT thresholds)'
+                  id={ids.associatedCompanies}
+                >
+                  <Input
+                    id={ids.associatedCompanies}
+                    type='number'
+                    min={1}
+                    max={50}
+                    value={String(formData.associatedCompaniesCount)}
+                    onChange={(e) => actions.setAssociatedCompaniesCount(Number(e.target.value))}
+                    placeholder='1'
+                    className={INPUT_CLASS}
+                    aria-describedby={getHintId(ids.associatedCompanies)}
+                  />
+                </Field>
+
+                {/* Losses Brought Forward */}
+                <Field
+                  label='Losses Brought Forward'
+                  hint='Trading losses from prior years'
+                  id={ids.losses}
+                  tooltipFieldName='directorLosses'
+                >
+                  <Input
+                    id={ids.losses}
+                    type='text'
+                    value={formatCurrency(formData.lossesBroughtForward)}
+                    onChange={(e) => actions.setLossesBroughtForward(parseCurrency(e.target.value))}
+                    placeholder='£0'
+                    className={INPUT_CLASS}
+                    aria-describedby={getHintId(ids.losses)}
+                  />
+                </Field>
+
+                {/* Minimum Salary Requirement */}
+                <Field
+                  label='Minimum Salary'
+                  hint='Floor for mortgage or visa applications'
+                  id={ids.minSalary}
+                  tooltipFieldName='directorMinimumSalary'
+                >
+                  <Input
+                    id={ids.minSalary}
+                    type='text'
+                    value={formatCurrency(formData.minimumSalaryRequirement)}
+                    onChange={(e) => {
+                      const val = parseCurrency(e.target.value);
+                      actions.setMinimumSalaryRequirement(val === 0 ? undefined : val);
+                    }}
+                    placeholder='£0'
+                    className={INPUT_CLASS}
+                    aria-describedby={getHintId(ids.minSalary)}
+                  />
+                </Field>
               </div>
             )}
+          </div>
 
-            {/* Company Car BIK */}
+          {/* Section: Compare My Setup */}
+          <Section title='Compare My Setup'>
+            <p className='mb-3 text-slate-500 text-xs'>
+              Enter your current salary and dividends to see how it compares to the baseline mix.
+            </p>
             <Field
-              label='Company Car BIK'
-              hint='Taxable benefit amount'
-              id={ids.carBik}
-              tooltipFieldName='directorCompanyCar'
+              label='Your Current Salary'
+              hint='Annual gross salary'
+              id={ids.yourSalary}
+              tooltipFieldName='directorYourSalary'
             >
               <Input
-                id={ids.carBik}
+                id={ids.yourSalary}
                 type='text'
-                value={formatCurrency(formData.companyCarBIK)}
-                onChange={(e) => actions.setCompanyCarBIK(parseCurrency(e.target.value))}
-                placeholder='£0'
-                className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.carBik)}
-              />
-            </Field>
-
-            {/* Losses Brought Forward */}
-            <Field
-              label='Losses Brought Forward'
-              hint='Trading losses from prior years'
-              id={ids.losses}
-              tooltipFieldName='directorLosses'
-            >
-              <Input
-                id={ids.losses}
-                type='text'
-                value={formatCurrency(formData.lossesBroughtForward)}
-                onChange={(e) => actions.setLossesBroughtForward(parseCurrency(e.target.value))}
-                placeholder='£0'
-                className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.losses)}
-              />
-            </Field>
-
-            {/* Minimum Salary Requirement */}
-            <Field
-              label='Minimum Salary'
-              hint='Floor for mortgage or visa applications'
-              id={ids.minSalary}
-              tooltipFieldName='directorMinimumSalary'
-            >
-              <Input
-                id={ids.minSalary}
-                type='text'
-                value={formatCurrency(formData.minimumSalaryRequirement)}
+                value={formatCurrency(formData.yourSetupSalary)}
                 onChange={(e) => {
                   const val = parseCurrency(e.target.value);
-                  actions.setMinimumSalaryRequirement(val === 0 ? undefined : val);
+                  actions.setYourSetupSalary(val === 0 ? undefined : val);
                 }}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.minSalary)}
+                aria-describedby={getHintId(ids.yourSalary)}
               />
             </Field>
-          </div>
-        )}
-      </div>
-
-      {/* Section: Compare My Setup */}
-      <Section title='Compare My Setup'>
-        <p className='mb-3 text-slate-500 text-xs'>
-          Enter your current salary and dividends to see how it compares to the baseline mix.
-        </p>
-        <Field
-          label='Your Current Salary'
-          hint='Annual gross salary'
-          id={ids.yourSalary}
-          tooltipFieldName='directorYourSalary'
-        >
-          <Input
-            id={ids.yourSalary}
-            type='text'
-            value={formatCurrency(formData.yourSetupSalary)}
-            onChange={(e) => {
-              const val = parseCurrency(e.target.value);
-              actions.setYourSetupSalary(val === 0 ? undefined : val);
-            }}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.yourSalary)}
-          />
-        </Field>
-        <Field
-          label='Your Current Dividends'
-          hint='Annual dividends'
-          id={ids.yourDividends}
-          tooltipFieldName='directorYourDividends'
-        >
-          <Input
-            id={ids.yourDividends}
-            type='text'
-            value={formatCurrency(formData.yourSetupDividends)}
-            onChange={(e) => {
-              const val = parseCurrency(e.target.value);
-              actions.setYourSetupDividends(val === 0 ? undefined : val);
-            }}
-            placeholder='£0'
-            className={INPUT_CLASS}
-            aria-describedby={getHintId(ids.yourDividends)}
-          />
-        </Field>
-      </Section>
+            <Field
+              label='Your Current Dividends'
+              hint='Annual dividends'
+              id={ids.yourDividends}
+              tooltipFieldName='directorYourDividends'
+            >
+              <Input
+                id={ids.yourDividends}
+                type='text'
+                value={formatCurrency(formData.yourSetupDividends)}
+                onChange={(e) => {
+                  const val = parseCurrency(e.target.value);
+                  actions.setYourSetupDividends(val === 0 ? undefined : val);
+                }}
+                placeholder='£0'
+                className={INPUT_CLASS}
+                aria-describedby={getHintId(ids.yourDividends)}
+              />
+            </Field>
+          </Section>
+        </>
+      ) : null}
 
       {/* Spacer */}
       <div className='flex-1' />
@@ -752,9 +834,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className='mb-5'>
-      <h3 className='mb-3 font-semibold text-slate-500 text-xs uppercase tracking-wider'>
-        {title}
-      </h3>
+      <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
       <div className='space-y-4'>{children}</div>
     </div>
   );

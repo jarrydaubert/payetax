@@ -6,20 +6,10 @@
  */
 'use client';
 
-import { useMemo } from 'react';
 import { GradientText } from '@/components/atoms/GradientText';
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
-import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { cn } from '@/lib/utils';
-import {
-  useDirectorFormSlice,
-  useMonthlyModeOutput,
-  useSelectedStrategy,
-  useSliderSalary,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
-
-const TAX_YEAR = CURRENT_TAX_YEAR;
+import { useDirectorFormValue, useMonthlyModeOutput } from '@/store/directorGuideStore';
 
 interface SummaryCardsProps {
   className?: string;
@@ -35,90 +25,21 @@ function formatCurrency(amount: number): string {
 }
 
 export function SummaryCards({ className }: SummaryCardsProps) {
-  const comparison = useStrategyComparison();
-  const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
-  const formData = useDirectorFormSlice((state) => ({
-    mode: state.mode,
-    region: state.region,
-    otherIncome: state.otherIncome,
-    pensionContribution: state.pensionContribution,
-    hasEmploymentAllowance: state.hasEmploymentAllowance,
-    studentLoanPlans: state.studentLoanPlans,
-    companyCarBIK: state.companyCarBIK,
-  }));
+  const { activeScenario } = useActiveDirectorScenario();
+  const mode = useDirectorFormValue((state) => state.mode);
   const monthlyModeOutput = useMonthlyModeOutput();
-  const isMonthlyMode = formData.mode === 'monthly';
+  const isMonthlyMode = mode === 'monthly';
 
-  // Extract only the fields we need to minimize re-renders
-  const {
-    region,
-    otherIncome,
-    pensionContribution,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    companyCarBIK,
-  } = formData;
-
-  // Get active values (from slider or selected strategy)
-  const values = useMemo(() => {
-    if (!comparison || comparison.grossProfit <= 0) return null;
-
-    const scenarioProfit = comparison.grossProfitAfterPension ?? comparison.grossProfit;
-
-    if (sliderSalary !== null) {
-      const scenario = calculateSalaryScenario(
-        sliderSalary,
-        scenarioProfit,
-        region ?? 'rUK',
-        TAX_YEAR,
-        otherIncome,
-        hasEmploymentAllowance,
-        studentLoanPlans,
-        pensionContribution,
-        companyCarBIK,
-      );
-
-      return {
-        takeHome: scenario.takeHome,
-        salary: scenario.salary,
-        dividends: scenario.dividends,
-        corporationTax: scenario.corporationTax,
-        dividendTax: scenario.dividendTax,
-      };
-    }
-
-    // Use selected strategy
-    const strategy = comparison.strategies[selectedStrategy];
-    return {
-      takeHome: strategy.takeHome,
-      salary: strategy.salary,
-      dividends: strategy.dividends,
-      corporationTax: strategy.corporationTax,
-      dividendTax: strategy.dividendTax,
-    };
-  }, [
-    comparison,
-    sliderSalary,
-    selectedStrategy,
-    region,
-    otherIncome,
-    pensionContribution,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    companyCarBIK,
-  ]);
-
-  const hasResults = values !== null;
+  const hasResults = activeScenario !== null;
   const monthlyDrawAmount = hasResults
     ? isMonthlyMode && monthlyModeOutput
       ? monthlyModeOutput.safeMonthlyDraw
-      : values.takeHome / 12
+      : activeScenario.takeHome / 12
     : null;
   const monthlyDrawLabel = monthlyDrawAmount === null ? '—' : formatCurrency(monthlyDrawAmount);
 
   // Calculate net dividends for display (gross dividends - dividend tax)
-  const netDividends = hasResults ? values.dividends - values.dividendTax : 0;
+  const netDividends = hasResults ? activeScenario.dividends - activeScenario.dividendTax : 0;
 
   const cards = [
     {
@@ -134,26 +55,26 @@ export function SummaryCards({ className }: SummaryCardsProps) {
     },
     {
       label: 'Annual Salary',
-      value: hasResults ? formatCurrency(values.salary) : '—',
+      value: hasResults ? formatCurrency(activeScenario.salary) : '—',
       subtext: 'Gross via PAYE',
       ariaDescription: hasResults
-        ? `Annual gross salary of ${formatCurrency(values.salary)} paid via PAYE`
+        ? `Annual gross salary of ${formatCurrency(activeScenario.salary)} paid via PAYE`
         : 'No results available',
     },
     {
       label: 'Annual Dividends',
-      value: hasResults ? formatCurrency(values.dividends) : '—',
-      subtext: `Gross declared${hasResults && values.dividendTax > 0 ? ` (${formatCurrency(netDividends)} after tax)` : ''}`,
+      value: hasResults ? formatCurrency(activeScenario.dividends) : '—',
+      subtext: `Gross declared${hasResults && activeScenario.dividendTax > 0 ? ` (${formatCurrency(netDividends)} after tax)` : ''}`,
       ariaDescription: hasResults
-        ? `Annual gross dividends of ${formatCurrency(values.dividends)}${values.dividendTax > 0 ? `, ${formatCurrency(netDividends)} after dividend tax` : ''}`
+        ? `Annual gross dividends of ${formatCurrency(activeScenario.dividends)}${activeScenario.dividendTax > 0 ? `, ${formatCurrency(netDividends)} after dividend tax` : ''}`
         : 'No results available',
     },
     {
       label: 'Corporation Tax',
-      value: hasResults ? formatCurrency(values.corporationTax) : '—',
+      value: hasResults ? formatCurrency(activeScenario.corporationTax) : '—',
       subtext: 'To set aside for HMRC',
       ariaDescription: hasResults
-        ? `Corporation tax of ${formatCurrency(values.corporationTax)} to set aside`
+        ? `Corporation tax of ${formatCurrency(activeScenario.corporationTax)} to set aside`
         : 'No results available',
     },
   ];

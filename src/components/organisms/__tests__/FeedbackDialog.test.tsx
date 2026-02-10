@@ -37,6 +37,12 @@ describe('FeedbackDialog Component', () => {
       expect(screen.getByRole('button', { name: /feedback/i })).toBeInTheDocument();
     });
 
+    it('should render a custom trigger label', () => {
+      render(<FeedbackDialog triggerLabel='Send feedback' triggerVariant='outline' />);
+
+      expect(screen.getByRole('button', { name: /send feedback/i })).toBeInTheDocument();
+    });
+
     it('should render button with icon', () => {
       render(<FeedbackDialog />);
 

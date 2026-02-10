@@ -1,6 +1,7 @@
-import { ArrowRight, CheckCircle2, FileText, Mail, Shield, Sparkles, Workflow } from 'lucide-react';
+import { ArrowRight, CheckCircle2, FileText, Shield, Sparkles, Workflow } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
+import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,11 +35,6 @@ export default function AboutPage() {
           { name: 'Home', url: SITE_URL },
           { name: 'About', url: `${SITE_URL}/about` },
         ]}
-      />
-
-      <div
-        className='pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_15%,rgba(6,182,212,0.20),transparent_45%),radial-gradient(circle_at_88%_8%,rgba(16,185,129,0.16),transparent_40%),radial-gradient(circle_at_50%_78%,rgba(6,182,212,0.12),transparent_48%)]'
-        aria-hidden='true'
       />
 
       <section className='border-border/40 border-b py-24 md:py-28'>
@@ -296,16 +292,11 @@ export default function AboutPage() {
                 needing an accounting background.
               </p>
               <div className='mt-6 flex flex-wrap gap-3'>
-                <Button
-                  asChild
-                  variant='outline'
-                  className='rounded-lg border-border/70 bg-card/70 hover:bg-card'
-                >
-                  <a href='mailto:support@payetax.co.uk?subject=About%20PayeTax%20feedback'>
-                    <Mail className='size-4' />
-                    Send feedback
-                  </a>
-                </Button>
+                <FeedbackDialog
+                  triggerLabel='Send feedback'
+                  triggerVariant='outline'
+                  triggerClassName='rounded-lg border-border/70 bg-card/70 hover:bg-card'
+                />
                 <Button asChild variant='brandOutline' className='rounded-lg'>
                   <Link href='/install'>
                     <Workflow className='size-4' />

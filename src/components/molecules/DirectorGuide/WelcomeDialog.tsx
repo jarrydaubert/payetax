@@ -66,10 +66,10 @@ export function DirectorGuideWelcomeDialog() {
           </section>
 
           <section>
-            <h3 className='font-medium text-foreground'>Coming soon</h3>
+            <h3 className='font-medium text-foreground'>Available now</h3>
             <ul className='mt-2 list-disc space-y-1 pl-5 text-muted-foreground'>
-              <li>Downloadable tax pack</li>
-              <li>Calendar reminders</li>
+              <li>Key tax dates with downloadable .ics calendar</li>
+              <li>Email summary of your strategy comparison</li>
             </ul>
           </section>
         </div>

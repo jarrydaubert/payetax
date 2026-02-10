@@ -43,6 +43,12 @@ export interface CorporationTaxResult {
   marginalRelief: number;
 }
 
+function normalizeAssociatedCompaniesCount(associatedCompanies = 1): number {
+  if (!Number.isFinite(associatedCompanies)) return 1;
+  const normalized = Math.floor(associatedCompanies);
+  return normalized > 0 ? normalized : 1;
+}
+
 // ============================================================================
 // CALCULATION FUNCTIONS
 // ============================================================================
@@ -84,7 +90,10 @@ export interface CorporationTaxResult {
  * // { corporationTax: 75000, effectiveRate: 0.25, rateBand: 'main' }
  * ```
  */
-export function calculateCorporationTax(taxableProfit: number): CorporationTaxResult {
+export function calculateCorporationTax(
+  taxableProfit: number,
+  associatedCompanies = 1,
+): CorporationTaxResult {
   const {
     SMALL_PROFITS_RATE,
     SMALL_PROFITS_LIMIT,
@@ -92,6 +101,9 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
     MAIN_RATE_LIMIT,
     MARGINAL_RELIEF_FRACTION,
   } = CT_RATES;
+  const associatedCompaniesCount = normalizeAssociatedCompaniesCount(associatedCompanies);
+  const adjustedSmallProfitsLimit = SMALL_PROFITS_LIMIT / associatedCompaniesCount;
+  const adjustedMainRateLimit = MAIN_RATE_LIMIT / associatedCompaniesCount;
 
   // Handle invalid, zero, or negative profit
   if (!Number.isFinite(taxableProfit) || taxableProfit <= 0) {
@@ -105,7 +117,7 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
   }
 
   // Case 1: Small profits rate (≤ £50,000)
-  if (taxableProfit <= SMALL_PROFITS_LIMIT) {
+  if (taxableProfit <= adjustedSmallProfitsLimit) {
     const tax = roundToPence(taxableProfit * SMALL_PROFITS_RATE);
     return {
       taxableProfit,
@@ -117,7 +129,7 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
   }
 
   // Case 2: Main rate (≥ £250,000)
-  if (taxableProfit >= MAIN_RATE_LIMIT) {
+  if (taxableProfit >= adjustedMainRateLimit) {
     const tax = roundToPence(taxableProfit * MAIN_RATE);
     return {
       taxableProfit,
@@ -139,7 +151,7 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
   //
   // @see https://www.gov.uk/guidance/corporation-tax-marginal-relief
   const mainRateTax = taxableProfit * MAIN_RATE;
-  const marginalRelief = MARGINAL_RELIEF_FRACTION * (MAIN_RATE_LIMIT - taxableProfit);
+  const marginalRelief = MARGINAL_RELIEF_FRACTION * (adjustedMainRateLimit - taxableProfit);
 
   const tax = roundToPence(mainRateTax - marginalRelief);
   const effectiveRate = tax / taxableProfit;
@@ -162,10 +174,14 @@ export function calculateCorporationTax(taxableProfit: number): CorporationTaxRe
  * @param _taxYear - Tax year (reserved for future use when rates change)
  * @returns Corporation Tax due (rounded to pence)
  */
-export function getCorporationTax(taxableProfit: number, _taxYear?: string): number {
+export function getCorporationTax(
+  taxableProfit: number,
+  _taxYear?: string,
+  associatedCompanies = 1,
+): number {
   // Note: taxYear parameter reserved for future use when CT rates become year-dependent
   // Currently CT rates are stable since April 2023 reform
-  return calculateCorporationTax(taxableProfit).corporationTax;
+  return calculateCorporationTax(taxableProfit, associatedCompanies).corporationTax;
 }
 
 /**
@@ -176,8 +192,8 @@ export function getCorporationTax(taxableProfit: number, _taxYear?: string): num
  * @param taxableProfit - Company's taxable profit
  * @returns Effective rate as decimal (e.g., 0.22 for 22%)
  */
-export function getEffectiveCTRate(taxableProfit: number): number {
-  return calculateCorporationTax(taxableProfit).effectiveRate;
+export function getEffectiveCTRate(taxableProfit: number, associatedCompanies = 1): number {
+  return calculateCorporationTax(taxableProfit, associatedCompanies).effectiveRate;
 }
 
 // ============================================================================

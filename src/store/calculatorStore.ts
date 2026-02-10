@@ -29,7 +29,6 @@
 import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { useShallow } from 'zustand/react/shallow';
 import {
   type NICategory,
   type PayPeriod,
@@ -59,6 +58,7 @@ import {
   PensionContributionTypeSchema,
   WhatIfTypeSchema,
 } from '@/lib/validation';
+import { useShallow } from '@/lib/zustandShallow';
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 

@@ -6,17 +6,7 @@
  */
 'use client';
 
-import { useMemo } from 'react';
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
-import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
-import {
-  useDirectorFormSlice,
-  useSelectedStrategy,
-  useSliderSalary,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
-
-const TAX_YEAR = CURRENT_TAX_YEAR;
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-GB', {
@@ -27,60 +17,16 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export function TaxPots() {
-  const formData = useDirectorFormSlice((state) => ({
-    region: state.region,
-    otherIncome: state.otherIncome,
-    hasEmploymentAllowance: state.hasEmploymentAllowance,
-    studentLoanPlans: state.studentLoanPlans,
-    pensionContribution: state.pensionContribution,
-    companyCarBIK: state.companyCarBIK,
-  }));
-  const comparison = useStrategyComparison();
-  const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
+  const { activeScenario } = useActiveDirectorScenario();
 
-  // Calculate active scenario values
-  const values = useMemo(() => {
-    if (!comparison || comparison.grossProfit <= 0) return null;
+  if (!activeScenario) return null;
 
-    // If using slider, calculate custom scenario
-    if (sliderSalary !== null) {
-      const scenario = calculateSalaryScenario(
-        sliderSalary,
-        comparison.grossProfit - formData.pensionContribution,
-        formData.region ?? 'rUK',
-        TAX_YEAR,
-        formData.otherIncome,
-        formData.hasEmploymentAllowance,
-        formData.studentLoanPlans,
-        formData.pensionContribution,
-        formData.companyCarBIK,
-      );
-
-      return {
-        corporationTax: scenario.corporationTax,
-        incomeTax: scenario.incomeTax,
-        dividendTax: scenario.dividendTax,
-        studentLoan: scenario.studentLoan,
-      };
-    }
-
-    // Use selected strategy
-    const strategy = comparison.strategies[selectedStrategy];
-    return {
-      corporationTax: strategy.corporationTax,
-      incomeTax: strategy.incomeTax,
-      dividendTax: strategy.dividendTax,
-      studentLoan: strategy.studentLoan,
-    };
-  }, [comparison, sliderSalary, selectedStrategy, formData]);
-
-  if (!values) return null;
-
-  const personalTotal = values.incomeTax + values.dividendTax + values.studentLoan;
+  const personalTotal =
+    activeScenario.incomeTax + activeScenario.dividendTax + activeScenario.studentLoan;
+  const companyTotal = activeScenario.corporationTax + activeScenario.employerNI;
 
   // Monthly set-aside amounts (annual ÷ 12)
-  const monthlyCompanyPot = Math.round(values.corporationTax / 12);
+  const monthlyCompanyPot = Math.round(companyTotal / 12);
   const monthlyPersonalPot = Math.round(personalTotal / 12);
 
   return (
@@ -95,8 +41,16 @@ export function TaxPots() {
           <div className='space-y-1.5 text-sm'>
             <div className='flex justify-between text-slate-300'>
               <span>Corporation Tax</span>
-              <span className='font-mono'>{formatCurrency(values.corporationTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.corporationTax)}</span>
             </div>
+            {activeScenario.employerNI > 0 && (
+              <div className='flex justify-between text-slate-300'>
+                <span>
+                  {activeScenario.companyCarBIK > 0 ? 'Employer NI + Class 1A' : 'Employer NI'}
+                </span>
+                <span className='font-mono'>{formatCurrency(activeScenario.employerNI)}</span>
+              </div>
+            )}
             <div className='flex justify-between border-white/5 border-t pt-2'>
               <span className='font-medium text-slate-100'>Monthly</span>
               <span className='font-mono font-semibold text-cyan-400'>
@@ -115,16 +69,16 @@ export function TaxPots() {
           <div className='space-y-1.5 text-sm'>
             <div className='flex justify-between text-slate-300'>
               <span>Income Tax</span>
-              <span className='font-mono'>{formatCurrency(values.incomeTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.incomeTax)}</span>
             </div>
             <div className='flex justify-between text-slate-300'>
               <span>Dividend Tax</span>
-              <span className='font-mono'>{formatCurrency(values.dividendTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.dividendTax)}</span>
             </div>
-            {values.studentLoan > 0 && (
+            {activeScenario.studentLoan > 0 && (
               <div className='flex justify-between text-slate-300'>
                 <span>Student Loan</span>
-                <span className='font-mono'>{formatCurrency(values.studentLoan)}</span>
+                <span className='font-mono'>{formatCurrency(activeScenario.studentLoan)}</span>
               </div>
             )}
             <div className='flex justify-between border-white/5 border-t pt-2'>
