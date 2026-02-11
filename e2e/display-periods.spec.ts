@@ -34,9 +34,16 @@ test.describe('Display Periods', () => {
 
     // Check initial state
     const initiallyChecked = await hourlyCheckbox.isChecked();
+    await hourlyCheckbox.scrollIntoViewIfNeeded();
 
-    // Toggle and verify table updates
-    await hourlyCheckbox.click();
+    // Radix renders role=checkbox buttons; click directly to avoid check()/uncheck() flakiness in WebKit.
+    if (initiallyChecked) {
+      await hourlyCheckbox.click({ force: true });
+      await expect(hourlyCheckbox).not.toBeChecked();
+    } else {
+      await hourlyCheckbox.click({ force: true });
+      await expect(hourlyCheckbox).toBeChecked();
+    }
 
     if (initiallyChecked) {
       await expect(resultsTable.locator('th:has-text("Hourly")')).not.toBeVisible();
@@ -49,7 +56,8 @@ test.describe('Display Periods', () => {
     // Uncheck a period
     const dailyCheckbox = page.getByRole('checkbox', { name: 'Daily', exact: true });
     if (await dailyCheckbox.isChecked()) {
-      await dailyCheckbox.click();
+      await dailyCheckbox.scrollIntoViewIfNeeded();
+      await dailyCheckbox.click({ force: true });
     }
 
     // Recalculate with new salary

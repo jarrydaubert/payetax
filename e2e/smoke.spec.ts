@@ -59,15 +59,18 @@ test.describe('Smoke Tests', () => {
     await page.goto('/');
 
     // Navigate to Blog
-    await page
-      .locator('nav a')
-      .filter({ hasText: /blog|taxinsights/i })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/blog/);
+    const blogNavLink = page
+      .locator('nav[aria-label="Main navigation"] a[href="/blog"]:visible')
+      .first();
+    await expect(blogNavLink).toBeVisible();
+    await blogNavLink.click();
+    await expect(page).toHaveURL(/\/blog(?:$|[?#])/);
 
     // Navigate back home via logo
-    await page.locator('a[href="/"]').first().click();
+    await page
+      .getByRole('link', { name: /payetax/i })
+      .first()
+      .click();
     await expect(page.locator('h1')).toBeVisible();
 
     // Ensure primary CTA still navigates to the calculator.

@@ -34,6 +34,7 @@
  */
 
 import { describe, expect, it } from '@jest/globals';
+import { TAX_RATES } from '@/constants/taxRates';
 // Validation
 import { validateInput } from '@/lib/validation/directorValidation';
 import { calculateCorporationTax } from '../corporationTax';
@@ -3055,394 +3056,54 @@ describe('RUTHLESS: Display Rounding Sanity', () => {
 });
 
 // =============================================================================
-// OFFICIAL HMRC CA44 TEST CASES (2025-26)
+// HMRC CA44 REFERENCE CHECKS (2025-26)
 // =============================================================================
 // Source: CA44 HMRC 04/25 - "National Insurance for company directors"
-// These are OFFICIAL worked examples from HMRC guidance
-// Our calculator MUST match these exactly for NI calculations
+// These tests are intentionally scoped to the NI behavior currently implemented.
 
-describe('HMRC CA44 Official Test Cases (2025-26)', () => {
-  /**
-   * CA44 Annual Thresholds for 2025-26:
-   * ST (Secondary Threshold):     £5,000 annual / £417 monthly
-   * LEL (Lower Earnings Limit):   £6,500 annual / £542 monthly
-   * PT (Primary Threshold):       £12,570 annual / £1,048 monthly
-   * UEL (Upper Earnings Limit):   £50,270 annual / £4,189 monthly
-   * UST (Under 21):               £50,270 annual / £4,189 monthly
-   * AUST (Apprentice <25):        £50,270 annual / £4,189 monthly
-   * VUST (Veterans):              £50,270 annual / £4,189 monthly
-   * FUST (Freeports):             £25,000 annual / £2,083 monthly
-   * IZUST (Investment Zones):     £25,000 annual / £2,083 monthly
-   *
-   * NI Rates:
-   * Employee: 8% (PT to UEL), 2% (above UEL)
-   * Employer: 15% (above ST)
-   * Reduced (Cat B): 1.85% (PT to UEL), 2% (above UEL)
-   */
-
-  describe('Example 1: Mr Armstrong (Category A, over 21, regular salary)', () => {
-    // CA44 Page 4: Director over 21, monthly salary £1,615, 12 months
-    const _CA44_ARMSTRONG = {
-      category: 'A',
-      monthlyPay: 1615,
-      annualEarnings: 19380, // 12 × £1,615
-      expectedEmployeeNI: 544.8, // (£19,380 - £12,570) × 8%
-      expectedEmployerNI: 2157.0, // (£19,380 - £5,000) × 15%
-    };
-
-    it('should calculate employee NI as £544.80 on £19,380 annual earnings', () => {
-      // Calculation: (£19,380 - £12,570) × 8% = £6,810 × 0.08 = £544.80
-      // expect(calculateDirectorEmployeeNI(CA44_ARMSTRONG.annualEarnings)).toBe(544.80);
-    });
-
-    it('should calculate employer NI as £2,157.00 on £19,380 annual earnings', () => {
-      // Calculation: (£19,380 - £5,000) × 15% = £14,380 × 0.15 = £2,157.00
-      // expect(calculateDirectorEmployerNI(CA44_ARMSTRONG.annualEarnings)).toBe(2157.00);
-    });
-
-    it('should use annual method even with monthly payments', () => {
-      // Directors use annual earnings period, not per-pay-period
-      // Monthly payments don't affect threshold usage
-      // expect(getDirectorEarningsPeriod()).toBe('annual');
-    });
+describe('HMRC CA44 reference checks (2025-26)', () => {
+  it('matches CA44 Example 1 (Armstrong): £19,380 annual earnings, category A', () => {
+    const annualEarnings = 19380;
+    expect(calculateEmployeeNI(annualEarnings, TAX_YEAR).employeeNI).toBeCloseTo(544.8, 2);
+    expect(calculateEmployerNI(annualEarnings, TAX_YEAR).employerNI).toBeCloseTo(2157, 2);
   });
 
-  describe('Example 2: Mr Taylor (Category M, under 21, regular salary)', () => {
-    // CA44 Page 5: Director under 21, monthly salary £1,615, 12 months
-    const _CA44_TAYLOR = {
-      category: 'M',
-      monthlyPay: 1615,
-      annualEarnings: 19380,
-      expectedEmployeeNI: 544.8, // Same as Cat A (employee NI unchanged)
-      expectedEmployerNI: 0.0, // 0% rate up to UST (£50,270)
-    };
-
-    it('should calculate employee NI as £544.80 (same as Category A)', () => {
-      // Under-21 ONLY affects employer NI, not employee NI
-      // expect(calculateDirectorEmployeeNI(CA44_TAYLOR.annualEarnings, 'M')).toBe(544.80);
-    });
-
-    it('should calculate employer NI as £0.00 (0% up to UST £50,270)', () => {
-      // Category M: 0% employer NI between ST and UST
-      // £19,380 < £50,270 (UST), so £0 employer NI
-      // expect(calculateDirectorEmployerNI(CA44_TAYLOR.annualEarnings, 'M')).toBe(0.00);
-    });
-
-    it('should apply 15% employer NI only above UST for under-21s', () => {
-      // If earnings exceeded £50,270, employer NI would apply on excess
-      const _earningsAboveUST = 60000;
-      // Employer NI = (£60,000 - £50,270) × 15% = £1,459.50
-      // expect(calculateDirectorEmployerNI(earningsAboveUST, 'M')).toBe(1459.50);
-    });
+  it('matches CA44 Example 3 (Morris): salary plus bonus = £23,920 annual earnings', () => {
+    const annualEarnings = 23920;
+    expect(calculateEmployeeNI(annualEarnings, TAX_YEAR).employeeNI).toBeCloseTo(908, 2);
+    expect(calculateEmployerNI(annualEarnings, TAX_YEAR).employerNI).toBeCloseTo(2838, 2);
   });
 
-  describe('Example 3: Mr Morris (Category A, over 21, with bonus)', () => {
-    // CA44 Page 6: Director over 21, £1,160/month + £10,000 bonus in June
-    const _CA44_MORRIS = {
-      category: 'A',
-      monthlySalary: 1160,
-      bonus: 10000,
-      annualEarnings: 23920, // (12 × £1,160) + £10,000
-      expectedEmployeeNI: 908.0, // (£23,920 - £12,570) × 8%
-      expectedEmployerNI: 2838.0, // (£23,920 - £5,000) × 15%
-    };
-
-    it('should calculate employee NI as £908.00 on £23,920 annual earnings', () => {
-      // Calculation: (£23,920 - £12,570) × 8% = £11,350 × 0.08 = £908.00
-      // expect(calculateDirectorEmployeeNI(CA44_MORRIS.annualEarnings)).toBe(908.00);
-    });
-
-    it('should calculate employer NI as £2,838.00 on £23,920 annual earnings', () => {
-      // Calculation: (£23,920 - £5,000) × 15% = £18,920 × 0.15 = £2,838.00
-      // expect(calculateDirectorEmployerNI(CA44_MORRIS.annualEarnings)).toBe(2838.00);
-    });
-
-    it('should include bonus in annual earnings for cumulative calculation', () => {
-      // Bonus is part of total annual earnings, not separate
-      const _annualSalary = 1160 * 12;
-      const _bonus = 10000;
-      // expect(annualSalary + bonus).toBe(23920);
-    });
+  it('matches recruiter case annual-method NI after April 2025 threshold change', () => {
+    const salary = 5845;
+    expect(calculateEmployerNI(salary, '2024-2025').employerNI).toBe(0);
+    expect(calculateEmployerNI(salary, TAX_YEAR).employerNI).toBeCloseTo(126.75, 2);
   });
 
-  describe('Example 4: Mr Johnson (Category F, Freeport, age 26, with bonus)', () => {
-    // CA44 Page 7: Freeport director, £2,000/month + £10,000 bonus
-    const _CA44_JOHNSON = {
-      category: 'F',
-      monthlySalary: 2000,
-      bonus: 10000,
-      annualEarnings: 34000, // (12 × £2,000) + £10,000
-      expectedEmployeeNI: 1714.4, // (£34,000 - £12,570) × 8%
-      expectedEmployerNI: 1350.0, // (£34,000 - £25,000) × 15% (FUST = £25,000)
-    };
-
-    it('should calculate employee NI as £1,714.40 on £34,000 annual earnings', () => {
-      // Calculation: (£34,000 - £12,570) × 8% = £21,430 × 0.08 = £1,714.40
-      // expect(calculateDirectorEmployeeNI(CA44_JOHNSON.annualEarnings, 'F')).toBe(1714.40);
-    });
-
-    it('should calculate employer NI as £1,350.00 (0% up to FUST £25,000)', () => {
-      // Category F: 0% employer NI between ST and FUST
-      // Calculation: (£34,000 - £25,000) × 15% = £9,000 × 0.15 = £1,350.00
-      // expect(calculateDirectorEmployerNI(CA44_JOHNSON.annualEarnings, 'F')).toBe(1350.00);
-    });
-
-    it('should use FUST threshold (£25,000) not UST (£50,270) for Freeport', () => {
-      // Freeport Upper Secondary Threshold is lower than standard UST
-      // expect(getThreshold('FUST')).toBe(25000);
-      // expect(getThreshold('UST')).toBe(50270);
-    });
-
-    it('should allow negative employer NI adjustment in final month (CA44 shows -£137.55)', () => {
-      // When using alternative method, year-end reconciliation can result in refund
-      // CA44 shows "Employer NICs this pay period: -£137.55"
-      // This is valid - overpaid NI gets credited back
-      // expect(reconcileDirectorNI).toBeDefined();
-    });
+  it('uses CA44 2025-26 NI thresholds in taxRates source of truth', () => {
+    const rates = TAX_RATES[TAX_YEAR].nationalInsurance;
+    expect(rates.employer.A.secondary.threshold).toBe(5000); // ST
+    expect(rates.lowerEarningsLimit).toBe(6500); // LEL
+    expect(rates.employee.A.primary.threshold).toBe(12570); // PT
+    expect(rates.employee.A.upper.threshold).toBe(50270); // UEL
+    expect(rates.employer.M.secondary.threshold).toBe(50270); // UST
+    expect(rates.employer.H.secondary.threshold).toBe(50270); // AUST
+    expect(getEmployerNIThreshold(TAX_YEAR)).toBe(5000);
   });
 
-  describe('Example 5: Mr Williams (Category M→A transition at age 21)', () => {
-    // CA44 Page 21: Director turns 21 mid-year
-    const _CA44_WILLIAMS = {
-      totalEarnings: 21700,
-      earningsBeforeAge21: 12000, // Category M
-      earningsAfterAge21: 9700, // Category A
-      expectedEmployeeNI: 730.4, // Only on Cat A portion above PT
-      expectedEmployerNI: 1455.0, // 15% on Cat A portion above ST
-    };
-
-    it('should calculate employee NI as £730.40 when turning 21 mid-year', () => {
-      // Priority: Category M earnings (£12,000) first, then Category A (£9,700)
-      // Cat M fills: ST (£5,000) + LEL gap (£1,500) + PT gap (£5,500) = £12,000 ✓
-      // Cat A: £570 in PT gap (no EE NI) + £9,130 above PT @ 8% = £730.40
-      // expect(calculateDirectorEmployeeNI_CategoryChange(CA44_WILLIAMS)).toBe(730.40);
-    });
-
-    it('should calculate employer NI as £1,455.00 when turning 21 mid-year', () => {
-      // Cat M: 0% on all £12,000 (below UST)
-      // Cat A: £570 gap to PT @ 15% = £85.50, £9,130 above PT @ 15% = £1,369.50
-      // Total: £85.50 + £1,369.50 = £1,455.00
-      // expect(calculateDirectorEmployerNI_CategoryChange(CA44_WILLIAMS)).toBe(1455.00);
-    });
-
-    it('should prioritize Category M earnings first when categories change', () => {
-      // HMRC rule: Reduced-rate categories get priority
-      // Order: B/E/I first, then A/M/F/N/V/H
-      // expect(getCategoryPriority('M')).toBeLessThan(getCategoryPriority('A'));
-    });
+  it('keeps annual NI equivalent regardless of monthly payment pattern', () => {
+    const annualEarnings = 1615 * 12;
+    const monthlySlice = 1615;
+    const annualViaMonthly = monthlySlice * 12;
+    expect(annualViaMonthly).toBe(annualEarnings);
+    expect(calculateEmployeeNI(annualViaMonthly, TAX_YEAR).employeeNI).toBeCloseTo(544.8, 2);
+    expect(calculateEmployerNI(annualViaMonthly, TAX_YEAR).employerNI).toBeCloseTo(2157, 2);
   });
 
-  describe('Example 6: Mr Roberts (Category A→C at State Pension age)', () => {
-    // CA44 Page 22: Director reaches State Pension age mid-year
-    const _CA44_ROBERTS = {
-      totalEarnings: 30000,
-      earningsBeforeSPA: 12000, // Category A
-      earningsAfterSPA: 18000, // Category C
-      expectedEmployeeNI: 0.0, // Cat A portion below PT, Cat C = 0%
-      expectedEmployerNI: 3750.0, // 15% on all earnings above ST
-    };
-
-    it('should calculate employee NI as £0.00 at State Pension age', () => {
-      // Cat A: £12,000 (below PT £12,570) = £0
-      // Cat C: 0% employee rate (over State Pension age)
-      // expect(calculateDirectorEmployeeNI_SPA(CA44_ROBERTS)).toBe(0.00);
-    });
-
-    it('should calculate employer NI as £3,750.00 (employer NI continues post-SPA)', () => {
-      // Employer NI still due even after State Pension age
-      // Cat A: (£12,000 - £5,000) × 15% = £1,050
-      // Cat C: (£18,000 - £0 since ST used) remaining @ 15%
-      // But CA44 shows: Cat A = £1,050, Cat C = £2,700, Total = £3,750
-      // expect(calculateDirectorEmployerNI_SPA(CA44_ROBERTS)).toBe(3750.00);
-    });
-
-    it('should continue employer NI at 15% after State Pension age', () => {
-      // Employee NI stops, employer NI continues
-      // expect(getEmployerNIRate('C')).toBe(15);
-      // expect(getEmployeeNIRate('C')).toBe(0);
-    });
-  });
-
-  describe('Example 7: Mrs Brown (Category B→A, reduced rate revoked)', () => {
-    // CA44 Page 23: Married woman revokes reduced rate election mid-year
-    const _CA44_BROWN = {
-      totalEarnings: 58270, // £50,270 + £8,000
-      earningsBeforeRevoke: 50270, // Category B (reduced rate)
-      earningsAfterRevoke: 8000, // Category A (standard rate)
-      expectedEmployeeNI: 857.45, // £697.45 (Cat B) + £160.00 (Cat A)
-      expectedEmployerNI: 7990.5, // £6,790.50 (Cat B) + £1,200.00 (Cat A)
-    };
-
-    it('should calculate employee NI as £857.45 with reduced rate revocation', () => {
-      // Cat B: (£50,270 - £12,570) × 1.85% = £37,700 × 0.0185 = £697.45
-      // Cat A: £8,000 above UEL × 2% = £160.00
-      // Total: £697.45 + £160.00 = £857.45
-      // expect(calculateDirectorEmployeeNI_RevokedReduced(CA44_BROWN)).toBeCloseTo(857.45, 2);
-    });
-
-    it('should calculate employer NI as £7,990.50 with reduced rate revocation', () => {
-      // Cat B: (£50,270 - £5,000) × 15% = £45,270 × 0.15 = £6,790.50
-      // Cat A: £8,000 × 15% = £1,200.00
-      // Total: £6,790.50 + £1,200.00 = £7,990.50
-      // expect(calculateDirectorEmployerNI_RevokedReduced(CA44_BROWN)).toBeCloseTo(7990.50, 2);
-    });
-
-    it('should apply reduced rate (1.85%) on earnings up to UEL', () => {
-      // Category B/E: 1.85% employee rate (reduced), 2% above UEL (same as standard)
-      // expect(getEmployeeNIRate('B', 'belowUEL')).toBe(1.85);
-      // expect(getEmployeeNIRate('B', 'aboveUEL')).toBe(2);
-    });
-  });
-
-  describe('Example 8: Mrs Cross (Category B→A, divorce)', () => {
-    // CA44 Page 24: Marriage ends in divorce, reduced rate lost
-    const _CA44_CROSS = {
-      totalEarnings: 30000,
-      earningsBeforeDivorce: 10000, // Category B
-      earningsAfterDivorce: 20000, // Category A
-      expectedEmployeeNI: 1394.4, // Only Cat A portion above PT
-      expectedEmployerNI: 3750.0, // 15% on all above ST
-    };
-
-    it('should calculate employee NI as £1,394.40 after divorce', () => {
-      // Cat B: £10,000 (below PT £12,570) = £0
-      // Cat A: (£12,570 + £20,000 - £12,570) above PT × 8%
-      // Actually: £2,570 fills PT gap + £17,430 above PT
-      // £17,430 × 8% = £1,394.40
-      // expect(calculateDirectorEmployeeNI_Divorce(CA44_CROSS)).toBeCloseTo(1394.40, 2);
-    });
-
-    it('should calculate employer NI as £3,750.00 after divorce', () => {
-      // Cat B: (£10,000 - £5,000) × 15% = £750.00
-      // Cat A: (£20,000 - remaining ST gap) × 15%
-      // £2,570 + £17,430 = £20,000 total Cat A
-      // Employer: £20,000 × 15% = £3,000.00
-      // Total: £750 + £3,000 = £3,750.00
-      // expect(calculateDirectorEmployerNI_Divorce(CA44_CROSS)).toBe(3750.00);
-    });
-  });
-
-  describe('CA44 Threshold Verification', () => {
-    // Verify all thresholds match CA44 exactly
-
-    it('should use ST (Secondary Threshold) = £5,000 annual', () => {
-      // expect(getNIThreshold('ST', 'annual')).toBe(5000);
-      // expect(getNIThreshold('ST', 'monthly')).toBe(417);
-    });
-
-    it('should use LEL (Lower Earnings Limit) = £6,500 annual', () => {
-      // expect(getNIThreshold('LEL', 'annual')).toBe(6500);
-      // expect(getNIThreshold('LEL', 'monthly')).toBe(542);
-      // expect(getNIThreshold('LEL', 'weekly')).toBe(125);
-    });
-
-    it('should use PT (Primary Threshold) = £12,570 annual', () => {
-      // expect(getNIThreshold('PT', 'annual')).toBe(12570);
-      // expect(getNIThreshold('PT', 'monthly')).toBe(1048);
-    });
-
-    it('should use UEL/UST/AUST/VUST = £50,270 annual', () => {
-      // expect(getNIThreshold('UEL', 'annual')).toBe(50270);
-      // expect(getNIThreshold('UST', 'annual')).toBe(50270);
-      // expect(getNIThreshold('AUST', 'annual')).toBe(50270);
-      // expect(getNIThreshold('VUST', 'annual')).toBe(50270);
-      // expect(getNIThreshold('UEL', 'monthly')).toBe(4189);
-      // expect(getNIThreshold('UEL', 'weekly')).toBe(967);
-    });
-
-    it('should use FUST/IZUST = £25,000 annual', () => {
-      // expect(getNIThreshold('FUST', 'annual')).toBe(25000);
-      // expect(getNIThreshold('IZUST', 'annual')).toBe(25000);
-      // expect(getNIThreshold('FUST', 'monthly')).toBe(2083);
-      // expect(getNIThreshold('FUST', 'weekly')).toBe(481);
-    });
-
-    it('should use Employment Allowance = £10,500 from April 2025', () => {
-      // CA44 Section 2.2: "from 6 April 2025 the rate is £10,500"
-      // expect(getEmploymentAllowance('2025-26')).toBe(10500);
-    });
-
-    it('should note EA £100k restriction removed from April 2025', () => {
-      // CA44: "This will not apply from 6 April 2025 onwards"
-      // expect(getEAEligibilityRules('2025-26').maxNILiabilityLimit).toBeNull();
-    });
-  });
-
-  describe('CA44 Director Calculation Rules', () => {
-    // Verify calculation methods match CA44
-
-    it('should use annual earnings period for directors (not per-pay-period)', () => {
-      // CA44 Section 21: "Even if directors are paid weekly or monthly,
-      // their earnings period is either: annual, pro rata annual"
-      // expect(getDirectorEarningsPeriod()).toBe('annual');
-    });
-
-    it('should use pro-rata annual for mid-year appointments', () => {
-      // CA44 Section 23: "Directors first appointed during the tax year
-      // have a pro rata annual earnings period"
-      // expect(getDirectorEarningsPeriod({ appointedMidYear: true })).toBe('pro-rata-annual');
-    });
-
-    it('should calculate pro-rata thresholds correctly (round up)', () => {
-      // CA44 Section 25: "round up to the next whole pound"
-      // For 26-week appointment:
-      // Pro-rata PT = (12570 / 52) × 26 = 6285 (rounded up)
-      // expect(getProRataThreshold('PT', 26)).toBe(6285);
-    });
-
-    it('should support exact percentage method', () => {
-      // CA44 Section 40: Multiply earnings × rate, round to nearest penny
-      // expect(calculateNI_ExactPercentage).toBeDefined();
-    });
-
-    it('should support adapted tables method', () => {
-      // CA44 Section 41-44: Can adapt weekly/monthly tables
-      // Divide total by 12 (monthly) or 52 (weekly), multiply result by same
-      // expect(calculateNI_AdaptedTables).toBeDefined();
-    });
-  });
-
-  describe('CA44 NI Category Letters', () => {
-    // Verify all category letters mentioned in CA44
-
-    it('should support Category A (standard rate, over 21)', () => {
-      // expect(getNICategory('A').employeeRate).toBe(8);
-      // expect(getNICategory('A').employerRate).toBe(15);
-    });
-
-    it('should support Category B (reduced rate, married women/widows)', () => {
-      // expect(getNICategory('B').employeeRate).toBe(1.85);
-      // expect(getNICategory('B').employerRate).toBe(15);
-    });
-
-    it('should support Category C (over State Pension age)', () => {
-      // expect(getNICategory('C').employeeRate).toBe(0);
-      // expect(getNICategory('C').employerRate).toBe(15);
-    });
-
-    it('should support Category M (under 21)', () => {
-      // expect(getNICategory('M').employeeRate).toBe(8);
-      // expect(getNICategory('M').employerThreshold).toBe(50270); // UST
-    });
-
-    it('should support Category H (apprentice under 25)', () => {
-      // expect(getNICategory('H').employeeRate).toBe(8);
-      // expect(getNICategory('H').employerThreshold).toBe(50270); // AUST
-    });
-
-    it('should support Category F (Freeports)', () => {
-      // expect(getNICategory('F').employeeRate).toBe(8);
-      // expect(getNICategory('F').employerThreshold).toBe(25000); // FUST
-    });
-
-    it('should support Category V (Armed Forces Veterans)', () => {
-      // expect(getNICategory('V').employeeRate).toBe(8);
-      // expect(getNICategory('V').employerThreshold).toBe(50270); // VUST
-    });
-
-    it('should support Category I/N (Investment Zones)', () => {
-      // expect(getNICategory('I').employerThreshold).toBe(25000); // IZUST
-      // expect(getNICategory('N').employerThreshold).toBe(25000); // IZUST
-    });
-  });
+  it.todo(
+    'adds executable CA44 parity tests for category transitions (M→A, A→C, B→A) once category-aware NI calculators are implemented',
+  );
+  it.todo(
+    'adds executable CA44 parity tests for Freeport/Investment Zone categories (F/I/N/V) once those NI categories are implemented',
+  );
 });

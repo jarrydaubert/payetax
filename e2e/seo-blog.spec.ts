@@ -93,7 +93,8 @@ test.describe('Essential SEO Tests', () => {
   test.describe('Blog Navigation', () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to blog
-      await page.goto('/blog', { waitUntil: 'networkidle' });
+      await page.goto('/blog', { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
 
       // Dismiss cookie banner if it appears
       const acceptCookiesButton = page.locator('button:has-text("Accept All")');

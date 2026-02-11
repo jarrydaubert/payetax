@@ -174,18 +174,36 @@ export function StrategyComparisonTable() {
       </div>
 
       {/* Your Setup Card (4th card) */}
-      {comparison.strategies.yourSetup && (
-        <YourSetupCard yourSetup={comparison.strategies.yourSetup} />
-      )}
+      <YourSetupCard yourSetup={comparison.strategies.yourSetup} />
     </div>
   );
 }
 
 interface YourSetupCardProps {
-  yourSetup: YourSetupResult;
+  yourSetup?: YourSetupResult;
 }
 
 function YourSetupCard({ yourSetup }: YourSetupCardProps) {
+  if (!yourSetup) {
+    return (
+      <div className='relative mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4'>
+        <div className='mb-3 flex items-center gap-2'>
+          <div className='flex size-8 items-center justify-center rounded-lg bg-amber-500/20'>
+            <User className='size-4 text-amber-400' />
+          </div>
+          <div>
+            <h4 className='font-medium text-slate-100'>Your Setup</h4>
+            <p className='text-slate-500 text-xs'>Your current arrangement</p>
+          </div>
+        </div>
+        <div className='rounded-lg bg-black/20 p-3 text-slate-300 text-sm'>
+          <span className='font-medium text-slate-100'>Not set.</span> Add your salary and dividends
+          in Full Inputs to compare your current setup against the baseline mix.
+        </div>
+      </div>
+    );
+  }
+
   const totalTax = yourSetup.totalPersonalTax + yourSetup.corporationTax + yourSetup.employerNI;
   const delta = yourSetup.deltaVsOptimal;
   const isNearBaseline = Math.abs(delta) < 10;

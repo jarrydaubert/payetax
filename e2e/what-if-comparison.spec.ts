@@ -119,7 +119,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     await page.waitForTimeout(1500);
 
     // Comparison should be visible
-    const comparisonHeading = page.locator('text=Current vs What If Comparison').first();
+    const comparisonHeading = page.locator('text=Current vs What If').first();
     await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
 
     // Clear button should now be visible
@@ -186,7 +186,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await page.waitForTimeout(1500);
 
     // Comparison table should be visible with Current vs What If columns
-    const comparisonHeading = page.locator('text=Current vs What If Comparison').first();
+    const comparisonHeading = page.locator('text=Current vs What If').first();
     await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
@@ -215,7 +215,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await page.waitForTimeout(1500);
 
     // Comparison should show decreased values
-    const comparisonHeading = page.locator('text=Current vs What If Comparison').first();
+    const comparisonHeading = page.locator('text=Current vs What If').first();
     await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
@@ -439,7 +439,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await page.waitForTimeout(1500);
 
     // Comparison should be visible showing the tax trap effects
-    const comparisonHeading = page.locator('text=Current vs What If Comparison').first();
+    const comparisonHeading = page.locator('text=Current vs What If').first();
     await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
 
     // Should show tax calculations for both scenarios

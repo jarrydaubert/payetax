@@ -245,6 +245,18 @@ describe('Director Guide calculator components', () => {
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
     });
 
+    it('shows Your Setup empty state when no setup values are provided', () => {
+      setStoreState({ strategyComparison: createComparison() as never });
+
+      render(<StrategyComparisonTable />);
+
+      expect(screen.getByText('Your Setup')).toBeInTheDocument();
+      expect(screen.getByText(/Not set\./i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Add your salary and dividends in Full Inputs to compare/i),
+      ).toBeInTheDocument();
+    });
+
     it('tracks pro strategy selection when a card is clicked', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 

@@ -182,7 +182,7 @@ describe('ComparisonInputs', () => {
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/positive/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/at least £1/i);
     });
 
     it('should validate total range', async () => {
@@ -197,7 +197,7 @@ describe('ComparisonInputs', () => {
       const button = screen.getByRole('button', { name: /compare/i });
       await user.click(button);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(/positive/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/at least £1/i);
     });
 
     it('should accept valid percentage', async () => {

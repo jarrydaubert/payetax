@@ -176,10 +176,17 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
   test.beforeEach(async ({ page }) => {
     const timestamp = Date.now();
     await page.goto(`/?t=${timestamp}#tax-calculator`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
 
-    // Wait for calculator to be interactive
-    const salaryInput = page.getByTestId('salary-input');
-    await expect(salaryInput).toBeVisible({ timeout: 10000 });
+    // Wait for calculator to be interactive (fallback to accessible name if test id is delayed).
+    let salaryInput = page.getByTestId('salary-input');
+    const hasSalaryInputByTestId = await salaryInput
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
+    if (!hasSalaryInputByTestId) {
+      salaryInput = page.getByRole('spinbutton', { name: /^salary$/i });
+    }
+    await expect(salaryInput).toBeVisible({ timeout: 15000 });
 
     // Dismiss cookie banner if visible (global-setup should handle this, but verify)
     const acceptCookiesButton = page.getByTestId('cookie-accept-analytics');

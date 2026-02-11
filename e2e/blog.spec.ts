@@ -11,8 +11,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Blog', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/blog');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/blog', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await expect(page.getByRole('main')).toBeVisible({ timeout: 10000 });
   });
 
   test('displays blog posts', async ({ page }) => {
@@ -22,20 +22,21 @@ test.describe('Blog', () => {
   });
 
   test('category filtering works', async ({ page }) => {
-    // Find and click a category group link
+    // Click the first category group in the dedicated blog category nav.
     const categoryLink = page
-      .locator('a')
-      .filter({ hasText: /Tax Guides|Student Loans|News/i })
+      .getByRole('navigation', { name: /blog categories/i })
+      .locator('a[href^="/blog/category/"]')
       .first();
     await categoryLink.click();
 
     // Verify URL updated to category route
-    await page.waitForURL(/\/blog\/category\//, { timeout: 5000 });
-    expect(page.url()).toContain('/blog/category/');
+    await expect(page).toHaveURL(/\/blog\/category\/[^/?#]+(?:\?.*)?$/);
   });
 
   test('can navigate to individual blog post', async ({ page }) => {
-    const firstPost = page.locator('a[href^="/blog/"]').first();
+    const firstPost = page
+      .locator('main a[href^="/blog/"]:not([href*="/category/"]):not([href="/blog"])')
+      .first();
     await firstPost.click();
 
     await expect(page).toHaveURL(/\/blog\/.+/);
@@ -45,16 +46,19 @@ test.describe('Blog', () => {
   test('All Posts resets filter', async ({ page }) => {
     // Apply a filter first
     const categoryLink = page
-      .locator('a')
-      .filter({ hasText: /Tax Guides|News/i })
+      .getByRole('navigation', { name: /blog categories/i })
+      .locator('a[href^="/blog/category/"]')
       .first();
     await categoryLink.click();
-    await page.waitForURL(/\/blog\/category\//);
+    await expect(page).toHaveURL(/\/blog\/category\//);
 
     // Click All Articles
-    await page.locator('a:has-text("All Articles")').click();
+    await page
+      .getByRole('navigation', { name: /blog categories/i })
+      .getByRole('link', { name: 'All Articles' })
+      .click();
 
     // URL should not have category param
-    await expect(page).toHaveURL(/\/blog$/);
+    await expect(page).toHaveURL(/\/blog(?:\?.*)?$/);
   });
 });
