@@ -120,6 +120,7 @@ export function NavbarMobileMenu({
             className={cn(
               'fixed right-0 left-0 z-50 md:hidden',
               LAYOUT.BELOW_NAVBAR,
+              'top-[calc(4rem+var(--pwa-safe-area-top,0px))]',
               'mobile-menu-blur px-4 py-6',
             )}
             aria-label='Mobile navigation menu'

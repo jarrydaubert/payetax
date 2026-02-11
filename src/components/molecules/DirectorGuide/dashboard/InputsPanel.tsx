@@ -39,7 +39,8 @@ if (!rates) {
 // Shared input styling
 const INPUT_CLASS =
   'border-white/[0.08] bg-slate-800 font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500';
-const SECTION_HEADING_CLASS = 'mb-3 font-semibold text-slate-500 text-xs uppercase tracking-wider';
+const SECTION_HEADING_CLASS =
+  'mb-4 font-semibold text-slate-500 text-xs uppercase tracking-[0.08em]';
 
 const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
 
@@ -167,7 +168,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   };
 
   return (
-    <aside className={cn('flex h-full flex-col bg-slate-900 p-5', className)}>
+    <aside className={cn('flex h-full flex-col bg-slate-900 px-5 py-6', className)}>
       {/* Section: Mode */}
       <Section title='Mode'>
         <fieldset aria-labelledby={ids.mode}>
@@ -833,10 +834,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className='mb-5'>
+    <section className='mb-6 rounded-xl border border-white/[0.05] bg-slate-950/45 p-4'>
       <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
       <div className='space-y-4'>{children}</div>
-    </div>
+    </section>
   );
 }
 
@@ -856,16 +857,16 @@ function Field({
   const hintId = hint ? getHintId(id) : undefined;
 
   return (
-    <div className='space-y-1.5'>
+    <div className='space-y-2'>
       <div className='flex items-center gap-2'>
-        <Label htmlFor={id} className='text-slate-400 text-sm'>
+        <Label htmlFor={id} className='text-slate-400 text-sm leading-none'>
           {label}
         </Label>
         {tooltipFieldName && <LabelTooltip fieldName={tooltipFieldName} />}
       </div>
       {children}
       {hint && (
-        <p id={hintId} className='text-slate-600 text-xs'>
+        <p id={hintId} className='text-slate-600 text-xs leading-relaxed'>
           {hint}
         </p>
       )}

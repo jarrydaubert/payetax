@@ -287,10 +287,10 @@ describe('SimpleNavbar Component', () => {
     });
 
     it('should render navbar spacer', () => {
-      const { container } = render(<SimpleNavbar />);
+      render(<SimpleNavbar />);
 
       // Fixed navbar needs a spacer div
-      const spacer = container.querySelector('.h-16');
+      const spacer = screen.getByTestId('navbar-spacer');
       expect(spacer).toBeInTheDocument();
     });
   });

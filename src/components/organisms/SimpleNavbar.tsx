@@ -144,6 +144,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'bg-deep/80 backdrop-blur-[20px]',
           className,
         )}
+        style={{ top: 'var(--pwa-safe-area-top, 0px)' }}
         aria-label='Main navigation'
       >
         {/* Logo - Home button */}
@@ -225,7 +226,10 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       />
 
       {/* Spacer for fixed navbar */}
-      <div className='h-16 sm:h-20' />
+      <div
+        className='h-[calc(4rem+var(--pwa-safe-area-top,0px))] sm:h-20'
+        data-testid='navbar-spacer'
+      />
     </>
   );
 };
