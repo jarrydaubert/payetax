@@ -9,6 +9,7 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
+import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
@@ -20,6 +21,8 @@ export function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+const BASE_URL = resolveNewsletterBaseUrl();
 
 function normalizeTaxYear(taxYear?: string): TaxYear {
   if (!taxYear) return '2025-2026';
@@ -143,7 +146,7 @@ Not financial or tax advice.
 Consult a qualified accountant for advice specific to your situation.
 Based on HMRC rates for ${year} which may change.
 
-Recalculate: https://payetax.co.uk/tools/director-guide
+Recalculate: ${BASE_URL}/tools/director-guide
 `.trim();
 }
 
@@ -176,18 +179,23 @@ export function generateDirectorEmailHtml(args: {
   <title>Director Strategy Report - PayeTax</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc;">
+  <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent; font-size: 1px; line-height: 1px;">
+    Director strategy summary: ${safeStrategyName} with estimated take-home ${formatCurrency(strategy.takeHome)} per year.
+    ${'&nbsp;'.repeat(40)}
+  </div>
+
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <h1 style="margin: 0; font-size: 24px; color: #020617;">
-        <span style="color: #020617;">paye</span><span style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">tax</span>
+      <h1 style="margin: 0; font-size: 24px;">
+        <span style="color: #020617;">paye</span><span style="color: #0d9488;">tax</span>
       </h1>
       <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Director Strategy Report${safeTaxYear ? ` - ${safeTaxYear}` : ''}</p>
       <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px;">Generated: ${escapeHtml(safeGeneratedDate)}</p>
     </div>
 
     <!-- Executive Summary -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
       <h2 style="margin: 0 0 8px; font-size: 20px; color: #020617;">Scenario Summary</h2>
       <p style="margin: 0 0 24px; font-size: 28px; font-weight: 700; color: #10b981;">${safeStrategyName}</p>
 
@@ -206,13 +214,13 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Company Overview Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
       <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Company Overview</h2>
       <p style="margin: 0; color: #64748b; font-size: 14px;">Gross profit available for extraction: <strong style="color: #020617;">${formatCurrency(grossProfit)}</strong></p>
     </div>
 
     <!-- Detailed Breakdown Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
       <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Detailed Breakdown - ${safeStrategyName}</h2>
       
       <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
@@ -249,7 +257,7 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Key Dates Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
       <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Key Tax Dates</h2>
       
       <table style="width: 100%; border-collapse: collapse;">
@@ -273,7 +281,7 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Tax Thresholds Card -->
-    <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
       <h2 style="margin: 0 0 24px; font-size: 18px; color: #020617;">Tax Rates & Thresholds Used (${safeTaxYear || '2025-26'})</h2>
       
       <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -341,7 +349,7 @@ export function generateDirectorEmailHtml(args: {
 
     <!-- CTA -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://payetax.co.uk/tools/director-guide" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+      <a href="${BASE_URL}/tools/director-guide?utm_source=director_results_email&utm_medium=email&utm_campaign=director_recalculate" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #052e2b; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
         Recalculate with Different Inputs
       </a>
     </div>
@@ -354,9 +362,9 @@ export function generateDirectorEmailHtml(args: {
         <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
       </p>
       <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
-        <a href="https://payetax.co.uk" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
+        <a href="${BASE_URL}" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
         &nbsp;•&nbsp;
-        <a href="https://payetax.co.uk/privacy" style="color: #94a3b8; text-decoration: none;">Privacy</a>
+        <a href="${BASE_URL}/privacy" style="color: #94a3b8; text-decoration: none;">Privacy</a>
       </p>
     </div>
   </div>

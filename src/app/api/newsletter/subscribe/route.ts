@@ -3,6 +3,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { generateWelcomeEmailHtml, generateWelcomeEmailText } from '@/../emails/welcome';
+import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import {
   createUnsubscribeToken,
   resolveUnsubscribeSecret,
@@ -16,6 +17,7 @@ export const runtime = 'nodejs';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const audienceId = process.env.RESEND_AUDIENCE_ID;
+const BASE_URL = resolveNewsletterBaseUrl();
 
 const MAX_BODY_SIZE = 1024; // 1KB is plenty for an email subscription
 
@@ -141,7 +143,7 @@ export async function POST(request: NextRequest) {
     if (!isAlreadySubscribed) {
       // Generate unsubscribe URL with signed token
       const unsubscribeToken = createUnsubscribeToken(email, unsubscribeSecret);
-      const unsubscribeUrl = `https://payetax.co.uk/api/newsletter/unsubscribe?token=${unsubscribeToken}`;
+      const unsubscribeUrl = `${BASE_URL}/api/newsletter/unsubscribe?token=${unsubscribeToken}`;
 
       // Send welcome email with both HTML and plain-text (fire and forget)
       resend.emails
