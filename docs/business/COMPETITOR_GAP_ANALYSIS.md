@@ -90,7 +90,7 @@
 | Jargon tooltips | **UNIQUE** | - | - | - | - | - |
 | Employment Allowance toggle | Y | Y | Y | - | - | - |
 | Entry choice routing | *PLANNED* | - | - | - | - | - |
-| Calendar .ics downloads | *PLANNED* | - | - | - | - | - |
+| Calendar .ics downloads | **UNIQUE** | - | - | - | - | - |
 | Tax Bathtub visual | *PLANNED* | - | - | - | - | - |
 | Bank transfer references | *PLANNED* | - | - | - | - | - |
 

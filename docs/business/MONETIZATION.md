@@ -16,6 +16,17 @@ High‑intent traffic → calculator → paid outcome.
 
 ---
 
+## Current Status
+
+- Director Guide is live and free.
+- Referral infrastructure is partially live:
+  - `POST /api/referral/lead` is implemented.
+  - Referral CTA in main calculator UI remains intentionally disabled until partner agreements are in place.
+- Tax Pack flow is not implemented yet (no live checkout/export pipeline).
+- Newsletter lifecycle loop is live (manual broadcast script available).
+
+---
+
 ## Revenue Model (Evergreen)
 
 Define the funnel with variables and tune the leverage points:
@@ -70,6 +81,10 @@ Technical stack:
 - Temporary storage for export payloads
 - PDF/CSV/DOCX generation via client-side or edge workers (based on bundle size)
 - Email delivery via Resend
+
+Execution:
+- Source plan: `docs/business/tax-pack/TAX_PACK_PLAN.md`
+- Delivery tasks: `docs/BACKLOG.md` (Monetization -> Tax Pack V1)
 
 ---
 
