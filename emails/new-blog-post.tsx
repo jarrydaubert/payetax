@@ -1,6 +1,7 @@
 // emails/new-blog-post.tsx
 // Newsletter email template matching the calculator results email style
 
+import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import {
   createUnsubscribeToken,
   resolveUnsubscribeSecret,
@@ -10,7 +11,7 @@ import {
 // CONFIGURATION
 // ============================================================================
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://payetax.co.uk';
+const BASE_URL = resolveNewsletterBaseUrl();
 const ALLOWED_HOSTS = ['payetax.co.uk', 'www.payetax.co.uk'];
 
 // ============================================================================
@@ -170,7 +171,7 @@ export function generateNewBlogPostHtml({
       </p>
 
       <!-- CTA Button (gradient works on button backgrounds in most clients) -->
-      <a href="${trackedArticleUrl}" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;" aria-label="Read Full Article: ${safeTitle}">
+      <a href="${trackedArticleUrl}" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #052e2b; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;" aria-label="Read Full Article: ${safeTitle}">
         Read Full Article →
       </a>
     </div>

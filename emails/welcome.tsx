@@ -1,6 +1,7 @@
 // emails/welcome.tsx
 // Welcome email sent to new newsletter subscribers
 
+import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import {
   createUnsubscribeToken,
   resolveUnsubscribeSecret,
@@ -10,7 +11,7 @@ import {
 // CONFIGURATION
 // ============================================================================
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://payetax.co.uk';
+const BASE_URL = resolveNewsletterBaseUrl();
 
 // ============================================================================
 // SECURITY HELPERS
@@ -87,7 +88,7 @@ export function generateWelcomeEmailHtml(email: string): string {
       </p>
 
       <!-- CTA Button -->
-      <a href="${BASE_URL}?utm_source=newsletter&utm_medium=email&utm_campaign=welcome" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+      <a href="${BASE_URL}?utm_source=newsletter&utm_medium=email&utm_campaign=welcome" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #052e2b; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
         Calculate Your Take-Home Pay →
       </a>
     </div>

@@ -21,12 +21,20 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Resend } from 'resend';
-import { generateNewBlogPostHtml } from '../emails/new-blog-post';
+import { generateNewBlogPostHtml, generateNewBlogPostText } from '../emails/new-blog-post';
+import { shouldMarkPostAsAnnounced } from '../src/lib/newsletter/broadcastPolicy';
+import { resolveNewsletterBaseUrl } from '../src/lib/newsletter/emailConfig';
+import {
+  createUnsubscribeToken,
+  resolveUnsubscribeSecret,
+} from '../src/lib/newsletter/unsubscribeToken';
 
 // Config
 const ANNOUNCED_POSTS_FILE = join(process.cwd(), '.announced-posts.json');
 const BATCH_SIZE = 50; // Resend recommends batching
 const DELAY_BETWEEN_BATCHES_MS = 1000;
+const CONTACT_PAGE_SIZE = 100;
+const BASE_URL = resolveNewsletterBaseUrl();
 
 // Types
 interface BlogPost {
@@ -119,9 +127,27 @@ async function fetchBlogPost(slug: string): Promise<BlogPost | null> {
   };
 }
 
-// Fetch all contacts from Resend audience
-async function fetchContacts(audienceId: string): Promise<Contact[]> {
-  const response = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+function getUnsubscribeUrl(email: string): string {
+  const token = createUnsubscribeToken(email, resolveUnsubscribeSecret());
+  return `${BASE_URL}/api/newsletter/unsubscribe?token=${token}`;
+}
+
+interface ContactsPageResponse {
+  data: Contact[];
+  has_more?: boolean;
+}
+
+async function fetchContactsPage(
+  audienceId: string,
+  after?: string,
+): Promise<ContactsPageResponse> {
+  const params = new URLSearchParams();
+  params.set('limit', String(CONTACT_PAGE_SIZE));
+  if (after) params.set('after', after);
+  const query = params.toString();
+  const endpoint = `https://api.resend.com/audiences/${audienceId}/contacts${query ? `?${query}` : ''}`;
+
+  const response = await fetch(endpoint, {
     headers: {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
@@ -129,11 +155,39 @@ async function fetchContacts(audienceId: string): Promise<Contact[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch contacts: ${response.statusText}`);
+    throw new Error(`Failed to fetch contacts: ${response.status} ${response.statusText}`);
   }
 
-  const data = (await response.json()) as { data: Contact[] };
-  return data.data.filter((c) => !c.unsubscribed);
+  return (await response.json()) as ContactsPageResponse;
+}
+
+// Fetch all contacts from Resend audience (cursor pagination)
+async function fetchContacts(audienceId: string): Promise<Contact[]> {
+  const allContacts: Contact[] = [];
+  let after: string | undefined;
+
+  while (true) {
+    const page = await fetchContactsPage(audienceId, after);
+    const pageContacts = page.data || [];
+    allContacts.push(...pageContacts);
+
+    if (!page.has_more) {
+      break;
+    }
+
+    const lastContact = pageContacts.at(-1);
+    if (!lastContact?.id) {
+      throw new Error('Failed to paginate contacts: missing cursor id on last contact');
+    }
+    after = lastContact.id;
+  }
+
+  const dedupedByEmail = new Map<string, Contact>();
+  for (const contact of allContacts) {
+    dedupedByEmail.set(contact.email.toLowerCase(), contact);
+  }
+
+  return [...dedupedByEmail.values()].filter((c) => !c.unsubscribed);
 }
 
 // Send emails in batches
@@ -143,7 +197,7 @@ async function sendEmails(
   post: BlogPost,
   dryRun: boolean,
 ): Promise<{ sent: number; failed: number }> {
-  const postUrl = `https://payetax.co.uk/blog/${post.slug}`;
+  const postUrl = `${BASE_URL}/blog/${post.slug}`;
   let sent = 0;
   let failed = 0;
 
@@ -167,12 +221,26 @@ async function sendEmails(
           publishedAt: post.publishedAt,
           recipientEmail: contact.email,
         });
+        const text = generateNewBlogPostText({
+          title: post.title,
+          excerpt: post.excerpt,
+          url: postUrl,
+          category: post.category,
+          publishedAt: post.publishedAt,
+          recipientEmail: contact.email,
+        });
+        const unsubscribeUrl = getUnsubscribeUrl(contact.email);
 
         const { error } = await resend.emails.send({
           from: 'PayeTax <noreply@payetax.co.uk>',
           to: contact.email,
           subject: `New on PayeTax: ${post.title}`,
           html,
+          text,
+          headers: {
+            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
         });
 
         if (error) {
@@ -264,8 +332,15 @@ async function main() {
   console.log('📤 Sending emails...');
   const { sent, failed } = await sendEmails(resend, contacts, post, dryRun);
 
-  // Track announced post (only if not dry run and at least one sent)
-  if (!dryRun && sent > 0) {
+  const markAsAnnounced = shouldMarkPostAsAnnounced({
+    dryRun,
+    sent,
+    failed,
+    expectedRecipients: contacts.length,
+  });
+
+  // Track announced post only on complete successful broadcast
+  if (markAsAnnounced) {
     announcedPosts.posts.push(postSlug);
     announcedPosts.lastUpdated = new Date().toISOString();
     saveAnnouncedPosts(announcedPosts);
@@ -276,8 +351,12 @@ async function main() {
   console.log(`   Sent: ${sent}`);
   console.log(`   Failed: ${failed}`);
 
-  if (!dryRun && sent > 0) {
+  if (markAsAnnounced) {
     console.log(`   Post "${postSlug}" marked as announced.`);
+  } else if (!dryRun) {
+    console.log(
+      `   Post "${postSlug}" NOT marked announced (sent ${sent}/${contacts.length}, failed ${failed}).`,
+    );
   }
 }
 
