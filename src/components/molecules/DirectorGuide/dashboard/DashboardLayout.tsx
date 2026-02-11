@@ -158,7 +158,7 @@ export function DashboardLayout({
 
         {/* Inputs panel - collapsible, desktop only */}
         <div
-          className='relative shrink-0 overflow-hidden border-white/[0.04] border-r transition-[width] duration-200 ease-out max-lg:hidden'
+          className='relative shrink-0 overflow-hidden border-white/[0.04] border-r bg-slate-950 transition-[width] duration-200 ease-out max-lg:hidden'
           style={{ width: inputsCollapsed ? 0 : INPUTS_PANEL_WIDTH }}
           aria-hidden={inputsCollapsed}
           inert={inputsCollapsed ? true : undefined}
@@ -168,7 +168,10 @@ export function DashboardLayout({
               Your Numbers
             </h2>
           </div>
-          <div className='h-full overflow-y-auto pt-12' style={{ width: INPUTS_PANEL_WIDTH }}>
+          <div
+            className='h-full overflow-y-auto bg-slate-950 pt-12'
+            style={{ width: INPUTS_PANEL_WIDTH }}
+          >
             {inputs}
           </div>
           {onToggleInputs && !inputsCollapsed && (

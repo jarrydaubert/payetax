@@ -95,8 +95,8 @@ describe('LandscapePrompt', () => {
 
   it('applies custom className on wrapper', () => {
     setViewport(375, 812);
-    const { container } = render(<LandscapePrompt className='custom-class' />);
+    render(<LandscapePrompt className='custom-class' />);
 
-    expect(container.querySelector('.custom-class')).toBeInTheDocument();
+    expect(document.body.querySelector('.custom-class')).toBeInTheDocument();
   });
 });

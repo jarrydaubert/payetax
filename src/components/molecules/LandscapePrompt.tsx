@@ -23,6 +23,7 @@
 
 import { Smartphone, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS } from '@/constants/ui';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
@@ -55,6 +56,12 @@ interface LandscapePromptProps {
  */
 export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [portalMounted, setPortalMounted] = useState(false);
+
+  useEffect(() => {
+    setPortalMounted(true);
+    return () => setPortalMounted(false);
+  }, []);
 
   useEffect(() => {
     // Check if user has dismissed before (localStorage)
@@ -103,16 +110,16 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
     onDismiss?.();
   };
 
-  if (!isVisible) {
+  if (!(isVisible && portalMounted)) {
     return null;
   }
 
-  return (
+  const prompt = (
     <output
       aria-live='polite'
       aria-atomic='true'
       className={cn(
-        'fixed inset-0 z-40 flex items-center justify-center md:hidden',
+        'fixed inset-0 z-[9998] flex items-center justify-center md:hidden',
         'fade-in animate-in duration-500',
         'pointer-events-none', // Allow clicks through to content
         className,
@@ -161,4 +168,6 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
       </div>
     </output>
   );
+
+  return createPortal(prompt, document.body);
 }

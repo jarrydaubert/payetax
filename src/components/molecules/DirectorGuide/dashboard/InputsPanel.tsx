@@ -168,7 +168,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   };
 
   return (
-    <aside className={cn('flex h-full flex-col bg-slate-900 px-5 py-6', className)}>
+    <aside className={cn('flex h-full flex-col bg-slate-950 px-5 py-6', className)}>
       {/* Section: Mode */}
       <Section title='Mode'>
         <fieldset aria-labelledby={ids.mode}>
@@ -213,7 +213,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               type='button'
               onClick={() => setQuickStartMode(true)}
               className={cn(
-                'rounded-md px-3 py-2 text-sm transition-colors',
+                'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 quickStartMode
                   ? 'bg-cyan-500/20 font-medium text-cyan-300'
                   : 'text-slate-400 hover:text-slate-200',
@@ -226,7 +226,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               type='button'
               onClick={() => setQuickStartMode(false)}
               className={cn(
-                'rounded-md px-3 py-2 text-sm transition-colors',
+                'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 !quickStartMode
                   ? 'bg-cyan-500/20 font-medium text-cyan-300'
                   : 'text-slate-400 hover:text-slate-200',
@@ -488,7 +488,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <button
             type='button'
             onClick={() => setQuickStartMode(false)}
-            className='mt-3 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-cyan-300 text-xs transition-colors hover:bg-cyan-500/20'
+            className='mt-3 whitespace-nowrap rounded-md border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-cyan-300 text-xs transition-colors hover:bg-cyan-500/20'
           >
             Add More Detail
           </button>
@@ -834,7 +834,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className='mb-6 rounded-xl border border-white/[0.05] bg-slate-950/45 p-4'>
+    <section className='mb-6 rounded-xl border border-white/[0.05] bg-slate-900/40 p-4'>
       <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
       <div className='space-y-4'>{children}</div>
     </section>

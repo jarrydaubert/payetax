@@ -11,6 +11,9 @@
     return;
   }
   const isDev = false;
+  const isStandalonePwa =
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
   const log = (message, ...args) => {
     if (isDev) {
       console.log(`[PWA] ${message}`, ...args);
@@ -26,7 +29,7 @@
 
       // Handle already-waiting worker (from previous session)
       if (registration.waiting && navigator.serviceWorker.controller) {
-        showUpdateBanner();
+        handleWaitingUpdate();
       }
 
       registration.addEventListener('updatefound', handleUpdateFound);
@@ -56,9 +59,19 @@
     if (!installingWorker) return;
     installingWorker.addEventListener('statechange', () => {
       if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-        showUpdateBanner();
+        handleWaitingUpdate();
       }
     });
+  }
+
+  function handleWaitingUpdate() {
+    if (isStandalonePwa) {
+      // Installed iOS/Android PWAs should update automatically
+      // to avoid users being stuck on old UI due hidden/deferred banners.
+      triggerUpdate();
+      return;
+    }
+    showUpdateBanner();
   }
 
   function showUpdateBanner() {
