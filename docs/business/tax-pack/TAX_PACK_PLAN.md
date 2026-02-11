@@ -72,6 +72,21 @@ Use async fulfillment. Do not block webhook processing on document generation.
 6. `GET /api/tax-pack/download/[token]`
 - Validates grant and issues a fresh short-lived object storage signed URL (5-minute expiry) per request.
 
+## Implementation Decisions (V1)
+
+These decisions are fixed for V1 unless explicitly changed in this doc.
+
+- Payments: Stripe Checkout with server-owned Price ID and Stripe automatic tax enabled.
+- Webhook fulfillment: signature verification via `stripe.webhooks.constructEvent` + idempotency using persisted Stripe event IDs and unique `stripeSessionId`.
+- Relational persistence: Postgres as system of record for orders, snapshots, artifacts, grants, webhook events, and audit logs.
+- Async orchestration: Inngest worker flow with retries and dead-letter handling for bundle generation.
+- Artifact storage: private object storage (S3-compatible) with signed URLs and lifecycle policies.
+- PDF generation: HTML template rendered via Playwright.
+- DOCX generation: `docxtemplater` with versioned `.docx` templates.
+- ZIP packaging: `archiver`.
+- CSV generation: server-side deterministic writer from snapshot data.
+- Observability: Sentry for tracing/errors plus product metrics and alerting defined in this plan.
+
 ## Data Contracts
 
 - `taxPackOrder`: id, email, stripeSessionId, stripePaymentIntentId, status, createdAt, paidAt, readyAt.
