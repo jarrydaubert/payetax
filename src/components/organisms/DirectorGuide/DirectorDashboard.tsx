@@ -39,6 +39,7 @@ import {
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { resolveAnnualFinancials } from '@/lib/tax/variableIncome';
 import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
@@ -51,11 +52,13 @@ import {
 
 /** Debounce delay for auto-calculate (ms) */
 const CALCULATE_DEBOUNCE_MS = 200;
+export const DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY = 'director-guide-education-collapsed:v1';
 
 export function DirectorDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Icon menu collapsed by default
   const [inputsCollapsed, setInputsCollapsed] = useState(false); // Inputs panel expanded
-  const [educationCollapsed, setEducationCollapsed] = useState(false); // Education panel expanded
+  const [educationCollapsed, setEducationCollapsed] = useState(true); // Start collapsed to prioritize calculator workspace
+  const [hasLoadedEducationPreference, setHasLoadedEducationPreference] = useState(false);
   const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
   const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -154,6 +157,21 @@ export function DirectorDashboard() {
       hasTrackedStart.current = true;
     }
   }, []);
+
+  // Restore persisted learn-panel preference once per session.
+  useEffect(() => {
+    const persisted = safeGetItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY);
+    if (persisted === 'true' || persisted === 'false') {
+      setEducationCollapsed(persisted === 'true');
+    }
+    setHasLoadedEducationPreference(true);
+  }, []);
+
+  // Persist learn-panel preference after initial load.
+  useEffect(() => {
+    if (!hasLoadedEducationPreference) return;
+    safeSetItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, String(educationCollapsed));
+  }, [educationCollapsed, hasLoadedEducationPreference]);
 
   // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
   useEffect(() => {

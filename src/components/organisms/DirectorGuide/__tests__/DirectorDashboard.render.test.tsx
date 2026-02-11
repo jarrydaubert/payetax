@@ -1,8 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
-import { DirectorDashboard } from '../DirectorDashboard';
+import { DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, DirectorDashboard } from '../DirectorDashboard';
 
 jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackGuideReset: jest.fn(),
@@ -28,15 +28,25 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
     inputs,
     main,
     education,
+    educationCollapsed,
+    onToggleEducation,
   }: {
     sidebar: ReactNode;
     inputs: ReactNode;
     main: ReactNode;
     education: ReactNode;
+    educationCollapsed?: boolean;
+    onToggleEducation?: () => void;
   }) => (
     <div>
       {sidebar}
       {inputs}
+      <div data-testid='education-collapsed'>{String(Boolean(educationCollapsed))}</div>
+      {onToggleEducation && (
+        <button type='button' onClick={onToggleEducation}>
+          Toggle Education
+        </button>
+      )}
       {main}
       {education}
     </div>
@@ -99,6 +109,7 @@ function createComparison(grossProfit: number) {
 describe('DirectorDashboard (normal mode)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    localStorage.clear();
     const current = useDirectorGuideStore.getState();
     useDirectorGuideStore.setState({
       ...current,
@@ -184,5 +195,31 @@ describe('DirectorDashboard (normal mode)', () => {
 
     expect(trackGuideReset).toHaveBeenCalledTimes(1);
     expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
+  });
+
+  it('restores learn panel collapse preference from localStorage', async () => {
+    localStorage.setItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, 'false');
+
+    render(<DirectorDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('education-collapsed')).toHaveTextContent('false');
+    });
+  });
+
+  it('persists learn panel collapse preference when toggled', async () => {
+    localStorage.setItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, 'false');
+
+    render(<DirectorDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('education-collapsed')).toHaveTextContent('false');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle Education' }));
+
+    await waitFor(() => {
+      expect(localStorage.getItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY)).toBe('true');
+    });
   });
 });

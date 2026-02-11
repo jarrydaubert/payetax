@@ -28,7 +28,7 @@ interface DashboardLayoutProps {
   sidebar: ReactNode;
   inputs: ReactNode;
   main: ReactNode;
-  education: ReactNode;
+  education?: ReactNode;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
   onToggleInputs?: () => void;
@@ -204,7 +204,7 @@ export function DashboardLayout({
               <PanelLeftOpen className='size-4' />
             </button>
           )}
-          {educationCollapsed && onToggleEducation && (
+          {education && educationCollapsed && onToggleEducation && (
             <button
               type='button'
               onClick={onToggleEducation}
@@ -217,27 +217,29 @@ export function DashboardLayout({
           {main}
         </div>
 
-        {/* Education panel - collapsible, desktop only */}
-        <div
-          className='relative shrink-0 overflow-hidden border-white/[0.04] border-l bg-slate-900 transition-[width] duration-200 ease-out max-lg:hidden'
-          style={{ width: educationCollapsed ? 0 : EDUCATION_PANEL_WIDTH }}
-          aria-hidden={educationCollapsed}
-          inert={educationCollapsed ? true : undefined}
-        >
-          <div className='h-full overflow-y-auto' style={{ width: EDUCATION_PANEL_WIDTH }}>
-            {education}
+        {/* Education panel - optional, collapsible, desktop only */}
+        {education && (
+          <div
+            className='relative shrink-0 overflow-hidden border-white/[0.04] border-l bg-slate-900 transition-[width] duration-200 ease-out max-lg:hidden'
+            style={{ width: educationCollapsed ? 0 : EDUCATION_PANEL_WIDTH }}
+            aria-hidden={educationCollapsed}
+            inert={educationCollapsed ? true : undefined}
+          >
+            <div className='h-full overflow-y-auto' style={{ width: EDUCATION_PANEL_WIDTH }}>
+              {education}
+            </div>
+            {onToggleEducation && !educationCollapsed && (
+              <button
+                type='button'
+                onClick={onToggleEducation}
+                className='absolute top-4 left-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                aria-label='Hide learn panel'
+              >
+                <PanelRightClose className='size-4' />
+              </button>
+            )}
           </div>
-          {onToggleEducation && !educationCollapsed && (
-            <button
-              type='button'
-              onClick={onToggleEducation}
-              className='absolute top-4 left-4 z-10 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
-              aria-label='Hide learn panel'
-            >
-              <PanelRightClose className='size-4' />
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Mobile: FAB to open inputs */}
@@ -263,7 +265,7 @@ export function DashboardLayout({
       </MobileDrawer>
 
       {/* Mobile: FAB to show education */}
-      {onToggleMobileEducation && !mobileInputsOpen && !mobileEducationOpen && (
+      {education && onToggleMobileEducation && !mobileInputsOpen && !mobileEducationOpen && (
         <button
           type='button'
           onClick={handleToggleMobileEducation}
@@ -275,14 +277,16 @@ export function DashboardLayout({
       )}
 
       {/* Mobile: Education drawer */}
-      <MobileDrawer
-        isOpen={mobileEducationOpen}
-        onClose={handleToggleMobileEducation}
-        title='Learn'
-        variant='education'
-      >
-        {education}
-      </MobileDrawer>
+      {education && (
+        <MobileDrawer
+          isOpen={mobileEducationOpen}
+          onClose={handleToggleMobileEducation}
+          title='Learn'
+          variant='education'
+        >
+          {education}
+        </MobileDrawer>
+      )}
     </>
   );
 }
