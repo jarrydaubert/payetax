@@ -116,6 +116,66 @@ describe('/api/indexnow POST', () => {
     });
   });
 
+  it('rejects lookalike paths that should not be indexable', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.INDEXNOW_SUBMIT_SECRET = 'secret';
+
+    const request = buildRequest(
+      {
+        urls: [
+          'https://payetax.co.uk/about-hack',
+          'https://payetax.co.uk/monitoring',
+          'https://payetax.co.uk/api/indexnow',
+        ],
+      },
+      { 'x-indexnow-secret': 'secret' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({
+      error: 'All URLs must be valid HTTPS payetax.co.uk URLs',
+      invalidCount: 3,
+    });
+  });
+
+  it('allows only explicit root/static pages and approved section prefixes', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.INDEXNOW_SUBMIT_SECRET = 'secret';
+    process.env.INDEXNOW_KEY = 'indexnow-key';
+
+    const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response('', {
+        status: 200,
+      }),
+    );
+
+    const request = buildRequest(
+      {
+        urls: [
+          'https://payetax.co.uk/',
+          'https://payetax.co.uk/blog',
+          'https://payetax.co.uk/blog/salary-guide',
+          'https://payetax.co.uk/tools/director-guide',
+          'https://payetax.co.uk/calculator/50000-after-tax',
+        ],
+      },
+      { 'x-indexnow-secret': 'secret' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json).toEqual({
+      success: true,
+      submitted: 5,
+      message: 'Successfully submitted 5 URLs to IndexNow',
+    });
+
+    fetchSpy.mockRestore();
+  });
+
   it('returns a configured message when IndexNow key is missing', async () => {
     process.env.NODE_ENV = 'production';
     process.env.INDEXNOW_SUBMIT_SECRET = 'secret';

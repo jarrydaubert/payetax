@@ -18,19 +18,39 @@ const MAX_BODY_SIZE = 50 * 1024; // 50KB
 const ALLOWED_HOST = 'payetax.co.uk';
 const FETCH_TIMEOUT_MS = 10000; // 10 seconds
 
-// Allowed URL path prefixes (only index actual content pages)
-const ALLOWED_PATH_PREFIXES = [
+// Allowed exact content pages (no prefix matching here)
+const ALLOWED_EXACT_PATHS = new Set([
   '/',
+  '/about',
+  '/privacy',
+  '/compliance',
+  '/blog',
+  '/tools',
+  '/scenarios',
+  '/alternatives',
+  '/vs',
+]);
+
+// Allowed section prefixes (supports nested detail pages)
+const ALLOWED_PATH_PREFIXES = [
   '/blog/',
   '/alternatives/',
   '/vs/',
   '/calculator/',
   '/tools/',
   '/scenarios/',
-  '/about',
-  '/privacy',
-  '/compliance',
 ];
+
+function isAllowedPath(pathname: string): boolean {
+  // Normalize trailing slash for exact-page checks (except root)
+  const normalizedPath =
+    pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+  return (
+    ALLOWED_EXACT_PATHS.has(normalizedPath) ||
+    ALLOWED_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
+}
 
 /**
  * Verify request authentication
@@ -60,9 +80,7 @@ function isValidPayetaxUrl(url: string): boolean {
       parsed.hash === '' &&
       parsed.username === '' &&
       parsed.password === '' &&
-      ALLOWED_PATH_PREFIXES.some(
-        (prefix) => parsed.pathname === prefix || parsed.pathname.startsWith(prefix),
-      )
+      isAllowedPath(parsed.pathname)
     );
   } catch {
     return false;

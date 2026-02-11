@@ -12,14 +12,20 @@
 > See `docs/business/MONETIZATION.md`
 
 - [ ] Tax Pack V1: add feature flag + CTA placement in Director Guide results flow
-- [ ] Tax Pack V1: create Stripe Checkout session API route
-- [ ] Tax Pack V1: add webhook verification + paid session persistence
-- [ ] Tax Pack V1: define validated export payload schema (deterministic numbers only)
-- [ ] Tax Pack V1: generate bundle artifacts (PDF summary, CSV schedule, board minutes DOCX, dividend voucher DOCX)
-- [ ] Tax Pack V1: package/download ZIP and add expiring re-download token flow
-- [ ] Tax Pack V1: send post-purchase email with secure re-download link
-- [ ] Tax Pack V1: add route-level tests (checkout, webhook, download auth, replay/expiry)
-- [ ] Tax Pack V1: add E2E happy-path purchase/download flow with provider mocks
+- [ ] Tax Pack V1: implement server-owned Stripe Checkout session route (price + automatic tax configured server-side)
+- [ ] Tax Pack V1: implement signature-verified, idempotent webhook processing with event dedupe persistence
+- [ ] Tax Pack V1: define/export validated snapshot schema (deterministic numbers, integer pence, checksum, version fields)
+- [ ] Tax Pack V1: include distributable-profits check result in snapshot and generated documents
+- [ ] Tax Pack V1: build async generation worker (PDF/CSV/DOCX/ZIP) with retries, dead-letter, and `failed` state handling
+- [ ] Tax Pack V1: persist artifacts in private object storage with template version tracking
+- [ ] Tax Pack V1: implement order status endpoint and success-page polling flow (`pending_payment`, `processing`, `ready`, `failed`)
+- [ ] Tax Pack V1: implement download grant model (7-day expiry, max 5 downloads, revocation, invalid-attempt throttling)
+- [ ] Tax Pack V1: issue fresh 5-minute object-storage signed URL on each valid download request
+- [ ] Tax Pack V1: implement email delivery + resend flow where email is non-critical path
+- [ ] Tax Pack V1: implement refund/dispute webhooks (full refund revoke, partial refund policy handling)
+- [ ] Tax Pack V1: add draft-order cleanup job for abandoned checkouts older than 48 hours
+- [ ] Tax Pack V1: add route/integration tests for checkout, webhook idempotency, generation failure, grants, replay, expiry, and revocation
+- [ ] Tax Pack V1: add E2E purchase/download flow with provider mocks in Stripe test mode
 
 ### Release Gates
 - [ ] Run: `bun run test:no-coverage`

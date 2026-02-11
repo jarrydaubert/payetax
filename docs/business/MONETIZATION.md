@@ -72,14 +72,17 @@ Who it is for:
 Flow:
 - User completes Director Guide and sees a Tax Pack CTA
 - Checkout via Stripe
-- Server verifies payment and returns export payload
-- Client generates documents and offers a bundle download
-- Recovery link supports re-download
+- Signature-verified webhook marks order paid (idempotent)
+- Async worker generates bundle and stores artifact privately
+- Success page polls status and unlocks secure download
+- Recovery link supports re-download via expiring grant
 
 Technical stack:
 - Stripe Checkout
-- Temporary storage for export payloads
-- PDF/CSV/DOCX generation via client-side or edge workers (based on bundle size)
+- Signature-verified webhooks + idempotent order processing
+- Deterministic payload snapshot with checksum
+- Async PDF/CSV/DOCX generation + ZIP packaging
+- Private object storage + signed download grants
 - Email delivery via Resend
 
 Execution:
