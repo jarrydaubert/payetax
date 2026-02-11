@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 
   // Rate limiting: 5 unsubscribe attempts per minute per client
   const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, { max: 5, window: 60000 })) {
+  if (!(await checkRateLimit(`newsletter-unsubscribe:${clientId}`, { max: 5, window: 60000 }))) {
     return new NextResponse(
       renderUnsubscribePage('Too many requests. Please try again later.', false),
       { status: 429, headers: SECURITY_HEADERS },

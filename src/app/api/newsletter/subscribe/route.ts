@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
   // Get client identifier - always rate limit (never skip)
   const clientId = getClientIdentifier(request);
 
-  if (!checkRateLimit(clientId, { max: 3, window: 60000 })) {
+  if (!(await checkRateLimit(`newsletter-subscribe:${clientId}`, { max: 3, window: 60000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

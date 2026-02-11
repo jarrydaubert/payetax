@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
   }
 
   const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, RATE_LIMIT)) {
+  if (!(await checkRateLimit(`sentry-webhook:${clientId}`, RATE_LIMIT))) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

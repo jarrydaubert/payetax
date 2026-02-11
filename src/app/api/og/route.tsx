@@ -68,9 +68,9 @@ const CACHE_HEADERS = {
   'Cache-Control': 'public, immutable, s-maxage=31536000, stale-while-revalidate=86400',
 };
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, RATE_LIMIT)) {
+  if (!(await checkRateLimit(`og:${clientId}`, RATE_LIMIT))) {
     return new Response('Too many requests', { status: 429 });
   }
 

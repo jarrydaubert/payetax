@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 5 emails per minute per client
   const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, { max: 5, window: 60000 })) {
+  if (!(await checkRateLimit(`send-results:${clientId}`, { max: 5, window: 60000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

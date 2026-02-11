@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 3 leads per hour per client
   const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, { max: 3, window: 3600000 })) {
+  if (!(await checkRateLimit(`referral-lead:${clientId}`, { max: 3, window: 3600000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

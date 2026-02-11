@@ -56,6 +56,13 @@ interface AnnouncedPosts {
   lastUpdated: string;
 }
 
+function maskEmail(email: string): string {
+  const [localPart, domain] = email.split('@');
+  if (!(localPart && domain)) return email;
+  if (localPart.length <= 2) return `${localPart[0] ?? '*'}*@${domain}`;
+  return `${localPart.slice(0, 2)}***@${domain}`;
+}
+
 // Parse CLI arguments
 function parseArgs(): { postSlug: string; dryRun: boolean } {
   const args = process.argv.slice(2);
@@ -207,7 +214,7 @@ async function sendEmails(
 
     for (const contact of batch) {
       if (dryRun) {
-        console.log(`  [DRY RUN] Would send to: ${contact.email}`);
+        console.log(`  [DRY RUN] Would send to: ${maskEmail(contact.email)}`);
         sent++;
         continue;
       }
@@ -244,14 +251,14 @@ async function sendEmails(
         });
 
         if (error) {
-          console.error(`  Failed to send to ${contact.email}: ${error.message}`);
+          console.error(`  Failed to send to ${maskEmail(contact.email)}: ${error.message}`);
           failed++;
         } else {
-          console.log(`  Sent to: ${contact.email}`);
+          console.log(`  Sent to: ${maskEmail(contact.email)}`);
           sent++;
         }
       } catch (err) {
-        console.error(`  Error sending to ${contact.email}:`, err);
+        console.error(`  Error sending to ${maskEmail(contact.email)}:`, err);
         failed++;
       }
     }

@@ -57,6 +57,11 @@ export const ServerEnvSchema = z.object({
     .min(1, 'Resend API key is required for email functionality')
     .optional(),
   RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter').optional(),
+  UPSTASH_REDIS_REST_URL: z.string().url('Upstash Redis REST URL must be a valid URL').optional(),
+  UPSTASH_REDIS_REST_TOKEN: z
+    .string()
+    .min(1, 'Upstash Redis REST token must not be empty')
+    .optional(),
 
   // Sentry Build Configuration
   SENTRY_AUTH_TOKEN: z.string().optional(),
@@ -154,6 +159,8 @@ export function validateServerEnv(): ServerEnv {
   const result = ServerEnvSchema.safeParse({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,

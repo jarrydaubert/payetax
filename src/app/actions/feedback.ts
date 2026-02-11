@@ -92,7 +92,7 @@ export async function submitFeedback(
   const ipAddress = await getClientIp();
 
   // Check rate limit (10 requests per minute per IP)
-  if (!checkRateLimit(ipAddress)) {
+  if (!(await checkRateLimit(`feedback:${ipAddress}`))) {
     return {
       success: false,
       error: 'Too many requests. Please try again in a minute.',

@@ -39,7 +39,7 @@ describe('submitFeedback', () => {
 
     const result = await submitFeedback({ success: false }, formData);
 
-    expect(checkRateLimit).toHaveBeenCalledWith('1.2.3.4');
+    expect(checkRateLimit).toHaveBeenCalledWith('feedback:1.2.3.4');
     expect(result.success).toBe(false);
     expect(result.error).toBe('Too many requests. Please try again in a minute.');
   });

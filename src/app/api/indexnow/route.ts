@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
   // Rate limiting: 10 requests per minute per IP
   const clientId = getClientIdentifier(request);
 
-  if (!checkRateLimit(clientId)) {
+  if (!(await checkRateLimit(`indexnow:${clientId}`))) {
     console.warn(`[IndexNow:${requestId}] Rate limited: ${clientId}`);
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
