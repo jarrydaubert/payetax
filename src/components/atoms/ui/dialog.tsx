@@ -72,7 +72,7 @@ const DialogContent = forwardRef<
       {children}
       <DialogPrimitive.Close
         className={cn(
-          'absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity',
+          'absolute top-2 right-2 inline-flex h-11 w-11 items-center justify-center rounded-md opacity-70 ring-offset-background transition-opacity sm:top-4 sm:right-4 sm:h-8 sm:w-8',
           'hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
           'disabled:pointer-events-none',
         )}

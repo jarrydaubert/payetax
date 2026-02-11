@@ -76,13 +76,14 @@ describe('/api/indexnow POST', () => {
 
     const request = buildRequest(
       { urls: ['https://payetax.co.uk/blog/valid'] },
-      { 'x-indexnow-secret': 'secret' },
+      { 'x-indexnow-secret': 'secret', 'x-forwarded-for': '1.2.3.4' },
     );
     const response = await POST(request);
     const json = await response.json();
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
+    expect(mockCheckRateLimit).toHaveBeenCalledWith('indexnow:1.2.3.4');
   });
 
   it('rejects invalid JSON payloads', async () => {

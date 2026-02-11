@@ -99,10 +99,15 @@ describe('/api/newsletter/unsubscribe GET', () => {
 
   it('rate limits repeated unsubscribe attempts', async () => {
     const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' }, false);
-    const request = buildRequest({ token: 'token' });
+    const request = buildRequest({ token: 'token' }, { 'x-forwarded-for': '1.2.3.4' });
     const response = await GET(request);
+    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
 
     expect(response.status).toBe(429);
+    expect(checkRateLimit).toHaveBeenCalledWith('newsletter-unsubscribe:1.2.3.4', {
+      max: 5,
+      window: 60000,
+    });
   });
 
   it('rejects missing tokens', async () => {

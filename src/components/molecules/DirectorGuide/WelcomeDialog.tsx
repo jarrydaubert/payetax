@@ -42,7 +42,7 @@ export function DirectorGuideWelcomeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='border-border/50 bg-card/95 text-foreground shadow-2xl backdrop-blur-xl sm:max-w-lg'>
+      <DialogContent className='top-[calc(env(safe-area-inset-top,0px)+0.5rem)] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] translate-y-0 overflow-y-auto border-border/50 bg-card/95 text-foreground shadow-2xl backdrop-blur-xl sm:top-[50%] sm:max-w-lg sm:translate-y-[-50%]'>
         <DialogHeader>
           <DialogTitle>Welcome to the Director Pay Calculator</DialogTitle>
           <DialogDescription>A quick overview before you start.</DialogDescription>
@@ -86,7 +86,12 @@ export function DirectorGuideWelcomeDialog() {
         </div>
 
         <DialogFooter className='mt-6'>
-          <Button type='button' onClick={() => handleOpenChange(false)} variant='brandOutline'>
+          <Button
+            type='button'
+            onClick={() => handleOpenChange(false)}
+            variant='brandOutline'
+            className='w-full sm:w-auto'
+          >
             Got it, let&apos;s start
           </Button>
         </DialogFooter>

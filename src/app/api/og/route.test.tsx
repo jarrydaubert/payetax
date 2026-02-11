@@ -55,12 +55,12 @@ function collectText(node: unknown, buffer: string[] = []): string[] {
   return buffer;
 }
 
-function buildRequest(search: Record<string, string>) {
+function buildRequest(search: Record<string, string>, headers?: Record<string, string>) {
   const url = new URL('https://payetax.co.uk/api/og');
   for (const [key, value] of Object.entries(search)) {
     url.searchParams.set(key, value);
   }
-  return new NextRequest(url);
+  return new NextRequest(url, { headers: new Headers(headers) });
 }
 
 describe('/api/og GET', () => {
@@ -100,8 +100,9 @@ describe('/api/og GET', () => {
   it('returns 429 when rate limited', async () => {
     mockCheckRateLimit.mockReturnValue(false);
     const { GET } = await import('./route');
-    const response = await GET(buildRequest({}));
+    const response = await GET(buildRequest({}, { 'x-forwarded-for': '1.2.3.4' }));
 
     expect(response.status).toBe(429);
+    expect(mockCheckRateLimit).toHaveBeenCalledWith('og:1.2.3.4', { max: 10, window: 60000 });
   });
 });

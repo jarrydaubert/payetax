@@ -148,6 +148,13 @@ describe('NavbarMobileMenu', () => {
   });
 
   describe('Styling', () => {
+    it('applies standalone safe-area top offset below navbar', () => {
+      render(<NavbarMobileMenu {...defaultProps} />);
+      expect(screen.getByRole('dialog')).toHaveClass(
+        'top-[calc(4rem+var(--pwa-safe-area-top,0px))]',
+      );
+    });
+
     it('should have correct base classes on links', () => {
       render(<NavbarMobileMenu {...defaultProps} />);
       const aboutLink = screen.getByRole('link', { name: 'About' });

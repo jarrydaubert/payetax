@@ -99,12 +99,20 @@ describe('/api/send-director-results POST', () => {
 
   it('rate limits when the limiter denies the client', async () => {
     const POST = await loadRoute({ RESEND_API_KEY: 'test' }, false);
-    const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
+    const request = buildRequest(validPayload, {
+      origin: 'https://payetax.co.uk',
+      'x-forwarded-for': '1.2.3.4',
+    });
     const response = await POST(request);
     const json = await response.json();
+    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
+    expect(checkRateLimit).toHaveBeenCalledWith('send-director-results:1.2.3.4', {
+      max: 5,
+      window: 60000,
+    });
   });
 
   it('returns 503 when Resend is not configured', async () => {

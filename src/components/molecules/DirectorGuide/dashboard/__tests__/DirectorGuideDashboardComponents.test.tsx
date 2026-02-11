@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { usePathname } from 'next/navigation';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
@@ -225,7 +225,18 @@ describe('Director Guide dashboard components', () => {
         />,
       );
 
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      const mobileDrawer = screen.getByRole('dialog');
+      expect(mobileDrawer).toBeInTheDocument();
+      expect(within(mobileDrawer).getByText('Your Numbers').parentElement).toHaveClass(
+        'pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]',
+      );
+
+      const closeButton = screen.getByLabelText('Close your numbers panel');
+      expect(closeButton).toHaveClass('h-11', 'w-11');
+      expect(mobileDrawer.querySelector('div.flex-1.overflow-y-auto')).toHaveClass(
+        'pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]',
+      );
+
       fireEvent.click(screen.getByLabelText('Close your numbers panel'));
       expect(handleMobileInputs).toHaveBeenCalled();
     });

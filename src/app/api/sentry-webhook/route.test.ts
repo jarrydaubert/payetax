@@ -110,12 +110,20 @@ describe('/api/sentry-webhook POST', () => {
     setRateLimitResult(false);
     const body = JSON.stringify(basePayload);
     const signature = signBody(body, 'secret');
-    const request = buildRequest(body, { 'sentry-hook-signature': signature });
+    const request = buildRequest(body, {
+      'sentry-hook-signature': signature,
+      'x-forwarded-for': '1.2.3.4',
+    });
     const response = await POST(request);
     const json = await response.json();
+    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests' });
+    expect(checkRateLimit).toHaveBeenCalledWith('sentry-webhook:1.2.3.4', {
+      max: 30,
+      window: 60000,
+    });
   });
 
   it('rejects invalid signatures', async () => {

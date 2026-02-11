@@ -24,6 +24,7 @@ import { Resend } from 'resend';
 import { generateNewBlogPostHtml, generateNewBlogPostText } from '../emails/new-blog-post';
 import { shouldMarkPostAsAnnounced } from '../src/lib/newsletter/broadcastPolicy';
 import { resolveNewsletterBaseUrl } from '../src/lib/newsletter/emailConfig';
+import { maskEmailForLogs } from '../src/lib/newsletter/maskEmail';
 import {
   createUnsubscribeToken,
   resolveUnsubscribeSecret,
@@ -54,13 +55,6 @@ interface Contact {
 interface AnnouncedPosts {
   posts: string[];
   lastUpdated: string;
-}
-
-function maskEmail(email: string): string {
-  const [localPart, domain] = email.split('@');
-  if (!(localPart && domain)) return email;
-  if (localPart.length <= 2) return `${localPart[0] ?? '*'}*@${domain}`;
-  return `${localPart.slice(0, 2)}***@${domain}`;
 }
 
 // Parse CLI arguments
@@ -214,7 +208,7 @@ async function sendEmails(
 
     for (const contact of batch) {
       if (dryRun) {
-        console.log(`  [DRY RUN] Would send to: ${maskEmail(contact.email)}`);
+        console.log(`  [DRY RUN] Would send to: ${maskEmailForLogs(contact.email)}`);
         sent++;
         continue;
       }
@@ -251,14 +245,14 @@ async function sendEmails(
         });
 
         if (error) {
-          console.error(`  Failed to send to ${maskEmail(contact.email)}: ${error.message}`);
+          console.error(`  Failed to send to ${maskEmailForLogs(contact.email)}: ${error.message}`);
           failed++;
         } else {
-          console.log(`  Sent to: ${maskEmail(contact.email)}`);
+          console.log(`  Sent to: ${maskEmailForLogs(contact.email)}`);
           sent++;
         }
       } catch (err) {
-        console.error(`  Error sending to ${maskEmail(contact.email)}:`, err);
+        console.error(`  Error sending to ${maskEmailForLogs(contact.email)}:`, err);
         failed++;
       }
     }

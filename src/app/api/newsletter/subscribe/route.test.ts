@@ -96,13 +96,18 @@ describe('/api/newsletter/subscribe POST', () => {
     const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' }, false);
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
-      { origin: 'https://payetax.co.uk' },
+      { origin: 'https://payetax.co.uk', 'x-forwarded-for': '1.2.3.4' },
     );
     const response = await POST(request);
     const json = await response.json();
+    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
+    expect(checkRateLimit).toHaveBeenCalledWith('newsletter-subscribe:1.2.3.4', {
+      max: 3,
+      window: 60000,
+    });
   });
 
   it('returns 503 when Resend is not configured', async () => {

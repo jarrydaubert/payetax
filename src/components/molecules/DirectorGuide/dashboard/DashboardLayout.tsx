@@ -97,7 +97,7 @@ function MobileDrawer({
       aria-labelledby={`drawer-title-${variant}`}
       className={cn('fixed inset-0 z-50 flex flex-col lg:hidden', bgColor)}
     >
-      <div className='relative border-white/[0.04] border-b px-4 py-3'>
+      <div className='relative border-white/[0.04] border-b px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
         <h2
           id={`drawer-title-${variant}`}
           className='pointer-events-none text-center font-semibold text-lg text-slate-100'
@@ -109,14 +109,16 @@ function MobileDrawer({
             ref={closeButtonRef}
             type='button'
             onClick={onClose}
-            className='absolute top-1/2 right-4 -translate-y-1/2 rounded p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200'
+            className='absolute top-1/2 right-2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/60'
             aria-label={`Close ${title.toLowerCase()} panel`}
           >
             <X className='size-5' />
           </button>
         )}
       </div>
-      <div className='flex-1 overflow-y-auto'>{children}</div>
+      <div className='flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
+        {children}
+      </div>
     </div>
   );
 }
@@ -192,7 +194,7 @@ export function DashboardLayout({
           className='relative min-w-0 flex-1 overflow-y-auto bg-slate-950'
         >
           {/* Mobile header with logo */}
-          <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 py-3 backdrop-blur-sm lg:hidden'>
+          <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 backdrop-blur-sm lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>
               <span className='brand-wordmark text-[1.2rem] text-slate-100'>
                 paye
