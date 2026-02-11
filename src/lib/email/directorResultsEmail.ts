@@ -57,6 +57,12 @@ function getSelfAssessmentDeadlineLabel(taxYear?: string): string {
   return `31 January ${startYear + 2}`;
 }
 
+function formatTaxYearLabel(taxYear?: string): string {
+  const normalized = normalizeTaxYear(taxYear);
+  const [start, end] = normalized.split('-');
+  return `${start}-${end?.slice(-2) ?? ''}`;
+}
+
 export function getDirectorEmailThresholds(taxYear?: string) {
   const year = normalizeTaxYear(taxYear);
   const rates = TAX_RATES[year];
@@ -104,7 +110,7 @@ export function generateDirectorEmailText(args: {
 }): string {
   const { grossProfit, strategies, recommended, savingsVsAllSalary, taxYear } = args;
   const strategy = strategies[recommended];
-  const year = taxYear || '2025-26';
+  const year = formatTaxYearLabel(taxYear);
 
   return `
 DIRECTOR TAX STRATEGY REPORT - PayeTax
@@ -162,7 +168,7 @@ export function generateDirectorEmailHtml(args: {
 
   const strategy = strategies[recommended];
   const safeStrategyName = escapeHtml(strategy.name);
-  const safeTaxYear = escapeHtml(taxYear || '2025-26');
+  const safeTaxYear = escapeHtml(formatTaxYearLabel(taxYear));
   const safeGeneratedDate =
     generatedDate ??
     new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -199,18 +205,24 @@ export function generateDirectorEmailHtml(args: {
       <h2 style="margin: 0 0 8px; font-size: 20px; color: #020617;">Scenario Summary</h2>
       <p style="margin: 0 0 24px; font-size: 28px; font-weight: 700; color: #10b981;">${safeStrategyName}</p>
 
-      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 200px; padding: 16px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
-          <p style="margin: 0 0 4px; color: #166534; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monthly Take-Home</p>
-          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981;">${formatCurrency(strategy.takeHome / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-          <p style="margin: 8px 0 0; color: #166534; font-size: 12px;">Annual: ${formatCurrency(strategy.takeHome)}</p>
-        </div>
-        <div style="flex: 1; min-width: 200px; padding: 16px; background: #fef3c7; border-radius: 12px; border: 1px solid #fde68a;">
-          <p style="margin: 0 0 4px; color: #92400e; font-size: 12px; text-transform: uppercase; font-weight: 600;">Savings vs All Salary</p>
-          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #f59e0b;">${formatCurrency(savingsVsAllSalary)}<span style="font-size: 14px; font-weight: 400;">/year</span></p>
-          <p style="margin: 8px 0 0; color: #92400e; font-size: 12px;">Tax saved annually</p>
-        </div>
-      </div>
+      <table role="presentation" style="width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;">
+        <tr>
+          <td style="width: 50%; vertical-align: top; padding-right: 8px;">
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
+              <p style="margin: 0 0 6px; color: #166534; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monthly Take-Home</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #166534; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Annual: ${formatCurrency(strategy.takeHome)}</p>
+            </div>
+          </td>
+          <td style="width: 50%; vertical-align: top; padding-left: 8px;">
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #fef3c7; border-radius: 12px; border: 1px solid #fde68a;">
+              <p style="margin: 0 0 6px; color: #92400e; font-size: 12px; text-transform: uppercase; font-weight: 600;">Savings vs All Salary</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #f59e0b; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(savingsVsAllSalary)}<span style="font-size: 14px; font-weight: 400;">/year</span></p>
+              <p style="margin: 10px 0 0; color: #92400e; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tax saved annually</p>
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <!-- Company Overview Card -->
@@ -242,18 +254,24 @@ export function generateDirectorEmailHtml(args: {
         </tr>
       </table>
 
-      <div style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 200px; padding: 16px; background: #eff6ff; border-radius: 12px; border: 1px solid #bfdbfe;">
-          <p style="margin: 0 0 4px; color: #1e40af; font-size: 12px; text-transform: uppercase; font-weight: 600;">Company Tax Pot</p>
-          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2563eb;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-          <p style="margin: 8px 0 0; color: #1e40af; font-size: 12px;">Corporation Tax + Employer NI</p>
-        </div>
-        <div style="flex: 1; min-width: 200px; padding: 16px; background: #faf5ff; border-radius: 12px; border: 1px solid #e9d5ff;">
-          <p style="margin: 0 0 4px; color: #6b21a8; font-size: 12px; text-transform: uppercase; font-weight: 600;">Personal Tax Pot</p>
-          <p style="margin: 0; font-size: 24px; font-weight: 700; color: #7c3aed;">${formatCurrency(strategy.totalPersonalTax / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-          <p style="margin: 8px 0 0; color: #6b21a8; font-size: 12px;">For Self Assessment (${escapeHtml(saDeadline)})</p>
-        </div>
-      </div>
+      <table role="presentation" style="width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; margin-top: 24px;">
+        <tr>
+          <td style="width: 50%; vertical-align: top; padding-right: 8px;">
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #eff6ff; border-radius: 12px; border: 1px solid #bfdbfe;">
+              <p style="margin: 0 0 6px; color: #1e40af; font-size: 12px; text-transform: uppercase; font-weight: 600;">Company Tax Pot</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2563eb; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #1e40af; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Corporation Tax + Employer NI</p>
+            </div>
+          </td>
+          <td style="width: 50%; vertical-align: top; padding-left: 8px;">
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #faf5ff; border-radius: 12px; border: 1px solid #e9d5ff;">
+              <p style="margin: 0 0 6px; color: #6b21a8; font-size: 12px; text-transform: uppercase; font-weight: 600;">Personal Tax Pot</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #7c3aed; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.totalPersonalTax / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #6b21a8; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Self Assessment due ${escapeHtml(saDeadline)}</p>
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <!-- Key Dates Card -->

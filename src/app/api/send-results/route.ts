@@ -164,11 +164,11 @@ function generateEmailHtml(results: EmailResults, taxYear?: string): string {
 
       <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
         <p style="margin: 0 0 6px; color: #0f766e; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;">Take-Home Pay</p>
-        <p style="margin: 0; font-size: 34px; font-weight: 700; color: #0f766e;">${formatCurrency(results.netPay.annually)}</p>
-        <p style="margin: 8px 0 0; color: #115e59; font-size: 14px;">${formatCurrency(results.netPay.monthly)}/month • ${effectiveRate}% effective tax rate</p>
+        <p style="margin: 0; font-size: 34px; font-weight: 700; color: #0f766e; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.annually)}</p>
+        <p style="margin: 8px 0 0; color: #115e59; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.monthly)}/month • ${effectiveRate}% effective tax rate</p>
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
         <thead>
           <tr style="border-bottom: 2px solid #e2e8f0;">
             <th style="text-align: left; padding: 10px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Item</th>
@@ -215,17 +215,17 @@ function generateEmailHtml(results: EmailResults, taxYear?: string): string {
               : ''
           }
           <tr style="background: #ecfeff;">
-            <td style="padding: 14px 10px; color: #0f766e; font-weight: 700;">Take-Home Pay</td>
-            <td style="padding: 14px 10px; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.annually)}</td>
-            <td style="padding: 14px 10px; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.monthly)}</td>
+            <td style="padding: 14px 0; color: #0f766e; font-weight: 700;">Take-Home Pay</td>
+            <td style="padding: 14px 0; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.annually)}</td>
+            <td style="padding: 14px 0; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.monthly)}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div style="text-align: center; margin-top: 24px;">
-      <a href="${BASE_URL}?utm_source=results_email&utm_medium=email&utm_campaign=results_followup" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #052e2b; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
-        Recalculate with New Inputs ->
+      <a href="${BASE_URL}?utm_source=results_email&utm_medium=email&utm_campaign=results_followup" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; line-height: 1.2;">
+        Recalculate with New Inputs →
       </a>
     </div>
 
