@@ -4,7 +4,7 @@
  *
  * All Salary | Baseline Mix (Comparison) | All Dividends
  * Selected card has cyan glow. Clicking a card updates the slider.
- * Dynamic message shows savings (green) or cost (red) vs baseline.
+ * Dynamic message shows savings (green) or cost (red) vs optimal mix.
  */
 'use client';
 
@@ -30,8 +30,9 @@ export function StrategyComparisonTable() {
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
-  // Calculate tax difference vs baseline (optimal mix for these inputs)
+  // Calculate deltas against optimal mix (best take-home for these inputs)
   const optimalStrategy = comparison.strategies.optimalMix;
+  const optimalTakeHome = optimalStrategy.takeHome;
   const optimalTotalTax =
     optimalStrategy.totalPersonalTax + optimalStrategy.corporationTax + optimalStrategy.employerNI;
 
@@ -42,8 +43,8 @@ export function StrategyComparisonTable() {
   const taxDifference = currentTotalTax - optimalTotalTax;
   const taxPercentageMore = optimalTotalTax > 0 ? (taxDifference / optimalTotalTax) * 100 : 0;
 
-  const isNearBaseline = Math.abs(taxDifference) < 10; // Within £10 of baseline
-  const isCosting = taxDifference > 10; // Paying more tax than baseline
+  const isNearOptimal = Math.abs(taxDifference) < 10; // Within £10 of optimal mix
+  const isCosting = taxDifference > 10; // Paying more tax than optimal mix
 
   const strategies = [
     {
@@ -78,12 +79,16 @@ export function StrategyComparisonTable() {
       {/* Header with dynamic message */}
       <div>
         <h3 className='font-semibold text-slate-100'>Choose Your Strategy</h3>
-        {isNearBaseline && (
+        <p className='text-slate-400 text-sm'>
+          Baseline Mix is the highest estimated annual take-home for your current inputs (all taxes
+          and NI included), not a "lowest NI only" target.
+        </p>
+        {isNearOptimal && (
           <p className='text-sm'>
-            <span className='font-medium text-emerald-400'>Closest to the baseline mix</span>
+            <span className='font-medium text-emerald-400'>Closest to the optimal mix</span>
             <span className='text-slate-500'>
               {' '}
-              — baseline is the lowest-tax mix for these inputs
+              — use the £ deltas on each card to compare tradeoffs
             </span>
           </p>
         )}
@@ -94,7 +99,7 @@ export function StrategyComparisonTable() {
             </span>
             <span className='text-slate-500'>
               {' '}
-              than the baseline mix ({formatCurrency(taxDifference)} extra)
+              than the optimal mix ({formatCurrency(taxDifference)} extra)
             </span>
           </p>
         )}
@@ -106,6 +111,9 @@ export function StrategyComparisonTable() {
           const isSelected = selectedStrategy === key;
           const isRecommended = comparison.recommended === key;
           const totalTax = data.totalPersonalTax + data.corporationTax + data.employerNI;
+          const takeHomeDelta = data.takeHome - optimalTakeHome;
+          const taxDelta = totalTax - optimalTotalTax;
+          const isOptimalReference = Math.abs(takeHomeDelta) < 0.01;
 
           return (
             <button
@@ -162,6 +170,31 @@ export function StrategyComparisonTable() {
                     {formatCurrency(data.takeHome)}
                   </span>
                 </div>
+                <div className='flex justify-between'>
+                  <span className='text-slate-500'>Vs Optimal</span>
+                  <span
+                    className={cn(
+                      'font-mono',
+                      isOptimalReference
+                        ? 'text-emerald-400'
+                        : takeHomeDelta < 0
+                          ? 'text-red-400'
+                          : 'text-emerald-400',
+                    )}
+                  >
+                    {isOptimalReference
+                      ? 'Reference'
+                      : `${takeHomeDelta < 0 ? '-' : '+'}${formatCurrency(Math.abs(takeHomeDelta))}`}
+                  </span>
+                </div>
+                <div className='text-right text-slate-500 text-xs'>
+                  Tax delta:{' '}
+                  {taxDelta > 0
+                    ? `+${formatCurrency(taxDelta)}`
+                    : taxDelta < 0
+                      ? `-${formatCurrency(Math.abs(taxDelta))}`
+                      : '£0'}
+                </div>
               </div>
 
               {/* Effective Rate */}
@@ -198,7 +231,7 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
         </div>
         <div className='rounded-lg bg-black/20 p-3 text-slate-300 text-sm'>
           <span className='font-medium text-slate-100'>Not set.</span> Add your salary and dividends
-          in Full Inputs to compare your current setup against the baseline mix.
+          in Full Inputs to compare your current setup against the optimal mix.
         </div>
       </div>
     );
@@ -206,7 +239,7 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
 
   const totalTax = yourSetup.totalPersonalTax + yourSetup.corporationTax + yourSetup.employerNI;
   const delta = yourSetup.deltaVsOptimal;
-  const isNearBaseline = Math.abs(delta) < 10;
+  const isNearOptimal = Math.abs(delta) < 10;
   const isCosting = delta > 10;
   const isSaving = delta < -10;
 
@@ -262,15 +295,15 @@ function YourSetupCard({ yourSetup }: YourSetupCardProps) {
 
       {/* Delta vs Optimal */}
       <div className='mt-3 rounded-lg bg-black/20 p-2 text-center text-sm'>
-        {isNearBaseline && <span className='text-emerald-400'>Within £10 of the baseline mix</span>}
+        {isNearOptimal && <span className='text-emerald-400'>Within £10 of the optimal mix</span>}
         {isCosting && (
           <span className='text-red-400'>
-            Pays {formatCurrency(delta)} more tax than baseline per year
+            Pays {formatCurrency(delta)} more tax than optimal per year
           </span>
         )}
         {isSaving && (
           <span className='text-emerald-400'>
-            Pays {formatCurrency(Math.abs(delta))} less tax than baseline per year
+            Pays {formatCurrency(Math.abs(delta))} less tax than optimal per year
           </span>
         )}
       </div>

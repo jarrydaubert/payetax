@@ -215,7 +215,11 @@ describe('Director Guide calculator components', () => {
 
       render(<StrategyComparisonTable />);
       expect(screen.getByText('Choose Your Strategy')).toBeInTheDocument();
-      expect(screen.getByText(/Closest to the baseline mix/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Baseline Mix is the highest estimated annual take-home/i),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/Closest to the optimal mix/i)).toBeInTheDocument();
+      expect(screen.getByText('-£4,000')).toBeInTheDocument();
       expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
     });
 
@@ -240,7 +244,7 @@ describe('Director Guide calculator components', () => {
       setStoreState({ strategyComparison: comparison as never, sliderSalary: 20000 });
 
       render(<StrategyComparisonTable />);
-      expect(screen.getByText(/Pays £1,500 more tax than baseline per year/i)).toBeInTheDocument();
+      expect(screen.getByText(/Pays £1,500 more tax than optimal per year/i)).toBeInTheDocument();
       expect(screen.getByText('Your Setup')).toBeInTheDocument();
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
     });
@@ -255,6 +259,7 @@ describe('Director Guide calculator components', () => {
       expect(
         screen.getByText(/Add your salary and dividends in Full Inputs to compare/i),
       ).toBeInTheDocument();
+      expect(screen.getByText(/against the optimal mix/i)).toBeInTheDocument();
     });
 
     it('tracks pro strategy selection when a card is clicked', () => {

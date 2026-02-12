@@ -37,6 +37,8 @@
 ### Accuracy Guards
 - [ ] Verify other income affects PA taper, dividend allowance, and student loan thresholds
 - [ ] If not verified, hide or guard those inputs
+- [ ] Director Guide: add explicit assumptions panel clarifying salary/dividend mix is scenario-dependent (not a fixed "salary to employer NI threshold" rule)
+- [ ] Director Guide: add MTD for Income Tax scope/timeline note (starts 6 Apr 2026 for qualifying self-employment/property income over threshold; clarify PAYE/dividends treatment)
 
 ---
 
@@ -64,6 +66,7 @@
 
 ### Compare My Setup
 - [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)
+- [ ] Director Guide: add objective toggle (`Maximize take-home` vs `Minimize NI`) and show tradeoff deltas across strategies
 
 ---
 
