@@ -83,6 +83,40 @@ export function NewsletterCTA({
           data-kit-embed-src={KIT_EMBED_SRC}
         />
 
+        <style jsx global>{`
+          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-fields {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+          }
+
+          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-input,
+          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form input[type='email'] {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+          }
+
+          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-submit,
+          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form button[type='submit'] {
+            width: auto !important;
+            min-width: 172px !important;
+            white-space: nowrap !important;
+          }
+
+          @media (max-width: 640px) {
+            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-fields {
+              flex-direction: column !important;
+              align-items: stretch !important;
+            }
+
+            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-submit,
+            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form button[type='submit'] {
+              width: 100% !important;
+              min-width: 0 !important;
+            }
+          }
+        `}</style>
+
         <p className='mt-4 text-muted-foreground text-xs'>
           We respect your privacy.{' '}
           <Link href='/privacy' className='underline hover:text-foreground'>
