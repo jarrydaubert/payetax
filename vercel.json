@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm install",
+  "installCommand": "bun install --frozen-lockfile",
   "redirects": [
     {
       "source": "/:path*",
