@@ -1,7 +1,7 @@
 // src/app/api/newsletter/unsubscribe/route.ts
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { unsubscribeEmailInKit } from '@/lib/newsletter/kitClient';
 import {
   resolveUnsubscribeSecret,
   verifyUnsubscribeToken,
@@ -10,8 +10,7 @@ import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const audienceId = process.env.RESEND_AUDIENCE_ID;
+const KIT_API_SECRET = process.env.KIT_API_SECRET;
 
 // SECURITY: Require secret in production, use dev fallback only in development
 const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET;
@@ -112,7 +111,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!(resend && audienceId)) {
+  if (!KIT_API_SECRET) {
     return new NextResponse(renderUnsubscribePage('Service temporarily unavailable', false), {
       status: 503,
       headers: SECURITY_HEADERS,
@@ -120,29 +119,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Update contact to mark as unsubscribed (preserves suppression records)
-    // This is preferred over remove() which deletes the contact entirely
-    await resend.contacts.update({
-      id: email, // Resend accepts email as ID
-      audienceId,
-      unsubscribed: true,
-    });
+    await unsubscribeEmailInKit({ apiSecret: KIT_API_SECRET, email });
 
     // Always show success (idempotent - prevents email enumeration)
     return new NextResponse(renderUnsubscribeSuccessPage(), {
       headers: SECURITY_HEADERS,
     });
   } catch (error) {
-    // If update fails (contact doesn't exist), try remove as fallback
-    try {
-      await resend.contacts.remove({ email, audienceId });
-      return new NextResponse(renderUnsubscribeSuccessPage(), {
-        headers: SECURITY_HEADERS,
-      });
-    } catch {
-      // Ignore - contact may not exist, which is fine
-    }
-
     console.error('[newsletter/unsubscribe] Error:', error);
     // Generic error - don't reveal if email existed
     return new NextResponse(

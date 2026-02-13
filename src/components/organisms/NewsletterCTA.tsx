@@ -4,82 +4,57 @@
 /**
  * Newsletter CTA Component
  *
- * Email subscription form with brand gradient background.
- * Includes honeypot for bot protection and GDPR-compliant messaging.
+ * Kit embed wrapper with PayeTax styling.
+ * The Kit script is injected client-side so it reliably initializes in App Router.
  *
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
 
-import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import type { FormEvent } from 'react';
-import { useCallback, useId, useState } from 'react';
-
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface NewsletterCTAProps {
   className?: string;
+  title?: string;
+  description?: string;
 }
 
-export function NewsletterCTA({ className }: NewsletterCTAProps) {
-  const id = useId();
-  const headingId = `${id}-heading`;
-  const emailId = `${id}-email`;
-  const errorId = `${id}-error`;
+const DEFAULT_TITLE = 'Stay Updated on UK Tax Changes';
+const DEFAULT_DESCRIPTION =
+  'HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.';
+// Keep the embedded form UID configurable via env so non-code Kit form swaps are possible.
+const KIT_EMBED_UID = process.env.NEXT_PUBLIC_KIT_EMBED_UID || '648a4b276a';
+const KIT_EMBED_VERSION = process.env.NEXT_PUBLIC_KIT_EMBED_VERSION;
+const KIT_EMBED_SRC = KIT_EMBED_VERSION
+  ? `https://payetax.kit.com/${KIT_EMBED_UID}/index.js?v=${encodeURIComponent(KIT_EMBED_VERSION)}`
+  : `https://payetax.kit.com/${KIT_EMBED_UID}/index.js`;
 
-  const [email, setEmail] = useState('');
-  const [honeypot, setHoneypot] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+export function NewsletterCTA({
+  className,
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+}: NewsletterCTAProps) {
+  const embedMountRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  useEffect(() => {
+    const mount = embedMountRef.current;
+    if (!mount) return;
 
-      // Bot check - honeypot should be empty
-      // Silently no-op to avoid polluting conversion metrics
-      if (honeypot) return;
+    // Reset mount to avoid duplicate forms under Strict Mode/dev re-renders.
+    mount.innerHTML = '';
 
-      const trimmedEmail = email.trim();
-      if (!trimmedEmail) return;
+    // Script is injected client-side so Kit can initialize reliably in App Router routes.
+    const script = document.createElement('script');
+    script.async = true;
+    script.dataset.uid = KIT_EMBED_UID;
+    script.src = KIT_EMBED_SRC;
+    mount.appendChild(script);
 
-      setStatus('loading');
-      setErrorMessage('');
-
-      try {
-        const response = await fetch('/api/newsletter/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: trimmedEmail }),
-        });
-
-        if (!response.ok) {
-          // Safely parse error - API may return non-JSON (edge errors, HTML, etc.)
-          const text = await response.text();
-          let message = 'Failed to subscribe';
-          try {
-            const data = JSON.parse(text) as { error?: string };
-            message = data.error ?? message;
-          } catch {
-            // Non-JSON response; keep default message
-          }
-          throw new Error(message);
-        }
-
-        setStatus('success');
-        setEmail('');
-      } catch (error) {
-        setStatus('error');
-        setErrorMessage(
-          error instanceof Error ? error.message : 'Something went wrong. Please try again.',
-        );
-      }
-    },
-    [email, honeypot],
-  );
+    return () => {
+      mount.innerHTML = '';
+    };
+  }, []);
 
   return (
     <section
@@ -87,7 +62,7 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
         'relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-8 md:p-12',
         className,
       )}
-      aria-labelledby={headingId}
+      aria-label='Newsletter signup'
     >
       {/* Background decoration */}
       <div className='pointer-events-none absolute inset-0 opacity-80' aria-hidden='true'>
@@ -95,109 +70,26 @@ export function NewsletterCTA({ className }: NewsletterCTAProps) {
       </div>
 
       <div className='relative text-center'>
-        <h2
-          id={headingId}
-          className='mb-3 font-bold font-display text-2xl text-foreground md:text-3xl'
-        >
-          Stay Updated on UK Tax Changes
+        <h2 className='mb-3 font-bold font-display text-2xl text-foreground md:text-3xl'>
+          {title}
         </h2>
+        <p className='mb-6 text-muted-foreground'>{description}</p>
 
-        <p className='mb-6 text-muted-foreground'>
-          HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.
+        <div
+          ref={embedMountRef}
+          className='mx-auto w-full max-w-xl'
+          // Diagnostic metadata only; form visual styling is maintained in docs/guides/KIT_EMBED_CSS.css
+          data-kit-embed-uid={KIT_EMBED_UID}
+          data-kit-embed-src={KIT_EMBED_SRC}
+        />
+
+        <p className='mt-4 text-muted-foreground text-xs'>
+          We respect your privacy.{' '}
+          <Link href='/privacy' className='underline hover:text-foreground'>
+            Privacy Policy
+          </Link>
+          . Unsubscribe anytime.
         </p>
-
-        {/* Status region for SR announcements */}
-        <div aria-live='polite' aria-atomic='true'>
-          {status === 'success' && (
-            <div
-              className={cn(
-                'rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm',
-                SPACING.P_4,
-              )}
-            >
-              <p className='font-medium text-emerald-100'>
-                Thanks! Check your inbox to confirm your subscription.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {status !== 'success' && (
-          <form onSubmit={handleSubmit} className='mx-auto max-w-md'>
-            <div className='flex flex-col gap-3 sm:flex-row sm:items-start'>
-              <label htmlFor={emailId} className='sr-only'>
-                Email address
-              </label>
-              <Input
-                id={emailId}
-                type='email'
-                name='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder='Enter your email'
-                required
-                disabled={status === 'loading'}
-                autoComplete='email'
-                inputMode='email'
-                className={cn(
-                  'h-11 flex-1 border-border bg-background/80 px-4 text-foreground',
-                  'placeholder:text-muted-foreground',
-                  'focus-visible:ring-ring/60 focus-visible:ring-offset-background',
-                  'disabled:opacity-50 sm:min-w-0',
-                )}
-                aria-invalid={status === 'error'}
-                aria-describedby={status === 'error' ? errorId : undefined}
-              />
-
-              {/* Honeypot field - hidden from users, visible to bots */}
-              <input
-                type='text'
-                name='website'
-                value={honeypot}
-                onChange={(e) => setHoneypot(e.target.value)}
-                className='absolute -left-[9999px] opacity-0'
-                tabIndex={-1}
-                autoComplete='off'
-                aria-hidden='true'
-              />
-
-              <Button
-                type='submit'
-                disabled={status === 'loading'}
-                variant='brandOutline'
-                size='touch'
-                className='rounded-lg px-6 sm:min-w-[140px]'
-              >
-                {status === 'loading' ? (
-                  <span className={cn('flex items-center', SPACING.GAP_2)}>
-                    <Loader2 className={cn(ICON_SIZES.SIZE_4, 'animate-spin')} />
-                    Subscribing...
-                  </span>
-                ) : (
-                  'Subscribe'
-                )}
-              </Button>
-            </div>
-
-            {status === 'error' && (
-              <p
-                id={errorId}
-                className={cn(SPACING.MT_3, TYPOGRAPHY.TEXT_SM, 'text-destructive')}
-                role='alert'
-              >
-                {errorMessage}
-              </p>
-            )}
-
-            <p className={cn(SPACING.MT_4, TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>
-              We respect your privacy.{' '}
-              <Link href='/privacy' className='underline hover:text-foreground'>
-                Privacy Policy
-              </Link>
-              . Unsubscribe anytime.
-            </p>
-          </form>
-        )}
       </div>
     </section>
   );

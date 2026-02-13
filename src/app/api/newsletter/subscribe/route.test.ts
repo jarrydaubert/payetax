@@ -5,7 +5,7 @@
  * What bug will this test find?
  * - Origin allowlist regressions (CSRF bypass)
  * - Rate-limit bypass
- * - Resend/audience configuration errors
+ * - Kit configuration errors
  * - JSON/Zod validation failures
  */
 
@@ -15,23 +15,10 @@ jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(),
 }));
 
-jest.mock('@/lib/newsletter/unsubscribeToken', () => ({
-  createUnsubscribeToken: jest.fn(),
-  resolveUnsubscribeSecret: jest.fn(),
-}));
+const subscribeEmailToKitMock = jest.fn();
 
-const sendMock = jest.fn();
-const contactsCreateMock = jest.fn();
-
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
-    emails: {
-      send: sendMock,
-    },
-    contacts: {
-      create: contactsCreateMock,
-    },
-  })),
+jest.mock('@/lib/newsletter/kitClient', () => ({
+  subscribeEmailToKit: (...args: unknown[]) => subscribeEmailToKitMock(...args),
 }));
 
 const ORIGINAL_ENV = process.env;
@@ -59,14 +46,6 @@ async function loadRoute(envOverrides: Record<string, string | undefined> = {}, 
     checkRateLimit: jest.Mock;
   };
   checkRateLimit.mockReturnValue(rateLimit);
-  const { createUnsubscribeToken, resolveUnsubscribeSecret } = jest.requireMock(
-    '@/lib/newsletter/unsubscribeToken',
-  ) as {
-    createUnsubscribeToken: jest.Mock;
-    resolveUnsubscribeSecret: jest.Mock;
-  };
-  createUnsubscribeToken.mockReturnValue('token');
-  resolveUnsubscribeSecret.mockReturnValue('secret');
   return module.POST;
 }
 
@@ -74,8 +53,8 @@ describe('/api/newsletter/subscribe POST', () => {
   let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    sendMock.mockReset();
-    contactsCreateMock.mockReset();
+    subscribeEmailToKitMock.mockReset();
+    subscribeEmailToKitMock.mockResolvedValue(undefined);
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -85,7 +64,7 @@ describe('/api/newsletter/subscribe POST', () => {
   });
 
   it('rejects invalid origins', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest({ email: 'test@payetax.co.uk' }, { origin: 'https://evil.com' });
     const response = await POST(request);
 
@@ -93,7 +72,7 @@ describe('/api/newsletter/subscribe POST', () => {
   });
 
   it('rate limits when the limiter denies the client', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' }, false);
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' }, false);
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
       { origin: 'https://payetax.co.uk', 'x-forwarded-for': '1.2.3.4' },
@@ -110,8 +89,8 @@ describe('/api/newsletter/subscribe POST', () => {
     });
   });
 
-  it('returns 503 when Resend is not configured', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: undefined, RESEND_AUDIENCE_ID: 'aud' });
+  it('returns 503 when Kit is not configured', async () => {
+    const POST = await loadRoute({ KIT_API_SECRET: undefined, KIT_FORM_ID: '123' });
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
       { origin: 'https://payetax.co.uk' },
@@ -120,11 +99,11 @@ describe('/api/newsletter/subscribe POST', () => {
     const json = await response.json();
 
     expect(response.status).toBe(503);
-    expect(json).toEqual({ error: 'Email service not configured' });
+    expect(json).toEqual({ error: 'Newsletter not configured' });
   });
 
-  it('returns 503 when audience is not configured', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: undefined });
+  it('returns 503 when Kit form is not configured', async () => {
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: undefined });
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
       { origin: 'https://payetax.co.uk' },
@@ -137,7 +116,7 @@ describe('/api/newsletter/subscribe POST', () => {
   });
 
   it('rejects invalid JSON payloads', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest('{', { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -147,7 +126,7 @@ describe('/api/newsletter/subscribe POST', () => {
   });
 
   it('rejects invalid email payloads', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest({ email: 'bad' }, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -156,9 +135,8 @@ describe('/api/newsletter/subscribe POST', () => {
     expect(json.error).toBe('Invalid email address');
   });
 
-  it('returns success without sending a welcome email when contact exists', async () => {
-    contactsCreateMock.mockResolvedValue({ error: { message: 'already exists' } });
-    const POST = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+  it('subscribes via Kit and returns success', async () => {
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
       { origin: 'https://payetax.co.uk' },
@@ -168,17 +146,16 @@ describe('/api/newsletter/subscribe POST', () => {
 
     expect(response.status).toBe(200);
     expect(json.success).toBe(true);
-    expect(sendMock).not.toHaveBeenCalled();
+    expect(subscribeEmailToKitMock).toHaveBeenCalledWith({
+      apiSecret: 'kit-secret',
+      formId: '123',
+      email: 'test@payetax.co.uk',
+    });
   });
 
-  it('creates contact and sends welcome email for new subscribers', async () => {
-    contactsCreateMock.mockResolvedValue({ error: null });
-    sendMock.mockResolvedValue({});
-    const POST = await loadRoute({
-      RESEND_API_KEY: 'test',
-      RESEND_AUDIENCE_ID: 'aud',
-      UNSUBSCRIBE_SECRET: 'secret',
-    });
+  it('returns 500 when Kit subscribe fails', async () => {
+    subscribeEmailToKitMock.mockRejectedValue(new Error('Kit failed'));
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest(
       { email: 'test@payetax.co.uk' },
       { origin: 'https://payetax.co.uk' },
@@ -186,9 +163,7 @@ describe('/api/newsletter/subscribe POST', () => {
     const response = await POST(request);
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.success).toBe(true);
-    expect(contactsCreateMock).toHaveBeenCalledTimes(1);
-    expect(sendMock).toHaveBeenCalled();
+    expect(response.status).toBe(500);
+    expect(json).toEqual({ error: 'Internal server error' });
   });
 });

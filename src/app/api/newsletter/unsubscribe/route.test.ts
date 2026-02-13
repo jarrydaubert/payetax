@@ -6,7 +6,7 @@
  * - Missing secret handling in production
  * - Rate-limit bypass
  * - Token verification regressions
- * - Resend configuration failures
+ * - Kit configuration failures
  */
 
 import { NextRequest } from 'next/server';
@@ -20,16 +20,10 @@ jest.mock('@/lib/newsletter/unsubscribeToken', () => ({
   verifyUnsubscribeToken: jest.fn(),
 }));
 
-const contactsUpdateMock = jest.fn();
-const contactsRemoveMock = jest.fn();
+const unsubscribeEmailInKitMock = jest.fn();
 
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
-    contacts: {
-      update: contactsUpdateMock,
-      remove: contactsRemoveMock,
-    },
-  })),
+jest.mock('@/lib/newsletter/kitClient', () => ({
+  unsubscribeEmailInKit: (...args: unknown[]) => unsubscribeEmailInKitMock(...args),
 }));
 
 const ORIGINAL_ENV = process.env;
@@ -72,8 +66,8 @@ describe('/api/newsletter/unsubscribe GET', () => {
   let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    contactsUpdateMock.mockResolvedValue({});
-    contactsRemoveMock.mockResolvedValue({});
+    unsubscribeEmailInKitMock.mockReset();
+    unsubscribeEmailInKitMock.mockResolvedValue(undefined);
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -88,8 +82,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
     const GET = await loadRoute({
       NODE_ENV: 'production',
       UNSUBSCRIBE_SECRET: undefined,
-      RESEND_API_KEY: 'test',
-      RESEND_AUDIENCE_ID: 'aud',
+      KIT_API_SECRET: 'kit-secret',
     });
     const request = buildRequest({ token: 'token' });
     const response = await GET(request);
@@ -98,7 +91,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
   });
 
   it('rate limits repeated unsubscribe attempts', async () => {
-    const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' }, false);
+    const GET = await loadRoute({ KIT_API_SECRET: 'kit-secret' }, false);
     const request = buildRequest({ token: 'token' }, { 'x-forwarded-for': '1.2.3.4' });
     const response = await GET(request);
     const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
@@ -111,7 +104,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
   });
 
   it('rejects missing tokens', async () => {
-    const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const GET = await loadRoute({ KIT_API_SECRET: 'kit-secret' });
     const request = buildRequest({});
     const response = await GET(request);
     const text = await response.text();
@@ -121,7 +114,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
   });
 
   it('rejects invalid tokens', async () => {
-    const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const GET = await loadRoute({ KIT_API_SECRET: 'kit-secret' });
     const { verifyUnsubscribeToken } = jest.requireMock('@/lib/newsletter/unsubscribeToken') as {
       verifyUnsubscribeToken: jest.Mock;
     };
@@ -134,8 +127,8 @@ describe('/api/newsletter/unsubscribe GET', () => {
     expect(text).toContain('Invalid or expired unsubscribe link');
   });
 
-  it('returns 503 when Resend is not configured', async () => {
-    const GET = await loadRoute({ RESEND_API_KEY: undefined, RESEND_AUDIENCE_ID: 'aud' });
+  it('returns 503 when Kit is not configured', async () => {
+    const GET = await loadRoute({ KIT_API_SECRET: undefined });
     const request = buildRequest({ token: 'token' });
     const response = await GET(request);
     const text = await response.text();
@@ -145,13 +138,16 @@ describe('/api/newsletter/unsubscribe GET', () => {
   });
 
   it('returns success for valid tokens', async () => {
-    const GET = await loadRoute({ RESEND_API_KEY: 'test', RESEND_AUDIENCE_ID: 'aud' });
+    const GET = await loadRoute({ KIT_API_SECRET: 'kit-secret' });
     const request = buildRequest({ token: 'token' });
     const response = await GET(request);
     const text = await response.text();
 
     expect(response.status).toBe(200);
     expect(text).toContain('Unsubscribed');
-    expect(contactsUpdateMock).toHaveBeenCalledTimes(1);
+    expect(unsubscribeEmailInKitMock).toHaveBeenCalledWith({
+      apiSecret: 'kit-secret',
+      email: 'user@payetax.co.uk',
+    });
   });
 });

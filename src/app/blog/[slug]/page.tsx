@@ -9,6 +9,7 @@ import { cache } from 'react';
 
 import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
@@ -345,6 +346,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </Button>
               </div>
             </div>
+
+            <NewsletterCTA
+              className='mt-8'
+              title='Get UK Tax Updates by Email'
+              description='Practical PAYE and tax-planning guidance whenever rules or thresholds change.'
+            />
           </article>
 
           {/* Related Posts */}

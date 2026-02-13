@@ -1,0 +1,140 @@
+/*
+  PayeTax Kit Embed Styles (source of truth)
+  ------------------------------------------
+  Usage:
+  1) Copy this file into Kit form editor -> "Custom CSS"
+  2) Click "Save & Publish" in Kit
+
+  Notes:
+  - These styles target Kit's form classes and are applied in Kit, not in this repo runtime CSS.
+  - Keep this file synchronized with the live Kit form to avoid design drift.
+*/
+
+/* Form container */
+.formkit-form,
+.seva-form.formkit-form {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+}
+
+/* Row layout */
+.formkit-fields {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+/* Email field */
+.formkit-input,
+.formkit-form input[type='email'] {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 46px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid #475569 !important;
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+  box-shadow: none !important;
+}
+
+/* Placeholder */
+.formkit-input::placeholder,
+.formkit-form input[type='email']::placeholder {
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+/* Focus state */
+.formkit-input:focus,
+.formkit-form input[type='email']:focus {
+  outline: none !important;
+  border-color: #22d3ee !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3) !important;
+}
+
+/* Subscribe button - dark/cyan style aligned to PayeTax visuals */
+.formkit-submit,
+.formkit-form button[type='submit'] {
+  position: relative !important;
+  overflow: hidden !important;
+  height: 46px !important;
+  padding: 0 20px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(34, 211, 238, 0.55) !important;
+  background: rgba(8, 23, 53, 0.85) !important;
+  color: #e6faff !important;
+  font-weight: 650 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.01em !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Neutralize Kit's internal button layers/pseudo-elements (prevents inner dark rectangle) */
+.formkit-submit::before,
+.formkit-submit::after,
+.formkit-form button[type='submit']::before,
+.formkit-form button[type='submit']::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.formkit-submit > *,
+.formkit-form button[type='submit'] > * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  color: inherit !important;
+}
+
+.formkit-submit:hover,
+.formkit-form button[type='submit']:hover {
+  background: linear-gradient(135deg, #0891b2 0%, #10b981 100%) !important;
+  color: #f0fdff !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25) !important;
+}
+
+.formkit-submit:focus-visible,
+.formkit-form button[type='submit']:focus-visible {
+  outline: none !important;
+  box-shadow:
+    0 0 0 3px rgba(34, 211, 238, 0.35),
+    0 8px 20px rgba(16, 185, 129, 0.2) !important;
+}
+
+.formkit-submit:active,
+.formkit-form button[type='submit']:active {
+  transform: translateY(1px) !important;
+}
+
+/* Keep helper text readable */
+.formkit-powered-by-convertkit,
+.formkit-powered-by,
+.formkit-form p,
+.formkit-form small {
+  color: #94a3b8 !important;
+}
+
+/* Mobile stack */
+@media (max-width: 640px) {
+  .formkit-fields {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .formkit-submit,
+  .formkit-form button[type='submit'] {
+    width: 100% !important;
+  }
+}

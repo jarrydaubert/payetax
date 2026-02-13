@@ -4,6 +4,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 
 // ============================================================================
@@ -224,6 +225,12 @@ export default function LandingPageSections() {
       <FeaturesSection />
       <HowItWorksSection />
       <FAQSection />
+      <div className='container mx-auto max-w-4xl px-4 py-10'>
+        <NewsletterCTA
+          title='Get TaxInsights by Email'
+          description='HMRC updates, practical tax-saving tips, and important deadlines for UK employees and directors.'
+        />
+      </div>
       <FinalCTASection />
     </>
   );

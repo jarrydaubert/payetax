@@ -10,6 +10,7 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
 import { BlogNav } from '@/components/molecules/BlogNav';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import {
   getCategoriesForNavGroup,
   getNavGroupBySlug,
@@ -233,6 +234,12 @@ export default async function CategoryPage({
             <p className='text-lg text-slate-400'>No articles found. Check back soon!</p>
           </div>
         )}
+
+        <NewsletterCTA
+          className='mt-10'
+          title='Get Tax Articles in Your Inbox'
+          description='Subscribe for new UK tax explainers, deadline reminders, and PAYE updates.'
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (

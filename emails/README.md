@@ -1,28 +1,13 @@
 # Email Templates
 
-Newsletter and notification email templates for PayeTax.
+Newsletter templates were removed from the app codebase.
 
-## Current Implementation
+Newsletter lifecycle is now handled in Kit:
 
-Templates use **raw HTML strings** (template literals) for simplicity and zero runtime dependencies.
+- Signup: `src/app/api/newsletter/subscribe/route.ts`
+- Unsubscribe (legacy token links): `src/app/api/newsletter/unsubscribe/route.ts`
+- Broadcasts/sequences: configured in Kit dashboard
 
-## Files
+Transactional app emails are defined in `src/lib/email/` and sent via Resend.
 
-- `welcome.tsx` - Welcome email for new newsletter subscribers
-- `new-blog-post.tsx` - Notification when new blog posts are published
-
-## Dependencies
-
-`@react-email/components` is installed but not yet used. It's kept for potential future migration to React Email components (better DX, preview tooling).
-
-See `docs/guides/RESEND.md` for newsletter setup and usage.
-
-## Usage
-
-```typescript
-import { generateNewBlogPostHtml } from '@/emails/new-blog-post';
-import { generateWelcomeEmailHtml } from '@/emails/welcome';
-
-// Generate HTML string for Resend
-const html = generateNewBlogPostHtml({ title, excerpt, url, recipientEmail });
-```
+See `docs/guides/RESEND.md` for provider setup.

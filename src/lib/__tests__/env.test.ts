@@ -36,7 +36,8 @@ describe('Environment Variable Validation', () => {
     // Clear problematic env vars that might have invalid values
     process.env.INDEXNOW_KEY = undefined;
     process.env.RESEND_API_KEY = undefined;
-    process.env.RESEND_AUDIENCE_ID = undefined;
+    process.env.KIT_API_SECRET = undefined;
+    process.env.KIT_FORM_ID = undefined;
     process.env.NEXT_PUBLIC_SITE_URL = undefined;
     process.env.NEXT_PUBLIC_GA_ID = undefined;
     process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = undefined;
@@ -158,9 +159,16 @@ describe('Environment Variable Validation', () => {
         expect(result.success).toBe(true);
       });
 
-      it('should accept valid Resend audience ID', () => {
+      it('should accept valid Kit API secret', () => {
         const result = ServerEnvSchema.safeParse({
-          RESEND_AUDIENCE_ID: 'aud_abc123def456',
+          KIT_API_SECRET: 'kit_abc123def456',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept valid Kit form ID', () => {
+        const result = ServerEnvSchema.safeParse({
+          KIT_FORM_ID: '12345',
         });
         expect(result.success).toBe(true);
       });
@@ -242,9 +250,16 @@ describe('Environment Variable Validation', () => {
         expect(result.success).toBe(false);
       });
 
-      it('should reject empty Resend audience ID if provided', () => {
+      it('should reject empty Kit API secret if provided', () => {
         const result = ServerEnvSchema.safeParse({
-          RESEND_AUDIENCE_ID: '',
+          KIT_API_SECRET: '',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should reject empty Kit form ID if provided', () => {
+        const result = ServerEnvSchema.safeParse({
+          KIT_FORM_ID: '',
         });
         expect(result.success).toBe(false);
       });
@@ -304,7 +319,8 @@ describe('Environment Variable Validation', () => {
       const result = RequiredProductionEnvSchema.safeParse({
         NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
         RESEND_API_KEY: 're_test123',
-        RESEND_AUDIENCE_ID: 'aud_test123',
+        KIT_API_SECRET: 'kit_test123',
+        KIT_FORM_ID: '12345',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
         NEXT_PUBLIC_GA_ID: 'G-TEST123456',
       });
@@ -315,7 +331,8 @@ describe('Environment Variable Validation', () => {
       const result = RequiredProductionEnvSchema.safeParse({
         NEXT_PUBLIC_SITE_URL: undefined,
         RESEND_API_KEY: undefined,
-        RESEND_AUDIENCE_ID: undefined,
+        KIT_API_SECRET: undefined,
+        KIT_FORM_ID: undefined,
       });
       expect(result.success).toBe(false);
     });
@@ -324,7 +341,8 @@ describe('Environment Variable Validation', () => {
       const result = RequiredProductionEnvSchema.safeParse({
         NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
         RESEND_API_KEY: 're_test123',
-        RESEND_AUDIENCE_ID: 'aud_test123',
+        KIT_API_SECRET: 'kit_test123',
+        KIT_FORM_ID: '12345',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
         NEXT_PUBLIC_GA_ID: undefined,
       });
@@ -335,7 +353,8 @@ describe('Environment Variable Validation', () => {
       const result = RequiredProductionEnvSchema.safeParse({
         NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
         RESEND_API_KEY: 're_test123',
-        RESEND_AUDIENCE_ID: 'aud_test123',
+        KIT_API_SECRET: 'kit_test123',
+        KIT_FORM_ID: '12345',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
         NEXT_PUBLIC_GA_ID: undefined,
       });
@@ -378,11 +397,15 @@ describe('Environment Variable Validation', () => {
   describe('validateServerEnv', () => {
     it('should validate from process.env', () => {
       process.env.RESEND_API_KEY = 're_test123';
+      process.env.KIT_API_SECRET = 'kit_test123';
+      process.env.KIT_FORM_ID = '12345';
       process.env.NODE_ENV = 'test';
 
       const env = validateServerEnv();
 
       expect(env.RESEND_API_KEY).toBe('re_test123');
+      expect(env.KIT_API_SECRET).toBe('kit_test123');
+      expect(env.KIT_FORM_ID).toBe('12345');
       expect(env.NODE_ENV).toBe('test');
     });
 
@@ -395,6 +418,8 @@ describe('Environment Variable Validation', () => {
     it('should handle missing optional env vars', () => {
       // Clear all server env vars
       process.env.RESEND_API_KEY = undefined;
+      process.env.KIT_API_SECRET = undefined;
+      process.env.KIT_FORM_ID = undefined;
       process.env.INDEXNOW_KEY = undefined;
 
       // Should not throw - all are optional
@@ -406,11 +431,15 @@ describe('Environment Variable Validation', () => {
     it('should validate both public and server env vars', () => {
       process.env.NEXT_PUBLIC_GA_ID = 'G-TEST123456';
       process.env.RESEND_API_KEY = 're_test123';
+      process.env.KIT_API_SECRET = 'kit_test123';
+      process.env.KIT_FORM_ID = '12345';
 
       const env = validateEnv();
 
       expect(env.public.NEXT_PUBLIC_GA_ID).toBe('G-TEST123456');
       expect(env.server.RESEND_API_KEY).toBe('re_test123');
+      expect(env.server.KIT_API_SECRET).toBe('kit_test123');
+      expect(env.server.KIT_FORM_ID).toBe('12345');
     });
 
     it('should throw if either validation fails', () => {
@@ -424,7 +453,8 @@ describe('Environment Variable Validation', () => {
     it('should validate required production env vars from process.env', () => {
       process.env.NEXT_PUBLIC_SITE_URL = 'https://payetax.co.uk';
       process.env.RESEND_API_KEY = 're_test123';
-      process.env.RESEND_AUDIENCE_ID = 'aud_test123';
+      process.env.KIT_API_SECRET = 'kit_test123';
+      process.env.KIT_FORM_ID = '12345';
       process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'true';
       process.env.NEXT_PUBLIC_GA_ID = 'G-TEST123456';
 
@@ -432,14 +462,16 @@ describe('Environment Variable Validation', () => {
 
       expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://payetax.co.uk');
       expect(env.RESEND_API_KEY).toBe('re_test123');
-      expect(env.RESEND_AUDIENCE_ID).toBe('aud_test123');
+      expect(env.KIT_API_SECRET).toBe('kit_test123');
+      expect(env.KIT_FORM_ID).toBe('12345');
       expect(env.NEXT_PUBLIC_GA_ID).toBe('G-TEST123456');
     });
 
     it('should throw when required production env vars are missing', () => {
       process.env.NEXT_PUBLIC_SITE_URL = undefined;
       process.env.RESEND_API_KEY = undefined;
-      process.env.RESEND_AUDIENCE_ID = undefined;
+      process.env.KIT_API_SECRET = undefined;
+      process.env.KIT_FORM_ID = undefined;
 
       expect(() => validateProductionEnv()).toThrow(
         'Missing or invalid required production environment variables',
@@ -449,7 +481,8 @@ describe('Environment Variable Validation', () => {
     it('should allow missing GA ID when analytics are disabled', () => {
       process.env.NEXT_PUBLIC_SITE_URL = 'https://payetax.co.uk';
       process.env.RESEND_API_KEY = 're_test123';
-      process.env.RESEND_AUDIENCE_ID = 'aud_test123';
+      process.env.KIT_API_SECRET = 'kit_test123';
+      process.env.KIT_FORM_ID = '12345';
       process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'false';
       process.env.NEXT_PUBLIC_GA_ID = undefined;
 

@@ -1,35 +1,18 @@
 // src/app/api/newsletter/subscribe/route.ts
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import { generateWelcomeEmailHtml, generateWelcomeEmailText } from '@/../emails/welcome';
-import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
-import {
-  createUnsubscribeToken,
-  resolveUnsubscribeSecret,
-} from '@/lib/newsletter/unsubscribeToken';
+import { subscribeEmailToKit } from '@/lib/newsletter/kitClient';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { NewsletterSubscribeRequestSchema } from '@/lib/validation/emailValidation';
 
-// Explicit Node.js runtime (Resend SDK requires Node APIs)
+// Explicit Node.js runtime for consistent server behavior and Buffer usage.
 export const runtime = 'nodejs';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const audienceId = process.env.RESEND_AUDIENCE_ID;
-const BASE_URL = resolveNewsletterBaseUrl();
+const KIT_API_SECRET = process.env.KIT_API_SECRET;
+const KIT_FORM_ID = process.env.KIT_FORM_ID;
 
 const MAX_BODY_SIZE = 1024; // 1KB is plenty for an email subscription
-
-/** Escape HTML to prevent injection (including single quotes for attributes) */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 /** Get client IP from headers (Vercel/Cloudflare set these securely) */
 function getClientIdentifier(request: NextRequest): string {
@@ -67,13 +50,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Check configuration
-  if (!resend) {
-    console.error('[newsletter/subscribe] Resend not configured');
-    return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
-  }
-
-  if (!audienceId) {
-    console.error('[newsletter/subscribe] Audience ID not configured');
+  if (!(KIT_API_SECRET && KIT_FORM_ID)) {
+    console.error('[newsletter/subscribe] Kit is not configured');
     return NextResponse.json({ error: 'Newsletter not configured' }, { status: 503 });
   }
 
@@ -109,73 +87,7 @@ export async function POST(request: NextRequest) {
   const { email } = validation.data;
 
   try {
-    // Ensure unsubscribe token signing is configured before doing any work in production.
-    // (In dev/test we allow a safe fallback to keep local flows working.)
-    let unsubscribeSecret: string;
-    try {
-      unsubscribeSecret = resolveUnsubscribeSecret();
-    } catch (err) {
-      console.error('[newsletter/subscribe] Unsubscribe signing not configured:', err);
-      return NextResponse.json({ error: 'Newsletter not configured' }, { status: 503 });
-    }
-
-    // Try to create contact directly (skip the extra GET call)
-    // Resend returns an error if contact already exists - we handle that as success
-    const { error } = await resend.contacts.create({
-      email,
-      audienceId,
-      unsubscribed: false,
-    });
-
-    // Check if "already exists" error - treat as idempotent success
-    // This avoids email enumeration attacks (same response for new vs existing)
-    const isAlreadySubscribed =
-      error?.message?.toLowerCase().includes('already') ||
-      error?.message?.toLowerCase().includes('exists') ||
-      error?.message?.toLowerCase().includes('contact');
-
-    if (error && !isAlreadySubscribed) {
-      console.error('[newsletter/subscribe] Resend error:', error);
-      return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
-    }
-
-    // Only send welcome email for NEW subscribers
-    if (!isAlreadySubscribed) {
-      // Generate unsubscribe URL with signed token
-      const unsubscribeToken = createUnsubscribeToken(email, unsubscribeSecret);
-      const unsubscribeUrl = `${BASE_URL}/api/newsletter/unsubscribe?token=${unsubscribeToken}`;
-
-      // Send welcome email with both HTML and plain-text (fire and forget)
-      resend.emails
-        .send({
-          from: 'PayeTax <noreply@payetax.co.uk>',
-          to: email,
-          subject: 'Welcome to PayeTax!',
-          html: generateWelcomeEmailHtml(email),
-          text: generateWelcomeEmailText(email),
-          headers: {
-            'List-Unsubscribe': `<${unsubscribeUrl}>`,
-            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-          },
-        })
-        .catch((err) => {
-          console.error('[newsletter/subscribe] Failed to send welcome email:', err);
-        });
-
-      // Notify admin of new subscriber (escape email in HTML)
-      const safeEmail = escapeHtml(email);
-      resend.emails
-        .send({
-          from: 'PayeTax <noreply@payetax.co.uk>',
-          to: 'support@payetax.co.uk',
-          subject: `New subscriber: ${email}`,
-          html: `<p>New newsletter subscriber: <strong>${safeEmail}</strong></p><p>Time: ${new Date().toISOString()}</p>`,
-          text: `New newsletter subscriber: ${email}\nTime: ${new Date().toISOString()}`,
-        })
-        .catch((err) => {
-          console.error('[newsletter/subscribe] Failed to send admin notification:', err);
-        });
-    }
+    await subscribeEmailToKit({ apiSecret: KIT_API_SECRET, formId: KIT_FORM_ID, email });
 
     // Return same success response regardless of new vs existing (idempotent)
     return NextResponse.json({

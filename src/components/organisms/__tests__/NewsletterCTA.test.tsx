@@ -1,57 +1,38 @@
-import { fireEvent, render, screen, waitFor } from '@/test/testing-library';
+import { render, screen } from '@/test/testing-library';
 
 import { NewsletterCTA } from '../NewsletterCTA';
 
 describe('NewsletterCTA', () => {
-  const originalFetch = global.fetch;
-
-  afterEach(() => {
-    global.fetch = originalFetch;
-    jest.clearAllMocks();
-  });
-
-  it('submits an email and shows success state', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      text: async () => '',
-    });
-
+  it('renders default headline, description, and privacy copy', () => {
     render(<NewsletterCTA />);
 
-    fireEvent.change(screen.getByLabelText('Email address'), {
-      target: { value: 'hello@example.com' },
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /Subscribe/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/Thanks! Check your inbox/i)).toBeInTheDocument();
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith('/api/newsletter/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'hello@example.com' }),
-    });
+    expect(screen.getByText('Stay Updated on UK Tax Changes')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Privacy Policy/i })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
   });
 
-  it('skips submit when honeypot is filled', async () => {
-    global.fetch = jest.fn();
-
+  it('renders Kit embed configuration with expected uid and source', () => {
     const { container } = render(<NewsletterCTA />);
 
-    const honeypot = container.querySelector('input[name="website"]') as HTMLInputElement;
-    fireEvent.change(honeypot, { target: { value: 'bot' } });
+    const embedMount = container.querySelector('[data-kit-embed-uid="648a4b276a"]');
+    expect(embedMount).toBeInTheDocument();
+    expect(embedMount).toHaveAttribute(
+      'data-kit-embed-src',
+      'https://payetax.kit.com/648a4b276a/index.js',
+    );
+  });
 
-    fireEvent.change(screen.getByLabelText('Email address'), {
-      target: { value: 'hello@example.com' },
-    });
+  it('supports custom title/description props', () => {
+    render(<NewsletterCTA title='Join Tax Insights' description='Weekly PAYE updates.' />);
 
-    const form = container.querySelector('form') as HTMLFormElement;
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(global.fetch).not.toHaveBeenCalled();
-    });
+    expect(screen.getByText('Join Tax Insights')).toBeInTheDocument();
+    expect(screen.getByText('Weekly PAYE updates.')).toBeInTheDocument();
   });
 });

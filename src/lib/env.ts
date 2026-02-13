@@ -51,12 +51,14 @@ export const PublicEnvSchema = z.object({
  * These are only available on the server (never exposed to browser)
  */
 export const ServerEnvSchema = z.object({
-  // Email Service
+  // Transactional Email Service
   RESEND_API_KEY: z
     .string()
     .min(1, 'Resend API key is required for email functionality')
     .optional(),
-  RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter').optional(),
+  // Newsletter Service (Kit)
+  KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter').optional(),
+  KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter').optional(),
   UPSTASH_REDIS_REST_URL: z.string().url('Upstash Redis REST URL must be a valid URL').optional(),
   UPSTASH_REDIS_REST_TOKEN: z
     .string()
@@ -102,7 +104,8 @@ export const RequiredProductionEnvSchema = z
   .object({
     NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
     RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
-    RESEND_AUDIENCE_ID: z.string().min(1, 'Resend audience ID is required for newsletter'),
+    KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter'),
+    KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter'),
     NEXT_PUBLIC_ENABLE_ANALYTICS: z
       .string()
       .transform((val) => val === 'true')
@@ -158,7 +161,8 @@ export function validatePublicEnv(): PublicEnv {
 export function validateServerEnv(): ServerEnv {
   const result = ServerEnvSchema.safeParse({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
-    RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+    KIT_API_SECRET: process.env.KIT_API_SECRET,
+    KIT_FORM_ID: process.env.KIT_FORM_ID,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
@@ -203,7 +207,8 @@ export function validateProductionEnv(): RequiredProductionEnv {
   const result = RequiredProductionEnvSchema.safeParse({
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
-    RESEND_AUDIENCE_ID: process.env.RESEND_AUDIENCE_ID,
+    KIT_API_SECRET: process.env.KIT_API_SECRET,
+    KIT_FORM_ID: process.env.KIT_FORM_ID,
     NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   });
