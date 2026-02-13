@@ -104,6 +104,11 @@ self.addEventListener('fetch', (event) => {
 
   if (method !== 'GET') return;
   if (!url.startsWith('http')) return;
+  const requestUrl = new URL(url);
+
+  // Never proxy third-party requests through SW cache logic.
+  // This avoids CSP/connect-src conflicts for vendor scripts (Kit/ConvertKit, analytics, etc.).
+  if (requestUrl.origin !== self.location.origin) return;
 
   // Skip analytics/tracking domains
   const skipDomains = [
