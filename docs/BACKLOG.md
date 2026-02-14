@@ -51,6 +51,7 @@
 - [ ] Enable referral CTA in `src/components/organisms/CalculatorContainer.tsx`
 
 ### Organic SEO + Blog Engine
+- [ ] Write blog posts for empty categories: company-tax, personal-finance, self-assessment
 - [ ] Ensure each new blog post has a primary CTA to calculator/director guide
 - [ ] Ensure each new blog post has a secondary CTA to newsletter signup
 - [ ] Keep blog-to-money-page internal links healthy (calculator, director guide, compliance)

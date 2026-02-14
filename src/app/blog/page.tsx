@@ -3,7 +3,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BlogNav } from '@/components/molecules/BlogNav';
 import { PullQuote } from '@/components/molecules/PullQuote';
 import { AllPostsGrid } from '@/components/organisms/AllPostsGrid';
 import { DeepDives } from '@/components/organisms/DeepDives';
@@ -172,43 +171,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <h1 className='sr-only'>TaxInsights by PayeTax</h1>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
             {/* Main Content Column */}
-            <div className='space-y-12'>
+            <div>
               {/* Latest Articles */}
               <LatestArticles posts={latestPosts} />
-
-              {/* Pull Quote */}
-              <PullQuote text={pullQuote.text} attribution={pullQuote.attribution} />
-
-              {/* Deep Dives */}
-              <DeepDives posts={deepDives} />
-
-              {/* Category Navigation - Below Deep Dives */}
-              <div className='pt-4'>
-                <BlogNav />
-              </div>
-
-              {/* Browse by Category */}
-              <section className='rounded-2xl border border-slate-800 bg-slate-900/40 p-6'>
-                <h2 className='font-semibold text-lg text-white'>Browse by Category</h2>
-                <p className='mt-1 text-slate-400 text-sm'>Jump straight to a topic.</p>
-                <div className='mt-4 flex flex-wrap gap-2'>
-                  {categories
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((category) => (
-                      <Link
-                        key={category.slug}
-                        href={`/blog/category/${category.slug}`}
-                        className='rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-slate-200 text-sm transition hover:border-slate-600 hover:text-white'
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                </div>
-              </section>
             </div>
 
-            {/* Sidebar - Editor's Picks (mt-12 aligns with Latest Articles content) */}
-            <div className='hidden lg:mt-12 lg:block'>
+            {/* Sidebar - Editor's Picks (offset to align with article cards below heading) */}
+            <div className='hidden lg:mt-11 lg:block'>
               <EditorsPicksSticky posts={editorsPicks} />
             </div>
           </div>
@@ -219,6 +188,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         </div>
 
+        {/* Full-width sections - centered like All Articles */}
+        <div className='container mx-auto max-w-7xl space-y-12 px-4 pb-12'>
+          {/* Pull Quote */}
+          <PullQuote text={pullQuote.text} attribution={pullQuote.attribution} />
+
+          {/* Deep Dives */}
+          <DeepDives posts={deepDives} />
+        </div>
+
         {/* All Posts Section - Server-side pagination */}
         <div className='border-slate-800 border-t'>
           <AllPostsGrid
@@ -226,6 +204,33 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             currentPage={currentPage}
             totalPages={totalPages}
             totalPosts={totalPosts}
+            filterSlot={
+              <nav aria-label='Browse blog categories' className='mb-8'>
+                <ul className='grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
+                  <li>
+                    <Link
+                      href='/blog'
+                      aria-current='page'
+                      className='block rounded-full border border-cyan-500 bg-cyan-500/20 px-4 py-2 text-center text-cyan-400 text-sm'
+                    >
+                      All Articles
+                    </Link>
+                  </li>
+                  {[...categories]
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((category) => (
+                      <li key={category.slug}>
+                        <Link
+                          href={`/blog/category/${category.slug}`}
+                          className='block rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-center text-slate-200 text-sm transition hover:border-cyan-500/50 hover:text-white'
+                        >
+                          {category.name}
+                        </Link>
+                      </li>
+                    ))}
+                </ul>
+              </nav>
+            }
           />
         </div>
 

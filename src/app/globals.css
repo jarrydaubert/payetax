@@ -124,34 +124,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Hero Badge with pulse animation */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 100px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--brand-cyan);
-  margin-bottom: 2rem;
-}
-
-.hero-badge .pulse {
-  width: 6px;
-  height: 6px;
-  background: var(--brand-cyan);
-  border-radius: 50%;
-  animation: badge-pulse 2s ease-in-out infinite;
-}
-
-@keyframes badge-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); }
-  50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
-}
-
 /* New gradient text utility */
 .text-gradient-new {
   background: var(--brand-gradient-new);
@@ -194,7 +166,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   padding: 1.5rem;
-  text-align: left;
+  text-align: center;
   transition: all 0.3s;
 }
 
@@ -212,7 +184,7 @@
   justify-content: center;
   background: rgba(6, 182, 212, 0.1);
   border-radius: 10px;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
   font-size: 1.25rem;
 }
 
@@ -531,9 +503,6 @@
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .bg-circle-1, .bg-circle-2 {
-    animation: none;
-  }
-  .hero-badge .pulse {
     animation: none;
   }
 }

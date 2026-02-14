@@ -16,12 +16,6 @@ describe('ServerHero Component', () => {
     expect(screen.getByText("you'll take home")).toBeInTheDocument();
   });
 
-  it('should render badge with HMRC rates', () => {
-    render(<ServerHero />);
-
-    expect(screen.getByText('Official HMRC 2025-26 Rates')).toBeInTheDocument();
-  });
-
   it('should render the tagline with HMRC mention', () => {
     render(<ServerHero />);
 

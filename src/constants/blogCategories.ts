@@ -2,8 +2,8 @@
 /**
  * Blog Category Taxonomy - Single Source of Truth
  *
- * Defines all blog categories with their display properties, colors, and navigation groupings.
- * Used by the blog redesign for consistent category styling and nav group routing.
+ * Defines all blog categories with their display properties and colors.
+ * Used by the blog redesign for consistent category styling.
  *
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
@@ -24,7 +24,6 @@ export const BLOG_CATEGORIES = {
     slug: 'salary-guides',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   'tax-basics': {
     key: 'tax-basics',
@@ -32,7 +31,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-basics',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   'tax-planning': {
     key: 'tax-planning',
@@ -40,7 +38,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-planning',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   'tax-tips': {
     key: 'tax-tips',
@@ -48,7 +45,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-tips',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   'tax-comparison': {
     key: 'tax-comparison',
@@ -56,7 +52,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-comparison',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   'tax-tools': {
     key: 'tax-tools',
@@ -64,7 +59,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-tools',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Tax Guides',
   },
   // Student Loans
   'student-loans': {
@@ -73,7 +67,6 @@ export const BLOG_CATEGORIES = {
     slug: 'student-loans',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'Student Loans',
   },
   // News group
   'tax-changes': {
@@ -82,7 +75,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-changes',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'News',
   },
   'tax-deadlines': {
     key: 'tax-deadlines',
@@ -90,7 +82,6 @@ export const BLOG_CATEGORIES = {
     slug: 'tax-deadlines',
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
-    navGroup: 'News',
   },
 } as const;
 
@@ -105,44 +96,6 @@ export type CategoryKey = keyof typeof BLOG_CATEGORIES;
 export type CategoryConfig = (typeof BLOG_CATEGORIES)[CategoryKey];
 
 /**
- * Navigation group configuration for the blog header
- */
-export interface NavGroupConfig {
-  label: string;
-  slug: string;
-  categories: CategoryKey[];
-}
-
-/**
- * Navigation groups - aggregate multiple categories into nav items
- * Categories array must contain valid CategoryKey values from BLOG_CATEGORIES
- */
-export const NAV_GROUPS: NavGroupConfig[] = [
-  {
-    label: 'Tax Guides',
-    slug: 'tax-guides',
-    categories: [
-      'salary-guides',
-      'tax-basics',
-      'tax-planning',
-      'tax-tips',
-      'tax-comparison',
-      'tax-tools',
-    ],
-  },
-  { label: 'Student Loans', slug: 'student-loans', categories: ['student-loans'] },
-  { label: 'News', slug: 'news', categories: ['tax-changes', 'tax-deadlines'] },
-];
-
-/**
- * Get categories for a navigation group by slug
- */
-export function getCategoriesForNavGroup(groupSlug: string): CategoryKey[] {
-  const group = NAV_GROUPS.find((g) => g.slug === groupSlug);
-  return group?.categories ?? [];
-}
-
-/**
  * Get category config by URL slug (not by key)
  */
 export function getCategoryBySlug(slug: string): CategoryConfig | undefined {
@@ -154,20 +107,6 @@ export function getCategoryBySlug(slug: string): CategoryConfig | undefined {
  */
 export function getCategoryByKey(key: string): CategoryConfig | undefined {
   return BLOG_CATEGORIES[key as CategoryKey];
-}
-
-/**
- * Check if a slug is a nav group slug
- */
-export function isNavGroupSlug(slug: string): boolean {
-  return NAV_GROUPS.some((g) => g.slug === slug);
-}
-
-/**
- * Get nav group by slug
- */
-export function getNavGroupBySlug(slug: string): NavGroupConfig | undefined {
-  return NAV_GROUPS.find((g) => g.slug === slug);
 }
 
 /**

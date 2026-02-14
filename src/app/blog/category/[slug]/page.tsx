@@ -1,7 +1,6 @@
 // src/app/blog/category/[slug]/page.tsx
 /**
  * Category-specific blog page using local MDX blog system
- * Supports both individual categories AND nav groups (e.g., "tax-guides" = tax-guide + guide)
  */
 
 import type { Metadata } from 'next';
@@ -9,17 +8,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
-import { BlogNav } from '@/components/molecules/BlogNav';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
-import {
-  getCategoriesForNavGroup,
-  getNavGroupBySlug,
-  NAV_GROUPS,
-  POSTS_PER_PAGE,
-} from '@/constants/blogCategories';
+import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 import { SITE_URL } from '@/lib/metadata';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 // Cache categories fetch to deduplicate calls
 const getCachedCategories = cache(() => getBlogCategories());
@@ -29,11 +22,8 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  // Generate params for both nav groups AND individual categories
   const categories = await getCachedCategories();
-  const categoryParams = categories.map((c) => ({ slug: c.slug }));
-  const navGroupParams = NAV_GROUPS.map((g) => ({ slug: g.slug }));
-  return [...navGroupParams, ...categoryParams];
+  return categories.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({
@@ -52,21 +42,6 @@ export async function generateMetadata({
   const canonicalUrl = page > 1 ? `${canonicalBase}?page=${page}` : canonicalBase;
   const ogImage = `${SITE_URL}/images/og-image.png`;
 
-  // Check if it's a nav group first
-  const navGroup = getNavGroupBySlug(slug);
-  if (navGroup) {
-    const title = `${navGroup.label} | TaxInsights by PayeTax`;
-    const description = `Expert ${navGroup.label.toLowerCase()} articles from TaxInsights. Clear UK tax guidance with no jargon.`;
-    return {
-      title,
-      description,
-      alternates: { canonical: canonicalUrl },
-      openGraph: { title, description, url: canonicalUrl, images: [ogImage] },
-      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
-    };
-  }
-
-  // Fall back to individual category
   const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
   if (!category) {
@@ -93,30 +68,24 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
+  const rawPage = resolvedSearchParams.page;
+  const pageValue = Array.isArray(rawPage) ? rawPage[0] : rawPage;
+  const currentPage = Math.max(1, Number.parseInt(pageValue ?? '1', 10) || 1);
 
-  const currentPage = resolvedSearchParams.page
-    ? Number.parseInt(
-        Array.isArray(resolvedSearchParams.page)
-          ? (resolvedSearchParams.page[0] ?? '1')
-          : resolvedSearchParams.page,
-        10,
-      )
-    : 1;
+  // Verify category exists
+  const categories = await getCachedCategories();
+  const category = categories.find((c) => c.slug === slug);
+  if (!category) return notFound();
 
-  // Check if this is a nav group (e.g., "tax-guides" maps to ["tax-guide", "guide"])
-  const navGroup = getNavGroupBySlug(slug);
-  const isGroup = !!navGroup;
-  const categoryKeys = isGroup ? getCategoriesForNavGroup(slug) : [slug];
-
-  // Fetch posts filtered by category keys (multiple for groups, single for categories)
+  // Fetch posts filtered by category
   const posts = await getBlogPosts({
     page: currentPage,
     pageSize: POSTS_PER_PAGE,
-    categories: categoryKeys,
+    categories: [slug],
   });
 
-  // Count total posts in these categories
-  const allPosts = await getBlogPosts({ categories: categoryKeys, pageSize: 1000 });
+  // Count total posts in this category
+  const allPosts = await getBlogPosts({ categories: [slug], pageSize: 1000 });
   const totalCount = allPosts.length;
   const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
 
@@ -124,18 +93,6 @@ export default async function CategoryPage({
   if (posts.length === 0 && currentPage > 1) {
     return notFound();
   }
-
-  // For individual categories, verify it exists
-  if (!isGroup) {
-    const categories = await getCachedCategories();
-    const category = categories.find((c) => c.slug === slug);
-    if (!category) return notFound();
-  }
-
-  // Display name for header
-  const displayName = isGroup
-    ? navGroup.label
-    : slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   // Breadcrumb structured data
   const breadcrumbStructuredData = {
@@ -147,7 +104,7 @@ export default async function CategoryPage({
       {
         '@type': 'ListItem',
         position: 3,
-        name: displayName,
+        name: category.name,
         item: `${SITE_URL}/blog/category/${slug}`,
       },
     ],
@@ -180,17 +137,16 @@ export default async function CategoryPage({
                 </Link>
               </li>
               <li>/</li>
-              <li className='text-cyan-400'>{displayName}</li>
+              <li className='text-cyan-400'>{category.name}</li>
             </ol>
           </nav>
 
           <h1 className='mb-4 font-bold font-display text-3xl text-white md:text-4xl'>
-            {displayName}
+            {category.name}
           </h1>
           <p className='max-w-2xl text-slate-300'>
-            {isGroup
-              ? `Browse all ${displayName.toLowerCase()} articles - expert UK tax guidance with no jargon.`
-              : `Expert articles on ${displayName.toLowerCase()} including UK tax updates, guidance, and practical advice.`}
+            Expert articles on {category.name.toLowerCase()} including UK tax updates, guidance, and
+            practical advice.
           </p>
           <p className='mt-2 text-slate-500 text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
@@ -198,9 +154,40 @@ export default async function CategoryPage({
         </div>
       </div>
 
-      {/* Blog Nav */}
-      <div className='container mx-auto max-w-7xl px-4 pt-8'>
-        <BlogNav activeGroup={isGroup ? slug : undefined} />
+      {/* Category Filter Pills */}
+      <div className='border-slate-800 border-b'>
+        <div className='container mx-auto max-w-7xl px-4 py-6'>
+          <nav aria-label='Browse blog categories'>
+            <ul className='grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
+              <li>
+                <Link
+                  href='/blog'
+                  className='block rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-center text-slate-200 text-sm transition hover:border-cyan-500/50 hover:text-white'
+                >
+                  All Articles
+                </Link>
+              </li>
+              {[...categories]
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((cat) => (
+                  <li key={cat.slug}>
+                    <Link
+                      href={`/blog/category/${cat.slug}`}
+                      aria-current={cat.slug === slug ? 'page' : undefined}
+                      className={cn(
+                        'block rounded-full border px-4 py-2 text-center text-sm transition',
+                        cat.slug === slug
+                          ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400'
+                          : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:border-cyan-500/50 hover:text-white',
+                      )}
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </nav>
+        </div>
       </div>
 
       {/* Posts Grid */}
@@ -231,7 +218,10 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className='py-16 text-center'>
-            <p className='text-lg text-slate-400'>No articles found. Check back soon!</p>
+            <p className='text-lg text-slate-400'>No articles found in this category yet.</p>
+            <Link href='/blog' className='mt-4 inline-block text-cyan-400 hover:text-cyan-300'>
+              ← Browse all articles
+            </Link>
           </div>
         )}
 

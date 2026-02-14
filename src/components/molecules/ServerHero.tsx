@@ -1,6 +1,6 @@
 // src/components/molecules/ServerHero.tsx
 // Server-rendered hero for instant LCP - no 'use client' directive
-// Matches payetax-web design: badge, headline, dual CTAs, trust strip, bento grid
+// Matches payetax-web design: headline, dual CTAs, trust strip, bento grid
 
 import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
@@ -20,12 +20,6 @@ export default function ServerHero({ className }: ServerHeroProps) {
         className,
       )}
     >
-      {/* Badge */}
-      <div className='hero-badge'>
-        <span className='pulse' />
-        Official HMRC 2025-26 Rates
-      </div>
-
       {/* Heading */}
       <h1 className='mx-auto mb-6 max-w-[900px] font-bold font-display text-[clamp(3rem,10vw,5.5rem)] text-text-primary-new leading-[1.05] tracking-[-0.04em]'>
         See what
