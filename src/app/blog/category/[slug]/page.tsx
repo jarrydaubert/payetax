@@ -236,7 +236,7 @@ export default async function CategoryPage({
         )}
 
         <NewsletterCTA
-          className='mt-10'
+          className='mx-auto mt-10 max-w-4xl'
           title='Get Tax Articles in Your Inbox'
           description='Subscribe for new UK tax explainers, deadline reminders, and PAYE updates.'
         />

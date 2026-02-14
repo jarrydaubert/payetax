@@ -3,7 +3,7 @@ import { render, screen } from '@/test/testing-library';
 import { NewsletterCTA } from '../NewsletterCTA';
 
 describe('NewsletterCTA', () => {
-  it('renders default headline, description, and privacy copy', () => {
+  it('renders default headline and description', () => {
     render(<NewsletterCTA />);
 
     expect(screen.getByText('Stay Updated on UK Tax Changes')).toBeInTheDocument();
@@ -12,10 +12,7 @@ describe('NewsletterCTA', () => {
         'HMRC rate updates, tax-saving strategies, and deadline reminders. No spam, ever.',
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Privacy Policy/i })).toHaveAttribute(
-      'href',
-      '/privacy',
-    );
+    expect(screen.queryByRole('link', { name: /Privacy Policy/i })).not.toBeInTheDocument();
   });
 
   it('renders Kit embed configuration with expected uid and source', () => {

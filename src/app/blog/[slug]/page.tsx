@@ -348,7 +348,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
 
             <NewsletterCTA
-              className='mt-8'
+              className='mx-auto mt-8 max-w-4xl'
               title='Get UK Tax Updates by Email'
               description='Practical PAYE and tax-planning guidance whenever rules or thresholds change.'
             />

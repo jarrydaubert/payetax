@@ -232,7 +232,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         {/* CTAs - Below All Posts */}
         <div className='container mx-auto max-w-7xl px-4 py-16'>
           {/* Newsletter CTA */}
-          <NewsletterCTA />
+          <NewsletterCTA className='mx-auto max-w-4xl' />
 
           {/* Calculator CTA */}
           <div className='mt-8 text-center'>

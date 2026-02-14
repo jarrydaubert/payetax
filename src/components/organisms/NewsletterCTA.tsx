@@ -10,7 +10,6 @@
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
 
-import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -59,7 +58,7 @@ export function NewsletterCTA({
   return (
     <section
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-8 md:p-12',
+        'newsletter-cta relative overflow-hidden rounded-2xl border border-border/60 bg-card/70 p-8 md:p-12',
         className,
       )}
       aria-label='Newsletter signup'
@@ -84,46 +83,139 @@ export function NewsletterCTA({
         />
 
         <style jsx global>{`
-          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-fields {
+          /* Force inline layout - target ALL possible Kit containers */
+          .newsletter-cta .formkit-fields,
+          .newsletter-cta .seva-fields,
+          .newsletter-cta ul.formkit-fields,
+          .newsletter-cta [data-element='fields'],
+          .newsletter-cta [class*='formkit-field'] {
             display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
             align-items: center !important;
             gap: 12px !important;
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
 
-          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-input,
-          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form input[type='email'] {
-            flex: 1 1 auto !important;
+          /* Override data-stacked at all breakpoints for desktop */
+          .newsletter-cta [data-stacked='true'],
+          .newsletter-cta [data-stacked='false'] {
+            flex-direction: row !important;
+          }
+
+          /* Email field container - takes available space */
+          .newsletter-cta .formkit-field,
+          .newsletter-cta .formkit-fields > li:first-child,
+          .newsletter-cta .formkit-fields > *:first-child {
+            flex: 1 1 0% !important;
             min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            list-style: none !important;
           }
 
-          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-submit,
-          [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form button[type='submit'] {
+          /* Button container - fixed width, no grow */
+          .newsletter-cta .formkit-fields > li:last-child,
+          .newsletter-cta .formkit-fields > *:last-child,
+          .newsletter-cta .formkit-submit-wrapper {
+            flex: 0 0 auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            list-style: none !important;
+          }
+
+          /* Email input */
+          .newsletter-cta .formkit-input,
+          .newsletter-cta .formkit-form input[type='email'],
+          .newsletter-cta input[type='email'] {
+            width: 100% !important;
+            min-width: 0 !important;
+            box-shadow: none !important;
+            background-image: none !important;
+          }
+
+          /* Subscribe button - CRITICAL: override flex-basis:100% from Kit */
+          .newsletter-cta .formkit-submit,
+          .newsletter-cta .formkit-form button[type='submit'],
+          .newsletter-cta button[type='submit'] {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex: 0 0 auto !important;
+            flex-basis: auto !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
             width: auto !important;
-            min-width: 172px !important;
+            min-width: 140px !important;
+            max-width: 180px !important;
+            margin-bottom: 0 !important;
             white-space: nowrap !important;
           }
 
+          /* Neutralize button pseudo-elements */
+          .newsletter-cta .formkit-submit::before,
+          .newsletter-cta .formkit-submit::after,
+          .newsletter-cta button[type='submit']::before,
+          .newsletter-cta button[type='submit']::after {
+            content: none !important;
+            display: none !important;
+          }
+
+          .newsletter-cta .formkit-submit > *,
+          .newsletter-cta button[type='submit'] > * {
+            border: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+          }
+
+          /* Built with Kit - SVG logo uses dark fill, need filter to brighten */
+          .newsletter-cta .formkit-powered-by-convertkit-container,
+          .newsletter-cta .formkit-powered-by-convertkit,
+          .newsletter-cta .formkit-powered-by,
+          .newsletter-cta [class*='powered-by'],
+          .newsletter-cta [class*='formkit-guarantee'],
+          .newsletter-cta .formkit-form small,
+          .newsletter-cta .formkit-form p:not(:first-child) {
+            color: #cbd5e1 !important;
+            opacity: 1 !important;
+            filter: invert(1) brightness(0.7) !important;
+            -webkit-text-fill-color: #cbd5e1 !important;
+          }
+
+          .newsletter-cta .formkit-powered-by-convertkit-container a,
+          .newsletter-cta .formkit-powered-by-convertkit a,
+          .newsletter-cta .formkit-powered-by a,
+          .newsletter-cta [class*='powered-by'] a {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+            filter: invert(1) brightness(0.7) !important;
+            -webkit-text-fill-color: #e2e8f0 !important;
+          }
+
+          /* Mobile: stack vertically */
           @media (max-width: 640px) {
-            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-fields {
+            .newsletter-cta .formkit-fields,
+            .newsletter-cta .seva-fields,
+            .newsletter-cta ul.formkit-fields,
+            .newsletter-cta [data-element='fields'],
+            .newsletter-cta [data-stacked='true'],
+            .newsletter-cta [data-stacked='false'] {
               flex-direction: column !important;
               align-items: stretch !important;
             }
 
-            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-submit,
-            [data-kit-embed-uid='${KIT_EMBED_UID}'] .formkit-form button[type='submit'] {
+            .newsletter-cta .formkit-submit,
+            .newsletter-cta .formkit-form button[type='submit'],
+            .newsletter-cta button[type='submit'] {
               width: 100% !important;
               min-width: 0 !important;
+              max-width: none !important;
+              flex-basis: 100% !important;
             }
           }
         `}</style>
-
-        <p className='mt-4 text-muted-foreground text-xs'>
-          We respect your privacy.{' '}
-          <Link href='/privacy' className='underline hover:text-foreground'>
-            Privacy Policy
-          </Link>
-          . Unsubscribe anytime.
-        </p>
       </div>
     </section>
   );
