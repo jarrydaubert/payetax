@@ -61,9 +61,6 @@
 ### Security Docs + Audit Hygiene
 - [ ] Document per-route validation approach
 - [ ] Document per-route body size limits
-- [ ] Document that `bun audit` requires network access
-- [ ] Fix `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` header comment for Plan 4 threshold
-- [ ] Add a repeatable bundle-size verification step
 
 ### Compare My Setup
 - [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)

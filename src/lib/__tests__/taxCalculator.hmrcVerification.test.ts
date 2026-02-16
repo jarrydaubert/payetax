@@ -18,7 +18,7 @@
  * Student Loan Thresholds 2025-26:
  * - Plan 1: £26,065 (9%)
  * - Plan 2: £28,470 (9%)
- * - Plan 4: £31,395 (9%)
+ * - Plan 4: £32,745 (9%)
  * - Plan 5: £25,000 (9%)
  * - Postgraduate: £21,000 (6%)
  */

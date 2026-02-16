@@ -22,18 +22,6 @@ Good copy editing isn't about rewriting—it's about enhancing. Each pass focuse
 - Preserve the author's voice while improving clarity
 
 ---
-## PayeTax Context
-
-**Product:** Free UK PAYE tax calculator at payetax.uk
-**Focus:** Accuracy (matches HMRC), privacy (no accounts), comprehensive features
-**Audience:** UK employees, job seekers, directors, HR professionals
-**Key pages:** Homepage calculator, /salary/[amount] pages, Director Guide
-**Voice:** Clear, confident, numbers-focused, British English
-**Constraints:** No user accounts, no ads, must match HMRC accuracy
-
-See `.claude/product-marketing-context.md` for full details.
-
----
 
 ## The Seven Sweeps Framework
 

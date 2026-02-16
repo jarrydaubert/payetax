@@ -216,13 +216,13 @@ export function Analytics() {
       <Script
         id='ga-script'
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy='afterInteractive'
+        strategy='lazyOnload'
         onLoad={() => setIsLoaded(true)}
       />
 
       {/* Google Analytics Initialization - static id prevents duplicate execution */}
       {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
-      <Script id='ga-init' strategy='afterInteractive'>
+      <Script id='ga-init' strategy='lazyOnload'>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

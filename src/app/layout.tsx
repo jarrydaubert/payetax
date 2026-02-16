@@ -98,8 +98,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           ) : null}
         </ThemeProvider>
 
-        {/* Service Worker Registration - afterInteractive for non-blocking load */}
-        <Script src='/register-sw.js' strategy='afterInteractive' />
+        {/* Service Worker Registration - lazyOnload to avoid competing with initial hydration */}
+        <Script src='/register-sw.js' strategy='lazyOnload' />
       </body>
     </html>
   );
