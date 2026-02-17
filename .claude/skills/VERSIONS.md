@@ -2,6 +2,12 @@
 
 Current versions of all skills. Agents can compare against local versions to check for updates.
 
+## File Structure
+
+- **`SKILL.md`** files — customised for PayeTax with `## PayeTax Context` sections. These are ours to edit.
+- **`references/`** directories — original reference material from the [Corey Haines marketing skills package](https://github.com/coreyhaines). Do NOT modify these. Compare against upstream when checking for updates.
+- **`.claude/tools/`** — original tools registry and integration guides from the same package. Do NOT modify these.
+
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
 | ab-test-setup | 1.0.0 | 2026-02-17 |
