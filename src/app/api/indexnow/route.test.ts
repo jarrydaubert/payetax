@@ -159,6 +159,8 @@ describe('/api/indexnow POST', () => {
           'https://payetax.co.uk/blog/salary-guide',
           'https://payetax.co.uk/tools/director-guide',
           'https://payetax.co.uk/calculator/50000-after-tax',
+          'https://payetax.co.uk/best-for',
+          'https://payetax.co.uk/best-for/contractors',
         ],
       },
       { 'x-indexnow-secret': 'secret' },
@@ -169,8 +171,8 @@ describe('/api/indexnow POST', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({
       success: true,
-      submitted: 5,
-      message: 'Successfully submitted 5 URLs to IndexNow',
+      submitted: 7,
+      message: 'Successfully submitted 7 URLs to IndexNow',
     });
 
     fetchSpy.mockRestore();

@@ -21,7 +21,7 @@ import {
   getEditorsPicks,
   getLatestPosts,
 } from '@/lib/blog';
-import { LOGO_URL, SITE_URL } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, LOGO_URL, SITE_URL } from '@/lib/metadata';
 
 // ⚠️ CRITICAL: DO NOT CHANGE THIS CONFIGURATION WITHOUT TESTING
 // This config has been carefully tuned for Next.js 15/16 compatibility
@@ -49,41 +49,38 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   const isOutOfRange = page > totalPages;
   const canonicalPage = isOutOfRange ? 1 : page;
 
-  // Self-referential canonical URL (page 1 = /blog, page 2+ = /blog?page=N)
-  const canonicalUrl =
-    canonicalPage > 1 ? `${SITE_URL}/blog?page=${canonicalPage}` : `${SITE_URL}/blog`;
+  // Self-referential canonical URL path (page 1 = /blog, page 2+ = /blog?page=N)
+  const canonicalPath = canonicalPage > 1 ? `/blog?page=${canonicalPage}` : '/blog';
 
   // Note: rel="prev/next" link hints removed - Next.js `other` field outputs <meta> not <link>
   // If needed in future, use a custom <head> component to render actual <link> tags
 
   const title =
     page > 1 ? `TaxInsights by PayeTax | Page ${page}` : 'TaxInsights by PayeTax | UK Tax Guidance';
-
-  return {
+  const description =
+    'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights for 2025-26. Clear explanations, no jargon.';
+  const metadata = generateMetadataHelper({
     title,
-    description:
-      'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights for 2025-26. Clear explanations, no jargon.',
+    description,
     keywords:
       'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips',
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    robots: isOutOfRange ? { index: false, follow: false } : undefined,
+    pathname: canonicalPath,
+    noIndex: isOutOfRange,
+    ogImage: '/images/blog/taxinsights-og.jpg',
+  });
+
+  return {
+    ...metadata,
     openGraph: {
-      title,
+      ...metadata.openGraph,
       description:
         'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, self-assessment guides, and practical financial insights.',
-      url: canonicalUrl,
-      type: 'website',
       siteName: 'TaxInsights by PayeTax',
-      images: [`${SITE_URL}/images/blog/taxinsights-og.jpg`],
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
+      ...metadata.twitter,
       description:
         'Clear, actionable UK tax information based on official HMRC rates and guidance. Stay informed with the latest tax news, PAYE updates, and practical financial insights.',
-      images: [`${SITE_URL}/images/blog/taxinsights-og.jpg`],
     },
   };
 }
@@ -100,6 +97,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     getLatestPosts(5), // For latest articles section
     getBlogCategories(),
   ]);
+  const nonEmptyCategories = categories.filter((category) => (category.count ?? 0) > 0);
 
   // Get paginated posts for All Posts section
   const paginatedPosts = await getBlogPosts({
@@ -168,7 +166,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className='min-h-screen bg-slate-950'>
         {/* Main Content with Sidebar */}
         <div className='container mx-auto max-w-7xl px-4 py-12'>
-          <h1 className='sr-only'>TaxInsights by PayeTax</h1>
+          <h1 className='mb-8 font-bold font-display text-3xl text-white md:text-4xl'>
+            UK Tax Guides &amp; PAYE Insights
+          </h1>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
             {/* Main Content Column */}
             <div>
@@ -216,7 +216,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       All Articles
                     </Link>
                   </li>
-                  {[...categories]
+                  {[...nonEmptyCategories]
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .map((category) => (
                       <li key={category.slug}>

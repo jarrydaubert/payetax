@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllCompetitorSlugs, getCompetitorBySlug } from '@/data/competitors';
-import { SITE_URL } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { VsPageContent } from './VsPageContent';
 
 interface PageProps {
@@ -37,31 +37,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `PayeTax vs ${competitor.name} | UK Tax Calculator Comparison`;
   const description = `Compare PayeTax and ${competitor.name} side-by-side. See features, pros, cons, and which UK tax calculator is right for you.`;
-  const pageUrl = `${SITE_URL}/vs/${slug}`;
-  const ogImage = `${SITE_URL}/images/og-image.png`;
+  const pathname = `/vs/${slug}`;
 
-  return {
+  return generateMetadataHelper({
     title,
     description,
     keywords: `payetax vs ${competitor.name.toLowerCase()}, ${competitor.shortName?.toLowerCase() ?? competitor.name.toLowerCase()} comparison, uk tax calculator comparison, paye calculator comparison`,
-    alternates: {
-      canonical: pageUrl,
-    },
-    openGraph: {
-      title,
-      description,
-      url: pageUrl,
-      type: 'website',
-      siteName: 'PayeTax',
-      images: [ogImage],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `PayeTax vs ${competitor.name}`,
-      description,
-      images: [ogImage],
-    },
-  };
+    pathname,
+  });
 }
 
 export default async function VsPage({ params }: PageProps) {

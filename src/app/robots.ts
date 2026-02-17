@@ -19,7 +19,15 @@ import { SITE_URL } from '@/lib/metadata';
  */
 
 // Shared disallow list for all allowed crawlers
-const DISALLOW_PATHS = ['/api/', '/admin/', '/_next/data/', '/_vercel/', '/private/', '/offline'];
+const DISALLOW_PATHS = [
+  '/api/',
+  '/admin/',
+  '/_next/data/',
+  '/_vercel/',
+  '/private/',
+  '/offline',
+  '/monitoring',
+];
 
 export default function robots(): MetadataRoute.Robots {
   return {

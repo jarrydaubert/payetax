@@ -40,6 +40,22 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', '/blog');
     });
 
+    it('should render Best UK Calculators link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Best UK Calculators/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/best-uk-tax-calculators');
+    });
+
+    it('should render Alternatives link', () => {
+      render(<Footer />);
+
+      const link = screen.getByRole('link', { name: /Alternatives/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', '/alternatives');
+    });
+
     it('should render About link', () => {
       render(<Footer />);
 

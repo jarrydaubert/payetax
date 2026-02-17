@@ -99,6 +99,16 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
+  async redirects() {
+    return [
+      {
+        source: '/blog/category/tax-tools',
+        destination: '/blog/category/tax-basics',
+        permanent: true,
+      },
+    ];
+  },
+
   // Enable source maps for Sentry error tracking (deleted after upload via Sentry config)
   productionBrowserSourceMaps: true,
 

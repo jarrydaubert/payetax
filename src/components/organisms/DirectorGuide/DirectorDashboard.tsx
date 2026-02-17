@@ -11,6 +11,7 @@
 'use client';
 
 import { Calculator, Mail } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   KeyDates,
@@ -262,6 +263,22 @@ export function DirectorDashboard() {
                   Dashboard
                 </span>
               </h1>
+              <nav
+                aria-label='Director guide navigation links'
+                className='mt-2 flex flex-wrap items-center gap-3 text-slate-400 text-sm'
+              >
+                <Link href='/' className='hover:text-slate-200'>
+                  PAYE Calculator
+                </Link>
+                <span aria-hidden='true'>|</span>
+                <Link href='/tools' className='hover:text-slate-200'>
+                  All Tools
+                </Link>
+                <span aria-hidden='true'>|</span>
+                <Link href='/blog' className='hover:text-slate-200'>
+                  Tax Guides
+                </Link>
+              </nav>
             </div>
 
             {/* Results */}

@@ -12,8 +12,8 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('See what')).toBeInTheDocument();
-    expect(screen.getByText("you'll take home")).toBeInTheDocument();
+    expect(screen.getByText('Free UK PAYE Tax Calculator')).toBeInTheDocument();
+    expect(screen.getByText('See your take-home pay')).toBeInTheDocument();
   });
 
   it('should render the tagline with HMRC mention', () => {
@@ -63,7 +63,7 @@ describe('ServerHero Component', () => {
 
     const gradientText = container.querySelector('.text-gradient-new');
     expect(gradientText).toBeInTheDocument();
-    expect(gradientText?.textContent).toBe("you'll take home");
+    expect(gradientText?.textContent).toBe('See your take-home pay');
   });
 
   it('should accept and apply custom className', () => {

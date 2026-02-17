@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.2/schema.json",
   "root": true,
   "vcs": {
     "enabled": true,
@@ -60,7 +60,8 @@
         "noGlobalAssign": "error",
         "noRedeclare": "error",
         "noShadowRestrictedNames": "error",
-        "useAwait": "error"
+        "useAwait": "error",
+        "noDuplicateDependencies": "error"
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -131,8 +132,7 @@
           "options": {
             "functions": ["cn", "clsx", "twMerge", "classNames"]
           }
-        },
-        "noDuplicateDependencies": "error"
+        }
       }
     }
   },

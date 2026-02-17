@@ -26,7 +26,7 @@ describe('UseCasePage', () => {
       params: Promise.resolve({ 'use-case': slug }),
     });
 
-    expect(metadata.title).toBe(useCase.title);
+    expect(metadata.title).toBe(`${useCase.title} | PayeTax`);
     expect(metadata.alternates?.canonical).toContain(`/best-for/${slug}`);
   });
 

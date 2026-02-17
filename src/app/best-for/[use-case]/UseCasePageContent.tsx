@@ -1,5 +1,4 @@
 // src/app/best-for/[use-case]/UseCasePageContent.tsx
-'use client';
 
 import {
   ArrowRight,

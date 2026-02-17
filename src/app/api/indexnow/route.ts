@@ -27,7 +27,9 @@ const ALLOWED_EXACT_PATHS = new Set([
   '/blog',
   '/tools',
   '/scenarios',
+  '/best-for',
   '/alternatives',
+  '/best-uk-tax-calculators',
   '/vs',
 ]);
 
@@ -39,6 +41,7 @@ const ALLOWED_PATH_PREFIXES = [
   '/calculator/',
   '/tools/',
   '/scenarios/',
+  '/best-for/',
 ];
 
 function isAllowedPath(pathname: string): boolean {

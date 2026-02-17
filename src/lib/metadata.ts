@@ -221,8 +221,8 @@ export function generateMetadata({
 
     // Other metadata
     other: {
-      'msapplication-TileColor': '#06b6d4',
-      'theme-color': '#06b6d4',
+      'msapplication-TileColor': '#1f2937',
+      'theme-color': '#1f2937',
       // Schema.org JSON-LD markup is handled separately via the StructuredData component
     },
   };
@@ -241,7 +241,7 @@ export function generateMetadata({
  */
 export function generateViewport(): Viewport {
   return {
-    themeColor: '#252525', // Dark mode only
+    themeColor: '#1f2937', // Dark mode only
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom

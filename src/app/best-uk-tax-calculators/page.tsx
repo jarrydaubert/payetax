@@ -1,5 +1,4 @@
 // src/app/best-uk-tax-calculators/page.tsx
-'use client';
 
 import { ArrowRight, Award, Calculator, Search, Users } from 'lucide-react';
 import Link from 'next/link';

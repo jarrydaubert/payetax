@@ -7,6 +7,14 @@ describe('robots metadata', () => {
     expect(result.sitemap).toBe('https://payetax.co.uk/sitemap.xml');
     expect(result.rules).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({
+          userAgent: '*',
+          disallow: expect.arrayContaining(['/monitoring']),
+        }),
+      ]),
+    );
+    expect(result.rules).toEqual(
+      expect.arrayContaining([
         expect.objectContaining({ userAgent: 'OAI-SearchBot', allow: '/' }),
         expect.objectContaining({ userAgent: 'GPTBot', disallow: '/' }),
         expect.objectContaining({ userAgent: 'Claude-SearchBot', allow: '/' }),

@@ -219,8 +219,8 @@ describe('Metadata Module', () => {
 
       expect(metadata.manifest).toBe('/manifest.json');
       expect(metadata.other).toEqual({
-        'msapplication-TileColor': '#06b6d4',
-        'theme-color': '#06b6d4',
+        'msapplication-TileColor': '#1f2937',
+        'theme-color': '#1f2937',
       });
     });
 
@@ -253,7 +253,7 @@ describe('Metadata Module', () => {
       const viewport = generateViewport();
 
       expect(viewport).toEqual({
-        themeColor: '#252525',
+        themeColor: '#1f2937',
         width: 'device-width',
         initialScale: 1,
         maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom

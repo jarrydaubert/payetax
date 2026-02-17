@@ -22,9 +22,9 @@ export default function ServerHero({ className }: ServerHeroProps) {
     >
       {/* Heading */}
       <h1 className='mx-auto mb-6 max-w-[900px] font-bold font-display text-[clamp(3rem,10vw,5.5rem)] text-text-primary-new leading-[1.05] tracking-[-0.04em]'>
-        See what
+        Free UK PAYE Tax Calculator
         <br />
-        <span className='text-gradient-new'>you&apos;ll take home</span>
+        <span className='text-gradient-new'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}

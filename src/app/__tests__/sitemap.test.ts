@@ -21,6 +21,9 @@ const { getBlogPosts, getBlogCategories } = jest.requireMock('@/lib/blog') as {
   getBlogPosts: jest.Mock;
   getBlogCategories: jest.Mock;
 };
+const { getAllCompetitorSlugs } = jest.requireMock('@/data/competitors') as {
+  getAllCompetitorSlugs: jest.Mock;
+};
 
 describe('sitemap', () => {
   const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -83,5 +86,41 @@ describe('sitemap', () => {
         }),
       ]),
     );
+  });
+
+  it('caps long-tail programmatic URLs for crawl-budget focus', async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
+
+    getBlogPosts.mockResolvedValue([]);
+    getBlogCategories.mockResolvedValue([]);
+    getAllCompetitorSlugs.mockReturnValue([
+      'gov-uk-calculator',
+      'salary-calculator',
+      'listentotaxman',
+      'moneysavingexpert',
+      'xero-calculator',
+      'sage-calculator',
+      'quickbooks-calculator',
+      'reed-calculator',
+      'freelancer-calculator',
+      'contractor-calculator',
+      'taxscouts',
+      'salarybot',
+      'extra-1',
+      'extra-2',
+    ]);
+
+    const { default: sitemap } = await import('../sitemap');
+    const entries = (await sitemap()) as MetadataRoute.Sitemap;
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).toContain('https://example.com/calculator/30000-after-tax');
+    expect(urls).not.toContain('https://example.com/calculator/19000-after-tax');
+    expect(urls).not.toContain('https://example.com/calculator/104000-after-tax');
+
+    const alternativesCount = urls.filter((url) => url.includes('/alternatives/')).length;
+    const vsCount = urls.filter((url) => url.includes('/vs/')).length;
+    expect(alternativesCount).toBeLessThanOrEqual(12);
+    expect(vsCount).toBeLessThanOrEqual(12);
   });
 });

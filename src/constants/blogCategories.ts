@@ -53,13 +53,6 @@ export const BLOG_CATEGORIES = {
     color: BRAND_COLOR,
     textColor: BRAND_TEXT,
   },
-  'tax-tools': {
-    key: 'tax-tools',
-    label: 'Tax Tools',
-    slug: 'tax-tools',
-    color: BRAND_COLOR,
-    textColor: BRAND_TEXT,
-  },
   // Student Loans
   'student-loans': {
     key: 'student-loans',

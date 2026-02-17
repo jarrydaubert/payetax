@@ -394,7 +394,7 @@ export function ResultsTable({
           */}
           <section
             ref={containerRef}
-            className='w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
+            className='w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
             style={{
               scrollbarWidth: 'auto',
               scrollbarColor: 'hsl(var(--muted-foreground)) hsl(var(--muted))',
@@ -407,7 +407,7 @@ export function ResultsTable({
           >
             <table
               data-testid='results-table'
-              className={`table-drag-scroll w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
+              className={`w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
               style={{ tableLayout: 'auto', minWidth: '100%' }}
             >
               <caption className='sr-only'>

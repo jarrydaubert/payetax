@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { generateMetadata as metadataGenerator, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import '@/styles/table-drag-scroll.css';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';

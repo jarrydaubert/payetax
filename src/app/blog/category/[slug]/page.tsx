@@ -11,7 +11,7 @@ import { cache } from 'react';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
-import { SITE_URL } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { cn, formatDate } from '@/lib/utils';
 
 // Cache categories fetch to deduplicate calls
@@ -23,7 +23,9 @@ export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const categories = await getCachedCategories();
-  return categories.map((c) => ({ slug: c.slug }));
+  return categories
+    .filter((category) => (category.count ?? 0) > 0)
+    .map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({
@@ -38,9 +40,7 @@ export async function generateMetadata({
   const rawPage = resolvedSearchParams.page;
   const pageValue = Array.isArray(rawPage) ? rawPage[0] : rawPage;
   const page = Math.max(1, Number.parseInt(pageValue ?? '1', 10) || 1);
-  const canonicalBase = `${SITE_URL}/blog/category/${slug}`;
-  const canonicalUrl = page > 1 ? `${canonicalBase}?page=${page}` : canonicalBase;
-  const ogImage = `${SITE_URL}/images/og-image.png`;
+  const canonicalPath = page > 1 ? `/blog/category/${slug}?page=${page}` : `/blog/category/${slug}`;
 
   const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
@@ -49,13 +49,23 @@ export async function generateMetadata({
   }
 
   const title = `${category.name} | TaxInsights by PayeTax`;
-  const description = `Expert guidance and articles on ${category.name.toLowerCase()} from TaxInsights.`;
-  return {
+  const articleCount = category.count ?? 0;
+  const description = `UK ${category.name.toLowerCase()} guides and PAYE explainers from TaxInsights by PayeTax. ${articleCount} ${articleCount === 1 ? 'article' : 'articles'} with practical HMRC-aligned advice.`;
+  const metadata = generateMetadataHelper({
     title,
     description,
-    alternates: { canonical: canonicalUrl },
-    openGraph: { title, description, url: canonicalUrl, images: [ogImage] },
-    twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
+    keywords: `${category.name.toLowerCase()}, uk tax guides, paye guides, tax insights`,
+    pathname: canonicalPath,
+    ogImage: '/images/og-image.png',
+    noIndex: articleCount === 0,
+  });
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      siteName: 'TaxInsights by PayeTax',
+    },
   };
 }
 
@@ -75,6 +85,7 @@ export default async function CategoryPage({
   // Verify category exists
   const categories = await getCachedCategories();
   const category = categories.find((c) => c.slug === slug);
+  const nonEmptyCategories = categories.filter((item) => (item.count ?? 0) > 0);
   if (!category) return notFound();
 
   // Fetch posts filtered by category
@@ -88,6 +99,10 @@ export default async function CategoryPage({
   const allPosts = await getBlogPosts({ categories: [slug], pageSize: 1000 });
   const totalCount = allPosts.length;
   const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
+
+  if (totalCount === 0) {
+    return notFound();
+  }
 
   // 404 if no posts and not first page
   if (posts.length === 0 && currentPage > 1) {
@@ -167,7 +182,7 @@ export default async function CategoryPage({
                   All Articles
                 </Link>
               </li>
-              {[...categories]
+              {[...nonEmptyCategories]
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((cat) => (
                   <li key={cat.slug}>

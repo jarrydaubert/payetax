@@ -17,7 +17,7 @@ import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent, extractFAQs, extractHowToSteps } from '@/lib/mdx';
-import { LOGO_URL, SITE_URL } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, LOGO_URL, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
 // Cache blog post fetch to deduplicate calls between generateMetadata and page component
@@ -57,31 +57,31 @@ export async function generateMetadata({
 
   // Normalize image URL once for consistent usage
   const imageUrl = getAbsoluteImageUrl(post.image);
+  const title = post.seoTitle || post.title;
+  const description = post.seoDescription || post.excerpt;
+  const keywords =
+    post.seoKeywords?.join(', ') ||
+    `${post.categoryData?.name || post.category}, uk tax, paye, tax insights`;
+  const pathname = `/blog/${resolvedParams.slug}`;
+  const metadata = generateMetadataHelper({
+    title,
+    description,
+    keywords,
+    pathname,
+    type: 'article',
+    publishedTime: post.publishedAt,
+    modifiedTime: post.updatedAt,
+    authors: post.author ? [post.author] : undefined,
+    section: post.categoryData?.name || post.category,
+    tags: post.tags,
+    ...(imageUrl ? { ogImage: imageUrl } : {}),
+  });
 
   return {
-    // Use seoTitle for shorter, optimized title tags (avoids SEO title length issues)
-    title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
-    keywords: post.seoKeywords?.join(', '),
-    alternates: {
-      canonical: `${SITE_URL}/blog/${resolvedParams.slug}`,
-    },
+    ...metadata,
     openGraph: {
-      title: post.seoTitle || post.title,
-      description: post.seoDescription || post.excerpt,
-      type: 'article',
+      ...metadata.openGraph,
       siteName: 'TaxInsights by PayeTax',
-      publishedTime: post.publishedAt,
-      modifiedTime: post.updatedAt,
-      authors: post.author ? [post.author] : undefined,
-      tags: post.tags,
-      images: imageUrl ? [{ url: imageUrl, alt: post.imageAlt || post.title }] : undefined,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.seoTitle || post.title,
-      description: post.seoDescription || post.excerpt,
-      images: imageUrl ? [imageUrl] : undefined,
     },
   };
 }

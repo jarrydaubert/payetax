@@ -3,10 +3,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { getAllUseCaseSlugs, getUseCaseBySlug } from '@/data/useCases';
-import { SITE_URL } from '@/lib/metadata';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { UseCasePageContent } from './UseCasePageContent';
-
-const OG_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 interface PageProps {
   params: Promise<{ 'use-case': string }>;
@@ -34,31 +32,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = useCase.title;
-  const description = useCase.description;
-
-  return {
+  const title = useCase.title.includes('PayeTax') ? useCase.title : `${useCase.title} | PayeTax`;
+  return generateMetadataHelper({
     title,
-    description,
+    description: useCase.description,
     keywords: useCase.searchIntent.join(', '),
-    alternates: {
-      canonical: `${SITE_URL}/best-for/${slug}`,
-    },
-    openGraph: {
-      title,
-      description,
-      url: `${SITE_URL}/best-for/${slug}`,
-      type: 'article',
-      siteName: 'PayeTax',
-      images: [OG_IMAGE],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [OG_IMAGE],
-    },
-  };
+    pathname: `/best-for/${slug}`,
+    type: 'article',
+    section: 'Best For',
+    tags: useCase.searchIntent,
+  });
 }
 
 export default async function UseCasePage({ params }: PageProps) {
@@ -75,9 +58,11 @@ export default async function UseCasePage({ params }: PageProps) {
         type='breadcrumb'
         breadcrumbs={[
           { name: 'Home', url: SITE_URL },
+          { name: 'Best For', url: `${SITE_URL}/best-for` },
           { name: useCase.title, url: `${SITE_URL}/best-for/${slug}` },
         ]}
       />
+      <StructuredData type='faq' faqs={useCase.faqs} />
       <UseCasePageContent useCase={useCase} />
     </>
   );

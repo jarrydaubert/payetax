@@ -44,4 +44,17 @@ describe('llms.txt route', () => {
     expect(text).toContain(`${longExcerpt.slice(0, 150)}...`);
     expect(text).not.toContain('## Blog Posts - Empty');
   });
+
+  it('returns a valid response when blog data fetch fails', async () => {
+    (getBlogPosts as jest.Mock).mockRejectedValue(new Error('blog fail'));
+    (getBlogCategories as jest.Mock).mockRejectedValue(new Error('category fail'));
+
+    const response = await GET();
+    const text = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
+    expect(text).toContain('# PayeTax');
+    expect(text).toContain('## Main Pages');
+  });
 });

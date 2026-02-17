@@ -120,11 +120,6 @@ export const BLOG_CATEGORIES = [
     description: 'Latest updates and changes in UK tax legislation',
   },
   {
-    name: 'Tax Tools',
-    slug: 'tax-tools',
-    description: 'Calculators and tools for UK tax planning',
-  },
-  {
     name: 'Tax Comparison',
     slug: 'tax-comparison',
     description: 'Compare tax rates and systems across UK regions',

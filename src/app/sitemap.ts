@@ -25,6 +25,67 @@ const SITE_URL =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : 'https://payetax.co.uk');
 
+// Crawl-budget strategy:
+// Prioritize high-intent salary URLs instead of submitting the full long-tail set.
+const PRIORITY_SALARIES = [
+  18000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000,
+  85000, 90000, 95000, 100000, 101000, 105000, 110000, 115000, 120000, 125000, 130000, 140000,
+  150000, 175000, 200000, 250000, 300000, 500000,
+];
+
+// High-volume salaries with known search data
+const SALARY_SEARCH_VOLUME_HINT: Record<number, number> = {
+  80000: 620,
+  90000: 530,
+  70000: 480,
+  100000: 450,
+  60000: 390,
+  50000: 350,
+  40000: 320,
+  30000: 280,
+  35000: 250,
+  45000: 230,
+  55000: 210,
+  65000: 190,
+  75000: 180,
+  105000: 170,
+  115000: 170,
+  85000: 160,
+  95000: 150,
+  125000: 140,
+  110000: 130,
+  120000: 120,
+};
+
+const PRIORITY_COMPETITOR_SLUGS = [
+  'gov-uk-calculator',
+  'salary-calculator',
+  'listentotaxman',
+  'moneysavingexpert',
+  'xero-calculator',
+  'sage-calculator',
+  'quickbooks-calculator',
+  'reed-calculator',
+  'freelancer-calculator',
+  'contractor-calculator',
+  'taxscouts',
+  'salarybot',
+];
+const MAX_COMPETITOR_SLUGS_IN_SITEMAP = 12;
+
+function selectCompetitorSlugsForSitemap(allSlugs: string[]): string[] {
+  const prioritized = PRIORITY_COMPETITOR_SLUGS.filter((slug) => allSlugs.includes(slug));
+  if (prioritized.length >= MAX_COMPETITOR_SLUGS_IN_SITEMAP) {
+    return prioritized.slice(0, MAX_COMPETITOR_SLUGS_IN_SITEMAP);
+  }
+
+  const fallback = allSlugs
+    .filter((slug) => !prioritized.includes(slug))
+    .slice(0, MAX_COMPETITOR_SLUGS_IN_SITEMAP - prioritized.length);
+
+  return [...prioritized, ...fallback];
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
   // Keep static routes stable; update this when static content is materially changed.
@@ -124,59 +185,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Expanded salary pages for comprehensive SEO coverage (150+ pages)
-  // High-volume salaries with known search data
-  const highVolumeSalaries: Record<number, number> = {
-    80000: 620,
-    90000: 530,
-    70000: 480,
-    100000: 450,
-    60000: 390,
-    50000: 350,
-    40000: 320,
-    30000: 280,
-    35000: 250,
-    45000: 230,
-    55000: 210,
-    65000: 190,
-    75000: 180,
-    105000: 170,
-    115000: 170,
-    85000: 160,
-    95000: 150,
-    125000: 140,
-    110000: 130,
-    120000: 120,
-  };
-
-  // All programmatic salaries (matches generateStaticParams in calculator/[salary]/page.tsx)
-  const allSalaries = [
-    // Entry-level (£18k-£25k)
-    18000, 19000, 20000, 21000, 22000, 23000, 24000, 25000,
-    // Lower-mid (£26k-£35k)
-    26000, 27000, 28000, 29000, 30000, 31000, 32000, 33000, 34000, 35000,
-    // Mid range (£36k-£50k)
-    36000, 37000, 38000, 39000, 40000, 41000, 42000, 43000, 44000, 45000, 46000, 47000, 48000,
-    49000, 50000,
-    // Upper-mid (£51k-£75k)
-    51000, 52000, 53000, 54000, 55000, 56000, 57000, 58000, 59000, 60000, 61000, 62000, 63000,
-    64000, 65000, 66000, 67000, 68000, 69000, 70000, 71000, 72000, 73000, 74000, 75000,
-    // Higher earners (£76k-£100k)
-    76000, 77000, 78000, 79000, 80000, 82000, 85000, 87000, 90000, 92000, 95000, 97000, 100000,
-    // Tax trap zone (£100k-£125k)
-    101000, 102000, 103000, 104000, 105000, 106000, 107000, 108000, 109000, 110000, 111000, 112000,
-    113000, 114000, 115000, 116000, 117000, 118000, 119000, 120000, 121000, 122000, 123000, 124000,
-    125000,
-    // High earners (£125k+)
-    130000, 135000, 140000, 145000, 150000, 155000, 160000, 165000, 170000, 175000, 180000, 185000,
-    190000, 195000, 200000,
-    // Executive
-    210000, 220000, 225000, 230000, 240000, 250000, 275000, 300000, 325000, 350000, 375000, 400000,
-    450000, 500000,
-  ];
-
-  const salaryPages: SitemapEntry[] = allSalaries.map((salary) => {
-    const volume = highVolumeSalaries[salary] || 50;
+  const salaryPages: SitemapEntry[] = PRIORITY_SALARIES.map((salary) => {
+    const volume = SALARY_SEARCH_VOLUME_HINT[salary] || 50;
     return {
       url: `${baseUrl}/calculator/${salary}-after-tax`,
       lastModified: staticPagesDate,
@@ -201,12 +211,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let categoryPages: SitemapEntry[] = [];
   try {
     const categories = await getBlogCategories();
-    categoryPages = categories.map((category) => ({
-      url: `${baseUrl}/blog/category/${category.slug}`,
-      lastModified: staticPagesDate,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    }));
+    categoryPages = categories
+      .filter((category) => (typeof category.count === 'number' ? category.count > 0 : true))
+      .map((category) => ({
+        url: `${baseUrl}/blog/category/${category.slug}`,
+        lastModified: staticPagesDate,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      }));
   } catch (_error) {
     // Silently fail - fallback content will be used below
   }
@@ -244,7 +256,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Competitor comparison pages
-  const competitorSlugs = getAllCompetitorSlugs();
+  const competitorSlugs = selectCompetitorSlugsForSitemap(getAllCompetitorSlugs());
   const competitorPages: SitemapEntry[] = competitorSlugs.flatMap((slug) => [
     {
       url: `${baseUrl}/alternatives/${slug}`,
