@@ -38,6 +38,44 @@ Gather this context (ask if not provided):
 
 ---
 
+## PayeTax Context
+
+PayeTax is a free UK tax calculator — there is no purchase funnel. Content serves SEO (driving calculator traffic) and trust (proving accuracy).
+
+### Content Pillars
+1. **UK PAYE & Income Tax** — tax codes, personal allowance, marginal rates, Scottish/Welsh variations
+2. **National Insurance** — thresholds, classes, employer vs employee
+3. **Director & Dividend Tax** — salary vs dividends, corporation tax, optimal extraction
+4. **Salary Negotiation & Take-Home Pay** — comparing offers, understanding gross vs net
+5. **Tax Year Updates** — Budget reactions, rate changes, deadline reminders
+
+### Blog Writing Guidelines
+Follow `docs/blog/BLOG_GUIDE.md` and `docs/blog/CONTENT_PHILOSOPHY.md`:
+- Accuracy first — use `src/constants/taxRates.ts` as single source of truth
+- Explain the *why*, not just numbers
+- No fear-mongering or aggressive sales language
+- Always include a calculator link and relevant internal links
+- Avoid hardcoded rate values in text; reference the calculator
+- New posts go in `docs/BACKLOG.md` before writing
+
+### Ideation Sources (Not SaaS Calls/Surveys)
+- Reddit: r/UKPersonalFinance (rich question bank)
+- MoneySavingExpert forums
+- Google "People Also Ask" for tax queries
+- HMRC guidance gaps (official docs are hard to read — simplify them)
+- Seasonal hooks: Budget (autumn), new tax year (April 6), P60 season (May), graduate jobs (September)
+
+### User Journey (Not a Purchase Funnel)
+Awareness ("what is PAYE?") → Understanding ("how much tax on £40k?") → Verification ("is this calculator accurate?") → Task completion (get my number) → Sharing (tell colleagues/friends)
+
+### Newsletter
+- Kit/ConvertKit integration exists (`src/lib/newsletter/kitClient.ts`)
+- `NewsletterCTA` component on blog pages
+- Subscribe/unsubscribe API routes at `/api/newsletter/`
+- Content: "Stay Updated on UK Tax Changes" — rate updates, strategies, deadline reminders
+
+---
+
 ## Searchable vs Shareable
 
 Every piece of content must be searchable, shareable, or both. Prioritize in that order—search traffic is the foundation.

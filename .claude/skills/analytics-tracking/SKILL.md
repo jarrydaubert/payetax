@@ -21,6 +21,42 @@ Before implementing tracking, understand:
 
 ---
 
+## PayeTax Context
+
+PayeTax is a free tool with no user accounts, no purchases, and no subscriptions. Analytics must reflect this model.
+
+### Existing Analytics Stack
+- **Vercel Analytics** + **Vercel Speed Insights** — built-in, in `src/app/layout.tsx`
+- **Google Tag Manager** + **GA4** — loaded via `src/components/organisms/Analytics.tsx` with `strategy='lazyOnload'`
+- **Ahrefs Analytics** — loaded via `src/components/organisms/AhrefsAnalytics.tsx` with `strategy='lazyOnload'`
+- Analytics helper: `src/lib/analytics.ts`
+- Director Guide analytics: `src/lib/directorGuideAnalytics.ts`
+
+### PayeTax Conversion Events (not SaaS signup/purchase)
+- `calculator_completed` — user got a tax breakdown result (properties: salary, tax_year, employment_type)
+- `result_viewed` — user viewed a specific period breakdown (properties: period — annual/monthly/weekly/daily)
+- `result_shared` — user shared their result
+- `director_guide_started` — user opened Director Pay Calculator
+- `director_email_sent` — user emailed their director results
+- `newsletter_subscribed` — user signed up for TaxInsights newsletter
+- `blog_article_read` — user read a blog post (properties: slug, category)
+- `cta_clicked` — user clicked a CTA (properties: location, type)
+- `pwa_installed` — user installed the PWA
+
+### User Properties (anonymous — no user IDs)
+- `tax_year` — which tax year they calculated
+- `employment_type` — PAYE, director, etc.
+- `returning_visitor` — boolean (cookie-based)
+- `source` — PWA vs web
+
+### Privacy Constraints
+- No user accounts — no `user_id`, `plan_type`, or `account_id`
+- Privacy-first: prefer cookie-free analytics modes where possible
+- Vercel Analytics is privacy-preserving by default (no cookies)
+- GTM/GA4 requires cookie consent via `CookieBanner` component (`src/components/organisms/CookieBanner.tsx`)
+
+---
+
 ## Core Principles
 
 ### 1. Track for Decisions, Not Data

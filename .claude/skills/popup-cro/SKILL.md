@@ -37,6 +37,34 @@ Before providing recommendations, understand:
 
 ---
 
+## PayeTax Context
+
+PayeTax uses dialogs and banners — not traditional marketing popups. There are no discount offers, exit-intent lead captures, or full-screen interstitials.
+
+### Existing Dialogs & Banners
+- **DirectorGuideWelcomeDialog** (`src/components/molecules/DirectorGuide/WelcomeDialog.tsx`) — first-visit modal explaining the Director Guide tool, localStorage-based dismissal, accessible Dialog component
+- **EmailResultsDialog** (`src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`) — click-triggered modal with email form, sends director results via Resend `/api/send-director-results`, rate limited, links to privacy policy
+- **CookieBanner** — consent banner for analytics cookies, dismissable, persisted
+- **PWAInstallBanner** — prompts returning mobile users to install the PWA
+- **FeedbackDialog** — user feedback collection dialog
+
+### Optimisation Focus
+- WelcomeDialog copy clarity (does it explain value in 5 seconds?)
+- EmailResultsDialog form friction (single email field, clear privacy statement)
+- CookieBanner unobtrusiveness (doesn't block calculator)
+- PWAInstallBanner timing (only shown to engaged returning users)
+- Dialog accessibility (keyboard navigation, focus trap, Esc to close, screen reader support)
+- Mobile dialog sizing (not full-screen, easy dismiss)
+
+### What Does NOT Apply
+- Exit-intent popups — no e-commerce conversion to save
+- Discount/promotion popups — everything is free
+- Email capture popups on scroll/timer — newsletter is inline CTA only
+- Full-screen overlays — would block the calculator
+- Frequency capping across multiple popups — each dialog has its own trigger
+
+---
+
 ## Core Principles
 
 ### 1. Timing Is Everything

@@ -23,6 +23,33 @@ Before implementing schema, understand:
 
 ---
 
+## PayeTax Context
+
+PayeTax already has extensive schema markup. When working on structured data for this project:
+
+### Existing Implementation
+- Schema component: `src/components/organisms/StructuredData.tsx` — supports 13+ types
+- All schemas use `<script type="application/ld+json">` in server-rendered HTML (not `next/script`)
+- XSS protection: `JSON.stringify(schemaData).replace(/<\/script/gi, '<\\/script')`
+- `Organization` schema emitted from `src/app/layout.tsx` (appears on every page)
+
+### Active Schema Types
+- **Homepage**: `WebSite`, `Organization`, `SoftwareApplication`, `FinancialService`, `HowTo`, `Dataset`, `FAQPage`, `BreadcrumbList`
+- **Salary pages** (`/calculator/[salary]-after-tax`): `SalaryCalculation` (custom `WebPage` + `FinancialProduct` hybrid), `BreadcrumbList`
+- **Blog posts**: `BlogPosting`, `BreadcrumbList`, dynamic `FAQPage` (extracted from content), conditional `HowTo`
+- **Director Guide**: `SoftwareApplication`, `FAQPage`, `Dataset`
+- **Use-case pages** (`/best-for/[use-case]`): `BreadcrumbList`, `FAQPage`
+
+### PayeTax-Specific Rules
+- Currency is always GBP (£), not USD
+- `inLanguage: 'en-GB'` on all content schemas
+- `Dataset` schema pulls live values from `src/constants/taxRates.ts` — auto-updates when rates change
+- No `aggregateRating` — only add when backed by real, verifiable reviews (fake ratings trigger Google penalties)
+- `Organization.sameAs` currently only lists Twitter/X — expand when more profiles exist
+- Tax rates source: `src/constants/taxRates.ts` — all schema monetary values must derive from this file
+
+---
+
 ## Core Principles
 
 ### 1. Accuracy First

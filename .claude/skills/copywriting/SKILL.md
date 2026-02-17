@@ -37,6 +37,33 @@ Gather this context (ask if not provided):
 
 ---
 
+## PayeTax Context
+
+### Product Model
+PayeTax is free with no accounts, no ads, no paywall. There is no "Start Free Trial" or "See Pricing" CTA. The conversion is calculator usage and trust.
+
+### PayeTax CTAs
+- "Calculate My Take-Home Pay" / "See My Tax Breakdown" (calculator pages)
+- "Try the Director Calculator" (cross-sell to Director Guide)
+- "Stay Updated on UK Tax Changes" (newsletter CTA via Kit)
+- "Email My Results" (main calculator inline form + Director Guide dialog)
+- "Share This Result" (social sharing)
+
+### Proof Types (Not Enterprise Logos)
+- HMRC accuracy: "Based on official HMRC rates for 2025/26"
+- Privacy: "No account required. No data stored."
+- Freshness: "Updated for the current tax year"
+- Specificity: cite exact thresholds from `src/constants/taxRates.ts`
+- Social: Reddit mentions, public testimonials, calculation count if tracked
+
+### Brand Voice
+- Clear and confident, never salesy
+- British English (colour, organised, programme)
+- Professional but approachable
+- Numbers-focused and precise
+
+---
+
 ## Copywriting Principles
 
 ### Clarity Over Cleverness

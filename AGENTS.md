@@ -68,31 +68,59 @@ See `CLAUDE.md` and `docs/guides/` for details:
 
 ## Skills (Agent Reference)
 
-Skill docs live in `.claude/skills/`:
-- `.claude/skills/ab-test-setup/SKILL.md`
-- `.claude/skills/accessibility/SKILL.md`
-- `.claude/skills/analytics-tracking/SKILL.md`
-- `.claude/skills/competitor-alternatives/SKILL.md`
-- `.claude/skills/content-strategy/SKILL.md`
-- `.claude/skills/copy-editing/SKILL.md`
-- `.claude/skills/copywriting/SKILL.md`
-- `.claude/skills/email-sequence/SKILL.md`
-- `.claude/skills/engineering/SKILL.md`
-- `.claude/skills/form-cro/SKILL.md`
-- `.claude/skills/free-tool-strategy/SKILL.md`
-- `.claude/skills/launch-strategy/SKILL.md`
-- `.claude/skills/marketing-ideas/SKILL.md`
-- `.claude/skills/marketing-psychology/SKILL.md`
-- `.claude/skills/onboarding-cro/SKILL.md`
-- `.claude/skills/page-cro/SKILL.md`
-- `.claude/skills/paid-ads/SKILL.md`
-- `.claude/skills/paywall-upgrade-cro/SKILL.md`
-- `.claude/skills/popup-cro/SKILL.md`
-- `.claude/skills/pricing-strategy/SKILL.md`
-- `.claude/skills/product-marketing-context/SKILL.md`
-- `.claude/skills/programmatic-seo/SKILL.md`
-- `.claude/skills/referral-program/SKILL.md`
-- `.claude/skills/schema-markup/SKILL.md`
-- `.claude/skills/seo-audit/SKILL.md`
-- `.claude/skills/signup-flow-cro/SKILL.md`
-- `.claude/skills/social-content/SKILL.md`
+All skills have `## PayeTax Context` sections with project-specific guidance, file paths, and what does/doesn't apply.
+
+Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.md`.
+
+### SEO & Content
+- `seo-audit` — full-site SEO audit (incl. AI bot access, llms.txt)
+- `programmatic-seo` — salary pages, template-based SEO at scale
+- `schema-markup` — JSON-LD structured data
+- `content-strategy` — blog planning, topic clusters, content pillars
+- `competitor-alternatives` — vs pages, alternative pages
+
+### Copy & Creative
+- `copywriting` — page copy, headlines, CTAs
+- `copy-editing` — editing passes on existing copy
+- `social-content` — LinkedIn, Twitter/X, Reddit content
+
+### Conversion & UX
+- `page-cro` — page-level conversion optimisation
+- `form-cro` — calculator inputs, email forms, newsletter signup
+- `onboarding-cro` — first-visit experience, WelcomeDialog
+- `popup-cro` — dialogs and banners (WelcomeDialog, EmailResultsDialog, CookieBanner, PWA)
+- `ab-test-setup` — experiment design and statistical rigour
+
+### Marketing & Growth
+- `marketing-ideas` — 139 categorised tactics, filtered for PayeTax
+- `launch-strategy` — feature releases, tax calendar events
+- `free-tool-strategy` — new calculator planning and evaluation
+- `marketing-psychology` — mental models and behavioural science
+- `email-sequence` — Kit newsletter + Resend transactional email
+- `product-marketing-context` — shared context doc for all skills
+
+### Engineering & Analytics
+- `engineering` — Next.js, React, TypeScript, performance
+- `accessibility` — WCAG 2.2 AA compliance
+- `analytics-tracking` — GA4, GTM, Vercel Analytics, event tracking
+
+### Slash Commands
+- `/debug` — systematic debugging session
+- `/audit` — deep code/architecture audit
+- `/finance` — UK tax specialist for HMRC verification
+- `/compliance` — compliance auditor
+- `/plan` — architecture planning session
+- `/cleanup` — find duplicates, orphans, junk
+- `/test` — coverage gaps, write/review tests
+- `/security` — OWASP web security review
+
+## Tools & Integrations
+
+- Tool registry: `.claude/tools/REGISTRY.md`
+- Integration guides: `.claude/tools/integrations/` (Kit, Resend, Ahrefs, GA4, etc.)
+
+## Email Infrastructure
+
+Split provider model (see `docs/guides/RESEND.md`):
+- **Kit** — newsletter (subscribe/unsubscribe, broadcasts, automations)
+- **Resend** — transactional (PAYE results, director results, referral leads, feedback)

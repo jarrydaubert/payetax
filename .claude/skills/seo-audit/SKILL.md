@@ -32,6 +32,33 @@ Before auditing, understand:
 
 ---
 
+## PayeTax Context
+
+When auditing PayeTax, keep these project-specific details in mind:
+
+### Site Type
+PayeTax is a free utility/calculator site — not SaaS, e-commerce, or a blog. Audit through the lens of a tool-first site where the primary "conversion" is calculator usage, not signup or purchase.
+
+### Key File Paths
+- Robots: `src/app/robots.ts` (AI bot separation: search bots allowed, training bots blocked)
+- Sitemap: `src/app/sitemap.ts` (150+ programmatic pages + blog + competitors)
+- llms.txt: `src/app/llms.txt/route.ts` (AI discoverability)
+- Metadata helper: `src/lib/metadata.ts` (`generateMetadata` with canonical, OG, robots directives)
+- Schema: `src/components/organisms/StructuredData.tsx` (13+ schema types)
+- Tax rates: `src/constants/taxRates.ts` (source of truth for all calculated values)
+
+### Priority Keywords
+- "[salary] after tax", "take home pay [salary]", "UK PAYE calculator", "tax calculator UK"
+- Director: "salary vs dividends", "director pay calculator"
+- Regional: "Scottish tax calculator", "Welsh tax rates"
+
+### Common Calculator-Site Issues
+- Thin programmatic pages (salary pages need unique calculated content, not just template swaps)
+- Cannibalization between `/calculator/70000-after-tax` and blog posts targeting similar queries
+- Schema accuracy — `Dataset` and `SalaryCalculation` values must match `taxRates.ts`
+
+---
+
 ## Audit Framework
 
 ### Priority Order
@@ -51,6 +78,14 @@ Before auditing, understand:
 - Check for unintentional blocks
 - Verify important pages allowed
 - Check sitemap reference
+
+**AI Bot Access**
+- Search/citation bots allowed: OAI-SearchBot, Claude-SearchBot, PerplexityBot, Googlebot, Bingbot
+- Training/scraping bots blocked: GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot
+- Per-bot rules defined (not relying on wildcard alone)
+- DISALLOW paths consistent across all allowed bots
+- User-agent strings match current platform docs (OpenAI, Anthropic, Perplexity, Google, Apple)
+- Check `src/app/robots.ts` for implementation
 
 **XML Sitemap**
 - Exists and accessible
@@ -138,6 +173,23 @@ Before auditing, understand:
 - Consistent structure
 - No unnecessary parameters
 - Lowercase and hyphen-separated
+
+### llms.txt
+
+**Check for:**
+- File exists at `/llms.txt` and returns `text/plain` content type
+- Follows spec format: H1 site name, `>` summary block, sections with markdown links
+- All main pages and tools listed
+- Blog posts in sync (new posts included, removed posts cleaned up)
+- Descriptions accurate and current (match actual page content)
+- Caching/revalidation configured (static generation with periodic revalidation)
+- Check `src/app/llms.txt/route.ts` for implementation
+
+**Common issues:**
+- New pages or blog posts missing from llms.txt
+- Stale descriptions that no longer match page content
+- Broken links to pages that have been moved or deleted
+- Missing content type header (must be `text/plain`)
 
 ---
 
@@ -355,6 +407,7 @@ Same format as above
 
 - [AI Writing Detection](references/ai-writing-detection.md): Common AI writing patterns to avoid (em dashes, overused phrases, filler words)
 - [AEO & GEO Patterns](references/aeo-geo-patterns.md): Content patterns optimized for answer engines and AI citation
+- [llms.txt Spec](https://llmstxt.org): Standard for machine-readable site descriptions for AI assistants
 
 ---
 

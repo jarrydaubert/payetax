@@ -15,6 +15,29 @@ If `.claude/product-marketing-context.md` exists, read it before asking question
 
 ---
 
+## PayeTax Context
+
+PayeTax is already live and fully public. "Launches" are feature releases and tax-calendar events, not waitlists or beta phases.
+
+### Launch Moments
+- **New tax year** (April 6) — biggest annual moment. Rates update, all calculators refresh, blog posts update.
+- **Budget announcement** (autumn) — immediate reaction content, rate change previews
+- **New calculator/tool** — e.g. adding a student loan calculator or IR35 estimator
+- **Major feature updates** — e.g. Director Guide launch, new comparison pages
+
+### Channels (ORB Framework)
+- **Owned**: Blog (payetax.co.uk/blog), newsletter (Kit/ConvertKit), PWA update banner
+- **Rented**: Twitter/X (@PayeTaxUK), LinkedIn, Reddit (r/UKPersonalFinance)
+- **Borrowed**: Personal finance bloggers, accountancy forums, MoneySavingExpert community, Product Hunt (for major releases)
+
+### What Does NOT Apply
+- Waitlists, alpha/beta phases — tool is fully open
+- In-app onboarding sequences — no accounts
+- Paid acquisition for launches — no ad budget
+- Trial-to-paid conversion tracking — everything is free
+
+---
+
 ## Core Philosophy
 
 The best companies don't just launch once—they launch again and again. Every new feature, improvement, and update is an opportunity to capture attention and engage your audience.

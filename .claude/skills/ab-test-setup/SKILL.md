@@ -21,6 +21,34 @@ Before designing a test, understand:
 
 ---
 
+## PayeTax Context
+
+### Testable Metrics (Not SaaS Signup Rates)
+- Calculator completion rate (did they get results?)
+- Calculator engagement (time spent, periods viewed)
+- Newsletter signup rate (blog CTAs)
+- Return visit rate (cookie-based)
+- Scroll depth on salary/blog pages
+- Director Guide email-results completion
+
+### Test Assignment
+No user accounts — tests must use cookie-based session assignment for consistency across page views. Consider Vercel Edge Config for A/B routing or PostHog feature flags.
+
+### Guardrail Metrics
+- Bounce rate (should not increase)
+- Calculator error rate (must not regress)
+- Core Web Vitals (LCP, CLS, INP must stay within thresholds)
+- Accessibility score (WCAG 2.2 AA compliance must be maintained)
+
+### High-Value Test Opportunities
+- Homepage hero copy/headline variants
+- Calculator default values (empty vs pre-filled salary)
+- Results display format (annual-first vs monthly-first)
+- Newsletter CTA placement and copy on blog pages
+- Trust signal variations ("HMRC-accurate" vs "Updated for 2025/26")
+
+---
+
 ## Core Principles
 
 ### 1. Start with a Hypothesis

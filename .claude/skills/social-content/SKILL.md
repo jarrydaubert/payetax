@@ -37,6 +37,35 @@ Gather this context (ask if not provided):
 
 ---
 
+## PayeTax Context
+
+### Active Channels
+- **Twitter/X** (@PayeTaxUK) — tax tips, Budget reactions, calculator updates
+- **LinkedIn** — professional audience, salary insights, director tax advice
+- **Reddit** (r/UKPersonalFinance) — helpful answers linking to calculator when relevant. Never promotional — add value first.
+
+### Content Pillars for PayeTax
+1. **Tax news & Budget reactions** — topical authority, time-sensitive (high engagement)
+2. **Salary data & benchmarks** — shareable data-driven content ("Average take-home pay for UK salaries")
+3. **Calculator tips & features** — lesser-known features, how-to threads
+4. **UK personal finance education** — PAYE explainers, tax code guidance, NI breakdowns
+
+### Seasonal Calendar
+- **January** — New Year job changes, "what will I earn?" season
+- **March–April** — End of tax year, P60 season, new rates announced
+- **April 6** — New tax year launch (biggest content moment — "2026/27 rates are live")
+- **Autumn** — Budget announcement (rates may change, immediate reaction content)
+- **September** — Graduate job starts, back-to-work season
+
+### Brand Voice Constraints
+- Clear and confident, never salesy or pushy
+- No upsells (there's nothing to upsell)
+- Professional but approachable
+- British English only (no American spellings)
+- Numbers-focused, precise — never vague claims
+
+---
+
 ## Platform Quick Reference
 
 | Platform | Best For | Frequency | Key Format |

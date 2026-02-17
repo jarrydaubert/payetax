@@ -21,6 +21,25 @@ When asked for marketing ideas:
 
 ---
 
+## PayeTax Context — Priority Ideas Filter
+
+Of the 139 ideas below, these categories are most relevant to PayeTax (free UK tax calculator, no accounts, no ads, SEO + word-of-mouth growth):
+
+### High Priority
+- **Content & SEO** — core growth lever. Blog posts, programmatic salary pages, tax explainers.
+- **Free Tools / Engineering as Marketing** — each new calculator is more keyword surface area.
+- **PR & Media** — Budget announcements, tax year changes are natural news hooks. Pitch personal finance journalists.
+- **Social & Community** — Reddit (r/UKPersonalFinance), Twitter/X, LinkedIn. Value-first, never promotional.
+
+### Medium Priority
+- **Partnerships** — personal finance blogs, accountancy sites, payroll software companies (link exchanges, mentions).
+- **Product Hunt** — relevant for major feature launches (Director Guide, new calculator types).
+
+### Low Priority / Skip
+- Paid ads (no budget, no conversion event), enterprise sales, developer relations, lifetime deals, waitlists, international expansion, in-app upsells, affiliate programs, conferences, podcasts (for now).
+
+---
+
 ## Ideas by Category (Quick Reference)
 
 | Category | Ideas | Examples |

@@ -32,6 +32,37 @@ Before designing a programmatic SEO strategy, understand:
 
 ---
 
+## PayeTax Context
+
+PayeTax already has extensive programmatic SEO pages. When working on pSEO for this project, use these established patterns:
+
+### Existing Page Patterns
+- `/calculator/[salary]-after-tax` — 150+ salary pages (£25k–£200k). Canonical format always includes `-after-tax` suffix. Non-canonical variants redirect via 308.
+- `/vs/[competitor]` — "PayeTax vs X" comparison pages (`dynamicParams = false`)
+- `/alternatives/[competitor]` — "X Alternative" pages (`dynamicParams = false`)
+- `/best-for/[use-case]` — Audience-specific landing pages
+- `/scenarios/[slug]` — Tax scenario pages (e.g. "salary sacrifice", "multiple jobs")
+- `/blog/category/[slug]` — Blog category hubs
+
+### Key Implementation Details
+- All programmatic pages use `generateStaticParams()` with `dynamicParams = false` (except salary pages which use `true` with noindex for unknown slugs)
+- Canonical URLs set via `generateMetadata` helper in `src/lib/metadata.ts`
+- Salary pages in `src/app/calculator/[salary]/page.tsx`, competitors in `src/data/competitors.ts`
+- Sitemap at `src/app/sitemap.ts` — all programmatic pages must be added here
+- Schema markup via `<StructuredData>` component in `src/components/organisms/StructuredData.tsx`
+
+### UK Tax Keyword Landscape
+- Primary patterns: "[salary] after tax", "take home pay [salary]", "PAYE calculator", "UK tax calculator"
+- Regional: Scottish tax rates, Welsh tax rates (different income tax bands)
+- Director: "salary vs dividends", "director pay calculator", "optimal salary for directors"
+- Seasonal: surges around April (new tax year), Budget announcements, September (graduate jobs)
+
+### Cannibalization Risk
+- `/calculator/70000-after-tax` targets "£70k after tax" — ensure no blog post or scenario page also targets this exact phrase
+- `/vs/X` and `/alternatives/X` serve different intents: "PayeTax vs X" (direct comparison) vs "X alternative" (seeking options). Keep content distinct.
+
+---
+
 ## Core Principles
 
 ### 1. Unique Value Per Page

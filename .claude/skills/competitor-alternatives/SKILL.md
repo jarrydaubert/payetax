@@ -36,6 +36,40 @@ Before creating competitor pages, understand:
 
 ---
 
+## PayeTax Context
+
+PayeTax is a free UK PAYE tax calculator with no accounts, no ads, and no paywall. Competitor pages have a different shape than typical SaaS comparisons.
+
+### Existing Implementation
+- Competitor data: `src/data/competitors.ts` — centralized YAML-style data for all competitors
+- `/vs/[competitor]` pages: "PayeTax vs X" direct comparisons (`src/app/vs/[competitor]/page.tsx`)
+- `/alternatives/[competitor]` pages: "X Alternative" pages (`src/app/alternatives/[competitor]/page.tsx`)
+- Both use `dynamicParams = false` — only pre-defined competitors generate pages
+
+### UK Tax Calculator Competitors
+- **ListenToTaxman** — established, ad-supported, account-free
+- **TheSalaryCalculator.co.uk** — similar feature set, ad-supported
+- **MoneySavingExpert** — calculator embedded in broader finance site, high domain authority
+- **Reed Salary Calculator** — job board context, limited features
+- **HMRC Basic Calculator** — official but limited, no breakdown detail
+- **SalaryBot** — Slack-based, different UX model
+
+### PayeTax Differentiators for Comparisons
+- **Free with no ads** (vs ad-supported competitors)
+- **No account required** (vs tools that require signup)
+- **Privacy-first** — no data stored, client-side calculations
+- **HMRC-accurate** — rates from `src/constants/taxRates.ts`, updated each tax year
+- **Comprehensive** — all tax codes, student loans (Plans 1–5 + PGL), pension schemes, Scottish/Welsh rates, Marriage Allowance
+- **Director Guide** — salary vs dividend optimizer (unique feature)
+
+### Comparison Framing (Not SaaS Migration)
+- There is nothing to "migrate" — users just visit the URL. No data to transfer, no account to close.
+- Pricing comparison = "free vs ad-supported" or "free vs account-gated"
+- Social proof = Reddit mentions (r/UKPersonalFinance), accuracy verification against HMRC, public testimonials
+- "Switching cost" is zero — lead with this
+
+---
+
 ## Core Principles
 
 ### 1. Honesty Builds Trust
