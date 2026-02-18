@@ -130,21 +130,6 @@ export const BLOG_CATEGORIES = [
     description: 'Student loan repayment and tax implications',
   },
   {
-    name: 'Personal Finance',
-    slug: 'personal-finance',
-    description: 'Broader financial planning and money management topics',
-  },
-  {
-    name: 'Self Assessment',
-    slug: 'self-assessment',
-    description: 'Guides and tips for completing your self assessment tax return',
-  },
-  {
-    name: 'Company Tax',
-    slug: 'company-tax',
-    description: 'Information about corporation tax and business taxation',
-  },
-  {
     name: 'Salary Guides',
     slug: 'salary-guides',
     description: 'Practical salary breakdowns showing take-home pay and lifestyle implications',

@@ -38,7 +38,7 @@ import {
   TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
-import { trackCalculatorEvent, trackCalculatorUsage } from '@/lib/analytics';
+import { trackCalculatorEvent, trackCalculatorUsage, trackEvent } from '@/lib/analytics';
 import { safeStorage } from '@/lib/safeStorage';
 import {
   addBreadcrumb,
@@ -103,6 +103,89 @@ const TAX_YEAR_INPUT_SCHEMA = z
 const PAY_PERIOD_VALUES = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
 const STUDENT_LOAN_PLAN_VALUES = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 const TAX_REGION_VALUES = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
+
+const SALARY_INPUT_SCHEMA = z
+  .number()
+  .min(0, 'Salary must be positive')
+  .max(10_000_000, 'Salary exceeds maximum')
+  .finite('Salary must be a valid number');
+
+const PAY_PERIOD_INPUT_SCHEMA = z.enum(PAY_PERIOD_VALUES);
+
+const TAX_CODE_INPUT_SCHEMA = z
+  .string()
+  .min(1)
+  .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase())
+  .refine(
+    (code) => {
+      // Remove emergency suffix (W1, M1, X) before validation
+      const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
+
+      // Support Scottish (S) and Welsh (C) prefixes.
+      // Note: prefix does not change allowance logic; it affects which tax rates apply.
+      const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
+
+      // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
+      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
+      if (specialCodes.includes(codeWithoutPrefix)) return true;
+
+      // Standard format or K codes.
+      const standardPattern = /^[0-9]+[LMNPTX]?$/;
+      const kCodePattern = /^K[0-9]+$/;
+
+      return standardPattern.test(codeWithoutPrefix) || kCodePattern.test(codeWithoutPrefix);
+    },
+    { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' },
+  );
+
+const REGION_INPUT_SCHEMA = z.enum(TAX_REGION_VALUES);
+
+const PARTNER_GROSS_WAGE_INPUT_SCHEMA = z
+  .number()
+  .min(0, 'Partner wage cannot be negative')
+  .max(10_000_000, 'Partner wage exceeds maximum')
+  .finite('Partner wage must be a valid number');
+
+const AGE_INPUT_SCHEMA = z
+  .number()
+  .int('Age must be a whole number')
+  .min(0, 'Age cannot be negative')
+  .max(120, 'Age must be between 0 and 120');
+
+const PENSION_PERCENT_INPUT_SCHEMA = z
+  .number()
+  .min(0, 'Pension contribution must be positive')
+  .max(100, 'Pension percentage cannot exceed 100%');
+
+const PENSION_AMOUNT_INPUT_SCHEMA = z
+  .number()
+  .min(0, 'Pension contribution must be positive')
+  .max(10_000_000, 'Pension amount exceeds maximum');
+
+const STUDENT_LOAN_PLAN_SCHEMA = z.enum(STUDENT_LOAN_PLAN_VALUES);
+
+const STUDENT_LOAN_SELECTION_SCHEMA = z.union([
+  z.literal('none'),
+  z
+    .array(STUDENT_LOAN_PLAN_SCHEMA)
+    .max(2, 'Maximum 2 student loans allowed')
+    .refine(
+      (plans) => new Set(plans).size === plans.length,
+      'Duplicate student loan plans not allowed',
+    ),
+]);
+
+const HOURS_PER_WEEK_INPUT_SCHEMA = z
+  .number()
+  .min(1, 'Hours per week must be greater than 0')
+  .max(168, 'Hours per week cannot exceed 168')
+  .finite('Hours per week must be a valid number');
+
+const ALLOWANCES_DEDUCTIONS_INPUT_SCHEMA = z
+  .number()
+  .min(-1_000_000, 'Allowances/deductions cannot be less than -£1M')
+  .max(1_000_000, 'Allowances/deductions cannot exceed £1M')
+  .finite('Allowances/deductions must be a valid number');
 
 /**
  * Interface defining all inputs required for tax calculations
@@ -275,39 +358,29 @@ const PersistedIncomeSourceSchema = z
     type: z.enum(['employment', 'pension', 'statePension', 'rental', 'investment', 'other']),
     label: z.string().max(100).optional(),
     amount: z.number().finite().nonnegative().max(10_000_000),
-    period: z.enum(PAY_PERIOD_VALUES),
+    period: PAY_PERIOD_INPUT_SCHEMA,
   })
   .strict();
 
 const CalculatorInputPartialSchema = z
   .object({
-    salary: z.number().finite().min(0).max(10_000_000).optional(),
-    payPeriod: z.enum(PAY_PERIOD_VALUES).optional(),
+    salary: SALARY_INPUT_SCHEMA.optional(),
+    payPeriod: PAY_PERIOD_INPUT_SCHEMA.optional(),
     taxYear: TAX_YEAR_INPUT_SCHEMA.optional(),
     taxCode: z.string().max(20).optional(),
-    region: z.enum(TAX_REGION_VALUES).optional(),
+    region: REGION_INPUT_SCHEMA.optional(),
     isScottish: z.boolean().optional(),
     isMarried: z.boolean().optional(),
-    partnerGrossWage: z.number().finite().min(0).max(10_000_000).optional(),
+    partnerGrossWage: PARTNER_GROSS_WAGE_INPUT_SCHEMA.optional(),
     isBlind: z.boolean().optional(),
-    age: z.number().int().min(0).max(120).optional(),
+    age: AGE_INPUT_SCHEMA.optional(),
     payNoNI: z.boolean().optional(),
-    studentLoanPlans: z
-      .union([
-        z.literal('none'),
-        z
-          .array(z.enum(STUDENT_LOAN_PLAN_VALUES))
-          .max(2)
-          .refine((plans) => {
-            return new Set(plans).size === plans.length;
-          }, 'Duplicate student loan plans not allowed'),
-      ])
-      .optional(),
-    pensionContribution: z.number().finite().min(0).max(10_000_000).optional(),
+    studentLoanPlans: STUDENT_LOAN_SELECTION_SCHEMA.optional(),
+    pensionContribution: PENSION_AMOUNT_INPUT_SCHEMA.optional(),
     pensionContributionType: z.enum(['percentage', 'amount']).optional(),
     niCategory: NICategorySchema.optional(),
-    hoursPerWeek: z.number().finite().min(1).max(168).optional(),
-    allowancesDeductions: z.number().finite().min(-1_000_000).max(1_000_000).optional(),
+    hoursPerWeek: HOURS_PER_WEEK_INPUT_SCHEMA.optional(),
+    allowancesDeductions: ALLOWANCES_DEDUCTIONS_INPUT_SCHEMA.optional(),
     incomeSources: z.array(PersistedIncomeSourceSchema).max(10).optional(),
   })
   .strict();
@@ -349,12 +422,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         setSalary: (salary) => {
           // Validate salary input
           try {
-            const validated = z
-              .number()
-              .min(0, 'Salary must be positive')
-              .max(10_000_000, 'Salary exceeds maximum')
-              .finite('Salary must be a valid number')
-              .safeParse(salary);
+            const validated = SALARY_INPUT_SCHEMA.safeParse(salary);
 
             if (!validated.success) {
               // Expected user behavior - don't log as warning (Sentry captures console.warn)
@@ -377,17 +445,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         setPayPeriod: (payPeriod) => {
           // Validate pay period - include all valid periods from PERIODS constant
           try {
-            const validated = z
-              .enum([
-                'annually',
-                'monthly',
-                'fourWeekly',
-                'fortnightly',
-                'weekly',
-                'daily',
-                'hourly',
-              ])
-              .safeParse(payPeriod);
+            const validated = PAY_PERIOD_INPUT_SCHEMA.safeParse(payPeriod);
 
             if (!validated.success) {
               // Invalid pay period - just log and don't update state
@@ -436,34 +494,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
 
           try {
-            const validated = z
-              .string()
-              .min(1)
-              .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase()) // Remove ALL spaces, trim, uppercase
-              .refine(
-                (code) => {
-                  // Remove emergency suffix (W1, M1, X) before validation
-                  const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
-
-                  // Support Scottish (S) and Welsh (C) prefixes.
-                  // Note: prefix does not change allowance logic; it affects which tax rates apply.
-                  const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
-
-                  // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
-                  const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-                  if (specialCodes.includes(codeWithoutPrefix)) return true;
-
-                  // Standard format or K codes.
-                  const standardPattern = /^[0-9]+[LMNPTX]?$/;
-                  const kCodePattern = /^K[0-9]+$/;
-
-                  return (
-                    standardPattern.test(codeWithoutPrefix) || kCodePattern.test(codeWithoutPrefix)
-                  );
-                },
-                { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' },
-              )
-              .safeParse(taxCode);
+            const validated = TAX_CODE_INPUT_SCHEMA.safeParse(taxCode);
 
             if (!validated.success) {
               // Invalid tax code - just log and don't update state
@@ -485,9 +516,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         setRegion: (region) => {
           // Validate region
           try {
-            const validated = z
-              .enum(['England', 'Scotland', 'Wales', 'Northern Ireland'])
-              .safeParse(region);
+            const validated = REGION_INPUT_SCHEMA.safeParse(region);
 
             if (!validated.success) {
               logCalculatorWarning(
@@ -550,12 +579,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         setPartnerGrossWage: (partnerGrossWage) => {
           // Validate partner wage
-          const validated = z
-            .number()
-            .min(0, 'Partner wage cannot be negative')
-            .max(10_000_000, 'Partner wage exceeds maximum')
-            .finite('Partner wage must be a valid number')
-            .safeParse(partnerGrossWage);
+          const validated = PARTNER_GROSS_WAGE_INPUT_SCHEMA.safeParse(partnerGrossWage);
 
           if (!validated.success) {
             logCalculatorWarning(
@@ -583,12 +607,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         setAge: (age) => {
           // Validate age if provided
           if (age !== undefined) {
-            const validated = z
-              .number()
-              .int('Age must be a whole number')
-              .min(0, 'Age cannot be negative')
-              .max(120, 'Age must be between 0 and 120')
-              .safeParse(age);
+            const validated = AGE_INPUT_SCHEMA.safeParse(age);
 
             if (!validated.success) {
               logCalculatorWarning(
@@ -621,14 +640,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           // Validate based on contribution type
           const schema =
             input.pensionContributionType === 'percentage'
-              ? z
-                  .number()
-                  .min(0, 'Pension contribution must be positive')
-                  .max(100, 'Pension percentage cannot exceed 100%')
-              : z
-                  .number()
-                  .min(0, 'Pension contribution must be positive')
-                  .max(10_000_000, 'Pension amount exceeds maximum');
+              ? PENSION_PERCENT_INPUT_SCHEMA
+              : PENSION_AMOUNT_INPUT_SCHEMA;
 
           const validated = schema.safeParse(pensionContribution);
 
@@ -658,10 +671,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         setStudentLoanPlans: (studentLoanPlans) => {
           // Validate student loan plans - either 'none' or array of valid plans
-          const planEnum = z.enum(['plan1', 'plan2', 'plan4', 'plan5', 'postgrad']);
-          const validated = z
-            .union([z.literal('none'), z.array(planEnum).max(2, 'Maximum 2 student loans allowed')])
-            .safeParse(studentLoanPlans);
+          const validated = STUDENT_LOAN_SELECTION_SCHEMA.safeParse(studentLoanPlans);
 
           if (!validated.success) {
             logCalculatorWarning(
@@ -671,22 +681,11 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          // Check for duplicates if array
-          if (Array.isArray(validated.data)) {
-            const unique = new Set(validated.data);
-            if (unique.size !== validated.data.length) {
-              logCalculatorWarning('[Calculator] Duplicate student loan plans not allowed');
-              return;
-            }
-          }
-
           set((state) => ({ input: { ...state.input, studentLoanPlans: validated.data } }));
         },
         toggleStudentLoan: (plan) => {
           // Validate plan
-          const planValidated = z
-            .enum(['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'])
-            .safeParse(plan);
+          const planValidated = STUDENT_LOAN_PLAN_SCHEMA.safeParse(plan);
 
           if (!planValidated.success) {
             logCalculatorWarning(
@@ -746,12 +745,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         setHoursPerWeek: (hoursPerWeek) => {
           // Validate hours per week
-          const validated = z
-            .number()
-            .min(1, 'Hours per week must be greater than 0')
-            .max(168, 'Hours per week cannot exceed 168')
-            .finite('Hours per week must be a valid number')
-            .safeParse(hoursPerWeek);
+          const validated = HOURS_PER_WEEK_INPUT_SCHEMA.safeParse(hoursPerWeek);
 
           if (!validated.success) {
             logCalculatorWarning(
@@ -764,12 +758,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         setAllowancesDeductions: (allowancesDeductions) => {
           // Validate allowances/deductions
-          const validated = z
-            .number()
-            .min(-1_000_000, 'Allowances/deductions cannot be less than -£1M')
-            .max(1_000_000, 'Allowances/deductions cannot exceed £1M')
-            .finite('Allowances/deductions must be a valid number')
-            .safeParse(allowancesDeductions);
+          const validated = ALLOWANCES_DEDUCTIONS_INPUT_SCHEMA.safeParse(allowancesDeductions);
 
           if (!validated.success) {
             logCalculatorWarning(
@@ -927,6 +916,18 @@ export const useCalculatorStore = create<CalculatorState>()(
                 salary_range: salaryRange,
               });
               trackCalculatorUsage('paye', salaryRange);
+              trackEvent({
+                action: 'calculator_completion',
+                category: 'funnel',
+                label: 'paye_calculator',
+                custom_data: {
+                  salary_range: salaryRange,
+                  has_student_loan: input.studentLoanPlans !== 'none',
+                  has_pension: input.pensionContribution > 0,
+                  tax_year: input.taxYear,
+                  region: input.region,
+                },
+              });
             }
           } catch (error) {
             // Log calculation errors for debugging

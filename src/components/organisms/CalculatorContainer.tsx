@@ -15,6 +15,7 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
+import { trackEvent } from '@/lib/analytics';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
@@ -58,6 +59,7 @@ export function CalculatorContainer() {
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [portalMounted, setPortalMounted] = React.useState(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
   const whatIfScrollTimeoutRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
@@ -119,6 +121,15 @@ export function CalculatorContainer() {
   };
 
   const handleCalculate = () => {
+    if (!hasTrackedCalculatorStartRef.current) {
+      trackEvent({
+        action: 'calculator_start',
+        category: 'funnel',
+        label: 'paye_calculator',
+      });
+      hasTrackedCalculatorStartRef.current = true;
+    }
+
     // Use React 18's useTransition to mark calculations as non-urgent
     // This keeps the UI responsive during heavy computations
     startTransition(() => {

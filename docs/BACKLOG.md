@@ -51,12 +51,11 @@
 - [ ] Enable referral CTA in `src/components/organisms/CalculatorContainer.tsx`
 
 ### Organic SEO + Blog Engine
-- [ ] Resolve empty legacy categories in `src/config/blog.config.ts` (`company-tax`, `personal-finance`, `self-assessment`): publish posts or remove from taxonomy
 - [ ] Ensure each new blog post has a primary CTA to calculator/director guide
 - [ ] Ensure each new blog post has a secondary CTA to newsletter signup
 - [ ] Keep blog-to-money-page internal links healthy (calculator, director guide, compliance)
 - [ ] Run subscriber announcement flow for newly published posts
-- [ ] Track and review funnel metrics: sessions -> calculator start -> completion -> monetization click
+- [ ] Review funnel metrics: sessions -> `calculator_start` -> `calculator_completion` -> monetization click
 
 ### Compare My Setup
 - [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)
@@ -73,7 +72,6 @@
 - [ ] Store HMRC source provenance alongside golden master data
 
 ### Calculator Store Cleanup
-- [ ] Extract Zod schemas to module scope to reduce churn
 
 ---
 
