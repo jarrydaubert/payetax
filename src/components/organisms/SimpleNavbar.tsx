@@ -2,11 +2,11 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
-import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -26,6 +26,19 @@ const CALCULATOR_HASH = `#${CALCULATOR_ID}`;
 interface SimpleNavbarProps {
   className?: string;
 }
+
+// Keep feedback UI off the critical path for initial mobile render.
+const FeedbackDialog = dynamic(
+  () => import('@/components/organisms/FeedbackDialog').then((mod) => mod.FeedbackDialog),
+  {
+    ssr: false,
+    loading: () => (
+      <span className='flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-[0.85rem] text-text-secondary-new'>
+        Feedback
+      </span>
+    ),
+  },
+);
 
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

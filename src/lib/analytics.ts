@@ -15,7 +15,6 @@
  */
 
 import { areCookiesAccepted } from '@/lib/cookieUtils';
-import { addBreadcrumb } from '@/lib/sentry';
 
 /** High-signal events that warrant Sentry breadcrumbs */
 const HIGH_SIGNAL_ACTIONS = new Set([
@@ -24,6 +23,24 @@ const HIGH_SIGNAL_ACTIONS = new Set([
   'newsletter_subscribe_failed',
   'affiliate_click',
 ]);
+
+/**
+ * Lazily load Sentry breadcrumb helper so analytics tracking does not force
+ * Sentry into the initial client bundle.
+ */
+function addAnalyticsBreadcrumb(message: string, data: Record<string, unknown>): void {
+  import('@/lib/sentry')
+    .then(({ addBreadcrumb }) => {
+      addBreadcrumb('analytics', {
+        message,
+        level: 'info',
+        data,
+      });
+    })
+    .catch(() => {
+      // Ignore breadcrumb failures - analytics must stay non-blocking.
+    });
+}
 
 // Types for analytics events
 export type SEOActionType =
@@ -77,15 +94,11 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 
     // Only breadcrumb high-signal events to avoid Sentry noise
     if (HIGH_SIGNAL_ACTIONS.has(action)) {
-      addBreadcrumb('analytics', {
-        message: `SEO action: ${action}`,
-        level: 'info',
-        data: {
-          action,
-          source: data.source,
-          target: data.target,
-          page_path: pagePath,
-        },
+      addAnalyticsBreadcrumb(`SEO action: ${action}`, {
+        action,
+        source: data.source,
+        target: data.target,
+        page_path: pagePath,
       });
     }
 
@@ -126,15 +139,11 @@ export function trackEvent(event: AnalyticsEvent): void {
 
     // Only breadcrumb high-signal events to avoid Sentry noise
     if (HIGH_SIGNAL_ACTIONS.has(event.action)) {
-      addBreadcrumb('analytics', {
-        message: `Analytics event: ${event.action}`,
-        level: 'info',
-        data: {
-          action: event.action,
-          category: event.category,
-          label: event.label,
-          value: event.value,
-        },
+      addAnalyticsBreadcrumb(`Analytics event: ${event.action}`, {
+        action: event.action,
+        category: event.category,
+        label: event.label,
+        value: event.value,
       });
     }
 
