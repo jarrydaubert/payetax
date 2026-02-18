@@ -20,6 +20,14 @@ import {
   type TaxCalculationResults,
 } from './taxCalculator';
 
+const shouldLogWarnings = process.env.NODE_ENV !== 'production';
+
+function logSalaryComparisonWarning(message: string, data?: unknown): void {
+  if (shouldLogWarnings) {
+    console.warn(message, data);
+  }
+}
+
 /**
  * Comparison input mode
  */
@@ -82,7 +90,7 @@ export interface ComparisonResults {
 export function calculateNewSalary(input: ComparisonInput): number | null {
   try {
     if (!isValidComparisonInput(input)) {
-      console.warn('[salaryComparison] Invalid comparison input:', input);
+      logSalaryComparisonWarning('[salaryComparison] Invalid comparison input:', input);
       return null;
     }
 

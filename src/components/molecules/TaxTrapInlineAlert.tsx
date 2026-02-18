@@ -59,7 +59,9 @@ export function TaxTrapInlineAlert({
       }
     } catch (error) {
       // localStorage might not be available (SSR, private browsing)
-      console.warn('[TaxTrapInlineAlert] localStorage unavailable:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[TaxTrapInlineAlert] localStorage unavailable:', error);
+      }
     }
   }, []);
 
@@ -85,7 +87,9 @@ export function TaxTrapInlineAlert({
       localStorage.setItem('taxTrapAlertDismissed', 'true');
       setIsDismissed(true);
     } catch (error) {
-      console.warn('[TaxTrapInlineAlert] Failed to save dismissal:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[TaxTrapInlineAlert] Failed to save dismissal:', error);
+      }
       setIsDismissed(true); // Still dismiss in UI even if localStorage fails
     }
   };

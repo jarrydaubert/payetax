@@ -24,6 +24,14 @@
 
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 
+const shouldLogWarnings = process.env.NODE_ENV !== 'production';
+
+function logPensionWarning(message: string): void {
+  if (shouldLogWarnings) {
+    console.warn(message);
+  }
+}
+
 export interface PensionOptimization {
   /** Suggested pension contribution to drop below £100k */
   suggested: number;
@@ -73,12 +81,12 @@ export function calculateOptimalPension(
   // Validate inputs
   try {
     if (!isValidSalary(salary)) {
-      console.warn(`[pensionOptimizer] Invalid salary input: ${salary}`);
+      logPensionWarning(`[pensionOptimizer] Invalid salary input: ${salary}`);
       return null;
     }
 
     if (currentPension < 0 || !Number.isFinite(currentPension)) {
-      console.warn(`[pensionOptimizer] Invalid pension input: ${currentPension}`);
+      logPensionWarning(`[pensionOptimizer] Invalid pension input: ${currentPension}`);
       return null;
     }
   } catch (error) {
@@ -169,12 +177,12 @@ export function compareWithOptimization(
   try {
     // Validate inputs
     if (!(isValidSalary(salary) && isValidSalary(pensionContribution))) {
-      console.warn('[pensionOptimizer] Invalid input to compareWithOptimization');
+      logPensionWarning('[pensionOptimizer] Invalid input to compareWithOptimization');
       return null;
     }
 
     if (pensionContribution < 0 || pensionContribution > salary) {
-      console.warn('[pensionOptimizer] Pension contribution must be between 0 and salary');
+      logPensionWarning('[pensionOptimizer] Pension contribution must be between 0 and salary');
       return null;
     }
 

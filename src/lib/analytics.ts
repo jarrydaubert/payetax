@@ -24,6 +24,14 @@ const HIGH_SIGNAL_ACTIONS = new Set([
   'affiliate_click',
 ]);
 
+const shouldLogWarnings = process.env.NODE_ENV !== 'production';
+
+function logAnalyticsWarning(message: string, error: unknown): void {
+  if (shouldLogWarnings) {
+    console.warn(message, error);
+  }
+}
+
 /**
  * Lazily load Sentry breadcrumb helper so analytics tracking does not force
  * Sentry into the initial client bundle.
@@ -116,7 +124,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
       });
     }
   } catch (error) {
-    console.warn('Analytics tracking error:', error);
+    logAnalyticsWarning('Analytics tracking error:', error);
   }
 }
 
@@ -158,7 +166,7 @@ export function trackEvent(event: AnalyticsEvent): void {
       });
     }
   } catch (error) {
-    console.warn('Analytics tracking error:', error);
+    logAnalyticsWarning('Analytics tracking error:', error);
   }
 }
 
@@ -231,7 +239,7 @@ export function trackPageView(page_path: string, page_title?: string): void {
       send_page_view: true,
     });
   } catch (error) {
-    console.warn('Page view tracking error:', error);
+    logAnalyticsWarning('Page view tracking error:', error);
   }
 }
 
@@ -372,7 +380,7 @@ export function trackCoreWebVitals(): void {
       }
     }
   } catch (error) {
-    console.warn('Performance metrics tracking error:', error);
+    logAnalyticsWarning('Performance metrics tracking error:', error);
   }
 }
 

@@ -1,6 +1,14 @@
 // src/hooks/useMouseDragScroll.ts
 import * as React from 'react';
 
+const shouldLogWarnings = process.env.NODE_ENV !== 'production';
+
+function logDragScrollWarning(message: string, error: unknown): void {
+  if (shouldLogWarnings) {
+    console.warn(message, error);
+  }
+}
+
 /**
  * Custom hook to enable mouse/touch/pen drag scrolling on a container element
  * Uses modern Pointer Events API for unified input handling
@@ -92,7 +100,7 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
         element.setPointerCapture(e.pointerId);
       } catch (err) {
         // Fallback for older browsers
-        console.warn('⚠️ [DragScroll] Pointer capture failed:', err);
+        logDragScrollWarning('[DragScroll] Pointer capture failed:', err);
       }
 
       isDraggingRef.current = true;
@@ -151,7 +159,7 @@ export function useMouseDragScroll<T extends HTMLElement = HTMLElement>(
       try {
         element.releasePointerCapture(e.pointerId);
       } catch (err) {
-        console.warn('⚠️ [DragScroll] Pointer release failed:', err);
+        logDragScrollWarning('[DragScroll] Pointer release failed:', err);
       }
 
       isDraggingRef.current = false;

@@ -44,7 +44,9 @@ const CookieBanner: React.FC = () => {
         return () => clearTimeout(timer);
       }
     } catch (error) {
-      console.warn('Failed to check cookie consent status:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Failed to check cookie consent status:', error);
+      }
       // Fallback: show banner if localStorage fails
       const timer = setTimeout(() => setShowBanner(true), 500);
       return () => clearTimeout(timer);
