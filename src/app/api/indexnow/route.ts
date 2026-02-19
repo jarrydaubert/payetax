@@ -11,6 +11,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 // Security constants
 const MAX_URLS = 100;
@@ -90,29 +91,6 @@ function isValidPayetaxUrl(url: string): boolean {
   }
 }
 
-/**
- * Get client IP with better fallback than "unknown"
- */
-function getClientIdentifier(request: NextRequest): string {
-  // Vercel sets x-forwarded-for securely at the edge
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0]?.trim();
-    if (firstIp) return firstIp;
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  // Fallback: hash of user-agent + accept to avoid single "unknown" bucket
-  const ua = request.headers.get('user-agent') || '';
-  const accept = request.headers.get('accept') || '';
-  const hash = `anon-${Buffer.from(ua + accept)
-    .toString('base64')
-    .slice(0, 16)}`;
-  return hash;
-}
-
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   const requestId = crypto.randomUUID().slice(0, 8);
@@ -124,7 +102,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limiting: 10 requests per minute per IP
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(request, { includeAcceptHeaderInFallback: true });
 
   if (!(await checkRateLimit(`indexnow:${clientId}`))) {
     console.warn(`[IndexNow:${requestId}] Rate limited: ${clientId}`);

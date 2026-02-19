@@ -14,6 +14,7 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { TAX_RATES } from '@/constants/taxRates';
+import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from './businessThresholds';
 
 // ============================================================================
 // TYPES
@@ -21,28 +22,31 @@ import { TAX_RATES } from '@/constants/taxRates';
 
 export type WarningSeverity = 'hard' | 'soft' | 'educational';
 
-export type WarningType =
+export const DIRECTOR_WARNING_TYPES = [
   // Hard constraints
-  | 'SURVIVAL_MODE'
-  | 'OVERDRAWN'
-  | 'DIVIDEND_RESERVES'
+  'SURVIVAL_MODE',
+  'OVERDRAWN',
+  'DIVIDEND_RESERVES',
   // Soft warnings (may apply)
-  | 'VAT_THRESHOLD'
-  | 'SELF_ASSESSMENT'
-  | 'PAYMENTS_ON_ACCOUNT'
-  | 'EA_ELIGIBILITY_CHECK'
-  | 'BIK_CLASS_1A_WARNING'
-  | 'LOSSES_ELIGIBILITY'
+  'VAT_THRESHOLD',
+  'SELF_ASSESSMENT',
+  'PAYMENTS_ON_ACCOUNT',
+  'EA_ELIGIBILITY_CHECK',
+  'BIK_CLASS_1A_WARNING',
+  'LOSSES_ELIGIBILITY',
   // Educational
-  | 'PA_TAPER'
-  | 'HICBC'
-  | 'PENSION_GAP'
-  | 'PENSION_AA_EXCEEDED'
-  | 'PENSION_TAPER'
-  | 'POTENTIAL_DLA'
-  | 'HIGH_COMPLEXITY'
-  | 'MORTGAGE_IMPACT'
-  | 'MID_YEAR_ASSUMPTION';
+  'PA_TAPER',
+  'HICBC',
+  'PENSION_GAP',
+  'PENSION_AA_EXCEEDED',
+  'PENSION_TAPER',
+  'POTENTIAL_DLA',
+  'HIGH_COMPLEXITY',
+  'MORTGAGE_IMPACT',
+  'MID_YEAR_ASSUMPTION',
+] as const;
+
+export type WarningType = (typeof DIRECTOR_WARNING_TYPES)[number];
 
 export interface Warning {
   type: WarningType;
@@ -71,13 +75,10 @@ export interface WarningInput {
 // CONSTANTS
 // ============================================================================
 
-const VAT_REGISTRATION_THRESHOLD = 90000; // 2025-26 threshold
 const VAT_WARNING_PROXIMITY = 5000; // Warn when within £5k of threshold
-const PENSION_ANNUAL_ALLOWANCE = 60000; // Standard AA
-const PENSION_TAPER_THRESHOLD = 260000; // Adjusted income threshold for AA taper
-const HICBC_START = 60000; // High Income Child Benefit Charge starts
-const HICBC_END = 80000; // HICBC fully claws back
-const SA_LIABILITY_THRESHOLD = 1000; // Payments on Account threshold
+const PENSION_ANNUAL_ALLOWANCE = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionAnnualAllowance;
+const PENSION_TAPER_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperLegislative;
+const SA_LIABILITY_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.paymentsOnAccount;
 const SA_DEDUCTION_THRESHOLD = 0.8; // 80% deducted at source exemption
 const HIGH_COMPLEXITY_THRESHOLD = 10000000; // £10m+ is complex
 
@@ -95,6 +96,9 @@ export function getWarnings(input: WarningInput): Warning[] {
   const warnings: Warning[] = [];
   const taxYear = input.taxYear ?? '2025-2026';
   const rates = TAX_RATES[taxYear];
+  const vatRegistrationThreshold = rates.vatRegistrationThreshold;
+  const hicbcStart = rates.hicbc.start;
+  const hicbcEnd = rates.hicbc.end;
 
   const profit = input.profit ?? 0;
   const revenue = input.revenue ?? 0;
@@ -149,18 +153,18 @@ export function getWarnings(input: WarningInput): Warning[] {
   // ========================================================================
 
   // VAT Threshold proximity
-  if (revenue > 0 && revenue >= VAT_REGISTRATION_THRESHOLD - VAT_WARNING_PROXIMITY) {
-    if (revenue < VAT_REGISTRATION_THRESHOLD) {
+  if (revenue > 0 && revenue >= vatRegistrationThreshold - VAT_WARNING_PROXIMITY) {
+    if (revenue < vatRegistrationThreshold) {
       warnings.push({
         type: 'VAT_THRESHOLD',
         severity: 'soft',
-        message: `Your revenue of £${revenue.toLocaleString()} is within £${(VAT_REGISTRATION_THRESHOLD - revenue).toLocaleString()} of the VAT registration threshold.`,
+        message: `Your revenue of £${revenue.toLocaleString()} is within £${(vatRegistrationThreshold - revenue).toLocaleString()} of the VAT registration threshold.`,
       });
     } else {
       warnings.push({
         type: 'VAT_THRESHOLD',
         severity: 'soft',
-        message: `Your revenue exceeds the £${VAT_REGISTRATION_THRESHOLD.toLocaleString()} VAT registration threshold. You must register for VAT if not already.`,
+        message: `Your revenue exceeds the £${vatRegistrationThreshold.toLocaleString()} VAT registration threshold. You must register for VAT if not already.`,
       });
     }
   }
@@ -234,7 +238,7 @@ export function getWarnings(input: WarningInput): Warning[] {
 
   const totalIncome = salary + dividends;
   const paThreshold = rates.personalAllowanceReductionThreshold; // £100,000
-  const paFullyTaperedAt = 125140; // £100k + (£12,570 × 2)
+  const paFullyTaperedAt = paThreshold + rates.personalAllowance * 2;
 
   // PA Taper zone (60% effective rate)
   if (totalIncome > paThreshold && totalIncome <= paFullyTaperedAt) {
@@ -246,10 +250,10 @@ export function getWarnings(input: WarningInput): Warning[] {
   }
 
   // High Income Child Benefit Charge
-  if (input.hasChildren && totalIncome >= HICBC_START && totalIncome <= HICBC_END) {
+  if (input.hasChildren && totalIncome >= hicbcStart && totalIncome <= hicbcEnd) {
     const clawbackPercent = Math.min(
       100,
-      ((totalIncome - HICBC_START) / (HICBC_END - HICBC_START)) * 100,
+      ((totalIncome - hicbcStart) / (hicbcEnd - hicbcStart)) * 100,
     );
     warnings.push({
       type: 'HICBC',
@@ -355,7 +359,7 @@ function estimateDividendTax(dividends: number, salary: number, taxYear: TaxYear
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
   const basicRateLimit = rates.bands[0]?.threshold ?? 37700; // £37,700
-  const dividendAllowance = 500; // 2025-26
+  const dividendAllowance = rates.dividendAllowance;
 
   // Income already used by salary
   const salaryAbovePA = Math.max(0, salary - personalAllowance);

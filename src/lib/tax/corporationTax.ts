@@ -10,6 +10,7 @@
  */
 
 import { CT_RATES } from '@/constants/taxRates';
+import { roundToPence } from './utils';
 
 // Re-export for backwards compatibility with existing imports
 export { CT_RATES } from '@/constants/taxRates';
@@ -199,13 +200,6 @@ export function getEffectiveCTRate(taxableProfit: number, associatedCompanies = 
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
-
-/**
- * Round to nearest penny (2 decimal places)
- */
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
-}
 
 /**
  * Round to 4 decimal places (for rate precision)

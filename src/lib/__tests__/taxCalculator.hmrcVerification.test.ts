@@ -149,6 +149,36 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         2,
       );
     });
+
+    it('Scottish £50,000 salary - 2025-26 banding check', () => {
+      const result = calculateTax(
+        createInput({ salary: 50000, isScottish: true, taxCode: 'S1257L' }),
+      );
+
+      // Taxable income: £50,000 - £12,570 = £37,430
+      // Starter: £2,827 × 19% = £537.13
+      // Basic: (£14,921-£2,827)=£12,094 × 20% = £2,418.80
+      // Intermediate: (£31,092-£14,921)=£16,171 × 21% = £3,395.91
+      // Higher: (£37,430-£31,092)=£6,338 × 42% = £2,661.96
+      // Total = £9,013.80
+      expect(result.incomeTax.annually).toBeCloseTo(9013.8, 1);
+
+      // NI remains UK-wide for category A
+      // (£50,000 - £12,570) × 8% = £2,994.40
+      expect(result.nationalInsurance.annually).toBeCloseTo(2994.4, 1);
+    });
+
+    it('Welsh C-prefix tax code uses rUK tax rates', () => {
+      const rUk = calculateTax(createInput({ salary: 60000, taxCode: '1257L', isScottish: false }));
+      const welsh = calculateTax(
+        createInput({ salary: 60000, taxCode: 'C1257L', isScottish: false }),
+      );
+
+      expect(welsh.taxFreeAmount).toBe(rUk.taxFreeAmount);
+      expect(welsh.incomeTax.annually).toBeCloseTo(rUk.incomeTax.annually, 2);
+      expect(welsh.nationalInsurance.annually).toBeCloseTo(rUk.nationalInsurance.annually, 2);
+      expect(welsh.netPay.annually).toBeCloseTo(rUk.netPay.annually, 2);
+    });
   });
 
   describe('Personal Allowance Tapering Edge Cases', () => {

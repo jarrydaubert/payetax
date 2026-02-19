@@ -3,6 +3,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { subscribeEmailToKit } from '@/lib/newsletter/kitClient';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { NewsletterSubscribeRequestSchema } from '@/lib/validation/emailValidation';
 
@@ -13,25 +14,6 @@ const KIT_API_SECRET = process.env.KIT_API_SECRET;
 const KIT_FORM_ID = process.env.KIT_FORM_ID;
 
 const MAX_BODY_SIZE = 1024; // 1KB is plenty for an email subscription
-
-/** Get client IP from headers (Vercel/Cloudflare set these securely) */
-function getClientIdentifier(request: NextRequest): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0];
-    if (firstIp) return firstIp.trim();
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp;
-
-  // Fallback: hash of user-agent to avoid single "unknown" bucket
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `anon-${Buffer.from(ua).toString('base64').slice(0, 16)}`;
-}
 
 export async function POST(request: NextRequest) {
   // Basic CSRF check

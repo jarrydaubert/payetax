@@ -71,6 +71,15 @@
 - [ ] Add more payslip-style regression locks and tighten tolerances where safe
 - [ ] Store HMRC source provenance alongside golden master data
 
+### Post-Audit Follow-Ups (Remaining)
+- [ ] Sunset legacy `DIVIDEND_RATES.ALLOWANCE` export once all imports are migrated to `TAX_RATES[year].dividendAllowance`
+- [ ] Define and execute a deprecation date for legacy 64-bit unsubscribe token signatures in `src/lib/newsletter/unsubscribeToken.ts`
+- [ ] Replace fallback tax-rate literals in UI fallback paths (for example `ResultsSummaryCards`) with source-of-truth derived defaults
+- [ ] Normalize custom subpixel font classes to approved Tailwind/design token scale (SimpleNavbar, SidebarNav)
+- [ ] Run production-only validation checklist after each release and store pass/fail notes (`docs/guides/POST_RELEASE_VALIDATION.md`)
+- [ ] Verify distributed rate limiting against real Upstash Redis in production (no in-memory fallback)
+- [ ] Run quarterly keyboard + screen-reader accessibility regression session across calculator and director guide
+
 ### Calculator Store Cleanup
 
 ---

@@ -13,6 +13,7 @@
 | **Check tech stack?** | [`TECH_STACK.md`](./guides/TECH_STACK.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
+| **Run post-release checks?** | [`POST_RELEASE_VALIDATION.md`](./guides/POST_RELEASE_VALIDATION.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
 | **Use Linear?** | [`LINEAR.md`](./guides/LINEAR.md) |

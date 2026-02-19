@@ -14,6 +14,7 @@ import {
   DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS,
   getAvailableDirectorStudentLoanPlans,
 } from '@/lib/tax/studentLoanPlans';
+import { DIRECTOR_WARNING_TYPES } from '@/lib/tax/warnings';
 
 // ============================================================================
 // ENUMS & CONSTANTS
@@ -45,10 +46,9 @@ export const CALCULATION_MODES = ['normal', 'survival', 'modified_survival'] as 
  * Warning types that can be triggered during calculation
  */
 export const WARNING_TYPES = [
-  'SURVIVAL_MODE',
+  ...DIRECTOR_WARNING_TYPES,
+  // Legacy warning types emitted by directorCalculator.ts
   'MODIFIED_SURVIVAL',
-  'HIGH_COMPLEXITY',
-  'VAT_THRESHOLD',
   'DLA_RISK',
   'ALREADY_TAKEN_TOO_MUCH',
 ] as const;

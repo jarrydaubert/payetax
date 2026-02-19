@@ -17,6 +17,7 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { TAX_RATES } from '@/constants/taxRates';
+import { roundToPence } from './utils';
 
 // ============================================================================
 // TYPES
@@ -97,12 +98,4 @@ export function calculateEmployeeNI(
  */
 export function getEmployeeNI(salary: number, taxYear: TaxYear = '2025-2026'): number {
   return calculateEmployeeNI(salary, taxYear).employeeNI;
-}
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
 }

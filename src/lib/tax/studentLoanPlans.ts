@@ -17,6 +17,8 @@ export const DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS = [
  */
 export const DIRECTOR_STUDENT_LOAN_PLANS_BY_TAX_YEAR: Record<TaxYear, readonly StudentLoanPlan[]> =
   {
+    // Plan 5 is intentionally excluded in director flows until rollout criteria are confirmed.
+    // Core PAYE calculator still supports Plan 5 for employee scenarios.
     '2023-2024': ['plan1', 'plan2', 'plan4', 'postgrad'],
     '2024-2025': ['plan1', 'plan2', 'plan4', 'postgrad'],
     '2025-2026': ['plan1', 'plan2', 'plan4', 'postgrad'],

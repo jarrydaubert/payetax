@@ -2247,11 +2247,11 @@ describe('RUTHLESS: Off-By-One Threshold Attacks', () => {
     expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12570);
   });
 
-  it('should lose £1 PA at exactly £100,002 (taper active)', () => {
-    // BUG: Taper calculation wrong by £1 or uses wrong divisor
+  it('should keep full PA at exactly £100,002 (HMRC £2 rounding)', () => {
+    // HMRC-style taper reduction rounds down to the nearest £2.
     const income = 100002;
-    // PA = 12570 - floor((100002 - 100000) / 2) = 12570 - 1 = £12,569
-    expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12569);
+    // Raw reduction = £1, rounded down to £0 => PA stays £12,570.
+    expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12570);
   });
 
   it('should have ZERO PA at exactly £125,140', () => {

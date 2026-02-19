@@ -807,6 +807,7 @@ function calculateYourSetupStrategy(
     pension,
     companyCarBIK,
     associatedCompaniesCount,
+    lossesBroughtForward,
   } = opts;
 
   const salary = userSalary;
@@ -824,8 +825,9 @@ function calculateYourSetupStrategy(
   // Profit available for dividends = grossProfit - salary - employerNI - CT on remaining
   const costOfSalary = salary + employerNI;
   const profitAfterSalary = Math.max(0, grossProfit - costOfSalary);
+  const taxableProfitAfterSalary = Math.max(0, profitAfterSalary - lossesBroughtForward);
   const ctOnRemaining = getCorporationTax(
-    profitAfterSalary,
+    taxableProfitAfterSalary,
     undefined,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
@@ -842,9 +844,10 @@ function calculateYourSetupStrategy(
   const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax;
 
-  // Corporation tax: based on profit minus salary cost
+  // Corporation tax: based on profit minus salary cost and losses brought forward
+  const taxableProfit = Math.max(0, grossProfit - costOfSalary - lossesBroughtForward);
   const corporationTax = getCorporationTax(
-    Math.max(0, grossProfit - costOfSalary),
+    taxableProfit,
     undefined,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );

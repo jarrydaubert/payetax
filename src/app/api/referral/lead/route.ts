@@ -2,7 +2,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { maskEmailForLogs } from '@/lib/newsletter/maskEmail';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { ReferralLeadRequestSchema } from '@/lib/validation/emailValidation';
 
@@ -25,6 +27,14 @@ const ReferralLeadSchema = ReferralLeadRequestSchema.extend({
 
 type ReferralLead = z.infer<typeof ReferralLeadSchema>;
 
+function formatErrorForLog(error: unknown): { name?: string; message?: string } {
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message };
+  }
+
+  return { message: 'Unknown error' };
+}
+
 /** Escape HTML to prevent injection */
 function escapeHtml(str: string): string {
   return str
@@ -33,25 +43,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/** Get client identifier - never returns shared bucket */
-function getClientIdentifier(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0]?.trim();
-    if (firstIp) return `ip:${firstIp}`;
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return `ip:${realIp}`;
-
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return `ip:${cfIp}`;
-
-  // Fallback: hash of user-agent to avoid shared bucket
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
 function getReasonLabel(reason: ReferralLead['reason']): string {
@@ -229,7 +220,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limiting: 3 leads per hour per client
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(request, { ipPrefix: 'ip:', fallbackPrefix: 'ua:' });
   if (!(await checkRateLimit(`referral-lead:${clientId}`, { max: 3, window: 3600000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
@@ -299,7 +290,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (userEmailResult.error) {
-      console.error('[referral/lead] User confirmation error:', userEmailResult.error);
+      console.error('[referral/lead] User confirmation error:', {
+        error: formatErrorForLog(userEmailResult.error),
+        email: maskEmailForLogs(lead.email),
+      });
       return NextResponse.json({ error: 'Failed to send confirmation email' }, { status: 500 });
     }
 
@@ -314,12 +308,18 @@ export async function POST(request: NextRequest) {
         text: partnerEmailContent.text,
       })
       .catch((err) => {
-        console.error('[referral/lead] Partner notification error:', err);
+        console.error('[referral/lead] Partner notification error:', {
+          error: formatErrorForLog(err),
+          email: maskEmailForLogs(lead.email),
+        });
       });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[referral/lead] Error:', error);
+    console.error('[referral/lead] Error:', {
+      error: formatErrorForLog(error),
+      email: maskEmailForLogs(lead.email),
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

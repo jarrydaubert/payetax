@@ -7,8 +7,6 @@ import dynamic from 'next/dynamic';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
-// MONETIZATION: Disabled until partner agreements in place
-// import { AccountantReferralCTA } from '@/components/molecules/AccountantReferralCTA';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
@@ -19,6 +17,7 @@ import { trackEvent } from '@/lib/analytics';
 import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
+import { useShallow } from '@/lib/zustandShallow';
 import {
   useCalculatorActions,
   useCalculatorResults,
@@ -45,7 +44,28 @@ export function CalculatorContainer() {
   const results = useCalculatorResults();
   const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
   const whatIfResults = useCalculatorStore((state) => state.whatIfResults);
-  const input = useCalculatorStore((state) => state.input);
+  const input = useCalculatorStore(
+    useShallow((state) => ({
+      salary: state.input.salary,
+      payPeriod: state.input.payPeriod,
+      taxYear: state.input.taxYear,
+      taxCode: state.input.taxCode,
+      isScottish: state.input.isScottish,
+      isMarried: state.input.isMarried,
+      partnerGrossWage: state.input.partnerGrossWage,
+      isBlind: state.input.isBlind,
+      age: state.input.age,
+      payNoNI: state.input.payNoNI,
+      pensionContribution: state.input.pensionContribution,
+      pensionContributionType: state.input.pensionContributionType,
+      studentLoanPlans: state.input.studentLoanPlans,
+      niCategory: state.input.niCategory,
+      hoursPerWeek: state.input.hoursPerWeek,
+      allowancesDeductions: state.input.allowancesDeductions,
+      incomeSources: state.input.incomeSources,
+      region: state.input.region,
+    })),
+  );
   const { calculate, calculatePreviousYear, setPensionContribution, setPensionContributionType } =
     useCalculatorActions();
   const [, startTransition] = React.useTransition();
@@ -136,6 +156,14 @@ export function CalculatorContainer() {
       calculate();
       calculatePreviousYear();
     });
+
+    if (/\s*(W1|M1|X)$/i.test(input.taxCode)) {
+      toast.info('Emergency tax code detected', {
+        description:
+          'W1/M1/X codes are non-cumulative and may differ from your final annual tax position.',
+        duration: TIMERS.TOAST_SUCCESS,
+      });
+    }
 
     // Announce for screen readers (event-driven)
     setLiveMessage('Tax calculation complete. Results updated.');
@@ -302,23 +330,6 @@ export function CalculatorContainer() {
             aria-label='Tax calculation results summary'
           >
             <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
-
-            {/* MONETIZATION: Accountant referral CTA disabled until partner agreements in place
-            <AccountantReferralCTA
-              situation={{
-                salary: results.grossSalary.annually,
-                isScottish: input.isScottish ?? false,
-                effectiveTaxRate:
-                  results.grossSalary.annually > 0
-                    ? ((results.incomeTax.annually + results.nationalInsurance.annually) /
-                        results.grossSalary.annually) *
-                      100
-                    : 0,
-                taxCode: input.taxCode,
-              }}
-              className={SPACING.MT_4}
-            />
-            */}
           </motion.div>
         )}
       </AnimatePresence>

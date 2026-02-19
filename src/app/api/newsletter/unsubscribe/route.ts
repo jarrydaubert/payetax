@@ -7,6 +7,7 @@ import {
   verifyUnsubscribeToken,
 } from '@/lib/newsletter/unsubscribeToken';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 export const runtime = 'nodejs';
 
@@ -34,25 +35,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/** Get client identifier - never returns null */
-function getClientIdentifier(request: NextRequest): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0];
-    if (firstIp) return firstIp.trim();
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp;
-
-  // Fallback: hash of user-agent to avoid unlimited requests
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `anon-${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
 export async function GET(request: NextRequest) {

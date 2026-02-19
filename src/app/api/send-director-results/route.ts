@@ -7,6 +7,7 @@ import {
   generateDirectorEmailText,
 } from '@/lib/email/directorResultsEmail';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { formatCurrency } from '@/lib/utils';
@@ -25,25 +26,6 @@ function formatErrorForLog(error: unknown): { name?: string; message?: string } 
 }
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
 
-/** Get client identifier - always returns a key */
-function getClientIdentifier(request: NextRequest): string {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0];
-    if (firstIp) return firstIp.trim();
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp;
-
-  // Fallback: hash of user-agent
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
-}
-
 export async function POST(request: NextRequest) {
   // CSRF protection check (origin/referer allowlist).
   if (!isValidRequestOrigin(request)) {
@@ -51,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limiting: 5 emails per minute per client
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
   if (!(await checkRateLimit(`send-director-results:${clientId}`, { max: 5, window: 60000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },

@@ -20,6 +20,7 @@
 import type { TaxYear } from '@/constants/taxRates';
 import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
+import { roundToPence } from './utils';
 
 // ============================================================================
 // TYPES
@@ -74,7 +75,8 @@ export function calculateIncomeTax(
   // Calculate personal allowance reduction for high earners
   let personalAllowance = basePersonalAllowance;
   if (salary > reductionThreshold) {
-    const reduction = Math.floor((salary - reductionThreshold) * reductionRate);
+    // Align with main PAYE engine: round down PA reduction to the nearest £2.
+    const reduction = Math.floor(((salary - reductionThreshold) * reductionRate) / 2) * 2;
     personalAllowance = Math.max(0, basePersonalAllowance - reduction);
   }
 
@@ -126,12 +128,4 @@ export function getIncomeTax(
   taxYear: TaxYear = '2025-2026',
 ): number {
   return calculateIncomeTax(salary, region, taxYear).incomeTax;
-}
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
 }

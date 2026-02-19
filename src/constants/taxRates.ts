@@ -104,6 +104,11 @@ export const TAX_RATES: Record<
     marriageAllowance: number;
     blindPersonsAllowance: number;
     dividendAllowance: number; // Tax-free dividend allowance
+    vatRegistrationThreshold: number; // VAT registration threshold
+    hicbc: {
+      start: number; // High Income Child Benefit Charge start threshold
+      end: number; // HICBC full clawback threshold
+    };
     // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
     ageAllowance65to74: number;
     ageAllowance75plus: number;
@@ -147,6 +152,11 @@ export const TAX_RATES: Record<
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
     dividendAllowance: 1000, // £1,000 for 2023-24 (reduced from £2,000)
+    vatRegistrationThreshold: 85000,
+    hicbc: {
+      start: 50000,
+      end: 60000,
+    },
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,
@@ -235,6 +245,11 @@ export const TAX_RATES: Record<
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
     dividendAllowance: 500, // £500 for 2024-25 (reduced from £1,000)
+    vatRegistrationThreshold: 90000,
+    hicbc: {
+      start: 60000,
+      end: 80000,
+    },
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,
@@ -319,6 +334,11 @@ export const TAX_RATES: Record<
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026
     dividendAllowance: 500, // £500 for 2025-26 (maintained from 2024-25)
+    vatRegistrationThreshold: 90000,
+    hicbc: {
+      start: 60000,
+      end: 80000,
+    },
     // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
     ageAllowance65to74: 3660,
     ageAllowance75plus: 3960,

@@ -5,6 +5,7 @@ import { Resend } from 'resend';
 import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import {
   calculateTax,
@@ -38,26 +39,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/** Get client identifier - always returns a key */
-function getClientIdentifier(request: NextRequest): string {
-  // Prefer Cloudflare's header (most reliable)
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp;
-
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0];
-    if (firstIp) return firstIp.trim();
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  // Fallback: hash of user-agent
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
 // Format tax year for display in emails (e.g., "2025-2026" -> "2025-26")
@@ -254,7 +235,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limiting: 5 emails per minute per client
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
   if (!(await checkRateLimit(`send-results:${clientId}`, { max: 5, window: 60000 }))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },

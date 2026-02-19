@@ -18,6 +18,7 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { DIVIDEND_RATES, TAX_RATES } from '@/constants/taxRates';
+import { roundToPence } from './utils';
 
 // Re-export for backwards compatibility with existing imports
 export { DIVIDEND_RATES } from '@/constants/taxRates';
@@ -136,7 +137,8 @@ export function calculateDividendTax(
   // which is the cumulative taxable income amount (37700)
   const higherBandEnd = rates.bands[1]?.threshold ?? 125140;
 
-  const { ALLOWANCE, BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
+  const { BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
+  const dividendAllowance = rates.dividendAllowance;
 
   // Step 1: Calculate unused Personal Allowance that can shelter dividends
   // If other income < tapered PA, the unused portion shelters dividends at 0% tax
@@ -145,8 +147,8 @@ export function calculateDividendTax(
   const dividendsAfterPA = dividends - dividendsSheltered;
 
   // Step 2: Apply dividend allowance to remaining dividends
-  const allowanceUsed = Math.min(dividendsAfterPA, ALLOWANCE);
-  const taxableDividends = Math.max(0, dividendsAfterPA - ALLOWANCE);
+  const allowanceUsed = Math.min(dividendsAfterPA, dividendAllowance);
+  const taxableDividends = Math.max(0, dividendsAfterPA - dividendAllowance);
 
   if (taxableDividends <= 0) {
     const bandBreakdown: DividendBandBreakdown[] = [];
@@ -305,13 +307,6 @@ export function getEffectiveDividendRate(
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
-
-/**
- * Round to nearest penny (2 decimal places)
- */
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
-}
 
 /**
  * Round to 4 decimal places (for rate precision)

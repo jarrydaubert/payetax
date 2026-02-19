@@ -37,6 +37,7 @@ import type {
 import { getCorporationTax } from './corporationTax';
 import { getDividendTax } from './dividendTax';
 import { getEmployerNI } from './employerNI';
+import { roundToPence } from './utils';
 
 // ============================================================================
 // CONSTANTS
@@ -59,12 +60,15 @@ export const POA_MULTIPLIER = 1.5;
 /** Profit threshold for high complexity warning */
 export const HIGH_COMPLEXITY_THRESHOLD = 250000;
 
-/** VAT registration threshold */
-export const VAT_REGISTRATION_THRESHOLD = 90000;
+const DEFAULT_DIRECTOR_RATES = TAX_RATES['2025-2026'];
+const VAT_WARNING_PROXIMITY = 5000;
 
-/** VAT warning band (early warning) */
-export const VAT_WARNING_LOWER = 85000;
-export const VAT_WARNING_UPPER = 95000;
+/** VAT registration threshold (default tax year export for backwards compatibility) */
+export const VAT_REGISTRATION_THRESHOLD = DEFAULT_DIRECTOR_RATES.vatRegistrationThreshold;
+
+/** VAT warning band (default tax year export for backwards compatibility) */
+export const VAT_WARNING_LOWER = VAT_REGISTRATION_THRESHOLD - VAT_WARNING_PROXIMITY;
+export const VAT_WARNING_UPPER = VAT_REGISTRATION_THRESHOLD + VAT_WARNING_PROXIMITY;
 
 // ============================================================================
 // MAIN CALCULATION FUNCTION
@@ -221,7 +225,14 @@ export function calculateDirectorScenario(
   const personalTaxMonthly = roundToPence(personalTaxAnnual / 12);
 
   // Step 13: Collect warnings
-  const warnings = collectWarnings(input, grossProfit, netRevenue, annualTakeHome);
+  const warnings = collectWarnings(
+    input,
+    grossProfit,
+    netRevenue,
+    annualTakeHome,
+    includesPOA,
+    taxYear,
+  );
 
   return {
     mode: 'normal',
@@ -291,8 +302,13 @@ function collectWarnings(
   grossProfit: number,
   netRevenue: number,
   annualTakeHome: number,
+  includesPOA: boolean,
+  taxYear: TaxYear,
 ): Warning[] {
   const warnings: Warning[] = [];
+  const vatRegistrationThreshold = TAX_RATES[taxYear].vatRegistrationThreshold;
+  const vatWarningLower = vatRegistrationThreshold - VAT_WARNING_PROXIMITY;
+  const vatWarningUpper = vatRegistrationThreshold + VAT_WARNING_PROXIMITY;
 
   // High complexity warning (profit > £250k)
   if (grossProfit > HIGH_COMPLEXITY_THRESHOLD) {
@@ -303,11 +319,11 @@ function collectWarnings(
   }
 
   // VAT threshold warning (approaching £90k)
-  if (netRevenue > VAT_WARNING_LOWER && netRevenue < VAT_WARNING_UPPER) {
+  if (netRevenue > vatWarningLower && netRevenue < vatWarningUpper) {
     warnings.push({
       type: 'VAT_THRESHOLD',
       message:
-        `Heads up: VAT registration is required above £${VAT_REGISTRATION_THRESHOLD.toLocaleString()} turnover. ` +
+        `Heads up: VAT registration is required above £${vatRegistrationThreshold.toLocaleString()} turnover. ` +
         "If you're not registered yet, you may need to be.",
     });
   }
@@ -332,16 +348,13 @@ function collectWarnings(
     });
   }
 
+  if (includesPOA) {
+    warnings.push({
+      type: 'PAYMENTS_ON_ACCOUNT',
+      message:
+        'This estimate includes Payments on Account (1.5x first-year budgeting). Your later Self Assessment bills may differ.',
+    });
+  }
+
   return warnings;
-}
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/**
- * Round to nearest penny (2 decimal places)
- */
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
 }

@@ -12,6 +12,7 @@
 
 import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
 import { TAX_RATES } from '@/constants/taxRates';
+import { roundToPence } from './utils';
 
 export interface StudentLoanResult {
   plan1: number;
@@ -62,10 +63,6 @@ export function getStudentLoanRepayment(
   result.total = roundToPence(result.total);
 
   return result;
-}
-
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
 }
 
 /**

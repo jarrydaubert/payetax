@@ -9,6 +9,7 @@ Tests should catch real regressions in calculation, UX, or security behavior.
 See also:
 - `docs/guides/BUG_CATALOG.md`
 - `docs/guides/TESTING_MATRIX.md`
+- `docs/guides/POST_RELEASE_VALIDATION.md`
 
 ---
 
@@ -40,6 +41,7 @@ Keep HMRC values anchored to source documents and code references.
 - `bun run test:no-coverage`
 - `bun run build`
 - Targeted Playwright suites for critical flows
+- Post-release production validation checklist (manual/high-confidence checks)
 
 ---
 

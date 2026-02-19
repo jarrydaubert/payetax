@@ -19,6 +19,7 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { TAX_RATES } from '@/constants/taxRates';
+import { roundToPence } from './utils';
 
 // ============================================================================
 // TYPES
@@ -137,15 +138,4 @@ export function getEmployerNIThreshold(taxYear: TaxYear = '2025-2026'): number {
 export function getEmployerNIRate(taxYear: TaxYear = '2025-2026'): number {
   const rates = TAX_RATES[taxYear];
   return rates.nationalInsurance.employer.A.secondary.rate / 100;
-}
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/**
- * Round to nearest penny (2 decimal places)
- */
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
 }

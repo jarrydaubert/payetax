@@ -55,25 +55,9 @@ import {
 } from '@/constants/taxRates';
 import type { IncomeSource } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
+import { roundToPence } from './tax/utils';
 
-/**
- * Round monetary values to pence for accurate financial calculations
- *
- * This function ensures all monetary calculations maintain pence-level precision
- * by rounding to 2 decimal places, which is critical for matching HMRC calculations.
- *
- * @param value - The monetary value to round
- * @returns Value rounded to the nearest penny
- *
- * @example
- * roundToPence(123.456789) // Returns 123.46
- * roundToPence(99.994) // Returns 99.99
- */
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
-const AVERAGE_WEEKS_PER_MONTH = 4.333;
+const AVERAGE_WEEKS_PER_MONTH = WEEKS_PER_YEAR / 12;
 
 // ============================================================================
 // HELPER FUNCTIONS - Extracted for maintainability
@@ -713,6 +697,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   if (input.pensionContribution > 0) {
     if (input.pensionContributionType === 'percentage') {
+      // Input is validated at the boundary (Zod) to stay within 0-100%.
       // Percentage of PRIMARY employment salary (not other income sources)
       // Pension contributions are typically on employment earnings only
       annualPensionContribution = annualGrossSalary * (input.pensionContribution / 100);
@@ -1209,8 +1194,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         break;
 
       case PERIODS.FOUR_WEEKLY: {
-        // Monthly * (12/13) - averages to four-weekly
-        const fourWeeklyFactor = 12 / 13;
+        // Monthly * factor - averages to four-weekly
+        const fourWeeklyFactor = PERIOD_CONVERSION_FACTORS.FOUR_WEEKLY;
         grossSalary[period] = roundToPence(monthlyGrossSalary * fourWeeklyFactor);
         incomeTax[period] = roundToPence(monthlyTax * fourWeeklyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(
@@ -1225,8 +1210,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       }
 
       case PERIODS.FORTNIGHTLY: {
-        // Monthly * (12/26) - averages to fortnightly
-        const fortnightlyFactor = 12 / 26;
+        // Monthly * factor - averages to fortnightly
+        const fortnightlyFactor = PERIOD_CONVERSION_FACTORS.FORTNIGHTLY;
         grossSalary[period] = roundToPence(monthlyGrossSalary * fortnightlyFactor);
         incomeTax[period] = roundToPence(monthlyTax * fortnightlyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(
@@ -1241,8 +1226,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       }
 
       case PERIODS.WEEKLY: {
-        // Monthly * (12/52) - averages to weekly
-        const weeklyFactor = 12 / 52;
+        // Monthly * factor - averages to weekly
+        const weeklyFactor = PERIOD_CONVERSION_FACTORS.WEEKLY;
         grossSalary[period] = roundToPence(monthlyGrossSalary * weeklyFactor);
         incomeTax[period] = roundToPence(monthlyTax * weeklyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * weeklyFactor);
@@ -1255,8 +1240,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       }
 
       case PERIODS.DAILY: {
-        // Monthly * (12/260) - averages to daily (5 working days per week)
-        const dailyFactor = 12 / 260;
+        // Monthly * factor - averages to daily (5 working days per week)
+        const dailyFactor = PERIOD_CONVERSION_FACTORS.DAILY;
         grossSalary[period] = roundToPence(monthlyGrossSalary * dailyFactor);
         incomeTax[period] = roundToPence(monthlyTax * dailyFactor);
         nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * dailyFactor);
@@ -1282,13 +1267,18 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           );
           netPay[period] = roundToPence(monthlyNetPay / monthlyHours);
         } else {
-          // Default to annual / (52 * 40) if no hours specified
-          grossSalary[period] = roundToPence(annualGrossSalary / (52 * 40));
-          incomeTax[period] = roundToPence(annualTax / (52 * 40));
-          nationalInsuranceByPeriod[period] = roundToPence(annualNationalInsurance / (52 * 40));
-          studentLoanByPeriod[period] = roundToPence(annualStudentLoan / (52 * 40));
-          pensionContributionByPeriod[period] = roundToPence(annualPensionContribution / (52 * 40));
-          netPay[period] = roundToPence(annualNetPay / (52 * 40));
+          // Default to annual / (weeks * default hours) if no hours specified
+          const annualDefaultHours = WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK;
+          grossSalary[period] = roundToPence(annualGrossSalary / annualDefaultHours);
+          incomeTax[period] = roundToPence(annualTax / annualDefaultHours);
+          nationalInsuranceByPeriod[period] = roundToPence(
+            annualNationalInsurance / annualDefaultHours,
+          );
+          studentLoanByPeriod[period] = roundToPence(annualStudentLoan / annualDefaultHours);
+          pensionContributionByPeriod[period] = roundToPence(
+            annualPensionContribution / annualDefaultHours,
+          );
+          netPay[period] = roundToPence(annualNetPay / annualDefaultHours);
         }
         break;
     }

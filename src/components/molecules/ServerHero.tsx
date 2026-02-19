@@ -67,7 +67,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
           <div key={text} className='flex items-center gap-2 text-sm text-text-dim'>
-            <Icon className='h-[18px] w-[18px] flex-shrink-0 text-emerald' />
+            <Icon aria-hidden='true' className='h-[18px] w-[18px] flex-shrink-0 text-emerald' />
             <span>{text}</span>
           </div>
         ))}
@@ -82,7 +82,9 @@ export default function ServerHero({ className }: ServerHeroProps) {
           { icon: '🇬🇧', title: 'UK Coverage', desc: 'Built for England, Wales, NI, and Scotland' },
         ].map((item) => (
           <div key={item.title} className='bento-item'>
-            <div className='bento-icon'>{item.icon}</div>
+            <div className='bento-icon' aria-hidden='true'>
+              {item.icon}
+            </div>
             <div className='bento-title'>{item.title}</div>
             <div className='bento-desc'>{item.desc}</div>
           </div>
