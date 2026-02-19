@@ -917,6 +917,21 @@ export const useCalculatorStore = create<CalculatorState>()(
               });
               trackCalculatorUsage('paye', salaryRange);
               trackEvent({
+                action: 'calculator_completed',
+                category: 'funnel',
+                label: 'paye_calculator',
+                custom_data: {
+                  salary_range: salaryRange,
+                  has_student_loan: input.studentLoanPlans !== 'none',
+                  has_pension: input.pensionContribution > 0,
+                  tax_year: input.taxYear,
+                  region: input.region,
+                  employment_type: 'paye',
+                },
+              });
+
+              // Backward-compatible alias for existing dashboards.
+              trackEvent({
                 action: 'calculator_completion',
                 category: 'funnel',
                 label: 'paye_calculator',
@@ -926,6 +941,7 @@ export const useCalculatorStore = create<CalculatorState>()(
                   has_pension: input.pensionContribution > 0,
                   tax_year: input.taxYear,
                   region: input.region,
+                  employment_type: 'paye',
                 },
               });
             }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { trackEvent } from '@/lib/analytics';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -43,6 +44,11 @@ export default function PWAInstallBanner() {
     };
 
     const onAppInstalled = () => {
+      trackEvent({
+        action: 'pwa_installed',
+        category: 'engagement',
+        label: 'appinstalled',
+      });
       setVisible(false);
       setDeferredPrompt(null);
     };

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
@@ -55,6 +56,11 @@ export default function CallToAction({
       setStatus('success');
       setErrorMessage('');
       setEmail('');
+      trackEvent({
+        action: 'newsletter_subscribed',
+        category: 'engagement',
+        label: 'cta_newsletter_form',
+      });
     } catch {
       setStatus('error');
       setErrorMessage('Something went wrong. Please try again.');

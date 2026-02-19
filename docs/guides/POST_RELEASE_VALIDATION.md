@@ -101,7 +101,7 @@ Goal: verify crawl/index behavior that local checks cannot fully validate.
 
 Goal: verify event pipelines in live environment.
 
-- [ ] Key funnel events are firing (`calculator_start`, `calculator_completion`, director-guide core events).
+- [ ] Key funnel events are firing (`calculator_start`, `calculator_completed`, director-guide core events).
 - [ ] No obvious PII leakage in analytics payloads.
 - [ ] Event volume shape looks normal vs prior release window.
 

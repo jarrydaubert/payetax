@@ -30,6 +30,7 @@ import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
+import { trackEvent } from '@/lib/analytics';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 
@@ -151,6 +152,7 @@ export function ResultsTable({
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
 
+    const currentlyVisible = visiblePeriods.includes(period);
     const newPeriods = visiblePeriods.includes(period)
       ? visiblePeriods.filter((p) => p !== period)
       : (() => {
@@ -167,6 +169,16 @@ export function ResultsTable({
           const combined = [...visiblePeriods, period];
           return allPeriods.filter((p) => combined.includes(p));
         })();
+
+    trackEvent({
+      action: 'result_viewed',
+      category: 'engagement',
+      label: period,
+      custom_data: {
+        selected: !currentlyVisible,
+        visible_period_count: newPeriods.length,
+      },
+    });
 
     onVisiblePeriodsChange(newPeriods);
   };

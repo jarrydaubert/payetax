@@ -62,6 +62,13 @@ describe('Environment Variable Validation', () => {
         expect(result.success).toBe(true);
       });
 
+      it('should accept Ahrefs key when provided', () => {
+        const result = PublicEnvSchema.safeParse({
+          NEXT_PUBLIC_AHREFS_KEY: 'ahrefs_public_key',
+        });
+        expect(result.success).toBe(true);
+      });
+
       it('should accept valid Sentry DSN', () => {
         const result = PublicEnvSchema.safeParse({
           NEXT_PUBLIC_SENTRY_DSN: 'https://abc123@sentry.io/123456',
@@ -133,6 +140,13 @@ describe('Environment Variable Validation', () => {
       it('should reject invalid site URL', () => {
         const result = PublicEnvSchema.safeParse({
           NEXT_PUBLIC_SITE_URL: 'invalid-url',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should reject empty Ahrefs key if provided', () => {
+        const result = PublicEnvSchema.safeParse({
+          NEXT_PUBLIC_AHREFS_KEY: '',
         });
         expect(result.success).toBe(false);
       });

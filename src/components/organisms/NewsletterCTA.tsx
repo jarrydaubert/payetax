@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 
 interface NewsletterCTAProps {
@@ -50,7 +51,24 @@ export function NewsletterCTA({
     script.src = KIT_EMBED_SRC;
     mount.appendChild(script);
 
+    // Track newsletter subscribe intent from embedded Kit form submissions.
+    // Kit handles submission externally, so this is the most reliable in-app hook.
+    const handleSubmit = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLFormElement)) return;
+      if (!mount.contains(target)) return;
+
+      trackEvent({
+        action: 'newsletter_subscribed',
+        category: 'engagement',
+        label: 'kit_embed_submit',
+      });
+    };
+
+    mount.addEventListener('submit', handleSubmit, true);
+
     return () => {
+      mount.removeEventListener('submit', handleSubmit, true);
       mount.innerHTML = '';
     };
   }, []);

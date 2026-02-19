@@ -7,6 +7,6 @@ describe('PrivacyPage', () => {
 
     expect(screen.getByText('Your Data Stays')).toBeInTheDocument();
     expect(screen.getByText('In Your Browser')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: October 4, 2025')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: February 19, 2026')).toBeInTheDocument();
   });
 });

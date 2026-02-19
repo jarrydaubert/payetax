@@ -55,7 +55,14 @@
 - [ ] Ensure each new blog post has a secondary CTA to newsletter signup
 - [ ] Keep blog-to-money-page internal links healthy (calculator, Director Intelligence, compliance)
 - [ ] Run subscriber announcement flow for newly published posts
-- [ ] Review funnel metrics: sessions -> `calculator_start` -> `calculator_completion` -> monetization click
+- [ ] Review funnel metrics: sessions -> `calculator_start` -> `calculator_completed` -> monetization click
+
+### Sitemap Curation Follow-Ups
+- [ ] Review `indexable page not in sitemap` monthly (Ahrefs + GSC) and keep an explicit keep/exclude decision log
+- [ ] Promote traffic-bearing salary URLs into `PRIORITY_SALARIES` when they cross threshold (currently: `47000`, `73000`, `49000`)
+- [ ] Replace static competitor sitemap cap logic with data-led inclusion rule (impressions/clicks threshold)
+- [ ] Decide blog pagination indexing policy and align implementation (`/blog?page=2+` in sitemap vs `noindex`)
+- [ ] Document sitemap inclusion/exclusion strategy in docs to reduce future audit noise
 
 ### Compare My Setup
 - [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)
@@ -83,6 +90,7 @@
 ### Post-Audit Follow-Ups (Remaining)
 - [ ] Sunset legacy `DIVIDEND_RATES.ALLOWANCE` export once all imports are migrated to `TAX_RATES[year].dividendAllowance`
 - [ ] Define and execute a deprecation date for legacy 64-bit unsubscribe token signatures in `src/lib/newsletter/unsubscribeToken.ts`
+- [ ] Define and execute a deprecation date for analytics alias event `calculator_completion` after dashboards migrate to `calculator_completed`
 - [ ] Replace fallback tax-rate literals in UI fallback paths (for example `ResultsSummaryCards`) with source-of-truth derived defaults
 - [ ] Normalize custom subpixel font classes to approved Tailwind/design token scale (SimpleNavbar, SidebarNav)
 - [ ] Run production-only validation checklist after each release and store pass/fail notes (`docs/guides/POST_RELEASE_VALIDATION.md`)

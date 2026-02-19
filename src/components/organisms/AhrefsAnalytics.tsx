@@ -1,7 +1,6 @@
 // src/components/organisms/AhrefsAnalytics.tsx
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
 import { areCookiesAccepted } from '@/lib/cookieUtils';
@@ -18,7 +17,6 @@ const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
  * If consent is revoked after load, users must refresh for the change to take effect.
  */
 export function AhrefsAnalytics() {
-  const pathname = usePathname();
   const [hasConsent, setHasConsent] = useState(false);
 
   useEffect(() => {
@@ -52,7 +50,7 @@ export function AhrefsAnalytics() {
   }, []);
 
   // Don't render if analytics are disabled, no key is configured, or consent is missing.
-  if (pathname === '/' || !(ANALYTICS_ENABLED && AHREFS_KEY && hasConsent)) {
+  if (!(ANALYTICS_ENABLED && AHREFS_KEY && hasConsent)) {
     return null;
   }
 

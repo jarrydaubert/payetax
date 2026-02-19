@@ -4,7 +4,7 @@
 import { Calendar, CheckCircle, Cookie, Eye, Lock, Shield, X } from 'lucide-react';
 
 // Last updated date - update when privacy policy changes
-const PRIVACY_LAST_UPDATED = 'October 4, 2025';
+const PRIVACY_LAST_UPDATED = 'February 19, 2026';
 
 import { GradientText } from '@/components/atoms/GradientText';
 import { ComparisonCards } from '@/components/molecules/ComparisonCards';

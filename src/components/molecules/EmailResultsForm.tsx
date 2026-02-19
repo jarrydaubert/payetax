@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES } from '@/constants/designTokens';
+import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 
@@ -97,6 +98,15 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
 
       setSentEmail(normalizedEmail);
       setIsSent(true);
+      trackEvent({
+        action: 'result_shared',
+        category: 'engagement',
+        label: 'email',
+        custom_data: {
+          tax_year: input.taxYear,
+          region: input.isScottish ? 'Scotland' : 'rUK',
+        },
+      });
       toast.success('Results sent!', {
         description: `Check your inbox at ${maskEmail(normalizedEmail)}`,
       });

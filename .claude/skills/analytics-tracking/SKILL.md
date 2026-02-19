@@ -1,6 +1,6 @@
 ---
 name: analytics-tracking
-version: 1.0.0
+version: 1.1.0
 description: When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions "set up tracking," "GA4," "Google Analytics," "conversion tracking," "event tracking," "UTM parameters," "tag manager," "GTM," "analytics implementation," or "tracking plan." For A/B test measurement, see ab-test-setup.
 ---
 
@@ -19,41 +19,74 @@ Before implementing tracking, understand:
 2. **Current State** - What tracking exists? What tools are in use?
 3. **Technical Context** - What's the tech stack? Any privacy/compliance requirements?
 
+For PayeTax, start from the known context below and ask only delta questions.
+
 ---
 
 ## PayeTax Context
 
 PayeTax is a free tool with no user accounts, no purchases, and no subscriptions. Analytics must reflect this model.
 
-### Existing Analytics Stack
-- **Vercel Analytics** + **Vercel Speed Insights** — built-in, in `src/app/layout.tsx`
-- **Google Tag Manager** + **GA4** — loaded via `src/components/organisms/Analytics.tsx` with `strategy='lazyOnload'`
-- **Ahrefs Analytics** — loaded via `src/components/organisms/AhrefsAnalytics.tsx` with `strategy='lazyOnload'`
-- Analytics helper: `src/lib/analytics.ts`
-- Director Guide analytics: `src/lib/directorGuideAnalytics.ts`
+### Existing Analytics Stack (live implementation)
+- **Vercel Analytics** + **Vercel Speed Insights** in `src/app/layout.tsx` (privacy-preserving)
+- **Direct GA4 (`gtag.js`, no GTM)** in `src/components/organisms/Analytics.tsx`
+- **Ahrefs Analytics** in `src/components/organisms/AhrefsAnalytics.tsx`
+- Shared tracking helper in `src/lib/analytics.ts`
+- Director Intelligence event module in `src/lib/directorGuideAnalytics.ts`
 
-### PayeTax Conversion Events (not SaaS signup/purchase)
-- `calculator_completed` — user got a tax breakdown result (properties: salary, tax_year, employment_type)
-- `result_viewed` — user viewed a specific period breakdown (properties: period — annual/monthly/weekly/daily)
-- `result_shared` — user shared their result
-- `director_guide_started` — user opened Director Pay Calculator
-- `director_email_sent` — user emailed their director results
-- `newsletter_subscribed` — user signed up for TaxInsights newsletter
-- `blog_article_read` — user read a blog post (properties: slug, category)
-- `cta_clicked` — user clicked a CTA (properties: location, type)
-- `pwa_installed` — user installed the PWA
+### Consent Model (must match code)
+- Consent state keys in localStorage:
+  - `cookie-consent` (`accepted` / `declined`)
+  - `cookie-consent-timestamp` (12-month expiry)
+- Consent helper: `src/lib/cookieUtils.ts`
+- Banner dispatches `cookieConsentUpdated`: `src/components/organisms/CookieBanner.tsx`
+- GA4 defaults to denied storage and upgrades only `analytics_storage` after consent
+- Ahrefs script loads only when consent is accepted and key exists
+- Vercel Analytics/Speed Insights are not consent-gated in this implementation
 
-### User Properties (anonymous — no user IDs)
-- `tax_year` — which tax year they calculated
-- `employment_type` — PAYE, director, etc.
-- `returning_visitor` — boolean (cookie-based)
-- `source` — PWA vs web
+### Required Environment Variables
+- `NEXT_PUBLIC_ENABLE_ANALYTICS` (set `false` to disable analytics components)
+- `NEXT_PUBLIC_GA_ID` (required for GA4)
+- `NEXT_PUBLIC_AHREFS_KEY` (required for Ahrefs)
+- Keep these documented in `.env.template`
+
+### Canonical Conversion Events (PayeTax)
+| Funnel | Event | Key Properties | Source File |
+|-------|-------|----------------|-------------|
+| PAYE | `calculator_start` | `label` | `src/components/organisms/CalculatorContainer.tsx` |
+| PAYE | `calculator_completed` | `salary_range`, `tax_year`, `region`, `employment_type` | `src/store/calculatorStore.ts` |
+| PAYE | `result_viewed` | `label` (period), `selected`, `visible_period_count` | `src/components/organisms/CalculatorResults/ResultsTable.tsx` |
+| PAYE | `result_shared` | `label`, `tax_year`, `region` | `src/components/organisms/CalculatorContainer.tsx`, `src/components/molecules/EmailResultsForm.tsx` |
+| Director Intelligence | `guide_started` | `label` | `src/lib/directorGuideAnalytics.ts` |
+| Director Intelligence | `guide_results_shown` | `label`, `profit_bucket` | `src/lib/directorGuideAnalytics.ts` |
+| Director Intelligence | `guide_email_sent` | `label` | `src/lib/directorGuideAnalytics.ts` |
+| Content/Retention | `newsletter_subscribed` | `label` | `src/components/organisms/NewsletterCTA.tsx`, `src/components/molecules/CallToAction.tsx` |
+| Content/Retention | `blog_article_read` | `slug`, `category` | `src/components/organisms/BlogArticleAnalytics.tsx` |
+| Content/Retention | `cta_clicked` | `label` | `src/components/molecules/HeroCTA.tsx` |
+| Platform | `pwa_installed` | `label` | `src/components/organisms/PWAInstallBanner.tsx` |
+
+### Event Naming and Migration Rules
+- Canonical list lives in `docs/guides/ANALYTICS_TRACKING.md`
+- Keep dual emits only for active migrations
+- Current aliases:
+  - `calculator_completion` (legacy alias of `calculator_completed`)
+  - `pro_calculator_started` / `pro_calculator_completed` (alongside `guide_*`)
+- Every alias must have a removal item in `docs/BACKLOG.md`
 
 ### Privacy Constraints
-- No user accounts — no `user_id`, `plan_type`, or `account_id`
-- Privacy-first: prefer cookie-free analytics modes where possible
-- Vercel Analytics is privacy-preserving by default (no cookies)
-- GTM/GA4 requires cookie consent via `CookieBanner` component (`src/components/organisms/CookieBanner.tsx`)
+- No user accounts: do **not** introduce `user_id`, `plan_type`, or `account_id`
+- Never send exact salary, revenue, profit, or email address values
+- Use bucketed fields (`salary_range`, `profit_bucket`, etc.)
+- Use `trackEvent()` / `trackSEOAction()` helpers so consent gating remains centralized
+
+### Audit-Derived Guardrails
+- Do not exclude homepage from Ahrefs unless explicitly requested
+- If events change, update all of:
+  - `docs/guides/ANALYTICS_TRACKING.md`
+  - `docs/guides/POST_RELEASE_VALIDATION.md`
+  - relevant tests
+- If public analytics env vars change, update both `.env.template` and `src/lib/env.ts`
+- If tracking/privacy materially changes, ensure privacy-page wording/date is updated
 
 ---
 
@@ -96,7 +129,7 @@ Event Name | Category | Properties | Trigger | Notes
 |------|----------|
 | Pageviews | Automatic, enhanced with metadata |
 | User Actions | Button clicks, form submissions, feature usage |
-| System Events | Signup completed, purchase, subscription changed |
+| System Events | Consent updates, performance metrics, PWA install |
 | Custom Conversions | Goal completions, funnel stages |
 
 **For comprehensive event lists**: See [references/event-library.md](references/event-library.md)
@@ -108,81 +141,79 @@ Event Name | Category | Properties | Trigger | Notes
 ### Recommended Format: Object-Action
 
 ```
-signup_completed
-button_clicked
+calculator_completed
+cta_clicked
 form_submitted
-article_read
-checkout_payment_completed
+blog_article_read
+result_shared
 ```
 
 ### Best Practices
 - Lowercase with underscores
-- Be specific: `cta_hero_clicked` vs. `button_clicked`
-- Include context in properties, not event name
-- Avoid spaces and special characters
-- Document decisions
+- Be specific: `cta_clicked` + contextual properties beats many near-duplicate names
+- Keep context in properties, not in bloated event names
+- Avoid spaces/special characters
+- Document every new event in tracking docs
 
 ---
 
 ## Essential Events
 
-### Marketing Site
+### PayeTax
 
 | Event | Properties |
 |-------|------------|
-| cta_clicked | button_text, location |
-| form_submitted | form_type |
-| signup_completed | method, source |
-| demo_requested | - |
-
-### Product/App
-
-| Event | Properties |
-|-------|------------|
-| onboarding_step_completed | step_number, step_name |
-| feature_used | feature_name |
-| purchase_completed | plan, value |
-| subscription_cancelled | reason |
-
-**For full event library by business type**: See [references/event-library.md](references/event-library.md)
+| `calculator_start` | label |
+| `calculator_completed` | salary_range, tax_year, region, employment_type |
+| `result_viewed` | label (period), selected, visible_period_count |
+| `result_shared` | label (csv_export/print/email), tax_year, region |
+| `guide_started` / `guide_results_shown` | label, profit_bucket |
+| `guide_email_sent` | label |
+| `newsletter_subscribed` | label |
+| `blog_article_read` | slug, category |
+| `cta_clicked` | label |
+| `pwa_installed` | label |
 
 ---
 
 ## Event Properties
 
-### Standard Properties
+### Standard Properties (PayeTax)
 
 | Category | Properties |
 |----------|------------|
 | Page | page_title, page_location, page_referrer |
-| User | user_id, user_type, account_id, plan_type |
+| Visitor (anonymous) | returning_visitor, source |
 | Campaign | source, medium, campaign, content, term |
-| Product | product_id, product_name, category, price |
+| Calculation | tax_year, region, employment_type, salary_range, profit_bucket |
 
 ### Best Practices
 - Use consistent property names
-- Include relevant context
-- Don't duplicate automatic properties
+- Include only decision-relevant context
+- Do not duplicate automatic GA fields unless needed
 - Avoid PII in properties
 
 ---
 
 ## GA4 Implementation
 
-### Quick Setup
+### PayeTax Quick Setup
 
-1. Create GA4 property and data stream
-2. Install gtag.js or GTM
-3. Enable enhanced measurement
-4. Configure custom events
-5. Mark conversions in Admin
+1. Create GA4 property and web data stream
+2. Set `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_ENABLE_ANALYTICS`
+3. Keep Consent Mode defaults denied in `src/components/organisms/Analytics.tsx`
+4. Emit events through `trackEvent()` from `src/lib/analytics.ts`
+5. Mark canonical events as conversions in GA4 Admin
 
 ### Custom Event Example
 
 ```javascript
-gtag('event', 'signup_completed', {
-  'method': 'email',
-  'plan': 'free'
+gtag('event', 'calculator_completed', {
+  category: 'funnel',
+  label: 'paye_calculator',
+  salary_range: '50k_75k',
+  tax_year: '2025-2026',
+  region: 'rUK'
 });
 ```
 
@@ -192,25 +223,10 @@ gtag('event', 'signup_completed', {
 
 ## Google Tag Manager
 
-### Container Structure
+PayeTax currently does **not** use GTM. Do not introduce GTM unless explicitly requested.
+If GTM is requested, document migration steps and avoid dual tracking.
 
-| Component | Purpose |
-|-----------|---------|
-| Tags | Code that executes (GA4, pixels) |
-| Triggers | When tags fire (page view, click) |
-| Variables | Dynamic values (click text, data layer) |
-
-### Data Layer Pattern
-
-```javascript
-dataLayer.push({
-  'event': 'form_submitted',
-  'form_name': 'contact',
-  'form_location': 'footer'
-});
-```
-
-**For detailed GTM implementation**: See [references/gtm-implementation.md](references/gtm-implementation.md)
+**For GTM details (only if adopted)**: See [references/gtm-implementation.md](references/gtm-implementation.md)
 
 ---
 
@@ -230,7 +246,7 @@ dataLayer.push({
 - Lowercase everything
 - Use underscores or hyphens consistently
 - Be specific but concise: `blog_footer_cta`, not `cta1`
-- Document all UTMs in a spreadsheet
+- Document campaign naming decisions
 
 ---
 
@@ -240,42 +256,51 @@ dataLayer.push({
 
 | Tool | Use For |
 |------|---------|
-| GA4 DebugView | Real-time event monitoring |
-| GTM Preview Mode | Test triggers before publish |
+| GA4 DebugView | Real-time event verification |
+| Browser DevTools | Network/script load and consent state checks |
 | Browser Extensions | Tag Assistant, dataLayer Inspector |
+| GTM Preview Mode | Only if GTM is explicitly adopted |
 
 ### Validation Checklist
 
-- [ ] Events firing on correct triggers
-- [ ] Property values populating correctly
-- [ ] No duplicate events
-- [ ] Works across browsers and mobile
-- [ ] Conversions recorded correctly
-- [ ] No PII leaking
+- [ ] Events fire on expected user actions
+- [ ] Consent declined -> no GA4/Ahrefs custom events
+- [ ] Consent accepted -> events include expected properties
+- [ ] No duplicate events from multiple emit points
+- [ ] Event names match `docs/guides/ANALYTICS_TRACKING.md`
+- [ ] No PII leakage in payloads
 
 ### Common Issues
 
 | Issue | Check |
 |-------|-------|
-| Events not firing | Trigger config, GTM loaded |
-| Wrong values | Variable path, data layer structure |
-| Duplicate events | Multiple containers, trigger firing twice |
+| Events not firing | Consent accepted, env vars present, scripts loaded |
+| Wrong values | Correct bucketed fields and property names |
+| Duplicate events | Multiple emit sites, Strict Mode re-run, stale migration aliases |
+
+### PayeTax Verification Commands
+
+```bash
+bun run fix-all
+bun run test:no-coverage
+bun run build
+```
 
 ---
 
 ## Privacy and Compliance
 
 ### Considerations
-- Cookie consent required in EU/UK/CA
+- Cookie consent required in UK/EU contexts
 - No PII in analytics properties
-- Data retention settings
-- User deletion capabilities
+- Data retention settings should be reviewed in vendor tools
+- Keep privacy policy aligned with tracking behavior
 
 ### Implementation
-- Use consent mode (wait for consent)
-- IP anonymization
-- Only collect what you need
-- Integrate with consent management platform
+- Use Consent Mode with denied defaults
+- Keep IP anonymization enabled
+- Collect minimum viable analytics data
+- Route custom events through centralized helpers
 
 ---
 
@@ -284,41 +309,43 @@ dataLayer.push({
 ### Tracking Plan Document
 
 ```markdown
-# [Site/Product] Tracking Plan
+# PayeTax Analytics Tracking Plan
 
 ## Overview
-- Tools: GA4, GTM
+- Tools: Vercel Analytics, GA4 (direct), Ahrefs
 - Last updated: [Date]
 
 ## Events
 
 | Event Name | Description | Properties | Trigger |
 |------------|-------------|------------|---------|
-| signup_completed | User completes signup | method, plan | Success page |
+| calculator_completed | PAYE result computed | salary_range, tax_year, region | Successful calculation |
 
 ## Custom Dimensions
 
 | Name | Scope | Parameter |
 |------|-------|-----------|
-| user_type | User | user_type |
+| salary_range | Event | salary_range |
+| tax_year | Event | tax_year |
 
 ## Conversions
 
 | Conversion | Event | Counting |
 |------------|-------|----------|
-| Signup | signup_completed | Once per session |
+| PAYE completion | calculator_completed | Once per successful calculation |
 ```
 
 ---
 
 ## Task-Specific Questions
 
-1. What tools are you using (GA4, Mixpanel, etc.)?
-2. What key actions do you want to track?
-3. What decisions will this data inform?
-4. Who implements - dev team or marketing?
-5. Are there privacy/consent requirements?
-6. What's already tracked?
+For PayeTax, ask only what changed:
+
+1. Which flows are in scope (PAYE, Director Intelligence, blog/newsletter, PWA)?
+2. Is this a net-new event, a rename, or a deprecation?
+3. Which dashboards currently depend on the event names being changed?
+4. Do docs/privacy text need updates with this change?
+5. Which tests should be added or updated for regression safety?
 
 ---
 

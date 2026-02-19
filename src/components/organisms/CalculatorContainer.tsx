@@ -214,6 +214,15 @@ export function CalculatorContainer() {
     if (!results) return;
     try {
       exportToCSV(results);
+      trackEvent({
+        action: 'result_shared',
+        category: 'engagement',
+        label: 'csv_export',
+        custom_data: {
+          tax_year: input.taxYear,
+          region: input.region,
+        },
+      });
       toast.success('CSV exported successfully!');
     } catch {
       toast.error('Failed to export CSV');
@@ -231,6 +240,15 @@ export function CalculatorContainer() {
         allowancesDeductions: input.allowancesDeductions,
         previousYearResults,
         taxYear: input.taxYear,
+      });
+      trackEvent({
+        action: 'result_shared',
+        category: 'engagement',
+        label: 'print',
+        custom_data: {
+          tax_year: input.taxYear,
+          region: input.region,
+        },
       });
     } catch {
       toast.error('Failed to open print dialog');

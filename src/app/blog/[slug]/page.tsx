@@ -9,6 +9,7 @@ import { cache } from 'react';
 
 import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
+import { BlogArticleAnalytics } from '@/components/organisms/BlogArticleAnalytics';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { TableOfContents } from '@/components/organisms/TableOfContents';
@@ -175,6 +176,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
       {faqs.length > 0 && <StructuredData type='faq' faqs={faqs} />}
       {howToData && <StructuredData type='howto' data={howToData} />}
+      <BlogArticleAnalytics slug={post.slug} category={post.categoryData?.name || post.category} />
 
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>

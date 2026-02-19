@@ -27,6 +27,7 @@ const GA_ID_SCHEMA = z
 export const PublicEnvSchema = z.object({
   // Analytics
   NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
+  NEXT_PUBLIC_AHREFS_KEY: z.string().min(1, 'Ahrefs key must not be empty').optional(),
 
   // Error Monitoring
   NEXT_PUBLIC_SENTRY_DSN: z.string().url('Sentry DSN must be a valid URL').optional(),
@@ -137,6 +138,7 @@ export type RequiredProductionEnv = z.infer<typeof RequiredProductionEnvSchema>;
 export function validatePublicEnv(): PublicEnv {
   const result = PublicEnvSchema.safeParse({
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    NEXT_PUBLIC_AHREFS_KEY: process.env.NEXT_PUBLIC_AHREFS_KEY,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_ENABLE_PWA: process.env.NEXT_PUBLIC_ENABLE_PWA,
