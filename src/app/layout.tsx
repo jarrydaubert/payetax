@@ -1,6 +1,5 @@
 // src/app/layout.tsx
 import type { Metadata, Viewport } from 'next';
-import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 import { generateMetadata as metadataGenerator, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
@@ -12,11 +11,10 @@ import { Suspense } from 'react';
 import { inter, spaceGrotesk } from '@/app/fonts';
 import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
+import { AppToaster } from '@/components/organisms/AppToaster';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
-
-const Toaster = dynamic(() => import('sonner').then((mod) => mod.Toaster), { ssr: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -89,7 +87,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeProvider>
           <Suspense fallback={null}>{analyticsEnabled ? <Analytics /> : null}</Suspense>
           <Layout>{children}</Layout>
-          <Toaster position='top-right' richColors expand={true} closeButton />
+          <AppToaster />
           {analyticsEnabled ? (
             <>
               {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
