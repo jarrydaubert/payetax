@@ -74,6 +74,11 @@
 - [ ] Replace director NI category placeholders (`it.todo`) with implemented tests in `src/lib/tax/__tests__/directorCalculator.spec.ts`
 - [ ] Decide and document a policy for known HMRC rounding divergences (exact matching vs explicit tolerance bands)
 - [ ] Make coverage command CI-safe locally by separating report open step from `bun run test` (current `open .../lcov-report` fails in headless/sandboxed environments)
+- [ ] Add CI guard to block new `it.skip`/`test.skip`/`it.todo` entries unless explicitly allowlisted with rationale
+- [ ] Add Scottish HMRC verification cases to golden fixtures and unit verification suite
+- [ ] Add Welsh (`C` prefix) tax code regression tests to confirm rUK handling remains correct
+- [ ] Add a lightweight test-audit metrics script (suites/tests/skips/todos/coverage) so future audits use generated numbers instead of stale snapshots
+- [ ] Add changed-files coverage check in CI (minimum coverage on touched files) to reduce silent regressions in low-traffic modules
 
 ### Post-Audit Follow-Ups (Remaining)
 - [ ] Sunset legacy `DIVIDEND_RATES.ALLOWANCE` export once all imports are migrated to `TAX_RATES[year].dividendAllowance`
