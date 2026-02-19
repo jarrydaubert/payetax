@@ -1,107 +1,66 @@
 # Backlog
 
-> **TODO list only.** Delete entries when done.
-> Ordered by criticality from highest to lowest.
-> If Stripe = £0, monetization items come first.
+Last updated: February 19, 2026
+
+Only active commitments are listed below. Every item has a first action and a measurable done condition.
 
 ---
 
-## P0 — Core Business Outcomes
+## P0 - Do Now
 
-### Tax Pack V1 (Monetization)
-> See `docs/business/MONETIZATION.md`
-
-- [ ] Tax Pack V1: add feature flag + CTA placement in Director Intelligence results flow
-- [ ] Tax Pack V1: implement server-owned Stripe Checkout session route (price + automatic tax configured server-side)
-- [ ] Tax Pack V1: implement signature-verified, idempotent webhook processing with event dedupe persistence
-- [ ] Tax Pack V1: define/export validated snapshot schema (deterministic numbers, integer pence, checksum, version fields)
-- [ ] Tax Pack V1: include distributable-profits check result in snapshot and generated documents
-- [ ] Tax Pack V1: build async generation worker (PDF/CSV/DOCX/ZIP) with retries, dead-letter, and `failed` state handling
-- [ ] Tax Pack V1: persist artifacts in private object storage with template version tracking
-- [ ] Tax Pack V1: implement order status endpoint and success-page polling flow (`pending_payment`, `processing`, `ready`, `failed`)
-- [ ] Tax Pack V1: implement download grant model (7-day expiry, max 5 downloads, revocation, invalid-attempt throttling)
-- [ ] Tax Pack V1: issue fresh 5-minute object-storage signed URL on each valid download request
-- [ ] Tax Pack V1: implement email delivery + resend flow where email is non-critical path
-- [ ] Tax Pack V1: implement refund/dispute webhooks (full refund revoke, partial refund policy handling)
-- [ ] Tax Pack V1: add draft-order cleanup job for abandoned checkouts older than 48 hours
-- [ ] Tax Pack V1: add route/integration tests for checkout, webhook idempotency, generation failure, grants, replay, expiry, and revocation
-- [ ] Tax Pack V1: add E2E purchase/download flow with provider mocks in Stripe test mode
-
-### Release Gates
-- [ ] Run: `bun run test:no-coverage`
-- [ ] Run: `bun run build`
-- [ ] Run: `bun run test:e2e:critical`
-- [ ] Smoke: calculator, Director Intelligence, blog, OG previews
-- [ ] Push feature branch, prep release notes
-
-### Accuracy Guards
-- [ ] Verify other income affects PA taper, dividend allowance, and student loan thresholds
-- [ ] If not verified, hide or guard those inputs
-- [ ] Director Intelligence: add explicit assumptions panel clarifying salary/dividend mix is scenario-dependent (not a fixed "salary to employer NI threshold" rule)
-- [ ] Director Intelligence: add MTD for Income Tax scope/timeline note (starts 6 Apr 2026 for qualifying self-employment/property income over threshold; clarify PAYE/dividends treatment)
+| ID | Work Item | Next Step | Done When |
+|---|---|---|---|
+| `P0-1` | Add HMRC legislative traceability in `src/constants/taxRates.ts` | Add per-tax-year source links/comments for all major thresholds and rates. | Every supported tax year includes explicit HMRC source references for income tax, NI, dividend, and student loan rules. |
+| `P0-2` | Expand tax-engine verification depth | Add Scottish HMRC verification fixtures, Welsh `C`-code regression tests, and new property/invariant cases. | Test suite includes the new fixtures/tests and they pass in CI with no new skips/todos. |
+| `P0-3` | Finalize analytics governance baseline | Introduce typed analytics contract + CI check for unknown events; schedule alias removal for `calculator_completion`. | CI fails on unknown event names, docs align with code, and alias event is removed by deprecation date. |
+| `P0-4` | Verify distributed rate limiting in production | Run production validation against real Upstash-backed limits on public mutation routes. | Evidence recorded in release notes/runbook showing distributed limits work and in-memory fallback is not used in production. |
+| `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A full Stripe test-mode purchase reaches `ready` state and produces one downloadable artifact end-to-end. |
+| `P0-6` | Enforce release verification discipline | Use `bun run release:verify` and `POST_RELEASE_VALIDATION.md` on each release; store pass/fail notes. | Each release has a completed verification record linked in release notes/changelog. |
+| `P0-7` | Verify director-calculator threshold interactions | Add regression tests for how other income affects PA taper, dividend allowance, and student loan thresholds in director flows. | Tests prove expected threshold interactions or UI guards are added where unsupported. |
+| `P0-8` | Improve Director Intelligence assumption clarity | Add explicit assumptions panel and MTD timeline note in Director Intelligence outputs. | Users can see model assumptions and MTD scope/timeline without leaving results flow. |
 
 ---
 
-## P1 — Growth + Revenue Ops
+## P1 - Next
 
-### Referral Rollout
-- [ ] Validate referrals: talk to 5 accountants
-- [ ] Track "this is complex" clicks as a demand signal
-- [ ] Secure a paying referral partner
-- [ ] Enable referral CTA in `src/components/organisms/CalculatorContainer.tsx`
-
-### Organic SEO + Blog Engine
-- [ ] Ensure each new blog post has a primary CTA to calculator/Director Intelligence
-- [ ] Ensure each new blog post has a secondary CTA to newsletter signup
-- [ ] Keep blog-to-money-page internal links healthy (calculator, Director Intelligence, compliance)
-- [ ] Run subscriber announcement flow for newly published posts
-- [ ] Review funnel metrics: sessions -> `calculator_start` -> `calculator_completed` -> monetization click
-
-### Sitemap Curation Follow-Ups
-- [ ] Review `indexable page not in sitemap` monthly (Ahrefs + GSC) and keep an explicit keep/exclude decision log
-- [ ] Promote traffic-bearing salary URLs into `PRIORITY_SALARIES` when they cross threshold (currently: `47000`, `73000`, `49000`)
-- [ ] Replace static competitor sitemap cap logic with data-led inclusion rule (impressions/clicks threshold)
-- [ ] Decide blog pagination indexing policy and align implementation (`/blog?page=2+` in sitemap vs `noindex`)
-- [ ] Document sitemap inclusion/exclusion strategy in docs to reduce future audit noise
-
-### Compare My Setup
-- [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)
-- [ ] Director Intelligence: add objective toggle (`Maximize take-home` vs `Minimize NI`) and show tradeoff deltas across strategies
+| ID | Work Item | Next Step | Done When |
+|---|---|---|---|
+| `P1-1` | Visual regression pilot | Add baseline snapshots for homepage hero, calculator results, and Director Intelligence dashboard. | CI flags visual diffs on those three surfaces with an approve/update workflow documented. |
+| `P1-2` | Currency arithmetic strategy review | Compare current rounding-to-pence approach against integer-pence/decimal alternatives and document tradeoffs. | Decision doc is published and linked from `SYSTEM_OVERVIEW.md`, with follow-up implementation ticket if needed. |
+| `P1-3` | Bot-mitigation hardening for mutation endpoints | Evaluate Turnstile/challenge + heuristic throttling on `/api/newsletter/*`, `/api/send-results`, `/api/referral/lead`. | Chosen approach is implemented (or explicitly rejected with rationale) and false-positive risk is documented. |
+| `P1-4` | Calculation anomaly monitoring | Define and ship alerts for impossible outputs (NaN, invalid effective rate bounds, negative post-tax totals where disallowed). | Alerts are live, tested in non-prod, and runbook response steps are documented. |
+| `P1-5` | SPF/DKIM/DMARC monitoring cadence | Define monthly monitoring checklist and owner process for Kit/Resend domains. | Recurring check exists with first completed report and remediation path documented. |
+| `P1-6` | Package manager/runtime alignment | Decide and document one install/build path across local, CI, and Vercel (Bun vs npm). | Build pipeline uses one documented source of truth and lockfile drift is eliminated. |
+| `P1-7` | Clear remaining skipped/todo tests | Resolve known skipped tests and replace director NI `it.todo` placeholders with implemented tests. | Skipped/todo count for known items is zero (or explicitly justified in test comments). |
+| `P1-8` | Lock testing hygiene in CI | Add guard to block new `it.skip`/`test.skip`/`it.todo` unless allowlisted with rationale. | CI fails on new unapproved skipped/todo tests. |
+| `P1-9` | Formalize HMRC rounding divergence policy | Document exact-match vs tolerance rules for known HMRC rounding edge cases. | Policy is published and referenced by tax verification tests. |
+| `P1-10` | Migrate remaining hardcoded fallback tax literals | Replace fallback literals in UI fallback paths with source-of-truth derived defaults. | No tax-rate fallback literals remain outside approved constants modules. |
+| `P1-11` | Define Tax Pack snapshot contract | Specify deterministic snapshot schema (integer pence, checksum, version fields) and enforce validation. | Snapshot schema is implemented and used by generation pipeline and tests. |
+| `P1-12` | Deliver Tax Pack artifact pipeline | Build async generation/storage/download-grant flow (retry + failure handling). | Paid order can generate and retrieve artifacts through signed, expiring download grants. |
+| `P1-13` | Complete Tax Pack operational hardening | Implement refund/dispute handling, abandoned-order cleanup, and resend-safe email delivery. | Post-payment lifecycle paths are covered with deterministic state transitions. |
+| `P1-14` | Test Tax Pack end-to-end flows | Add integration + E2E tests for checkout, webhook idempotency, artifact generation, grant replay/expiry/revocation. | Test suite reliably catches regressions in purchase and delivery lifecycle. |
+| `P1-15` | Make coverage workflow CI-safe | Split report-opening behavior from coverage command so headless/sandbox runs do not fail. | Coverage commands run cleanly in local headless and CI contexts. |
+| `P1-16` | Add test-audit metrics generator | Create script to output suites/tests/skips/todos/coverage from current run artifacts. | Audit numbers are generated from script output instead of manual snapshots. |
+| `P1-17` | Investigate low Google referrer share | Run GSC + Ahrefs indexability audit (coverage, canonical, noindex, sitemap, robots, structured data) focused on why Bing/DDG/Yahoo outperform Google. | Root-cause report is documented and prioritized fix tickets are created with owner and ETA. |
+| `P1-18` | Strengthen internal links from top organic blog pages | Add contextual internal links from top blog landing pages to calculator and relevant tool pages. | Top 10 organic blog pages each include at least 2 relevant internal links to core conversion pages and pass crawl validation. |
 
 ---
 
-## P2 — Quality Hardening
+## P2 - Later (Planned Experiments)
 
-### Testing & Coverage
-> Mantra: **"What bug will this test find?"** (see `docs/guides/TESTING.md`)
-
-- [ ] Add more payslip-style regression locks and tighten tolerances where safe
-- [ ] Store HMRC source provenance alongside golden master data
-- [ ] Resolve remaining skipped tests: HMRC rounding edge cases (2) + cookie month-boundary edge case (1)
-- [ ] Replace director NI category placeholders (`it.todo`) with implemented tests in `src/lib/tax/__tests__/directorCalculator.spec.ts`
-- [ ] Decide and document a policy for known HMRC rounding divergences (exact matching vs explicit tolerance bands)
-- [ ] Make coverage command CI-safe locally by separating report open step from `bun run test` (current `open .../lcov-report` fails in headless/sandboxed environments)
-- [ ] Add CI guard to block new `it.skip`/`test.skip`/`it.todo` entries unless explicitly allowlisted with rationale
-- [ ] Add Scottish HMRC verification cases to golden fixtures and unit verification suite
-- [ ] Add Welsh (`C` prefix) tax code regression tests to confirm rUK handling remains correct
-- [ ] Add a lightweight test-audit metrics script (suites/tests/skips/todos/coverage) so future audits use generated numbers instead of stale snapshots
-- [ ] Add changed-files coverage check in CI (minimum coverage on touched files) to reduce silent regressions in low-traffic modules
-
-### Post-Audit Follow-Ups (Remaining)
-- [ ] Sunset legacy `DIVIDEND_RATES.ALLOWANCE` export once all imports are migrated to `TAX_RATES[year].dividendAllowance`
-- [ ] Define and execute a deprecation date for legacy 64-bit unsubscribe token signatures in `src/lib/newsletter/unsubscribeToken.ts`
-- [ ] Define and execute a deprecation date for analytics alias event `calculator_completion` after dashboards migrate to `calculator_completed`
-- [ ] Replace fallback tax-rate literals in UI fallback paths (for example `ResultsSummaryCards`) with source-of-truth derived defaults
-- [ ] Normalize custom subpixel font classes to approved Tailwind/design token scale (SimpleNavbar, SidebarNav)
-- [ ] Run production-only validation checklist after each release and store pass/fail notes (`docs/guides/POST_RELEASE_VALIDATION.md`)
-- [ ] Verify distributed rate limiting against real Upstash Redis in production (no in-memory fallback)
-- [ ] Run quarterly keyboard + screen-reader accessibility regression session across calculator and Director Intelligence
-
-### Calculator Store Cleanup
-
----
-
-## P3 — Optional
-
-### Idea Inbox (Lean)
-- [ ] Validate demand for an embeddable calculator widget (HR/recruiters/finance blogs) before building
+| ID | Work Item | Next Step | Done When |
+|---|---|---|---|
+| `P2-1` | React Compiler experiment | Enable in a controlled branch and compare INP/render metrics against baseline. | Keep/rollback decision documented with measured performance and regression results. |
+| `P2-2` | Cache Components / `use cache` experiment | Trial on static-heavy routes and capture TTFB/LCP impact. | Route-by-route decision documented with before/after metrics and rollout plan if beneficial. |
+| `P2-3` | Compliance integrity transparency section | Draft `/compliance` addition with engine version, tax-rules version, and last verification date. | Section is published or explicitly deferred with rationale after trust-impact review. |
+| `P2-4` | Embeddable widget demand validation | Run lightweight demand test with target users/partners before any build work. | Build/no-build decision made from recorded demand signals and opportunity cost review. |
+| `P2-5` | Referral rollout validation | Validate demand with accountant discovery calls and instrument "this is complex" interaction tracking. | Go/no-go decision made with evidence and CTA enabled only if partner readiness exists. |
+| `P2-6` | Sitemap inclusion policy hardening | Define and enforce data-led sitemap inclusion rules for salary and competitor pages. | Inclusion/exclusion policy is documented and monthly review loop is running. |
+| `P2-7` | Accessibility manual regression cadence | Run quarterly keyboard + screen-reader checks across calculator and Director Intelligence. | First quarterly report completed with tracked remediation items. |
+| `P2-8` | Sunset legacy compatibility paths | Remove legacy `DIVIDEND_RATES.ALLOWANCE` usage and define a date to drop 64-bit unsubscribe token signatures. | Legacy paths are removed or have dated deprecation plans with owners. |
+| `P2-9` | Strengthen blog conversion operations | Ensure each new post ships with primary/secondary CTA placement and internal links to calculator/director/compliance pages. | Editorial checklist is updated and applied to new posts by default. |
+| `P2-10` | Add growth funnel review cadence | Review sessions -> `calculator_start` -> `calculator_completed` -> monetization click on a regular cadence. | Monthly funnel review notes exist with one decision/action each cycle. |
+| `P2-11` | Improve Compare My Setup UX | Add explicit edit/apply/reset/clear flow and objective toggle (`Maximize take-home` vs `Minimize NI`). | Users can compare strategies without hidden prefills and see objective tradeoffs. |
+| `P2-12` | Add changed-files coverage gate | Enforce minimum coverage on touched files to reduce regressions in low-traffic modules. | CI blocks PRs that lower coverage below threshold on changed files. |
+| `P2-13` | Add SEO freshness pass for top traffic posts | Update top-performing tax posts with explicit tax-year freshness and updated `dateModified` metadata where applicable. | Refresh pass is completed for top 5 traffic-driving posts and changes are indexed successfully in GSC. |
+| `P2-14` | Add monthly SEO technical review cadence | Run recurring checks for index coverage, sitemap inclusion, canonicals, and structured data validity. | Monthly SEO review note exists with one action item and owner each cycle. |

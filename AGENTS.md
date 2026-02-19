@@ -56,6 +56,8 @@ bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E
 bun run bundle:analyze      # Bundle analysis
+bun run check:analytics-env # Verify analytics env/template/schema sync
+bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 ```
 
@@ -63,7 +65,7 @@ bun run linear:me           # View Linear issues
 
 See `CLAUDE.md` and `docs/guides/` for details:
 - `TESTING.md`
-- `ARCHITECTURE.md`
+- `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`
 
 ## Skills (Agent Reference)
@@ -102,7 +104,7 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 ### Engineering & Analytics
 - `engineering` — Next.js, React, TypeScript, performance
 - `accessibility` — WCAG 2.2 AA compliance
-- `analytics-tracking` — GA4, GTM, Vercel Analytics, event tracking
+- `analytics-tracking` — GA4, Vercel Analytics, Ahrefs, event tracking
 
 ### Slash Commands
 - `/debug` — systematic debugging session

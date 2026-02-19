@@ -87,7 +87,7 @@ Technical stack:
 
 Execution:
 - Source plan: `docs/business/tax-pack/TAX_PACK_PLAN.md`
-- Delivery tasks: `docs/BACKLOG.md` (Monetization -> Tax Pack V1)
+- Delivery tasks: `docs/BACKLOG.md` (`P0-5` plus related follow-on items)
 
 ---
 

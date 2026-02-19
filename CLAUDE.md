@@ -45,6 +45,8 @@ bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E
 bun run bundle:analyze      # Bundle analysis
+bun run check:analytics-env # Verify analytics env/template/schema sync
+bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 ```
 
@@ -67,5 +69,5 @@ vercel link
 
 See `docs/guides/` for detail:
 - `TESTING.md`
-- `ARCHITECTURE.md`
+- `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`

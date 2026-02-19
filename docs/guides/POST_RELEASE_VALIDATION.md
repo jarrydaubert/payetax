@@ -8,6 +8,14 @@ Evidence: record each item as `PASS`/`FAIL` with timestamp and deployment URL in
 
 ---
 
+## 0) Local Preflight (Required)
+
+Goal: block avoidable regressions before checking production-only items.
+
+- [ ] Run `bun run release:verify` and ensure all steps pass.
+
+---
+
 ## 1) Production Smoke (Critical User Paths)
 
 Goal: confirm core journeys still work in the real deployed environment.

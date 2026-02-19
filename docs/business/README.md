@@ -38,10 +38,7 @@ Focus: Director Intelligence calculator and related monetization.
 
 - `CASE_STUDY_RECRUITER.md`
 - `COMPETITOR_GAP_ANALYSIS.md`
-- `../archive/DOCS_LIBRARY_SPEC.md`
 
 ## Rule
 
 If it’s work to be done, it lives in `docs/BACKLOG.md`.
-
-Go-live scope and long-term ideas are tracked in `docs/BACKLOG.md`.

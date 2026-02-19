@@ -9,8 +9,8 @@
 | Need to... | Read this |
 |------------|-----------|
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
-| **Understand the codebase?** | [`ARCHITECTURE.md`](./guides/ARCHITECTURE.md) |
-| **Check tech stack?** | [`TECH_STACK.md`](./guides/TECH_STACK.md) |
+| **See active TODOs?** | [`BACKLOG.md`](./BACKLOG.md) |
+| **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Run post-release checks?** | [`POST_RELEASE_VALIDATION.md`](./guides/POST_RELEASE_VALIDATION.md) |
@@ -31,8 +31,7 @@ docs/
 │
 ├── business/              # Product & business strategy
 ├── blog/                  # Blog content & strategy
-├── guides/                # Developer guides (incl. skills/commands)
-└── archive/               # Parked ideas
+└── guides/                # Developer guides (incl. skills/commands)
 ```
 
 ---
