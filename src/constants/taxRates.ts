@@ -72,6 +72,102 @@ export interface TaxAllowance {
 export const TAX_YEARS: TaxYear[] = ['2025-2026', '2024-2025', '2023-2024'];
 export const CURRENT_TAX_YEAR: TaxYear = TAX_YEARS[0] as TaxYear;
 
+/**
+ * Legislative traceability for key PAYE domains.
+ *
+ * Keep these references aligned with values in `TAX_RATES` when updating a tax year.
+ * Use official primary sources wherever possible.
+ */
+export interface TaxYearLegislativeSources {
+  incomeTax: {
+    ukMainBands: string[];
+    scotlandBands: string[];
+  };
+  nationalInsurance: {
+    employeeAndEmployerClass1: string[];
+    employmentAllowanceAndClass1A: string[];
+  };
+  dividends: {
+    allowanceAndRates: string[];
+  };
+  studentLoan: {
+    plansAndThresholds: string[];
+  };
+  verifiedOn: string; // YYYY-MM-DD (last manual verification pass)
+  notes?: string[];
+}
+
+export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
+  '2023-2024': {
+    incomeTax: {
+      ukMainBands: ['https://www.gov.uk/income-tax-rates'],
+      scotlandBands: ['https://www.gov.scot/publications/scottish-income-tax-2023-2024/'],
+    },
+    nationalInsurance: {
+      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employmentAllowanceAndClass1A: [
+        'https://www.gov.uk/claim-employment-allowance',
+        'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
+      ],
+    },
+    dividends: {
+      allowanceAndRates: ['https://www.gov.uk/tax-on-dividends'],
+    },
+    studentLoan: {
+      plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
+    },
+    verifiedOn: '2026-02-19',
+    notes: [
+      'Use HMRC/GOV.UK published 2023-24 rates and thresholds when amending historical values.',
+    ],
+  },
+  '2024-2025': {
+    incomeTax: {
+      ukMainBands: ['https://www.gov.uk/income-tax-rates'],
+      scotlandBands: [
+        'https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/',
+      ],
+    },
+    nationalInsurance: {
+      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employmentAllowanceAndClass1A: [
+        'https://www.gov.uk/claim-employment-allowance',
+        'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
+      ],
+    },
+    dividends: {
+      allowanceAndRates: ['https://www.gov.uk/tax-on-dividends'],
+    },
+    studentLoan: {
+      plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
+    },
+    verifiedOn: '2026-02-19',
+  },
+  '2025-2026': {
+    incomeTax: {
+      ukMainBands: ['https://www.gov.uk/income-tax-rates'],
+      scotlandBands: ['https://www.mygov.scot/scottish-income-tax/current-income-tax-rates'],
+    },
+    nationalInsurance: {
+      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employmentAllowanceAndClass1A: [
+        'https://www.gov.uk/claim-employment-allowance',
+        'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
+      ],
+    },
+    dividends: {
+      allowanceAndRates: ['https://www.gov.uk/tax-on-dividends'],
+    },
+    studentLoan: {
+      plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
+    },
+    verifiedOn: '2026-02-19',
+    notes: [
+      'Employer NI secondary threshold/rate and Employment Allowance updates are from Autumn Budget 2024 implementation for 2025-26.',
+    ],
+  },
+};
+
 interface TaxYearDisplayOptions {
   separator?: '-' | '/';
   shortEndYear?: boolean;
