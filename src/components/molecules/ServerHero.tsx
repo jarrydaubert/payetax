@@ -26,6 +26,10 @@ export default function ServerHero({ className }: ServerHeroProps) {
         className,
       )}
     >
+      <p className='mb-4 rounded-full border border-cyan/20 bg-cyan/5 px-4 py-1.5 font-medium text-cyan text-sm'>
+        Updated for {taxYearLabel}
+      </p>
+
       {/* Heading */}
       <h1 className='mx-auto mb-6 max-w-[900px] font-bold font-display text-[clamp(3rem,10vw,5.5rem)] text-text-primary-new leading-[1.05] tracking-[-0.04em]'>
         Free UK PAYE Tax Calculator
@@ -37,9 +41,6 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <p className='mx-auto mb-10 max-w-[580px] text-lg text-text-secondary-new leading-[1.8]'>
         Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
         on HMRC rates; results can vary with payslip timing and deductions.
-      </p>
-      <p className='mb-6 rounded-full border border-cyan/20 bg-cyan/5 px-4 py-1.5 font-medium text-cyan text-sm'>
-        Updated for {taxYearLabel}
       </p>
 
       {/* CTA Buttons */}
@@ -71,7 +72,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <div className='flex max-w-[900px] flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
-          { icon: CheckCircle, text: `Updated for ${taxYearLabel}` },
+          { icon: CheckCircle, text: 'Fast in-browser results' },
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (

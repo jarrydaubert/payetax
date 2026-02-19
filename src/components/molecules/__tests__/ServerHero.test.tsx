@@ -44,7 +44,7 @@ describe('ServerHero Component', () => {
     render(<ServerHero />);
 
     expect(screen.getByText('Official HMRC rates')).toBeInTheDocument();
-    expect(screen.getAllByText(/Updated for/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Fast in-browser results')).toBeInTheDocument();
     expect(screen.getByText('Your data stays private')).toBeInTheDocument();
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });
