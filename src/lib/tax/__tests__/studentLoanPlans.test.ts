@@ -6,7 +6,7 @@ import {
 } from '../studentLoanPlans';
 
 describe('studentLoanPlans', () => {
-  it('returns tax-year-specific available plans for director guide', () => {
+  it('returns tax-year-specific available plans for Director Intelligence', () => {
     expect(getAvailableDirectorStudentLoanPlans('2025-2026')).toEqual([
       'plan1',
       'plan2',

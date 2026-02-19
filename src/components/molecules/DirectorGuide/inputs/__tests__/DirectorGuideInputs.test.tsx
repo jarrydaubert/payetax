@@ -74,7 +74,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState(partial as never);
 }
 
-describe('Director Guide input components', () => {
+describe('Director Intelligence input components', () => {
   beforeEach(() => {
     const current = useDirectorGuideStore.getState();
     setStoreState({

@@ -1,6 +1,6 @@
 // src/store/__tests__/directorGuideStore.test.ts
 /**
- * Tests for Director Guide Store
+ * Tests for Director Intelligence Store
  *
  * Post-merge: Removed step wizard tests, added strategy comparison tests.
  */

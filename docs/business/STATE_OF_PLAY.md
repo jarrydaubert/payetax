@@ -22,7 +22,7 @@ Status legend:
 
 | Area | Status | Notes | Source Docs |
 |------|--------|-------|-------------|
-| Director Guide core calculator | Live | Strategy comparison, warnings, education + input workflow are live. | `DIRECTOR_CALCULATOR_BUILD.md`, `DIRECTOR_GUIDE_POSITIONING.md` |
+| Director Intelligence core calculator | Live | Strategy comparison, warnings, education + input workflow are live. | `DIRECTOR_CALCULATOR_BUILD.md`, `DIRECTOR_GUIDE_POSITIONING.md` |
 | Variable Income (Monthly mode) | Live | Annual/monthly toggle, safe monthly draw, buffer logic, warnings are implemented. | `DIRECTOR_VARIABLE_INCOME_SPEC.md` |
 | Key dates `.ics` download | Live | Downloadable calendar export is implemented in product. | `COMPETITOR_GAP_ANALYSIS.md` |
 | Two Pots set-aside guidance | Live | Company/personal tax pots and set-aside messaging are live. | `DIRECTOR_GUIDE_POSITIONING.md`, `COMPETITOR_GAP_ANALYSIS.md` |
@@ -33,7 +33,7 @@ Status legend:
 
 ## Scope Guardrails (Current)
 
-- Tax Pack V1 scope is Director Guide extraction output only.
+- Tax Pack V1 scope is Director Intelligence extraction output only.
 - CGT and crypto are explicitly out of scope for Tax Pack V1.
 
 ## Parked For Now (Not In Lean Scope)

@@ -51,7 +51,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
   const links = [
     { href: `/${CALCULATOR_HASH}`, label: 'Calculator' },
-    { href: '/tools/director-guide', label: 'Director Guide' },
+    { href: '/tools/director-guide', label: 'Director Intelligence' },
     { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About' },
   ] as const;

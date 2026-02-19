@@ -17,7 +17,7 @@ export default function DirectorGuidePage() {
   const breadcrumbItems = [
     { name: 'Home', url: SITE_URL },
     { name: 'Tools', url: `${SITE_URL}/tools` },
-    { name: 'Director Guide', url: `${SITE_URL}/tools/director-guide` },
+    { name: 'Director Intelligence', url: `${SITE_URL}/tools/director-guide` },
   ];
 
   const softwareSchema = {

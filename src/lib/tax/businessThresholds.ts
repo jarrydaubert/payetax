@@ -1,5 +1,5 @@
 /**
- * Director Guide business thresholds used for warning/education messaging.
+ * Director Intelligence business thresholds used for warning/education messaging.
  * Keep these centralized to avoid drift across components.
  */
 import { TAX_RATES } from '@/constants/taxRates';

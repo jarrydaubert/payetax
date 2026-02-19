@@ -3,7 +3,7 @@
  *
  * - Expanded: workflow labels + quick actions
  * - Collapsed: compact icon rail
- * - Includes contextual jump menu for Director Guide sections
+ * - Includes contextual jump menu for Director Intelligence sections
  */
 'use client';
 

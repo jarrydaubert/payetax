@@ -1,6 +1,6 @@
 // src/components/molecules/DirectorGuide/dashboard/index.ts
 /**
- * Dashboard molecules for Director Guide
+ * Dashboard molecules for Director Intelligence
  *
  * 4-panel layout matching the original mockup design.
  * Dark theme with cyan/emerald gradients.

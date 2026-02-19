@@ -1,5 +1,5 @@
 /**
- * Variable income helpers for Director Guide monthly mode.
+ * Variable income helpers for Director Intelligence monthly mode.
  *
  * The core annual tax engine remains unchanged; this module projects monthly
  * inputs into annual values and derives a cash-aware monthly draw.

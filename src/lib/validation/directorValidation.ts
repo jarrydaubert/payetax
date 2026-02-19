@@ -97,7 +97,7 @@ export const CurrencyAmountSchema = z
 /**
  * Director Calculator Input Schema
  *
- * Validates all user inputs for the director guide.
+ * Validates all user inputs for the Director Intelligence.
  * Each field has clear error messages for user feedback.
  */
 export const DirectorInputSchema = z.object({

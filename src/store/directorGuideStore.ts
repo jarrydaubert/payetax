@@ -1,6 +1,6 @@
 // src/store/directorGuideStore.ts
 /**
- * Director Guide - Zustand State Management Store
+ * Director Intelligence - Zustand State Management Store
  *
  * Manages form state for the Director Calculator with Education Panel.
  * Full pro calculator: student loans, pension, BIK, EA, strategy comparison.
@@ -60,7 +60,7 @@ export type YearEndMonth = '03' | '12' | 'other' | 'unknown';
 /** Taken via payroll options */
 export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 
-/** Director guide input mode */
+/** Director Intelligence input mode */
 export type DirectorGuideMode = 'annual' | 'monthly';
 
 /** Monthly-mode derived outputs */

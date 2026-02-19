@@ -17,7 +17,7 @@ export default function ToolsPage() {
   const tools = [
     {
       href: '/tools/director-guide',
-      title: 'Director Guide',
+      title: 'Director Intelligence',
       description: 'Salary vs dividends optimizer for UK limited company directors.',
     },
     {

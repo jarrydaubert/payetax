@@ -12,7 +12,7 @@ export const DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS = [
 ] as const satisfies readonly StudentLoanPlan[];
 
 /**
- * Director Guide availability differs by tax year.
+ * Director Intelligence availability differs by tax year.
  * Keep this mapping explicit so future tax-year rollovers update here once.
  */
 export const DIRECTOR_STUDENT_LOAN_PLANS_BY_TAX_YEAR: Record<TaxYear, readonly StudentLoanPlan[]> =

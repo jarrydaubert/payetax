@@ -6,12 +6,12 @@ Primary route: `/tools/director-guide`
 
 ## Goal
 
-Ship a paid, deterministic export bundle for Director Guide users who want records they can review and share with an accountant.
+Ship a paid, deterministic export bundle for Director Intelligence users who want records they can review and share with an accountant.
 
 ## Scope (V1)
 
 In scope:
-- Director Guide scenarios only (single-company salary/dividend extraction outcomes).
+- Director Intelligence scenarios only (single-company salary/dividend extraction outcomes).
 - One-time purchase via Stripe Checkout.
 - Bundle artifacts: tax summary PDF, annual schedule CSV, board minutes DOCX template, dividend voucher DOCX template.
 - Secure re-download flow.
@@ -170,5 +170,5 @@ Gate 4: Verification + release
 - Paid users receive a ready bundle within SLA (P95 <= 60s, P99 <= 180s after payment webhook receipt).
 - Unpaid users cannot obtain download grants.
 - Expired, over-limit, revoked, or invalid tokens are rejected.
-- Exported numbers exactly match deterministic Director Guide outputs from stored snapshot.
+- Exported numbers exactly match deterministic Director Intelligence outputs from stored snapshot.
 - Webhook retries and duplicate events do not create duplicate paid orders or duplicate fulfillment.

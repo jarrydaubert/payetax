@@ -40,7 +40,7 @@ export function Footer({ className }: FooterProps) {
           <Link href='/tools/scottish-tax-calculator'>Scottish Tax</Link>
           <Link href='/tools/marriage-allowance-calculator'>Marriage Allowance</Link>
           <Link href='/tools/national-insurance-calculator'>National Insurance</Link>
-          <Link href='/tools/director-guide'>Director Guide</Link>
+          <Link href='/tools/director-guide'>Director Intelligence</Link>
           <Link href='/install'>Install App</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>

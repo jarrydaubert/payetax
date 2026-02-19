@@ -1,5 +1,5 @@
 /**
- * Director Guide Critical Path Tests
+ * Director Intelligence Critical Path Tests
  *
  * What bugs will these tests find?
  * - Regressions that stop `/tools/director-guide` from producing results
@@ -34,7 +34,7 @@ async function dismissWelcomeDialogIfPresent(page: Page): Promise<void> {
   await expect(dialog).toBeHidden();
 }
 
-test.describe('Director Guide critical @critical', () => {
+test.describe('Director Intelligence critical @critical', () => {
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
     await dismissWelcomeDialogIfPresent(page);

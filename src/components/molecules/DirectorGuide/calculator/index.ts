@@ -1,6 +1,6 @@
 // src/components/molecules/DirectorGuide/calculator/index.ts
 /**
- * Calculator molecules for Director Guide
+ * Calculator molecules for Director Intelligence
  */
 
 export { KeyDates } from './KeyDates';

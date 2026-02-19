@@ -1,4 +1,4 @@
-# Director Guide - Product Positioning
+# Director Intelligence - Product Positioning
 
 > **Route:** `/tools/director-guide`
 > **Technical spec:** See `DIRECTOR_CALCULATOR_BUILD.md`

@@ -1,9 +1,9 @@
-# Director Guide — Variable Income Mode (Monthly Cashflow)
+# Director Intelligence — Variable Income Mode (Monthly Cashflow)
 
 ## Status (February 9, 2026)
 
-- Implemented in the Director Guide with **Annual / Monthly** mode switching.
-- Core monthly logic is live in `src/lib/tax/variableIncome.ts` and wired into the Director Guide store + dashboard.
+- Implemented in the Director Intelligence with **Annual / Monthly** mode switching.
+- Core monthly logic is live in `src/lib/tax/variableIncome.ts` and wired into the Director Intelligence store + dashboard.
 - Safe monthly draw, buffer status, and monthly-mode warnings are implemented.
 - Analytics coverage and unit/component/store tests were added for monthly-mode flows.
 - Follow-up hardening items are tracked in `docs/BACKLOG.md`.
@@ -146,6 +146,6 @@ Add to DirectorGuide state (monthly mode only):
 
 ## Rollout Status
 
-- Monthly mode is available in the Director Guide calculator.
+- Monthly mode is available in the Director Intelligence calculator.
 - Default mode remains **Annual** to preserve first-load behavior.
 - Tooltip/help copy for projection assumptions is included in the monthly flow.

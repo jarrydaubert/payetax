@@ -203,7 +203,7 @@ export function DashboardLayout({
                 </span>
               </span>
             </Link>
-            <span className='text-slate-500 text-sm'>Director Guide</span>
+            <span className='text-slate-500 text-sm'>Director Intelligence</span>
           </div>
 
           {/* Toggle buttons when panels are collapsed */}

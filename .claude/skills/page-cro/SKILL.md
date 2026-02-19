@@ -28,9 +28,14 @@ PayeTax has no signup or purchase. "Conversion" means: calculator usage, result 
 ### Key Page Types
 - **Homepage** — calculator is the hero. Conversion = user enters salary and gets results.
 - **Salary pages** (`/calculator/[salary]-after-tax`) — pre-calculated results for SEO. Conversion = user trusts result and tries their own salary.
-- **Tool pages** (Director Guide, Tax Code Decoder, etc.) — secondary calculators. Conversion = tool completion.
+- **Tool pages** (Director Intelligence, Tax Code Decoder, etc.) — secondary calculators. Conversion = tool completion.
 - **Blog posts** — informational content. Conversion = newsletter signup or click-through to calculator.
 - **Comparison pages** (`/vs/`, `/alternatives/`) — competitive SEO. Conversion = click-through to calculator.
+
+### Navigation Policy (Intentional)
+- Many SEO/programmatic pages are intentionally discoverable via sitemap, internal links, and footer links (not primary nav).
+- Keep primary nav focused on core user flows; do not treat "not in main nav" as an SEO bug by default.
+- Only flag navigation as an SEO risk when crawlability/indexation/internal-link equity is actually weak.
 
 ### Trust Signals (Critical for Financial Tools)
 - "Based on official HMRC rates for 2025/26"

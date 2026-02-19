@@ -964,7 +964,7 @@
   }
 }
 
-/* Print Styles - Director Guide Dashboard */
+/* Print Styles - Director Intelligence Dashboard */
 @media print {
   /* Reset page */
   @page {
@@ -991,7 +991,7 @@
     line-height: 1.4;
   }
 
-  /* Director Guide specific print styles */
+  /* Director Intelligence specific print styles */
   .director-dashboard-print {
     display: block !important;
     width: 100% !important;

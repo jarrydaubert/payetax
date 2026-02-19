@@ -104,7 +104,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState(partial as never);
 }
 
-describe('Director Guide calculator components', () => {
+describe('Director Intelligence calculator components', () => {
   beforeEach(() => {
     const current = useDirectorGuideStore.getState();
     setStoreState({

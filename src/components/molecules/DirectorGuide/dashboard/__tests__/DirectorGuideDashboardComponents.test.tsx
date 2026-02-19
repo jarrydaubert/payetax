@@ -64,7 +64,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState(partial as never);
 }
 
-describe('Director Guide dashboard components', () => {
+describe('Director Intelligence dashboard components', () => {
   beforeEach(() => {
     (usePathname as jest.Mock).mockReturnValue('/');
     const current = useDirectorGuideStore.getState();

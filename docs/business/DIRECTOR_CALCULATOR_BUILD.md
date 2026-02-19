@@ -1,6 +1,6 @@
 # Director Pay Calculator — Product Spec
 
-Purpose: define inputs, outputs, and behaviors for the Director Guide calculator. Keep numeric values in code.
+Purpose: define inputs, outputs, and behaviors for the Director Intelligence calculator. Keep numeric values in code.
 
 ## Scope
 

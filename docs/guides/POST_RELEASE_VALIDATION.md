@@ -14,7 +14,7 @@ Goal: confirm core journeys still work in the real deployed environment.
 
 - [ ] Homepage loads and main CTA scrolls to calculator.
 - [ ] PAYE calculator computes result for at least two salaries and updates charts/table.
-- [ ] Director Guide completes end-to-end with results shown.
+- [ ] Director Intelligence completes end-to-end with results shown.
 - [ ] Blog page and one dynamic blog post load without hydration errors.
 - [ ] OG image endpoint responds for at least one route.
 
@@ -53,10 +53,10 @@ Goal: verify third-party integrations from real production infra.
 
 Goal: validate behavior that static/unit checks cannot guarantee.
 
-- [ ] Keyboard-only navigation works for calculator and director guide (visible focus throughout).
+- [ ] Keyboard-only navigation works for calculator and Director Intelligence (visible focus throughout).
 - [ ] Screen reader announces calculation updates/live region content as expected.
 - [ ] Decorative icons are not announced as meaningful content.
-- [ ] No obvious contrast failures on key pages (homepage, calculator, director guide).
+- [ ] No obvious contrast failures on key pages (homepage, calculator, Director Intelligence).
 
 Recommended tools:
 - axe DevTools quick scan on key pages
@@ -69,7 +69,7 @@ Recommended tools:
 Goal: catch regressions not visible in local bundle/test runs.
 
 - [ ] Run Lighthouse desktop + mobile against production and compare to previous release.
-- [ ] Validate no new layout shifts during initial calculator/director guide load.
+- [ ] Validate no new layout shifts during initial calculator/Director Intelligence load.
 - [ ] Confirm interaction responsiveness on low-power mobile for core flows.
 - [ ] Confirm no abnormal JS errors in browser console during core flows.
 

@@ -11,7 +11,7 @@
 ### Tax Pack V1 (Monetization)
 > See `docs/business/MONETIZATION.md`
 
-- [ ] Tax Pack V1: add feature flag + CTA placement in Director Guide results flow
+- [ ] Tax Pack V1: add feature flag + CTA placement in Director Intelligence results flow
 - [ ] Tax Pack V1: implement server-owned Stripe Checkout session route (price + automatic tax configured server-side)
 - [ ] Tax Pack V1: implement signature-verified, idempotent webhook processing with event dedupe persistence
 - [ ] Tax Pack V1: define/export validated snapshot schema (deterministic numbers, integer pence, checksum, version fields)
@@ -31,14 +31,14 @@
 - [ ] Run: `bun run test:no-coverage`
 - [ ] Run: `bun run build`
 - [ ] Run: `bun run test:e2e:critical`
-- [ ] Smoke: calculator, director guide, blog, OG previews
+- [ ] Smoke: calculator, Director Intelligence, blog, OG previews
 - [ ] Push feature branch, prep release notes
 
 ### Accuracy Guards
 - [ ] Verify other income affects PA taper, dividend allowance, and student loan thresholds
 - [ ] If not verified, hide or guard those inputs
-- [ ] Director Guide: add explicit assumptions panel clarifying salary/dividend mix is scenario-dependent (not a fixed "salary to employer NI threshold" rule)
-- [ ] Director Guide: add MTD for Income Tax scope/timeline note (starts 6 Apr 2026 for qualifying self-employment/property income over threshold; clarify PAYE/dividends treatment)
+- [ ] Director Intelligence: add explicit assumptions panel clarifying salary/dividend mix is scenario-dependent (not a fixed "salary to employer NI threshold" rule)
+- [ ] Director Intelligence: add MTD for Income Tax scope/timeline note (starts 6 Apr 2026 for qualifying self-employment/property income over threshold; clarify PAYE/dividends treatment)
 
 ---
 
@@ -51,15 +51,15 @@
 - [ ] Enable referral CTA in `src/components/organisms/CalculatorContainer.tsx`
 
 ### Organic SEO + Blog Engine
-- [ ] Ensure each new blog post has a primary CTA to calculator/director guide
+- [ ] Ensure each new blog post has a primary CTA to calculator/Director Intelligence
 - [ ] Ensure each new blog post has a secondary CTA to newsletter signup
-- [ ] Keep blog-to-money-page internal links healthy (calculator, director guide, compliance)
+- [ ] Keep blog-to-money-page internal links healthy (calculator, Director Intelligence, compliance)
 - [ ] Run subscriber announcement flow for newly published posts
 - [ ] Review funnel metrics: sessions -> `calculator_start` -> `calculator_completion` -> monetization click
 
 ### Compare My Setup
 - [ ] Add explicit `Edit setup` flow with clear `Apply`, `Reset`, and `Clear` actions (no forced prefill from optimal)
-- [ ] Director Guide: add objective toggle (`Maximize take-home` vs `Minimize NI`) and show tradeoff deltas across strategies
+- [ ] Director Intelligence: add objective toggle (`Maximize take-home` vs `Minimize NI`) and show tradeoff deltas across strategies
 
 ---
 
@@ -87,7 +87,7 @@
 - [ ] Normalize custom subpixel font classes to approved Tailwind/design token scale (SimpleNavbar, SidebarNav)
 - [ ] Run production-only validation checklist after each release and store pass/fail notes (`docs/guides/POST_RELEASE_VALIDATION.md`)
 - [ ] Verify distributed rate limiting against real Upstash Redis in production (no in-memory fallback)
-- [ ] Run quarterly keyboard + screen-reader accessibility regression session across calculator and director guide
+- [ ] Run quarterly keyboard + screen-reader accessibility regression session across calculator and Director Intelligence
 
 ### Calculator Store Cleanup
 

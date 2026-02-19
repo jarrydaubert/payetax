@@ -264,7 +264,7 @@ export function DirectorDashboard() {
                 </span>
               </h1>
               <nav
-                aria-label='Director guide navigation links'
+                aria-label='Director Intelligence navigation links'
                 className='mt-2 flex flex-wrap items-center gap-3 text-slate-400 text-sm'
               >
                 <Link href='/' className='hover:text-slate-200'>

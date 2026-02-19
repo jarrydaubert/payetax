@@ -142,7 +142,7 @@ export const INPUT_TOOLTIPS = {
     note: 'Positive for increase, negative for decrease',
   },
 
-  // Director Guide Inputs
+  // Director Intelligence Inputs
   directorRevenue: {
     title: 'Annual Revenue',
     description: 'Total company revenue for the year before expenses',

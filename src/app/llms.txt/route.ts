@@ -114,7 +114,7 @@ Interactive calculations run in your browser and tax inputs aren't stored; some 
 
 ## Tools
 
-- [Director Guide](${SITE_URL}/tools/director-guide): Salary vs dividend comparison tool for UK company directors - compares extraction scenarios and tax impact
+- [Director Intelligence](${SITE_URL}/tools/director-guide): Salary vs dividend comparison tool for UK company directors - compares extraction scenarios and tax impact
 - [Tax Code Decoder](${SITE_URL}/tools/tax-code-decoder): Decode and understand your HMRC tax code - explains what each letter and number means
 - [Scottish Tax Calculator](${SITE_URL}/tools/scottish-tax-calculator): Dedicated calculator for Scottish 6-band income tax rates
 - [National Insurance Calculator](${SITE_URL}/tools/national-insurance-calculator): Calculate NI contributions for employees, employers, and self-employed

@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-**PayeTax's Director Guide has a significant competitive advantage.** No existing UK competitor combines education-first content with interactive calculators AND practical "set-aside" guidance. The market is full of:
+**PayeTax's Director Intelligence has a significant competitive advantage.** No existing UK competitor combines education-first content with interactive calculators AND practical "set-aside" guidance. The market is full of:
 - **Calculators without education** (most competitors)
 - **Education without calculators** (blog articles)
 - **Neither has "tax set-aside" features** (the gap)
@@ -194,7 +194,7 @@ Lead with:
 
 ## Conclusion
 
-**PayeTax's Director Guide fills a clear market gap.** The competition offers either:
+**PayeTax's Director Intelligence fills a clear market gap.** The competition offers either:
 - Calculators (no education)
 - Education (no calculator)
 - Neither has set-aside guidance

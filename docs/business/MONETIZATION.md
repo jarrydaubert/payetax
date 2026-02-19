@@ -18,7 +18,7 @@ High‑intent traffic → calculator → paid outcome.
 
 ## Current Status
 
-- Director Guide is live and free.
+- Director Intelligence is live and free.
 - Referral infrastructure is partially live:
   - `POST /api/referral/lead` is implemented.
   - Referral CTA in main calculator UI remains intentionally disabled until partner agreements are in place.
@@ -67,10 +67,10 @@ What it is:
 - One downloadable bundle (ZIP)
 
 Who it is for:
-- Directors who completed the Director Guide and want a clean export for records or accountant handoff.
+- Directors who completed the Director Intelligence and want a clean export for records or accountant handoff.
 
 Flow:
-- User completes Director Guide and sees a Tax Pack CTA
+- User completes Director Intelligence and sees a Tax Pack CTA
 - Checkout via Stripe
 - Signature-verified webhook marks order paid (idempotent)
 - Async worker generates bundle and stores artifact privately

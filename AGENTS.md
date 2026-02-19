@@ -17,7 +17,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 
 - Tax rates: `src/constants/taxRates.ts`
 - Calculator logic: `src/lib/taxCalculator.ts`
-- Director guide logic: `src/lib/tax/`
+- Director Intelligence logic: `src/lib/tax/`
 
 ## Before You Change Code
 

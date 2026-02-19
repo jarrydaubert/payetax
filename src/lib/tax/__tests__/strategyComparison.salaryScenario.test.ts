@@ -1,7 +1,7 @@
 /**
  * Strategy Comparison - Salary Scenario Tests
  *
- * Focused tests for Director Guide helper logic.
+ * Focused tests for Director Intelligence helper logic.
  * Each test names the bug it is meant to catch.
  */
 

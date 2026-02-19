@@ -1,6 +1,6 @@
 // src/components/molecules/DirectorGuide/index.ts
 /**
- * Director Guide molecules
+ * Director Intelligence molecules
  *
  * Post-merge structure:
  * - calculator/ - Strategy comparison, slider, breakdowns

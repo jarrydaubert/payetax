@@ -29,7 +29,7 @@ async function selectEnglandRegion(page: Page): Promise<void> {
   await page.getByRole('option', { name: 'England' }).click();
 }
 
-test.describe('Director Guide recruiter regression', () => {
+test.describe('Director Intelligence recruiter regression', () => {
   test('annual recruiter case keeps expected strategy outputs', async ({ page }) => {
     await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
     await dismissWelcomeDialogIfPresent(page);

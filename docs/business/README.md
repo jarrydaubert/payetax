@@ -1,6 +1,6 @@
 # PayeTax Business Docs
 
-Focus: Director Guide calculator and related monetization.
+Focus: Director Intelligence calculator and related monetization.
 
 ## Start Here
 
@@ -21,7 +21,7 @@ Focus: Director Guide calculator and related monetization.
 - `STATE_OF_PLAY.md` is the current implementation snapshot.
 - Keep `STATE_OF_PLAY.md` and `docs/BACKLOG.md` updated in the same PR when feature status changes.
 
-## Current Must-Have Behavior (Director Guide)
+## Current Must-Have Behavior (Director Intelligence)
 
 - Dual what-if controls in calculator: salary scenario and company profit scenario.
 - Scenario outputs stay consistent across cards/tables by using one active-scenario calculation path.

@@ -1,6 +1,6 @@
 // src/lib/directorGuideAnalytics.ts
 /**
- * Analytics tracking for Director Guide
+ * Analytics tracking for Director Intelligence
  *
  * Tracks user journey through the guide while respecting privacy.
  * Revenue/expense values are bucketed, not logged raw.

@@ -1,5 +1,5 @@
 /**
- * Director Guide Welcome Dialog
+ * Director Intelligence Welcome Dialog
  *
  * First-visit modal to set expectations for the Director Pay Calculator.
  */
