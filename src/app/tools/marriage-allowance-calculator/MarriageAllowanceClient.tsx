@@ -4,6 +4,7 @@
 import { ArrowRight, CheckCircle, Heart, Info, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -359,6 +360,12 @@ export function MarriageAllowanceClient() {
           </div>
         </CardContent>
       </Card>
+
+      <NewsletterCTA
+        className='mb-8'
+        title='Get UK Tax Savings Tips by Email'
+        description='Marriage Allowance updates, HMRC changes, and practical tax-saving guides.'
+      />
 
       {/* CTA */}
       <div className='mt-12 text-center'>

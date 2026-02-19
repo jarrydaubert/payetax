@@ -35,16 +35,16 @@ describe('ServerHero Component', () => {
   it('should render secondary CTA link', () => {
     render(<ServerHero />);
 
-    const secondaryLink = screen.getByRole('link', { name: /See What's Included/i });
+    const secondaryLink = screen.getByRole('link', { name: /Explore Tax Tools/i });
     expect(secondaryLink).toBeInTheDocument();
-    expect(secondaryLink).toHaveAttribute('href', '#features');
+    expect(secondaryLink).toHaveAttribute('href', '/tools');
   });
 
   it('should render trust strip items', () => {
     render(<ServerHero />);
 
     expect(screen.getByText('Official HMRC rates')).toBeInTheDocument();
-    expect(screen.getByText('HMRC rate-based estimates')).toBeInTheDocument();
+    expect(screen.getAllByText(/Updated for/i).length).toBeGreaterThan(0);
     expect(screen.getByText('Your data stays private')).toBeInTheDocument();
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });

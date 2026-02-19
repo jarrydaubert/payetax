@@ -8,6 +8,7 @@ import { TwoColumnComparison } from '@/components/molecules/ComparisonTable';
 import { PageHero } from '@/components/molecules/PageHero';
 import { AdvantagesList, ProsCons } from '@/components/molecules/ProsCons';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { Competitor } from '@/data/competitors';
 import { cn } from '@/lib/utils';
@@ -182,7 +183,7 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>
-                <Link href='/'>
+                <Link href='/#tax-calculator'>
                   <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                   Try PayeTax Now
                 </Link>
@@ -195,6 +196,15 @@ export function AlternativePageContent({ competitor }: AlternativePageContentPro
               </Button>
             </div>
           </Card>
+        </div>
+      </section>
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_SM}>
+          <NewsletterCTA
+            title='Get UK Tax Updates by Email'
+            description='HMRC changes, practical tips, and new calculator guidance. No spam.'
+          />
         </div>
       </section>
     </div>

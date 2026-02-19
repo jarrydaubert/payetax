@@ -167,7 +167,7 @@ export function ScenarioSummaryCard({
 
       {/* CTA */}
       <Link
-        href='/#calculator'
+        href='/#tax-calculator'
         className={cn(
           'flex items-center justify-center',
           SPACING.GAP_2,

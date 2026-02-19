@@ -4,6 +4,7 @@
 import { ArrowRight, Calculator, ChevronDown, HelpCircle, Info, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -431,6 +432,12 @@ export function NICalculatorClient() {
           </div>
         </CardContent>
       </Card>
+
+      <NewsletterCTA
+        className='mb-8'
+        title='Get UK NI and Tax Updates by Email'
+        description='HMRC threshold updates, payroll changes, and practical tax guidance.'
+      />
 
       {/* CTA */}
       <div className='mt-12 text-center'>

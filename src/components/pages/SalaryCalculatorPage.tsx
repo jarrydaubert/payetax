@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
 import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
@@ -341,6 +342,15 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           </div>
         </section>
       )}
+
+      <section className={cn('bg-muted/30', 'py-8 sm:py-12')}>
+        <div className={cn('container mx-auto max-w-4xl', SPACING.PX_RESPONSIVE)}>
+          <NewsletterCTA
+            title='Get UK Tax Updates by Email'
+            description='HMRC updates, practical salary-tax tips, and important deadlines.'
+          />
+        </div>
+      </section>
     </div>
   );
 }

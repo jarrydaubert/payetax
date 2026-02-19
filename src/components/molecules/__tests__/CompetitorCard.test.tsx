@@ -53,6 +53,6 @@ describe('CompetitorCard', () => {
 
     expect(screen.getByText('PayeTax')).toBeInTheDocument();
     const link = screen.getByRole('link', { name: /Try PayeTax now/i });
-    expect(link).toHaveAttribute('href', '/');
+    expect(link).toHaveAttribute('href', '/#tax-calculator');
   });
 });

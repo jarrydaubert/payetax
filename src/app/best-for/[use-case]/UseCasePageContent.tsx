@@ -19,6 +19,7 @@ import { Button } from '@/components/atoms/ui/button';
 import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { UseCase, UseCaseFeature } from '@/data/useCases';
 import { cn } from '@/lib/utils';
@@ -224,6 +225,15 @@ export function UseCasePageContent({ useCase }: UseCasePageContentProps) {
           </div>
         </section>
       )}
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_SM}>
+          <NewsletterCTA
+            title={`Get Tax Updates for ${useCase.audience}`}
+            description='Practical HMRC updates, deadline reminders, and tax guidance by email.'
+          />
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className={LAYOUT.SECTION}>

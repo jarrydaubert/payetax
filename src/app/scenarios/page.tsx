@@ -9,6 +9,7 @@
 import { ArrowRight, Calculator } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import Link from 'next/link';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
@@ -128,6 +129,15 @@ export default function ScenariosPage() {
           </div>
         </section>
 
+        <section className='py-12'>
+          <div className={cn(LAYOUT.CONTAINER_SM)}>
+            <NewsletterCTA
+              title='Get Scenario-Based UK Tax Tips'
+              description='HMRC updates, planning guides, and practical tips for real-world salary cases.'
+            />
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className='bg-muted/30 py-16'>
           <div className={cn(LAYOUT.CONTAINER, 'text-center')}>
@@ -139,7 +149,7 @@ export default function ScenariosPage() {
               Use our full calculator to enter your details and get a personalized breakdown.
             </p>
             <Link
-              href='/#calculator'
+              href='/#tax-calculator'
               className={cn(
                 'inline-flex items-center',
                 SPACING.GAP_2,

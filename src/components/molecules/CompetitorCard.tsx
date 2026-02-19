@@ -225,7 +225,7 @@ export function PayeTaxCard({ className }: PayeTaxCardProps) {
 
         <div className={SPACING.PT_4}>
           <Link
-            href='/'
+            href='/#tax-calculator'
             className={cn(
               'inline-flex items-center font-semibold text-primary transition-colors hover:text-primary/80',
               TYPOGRAPHY.TEXT_SM,

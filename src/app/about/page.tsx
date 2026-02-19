@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, FileText, Shield, Sparkles, Workflow } from '
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -315,6 +316,15 @@ export default function AboutPage() {
               </div>
             </Card>
           </div>
+        </div>
+      </section>
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_SM}>
+          <NewsletterCTA
+            title='Get UK Tax Updates by Email'
+            description='HMRC changes, practical tax guides, and deadline reminders.'
+          />
         </div>
       </section>
 

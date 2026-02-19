@@ -9,6 +9,7 @@ import { ComparisonTable } from '@/components/molecules/ComparisonTable';
 import { CompetitorCard, PayeTaxCard } from '@/components/molecules/CompetitorCard';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { COMPETITORS } from '@/data/competitors';
@@ -308,19 +309,28 @@ export default function BestUKTaxCalculatorsPage() {
               </p>
               <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
                 <Button asChild size='lg'>
-                  <Link href='/'>
+                  <Link href='/#tax-calculator'>
                     <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                     Try PayeTax Now
                   </Link>
                 </Button>
                 <Button asChild variant='outline' size='lg'>
                   <Link href='/about'>
-                    Learn More
+                    About PayeTax
                     <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} />
                   </Link>
                 </Button>
               </div>
             </Card>
+          </div>
+        </section>
+
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER_SM}>
+            <NewsletterCTA
+              title='Stay Ahead of UK Tax Changes'
+              description='Get HMRC updates, practical tax guides, and product improvements by email.'
+            />
           </div>
         </section>
       </div>

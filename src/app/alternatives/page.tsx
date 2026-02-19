@@ -7,6 +7,7 @@ import { Card } from '@/components/atoms/ui/card';
 import { CompetitorCard, PayeTaxCard } from '@/components/molecules/CompetitorCard';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { COMPETITORS } from '@/data/competitors';
@@ -98,7 +99,7 @@ export default function AlternativesIndexPage() {
             <PayeTaxCard />
             <div className={cn('text-center', SPACING.MT_8)}>
               <Button asChild size='lg'>
-                <Link href='/'>
+                <Link href='/#tax-calculator'>
                   <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                   Try PayeTax Now
                 </Link>
@@ -148,7 +149,7 @@ export default function AlternativesIndexPage() {
               </p>
               <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
                 <Button asChild size='lg'>
-                  <Link href='/'>
+                  <Link href='/#tax-calculator'>
                     <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                     Calculate Your Take-Home Pay
                   </Link>
@@ -161,6 +162,15 @@ export default function AlternativesIndexPage() {
                 </Button>
               </div>
             </Card>
+          </div>
+        </section>
+
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER_SM}>
+            <NewsletterCTA
+              title='Get HMRC Updates by Email'
+              description='Tax rule changes, practical guidance, and calculator updates. No spam.'
+            />
           </div>
         </section>
       </div>

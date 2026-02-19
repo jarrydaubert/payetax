@@ -6,6 +6,7 @@ import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { HeroCTA } from '@/components/molecules/HeroCTA';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 
 interface ServerHeroProps {
@@ -13,6 +14,11 @@ interface ServerHeroProps {
 }
 
 export default function ServerHero({ className }: ServerHeroProps) {
+  const taxYearLabel = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+    separator: '/',
+    shortEndYear: true,
+  });
+
   return (
     <section
       className={cn(
@@ -31,6 +37,9 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <p className='mx-auto mb-10 max-w-[580px] text-lg text-text-secondary-new leading-[1.8]'>
         Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
         on HMRC rates; results can vary with payslip timing and deductions.
+      </p>
+      <p className='mb-6 rounded-full border border-cyan/20 bg-cyan/5 px-4 py-1.5 font-medium text-cyan text-sm'>
+        Updated for {taxYearLabel}
       </p>
 
       {/* CTA Buttons */}
@@ -51,8 +60,8 @@ export default function ServerHero({ className }: ServerHeroProps) {
           size='touch'
           className='rounded-xl border-white/10 bg-transparent px-8 text-text-primary-new hover:border-cyan/30 hover:bg-white/5 hover:text-text-primary-new'
         >
-          <Link href='#features'>
-            See What&apos;s Included
+          <Link href='/tools'>
+            Explore Tax Tools
             <ChevronDown className='h-[18px] w-[18px]' />
           </Link>
         </Button>
@@ -62,7 +71,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <div className='flex max-w-[900px] flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
-          { icon: CheckCircle, text: 'HMRC rate-based estimates' },
+          { icon: CheckCircle, text: `Updated for ${taxYearLabel}` },
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (

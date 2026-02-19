@@ -8,6 +8,7 @@ import { Card } from '@/components/atoms/ui/card';
 import { TwoColumnComparison } from '@/components/molecules/ComparisonTable';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { Competitor } from '@/data/competitors';
 import { PAYETAX_INFO } from '@/data/competitors';
@@ -169,7 +170,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
 
               <div className={SPACING.MT_6}>
                 <Button asChild className='w-full'>
-                  <Link href='/'>
+                  <Link href='/#tax-calculator'>
                     <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                     Try PayeTax
                   </Link>
@@ -286,7 +287,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
             </p>
             <div className={cn('flex flex-col justify-center sm:flex-row', SPACING.GAP_4)}>
               <Button asChild size='lg'>
-                <Link href='/'>
+                <Link href='/#tax-calculator'>
                   <Calculator className={cn(ICON_SIZES.SIZE_4, 'mr-2')} />
                   Try PayeTax Now
                 </Link>
@@ -299,6 +300,15 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
               </Button>
             </div>
           </Card>
+        </div>
+      </section>
+
+      <section className={LAYOUT.SECTION}>
+        <div className={LAYOUT.CONTAINER_SM}>
+          <NewsletterCTA
+            title='Get HMRC Updates and Tax Guides'
+            description='UK tax updates, practical explanations, and tool improvements. No spam.'
+          />
         </div>
       </section>
     </div>

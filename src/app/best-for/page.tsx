@@ -5,6 +5,7 @@ import { Badge } from '@/components/atoms/ui/badge';
 import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { USE_CASES } from '@/data/useCases';
@@ -108,7 +109,7 @@ export default function BestForPage() {
                           'transition-colors group-hover:text-primary/80',
                         )}
                       >
-                        View
+                        View Guide
                         <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-1')} />
                       </span>
                     </div>
@@ -116,6 +117,15 @@ export default function BestForPage() {
                 </Link>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER_SM}>
+            <NewsletterCTA
+              title='Get UK Tax Guidance by Email'
+              description='HMRC updates, practical tax tips, and new calculator features. No spam.'
+            />
           </div>
         </section>
       </div>

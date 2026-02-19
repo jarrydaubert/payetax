@@ -32,6 +32,7 @@ import {
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
 import { DirectorGuideWelcomeDialog } from '@/components/molecules/DirectorGuide/WelcomeDialog';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SPACING } from '@/constants/designTokens';
@@ -437,6 +438,14 @@ export function DirectorDashboard() {
                 </div>
               </div>
             )}
+
+            <section aria-label='Tax updates newsletter' className={SPACING.MT_8}>
+              <NewsletterCTA
+                className='mx-auto max-w-4xl'
+                title='Get Director Tax Updates by Email'
+                description='HMRC changes, director tax guidance, and practical planning tips.'
+              />
+            </section>
           </main>
         }
         education={<EducationPanel />}

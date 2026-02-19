@@ -1,5 +1,6 @@
 // src/app/tools/page.tsx
 import Link from 'next/link';
+import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import PageContainer from '@/components/templates/PageContainer';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
@@ -94,11 +95,18 @@ export default function ToolsPage() {
                   <div className='mt-1 text-slate-500 text-sm'>{tool.description}</div>
                 </div>
                 <span className='text-cyan-400 text-sm transition group-hover:translate-x-0.5'>
-                  Open →
+                  Use Tool →
                 </span>
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className='mt-10'>
+          <NewsletterCTA
+            title='Get HMRC Updates and Tax Tips'
+            description='Practical UK tax updates and deadline reminders, straight to your inbox.'
+          />
         </div>
       </PageContainer>
     </>
