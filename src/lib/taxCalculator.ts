@@ -620,8 +620,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 1. Prepare input data and tax rates
   // ---------------
 
-  // Determine if using Scottish rates (from explicit flag or tax code)
-  const isScottish = input.isScottish || input.taxCode.startsWith(SCOTTISH_PREFIX);
+  // Determine if using Scottish rates.
+  // Prefix precedence: Welsh C-prefix always uses rUK bands, Scottish S-prefix always uses Scottish bands.
+  const normalizedTaxCode = input.taxCode.toUpperCase().trim();
+  const hasScottishPrefix = normalizedTaxCode.startsWith(SCOTTISH_PREFIX);
+  const hasWelshPrefix = normalizedTaxCode.startsWith('C');
+  const isScottish = hasWelshPrefix ? false : input.isScottish || hasScottishPrefix;
 
   // Get the tax rates for the selected year
   const standardRates = TAX_RATES[input.taxYear];

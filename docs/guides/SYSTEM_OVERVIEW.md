@@ -239,7 +239,7 @@ This section keeps only proposals we are actually adopting. Rejected/deferred su
 
 | Proposed in Reviews | What We Will Do | Backlog |
 |---|---|---|
-| Expand property-based and invariant-style tax testing | Add targeted property/invariant cases and increase HMRC scenario depth (including Scottish/Welsh verification coverage). | `docs/BACKLOG.md` (`P0-2`) |
+| Expand property-based and invariant-style tax testing | Completed on February 19, 2026 in `taxCalculator.hmrcVerification.test.ts` and `taxCalculator.invariants.test.ts` (Scottish fixtures, Welsh `C`-prefix regressions, and sampled property/invariant checks). | Implemented |
 | Add legislative traceability for tax rules | Completed on February 19, 2026 in `src/constants/taxRates.ts` via `TAX_YEAR_SOURCES` (per-year references for income tax, NI, dividends, and student loans). | Implemented |
 | Strengthen confidence in currency arithmetic | Run and document a formal arithmetic strategy review (current rounding-to-pence vs integer-pence/decimal model). | `docs/BACKLOG.md` (`P1-2`) |
 | Add visual regression safety net | Pilot visual regression checks for high-risk surfaces (homepage hero, calculator results, Director Intelligence dashboard). | `docs/BACKLOG.md` (`P1-1`) |

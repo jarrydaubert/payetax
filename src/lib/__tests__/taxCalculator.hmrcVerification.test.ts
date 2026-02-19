@@ -45,6 +45,39 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     ...overrides,
   });
 
+  const scottishHmrcFixtures202526 = [
+    {
+      salary: 15397,
+      expectedIncomeTax: 537.12,
+      expectedNI: 226.2,
+      note: 'Starter rate boundary (19%)',
+    },
+    {
+      salary: 27491,
+      expectedIncomeTax: 2955.96,
+      expectedNI: 1193.64,
+      note: 'Basic rate boundary (20%)',
+    },
+    {
+      salary: 43662,
+      expectedIncomeTax: 6351.84,
+      expectedNI: 2487.36,
+      note: 'Intermediate rate boundary (21%)',
+    },
+    {
+      salary: 75000,
+      expectedIncomeTax: 19513.8,
+      expectedNI: 3510.6,
+      note: 'Higher rate boundary (42%)',
+    },
+    {
+      salary: 90000,
+      expectedIncomeTax: 26263.8,
+      expectedNI: 3810.6,
+      note: 'Advanced rate in-range (45%)',
+    },
+  ] as const;
+
   describe('HMRC Example Calculations (2025-26)', () => {
     it('£25,000 salary - standard calculation', () => {
       const result = calculateTax(createInput({ salary: 25000 }));
@@ -150,34 +183,45 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       );
     });
 
-    it('Scottish £50,000 salary - 2025-26 banding check', () => {
+    it.each(scottishHmrcFixtures202526)('Scottish HMRC fixture £$salary ($note)', ({
+      salary,
+      expectedIncomeTax,
+      expectedNI,
+    }) => {
       const result = calculateTax(
-        createInput({ salary: 50000, isScottish: true, taxCode: 'S1257L' }),
+        createInput({ salary, isScottish: true, taxCode: 'S1257L', taxYear: '2025-2026' }),
       );
 
-      // Taxable income: £50,000 - £12,570 = £37,430
-      // Starter: £2,827 × 19% = £537.13
-      // Basic: (£14,921-£2,827)=£12,094 × 20% = £2,418.80
-      // Intermediate: (£31,092-£14,921)=£16,171 × 21% = £3,395.91
-      // Higher: (£37,430-£31,092)=£6,338 × 42% = £2,661.96
-      // Total = £9,013.80
-      expect(result.incomeTax.annually).toBeCloseTo(9013.8, 1);
-
-      // NI remains UK-wide for category A
-      // (£50,000 - £12,570) × 8% = £2,994.40
-      expect(result.nationalInsurance.annually).toBeCloseTo(2994.4, 1);
+      expect(result.incomeTax.annually).toBeCloseTo(expectedIncomeTax, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(expectedNI, 2);
     });
 
-    it('Welsh C-prefix tax code uses rUK tax rates', () => {
-      const rUk = calculateTax(createInput({ salary: 60000, taxCode: '1257L', isScottish: false }));
+    it.each([
+      { salary: 30000, taxYear: '2023-2024' as const },
+      { salary: 60000, taxYear: '2024-2025' as const },
+      { salary: 90000, taxYear: '2025-2026' as const },
+    ])('Welsh C-prefix parity with rUK ($taxYear, £$salary)', ({ salary, taxYear }) => {
+      const rUk = calculateTax(
+        createInput({ salary, taxCode: '1257L', isScottish: false, taxYear }),
+      );
       const welsh = calculateTax(
-        createInput({ salary: 60000, taxCode: 'C1257L', isScottish: false }),
+        createInput({ salary, taxCode: 'C1257L', isScottish: false, taxYear }),
       );
 
       expect(welsh.taxFreeAmount).toBe(rUk.taxFreeAmount);
       expect(welsh.incomeTax.annually).toBeCloseTo(rUk.incomeTax.annually, 2);
       expect(welsh.nationalInsurance.annually).toBeCloseTo(rUk.nationalInsurance.annually, 2);
       expect(welsh.netPay.annually).toBeCloseTo(rUk.netPay.annually, 2);
+    });
+
+    it('Welsh C-prefix overrides stale isScottish=true input', () => {
+      const rUk = calculateTax(createInput({ salary: 60000, taxCode: '1257L', isScottish: false }));
+      const welshWithStaleFlag = calculateTax(
+        createInput({ salary: 60000, taxCode: 'C1257L', isScottish: true }),
+      );
+
+      expect(welshWithStaleFlag.incomeTax.annually).toBeCloseTo(rUk.incomeTax.annually, 2);
+      expect(welshWithStaleFlag.netPay.annually).toBeCloseTo(rUk.netPay.annually, 2);
     });
   });
 

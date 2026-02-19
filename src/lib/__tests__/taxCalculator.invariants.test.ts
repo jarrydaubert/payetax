@@ -84,4 +84,40 @@ describe('Tax Calculator invariants', () => {
     // Taxable income is higher than salary (after pension) because allowance is negative.
     expect(r.taxableIncome).toBeGreaterThan(40000);
   });
+
+  it('sampled salary grid keeps accounting sanity: non-negative deductions and net <= gross', () => {
+    const salaries = [12570, 18000, 30000, 50270, 75000, 99999, 120000];
+
+    for (const salary of salaries) {
+      const r = calculateTax(createInput({ salary }));
+      const gross = totalGrossAnnual(r);
+
+      expect(r.incomeTax.annually).toBeGreaterThanOrEqual(0);
+      expect(r.nationalInsurance.annually).toBeGreaterThanOrEqual(0);
+      expect(r.studentLoan.annually).toBeGreaterThanOrEqual(0);
+      expect(r.netPay.annually).toBeLessThanOrEqual(gross);
+    }
+  });
+
+  it('sampled salary grid is monotonic for annual net pay (rUK + Scottish)', () => {
+    const salaries = [12000, 18000, 25000, 35000, 50000, 70000, 90000];
+
+    const assertNonDecreasing = (region: 'rUK' | 'Scotland') => {
+      let lastNet = Number.NEGATIVE_INFINITY;
+      for (const salary of salaries) {
+        const r = calculateTax(
+          createInput({
+            salary,
+            isScottish: region === 'Scotland',
+            taxCode: region === 'Scotland' ? 'S1257L' : '1257L',
+          }),
+        );
+        expect(r.netPay.annually).toBeGreaterThanOrEqual(lastNet);
+        lastNet = r.netPay.annually;
+      }
+    };
+
+    assertNonDecreasing('rUK');
+    assertNonDecreasing('Scotland');
+  });
 });

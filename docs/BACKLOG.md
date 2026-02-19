@@ -10,7 +10,6 @@ Only active commitments are listed below. Every item has a first action and a me
 
 | ID | Work Item | Next Step | Done When |
 |---|---|---|---|
-| `P0-2` | Expand tax-engine verification depth | Add Scottish HMRC verification fixtures, Welsh `C`-code regression tests, and new property/invariant cases. | Test suite includes the new fixtures/tests and they pass in CI with no new skips/todos. |
 | `P0-3` | Finalize analytics governance baseline | Introduce typed analytics contract + CI check for unknown events; schedule alias removal for `calculator_completion`. | CI fails on unknown event names, docs align with code, and alias event is removed by deprecation date. |
 | `P0-4` | Verify distributed rate limiting in production | Run production validation against real Upstash-backed limits on public mutation routes. | Evidence recorded in release notes/runbook showing distributed limits work and in-memory fallback is not used in production. |
 | `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A full Stripe test-mode purchase reaches `ready` state and produces one downloadable artifact end-to-end. |
