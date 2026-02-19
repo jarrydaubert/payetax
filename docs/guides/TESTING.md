@@ -15,12 +15,30 @@ See also:
 ## Running Tests
 
 ```bash
-bun run test                # Unit tests with coverage
 bun run test:no-coverage    # Unit tests (fast)
-bun run test:e2e            # E2E tests
-bun run test:dev            # E2E (single browser)
+bun run test:ci             # Full unit suite with coverage (CI-safe)
+bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
+bun run test:e2e            # Full multi-browser E2E
+bun run test:quick          # Fast local gate: unit fast + critical E2E
+bun run test:full           # Full gate: coverage unit + full E2E
 bun run fix-all             # Lint + typecheck + format
-bun audit                   # Dependency vulnerability scan (requires network access)
+bun run clean:test          # Clear old test artifacts
+```
+
+Notes:
+- `bun run test` is still available when you want local coverage + HTML report auto-open.
+- `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
+
+---
+
+## Cleaning Test Artifacts
+
+Use these when stale reports/traces or auth state pollute local runs.
+
+```bash
+bun run clean:reports   # Clears coverage + Playwright reports/test-results/blob-report
+bun run test:e2e:clear  # Clears Playwright artifacts + storageState
+bun run clean:test      # One-shot cleanup for unit + E2E test artifacts
 ```
 
 ---
@@ -39,7 +57,7 @@ Keep HMRC values anchored to source documents and code references.
 
 - `bun run test:no-coverage`
 - `bun run build`
-- Targeted Playwright suites for critical flows
+- `bun run test:e2e:critical`
 - Post-release production validation checklist (manual/high-confidence checks)
 
 ---
