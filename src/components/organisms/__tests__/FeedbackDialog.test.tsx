@@ -1,12 +1,13 @@
-// src/components/molecules/__tests__/FeedbackDialog.test.tsx
+// src/components/organisms/__tests__/FeedbackDialog.test.tsx
 /**
  * FeedbackDialog Tests
  *
- * Note: React 19's useActionState requires special handling in tests.
- * Some tests for submission behavior are simplified due to test environment limitations.
+ * React 19 useActionState behavior is tested via mocked server actions.
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
+import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { FeedbackDialog } from '../FeedbackDialog';
 
 // Mock toast
@@ -25,9 +26,15 @@ jest.mock('@/app/actions/feedback', () => ({
   })),
 }));
 
+const mockSubmitFeedback = submitFeedback as jest.MockedFunction<typeof submitFeedback>;
+
 describe('FeedbackDialog Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSubmitFeedback.mockResolvedValue({
+      success: true,
+      message: 'Thanks! Your feedback has been sent to the team.',
+    });
   });
 
   describe('Rendering', () => {
@@ -239,10 +246,14 @@ describe('FeedbackDialog Component', () => {
   });
 
   describe('Form Submission', () => {
-    // Note: Skipped - React 19 server actions work differently than fetch
-    it.skip('should call API with correct data', async () => {
+    const fillAndSubmitForm = async ({
+      email = 'test@example.com',
+      message = 'This is my feedback message',
+    }: {
+      email?: string;
+      message?: string;
+    } = {}) => {
       const user = userEvent.setup();
-      render(<FeedbackDialog />);
 
       fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
 
@@ -251,43 +262,41 @@ describe('FeedbackDialog Component', () => {
       });
 
       const emailInput = screen.getByLabelText(/email/i);
-      await user.type(emailInput, 'test@example.com');
+      await user.clear(emailInput);
+      if (email) {
+        await user.type(emailInput, email);
+      }
 
       const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'This is my feedback message');
+      await user.clear(messageInput);
+      await user.type(messageInput, message);
 
       const submitButton = screen.getByRole('button', { name: /send feedback/i });
       fireEvent.click(submitButton);
+    };
+
+    it('should call server action with correct form data', async () => {
+      render(<FeedbackDialog />);
+      await fillAndSubmitForm();
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          '/api/feedback',
-          expect.objectContaining({
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: expect.stringContaining('test@example.com'),
-          }),
-        );
+        expect(mockSubmitFeedback).toHaveBeenCalled();
       });
+
+      const latestCall = mockSubmitFeedback.mock.calls.at(-1);
+      expect(latestCall).toBeDefined();
+      if (!latestCall) return;
+
+      const [, submittedFormData] = latestCall;
+      expect(submittedFormData).toBeInstanceOf(FormData);
+      expect(submittedFormData.get('email')).toBe('test@example.com');
+      expect(submittedFormData.get('message')).toBe('This is my feedback message');
+      expect(submittedFormData.get('url')).toBe(window.location.href);
     });
 
-    it.skip('should show success toast on successful submission', async () => {
-      const user = userEvent.setup();
-      const { toast } = require('sonner');
-
+    it('should show success toast on successful submission', async () => {
       render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-      });
-
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
-
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
+      await fillAndSubmitForm({ email: '', message: 'Valid feedback message' });
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith(
@@ -296,147 +305,97 @@ describe('FeedbackDialog Component', () => {
       });
     });
 
-    it.skip('should show error toast on failed submission', async () => {
-      const user = userEvent.setup();
-      const { toast } = require('sonner');
-
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'Server error' }),
+    it('should show error toast on failed submission', async () => {
+      mockSubmitFeedback.mockResolvedValueOnce({
+        success: false,
+        error: 'Server error',
       });
 
       render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-      });
-
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
-
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
+      await fillAndSubmitForm({ message: 'Valid feedback message' });
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Server error');
       });
     });
 
-    it.skip('should show network error toast on fetch failure', async () => {
-      const user = userEvent.setup();
-      const { toast } = require('sonner');
-
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-
-      render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
+    it('should show generic error message returned by server action', async () => {
+      mockSubmitFeedback.mockResolvedValueOnce({
+        success: false,
+        error: 'Something went wrong. Please try again later.',
       });
 
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
-
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
+      render(<FeedbackDialog />);
+      await fillAndSubmitForm({ message: 'Valid feedback message' });
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Network error'));
+        expect(toast.error).toHaveBeenCalledWith('Something went wrong. Please try again later.');
       });
     });
 
-    // Note: Skipped - React 19 useActionState testing requires special setup
-    it.skip('should show loading state during submission', async () => {
-      const user = userEvent.setup();
-
-      let resolveSubmit: () => void;
-      const submitPromise = new Promise<void>((resolve) => {
+    it('should show loading state during submission', async () => {
+      let resolveSubmit: ((value: FeedbackFormState) => void) | undefined;
+      const submitPromise = new Promise<FeedbackFormState>((resolve) => {
         resolveSubmit = resolve;
       });
 
-      (global.fetch as jest.Mock).mockReturnValueOnce(
-        submitPromise.then(() => ({ ok: true, json: async () => ({}) })),
-      );
+      mockSubmitFeedback.mockImplementationOnce(async () => submitPromise);
 
       render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-      });
-
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
-
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Sending...')).toBeInTheDocument();
-      });
-
-      resolveSubmit?.();
-    });
-
-    it.skip('should disable submit button during submission', async () => {
-      const user = userEvent.setup();
-
-      let resolveSubmit: () => void;
-      const submitPromise = new Promise<void>((resolve) => {
-        resolveSubmit = resolve;
-      });
-
-      (global.fetch as jest.Mock).mockReturnValueOnce(
-        submitPromise.then(() => ({ ok: true, json: async () => ({}) })),
-      );
-
-      render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-      });
-
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
-
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
+      await fillAndSubmitForm({ message: 'Valid feedback message' });
 
       await waitFor(() => {
         const sendingButton = screen.getByRole('button', { name: /sending/i });
         expect(sendingButton).toBeDisabled();
       });
 
-      resolveSubmit?.();
-    });
-
-    it.skip('should clear form and close dialog after successful submission', async () => {
-      const user = userEvent.setup();
-
-      render(<FeedbackDialog />);
-
-      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
+      resolveSubmit?.({
+        success: true,
+        message: 'Thanks! Your feedback has been sent to the team.',
       });
 
-      const messageInput = screen.getByLabelText(/message/i);
-      await user.type(messageInput, 'Valid feedback message');
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalled();
+      });
+    });
 
-      const submitButton = screen.getByRole('button', { name: /send feedback/i });
-      fireEvent.click(submitButton);
+    it('should disable submit button during submission', async () => {
+      let resolveSubmit: ((value: FeedbackFormState) => void) | undefined;
+      const submitPromise = new Promise<FeedbackFormState>((resolve) => {
+        resolveSubmit = resolve;
+      });
+
+      mockSubmitFeedback.mockImplementationOnce(async () => submitPromise);
+
+      render(<FeedbackDialog />);
+      await fillAndSubmitForm({ message: 'Valid feedback message' });
+
+      await waitFor(() => {
+        const sendingButton = screen.getByRole('button', { name: /sending/i });
+        expect(sendingButton).toBeDisabled();
+      });
+
+      resolveSubmit?.({
+        success: true,
+        message: 'Thanks! Your feedback has been sent to the team.',
+      });
+    });
+
+    it('should clear form and close dialog after successful submission', async () => {
+      render(<FeedbackDialog />);
+      await fillAndSubmitForm({ email: 'clearme@example.com', message: 'Valid feedback message' });
 
       await waitFor(() => {
         expect(screen.queryByText('Share Your Feedback')).not.toBeInTheDocument();
       });
+
+      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
+      await waitFor(() => {
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      });
+
+      expect(screen.getByLabelText(/email/i)).toHaveValue('');
+      expect(screen.getByLabelText(/message/i)).toHaveValue('');
     });
   });
 

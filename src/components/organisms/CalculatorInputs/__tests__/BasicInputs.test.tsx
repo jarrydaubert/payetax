@@ -170,6 +170,14 @@ describe('BasicInputs Component', () => {
 
       expect(mockSetTaxCode).toHaveBeenCalledWith('BR');
     });
+
+    it('should call setIsMarried when married checkbox is toggled', () => {
+      render(<BasicInputs />);
+
+      fireEvent.click(screen.getByTestId('married-checkbox'));
+
+      expect(mockSetIsMarried).toHaveBeenCalledWith(true);
+    });
   });
 
   describe('Tax Code Placeholder', () => {

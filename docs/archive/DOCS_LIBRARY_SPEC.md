@@ -1091,7 +1091,7 @@ redirects: async () => [
 ],
 ```
 
-Track all URL changes in `docs/REDIRECT_LOG.md`.
+Track URL changes in release notes or active planning docs (the old redirect log file was removed).
 
 ---
 

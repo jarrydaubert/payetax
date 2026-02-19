@@ -8,7 +8,6 @@ Tests should catch real regressions in calculation, UX, or security behavior.
 
 See also:
 - `docs/guides/BUG_CATALOG.md`
-- `docs/guides/TESTING_MATRIX.md`
 - `docs/guides/POST_RELEASE_VALIDATION.md`
 
 ---

@@ -70,6 +70,10 @@
 
 - [ ] Add more payslip-style regression locks and tighten tolerances where safe
 - [ ] Store HMRC source provenance alongside golden master data
+- [ ] Resolve remaining skipped tests: HMRC rounding edge cases (2) + cookie month-boundary edge case (1)
+- [ ] Replace director NI category placeholders (`it.todo`) with implemented tests in `src/lib/tax/__tests__/directorCalculator.spec.ts`
+- [ ] Decide and document a policy for known HMRC rounding divergences (exact matching vs explicit tolerance bands)
+- [ ] Make coverage command CI-safe locally by separating report open step from `bun run test` (current `open .../lcov-report` fails in headless/sandboxed environments)
 
 ### Post-Audit Follow-Ups (Remaining)
 - [ ] Sunset legacy `DIVIDEND_RATES.ALLOWANCE` export once all imports are migrated to `TAX_RATES[year].dividendAllowance`
