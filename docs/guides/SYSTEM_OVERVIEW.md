@@ -169,6 +169,7 @@ Controls in use:
 - Input validation with Zod schemas
 - CSRF/origin protections: `src/lib/security/origin.ts`
 - Rate limiting: `src/lib/rateLimit.ts` (distributed when Upstash configured)
+- Bot mitigation for mutation routes: `src/lib/security/botGuard.ts`
 - HMAC token flows for unsubscribe links: `src/lib/newsletter/unsubscribeToken.ts`
 - Security headers and platform-level controls in framework config
 
@@ -202,6 +203,9 @@ This separation keeps lifecycle marketing and transactional deliverability conce
   - `docs/guides/POST_RELEASE_VALIDATION.md`
 
 Covers production-only checks for security controls, external integrations, observability, SEO/indexing, and analytics sanity.
+
+Release evidence artifact:
+- `docs/reports/releases/v<version>.md` (generated via `release:report:init`, validated via `release:report:check`)
 
 ---
 

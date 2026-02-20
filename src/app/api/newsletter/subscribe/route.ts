@@ -3,6 +3,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { subscribeEmailToKit } from '@/lib/newsletter/kitClient';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { NewsletterSubscribeRequestSchema } from '@/lib/validation/emailValidation';
@@ -55,6 +56,12 @@ export async function POST(request: NextRequest) {
     body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const botReason = detectLikelyBotRequest(request, body);
+  if (botReason) {
+    console.warn(`[newsletter/subscribe] blocked likely bot request (${botReason})`);
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
   // Validate with Zod

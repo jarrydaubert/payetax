@@ -1,7 +1,7 @@
 // src/app/blog/[slug]/page.tsx
 
 import { ArrowLeft, Calendar, ChevronRight, Clock, RefreshCw, User } from 'lucide-react';
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -24,6 +24,91 @@ import { cn } from '@/lib/utils';
 
 // Cache blog post fetch to deduplicate calls between generateMetadata and page component
 const getCachedBlogPost = cache((slug: string) => getBlogPostBySlug(slug));
+
+interface InternalToolLink {
+  id: string;
+  href: Route | { pathname: Route; hash: string };
+  title: string;
+  description: string;
+}
+
+const BASE_INTERNAL_LINKS: InternalToolLink[] = [
+  {
+    id: 'paye-calculator',
+    href: { pathname: '/', hash: 'tax-calculator' },
+    title: 'PAYE Calculator',
+    description: 'Estimate your take-home pay in seconds.',
+  },
+  {
+    id: 'director-intelligence',
+    href: '/tools/director-guide',
+    title: 'Director Intelligence',
+    description: 'Compare salary and dividend strategies.',
+  },
+];
+
+const CONTEXTUAL_INTERNAL_LINKS: Array<{
+  matcher: RegExp;
+  link: InternalToolLink;
+}> = [
+  {
+    matcher: /\bscottish|scotland\b/i,
+    link: {
+      id: 'scottish-calculator',
+      href: '/tools/scottish-tax-calculator',
+      title: 'Scottish Tax Calculator',
+      description: 'Use Scottish bands for accurate estimates.',
+    },
+  },
+  {
+    matcher: /\bnational insurance\b|\bni\b/i,
+    link: {
+      id: 'ni-calculator',
+      href: '/tools/national-insurance-calculator',
+      title: 'National Insurance Calculator',
+      description: 'See employee and employer NI breakdowns.',
+    },
+  },
+  {
+    matcher: /\bmarriage allowance\b/i,
+    link: {
+      id: 'marriage-allowance-calculator',
+      href: '/tools/marriage-allowance-calculator',
+      title: 'Marriage Allowance Calculator',
+      description: 'Check eligibility and estimated savings.',
+    },
+  },
+  {
+    matcher: /\btax code\b/i,
+    link: {
+      id: 'tax-code-decoder',
+      href: '/tools/tax-code-decoder',
+      title: 'Tax Code Decoder',
+      description: 'Understand what your tax code means.',
+    },
+  },
+];
+
+function getInternalToolLinks(post: {
+  title: string;
+  excerpt: string;
+  tags?: string[];
+}): InternalToolLink[] {
+  const sourceText = `${post.title} ${post.excerpt} ${(post.tags ?? []).join(' ')}`.toLowerCase();
+  const links = [...BASE_INTERNAL_LINKS];
+
+  for (const { matcher, link } of CONTEXTUAL_INTERNAL_LINKS) {
+    if (matcher.test(sourceText)) {
+      links.push(link);
+    }
+  }
+
+  const uniqueLinks = links.filter(
+    (link, index, arr) => arr.findIndex((candidate) => candidate.id === link.id) === index,
+  );
+
+  return uniqueLinks.slice(0, 3);
+}
 
 /** Normalize image URL - handles both relative and absolute paths */
 function getAbsoluteImageUrl(image: string | undefined): string | undefined {
@@ -148,6 +233,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   ]);
   const salaryIntentLabel =
     salaryIntentTarget === null ? null : salaryIntentTarget.toLocaleString('en-GB');
+  const internalToolLinks = getInternalToolLinks(post);
 
   const articleData = {
     title: post.title,
@@ -353,6 +439,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Financial Disclaimer - Required for HMRC compliance */}
             <BlogDisclaimer className='mt-12 md:mt-16' />
+
+            <section className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
+              <h3 className='mb-2 font-semibold text-foreground'>Useful tools for this topic</h3>
+              <p className={cn('mb-4 text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
+                Jump straight into calculators and guides relevant to what you just read.
+              </p>
+              <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+                {internalToolLinks.map((link) => (
+                  <Link
+                    key={link.id}
+                    href={link.href}
+                    className='rounded-lg border border-primary/20 bg-background/80 p-3 transition-colors hover:border-primary/35 hover:bg-primary/5'
+                  >
+                    <p className='font-medium text-foreground'>{link.title}</p>
+                    <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_XS)}>
+                      {link.description}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </section>
 
             {/* CTA Section */}
             <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>

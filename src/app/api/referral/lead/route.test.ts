@@ -149,6 +149,19 @@ describe('/api/referral/lead POST', () => {
     expect(json.details).toBeDefined();
   });
 
+  it('rejects obvious non-browser user agents', async () => {
+    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    const request = buildRequest(validPayload, {
+      origin: 'https://payetax.co.uk',
+      'user-agent': 'python-requests/2.32.3',
+    });
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({ error: 'Invalid request' });
+  });
+
   it('returns 500 when user confirmation email fails', async () => {
     sendMock.mockResolvedValue({ error: { message: 'failed' } });
     const POST = await loadRoute({ RESEND_API_KEY: 'test' });

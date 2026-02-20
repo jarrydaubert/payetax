@@ -1,69 +1,92 @@
 #!/usr/bin/env bun
 /**
- * Runs `bun pm scan` and fails only on non-allowlisted advisories.
+ * Runs `bun audit --json --audit-level=high` and fails only on non-allowlisted advisories.
  */
 
 import { spawnSync } from 'node:child_process';
 import { DEPENDENCY_ADVISORY_ALLOWLIST } from './dependency-advisory-allowlist';
 
-type Advisory = {
-  packageName: string;
-  cve: string | null;
-  rawBlock: string;
+type BunAuditAdvisory = {
+  url?: string;
+  title?: string;
+  severity?: string;
 };
 
-function parseAdvisories(output: string): Advisory[] {
-  const advisories: Advisory[] = [];
-  const blockRegex =
-    /WARNING:\s+([^\n]+)([\s\S]*?)(?=\n\s*WARNING:\s+|\n\d+\s+advisory|\nerror:|$)/g;
+type Advisory = {
+  packageName: string;
+  id: string | null;
+  title: string;
+  severity: string;
+  raw: BunAuditAdvisory;
+};
 
-  for (const match of output.matchAll(blockRegex)) {
-    const packageName = match[1]?.trim() ?? 'unknown';
-    const rawBlock = `${match[0]}`.trim();
-    const cveMatch = rawBlock.match(/CVE-\d{4}-\d+/i);
-    advisories.push({
-      packageName,
-      cve: cveMatch ? cveMatch[0].toUpperCase() : null,
-      rawBlock,
-    });
+function extractAdvisoryId(url?: string): string | null {
+  if (!url) return null;
+  const ghsaMatch = url.match(/GHSA-[a-z0-9-]+/i);
+  if (ghsaMatch?.[0]) return ghsaMatch[0].toUpperCase();
+  const cveMatch = url.match(/CVE-\d{4}-\d+/i);
+  if (cveMatch?.[0]) return cveMatch[0].toUpperCase();
+  return null;
+}
+
+function parseBunAuditJson(stdout: string): Advisory[] {
+  const advisories: Advisory[] = [];
+
+  for (const line of stdout.split('\n')) {
+    const trimmed = line.trim();
+    if (!(trimmed.startsWith('{') && trimmed.endsWith('}'))) continue;
+
+    let payload: Record<string, BunAuditAdvisory[]>;
+    try {
+      payload = JSON.parse(trimmed) as Record<string, BunAuditAdvisory[]>;
+    } catch {
+      continue;
+    }
+
+    for (const [packageName, packageAdvisories] of Object.entries(payload)) {
+      for (const advisory of packageAdvisories) {
+        advisories.push({
+          packageName,
+          id: extractAdvisoryId(advisory.url),
+          title: advisory.title ?? 'Unknown advisory',
+          severity: advisory.severity ?? 'unknown',
+          raw: advisory,
+        });
+      }
+    }
   }
 
   return advisories;
 }
 
 function isAllowlisted(advisory: Advisory): boolean {
+  if (!advisory.id) return false;
   return DEPENDENCY_ADVISORY_ALLOWLIST.some(
     (entry) =>
-      advisory.cve === entry.id &&
+      advisory.id === entry.id &&
       advisory.packageName.toLowerCase() === entry.package.toLowerCase(),
   );
 }
 
 function main(): void {
-  const result = spawnSync('bun', ['pm', 'scan'], {
+  const result = spawnSync('bun', ['audit', '--json', '--audit-level=high'], {
     encoding: 'utf-8',
   });
 
   const stdout = result.stdout ?? '';
   const stderr = result.stderr ?? '';
-  const combinedOutput = [stdout, stderr].filter(Boolean).join('\n');
 
-  if (stdout) {
-    process.stdout.write(stdout);
-  }
-  if (stderr) {
-    process.stderr.write(stderr);
-  }
+  if (stdout) process.stdout.write(stdout);
+  if (stderr) process.stderr.write(stderr);
 
-  const advisories = parseAdvisories(combinedOutput);
-
-  if (result.status === 0) {
+  const advisories = parseBunAuditJson(stdout);
+  if (result.status === 0 && advisories.length === 0) {
     console.log('\n✅ Dependency audit passed with no advisories');
     return;
   }
 
   if (advisories.length === 0) {
-    console.error('\n❌ Dependency audit failed and no advisory blocks were parsed.');
+    console.error('\n❌ Dependency audit failed and no machine-readable advisories were parsed.');
     process.exit(result.status ?? 1);
   }
 
@@ -72,7 +95,7 @@ function main(): void {
   if (nonAllowlisted.length === 0) {
     console.log('\n⚠️  Dependency audit contains only allowlisted advisory entries:');
     for (const advisory of advisories) {
-      console.log(`   - ${advisory.packageName} (${advisory.cve ?? 'no-cve'})`);
+      console.log(`   - ${advisory.packageName} (${advisory.id ?? 'no-id'})`);
     }
     console.log('✅ Allowlisted-only dependency audit accepted');
     return;
@@ -80,7 +103,9 @@ function main(): void {
 
   console.error('\n❌ Non-allowlisted dependency advisories found:');
   for (const advisory of nonAllowlisted) {
-    console.error(`---\n${advisory.rawBlock}\n---`);
+    console.error(
+      `   - ${advisory.packageName} (${advisory.id ?? 'no-id'}) [${advisory.severity}]: ${advisory.title}`,
+    );
   }
   process.exit(1);
 }

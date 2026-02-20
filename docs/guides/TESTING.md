@@ -102,6 +102,8 @@ Keep HMRC values anchored to source documents and code references.
 - `bun run test:no-coverage`
 - `bun run build`
 - `bun run test:e2e:critical`
+- `bun run release:report:init` (before manual post-release checks)
+- `bun run release:report:check` (after checklist completion)
 - Post-release production validation checklist (manual/high-confidence checks)
 
 ---

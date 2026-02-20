@@ -5,11 +5,11 @@
  */
 export const DEPENDENCY_ADVISORY_ALLOWLIST = [
   {
-    id: 'CVE-2025-69873',
-    package: 'ajv',
-    via: 'webpack > schema-utils > ajv',
+    id: 'GHSA-3PPC-4F35-3M26',
+    package: 'minimatch',
+    via: '@sentry/node + Jest toolchain transitive dependency chain',
     reason:
-      'Transitive build-time advisory; tracked until webpack/schema-utils ship a patched chain.',
+      'Transitive advisory currently unresolved in upstream dependency chain; tracked monthly.',
     removeAfter: '2026-06-30',
   },
 ] as const;

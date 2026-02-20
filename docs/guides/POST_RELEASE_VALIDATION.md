@@ -4,7 +4,12 @@ Use this after every production release for checks that cannot be trusted fully 
 
 Owner: on-call/releasing engineer.
 
-Evidence: record each item as `PASS`/`FAIL` with timestamp and deployment URL in release notes or Linear.
+Evidence:
+- Initialize report scaffold: `bun run release:report:init`
+- Report path: `docs/reports/releases/v<package-version>.md`
+- Complete this checklist inside that report and set `Status: COMPLETE`
+- Validate completion: `bun run release:report:check`
+- Link report in release notes/changelog
 
 ---
 
@@ -13,6 +18,7 @@ Evidence: record each item as `PASS`/`FAIL` with timestamp and deployment URL in
 Goal: block avoidable regressions before checking production-only items.
 
 - [ ] Run `bun run release:verify` and ensure all steps pass.
+- [ ] Run `bun run release:report:init` to create the version report scaffold (if not present).
 
 ---
 

@@ -135,6 +135,32 @@ describe('/api/newsletter/subscribe POST', () => {
     expect(json.error).toBe('Invalid email address');
   });
 
+  it('rejects likely bot requests using honeypot fields', async () => {
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk', website: 'https://spam.example' },
+      { origin: 'https://payetax.co.uk' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({ error: 'Invalid request' });
+  });
+
+  it('rejects obvious non-browser user agents', async () => {
+    const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
+    const request = buildRequest(
+      { email: 'test@payetax.co.uk' },
+      { origin: 'https://payetax.co.uk', 'user-agent': 'curl/8.0.1' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({ error: 'Invalid request' });
+  });
+
   it('subscribes via Kit and returns success', async () => {
     const POST = await loadRoute({ KIT_API_SECRET: 'kit-secret', KIT_FORM_ID: '123' });
     const request = buildRequest(

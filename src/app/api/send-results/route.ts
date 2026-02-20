@@ -5,6 +5,7 @@ import { Resend } from 'resend';
 import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import {
@@ -266,6 +267,12 @@ export async function POST(request: NextRequest) {
     body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const botReason = detectLikelyBotRequest(request, body);
+  if (botReason) {
+    console.warn(`[send-results] blocked likely bot request (${botReason})`);
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
   const validation = SendResultsRequestSchema.safeParse(body);

@@ -145,6 +145,19 @@ describe('/api/send-results POST', () => {
     expect(json.details).toBeDefined();
   });
 
+  it('rejects likely bot requests using honeypot fields', async () => {
+    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    const request = buildRequest(
+      { ...validPayload, homepage: 'https://spam.example' },
+      { origin: 'https://payetax.co.uk' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({ error: 'Invalid request' });
+  });
+
   it('sends the email when inputs are valid', async () => {
     sendMock.mockResolvedValue({ error: null });
     const POST = await loadRoute({ RESEND_API_KEY: 'test' });
