@@ -5,7 +5,7 @@
  * Design goals:
  * - Same logic used everywhere (email templates + API routes)
  * - No default secret in production (missing config must be explicit)
- * - Backwards compatible with legacy 16-hex signature tokens
+ * - Backwards compatible with legacy 16-hex signature tokens until cutoff
  */
 
 import crypto from 'node:crypto';
@@ -13,6 +13,10 @@ import { z } from 'zod';
 
 // Token validity: 30 days (in milliseconds)
 export const TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+export const LEGACY_64BIT_SIGNATURE_SUPPORT_END_ISO = '2026-06-30';
+const LEGACY_64BIT_SIGNATURE_SUPPORT_END_MS = Date.parse(
+  `${LEGACY_64BIT_SIGNATURE_SUPPORT_END_ISO}T23:59:59.999Z`,
+);
 
 const DEV_FALLBACK_SECRET = 'payetax-dev-secret-do-not-use-in-prod';
 
@@ -72,9 +76,15 @@ export function verifyUnsubscribeToken(
     hmac.update(data);
     const expectedSignature = hmac.digest('hex').slice(0, 32); // 128-bit
 
-    // Backwards compat: accept 16-hex (64-bit) signatures.
-    const sigToCompare =
-      signature.length === 16 ? expectedSignature.slice(0, 16) : expectedSignature;
+    // Backwards compat: accept 16-hex (64-bit) signatures until the sunset date.
+    const isLegacy64BitSignature = signature.length === 16;
+    if (isLegacy64BitSignature && nowMs > LEGACY_64BIT_SIGNATURE_SUPPORT_END_MS) {
+      return null;
+    }
+
+    const sigToCompare = isLegacy64BitSignature
+      ? expectedSignature.slice(0, 16)
+      : expectedSignature;
 
     if (signature.length !== sigToCompare.length) return null;
     if (

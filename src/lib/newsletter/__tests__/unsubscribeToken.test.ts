@@ -2,6 +2,7 @@
 
 import {
   createUnsubscribeToken,
+  LEGACY_64BIT_SIGNATURE_SUPPORT_END_ISO,
   resolveUnsubscribeSecret,
   TOKEN_MAX_AGE_MS,
   verifyUnsubscribeToken,
@@ -39,6 +40,12 @@ describe('unsubscribeToken', () => {
   it('accepts legacy 16-hex signatures', () => {
     const token = createUnsubscribeToken(email, secret, now, 16);
     expect(verifyUnsubscribeToken(token, secret, now)).toBe(email);
+  });
+
+  it('rejects legacy 16-hex signatures after sunset date', () => {
+    const token = createUnsubscribeToken(email, secret, now, 16);
+    const afterSunset = Date.parse(`${LEGACY_64BIT_SIGNATURE_SUPPORT_END_ISO}T23:59:59.999Z`) + 1;
+    expect(verifyUnsubscribeToken(token, secret, afterSunset)).toBeNull();
   });
 
   it('requires UNSUBSCRIBE_SECRET in production', () => {

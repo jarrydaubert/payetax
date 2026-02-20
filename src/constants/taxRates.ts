@@ -608,12 +608,6 @@ export const SCOTTISH_TAX_RATES: Record<
 // @see https://www.gov.uk/tax-on-dividends
 
 export const DIVIDEND_RATES = {
-  /**
-   * @deprecated Use TAX_RATES[year].dividendAllowance instead (varies by year)
-   * 2023-24: £1,000 | 2024-25+: £500
-   */
-  ALLOWANCE: 500,
-
   /** Basic rate (8.75%) - for income within basic rate band */
   BASIC_RATE: 0.0875,
 

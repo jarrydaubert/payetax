@@ -7,6 +7,7 @@
  * @see https://www.gov.uk/tax-on-dividends
  */
 
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import {
   calculateDividendTax,
   DIVIDEND_RATES,
@@ -313,7 +314,7 @@ describe('Dividend Tax Calculator', () => {
 
   describe('DIVIDEND_RATES constants', () => {
     it('should have correct 2025-26 rates', () => {
-      expect(DIVIDEND_RATES.ALLOWANCE).toBe(500);
+      expect(TAX_RATES[CURRENT_TAX_YEAR].dividendAllowance).toBe(500);
       expect(DIVIDEND_RATES.BASIC_RATE).toBe(0.0875);
       expect(DIVIDEND_RATES.HIGHER_RATE).toBe(0.3375);
       expect(DIVIDEND_RATES.ADDITIONAL_RATE).toBe(0.3935);
