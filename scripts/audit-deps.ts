@@ -68,6 +68,52 @@ function isAllowlisted(advisory: Advisory): boolean {
   );
 }
 
+function parseIsoDate(value: string): Date | null {
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getDaysSince(date: Date): number {
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function printAllowlistFreshnessWarnings(): void {
+  const staleEntries: Array<{ id: string; packageName: string; days: number; cadence: number }> =
+    [];
+
+  for (const entry of DEPENDENCY_ADVISORY_ALLOWLIST) {
+    const checkedDate = parseIsoDate(entry.lastChecked);
+    if (!checkedDate) {
+      console.warn(
+        `⚠️  Allowlist entry ${entry.id} (${entry.package}) has invalid lastChecked date: ${entry.lastChecked}`,
+      );
+      continue;
+    }
+
+    const days = getDaysSince(checkedDate);
+    if (days > entry.reviewCadenceDays) {
+      staleEntries.push({
+        id: entry.id,
+        packageName: entry.package,
+        days,
+        cadence: entry.reviewCadenceDays,
+      });
+    }
+  }
+
+  if (staleEntries.length === 0) return;
+
+  console.warn('\n⚠️  Advisory allowlist review is overdue for:');
+  for (const entry of staleEntries) {
+    console.warn(
+      `   - ${entry.packageName} (${entry.id}) last checked ${entry.days}d ago (cadence ${entry.cadence}d)`,
+    );
+  }
+  console.warn('   Update lastChecked after monthly upstream review.');
+}
+
 function main(): void {
   const result = spawnSync('bun', ['audit', '--json', '--audit-level=high'], {
     encoding: 'utf-8',
@@ -81,6 +127,7 @@ function main(): void {
 
   const advisories = parseBunAuditJson(stdout);
   if (result.status === 0 && advisories.length === 0) {
+    printAllowlistFreshnessWarnings();
     console.log('\n✅ Dependency audit passed with no advisories');
     return;
   }
@@ -97,6 +144,7 @@ function main(): void {
     for (const advisory of advisories) {
       console.log(`   - ${advisory.packageName} (${advisory.id ?? 'no-id'})`);
     }
+    printAllowlistFreshnessWarnings();
     console.log('✅ Allowlisted-only dependency audit accepted');
     return;
   }

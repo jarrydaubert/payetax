@@ -27,7 +27,7 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P1-13` | Complete Tax Pack operational hardening | Implement refund/dispute handling, abandoned-order cleanup, and resend-safe email delivery. | Post-payment lifecycle paths are covered with deterministic state transitions. |
 | `P1-14` | Test Tax Pack end-to-end flows | Add integration + E2E tests for checkout, webhook idempotency, artifact generation, grant replay/expiry/revocation. | Test suite reliably catches regressions in purchase and delivery lifecycle. |
 | `P1-17` | Investigate low Google referrer share | Run GSC + Ahrefs indexability audit (coverage, canonical, noindex, sitemap, robots, structured data) focused on why Bing/DDG/Yahoo outperform Google. | Root-cause report is documented and prioritized fix tickets are created with owner and ETA. |
-| `P1-27` | Track unresolved transitive `minimatch` advisory | Keep `GHSA-3PPC-4F35-3M26` documented as upstream-transitive (`@sentry/node`, Jest toolchain), re-check monthly, and avoid repeated local override experiments unless parent packages publish compatible fixes. | `bun audit` no longer reports `minimatch <10.2.1` without risky major-force overrides, and this item is closed with the parent package versions that resolved it. |
+| `P1-27` | Track unresolved transitive `minimatch` advisory | Keep `GHSA-3PPC-4F35-3M26` documented as upstream-transitive (`@sentry/node`, Jest toolchain), run monthly `bun run audit:deps`, and update allowlist `lastChecked` metadata after each review. | `bun audit` no longer reports `minimatch <10.2.1` without risky major-force overrides, and this item is closed with the parent package versions that resolved it. |
 
 ---
 
