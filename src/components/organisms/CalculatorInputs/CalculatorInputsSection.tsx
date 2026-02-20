@@ -4,9 +4,9 @@
 import { Calculator, ChevronDown, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
+import { Spinner } from '@/components/atoms/Spinner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Spinner } from '@/components/ui/spinner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';

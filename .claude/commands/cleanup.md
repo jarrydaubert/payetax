@@ -91,6 +91,12 @@ public/* (referenced by metadata/icons/manifest)
 - `scripts/`
 - `emails/`
 
+Always ignore generated/cache directories during housekeeping:
+- `.next/`
+- `.swc/`
+- `node_modules/`
+- `audit-outputs/`
+
 **For each directory:**
 1. List all files (use LS tool)
 2. Note suspicious patterns
@@ -162,7 +168,8 @@ rg "ComponentName" content/
 
 ### Run Knip (Verify Each Finding!)
 ```bash
-bunx knip    # or: npx knip
+bun run audit:unused       # focused cleanup signal (files/deps/binaries/unlisted)
+bun run audit:unused:full  # full export/type report when needed
 ```
 
 ### Verification Checklist
@@ -200,6 +207,9 @@ Always exempt unless PROVEN unused:
 - Analytics packages
 - Testing utilities (`@testing-library/*`, `jest-*`)
 - Content processing (`gray-matter`, `reading-time`)
+- Service worker files (`public/register-sw.js`, `public/sw.js`)
+- Kit embed styling source (`docs/guides/KIT_EMBED_CSS.css`)
+- Search-engine verification files in `public/*.txt` (verify external ownership usage before flagging)
 
 ---
 
@@ -207,9 +217,9 @@ Always exempt unless PROVEN unused:
 
 ### Hygiene Items (not dead code)
 ```bash
-rg "// TODO" src/
-rg "// FIXME" src/
-rg "// HACK" src/
+rg "// TODO" src/ e2e/
+rg "// FIXME" src/ e2e/
+rg "// HACK" src/ e2e/
 ```
 
 ### Actual Dead Code (requires reachability analysis)

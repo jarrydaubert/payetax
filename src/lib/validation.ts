@@ -832,31 +832,3 @@ export function clamp(value: number, min: number, max: number): number {
 export function roundTo(value: number, decimals: number): number {
   return Math.round(value * 10 ** decimals) / 10 ** decimals;
 }
-
-/**
- * Validates tax year format (legacy function for backwards compatibility)
- * @deprecated Use TaxYearSchema.safeParse() instead
- */
-export function isValidTaxYear(year: string): boolean {
-  return TaxYearSchema.safeParse(year).success;
-}
-
-/**
- * Validates tax code format (legacy function for backwards compatibility)
- * @deprecated Use TaxCodeSchema.safeParse() instead
- */
-export function isValidTaxCode(code: string): boolean {
-  return TaxCodeSchema.safeParse(code).success;
-}
-
-/**
- * Sanitizes salary amount (legacy function for backwards compatibility)
- * @deprecated Use SalarySanitizationSchema.parse() instead
- */
-export function sanitizeSalary(salary: number | string | unknown): number {
-  try {
-    return SalarySanitizationSchema.parse(salary);
-  } catch {
-    return 0;
-  }
-}

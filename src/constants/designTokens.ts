@@ -585,20 +585,6 @@ export type ColorClass = (typeof COLORS)[ColorKey];
 /** Type-safe shadow class strings */
 export type ShadowClass = (typeof SHADOWS)[ShadowKey];
 
-// Legacy aliases (for backwards compatibility)
-/** @deprecated Use TypographyKey instead */
-export type TypographyToken = TypographyKey;
-/** @deprecated Use SpacingKey instead */
-export type SpacingToken = SpacingKey;
-/** @deprecated Use IconSizeKey instead */
-export type IconSizeToken = IconSizeKey;
-/** @deprecated Use LayoutKey instead */
-export type LayoutToken = LayoutKey;
-/** @deprecated Use ColorKey instead */
-export type ColorToken = ColorKey;
-/** @deprecated Use ShadowKey instead */
-export type ShadowToken = ShadowKey;
-
 /** Union of all token keys */
 export type DesignTokenKey =
   | TypographyKey
@@ -616,9 +602,6 @@ export type DesignTokenClass =
   | LayoutClass
   | ColorClass
   | ShadowClass;
-
-/** @deprecated Use DesignTokenKey instead */
-export type DesignToken = DesignTokenKey;
 
 /**
  * CSS Custom Properties for dynamic theming

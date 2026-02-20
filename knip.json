@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "ignoreFiles": ["docs/guides/KIT_EMBED_CSS.css", "public/register-sw.js", "public/sw.js"],
+  "ignoreDependencies": ["@bun-security-scanner/osv", "@types/github-slugger", "sharp", "undici"],
+  "ignoreBinaries": ["open"],
+  "ignoreIssues": {
+    "**/*.test.ts": ["unlisted"],
+    "**/*.test.tsx": ["unlisted"],
+    "**/*.spec.ts": ["unlisted"],
+    "**/*.spec.tsx": ["unlisted"],
+    "postcss.config.mjs": ["unlisted"]
+  }
+}

@@ -13,7 +13,6 @@ import { render } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { ChartsContainer } from '../ChartsContainer';
-import { EffectiveTaxRateChart } from '../EffectiveTaxRateChart';
 import { IncomeBreakdownChart } from '../IncomeBreakdownChart';
 import { NetIncomeComparisonChart } from '../NetIncomeComparisonChart';
 import { TaxLiabilityChart } from '../TaxLiabilityChart';
@@ -254,53 +253,6 @@ describe('Calculator Charts - Accessibility', () => {
     });
   });
 
-  describe('EffectiveTaxRateChart', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<EffectiveTaxRateChart results={mockResults} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('should have no violations for Scottish taxpayers', async () => {
-      const { container } = render(
-        <EffectiveTaxRateChart results={mockResults} isScottish={true} />,
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('should have role="img" attribute', () => {
-      const { container } = render(<EffectiveTaxRateChart results={mockResults} />);
-
-      const chartContainer = container.querySelector('[role="img"]');
-      expect(chartContainer).toBeInTheDocument();
-    });
-
-    it('should have descriptive aria-label', () => {
-      const { container } = render(<EffectiveTaxRateChart results={mockResults} />);
-
-      const chartContainer = container.querySelector('[role="img"]');
-      expect(chartContainer).toHaveAttribute('aria-label');
-      expect(chartContainer?.getAttribute('aria-label')).toContain('Area chart');
-      expect(chartContainer?.getAttribute('aria-label')).toContain('tax rate');
-    });
-
-    it('should have no violations with high salary (tax trap zone)', async () => {
-      const taxTrapResults = {
-        ...mockResults,
-        grossSalary: { ...mockResults.grossSalary, annually: 110000 },
-        effectiveTaxRate: 38.5,
-        marginalTaxRate: 60, // Personal allowance taper zone
-      };
-      const { container } = render(<EffectiveTaxRateChart results={taxTrapResults} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-  });
-
   describe('ChartsContainer', () => {
     it('should have no accessibility violations (single scenario)', async () => {
       const { container } = render(<ChartsContainer results={mockMultiSourceResults} />);
@@ -380,7 +332,6 @@ describe('Calculator Charts - Accessibility', () => {
           <NetIncomeComparisonChart results={mockResults} />
           <IncomeBreakdownChart results={mockMultiSourceResults} />
           <TaxLiabilityChart results={mockResults} whatIfResults={mockWhatIfResults} />
-          <EffectiveTaxRateChart results={mockResults} />
         </div>,
       );
 
