@@ -223,6 +223,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
       <PanelSection title='Assumptions'>
         <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
+          <p className='mb-3 text-slate-300 text-xs leading-relaxed'>
+            Results below use the current inputs and assumptions shown here.
+          </p>
           <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
           <AssumptionRow
             label='Region'
@@ -282,6 +285,21 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <li>• MPAA (Money Purchase Annual Allowance) - £10k limit if pension accessed</li>
               <li>• Dividend timing (declaration vs payment date)</li>
             </ul>
+          </div>
+          <div className='rounded-[10px] border border-cyan-500/20 bg-cyan-500/5 p-4'>
+            <div className='mb-2 font-medium text-cyan-200 text-sm'>
+              MTD for Income Tax timeline (current HMRC plan)
+            </div>
+            <ul className='space-y-1 text-cyan-100/90 text-xs'>
+              <li>• From 6 April 2026: qualifying income over £50,000</li>
+              <li>• From 6 April 2027: qualifying income over £30,000</li>
+              <li>• From 6 April 2028: qualifying income over £20,000</li>
+            </ul>
+            <p className='mt-2 text-cyan-100/85 text-xs leading-relaxed'>
+              Scope depends on your personal income sources. Limited-company directors may still
+              file Self Assessment outside MTD for Income Tax unless qualifying self-employment or
+              property income applies.
+            </p>
           </div>
           <div className='rounded-[10px] border border-amber-500/20 bg-amber-500/5 p-3'>
             <p className='text-amber-200 text-xs leading-relaxed'>

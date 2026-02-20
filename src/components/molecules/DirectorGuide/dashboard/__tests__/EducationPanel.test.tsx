@@ -121,4 +121,24 @@ describe('DirectorGuide EducationPanel', () => {
     expect(screen.getByText('Mid-Year Projection Assumption')).toBeInTheDocument();
     expect(screen.getByText(/Monthly projection \(2 months remaining\)/i)).toBeInTheDocument();
   });
+
+  test('shows MTD for Income Tax timeline and scope note', () => {
+    render(<EducationPanel />);
+
+    expect(screen.getByText('MTD for Income Tax timeline (current HMRC plan)')).toBeInTheDocument();
+    expect(
+      screen.getByText(/From 6 April 2026: qualifying income over £50,000/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/From 6 April 2027: qualifying income over £30,000/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/From 6 April 2028: qualifying income over £20,000/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Limited-company directors may still file Self Assessment outside MTD for Income Tax/i,
+      ),
+    ).toBeInTheDocument();
+  });
 });
