@@ -43,7 +43,7 @@
     "test:e2e:ci": "playwright test --reporter=html",
     "test:e2e:clear": "rm -rf audit-outputs/playwright-report audit-outputs/test-results audit-outputs/blob-report playwright/.auth/storageState.json && echo '✅ E2E test artifacts cleared'",
     "test:metrics": "bun scripts/test-metrics.ts",
-    "audit:deps": "bun pm scan",
+    "audit:deps": "bun scripts/audit-deps.ts",
     "audit:unused": "knip --no-exit-code",
     "audit:a11y": "jest --testPathPatterns=\\.axe\\.test\\. --no-coverage --passWithNoTests",
     "audit:security": "bun scripts/security-audit.js",

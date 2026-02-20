@@ -39,6 +39,7 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P1-16` | Add test-audit metrics generator | Create script to output suites/tests/skips/todos/coverage from current run artifacts. | Audit numbers are generated from script output instead of manual snapshots. |
 | `P1-17` | Investigate low Google referrer share | Run GSC + Ahrefs indexability audit (coverage, canonical, noindex, sitemap, robots, structured data) focused on why Bing/DDG/Yahoo outperform Google. | Root-cause report is documented and prioritized fix tickets are created with owner and ETA. |
 | `P1-18` | Strengthen internal links from top organic blog pages | Add contextual internal links from top blog landing pages to calculator and relevant tool pages. | Top 10 organic blog pages each include at least 2 relevant internal links to core conversion pages and pass crawl validation. |
+| `P1-19` | Remove temporary dependency advisory allowlist | Re-check `CVE-2025-69873` transitive path (`webpack > schema-utils > ajv`) after upstream updates and remove allowlist entry when fixed. | `bun run audit:deps` passes with no allowlisted advisories and `scripts/dependency-advisory-allowlist.ts` entry is removed. |
 
 Status note (February 20, 2026):
 - `P1-8` completed: guardrail implemented via `scripts/check-test-skips.ts` + `scripts/test-debt-allowlist.ts`, wired into `bun run fix-all`.
