@@ -59,6 +59,8 @@
     "release:report:init": "bun scripts/release-verification-report.ts init",
     "release:report:status": "bun scripts/release-verification-report.ts status",
     "release:report:check": "bun scripts/release-verification-report.ts check --strict",
+    "funnel:report:init": "bun scripts/funnel-review-report.ts init",
+    "funnel:report:status": "bun scripts/funnel-review-report.ts status",
     "monitor-all": "bun run audit:security && bun run bundle:analyze",
     "deploy": "bun run clean && bun run release && echo '✅ Ready for deployment!'",
     "debug": "bun run clean && bun run typecheck && bun run build",

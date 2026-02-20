@@ -17,6 +17,7 @@
 | **Review currency arithmetic decision?** | [`CURRENCY_ARITHMETIC_DECISION.md`](./guides/CURRENCY_ARITHMETIC_DECISION.md) |
 | **Run post-release checks?** | [`POST_RELEASE_VALIDATION.md`](./guides/POST_RELEASE_VALIDATION.md) |
 | **See release verification reports?** | [`reports/releases/README.md`](./reports/releases/README.md) |
+| **Run monthly funnel reviews?** | [`reports/funnel/README.md`](./reports/funnel/README.md) |
 | **Monitor SPF/DKIM/DMARC monthly?** | [`EMAIL_AUTH_MONITORING.md`](./guides/EMAIL_AUTH_MONITORING.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
