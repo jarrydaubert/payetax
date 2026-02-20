@@ -146,4 +146,19 @@ bun scripts/linear.js create
 
 # Move issue state
 bun scripts/linear.js update-status PAYTAX-123 "In Progress"
+
+# Validate backlog/board linkage
+bun scripts/linear.js sync-backlog --strict
+
+# Check open release blockers before release
+bun scripts/linear.js release-blockers --strict
+
+# Validate Ready-state DoR fields
+bun scripts/linear.js enforce-dor --strict
+
+# Detect done/backlog drift
+bun scripts/linear.js burn-down-cleanup
+
+# One-shot hygiene suite
+bun scripts/linear.js kanban-check --strict
 ```

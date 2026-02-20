@@ -3,10 +3,13 @@
 
 const { LinearClient } = require('@linear/sdk');
 const readline = require('node:readline');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 // Configuration
 const LINEAR_API_KEY = process.env.LINEAR_API_KEY;
 const TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYTAX'; // Team identifier
+const BACKLOG_PATH = path.resolve(process.cwd(), 'docs/BACKLOG.md');
 
 if (!LINEAR_API_KEY) {
   console.error('❌ Error: LINEAR_API_KEY environment variable not set');
@@ -60,6 +63,506 @@ function formatPriority(priority) {
     4: '⚪ None',
   };
   return priorities[priority] || '⚪ None';
+}
+
+function extractBacklogIds(text) {
+  return [...new Set((text.match(/\bP\d+-\d+\b/g) || []).map((id) => id.trim()))];
+}
+
+function parseBacklogItems(markdown) {
+  const items = [];
+  const lines = markdown.split('\n');
+  let section = null;
+
+  for (const line of lines) {
+    const sectionMatch = line.match(/^##\s+(P\d+)\b/);
+    if (sectionMatch) {
+      section = sectionMatch[1];
+      continue;
+    }
+
+    const rowMatch = line.match(/^\|\s*`(P\d+-\d+)`\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/);
+    if (!rowMatch) {
+      continue;
+    }
+
+    items.push({
+      id: rowMatch[1],
+      workItem: rowMatch[2],
+      nextStep: rowMatch[3],
+      doneWhen: rowMatch[4],
+      section,
+    });
+  }
+
+  return items;
+}
+
+async function readBacklogItems() {
+  const content = await fs.readFile(BACKLOG_PATH, 'utf8');
+  return parseBacklogItems(content);
+}
+
+function normalizeStateName(state) {
+  return state?.name?.toLowerCase() || '';
+}
+
+function isDoneLikeState(state) {
+  const name = normalizeStateName(state);
+  return name.includes('done') || name.includes('complete') || name.includes('cancel');
+}
+
+async function getTeam() {
+  const me = await linear.viewer;
+  const teams = await me.teams();
+  return teams.nodes.find((team) => team.key === TEAM_KEY);
+}
+
+async function fetchTeamIssues() {
+  return linear.issues({
+    filter: {
+      team: { key: { eq: TEAM_KEY } },
+    },
+  });
+}
+
+async function collectIssueMeta(issues) {
+  const metas = [];
+  for (const issue of issues.nodes) {
+    const state = await issue.state;
+    const project = await issue.project;
+    const labels = await issue.labels();
+    const textToScan = [issue.title || '', issue.description || ''].join('\n');
+
+    metas.push({
+      id: issue.identifier,
+      title: issue.title,
+      description: issue.description || '',
+      stateName: state?.name || 'Unknown',
+      isDoneLike: isDoneLikeState(state),
+      projectName: project?.name || null,
+      priority: issue.priority,
+      url: issue.url,
+      backlogRefs: extractBacklogIds(textToScan),
+      labels: (labels?.nodes || []).map((label) => label.name),
+    });
+  }
+  return metas;
+}
+
+function sectionHasChecklist(description, sectionTitle) {
+  if (!description) {
+    return false;
+  }
+
+  const escapedTitle = sectionTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const sectionRegex = new RegExp(`##\\s+${escapedTitle}\\s*\\n([\\s\\S]*?)(\\n##\\s+|$)`, 'i');
+  const match = description.match(sectionRegex);
+  if (!match) {
+    return false;
+  }
+
+  return /-\s*\[\s*[xX ]\s*\]/.test(match[1]);
+}
+
+/**
+ * Validate Ready-state issues against Definition of Ready fields in issue content.
+ */
+async function enforceDoR(options = {}) {
+  try {
+    log('\n🛡️ Enforcing Definition of Ready checks...', 'cyan');
+
+    const targetState = (options.stateName || 'Ready').toLowerCase();
+    const issues = await fetchTeamIssues();
+    const issueMeta = await collectIssueMeta(issues);
+
+    const readyIssues = issueMeta.filter(
+      (meta) => normalizeStateName({ name: meta.stateName }) === targetState,
+    );
+
+    if (readyIssues.length === 0) {
+      log(`✅ No issues currently in "${options.stateName || 'Ready'}" state.`, 'green');
+      return { ok: true, violations: [] };
+    }
+
+    const violations = [];
+
+    for (const issue of readyIssues) {
+      const missing = [];
+
+      if (issue.backlogRefs.length === 0) {
+        missing.push('Backlog ID reference (e.g. P0-5) in title/description');
+      }
+
+      if (!sectionHasChecklist(issue.description, 'Acceptance Criteria')) {
+        missing.push('Acceptance Criteria checklist section');
+      }
+
+      if (!sectionHasChecklist(issue.description, 'Test Plan')) {
+        missing.push('Test Plan checklist section');
+      } else if (!/\bbug\b/i.test(issue.description)) {
+        missing.push('explicit bug intent in Test Plan');
+      }
+
+      if (missing.length > 0) {
+        violations.push({ issue, missing });
+      }
+    }
+
+    if (violations.length === 0) {
+      log(
+        `✅ All ${readyIssues.length} "${options.stateName || 'Ready'}" issues satisfy DoR checks.`,
+        'green',
+      );
+      return { ok: true, violations: [] };
+    }
+
+    log(`\n❌ DoR violations found (${violations.length} issue(s))`, 'red');
+    for (const violation of violations) {
+      log(`  - ${violation.issue.id}: ${violation.issue.title}`, 'bright');
+      log(`    Missing: ${violation.missing.join(' | ')}`, 'yellow');
+      log(`    URL: ${violation.issue.url}`, 'blue');
+    }
+
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+
+    return { ok: false, violations };
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    console.error(error);
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+    return { ok: false, error };
+  }
+}
+
+/**
+ * Report done issues that still map to active backlog IDs (burn-down hygiene).
+ */
+async function burnDownCleanup(options = {}) {
+  try {
+    log('\n🧹 Running burn-down cleanup checks...', 'cyan');
+
+    const backlogItems = await readBacklogItems();
+    const activeBacklogIds = new Set(backlogItems.map((item) => item.id));
+    const backlogById = new Map(backlogItems.map((item) => [item.id, item]));
+
+    const issues = await fetchTeamIssues();
+    const issueMeta = await collectIssueMeta(issues);
+
+    const staleDoneIssues = [];
+    const linkedByBacklogId = new Map();
+
+    for (const issue of issueMeta) {
+      for (const ref of issue.backlogRefs) {
+        if (!linkedByBacklogId.has(ref)) {
+          linkedByBacklogId.set(ref, []);
+        }
+        linkedByBacklogId.get(ref).push(issue);
+      }
+
+      if (!issue.isDoneLike) {
+        continue;
+      }
+
+      const stillActiveRefs = issue.backlogRefs.filter((ref) => activeBacklogIds.has(ref));
+      if (stillActiveRefs.length > 0) {
+        staleDoneIssues.push({ issue, stillActiveRefs });
+      }
+    }
+
+    const readyToRemove = [];
+    for (const item of backlogItems) {
+      const linkedIssues = linkedByBacklogId.get(item.id) || [];
+      if (linkedIssues.length === 0) {
+        continue;
+      }
+
+      const allDone = linkedIssues.every((issue) => issue.isDoneLike);
+      if (allDone) {
+        readyToRemove.push({ item, linkedIssues });
+      }
+    }
+
+    if (staleDoneIssues.length === 0 && readyToRemove.length === 0) {
+      log('✅ No burn-down cleanup issues detected.', 'green');
+      return { ok: true, staleDoneIssues: [], readyToRemove: [] };
+    }
+
+    if (staleDoneIssues.length > 0) {
+      log(
+        `\n⚠️ Done issues still linked to active backlog IDs (${staleDoneIssues.length}):`,
+        'yellow',
+      );
+      for (const entry of staleDoneIssues) {
+        log(`  - ${entry.issue.id}: ${entry.issue.title}`, 'bright');
+        log(`    Active backlog refs: ${entry.stillActiveRefs.join(', ')}`, 'dim');
+        log(`    URL: ${entry.issue.url}`, 'blue');
+      }
+    }
+
+    if (readyToRemove.length > 0) {
+      log(
+        `\n📌 Backlog items that appear completed and removable (${readyToRemove.length}):`,
+        'cyan',
+      );
+      for (const entry of readyToRemove) {
+        const issueIds = entry.linkedIssues.map((issue) => issue.id).join(', ');
+        log(
+          `  - ${entry.item.id}: ${backlogById.get(entry.item.id)?.workItem || 'Unknown item'}`,
+          'bright',
+        );
+        log(`    Linked done issues: ${issueIds}`, 'dim');
+      }
+    }
+
+    if ((staleDoneIssues.length > 0 || readyToRemove.length > 0) && options.strict) {
+      process.exitCode = 1;
+    }
+
+    return { ok: false, staleDoneIssues, readyToRemove };
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    console.error(error);
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+    return { ok: false, error };
+  }
+}
+
+/**
+ * Run all Kanban hygiene checks in one command.
+ */
+async function kanbanCheck(options = {}) {
+  log('\n🧪 Running Kanban hygiene check suite...', 'cyan');
+  const strict = Boolean(options.strict);
+  const stateName = options.stateName || 'Ready';
+
+  const syncResult = await syncBacklog({ strict: false });
+  const blockersResult = await listReleaseBlockers({ strict: false });
+  const dorResult = await enforceDoR({ strict: false, stateName });
+  const cleanupResult = await burnDownCleanup({ strict: false });
+
+  const hasProblems = [
+    !syncResult?.ok,
+    !blockersResult?.ok,
+    !dorResult?.ok,
+    !cleanupResult?.ok,
+  ].some(Boolean);
+
+  if (hasProblems) {
+    log('\n❌ Kanban check suite found issues. Review sections above.', 'red');
+    if (strict) {
+      process.exitCode = 1;
+    }
+    return { ok: false, syncResult, blockersResult, dorResult, cleanupResult };
+  }
+
+  log('\n✅ Kanban check suite passed.', 'green');
+  return { ok: true, syncResult, blockersResult, dorResult, cleanupResult };
+}
+
+/**
+ * Validate docs/BACKLOG.md against Linear issues.
+ * Matches backlog IDs referenced in issue title/description.
+ */
+async function syncBacklog(options = {}) {
+  try {
+    log('\n🧭 Syncing backlog IDs with Linear issues...', 'cyan');
+
+    const backlogItems = await readBacklogItems();
+    if (backlogItems.length === 0) {
+      log(`❌ No backlog items parsed from ${BACKLOG_PATH}`, 'red');
+      return { ok: false };
+    }
+
+    const team = await getTeam();
+    if (!team) {
+      log(`❌ Team with key "${TEAM_KEY}" not found`, 'red');
+      return { ok: false };
+    }
+
+    const issues = await fetchTeamIssues();
+    const issueMeta = await collectIssueMeta(issues);
+
+    const backlogById = new Map(backlogItems.map((item) => [item.id, item]));
+    const linkedIssueIdsByBacklogId = new Map();
+    const unknownRefs = [];
+
+    for (const meta of issueMeta) {
+      for (const ref of meta.backlogRefs) {
+        if (!backlogById.has(ref)) {
+          unknownRefs.push({ issueId: meta.id, ref, title: meta.title });
+          continue;
+        }
+        if (!linkedIssueIdsByBacklogId.has(ref)) {
+          linkedIssueIdsByBacklogId.set(ref, []);
+        }
+        linkedIssueIdsByBacklogId.get(ref).push(meta);
+      }
+    }
+
+    const missing = [];
+    for (const item of backlogItems) {
+      if (!linkedIssueIdsByBacklogId.has(item.id)) {
+        missing.push(item);
+      }
+    }
+
+    const duplicated = [];
+    for (const [backlogId, linkedIssues] of linkedIssueIdsByBacklogId.entries()) {
+      if (linkedIssues.length > 1) {
+        duplicated.push({ backlogId, linkedIssues });
+      }
+    }
+
+    log(
+      `\n📊 Summary: ${backlogItems.length} backlog items, ${issueMeta.length} Linear issues scanned`,
+      'bright',
+    );
+    log(`  Missing links: ${missing.length}`, missing.length > 0 ? 'red' : 'green');
+    log(`  Duplicate links: ${duplicated.length}`, duplicated.length > 0 ? 'yellow' : 'green');
+    log(`  Unknown refs: ${unknownRefs.length}`, unknownRefs.length > 0 ? 'yellow' : 'green');
+
+    if (missing.length > 0) {
+      log('\n❌ Backlog items with no matching Linear issue reference:', 'red');
+      for (const item of missing) {
+        log(`  - ${item.id} (${item.section || 'Unsectioned'}): ${item.workItem}`, 'dim');
+      }
+    }
+
+    if (duplicated.length > 0) {
+      log('\n⚠️ Backlog IDs referenced by multiple Linear issues:', 'yellow');
+      for (const entry of duplicated) {
+        const ids = entry.linkedIssues.map((issue) => issue.id).join(', ');
+        log(`  - ${entry.backlogId}: ${ids}`, 'dim');
+      }
+    }
+
+    if (unknownRefs.length > 0) {
+      log('\n⚠️ Linear issues referencing backlog IDs not found in docs/BACKLOG.md:', 'yellow');
+      for (const ref of unknownRefs) {
+        log(`  - ${ref.issueId} references ${ref.ref} (${ref.title})`, 'dim');
+      }
+    }
+
+    const ok = missing.length === 0 && unknownRefs.length === 0;
+    if (ok) {
+      log('\n✅ Backlog and Linear references are in sync.', 'green');
+    }
+
+    if (!ok && options.strict) {
+      process.exitCode = 1;
+    }
+
+    return { ok, missing, duplicated, unknownRefs };
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    console.error(error);
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+    return { ok: false, error };
+  }
+}
+
+/**
+ * Show open release blockers using P0 backlog IDs, urgent priority, or release-blocker label.
+ */
+async function listReleaseBlockers(options = {}) {
+  try {
+    log('\n🚨 Gathering release blockers...', 'cyan');
+
+    const backlogItems = await readBacklogItems();
+    const p0Items = backlogItems.filter((item) => item.section === 'P0');
+    const p0Ids = new Set(p0Items.map((item) => item.id));
+    const backlogById = new Map(backlogItems.map((item) => [item.id, item]));
+
+    const team = await getTeam();
+    if (!team) {
+      log(`❌ Team with key "${TEAM_KEY}" not found`, 'red');
+      return { ok: false };
+    }
+
+    const issues = await fetchTeamIssues();
+    const issueMeta = await collectIssueMeta(issues);
+
+    const blockers = [];
+    const p0Coverage = new Map();
+
+    for (const meta of issueMeta) {
+      for (const ref of meta.backlogRefs) {
+        if (p0Ids.has(ref)) {
+          p0Coverage.set(ref, meta);
+        }
+      }
+
+      const isReleaseLabel = meta.labels.some((label) => label.toLowerCase() === 'release-blocker');
+      const hasP0Ref = meta.backlogRefs.some((ref) => p0Ids.has(ref));
+      const isUrgent = meta.priority === 0;
+
+      if (!meta.isDoneLike && (isReleaseLabel || hasP0Ref || isUrgent)) {
+        const reasons = [];
+        if (hasP0Ref) {
+          reasons.push(`P0 refs: ${meta.backlogRefs.filter((ref) => p0Ids.has(ref)).join(', ')}`);
+        }
+        if (isReleaseLabel) {
+          reasons.push('label: release-blocker');
+        }
+        if (isUrgent) {
+          reasons.push('priority: urgent');
+        }
+        blockers.push({ ...meta, reasons });
+      }
+    }
+
+    const missingP0Links = p0Items.filter((item) => !p0Coverage.has(item.id));
+
+    if (blockers.length === 0 && missingP0Links.length === 0) {
+      log('\n✅ No open release blockers found.', 'green');
+      return { ok: true, blockers: [], missingP0Links: [] };
+    }
+
+    if (blockers.length > 0) {
+      log(`\n❌ Open release blockers (${blockers.length}):`, 'red');
+      for (const blocker of blockers) {
+        log(`  - ${blocker.id}: ${blocker.title}`, 'bright');
+        log(
+          `    Status: ${blocker.stateName} | Priority: ${formatPriority(blocker.priority)}`,
+          'dim',
+        );
+        log(`    Reason: ${blocker.reasons.join(' | ')}`, 'yellow');
+        if (blocker.projectName) {
+          log(`    Project: ${blocker.projectName}`, 'dim');
+        }
+        log(`    URL: ${blocker.url}`, 'blue');
+      }
+    }
+
+    if (missingP0Links.length > 0) {
+      log('\n⚠️ P0 backlog items with no linked Linear issue reference:', 'yellow');
+      for (const item of missingP0Links) {
+        log(`  - ${item.id}: ${backlogById.get(item.id)?.workItem || 'Unknown item'}`, 'dim');
+      }
+    }
+
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+
+    return { ok: false, blockers, missingP0Links };
+  } catch (error) {
+    log(`❌ Error: ${error.message}`, 'red');
+    console.error(error);
+    if (options.strict) {
+      process.exitCode = 1;
+    }
+    return { ok: false, error };
+  }
 }
 
 // Commands
@@ -871,6 +1374,43 @@ async function main() {
         }
         break;
 
+      case 'sync-backlog': {
+        const strict = args.includes('--strict');
+        await syncBacklog({ strict });
+        break;
+      }
+
+      case 'release-blockers':
+      case 'list-release-blockers': {
+        const strict = args.includes('--strict');
+        await listReleaseBlockers({ strict });
+        break;
+      }
+
+      case 'enforce-dor': {
+        const strict = args.includes('--strict');
+        const stateArgIndex = args.indexOf('--state');
+        const stateName =
+          stateArgIndex !== -1 && args[stateArgIndex + 1] ? args[stateArgIndex + 1] : 'Ready';
+        await enforceDoR({ strict, stateName });
+        break;
+      }
+
+      case 'burn-down-cleanup': {
+        const strict = args.includes('--strict');
+        await burnDownCleanup({ strict });
+        break;
+      }
+
+      case 'kanban-check': {
+        const strict = args.includes('--strict');
+        const stateArgIndex = args.indexOf('--state');
+        const stateName =
+          stateArgIndex !== -1 && args[stateArgIndex + 1] ? args[stateArgIndex + 1] : 'Ready';
+        await kanbanCheck({ strict, stateName });
+        break;
+      }
+
       default:
         log('\n📊 Linear Helper for PayeTax\n', 'bright');
         log('Usage: bun run linear:<command> [options]\n', 'cyan');
@@ -884,6 +1424,30 @@ async function main() {
         log('    --parent ID           Create as sub-issue (e.g., --parent PAYTAX-123)', 'dim');
         log('  update-status ID STATUS Update issue workflow status', 'dim');
         log('  assign-to-project       Assign issue(s) to project', 'dim');
+        log(
+          '  sync-backlog            Validate docs/BACKLOG.md IDs against Linear references',
+          'dim',
+        );
+        log('    --strict              Exit non-zero when drift is found', 'dim');
+        log(
+          '  release-blockers        List open release blockers (P0 refs / urgent / label)',
+          'dim',
+        );
+        log('    --strict              Exit non-zero when blockers exist', 'dim');
+        log('  enforce-dor             Validate Ready-state issues meet DoR content checks', 'dim');
+        log('    --state NAME          State to validate [default: Ready]', 'dim');
+        log('    --strict              Exit non-zero when DoR violations exist', 'dim');
+        log(
+          '  burn-down-cleanup       Detect done/backlog drift and removable backlog items',
+          'dim',
+        );
+        log('    --strict              Exit non-zero when cleanup items are found', 'dim');
+        log(
+          '  kanban-check            Run sync-backlog + release-blockers + enforce-dor + burn-down-cleanup',
+          'dim',
+        );
+        log('    --state NAME          State to validate for DoR [default: Ready]', 'dim');
+        log('    --strict              Exit non-zero when any check reports issues', 'dim');
         log('  delete, rm              Delete issue(s) by identifier', 'dim');
         log('  cycles                  List cycles/sprints', 'dim');
         log('  projects                List projects', 'dim');
@@ -896,6 +1460,11 @@ async function main() {
         log('  bun run linear:create', 'cyan');
         log('  bun run linear update-status PAYTAX-24 Done', 'cyan');
         log('  bun run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
+        log('  bun run linear sync-backlog --strict', 'cyan');
+        log('  bun run linear release-blockers', 'cyan');
+        log('  bun run linear enforce-dor --strict', 'cyan');
+        log('  bun run linear burn-down-cleanup', 'cyan');
+        log('  bun run linear kanban-check --strict', 'cyan');
         log('\nEnvironment:', 'bright');
         log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');
         log('  LINEAR_TEAM_KEY    Team identifier [default: PAYETAX]', 'dim');
@@ -926,4 +1495,9 @@ module.exports = {
   listProjects,
   showInfo,
   assignToProject,
+  syncBacklog,
+  listReleaseBlockers,
+  enforceDoR,
+  burnDownCleanup,
+  kanbanCheck,
 };

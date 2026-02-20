@@ -59,6 +59,21 @@ bun scripts/linear.js create
 
 # Move issue status
 bun scripts/linear.js update-status PAYTAX-123 "In Progress"
+
+# Validate backlog <-> Linear linkage
+bun scripts/linear.js sync-backlog
+
+# Release blocker report
+bun scripts/linear.js release-blockers
+
+# Validate DoR for Ready-state issues
+bun scripts/linear.js enforce-dor --strict
+
+# Burn-down hygiene report
+bun scripts/linear.js burn-down-cleanup
+
+# One-shot pre-planning / pre-release hygiene suite
+bun scripts/linear.js kanban-check --strict
 ```
 
 ---
@@ -86,9 +101,42 @@ Current script (`scripts/linear.js`) mainly uses:
 - update status/priority/parent/description
 - assign to project
 
-### High-Value Next Automations
+### Automation Commands Added
 
-1. `sync-backlog`: validate every active `docs/BACKLOG.md` ID has a matching Linear issue.
-2. `enforce-dor`: block move to `Ready` without acceptance criteria + test plan fields.
-3. `release-blockers-view`: auto-label + report `P0` open blockers.
-4. `burn-down-cleanup`: detect issues in `Done` whose backlog items were not removed yet.
+- `sync-backlog`:
+  - Parses `docs/BACKLOG.md`
+  - Finds backlog IDs referenced in Linear issue title/description
+  - Reports missing links, duplicate links, and unknown references
+  - Supports `--strict` for non-zero exit on drift
+
+- `release-blockers`:
+  - Reports open blockers based on any of:
+    - linked `P0-*` backlog IDs
+    - `release-blocker` label
+    - urgent priority
+  - Also reports `P0` items without linked Linear issues
+  - Supports `--strict` for non-zero exit when blockers exist
+
+- `enforce-dor`:
+  - Validates issues in `Ready` (or `--state`) have:
+    - backlog ID reference
+    - acceptance criteria checklist section
+    - test plan checklist section with explicit bug intent
+  - Supports `--strict` for non-zero exit on violations
+
+- `burn-down-cleanup`:
+  - Reports done issues still linked to active backlog IDs
+  - Reports backlog items whose linked issues are all done (removal candidates)
+  - Supports `--strict` for non-zero exit when cleanup items are found
+
+- `kanban-check`:
+  - Runs all checks in one command:
+    - `sync-backlog`
+    - `release-blockers`
+    - `enforce-dor`
+    - `burn-down-cleanup`
+  - Supports `--strict` for non-zero exit when any check reports problems
+
+### Next Automation Candidate
+
+1. Add transition guard in `update-status` to auto-run `enforce-dor` before allowing move to `Ready` (with explicit `--force` override).
