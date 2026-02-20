@@ -59,6 +59,7 @@
     "release:report:init": "bun scripts/release-verification-report.ts init",
     "release:report:status": "bun scripts/release-verification-report.ts status",
     "release:report:check": "bun scripts/release-verification-report.ts check --strict",
+    "ops:verify-rate-limit": "bun scripts/verify-rate-limit.ts",
     "funnel:report:init": "bun scripts/funnel-review-report.ts init",
     "funnel:report:status": "bun scripts/funnel-review-report.ts status",
     "seo:report:init": "bun scripts/seo-tech-report.ts init",

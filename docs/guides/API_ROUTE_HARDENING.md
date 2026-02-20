@@ -25,6 +25,7 @@ For routes that accept request bodies (`POST`):
 | `/api/indexnow` | `POST` | `x-indexnow-secret` via `isAuthenticated(request)` | default `checkRateLimit` config (`10/min`) per client (`indexnow:*`) | `50KB` (`MAX_BODY_SIZE`) | JSON structure + URL count (`MAX_URLS=100`) + HTTPS/domain/path allowlist checks |
 | `/api/sentry-webhook` | `POST` | HMAC signature via `sentry-hook-signature` + `SENTRY_WEBHOOK_SECRET` | `30/min` per client (`sentry-webhook:*`) | `1MB` (`MAX_PAYLOAD_SIZE`) via header + raw bytes | signature verification, JSON parse, resource/action checks |
 | `/api/newsletter/unsubscribe` | `GET` | signed token verification (`verifyUnsubscribeToken`) | `5/min` per client (`newsletter-unsubscribe:*`) | N/A (`GET`) | query token presence + signature validity |
+| `/api/ops/rate-limit-health` | `GET` | `x-rate-limit-health-secret` (required in production) | none | N/A (`GET`) | protected diagnostics response from `getRateLimitDiagnostics()` |
 | `/api/tax-rates` | `GET` | none (public, cacheable dataset) | none | N/A (`GET`) | no external input; response is server-constructed |
 
 ## Notes

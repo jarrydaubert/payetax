@@ -14,6 +14,7 @@
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Review sitemap policy?** | [`SITEMAP_POLICY.md`](./guides/SITEMAP_POLICY.md) |
+| **Verify distributed rate limits?** | [`RATE_LIMIT_VERIFICATION.md`](./guides/RATE_LIMIT_VERIFICATION.md) |
 | **Review bot mitigation rules?** | [`BOT_MITIGATION.md`](./guides/BOT_MITIGATION.md) |
 | **Review currency arithmetic decision?** | [`CURRENCY_ARITHMETIC_DECISION.md`](./guides/CURRENCY_ARITHMETIC_DECISION.md) |
 | **Run post-release checks?** | [`POST_RELEASE_VALIDATION.md`](./guides/POST_RELEASE_VALIDATION.md) |

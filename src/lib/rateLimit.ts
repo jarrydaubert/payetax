@@ -23,6 +23,18 @@ interface RateLimitConfig {
   window: number; // Time window in milliseconds
 }
 
+export type RateLimitBackend = 'distributed' | 'in-memory';
+export type RateLimitFallbackReason = 'missing_config' | 'upstash_error';
+
+export interface RateLimitDiagnostics {
+  configured: boolean;
+  backend: RateLimitBackend;
+  upstashPing: 'ok' | 'failed' | 'not_configured';
+  lastFallbackReason: RateLimitFallbackReason | null;
+  lastFallbackAt: string | null;
+  upstashError?: string;
+}
+
 // Default: 10 requests per minute per IP
 const DEFAULT_CONFIG: RateLimitConfig = {
   max: 10,
@@ -35,6 +47,8 @@ const DISTRIBUTED_KEY_PREFIX = 'payetax:ratelimit:v1';
 
 let loggedMissingDistributedConfig = false;
 let loggedDistributedFailure = false;
+let lastFallbackReason: RateLimitFallbackReason | null = null;
+let lastFallbackAt: string | null = null;
 
 // Create LRU cache for rate limiting
 // max: 500 entries (500 different IPs tracked simultaneously)
@@ -46,6 +60,11 @@ const rateLimitCache = new LRUCache<string, number>({
 
 function hasDistributedConfig(): boolean {
   return Boolean(UPSTASH_REDIS_REST_URL && UPSTASH_REDIS_REST_TOKEN);
+}
+
+function markFallback(reason: RateLimitFallbackReason): void {
+  lastFallbackReason = reason;
+  lastFallbackAt = new Date().toISOString();
 }
 
 function runInMemoryCheck(key: string, config: RateLimitConfig): boolean {
@@ -83,6 +102,7 @@ async function runUpstashCommand(parts: string[]): Promise<unknown> {
 
 async function incrementDistributedCounter(key: string, windowMs: number): Promise<number | null> {
   if (!hasDistributedConfig()) {
+    markFallback('missing_config');
     if (process.env.NODE_ENV === 'production' && !loggedMissingDistributedConfig) {
       loggedMissingDistributedConfig = true;
       console.error(
@@ -105,6 +125,7 @@ async function incrementDistributedCounter(key: string, windowMs: number): Promi
 
     return count;
   } catch (error) {
+    markFallback('upstash_error');
     if (process.env.NODE_ENV === 'production' && !loggedDistributedFailure) {
       loggedDistributedFailure = true;
       const message = error instanceof Error ? error.message : 'unknown error';
@@ -142,6 +163,43 @@ export async function checkRateLimit(
   }
 
   return runInMemoryCheck(key, config);
+}
+
+/**
+ * Runtime diagnostics used for production verification of distributed rate limiting.
+ */
+export async function getRateLimitDiagnostics(): Promise<RateLimitDiagnostics> {
+  const configured = hasDistributedConfig();
+
+  if (!configured) {
+    return {
+      configured: false,
+      backend: 'in-memory',
+      upstashPing: 'not_configured',
+      lastFallbackReason,
+      lastFallbackAt,
+    };
+  }
+
+  try {
+    await runUpstashCommand(['PING']);
+    return {
+      configured: true,
+      backend: 'distributed',
+      upstashPing: 'ok',
+      lastFallbackReason,
+      lastFallbackAt,
+    };
+  } catch (error) {
+    return {
+      configured: true,
+      backend: 'in-memory',
+      upstashPing: 'failed',
+      lastFallbackReason,
+      lastFallbackAt,
+      upstashError: error instanceof Error ? error.message : 'unknown error',
+    };
+  }
 }
 
 /**

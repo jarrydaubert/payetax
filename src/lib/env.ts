@@ -80,6 +80,10 @@ export const ServerEnvSchema = z.object({
     .string()
     .min(1, 'Upstash Redis REST token must not be empty')
     .optional(),
+  RATE_LIMIT_HEALTH_SECRET: z
+    .string()
+    .min(1, 'Rate-limit health secret must not be empty')
+    .optional(),
 
   // Sentry Build Configuration
   SENTRY_AUTH_TOKEN: z.string().optional(),
@@ -230,6 +234,7 @@ export function validateServerEnv(): ServerEnv {
     UNSUBSCRIBE_SECRET: process.env.UNSUBSCRIBE_SECRET,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    RATE_LIMIT_HEALTH_SECRET: process.env.RATE_LIMIT_HEALTH_SECRET,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,

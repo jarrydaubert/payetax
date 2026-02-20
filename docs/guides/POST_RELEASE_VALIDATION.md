@@ -46,6 +46,9 @@ Goal: confirm runtime protections are effective with real edge/network behavior.
 - [ ] CSRF/origin protections reject invalid-origin POST requests on public mutation APIs.
 - [ ] Rate limiting throttles repeated requests from same client and recovers after window.
 - [ ] Upstash-backed distributed rate limiting is active (not in-memory fallback).
+  - Run:
+    - `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run ops:verify-rate-limit`
+  - Record command output in the release report.
 - [ ] `/api/indexnow` rejects missing/invalid secret and accepts valid secret.
 - [ ] `/api/sentry-webhook` rejects invalid signature and accepts valid signed test payload.
 

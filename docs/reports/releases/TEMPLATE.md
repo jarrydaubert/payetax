@@ -33,6 +33,7 @@ Notes:
 
 - [ ] CSRF/origin enforcement verified
 - [ ] Rate limiting verified (distributed, not in-memory fallback)
+  - Evidence: `bun run ops:verify-rate-limit` output captured below
 - [ ] IndexNow secret enforcement verified
 - [ ] Sentry webhook signature handling verified
 
