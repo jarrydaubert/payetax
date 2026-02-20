@@ -34,6 +34,20 @@ export const PublicEnvSchema = z.object({
 
   // Site Configuration
   NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL').optional(),
+  NEXT_PUBLIC_BASE_URL: z.string().url('Base URL must be a valid URL').optional(),
+  NEXT_PUBLIC_VERCEL_URL: z.string().min(1, 'Vercel URL must not be empty').optional(),
+
+  // UI/Embed Configuration
+  NEXT_PUBLIC_KIT_EMBED_UID: z.string().min(1, 'Kit embed UID must not be empty').optional(),
+  NEXT_PUBLIC_KIT_EMBED_VERSION: z
+    .string()
+    .min(1, 'Kit embed version must not be empty')
+    .optional(),
+  NEXT_PUBLIC_APP_VERSION: z.string().min(1, 'App version must not be empty').optional(),
+  NEXT_PUBLIC_SHOW_DEBUG_ERRORS: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
 
   // Feature Flags
   NEXT_PUBLIC_ENABLE_PWA: z
@@ -77,6 +91,11 @@ export const ServerEnvSchema = z.object({
   VERCEL_TOKEN: z.string().optional(),
   VERCEL_ORG_ID: z.string().optional(),
   VERCEL_PROJECT_ID: z.string().optional(),
+  VERCEL_URL: z.string().min(1, 'VERCEL_URL must not be empty').optional(),
+  VERCEL_PROJECT_PRODUCTION_URL: z
+    .string()
+    .min(1, 'VERCEL_PROJECT_PRODUCTION_URL must not be empty')
+    .optional(),
 
   // IndexNow API
   INDEXNOW_KEY: z
@@ -94,6 +113,10 @@ export const ServerEnvSchema = z.object({
 
   // Build Configuration
   ANALYZE: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
+  SKIP_CONFIG_VALIDATION: z
     .string()
     .transform((val) => val === 'true')
     .optional(),
@@ -174,6 +197,12 @@ export function validatePublicEnv(): PublicEnv {
     NEXT_PUBLIC_AHREFS_KEY: process.env.NEXT_PUBLIC_AHREFS_KEY,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+    NEXT_PUBLIC_KIT_EMBED_UID: process.env.NEXT_PUBLIC_KIT_EMBED_UID,
+    NEXT_PUBLIC_KIT_EMBED_VERSION: process.env.NEXT_PUBLIC_KIT_EMBED_VERSION,
+    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
+    NEXT_PUBLIC_SHOW_DEBUG_ERRORS: process.env.NEXT_PUBLIC_SHOW_DEBUG_ERRORS,
     NEXT_PUBLIC_ENABLE_PWA: process.env.NEXT_PUBLIC_ENABLE_PWA,
     NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
   });
@@ -208,12 +237,15 @@ export function validateServerEnv(): ServerEnv {
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     VERCEL_ORG_ID: process.env.VERCEL_ORG_ID,
     VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
+    VERCEL_URL: process.env.VERCEL_URL,
+    VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
     INDEXNOW_KEY: process.env.INDEXNOW_KEY,
     INDEXNOW_SUBMIT_SECRET: process.env.INDEXNOW_SUBMIT_SECRET,
     REFERRAL_PARTNER_EMAIL: process.env.REFERRAL_PARTNER_EMAIL,
     LINEAR_API_KEY: process.env.LINEAR_API_KEY,
     LINEAR_TEAM_KEY: process.env.LINEAR_TEAM_KEY,
     ANALYZE: process.env.ANALYZE,
+    SKIP_CONFIG_VALIDATION: process.env.SKIP_CONFIG_VALIDATION,
     NODE_ENV: process.env.NODE_ENV,
   });
 

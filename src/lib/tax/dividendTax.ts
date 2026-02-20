@@ -131,11 +131,12 @@ export function calculateDividendTax(
   // Get band thresholds (with fallbacks for safety)
   // Note: Band thresholds are based on BASE PA position, not tapered
   // Basic rate band ends at base PA + basic rate threshold
-  const basicBandEnd = basePersonalAllowance + (rates.bands[0]?.threshold ?? 37700);
+  const basicBandThreshold = rates.bands[0]?.threshold ?? 0;
+  const basicBandEnd = basePersonalAllowance + basicBandThreshold;
   // Higher rate band ends at £125,140 total income (threshold is already absolute, not cumulative)
   // Note: bands[1].threshold = 125140 represents the absolute income level, unlike bands[0].threshold
   // which is the cumulative taxable income amount (37700)
-  const higherBandEnd = rates.bands[1]?.threshold ?? 125140;
+  const higherBandEnd = rates.bands[1]?.threshold ?? Number.POSITIVE_INFINITY;
 
   const { BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
   const dividendAllowance = rates.dividendAllowance;

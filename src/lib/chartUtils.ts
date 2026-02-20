@@ -5,12 +5,11 @@
  * for income breakdown, tax liability, and effective rate visualizations.
  */
 
-import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
 import type { TaxCalculationResults } from './taxCalculator';
 import { formatCurrency } from './utils';
 
 // Get tax thresholds from the single source of truth
-const CURRENT_TAX_YEAR = '2025-2026' as const;
 const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
 const currentScottishRates = SCOTTISH_TAX_RATES[CURRENT_TAX_YEAR];
 

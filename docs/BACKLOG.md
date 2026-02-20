@@ -15,7 +15,6 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P0-6` | Enforce release verification discipline | Use `bun run release:verify` and `POST_RELEASE_VALIDATION.md` on each release; store pass/fail notes. | Each release has a completed verification record linked in release notes/changelog. |
 | `P0-7` | Verify director-calculator threshold interactions | Add regression tests for how other income affects PA taper, dividend allowance, and student loan thresholds in director flows. | Tests prove expected threshold interactions or UI guards are added where unsupported. |
 | `P0-8` | Improve Director Intelligence assumption clarity | Add explicit assumptions panel and MTD timeline note in Director Intelligence outputs. | Users can see model assumptions and MTD scope/timeline without leaving results flow. |
-| `P0-10` | Harden environment contract and fail-fast validation | Add missing runtime env keys to env validation (`ServerEnvSchema` + production/public checks), and add missing template keys (`NEXT_PUBLIC_SITE_URL`, `LINEAR_API_KEY`, `LINEAR_TEAM_KEY`). | No env var used by live routes exists outside schema/template policy, and production validation fails fast with clear messages before serving traffic. |
 
 ---
 
@@ -24,10 +23,7 @@ Only active commitments are listed below. Every item has a first action and a me
 | ID | Work Item | Next Step | Done When |
 |---|---|---|---|
 | `P1-1` | Visual regression pilot | Add baseline snapshots for homepage hero, calculator results, and Director Intelligence dashboard. | CI flags visual diffs on those three surfaces with an approve/update workflow documented. |
-| `P1-2` | Currency arithmetic strategy review | Compare current rounding-to-pence approach against integer-pence/decimal alternatives and document tradeoffs. | Decision doc is published and linked from `SYSTEM_OVERVIEW.md`, with follow-up implementation ticket if needed. |
 | `P1-3` | Bot-mitigation hardening for mutation endpoints | Evaluate Turnstile/challenge + heuristic throttling on `/api/newsletter/*`, `/api/send-results`, `/api/referral/lead`. | Chosen approach is implemented (or explicitly rejected with rationale) and false-positive risk is documented. |
-| `P1-5` | SPF/DKIM/DMARC monitoring cadence | Define monthly monitoring checklist and owner process for Kit/Resend domains. | Recurring check exists with first completed report and remediation path documented. |
-| `P1-10` | Migrate remaining hardcoded fallback tax literals | Replace fallback literals in UI fallback paths with source-of-truth derived defaults. | No tax-rate fallback literals remain outside approved constants modules. |
 | `P1-11` | Define Tax Pack snapshot contract | Specify deterministic snapshot schema (integer pence, checksum, version fields) and enforce validation. | Snapshot schema is implemented and used by generation pipeline and tests. |
 | `P1-12` | Deliver Tax Pack artifact pipeline | Build async generation/storage/download-grant flow (retry + failure handling). | Paid order can generate and retrieve artifacts through signed, expiring download grants. |
 | `P1-13` | Complete Tax Pack operational hardening | Implement refund/dispute handling, abandoned-order cleanup, and resend-safe email delivery. | Post-payment lifecycle paths are covered with deterministic state transitions. |
@@ -37,8 +33,6 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P1-19` | Remove temporary dependency advisory allowlist | Re-check `CVE-2025-69873` transitive path (`webpack > schema-utils > ajv`) after upstream updates and remove allowlist entry when fixed. | `bun run audit:deps` passes with no allowlisted advisories and `scripts/dependency-advisory-allowlist.ts` entry is removed. |
 | `P1-20` | Reconcile `knip` dependency findings once security scanner is non-interactive | Remove or reclassify `@bun-security-scanner/osv`, `@types/github-slugger`, `undici`, and `sharp` after scanner prompt no longer blocks non-TTY dependency operations. | `bun remove`/`bun install` can run unattended in CI/local and `bun run audit:unused` no longer needs dependency ignore entries for these packages. |
 | `P1-27` | Track unresolved transitive `minimatch` advisory | Keep `GHSA-3ppc-4f35-3m26` documented as upstream-transitive (`@sentry/node`, Jest toolchain), re-check monthly, and avoid repeated local override experiments unless parent packages publish compatible fixes. | `bun audit` no longer reports `minimatch <10.2.1` without risky major-force overrides, and this item is closed with the parent package versions that resolved it. |
-| `P1-28` | Add env drift CI guard | Extend existing env-sync checks to validate schema `<->` template `<->` runtime usage parity (avoid parallel checker drift). | CI fails on env drift and blocks merges when any runtime env key is undocumented or unschematized. |
-| `P1-29` | Split MR CI jobs and cache Playwright browsers | Split monolithic `mr_validation` into parallel jobs (lint/typecheck, unit, build, e2e-critical) and cache Playwright browser binaries. | MR runtime drops materially, browser downloads are reused between runs, and CI remains stable under free-tier limits. |
 
 ---
 

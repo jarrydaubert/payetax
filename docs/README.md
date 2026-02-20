@@ -13,7 +13,9 @@
 | **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
+| **Review currency arithmetic decision?** | [`CURRENCY_ARITHMETIC_DECISION.md`](./guides/CURRENCY_ARITHMETIC_DECISION.md) |
 | **Run post-release checks?** | [`POST_RELEASE_VALIDATION.md`](./guides/POST_RELEASE_VALIDATION.md) |
+| **Monitor SPF/DKIM/DMARC monthly?** | [`EMAIL_AUTH_MONITORING.md`](./guides/EMAIL_AUTH_MONITORING.md) |
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
 | **Use Linear?** | [`LINEAR.md`](./guides/LINEAR.md) |

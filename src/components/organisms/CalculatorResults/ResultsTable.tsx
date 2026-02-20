@@ -27,7 +27,7 @@ import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { trackEvent } from '@/lib/analytics';
@@ -123,7 +123,7 @@ export function ResultsTable({
     if (hasMarriageCode) return false;
 
     // Get tax constants for the current year
-    const taxConstants = TAX_RATES[(taxYear || '2025-2026') as TaxYear];
+    const taxConstants = TAX_RATES[(taxYear || CURRENT_TAX_YEAR) as TaxYear];
     const basicBand = taxConstants?.bands[0];
     if (!(taxConstants && basicBand)) return false;
     const personalAllowance = taxConstants.personalAllowance;
@@ -142,7 +142,7 @@ export function ResultsTable({
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   // Default to current tax year if not provided
-  const currentTaxYear = taxYear || '2025-2026'; // e.g., "2025-2026"
+  const currentTaxYear = taxYear || CURRENT_TAX_YEAR; // e.g., "2025-2026"
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
   const previousYearLabel = currentYearStart - 1; // 2024
 

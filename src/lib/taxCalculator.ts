@@ -813,7 +813,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
     const prevBand = higherRateBandIndex > 0 ? taxRates.bands[higherRateBandIndex - 1] : null;
     const firstBand = taxRates.bands[0];
-    const basicRateThreshold = prevBand?.threshold ?? firstBand?.threshold ?? 37700;
+    const basicRateThreshold = prevBand?.threshold ?? firstBand?.threshold ?? 0;
     const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
 
     // Check if USER can RECEIVE marriage allowance from their partner:

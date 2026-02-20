@@ -358,7 +358,7 @@ export function getWarnings(input: WarningInput): Warning[] {
 function estimateDividendTax(dividends: number, salary: number, taxYear: TaxYear): number {
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
-  const basicRateLimit = rates.bands[0]?.threshold ?? 37700; // £37,700
+  const basicRateLimit = rates.bands[0]?.threshold ?? 0;
   const dividendAllowance = rates.dividendAllowance;
 
   // Income already used by salary
@@ -383,7 +383,7 @@ function estimateDividendTax(dividends: number, salary: number, taxYear: TaxYear
 function estimateIncomeTax(salary: number, taxYear: TaxYear): number {
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;
-  const basicRateLimit = rates.bands[0]?.threshold ?? 37700;
+  const basicRateLimit = rates.bands[0]?.threshold ?? 0;
 
   const taxableIncome = Math.max(0, salary - personalAllowance);
   if (taxableIncome <= 0) return 0;

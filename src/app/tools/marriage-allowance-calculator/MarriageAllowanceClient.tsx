@@ -9,15 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn } from '@/lib/utils';
 
-const TAX_YEAR = '2025-2026' as const;
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
 const MARRIAGE_ALLOWANCE = rates.marriageAllowance; // £1,260 for 2025-26
 const PERSONAL_ALLOWANCE = rates.personalAllowance; // £12,570
-const BASIC_RATE_LIMIT = PERSONAL_ALLOWANCE + (rates.bands[0]?.threshold ?? 37700); // £50,270
+const BASIC_RATE_LIMIT = PERSONAL_ALLOWANCE + (rates.bands[0]?.threshold ?? 0);
 const TAX_SAVING = Math.round(MARRIAGE_ALLOWANCE * 0.2); // £252
 
 function formatCurrency(amount: number): string {

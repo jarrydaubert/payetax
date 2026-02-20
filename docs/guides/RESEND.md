@@ -47,3 +47,7 @@ Broadcasting is managed in Kit (broadcasts/sequences/automations), not from this
 - Newsletter signup issues: verify `KIT_API_SECRET` and `KIT_FORM_ID`.
 - Transactional email issues: verify `RESEND_API_KEY`.
 - Rate limit behavior: inspect `src/lib/rateLimit.ts`.
+
+## Operational Monitoring
+
+- Monthly SPF/DKIM/DMARC checks and reporting: `docs/guides/EMAIL_AUTH_MONITORING.md`

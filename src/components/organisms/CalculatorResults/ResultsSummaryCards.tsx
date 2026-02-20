@@ -31,7 +31,7 @@ interface ResultsSummaryCardsProps {
 
 export function ResultsSummaryCards({
   results,
-  taxYear = TAX_YEARS[0],
+  taxYear = TAX_YEARS[0] as TaxYear,
   input,
 }: ResultsSummaryCardsProps) {
   const shouldReduceMotion = useMotionPreference();
@@ -41,14 +41,13 @@ export function ResultsSummaryCards({
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
 
   // Get tax rates for the specified tax year
-  const effectiveTaxYear = taxYear ?? '2025-2026';
-  const taxRates = TAX_RATES[effectiveTaxYear];
-  const basicBand = taxRates?.bands[0];
-  const higherBand = taxRates?.bands[1];
-  const personalAllowance = taxRates?.personalAllowance ?? 12570;
-  const basicRateThreshold = personalAllowance + (basicBand?.threshold ?? 37700); // £50,270
-  const paReductionThreshold = taxRates?.personalAllowanceReductionThreshold ?? 100000; // £100,000
-  const higherRateThreshold = personalAllowance + (higherBand?.threshold ?? 112570); // £125,140
+  const taxRates = TAX_RATES[taxYear];
+  const basicBandThreshold = taxRates.bands[0]?.threshold ?? 0;
+  const higherBandThreshold = taxRates.bands[1]?.threshold ?? basicBandThreshold;
+  const personalAllowance = taxRates.personalAllowance;
+  const basicRateThreshold = personalAllowance + basicBandThreshold;
+  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold;
+  const higherRateThreshold = higherBandThreshold;
 
   // Marginal tax rate: approximate tax/NI/SL rate on the next bit of salary.
   // Prefer dynamic calculation from the user's actual input; fall back to a band approximation.

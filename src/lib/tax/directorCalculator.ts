@@ -25,8 +25,7 @@
  * 6. Return actionable numbers (monthly pay, tax pots)
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import type {
   DirectorCalculationResult,
   DirectorInput,
@@ -47,7 +46,7 @@ import { roundToPence } from './utils';
  * Default salary for 2025-26 (for backwards compatibility with tests)
  * IMPORTANT: Use TAX_RATES[taxYear].personalAllowance in calculations
  */
-export const DEFAULT_SALARY = TAX_RATES['2025-2026'].personalAllowance;
+export const DEFAULT_SALARY = TAX_RATES[CURRENT_TAX_YEAR].personalAllowance;
 
 /** VAT standard rate (20%) */
 
@@ -60,7 +59,7 @@ export const POA_MULTIPLIER = 1.5;
 /** Profit threshold for high complexity warning */
 export const HIGH_COMPLEXITY_THRESHOLD = 250000;
 
-const DEFAULT_DIRECTOR_RATES = TAX_RATES['2025-2026'];
+const DEFAULT_DIRECTOR_RATES = TAX_RATES[CURRENT_TAX_YEAR];
 const VAT_WARNING_PROXIMITY = 5000;
 
 /** VAT registration threshold (default tax year export for backwards compatibility) */
@@ -104,7 +103,7 @@ export const VAT_WARNING_UPPER = VAT_REGISTRATION_THRESHOLD + VAT_WARNING_PROXIM
  */
 export function calculateDirectorScenario(
   input: DirectorInput,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): DirectorCalculationResult {
   const rates = TAX_RATES[taxYear];
   const personalAllowance = rates.personalAllowance;

@@ -1,10 +1,14 @@
 // src/lib/taxCodeDecoder.ts
 
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
 
 // Get the standard personal allowance from the single source of truth
 // Using the latest tax year for reference
-const STANDARD_PERSONAL_ALLOWANCE = TAX_RATES['2025-2026'].personalAllowance;
+const STANDARD_PERSONAL_ALLOWANCE = TAX_RATES[CURRENT_TAX_YEAR].personalAllowance;
+const TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
 
 export interface TaxCodeDecoded {
   code: string;
@@ -218,7 +222,7 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
       // Add context about common allowances using the standard value from taxRates.ts
       if (result.allowance === STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(
-          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for 2025-26.`,
+          `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for ${TAX_YEAR_DISPLAY}.`,
         );
       } else if (result.allowance > STANDARD_PERSONAL_ALLOWANCE) {
         result.details.push(

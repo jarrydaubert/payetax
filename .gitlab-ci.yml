@@ -16,6 +16,8 @@ workflow:
 variables:
   # Bun cache directory
   BUN_INSTALL_CACHE_DIR: "$CI_PROJECT_DIR/.bun-cache"
+  # Reuse Playwright browser binaries across MR jobs.
+  PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
 
 # Cache bun dependencies - shared across all branches until bun.lock changes
 cache:
@@ -24,6 +26,7 @@ cache:
       - bun.lock
   paths:
     - .bun-cache/
+    - .cache/ms-playwright/
     - node_modules/
   policy: pull-push
 
@@ -31,31 +34,21 @@ cache:
 # OPTIMIZATION STRATEGY:
 # ──────────────────────────────────────────────────────────
 # 1. NO CI ON MAIN - Vercel handles all validation on push
-# 2. MR validation gates: lint, typecheck, unit tests, build, and critical E2E
+# 2. MR validation gates split into parallel jobs
 # 3. Bun for fast dependency installation
-# 4. Cache shared across branches (keyed to bun.lock)
+# 4. Cache shared across branches (keyed to bun.lock), including Playwright browsers
 # 5. Interruptible - stops old jobs when new commits push
 # ──────────────────────────────────────────────────────────
 
-mr_validation:
+.mr_base:
   stage: validate
   # Keep CI Bun version aligned with package.json "packageManager" (bun@1.3.x).
   image: oven/bun:1.3-debian
   interruptible: true
-  script:
-    - echo "⚡ MR validation (lint + typecheck + unit tests + build + critical E2E)"
+  before_script:
     - bun --version
     # Install dependencies (fast with warm cache)
     - bun install --frozen-lockfile
-    # Validation gates - use package.json scripts
-    - bun run lint
-    - bun run typecheck
-    - bun run test:no-coverage
-    - bun run build
-    - bunx playwright install --with-deps
-    - bun run test:e2e:critical
-    - echo "✅ Validation passed!"
-  timeout: 30 minutes
   rules:
     # Skip for docs-only changes
     - changes:
@@ -66,6 +59,40 @@ mr_validation:
       when: never
     - when: on_success
 
+mr_lint_typecheck:
+  extends: .mr_base
+  script:
+    - echo "⚡ MR validation: lint + typecheck"
+    - bun run lint
+    - bun run typecheck
+    - echo "✅ Lint + typecheck passed!"
+  timeout: 15 minutes
+
+mr_unit_tests:
+  extends: .mr_base
+  script:
+    - echo "⚡ MR validation: unit tests"
+    - bun run test:no-coverage
+    - echo "✅ Unit tests passed!"
+  timeout: 20 minutes
+
+mr_build:
+  extends: .mr_base
+  script:
+    - echo "⚡ MR validation: production build"
+    - bun run build
+    - echo "✅ Build passed!"
+  timeout: 20 minutes
+
+mr_e2e_critical:
+  extends: .mr_base
+  script:
+    - echo "⚡ MR validation: critical E2E"
+    - bunx playwright install --with-deps chromium
+    - bun run test:e2e:critical
+    - echo "✅ Critical E2E passed!"
+  timeout: 30 minutes
+
 # ──────────────────────────────────────────────────────────
 # WHAT RUNS WHERE:
 # ──────────────────────────────────────────────────────────
@@ -75,13 +102,13 @@ mr_validation:
 #   bun run test          - unit tests with coverage
 #   bun run test:e2e      - Playwright E2E tests
 #
-# GITLAB CI (This File - MRs only):
+# GITLAB CI (This File - MRs only, parallel jobs):
 #   ✅ Lint (biome check .)
 #   ✅ Typecheck (tsc --noEmit)
 #   ✅ Unit tests (jest --no-coverage)
 #   ✅ Build (next build)
 #   ✅ Critical E2E (Playwright smoke + golden)
-#   ⏱️  Heavier MR gate - adjust timeout/usage as needed
+#   ⏱️  Cached Playwright browsers + parallel jobs to reduce MR wall time
 #
 # VERCEL (Automatic - every push):
 #   ✅ Build validation (next build)

@@ -228,7 +228,7 @@ Key active hardening themes are tracked in:
 
 Notable areas under active governance:
 - Analytics alias deprecation lifecycle
-- Additional CI guardrails for analytics/env/document drift
+- Additional CI guardrails for analytics/document drift
 - Ongoing accessibility and production validation cadence
 
 ---
@@ -252,10 +252,10 @@ This section keeps only proposals we are actually adopting. Rejected/deferred su
 |---|---|---|
 | Expand property-based and invariant-style tax testing | Completed on February 19, 2026 in `taxCalculator.hmrcVerification.test.ts` and `taxCalculator.invariants.test.ts` (Scottish fixtures, Welsh `C`-prefix regressions, and sampled property/invariant checks). | Implemented |
 | Add legislative traceability for tax rules | Completed on February 19, 2026 in `src/constants/taxRates.ts` via `TAX_YEAR_SOURCES` (per-year references for income tax, NI, dividends, and student loans). | Implemented |
-| Strengthen confidence in currency arithmetic | Run and document a formal arithmetic strategy review (current rounding-to-pence vs integer-pence/decimal model). | `docs/BACKLOG.md` (`P1-2`) |
+| Strengthen confidence in currency arithmetic | Completed on February 20, 2026 via formal decision record in `docs/guides/CURRENCY_ARITHMETIC_DECISION.md` (retain number + explicit pence-rounding model for calculators). | Implemented |
 | Add visual regression safety net | Pilot visual regression checks for high-risk surfaces (homepage hero, calculator results, Director Intelligence dashboard). | `docs/BACKLOG.md` (`P1-1`) |
 | Harden abuse controls on public mutation routes | Evaluate and implement bot-mitigation hardening for `/api/newsletter/*`, `/api/send-results`, and `/api/referral/lead`. | `docs/BACKLOG.md` (`P1-3`) |
 | Improve anomaly detection in production | Completed on February 20, 2026 via calculator anomaly monitoring (`calculator_error` with `error_type=calculation_anomaly`) and Sentry breadcrumbs/exceptions for impossible outputs. | Implemented |
-| Strengthen operational email trust posture | Add recurring SPF/DKIM/DMARC monitoring for sending domains/providers. | `docs/BACKLOG.md` (`P1-5`) |
+| Strengthen operational email trust posture | Completed on February 20, 2026 via monthly SPF/DKIM/DMARC SOP and first report artifact under `docs/reports/email-auth/`. | Implemented |
 | Validate newer React/Next performance features safely | Run controlled experiments for React Compiler and Cache Components on selected routes before any default enablement. | `docs/BACKLOG.md` (`P2-1`, `P2-2`) |
 | Improve external trust visibility | Evaluate adding an integrity transparency section on `/compliance` with engine/rules version + last verification date. | `docs/BACKLOG.md` (`P2-3`) |

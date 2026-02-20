@@ -2,9 +2,9 @@
  * Director Intelligence business thresholds used for warning/education messaging.
  * Keep these centralized to avoid drift across components.
  */
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 
-const DIRECTOR_GUIDE_RATES = TAX_RATES['2025-2026'];
+const DIRECTOR_GUIDE_RATES = TAX_RATES[CURRENT_TAX_YEAR];
 
 export const DIRECTOR_GUIDE_BUSINESS_THRESHOLDS = {
   vatRegistration: DIRECTOR_GUIDE_RATES.vatRegistrationThreshold,
