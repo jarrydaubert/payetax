@@ -216,9 +216,9 @@ describe('Director Intelligence calculator components', () => {
       render(<StrategyComparisonTable />);
       expect(screen.getByText('Choose Your Strategy')).toBeInTheDocument();
       expect(
-        screen.getByText(/Baseline Mix is the highest estimated annual take-home/i),
+        screen.getByText(/Compare salary\/dividend tradeoffs using your selected objective/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/Closest to the optimal mix/i)).toBeInTheDocument();
+      expect(screen.getByText(/Closest to max take-home objective/i)).toBeInTheDocument();
       expect(screen.getByText('-£4,000')).toBeInTheDocument();
       expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
     });
@@ -231,10 +231,11 @@ describe('Director Intelligence calculator components', () => {
             totalPersonalTax: 100,
             employerNI: 100,
             corporationTax: 100,
+            takeHome: 36000,
           }),
           allDividends: createStrategy('All Dividends'),
           yourSetup: {
-            ...createStrategy('Your Setup', { salary: 30000, dividends: 40000 }),
+            ...createStrategy('Your Setup', { salary: 30000, dividends: 40000, takeHome: 34500 }),
             deltaVsOptimal: 1500,
             exceedsProfit: true,
           },
@@ -244,7 +245,9 @@ describe('Director Intelligence calculator components', () => {
       setStoreState({ strategyComparison: comparison as never, sliderSalary: 20000 });
 
       render(<StrategyComparisonTable />);
-      expect(screen.getByText(/Pays £1,500 more tax than optimal per year/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Takes home £1,500 less per year vs max take-home/i),
+      ).toBeInTheDocument();
       expect(screen.getByText('Your Setup')).toBeInTheDocument();
       expect(screen.getByText(/Exceeds Profit/i)).toBeInTheDocument();
     });
@@ -259,7 +262,17 @@ describe('Director Intelligence calculator components', () => {
       expect(
         screen.getByText(/Add your salary and dividends in Full Inputs to compare/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/against the optimal mix/i)).toBeInTheDocument();
+      expect(screen.getByText(/against your selected objective/i)).toBeInTheDocument();
+    });
+
+    it('switches objective mode to Minimize NI and updates objective labels', () => {
+      setStoreState({ strategyComparison: createComparison() as never });
+
+      render(<StrategyComparisonTable />);
+      fireEvent.click(screen.getByRole('button', { name: 'Minimize NI' }));
+
+      expect(screen.getByText('Lowest NI')).toBeInTheDocument();
+      expect(screen.getAllByText(/Vs Lowest NI/i).length).toBeGreaterThan(0);
     });
 
     it('tracks pro strategy selection when a card is clicked', () => {

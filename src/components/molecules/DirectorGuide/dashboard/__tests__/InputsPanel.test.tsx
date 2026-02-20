@@ -230,4 +230,33 @@ describe('DirectorGuide InputsPanel', () => {
 
     expect(useDirectorGuideStore.getState().formData.revenue).toBeUndefined();
   });
+
+  it('uses explicit apply/reset/clear controls for Compare My Setup', () => {
+    render(<InputsPanel />);
+    fireEvent.click(screen.getByRole('button', { name: 'Full Inputs' }));
+
+    fireEvent.change(screen.getByLabelText('Your Current Salary'), { target: { value: '12000' } });
+    fireEvent.change(screen.getByLabelText('Your Current Dividends'), {
+      target: { value: '18000' },
+    });
+
+    // Draft edits should not update the store until Apply is clicked.
+    let form = useDirectorGuideStore.getState().formData;
+    expect(form.yourSetupSalary).toBeUndefined();
+    expect(form.yourSetupDividends).toBeUndefined();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+    form = useDirectorGuideStore.getState().formData;
+    expect(form.yourSetupSalary).toBe(12000);
+    expect(form.yourSetupDividends).toBe(18000);
+
+    fireEvent.change(screen.getByLabelText('Your Current Salary'), { target: { value: '13000' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Reset Draft' }));
+    expect(screen.getByLabelText('Your Current Salary')).toHaveValue('£12,000');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    form = useDirectorGuideStore.getState().formData;
+    expect(form.yourSetupSalary).toBeUndefined();
+    expect(form.yourSetupDividends).toBeUndefined();
+  });
 });

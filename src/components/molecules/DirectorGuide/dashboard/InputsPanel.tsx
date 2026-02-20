@@ -7,7 +7,7 @@
 'use client';
 
 import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,8 @@ const SECTION_HEADING_CLASS =
   'mb-4 font-semibold text-slate-500 text-xs uppercase tracking-[0.08em]';
 
 const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
+const formatCurrencyInput = (value: number | undefined) =>
+  value === undefined ? '' : `£${value.toLocaleString('en-GB')}`;
 
 interface InputsPanelProps {
   onReset?: () => void;
@@ -76,6 +78,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const baseId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [quickStartMode, setQuickStartMode] = useState(true);
+  const [yourSetupDraftSalary, setYourSetupDraftSalary] = useState('');
+  const [yourSetupDraftDividends, setYourSetupDraftDividends] = useState('');
 
   const formData = useDirectorFormSlice((formData) => ({
     mode: formData.mode,
@@ -112,12 +116,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   // Derive country selection from store region (single source of truth)
   const selectedCountry = formData.region ? regionToCountry[formData.region] : '';
 
-  const formatCurrency = (value: number | undefined) => {
-    if (value === undefined) return '';
-    // Show 0 as "£0" for clarity, not empty string
-    return `£${value.toLocaleString('en-GB')}`;
-  };
-
   const parseCurrency = (value: string): number => {
     const num = value.replace(/[^0-9]/g, '');
     return num ? Number(num) : 0;
@@ -126,6 +124,39 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const parseCurrencyOptional = (value: string): number | undefined => {
     const num = value.replace(/[^0-9]/g, '');
     return num ? Number(num) : undefined;
+  };
+
+  useEffect(() => {
+    setYourSetupDraftSalary(formatCurrencyInput(formData.yourSetupSalary));
+    setYourSetupDraftDividends(formatCurrencyInput(formData.yourSetupDividends));
+  }, [formData.yourSetupSalary, formData.yourSetupDividends]);
+
+  const draftYourSetupSalary = parseCurrencyOptional(yourSetupDraftSalary);
+  const draftYourSetupDividends = parseCurrencyOptional(yourSetupDraftDividends);
+  const hasYourSetupDraftChanges =
+    draftYourSetupSalary !== formData.yourSetupSalary ||
+    draftYourSetupDividends !== formData.yourSetupDividends;
+  const canClearYourSetup =
+    draftYourSetupSalary !== undefined ||
+    draftYourSetupDividends !== undefined ||
+    formData.yourSetupSalary !== undefined ||
+    formData.yourSetupDividends !== undefined;
+
+  const handleApplyYourSetup = () => {
+    actions.setYourSetupSalary(draftYourSetupSalary);
+    actions.setYourSetupDividends(draftYourSetupDividends);
+  };
+
+  const handleResetYourSetupDraft = () => {
+    setYourSetupDraftSalary(formatCurrencyInput(formData.yourSetupSalary));
+    setYourSetupDraftDividends(formatCurrencyInput(formData.yourSetupDividends));
+  };
+
+  const handleClearYourSetup = () => {
+    setYourSetupDraftSalary('');
+    setYourSetupDraftDividends('');
+    actions.setYourSetupSalary(undefined);
+    actions.setYourSetupDividends(undefined);
   };
 
   const handleReset = () => {
@@ -256,7 +287,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.monthlyIncome}
                 type='text'
-                value={formatCurrency(formData.monthlyIncome)}
+                value={formatCurrencyInput(formData.monthlyIncome)}
                 onChange={(e) => actions.setMonthlyIncome(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -273,7 +304,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.monthlyExpenses}
                 type='text'
-                value={formatCurrency(formData.monthlyExpenses)}
+                value={formatCurrencyInput(formData.monthlyExpenses)}
                 onChange={(e) => actions.setMonthlyExpenses(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -324,7 +355,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.cashInBank}
                 type='text'
-                value={formatCurrency(formData.cashInBank)}
+                value={formatCurrencyInput(formData.cashInBank)}
                 onChange={(e) => actions.setCashInBank(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -341,7 +372,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.minimumMonthlyDraw}
                 type='text'
-                value={formatCurrency(formData.minimumMonthlyDraw)}
+                value={formatCurrencyInput(formData.minimumMonthlyDraw)}
                 onChange={(e) => actions.setMinimumMonthlyDraw(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -380,7 +411,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.revenue}
                 data-testid='director-revenue-input'
                 type='text'
-                value={formatCurrency(formData.revenue)}
+                value={formatCurrencyInput(formData.revenue)}
                 onChange={(e) => actions.setRevenue(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -398,7 +429,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.expenses}
                 data-testid='director-expenses-input'
                 type='text'
-                value={formatCurrency(formData.expenses)}
+                value={formatCurrencyInput(formData.expenses)}
                 onChange={(e) => actions.setExpenses(parseCurrencyOptional(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -508,7 +539,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.ytdSalary}
                 type='text'
-                value={formatCurrency(formData.ytdSalary)}
+                value={formatCurrencyInput(formData.ytdSalary)}
                 onChange={(e) => actions.setYtdSalary(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -525,7 +556,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.ytdDividends}
                 type='text'
-                value={formatCurrency(formData.ytdDividends)}
+                value={formatCurrencyInput(formData.ytdDividends)}
                 onChange={(e) => actions.setYtdDividends(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -542,7 +573,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.ytdDrawings}
                 type='text'
-                value={formatCurrency(formData.ytdDrawings)}
+                value={formatCurrencyInput(formData.ytdDrawings)}
                 onChange={(e) => actions.setYtdDrawings(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -562,7 +593,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.otherIncome}
                 type='text'
-                value={formatCurrency(formData.otherIncome)}
+                value={formatCurrencyInput(formData.otherIncome)}
                 onChange={(e) => actions.setOtherIncome(parseCurrency(e.target.value))}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -660,7 +691,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   <Input
                     id={ids.pension}
                     type='text'
-                    value={formatCurrency(formData.pensionContribution)}
+                    value={formatCurrencyInput(formData.pensionContribution)}
                     onChange={(e) => actions.setPensionContribution(parseCurrency(e.target.value))}
                     placeholder='£0'
                     className={INPUT_CLASS}
@@ -697,7 +728,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   <Input
                     id={ids.carBik}
                     type='text'
-                    value={formatCurrency(formData.companyCarBIK)}
+                    value={formatCurrencyInput(formData.companyCarBIK)}
                     onChange={(e) => actions.setCompanyCarBIK(parseCurrency(e.target.value))}
                     placeholder='£0'
                     className={INPUT_CLASS}
@@ -733,7 +764,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   <Input
                     id={ids.losses}
                     type='text'
-                    value={formatCurrency(formData.lossesBroughtForward)}
+                    value={formatCurrencyInput(formData.lossesBroughtForward)}
                     onChange={(e) => actions.setLossesBroughtForward(parseCurrency(e.target.value))}
                     placeholder='£0'
                     className={INPUT_CLASS}
@@ -751,7 +782,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   <Input
                     id={ids.minSalary}
                     type='text'
-                    value={formatCurrency(formData.minimumSalaryRequirement)}
+                    value={formatCurrencyInput(formData.minimumSalaryRequirement)}
                     onChange={(e) => {
                       const val = parseCurrency(e.target.value);
                       actions.setMinimumSalaryRequirement(val === 0 ? undefined : val);
@@ -768,7 +799,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           {/* Section: Compare My Setup */}
           <Section title='Compare My Setup'>
             <p className='mb-3 text-slate-500 text-xs'>
-              Enter your current salary and dividends to see how it compares to the baseline mix.
+              Edit values first, then apply. Your setup is only compared when you click Apply.
             </p>
             <Field
               label='Your Current Salary'
@@ -779,10 +810,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.yourSalary}
                 type='text'
-                value={formatCurrency(formData.yourSetupSalary)}
+                value={yourSetupDraftSalary}
                 onChange={(e) => {
-                  const val = parseCurrency(e.target.value);
-                  actions.setYourSetupSalary(val === 0 ? undefined : val);
+                  const value = parseCurrencyOptional(e.target.value);
+                  setYourSetupDraftSalary(value === undefined ? '' : formatCurrencyInput(value));
                 }}
                 placeholder='£0'
                 className={INPUT_CLASS}
@@ -798,16 +829,66 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <Input
                 id={ids.yourDividends}
                 type='text'
-                value={formatCurrency(formData.yourSetupDividends)}
+                value={yourSetupDraftDividends}
                 onChange={(e) => {
-                  const val = parseCurrency(e.target.value);
-                  actions.setYourSetupDividends(val === 0 ? undefined : val);
+                  const value = parseCurrencyOptional(e.target.value);
+                  setYourSetupDraftDividends(value === undefined ? '' : formatCurrencyInput(value));
                 }}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.yourDividends)}
               />
             </Field>
+            <div className='space-y-2 pt-1'>
+              <div className='grid grid-cols-3 gap-2'>
+                <button
+                  type='button'
+                  onClick={handleApplyYourSetup}
+                  disabled={!hasYourSetupDraftChanges}
+                  className={cn(
+                    'rounded-md px-3 py-2 text-xs transition-colors',
+                    hasYourSetupDraftChanges
+                      ? 'bg-cyan-500/20 font-medium text-cyan-300 hover:bg-cyan-500/30'
+                      : 'cursor-not-allowed bg-slate-800 text-slate-500',
+                  )}
+                >
+                  Apply
+                </button>
+                <button
+                  type='button'
+                  onClick={handleResetYourSetupDraft}
+                  disabled={!hasYourSetupDraftChanges}
+                  className={cn(
+                    'rounded-md border border-white/[0.08] px-3 py-2 text-xs transition-colors',
+                    hasYourSetupDraftChanges
+                      ? 'text-slate-300 hover:border-white/[0.16] hover:bg-slate-800'
+                      : 'cursor-not-allowed text-slate-500',
+                  )}
+                >
+                  Reset Draft
+                </button>
+                <button
+                  type='button'
+                  onClick={handleClearYourSetup}
+                  disabled={!canClearYourSetup}
+                  className={cn(
+                    'rounded-md border border-white/[0.08] px-3 py-2 text-xs transition-colors',
+                    canClearYourSetup
+                      ? 'text-slate-300 hover:border-white/[0.16] hover:bg-slate-800'
+                      : 'cursor-not-allowed text-slate-500',
+                  )}
+                >
+                  Clear
+                </button>
+              </div>
+              <p className='text-slate-600 text-xs'>
+                Applied setup:{' '}
+                <span className='text-slate-400'>
+                  Salary {formatCurrencyInput(formData.yourSetupSalary) || 'Not set'} / Dividends{' '}
+                  {formatCurrencyInput(formData.yourSetupDividends) || 'Not set'}
+                </span>
+              </p>
+            </div>
           </Section>
         </>
       ) : null}
