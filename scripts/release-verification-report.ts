@@ -68,13 +68,15 @@ function summarizeReport(content: string): {
   uncheckedItems: number;
   releaseVersion: string;
   deploymentUrl: string;
+  releaseNotesUrl: string;
 } {
   const status = content.match(/^Status:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const releaseVersion = content.match(/^Release Version:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const deploymentUrl = content.match(/^Deployment URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
+  const releaseNotesUrl = content.match(/^Release Notes URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const uncheckedItems = [...content.matchAll(/^- \[ \]/gm)].length;
 
-  return { status, uncheckedItems, releaseVersion, deploymentUrl };
+  return { status, uncheckedItems, releaseVersion, deploymentUrl, releaseNotesUrl };
 }
 
 function runInit(version: string): void {
@@ -106,6 +108,7 @@ function runStatus(version: string, strict: boolean): void {
   console.log(`   - Open checklist items: ${summary.uncheckedItems}`);
   console.log(`   - Release Version: ${summary.releaseVersion}`);
   console.log(`   - Deployment URL: ${summary.deploymentUrl}`);
+  console.log(`   - Release Notes URL: ${summary.releaseNotesUrl}`);
 
   if (summary.releaseVersion !== `v${version}`) {
     console.error(
@@ -128,6 +131,17 @@ function runStatus(version: string, strict: boolean): void {
   }
   if (summary.deploymentUrl === 'TBD' || !summary.deploymentUrl.startsWith('http')) {
     errors.push('Deployment URL must be set to a valid URL');
+  }
+  if (
+    summary.releaseNotesUrl === 'MISSING' ||
+    summary.releaseNotesUrl === 'TBD' ||
+    summary.releaseNotesUrl.length === 0
+  ) {
+    errors.push('Release Notes URL must be set');
+  } else if (
+    !(summary.releaseNotesUrl.startsWith('http') || summary.releaseNotesUrl.startsWith('docs/'))
+  ) {
+    errors.push('Release Notes URL must be an absolute URL or docs path');
   }
 
   if (errors.length > 0) {

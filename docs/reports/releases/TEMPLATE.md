@@ -4,6 +4,7 @@ Date: {{DATE}}
 Release Version: {{VERSION}}
 Commit: {{COMMIT_SHA}}
 Deployment URL: TBD
+Release Notes URL: TBD
 Releasing Engineer: TBD
 Status: IN_PROGRESS
 

@@ -8,6 +8,7 @@ Evidence:
 - Initialize report scaffold: `bun run release:report:init`
 - Report path: `docs/reports/releases/v<package-version>.md`
 - Complete this checklist inside that report and set `Status: COMPLETE`
+- Set `Deployment URL` and `Release Notes URL` before strict check
 - Validate completion: `bun run release:report:check`
 - Link report in release notes/changelog
 

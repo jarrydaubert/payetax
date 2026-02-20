@@ -55,7 +55,7 @@
     "dev-setup": "bun run clean:all && bun run fix-all && bun run dev",
     "dev:turbo": "next dev --turbo",
     "release": "bun run clean && bun run fix-all && bun run test && bun run build:analyze && bun run audit:deps",
-    "release:verify": "bun run fix-all && bun run test:no-coverage && bun run build",
+    "release:verify": "bun run fix-all && bun run test:no-coverage && bun run build && bun run release:report:status",
     "release:report:init": "bun scripts/release-verification-report.ts init",
     "release:report:status": "bun scripts/release-verification-report.ts status",
     "release:report:check": "bun scripts/release-verification-report.ts check --strict",

@@ -12,7 +12,7 @@ Only active commitments are listed below. Every item has a first action and a me
 |---|---|---|---|
 | `P0-4` | Verify distributed rate limiting in production | Run `ops:verify-rate-limit` against production (`RATE_LIMIT_VERIFY_BASE_URL` + `RATE_LIMIT_HEALTH_SECRET`) and paste output into the release report. | Evidence recorded in release notes/runbook showing distributed limits work and in-memory fallback is not used in production. |
 | `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A full Stripe test-mode purchase reaches `ready` state and produces one downloadable artifact end-to-end. |
-| `P0-6` | Enforce release verification discipline | Adopt `release:report:*` workflow (`init` -> complete checklist -> `check`) on each release and link report in release notes/changelog. | Each release has a completed verification record in `docs/reports/releases/` linked in release notes/changelog. |
+| `P0-6` | Enforce release verification discipline | Fill `Deployment URL` + `Release Notes URL` in `docs/reports/releases/v<version>.md`, complete checklist, then run `bun run release:report:check`. | Each release has a completed verification record in `docs/reports/releases/` linked in release notes/changelog. |
 | `P0-7` | Verify director-calculator threshold interactions | Add regression tests for how other income affects PA taper, dividend allowance, and student loan thresholds in director flows. | Tests prove expected threshold interactions or UI guards are added where unsupported. |
 
 ---
