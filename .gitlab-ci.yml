@@ -62,35 +62,35 @@ cache:
 mr_lint_typecheck:
   extends: .mr_base
   script:
-    - echo "⚡ MR validation: lint + typecheck"
+    - 'echo "MR validation: lint + typecheck"'
     - bun run lint
     - bun run typecheck
-    - echo "✅ Lint + typecheck passed!"
+    - 'echo "Lint + typecheck passed!"'
   timeout: 15 minutes
 
 mr_unit_tests:
   extends: .mr_base
   script:
-    - echo "⚡ MR validation: unit tests"
+    - 'echo "MR validation: unit tests"'
     - bun run test:no-coverage
-    - echo "✅ Unit tests passed!"
+    - 'echo "Unit tests passed!"'
   timeout: 20 minutes
 
 mr_build:
   extends: .mr_base
   script:
-    - echo "⚡ MR validation: production build"
+    - 'echo "MR validation: production build"'
     - bun run build
-    - echo "✅ Build passed!"
+    - 'echo "Build passed!"'
   timeout: 20 minutes
 
 mr_e2e_critical:
   extends: .mr_base
   script:
-    - echo "⚡ MR validation: critical E2E"
+    - 'echo "MR validation: critical E2E"'
     - bunx playwright install --with-deps chromium
     - bun run test:e2e:critical
-    - echo "✅ Critical E2E passed!"
+    - 'echo "Critical E2E passed!"'
   timeout: 30 minutes
 
 # ──────────────────────────────────────────────────────────
