@@ -79,9 +79,29 @@ function getDaysSince(date: Date): number {
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
 }
 
+function getDaysUntil(date: Date): number {
+  const now = Date.now();
+  const diffMs = date.getTime() - now;
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+function formatIsoDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
 function printAllowlistFreshnessWarnings(): void {
   const staleEntries: Array<{ id: string; packageName: string; days: number; cadence: number }> =
     [];
+  const reviewSchedule: Array<{
+    id: string;
+    packageName: string;
+    nextReviewDate: string;
+    daysUntilReview: number;
+  }> = [];
 
   for (const entry of DEPENDENCY_ADVISORY_ALLOWLIST) {
     const checkedDate = parseIsoDate(entry.lastChecked);
@@ -91,6 +111,14 @@ function printAllowlistFreshnessWarnings(): void {
       );
       continue;
     }
+
+    const nextReviewDate = addDays(checkedDate, entry.reviewCadenceDays);
+    reviewSchedule.push({
+      id: entry.id,
+      packageName: entry.package,
+      nextReviewDate: formatIsoDate(nextReviewDate),
+      daysUntilReview: getDaysUntil(nextReviewDate),
+    });
 
     const days = getDaysSince(checkedDate);
     if (days > entry.reviewCadenceDays) {
@@ -103,15 +131,26 @@ function printAllowlistFreshnessWarnings(): void {
     }
   }
 
-  if (staleEntries.length === 0) return;
-
-  console.warn('\n⚠️  Advisory allowlist review is overdue for:');
-  for (const entry of staleEntries) {
-    console.warn(
-      `   - ${entry.packageName} (${entry.id}) last checked ${entry.days}d ago (cadence ${entry.cadence}d)`,
-    );
+  if (staleEntries.length > 0) {
+    console.warn('\n⚠️  Advisory allowlist review is overdue for:');
+    for (const entry of staleEntries) {
+      console.warn(
+        `   - ${entry.packageName} (${entry.id}) last checked ${entry.days}d ago (cadence ${entry.cadence}d)`,
+      );
+    }
+    console.warn('   Update lastChecked after monthly upstream review.');
   }
-  console.warn('   Update lastChecked after monthly upstream review.');
+
+  if (reviewSchedule.length > 0) {
+    console.warn('\n📅 Advisory allowlist review schedule:');
+    for (const entry of reviewSchedule) {
+      const dueText =
+        entry.daysUntilReview >= 0
+          ? `${entry.nextReviewDate} (${entry.daysUntilReview}d)`
+          : `${entry.nextReviewDate} (${Math.abs(entry.daysUntilReview)}d overdue)`;
+      console.warn(`   - ${entry.packageName} (${entry.id}) -> ${dueText}`);
+    }
+  }
 }
 
 function main(): void {

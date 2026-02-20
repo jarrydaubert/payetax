@@ -31,6 +31,18 @@ Notes:
 Notes:
 - 
 
+## Top Traffic Post Refresh Tracking
+
+Use this section when running freshness passes so indexing follow-up is recorded in one place.
+
+| URL | Refresh Date | Submitted in GSC | Last Crawled | Indexed |
+|---|---|---|---|---|
+| `/blog/...` | YYYY-MM-DD | Yes/No | YYYY-MM-DD or TBD | Yes/No |
+| `/blog/...` | YYYY-MM-DD | Yes/No | YYYY-MM-DD or TBD | Yes/No |
+| `/blog/...` | YYYY-MM-DD | Yes/No | YYYY-MM-DD or TBD | Yes/No |
+| `/blog/...` | YYYY-MM-DD | Yes/No | YYYY-MM-DD or TBD | Yes/No |
+| `/blog/...` | YYYY-MM-DD | Yes/No | YYYY-MM-DD or TBD | Yes/No |
+
 ## Actions
 
 - Action: TBD (owner + due date)

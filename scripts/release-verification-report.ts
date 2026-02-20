@@ -69,14 +69,24 @@ function summarizeReport(content: string): {
   releaseVersion: string;
   deploymentUrl: string;
   releaseNotesUrl: string;
+  releasingEngineer: string;
 } {
   const status = content.match(/^Status:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const releaseVersion = content.match(/^Release Version:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const deploymentUrl = content.match(/^Deployment URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const releaseNotesUrl = content.match(/^Release Notes URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
+  const releasingEngineer =
+    content.match(/^Releasing Engineer:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const uncheckedItems = [...content.matchAll(/^- \[ \]/gm)].length;
 
-  return { status, uncheckedItems, releaseVersion, deploymentUrl, releaseNotesUrl };
+  return {
+    status,
+    uncheckedItems,
+    releaseVersion,
+    deploymentUrl,
+    releaseNotesUrl,
+    releasingEngineer,
+  };
 }
 
 function runInit(version: string): void {
@@ -109,6 +119,7 @@ function runStatus(version: string, strict: boolean): void {
   console.log(`   - Release Version: ${summary.releaseVersion}`);
   console.log(`   - Deployment URL: ${summary.deploymentUrl}`);
   console.log(`   - Release Notes URL: ${summary.releaseNotesUrl}`);
+  console.log(`   - Releasing Engineer: ${summary.releasingEngineer}`);
 
   if (summary.releaseVersion !== `v${version}`) {
     console.error(
@@ -142,6 +153,13 @@ function runStatus(version: string, strict: boolean): void {
     !(summary.releaseNotesUrl.startsWith('http') || summary.releaseNotesUrl.startsWith('docs/'))
   ) {
     errors.push('Release Notes URL must be an absolute URL or docs path');
+  }
+  if (
+    summary.releasingEngineer === 'MISSING' ||
+    summary.releasingEngineer === 'TBD' ||
+    summary.releasingEngineer.length === 0
+  ) {
+    errors.push('Releasing Engineer must be set');
   }
 
   if (errors.length > 0) {
