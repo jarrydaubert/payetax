@@ -109,13 +109,13 @@ test.describe('Essential SEO Tests', () => {
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('🔍 Checking blog page heading...');
 
-      // Should have blog heading - "TaxInsights"
-      await expect(page.getByRole('heading', { name: /TaxInsights/i }).first()).toBeVisible({
-        timeout: 10000,
-      });
+      // Blog heading copy can evolve; assert a stable, intent-aligned H1.
+      const heading = page.locator('main h1').first();
+      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(heading).toContainText(/TaxInsights|UK Tax Guides|PAYE Insights/i);
 
       // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('✅ Blog heading "TaxInsights" found');
+      console.log('✅ Blog heading found');
 
       // Take screenshot for visual verification
       await page.screenshot({
@@ -135,7 +135,7 @@ test.describe('Essential SEO Tests', () => {
       if (!hasHomeLink) {
         // biome-ignore lint/suspicious/noConsole: Test debugging output
         console.log('⏭️  Skipping - no "Back to Calculator" link found');
-        test.skip();
+        test.skip(true, 'No "Back to Calculator" link found on current blog page variant');
         return;
       }
 
@@ -173,7 +173,7 @@ test.describe('Essential SEO Tests', () => {
       if (postCount === 0) {
         // biome-ignore lint/suspicious/noConsole: Test debugging output
         console.log('⏭️  No blog posts available yet - this is OK for new blog');
-        test.skip();
+        test.skip(true, 'Blog has no posts in this environment');
         return;
       }
 

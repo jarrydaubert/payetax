@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated: February 19, 2026
+Last updated: February 20, 2026
 
 Only active commitments are listed below. Every item has a first action and a measurable done condition.
 
@@ -10,7 +10,6 @@ Only active commitments are listed below. Every item has a first action and a me
 
 | ID | Work Item | Next Step | Done When |
 |---|---|---|---|
-| `P0-3` | Finalize analytics governance baseline | Introduce typed analytics contract + CI check for unknown events; schedule alias removal for `calculator_completion`. | CI fails on unknown event names, docs align with code, and alias event is removed by deprecation date. |
 | `P0-4` | Verify distributed rate limiting in production | Run production validation against real Upstash-backed limits on public mutation routes. | Evidence recorded in release notes/runbook showing distributed limits work and in-memory fallback is not used in production. |
 | `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A full Stripe test-mode purchase reaches `ready` state and produces one downloadable artifact end-to-end. |
 | `P0-6` | Enforce release verification discipline | Use `bun run release:verify` and `POST_RELEASE_VALIDATION.md` on each release; store pass/fail notes. | Each release has a completed verification record linked in release notes/changelog. |
@@ -30,7 +29,6 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P1-5` | SPF/DKIM/DMARC monitoring cadence | Define monthly monitoring checklist and owner process for Kit/Resend domains. | Recurring check exists with first completed report and remediation path documented. |
 | `P1-6` | Package manager/runtime alignment | Decide and document one install/build path across local, CI, and Vercel (Bun vs npm). | Build pipeline uses one documented source of truth and lockfile drift is eliminated. |
 | `P1-7` | Clear remaining skipped/todo tests | Resolve known skipped tests and replace director NI `it.todo` placeholders with implemented tests. | Skipped/todo count for known items is zero (or explicitly justified in test comments). |
-| `P1-8` | Lock testing hygiene in CI | Add guard to block new `it.skip`/`test.skip`/`it.todo` unless allowlisted with rationale. | CI fails on new unapproved skipped/todo tests. |
 | `P1-9` | Formalize HMRC rounding divergence policy | Document exact-match vs tolerance rules for known HMRC rounding edge cases. | Policy is published and referenced by tax verification tests. |
 | `P1-10` | Migrate remaining hardcoded fallback tax literals | Replace fallback literals in UI fallback paths with source-of-truth derived defaults. | No tax-rate fallback literals remain outside approved constants modules. |
 | `P1-11` | Define Tax Pack snapshot contract | Specify deterministic snapshot schema (integer pence, checksum, version fields) and enforce validation. | Snapshot schema is implemented and used by generation pipeline and tests. |
@@ -41,6 +39,9 @@ Only active commitments are listed below. Every item has a first action and a me
 | `P1-16` | Add test-audit metrics generator | Create script to output suites/tests/skips/todos/coverage from current run artifacts. | Audit numbers are generated from script output instead of manual snapshots. |
 | `P1-17` | Investigate low Google referrer share | Run GSC + Ahrefs indexability audit (coverage, canonical, noindex, sitemap, robots, structured data) focused on why Bing/DDG/Yahoo outperform Google. | Root-cause report is documented and prioritized fix tickets are created with owner and ETA. |
 | `P1-18` | Strengthen internal links from top organic blog pages | Add contextual internal links from top blog landing pages to calculator and relevant tool pages. | Top 10 organic blog pages each include at least 2 relevant internal links to core conversion pages and pass crawl validation. |
+
+Status note (February 20, 2026):
+- `P1-8` completed: guardrail implemented via `scripts/check-test-skips.ts` + `scripts/test-debt-allowlist.ts`, wired into `bun run fix-all`.
 
 ---
 

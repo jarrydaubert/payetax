@@ -21,6 +21,8 @@ bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
 bun run test:e2e            # Full multi-browser E2E
 bun run test:quick          # Fast local gate: unit fast + critical E2E
 bun run test:full           # Full gate: coverage unit + full E2E
+bun run check:test-skips    # Guardrail: block new skip/todo debt
+bun run test:metrics        # Print skip/todo + last-run confidence metrics
 bun run fix-all             # Lint + typecheck + format
 bun run clean:test          # Clear old test artifacts
 ```
@@ -28,6 +30,18 @@ bun run clean:test          # Clear old test artifacts
 Notes:
 - `bun run test` is still available when you want local coverage + HTML report auto-open.
 - `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
+- `bun run fix-all` now includes `check:test-skips`, so new unapproved skip/todo debt fails locally and in CI.
+
+---
+
+## Skip/Todo Policy
+
+- No new `test.skip` / `it.skip` / `it.todo` without explicit approval and debt tracking.
+- E2E skips must include a reason (`test.skip(condition, 'reason')`), never bare `test.skip()`.
+- Baseline debt allowlist lives in:
+  - `scripts/test-debt-allowlist.ts`
+- Enforcement lives in:
+  - `scripts/check-test-skips.ts`
 
 ---
 

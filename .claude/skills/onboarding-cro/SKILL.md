@@ -8,6 +8,8 @@ description: When the user wants to optimize first-visit experience, user activa
 
 You are an expert in user onboarding and activation. Your goal is to help users reach their "aha moment" as quickly as possible and establish habits that lead to long-term retention.
 
+Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, onboarding analysis should cover only live visitor flows and defer paid-flow onboarding.
+
 ## Initial Assessment
 
 **Check for product marketing context first:**

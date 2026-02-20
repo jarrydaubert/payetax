@@ -1,0 +1,76 @@
+/**
+ * Canonical analytics event contract for PayeTax.
+ *
+ * Keep this list as the single source of truth for event names.
+ * CI enforces this contract via scripts/check-analytics-events.ts.
+ */
+
+export const ANALYTICS_EVENT_ACTIONS = [
+  'affiliate_click',
+  'blog_article_read',
+  'calculator_action',
+  'calculator_completed',
+  'calculator_completion',
+  'calculator_error',
+  'calculator_start',
+  'calculator_usage',
+  'cta_clicked',
+  'director_guide_buffer_shortfall_shown',
+  'director_guide_mode_changed',
+  'director_guide_safe_draw_calculated',
+  'export_failed',
+  'feedback_dialog_opened',
+  'feedback_submitted',
+  'guide_already_taken',
+  'guide_calculation_run',
+  'guide_education_expanded',
+  'guide_email_opened',
+  'guide_email_sent',
+  'guide_expenses_entered',
+  'guide_location_selected',
+  'guide_other_income_gate_shown',
+  'guide_other_income_has_other',
+  'guide_other_income_none',
+  'guide_reset',
+  'guide_results_copied',
+  'guide_results_shown',
+  'guide_revenue_entered',
+  'guide_started',
+  'guide_warning_shown',
+  'newsletter_subscribe_failed',
+  'newsletter_subscribed',
+  'performance_metric',
+  'pro_calculator_completed',
+  'pro_calculator_started',
+  'pro_calendar_downloaded',
+  'pro_strategy_selected',
+  'pwa_installed',
+  'referral_cta_clicked',
+  'referral_cta_dismissed',
+  'referral_lead_submitted',
+  'result_shared',
+  'result_viewed',
+] as const;
+
+export type AnalyticsAction = (typeof ANALYTICS_EVENT_ACTIONS)[number];
+
+export const SEO_ACTIONS = [
+  'affiliate_click',
+  'download',
+  'external_link',
+  'form_interaction',
+  'navigation',
+  'print',
+  'scroll_to_top',
+  'share',
+] as const;
+
+export type SEOActionType = (typeof SEO_ACTIONS)[number];
+
+export const DEPRECATED_ANALYTICS_ALIASES = {
+  calculator_completion: {
+    canonical: 'calculator_completed',
+    removeAfter: '2026-04-30',
+    reason: 'Legacy naming from pre-funnel-standardization period.',
+  },
+} as const;

@@ -14,10 +14,13 @@
  * @module lib/analytics
  */
 
+import type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 import { areCookiesAccepted } from '@/lib/cookieUtils';
 
+export type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
+
 /** High-signal events that warrant Sentry breadcrumbs */
-const HIGH_SIGNAL_ACTIONS = new Set([
+const HIGH_SIGNAL_ACTIONS: ReadonlySet<string> = new Set([
   'calculator_error',
   'export_failed',
   'newsletter_subscribe_failed',
@@ -50,19 +53,8 @@ function addAnalyticsBreadcrumb(message: string, data: Record<string, unknown>):
     });
 }
 
-// Types for analytics events
-export type SEOActionType =
-  | 'external_link'
-  | 'download'
-  | 'share'
-  | 'print'
-  | 'scroll_to_top'
-  | 'navigation'
-  | 'form_interaction'
-  | 'affiliate_click';
-
 export interface AnalyticsEvent {
-  action: string;
+  action: AnalyticsAction;
   category?: string;
   label?: string;
   value?: number;

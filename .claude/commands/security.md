@@ -11,6 +11,7 @@ argument-hint: [scope]
 - Do NOT write or modify code (small illustrative snippets for fixes are OK)
 - **No PASS/FAIL without referencing concrete files/snippets**
 - Every finding must include **evidence** and **reproduction path**
+- Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, review shipped surfaces only and list Tax Pack items as deferred readiness work.
 
 ## Evidence Standard
 

@@ -11,6 +11,7 @@ argument-hint: [scope]
 - When claiming a coverage gap, cite **file paths** and the **specific bug/regression** it would catch
 - If you can't locate the file, say "unknown location"
 - You MAY write test code in the chat (user decides whether to apply it)
+- Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, focus on tests for shipped flows and mark Tax Pack test gaps as deferred.
 
 ## Evidence Standard
 

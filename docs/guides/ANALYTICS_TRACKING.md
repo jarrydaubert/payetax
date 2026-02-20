@@ -7,6 +7,8 @@ Last updated: February 19, 2026
 - GA4 via direct `gtag.js` (consent-gated): `src/components/organisms/Analytics.tsx`
 - Ahrefs Analytics (consent-gated): `src/components/organisms/AhrefsAnalytics.tsx`
 - Shared event helper: `src/lib/analytics.ts`
+- Event contract source of truth: `src/lib/analyticsEvents.ts`
+- CI contract guard: `scripts/check-analytics-events.ts` (runs via `bun run fix-all`)
 
 ## Conversion Events
 | Event | Trigger | Properties | Source |
@@ -26,7 +28,7 @@ Last updated: February 19, 2026
 | `pwa_installed` | `appinstalled` fires | `label` | `src/components/organisms/PWAInstallBanner.tsx` |
 
 ## Migration Aliases
-- `calculator_completion` is a legacy alias for `calculator_completed` (currently dual-emitted; target removal by April 30, 2026).
+- `calculator_completion` is a legacy alias for `calculator_completed` (currently dual-emitted; removal date: April 30, 2026).
 - `pro_calculator_started`/`pro_calculator_completed` are currently emitted alongside guide events.
 
 ## Privacy Rules

@@ -143,7 +143,7 @@ describe('analytics', () => {
   describe('trackEvent', () => {
     it('tracks general analytics event', () => {
       const event: AnalyticsEvent = {
-        action: 'button_click',
+        action: 'cta_clicked',
         category: 'engagement',
         label: 'Calculate Tax',
         value: 1,
@@ -151,7 +151,7 @@ describe('analytics', () => {
 
       trackEvent(event);
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'button_click', {
+      expect(mockGtag).toHaveBeenCalledWith('event', 'cta_clicked', {
         category: 'engagement',
         label: 'Calculate Tax',
         value: 1,
@@ -159,11 +159,11 @@ describe('analytics', () => {
     });
 
     it('uses default category when not provided', () => {
-      trackEvent({ action: 'test_action' });
+      trackEvent({ action: 'calculator_start' });
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
-        'test_action',
+        'calculator_start',
         expect.objectContaining({
           category: 'general',
         }),
@@ -172,7 +172,7 @@ describe('analytics', () => {
 
     it('logs to console in development mode', () => {
       process.env.NODE_ENV = 'development';
-      const event: AnalyticsEvent = { action: 'test' };
+      const event: AnalyticsEvent = { action: 'result_shared' };
 
       trackEvent(event);
 
@@ -182,7 +182,7 @@ describe('analytics', () => {
     it('handles missing gtag gracefully', () => {
       (window as Window & { gtag?: unknown }).gtag = undefined;
 
-      expect(() => trackEvent({ action: 'test' })).not.toThrow();
+      expect(() => trackEvent({ action: 'result_shared' })).not.toThrow();
     });
 
     it('handles errors gracefully', () => {
@@ -190,20 +190,20 @@ describe('analytics', () => {
         throw new Error('Tracking error');
       });
 
-      expect(() => trackEvent({ action: 'test' })).not.toThrow();
+      expect(() => trackEvent({ action: 'result_shared' })).not.toThrow();
       expect(consoleWarnSpy).toHaveBeenCalledWith('Analytics tracking error:', expect.any(Error));
     });
 
     it('includes custom data in event', () => {
       const customData = { userId: '123', sessionId: 'abc' };
       trackEvent({
-        action: 'custom_event',
+        action: 'result_shared',
         custom_data: customData,
       });
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
-        'custom_event',
+        'result_shared',
         expect.objectContaining({
           ...customData,
         }),

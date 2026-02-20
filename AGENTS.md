@@ -12,6 +12,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Single source of truth: tax rates live in `src/constants/taxRates.ts`.
 - Test behavior: cover user-visible outcomes over implementation details.
 - Accessibility + performance: ship fast and inclusive UI.
+- Tax Pack status guardrail: Tax Pack is planned (not live); by default assess shipped flows only and treat Tax Pack work as deferred unless explicitly requested.
 
 ## Source Of Truth
 

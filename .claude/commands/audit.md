@@ -10,6 +10,7 @@ argument-hint: [target]
 - Output ALL audit findings directly in this conversation as markdown
 - Do NOT write or modify code (small illustrative snippets for fixes are OK)
 - If a file isn't provided, list what's needed and proceed with best-effort; do not invent content
+- Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, audit shipped flows only and mark Tax Pack gaps as deferred.
 
 ## Severity Definitions
 
