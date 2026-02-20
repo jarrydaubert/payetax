@@ -37,7 +37,6 @@ Only active commitments are listed below. Every item has a first action and a me
 |---|---|---|---|
 | `P2-1` | React Compiler experiment | Enable in a controlled branch and compare INP/render metrics against baseline. | Keep/rollback decision documented with measured performance and regression results. |
 | `P2-2` | Cache Components / `use cache` experiment | Trial on static-heavy routes and capture TTFB/LCP impact. | Route-by-route decision documented with before/after metrics and rollout plan if beneficial. |
-| `P2-3` | Compliance integrity transparency section | Draft `/compliance` addition with engine version, tax-rules version, and last verification date. | Section is published or explicitly deferred with rationale after trust-impact review. |
 | `P2-4` | Embeddable widget demand validation | Run lightweight demand test with target users/partners before any build work. | Build/no-build decision made from recorded demand signals and opportunity cost review. |
 | `P2-5` | Referral rollout validation | Validate demand with accountant discovery calls and instrument "this is complex" interaction tracking. | Go/no-go decision made with evidence and CTA enabled only if partner readiness exists. |
 | `P2-6` | Sitemap inclusion policy hardening | Define and enforce data-led sitemap inclusion rules for salary and competitor pages. | Inclusion/exclusion policy is documented and monthly review loop is running. |

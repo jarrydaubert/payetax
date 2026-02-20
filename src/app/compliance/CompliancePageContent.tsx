@@ -11,14 +11,43 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import {
+  CURRENT_TAX_YEAR_DISPLAY_SHORT,
+  formatIsoDateForDisplay,
+  RATES_LAST_VERIFIED,
+} from '@/constants/freshness';
+import {
   COMPLIANCE_FEATURES,
   COMPLIANCE_STATEMENTS,
   complianceStats,
   DATA_SOURCES,
 } from '@/constants/pages/compliancePageData';
+import { APP_VERSION } from '@/constants/version';
 import { cn } from '@/lib/utils';
 
 export function CompliancePageContent() {
+  const integritySnapshot = [
+    {
+      label: 'App release',
+      value: `v${APP_VERSION}`,
+      note: 'Version currently deployed from repository release tags.',
+    },
+    {
+      label: 'Tax ruleset',
+      value: CURRENT_TAX_YEAR_DISPLAY_SHORT,
+      note: 'Single source of truth: src/constants/taxRates.ts',
+    },
+    {
+      label: 'Rates verified',
+      value: formatIsoDateForDisplay(RATES_LAST_VERIFIED),
+      note: 'HMRC/Revenue Scotland rates last manually verified.',
+    },
+    {
+      label: 'Model class',
+      value: 'Deterministic',
+      note: 'No AI-generated tax outputs; fixed formulas and thresholds.',
+    },
+  ] as const;
+
   return (
     <div className={LAYOUT.PAGE_WRAPPER}>
       {/* Hero */}
@@ -40,6 +69,30 @@ export function CompliancePageContent() {
       <section className={LAYOUT.SECTION}>
         <div className={LAYOUT.CONTAINER}>
           <StatsGrid stats={complianceStats} columns={3} variant='elevated' />
+        </div>
+      </section>
+
+      {/* Integrity Snapshot */}
+      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
+        <div className={LAYOUT.CONTAINER}>
+          <SectionHeading
+            badge={{ icon: Shield, text: 'Integrity Snapshot' }}
+            title='Calculation Integrity Snapshot'
+            subtitle='Versioned references so assumptions and rate coverage are explicit.'
+            align='center'
+          />
+
+          <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+            {integritySnapshot.map((item) => (
+              <Card key={item.label} className={SURFACES.CARD_STANDARD}>
+                <p className='font-medium text-muted-foreground text-xs uppercase tracking-wide'>
+                  {item.label}
+                </p>
+                <p className='mt-2 font-semibold text-foreground text-xl'>{item.value}</p>
+                <p className='mt-2 text-muted-foreground text-sm'>{item.note}</p>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
