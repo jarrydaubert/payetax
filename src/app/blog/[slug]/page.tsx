@@ -45,6 +45,12 @@ const BASE_INTERNAL_LINKS: InternalToolLink[] = [
     title: 'Director Intelligence',
     description: 'Compare salary and dividend strategies.',
   },
+  {
+    id: 'compliance',
+    href: '/compliance',
+    title: 'Compliance & Methodology',
+    description: 'See assumptions, limitations, and policy references.',
+  },
 ];
 
 const CONTEXTUAL_INTERNAL_LINKS: Array<{
@@ -107,7 +113,7 @@ function getInternalToolLinks(post: {
     (link, index, arr) => arr.findIndex((candidate) => candidate.id === link.id) === index,
   );
 
-  return uniqueLinks.slice(0, 3);
+  return uniqueLinks.slice(0, 4);
 }
 
 /** Normalize image URL - handles both relative and absolute paths */

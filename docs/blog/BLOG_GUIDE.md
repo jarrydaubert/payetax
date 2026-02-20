@@ -40,3 +40,13 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Add new posts in the backlog before writing.
 - Update or retire posts when tax rules change.
 - Keep all work items in `docs/BACKLOG.md`.
+
+## Conversion Checklist (Default)
+
+Apply this on every new post before publish:
+
+- Primary CTA present: link to `/#tax-calculator` (or salary calculator page where appropriate).
+- Secondary CTA present: link to `/tools/director-guide` when relevant.
+- Trust/compliance path present: link to `/compliance`.
+- At least one contextual internal tool link beyond the three default links when relevant to the topic.
+- Newsletter block included in the post template.
