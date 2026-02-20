@@ -1,22 +1,25 @@
-# Marketing Skills Versions
+# PayeTax Skills Versions
 
 Canonical inventory for PayeTax skills, with clear separation between upstream (vanilla) content and PayeTax customization.
 
-## Upstream Source
+## Upstream Sources
 
-Skills and tools are sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills). Use this file when syncing or auditing drift.
+Skills and tools are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills). Use this file when syncing or auditing drift.
 
 ## Separation of Concerns
 
-### 1) Upstream/Vanilla Layer
-- Base methodology in each skill is synced from upstream.
-- `references/` and `.claude/tools/` are upstream-first assets.
+### 1) Marketing Upstream Layer (coreyhaines31/marketingskills)
+- Marketing/CRO/SEO baseline methodology synced from upstream.
+- `references/` and `.claude/tools/` are upstream-first assets for that set.
 
-### 2) PayeTax Custom Layer
+### 2) Engineering Workflow Upstream Layer (mattpocock/skills)
+- Engineering workflow skills adapted for PayeTax process/tooling.
+
+### 3) PayeTax Custom Layer
 - Every skill includes a `## PayeTax Context` section for local rules, constraints, and file paths.
 - PayeTax context can override generic advice where needed (free product model, privacy constraints, HMRC-accuracy emphasis).
 
-### 3) PayeTax-Only Skills
+### 4) PayeTax-Only Skills
 - `accessibility/`
 - `engineering/`
 
@@ -63,6 +66,16 @@ Skills and tools are sourced from [coreyhaines31/marketingskills](https://github
 | accessibility | 1.1.0 | 2026-02-20 |
 | engineering | 1.0.0 | 2026-02-04 |
 
+## External-Adapted Skills (3)
+
+Source: [mattpocock/skills](https://github.com/mattpocock/skills), commit `8e51ff7`.
+
+| Skill | Version | Last Updated |
+|-------|---------|--------------|
+| design-an-interface | 1.0.0 | 2026-02-20 |
+| prd-to-issues | 1.0.0 | 2026-02-20 |
+| tdd | 1.0.0 | 2026-02-20 |
+
 ## New Skill Alignment Standard
 
 When adding a new upstream skill to PayeTax:
@@ -87,6 +100,7 @@ When adding a new upstream skill to PayeTax:
 ### 2026-02-20
 - Synced upstream skills to v1.2.0.
 - Added new skills: ad-creative, ai-seo, churn-prevention, cold-email.
+- Added external-adapted engineering workflow skills: tdd, design-an-interface, prd-to-issues.
 - Expanded integrations and CLI docs in `.claude/tools/`.
 - Aligned all skills to include `## PayeTax Context`.
 - Normalized "Director Intelligence" naming across skills and commands.

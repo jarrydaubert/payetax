@@ -54,14 +54,22 @@ then write homepage hero copy
 | `/finance` | UK tax accuracy (HMRC verification) | `/finance ni` |
 | `/compliance` | UK GDPR + PECR + ASA/CAP audit | `/compliance` |
 
-## Skills (26 Installed)
+## Skills (29 Installed)
 
 ### Code & Quality
 
 | Skill | Use When | Example |
 | --- | --- | --- |
 | `engineering` | Next.js/React/TS performance patterns | "Review LCP + INP issues on homepage" |
+| `tdd` | Red/Green/Refactor test-first workflow | "Fix this regression with TDD" |
+| `design-an-interface` | Compare module/API shape options before coding | "Design the director engine interface in 3 ways" |
 | `accessibility` | WCAG 2.2 AA, a11y audits | "Check calculator keyboard nav + aria-live" |
+
+### Planning & Delivery
+
+| Skill | Use When | Example |
+| --- | --- | --- |
+| `prd-to-issues` | Break PRDs into vertical slices with clear dependencies | "Turn this tax pack PRD into execution-ready issues" |
 
 ### SEO & Content
 
@@ -111,4 +119,4 @@ then write homepage hero copy
 
 - If a command or skill is mentioned but not installed under `.claude/`, it can't be used until added.
 - If you want to make skills available globally in Codex, add them to your `AGENTS.md` list with name + description + path.
-- Skills are sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) — see `.claude/skills/VERSIONS.md` for sync history.
+- Skills are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — see `.claude/skills/VERSIONS.md` for sync history.

@@ -11,6 +11,7 @@
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
 | **See active TODOs?** | [`BACKLOG.md`](./BACKLOG.md) |
 | **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
+| **Use Claude skills/commands effectively?** | [`SKILLS_AND_COMMANDS.md`](./guides/SKILLS_AND_COMMANDS.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Review sitemap policy?** | [`SITEMAP_POLICY.md`](./guides/SITEMAP_POLICY.md) |
@@ -25,6 +26,7 @@
 | **Configure Sentry?** | [`SENTRY_LOGGING.md`](./guides/SENTRY_LOGGING.md) |
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
 | **Use Linear?** | [`LINEAR.md`](./guides/LINEAR.md) |
+| **Run Kanban workflow?** | [`KANBAN.md`](./guides/KANBAN.md) |
 | **Director tools strategy?** | [`business/README.md`](./business/README.md) |
 
 ---

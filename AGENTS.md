@@ -108,6 +108,9 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 
 ### Engineering & Analytics
 - `engineering` — Next.js, React, TypeScript, performance
+- `tdd` — test-driven development (Red/Green/Refactor) for regression-safe delivery
+- `design-an-interface` — compare multiple interface/module designs before implementation
+- `prd-to-issues` — break PRDs into vertical, testable execution slices
 - `accessibility` — WCAG 2.2 AA compliance
 - `analytics-tracking` — GA4, Vercel Analytics, Ahrefs, event tracking
 

@@ -56,7 +56,7 @@
 
 ---
 
-## Skills (26 installed)
+## Skills (29 installed)
 
 Skills provide expert knowledge that you load before a task.
 
@@ -65,7 +65,15 @@ Skills provide expert knowledge that you load before a task.
 | Skill | Use When |
 | --- | --- |
 | `engineering` | Next.js/React/TypeScript performance and patterns |
+| `tdd` | Test-driven delivery with bug-first Red/Green/Refactor loops |
+| `design-an-interface` | Compare API/module interface options before implementation |
 | `accessibility` | WCAG 2.2 AA, screen readers, keyboard nav |
+
+### Planning & Delivery
+
+| Skill | Use When |
+| --- | --- |
+| `prd-to-issues` | Break PRDs into vertical slices with dependencies and acceptance criteria |
 
 ### SEO & Content
 
@@ -120,6 +128,12 @@ Skills provide expert knowledge that you load before a task.
 
 > "Audit the calculator for WCAG issues"
 → `accessibility`
+
+> "Let's do this test-first and keep each change tiny"
+→ `tdd`
+
+> "Give me 3 different module interface options before coding"
+→ `design-an-interface`
 
 > "Write hero copy for the new tool"
 → `copywriting`
@@ -188,6 +202,7 @@ Skills provide expert knowledge that you load before a task.
 │   ├── content-strategy/
 │   ├── copy-editing/
 │   ├── copywriting/
+│   ├── design-an-interface/
 │   ├── email-sequence/
 │   ├── engineering/
 │   ├── form-cro/
@@ -198,11 +213,13 @@ Skills provide expert knowledge that you load before a task.
 │   ├── onboarding-cro/
 │   ├── page-cro/
 │   ├── popup-cro/
+│   ├── prd-to-issues/
 │   ├── product-marketing-context/
 │   ├── programmatic-seo/
 │   ├── schema-markup/
 │   ├── seo-audit/
 │   ├── social-content/
+│   ├── tdd/
 │   └── VERSIONS.md
 └── tools/
     ├── REGISTRY.md
