@@ -27,6 +27,19 @@ export default function AlternativesIndexPage() {
           { name: 'Alternatives', url: `${SITE_URL}/alternatives` },
         ]}
       />
+      <StructuredData
+        type='itemlist'
+        itemList={{
+          listName: 'UK Tax Calculator Alternatives',
+          listDescription: 'Comparison pages for UK tax calculator alternatives.',
+          items: sortedCompetitors.map((competitor, index) => ({
+            name: `${competitor.name} Alternative`,
+            url: `${SITE_URL}/alternatives/${competitor.slug}`,
+            description: competitor.description,
+            position: index + 1,
+          })),
+        }}
+      />
       <div className={LAYOUT.PAGE_WRAPPER}>
         {/* Hero Section */}
         <PageHero

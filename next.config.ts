@@ -218,6 +218,26 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Edge cache policy for blog pages
+        source: '/blog/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // Long-term caching for generated content assets
+        source: '/content/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
         // Long-term caching for static images
         source: '/images/(.*)',
         headers: [

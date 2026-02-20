@@ -57,7 +57,7 @@ bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E
 bun run bundle:analyze      # Bundle analysis
-bun run check:analytics-env # Verify analytics env/template/schema sync
+bun run check:env-contract # Verify critical env/template/schema sync
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 ```
@@ -77,6 +77,7 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 
 ### SEO & Content
 - `seo-audit` — full-site SEO audit (incl. AI bot access, llms.txt)
+- `ai-seo` — AI search optimisation (AEO/GEO/LLMO), AI Overviews, citations
 - `programmatic-seo` — salary pages, template-based SEO at scale
 - `schema-markup` — JSON-LD structured data
 - `content-strategy` — blog planning, topic clusters, content pillars
@@ -85,6 +86,8 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 ### Copy & Creative
 - `copywriting` — page copy, headlines, CTAs
 - `copy-editing` — editing passes on existing copy
+- `ad-creative` — ad copy variations, headlines, platform-specific creative
+- `cold-email` — B2B cold outreach emails and follow-up sequences
 - `social-content` — LinkedIn, Twitter/X, Reddit content
 
 ### Conversion & UX
@@ -99,6 +102,7 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 - `launch-strategy` — feature releases, tax calendar events
 - `free-tool-strategy` — new calculator planning and evaluation
 - `marketing-psychology` — mental models and behavioural science
+- `churn-prevention` — retention, cancel flows, dunning, win-back
 - `email-sequence` — Kit newsletter + Resend transactional email
 - `product-marketing-context` — shared context doc for all skills
 
@@ -120,7 +124,8 @@ Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.
 ## Tools & Integrations
 
 - Tool registry: `.claude/tools/REGISTRY.md`
-- Integration guides: `.claude/tools/integrations/` (Kit, Resend, Ahrefs, GA4, etc.)
+- Integration guides: `.claude/tools/integrations/` (58 guides — Kit, Resend, Ahrefs, GA4, etc.)
+- CLI tool scripts: `.claude/tools/clis/` (52 vendor scripts)
 
 ## Email Infrastructure
 

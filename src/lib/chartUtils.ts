@@ -167,7 +167,7 @@ export interface EffectiveTaxRateData {
 /**
  * Calculate effective tax rate (total tax / gross income)
  */
-function calculateEffectiveRate(
+export function calculateEffectiveRate(
   incomeTax: number,
   ni: number,
   studentLoan: number,
@@ -182,26 +182,25 @@ function calculateEffectiveRate(
  * Estimate marginal tax rate for a salary point
  * Uses thresholds from taxRates.ts single source of truth
  */
-function estimateMarginalRate(salary: number, isScottish = false): number {
-  const personalAllowance = currentRates.personalAllowance;
-  const basicRateThreshold = personalAllowance + (currentRates.bands[0]?.threshold ?? 0);
-  const higherRateThreshold = personalAllowance + (currentRates.bands[1]?.threshold ?? 0);
+export function estimateMarginalRate(salary: number, isScottish = false): number {
+  const rates = isScottish ? currentScottishRates : currentRates;
+  const personalAllowance = rates.personalAllowance;
 
-  if (isScottish) {
-    // Scottish has 6 bands - use intermediate rate threshold
-    const scottishIntermediateThreshold =
-      currentScottishRates.personalAllowance + (currentScottishRates.bands[2]?.threshold ?? 0);
-    if (salary <= personalAllowance) return 0;
-    if (salary <= scottishIntermediateThreshold) return currentScottishRates.bands[2]?.rate ?? 0;
-    if (salary <= higherRateThreshold) return currentScottishRates.bands[3]?.rate ?? 0;
-    return currentScottishRates.bands[5]?.rate ?? 0;
+  if (salary <= personalAllowance) return 0;
+
+  // Gross salary where PA is fully tapered to zero (e.g. £125,140 for current UK settings).
+  const paTaperEndGross = rates.personalAllowanceReductionThreshold + rates.personalAllowance * 2;
+
+  for (const band of rates.bands) {
+    // Bands are stored as taxable-income thresholds. Convert to gross-salary thresholds
+    // while clamping to PA taper-end so higher/additional boundaries map correctly.
+    const grossThreshold = Math.min(personalAllowance + band.threshold, paTaperEndGross);
+    if (salary <= grossThreshold) {
+      return band.rate;
+    }
   }
 
-  // UK (England, Wales, NI) rates
-  if (salary <= personalAllowance) return 0;
-  if (salary <= basicRateThreshold) return currentRates.bands[0]?.rate ?? 0;
-  if (salary <= higherRateThreshold) return currentRates.bands[1]?.rate ?? 0;
-  return currentRates.bands[2]?.rate ?? 0;
+  return rates.bands.at(-1)?.rate ?? 0;
 }
 
 export function getEffectiveTaxRateData(

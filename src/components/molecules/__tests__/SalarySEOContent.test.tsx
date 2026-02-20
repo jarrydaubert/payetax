@@ -4,10 +4,17 @@
 // src/components/molecules/__tests__/SalarySEOContent.test.tsx
 
 import { render, screen } from '@testing-library/react';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { SalarySEOContent } from '../SalarySEOContent';
 
 describe('SalarySEOContent', () => {
+  const taxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+    separator: '-',
+    shortEndYear: true,
+  });
+  const taxYearStart = CURRENT_TAX_YEAR.split('-')[0] || 'current';
+
   const createMockResults = (
     overrides: Partial<TaxCalculationResults> = {},
   ): TaxCalculationResults => ({
@@ -97,11 +104,11 @@ describe('SalarySEOContent', () => {
       expect(screen.getAllByText(/per month/).length).toBeGreaterThanOrEqual(1);
     });
 
-    it('should mention 2025-26 tax year', () => {
+    it('should mention current tax year', () => {
       const mockResults = createMockResults();
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
-      expect(screen.getByText(/2025-26 tax year/)).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(`${taxYearDisplay} tax year`))).toBeInTheDocument();
     });
   });
 
@@ -181,7 +188,10 @@ describe('SalarySEOContent', () => {
       render(<SalarySEOContent salary={30000} results={mockResults} />);
 
       expect(
-        screen.getByRole('heading', { level: 3, name: /Is £30,000 a Good Salary in 2025/i }),
+        screen.getByRole('heading', {
+          level: 3,
+          name: new RegExp(`Is £30,000 a Good Salary in ${taxYearStart}`, 'i'),
+        }),
       ).toBeInTheDocument();
     });
 
@@ -422,6 +432,28 @@ describe('SalarySEOContent', () => {
 
       // 5000 + 3000 = 8,000 (student loan not included in display)
       expect(screen.getByText(/£8,000\/year/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Internal Links', () => {
+    it('shows the tax trap guide link for salaries at or above £100k', () => {
+      const mockResults = createMockResults({ grossSalary: 110000 });
+      render(<SalarySEOContent salary={110000} results={mockResults} />);
+
+      expect(screen.getByRole('link', { name: /100k tax trap guide/i })).toHaveAttribute(
+        'href',
+        '/blog/100k-tax-trap-avoid-60-percent-tax-2025',
+      );
+    });
+
+    it('always shows a nearby salary page link', () => {
+      const mockResults = createMockResults();
+      render(<SalarySEOContent salary={30000} results={mockResults} />);
+
+      expect(screen.getByRole('link', { name: /£25,000 after tax/i })).toHaveAttribute(
+        'href',
+        '/calculator/25000-after-tax',
+      );
     });
   });
 });

@@ -24,10 +24,11 @@ export default function AboutPage() {
       <StructuredData
         type='person'
         expert={{
-          name: 'Jarryd',
+          name: 'Jarryd Daubert',
           jobTitle: 'Creator & Developer',
           description: 'Creator of PayeTax, building privacy-first tax tools for UK taxpayers.',
           organization: 'PayeTax',
+          expertise: ['UK PAYE tax', 'HMRC compliance', 'tax software'],
         }}
       />
       <StructuredData
@@ -301,6 +302,13 @@ export default function AboutPage() {
                 The goal is simple: give people enough clarity to make better pay decisions without
                 needing an accounting background.
               </p>
+              <ul className='mt-4 space-y-2 text-muted-foreground text-sm leading-relaxed'>
+                <li>Built and maintains the PAYE engine used across PayeTax calculators.</li>
+                <li>
+                  Verifies tax-year updates against official HMRC and Revenue Scotland sources.
+                </li>
+                <li>Uses automated unit and E2E checks before production releases.</li>
+              </ul>
               <div className='mt-6 flex flex-wrap gap-3'>
                 <FeedbackDialog
                   triggerLabel='Send feedback'

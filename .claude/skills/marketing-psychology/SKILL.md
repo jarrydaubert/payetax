@@ -1,7 +1,8 @@
 ---
 name: marketing-psychology
-version: 1.0.0
 description: "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' This skill provides 70+ mental models organized for marketing application."
+metadata:
+  version: 1.2.0
 ---
 
 # Marketing Psychology & Mental Models
@@ -452,3 +453,10 @@ When facing a marketing challenge, consider:
 - **popup-cro**: Use triggers and psychology in popups
 - **pricing-page optimization**: See page-cro for pricing psychology
 - **ab-test-setup**: Test psychological hypotheses
+
+## PayeTax Context
+
+- Apply psychology ethically. No dark patterns, fake urgency, or manipulative pressure.
+- For PayeTax, trust signals (accuracy, privacy, transparency) usually outperform aggressive persuasion.
+- Prioritize reduced friction on calculator completion and comprehension over novelty tactics.
+- When suggesting experiments, tie each to measurable product outcomes (calculator completion, result engagement, newsletter signup).

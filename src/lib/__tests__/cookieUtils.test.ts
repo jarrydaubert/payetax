@@ -257,34 +257,20 @@ describe('Cookie Utils', () => {
       expect(isConsentExpired()).toBe(false);
     });
 
-    // SKIP: Complex date mocking is fragile and this edge case is low-risk
-    // The month boundary calculation is tested implicitly by other expiration tests
-    // Fixing would require significant refactoring of Date mocking approach
-    test.skip('should handle edge case around month boundaries', () => {
-      // Test around February/March boundary to ensure month calculation is correct
-      const testDate = new Date('2024-03-31T10:00:00Z');
-      const twelveMonthsEarlier = new Date('2023-03-31T10:00:00Z');
+    test('should handle edge case around month boundaries', () => {
+      // Validate exact 12-month boundary around a real month-end transition.
+      const nowMs = Date.parse('2025-03-31T10:00:00.000Z');
+      const boundaryTimestamp = new Date(Date.parse('2024-03-31T10:00:00.000Z')).toISOString();
+      const expiredTimestamp = new Date(Date.parse('2024-03-31T09:59:59.999Z')).toISOString();
+      const dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(nowMs);
 
-      // Mock current date
-      const originalDate = global.Date;
-      Date.now = jest.fn(() => testDate.getTime());
-      global.Date = class extends originalDate {
-        constructor(...args: ConstructorParameters<typeof Date>) {
-          super();
-          if (args.length === 0) {
-            super.setTime(Date.now());
-          } else {
-            super.setTime(new originalDate(...args).getTime());
-          }
-        }
-      };
-
-      localStorageMock.setItem('cookie-consent-timestamp', twelveMonthsEarlier.toISOString());
-
+      localStorageMock.setItem('cookie-consent-timestamp', boundaryTimestamp);
       expect(isConsentExpired()).toBe(false);
 
-      // Restore original Date
-      global.Date = originalDate;
+      localStorageMock.setItem('cookie-consent-timestamp', expiredTimestamp);
+      expect(isConsentExpired()).toBe(true);
+
+      dateNowSpy.mockRestore();
     });
   });
 });

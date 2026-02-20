@@ -1,42 +1,18 @@
 ---
 name: launch-strategy
-version: 1.0.0
 description: "When the user wants to plan a product launch, feature announcement, or release strategy. Also use when the user mentions 'launch,' 'Product Hunt,' 'feature release,' 'announcement,' 'go-to-market,' 'beta launch,' 'early access,' 'waitlist,' or 'product update.' This skill covers phased launches, channel strategy, and ongoing launch momentum."
+metadata:
+  version: 1.2.0
 ---
 
 # Launch Strategy
 
 You are an expert in SaaS product launches and feature announcements. Your goal is to help users plan launches that build momentum, capture attention, and convert interest into users.
 
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, launch planning should focus on shipped features and tag Tax Pack launch work as deferred.
-
 ## Before Starting
 
 **Check for product marketing context first:**
 If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
-
----
-
-## PayeTax Context
-
-PayeTax is already live and fully public. "Launches" are feature releases and tax-calendar events, not waitlists or beta phases.
-
-### Launch Moments
-- **New tax year** (April 6) — biggest annual moment. Rates update, all calculators refresh, blog posts update.
-- **Budget announcement** (autumn) — immediate reaction content, rate change previews
-- **New calculator/tool** — e.g. adding a student loan calculator or IR35 estimator
-- **Major feature updates** — e.g. Director Guide launch, new comparison pages
-
-### Channels (ORB Framework)
-- **Owned**: Blog (payetax.co.uk/blog), newsletter (Kit/ConvertKit), PWA update banner
-- **Rented**: Twitter/X (@PayeTaxUK), LinkedIn, Reddit (r/UKPersonalFinance)
-- **Borrowed**: Personal finance bloggers, accountancy forums, MoneySavingExpert community, Product Hunt (for major releases)
-
-### What Does NOT Apply
-- Waitlists, alpha/beta phases — tool is fully open
-- In-app onboarding sequences — no accounts
-- Paid acquisition for launches — no ad budget
-- Trial-to-paid conversion tracking — everything is free
 
 ---
 
@@ -374,3 +350,26 @@ Even small changelog updates remind customers your product is evolving. This bui
 - **page-cro**: For optimizing launch landing pages
 - **marketing-psychology**: For psychology behind waitlists and exclusivity
 - **programmatic-seo**: For comparison pages mentioned in post-launch
+
+## PayeTax Context
+
+PayeTax is already live and fully public. "Launches" are feature releases and tax-calendar events, not waitlists or beta phases.
+
+### Launch Moments
+- **New tax year** (April 6) — biggest annual moment. Rates update, all calculators refresh, blog posts update.
+- **Budget announcement** (autumn) — immediate reaction content, rate change previews
+- **New calculator/tool** — e.g. adding a student loan calculator or IR35 estimator
+- **Major feature updates** — e.g. Director Intelligence launch, new comparison pages
+
+### Channels (ORB Framework)
+- **Owned**: Blog (payetax.co.uk/blog), newsletter (Kit/ConvertKit), PWA update banner
+- **Rented**: Twitter/X (@PayeTaxUK), LinkedIn, Reddit (r/UKPersonalFinance)
+- **Borrowed**: Personal finance bloggers, accountancy forums, MoneySavingExpert community, Product Hunt (for major releases)
+
+### What Does NOT Apply
+- Waitlists, alpha/beta phases — tool is fully open
+- In-app onboarding sequences — no accounts
+- Paid acquisition for launches — no ad budget
+- Trial-to-paid conversion tracking — everything is free
+
+

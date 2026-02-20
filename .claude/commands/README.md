@@ -2,12 +2,13 @@
 
 > Optimized commands and skills for PayeTax development.
 >
-> **Full documentation:** See `docs/SKILLS_AND_COMMANDS.md` for the canonical guide.
+> **Full documentation:** See `docs/guides/SKILLS_AND_COMMANDS.md` for the canonical guide.
 
 ## Philosophy
 
-**Commands** = explicit workflow actions (you invoke them)  
+**Commands** = explicit workflow actions (you invoke them)
 **Skills** = contextual knowledge (load before a task)
+**Skill structure** = one active `SKILL.md` per skill, with upstream methodology + `## PayeTax Context` custom layer.
 
 ---
 
@@ -55,7 +56,7 @@
 
 ---
 
-## Skills (Installed)
+## Skills (26 installed)
 
 Skills provide expert knowledge that you load before a task.
 
@@ -66,56 +67,74 @@ Skills provide expert knowledge that you load before a task.
 | `engineering` | Next.js/React/TypeScript performance and patterns |
 | `accessibility` | WCAG 2.2 AA, screen readers, keyboard nav |
 
-### Marketing & Copy
-
-| Skill | Use When |
-| --- | --- |
-| `copywriting` | Writing new marketing copy |
-| `copy-editing` | Editing or polishing existing copy |
-| `marketing-ideas` | Growth idea generation |
-| `marketing-psychology` | Persuasion and behavioral models |
-| `social-content` | LinkedIn/Twitter content |
-
 ### SEO & Content
 
 | Skill | Use When |
 | --- | --- |
 | `seo-audit` | Technical/on-page SEO audit |
+| `ai-seo` | AI search optimisation (AEO/GEO/LLMO), AI Overviews, citations |
 | `content-strategy` | Topic clusters, content planning |
 | `programmatic-seo` | Scaled page generation |
 | `schema-markup` | JSON-LD and rich snippets |
 | `analytics-tracking` | GA4/Vercel events and measurement |
+| `competitor-alternatives` | "vs" / alternatives pages |
+
+### Copy & Creative
+
+| Skill | Use When |
+| --- | --- |
+| `copywriting` | Writing new marketing copy |
+| `copy-editing` | Editing or polishing existing copy |
+| `ad-creative` | Ad copy variations, headlines, platform-specific creative |
+| `cold-email` | B2B cold outreach emails and follow-up sequences |
+| `social-content` | LinkedIn/Twitter content |
 
 ### Conversion & Growth
 
 | Skill | Use When |
 | --- | --- |
-| `page-cro` | Conversion optimization |
-| `competitor-alternatives` | "vs" / alternatives pages |
+| `page-cro` | Page-level conversion optimisation |
+| `form-cro` | Calculator inputs, email forms, newsletter signup |
+| `onboarding-cro` | First-visit experience, WelcomeDialog |
+| `popup-cro` | Dialogs and banners (WelcomeDialog, EmailResultsDialog, CookieBanner, PWA) |
+| `ab-test-setup` | Experiment design and statistical rigour |
+| `churn-prevention` | Retention, cancel flows, dunning, win-back |
+
+### Marketing & Growth
+
+| Skill | Use When |
+| --- | --- |
+| `marketing-ideas` | Growth idea generation |
+| `marketing-psychology` | Persuasion and behavioral models |
+| `launch-strategy` | Feature releases, tax calendar events |
 | `free-tool-strategy` | Free tool growth strategy |
-| `pricing-strategy` | Monetization and packaging |
+| `email-sequence` | Kit newsletter + Resend transactional email |
+| `product-marketing-context` | Shared context doc for all skills |
 
 ---
 
 ## When Skills Activate (Examples)
 
-> "How should I optimize LCP on the homepage?"  
+> "How should I optimize LCP on the homepage?"
 → `engineering`
 
-> "Audit the calculator for WCAG issues"  
+> "Audit the calculator for WCAG issues"
 → `accessibility`
 
-> "Write hero copy for the new tool"  
+> "Write hero copy for the new tool"
 → `copywriting`
 
-> "Plan a 3-month blog cluster for self-employed tax"  
+> "Plan a 3-month blog cluster for self-employed tax"
 → `content-strategy`
 
-> "Review salary pages for canonical/meta issues"  
+> "Review salary pages for canonical/meta issues"
 → `seo-audit`
 
-> "Create a PayeTax vs GOV.UK page outline"  
+> "Create a PayeTax vs GOV.UK page outline"
 → `competitor-alternatives`
+
+> "Optimise content for AI search engines"
+→ `ai-seo`
 
 ---
 
@@ -157,21 +176,36 @@ Skills provide expert knowledge that you load before a task.
 │   ├── plan.md
 │   ├── security.md
 │   └── test.md
-└── skills/
-    ├── accessibility/
-    ├── analytics-tracking/
-    ├── competitor-alternatives/
-    ├── content-strategy/
-    ├── copy-editing/
-    ├── copywriting/
-    ├── engineering/
-    ├── free-tool-strategy/
-    ├── marketing-ideas/
-    ├── marketing-psychology/
-    ├── page-cro/
-    ├── pricing-strategy/
-    ├── programmatic-seo/
-    ├── schema-markup/
-    ├── seo-audit/
-    └── social-content/
+├── skills/
+│   ├── ab-test-setup/
+│   ├── accessibility/
+│   ├── ad-creative/
+│   ├── ai-seo/
+│   ├── analytics-tracking/
+│   ├── churn-prevention/
+│   ├── cold-email/
+│   ├── competitor-alternatives/
+│   ├── content-strategy/
+│   ├── copy-editing/
+│   ├── copywriting/
+│   ├── email-sequence/
+│   ├── engineering/
+│   ├── form-cro/
+│   ├── free-tool-strategy/
+│   ├── launch-strategy/
+│   ├── marketing-ideas/
+│   ├── marketing-psychology/
+│   ├── onboarding-cro/
+│   ├── page-cro/
+│   ├── popup-cro/
+│   ├── product-marketing-context/
+│   ├── programmatic-seo/
+│   ├── schema-markup/
+│   ├── seo-audit/
+│   ├── social-content/
+│   └── VERSIONS.md
+└── tools/
+    ├── REGISTRY.md
+    ├── clis/          (52 vendor CLI scripts)
+    └── integrations/  (58 integration guides)
 ```

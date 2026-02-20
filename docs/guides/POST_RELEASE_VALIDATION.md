@@ -89,8 +89,14 @@ Goal: ensure release health after traffic hits production.
 
 - [ ] Sentry receives events with correct release version.
 - [ ] Error volume in first 1-2 hours is not materially above baseline.
+- [ ] No repeated `calculation_anomaly` alerts in Sentry for PAYE calculation flows.
 - [ ] No new repeated server/API failures in Vercel logs.
 - [ ] No broken webhook retries/backlogs (Sentry webhook, email providers).
+
+If `calculation_anomaly` appears:
+- [ ] Capture one example event ID and confirm input context (tax year, region, salary bucket).
+- [ ] Reproduce with equivalent non-PII input in non-prod and record whether issue is deterministic.
+- [ ] Open/attach a blocker issue with owner + ETA before release is considered fully healthy.
 
 ---
 

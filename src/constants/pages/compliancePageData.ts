@@ -17,6 +17,13 @@ import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
 import FileText from 'lucide-react/dist/esm/icons/file-text.js';
 import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import { RATES_LAST_VERIFIED } from '@/constants/freshness';
+import {
+  HMRC_INCOME_TAX_RATES_URL,
+  HMRC_STUDENT_LOAN_REPAYMENT_URL,
+  ONS_ASHE_URL,
+  REVENUE_SCOTLAND_INCOME_TAX_URL,
+} from '@/constants/sources';
 
 /**
  * Compliance feature interface
@@ -52,6 +59,8 @@ interface DataSource {
   reliability: string;
 }
 
+const COMPLIANCE_LAST_REVIEWED = RATES_LAST_VERIFIED;
+
 /**
  * HMRC compliance features and certifications
  * Displayed as feature cards on compliance page
@@ -68,7 +77,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Scottish tax rates independently verified against Revenue Scotland',
     ],
     icon: FileText,
-    lastUpdated: '2026-01-15',
+    lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Gov.UK Publications',
     color: 'from-primary to-accent',
   },
@@ -82,7 +91,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Open source — anyone can check our maths',
     ],
     icon: Shield,
-    lastUpdated: '2026-01-15',
+    lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Example Calculations',
     color: 'from-accent to-primary',
   },
@@ -96,7 +105,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Historical rates maintained for comparison',
     ],
     icon: Calendar,
-    lastUpdated: '2026-01-15',
+    lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Announcements',
     color: 'from-primary/80 to-accent/80',
   },
@@ -111,7 +120,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Professional user feedback integration',
     ],
     icon: Shield,
-    lastUpdated: '2026-01-15',
+    lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'Internal QA Process',
     color: 'from-accent/80 to-primary/80',
   },
@@ -127,28 +136,28 @@ const COMPLIANCE_STATEMENTS: ComplianceStatement[] = [
     statement:
       'All tax rates are sourced directly from official HMRC publications and updated within 24 hours of any announced changes.',
     verification: 'Verified against HMRC Income Tax rates and allowances (ITTOIA 2005)',
-    lastVerified: '2026-01-15',
+    lastVerified: COMPLIANCE_LAST_REVIEWED,
   },
   {
     category: 'National Insurance Compliance',
     statement:
       'National Insurance calculations follow official HMRC guidance for Class 1 contributions including current rates and thresholds.',
     verification: 'Compliant with National Insurance Contributions Act 2014 and subsequent updates',
-    lastVerified: '2026-01-15',
+    lastVerified: COMPLIANCE_LAST_REVIEWED,
   },
   {
     category: 'Student Loan Accuracy',
     statement:
       'Student loan calculations are accurate for all current repayment plans as defined by the Student Loans Company.',
     verification: 'Verified against SLC guidance and HMRC PAYE procedures',
-    lastVerified: '2026-01-15',
+    lastVerified: COMPLIANCE_LAST_REVIEWED,
   },
   {
     category: 'Scottish Tax Compliance',
     statement:
       'Scottish tax calculations use official rates published by Revenue Scotland and Scottish Government.',
     verification: 'Compliant with Scotland Act 2016 and Scottish Rate Resolution',
-    lastVerified: '2026-01-15',
+    lastVerified: COMPLIANCE_LAST_REVIEWED,
   },
 ];
 
@@ -160,29 +169,29 @@ const DATA_SOURCES: DataSource[] = [
   {
     source: 'HM Revenue & Customs',
     description: 'Official UK tax authority providing tax rates, allowances, and guidance',
-    url: 'https://www.gov.uk/government/organisations/hm-revenue-customs',
-    lastAccessed: '2026-01-15',
+    url: HMRC_INCOME_TAX_RATES_URL,
+    lastAccessed: COMPLIANCE_LAST_REVIEWED,
     reliability: 'Official Government Source',
   },
   {
     source: 'Revenue Scotland',
     description: 'Official Scottish tax authority for devolved Scottish income tax rates',
-    url: 'https://www.revenue.scot/',
-    lastAccessed: '2026-01-15',
+    url: REVENUE_SCOTLAND_INCOME_TAX_URL,
+    lastAccessed: COMPLIANCE_LAST_REVIEWED,
     reliability: 'Official Government Source',
   },
   {
     source: 'Student Loans Company',
     description: 'Official body managing student loans and repayment thresholds',
-    url: 'https://www.slc.co.uk/',
-    lastAccessed: '2026-01-15',
+    url: HMRC_STUDENT_LOAN_REPAYMENT_URL,
+    lastAccessed: COMPLIANCE_LAST_REVIEWED,
     reliability: 'Official Government Source',
   },
   {
     source: 'Office for National Statistics',
     description: 'UK national statistics including inflation rates and economic data',
-    url: 'https://www.ons.gov.uk/',
-    lastAccessed: '2026-01-15',
+    url: ONS_ASHE_URL,
+    lastAccessed: COMPLIANCE_LAST_REVIEWED,
     reliability: 'Official Government Source',
   },
 ];

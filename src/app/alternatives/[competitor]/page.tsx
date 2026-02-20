@@ -55,6 +55,24 @@ export default async function AlternativePage({ params }: PageProps) {
   }
 
   const url = `${SITE_URL}/alternatives/${slug}`;
+  const competitorBestFor = competitor.bestFor.slice(0, 2).filter(Boolean);
+  const competitorBestForText =
+    competitorBestFor.length > 0 ? competitorBestFor.join(' or ') : 'its specific feature set';
+  const alternativeFaqs = [
+    {
+      question: `What is a good alternative to ${competitor.name}?`,
+      answer: `PayeTax is a strong alternative to ${competitor.name} if you want a clean, mobile-first UK tax calculator with no display ads and What-If salary comparisons.`,
+    },
+    {
+      question: `When should I use ${competitor.name} instead of PayeTax?`,
+      answer: `${competitor.name} may be a better fit if you specifically need ${competitorBestForText}.`,
+    },
+    {
+      question: `Does PayeTax use official UK tax rates?`,
+      answer:
+        'Yes. PayeTax calculations are based on official HMRC rates and thresholds for supported tax years.',
+    },
+  ];
 
   return (
     <>
@@ -66,6 +84,7 @@ export default async function AlternativePage({ params }: PageProps) {
           { name: `${competitor.name} Alternative`, url },
         ]}
       />
+      <StructuredData type='faq' faqs={alternativeFaqs} />
       <AlternativePageContent competitor={competitor} />
     </>
   );

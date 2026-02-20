@@ -141,7 +141,7 @@ test('calculates basic rate tax correctly', () => {
 **Maintain HMRC-aligned fixtures per supported tax year:**
 
 ```typescript
-// e2e/fixtures/golden-tax-cases-2025-26.json
+// e2e/fixtures/golden-tax-cases-2025-26-COMPLETE.json
 {
   "taxYear": "2025-26",
   "region": "rUK",
@@ -163,6 +163,8 @@ test('calculates basic rate tax correctly', () => {
 ### Property-Based Testing
 
 **Use true invariants (not simplistic ones):**
+
+Optional: only if `fast-check` is installed in the repo.
 
 ```typescript
 import { fc } from 'fast-check';
@@ -233,7 +235,7 @@ describe('SalaryInputSchema', () => {
 
 **Verifies your tests actually catch bugs:**
 
-- **Tool**: Stryker (`npx stryker run`)
+- **Optional Tool**: Stryker (`npx stryker run`) only if installed/configured
 - **Goal**: >80% mutation score for critical paths
 - **Scope**: Only run on `src/lib/tax/**` and validation schemas (not UI)
 - **When**: Locally or nightly CI (too slow for every PR)
@@ -353,7 +355,7 @@ bun run test:e2e          # Playwright E2E
 ## Test Analysis
 
 **Scope:** [files examined]
-**Test Framework:** [Jest/Vitest/Bun test]
+**Test Framework:** [Jest]
 
 ### Coverage Gaps (Prioritized by Risk)
 
@@ -383,7 +385,7 @@ bun run test:e2e          # Playwright E2E
 
 ## Key Files
 
-- Test config: `jest.config.js` or `vitest.config.ts`
+- Test config: `jest.config.js`
 - E2E config: `playwright.config.ts`
 - Golden fixtures: `e2e/fixtures/`
 - Existing tests: `**/__tests__/*.test.ts`

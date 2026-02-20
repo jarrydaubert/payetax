@@ -1,6 +1,6 @@
 # PayeTax System Overview
 
-Last updated: February 19, 2026
+Last updated: February 20, 2026
 
 Purpose: a single technical brief for external reviewers covering architecture, stack choices, quality controls, and operational tradeoffs.
 
@@ -84,6 +84,17 @@ Director-specific logic modules:
 - `src/lib/tax/`
 
 Includes income tax, dividend tax, corporation tax, strategy comparison, warnings, and supporting calculations.
+
+### 4.4 Competitor Comparison Contract
+
+Canonical competitor comparison pattern:
+- Data source: `src/data/competitors.ts`
+- Required fields: `features`, `strengths`, `weaknesses`, `bestFor`, `payeTaxAdvantages`, `verification`
+- Rendering contract: `TwoColumnComparison` + detailed strengths/weaknesses columns + explicit verdict section in `src/app/vs/[competitor]/VsPageContent.tsx`
+
+Current decision:
+- Do not add a separate `detailedComparison` data field right now.
+- When additional depth is needed, extend existing competitor fields and/or the `VsPageContent` narrative sections so one pattern remains authoritative.
 
 ---
 
@@ -244,7 +255,7 @@ This section keeps only proposals we are actually adopting. Rejected/deferred su
 | Strengthen confidence in currency arithmetic | Run and document a formal arithmetic strategy review (current rounding-to-pence vs integer-pence/decimal model). | `docs/BACKLOG.md` (`P1-2`) |
 | Add visual regression safety net | Pilot visual regression checks for high-risk surfaces (homepage hero, calculator results, Director Intelligence dashboard). | `docs/BACKLOG.md` (`P1-1`) |
 | Harden abuse controls on public mutation routes | Evaluate and implement bot-mitigation hardening for `/api/newsletter/*`, `/api/send-results`, and `/api/referral/lead`. | `docs/BACKLOG.md` (`P1-3`) |
-| Improve anomaly detection in production | Add explicit monitoring rules for impossible calculation outputs (for example NaN or invalid effective rates). | `docs/BACKLOG.md` (`P1-4`) |
+| Improve anomaly detection in production | Completed on February 20, 2026 via calculator anomaly monitoring (`calculator_error` with `error_type=calculation_anomaly`) and Sentry breadcrumbs/exceptions for impossible outputs. | Implemented |
 | Strengthen operational email trust posture | Add recurring SPF/DKIM/DMARC monitoring for sending domains/providers. | `docs/BACKLOG.md` (`P1-5`) |
 | Validate newer React/Next performance features safely | Run controlled experiments for React Compiler and Cache Components on selected routes before any default enablement. | `docs/BACKLOG.md` (`P2-1`, `P2-2`) |
 | Improve external trust visibility | Evaluate adding an integrity transparency section on `/compliance` with engine/rules version + last verification date. | `docs/BACKLOG.md` (`P2-3`) |

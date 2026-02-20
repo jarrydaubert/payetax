@@ -37,16 +37,28 @@ async function getTableValueByHeader(
   return numeric;
 }
 
+async function selectPensionAmountType(page: Page): Promise<void> {
+  const pensionTypeSelect = page.getByTestId('pension-type-select');
+  await pensionTypeSelect.click();
+  const amountOption = page.getByRole('option').nth(1);
+  await expect(amountOption).toBeVisible({ timeout: 3000 });
+  await amountOption.click();
+  await expect(page.getByTestId('pension-input')).toBeVisible({ timeout: 3000 });
+}
+
 test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#tax-calculator');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await expect(page.getByTestId('salary-input')).toBeVisible({ timeout: 10000 });
 
     // Dismiss cookie banner
     const acceptButton = page.locator('button:has-text("Accept All")');
     if (await acceptButton.isVisible().catch(() => false)) {
       await acceptButton.click();
+      await expect(acceptButton)
+        .toBeHidden({ timeout: 5000 })
+        .catch(() => {});
     }
   });
 
@@ -113,16 +125,11 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
 
     // Add pension contribution (use testId to avoid matching tooltip button)
     // NOTE: Default type is 'percentage' so we need to switch to 'amount' first!
-    const pensionTypeSelect = page.getByTestId('pension-type-select');
-    await pensionTypeSelect.click();
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click(); // Select amount (£)
-    await page.waitForTimeout(300);
+    await selectPensionAmountType(page); // Select amount (£)
 
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('5000');
     await pensionInput.blur();
-    await page.waitForTimeout(300);
 
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });

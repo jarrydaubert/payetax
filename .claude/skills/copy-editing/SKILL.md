@@ -1,7 +1,8 @@
 ---
 name: copy-editing
-version: 1.0.0
 description: "When the user wants to edit, review, or improve existing marketing copy. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' or 'copy sweep.' This skill provides a systematic approach to editing marketing copy through multiple focused passes."
+metadata:
+  version: 1.2.0
 ---
 
 # Copy Editing
@@ -444,3 +445,10 @@ This iterative process ensures each edit doesn't create new problems while respe
 | Reviewing and improving existing copy | copy-editing (this skill) |
 | Editing copy you just wrote | copy-editing (this skill) |
 | Structural or strategic page changes | page-cro |
+
+## PayeTax Context
+
+- Optimize for trust and clarity, not hype. This is a financial calculator product.
+- Use UK English consistently.
+- Keep claims precise and verifiable (HMRC-rate based, privacy-safe, no overpromises).
+- Favor action language tied to real conversions: calculator use, results trust, newsletter signup.

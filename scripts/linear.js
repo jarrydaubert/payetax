@@ -142,7 +142,7 @@ async function listIssues(options = {}) {
     }
 
     if (issues.nodes.length === 0) {
-      log('  No issues found. Create one with: npm run linear:create', 'dim');
+      log('  No issues found. Create one with: bun run linear:create', 'dim');
       return issues.nodes;
     }
 
@@ -797,8 +797,8 @@ async function main() {
       case 'rm':
         if (args.length < 2) {
           log('❌ Please specify issue identifier(s) to delete', 'red');
-          log('Example: npm run linear delete PAYTAX-1', 'dim');
-          log('Example: npm run linear delete PAYTAX-1 PAYTAX-2 PAYTAX-3', 'dim');
+          log('Example: bun run linear delete PAYTAX-1', 'dim');
+          log('Example: bun run linear delete PAYTAX-1 PAYTAX-2 PAYTAX-3', 'dim');
         } else {
           const identifiers = args.slice(1);
           if (identifiers.length === 1) {
@@ -812,7 +812,7 @@ async function main() {
       case 'update-priority':
         if (args.length < 3) {
           log('❌ Please specify issue and priority', 'red');
-          log('Example: npm run linear update-priority PAYTAX-1 0', 'dim');
+          log('Example: bun run linear update-priority PAYTAX-1 0', 'dim');
           log('Priority: 0=Urgent, 1=High, 2=Medium, 3=Low, 4=None', 'dim');
         } else {
           const identifier = args[1];
@@ -824,7 +824,7 @@ async function main() {
       case 'set-parent':
         if (args.length < 3) {
           log('❌ Please specify child issue and parent issue', 'red');
-          log('Example: npm run linear set-parent PAYTAX-1 PAYTAX-50', 'dim');
+          log('Example: bun run linear set-parent PAYTAX-1 PAYTAX-50', 'dim');
         } else {
           await updateIssueParent(args[1], args[2]);
         }
@@ -834,7 +834,7 @@ async function main() {
       case 'set-status':
         if (args.length < 3) {
           log('❌ Please specify issue and status name', 'red');
-          log('Example: npm run linear update-status PAYTAX-1 Done', 'dim');
+          log('Example: bun run linear update-status PAYTAX-1 Done', 'dim');
           log('Common statuses: Todo, In Progress, Done, Canceled', 'dim');
         } else {
           const identifier = args[1];
@@ -847,7 +847,7 @@ async function main() {
       case 'set-description':
         if (args.length < 3) {
           log('❌ Please specify issue and description', 'red');
-          log('Example: npm run linear update-description PAYTAX-1 "New description"', 'dim');
+          log('Example: bun run linear update-description PAYTAX-1 "New description"', 'dim');
         } else {
           const identifier = args[1];
           const description = args.slice(2).join(' '); // Join description parts
@@ -859,9 +859,9 @@ async function main() {
       case 'add-to-project':
         if (args.length < 3) {
           log('❌ Please specify project name and issue identifier(s)', 'red');
-          log('Example: npm run linear assign-to-project PayeTax PAYTAX-1', 'dim');
+          log('Example: bun run linear assign-to-project PayeTax PAYTAX-1', 'dim');
           log(
-            'Example: npm run linear assign-to-project PayeTax PAYTAX-1 PAYTAX-2 PAYTAX-3',
+            'Example: bun run linear assign-to-project PayeTax PAYTAX-1 PAYTAX-2 PAYTAX-3',
             'dim',
           );
         } else {
@@ -873,7 +873,7 @@ async function main() {
 
       default:
         log('\n📊 Linear Helper for PayeTax\n', 'bright');
-        log('Usage: npm run linear:<command> [options]\n', 'cyan');
+        log('Usage: bun run linear:<command> [options]\n', 'cyan');
         log('Commands:', 'bright');
         log('  list, ls                List all issues', 'dim');
         log('    --me                  List issues assigned to you', 'dim');
@@ -890,12 +890,12 @@ async function main() {
         log('  info                    Show workspace info', 'dim');
         log('  help                    Show this help', 'dim');
         log('\nExamples:', 'bright');
-        log('  npm run linear:list', 'cyan');
-        log('  npm run linear list --project PayeTax', 'cyan');
-        log('  npm run linear list --team-only', 'cyan');
-        log('  npm run linear:create', 'cyan');
-        log('  npm run linear update-status PAYTAX-24 Done', 'cyan');
-        log('  npm run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
+        log('  bun run linear:list', 'cyan');
+        log('  bun run linear list --project PayeTax', 'cyan');
+        log('  bun run linear list --team-only', 'cyan');
+        log('  bun run linear:create', 'cyan');
+        log('  bun run linear update-status PAYTAX-24 Done', 'cyan');
+        log('  bun run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
         log('\nEnvironment:', 'bright');
         log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');
         log('  LINEAR_TEAM_KEY    Team identifier [default: PAYETAX]', 'dim');

@@ -5,6 +5,8 @@
  * Enforces:
  * - No new skip/todo debt beyond allowlisted baseline.
  * - No bare `test.skip()` in E2E tests (must include reason).
+ * - Skip/todo entries include an issue tag (PAYTAX-### or P#-#).
+ * - No commented-out assertions (e.g. `// expect(...)`) in executable test files.
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -22,6 +24,11 @@ const TEST_FILE_SUFFIXES = ['.test.ts', '.test.tsx', '.spec.ts', '.spec.tsx'];
 const SKIP_REGEX = /\b(?:it|test|describe)\.skip\s*\(/g;
 const TODO_REGEX = /\b(?:it|test)\.todo\s*\(/g;
 const BARE_PLAYWRIGHT_SKIP_REGEX = /test\.skip\(\s*\)/g;
+const SKIP_TITLE_REGEX = /\b(?:it|test|describe)\.skip\s*\(\s*(['"`])((?:\\.|(?!\1).)*)\1/g;
+const TODO_TITLE_REGEX = /\b(?:it|test)\.todo\s*\(\s*(['"`])((?:\\.|(?!\1).)*)\1/g;
+const PLAYWRIGHT_SKIP_REASON_REGEX = /\btest\.skip\s*\(\s*[^,]+,\s*(['"`])((?:\\.|(?!\1).)*)\1/g;
+const ISSUE_TAG_REGEX = /\b(?:PAYTAX-\d+|P\d+-\d+)\b/;
+const COMMENTED_EXPECT_REGEX = /(?:\/\/\s*expect\s*\(|\/\*\s*expect\s*\()/g;
 
 type FileDebt = {
   skip: number;
@@ -59,6 +66,19 @@ function countMatches(content: string, regex: RegExp): number {
   return Array.from(content.matchAll(regex)).length;
 }
 
+function validateIssueTag(
+  relPath: string,
+  kind: 'skip title' | 'todo title' | 'playwright skip reason',
+  text: string,
+  errors: string[],
+): void {
+  if (!ISSUE_TAG_REGEX.test(text)) {
+    errors.push(
+      `${relPath} has ${kind} without issue tag (PAYTAX-### or P#-#): "${text.slice(0, 120)}"`,
+    );
+  }
+}
+
 function main(): void {
   const files = TEST_ROOTS.flatMap((dir) => collectFiles(dir));
   const actualByFile = new Map<string, FileDebt>();
@@ -80,6 +100,33 @@ function main(): void {
       errors.push(
         `${relPath} contains bare test.skip() calls. Use test.skip(condition, 'reason') or test.skip(true, 'reason').`,
       );
+    }
+
+    const commentedExpectCount = countMatches(content, COMMENTED_EXPECT_REGEX);
+    if (commentedExpectCount > 0) {
+      errors.push(
+        `${relPath} contains ${commentedExpectCount} commented-out assertion(s). Remove them or convert to executable tests/todos.`,
+      );
+    }
+
+    for (const match of content.matchAll(SKIP_TITLE_REGEX)) {
+      const title = match[2];
+      if (!title) continue;
+      validateIssueTag(relPath, 'skip title', title, errors);
+    }
+
+    for (const match of content.matchAll(TODO_TITLE_REGEX)) {
+      const title = match[2];
+      if (!title) continue;
+      validateIssueTag(relPath, 'todo title', title, errors);
+    }
+
+    if (relPath.startsWith('e2e/')) {
+      for (const match of content.matchAll(PLAYWRIGHT_SKIP_REASON_REGEX)) {
+        const reason = match[2];
+        if (!reason) continue;
+        validateIssueTag(relPath, 'playwright skip reason', reason, errors);
+      }
     }
 
     actualByFile.set(relPath, { skip, todo });

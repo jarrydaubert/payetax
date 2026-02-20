@@ -12,6 +12,7 @@
  */
 
 import { expect, test } from '@playwright/test';
+import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
 
 test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
   test.beforeEach(async ({ page }) => {
@@ -19,13 +20,8 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    // Dismiss cookie banner
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
   });
 
   test('should accept Scottish tax code (S1257L)', async ({ page }) => {
@@ -47,7 +43,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     // Calculate
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     // Verify calculation succeeds
     const resultsTable = page.locator('[data-testid="results-table"]');
@@ -73,7 +68,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -97,7 +91,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -121,7 +114,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -145,7 +137,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -169,7 +160,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -193,7 +183,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -217,7 +206,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -241,7 +229,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -265,7 +252,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -289,7 +275,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -313,7 +298,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
@@ -337,7 +321,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     // Just verify it doesn't crash
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     // Page should still work (either error or success)
     const body = page.locator('body');
@@ -362,7 +345,6 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
 
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
-    await page.waitForTimeout(1500);
 
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();

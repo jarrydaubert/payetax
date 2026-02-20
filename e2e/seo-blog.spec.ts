@@ -20,7 +20,9 @@ test.describe('Essential SEO Tests', () => {
     const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
     if (cookieBannerVisible) {
       await acceptCookiesButton.click();
-      await page.waitForTimeout(500);
+      await expect(acceptCookiesButton)
+        .toBeHidden({ timeout: 5000 })
+        .catch(() => {});
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('🍪 Cookie banner dismissed');
     }
@@ -101,7 +103,9 @@ test.describe('Essential SEO Tests', () => {
       const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
       if (cookieBannerVisible) {
         await acceptCookiesButton.click();
-        await page.waitForTimeout(500);
+        await expect(acceptCookiesButton)
+          .toBeHidden({ timeout: 5000 })
+          .catch(() => {});
       }
     });
 
@@ -128,21 +132,18 @@ test.describe('Essential SEO Tests', () => {
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('🔍 Testing navigation back to calculator...');
 
-      // Should be able to navigate back to calculator - target the specific "Back to Calculator" link
-      const homeLink = page.getByRole('link', { name: 'Back to Calculator' });
-      const hasHomeLink = (await homeLink.count()) > 0;
-
-      if (!hasHomeLink) {
-        // biome-ignore lint/suspicious/noConsole: Test debugging output
-        console.log('⏭️  Skipping - no "Back to Calculator" link found');
-        test.skip(true, 'No "Back to Calculator" link found on current blog page variant');
-        return;
-      }
+      // Prefer explicit blog CTA; fallback to general calculator nav link.
+      const ctaLink = page.getByRole('link', { name: /try the free calculator/i });
+      const navLink = page
+        .getByRole('link', { name: /^calculator$/i })
+        .or(page.getByRole('link', { name: /open calculator/i }))
+        .first();
+      const homeLink = (await ctaLink.count()) > 0 ? ctaLink.first() : navLink;
 
       await expect(homeLink).toBeVisible();
 
       // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('🎯 Clicking "Back to Calculator" link...');
+      console.log('🎯 Clicking calculator link from blog...');
 
       await homeLink.click();
       await page.waitForLoadState('networkidle');
@@ -170,18 +171,17 @@ test.describe('Essential SEO Tests', () => {
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log(`📊 Found ${postCount} blog post(s)`);
 
-      if (postCount === 0) {
+      if (postCount > 0) {
+        await expect(blogPosts.first()).toBeVisible();
         // biome-ignore lint/suspicious/noConsole: Test debugging output
-        console.log('⏭️  No blog posts available yet - this is OK for new blog');
-        test.skip(true, 'Blog has no posts in this environment');
+        console.log('✅ Blog posts are visible');
         return;
       }
 
-      // Verify posts are visible
-      await expect(blogPosts.first()).toBeVisible();
-
+      // Empty-state is valid and should still render a stable UX affordance.
+      await expect(page.getByText('No articles found.')).toBeVisible();
       // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('✅ Blog posts are visible');
+      console.log('✅ Empty-state message shown when no posts exist');
     });
   });
 });

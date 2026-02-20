@@ -6,8 +6,8 @@
  * the centralized design token system (designTokens.ts).
  *
  * Usage:
- *   npm run audit:tokens
- *   npm run audit:tokens -- --fix  (auto-comment violations)
+ *   bun run audit:tokens
+ *   bun run audit:tokens -- --fix  (auto-comment violations)
  *
  * Exit codes:
  *   0 - Clean (no violations)
@@ -302,7 +302,7 @@ async function audit() {
   console.log('1. Replace hardcoded classes with design tokens from designTokens.ts');
   console.log('2. Remove inline styles and use className with tokens instead');
   console.log('3. If a pattern is common, add it to designTokens.ts');
-  console.log('4. Run `npm run audit:tokens` before committing\n');
+  console.log('4. Run `bun run audit:tokens` before committing\n');
 
   console.log('💡 Example fix:');
   console.log('  ❌ className="text-sm font-semibold"');

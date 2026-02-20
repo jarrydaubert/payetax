@@ -1,47 +1,97 @@
 # Marketing Skills Versions
 
-Current versions of all skills. Agents can compare against local versions to check for updates.
+Canonical inventory for PayeTax skills, with clear separation between upstream (vanilla) content and PayeTax customization.
 
-## File Structure
+## Upstream Source
 
-- **`SKILL.md`** files — customised for PayeTax with `## PayeTax Context` sections. These are ours to edit.
-- **`references/`** directories — original reference material from the [Corey Haines marketing skills package](https://github.com/coreyhaines). Do NOT modify these. Compare against upstream when checking for updates.
-- **`.claude/tools/`** — original tools registry and integration guides from the same package. Do NOT modify these.
+Skills and tools are sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills). Use this file when syncing or auditing drift.
+
+## Separation of Concerns
+
+### 1) Upstream/Vanilla Layer
+- Base methodology in each skill is synced from upstream.
+- `references/` and `.claude/tools/` are upstream-first assets.
+
+### 2) PayeTax Custom Layer
+- Every skill includes a `## PayeTax Context` section for local rules, constraints, and file paths.
+- PayeTax context can override generic advice where needed (free product model, privacy constraints, HMRC-accuracy emphasis).
+
+### 3) PayeTax-Only Skills
+- `accessibility/`
+- `engineering/`
+
+## Editing Rules
+
+- Prefer keeping upstream content intact when possible.
+- Put PayeTax-specific guidance in `## PayeTax Context` rather than editing upstream methodology sections.
+- If an upstream reference/tool file is edited for local correctness, log it in **Recent Changes**.
+- Keep naming consistent with current product language ("Director Intelligence").
+
+## Upstream-Synced Skills (24)
 
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
-| ab-test-setup | 1.0.0 | 2026-02-17 |
-| analytics-tracking | 1.0.0 | 2026-02-17 |
-| competitor-alternatives | 1.0.0 | 2026-02-17 |
-| content-strategy | 1.0.0 | 2026-02-17 |
-| copy-editing | 1.0.0 | 2026-01-27 |
-| copywriting | 1.0.0 | 2026-02-17 |
-| email-sequence | 1.0.0 | 2026-02-17 |
-| form-cro | 1.0.0 | 2026-02-17 |
-| free-tool-strategy | 1.0.0 | 2026-02-17 |
-| launch-strategy | 1.0.0 | 2026-02-17 |
-| marketing-ideas | 1.0.0 | 2026-02-17 |
-| marketing-psychology | 1.0.0 | 2026-01-27 |
-| onboarding-cro | 1.0.0 | 2026-02-17 |
-| page-cro | 1.0.0 | 2026-02-17 |
-| popup-cro | 1.0.0 | 2026-02-17 |
-| product-marketing-context | 1.0.0 | 2026-01-27 |
-| programmatic-seo | 1.0.0 | 2026-02-17 |
-| schema-markup | 1.0.0 | 2026-02-17 |
-| seo-audit | 1.0.0 | 2026-02-17 |
-| social-content | 1.0.0 | 2026-02-17 |
+| ab-test-setup | 1.2.0 | 2026-02-20 |
+| ad-creative | 1.2.0 | 2026-02-20 |
+| ai-seo | 1.2.0 | 2026-02-20 |
+| analytics-tracking | 1.2.0 | 2026-02-20 |
+| churn-prevention | 1.2.0 | 2026-02-20 |
+| cold-email | 1.2.0 | 2026-02-20 |
+| competitor-alternatives | 1.2.0 | 2026-02-20 |
+| content-strategy | 1.2.0 | 2026-02-20 |
+| copy-editing | 1.2.0 | 2026-02-20 |
+| copywriting | 1.2.0 | 2026-02-20 |
+| email-sequence | 1.2.0 | 2026-02-20 |
+| form-cro | 1.2.0 | 2026-02-20 |
+| free-tool-strategy | 1.2.0 | 2026-02-20 |
+| launch-strategy | 1.2.0 | 2026-02-20 |
+| marketing-ideas | 1.2.0 | 2026-02-20 |
+| marketing-psychology | 1.2.0 | 2026-02-20 |
+| onboarding-cro | 1.2.0 | 2026-02-20 |
+| page-cro | 1.2.0 | 2026-02-20 |
+| popup-cro | 1.2.0 | 2026-02-20 |
+| product-marketing-context | 1.2.0 | 2026-02-20 |
+| programmatic-seo | 1.2.0 | 2026-02-20 |
+| schema-markup | 1.2.0 | 2026-02-20 |
+| seo-audit | 1.2.0 | 2026-02-20 |
+| social-content | 1.2.0 | 2026-02-20 |
+
+## PayeTax-Only Skills
+
+| Skill | Version | Last Updated |
+|-------|---------|--------------|
+| accessibility | 1.1.0 | 2026-02-20 |
+| engineering | 1.0.0 | 2026-02-04 |
+
+## New Skill Alignment Standard
+
+When adding a new upstream skill to PayeTax:
+- Use `metadata.version` in frontmatter (match upstream convention).
+- Add a `## PayeTax Context` section with:
+  - what applies to PayeTax,
+  - what does not apply by default,
+  - key file paths and conversion definitions.
+- Remove or correct stale references to excluded skills.
+- Normalize terminology to current product naming.
+
+## Deliberately Excluded Upstream Skills
+
+- paid-ads
+- paywall-upgrade-cro
+- pricing-strategy
+- referral-program
+- signup-flow-cro
 
 ## Recent Changes
 
-### 2026-02-17
-- Added `## PayeTax Context` sections to 17 skills with project-specific guidance
-- Removed 6 inapplicable skills: paid-ads, paywall-upgrade-cro, pricing-strategy, referral-program, signup-flow-cro
-- Reframed form-cro, onboarding-cro, popup-cro, email-sequence for calculator/free-tool model
-- Added AI Bot Access + llms.txt checks to seo-audit
-- Cleaned up stale cross-references to deleted skills
-- Added blog guide references to content-strategy
-- Added full email infrastructure inventory to email-sequence and form-cro
+### 2026-02-20
+- Synced upstream skills to v1.2.0.
+- Added new skills: ad-creative, ai-seo, churn-prevention, cold-email.
+- Expanded integrations and CLI docs in `.claude/tools/`.
+- Aligned all skills to include `## PayeTax Context`.
+- Normalized "Director Intelligence" naming across skills and commands.
+- Clarified upstream-vs-custom separation and editing rules in this file.
 
-### 2026-01-27
-- Initial version tracking added
-- Added tools registry with 29 integration guides
+### 2026-02-17
+- Added initial PayeTax context sections to customized skills.
+- Reframed CRO/email skills for free calculator model.

@@ -56,6 +56,22 @@ export default async function VsPage({ params }: PageProps) {
   }
 
   const pageUrl = `${SITE_URL}/vs/${slug}`;
+  const vsFaqs = [
+    {
+      question: `PayeTax vs ${competitor.name}: which is better?`,
+      answer: `It depends on your needs. PayeTax is designed for a fast, privacy-first experience with What-If salary comparisons, while ${competitor.name} may suit users with different feature priorities.`,
+    },
+    {
+      question: `Does PayeTax support official HMRC tax rates?`,
+      answer:
+        'Yes. PayeTax uses official HMRC rates and thresholds for all supported UK tax years.',
+    },
+    {
+      question: `Can I compare salary scenarios in PayeTax?`,
+      answer:
+        'Yes. PayeTax includes What-If salary comparison so you can evaluate arbitrary salary changes quickly.',
+    },
+  ];
 
   return (
     <>
@@ -67,6 +83,7 @@ export default async function VsPage({ params }: PageProps) {
           { name: `vs ${competitor.name}`, url: pageUrl },
         ]}
       />
+      <StructuredData type='faq' faqs={vsFaqs} />
       <VsPageContent competitor={competitor} />
     </>
   );

@@ -113,7 +113,7 @@ export function CalculatorInputsSection({
               variant='outline'
               size='lg'
               className='w-full border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 hover:text-purple-800 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300 dark:hover:text-purple-200'
-              data-testid='what-if-trigger'
+              data-testid='what-if-collapsible-trigger'
             >
               <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>
                 <span>Compare Scenarios</span>

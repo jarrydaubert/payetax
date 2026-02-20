@@ -41,7 +41,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
 
       // Tax saving should be £732 (£3,660 × 20%)
       const taxSaving = noAge.incomeTax.annually - age67.incomeTax.annually;
-      expect(taxSaving).toBeCloseTo(732, 0);
+      expect(taxSaving).toBeCloseTo(732, 2);
     });
 
     it('✅ Age 75+: Gets £3,960 additional allowance', () => {
@@ -54,7 +54,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
 
       // Extra £300 allowance saves £60 in tax
       const extraSaving = age67.incomeTax.annually - age75.incomeTax.annually;
-      expect(extraSaving).toBeCloseTo(60, 0);
+      expect(extraSaving).toBeCloseTo(60, 2);
     });
 
     it('✅ Age 80: Still gets £3,960 (75+ rate)', () => {
@@ -263,7 +263,7 @@ describe('Age-Related Personal Allowances - Comprehensive Tests', () => {
       // No age: £20,000 - £12,570 = £7,430 taxable
       // Saving: £3,660 × 20% = £732
       const taxSaving = without.incomeTax.annually - with67.incomeTax.annually;
-      expect(taxSaving).toBeCloseTo(732, 0);
+      expect(taxSaving).toBeCloseTo(732, 2);
     });
 
     it('High earning 67 year old (£40k) - partial benefit', () => {

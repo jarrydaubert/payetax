@@ -4,6 +4,12 @@
  * Central data source for competitor comparison pages.
  * Used by /best-uk-tax-calculators, /alternatives/*, and /vs/* pages.
  *
+ * Canonical depth contract:
+ * - `features` powers `TwoColumnComparison`
+ * - `strengths` / `weaknesses` / `bestFor` / `payeTaxAdvantages` power narrative comparison sections
+ * - `verification` tracks evidence freshness
+ * No separate `detailedComparison` field is used at this time; extend these fields instead.
+ *
  * @module data/competitors
  */
 

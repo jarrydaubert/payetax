@@ -2,7 +2,7 @@
 // Main component for salary-specific landing pages
 //
 // Architecture note: `results` is frozen to `initialResults` intentionally for SEO.
-// Structured data uses the SSR snapshot for deterministic indexing by Googlebot.
+// Structured data is emitted from the parent Server Component using the same SSR snapshot.
 // The interactive calculator (CalculatorContent) uses store state separately.
 
 'use client';
@@ -13,10 +13,9 @@ import { SalaryQuickResults } from '@/components/molecules/SalaryQuickResults';
 import { SalarySEOContent } from '@/components/molecules/SalarySEOContent';
 import { CalculatorContent } from '@/components/organisms/CalculatorContent';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
-import { StructuredData } from '@/components/organisms/StructuredData';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
+import { formatIsoDateForDisplay, RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
-import { SITE_URL } from '@/lib/metadata';
 
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
@@ -77,39 +76,6 @@ const SALARY_BLOG_POSTS = new Map<number, { slug: string; title: string }>([
   ],
 ]);
 
-// Generate salary-specific FAQs
-function generateSalaryFAQs(
-  salary: number,
-  results: TaxCalculationResults,
-  taxYearDisplay: string,
-) {
-  const formattedSalary = salary.toLocaleString('en-GB');
-  const faqs = [
-    {
-      question: `How much tax do I pay on a £${formattedSalary} salary in the UK?`,
-      answer: `On a £${formattedSalary} salary in the UK for ${taxYearDisplay}, you pay £${results.incomeTax.annually.toLocaleString('en-GB')} in income tax and £${results.nationalInsurance.annually.toLocaleString('en-GB')} in National Insurance, leaving you with £${results.netPay.annually.toLocaleString('en-GB')} take-home pay per year.`,
-    },
-    {
-      question: `What is the monthly take-home pay on £${formattedSalary}?`,
-      answer: `With a gross salary of £${formattedSalary} per year, your monthly take-home pay is £${results.netPay.monthly.toLocaleString('en-GB')} after tax and National Insurance deductions.`,
-    },
-    {
-      question: `What is the effective tax rate on £${formattedSalary}?`,
-      answer: `The effective tax rate on a £${formattedSalary} salary is ${(((results.incomeTax.annually + results.nationalInsurance.annually) / salary) * 100).toFixed(1)}%. This includes both income tax and National Insurance contributions.`,
-    },
-  ];
-
-  // Add tax trap FAQ for £100k-£125k earners
-  if (salary >= 100000 && salary <= 125140) {
-    faqs.push({
-      question: `How does the £100k tax trap affect a £${formattedSalary} salary?`,
-      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective marginal tax rate of around 60% between £100,000 and £125,140 for most employees in England, Wales, and Northern Ireland. The impact depends on your circumstances.`,
-    });
-  }
-
-  return faqs;
-}
-
 interface SalaryCalculatorPageProps {
   salary: number;
   isHighPriority?: boolean;
@@ -135,6 +101,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
     separator: '-',
     shortEndYear: true,
   });
+  const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
   // Generate comparison salaries
   const comparisons = useMemo(() => {
@@ -153,22 +120,6 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
       .map(([amount, delta]) => ({ amount, label: formatDeltaLabel(delta) }));
   }, [salary]);
 
-  // Generate structured data for SEO (use #tax-calculator to match homepage)
-  const breadcrumbItems = [
-    { name: 'Home', url: `${SITE_URL}/` },
-    { name: 'Calculator', url: `${SITE_URL}/#tax-calculator` },
-    {
-      name: `£${formattedSalary} Salary`,
-      url: `${SITE_URL}/calculator/${salary}-after-tax`,
-    },
-  ];
-
-  // Memoize FAQ generation
-  const salaryFAQs = useMemo(
-    () => generateSalaryFAQs(salary, results, taxYearDisplay),
-    [salary, results, taxYearDisplay],
-  );
-
   // Find related blog post for this salary
   const relatedBlogPost = SALARY_BLOG_POSTS.get(salary);
 
@@ -184,22 +135,6 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
 
   return (
     <div className='min-h-screen bg-background'>
-      {/* Structured Data for SEO */}
-      <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
-      <StructuredData type='faq' faqs={salaryFAQs} />
-      <StructuredData type='calculator' />
-      <StructuredData type='dataset' />
-      <StructuredData
-        type='salarycalculation'
-        salaryData={{
-          salary,
-          netPay: results.netPay.annually,
-          incomeTax: results.incomeTax.annually,
-          nationalInsurance: results.nationalInsurance.annually,
-          url: `${SITE_URL}/calculator/${salary}-after-tax`,
-        }}
-      />
-
       {/* Hero Section with Instant Answer */}
       <section className={cn('relative overflow-hidden', 'py-8 sm:py-12')}>
         <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent' />
@@ -219,7 +154,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
               </li>
               <li>/</li>
               <li>
-                <Link href='/#tax-calculator' className='hover:text-primary'>
+                <Link href='/' className='hover:text-primary'>
                   Calculator
                 </Link>
               </li>
@@ -238,8 +173,11 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           >
             £{formattedSalary} After Tax UK {taxYearDisplay}
           </h1>
-          <p className={cn('text-muted-foreground', SPACING.MB_8)}>
+          <p className={cn('text-muted-foreground', SPACING.MB_2)}>
             UK take-home pay calculator for {taxYearDisplay} tax year
+          </p>
+          <p className={cn('text-muted-foreground/80 text-xs', SPACING.MB_8)}>
+            Rates verified for {taxYearDisplay} (last checked {ratesVerifiedDisplay}).
           </p>
           <div className='mb-8 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-amber-200 text-xs'>
             <p>

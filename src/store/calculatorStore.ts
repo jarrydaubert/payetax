@@ -326,6 +326,197 @@ const getSalaryRange = (salary: number): string | null => {
   return 'over_150k';
 };
 
+type CalculationAnomalyCode =
+  | 'non_finite_value'
+  | 'negative_component'
+  | 'invalid_effective_rate'
+  | 'negative_net_pay';
+
+interface CalculationAnomaly {
+  code: CalculationAnomalyCode;
+  detail: string;
+  value?: number;
+}
+
+const MAX_REPORTED_ANOMALIES = 6;
+
+export const collectCalculationAnomalies = (
+  results: TaxCalculationResults,
+): CalculationAnomaly[] => {
+  const anomalies: CalculationAnomaly[] = [];
+
+  const periodicMetrics = [
+    ['grossSalary', true],
+    ['incomeTax', true],
+    ['nationalInsurance', true],
+    ['studentLoan', true],
+    ['pensionContribution', true],
+    ['netPay', false],
+  ] as const;
+
+  for (const [metricName, requireNonNegative] of periodicMetrics) {
+    const metricValues = results[metricName];
+    if (!metricValues || typeof metricValues !== 'object') continue;
+
+    for (const [period, rawValue] of Object.entries(metricValues as Record<string, unknown>)) {
+      if (typeof rawValue !== 'number' || !Number.isFinite(rawValue)) {
+        anomalies.push({
+          code: 'non_finite_value',
+          detail: `${metricName}.${period}`,
+        });
+        continue;
+      }
+
+      if (requireNonNegative && rawValue < 0) {
+        anomalies.push({
+          code: 'negative_component',
+          detail: `${metricName}.${period}`,
+          value: rawValue,
+        });
+      }
+    }
+  }
+
+  if (typeof results.taxableIncome === 'number' && !Number.isFinite(results.taxableIncome)) {
+    anomalies.push({
+      code: 'non_finite_value',
+      detail: 'taxableIncome',
+      value: results.taxableIncome,
+    });
+  } else if (typeof results.taxableIncome === 'number' && results.taxableIncome < 0) {
+    anomalies.push({
+      code: 'negative_component',
+      detail: 'taxableIncome',
+      value: results.taxableIncome,
+    });
+  }
+
+  if (typeof results.employerNI === 'number' && !Number.isFinite(results.employerNI)) {
+    anomalies.push({
+      code: 'non_finite_value',
+      detail: 'employerNI',
+      value: results.employerNI,
+    });
+  } else if (typeof results.employerNI === 'number' && results.employerNI < 0) {
+    anomalies.push({
+      code: 'negative_component',
+      detail: 'employerNI',
+      value: results.employerNI,
+    });
+  }
+
+  if (Array.isArray(results.taxBands)) {
+    for (const [index, band] of results.taxBands.entries()) {
+      if (typeof band.amount !== 'number' || !Number.isFinite(band.amount)) {
+        anomalies.push({
+          code: 'non_finite_value',
+          detail: `taxBands[${index}].amount`,
+          value: band.amount,
+        });
+      } else if (band.amount < 0) {
+        anomalies.push({
+          code: 'negative_component',
+          detail: `taxBands[${index}].amount`,
+          value: band.amount,
+        });
+      }
+    }
+  }
+
+  const annualGross = results.incomeBreakdown?.total ?? results.grossSalary?.annually;
+  const annualNet = results.netPay?.annually;
+
+  if (
+    typeof annualGross === 'number' &&
+    Number.isFinite(annualGross) &&
+    annualGross > 0 &&
+    typeof annualNet === 'number' &&
+    Number.isFinite(annualNet)
+  ) {
+    const effectiveRate = ((annualGross - annualNet) / annualGross) * 100;
+    if (!Number.isFinite(effectiveRate) || effectiveRate < 0 || effectiveRate > 100) {
+      anomalies.push({
+        code: 'invalid_effective_rate',
+        detail: 'annual_effective_rate',
+        value: effectiveRate,
+      });
+    }
+
+    if (annualNet < 0) {
+      anomalies.push({
+        code: 'negative_net_pay',
+        detail: 'netPay.annually',
+        value: annualNet,
+      });
+    }
+  }
+
+  return anomalies;
+};
+
+const reportCalculationAnomalies = (
+  results: TaxCalculationResults,
+  input: CalculatorInput,
+  source: 'primary' | 'previous_year' | 'what_if',
+): void => {
+  const anomalies = collectCalculationAnomalies(results);
+  if (anomalies.length === 0) return;
+
+  const anomalyPreview = anomalies
+    .slice(0, MAX_REPORTED_ANOMALIES)
+    .map((anomaly) =>
+      typeof anomaly.value === 'number'
+        ? `${anomaly.code}:${anomaly.detail}=${anomaly.value}`
+        : `${anomaly.code}:${anomaly.detail}`,
+    );
+
+  addBreadcrumb('calculator', {
+    message: 'Calculation anomaly detected',
+    level: 'warning',
+    data: {
+      source,
+      tax_year: input.taxYear,
+      region: input.region,
+      anomaly_count: anomalies.length,
+      anomaly_preview: anomalyPreview,
+    },
+  });
+
+  trackEvent({
+    action: 'calculator_error',
+    category: 'quality',
+    label: `calculation_anomaly_${source}`,
+    custom_data: {
+      error_type: 'calculation_anomaly',
+      source,
+      anomaly_count: anomalies.length,
+      anomaly_codes: [...new Set(anomalies.map((anomaly) => anomaly.code))].join(','),
+      tax_year: input.taxYear,
+      region: input.region,
+      salary_range: getSalaryRange(input.salary) || 'unknown',
+    },
+  });
+
+  captureCalculatorError(
+    new Error(`Calculation anomaly detected (${source})`),
+    {
+      salary: input.salary,
+      taxYear: input.taxYear,
+      region: input.region,
+      taxCode: input.taxCode,
+      studentLoanPlans: input.studentLoanPlans,
+      pensionContribution: input.pensionContribution,
+      isMarried: input.isMarried,
+    },
+    'warning',
+  );
+
+  logCalculatorWarning('[Calculator] Calculation anomaly detected', {
+    source,
+    anomalies: anomalyPreview,
+  });
+};
+
 // Default tax year based on current date
 const defaultTaxYear = getCurrentTaxYear();
 
@@ -894,6 +1085,7 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             const results = calculateTax(inputWithDefaults);
             set({ results });
+            reportCalculationAnomalies(results, inputWithDefaults, 'primary');
 
             // Track successful calculation
             addBreadcrumb('calculator', {
@@ -980,6 +1172,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             const previousYearInput = { ...input, taxYear: previousYear };
             const previousResults = calculateTax(previousYearInput);
             set({ previousYearResults: previousResults });
+            reportCalculationAnomalies(previousResults, previousYearInput, 'previous_year');
           }
         },
         reset: () => {
@@ -1094,6 +1287,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             const whatIfResults = calculateTax(whatIfInput);
 
             set({ whatIfResults });
+            reportCalculationAnomalies(whatIfResults, whatIfInput, 'what_if');
           } catch (error) {
             console.error('What If calculation error:', error);
             set({ whatIfResults: null });

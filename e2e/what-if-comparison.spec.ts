@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
 import { generateUniqueTestData } from './helpers/tax-test-helpers';
 
 async function fillNumberInput(input: Locator, value: string) {
@@ -9,10 +10,10 @@ async function fillNumberInput(input: Locator, value: string) {
 }
 
 async function openWhatIfSection(page: Page) {
-  const toggle = page.getByTestId('what-if-trigger').first();
+  const toggle = page.getByTestId('what-if-collapsible-trigger');
   await expect(toggle).toBeVisible({ timeout: 5000 });
   await toggle.click();
-  await expect(page.getByTestId('what-if-trigger')).toHaveCount(2);
+  await expect(page.getByTestId('what-if-value-input')).toBeVisible({ timeout: 5000 });
 }
 
 /**
@@ -33,15 +34,8 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    // Dismiss cookie banner if present
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-      // biome-ignore lint/suspicious/noConsole: Test debugging output
-      console.log('🍪 Cookie banner dismissed');
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If collapsible section (required for all tests)
     await openWhatIfSection(page);
@@ -67,8 +61,8 @@ test.describe('What-If Comparison - Core Functionality', () => {
     const valueInput = page.locator('[data-testid="what-if-value-input"]');
     await expect(valueInput).toBeVisible();
 
-    // What-If trigger button should be present (use .first() due to 2 instances)
-    const whatIfTrigger = page.getByTestId('what-if-trigger').last();
+    // What-If compare button should be present
+    const whatIfTrigger = page.getByTestId('what-if-trigger');
     await expect(whatIfTrigger).toBeVisible();
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
@@ -107,16 +101,14 @@ test.describe('What-If Comparison - Core Functionality', () => {
 
     // Calculate baseline first
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Enter What-If value
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await fillNumberInput(whatIfInput, '10');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should be visible
     const comparisonHeading = page.locator('text=Current vs What If').first();
@@ -129,8 +121,11 @@ test.describe('What-If Comparison - Core Functionality', () => {
     // Click clear
     await clearButton.click();
 
+    // Clear button should disappear when What-If state is reset
+    await expect(clearButton).toBeHidden({ timeout: 5000 });
+
     // Comparison heading should no longer be visible
-    await expect(comparisonHeading).not.toBeVisible();
+    await expect(comparisonHeading).toBeHidden({ timeout: 5000 });
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ What-If clear works correctly');
@@ -143,12 +138,8 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -166,7 +157,6 @@ test.describe('What-If Comparison - Percentage Changes', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Wait for initial calculation
     const resultsTable = page.locator('[data-testid="results-table"]');
@@ -181,9 +171,8 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await fillNumberInput(whatIfInput, '10');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison table should be visible with Current vs What If columns
     const comparisonHeading = page.locator('text=Current vs What If').first();
@@ -203,16 +192,14 @@ test.describe('What-If Comparison - Percentage Changes', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Enter -5% decrease
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await fillNumberInput(whatIfInput, '-5');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should show decreased values
     const comparisonHeading = page.locator('text=Current vs What If').first();
@@ -229,12 +216,8 @@ test.describe('What-If Comparison - Amount Changes', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -250,7 +233,6 @@ test.describe('What-If Comparison - Amount Changes', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -262,9 +244,8 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await fillNumberInput(whatIfInput, '5000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Verify comparison displayed
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -284,7 +265,6 @@ test.describe('What-If Comparison - Amount Changes', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -296,9 +276,8 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await fillNumberInput(whatIfInput, '-10000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Verify comparison displayed
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -315,12 +294,8 @@ test.describe('What-If Comparison - New Total Salary', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -336,7 +311,6 @@ test.describe('What-If Comparison - New Total Salary', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -348,9 +322,8 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await fillNumberInput(whatIfInput, '50000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Verify comparison displayed
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -370,7 +343,6 @@ test.describe('What-If Comparison - New Total Salary', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -382,9 +354,8 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await fillNumberInput(whatIfInput, '60000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Verify comparison displayed
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -401,12 +372,8 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -422,7 +389,6 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -434,9 +400,8 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await fillNumberInput(whatIfInput, '110000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should be visible showing the tax trap effects
     const comparisonHeading = page.locator('text=Current vs What If').first();
@@ -460,7 +425,6 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -472,9 +436,8 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await fillNumberInput(whatIfInput, '125000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should show marginal rate differences
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -494,7 +457,6 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Total" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -506,9 +468,8 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await fillNumberInput(whatIfInput, '130000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should show improved marginal rate
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -525,12 +486,8 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -546,7 +503,6 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -558,9 +514,8 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await fillNumberInput(whatIfInput, '-5000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should show tax savings
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -580,7 +535,6 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     // Select "Amount" type
     const typeSelect = page.locator('[data-testid="what-if-type-select"]');
@@ -592,9 +546,8 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await fillNumberInput(whatIfInput, '-6000');
 
     // Click compare
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Comparison should show benefit of avoiding trap
     const comparisonSection = page.locator('text=Current vs What If').first();
@@ -611,12 +564,8 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
     const testId = Math.floor(Math.random() * 1000);
     await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
     await page.waitForLoadState('networkidle');
-
-    const acceptCookiesButton = page.locator('button:has-text("Accept All")');
-    const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);
-    if (cookieBannerVisible) {
-      await acceptCookiesButton.click();
-    }
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
 
     // Open What-If section
     await openWhatIfSection(page);
@@ -632,14 +581,12 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await fillNumberInput(whatIfInput, '10');
 
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Check comparison table structure
     const comparisonTable = page.locator('[data-testid="results-table"]');
@@ -665,14 +612,12 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await fillNumberInput(whatIfInput, '15');
 
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Percentage difference column should be visible
     const diffColumn = page.locator('text=/\\+.*%|\\-.*%/').first();
@@ -692,14 +637,12 @@ test.describe('What-If Comparison - Comparison Table Display', () => {
 
     // Calculate baseline
     await page.getByTestId('calculate-button').click();
-    await page.waitForTimeout(1000);
 
     const whatIfInput = page.locator('[data-testid="what-if-value-input"]');
     await fillNumberInput(whatIfInput, '5');
 
-    const compareButton = page.getByTestId('what-if-trigger').last();
+    const compareButton = page.getByTestId('what-if-trigger');
     await compareButton.click();
-    await page.waitForTimeout(1500);
 
     // Period checkboxes should be visible
     const yearlyCheckbox = page.locator('label:has-text("Yearly")').first();

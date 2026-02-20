@@ -5,13 +5,25 @@
 
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { SalaryCalculatorPage } from '@/components/pages/SalaryCalculatorPage';
-import { generateMetadata as generateMetadataHelper } from '@/lib/metadata';
+import { HMRC_INCOME_TAX_RATES_URL, HMRC_NI_RATES_URL } from '@/constants/sources';
+import {
+  CURRENT_TAX_YEAR,
+  formatTaxYearDisplay,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
+import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
+import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { calculateTax } from '@/lib/taxCalculator';
 
 // Tax year constant - single source of truth for this page
-const TAX_YEAR_DISPLAY = '2025-26';
-const TAX_YEAR_CALC = '2025-2026';
+const TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
+const TAX_YEAR_CALC: TaxYear = CURRENT_TAX_YEAR;
 
 // Next.js 16: Route segment config
 export const dynamic = 'force-static'; // Static generation with ISR
@@ -52,11 +64,57 @@ const HIGH_PRIORITY_SALARIES = [
   95000, 100000, 105000, 110000, 115000, 120000, 125000, 130000, 140000, 150000, 175000, 200000,
   250000, 300000, 500000,
 ];
+const HIGH_PRIORITY_SALARY_SET = new Set(HIGH_PRIORITY_SALARIES);
 
 interface PageProps {
   params: Promise<{
     salary: string;
   }>;
+}
+
+function generateSalaryFAQs(
+  salary: number,
+  results: TaxCalculationResults,
+  taxYearDisplay: string,
+) {
+  const formattedSalary = salary.toLocaleString('en-GB');
+  const faqs = [
+    {
+      question: `How much tax do I pay on a £${formattedSalary} salary in the UK?`,
+      answer: `On a £${formattedSalary} salary in the UK for ${taxYearDisplay}, you pay £${results.incomeTax.annually.toLocaleString('en-GB')} in income tax and £${results.nationalInsurance.annually.toLocaleString('en-GB')} in National Insurance, leaving you with £${results.netPay.annually.toLocaleString('en-GB')} take-home pay per year. Sources: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}) and HMRC National Insurance rates (${HMRC_NI_RATES_URL}).`,
+    },
+    {
+      question: `What is the monthly take-home pay on £${formattedSalary}?`,
+      answer: `With a gross salary of £${formattedSalary} per year, your monthly take-home pay is £${results.netPay.monthly.toLocaleString('en-GB')} after tax and National Insurance deductions. Sources: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}) and HMRC National Insurance rates (${HMRC_NI_RATES_URL}).`,
+    },
+    {
+      question: `What is the effective tax rate on £${formattedSalary}?`,
+      answer: `The effective tax rate on a £${formattedSalary} salary is ${(((results.incomeTax.annually + results.nationalInsurance.annually) / salary) * 100).toFixed(1)}%. This includes both income tax and National Insurance contributions. Sources: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}) and HMRC National Insurance rates (${HMRC_NI_RATES_URL}).`,
+    },
+  ];
+
+  const rates = TAX_RATES[CURRENT_TAX_YEAR];
+  const personalAllowanceFullyTaperedAt =
+    rates.personalAllowanceReductionThreshold + rates.personalAllowance * 2;
+
+  if (HIGH_PRIORITY_SALARY_SET.has(salary)) {
+    faqs.push({
+      question: `What is the weekly take-home pay on £${formattedSalary}?`,
+      answer: `On £${formattedSalary} gross pay, weekly take-home pay is about £${results.netPay.weekly.toLocaleString('en-GB')} after PAYE tax and National Insurance. For scenario testing and assumptions, use the full calculator: ${SITE_URL}/calculator/${salary}-after-tax. Sources: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}) and HMRC National Insurance rates (${HMRC_NI_RATES_URL}).`,
+    });
+  }
+
+  if (
+    salary >= rates.personalAllowanceReductionThreshold &&
+    salary <= personalAllowanceFullyTaperedAt
+  ) {
+    faqs.push({
+      question: `How does the £100k tax trap affect a £${formattedSalary} salary?`,
+      answer: `At £${formattedSalary}, you lose £1 of Personal Allowance for every £2 earned over £100,000. This creates an effective marginal tax rate of around 60% between £100,000 and £125,140 for most employees in England, Wales, and Northern Ireland. The impact depends on your circumstances. Source: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
+    });
+  }
+
+  return faqs;
 }
 
 // Parse salary from URL parameter
@@ -152,11 +210,37 @@ export default async function SalaryPage({ params }: PageProps) {
     hoursPerWeek: 37.5,
   });
 
+  const breadcrumbItems = [
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Calculator', url: `${SITE_URL}/` },
+    {
+      name: `£${salary.toLocaleString('en-GB')} Salary`,
+      url: `${SITE_URL}/calculator/${salary}-after-tax`,
+    },
+  ];
+  const salaryFAQs = generateSalaryFAQs(salary, initialResults, TAX_YEAR_DISPLAY);
+
   return (
-    <SalaryCalculatorPage
-      salary={salary}
-      isHighPriority={isHighPriority}
-      initialResults={initialResults}
-    />
+    <>
+      <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
+      <StructuredData type='faq' faqs={salaryFAQs} />
+      <StructuredData type='calculator' />
+      <StructuredData type='dataset' />
+      <StructuredData
+        type='salarycalculation'
+        salaryData={{
+          salary,
+          netPay: initialResults.netPay.annually,
+          incomeTax: initialResults.incomeTax.annually,
+          nationalInsurance: initialResults.nationalInsurance.annually,
+          url: `${SITE_URL}/calculator/${salary}-after-tax`,
+        }}
+      />
+      <SalaryCalculatorPage
+        salary={salary}
+        isHighPriority={isHighPriority}
+        initialResults={initialResults}
+      />
+    </>
   );
 }

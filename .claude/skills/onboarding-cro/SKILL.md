@@ -1,14 +1,13 @@
 ---
 name: onboarding-cro
-version: 1.0.0
-description: When the user wants to optimize first-visit experience, user activation, or time-to-value. Also use when the user mentions "onboarding flow," "activation rate," "user activation," "first-run experience," "empty states," "aha moment," or "new user experience." For ongoing email sequences, see email-sequence.
+description: When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. Also use when the user mentions "onboarding flow," "activation rate," "user activation," "first-run experience," "empty states," "onboarding checklist," "aha moment," or "new user experience." For ongoing email sequences, see email-sequence.
+metadata:
+  version: 1.2.0
 ---
 
 # Onboarding CRO
 
 You are an expert in user onboarding and activation. Your goal is to help users reach their "aha moment" as quickly as possible and establish habits that lead to long-term retention.
-
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, onboarding analysis should cover only live visitor flows and defer paid-flow onboarding.
 
 ## Initial Assessment
 
@@ -20,34 +19,6 @@ Before providing recommendations, understand:
 1. **Product Context** - What type of product? B2B or B2C? Core value proposition?
 2. **Activation Definition** - What's the "aha moment"? What action indicates a user "gets it"?
 3. **Current State** - What happens after signup? Where do users drop off?
-
----
-
-## PayeTax Context
-
-PayeTax has no user accounts or signup flow. "Onboarding" means the first-visit experience — getting a new visitor to trust the tool and complete their first calculation.
-
-### First-Visit Experiences
-- **Homepage** — calculator is the hero. First-visit goal: user enters salary and sees results.
-- **Director Guide** — `DirectorGuideWelcomeDialog` (`src/components/molecules/DirectorGuide/WelcomeDialog.tsx`) shows on first visit, explains what the tool does, localStorage-based dismissal.
-- **Salary pages** (`/calculator/[salary]-after-tax`) — pre-calculated results for SEO visitors. Goal: user trusts result and tries their own salary.
-- **Cookie banner** — `CookieBanner` component, first interaction for many visitors.
-- **PWA install prompt** — `PWAInstallBanner` for returning mobile users.
-
-### Activation Metrics (No Signup Required)
-- Calculator completion rate (entered salary → saw results)
-- Second calculation (changed a parameter, tried different salary)
-- Return visit (cookie-based detection)
-- Newsletter signup (Kit/ConvertKit via `NewsletterCTA`)
-- Director Guide email results (sent via Resend)
-
-### What Does NOT Apply
-- Post-signup onboarding checklists — there is no signup
-- Account setup wizards — no accounts
-- Team invite flows — single-user tool
-- Feature discovery sequences — all features visible
-- Trial-to-paid conversion — everything is free
-- In-app email sequences triggered by account creation
 
 ---
 
@@ -245,4 +216,31 @@ When recommending experiments, consider tests for:
 
 - **email-sequence**: For onboarding email series
 - **ab-test-setup**: For testing onboarding changes
-- **popup-cro**: For optimizing WelcomeDialog and other first-visit modals
+
+## PayeTax Context
+
+PayeTax has no user accounts or signup flow. "Onboarding" means the first-visit experience — getting a new visitor to trust the tool and complete their first calculation.
+
+### First-Visit Experiences
+- **Homepage** — calculator is the hero. First-visit goal: user enters salary and sees results.
+- **Director Intelligence** — `DirectorGuideWelcomeDialog` (`src/components/molecules/DirectorGuide/WelcomeDialog.tsx`) shows on first visit, explains what the tool does, localStorage-based dismissal.
+- **Salary pages** (`/calculator/[salary]-after-tax`) — pre-calculated results for SEO visitors. Goal: user trusts result and tries their own salary.
+- **Cookie banner** — `CookieBanner` component, first interaction for many visitors.
+- **PWA install prompt** — `PWAInstallBanner` for returning mobile users.
+
+### Activation Metrics (No Signup Required)
+- Calculator completion rate (entered salary → saw results)
+- Second calculation (changed a parameter, tried different salary)
+- Return visit (cookie-based detection)
+- Newsletter signup (Kit/ConvertKit via `NewsletterCTA`)
+- Director Intelligence email results (sent via Resend)
+
+### What Does NOT Apply
+- Post-signup onboarding checklists — there is no signup
+- Account setup wizards — no accounts
+- Team invite flows — single-user tool
+- Feature discovery sequences — all features visible
+- Trial-to-paid conversion — everything is free
+- In-app email sequences triggered by account creation
+
+

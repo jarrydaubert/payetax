@@ -6,7 +6,7 @@ import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
 import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import { generateMetadata, SITE_URL } from '@/lib/metadata';
+import { generateMetadata } from '@/lib/metadata';
 
 // Dynamic import for interactive content - hero is server-rendered for fast LCP
 // Using loading option for predictable fallback behavior (vs relying on outer Suspense)
@@ -48,7 +48,6 @@ export default function HomePage() {
       <StructuredData type='howto' />
       <StructuredData type='dataset' />
       <StructuredData type='faq' faqs={faqs} />
-      <StructuredData type='breadcrumb' breadcrumbs={[{ name: 'Home', url: SITE_URL }]} />
 
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />

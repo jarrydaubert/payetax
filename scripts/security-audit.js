@@ -82,62 +82,94 @@ function analyzeTrend(audits, metric, periods = 5) {
 
 function checkOutdatedPackages() {
   return new Promise((resolve) => {
-    exec('npm outdated --json', (_error, stdout, _stderr) => {
+    exec('bun outdated --no-progress', (_error, stdout = '', stderr = '') => {
       try {
-        if (stdout) {
-          const outdated = JSON.parse(stdout);
-          if (outdated?.error) {
-            resolve([]);
-            return;
-          }
-          const packages = Object.entries(outdated)
-            .filter(
-              ([, details]) =>
-                details &&
-                typeof details.current === 'string' &&
-                typeof details.latest === 'string',
-            )
-            .map(([name, details]) => ({
-              name,
-              current: details.current,
-              wanted: details.wanted,
-              latest: details.latest,
-              type: details.type || 'dependencies',
-            }));
-          resolve(packages);
-        } else {
+        const output = [stdout, stderr].filter(Boolean).join('\n');
+        if (!output.includes('│')) {
           resolve([]);
+          return;
         }
-      } catch (_e) {
+
+        const packages = output
+          .split('\n')
+          .filter((line) => line.includes('│'))
+          .map((line) => line.split('│').map((segment) => segment.trim()))
+          .filter((parts) => parts.length >= 6)
+          .map((parts) => ({
+            name: parts[1],
+            current: parts[2],
+            wanted: parts[3],
+            latest: parts[4],
+            type: 'dependencies',
+          }))
+          .filter((pkg) => pkg.name && pkg.name !== 'Package' && pkg.current && pkg.latest);
+
+        resolve(packages);
+      } catch (_error) {
         resolve([]);
       }
     });
   });
 }
 
-function runBunPmScan() {
-  return new Promise((resolve, reject) => {
-    exec('bun pm scan', (error, stdout = '', stderr = '') => {
-      const output = [stdout, stderr].filter(Boolean).join('\n');
-      const advisoriesMatch = output.match(/(\d+)\s+advisories?\s+found/i);
-      const advisories = advisoriesMatch ? Number(advisoriesMatch[1]) : 0;
-      const noAdvisories = /No advisories found/i.test(output);
-      const hasScanResult = noAdvisories || /advisories?\s+found/i.test(output);
+function extractJsonObject(output) {
+  const start = output.indexOf('{');
+  const end = output.lastIndexOf('}');
 
-      if (error && !hasScanResult) {
-        reject(error);
-        return;
+  if (start === -1 || end === -1 || end < start) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(output.slice(start, end + 1));
+  } catch (_error) {
+    return null;
+  }
+}
+
+function parseBunAuditOutput(output) {
+  const parsed = extractJsonObject(output);
+  const summary = emptyAuditMetadata().vulnerabilities;
+  const vulnerabilities = [];
+
+  if (!parsed || typeof parsed !== 'object') {
+    return { summary, vulnerabilities };
+  }
+
+  for (const [packageName, advisories] of Object.entries(parsed)) {
+    if (!Array.isArray(advisories)) continue;
+
+    for (const advisory of advisories) {
+      const severity = advisory.severity || 'info';
+      if (severity in summary) {
+        summary[severity] += 1;
+      } else {
+        summary.info += 1;
       }
 
-      resolve({
-        advisories: noAdvisories ? 0 : advisories,
-        output,
+      vulnerabilities.push({
+        name: packageName,
+        severity,
+        title: advisory.title || advisory.id || 'Security advisory',
+        url: advisory.url || null,
+        version: advisory.vulnerable_versions || advisory.version || null,
+        fixAvailable: advisory.fixed_versions || null,
       });
-    });
-  });
+    }
+  }
+
+  summary.total = vulnerabilities.length;
+  return { summary, vulnerabilities };
 }
 
 function generateSecurityReport(audit, history) {
+  console.log('\n🔐 Security Audit Report');
+  console.log(`   Source: ${audit.scanSource}`);
+  console.log(
+    `   Vulnerabilities: total=${audit.summary.total}, critical=${audit.summary.critical}, high=${audit.summary.high}, moderate=${audit.summary.moderate}, low=${audit.summary.low}`,
+  );
+  console.log(`   Outdated packages: ${audit.outdatedPackages?.length || 0}`);
+
   if (audit.vulnerabilities && audit.vulnerabilities.length > 0) {
     // Group by severity
     const bySeverity = audit.vulnerabilities.reduce((acc, vuln) => {
@@ -148,11 +180,11 @@ function generateSecurityReport(audit, history) {
 
     for (const severity of ['critical', 'high', 'moderate', 'low']) {
       if (bySeverity[severity] && bySeverity[severity].length > 0) {
-        for (const [_i, vuln] of bySeverity[severity].entries()) {
-          if (vuln.url) {
-          }
-          if (vuln.fixAvailable) {
-          }
+        const top = bySeverity[severity].slice(0, 5);
+        console.log(`\n   ${severity.toUpperCase()} (${bySeverity[severity].length})`);
+        for (const vuln of top) {
+          const detail = vuln.url ? ` (${vuln.url})` : '';
+          console.log(`   - ${vuln.name}: ${vuln.title}${detail}`);
         }
       }
     }
@@ -168,12 +200,10 @@ function generateSecurityReport(audit, history) {
     });
 
     if (criticalOutdated.length > 0) {
-      for (const _pkg of criticalOutdated.slice(0, 10)) {
+      console.log(`\n📦 Major updates available for ${criticalOutdated.length} package(s)`);
+      for (const pkg of criticalOutdated.slice(0, 10)) {
+        console.log(`   - ${pkg.name}: ${pkg.current} -> ${pkg.latest}`);
       }
-
-      if (criticalOutdated.length > 10) {
-      }
-    } else {
     }
   }
 
@@ -181,6 +211,10 @@ function generateSecurityReport(audit, history) {
   if (history.audits.length > 1) {
     const totalTrend = analyzeTrend(history.audits, 'total');
     if (totalTrend) {
+      const trendDirection = totalTrend.improving ? 'improving' : 'worsening';
+      console.log(
+        `\n📈 Trend (${Math.min(5, history.audits.length)} runs): ${trendDirection}, change=${totalTrend.change}`,
+      );
     }
 
     const criticalTrend = analyzeTrend(history.audits, 'critical');
@@ -219,78 +253,36 @@ function generateSecurityReport(audit, history) {
   recommendations.push('📋 Keep dependencies updated within major version ranges');
   recommendations.push('🚀 Monitor security advisories for used packages');
 
-  if (recommendations.length === 0) {
-  } else {
-    recommendations.forEach((_rec, _i) => {});
-  }
-  if (audit.summary.critical > 0 || audit.summary.high > 0) {
-  } else {
+  if (recommendations.length > 0) {
+    console.log('\n💡 Recommendations');
+    for (const rec of recommendations) {
+      console.log(`   - ${rec}`);
+    }
   }
 }
 
 async function runSecurityAudit() {
   return new Promise((resolve, reject) => {
-    exec('npm audit --audit-level=info --json', async (_error, stdout, _stderr) => {
+    exec('bun audit --json --audit-level=low', async (error, stdout = '', stderr = '') => {
       try {
-        let auditData = null;
-        let scanSource = 'npm audit';
+        const output = [stdout, stderr].filter(Boolean).join('\n');
+        const scanSource = 'bun audit';
+        const parsedAudit = parseBunAuditOutput(output);
 
-        if (stdout) {
-          auditData = JSON.parse(stdout);
-        }
-
-        const npmSummary = auditData?.metadata?.vulnerabilities;
-        const npmDependencies = auditData?.metadata?.dependencies;
-        const npmAuditMissingData =
-          !(npmSummary && npmDependencies) || auditData?.error?.code === 'ENOLOCK';
-
-        if (npmAuditMissingData) {
-          // Bun projects may not have package-lock.json; fall back to Bun's scanner.
-          const bunScan = await runBunPmScan();
-          scanSource = 'bun pm scan';
-          auditData = {
-            vulnerabilities: {},
-            metadata: emptyAuditMetadata(),
-          };
-
-          if (bunScan.advisories > 0) {
-            // Bun scan doesn't expose severities in a stable machine-readable format;
-            // classify advisories as high to keep CI behavior conservative.
-            auditData.metadata.vulnerabilities.high = bunScan.advisories;
-            auditData.metadata.vulnerabilities.total = bunScan.advisories;
-          }
+        if (error && parsedAudit.summary.total === 0) {
+          reject(error);
+          return;
         }
 
         // Get outdated packages info
         const outdatedPackages = await checkOutdatedPackages();
 
-        // Process vulnerabilities
-        const vulnerabilities = [];
-        if (auditData.vulnerabilities) {
-          for (const vuln of Object.values(auditData.vulnerabilities)) {
-            if (vuln.via) {
-              for (const via of vuln.via) {
-                if (typeof via === 'object') {
-                  vulnerabilities.push({
-                    name: vuln.name,
-                    severity: vuln.severity,
-                    title: via.title,
-                    url: via.url,
-                    version: via.version,
-                    fixAvailable: vuln.fixAvailable ? vuln.fixAvailable.version : null,
-                  });
-                }
-              }
-            }
-          }
-        }
-
         const audit = {
           timestamp: getCurrentTimestamp(),
           scanSource,
-          summary: auditData.metadata?.vulnerabilities || emptyAuditMetadata().vulnerabilities,
-          dependencies: auditData.metadata?.dependencies || emptyAuditMetadata().dependencies,
-          vulnerabilities,
+          summary: parsedAudit.summary,
+          dependencies: emptyAuditMetadata().dependencies,
+          vulnerabilities: parsedAudit.vulnerabilities,
           outdatedPackages,
         };
 
@@ -331,8 +323,12 @@ async function main() {
       audit.summary.high > SECURITY_THRESHOLDS.high;
 
     if (hasSecurityIssues) {
+      console.error(
+        '\n❌ Security gate failed: critical/high vulnerabilities exceed threshold (critical=0, high=0).',
+      );
       process.exit(1);
     } else {
+      console.log('\n✅ Security gate passed');
       process.exit(0);
     }
   } catch (error) {

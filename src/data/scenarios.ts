@@ -9,6 +9,12 @@
  * @module data/scenarios
  */
 
+import {
+  HMRC_INCOME_TAX_RATES_URL,
+  HMRC_NI_RATES_URL,
+  HMRC_STUDENT_LOAN_REPAYMENT_URL,
+  REVENUE_SCOTLAND_INCOME_TAX_URL,
+} from '@/constants/sources';
 import type { StudentLoanPlan } from '@/constants/taxRates';
 
 /**
@@ -132,7 +138,9 @@ export const SCENARIOS: Scenario[] = [
     },
     explanation: `At £100,000, you're at the threshold of the UK's most punishing tax zone. For every £2 you earn above this point, you lose £1 of your personal allowance (£12,570). This creates an effective 60% income tax rate on income between £100,001 and £125,140 (40% tax + 20% from lost allowance). Including 2% employee NI, your effective marginal rate is approximately 62%.
 
-At exactly £100k, you still have your full personal allowance. But even a small pay rise could push you into the trap, making pension contributions a powerful tool for staying below the threshold.`,
+At exactly £100k, you still have your full personal allowance. But even a small pay rise could push you into the trap, making pension contributions a powerful tool for staying below the threshold.
+
+Source: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
     optimization: `**Strategy: Salary Sacrifice to Pension**
 
 If your income is just above £100k, consider contributing the excess to your pension via salary sacrifice:
@@ -181,7 +189,9 @@ Example: If you earn £100,500, sacrificing £500 to pension saves you £300 in 
     },
     explanation: `At £110,000, you're £10,000 into the tax trap zone. Your personal allowance has been reduced by £5,000 (£1 lost for every £2 over £100k), leaving you with just £7,570 tax-free.
 
-This means you're paying 60% effective tax on that £10,000 excess - losing £6,000 that could have been in your pocket or pension.`,
+This means you're paying 60% effective tax on that £10,000 excess - losing £6,000 that could have been in your pocket or pension.
+
+Source: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
     optimization: `**Optimal Strategy: £10,000 Pension Contribution**
 
 To fully escape the tax trap, you need to reduce your taxable income to £100,000:
@@ -238,7 +248,9 @@ To fully escape the tax trap, you need to reduce your taxable income to £100,00
     },
     explanation: `At £120,000, the tax trap has erased almost all of your personal allowance. With £20,000 over the £100k threshold, you've lost £10,000 of allowance (leaving just £2,570).
 
-You're paying 60% effective tax on that entire £20,000 - that's £12,000 in extra tax compared to someone who kept their income at or below £100k.`,
+You're paying 60% effective tax on that entire £20,000 - that's £12,000 in extra tax compared to someone who kept their income at or below £100k.
+
+Source: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
     optimization: `**Strategy: Significant Pension Contribution**
 
 At this income level, pension contributions become extremely tax-efficient:
@@ -306,7 +318,9 @@ Even a partial contribution helps. Each £2 contributed restores £1 of personal
 - Annual repayment: £1,530 × 9% = £137.70
 - Monthly repayment: £11.48
 
-At this repayment rate, with typical loan balances (£40k-£50k), you're unlikely to fully repay before the 30-year write-off. But that's not necessarily bad - Plan 2 loans don't affect your credit score and are written off after 30 years.`,
+At this repayment rate, with typical loan balances (£40k-£50k), you're unlikely to fully repay before the 30-year write-off. But that's not necessarily bad - Plan 2 loans don't affect your credit score and are written off after 30 years.
+
+Source: HMRC student loan repayment guidance (${HMRC_STUDENT_LOAN_REPAYMENT_URL}).`,
     optimization: `**Understanding Your Options**
 
 At £30k with a Plan 2 loan, voluntary overpayments rarely make financial sense:
@@ -367,7 +381,9 @@ At £30k with a Plan 2 loan, voluntary overpayments rarely make financial sense:
 - Annual repayment: £11,530 × 9% = £1,037.70
 - Monthly repayment: £86.48
 
-This represents about 2.6% of your gross salary going to loan repayments. Combined with tax and NI, your total deductions are significant - but your take-home is still comfortable at this level.`,
+This represents about 2.6% of your gross salary going to loan repayments. Combined with tax and NI, your total deductions are significant - but your take-home is still comfortable at this level.
+
+Source: HMRC student loan repayment guidance (${HMRC_STUDENT_LOAN_REPAYMENT_URL}).`,
     optimization: `**At £40k, consider your loan balance**
 
 If your loan balance is under £30,000:
@@ -435,7 +451,9 @@ Scotland's higher rate (42%) starts at £43,663 vs the UK's 40% at £50,271.
 - Rest of UK income tax: ~£7,486
 - Annual difference: ~£590 more in Scotland
 
-However, Scottish taxpayers benefit from marginally lower rates on the first £27,491 of taxable income.`,
+However, Scottish taxpayers benefit from marginally lower rates on the first £27,491 of taxable income.
+
+Sources: Revenue Scotland (${REVENUE_SCOTLAND_INCOME_TAX_URL}) and HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
     optimization: `**What You Can Control**
 
 The tax difference is unavoidable based on where you live on 6 April. However:
@@ -494,7 +512,9 @@ Moving specifically to avoid Scottish tax rarely makes financial sense unless yo
 - Rest of UK income tax: ~£11,486
 - Annual difference: ~£790 more in Scotland
 
-At this level, you're paying 42% on income from £43,663 upward in Scotland, while in rUK you'd only hit 40% above £50,271.`,
+At this level, you're paying 42% on income from £43,663 upward in Scotland, while in rUK you'd only hit 40% above £50,271.
+
+Sources: Revenue Scotland (${REVENUE_SCOTLAND_INCOME_TAX_URL}) and HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}).`,
     optimization: `**Tax-Efficient Strategies at £60k**
 
 1. **Pension contributions**: Each £1,000 contributed saves £420 (Scottish higher rate)
@@ -560,7 +580,9 @@ At £60k, you're not yet in the personal allowance taper, so the focus is on max
 - National Insurance: ~£994/year (8% on earnings above £12,570)
 - Total deductions: ~£3,480 (13.9% of gross)
 
-You'll receive your first payslip showing gross pay, tax, NI, and net pay. Your tax code will likely be 1257L - this means you have the standard £12,570 personal allowance.`,
+You'll receive your first payslip showing gross pay, tax, NI, and net pay. Your tax code will likely be 1257L - this means you have the standard £12,570 personal allowance.
+
+Sources: HMRC Income Tax rates (${HMRC_INCOME_TAX_RATES_URL}) and HMRC National Insurance rates (${HMRC_NI_RATES_URL}).`,
     optimization: `**First Job Financial Priorities**
 
 1. **Understand your payslip**: Check tax code is 1257L (not BR or emergency code)

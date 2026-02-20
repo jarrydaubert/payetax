@@ -42,6 +42,7 @@
 
 import {
   DEFAULT_HOURS_PER_WEEK,
+  DEFAULT_TAX_CODE,
   type NICategory,
   type PayPeriod,
   PERIOD_CONVERSION_FACTORS,
@@ -620,9 +621,21 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 1. Prepare input data and tax rates
   // ---------------
 
+  // Defensive normalization for adversarial runtime inputs.
+  // Boundary validation should reject these first, but core math should stay finite.
+  const salaryInput = Number.isFinite(input.salary) && input.salary > 0 ? input.salary : 0;
+  const hoursPerWeek =
+    Number.isFinite(input.hoursPerWeek) && input.hoursPerWeek > 0
+      ? input.hoursPerWeek
+      : DEFAULT_HOURS_PER_WEEK;
+  const taxCodeInput =
+    typeof input.taxCode === 'string' && input.taxCode.trim().length > 0
+      ? input.taxCode
+      : DEFAULT_TAX_CODE;
+
   // Determine if using Scottish rates.
   // Prefix precedence: Welsh C-prefix always uses rUK bands, Scottish S-prefix always uses Scottish bands.
-  const normalizedTaxCode = input.taxCode.toUpperCase().trim();
+  const normalizedTaxCode = taxCodeInput.toUpperCase().trim();
   const hasScottishPrefix = normalizedTaxCode.startsWith(SCOTTISH_PREFIX);
   const hasWelshPrefix = normalizedTaxCode.startsWith('C');
   const isScottish = hasWelshPrefix ? false : input.isScottish || hasScottishPrefix;
@@ -639,11 +652,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // ---------------
 
   // First convert salary to annual amount based on input period
-  const annualGrossSalary = convertPeriodToAnnual(
-    input.salary,
-    input.payPeriod,
-    input.hoursPerWeek,
-  );
+  const annualGrossSalary = convertPeriodToAnnual(salaryInput, input.payPeriod, hoursPerWeek);
 
   // ---------------
   // 2.5. Calculate additional income from other sources
@@ -672,7 +681,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   if (input.incomeSources && input.incomeSources.length > 0) {
     for (const source of input.incomeSources) {
-      const sourceAnnual = convertPeriodToAnnual(source.amount, source.period, input.hoursPerWeek);
+      const sourceAnnual = convertPeriodToAnnual(source.amount, source.period, hoursPerWeek);
 
       if (source.type === 'employment') {
         employmentIncome += sourceAnnual;
@@ -711,7 +720,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       annualPensionContribution = convertPeriodToAnnual(
         input.pensionContribution,
         input.payPeriod,
-        input.hoursPerWeek,
+        hoursPerWeek,
       );
       monthlyPensionContribution = annualPensionContribution / 12;
     }
@@ -723,7 +732,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   // Parse tax code using comprehensive parser that handles all HMRC code types
   // This correctly handles K-codes (negative allowance), BR/D0/D1/NT (band overrides), and emergency codes
-  const taxCodeResult = parseTaxCode(input.taxCode, taxRates.personalAllowance);
+  const taxCodeResult = parseTaxCode(taxCodeInput, taxRates.personalAllowance);
   let annualTaxFreeAmount = taxCodeResult.allowance;
 
   // Store band override for use in tax calculation section
@@ -1259,9 +1268,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
       case PERIODS.HOURLY:
         // Special case for hourly rate
-        if (input.hoursPerWeek > 0) {
+        if (hoursPerWeek > 0) {
           // Monthly / (hours per week * average weeks per month)
-          const monthlyHours = input.hoursPerWeek * AVERAGE_WEEKS_PER_MONTH;
+          const monthlyHours = hoursPerWeek * AVERAGE_WEEKS_PER_MONTH;
           grossSalary[period] = roundToPence(monthlyGrossSalary / monthlyHours);
           incomeTax[period] = roundToPence(monthlyTax / monthlyHours);
           nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance / monthlyHours);

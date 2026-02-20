@@ -41,6 +41,12 @@ describe('Environment Variable Validation', () => {
     process.env.NEXT_PUBLIC_SITE_URL = undefined;
     process.env.NEXT_PUBLIC_GA_ID = undefined;
     process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = undefined;
+    process.env.UNSUBSCRIBE_SECRET = undefined;
+    process.env.REFERRAL_PARTNER_EMAIL = undefined;
+    process.env.INDEXNOW_SUBMIT_SECRET = undefined;
+    process.env.SENTRY_WEBHOOK_SECRET = undefined;
+    process.env.LINEAR_API_KEY = undefined;
+    process.env.LINEAR_TEAM_KEY = undefined;
   });
 
   afterEach(() => {
@@ -335,6 +341,9 @@ describe('Environment Variable Validation', () => {
         RESEND_API_KEY: 're_test123',
         KIT_API_SECRET: 'kit_test123',
         KIT_FORM_ID: '12345',
+        UNSUBSCRIBE_SECRET: 'unsub_secret_123',
+        REFERRAL_PARTNER_EMAIL: 'partner@payetax.co.uk',
+        INDEXNOW_SUBMIT_SECRET: 'indexnow_submit_secret',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
         NEXT_PUBLIC_GA_ID: 'G-TEST123456',
       });
@@ -347,6 +356,9 @@ describe('Environment Variable Validation', () => {
         RESEND_API_KEY: undefined,
         KIT_API_SECRET: undefined,
         KIT_FORM_ID: undefined,
+        UNSUBSCRIBE_SECRET: undefined,
+        REFERRAL_PARTNER_EMAIL: undefined,
+        INDEXNOW_SUBMIT_SECRET: undefined,
       });
       expect(result.success).toBe(false);
     });
@@ -357,6 +369,9 @@ describe('Environment Variable Validation', () => {
         RESEND_API_KEY: 're_test123',
         KIT_API_SECRET: 'kit_test123',
         KIT_FORM_ID: '12345',
+        UNSUBSCRIBE_SECRET: 'unsub_secret_123',
+        REFERRAL_PARTNER_EMAIL: 'partner@payetax.co.uk',
+        INDEXNOW_SUBMIT_SECRET: 'indexnow_submit_secret',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'true',
         NEXT_PUBLIC_GA_ID: undefined,
       });
@@ -369,10 +384,47 @@ describe('Environment Variable Validation', () => {
         RESEND_API_KEY: 're_test123',
         KIT_API_SECRET: 'kit_test123',
         KIT_FORM_ID: '12345',
+        UNSUBSCRIBE_SECRET: 'unsub_secret_123',
+        REFERRAL_PARTNER_EMAIL: 'partner@payetax.co.uk',
+        INDEXNOW_SUBMIT_SECRET: 'indexnow_submit_secret',
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
         NEXT_PUBLIC_GA_ID: undefined,
       });
       expect(result.success).toBe(true);
+    });
+
+    it('should require LINEAR_API_KEY when SENTRY_WEBHOOK_SECRET is set', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+        RESEND_API_KEY: 're_test123',
+        KIT_API_SECRET: 'kit_test123',
+        KIT_FORM_ID: '12345',
+        UNSUBSCRIBE_SECRET: 'unsub_secret_123',
+        REFERRAL_PARTNER_EMAIL: 'partner@payetax.co.uk',
+        INDEXNOW_SUBMIT_SECRET: 'indexnow_submit_secret',
+        NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
+        NEXT_PUBLIC_GA_ID: undefined,
+        SENTRY_WEBHOOK_SECRET: 'secret',
+        LINEAR_API_KEY: undefined,
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should require SENTRY_WEBHOOK_SECRET when LINEAR_API_KEY is set', () => {
+      const result = RequiredProductionEnvSchema.safeParse({
+        NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+        RESEND_API_KEY: 're_test123',
+        KIT_API_SECRET: 'kit_test123',
+        KIT_FORM_ID: '12345',
+        UNSUBSCRIBE_SECRET: 'unsub_secret_123',
+        REFERRAL_PARTNER_EMAIL: 'partner@payetax.co.uk',
+        INDEXNOW_SUBMIT_SECRET: 'indexnow_submit_secret',
+        NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
+        NEXT_PUBLIC_GA_ID: undefined,
+        SENTRY_WEBHOOK_SECRET: undefined,
+        LINEAR_API_KEY: 'lin_api_123',
+      });
+      expect(result.success).toBe(false);
     });
   });
 
@@ -469,6 +521,9 @@ describe('Environment Variable Validation', () => {
       process.env.RESEND_API_KEY = 're_test123';
       process.env.KIT_API_SECRET = 'kit_test123';
       process.env.KIT_FORM_ID = '12345';
+      process.env.UNSUBSCRIBE_SECRET = 'unsub_secret_123';
+      process.env.REFERRAL_PARTNER_EMAIL = 'partner@payetax.co.uk';
+      process.env.INDEXNOW_SUBMIT_SECRET = 'indexnow_submit_secret';
       process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'true';
       process.env.NEXT_PUBLIC_GA_ID = 'G-TEST123456';
 
@@ -486,6 +541,9 @@ describe('Environment Variable Validation', () => {
       process.env.RESEND_API_KEY = undefined;
       process.env.KIT_API_SECRET = undefined;
       process.env.KIT_FORM_ID = undefined;
+      process.env.UNSUBSCRIBE_SECRET = undefined;
+      process.env.REFERRAL_PARTNER_EMAIL = undefined;
+      process.env.INDEXNOW_SUBMIT_SECRET = undefined;
 
       expect(() => validateProductionEnv()).toThrow(
         'Missing or invalid required production environment variables',
@@ -497,6 +555,9 @@ describe('Environment Variable Validation', () => {
       process.env.RESEND_API_KEY = 're_test123';
       process.env.KIT_API_SECRET = 'kit_test123';
       process.env.KIT_FORM_ID = '12345';
+      process.env.UNSUBSCRIBE_SECRET = 'unsub_secret_123';
+      process.env.REFERRAL_PARTNER_EMAIL = 'partner@payetax.co.uk';
+      process.env.INDEXNOW_SUBMIT_SECRET = 'indexnow_submit_secret';
       process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = 'false';
       process.env.NEXT_PUBLIC_GA_ID = undefined;
 

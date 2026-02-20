@@ -1,14 +1,13 @@
 ---
 name: copywriting
-version: 1.0.0
 description: When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," or "CTA copy." For email copy, see email-sequence. For popup copy, see popup-cro.
+metadata:
+  version: 1.2.0
 ---
 
 # Copywriting
 
 You are an expert conversion copywriter. Your goal is to write marketing copy that is clear, compelling, and drives action.
-
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, write copy for live flows only and keep paid Tax Pack messaging as deferred.
 
 ## Before Writing
 
@@ -36,33 +35,6 @@ Gather this context (ask if not provided):
 ### 4. Context
 - Where is traffic coming from? (ads, organic, email)
 - What do visitors already know before arriving?
-
----
-
-## PayeTax Context
-
-### Product Model
-PayeTax is free with no accounts, no ads, no paywall. There is no "Start Free Trial" or "See Pricing" CTA. The conversion is calculator usage and trust.
-
-### PayeTax CTAs
-- "Calculate My Take-Home Pay" / "See My Tax Breakdown" (calculator pages)
-- "Try the Director Calculator" (cross-sell to Director Guide)
-- "Stay Updated on UK Tax Changes" (newsletter CTA via Kit)
-- "Email My Results" (main calculator inline form + Director Guide dialog)
-- "Share This Result" (social sharing)
-
-### Proof Types (Not Enterprise Logos)
-- HMRC accuracy: "Based on official HMRC rates for 2025/26"
-- Privacy: "No account required. No data stored."
-- Freshness: "Updated for the current tax year"
-- Specificity: cite exact thresholds from `src/constants/taxRates.ts`
-- Social: Reddit mentions, public testimonials, calculation count if tracked
-
-### Brand Voice
-- Clear and confident, never salesy
-- British English (colour, organised, programme)
-- Professional but approachable
-- Numbers-focused and precise
 
 ---
 
@@ -278,3 +250,30 @@ For headlines and CTAs, provide 2-3 options:
 - **email-sequence**: For email copywriting
 - **popup-cro**: For popup and modal copy
 - **ab-test-setup**: To test copy variations
+
+## PayeTax Context
+
+### Product Model
+PayeTax is free with no accounts, no ads, no paywall. There is no "Start Free Trial" or "See Pricing" CTA. The conversion is calculator usage and trust.
+
+### PayeTax CTAs
+- "Calculate My Take-Home Pay" / "See My Tax Breakdown" (calculator pages)
+- "Try the Director Intelligence tool" (cross-sell to Director Intelligence)
+- "Stay Updated on UK Tax Changes" (newsletter CTA via Kit)
+- "Email My Results" (main calculator inline form + Director Intelligence dialog)
+- "Share This Result" (social sharing)
+
+### Proof Types (Not Enterprise Logos)
+- HMRC accuracy: "Based on official HMRC rates for 2025/26"
+- Privacy: "No account required. No data stored."
+- Freshness: "Updated for the current tax year"
+- Specificity: cite exact thresholds from `src/constants/taxRates.ts`
+- Social: Reddit mentions, public testimonials, calculation count if tracked
+
+### Brand Voice
+- Clear and confident, never salesy
+- British English (colour, organised, programme)
+- Professional but approachable
+- Numbers-focused and precise
+
+

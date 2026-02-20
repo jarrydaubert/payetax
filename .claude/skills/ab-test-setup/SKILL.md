@@ -1,7 +1,8 @@
 ---
 name: ab-test-setup
-version: 1.0.0
 description: When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions "A/B test," "split test," "experiment," "test this change," "variant copy," "multivariate test," or "hypothesis." For tracking implementation, see analytics-tracking.
+metadata:
+  version: 1.2.0
 ---
 
 # A/B Test Setup
@@ -18,34 +19,6 @@ Before designing a test, understand:
 1. **Test Context** - What are you trying to improve? What change are you considering?
 2. **Current State** - Baseline conversion rate? Current traffic volume?
 3. **Constraints** - Technical complexity? Timeline? Tools available?
-
----
-
-## PayeTax Context
-
-### Testable Metrics (Not SaaS Signup Rates)
-- Calculator completion rate (did they get results?)
-- Calculator engagement (time spent, periods viewed)
-- Newsletter signup rate (blog CTAs)
-- Return visit rate (cookie-based)
-- Scroll depth on salary/blog pages
-- Director Guide email-results completion
-
-### Test Assignment
-No user accounts — tests must use cookie-based session assignment for consistency across page views. Consider Vercel Edge Config for A/B routing or PostHog feature flags.
-
-### Guardrail Metrics
-- Bounce rate (should not increase)
-- Calculator error rate (must not regress)
-- Core Web Vitals (LCP, CLS, INP must stay within thresholds)
-- Accessibility score (WCAG 2.2 AA compliance must be maintained)
-
-### High-Value Test Opportunities
-- Homepage hero copy/headline variants
-- Calculator default values (empty vs pre-filled salary)
-- Results display format (annual-first vs monthly-first)
-- Newsletter CTA placement and copy on blog pages
-- Trust signal variations ("HMRC-accurate" vs "Updated for 2025/26")
 
 ---
 
@@ -291,3 +264,31 @@ Document every test with:
 - **page-cro**: For generating test ideas based on CRO principles
 - **analytics-tracking**: For setting up test measurement
 - **copywriting**: For creating variant copy
+
+## PayeTax Context
+
+### Testable Metrics (Not SaaS Signup Rates)
+- Calculator completion rate (did they get results?)
+- Calculator engagement (time spent, periods viewed)
+- Newsletter signup rate (blog CTAs)
+- Return visit rate (cookie-based)
+- Scroll depth on salary/blog pages
+- Director Intelligence email-results completion
+
+### Test Assignment
+No user accounts — tests must use cookie-based session assignment for consistency across page views. Consider Vercel Edge Config for A/B routing or PostHog feature flags.
+
+### Guardrail Metrics
+- Bounce rate (should not increase)
+- Calculator error rate (must not regress)
+- Core Web Vitals (LCP, CLS, INP must stay within thresholds)
+- Accessibility score (WCAG 2.2 AA compliance must be maintained)
+
+### High-Value Test Opportunities
+- Homepage hero copy/headline variants
+- Calculator default values (empty vs pre-filled salary)
+- Results display format (annual-first vs monthly-first)
+- Newsletter CTA placement and copy on blog pages
+- Trust signal variations ("HMRC-accurate" vs "Updated for 2025/26")
+
+

@@ -43,16 +43,28 @@ async function getTableValueByHeader(
   return numeric;
 }
 
+async function selectPensionAmountType(page: Page): Promise<void> {
+  const pensionTypeSelect = page.getByTestId('pension-type-select');
+  await pensionTypeSelect.click();
+  const amountOption = page.getByRole('option').nth(1);
+  await expect(amountOption).toBeVisible({ timeout: 3000 });
+  await amountOption.click();
+  await expect(page.getByTestId('pension-input')).toBeVisible({ timeout: 3000 });
+}
+
 test.describe('Pension Limits - Annual Allowance Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/#tax-calculator');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await expect(page.getByTestId('salary-input')).toBeVisible({ timeout: 10000 });
 
     // Dismiss cookie banner
     const acceptButton = page.locator('button:has-text("Accept All")');
     if (await acceptButton.isVisible().catch(() => false)) {
       await acceptButton.click();
+      await expect(acceptButton)
+        .toBeHidden({ timeout: 5000 })
+        .catch(() => {});
     }
   });
 
@@ -63,10 +75,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('80000');
 
     // Add £60k pension contribution - switch to amount type first
-    await page.getByTestId('pension-type-select').click();
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
+    await selectPensionAmountType(page);
 
     const pensionInput = page.getByTestId('pension-input');
     await pensionInput.fill('60000');
@@ -87,12 +96,8 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('100000');
 
-    await page.getByTestId('pension-type-select').click();
-
+    await selectPensionAmountType(page);
     const pensionInput = page.getByTestId('pension-input');
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
     await pensionInput.fill('65000');
     await pensionInput.blur();
 
@@ -111,12 +116,8 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await page.getByTestId('salary-input').fill('280000');
 
     // Try to contribute £60k (will breach tapered allowance)
-    await page.getByTestId('pension-type-select').click();
-
+    await selectPensionAmountType(page);
     const pensionInput = page.getByTestId('pension-input');
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
     await pensionInput.fill('60000');
     await pensionInput.blur();
 
@@ -133,12 +134,8 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('400000');
 
-    await page.getByTestId('pension-type-select').click();
-
+    await selectPensionAmountType(page);
     const pensionInput = page.getByTestId('pension-input');
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
     await pensionInput.fill('10000'); // Exactly at minimum allowance
     await pensionInput.blur();
 
@@ -153,12 +150,8 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
 
     await page.getByTestId('salary-input').fill('50000');
 
-    await page.getByTestId('pension-type-select').click();
-
+    await selectPensionAmountType(page);
     const pensionInput = page.getByTestId('pension-input');
-    await page.waitForTimeout(300);
-    await page.getByRole('option').nth(1).click();
-    await page.waitForTimeout(300);
     await pensionInput.fill('20000');
     await pensionInput.blur();
 

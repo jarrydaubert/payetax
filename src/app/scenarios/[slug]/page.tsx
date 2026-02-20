@@ -93,14 +93,17 @@ function generateStructuredData(scenario: Scenario) {
         step: [
           {
             '@type': 'HowToStep',
+            name: 'Enter your salary',
             text: 'Enter your salary in the calculator',
           },
           {
             '@type': 'HowToStep',
+            name: 'Adjust pension contribution',
             text: 'Adjust pension contribution to see impact',
           },
           {
             '@type': 'HowToStep',
+            name: 'Review tax savings',
             text: 'Review the tax savings calculation',
           },
         ],
@@ -180,11 +183,15 @@ export default async function ScenarioPage({ params }: PageProps) {
     <>
       {/* Structured Data */}
       {structuredData.map((schema, index) => (
+        // Escape closing script tags in serialized JSON-LD
+        // to prevent script breakouts in inline script blocks.
         <script
           key={`structured-data-${String(schema?.['@type'] ?? 'schema')}-${index}`}
           type='application/ld+json'
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema).replace(/<\/script/gi, '<\\/script'),
+          }}
         />
       ))}
 

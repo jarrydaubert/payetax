@@ -156,7 +156,7 @@ describe('Dividend Tax Calculator', () => {
         // PA should shelter £12,570 of dividends
         expect(result.allowanceUsed).toBe(12570 + 500); // PA + dividend allowance
         expect(result.taxableDividends).toBe(16930);
-        expect(result.dividendTax).toBeCloseTo(1481.38, 1);
+        expect(result.dividendTax).toBeCloseTo(1481.38, 2);
       });
 
       it('should shelter dividends with unused PA from low salary', () => {
@@ -168,7 +168,7 @@ describe('Dividend Tax Calculator', () => {
 
         expect(result.allowanceUsed).toBe(7570 + 500); // Unused PA + dividend allowance
         expect(result.taxableDividends).toBe(11930);
-        expect(result.dividendTax).toBeCloseTo(1043.88, 1);
+        expect(result.dividendTax).toBeCloseTo(1043.88, 2);
       });
 
       it('should round to pence correctly', () => {
@@ -212,7 +212,7 @@ describe('Dividend Tax Calculator', () => {
         // Total: £3,255 + £4,826.25 = £8,081.25
         expect(result.allowanceUsed).toBe(500);
         expect(result.taxableDividends).toBe(51500);
-        expect(result.dividendTax).toBeCloseTo(8081.25, 1);
+        expect(result.dividendTax).toBeCloseTo(8081.25, 2);
       });
 
       it('should calculate correctly for All Dividends strategy (£0 salary)', () => {
@@ -229,11 +229,11 @@ describe('Dividend Tax Calculator', () => {
         // Total: £12,360.75
         expect(result.allowanceUsed).toBe(12570 + 500); // PA + dividend allowance
         expect(result.taxableDividends).toBe(64180);
-        expect(result.dividendTax).toBeCloseTo(12360.75, 1);
+        expect(result.dividendTax).toBeCloseTo(12360.75, 2);
 
         // Take-home should be ~£64,889
         const takeHome = 77250 - result.dividendTax;
-        expect(takeHome).toBeCloseTo(64889.25, 0);
+        expect(takeHome).toBeCloseTo(64889.25, 2);
       });
 
       it('should apply PA taper for high income (£100k+ total)', () => {

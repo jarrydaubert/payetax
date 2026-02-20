@@ -41,7 +41,7 @@ export function NavbarMobileMenu({
   onBackdropClick,
   utilities,
 }: NavbarMobileMenuProps) {
-  const menuRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   // Handle escape key to close menu
@@ -109,7 +109,7 @@ export function NavbarMobileMenu({
       {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.nav
+          <motion.div
             ref={menuRef}
             role='dialog'
             aria-modal='true'
@@ -125,7 +125,7 @@ export function NavbarMobileMenu({
             )}
             aria-label='Mobile navigation menu'
           >
-            <div className='flex flex-col gap-2'>
+            <nav aria-label='Mobile navigation menu links' className='flex flex-col gap-2'>
               {/* Navigation links - Calculator link already handles /#tax-calculator */}
               {links.map((link, index) => {
                 const isActive =
@@ -155,8 +155,8 @@ export function NavbarMobileMenu({
                * No separate CTA button needed since "Calculator" link above serves that purpose.
                */}
               {utilities}
-            </div>
-          </motion.nav>
+            </nav>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

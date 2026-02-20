@@ -1,14 +1,13 @@
 ---
 name: email-sequence
-version: 1.0.0
 description: When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions "email sequence," "drip campaign," "nurture sequence," "onboarding emails," "welcome sequence," "re-engagement emails," "email automation," or "lifecycle emails." For in-app onboarding, see onboarding-cro.
+metadata:
+  version: 1.2.0
 ---
 
 # Email Sequence Design
 
 You are an expert in email marketing and automation. Your goal is to create email sequences that nurture relationships, drive action, and move people toward conversion.
-
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, design email sequences for live flows and treat paid Tax Pack lifecycle emails as deferred.
 
 ## Initial Assessment
 
@@ -37,49 +36,6 @@ Before creating a sequence, understand:
    - Relationship-building goals
    - Segmentation goals
    - What defines success?
-
----
-
-## PayeTax Context
-
-PayeTax uses two email systems: Kit (ConvertKit) for newsletter and Resend for transactional email. There are no user accounts, so all email is opt-in and anonymous.
-
-### Email Infrastructure
-- **Kit (ConvertKit)** — newsletter platform. Client at `src/lib/newsletter/kitClient.ts`, API v4. Subscribe/unsubscribe routes at `/api/newsletter/subscribe` and `/api/newsletter/unsubscribe`. Broadcasting/sequences/automations managed in Kit dashboard, not from this repo.
-- **Resend** — transactional email. All app-generated emails use Resend via `RESEND_API_KEY`.
-- **NewsletterCTA** — Kit embed component at `src/components/organisms/NewsletterCTA.tsx`, appears on blog posts, homepage, blog index, blog categories. Configurable via env vars.
-- **Rate limits** — all email endpoints rate-limited via `src/lib/rateLimit.ts`
-
-### Transactional Emails (Resend) — Already Implemented
-- **PAYE calculator results** — `src/app/api/send-results/route.ts`. Inline form at `src/components/molecules/EmailResultsForm.tsx`. Server recalculates tax, sends HTML + plain text with annual/monthly breakdown, effective tax rate.
-- **Director Guide results** — `src/app/api/send-director-results/route.ts`. Modal at `src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`. Template at `src/lib/email/directorResultsEmail.ts`. Compares three strategies (All Salary, Optimal Mix, All Dividends).
-- **Referral lead emails** — `src/app/api/referral/lead/route.ts`. Sends two emails: user confirmation + partner notification.
-- **Feedback** — `src/app/actions/feedback.ts`.
-
-### Applicable Sequence Types (Kit)
-- **Newsletter welcome sequence** — what happens after someone subscribes via blog CTA (Kit automation)
-- **Tax year update emails** — April 6 rate changes, budget announcements (Kit broadcast)
-- **Re-engagement** — subscribers who haven't opened in 60+ days (Kit automation)
-
-### Reference Docs
-- `docs/guides/RESEND.md` — split provider model, env vars, source of truth file paths
-- `.claude/tools/integrations/resend.md` — Resend API capabilities and rate limits
-- `.claude/tools/integrations/kit.md` — Kit API capabilities, subscriber management, sequences
-
-### What Does NOT Apply
-- Onboarding email sequences — no user accounts to onboard
-- Trial-to-paid conversion sequences — everything is free
-- Billing/payment emails — no billing
-- Product usage report emails — no tracked usage
-- Upgrade/upsell sequences — no paid tier
-- Sales sequences — no sales process
-- Lead nurture sequences — no leads to nurture (newsletter is value-only)
-
-### Email Voice
-- Informational, not promotional (no product to sell)
-- UK tax expertise — helpful, clear, jargon-free
-- Seasonal relevance — tax year changes, budget announcements, SA deadlines
-- Privacy-first — "We never share your data. Unsubscribe anytime."
 
 ---
 
@@ -345,7 +301,51 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md). Key email
 
 ## Related Skills
 
+- **churn-prevention**: For cancel flows, save offers, and dunning strategy (email supports this)
 - **onboarding-cro**: For in-app onboarding (email supports this)
 - **copywriting**: For landing pages emails link to
 - **ab-test-setup**: For testing email elements
 - **popup-cro**: For email capture popups
+
+## PayeTax Context
+
+PayeTax uses two email systems: Kit (ConvertKit) for newsletter and Resend for transactional email. There are no user accounts, so all email is opt-in and anonymous.
+
+### Email Infrastructure
+- **Kit (ConvertKit)** — newsletter platform. Client at `src/lib/newsletter/kitClient.ts`, API v4. Subscribe/unsubscribe routes at `/api/newsletter/subscribe` and `/api/newsletter/unsubscribe`. Broadcasting/sequences/automations managed in Kit dashboard, not from this repo.
+- **Resend** — transactional email. All app-generated emails use Resend via `RESEND_API_KEY`.
+- **NewsletterCTA** — Kit embed component at `src/components/organisms/NewsletterCTA.tsx`, appears on blog posts, homepage, blog index, blog categories. Configurable via env vars.
+- **Rate limits** — all email endpoints rate-limited via `src/lib/rateLimit.ts`
+
+### Transactional Emails (Resend) — Already Implemented
+- **PAYE calculator results** — `src/app/api/send-results/route.ts`. Inline form at `src/components/molecules/EmailResultsForm.tsx`. Server recalculates tax, sends HTML + plain text with annual/monthly breakdown, effective tax rate.
+- **Director Intelligence results** — `src/app/api/send-director-results/route.ts`. Modal at `src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`. Template at `src/lib/email/directorResultsEmail.ts`. Compares three strategies (All Salary, Optimal Mix, All Dividends).
+- **Referral lead emails** — `src/app/api/referral/lead/route.ts`. Sends two emails: user confirmation + partner notification.
+- **Feedback** — `src/app/actions/feedback.ts`.
+
+### Applicable Sequence Types (Kit)
+- **Newsletter welcome sequence** — what happens after someone subscribes via blog CTA (Kit automation)
+- **Tax year update emails** — April 6 rate changes, budget announcements (Kit broadcast)
+- **Re-engagement** — subscribers who haven't opened in 60+ days (Kit automation)
+
+### Reference Docs
+- `docs/guides/RESEND.md` — split provider model, env vars, source of truth file paths
+- `.claude/tools/integrations/resend.md` — Resend API capabilities and rate limits
+- `.claude/tools/integrations/kit.md` — Kit API capabilities, subscriber management, sequences
+
+### What Does NOT Apply
+- Onboarding email sequences — no user accounts to onboard
+- Trial-to-paid conversion sequences — everything is free
+- Billing/payment emails — no billing
+- Product usage report emails — no tracked usage
+- Upgrade/upsell sequences — no paid tier
+- Sales sequences — no sales process
+- Lead nurture sequences — no leads to nurture (newsletter is value-only)
+
+### Email Voice
+- Informational, not promotional (no product to sell)
+- UK tax expertise — helpful, clear, jargon-free
+- Seasonal relevance — tax year changes, budget announcements, SA deadlines
+- Privacy-first — "We never share your data. Unsubscribe anytime."
+
+

@@ -1,6 +1,6 @@
 // src/app/blog/[slug]/page.tsx
 
-import { ArrowLeft, Calendar, ChevronRight, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar, ChevronRight, Clock, RefreshCw, User } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
+import { getSalaryIntentTargetFromTextValues } from '@/constants/salaryPageTargets';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent, extractFAQs, extractHowToSteps } from '@/lib/mdx';
 import { generateMetadata as generateMetadataHelper, LOGO_URL, SITE_URL } from '@/lib/metadata';
@@ -96,6 +97,11 @@ function formatDate(dateString: string): string {
   }).format(date);
 }
 
+function hasVisibleUpdateDate(publishedAt: string, updatedAt?: string): boolean {
+  if (!updatedAt) return false;
+  return new Date(updatedAt).getTime() > new Date(publishedAt).getTime();
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const post = await getCachedBlogPost(resolvedParams.slug);
@@ -135,6 +141,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const authorName =
     post.author && post.author !== 'PayeTax Team' ? post.author : 'PayeTax Editorial Team';
+  const showUpdatedDate = hasVisibleUpdateDate(post.publishedAt, post.updatedAt);
+  const salaryIntentTarget = getSalaryIntentTargetFromTextValues([
+    post.title,
+    ...(post.tags ?? []),
+  ]);
+  const salaryIntentLabel =
+    salaryIntentTarget === null ? null : salaryIntentTarget.toLocaleString('en-GB');
 
   const articleData = {
     title: post.title,
@@ -267,18 +280,31 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                   <time>{formatDate(post.publishedAt)}</time>
                 </div>
+                {showUpdatedDate && post.updatedAt && (
+                  <div className='flex items-center gap-2'>
+                    <RefreshCw className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                    <span>
+                      Updated <time>{formatDate(post.updatedAt)}</time>
+                    </span>
+                  </div>
+                )}
                 {post.readTime && (
                   <div className='flex items-center gap-2'>
                     <Clock className={ICON_SIZES.SIZE_4} aria-hidden='true' />
                     <span>{post.readTime}</span>
                   </div>
                 )}
-                {post.author && (
-                  <div className='flex items-center gap-2'>
-                    <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-                    <span>{post.author}</span>
-                  </div>
-                )}
+                <div className='flex items-center gap-2'>
+                  <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                  <span className='flex flex-col'>
+                    <span>{authorName}</span>
+                    {authorName === 'PayeTax Editorial Team' && (
+                      <span className='text-xs'>
+                        Calculations verified against official HMRC rates.
+                      </span>
+                    )}
+                  </span>
+                </div>
               </div>
             </header>
 
@@ -362,6 +388,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
                 Related Articles
               </h2>
+              {salaryIntentTarget !== null && salaryIntentLabel !== null && (
+                <div className='mb-6 rounded-lg border border-primary/25 bg-primary/5 p-4'>
+                  <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                    <p className={cn('text-foreground/80', TYPOGRAPHY.TEXT_SM)}>
+                      Need numbers for this scenario? Calculate your take-home pay on £
+                      {salaryIntentLabel}.
+                    </p>
+                    <Button asChild size='sm' className='shrink-0'>
+                      <Link href={`/calculator/${salaryIntentTarget}-after-tax`}>
+                        Calculate your take-home pay
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div className='grid gap-6 md:grid-cols-3'>
                 {relatedPosts.map((relatedPost) => (
                   <Link

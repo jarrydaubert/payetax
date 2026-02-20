@@ -109,7 +109,7 @@ describe('Corporation Tax Calculator', () => {
         expect(result.rateBand).toBe('marginal');
         // Effective rate should be very close to 19%
         expect(result.effectiveRate).toBeCloseTo(0.19, 2);
-        expect(result.corporationTax).toBeCloseTo(9500.27, 1);
+        expect(result.corporationTax).toBeCloseTo(9500.27, 2);
       });
 
       it('should calculate correctly just below main rate limit (£249,999)', () => {
@@ -121,7 +121,7 @@ describe('Corporation Tax Calculator', () => {
         expect(result.rateBand).toBe('marginal');
         // Effective rate should be very close to 25%
         expect(result.effectiveRate).toBeCloseTo(0.25, 2);
-        expect(result.corporationTax).toBeCloseTo(62499.74, 1);
+        expect(result.corporationTax).toBeCloseTo(62499.74, 2);
       });
     });
 

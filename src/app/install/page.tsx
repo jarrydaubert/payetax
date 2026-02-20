@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { StructuredData } from '@/components/organisms/StructuredData';
+import { type SchemaType, StructuredData } from '@/components/organisms/StructuredData';
 import { Button } from '@/components/ui/button';
 import { generateMetadata, SITE_URL } from '@/lib/metadata';
 
@@ -15,10 +15,36 @@ export default function InstallPage() {
     { name: 'Home', url: SITE_URL },
     { name: 'Install', url: `${SITE_URL}/install` },
   ];
+  const installHowToData: SchemaType = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to Install PayeTax',
+    description:
+      'Install PayeTax on iPhone, Android, and desktop for faster access and offline support.',
+    totalTime: 'PT2M',
+    step: [
+      {
+        '@type': 'HowToStep',
+        name: 'Install on iPhone or iPad',
+        text: 'Open PayeTax in Safari, tap Share, then choose Add to Home Screen.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Install on Android',
+        text: 'Open PayeTax in Chrome, tap the menu, then choose Install app or Add to Home screen.',
+      },
+      {
+        '@type': 'HowToStep',
+        name: 'Install on desktop',
+        text: 'Open PayeTax in Chrome or Edge, click the install icon in the address bar, then confirm.',
+      },
+    ],
+  };
 
   return (
     <>
       <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
+      <StructuredData type='howto' data={installHowToData} />
 
       <section className='container mx-auto max-w-6xl px-4 py-24 md:py-28'>
         <div className='mx-auto max-w-3xl text-center'>

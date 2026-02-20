@@ -62,6 +62,23 @@ export default async function UseCasePage({ params }: PageProps) {
           { name: useCase.title, url: `${SITE_URL}/best-for/${slug}` },
         ]}
       />
+      <StructuredData
+        type='calculator'
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: `${useCase.audience} Tax Calculator`,
+          url: `${SITE_URL}/best-for/${slug}`,
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web',
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'GBP',
+          },
+          description: useCase.description,
+        }}
+      />
       <StructuredData type='faq' faqs={useCase.faqs} />
       <UseCasePageContent useCase={useCase} />
     </>

@@ -89,7 +89,7 @@ function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) 
               prefetch={false}
             >
               {/* Number */}
-              <span className='flex-shrink-0 font-bold font-display text-2xl text-cyan-500/50 transition-colors group-hover:text-cyan-500'>
+              <span className='flex-shrink-0 font-bold font-display text-2xl text-cyan-400/80 transition-colors group-hover:text-cyan-300'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 

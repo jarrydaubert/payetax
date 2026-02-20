@@ -1,7 +1,8 @@
 ---
 name: content-strategy
-version: 1.0.0
 description: When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions "content strategy," "what should I write about," "content ideas," "blog strategy," "topic clusters," or "content planning." For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.
+metadata:
+  version: 1.2.0
 ---
 
 # Content Strategy
@@ -35,44 +36,6 @@ Gather this context (ask if not provided):
 ### 4. Competitive Landscape
 - Who are your main competitors?
 - What content gaps exist in your market?
-
----
-
-## PayeTax Context
-
-PayeTax is a free UK tax calculator — there is no purchase funnel. Content serves SEO (driving calculator traffic) and trust (proving accuracy).
-
-### Content Pillars
-1. **UK PAYE & Income Tax** — tax codes, personal allowance, marginal rates, Scottish/Welsh variations
-2. **National Insurance** — thresholds, classes, employer vs employee
-3. **Director & Dividend Tax** — salary vs dividends, corporation tax, optimal extraction
-4. **Salary Negotiation & Take-Home Pay** — comparing offers, understanding gross vs net
-5. **Tax Year Updates** — Budget reactions, rate changes, deadline reminders
-
-### Blog Writing Guidelines
-Follow `docs/blog/BLOG_GUIDE.md` and `docs/blog/CONTENT_PHILOSOPHY.md`:
-- Accuracy first — use `src/constants/taxRates.ts` as single source of truth
-- Explain the *why*, not just numbers
-- No fear-mongering or aggressive sales language
-- Always include a calculator link and relevant internal links
-- Avoid hardcoded rate values in text; reference the calculator
-- New posts go in `docs/BACKLOG.md` before writing
-
-### Ideation Sources (Not SaaS Calls/Surveys)
-- Reddit: r/UKPersonalFinance (rich question bank)
-- MoneySavingExpert forums
-- Google "People Also Ask" for tax queries
-- HMRC guidance gaps (official docs are hard to read — simplify them)
-- Seasonal hooks: Budget (autumn), new tax year (April 6), P60 season (May), graduate jobs (September)
-
-### User Journey (Not a Purchase Funnel)
-Awareness ("what is PAYE?") → Understanding ("how much tax on £40k?") → Verification ("is this calculator accurate?") → Task completion (get my number) → Sharing (tell colleagues/friends)
-
-### Newsletter
-- Kit/ConvertKit integration exists (`src/lib/newsletter/kitClient.ts`)
-- `NewsletterCTA` component on blog pages
-- Subscribe/unsubscribe API routes at `/api/newsletter/`
-- Content: "Stay Updated on UK Tax Changes" — rate updates, strategies, deadline reminders
 
 ---
 
@@ -389,6 +352,45 @@ Visual or structured representation of how content interconnects.
 
 - **copywriting**: For writing individual content pieces
 - **seo-audit**: For technical SEO and on-page optimization
+- **ai-seo**: For optimizing content for AI search engines and getting cited by LLMs
 - **programmatic-seo**: For scaled content generation
 - **email-sequence**: For email-based content
 - **social-content**: For social media content
+
+## PayeTax Context
+
+PayeTax is a free UK tax calculator — there is no purchase funnel. Content serves SEO (driving calculator traffic) and trust (proving accuracy).
+
+### Content Pillars
+1. **UK PAYE & Income Tax** — tax codes, personal allowance, marginal rates, Scottish/Welsh variations
+2. **National Insurance** — thresholds, classes, employer vs employee
+3. **Director & Dividend Tax** — salary vs dividends, corporation tax, optimal extraction
+4. **Salary Negotiation & Take-Home Pay** — comparing offers, understanding gross vs net
+5. **Tax Year Updates** — Budget reactions, rate changes, deadline reminders
+
+### Blog Writing Guidelines
+Follow `docs/blog/BLOG_GUIDE.md` and `docs/blog/CONTENT_PHILOSOPHY.md`:
+- Accuracy first — use `src/constants/taxRates.ts` as single source of truth
+- Explain the *why*, not just numbers
+- No fear-mongering or aggressive sales language
+- Always include a calculator link and relevant internal links
+- Avoid hardcoded rate values in text; reference the calculator
+- New posts go in `docs/BACKLOG.md` before writing
+
+### Ideation Sources (Not SaaS Calls/Surveys)
+- Reddit: r/UKPersonalFinance (rich question bank)
+- MoneySavingExpert forums
+- Google "People Also Ask" for tax queries
+- HMRC guidance gaps (official docs are hard to read — simplify them)
+- Seasonal hooks: Budget (autumn), new tax year (April 6), P60 season (May), graduate jobs (September)
+
+### User Journey (Not a Purchase Funnel)
+Awareness ("what is PAYE?") → Understanding ("how much tax on £40k?") → Verification ("is this calculator accurate?") → Task completion (get my number) → Sharing (tell colleagues/friends)
+
+### Newsletter
+- Kit/ConvertKit integration exists (`src/lib/newsletter/kitClient.ts`)
+- `NewsletterCTA` component on blog pages
+- Subscribe/unsubscribe API routes at `/api/newsletter/`
+- Content: "Stay Updated on UK Tax Changes" — rate updates, strategies, deadline reminders
+
+

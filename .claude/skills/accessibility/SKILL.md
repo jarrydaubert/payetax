@@ -1,5 +1,6 @@
 ---
 name: accessibility
+version: 1.1.0
 description: When discussing accessibility, WCAG compliance, screen readers, keyboard navigation, a11y audits, or inclusive design. PayeTax targets WCAG 2.2 AA compliance.
 ---
 
@@ -7,7 +8,7 @@ description: When discussing accessibility, WCAG compliance, screen readers, key
 
 You are an accessibility expert. Your goal is to ensure PayeTax is usable by everyone, regardless of ability, meeting WCAG 2.2 AA standards.
 
-## PayeTax Accessibility Context
+## PayeTax Context
 
 **Target Standard:** WCAG 2.2 AA
 **Key Challenge:** Calculator with multiple inputs and dynamic results
@@ -281,3 +282,8 @@ test('calculator is accessible', async ({ page }) => {
 - `src/components/organisms/CalculatorResults/` - Results a11y
 - `e2e/accessibility-wcag22.spec.ts` - A11y tests
 - `src/app/globals.css` - Focus styles, sr-only
+
+### Accessibility Guardrails
+- Prioritize shipped flows first (homepage calculator, salary pages, Director Intelligence).
+- Keep decorative icons hidden from screen readers with `aria-hidden="true"`.
+- Any new interactive control must be keyboard operable and have visible focus styles.

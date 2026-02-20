@@ -22,8 +22,9 @@
     "test:e2e:critical": "bun run test:e2e:smoke && bun run test:e2e:golden",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
-    "fix-all": "biome check --write . && bun run typecheck && bun run check-version && bun run check:analytics-env && bun run check:analytics-events && bun run check:test-skips",
+    "fix-all": "biome check --write . && bun run typecheck && bun run check-version && bun run check:env-contract && bun run check:analytics-events && bun run check:test-skips",
     "check-version": "bun scripts/check-version.ts",
+    "check:env-contract": "bun scripts/check-analytics-env-sync.ts",
     "check:analytics-env": "bun scripts/check-analytics-env-sync.ts",
     "check:analytics-events": "bun scripts/check-analytics-events.ts",
     "check:test-skips": "bun scripts/check-test-skips.ts",
@@ -81,7 +82,7 @@
     "@vercel/speed-insights": "1.3.1",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
-    "framer-motion": "12.34.2",
+    "framer-motion": "12.34.3",
     "fuse.js": "7.1.0",
     "github-slugger": "2.0.0",
     "gray-matter": "4.0.3",
@@ -109,7 +110,8 @@
     "external-editor": "^3.1.0",
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/core": "2.2.0",
-    "@opentelemetry/sdk-trace-base": "2.2.0"
+    "@opentelemetry/sdk-trace-base": "2.2.0",
+    "ajv": "^8.18.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

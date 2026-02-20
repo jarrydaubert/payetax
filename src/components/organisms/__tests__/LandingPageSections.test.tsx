@@ -7,6 +7,7 @@ describe('LandingPageSections', () => {
     render(<LandingPageSections />);
 
     expect(screen.getByText('Features')).toBeInTheDocument();
+    expect(screen.getByText('Trust')).toBeInTheDocument();
     expect(screen.getByText('How It Works')).toBeInTheDocument();
     expect(screen.getByText('FAQ')).toBeInTheDocument();
 
@@ -17,5 +18,15 @@ describe('LandingPageSections', () => {
   it('includes offline availability FAQ entry', () => {
     render(<LandingPageSections />);
     expect(screen.getByText('Can I use PayeTax offline?')).toBeInTheDocument();
+  });
+
+  it('includes high-intent FAQ links', () => {
+    render(<LandingPageSections />);
+
+    expect(screen.getByText('How much tax do I pay on £30,000?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '£30,000 after tax' })).toHaveAttribute(
+      'href',
+      '/calculator/30000-after-tax',
+    );
   });
 });

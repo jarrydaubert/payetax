@@ -40,3 +40,17 @@ Console logging is also captured automatically for warnings and errors.
 - Client: `instrumentation-client.ts`
 - Server: `sentry.server.config.ts`
 - Edge: `sentry.edge.config.ts`
+
+## Calculation Anomaly Alerts
+
+PayeTax emits explicit anomaly alerts when calculator output contains impossible values
+(for example non-finite numbers, negative tax components, or invalid effective-rate bounds).
+
+Primary signal:
+- Sentry exception message containing `Calculation anomaly detected`
+- Analytics event `calculator_error` with `error_type=calculation_anomaly`
+
+Minimum triage steps:
+1. Capture the Sentry event ID and inspect `tax_year`, `region`, and `salary` context.
+2. Reproduce with equivalent non-PII input in non-production.
+3. If reproducible, create a blocker issue before marking release health as complete.

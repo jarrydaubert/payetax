@@ -55,7 +55,7 @@ function analyzeBundleSize() {
   const _appBuildManifestPath = path.join(NEXT_BUILD_DIR, 'app-build-manifest.json');
 
   if (!fs.existsSync(buildManifestPath)) {
-    throw new Error('Build manifest not found. Run `npm run build` first.');
+    throw new Error('Build manifest not found. Run `bun run build` first.');
   }
 
   const buildManifest = JSON.parse(fs.readFileSync(buildManifestPath, 'utf8'));
@@ -146,7 +146,7 @@ function analyzeTrend(measurements, metric, periods = 5) {
 
   const first = recentMeasurements[0][metric];
   const last = recentMeasurements[recentMeasurements.length - 1][metric];
-  const change = ((last - first) / first) * 100;
+  const change = first === 0 ? 0 : ((last - first) / first) * 100;
 
   return {
     change: change.toFixed(1),
@@ -157,23 +157,47 @@ function analyzeTrend(measurements, metric, periods = 5) {
 }
 
 function generateBundleReport(analysis, history) {
-  analysis.chunks.forEach((chunk, _index) => {
-    const _status = chunk.exceedsThreshold ? '⚠️' : '✅';
-    const _firstLoadBadge = chunk.isFirstLoad ? '[FIRST LOAD]' : '';
-  });
+  console.log('\n📦 Bundle Analysis Report');
+  console.log(`   Timestamp: ${analysis.timestamp}`);
+  console.log(
+    `   Total JS size: ${formatBytes(analysis.totalSize)} (threshold ${formatBytes(BUNDLE_THRESHOLDS.totalSize)})`,
+  );
+  console.log(
+    `   First load JS: ${formatBytes(analysis.firstLoadJSSize)} (threshold ${formatBytes(BUNDLE_THRESHOLDS.firstLoadJS)})`,
+  );
+  console.log(`   Chunk count: ${analysis.chunkCount}`);
+
+  console.log('\n📊 Top Chunks');
+  let chunkIndex = 1;
+  for (const chunk of analysis.chunks) {
+    const status = chunk.exceedsThreshold ? '⚠️' : '✅';
+    const firstLoadBadge = chunk.isFirstLoad ? ' [FIRST LOAD]' : '';
+    console.log(
+      `   ${chunkIndex}. ${status} ${chunk.name} - ${chunk.sizeFormatted}${firstLoadBadge}`,
+    );
+    chunkIndex += 1;
+  }
 
   // Trend analysis
   if (history.measurements.length > 1) {
     const totalSizeTrend = analyzeTrend(history.measurements, 'totalSize');
     if (totalSizeTrend) {
+      const direction = totalSizeTrend.improving ? 'improving' : 'worsening';
+      console.log(
+        `\n📈 Total size trend: ${direction} (${totalSizeTrend.change}% over last ${Math.min(5, history.measurements.length)} runs)`,
+      );
     }
 
     const firstLoadTrend = analyzeTrend(history.measurements, 'firstLoadJSSize');
     if (firstLoadTrend) {
+      const direction = firstLoadTrend.improving ? 'improving' : 'worsening';
+      console.log(`   First-load trend: ${direction} (${firstLoadTrend.change}%)`);
     }
 
     const chunkCountTrend = analyzeTrend(history.measurements, 'chunkCount');
     if (chunkCountTrend) {
+      const direction = chunkCountTrend.improving ? 'improving' : 'worsening';
+      console.log(`   Chunk-count trend: ${direction} (${chunkCountTrend.change}%)`);
     }
   }
   const recommendations = [];
@@ -205,11 +229,12 @@ function generateBundleReport(analysis, history) {
   }
 
   if (recommendations.length === 0) {
+    console.log('\n✅ Bundle looks healthy and within thresholds.');
   } else {
-    recommendations.forEach((_rec, _i) => {});
-  }
-  if (!(analysis.thresholds.totalSizeOK && analysis.thresholds.firstLoadOK)) {
-  } else {
+    console.log('\n💡 Recommendations');
+    for (const rec of recommendations) {
+      console.log(`   - ${rec}`);
+    }
   }
 }
 
@@ -243,8 +268,16 @@ async function runBundleAnalysis() {
     );
 
     if (hasErrors) {
+      const failedThresholds = [];
+      if (!analysis.thresholds.totalSizeOK) failedThresholds.push('totalSize');
+      if (!analysis.thresholds.firstLoadOK) failedThresholds.push('firstLoadJS');
+      if (!analysis.thresholds.individualChunksOK) failedThresholds.push('individualChunk');
+      console.error(
+        `\n❌ Bundle gate failed: ${failedThresholds.join(', ')} exceeded configured thresholds.`,
+      );
       process.exit(1);
     } else {
+      console.log('\n✅ Bundle gate passed');
       process.exit(0);
     }
   } catch (error) {

@@ -32,15 +32,15 @@
 - Marriage Allowance transfer
 - Blind Person's Allowance
 
-### Director Guide (New)
+### Director Intelligence (New)
 - Optimal salary/dividend split calculator
 - Corporation tax integration
 - NI optimization for directors
 - Tax-efficient extraction planning
 
 ### Programmatic SEO Pages
-- `/salary/[amount]` - 25k-200k salary pages
-- `/after-tax/[amount]` - "X after tax" queries
+- `/calculator/[salary]-after-tax` - canonical salary result pages (e.g. `/calculator/70000-after-tax`)
+- `/calculator/[salary]` - non-canonical inputs redirected to canonical URLs
 - Location-specific pages (coming)
 
 ## Positioning
@@ -114,7 +114,7 @@
 - Social shares (growth)
 
 ### Secondary
-- Director Guide usage
+- Director Intelligence usage
 - Return visits
 - Bookmark/save
 
@@ -128,9 +128,10 @@
 
 ### Key Files
 - `src/app/page.tsx` - Homepage
-- `src/app/salary/[amount]/page.tsx` - Salary pages
+- `src/app/calculator/[salary]/page.tsx` - Salary pages
 - `src/components/organisms/CalculatorContainer.tsx` - Main calculator
-- `src/components/organisms/DirectorGuide/` - Director guide
+- `src/components/organisms/DirectorGuide/` - Director Intelligence components
+- `src/app/tools/director-guide/page.tsx` - Director Intelligence route (display name uses "Director Intelligence")
 
 ## Constraints
 

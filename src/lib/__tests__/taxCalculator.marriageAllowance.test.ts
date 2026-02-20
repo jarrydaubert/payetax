@@ -45,7 +45,7 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
       const withoutMarriage = calculateTax(withoutMarriageInput);
 
       const taxSaving = withoutMarriage.incomeTax.annually - result.incomeTax.annually;
-      expect(taxSaving).toBeCloseTo(252, 0);
+      expect(taxSaving).toBeCloseTo(252, 2);
     });
 
     it('✅ User earns £40k, partner earns £10k - SHOULD get allowance', () => {
@@ -157,7 +157,7 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
       expect(annualSaving).toBe(252);
 
       const monthlySaving = notMarried.incomeTax.monthly - married.incomeTax.monthly;
-      expect(monthlySaving).toBeCloseTo(21, 0); // £252 / 12 = £21
+      expect(monthlySaving).toBeCloseTo(21, 2); // £252 / 12 = £21
     });
 
     it('No tax saving when ineligible', () => {

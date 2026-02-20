@@ -449,6 +449,9 @@
 }
 
 .footer-links-new a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--text-dim);
   font-size: 0.85rem;
   line-height: 1.5;

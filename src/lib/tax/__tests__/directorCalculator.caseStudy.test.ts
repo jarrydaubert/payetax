@@ -126,7 +126,7 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       const monthlyNI = Math.max(0, (monthlySalary - monthlyThreshold) * 0.15);
 
       // (533 - 416.67) × 15% = 17.45
-      expect(monthlyNI).toBeCloseTo(17.45, 1);
+      expect(monthlyNI).toBeCloseTo(17.45, 2);
     });
 
     it('should match real payroll April 2025 NI (£17.40)', () => {
@@ -185,7 +185,7 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       expectedNI,
     }) => {
       const employerNI = calculateEmployerNI(salary);
-      expect(employerNI).toBeCloseTo(expectedNI, 1);
+      expect(employerNI).toBeCloseTo(expectedNI, 2);
     });
 
     it.each(salaryBreakpoints)('should determine pension credit eligibility for £$salary salary', ({
@@ -217,8 +217,8 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       const wrongRunway = retainedEarnings / monthlySalary;
       const correctRunway = cashInBank / monthlySalary;
 
-      expect(wrongRunway).toBeCloseTo(3.34, 1); // What director thought
-      expect(correctRunway).toBeCloseTo(1.67, 1); // Reality
+      expect(wrongRunway).toBeCloseTo(3.34, 2); // What director thought
+      expect(correctRunway).toBeCloseTo(1.67, 2); // Reality
     });
 
     it('should factor in creditors when calculating true cash available', () => {
@@ -252,16 +252,16 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       // Max salary = profit minus employer NI headroom
       // salary + (salary - 5000) × 0.15 = 7812
       // 1.15 × salary - 750 = 7812
-      // salary = 8562 / 1.15 = 7445
+      // salary = 8562 / 1.15 = 7445.22
 
       const maxSalary = (grossProfit + 5000 * 0.15) / 1.15;
-      expect(maxSalary).toBeCloseTo(7445, 0);
+      expect(maxSalary).toBeCloseTo(7445.22, 2);
 
       const employerNI = calculateEmployerNI(maxSalary);
-      expect(employerNI).toBeCloseTo(366.75, 0);
+      expect(employerNI).toBeCloseTo(366.78, 2);
 
       const totalCompanyCost = maxSalary + employerNI;
-      expect(totalCompanyCost).toBeCloseTo(7812, 0);
+      expect(totalCompanyCost).toBeCloseTo(7812, 2);
     });
 
     it('should show LEL strategy preserves cash buffer', () => {
@@ -269,16 +269,16 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       const employerNI = calculateEmployerNI(lelSalary); // 225
 
       const remainingProfit = grossProfit - lelSalary - employerNI;
-      expect(remainingProfit).toBeCloseTo(1087, 0);
+      expect(remainingProfit).toBeCloseTo(1087, 2);
 
       const corporationTax = remainingProfit * 0.19;
-      expect(corporationTax).toBeCloseTo(206.53, 0);
+      expect(corporationTax).toBeCloseTo(206.53, 2);
 
       const dividendsAvailable = remainingProfit - corporationTax;
-      expect(dividendsAvailable).toBeCloseTo(880, 0);
+      expect(dividendsAvailable).toBeCloseTo(880.47, 2);
 
       const totalTakeHome = lelSalary + dividendsAvailable;
-      expect(totalTakeHome).toBeCloseTo(7380, 0);
+      expect(totalTakeHome).toBeCloseTo(7380.47, 2);
     });
 
     it('should compare strategies correctly', () => {

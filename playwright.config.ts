@@ -100,8 +100,10 @@ export default defineConfig({
         ...devices['Pixel 5'],
       },
       testMatch: [
-        '**/calculator.spec.ts',
-        '**/layout-integrity.spec.ts',
+        '**/smoke.spec.ts',
+        '**/calculator-critical.spec.ts',
+        '**/director-guide-critical.spec.ts',
+        '**/payslip-regression.spec.ts',
         '**/golden-master-PERFECT.spec.ts',
       ],
     },
@@ -113,8 +115,10 @@ export default defineConfig({
         ...devices['iPhone 12'],
       },
       testMatch: [
-        '**/calculator.spec.ts',
-        '**/layout-integrity.spec.ts',
+        '**/smoke.spec.ts',
+        '**/calculator-critical.spec.ts',
+        '**/director-guide-critical.spec.ts',
+        '**/payslip-regression.spec.ts',
         '**/golden-master-PERFECT.spec.ts',
       ],
     },
@@ -125,7 +129,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run build && npm run start',
+    command: 'bun run build && bun run start',
     url: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

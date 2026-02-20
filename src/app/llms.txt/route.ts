@@ -3,6 +3,13 @@
 // Helps ChatGPT, Claude, Perplexity, and other AI tools understand the site
 // Dynamic: Automatically includes all blog posts grouped by category
 
+import {
+  HMRC_INCOME_TAX_RATES_URL,
+  HMRC_NI_RATES_URL,
+  HMRC_STUDENT_LOAN_REPAYMENT_URL,
+  REVENUE_SCOTLAND_INCOME_TAX_URL,
+} from '@/constants/sources';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { getAllCompetitorSlugs } from '@/data/competitors';
 import { getAllScenarioSlugs } from '@/data/scenarios';
 import { getAllUseCaseSlugs } from '@/data/useCases';
@@ -89,10 +96,11 @@ export async function GET() {
     .join('\n');
 
   const lastUpdated = new Date().toISOString().split('T')[0];
+  const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, { separator: '-' });
 
   const llmsTxt = `# PayeTax
 
-> Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with interactive calculations in your browser.
+> Free UK PAYE tax calculator with official HMRC rates for ${currentTaxYearDisplay}. Calculate income tax, National Insurance, student loans, and take-home pay instantly. Privacy-first with interactive calculations in your browser.
 
 Last updated: ${lastUpdated}
 
@@ -134,13 +142,13 @@ ${competitorPages}
 
 ## Tax Rates
 
-For current 2025-2026 tax rates (income tax bands, National Insurance thresholds, Scottish rates, student loan repayment thresholds), see our [Compliance page](${SITE_URL}/compliance) which links to official HMRC sources.
+For current ${currentTaxYearDisplay} tax rates (income tax bands, National Insurance thresholds, Scottish rates, student loan repayment thresholds), see our [Compliance page](${SITE_URL}/compliance) which links to official HMRC sources.
 
 Key rate sources:
-- [HMRC Income Tax Rates](https://www.gov.uk/income-tax-rates)
-- [HMRC National Insurance Rates](https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions)
-- [Revenue Scotland Tax Rates](https://www.revenue.scot/taxes/income-tax)
-- [Student Loan Repayment Thresholds](https://www.gov.uk/repaying-your-student-loan)
+- [HMRC Income Tax Rates](${HMRC_INCOME_TAX_RATES_URL})
+- [HMRC National Insurance Rates](${HMRC_NI_RATES_URL})
+- [Revenue Scotland Tax Rates](${REVENUE_SCOTLAND_INCOME_TAX_URL})
+- [Student Loan Repayment Thresholds](${HMRC_STUDENT_LOAN_REPAYMENT_URL})
 
 ${blogSections}
 

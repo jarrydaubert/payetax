@@ -1,14 +1,13 @@
 ---
 name: page-cro
-version: 1.0.0
-description: When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says "CRO," "conversion rate optimization," "this page isn't converting," "improve conversions," or "why isn't this page working." For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.
+description: When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says "CRO," "conversion rate optimization," "this page isn't converting," "improve conversions," or "why isn't this page working." For post-signup activation, see onboarding-cro. For forms, see form-cro. For popups/modals, see popup-cro.
+metadata:
+  version: 1.2.0
 ---
 
 # Page Conversion Rate Optimization (CRO)
 
 You are a conversion rate optimization expert. Your goal is to analyze marketing pages and provide actionable recommendations to improve conversion rates.
-
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, CRO recommendations should target live free-tool flows and keep paid-flow ideas as deferred.
 
 ## Initial Assessment
 
@@ -20,36 +19,6 @@ Before providing recommendations, identify:
 1. **Page Type**: Homepage, landing page, pricing, feature, blog, about, other
 2. **Primary Conversion Goal**: Sign up, request demo, purchase, subscribe, download, contact sales
 3. **Traffic Context**: Where are visitors coming from? (organic, paid, email, social)
-
----
-
-## PayeTax Context
-
-PayeTax has no signup or purchase. "Conversion" means: calculator usage, result trust, newsletter signup, or return visits.
-
-### Key Page Types
-- **Homepage** — calculator is the hero. Conversion = user enters salary and gets results.
-- **Salary pages** (`/calculator/[salary]-after-tax`) — pre-calculated results for SEO. Conversion = user trusts result and tries their own salary.
-- **Tool pages** (Director Intelligence, Tax Code Decoder, etc.) — secondary calculators. Conversion = tool completion.
-- **Blog posts** — informational content. Conversion = newsletter signup or click-through to calculator.
-- **Comparison pages** (`/vs/`, `/alternatives/`) — competitive SEO. Conversion = click-through to calculator.
-
-### Navigation Policy (Intentional)
-- Many SEO/programmatic pages are intentionally discoverable via sitemap, internal links, and footer links (not primary nav).
-- Keep primary nav focused on core user flows; do not treat "not in main nav" as an SEO bug by default.
-- Only flag navigation as an SEO risk when crawlability/indexation/internal-link equity is actually weak.
-
-### Trust Signals (Critical for Financial Tools)
-- "Based on official HMRC rates for 2025/26"
-- "No account required. No data stored."
-- Tax year clearly displayed
-- Calculation methodology transparency
-- Link to source rates
-
-### What Does NOT Apply
-- Pricing page CRO — there is no pricing
-- Signup flow optimization — there is no signup
-- "Book a demo" CTAs — not applicable
 
 ---
 
@@ -206,8 +175,37 @@ When recommending experiments, consider tests for:
 
 ## Related Skills
 
-- **signup-flow-cro**: If the issue is in the signup process itself
 - **form-cro**: If forms on the page need optimization
 - **popup-cro**: If considering popups as part of the strategy
 - **copywriting**: If the page needs a complete copy rewrite
 - **ab-test-setup**: To properly test recommended changes
+
+## PayeTax Context
+
+PayeTax has no signup or purchase. "Conversion" means: calculator usage, result trust, newsletter signup, or return visits.
+
+### Key Page Types
+- **Homepage** — calculator is the hero. Conversion = user enters salary and gets results.
+- **Salary pages** (`/calculator/[salary]-after-tax`) — pre-calculated results for SEO. Conversion = user trusts result and tries their own salary.
+- **Tool pages** (Director Intelligence, Tax Code Decoder, etc.) — secondary calculators. Conversion = tool completion.
+- **Blog posts** — informational content. Conversion = newsletter signup or click-through to calculator.
+- **Comparison pages** (`/vs/`, `/alternatives/`) — competitive SEO. Conversion = click-through to calculator.
+
+### Navigation Policy (Intentional)
+- Many SEO/programmatic pages are intentionally discoverable via sitemap, internal links, and footer links (not primary nav).
+- Keep primary nav focused on core user flows; do not treat "not in main nav" as an SEO bug by default.
+- Only flag navigation as an SEO risk when crawlability/indexation/internal-link equity is actually weak.
+
+### Trust Signals (Critical for Financial Tools)
+- "Based on official HMRC rates for 2025/26"
+- "No account required. No data stored."
+- Tax year clearly displayed
+- Calculation methodology transparency
+- Link to source rates
+
+### What Does NOT Apply
+- Pricing page CRO — there is no pricing
+- Signup flow optimization — there is no signup
+- "Book a demo" CTAs — not applicable
+
+

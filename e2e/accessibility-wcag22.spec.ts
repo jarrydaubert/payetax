@@ -32,7 +32,7 @@ import { expect, type Page, test } from '@playwright/test';
 const TEST_CONFIG = {
   pages: [
     { name: 'homepage', url: '/', critical: true },
-    { name: 'calculator', url: '/calculator/45000', critical: true },
+    { name: 'calculator', url: '/calculator/45000-after-tax', critical: true },
     { name: 'blog', url: '/blog', critical: false },
     { name: 'about', url: '/about', critical: false },
     { name: 'privacy', url: '/privacy', critical: false },
@@ -82,7 +82,7 @@ async function gotoWithRetry(page: Page, url: string): Promise<void> {
     } catch (error) {
       lastError = error;
       if (attempt === 0) {
-        await page.waitForTimeout(1000);
+        await page.request.get(url, { failOnStatusCode: false, timeout: 1000 }).catch(() => {});
       }
     }
   }
@@ -91,33 +91,25 @@ async function gotoWithRetry(page: Page, url: string): Promise<void> {
 }
 
 /**
- * Set theme (light or dark) using theme toggle
+ * Set theme state for scan.
+ * App runtime currently enforces dark mode, so avoid brittle UI-toggle heuristics.
  */
 async function setTheme(page: Page, theme: 'light' | 'dark'): Promise<void> {
-  // Navigate to homepage to access theme toggle
   if (!page.url().includes('localhost')) {
     await gotoWithRetry(page, '/');
   }
 
   await dismissCookieBanner(page);
 
-  // Check current theme
-  const html = page.locator('html');
-  const classes = await html.getAttribute('class');
-  const currentTheme = classes?.includes('dark') ? 'dark' : 'light';
-
-  // Toggle if needed
-  if (currentTheme !== theme) {
-    const themeToggle = page
-      .locator('button')
-      .filter({
-        has: page.locator('svg').first(),
-      })
-      .first();
-
-    if (await themeToggle.isVisible({ timeout: 1000 })) {
-      await themeToggle.click();
-    }
+  // Keep dark mode explicit; light runs keep default app behavior.
+  if (theme === 'dark') {
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      root.classList.remove('light');
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+      root.setAttribute('data-theme', 'dark');
+    });
   }
 }
 
@@ -197,14 +189,6 @@ test.describe('WCAG 2.2 AA - Full Page Scans', () => {
           const testName = `${pageConfig.name} should have no violations`;
 
           test(testName, async ({ page }) => {
-            // SKIP: Calculator desktop light mode - known issue (PAYTAX-81)
-            // Axe-core reports violations but unclear what specific rule is failing
-            // TODO: Debug with enhanced axe logging to identify exact violation
-            test.skip(
-              pageConfig.name === 'calculator' && viewport === 'desktop' && theme === 'light',
-              'PAYTAX-81: known calculator desktop light-mode accessibility violation',
-            );
-
             // Set theme
             await setTheme(page, theme);
 
@@ -238,14 +222,8 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
       });
 
       test('tooltips should be accessible', async ({ page }) => {
-        // SKIP: Tooltips light mode - known issue (PAYTAX-81)
-        // Axe-core reports violations on tooltip interactions
-        // Tooltips may have region/landmark issues or interactive element concerns
-        // TODO: Review tooltip implementation for ARIA attributes and landmark structure
-        test.skip(theme === 'light', 'PAYTAX-81: tooltip accessibility issue in light mode');
-
         await setTheme(page, theme);
-        await page.goto('/calculator/45000');
+        await page.goto('/calculator/45000-after-tax');
         await page.waitForLoadState('networkidle');
         await dismissCookieBanner(page);
 
@@ -253,7 +231,9 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
         const tooltip = page.locator('[data-tooltip], [role="tooltip"]').first();
         if (await tooltip.isVisible({ timeout: 1000 })) {
           await tooltip.hover();
-          await page.waitForTimeout(500);
+          await expect(page.locator('[role="tooltip"]').first())
+            .toBeVisible({ timeout: 2000 })
+            .catch(() => {});
         }
 
         await runAxeScan(page, {
@@ -265,7 +245,7 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
 
       test('form checkboxes should be accessible', async ({ page }) => {
         await setTheme(page, theme);
-        await page.goto('/calculator/45000');
+        await page.goto('/calculator/45000-after-tax');
         await page.waitForLoadState('networkidle');
         await dismissCookieBanner(page);
 
@@ -283,13 +263,6 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
       });
 
       test('mobile navigation menu should be accessible', async ({ page }) => {
-        // SKIP: Mobile menu - possible false positive (PAYTAX-81)
-        // We've added semantic landmarks (div→nav with aria-label) but test still fails
-        // Axe-core may be flagging other content on the page or backdrop elements
-        // Mobile menu itself is properly structured with nav landmark
-        // TODO: Investigate if axe is flagging unrelated elements or if there's another issue
-        test.skip(true, 'PAYTAX-81: mobile menu accessibility test pending false-positive review');
-
         await page.setViewportSize(TEST_CONFIG.viewports.mobile);
         await setTheme(page, theme);
         await page.goto('/');
@@ -372,7 +345,11 @@ test.describe('WCAG 2.2 AA - Keyboard Navigation', () => {
   async function focusInteractiveElement(page: Page, attempts = 5): Promise<void> {
     for (let i = 0; i < attempts; i++) {
       await page.keyboard.press('Tab');
-      await page.waitForTimeout(100);
+      await expect
+        .poll(async () => page.evaluate(() => document.activeElement?.tagName ?? ''), {
+          timeout: 1000,
+        })
+        .not.toBe('BODY');
 
       const isInteractive = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
@@ -427,14 +404,6 @@ test.describe('WCAG 2.2 AA - Keyboard Navigation', () => {
  */
 test.describe('WCAG 2.2 AA - Touch Targets (2.5.8)', () => {
   test('all interactive elements should meet 24×24px minimum', async ({ page }) => {
-    // SKIP: Touch targets - some elements still <24×24px (PAYTAX-81)
-    // Test is valid and correctly implements WCAG 2.5.8
-    // We've fixed select indicator (14→24px) and close button (p-1→p-2)
-    // However, some elements still fail (likely links, badges, or small buttons)
-    // Test now has enhanced logging to show exact elements and dimensions
-    // TODO: Run test to see console output, then fix remaining small elements
-    test.skip(true, 'PAYTAX-81: touch target violations still under remediation');
-
     await page.setViewportSize(TEST_CONFIG.viewports.mobile);
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -442,7 +411,7 @@ test.describe('WCAG 2.2 AA - Touch Targets (2.5.8)', () => {
 
     // Check interactive element sizes
     const interactiveElements = await page
-      .locator('button:visible, a:visible, input:visible, [role="button"]:visible')
+      .locator('button:visible, a:visible, input:visible, select:visible, [role="button"]:visible')
       .all();
 
     const tooSmall: string[] = [];
@@ -450,19 +419,37 @@ test.describe('WCAG 2.2 AA - Touch Targets (2.5.8)', () => {
     for (const element of interactiveElements) {
       const box = await element.boundingBox();
       if (box) {
-        // WCAG 2.5.8: Both width AND height must be ≥24px (with exceptions)
-        // We check if EITHER dimension is <24px
-        const minSize = Math.min(box.width, box.height);
-        if (minSize < 24) {
-          const elementInfo = await element.evaluate((el) => ({
-            tag: el.tagName,
-            id: el.id,
-            class: el.className,
-            text: el.textContent?.substring(0, 30),
-          }));
-          tooSmall.push(
-            `${elementInfo.tag}#${elementInfo.id || 'no-id'}.${elementInfo.class}: ${box.width.toFixed(0)}×${box.height.toFixed(0)}px (min: ${minSize.toFixed(0)}px) "${elementInfo.text}"`,
-          );
+        // WCAG 2.5.8 has exceptions (e.g. inline links in running text).
+        // We enforce the size rule for controls users are expected to tap directly.
+        const elementInfo = await element.evaluate((el) => {
+          const htmlEl = el as HTMLElement;
+          const style = window.getComputedStyle(htmlEl);
+          const tag = htmlEl.tagName.toLowerCase();
+          const role = htmlEl.getAttribute('role');
+          const inlineTextLink =
+            tag === 'a' &&
+            !!htmlEl.closest('p, li') &&
+            style.display === 'inline' &&
+            !htmlEl.className.toLowerCase().includes('button') &&
+            !htmlEl.className.toLowerCase().includes('btn');
+          const shouldCheck = !inlineTextLink;
+          return {
+            tag: htmlEl.tagName,
+            id: htmlEl.id,
+            class: htmlEl.className,
+            role,
+            text: htmlEl.textContent?.substring(0, 30),
+            shouldCheck,
+          };
+        });
+
+        if (elementInfo.shouldCheck) {
+          const minSize = Math.min(box.width, box.height);
+          if (minSize < 24) {
+            tooSmall.push(
+              `${elementInfo.tag}#${elementInfo.id || 'no-id'}.${elementInfo.class}: ${box.width.toFixed(0)}×${box.height.toFixed(0)}px (min: ${minSize.toFixed(0)}px, role: ${elementInfo.role || 'none'}) "${elementInfo.text}"`,
+            );
+          }
         }
       }
     }
@@ -497,7 +484,11 @@ test.describe('WCAG 2.2 AA - Focus Indicators', () => {
 
     // Focus first interactive element
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(100);
+    await expect
+      .poll(async () => page.evaluate(() => document.activeElement?.tagName ?? ''), {
+        timeout: 1000,
+      })
+      .not.toBe('BODY');
 
     // Check if focus indicator is visible
     const focusStyles = await page.evaluate(() => {
@@ -544,38 +535,26 @@ test.describe('WCAG 2.2 AA - Blog Content', () => {
   });
 
   test('blog category filtering should be accessible', async ({ page }) => {
-    // SKIP: Blog filtering - possible false positive (PAYTAX-81)
-    // We've added semantic landmark (div→section with aria-labelledby) to CategoryFilter
-    // The section has proper heading (h2 with id) and is properly labeled
-    // Test still fails - axe may be flagging other blog page content outside landmarks
-    // Category filter component itself is properly structured
-    // TODO: Investigate if issue is with blog page structure or other elements
-    test.skip(true, 'PAYTAX-81: blog filter accessibility test pending structural investigation');
-
     await page.setViewportSize(TEST_CONFIG.viewports.desktop);
     await page.goto('/blog');
     await page.waitForLoadState('networkidle');
     await dismissCookieBanner(page);
 
-    // Click category filter
-    const categoryButton = page
-      .locator('button')
-      .filter({
-        hasText: /Tax/,
-      })
-      .first();
+    const categoryNav = page.locator('nav[aria-label="Browse blog categories"]');
+    await expect(categoryNav).toBeVisible();
 
-    if (await categoryButton.isVisible({ timeout: 2000 })) {
-      await categoryButton.click();
-
-      await runAxeScan(page, {
-        pageName: 'blog-filtered',
-        viewport: 'desktop',
-        theme: 'light',
-      });
-    } else {
-      test.skip(true, 'Blog category button not visible in this environment');
+    // Category filter is link-based on the blog page.
+    const categoryLinks = categoryNav.locator('a').filter({ hasNotText: /all articles/i });
+    if ((await categoryLinks.count()) > 0) {
+      await categoryLinks.first().click();
+      await page.waitForLoadState('networkidle');
     }
+
+    await runAxeScan(page, {
+      pageName: 'blog-filtered',
+      viewport: 'desktop',
+      theme: 'light',
+    });
   });
 });
 

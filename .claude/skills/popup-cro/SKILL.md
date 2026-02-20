@@ -1,7 +1,8 @@
 ---
 name: popup-cro
-version: 1.0.0
 description: When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions "exit intent," "popup conversions," "modal optimization," "lead capture popup," "email popup," "announcement banner," or "overlay." For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.
+metadata:
+  version: 1.2.0
 ---
 
 # Popup CRO
@@ -34,34 +35,6 @@ Before providing recommendations, understand:
    - Traffic sources (paid, organic, direct)
    - New vs. returning visitors
    - Page types where shown
-
----
-
-## PayeTax Context
-
-PayeTax uses dialogs and banners — not traditional marketing popups. There are no discount offers, exit-intent lead captures, or full-screen interstitials.
-
-### Existing Dialogs & Banners
-- **DirectorGuideWelcomeDialog** (`src/components/molecules/DirectorGuide/WelcomeDialog.tsx`) — first-visit modal explaining the Director Guide tool, localStorage-based dismissal, accessible Dialog component
-- **EmailResultsDialog** (`src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`) — click-triggered modal with email form, sends director results via Resend `/api/send-director-results`, rate limited, links to privacy policy
-- **CookieBanner** — consent banner for analytics cookies, dismissable, persisted
-- **PWAInstallBanner** — prompts returning mobile users to install the PWA
-- **FeedbackDialog** — user feedback collection dialog
-
-### Optimisation Focus
-- WelcomeDialog copy clarity (does it explain value in 5 seconds?)
-- EmailResultsDialog form friction (single email field, clear privacy statement)
-- CookieBanner unobtrusiveness (doesn't block calculator)
-- PWAInstallBanner timing (only shown to engaged returning users)
-- Dialog accessibility (keyboard navigation, focus trap, Esc to close, screen reader support)
-- Mobile dialog sizing (not full-screen, easy dismiss)
-
-### What Does NOT Apply
-- Exit-intent popups — no e-commerce conversion to save
-- Discount/promotion popups — everything is free
-- Email capture popups on scroll/timer — newsletter is inline CTA only
-- Full-screen overlays — would block the calculator
-- Frequency capping across multiple popups — each dialog has its own trigger
 
 ---
 
@@ -478,3 +451,31 @@ Ideas to A/B test with expected outcomes
 - **page-cro**: For the page context around popups
 - **email-sequence**: For what happens after popup conversion
 - **ab-test-setup**: For testing popup variations
+
+## PayeTax Context
+
+PayeTax uses dialogs and banners — not traditional marketing popups. There are no discount offers, exit-intent lead captures, or full-screen interstitials.
+
+### Existing Dialogs & Banners
+- **DirectorGuideWelcomeDialog** (`src/components/molecules/DirectorGuide/WelcomeDialog.tsx`) — first-visit modal explaining the Director Intelligence tool, localStorage-based dismissal, accessible Dialog component
+- **EmailResultsDialog** (`src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`) — click-triggered modal with email form, sends director results via Resend `/api/send-director-results`, rate limited, links to privacy policy
+- **CookieBanner** — consent banner for analytics cookies, dismissable, persisted
+- **PWAInstallBanner** — prompts returning mobile users to install the PWA
+- **FeedbackDialog** — user feedback collection dialog
+
+### Optimisation Focus
+- WelcomeDialog copy clarity (does it explain value in 5 seconds?)
+- EmailResultsDialog form friction (single email field, clear privacy statement)
+- CookieBanner unobtrusiveness (doesn't block calculator)
+- PWAInstallBanner timing (only shown to engaged returning users)
+- Dialog accessibility (keyboard navigation, focus trap, Esc to close, screen reader support)
+- Mobile dialog sizing (not full-screen, easy dismiss)
+
+### What Does NOT Apply
+- Exit-intent popups — no e-commerce conversion to save
+- Discount/promotion popups — everything is free
+- Email capture popups on scroll/timer — newsletter is inline CTA only
+- Full-screen overlays — would block the calculator
+- Frequency capping across multiple popups — each dialog has its own trigger
+
+

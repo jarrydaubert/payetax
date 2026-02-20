@@ -422,3 +422,10 @@ export default function HomePage() {
 - `src/store/` - Zustand stores
 - `src/lib/validation/` - Zod schemas
 - `tailwind.config.ts` - Design tokens
+
+## PayeTax Context
+
+- Tax correctness is non-negotiable; financial logic changes must be tied back to `src/constants/taxRates.ts`.
+- Prefer changes that reduce user-facing risk over novelty (predictable behavior > clever implementation).
+- For new architecture suggestions, separate "ready now" vs "future" recommendations.
+- Always validate performance claims with project scripts and real outputs (`bun run fix-all`, `bun run build`, targeted tests).

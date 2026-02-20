@@ -7,8 +7,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
-
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
+import { StructuredData } from '@/components/organisms/StructuredData';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
@@ -109,29 +109,29 @@ export default async function CategoryPage({
     return notFound();
   }
 
-  // Breadcrumb structured data
-  const breadcrumbStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: category.name,
-        item: `${SITE_URL}/blog/category/${slug}`,
-      },
-    ],
-  };
-
   return (
     <div className='min-h-screen bg-slate-950'>
       {/* Structured Data */}
-      <script
-        type='application/ld+json'
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
+      <StructuredData
+        type='breadcrumb'
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'Blog', url: `${SITE_URL}/blog` },
+          { name: category.name, url: `${SITE_URL}/blog/category/${slug}` },
+        ]}
+      />
+      <StructuredData
+        type='itemlist'
+        itemList={{
+          listName: `${category.name} Articles`,
+          listDescription: `UK tax guides in the ${category.name} category.`,
+          items: posts.map((post, index) => ({
+            name: post.title,
+            url: `${SITE_URL}/blog/${post.slug}`,
+            description: post.excerpt,
+            position: index + 1,
+          })),
+        }}
       />
 
       {/* Header */}
@@ -163,7 +163,7 @@ export default async function CategoryPage({
             Expert articles on {category.name.toLowerCase()} including UK tax updates, guidance, and
             practical advice.
           </p>
-          <p className='mt-2 text-slate-500 text-sm'>
+          <p className='mt-2 text-slate-400 text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
           </p>
         </div>
@@ -221,11 +221,11 @@ export default async function CategoryPage({
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
-                <h3 className='mb-2 font-semibold text-white group-hover:text-cyan-400'>
+                <h2 className='mb-2 font-semibold text-white group-hover:text-cyan-400'>
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                </h3>
+                </h2>
                 <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
-                <time className='text-slate-500 text-xs' dateTime={post.publishedAt}>
+                <time className='text-slate-400 text-xs' dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
               </article>

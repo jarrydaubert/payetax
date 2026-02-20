@@ -138,6 +138,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       headline: post.title,
       description: post.excerpt,
       url: `${SITE_URL}/blog/${post.slug}`,
+      image: post.image
+        ? `${SITE_URL}${post.image.startsWith('/') ? post.image : `/${post.image}`}`
+        : `${SITE_URL}/images/og-image.png`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt || post.publishedAt,
       author: {
@@ -152,7 +155,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <script
         type='application/ld+json'
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe static structured data
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogStructuredData) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(blogStructuredData).replace(/<\/script/gi, '<\\/script'),
+        }}
       />
       <StructuredData
         type='breadcrumb'

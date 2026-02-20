@@ -1,14 +1,13 @@
 ---
 name: form-cro
-version: 1.0.0
-description: When the user wants to optimize any form — including calculator input forms, email capture forms, contact forms, newsletter signup forms, or feedback forms. Also use when the user mentions "form optimization," "form conversions," "form friction," "form fields," "form completion rate," or "contact form." For popups containing forms, see popup-cro.
+description: When the user wants to optimize any form — including lead capture forms, contact forms, demo request forms, application forms, survey forms, or checkout forms. Also use when the user mentions "form optimization," "lead form conversions," "form friction," "form fields," "form completion rate," or "contact form." For popups containing forms, see popup-cro.
+metadata:
+  version: 1.2.0
 ---
 
 # Form CRO
 
 You are an expert in form optimization. Your goal is to maximize form completion rates while capturing the data that matters.
-
-Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, form optimization should focus on live forms and defer checkout/payment-form recommendations.
 
 ## Initial Assessment
 
@@ -36,34 +35,6 @@ Before providing recommendations, identify:
    - What happens with form submissions?
    - Which fields are actually used in follow-up?
    - Are there compliance/legal requirements?
-
----
-
-## PayeTax Context
-
-PayeTax has no signup, checkout, or demo request forms. "Forms" on PayeTax are calculator inputs and email capture.
-
-### Existing Forms
-- **Calculator inputs** — salary field, tax year selector, pension %, student loan toggles, tax code field (homepage `src/app/page.tsx`)
-- **Director Guide inputs** — salary/dividends split, multiple tax parameters (`src/app/tools/director-guide/`)
-- **PAYE email results form** — inline email field at bottom of calculator results (`src/components/molecules/EmailResultsForm.tsx`), sends via Resend `/api/send-results`
-- **Director email results form** — email field inside modal (`src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`), sends via Resend `/api/send-director-results`
-- **Newsletter signup** — Kit/ConvertKit embed via `NewsletterCTA` (`src/components/organisms/NewsletterCTA.tsx`), appears on blog posts, homepage, blog index
-- **Referral lead form** — sends user confirmation + partner notification via Resend `/api/referral/lead`
-- **Feedback form** — `FeedbackDialog` component, sends via `src/app/actions/feedback.ts`
-
-### Optimisation Focus
-- Calculator input clarity (labels, defaults, mobile keyboard types)
-- Inline validation for salary, tax code, and email fields
-- Error message quality (e.g. "Enter a salary between £1 and £10,000,000")
-- Mobile-first field sizing (44px+ tap targets)
-- Email form friction reduction (single field, clear privacy statement)
-
-### What Does NOT Apply
-- Lead capture gating, demo request forms, quote forms, checkout forms
-- Multi-step form wizards (calculator is single-page)
-- Company/job title/phone number fields
-- Progressive profiling or form enrichment
 
 ---
 
@@ -455,3 +426,31 @@ Ideas to A/B test with expected outcomes
 - **popup-cro**: For forms inside popups/modals
 - **page-cro**: For the page containing the form
 - **ab-test-setup**: For testing form changes
+
+## PayeTax Context
+
+PayeTax has no signup, checkout, or demo request forms. "Forms" on PayeTax are calculator inputs and email capture.
+
+### Existing Forms
+- **Calculator inputs** — salary field, tax year selector, pension %, student loan toggles, tax code field (homepage `src/app/page.tsx`)
+- **Director Intelligence inputs** — salary/dividends split, multiple tax parameters (`src/app/tools/director-guide/`)
+- **PAYE email results form** — inline email field at bottom of calculator results (`src/components/molecules/EmailResultsForm.tsx`), sends via Resend `/api/send-results`
+- **Director email results form** — email field inside modal (`src/components/molecules/DirectorGuide/EmailResultsDialog.tsx`), sends via Resend `/api/send-director-results`
+- **Newsletter signup** — Kit/ConvertKit embed via `NewsletterCTA` (`src/components/organisms/NewsletterCTA.tsx`), appears on blog posts, homepage, blog index
+- **Referral lead form** — sends user confirmation + partner notification via Resend `/api/referral/lead`
+- **Feedback form** — `FeedbackDialog` component, sends via `src/app/actions/feedback.ts`
+
+### Optimisation Focus
+- Calculator input clarity (labels, defaults, mobile keyboard types)
+- Inline validation for salary, tax code, and email fields
+- Error message quality (e.g. "Enter a salary between £1 and £10,000,000")
+- Mobile-first field sizing (44px+ tap targets)
+- Email form friction reduction (single field, clear privacy statement)
+
+### What Does NOT Apply
+- Lead capture gating, demo request forms, quote forms, checkout forms
+- Multi-step form wizards (calculator is single-page)
+- Company/job title/phone number fields
+- Progressive profiling or form enrichment
+
+

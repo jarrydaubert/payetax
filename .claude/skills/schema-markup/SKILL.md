@@ -1,7 +1,8 @@
 ---
 name: schema-markup
-version: 1.0.0
 description: When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions "schema markup," "structured data," "JSON-LD," "rich snippets," "schema.org," "FAQ schema," "product schema," "review schema," or "breadcrumb schema." For broader SEO issues, see seo-audit.
+metadata:
+  version: 1.2.0
 ---
 
 # Schema Markup
@@ -20,33 +21,6 @@ Before implementing schema, understand:
 2. **Current State** - Any existing schema? Errors in implementation? Which rich results already appearing?
 
 3. **Goals** - Which rich results are you targeting? What's the business value?
-
----
-
-## PayeTax Context
-
-PayeTax already has extensive schema markup. When working on structured data for this project:
-
-### Existing Implementation
-- Schema component: `src/components/organisms/StructuredData.tsx` — supports 13+ types
-- All schemas use `<script type="application/ld+json">` in server-rendered HTML (not `next/script`)
-- XSS protection: `JSON.stringify(schemaData).replace(/<\/script/gi, '<\\/script')`
-- `Organization` schema emitted from `src/app/layout.tsx` (appears on every page)
-
-### Active Schema Types
-- **Homepage**: `WebSite`, `Organization`, `SoftwareApplication`, `FinancialService`, `HowTo`, `Dataset`, `FAQPage`, `BreadcrumbList`
-- **Salary pages** (`/calculator/[salary]-after-tax`): `SalaryCalculation` (custom `WebPage` + `FinancialProduct` hybrid), `BreadcrumbList`
-- **Blog posts**: `BlogPosting`, `BreadcrumbList`, dynamic `FAQPage` (extracted from content), conditional `HowTo`
-- **Director Guide**: `SoftwareApplication`, `FAQPage`, `Dataset`
-- **Use-case pages** (`/best-for/[use-case]`): `BreadcrumbList`, `FAQPage`
-
-### PayeTax-Specific Rules
-- Currency is always GBP (£), not USD
-- `inLanguage: 'en-GB'` on all content schemas
-- `Dataset` schema pulls live values from `src/constants/taxRates.ts` — auto-updates when rates change
-- No `aggregateRating` — only add when backed by real, verifiable reviews (fake ratings trigger Google penalties)
-- `Organization.sameAs` currently only lists Twitter/X — expand when more profiles exist
-- Tax rates source: `src/constants/taxRates.ts` — all schema monetary values must derive from this file
 
 ---
 
@@ -200,4 +174,38 @@ You can combine multiple schema types on one page using `@graph`:
 ## Related Skills
 
 - **seo-audit**: For overall SEO including schema review
+- **ai-seo**: For AI search optimization (schema helps AI understand content)
 - **programmatic-seo**: For templated schema at scale
+
+## PayeTax Context
+
+PayeTax already has extensive schema markup. When working on structured data for this project:
+
+### Existing Implementation
+- Schema component: `src/components/organisms/StructuredData.tsx` — supports 14 schema types
+- All schemas use `<script type="application/ld+json">` in server-rendered HTML (not `next/script`)
+- XSS protection: `JSON.stringify(schemaData).replace(/<\/script/gi, '<\/script')`
+- `Organization` schema emitted from `src/app/layout.tsx` (appears on every page)
+- Salary pages are generated at `src/app/calculator/[salary]/page.tsx` (canonical: `/calculator/{salary}-after-tax`)
+
+### Active Schema Types
+- **Homepage**: `WebSite`, `Organization`, `SoftwareApplication`, `FinancialService`, `HowTo`, `Dataset`, `FAQPage`
+- **Salary pages** (`/calculator/[salary]-after-tax`): `SalaryCalculation` (custom `WebPage` + `FinancialProduct` hybrid), `BreadcrumbList`
+- **Blog posts**: `BlogPosting`, `BreadcrumbList`, dynamic `FAQPage` (extracted from content), conditional `HowTo`
+- **Director Intelligence**: `SoftwareApplication`, `FAQPage`, `Dataset`
+- **Use-case pages** (`/best-for/[use-case]`): `BreadcrumbList`, `FAQPage`
+
+### PayeTax-Specific Rules
+- Currency is always GBP (£), not USD
+- `inLanguage: 'en-GB'` on all content schemas
+- `Dataset` schema pulls live values from `src/constants/taxRates.ts` — auto-updates when rates change
+- No `aggregateRating` — only add when backed by real, verifiable reviews (fake ratings trigger Google penalties)
+- `Organization.sameAs` currently only lists Twitter/X — expand when more profiles exist
+- Tax rates source: `src/constants/taxRates.ts` — all schema monetary values must derive from this file
+- Tax year strings must derive from `CURRENT_TAX_YEAR`/`formatTaxYearDisplay` (no hardcoded `"2025-26"` values)
+- Breadcrumb `item` must be a canonical page URL (no hash fragments like `/#tax-calculator`)
+- `HowTo.step` entries must include both `name` and `text`
+- Any inline JSON-LD script must escape `</script>` the same way as `StructuredData`
+- No schema on `noindex` utility pages unless there is explicit business need
+
+

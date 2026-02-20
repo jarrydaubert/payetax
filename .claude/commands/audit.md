@@ -29,7 +29,7 @@ argument-hint: [target]
 
 **Allowed targets:**
 - `calculator` - Tax calculator system (taxCalculator.ts, CalculatorContainer, taxRates.ts)
-- `director` - Director guide (director-guide page, send-director-results API)
+- `director` - Director Intelligence (`/tools/director-guide` page, send-director-results API)
 - `emails` - Email flows (newsletter, send-results, welcome templates)
 - `api` - API routes (all /api/* endpoints)
 - `security` - Security focus (auth, rate limiting, tokens, headers, PII)

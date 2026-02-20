@@ -13,6 +13,7 @@ import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import {
   getScenariosByCategory,
   SCENARIO_CATEGORIES,
@@ -23,8 +24,10 @@ import {
 import { generateMetadata as generateMetadataHelper, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
-// Display format for tax year - update when TAX_YEARS changes in taxRates.ts
-const CURRENT_TAX_YEAR_DISPLAY = '2025-26';
+const CURRENT_TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
 
 export const metadata: Metadata = generateMetadataHelper({
   title: 'Tax Scenarios & Calculators | UK Tax Planning Guides',

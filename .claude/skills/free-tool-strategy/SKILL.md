@@ -1,7 +1,8 @@
 ---
 name: free-tool-strategy
-version: 1.0.0
 description: When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. Also use when the user mentions "engineering as marketing," "free tool," "marketing tool," "calculator," "generator," "interactive tool," "lead gen tool," "build a tool for leads," or "free resource." This skill bridges engineering and marketing — useful for founders and technical marketers.
+metadata:
+  version: 1.2.0
 ---
 
 # Free Tool Strategy (Engineering as Marketing)
@@ -20,30 +21,6 @@ Before designing a tool strategy, understand:
 2. **Goals** - Lead generation? SEO/traffic? Brand awareness? Product education?
 
 3. **Resources** - Technical capacity to build? Ongoing maintenance bandwidth? Budget for promotion?
-
----
-
-## PayeTax Context
-
-**Important inversion:** PayeTax IS the free tool — it is not a company building a free tool alongside a paid product. When using this skill, focus on tool expansion and SEO surface area, not lead gating or conversion funnels.
-
-### Existing Tools
-- **PAYE Calculator** — main tool, homepage (`src/app/page.tsx`)
-- **Director Pay Calculator** — salary vs dividends optimizer (`src/app/tools/director-guide/`)
-- **Tax Code Decoder** (`src/app/tools/tax-code-decoder/`)
-- **Scottish Tax Calculator** (`src/app/tools/scottish-tax-calculator/`)
-- **National Insurance Calculator** (`src/app/tools/national-insurance-calculator/`)
-- **Marriage Allowance Calculator** (`src/app/tools/marriage-allowance-calculator/`)
-- **150+ salary pages** — programmatic SEO at `/calculator/[salary]-after-tax`
-
-### Expansion Strategy
-Each new calculator = more keyword surface area. Potential additions: student loan repayment calculator, employer NI cost calculator, salary sacrifice calculator, IR35 estimator, dividend tax calculator.
-
-### What Does NOT Apply
-- Lead gating / email walls — the tool is fully open
-- "Path from tool to product" — there is no separate product
-- Freemium conversion — everything is free
-- Usage limits — no caps on calculations
 
 ---
 
@@ -199,3 +176,27 @@ Rate each factor 1-5:
 - **seo-audit**: For SEO-optimizing the tool
 - **analytics-tracking**: For measuring tool usage
 - **email-sequence**: For nurturing leads from the tool
+
+## PayeTax Context
+
+**Important inversion:** PayeTax IS the free tool — it is not a company building a free tool alongside a paid product. When using this skill, focus on tool expansion and SEO surface area, not lead gating or conversion funnels.
+
+### Existing Tools
+- **PAYE Calculator** — main tool, homepage (`src/app/page.tsx`)
+- **Director Pay Calculator** — salary vs dividends optimizer (`src/app/tools/director-guide/`)
+- **Tax Code Decoder** (`src/app/tools/tax-code-decoder/`)
+- **Scottish Tax Calculator** (`src/app/tools/scottish-tax-calculator/`)
+- **National Insurance Calculator** (`src/app/tools/national-insurance-calculator/`)
+- **Marriage Allowance Calculator** (`src/app/tools/marriage-allowance-calculator/`)
+- **150+ salary pages** — programmatic SEO at `/calculator/[salary]-after-tax`
+
+### Expansion Strategy
+Each new calculator = more keyword surface area. Potential additions: student loan repayment calculator, employer NI cost calculator, salary sacrifice calculator, IR35 estimator, dividend tax calculator.
+
+### What Does NOT Apply
+- Lead gating / email walls — the tool is fully open
+- "Path from tool to product" — there is no separate product
+- Freemium conversion — everything is free
+- Usage limits — no caps on calculations
+
+

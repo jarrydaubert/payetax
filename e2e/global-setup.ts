@@ -19,13 +19,18 @@ async function globalSetup(config: FullConfig) {
   try {
     await page.goto(baseURL || 'http://localhost:3000');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1500);
+    await page.waitForLoadState('domcontentloaded');
 
     // Accept cookies using the data-testid
     const acceptButton = page.getByTestId('cookie-accept-analytics');
     if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await acceptButton.click();
-      await page.waitForTimeout(500);
+
+      await page
+        .waitForFunction(() => localStorage.getItem('cookie-consent') === 'accepted', {
+          timeout: 5000,
+        })
+        .catch(() => {});
 
       // Verify cookie consent was saved to localStorage
       const consent = await page.evaluate(() => localStorage.getItem('cookie-consent'));

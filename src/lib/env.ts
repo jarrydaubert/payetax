@@ -60,6 +60,7 @@ export const ServerEnvSchema = z.object({
   // Newsletter Service (Kit)
   KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter').optional(),
   KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter').optional(),
+  UNSUBSCRIBE_SECRET: z.string().min(1, 'Unsubscribe secret must not be empty').optional(),
   UPSTASH_REDIS_REST_URL: z.string().url('Upstash Redis REST URL must be a valid URL').optional(),
   UPSTASH_REDIS_REST_TOKEN: z
     .string()
@@ -70,6 +71,7 @@ export const ServerEnvSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
+  SENTRY_WEBHOOK_SECRET: z.string().min(1, 'Sentry webhook secret must not be empty').optional(),
 
   // Vercel Deployment
   VERCEL_TOKEN: z.string().optional(),
@@ -82,6 +84,13 @@ export const ServerEnvSchema = z.object({
     .uuid('IndexNow key must be a valid UUID')
     .optional()
     .or(z.literal('').transform(() => undefined)), // Allow empty string
+  INDEXNOW_SUBMIT_SECRET: z.string().min(1, 'IndexNow submit secret must not be empty').optional(),
+  REFERRAL_PARTNER_EMAIL: z
+    .string()
+    .email('Referral partner email must be a valid email address')
+    .optional(),
+  LINEAR_API_KEY: z.string().min(1, 'Linear API key must not be empty').optional(),
+  LINEAR_TEAM_KEY: z.string().min(1, 'Linear team key must not be empty').optional(),
 
   // Build Configuration
   ANALYZE: z
@@ -107,11 +116,16 @@ export const RequiredProductionEnvSchema = z
     RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
     KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter'),
     KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter'),
+    UNSUBSCRIBE_SECRET: z.string().min(1, 'Unsubscribe secret is required in production'),
+    REFERRAL_PARTNER_EMAIL: z.string().email('Referral partner email is required in production'),
+    INDEXNOW_SUBMIT_SECRET: z.string().min(1, 'IndexNow submit secret is required in production'),
     NEXT_PUBLIC_ENABLE_ANALYTICS: z
       .string()
       .transform((val) => val === 'true')
       .optional(),
     NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
+    SENTRY_WEBHOOK_SECRET: z.string().optional(),
+    LINEAR_API_KEY: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     const analyticsEnabled = data.NEXT_PUBLIC_ENABLE_ANALYTICS ?? true;
@@ -122,6 +136,25 @@ export const RequiredProductionEnvSchema = z
           'Google Analytics ID is required in production when analytics are enabled (set NEXT_PUBLIC_ENABLE_ANALYTICS=false to disable analytics).',
         path: ['NEXT_PUBLIC_GA_ID'],
       });
+    }
+
+    const webhookConfigured = Boolean(data.SENTRY_WEBHOOK_SECRET || data.LINEAR_API_KEY);
+    if (webhookConfigured) {
+      if (!data.SENTRY_WEBHOOK_SECRET) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'SENTRY_WEBHOOK_SECRET is required when Linear webhook integration is configured.',
+          path: ['SENTRY_WEBHOOK_SECRET'],
+        });
+      }
+      if (!data.LINEAR_API_KEY) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'LINEAR_API_KEY is required when Sentry webhook integration is configured.',
+          path: ['LINEAR_API_KEY'],
+        });
+      }
     }
   });
 
@@ -165,15 +198,21 @@ export function validateServerEnv(): ServerEnv {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     KIT_API_SECRET: process.env.KIT_API_SECRET,
     KIT_FORM_ID: process.env.KIT_FORM_ID,
+    UNSUBSCRIBE_SECRET: process.env.UNSUBSCRIBE_SECRET,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+    SENTRY_WEBHOOK_SECRET: process.env.SENTRY_WEBHOOK_SECRET,
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     VERCEL_ORG_ID: process.env.VERCEL_ORG_ID,
     VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
     INDEXNOW_KEY: process.env.INDEXNOW_KEY,
+    INDEXNOW_SUBMIT_SECRET: process.env.INDEXNOW_SUBMIT_SECRET,
+    REFERRAL_PARTNER_EMAIL: process.env.REFERRAL_PARTNER_EMAIL,
+    LINEAR_API_KEY: process.env.LINEAR_API_KEY,
+    LINEAR_TEAM_KEY: process.env.LINEAR_TEAM_KEY,
     ANALYZE: process.env.ANALYZE,
     NODE_ENV: process.env.NODE_ENV,
   });
@@ -211,8 +250,13 @@ export function validateProductionEnv(): RequiredProductionEnv {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     KIT_API_SECRET: process.env.KIT_API_SECRET,
     KIT_FORM_ID: process.env.KIT_FORM_ID,
+    UNSUBSCRIBE_SECRET: process.env.UNSUBSCRIBE_SECRET,
+    REFERRAL_PARTNER_EMAIL: process.env.REFERRAL_PARTNER_EMAIL,
+    INDEXNOW_SUBMIT_SECRET: process.env.INDEXNOW_SUBMIT_SECRET,
     NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    SENTRY_WEBHOOK_SECRET: process.env.SENTRY_WEBHOOK_SECRET,
+    LINEAR_API_KEY: process.env.LINEAR_API_KEY,
   });
 
   if (!result.success) {

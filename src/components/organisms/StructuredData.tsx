@@ -11,7 +11,7 @@
  */
 
 import type React from 'react';
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 
 /**
@@ -21,6 +21,14 @@ import { LOGO_URL, SITE_URL } from '@/lib/metadata';
  */
 function formatCurrency(amount: number): string {
   return `£${amount.toLocaleString('en-GB')}`;
+}
+
+/**
+ * Round currency values for schema output to avoid floating-point artifacts
+ * (e.g. 51157.35999999999).
+ */
+function roundCurrencyValue(amount: number): number {
+  return Math.round(amount * 100) / 100;
 }
 
 // Define typed interfaces for each schema type
@@ -56,6 +64,7 @@ interface SoftwareApplicationSchema {
   '@context': 'https://schema.org';
   '@type': 'SoftwareApplication';
   name: string;
+  url?: string;
   applicationCategory: string;
   operatingSystem: string;
   offers: {
@@ -236,51 +245,6 @@ interface PersonSchema {
   }>;
 }
 
-interface ReviewSchema {
-  '@context': 'https://schema.org';
-  '@type': 'Review';
-  itemReviewed: {
-    '@type': 'SoftwareApplication';
-    name: string;
-  };
-  reviewRating: {
-    '@type': 'Rating';
-    ratingValue: number;
-    bestRating: number;
-    worstRating: number;
-  };
-  author: {
-    '@type': 'Person';
-    name: string;
-  };
-  reviewBody: string;
-  datePublished: string;
-}
-
-interface ServiceSchema {
-  '@context': 'https://schema.org';
-  '@type': 'Service';
-  name: string;
-  description: string;
-  provider: {
-    '@type': 'Organization';
-    name: string;
-    url: string;
-  };
-  serviceType: string;
-  areaServed: string | string[];
-  hasOfferCatalog?: {
-    '@type': 'OfferCatalog';
-    name: string;
-    itemListElement: Array<{
-      '@type': 'Offer';
-      itemOffered: string;
-      price: string;
-      priceCurrency: string;
-    }>;
-  };
-}
-
 interface DatasetSchema {
   '@context': 'https://schema.org';
   '@type': 'Dataset';
@@ -371,8 +335,6 @@ export type SchemaType =
   | FinancialServiceSchema
   | HowToSchema
   | PersonSchema
-  | ReviewSchema
-  | ServiceSchema
   | DatasetSchema
   | SalaryCalculationSchema;
 
@@ -425,12 +387,23 @@ const CALCULATOR_DATA: SoftwareApplicationSchema = {
 };
 
 // Financial service data for enhanced AI discovery
+const CURRENT_TAX_YEAR_LONG = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: false,
+});
+const CURRENT_TAX_YEAR_SHORT = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
+const PREVIOUS_TAX_YEAR_LONG = TAX_YEARS[1]
+  ? formatTaxYearDisplay(TAX_YEARS[1], { separator: '-', shortEndYear: false })
+  : CURRENT_TAX_YEAR_LONG;
+
 const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
   '@context': 'https://schema.org',
   '@type': 'FinancialService',
   name: 'PayeTax UK Tax Calculator',
-  description:
-    'Free UK PAYE tax calculator with official HMRC rates for 2025-2026. Calculate income tax, National Insurance, student loan repayments, and pension contributions instantly.',
+  description: `Free UK PAYE tax calculator with official HMRC rates for ${CURRENT_TAX_YEAR_LONG}. Calculate income tax, National Insurance, student loan repayments, and pension contributions instantly.`,
   provider: {
     '@type': 'Organization',
     name: 'PayeTax',
@@ -498,7 +471,7 @@ const HOW_TO_DATA: HowToSchema = {
     {
       '@type': 'HowToStep',
       name: 'Select Tax Year',
-      text: 'Choose the appropriate tax year (2024-2025 or 2025-2026). Each tax year has different rates and thresholds.',
+      text: `Choose the appropriate tax year (${PREVIOUS_TAX_YEAR_LONG} or ${CURRENT_TAX_YEAR_LONG}). Each tax year has different rates and thresholds.`,
     },
     {
       '@type': 'HowToStep',
@@ -556,7 +529,7 @@ function generateDatasetData(): DatasetSchema {
       url: SITE_URL,
     },
     keywords: [
-      'UK tax rates 2025',
+      `UK tax rates ${safeStartYear}`,
       'PAYE calculator',
       'National Insurance rates',
       'HMRC tax bands',
@@ -650,8 +623,6 @@ export interface StructuredDataProps {
     | 'financialservice'
     | 'howto'
     | 'person'
-    | 'review'
-    | 'service'
     | 'dataset'
     | 'salarycalculation';
   /** Optional custom schema data that overrides defaults */
@@ -705,20 +676,6 @@ export interface StructuredDataProps {
     }>;
     expertise?: string[];
   };
-  /** Review data */
-  review?: {
-    rating: number;
-    author: string;
-    content: string;
-    datePublished: string;
-  };
-  /** Service data */
-  service?: {
-    name: string;
-    description: string;
-    serviceType: string;
-    areaServed: string[];
-  };
   /** Salary calculation data for programmatic salary pages */
   salaryData?: {
     salary: number;
@@ -747,8 +704,6 @@ export function StructuredData({
   faqs,
   articleData,
   expert,
-  review,
-  service,
   salaryData,
 }: StructuredDataProps): React.ReactNode {
   // Determine the data to include based on the type
@@ -840,7 +795,7 @@ export function StructuredData({
           // Use Organization for editorial team, Person for named authors
           '@type': articleData.authorName === 'PayeTax Editorial Team' ? 'Organization' : 'Person',
           name: articleData.authorName || 'PayeTax',
-          url: SITE_URL,
+          url: `${SITE_URL}/about`,
         },
         publisher: {
           '@type': 'Organization',
@@ -908,51 +863,6 @@ export function StructuredData({
       break;
     }
 
-    case 'review': {
-      if (!review) return null;
-
-      schemaData = {
-        '@context': 'https://schema.org',
-        '@type': 'Review',
-        itemReviewed: {
-          '@type': 'SoftwareApplication',
-          name: 'PayeTax UK Tax Calculator',
-        },
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: review.rating,
-          bestRating: 5,
-          worstRating: 1,
-        },
-        author: {
-          '@type': 'Person',
-          name: review.author,
-        },
-        reviewBody: review.content,
-        datePublished: review.datePublished,
-      } as ReviewSchema;
-      break;
-    }
-
-    case 'service': {
-      if (!service) return null;
-
-      schemaData = {
-        '@context': 'https://schema.org',
-        '@type': 'Service',
-        name: service.name,
-        description: service.description,
-        provider: {
-          '@type': 'Organization',
-          name: 'PayeTax',
-          url: SITE_URL,
-        },
-        serviceType: service.serviceType,
-        areaServed: service.areaServed,
-      } as ServiceSchema;
-      break;
-    }
-
     case 'dataset':
       schemaData = (data as DatasetSchema) || generateDatasetData();
       break;
@@ -965,7 +875,7 @@ export function StructuredData({
       schemaData = {
         '@context': 'https://schema.org',
         '@type': 'WebPage',
-        name: `£${formattedSalary} After Tax UK 2025-26`,
+        name: `£${formattedSalary} After Tax UK ${CURRENT_TAX_YEAR_SHORT}`,
         description: `Calculate take-home pay from a £${formattedSalary} salary in the UK. Income tax: £${salaryData.incomeTax.toLocaleString('en-GB')}, NI: £${salaryData.nationalInsurance.toLocaleString('en-GB')}, Net pay: £${salaryData.netPay.toLocaleString('en-GB')} per year.`,
         url: salaryData.url,
         mainEntity: {
@@ -982,26 +892,26 @@ export function StructuredData({
         about: {
           '@type': 'MonetaryAmount',
           currency: 'GBP',
-          value: salaryData.salary,
+          value: roundCurrencyValue(salaryData.salary),
           name: 'Gross Annual Salary',
         },
         mentions: [
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: salaryData.netPay,
+            value: roundCurrencyValue(salaryData.netPay),
             name: 'Annual Take-Home Pay',
           },
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: salaryData.incomeTax,
+            value: roundCurrencyValue(salaryData.incomeTax),
             name: 'Annual Income Tax',
           },
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: salaryData.nationalInsurance,
+            value: roundCurrencyValue(salaryData.nationalInsurance),
             name: 'Annual National Insurance',
           },
         ],

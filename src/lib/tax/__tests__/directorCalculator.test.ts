@@ -46,7 +46,7 @@ describe('Director Calculator', () => {
 
         if (isNormalMode(result)) {
           expect(result.salary).toBe(DEFAULT_SALARY);
-          expect(result.monthlySalary).toBeCloseTo(1047.5, 1);
+          expect(result.monthlySalary).toBeCloseTo(1047.5, 2);
         }
       });
 
@@ -360,10 +360,10 @@ describe('Director Calculator', () => {
 
           // Extraction amounts
           expect(result.salary).toBe(12570);
-          expect(result.employerNI).toBeCloseTo(1135.5, 1);
+          expect(result.employerNI).toBeCloseTo(1135.5, 2);
 
           // Taxable profit = 100000 - 12570 - 1135.5 = 86294.5
-          expect(result.taxableProfit).toBeCloseTo(86294.5, 1);
+          expect(result.taxableProfit).toBeCloseTo(86294.5, 2);
 
           // Corporation Tax (marginal relief applies)
           expect(result.corporationTax).toBeGreaterThan(15000);
