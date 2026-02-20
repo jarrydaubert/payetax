@@ -145,10 +145,10 @@ describe('Tax Calculator', () => {
       expect(result.grossSalary.annually).toBe(30000);
 
       // Income tax: (£30,000 - £12,570) × 20% = £17,430 × 20% = £3,486
-      expect(result.incomeTax.annually).toBeCloseTo(3486, 0);
+      expect(result.incomeTax.annually).toBeCloseTo(3486, 2);
 
       // National Insurance: (£30,000 - £12,570) × 8% = £17,430 × 8% = £1,394.40
-      expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 0);
+      expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
 
       // Net pay should be positive and less than gross
       expect(result.netPay.annually).toBeLessThan(30000);
@@ -183,11 +183,11 @@ describe('Tax Calculator', () => {
       // Validate gross salary preservation
       expect(result.grossSalary.annually).toBe(60000);
 
-      // Income tax: £7,540 (basic rate) + £3,892 (higher rate) = £11,432
-      expect(result.incomeTax.annually).toBeCloseTo(11432, 0);
+      // Annualized from monthly HMRC-style rounding = £11,432.04
+      expect(result.incomeTax.annually).toBeCloseTo(11432.04, 2);
 
       // National Insurance: £37,700 × 8% + £9,730 × 2% = £3,016 + £194.60 = £3,210.60
-      expect(result.nationalInsurance.annually).toBeCloseTo(3210.6, 1);
+      expect(result.nationalInsurance.annually).toBeCloseTo(3210.6, 2);
 
       // Net pay validation
       expect(result.netPay.annually).toBeLessThan(60000);
@@ -486,7 +486,7 @@ describe('Tax Calculator', () => {
       const input = createBasicInput(testAnnualSalary, { payPeriod: 'annually' });
       const result = calculateTax(input);
 
-      expect(result.grossSalary.monthly).toBeCloseTo(3000, 0); // £36,000 / 12 = £3,000
+      expect(result.grossSalary.monthly).toBeCloseTo(3000, 2); // £36,000 / 12 = £3,000
       expect(result.grossSalary.annually).toBe(testAnnualSalary);
       expect(result.netPay.monthly).toBeLessThan(result.grossSalary.monthly);
     });
@@ -496,7 +496,7 @@ describe('Tax Calculator', () => {
       const input = createBasicInput(testAnnualSalary, { payPeriod: 'annually' });
       const result = calculateTax(input);
 
-      expect(result.grossSalary.weekly).toBeCloseTo(692.31, 0); // £36,000 / 52 = £692.31
+      expect(result.grossSalary.weekly).toBeCloseTo(692.31, 2); // £36,000 / 52 = £692.31
       expect(result.grossSalary.annually).toBe(testAnnualSalary);
       expect(result.netPay.weekly).toBeLessThan(result.grossSalary.weekly);
     });
@@ -507,8 +507,8 @@ describe('Tax Calculator', () => {
       const input = createBasicInput(monthlySalary, { payPeriod: 'monthly' });
       const result = calculateTax(input);
 
-      expect(result.grossSalary.monthly).toBeCloseTo(3000, 0);
-      expect(result.grossSalary.annually).toBeCloseTo(36000, 0); // 3000 × 12
+      expect(result.grossSalary.monthly).toBeCloseTo(3000, 2);
+      expect(result.grossSalary.annually).toBeCloseTo(36000, 2); // 3000 × 12
       expect(result.netPay.monthly).toBeLessThan(result.grossSalary.monthly);
     });
   });
@@ -567,11 +567,11 @@ describe('Tax Calculator', () => {
       const result = calculateTax(input);
 
       // Annual should equal monthly * 12 (approximately due to rounding)
-      expect(result.grossSalary.monthly * 12).toBeCloseTo(result.grossSalary.annually, 0);
-      expect(result.incomeTax.monthly * 12).toBeCloseTo(result.incomeTax.annually, 1);
+      expect(result.grossSalary.monthly * 12).toBeCloseTo(result.grossSalary.annually, 2);
+      expect(result.incomeTax.monthly * 12).toBeCloseTo(result.incomeTax.annually, 2);
 
       // Weekly should equal annual / 52 (approximately)
-      expect(result.grossSalary.annually / 52).toBeCloseTo(result.grossSalary.weekly, 1);
+      expect(result.grossSalary.annually / 52).toBeCloseTo(result.grossSalary.weekly, 2);
     });
   });
 
@@ -593,7 +593,7 @@ describe('Tax Calculator', () => {
       expect(resultWith.taxFreeAmount).toBe(resultWithout.taxFreeAmount + 1260);
 
       // This should result in £252 less tax (£1,260 at 20% basic rate)
-      expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(252, 0);
+      expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(252, 2);
     });
 
     it('does NOT apply marriage allowance if partner earns MORE than personal allowance', () => {
@@ -660,8 +660,11 @@ describe('Tax Calculator', () => {
       // Should add £3,070 (2024-25) to tax-free allowance
       expect(resultWith.taxFreeAmount).toBe(resultWithout.taxFreeAmount + 3070);
 
-      // This should result in £614 less tax (£3,070 at 20% basic rate)
-      expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(614, 0);
+      // Annualized from monthly HMRC-style rounding = £614.04 less tax
+      expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(
+        614.04,
+        2,
+      );
     });
 
     it('applies blind persons allowance even for high earners', () => {
@@ -795,7 +798,7 @@ describe('Tax Calculator', () => {
       // With £80,000 income:
       // Taxable: £80,000 - £12,570 = £67,430
       // Advanced rate applies to income £62,431-£67,430 = £5,000
-      expect(advancedBand?.amount).toBeCloseTo(5000, 0);
+      expect(advancedBand?.amount).toBeCloseTo(5000, 2);
     });
 
     it('does not apply Advanced rate for income below £75,000', () => {
@@ -825,7 +828,7 @@ describe('Tax Calculator', () => {
       // Taxable: £150,000 - £0 PA = £150,000
       // Top rate applies to taxable income above £112,570
       // Amount in top band: £150,000 - £112,570 = £37,430
-      expect(topBand?.amount).toBeCloseTo(37430, 0);
+      expect(topBand?.amount).toBeCloseTo(37430, 2);
     });
   });
 
@@ -955,6 +958,41 @@ describe('Tax Calculator', () => {
       // Should handle gracefully - exact behavior depends on implementation
       expect(typeof result.incomeTax.annually).toBe('number');
       expect(typeof result.nationalInsurance.annually).toBe('number');
+    });
+
+    it('sanitizes NaN salary to safe finite outputs', () => {
+      const input = createBasicInput(Number.NaN);
+      const result = calculateTax(input);
+
+      expect(result.grossSalary.annually).toBe(0);
+      expect(result.incomeTax.annually).toBe(0);
+      expect(result.nationalInsurance.annually).toBe(0);
+      expect(result.netPay.annually).toBe(0);
+    });
+
+    it('sanitizes Infinity salaries to safe finite outputs', () => {
+      const positiveInfinityResult = calculateTax(createBasicInput(Number.POSITIVE_INFINITY));
+      const negativeInfinityResult = calculateTax(createBasicInput(Number.NEGATIVE_INFINITY));
+
+      for (const result of [positiveInfinityResult, negativeInfinityResult]) {
+        expect(result.grossSalary.annually).toBe(0);
+        expect(result.incomeTax.annually).toBe(0);
+        expect(result.nationalInsurance.annually).toBe(0);
+        expect(result.netPay.annually).toBe(0);
+      }
+    });
+
+    it('falls back to default tax code for empty or undefined taxCode input', () => {
+      const emptyCode = calculateTax(createBasicInput(30000, { taxCode: '' }));
+      const undefinedCode = calculateTax(
+        createBasicInput(30000, { taxCode: undefined as unknown as string }),
+      );
+      const baseline = calculateTax(createBasicInput(30000, { taxCode: '1257L' }));
+
+      expect(emptyCode.taxFreeAmount).toBe(baseline.taxFreeAmount);
+      expect(undefinedCode.taxFreeAmount).toBe(baseline.taxFreeAmount);
+      expect(emptyCode.incomeTax.annually).toBeCloseTo(baseline.incomeTax.annually, 2);
+      expect(undefinedCode.incomeTax.annually).toBeCloseTo(baseline.incomeTax.annually, 2);
     });
 
     it('handles very high salary', () => {

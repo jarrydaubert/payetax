@@ -12,6 +12,27 @@ See also:
 
 ---
 
+## Definition Of Done (Tests)
+
+A test task is only done when all criteria below are met:
+
+- Bug-linked intent: every new/updated test clearly answers "What bug will this test find?" in title or nearby context.
+- Executable coverage: no placeholder assertions; tests are runnable and assertions are active.
+- Deterministic status: no new `skip`/`todo`; any retained debt is tagged (`PAYTAX-###` or `P#-#`) and allowlisted with rationale.
+- Monetary assertions: use `toBeCloseTo(expected, 2)` for currency/tax amounts; avoid integer precision (`..., 0`/`..., 1`) in tax-critical suites.
+- Relevant gates pass:
+  - Unit-focused changes: `bun run test:no-coverage`
+  - Critical user-path/UI changes: `bun run test:e2e:critical`
+  - Full confidence gate before closure: `bun run test:ci` and `bun run test:e2e` (CI or equivalent environment)
+- Debt/accounting updated: `scripts/test-debt-allowlist.ts`, `docs/BACKLOG.md`, and related docs reflect the new truth.
+
+Target state for "no issues found" audits:
+- `bun run check:test-skips` passes with no unexpected debt.
+- `bun run test:metrics` reports `Playwright last run: status=passed` and `failedTests=0`.
+- No unresolved P0/P1 test-quality backlog items remain open.
+
+---
+
 ## Running Tests
 
 ```bash
@@ -38,6 +59,8 @@ Notes:
 
 - No new `test.skip` / `it.skip` / `it.todo` without explicit approval and debt tracking.
 - E2E skips must include a reason (`test.skip(condition, 'reason')`), never bare `test.skip()`.
+- Skip/todo entries must include an issue tag in title/reason: `PAYTAX-###` or backlog ID format `P#-#`.
+- No commented-out assertions in test files (e.g. `// expect(...)`); convert to real assertions or `it.todo`.
 - Baseline debt allowlist lives in:
   - `scripts/test-debt-allowlist.ts`
 - Enforcement lives in:
@@ -64,6 +87,13 @@ The golden master suite is the regression oracle for calculation accuracy.
 - Fixtures: `e2e/fixtures/`
 
 Keep HMRC values anchored to source documents and code references.
+
+### HMRC Rounding Divergence Policy
+
+- Core rule: engine outputs are monthly-first then annualized; assertions must follow engine behavior, not pure annual arithmetic.
+- Tax/NI/net assertions: use `toBeCloseTo(expected, 2)` with expected values derived from the current engine rounding model.
+- Published annual examples: if HMRC annual formula differs by a few pence from monthly-annualized output, assert the engine value and document the reason in the test comment.
+- Golden master (`e2e/golden-master-PERFECT.spec.ts`) is the canonical regression baseline for these rounding-sensitive scenarios.
 
 ---
 

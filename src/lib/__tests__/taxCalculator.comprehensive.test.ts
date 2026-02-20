@@ -76,9 +76,10 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           payPeriod: 'weekly',
         }),
       );
-      expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
-      expect(result.grossSalary.monthly).toBeCloseTo(2500, 0);
-      expect(result.grossSalary.weekly).toBe(576.92);
+      // 576.92 x 52 = 29,999.84
+      expect(result.grossSalary.annually).toBeCloseTo(29999.84, 2);
+      expect(result.grossSalary.monthly).toBeCloseTo(2499.99, 2);
+      expect(result.grossSalary.weekly).toBeCloseTo(576.92, 2);
     });
 
     it('handles FORTNIGHTLY salary input correctly', () => {
@@ -88,8 +89,9 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           payPeriod: 'fortnightly',
         }),
       );
-      expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
-      expect(result.grossSalary.fortnightly).toBe(1153.85);
+      // 1,153.85 x 26 = 30,000.10
+      expect(result.grossSalary.annually).toBeCloseTo(30000.1, 2);
+      expect(result.grossSalary.fortnightly).toBeCloseTo(1153.85, 2);
     });
 
     it('handles FOUR-WEEKLY salary input correctly', () => {
@@ -99,8 +101,9 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           payPeriod: 'fourWeekly',
         }),
       );
-      expect(result.grossSalary.annually).toBeCloseTo(30000, 0);
-      expect(result.grossSalary.fourWeekly).toBe(2307.69);
+      // 2,307.69 x 13 = 29,999.97
+      expect(result.grossSalary.annually).toBeCloseTo(29999.97, 2);
+      expect(result.grossSalary.fourWeekly).toBeCloseTo(2307.69, 2);
     });
 
     it('handles DAILY salary input correctly', () => {
@@ -111,8 +114,8 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         }),
       );
       // 260 working days per year (115.38 × 260 = 29,998.8)
-      expect(result.grossSalary.annually).toBeCloseTo(29998.8, 0);
-      expect(result.grossSalary.daily).toBe(115.38);
+      expect(result.grossSalary.annually).toBeCloseTo(29998.8, 2);
+      expect(result.grossSalary.daily).toBeCloseTo(115.38, 2);
     });
 
     it('handles HOURLY salary input correctly', () => {
@@ -124,8 +127,8 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         }),
       );
       // 15.38 × 37.5 × 52 = 29,991
-      expect(result.grossSalary.annually).toBeCloseTo(29991, 0);
-      expect(result.grossSalary.hourly).toBe(15.38);
+      expect(result.grossSalary.annually).toBeCloseTo(29991, 2);
+      expect(result.grossSalary.hourly).toBeCloseTo(15.38, 2);
     });
 
     it('handles HOURLY with custom hours per week', () => {
@@ -137,7 +140,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         }),
       );
       // 20 × 40 × 52 = 41,600
-      expect(result.grossSalary.annually).toBeCloseTo(41600, 0);
+      expect(result.grossSalary.annually).toBeCloseTo(41600, 2);
     });
 
     it('handles HOURLY with zero hours (should default to 40)', () => {
@@ -148,8 +151,8 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           hoursPerWeek: 0,
         }),
       );
-      // With 0 hours, hourly calculation gives 0 annual salary
-      expect(result.grossSalary.annually).toBe(0);
+      // Defensive normalization defaults to 40h/week.
+      expect(result.grossSalary.annually).toBeCloseTo(41600, 2);
     });
   });
 
@@ -169,11 +172,11 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         switch (category) {
           case 'A':
             // Standard: 8% on £12,570-£50,270
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 1);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
             break;
           case 'B':
             // Married woman/widow: 5% on £12,570-£50,270
-            expect(result.nationalInsurance.annually).toBeCloseTo(871.5, 0);
+            expect(result.nationalInsurance.annually).toBeCloseTo(871.56, 2);
             break;
           case 'C':
             // Over state pension age: 0%
@@ -181,19 +184,19 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
             break;
           case 'H':
             // Apprentice under 25: 8% (same as A)
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 1);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
             break;
           case 'J':
             // Deferment: 2% on all earnings above £12,570
-            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 1);
+            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 2);
             break;
           case 'M':
             // Under 21: 8% (same as A)
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 1);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
             break;
           case 'Z':
             // Under 21 deferment: 2% (same as J)
-            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 1);
+            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 2);
             break;
         }
       });
@@ -236,8 +239,10 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           }),
         );
 
-        const expectedRepayment = Math.max(0, (salary - threshold) * (rate / 100));
-        expect(result.studentLoan.annually).toBeCloseTo(expectedRepayment, 0);
+        // Engine rounds monthly repayment to pence before annualizing.
+        const expectedRepayment =
+          Math.round((((salary - threshold) * (rate / 100)) / 12) * 100) / 100;
+        expect(result.studentLoan.annually).toBeCloseTo(expectedRepayment * 12, 2);
       });
     });
 
@@ -259,17 +264,18 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         }),
       );
       // (£100,000 - £21,000) × 6% = £4,740
-      expect(result.studentLoan.annually).toBeCloseTo(4740, 0);
+      expect(result.studentLoan.annually).toBeCloseTo(4740, 2);
     });
   });
 
   describe('Input Validation and Error Handling', () => {
     it('handles negative salary gracefully', () => {
       const result = calculateTax(createInput({ salary: -1000 }));
-      expect(result.grossSalary.annually).toBe(-1000);
+      // Core engine normalizes non-positive values to zero.
+      expect(result.grossSalary.annually).toBe(0);
       expect(result.incomeTax.annually).toBe(0);
       expect(result.nationalInsurance.annually).toBe(0);
-      expect(result.netPay.annually).toBe(-1000);
+      expect(result.netPay.annually).toBe(0);
     });
 
     it('handles zero salary', () => {
@@ -289,7 +295,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
     it('handles decimal salary amounts', () => {
       const result = calculateTax(createInput({ salary: 30000.5 }));
-      expect(result.grossSalary.annually).toBe(30000.5);
+      expect(result.grossSalary.annually).toBeCloseTo(30000.5, 2);
     });
 
     it('handles invalid tax code gracefully', () => {
@@ -512,7 +518,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       );
 
       // £12 × 20 × 52 = £12,480 annually
-      expect(result.grossSalary.annually).toBeCloseTo(12480, 0);
+      expect(result.grossSalary.annually).toBeCloseTo(12480, 2);
       // Below PA, so no tax
       expect(result.incomeTax.annually).toBe(0);
       // No NI below threshold
@@ -525,27 +531,27 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
   describe('Boundary Testing', () => {
     it('exactly at personal allowance', () => {
       const result = calculateTax(createInput({ salary: 12570 }));
-      expect(result.taxableIncome).toBeCloseTo(0, 0);
+      expect(result.taxableIncome).toBeCloseTo(0, 2);
       expect(result.incomeTax.annually).toBe(0);
       expect(result.nationalInsurance.annually).toBe(0);
     });
 
     it('£1 over personal allowance', () => {
       const result = calculateTax(createInput({ salary: 12571 }));
-      expect(result.taxableIncome).toBeCloseTo(1, 0);
+      expect(result.taxableIncome).toBeCloseTo(1, 2);
       // Monthly calculation may round differently
-      expect(result.incomeTax.annually).toBeCloseTo(0.2, 1); // ~20p tax
-      expect(result.nationalInsurance.annually).toBeCloseTo(0.08, 1); // ~8p NI
+      expect(result.incomeTax.annually).toBeCloseTo(0.24, 2); // ~24p annualized from monthly rounding
+      expect(result.nationalInsurance.annually).toBeCloseTo(0.12, 2); // ~12p annualized from monthly rounding
     });
 
     it('exactly at higher rate threshold', () => {
       const result = calculateTax(createInput({ salary: 50270 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7540, 0);
+      expect(result.incomeTax.annually).toBeCloseTo(7539.96, 2);
     });
 
     it('£1 into higher rate', () => {
       const result = calculateTax(createInput({ salary: 50271 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7540.4, 1); // Extra 40p
+      expect(result.incomeTax.annually).toBeCloseTo(7540.44, 2); // Extra 44p annualized from monthly rounding
     });
 
     it('exactly at additional rate threshold', () => {
@@ -585,7 +591,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         // NI rates differ between years
         if (year === '2025-2026') {
           // 8% rate for 2025-26
-          expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 1);
+          expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
         }
       });
     });
@@ -603,7 +609,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       );
 
       // £10.42 × 37.5 × 52 = £20,319
-      expect(result.grossSalary.annually).toBeCloseTo(20319, 0);
+      expect(result.grossSalary.annually).toBeCloseTo(20319, 2);
       // Should pay some tax and NI
       expect(result.incomeTax.annually).toBeGreaterThan(0);
       expect(result.nationalInsurance.annually).toBeGreaterThan(0);
@@ -620,7 +626,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       );
 
       // £13.15 × 40 × 52 = £27,352
-      expect(result.grossSalary.annually).toBeCloseTo(27352, 0);
+      expect(result.grossSalary.annually).toBeCloseTo(27352, 2);
     });
 
     it('average UK salary', () => {
@@ -666,7 +672,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       // £11.50 × 25 × 52 = £14,950
       expect(result.grossSalary.annually).toBe(14950);
       // Just above PA, minimal tax
-      expect(result.incomeTax.annually).toBeCloseTo((14950 - 12570) * 0.2, 0);
+      expect(result.incomeTax.annually).toBeCloseTo(476.04, 2);
     });
   });
 });
