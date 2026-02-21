@@ -17,8 +17,6 @@ const CONTENT_ANIMATION = cn(
   'data-[state=closed]:animate-out data-[state=open]:animate-in',
   'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
   'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-  'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
-  'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
 );
 
 /**
@@ -33,7 +31,7 @@ const DialogOverlay = forwardRef<
     className={cn(
       'fixed inset-0 z-50 bg-black/80',
       // Reduced motion: disable animations
-      'motion-safe:duration-200',
+      'motion-safe:duration-300',
       OVERLAY_ANIMATION,
       className,
     )}
@@ -63,7 +61,7 @@ const DialogContent = forwardRef<
         // Size and layout
         'grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
         // Reduced motion: disable animations
-        'motion-safe:duration-200',
+        'motion-safe:duration-300',
         CONTENT_ANIMATION,
         className,
       )}

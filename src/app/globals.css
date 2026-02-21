@@ -485,7 +485,27 @@
   white-space: nowrap;
 }
 
+.footer-link-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 0.3s;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 .footer-links-new a:hover {
+  color: var(--brand-cyan);
+}
+
+.footer-link-button:hover {
   color: var(--brand-cyan);
 }
 

@@ -1,4 +1,3 @@
-// src/components/organisms/CookieBanner.tsx
 'use client';
 
 import { Cookie } from 'lucide-react';
@@ -6,138 +5,274 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { clearCookieConsent, getCookieConsent, isConsentExpired } from '@/lib/cookieUtils';
-import { safeSetItem } from '@/lib/safeStorage';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
+import type { ConsentPreferences } from '@/lib/cookieUtils';
+import {
+  clearCookieConsent,
+  getConsentPreferences,
+  isConsentExpired,
+  setConsentPreferences,
+} from '@/lib/cookieUtils';
 import { cn } from '@/lib/utils';
 
-/**
- * Persist consent choice and notify listeners
- * Analytics.tsx listens to this event to update gtag consent
- */
-function persistConsent(value: 'accepted' | 'declined'): void {
-  safeSetItem('cookie-consent', value);
-  safeSetItem('cookie-consent-timestamp', new Date().toISOString());
-  // Notify Analytics.tsx and other listeners (storage event only fires in other tabs)
-  document.dispatchEvent(new Event('cookieConsentUpdated'));
+const CONSENT_UPDATED_EVENT = 'cookieConsentUpdated';
+const OPEN_PREFERENCES_EVENT = 'openCookiePreferences';
+
+function notifyConsentUpdated(): void {
+  document.dispatchEvent(new Event(CONSENT_UPDATED_EVENT));
 }
 
 const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const [showReopenButton, setShowReopenButton] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [analyticsDraft, setAnalyticsDraft] = useState(false);
+
+  const loadCurrentPreferences = useCallback((): ConsentPreferences | null => {
+    const consent = getConsentPreferences();
+    setAnalyticsDraft(consent?.analytics ?? false);
+    return consent;
+  }, []);
 
   useEffect(() => {
-    // SSR guard
-    if (typeof window === 'undefined') return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
-    try {
-      const consent = getCookieConsent();
-      const expired = isConsentExpired();
+    const initialize = () => {
+      try {
+        const expired = isConsentExpired();
+        if (expired) {
+          clearCookieConsent();
+        }
 
-      // If consent expired, clear stored values and treat as no consent
-      if (expired) {
-        clearCookieConsent();
+        const existing = loadCurrentPreferences();
+        const hasDecision = Boolean(existing);
+
+        if (hasDecision) {
+          setShowBanner(false);
+          setShowReopenButton(true);
+          return;
+        }
+
+        timer = setTimeout(() => setShowBanner(true), 500);
+        setShowReopenButton(false);
+      } catch {
+        timer = setTimeout(() => setShowBanner(true), 500);
+        setShowReopenButton(false);
       }
+    };
 
-      // Show banner if no consent or expired (short delay to avoid hydration flash)
-      if (consent === null || expired) {
-        const timer = setTimeout(() => setShowBanner(true), 500);
-        return () => clearTimeout(timer);
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn('Failed to check cookie consent status:', error);
-      }
-      // Fallback: show banner if localStorage fails
-      const timer = setTimeout(() => setShowBanner(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const acceptCookies = useCallback(() => {
-    try {
-      persistConsent('accepted');
-    } catch (error) {
-      console.error('Failed to accept cookies:', error);
-    } finally {
-      // Always hide banner to prevent it from being stuck
+    const handleOpenPreferences = () => {
+      loadCurrentPreferences();
       setShowBanner(false);
-    }
+      setModalOpen(true);
+    };
+
+    initialize();
+    document.addEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      document.removeEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+    };
+  }, [loadCurrentPreferences]);
+
+  const applyPreferences = useCallback((preferences: ConsentPreferences) => {
+    setConsentPreferences(preferences);
+    setAnalyticsDraft(preferences.analytics);
+    setModalOpen(false);
+    setShowBanner(false);
+    setShowReopenButton(true);
+    notifyConsentUpdated();
   }, []);
 
-  const declineCookies = useCallback(() => {
-    try {
-      persistConsent('declined');
-    } catch (error) {
-      console.error('Failed to decline cookies:', error);
-    } finally {
-      // Always hide banner to prevent it from being stuck
-      setShowBanner(false);
+  const handleAcceptAll = useCallback(() => {
+    applyPreferences({ analytics: true });
+  }, [applyPreferences]);
+
+  const handleRejectAll = useCallback(() => {
+    applyPreferences({ analytics: false });
+  }, [applyPreferences]);
+
+  const handleSavePreferences = useCallback(() => {
+    applyPreferences({ analytics: analyticsDraft });
+  }, [analyticsDraft, applyPreferences]);
+
+  const handleManageFromBanner = useCallback(() => {
+    loadCurrentPreferences();
+    setShowBanner(false);
+    setModalOpen(true);
+  }, [loadCurrentPreferences]);
+
+  const handleModalOpenChange = useCallback((open: boolean) => {
+    setModalOpen(open);
+    if (!(open || getConsentPreferences())) {
+      setShowBanner(true);
     }
   }, []);
-
-  if (!showBanner) {
-    return null;
-  }
 
   return (
-    <div
-      className={cn(
-        'safe-bottom pointer-events-none fixed inset-x-0 z-40 flex justify-center',
-        SPACING.P_2,
-        'sm:p-4',
+    <>
+      {showBanner && (
+        <div className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'>
+          <Card className='motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 border-border/70 bg-card/95 shadow-2xl backdrop-blur-xl motion-safe:animate-in'>
+            <CardContent className='p-4'>
+              <div className='mb-3 flex items-start gap-3'>
+                <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/12'>
+                  <Cookie className='size-4 text-primary' aria-hidden='true' />
+                </div>
+                <div className='min-w-0'>
+                  <h2 className='font-semibold text-foreground text-sm'>Cookie Preferences</h2>
+                  <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
+                    We use analytics cookies to improve PayeTax. Essential storage for your consent
+                    choice is always active. Read our{' '}
+                    <Link
+                      href='/privacy'
+                      className='font-medium text-primary underline-offset-2 hover:underline'
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className='flex flex-col gap-2 px-4 pt-0 pb-4'>
+              <div className='grid w-full grid-cols-2 gap-2'>
+                <Button
+                  onClick={handleRejectAll}
+                  variant='outline'
+                  size='touch'
+                  className='w-full'
+                  data-testid='cookie-reject-all'
+                >
+                  Essential Only
+                </Button>
+                <Button
+                  onClick={handleAcceptAll}
+                  variant='default'
+                  size='touch'
+                  className='w-full'
+                  data-testid='cookie-accept-all'
+                >
+                  Accept All
+                </Button>
+              </div>
+              <Button
+                onClick={handleManageFromBanner}
+                variant='ghost'
+                size='sm'
+                className='h-auto py-1 text-xs'
+                data-testid='cookie-manage-preferences'
+              >
+                Manage Preferences
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       )}
-    >
-      <Card className='pointer-events-auto w-full max-w-2xl border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
-        <CardContent className={cn('pointer-events-auto text-center', SPACING.P_4, 'sm:p-6')}>
-          <div className={cn('flex justify-center', SPACING.MB_4)}>
-            <div className='flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end'>
-              <Cookie className={`${ICON_SIZES.SIZE_6} text-white`} aria-hidden='true' />
-            </div>
-          </div>
-          <h2 className={cn('font-semibold text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}>
-            Cookie preferences
-          </h2>
-          <p className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_SM)}>
-            We use analytics cookies to understand how visitors use our site and improve your
-            experience. Essential cookies (to remember your choice) are always active. See our{' '}
-            <Link
-              href='/privacy'
-              className='font-medium text-primary underline-offset-2 hover:underline'
-            >
-              Privacy Policy
-            </Link>{' '}
-            for details.
-          </p>
-        </CardContent>
 
-        <CardFooter
+      {showReopenButton && !showBanner && !modalOpen && (
+        <Button
+          type='button'
+          variant='outline'
+          size='icon-touch'
+          onClick={() => {
+            loadCurrentPreferences();
+            setModalOpen(true);
+          }}
           className={cn(
-            'flex flex-col justify-center pt-0 sm:flex-row sm:p-6',
-            SPACING.GAP_2,
-            SPACING.P_4,
-            'sm:gap-3',
+            'safe-bottom fixed bottom-4 left-4 z-30 rounded-full border-border/80 bg-card/95 shadow-xl backdrop-blur-sm',
+            'hover:bg-accent',
           )}
+          aria-label='Manage cookie preferences'
+          data-testid='cookie-reopen-button'
         >
-          <Button
-            onClick={declineCookies}
-            variant='outline'
-            size='touch'
-            className='min-w-36 border-border/70 bg-background/80 hover:bg-background'
-          >
-            Essential Only
-          </Button>
-          <Button
-            onClick={acceptCookies}
-            variant='accentOutline'
-            size='touch'
-            className='min-w-36'
-            data-testid='cookie-accept-analytics'
-          >
-            Accept Analytics
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          <Cookie className='size-5 text-primary' aria-hidden='true' />
+        </Button>
+      )}
+
+      <Dialog open={modalOpen} onOpenChange={handleModalOpenChange}>
+        <DialogContent className='max-h-[90vh] max-w-3xl overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>Privacy Overview</DialogTitle>
+            <DialogDescription>
+              Choose which non-essential cookies you allow. Necessary storage remains always on.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4'>
+            <section className='rounded-lg border border-border/70 p-4'>
+              <div className='flex items-center justify-between gap-3'>
+                <div>
+                  <h3 className='font-semibold text-foreground text-sm'>Necessary</h3>
+                  <p className='mt-1 text-muted-foreground text-sm'>
+                    Required for core site operation and remembering your consent choice.
+                  </p>
+                </div>
+                <span className='rounded-full bg-muted px-2.5 py-1 font-medium text-muted-foreground text-xs'>
+                  Always on
+                </span>
+              </div>
+            </section>
+
+            <section className='rounded-lg border border-border/70 p-4'>
+              <div className='flex items-center justify-between gap-3'>
+                <div>
+                  <h3 className='font-semibold text-foreground text-sm'>Analytics</h3>
+                  <p className='mt-1 text-muted-foreground text-sm'>
+                    Helps us understand usage and improve journeys. Disabled by default until you
+                    opt in.
+                  </p>
+                </div>
+                <Switch
+                  checked={analyticsDraft}
+                  onCheckedChange={setAnalyticsDraft}
+                  aria-label='Enable analytics cookies'
+                />
+              </div>
+            </section>
+          </div>
+
+          <DialogFooter className='mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:space-x-0'>
+            <Button
+              type='button'
+              variant='outline'
+              size='touch'
+              onClick={handleRejectAll}
+              data-testid='cookie-modal-reject-all'
+            >
+              Reject All
+            </Button>
+            <Button
+              type='button'
+              variant='accentOutline'
+              size='touch'
+              onClick={handleSavePreferences}
+              data-testid='cookie-modal-save'
+            >
+              Save Preferences
+            </Button>
+            <Button
+              type='button'
+              variant='default'
+              size='touch'
+              onClick={handleAcceptAll}
+              data-testid='cookie-modal-accept-all'
+            >
+              Accept All
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

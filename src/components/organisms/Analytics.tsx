@@ -180,9 +180,31 @@ export function Analytics() {
   useEffect(() => {
     if (!isLoaded) return;
 
+    const parseAnalyticsConsentValue = (value: string | null): boolean => {
+      if (value === 'accepted') return true;
+      if (value === 'declined') return false;
+      if (!value) return areCookiesAccepted();
+
+      try {
+        const parsed: unknown = JSON.parse(value);
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          'analytics' in parsed &&
+          typeof parsed.analytics === 'boolean'
+        ) {
+          return parsed.analytics;
+        }
+      } catch {
+        return areCookiesAccepted();
+      }
+
+      return areCookiesAccepted();
+    };
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cookie-consent') {
-        const newConsent = e.newValue === 'accepted';
+        const newConsent = parseAnalyticsConsentValue(e.newValue);
         if (window.consentMode) {
           window.consentMode.isConsentGiven = newConsent;
         }

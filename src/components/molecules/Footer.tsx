@@ -1,7 +1,9 @@
 // src/components/molecules/Footer.tsx
 // Simplified footer matching payetax-web design system
+'use client';
 
 import Link from 'next/link';
+import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -20,6 +22,10 @@ interface FooterProps {
 }
 
 export function Footer({ className }: FooterProps) {
+  const openCookiePreferences = useCallback(() => {
+    document.dispatchEvent(new Event('openCookiePreferences'));
+  }, []);
+
   return (
     <div className={cn('footer-new', className)}>
       <div className='footer-content-new'>
@@ -44,6 +50,9 @@ export function Footer({ className }: FooterProps) {
           <Link href='/install'>Install App</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
+          <button type='button' className='footer-link-button' onClick={openCookiePreferences}>
+            Cookie Settings
+          </button>
           <Link href='/compliance'>Compliance</Link>
           <a href='mailto:support@payetax.co.uk'>Support</a>
         </nav>

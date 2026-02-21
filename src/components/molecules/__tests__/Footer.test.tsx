@@ -1,7 +1,7 @@
 // src/components/molecules/__tests__/Footer.test.tsx
 // Tests for new simplified footer design (payetax-web design system)
 
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
 
 describe('Footer Component', () => {
@@ -70,6 +70,11 @@ describe('Footer Component', () => {
       const link = screen.getByRole('link', { name: /Privacy/i });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', '/privacy');
+    });
+
+    it('should render Cookie Settings button', () => {
+      render(<Footer />);
+      expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument();
     });
 
     it('should render Compliance link', () => {
@@ -173,6 +178,17 @@ describe('Footer Component', () => {
 
       const nav = screen.getByRole('navigation', { name: /footer/i });
       expect(nav).toBeInTheDocument();
+    });
+
+    it('dispatches openCookiePreferences when cookie settings is clicked', () => {
+      const listener = jest.fn();
+      document.addEventListener('openCookiePreferences', listener);
+
+      render(<Footer />);
+      fireEvent.click(screen.getByRole('button', { name: /Cookie Settings/i }));
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      document.removeEventListener('openCookiePreferences', listener);
     });
   });
 

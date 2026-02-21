@@ -1,25 +1,26 @@
-// src/components/organisms/__tests__/CookieBanner.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import * as cookieUtils from '@/lib/cookieUtils';
 import CookieBanner from '../CookieBanner';
 
-// Mock cookieUtils
 jest.mock('@/lib/cookieUtils', () => ({
-  getCookieConsent: jest.fn(() => null),
-  isConsentExpired: jest.fn(() => false),
+  clearCookieConsent: jest.fn(),
+  getConsentPreferences: jest.fn(),
+  isConsentExpired: jest.fn(),
+  setConsentPreferences: jest.fn(),
 }));
 
-// Mock Next.js Link
 jest.mock('next/link', () => {
   return ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
 });
 
-describe('CookieBanner Component', () => {
+describe('CookieBanner', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    localStorage.clear();
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
+    (cookieUtils.isConsentExpired as jest.Mock).mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -27,166 +28,78 @@ describe('CookieBanner Component', () => {
     jest.useRealTimers();
   });
 
-  describe('Initial Rendering', () => {
-    it('should render banner when consent not given', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+  it('renders compact banner when no consent exists', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      render(<CookieBanner />);
-
-      // Fast-forward timer to show banner
-      jest.advanceTimersByTime(1000);
-
-      await waitFor(() => {
-        expect(screen.getByText(/Cookie preferences/i)).toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.getByText(/Cookie Preferences/i)).toBeInTheDocument();
     });
 
-    it('should render accept and decline buttons', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+    expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Manage Preferences/i })).toBeInTheDocument();
+  });
 
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
+  it('stores accepted preferences from banner', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
-      });
-    });
+    const accept = await screen.findByRole('button', { name: /Accept All/i });
+    fireEvent.click(accept);
 
-    it('should not render when consent already given', () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue('accepted');
-      isConsentExpired.mockReturnValue(false);
-
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
-
-      expect(screen.queryByText(/Cookie preferences/i)).not.toBeInTheDocument();
+    expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: true });
+    await waitFor(() => {
+      expect(screen.queryByText(/Cookie Preferences/i)).not.toBeInTheDocument();
     });
   });
 
-  describe('Accept Button', () => {
-    it('should hide banner after accepting', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+  it('stores rejected preferences from banner', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
+    const reject = await screen.findByRole('button', { name: /Essential Only/i });
+    fireEvent.click(reject);
 
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
-      });
-
-      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
-      fireEvent.click(acceptButton);
-
-      await waitFor(() => {
-        expect(screen.queryByText(/Cookie preferences/i)).not.toBeInTheDocument();
-      });
-    });
-
-    it('should save consent to localStorage', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
-
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
-
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
-      });
-
-      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
-      fireEvent.click(acceptButton);
-
-      expect(localStorage.getItem('cookie-consent')).toBe('accepted');
-      expect(localStorage.getItem('cookie-consent-timestamp')).toBeTruthy();
-    });
+    expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: false });
   });
 
-  describe('Decline Button', () => {
-    it('should hide banner after declining', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+  it('opens centered modal from manage preferences and saves toggle state', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
+    fireEvent.click(await screen.findByRole('button', { name: /Manage Preferences/i }));
 
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
-      });
+    expect(await screen.findByText(/Privacy Overview/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Necessary' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Analytics' })).toBeInTheDocument();
 
-      const declineButton = screen.getByRole('button', { name: /Essential Only/i });
-      fireEvent.click(declineButton);
+    const toggle = screen.getByRole('switch', { name: /Enable analytics cookies/i });
+    fireEvent.click(toggle);
+    fireEvent.click(screen.getByRole('button', { name: /Save Preferences/i }));
 
-      await waitFor(() => {
-        expect(screen.queryByText(/Cookie preferences/i)).not.toBeInTheDocument();
-      });
-    });
-
-    it('should save declined consent to localStorage', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
-
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
-
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
-      });
-
-      const declineButton = screen.getByRole('button', { name: /Essential Only/i });
-      fireEvent.click(declineButton);
-
-      expect(localStorage.getItem('cookie-consent')).toBe('declined');
-      expect(localStorage.getItem('cookie-consent-timestamp')).toBeTruthy();
-    });
+    expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: true });
   });
 
-  describe('Privacy Policy Link', () => {
-    it('should render privacy policy link', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+  it('supports modal reject all action', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
+    fireEvent.click(await screen.findByRole('button', { name: /Manage Preferences/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /Reject All/i }));
 
-      await waitFor(() => {
-        expect(screen.getByRole('link', { name: /Privacy Policy/i })).toBeInTheDocument();
-      });
-
-      const link = screen.getByRole('link', { name: /Privacy Policy/i });
-      expect(link).toHaveAttribute('href', '/privacy');
-    });
+    expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: false });
   });
 
-  describe('Accessibility', () => {
-    it('should have proper button labels', async () => {
-      const { getCookieConsent, isConsentExpired } = require('@/lib/cookieUtils');
-      getCookieConsent.mockReturnValue(null);
-      isConsentExpired.mockReturnValue(false);
+  it('shows reopen control after existing consent and opens modal via custom event', async () => {
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
 
-      render(<CookieBanner />);
-      jest.advanceTimersByTime(1000);
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
 
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Accept Analytics/i })).toBeInTheDocument();
-      });
+    expect(screen.getByTestId('cookie-reopen-button')).toBeInTheDocument();
+    document.dispatchEvent(new Event('openCookiePreferences'));
 
-      const acceptButton = screen.getByRole('button', { name: /Accept Analytics/i });
-      const declineButton = screen.getByRole('button', { name: /Essential Only/i });
-
-      expect(acceptButton).toBeInTheDocument();
-      expect(declineButton).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Privacy Overview/i)).toBeInTheDocument();
   });
 });
