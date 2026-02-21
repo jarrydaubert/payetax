@@ -31,14 +31,14 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-6 max-w-[900px] font-bold font-display text-[clamp(3rem,10vw,5.5rem)] text-text-primary-new leading-[1.05] tracking-[-0.04em]'>
+      <h1 className='mx-auto mb-6 max-w-4xl font-bold font-display text-5xl text-text-primary-new leading-tight tracking-tight sm:text-6xl lg:text-7xl'>
         Free UK PAYE Tax Calculator
         <br />
         <span className='text-gradient-new'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
-      <p className='mx-auto mb-10 max-w-[580px] text-lg text-text-secondary-new leading-[1.8]'>
+      <p className='mx-auto mb-10 max-w-xl text-lg text-text-secondary-new leading-relaxed'>
         Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
         on HMRC rates; results can vary with payslip timing and deductions.
       </p>
@@ -63,13 +63,13 @@ export default function ServerHero({ className }: ServerHeroProps) {
         >
           <Link href='/tools'>
             Explore Tax Tools
-            <ChevronDown className='h-[18px] w-[18px]' />
+            <ChevronDown className='size-4' />
           </Link>
         </Button>
       </div>
 
       {/* Trust Strip */}
-      <div className='flex max-w-[900px] flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
+      <div className='flex max-w-4xl flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
           { icon: CheckCircle, text: 'Fast in-browser results' },
@@ -77,7 +77,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
           <div key={text} className='flex items-center gap-2 text-sm text-text-dim'>
-            <Icon aria-hidden='true' className='h-[18px] w-[18px] flex-shrink-0 text-emerald' />
+            <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-emerald' />
             <span>{text}</span>
           </div>
         ))}

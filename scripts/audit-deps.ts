@@ -59,6 +59,18 @@ function parseBunAuditJson(stdout: string): Advisory[] {
   return advisories;
 }
 
+function isAuditConnectivityFailure(output: string): boolean {
+  const normalized = output.toLowerCase();
+  return (
+    normalized.includes('connectionrefused') ||
+    normalized.includes('connection refused') ||
+    normalized.includes('econnrefused') ||
+    normalized.includes('audit request failed') ||
+    normalized.includes('enotfound') ||
+    normalized.includes('network')
+  );
+}
+
 function isAllowlisted(advisory: Advisory): boolean {
   if (!advisory.id) return false;
   return DEPENDENCY_ADVISORY_ALLOWLIST.some(
@@ -160,6 +172,7 @@ function main(): void {
 
   const stdout = result.stdout ?? '';
   const stderr = result.stderr ?? '';
+  const combinedOutput = [stdout, stderr].filter(Boolean).join('\n');
 
   if (stdout) process.stdout.write(stdout);
   if (stderr) process.stderr.write(stderr);
@@ -172,7 +185,18 @@ function main(): void {
   }
 
   if (advisories.length === 0) {
-    console.error('\n❌ Dependency audit failed and no machine-readable advisories were parsed.');
+    if (isAuditConnectivityFailure(combinedOutput)) {
+      console.error(
+        '\n❌ Dependency audit could not reach the Bun advisory service (network/connectivity issue).',
+      );
+      console.error(
+        '   Retry when connectivity is available; this is not a vulnerability finding.',
+      );
+      process.exit(1);
+    }
+    console.error(
+      '\n❌ Dependency audit failed and no machine-readable advisories were parsed (unexpected format/output).',
+    );
     process.exit(result.status ?? 1);
   }
 

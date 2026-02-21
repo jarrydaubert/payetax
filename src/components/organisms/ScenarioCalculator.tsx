@@ -144,10 +144,10 @@ export function ScenarioCalculator({
 
   // Category colors
   const categoryColors: Record<string, string> = {
-    'tax-trap': 'from-amber-500/10 to-orange-500/10',
-    'student-loan': 'from-blue-500/10 to-cyan-500/10',
-    scottish: 'from-purple-500/10 to-indigo-500/10',
-    'life-stage': 'from-green-500/10 to-emerald-500/10',
+    'tax-trap': 'from-warning/10 to-destructive/10',
+    'student-loan': 'from-primary/10 to-primary/5',
+    scottish: 'from-primary/10 to-muted/20',
+    'life-stage': 'from-success/10 to-primary/10',
   };
 
   return (
@@ -247,7 +247,7 @@ export function ScenarioCalculator({
             id={scottishId}
             checked={isScottish}
             onCheckedChange={setIsScottish}
-            className='data-[state=unchecked]:bg-white/20'
+            className='data-[state=unchecked]:bg-muted'
           />
         </div>
       </div>
@@ -316,8 +316,8 @@ function ResultItem({
         className={cn(
           TYPOGRAPHY.TEXT_BASE,
           'font-semibold',
-          negative && 'text-red-400/80',
-          highlight && 'text-green-400',
+          negative && 'text-destructive',
+          highlight && 'text-success',
         )}
       >
         {value}

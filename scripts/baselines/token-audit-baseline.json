@@ -1,0 +1,38 @@
+{
+  "createdAt": "2026-02-21T15:45:49.713Z",
+  "summary": {
+    "filesScanned": 292,
+    "totalViolations": 1063,
+    "typeCounts": {
+      "raw-palette-color": 911,
+      "hardcoded-class": 111,
+      "inline-style": 41
+    },
+    "surfaces": {
+      "director": {
+        "raw-palette-color": 320,
+        "hardcoded-class": 20,
+        "inline-style": 5,
+        "total": 345
+      },
+      "blog": {
+        "raw-palette-color": 120,
+        "hardcoded-class": 9,
+        "inline-style": 14,
+        "total": 143
+      },
+      "homecalc": {
+        "raw-palette-color": 41,
+        "hardcoded-class": 19,
+        "inline-style": 2,
+        "total": 62
+      },
+      "other": {
+        "raw-palette-color": 430,
+        "hardcoded-class": 63,
+        "inline-style": 20,
+        "total": 513
+      }
+    }
+  }
+}

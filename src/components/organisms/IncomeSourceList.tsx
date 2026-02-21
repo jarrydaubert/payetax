@@ -198,7 +198,7 @@ export function IncomeSourceList() {
                   }}
                 >
                   <SelectTrigger
-                    className={cn('h-9 w-[110px] border-input', TYPOGRAPHY.TEXT_SM)}
+                    className={cn('h-9 w-28 border-input', TYPOGRAPHY.TEXT_SM)}
                     aria-label='Select pay period'
                     data-testid={`income-source-${index}-period`}
                   >

@@ -199,7 +199,9 @@ describe('MarriageAllowanceAlert', () => {
       );
 
       const alert = container.querySelector('[role="status"]');
-      expect(alert).toHaveClass('border-pink-500/30');
+      expect(alert).toHaveClass('border-primary/30');
+      expect(alert).toHaveClass('from-primary/10');
+      expect(alert).toHaveClass('to-accent/10');
     });
 
     it('should have AlertTitle and AlertDescription', () => {

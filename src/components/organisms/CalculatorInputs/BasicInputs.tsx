@@ -176,7 +176,7 @@ export function BasicInputs() {
       className={SPACING.SPACE_Y_3}
     >
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
+      <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_BASE, 'sm:text-lg')}>
         Enter Income Tax Details
       </h3>
 
@@ -204,11 +204,7 @@ export function BasicInputs() {
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger
-              id={payPeriodId}
-              className='w-[140px]'
-              aria-labelledby={payPeriodLabelId}
-            >
+            <SelectTrigger id={payPeriodId} className='w-36' aria-labelledby={payPeriodLabelId}>
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -239,7 +235,7 @@ export function BasicInputs() {
           value={input.taxYear}
           onChange={setTaxYear}
           label=''
-          className='w-[170px]'
+          className='w-44'
         />
       </div>
 
@@ -257,7 +253,7 @@ export function BasicInputs() {
           value={input.taxCode}
           onChange={handleTaxCodeChange}
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-          className='w-[100px] uppercase'
+          className='w-24 uppercase'
           maxLength={10}
           data-testid='tax-code-input'
         />
@@ -278,7 +274,7 @@ export function BasicInputs() {
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger
             id={regionId}
-            className='w-[175px]'
+            className='w-44'
             aria-labelledby={regionLabelId}
             data-testid='region-select'
           >
@@ -295,7 +291,7 @@ export function BasicInputs() {
       </div>
 
       {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
-      <fieldset className='m-0 border-0 p-0'>
+      <fieldset className='border-0 p-0'>
         <legend className='sr-only'>Tax allowances and exemptions</legend>
         <div className={cn('flex items-center', SPACING.GAP_4)}>
           <div className={cn('flex items-center', SPACING.GAP_1_5)}>
@@ -359,10 +355,9 @@ export function BasicInputs() {
         </div>
       )}
 
-      {/* Age - Dropdown for State Pension Age (affects NI)
-          Column layout avoids truncation in narrow side-panels. */}
-      <div className={cn('flex flex-col', SPACING.GAP_2, SPACING.MT_4)}>
-        <div className={cn('flex items-center', SPACING.GAP_1_5)}>
+      {/* Age - Dropdown for State Pension Age (affects NI) */}
+      <div className={cn('flex items-center', SPACING.GAP_3, SPACING.MT_4)}>
+        <div className={cn('flex items-center whitespace-nowrap', SPACING.GAP_1_5)}>
           <LabelTooltip fieldName='age' />
           <Label
             id={ageLabelId}
@@ -387,7 +382,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className='w-full'
+            className='w-56'
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
@@ -416,7 +411,7 @@ export function BasicInputs() {
           <Select value={undergraduateLoan} onValueChange={handleUndergraduateLoanChange}>
             <SelectTrigger
               id={studentLoanId}
-              className='w-[200px]'
+              className='w-52'
               aria-labelledby={studentLoanLabelId}
               data-testid='student-loan-select'
             >
@@ -485,7 +480,7 @@ export function BasicInputs() {
           <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
             <SelectTrigger
               id={pensionTypeId}
-              className='w-[70px] shrink-0'
+              className='w-20 shrink-0'
               aria-labelledby={pensionTypeLabelId}
               data-testid='pension-type-select'
             >

@@ -313,7 +313,7 @@ export function ResultsTable({
       annual: results.nationalInsurance.annually,
       whatIfAnnual: whatIfResults?.nationalInsurance.annually,
       percentage: calculatePercentage(results.nationalInsurance.annually, grossAnnual),
-      color: 'text-amber-600 dark:text-yellow-400',
+      color: 'text-warning',
       isHighlight: false,
     },
     {
@@ -331,7 +331,7 @@ export function ResultsTable({
       annual: allowancesAmount,
       whatIfAnnual: whatIfResults ? allowancesAmount : undefined,
       percentage: calculatePercentage(allowancesAmount, grossAnnual),
-      color: 'text-teal-600 dark:text-teal-400',
+      color: 'text-primary',
       isHighlight: false,
     },
     {
@@ -340,7 +340,7 @@ export function ResultsTable({
       annual: results.netPay.annually,
       whatIfAnnual: whatIfResults?.netPay.annually,
       percentage: calculatePercentage(results.netPay.annually, grossAnnual),
-      color: 'text-green-600 dark:text-green-400',
+      color: 'text-success',
       isHighlight: true,
     },
     {
@@ -361,7 +361,7 @@ export function ResultsTable({
             annual: yearChange,
             whatIfAnnual: whatIfYearChange,
             percentage: yearChangePercentage,
-            color: yearChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive',
+            color: yearChange >= 0 ? 'text-success' : 'text-destructive',
             isHighlight: false,
           },
         ]
@@ -406,21 +406,14 @@ export function ResultsTable({
           */}
           <section
             ref={containerRef}
-            className='w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
-            style={{
-              scrollbarWidth: 'auto',
-              scrollbarColor: 'hsl(var(--muted-foreground)) hsl(var(--muted))',
-              WebkitOverflowScrolling: 'touch',
-              scrollBehavior: 'smooth',
-            }}
+            className='scroll-area-thin w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
             data-testid='results-table-container'
           >
             <table
               data-testid='results-table'
-              className={`w-full caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
-              style={{ tableLayout: 'auto', minWidth: '100%' }}
+              className={`w-full min-w-full table-auto caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
             >
               <caption className='sr-only'>
                 Tax calculation breakdown showing gross pay, deductions, and take-home pay across

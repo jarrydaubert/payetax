@@ -47,7 +47,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang='en-GB'
       className='dark'
       data-theme='dark'
-      style={{ colorScheme: 'dark' }}
       data-scroll-behavior='smooth'
       data-view-transition='enabled'
     >

@@ -41,8 +41,8 @@ export function getCategoryFallbackSvg(category: CategoryKey): string {
     <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
       <defs>
         <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:${color};stop-opacity:0.3"/>
-          <stop offset="100%" style="stop-color:${color};stop-opacity:0.1"/>
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0.1"/>
         </linearGradient>
       </defs>
       <rect width="800" height="450" fill="#0f172a"/>

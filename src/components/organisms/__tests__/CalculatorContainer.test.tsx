@@ -433,7 +433,7 @@ describe('CalculatorContainer Component', () => {
 
       const section = screen.getByTestId('calculator-section');
       // Updated to match current max-width
-      expect(section).toHaveClass('max-w-[1800px]');
+      expect(section).toHaveClass('max-w-screen-2xl');
     });
   });
 

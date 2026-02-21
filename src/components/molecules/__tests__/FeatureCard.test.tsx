@@ -125,7 +125,7 @@ describe('FeatureCard', () => {
 
     it('should apply simple variant classes', () => {
       const { container } = render(<FeatureCard feature={mockFeature} variant='simple' />);
-      const card = container.querySelector('[class*="border-none"]');
+      const card = container.querySelector('[class*="border-0"]');
       expect(card).toBeInTheDocument();
     });
   });

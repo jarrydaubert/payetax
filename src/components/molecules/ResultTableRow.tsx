@@ -75,7 +75,7 @@ export function ResultTableRow({
       </th>
       <TableCell
         className={cn(
-          'w-[55px] px-2 py-2.5 text-right font-mono',
+          'w-14 px-2 py-2.5 text-right font-mono',
           TYPOGRAPHY.TEXT_SM,
           color,
           isHighlight && 'font-bold',
@@ -94,7 +94,7 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-[100px] whitespace-nowrap bg-blue-500/10 px-2 py-2.5 text-right font-mono',
+                  'min-w-24 whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono',
                   TYPOGRAPHY.TEXT_SM,
                   color,
                   isHighlight && 'font-bold',
@@ -104,7 +104,7 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-[100px] whitespace-nowrap bg-purple-500/10 px-2 py-2.5 text-right font-mono',
+                  'min-w-24 whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono',
                   TYPOGRAPHY.TEXT_SM,
                   color,
                   isHighlight && 'font-bold',
@@ -121,7 +121,7 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'min-w-[100px] whitespace-nowrap px-2 py-2.5 text-right font-mono',
+              'min-w-24 whitespace-nowrap px-2 py-2.5 text-right font-mono',
               TYPOGRAPHY.TEXT_SM,
               color,
               isHighlight && 'font-bold',

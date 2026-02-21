@@ -140,7 +140,7 @@ export function NavbarMobileMenu({
                     href={link.href as Route}
                     onClick={() => onLinkClick(link.label)}
                     className={cn(
-                      'block min-h-[44px] rounded-lg px-4 py-3 font-medium text-[0.95rem] transition-colors',
+                      'block min-h-11 rounded-lg px-4 py-3 font-medium text-sm transition-colors',
                       isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new',
                     )}
                   >

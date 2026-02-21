@@ -33,27 +33,27 @@ export function TaxPots() {
     <div className='space-y-6'>
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Company Tax Pot */}
-        <div className='rounded-xl border border-cyan-500/30 bg-slate-800 p-5'>
+        <div className='rounded-xl border border-primary/30 bg-card p-5'>
           <div className='mb-4'>
-            <h3 className='font-semibold text-cyan-400 text-sm'>Company Tax Pot</h3>
-            <p className='text-slate-500 text-xs'>Set aside in company account</p>
+            <h3 className='font-semibold text-primary text-sm'>Company Tax Pot</h3>
+            <p className='text-muted-foreground text-xs'>Set aside in company account</p>
           </div>
           <div className='space-y-1.5 text-sm'>
-            <div className='flex justify-between text-slate-300'>
+            <div className='flex justify-between text-foreground'>
               <span>Corporation Tax</span>
               <span className='font-mono'>{formatCurrency(activeScenario.corporationTax)}</span>
             </div>
             {activeScenario.employerNI > 0 && (
-              <div className='flex justify-between text-slate-300'>
+              <div className='flex justify-between text-foreground'>
                 <span>
                   {activeScenario.companyCarBIK > 0 ? 'Employer NI + Class 1A' : 'Employer NI'}
                 </span>
                 <span className='font-mono'>{formatCurrency(activeScenario.employerNI)}</span>
               </div>
             )}
-            <div className='flex justify-between border-white/5 border-t pt-2'>
-              <span className='font-medium text-slate-100'>Monthly</span>
-              <span className='font-mono font-semibold text-cyan-400'>
+            <div className='flex justify-between border-border/50 border-t pt-2'>
+              <span className='font-medium text-foreground'>Monthly</span>
+              <span className='font-mono font-semibold text-primary'>
                 {formatCurrency(monthlyCompanyPot)}/mo
               </span>
             </div>
@@ -61,29 +61,29 @@ export function TaxPots() {
         </div>
 
         {/* Personal Tax Pot */}
-        <div className='rounded-xl border border-purple-500/30 bg-slate-800 p-5'>
+        <div className='rounded-xl border border-success/30 bg-card p-5'>
           <div className='mb-4'>
-            <h3 className='font-semibold text-purple-400 text-sm'>Personal Tax Pot</h3>
-            <p className='text-slate-500 text-xs'>Set aside for Self Assessment</p>
+            <h3 className='font-semibold text-sm text-success'>Personal Tax Pot</h3>
+            <p className='text-muted-foreground text-xs'>Set aside for Self Assessment</p>
           </div>
           <div className='space-y-1.5 text-sm'>
-            <div className='flex justify-between text-slate-300'>
+            <div className='flex justify-between text-foreground'>
               <span>Income Tax</span>
               <span className='font-mono'>{formatCurrency(activeScenario.incomeTax)}</span>
             </div>
-            <div className='flex justify-between text-slate-300'>
+            <div className='flex justify-between text-foreground'>
               <span>Dividend Tax</span>
               <span className='font-mono'>{formatCurrency(activeScenario.dividendTax)}</span>
             </div>
             {activeScenario.studentLoan > 0 && (
-              <div className='flex justify-between text-slate-300'>
+              <div className='flex justify-between text-foreground'>
                 <span>Student Loan</span>
                 <span className='font-mono'>{formatCurrency(activeScenario.studentLoan)}</span>
               </div>
             )}
-            <div className='flex justify-between border-white/5 border-t pt-2'>
-              <span className='font-medium text-slate-100'>Monthly</span>
-              <span className='font-mono font-semibold text-purple-400'>
+            <div className='flex justify-between border-border/50 border-t pt-2'>
+              <span className='font-medium text-foreground'>Monthly</span>
+              <span className='font-mono font-semibold text-success'>
                 {formatCurrency(monthlyPersonalPot)}/mo
               </span>
             </div>
@@ -92,7 +92,7 @@ export function TaxPots() {
       </div>
 
       {/* Disclaimer per spec */}
-      <p className='text-center text-slate-600 text-xs'>
+      <p className='text-center text-muted-foreground text-xs'>
         Illustrative set-aside for budgeting — not HMRC payment amounts. See Key Dates for actual
         due dates.
       </p>

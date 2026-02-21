@@ -206,7 +206,7 @@ describe('ComparisonResultsTable', () => {
   describe('Color Coding', () => {
     it('should use green for positive net difference', () => {
       const { container } = render(<ComparisonResultsTable results={mockResults} />);
-      const positiveValue = container.querySelector('.text-green-600');
+      const positiveValue = container.querySelector('.text-success');
       expect(positiveValue).toBeInTheDocument();
     });
 
@@ -218,7 +218,7 @@ describe('ComparisonResultsTable', () => {
       };
 
       const { container } = render(<ComparisonResultsTable results={negativeResults} />);
-      const negativeValue = container.querySelector('.text-amber-600');
+      const negativeValue = container.querySelector('.text-warning');
       expect(negativeValue).toBeInTheDocument();
     });
 

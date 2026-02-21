@@ -143,7 +143,7 @@ export default function CallToAction({
       {variant === 'newsletter' ? (
         <div className='mx-auto max-w-md'>
           {status === 'success' ? (
-            <div className='flex items-center justify-center gap-2 text-emerald-500'>
+            <div className='flex items-center justify-center gap-2 text-success'>
               <CheckCircle className={ICON_SIZES.SIZE_5} />
               <span>
                 {errorMessage === 'already'
@@ -179,7 +179,7 @@ export default function CallToAction({
               </Button>
             </form>
           )}
-          {status === 'error' && <p className='mt-2 text-red-500 text-sm'>{errorMessage}</p>}
+          {status === 'error' && <p className='mt-2 text-destructive text-sm'>{errorMessage}</p>}
           <div className='mt-6'>
             <Button
               asChild

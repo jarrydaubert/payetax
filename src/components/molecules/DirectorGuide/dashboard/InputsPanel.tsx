@@ -38,9 +38,9 @@ if (!rates) {
 
 // Shared input styling
 const INPUT_CLASS =
-  'border-white/[0.08] bg-slate-800 font-mono text-slate-100 placeholder:text-slate-500 focus:border-cyan-500';
+  'border-border/40 bg-card font-mono text-foreground placeholder:text-muted-foreground focus:border-primary';
 const SECTION_HEADING_CLASS =
-  'mb-4 font-semibold text-slate-500 text-xs uppercase tracking-[0.08em]';
+  'mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-[0.08em]';
 
 const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
 const formatCurrencyInput = (value: number | undefined) =>
@@ -199,22 +199,22 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   };
 
   return (
-    <aside className={cn('flex h-full flex-col bg-slate-950 px-5 py-6', className)}>
+    <aside className={cn('flex h-full flex-col bg-background px-5 py-6', className)}>
       {/* Section: Mode */}
       <Section title='Mode'>
         <fieldset aria-labelledby={ids.mode}>
           <legend id={ids.mode} className='sr-only'>
             Input mode
           </legend>
-          <div className='grid grid-cols-2 gap-2 rounded-lg border border-white/[0.04] bg-slate-950 p-1'>
+          <div className='grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
             <button
               type='button'
               onClick={() => actions.setMode('annual')}
               className={cn(
                 'rounded-md px-3 py-2 text-sm transition-colors',
                 !isMonthlyMode
-                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-primary/20 font-medium text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
               aria-pressed={!isMonthlyMode}
             >
@@ -226,8 +226,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               className={cn(
                 'rounded-md px-3 py-2 text-sm transition-colors',
                 isMonthlyMode
-                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-primary/20 font-medium text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
               aria-pressed={isMonthlyMode}
             >
@@ -239,15 +239,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       <Section title='Input Path'>
         <fieldset aria-label='Input path'>
-          <div className='grid grid-cols-2 gap-2 rounded-lg border border-white/[0.04] bg-slate-950 p-1'>
+          <div className='grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
             <button
               type='button'
               onClick={() => setQuickStartMode(true)}
               className={cn(
                 'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 quickStartMode
-                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-primary/20 font-medium text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
               aria-pressed={quickStartMode}
             >
@@ -259,8 +259,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               className={cn(
                 'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 !quickStartMode
-                  ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-primary/20 font-medium text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
               aria-pressed={!quickStartMode}
             >
@@ -268,7 +268,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </button>
           </div>
         </fieldset>
-        <p className='text-slate-500 text-xs'>
+        <p className='text-muted-foreground text-xs'>
           Quick Start shows minimum fields first. Full Inputs unlocks YTD, personal, and advanced
           detail.
         </p>
@@ -324,12 +324,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               >
                 <SelectTrigger
                   id={ids.contractStartMonth}
-                  className='border-white/[0.08] bg-slate-800 text-slate-100'
+                  className='border-border/40 bg-card text-foreground'
                   aria-describedby={getHintId(ids.contractStartMonth)}
                 >
                   <SelectValue placeholder='Select month' />
                 </SelectTrigger>
-                <SelectContent className='border-slate-700 bg-slate-800'>
+                <SelectContent className='border-border bg-card'>
                   <SelectItem value='4'>April</SelectItem>
                   <SelectItem value='5'>May</SelectItem>
                   <SelectItem value='6'>June</SelectItem>
@@ -445,9 +445,9 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             data-testid='director-includes-vat-checkbox'
             checked={formData.includesVat}
             onCheckedChange={(checked) => actions.setIncludesVat(checked === true)}
-            className='border-white/20 data-[state=checked]:bg-cyan-500'
+            className='border-border data-[state=checked]:bg-primary'
           />
-          <Label htmlFor={ids.includesVat} className='cursor-pointer text-slate-400 text-sm'>
+          <Label htmlFor={ids.includesVat} className='cursor-pointer text-muted-foreground text-sm'>
             Revenue includes VAT
           </Label>
           <LabelTooltip fieldName='directorIncludesVat' />
@@ -469,12 +469,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             <SelectTrigger
               id={ids.region}
               data-testid='director-region-select'
-              className='border-white/[0.08] bg-slate-800 text-slate-100'
+              className='border-border/40 bg-card text-foreground'
               aria-describedby={getHintId(ids.region)}
             >
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
-            <SelectContent className='border-slate-700 bg-slate-800'>
+            <SelectContent className='border-border bg-card'>
               <SelectItem value='england'>England</SelectItem>
               <SelectItem value='wales'>Wales</SelectItem>
               <SelectItem value='ni'>Northern Ireland</SelectItem>
@@ -495,12 +495,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           >
             <SelectTrigger
               id={ids.yearEnd}
-              className='border-white/[0.08] bg-slate-800 text-slate-100'
+              className='border-border/40 bg-card text-foreground'
               aria-describedby={getHintId(ids.yearEnd)}
             >
               <SelectValue placeholder='Select year-end' />
             </SelectTrigger>
-            <SelectContent className='border-slate-700 bg-slate-800'>
+            <SelectContent className='border-border bg-card'>
               <SelectItem value='03'>31 March</SelectItem>
               <SelectItem value='12'>31 December</SelectItem>
               <SelectItem value='other'>Other</SelectItem>
@@ -511,15 +511,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       </Section>
 
       {quickStartMode ? (
-        <div className='mb-5 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4'>
-          <p className='text-cyan-200 text-xs'>
+        <div className='mb-5 rounded-lg border border-primary/20 bg-primary/5 p-4'>
+          <p className='text-primary text-xs'>
             You can calculate with just company inputs + region. Add more detail any time for better
             accuracy.
           </p>
           <button
             type='button'
             onClick={() => setQuickStartMode(false)}
-            className='mt-3 whitespace-nowrap rounded-md border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-cyan-300 text-xs transition-colors hover:bg-cyan-500/20'
+            className='mt-3 whitespace-nowrap rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-primary text-xs transition-colors hover:bg-primary/20'
           >
             Add More Detail
           </button>
@@ -604,7 +604,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             {/* Other PAYE Employment */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <Label htmlFor={ids.otherPaye} className='text-slate-400 text-sm'>
+                <Label htmlFor={ids.otherPaye} className='text-muted-foreground text-sm'>
                   Other PAYE employment?
                 </Label>
                 <LabelTooltip fieldName='directorOtherPAYE' />
@@ -613,7 +613,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.otherPaye}
                 checked={formData.hasOtherPAYEEmployment}
                 onCheckedChange={actions.setHasOtherPAYEEmployment}
-                className='data-[state=checked]:bg-cyan-500'
+                className='data-[state=checked]:bg-primary'
               />
             </div>
           </Section>
@@ -625,7 +625,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               onClick={() => setAdvancedOpen(!advancedOpen)}
               aria-expanded={advancedOpen}
               aria-controls={ids.advancedPanel}
-              className='flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-slate-800 px-4 py-3 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-slate-700'
+              className='flex w-full items-center justify-between rounded-lg border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-all hover:border-border/40 hover:bg-accent/30'
             >
               <span className='font-medium'>Advanced Options</span>
               {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
@@ -634,12 +634,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             {advancedOpen && (
               <div
                 id={ids.advancedPanel}
-                className='mt-3 space-y-4 rounded-lg border border-white/[0.04] bg-slate-950 p-4'
+                className='mt-3 space-y-4 rounded-lg border border-border/40 bg-background p-4'
               >
                 {/* Employment Allowance */}
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
-                    <Label htmlFor={ids.employmentAllowance} className='text-slate-400 text-sm'>
+                    <Label
+                      htmlFor={ids.employmentAllowance}
+                      className='text-muted-foreground text-sm'
+                    >
                       Employment Allowance
                     </Label>
                     <LabelTooltip fieldName='directorEmploymentAllowance' />
@@ -648,13 +651,13 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     id={ids.employmentAllowance}
                     checked={formData.hasEmploymentAllowance}
                     onCheckedChange={actions.setHasEmploymentAllowance}
-                    className='data-[state=checked]:bg-cyan-500'
+                    className='data-[state=checked]:bg-primary'
                   />
                 </div>
 
                 {/* Student Loans */}
                 <fieldset className='space-y-2'>
-                  <legend className='flex items-center gap-2 text-slate-400 text-sm'>
+                  <legend className='flex items-center gap-2 text-muted-foreground text-sm'>
                     Student Loans
                     <LabelTooltip fieldName='directorStudentLoans' />
                   </legend>
@@ -667,11 +670,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                             id={checkboxId}
                             checked={formData.studentLoanPlans.includes(plan)}
                             onCheckedChange={() => actions.toggleStudentLoanPlan(plan)}
-                            className='border-white/20 data-[state=checked]:bg-cyan-500'
+                            className='border-border data-[state=checked]:bg-primary'
                           />
                           <Label
                             htmlFor={checkboxId}
-                            className='cursor-pointer text-slate-500 text-xs'
+                            className='cursor-pointer text-muted-foreground text-xs'
                           >
                             {STUDENT_LOAN_PLAN_SHORT_LABELS[plan]}
                           </Label>
@@ -706,11 +709,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                       onCheckedChange={(checked) =>
                         actions.setIsPensionAlreadyDeducted(checked === true)
                       }
-                      className='border-white/20 data-[state=checked]:bg-cyan-500'
+                      className='border-border data-[state=checked]:bg-primary'
                     />
                     <Label
                       htmlFor={ids.pensionDeducted}
-                      className='cursor-pointer text-slate-400 text-sm'
+                      className='cursor-pointer text-muted-foreground text-sm'
                     >
                       Already deducted from profit figure
                     </Label>
@@ -798,7 +801,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
           {/* Section: Compare My Setup */}
           <Section title='Compare My Setup'>
-            <p className='mb-3 text-slate-500 text-xs'>
+            <p className='mb-3 text-muted-foreground text-xs'>
               Edit values first, then apply. Your setup is only compared when you click Apply.
             </p>
             <Field
@@ -848,8 +851,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   className={cn(
                     'rounded-md px-3 py-2 text-xs transition-colors',
                     hasYourSetupDraftChanges
-                      ? 'bg-cyan-500/20 font-medium text-cyan-300 hover:bg-cyan-500/30'
-                      : 'cursor-not-allowed bg-slate-800 text-slate-500',
+                      ? 'bg-primary/20 font-medium text-primary hover:bg-primary/30'
+                      : 'cursor-not-allowed bg-card text-muted-foreground',
                   )}
                 >
                   Apply
@@ -859,10 +862,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   onClick={handleResetYourSetupDraft}
                   disabled={!hasYourSetupDraftChanges}
                   className={cn(
-                    'rounded-md border border-white/[0.08] px-3 py-2 text-xs transition-colors',
+                    'rounded-md border border-border/40 px-3 py-2 text-xs transition-colors',
                     hasYourSetupDraftChanges
-                      ? 'text-slate-300 hover:border-white/[0.16] hover:bg-slate-800'
-                      : 'cursor-not-allowed text-slate-500',
+                      ? 'text-foreground/90 hover:border-border/70 hover:bg-card'
+                      : 'cursor-not-allowed text-muted-foreground',
                   )}
                 >
                   Reset Draft
@@ -872,18 +875,18 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   onClick={handleClearYourSetup}
                   disabled={!canClearYourSetup}
                   className={cn(
-                    'rounded-md border border-white/[0.08] px-3 py-2 text-xs transition-colors',
+                    'rounded-md border border-border/40 px-3 py-2 text-xs transition-colors',
                     canClearYourSetup
-                      ? 'text-slate-300 hover:border-white/[0.16] hover:bg-slate-800'
-                      : 'cursor-not-allowed text-slate-500',
+                      ? 'text-foreground/90 hover:border-border/70 hover:bg-card'
+                      : 'cursor-not-allowed text-muted-foreground',
                   )}
                 >
                   Clear
                 </button>
               </div>
-              <p className='text-slate-600 text-xs'>
+              <p className='text-muted-foreground/80 text-xs'>
                 Applied setup:{' '}
-                <span className='text-slate-400'>
+                <span className='text-muted-foreground'>
                   Salary {formatCurrencyInput(formData.yourSetupSalary) || 'Not set'} / Dividends{' '}
                   {formatCurrencyInput(formData.yourSetupDividends) || 'Not set'}
                 </span>
@@ -901,9 +904,9 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <button
           type='button'
           onClick={handleReset}
-          className='flex w-full items-center gap-3 rounded-lg border border-white/[0.04] bg-slate-800 px-3 py-2 text-left text-slate-400 text-sm transition-all hover:border-white/[0.08] hover:bg-slate-700 hover:text-slate-200'
+          className='flex w-full items-center gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 text-left text-muted-foreground text-sm transition-all hover:border-border/40 hover:bg-accent/30 hover:text-foreground'
         >
-          <RotateCcw className='size-4 text-cyan-500' />
+          <RotateCcw className='size-4 text-primary' />
           <span className='flex-1'>Reset</span>
         </button>
       </div>
@@ -915,7 +918,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className='mb-6 rounded-xl border border-white/[0.05] bg-slate-900/40 p-4'>
+    <section className='mb-6 rounded-xl border border-border/50 bg-card/50 p-4'>
       <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
       <div className='space-y-4'>{children}</div>
     </section>
@@ -940,14 +943,14 @@ function Field({
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-2'>
-        <Label htmlFor={id} className='text-slate-400 text-sm leading-none'>
+        <Label htmlFor={id} className='text-muted-foreground text-sm leading-none'>
           {label}
         </Label>
         {tooltipFieldName && <LabelTooltip fieldName={tooltipFieldName} />}
       </div>
       {children}
       {hint && (
-        <p id={hintId} className='text-slate-600 text-xs leading-relaxed'>
+        <p id={hintId} className='text-muted-foreground/80 text-xs leading-relaxed'>
           {hint}
         </p>
       )}

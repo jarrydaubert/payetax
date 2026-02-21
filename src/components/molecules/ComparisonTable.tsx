@@ -37,12 +37,7 @@ export interface ComparisonTableProps {
  */
 function FeatureIcon({ available }: { available: boolean }) {
   if (available) {
-    return (
-      <Check
-        className={cn(ICON_SIZES.SIZE_5, 'text-green-600 dark:text-green-400')}
-        aria-label='Available'
-      />
-    );
+    return <Check className={cn(ICON_SIZES.SIZE_5, 'text-success')} aria-label='Available' />;
   }
   return (
     <X className={cn(ICON_SIZES.SIZE_5, 'text-muted-foreground/50')} aria-label='Not available' />
@@ -75,7 +70,7 @@ export function ComparisonTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className={cn(TYPOGRAPHY.TEXT_SM, 'w-[200px]')}>Feature</TableHead>
+            <TableHead className={cn(TYPOGRAPHY.TEXT_SM, 'w-48')}>Feature</TableHead>
             <TableHead
               className={cn(
                 TYPOGRAPHY.TEXT_SM,
@@ -134,7 +129,7 @@ export function TwoColumnComparison({ competitor, className }: TwoColumnComparis
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className={cn(TYPOGRAPHY.TEXT_SM, 'w-[200px]')}>Feature</TableHead>
+            <TableHead className={cn(TYPOGRAPHY.TEXT_SM, 'w-48')}>Feature</TableHead>
             <TableHead
               className={cn(
                 TYPOGRAPHY.TEXT_SM,

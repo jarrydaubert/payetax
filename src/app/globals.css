@@ -61,6 +61,10 @@
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.56 0.16 154);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.72 0.14 80);
+  --warning-foreground: oklch(0.18 0.02 80);
   --border: oklch(0.90 0 0);
   --input: oklch(0.92 0 0);
   --ring: oklch(0.708 0 0);
@@ -150,6 +154,27 @@
   background: rgba(2, 6, 23, 0.6);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
+}
+
+/* Shared horizontal scroll styling for comparison tables */
+.scroll-area-thin {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(var(--muted-foreground)) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-safe-top {
+  top: var(--pwa-safe-area-top, 0px);
+}
+
+.navbar-safe-spacer {
+  height: calc(4rem + var(--pwa-safe-area-top, 0px));
+}
+
+@media (min-width: 640px) {
+  .navbar-safe-spacer {
+    height: 5rem;
+  }
 }
 
 /* Bento Grid */
@@ -545,6 +570,10 @@
   --accent-foreground: oklch(0.93 0 0);         /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
   --destructive: oklch(0.85 0.16 27);           /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
   --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.78 0.16 154);
+  --success-foreground: oklch(0.18 0.02 154);
+  --warning: oklch(0.84 0.13 80);
+  --warning-foreground: oklch(0.22 0.03 80);
   --border: oklch(0.32 0.02 260);               /* Subtle but visible */
   --input: oklch(0.24 0.02 260);
   --ring: oklch(0.556 0 0);
@@ -575,6 +604,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -593,6 +626,7 @@
   }
 
   html {
+    color-scheme: dark;
     overflow-x: hidden;
     max-width: 100vw;
     /* Smooth scrolling for anchor links */

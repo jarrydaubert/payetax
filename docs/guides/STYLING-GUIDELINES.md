@@ -6,12 +6,12 @@
 
 **PayeTax follows a strict shadcn/ui-first approach with minimal custom styling.**
 
-### The Rules (No Exceptions Without Documentation)
+### The Rules (Enforced)
 
-1. **Use shadcn/ui components** for all interactive elements
-2. **Use design tokens** for common patterns (5+ uses)
-3. **Use inline Tailwind** for one-off decorative elements
-4. **Never mix approaches** - pick one and stick to it
+1. **Use shadcn/ui primitives first** for interactive UI
+2. **Use semantic theme classes second** (`bg-background`, `text-foreground`, `border-border`, etc.)
+3. **Use design tokens for true shared patterns only** (typography/spacing/layout)
+4. **Raw palette classes are restricted** and allowed only by explicit allowlist
 
 ---
 
@@ -32,19 +32,27 @@ import { Button } from '@/components/atoms/ui/button';
 </div>
 ```
 
-**Available shadcn components:**
+**Installed shadcn components (current):**
 - `Button` - All clickable actions
 - `Badge` - Labels, tags, status indicators
 - `Card` - Content containers
-- `Input` - Form inputs
-- `Select` - Dropdowns
-- `Dialog` - Modals
-- `Tooltip` - Help text
 - `Alert` - Notices, warnings
-- `Separator` - Dividers
-- `Tabs` - Navigation tabs
+- `Chart` - Data visualization wrapper
+- `Checkbox` - Boolean selections
+- `Collapsible` - Disclosure sections
+- `Dialog` - Modals
+- `Input` - Form inputs
+- `Label` - Input labels
+- `Select` - Dropdowns
+- `Slider` - Range controls
+- `Switch` - Toggle controls
+- `Table` - Tabular data
+- `Textarea` - Multi-line input
+- `Tooltip` - Help text
 
 **Rule:** If shadcn has it, USE IT. Don't reinvent.
+
+If you need `tabs`, `separator`, or `sheet`, install them first and then use them as primitives.
 
 ---
 
@@ -127,10 +135,10 @@ export const PARTICLE = 'absolute h-2 w-2 animate-pulse rounded-full...';
 export const CHART_TAX_COLOR = 'text-red-500'; // No!
 ```
 
-**Keep as inline Tailwind:**
+**Allowed inline palette usage:**
 - Chart colors (component-specific)
-- Alert/badge colors (semantic)
-- One-off gradient backgrounds
+- Explicit brand accents (allowlisted in audit script)
+- One-off gradient backgrounds on marketing surfaces
 
 ---
 
@@ -231,6 +239,26 @@ import { SURFACES } from '@/constants/designTokens';
 - `destructive` - Errors, delete actions
 - `border` - Dividers, outlines
 
+### Raw Palette Restriction (Enforced)
+
+Raw palette classes like `text-slate-*`, `bg-cyan-*`, `border-white/[...]`, `bg-[#...]` are restricted in UI code.
+Prefer semantic replacements:
+
+| Raw class | Preferred semantic replacement |
+|---|---|
+| `text-slate-100/200/300` | `text-foreground` |
+| `text-slate-400/500` | `text-muted-foreground` |
+| `bg-slate-800/900` | `bg-card` |
+| `bg-slate-950` | `bg-background` |
+| `border-slate-*` / `border-white/[...]` | `border-border` |
+| `text-cyan-*` | `text-primary` |
+| `bg-cyan-*/10` or `bg-cyan-*/20` | `bg-primary/10` or `bg-primary/20` |
+| `text-red-*` | `text-destructive` |
+| `text-amber-*` | `text-warning` (semantic alias) |
+| `text-emerald-*` | `text-success` (semantic alias) |
+
+Use raw palette classes only where explicitly allowlisted (brand accents, charts, constrained one-offs).
+
 ---
 
 ## 📋 Decision Flowchart
@@ -258,9 +286,10 @@ Before committing styling changes:
 
 - [ ] Used shadcn component where applicable?
 - [ ] No custom buttons/badges when shadcn exists?
-- [ ] Tokens only for 5+ use patterns?
+- [ ] Tokens only for true shared patterns (not one-off utility mirrors)?
 - [ ] No tokens for one-off decorations?
 - [ ] Semantic colors (not hardcoded hex/rgb)?
+- [ ] No new raw palette classes outside allowlist?
 - [ ] No `border-*` or `shadow-*` tokenized?
 - [ ] Responsive with mobile-first approach?
 
@@ -284,6 +313,15 @@ export const HERO_PARTICLE = 'h-2 w-2 rounded-full...'; // Used once!
 
 // RIGHT
 <div className="h-2 w-2 rounded-full animate-pulse..." /> // Inline
+```
+
+### ❌ Using raw palette color when semantic class exists
+```tsx
+// WRONG
+<p className="text-slate-400">Secondary text</p>
+
+// RIGHT
+<p className="text-muted-foreground">Secondary text</p>
 ```
 
 ### ❌ Tokenizing framework utilities
@@ -314,6 +352,7 @@ export const BORDER_TOP = 'border-t border-border';
 - ❌ Loading skeletons
 - ❌ Decorative particles
 - ❌ Arbitrary values
+- ❌ New color utility mirrors that duplicate semantic theme classes
 
 ---
 
@@ -322,8 +361,8 @@ export const BORDER_TOP = 'border-t border-border';
 **3 Simple Rules:**
 
 1. **shadcn/ui first** - Use components, not custom divs
-2. **Tokens for patterns** - 5+ uses = token
-3. **Inline for one-offs** - Decorations stay inline
+2. **Semantic colors first** - Replace raw palette classes
+3. **Tokens for true shared patterns** - keep them lean
 
 **No interpretation needed. Follow the rules.**
 

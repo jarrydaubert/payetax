@@ -98,8 +98,8 @@ export default function BestUKTaxCalculatorsPage() {
                   key={competitor.slug}
                   href={`/vs/${competitor.slug}`}
                   className={cn(
-                    'rounded-xl border border-white/[0.08] bg-[#0b1220]/40 px-4 py-3',
-                    'text-slate-200 text-sm transition hover:border-white/[0.14] hover:bg-[#0f172a]/50',
+                    'rounded-xl border border-border/60 bg-card/40 px-4 py-3',
+                    'text-foreground text-sm transition hover:border-primary/40 hover:bg-card/60',
                   )}
                 >
                   PayeTax vs {competitor.name}
@@ -145,11 +145,11 @@ export default function BestUKTaxCalculatorsPage() {
               <Card className={cn(SURFACES.CARD_STANDARD, 'text-center')}>
                 <div
                   className={cn(
-                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10',
+                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-warning/10',
                     SPACING.MB_4,
                   )}
                 >
-                  <Search className={cn(ICON_SIZES.SIZE_6, 'text-amber-600')} />
+                  <Search className={cn(ICON_SIZES.SIZE_6, 'text-warning')} />
                 </div>
                 <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>
                   Self-Assessment
@@ -157,19 +157,17 @@ export default function BestUKTaxCalculatorsPage() {
                 <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
                   Filing your own tax return?
                 </p>
-                <p className={cn('font-semibold text-amber-600', TYPOGRAPHY.TEXT_SM)}>
-                  → Use GOV.UK
-                </p>
+                <p className={cn('font-semibold text-warning', TYPOGRAPHY.TEXT_SM)}>→ Use GOV.UK</p>
               </Card>
 
               <Card className={cn(SURFACES.CARD_STANDARD, 'text-center')}>
                 <div
                   className={cn(
-                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10',
+                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10',
                     SPACING.MB_4,
                   )}
                 >
-                  <Users className={cn(ICON_SIZES.SIZE_6, 'text-blue-600')} />
+                  <Users className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />
                 </div>
                 <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>
                   Financial Advice
@@ -177,17 +175,17 @@ export default function BestUKTaxCalculatorsPage() {
                 <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
                   Want guides and editorial content?
                 </p>
-                <p className={cn('font-semibold text-blue-600', TYPOGRAPHY.TEXT_SM)}>→ Use MSE</p>
+                <p className={cn('font-semibold text-primary', TYPOGRAPHY.TEXT_SM)}>→ Use MSE</p>
               </Card>
 
               <Card className={cn(SURFACES.CARD_STANDARD, 'text-center')}>
                 <div
                   className={cn(
-                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10',
+                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success/10',
                     SPACING.MB_4,
                   )}
                 >
-                  <Award className={cn(ICON_SIZES.SIZE_6, 'text-purple-600')} />
+                  <Award className={cn(ICON_SIZES.SIZE_6, 'text-success')} />
                 </div>
                 <h3 className={cn('font-bold', TYPOGRAPHY.TEXT_LG, SPACING.MB_2)}>
                   Maximum Features
@@ -195,7 +193,7 @@ export default function BestUKTaxCalculatorsPage() {
                 <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
                   Need maternity pay or advanced options?
                 </p>
-                <p className={cn('font-semibold text-purple-600', TYPOGRAPHY.TEXT_SM)}>
+                <p className={cn('font-semibold text-success', TYPOGRAPHY.TEXT_SM)}>
                   → Use Salary Calculator
                 </p>
               </Card>

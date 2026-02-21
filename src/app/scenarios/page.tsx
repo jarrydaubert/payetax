@@ -46,24 +46,24 @@ export const revalidate = 86400;
  */
 const categoryStyles: Record<string, { gradient: string; icon: string; border: string }> = {
   'tax-trap': {
-    gradient: 'from-amber-500/20 to-orange-500/20',
+    gradient: 'from-warning/20 to-destructive/20',
     icon: '🎯',
-    border: 'border-amber-500/30 hover:border-amber-500/50',
+    border: 'border-warning/30 hover:border-warning/50',
   },
   'student-loan': {
-    gradient: 'from-blue-500/20 to-cyan-500/20',
+    gradient: 'from-primary/20 to-primary/10',
     icon: '🎓',
-    border: 'border-blue-500/30 hover:border-blue-500/50',
+    border: 'border-primary/30 hover:border-primary/50',
   },
   scottish: {
-    gradient: 'from-purple-500/20 to-indigo-500/20',
+    gradient: 'from-primary/20 to-accent/20',
     icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-    border: 'border-purple-500/30 hover:border-purple-500/50',
+    border: 'border-primary/30 hover:border-primary/50',
   },
   'life-stage': {
-    gradient: 'from-green-500/20 to-emerald-500/20',
+    gradient: 'from-success/20 to-success/10',
     icon: '📈',
-    border: 'border-green-500/30 hover:border-green-500/50',
+    border: 'border-success/30 hover:border-success/50',
   },
 };
 
@@ -186,9 +186,9 @@ function QuickStat({ value, label }: { value: string; label: string }) {
  * Default category styles
  */
 const defaultStyles = {
-  gradient: 'from-green-500/20 to-emerald-500/20',
+  gradient: 'from-success/20 to-success/10',
   icon: '📈',
-  border: 'border-green-500/30 hover:border-green-500/50',
+  border: 'border-success/30 hover:border-success/50',
 };
 
 /**

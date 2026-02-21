@@ -61,9 +61,9 @@ export interface FeatureCardProps {
  *     description: 'Lightning fast calculations',
  *     metric: '<1.5s',
  *     gradient: {
- *       bg: 'from-yellow-500/10 to-orange-500/10',
- *       icon: 'text-yellow-500',
- *       border: 'border-yellow-500/20'
+ *       bg: 'from-warning/10 to-destructive/10',
+ *       icon: 'text-warning',
+ *       border: 'border-warning/20'
  *     }
  *   }}
  *   variant="showcase"
@@ -78,7 +78,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
     {
       'hover:border-primary/50 hover:shadow-lg': variant === 'showcase',
       'bg-card/50 backdrop-blur-sm': variant === 'default',
-      'border-none shadow-none': variant === 'simple',
+      'border-0': variant === 'simple',
     },
     gradient?.bg,
     gradient?.border,

@@ -65,13 +65,13 @@ export function ProsCons({
       {/* Pros */}
       <Card
         className={cn(
-          'border-green-500/20 bg-gradient-to-br from-green-500/5 to-green-500/10',
+          'border-success/20 bg-gradient-to-br from-success/5 to-success/10',
           SPACING.P_6,
         )}
       >
         <h3
           className={cn(
-            'flex items-center font-bold text-green-600 dark:text-green-400',
+            'flex items-center font-bold text-success',
             TYPOGRAPHY.TEXT_LG,
             SPACING.MB_4,
             SPACING.GAP_2,
@@ -84,10 +84,7 @@ export function ProsCons({
           {pros.map((pro) => (
             <li key={pro} className={cn('flex items-start text-foreground', SPACING.GAP_3)}>
               <Check
-                className={cn(
-                  ICON_SIZES.SIZE_4,
-                  'mt-0.5 shrink-0 text-green-600 dark:text-green-400',
-                )}
+                className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 shrink-0 text-success')}
                 aria-hidden='true'
               />
               <span className={TYPOGRAPHY.TEXT_SM}>{pro}</span>
@@ -99,13 +96,13 @@ export function ProsCons({
       {/* Cons */}
       <Card
         className={cn(
-          'border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-amber-500/10',
+          'border-warning/20 bg-gradient-to-br from-warning/5 to-warning/10',
           SPACING.P_6,
         )}
       >
         <h3
           className={cn(
-            'flex items-center font-bold text-amber-600 dark:text-amber-400',
+            'flex items-center font-bold text-warning',
             TYPOGRAPHY.TEXT_LG,
             SPACING.MB_4,
             SPACING.GAP_2,
@@ -118,10 +115,7 @@ export function ProsCons({
           {cons.map((con) => (
             <li key={con} className={cn('flex items-start text-foreground', SPACING.GAP_3)}>
               <X
-                className={cn(
-                  ICON_SIZES.SIZE_4,
-                  'mt-0.5 shrink-0 text-amber-600 dark:text-amber-400',
-                )}
+                className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 shrink-0 text-warning')}
                 aria-hidden='true'
               />
               <span className={TYPOGRAPHY.TEXT_SM}>{con}</span>

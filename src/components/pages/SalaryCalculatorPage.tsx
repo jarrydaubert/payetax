@@ -179,7 +179,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
           <p className={cn('text-muted-foreground/80 text-xs', SPACING.MB_8)}>
             Rates verified for {taxYearDisplay} (last checked {ratesVerifiedDisplay}).
           </p>
-          <div className='mb-8 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-amber-200 text-xs'>
+          <div className='mb-8 rounded-lg border border-warning/30 bg-warning/10 p-3 text-warning text-xs'>
             <p>
               <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
               advice. Consult a qualified accountant for advice specific to your situation. Based on

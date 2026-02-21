@@ -213,7 +213,7 @@ export function WhatIfComparisonDisplay({
         currentAnnual: currentResults.nationalInsurance.annually,
         whatIfAnnual: whatIfResults.nationalInsurance.annually,
         percentage: calculatePercentage(currentResults.nationalInsurance.annually, currentGross),
-        color: 'text-amber-600 dark:text-yellow-400',
+        color: 'text-warning',
       },
       {
         category: 'Pension [You]',
@@ -230,7 +230,7 @@ export function WhatIfComparisonDisplay({
         // Note: Allowances are input-based and don't change between scenarios in this context
         whatIfAnnual: allowancesDeductions,
         percentage: calculatePercentage(allowancesDeductions, currentGross),
-        color: 'text-teal-600 dark:text-teal-400',
+        color: 'text-primary',
       },
       {
         category: 'Net Pay',
@@ -238,7 +238,7 @@ export function WhatIfComparisonDisplay({
         currentAnnual: currentResults.netPay.annually,
         whatIfAnnual: whatIfResults.netPay.annually,
         percentage: calculatePercentage(currentResults.netPay.annually, currentGross),
-        color: 'text-green-600 dark:text-green-400',
+        color: 'text-success',
         isHighlight: true,
       },
       {
@@ -278,7 +278,7 @@ export function WhatIfComparisonDisplay({
       </div>
 
       {/* Delta Summary Card */}
-      <Card className='overflow-hidden border-2 border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5 dark:border-purple-400/30'>
+      <Card className='overflow-hidden border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5'>
         <div className='p-4'>
           <div className='grid gap-4 sm:grid-cols-3'>
             {/* Net Pay Delta - Primary */}
@@ -288,7 +288,7 @@ export function WhatIfComparisonDisplay({
               </span>
               <div className='flex items-center gap-2'>
                 {netPayDeltaMonthly > 0 ? (
-                  <TrendingUp className='size-6 text-emerald' />
+                  <TrendingUp className='size-6 text-success' />
                 ) : netPayDeltaMonthly < 0 ? (
                   <TrendingDown className='size-6 text-destructive' />
                 ) : (
@@ -299,7 +299,7 @@ export function WhatIfComparisonDisplay({
                     'font-bold',
                     TYPOGRAPHY.TEXT_2XL,
                     netPayDeltaMonthly > 0
-                      ? 'text-emerald'
+                      ? 'text-success'
                       : netPayDeltaMonthly < 0
                         ? 'text-destructive'
                         : 'text-muted-foreground',
@@ -340,7 +340,7 @@ export function WhatIfComparisonDisplay({
                 {taxDeltaAnnual > 0 ? (
                   <ArrowUp className='size-4 text-destructive' />
                 ) : taxDeltaAnnual < 0 ? (
-                  <ArrowDown className='size-4 text-emerald' />
+                  <ArrowDown className='size-4 text-success' />
                 ) : null}
                 <span
                   className={cn(
@@ -349,7 +349,7 @@ export function WhatIfComparisonDisplay({
                     taxDeltaAnnual > 0
                       ? 'text-destructive'
                       : taxDeltaAnnual < 0
-                        ? 'text-emerald'
+                        ? 'text-success'
                         : '',
                   )}
                 >
@@ -367,7 +367,7 @@ export function WhatIfComparisonDisplay({
               {netPayDeltaMonthly > 0 ? (
                 <>
                   With this change, you&apos;d take home{' '}
-                  <span className='font-semibold text-emerald'>
+                  <span className='font-semibold text-success'>
                     {formatCurrency(Math.abs(netPayDeltaMonthly), 0)} more
                   </span>{' '}
                   each month ({formatCurrency(Math.abs(netPayDeltaMonthly * 12), 0)} per year).
@@ -406,12 +406,7 @@ export function WhatIfComparisonDisplay({
         <Card className='overflow-hidden'>
           <section
             ref={containerRef}
-            className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
-            style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
-              WebkitOverflowScrolling: 'touch',
-            }}
+            className='scroll-area-thin cursor-grab touch-pan-x overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
             aria-label='What If comparison table'
             aria-describedby={scrollHintId}
           >
@@ -420,13 +415,13 @@ export function WhatIfComparisonDisplay({
                 <TableRow className='bg-card hover:bg-card'>
                   <TableHead
                     scope='col'
-                    className='sticky top-0 left-0 z-20 min-w-[160px] bg-card font-semibold sm:min-w-[180px]'
+                    className='sticky top-0 left-0 z-20 min-w-40 bg-card font-semibold sm:min-w-44'
                   >
                     Category
                   </TableHead>
                   <TableHead
                     scope='col'
-                    className='sticky top-0 z-10 min-w-[60px] bg-card text-right font-semibold'
+                    className='sticky top-0 z-10 min-w-16 bg-card text-right font-semibold'
                     title='Percentage of current gross salary'
                   >
                     % of Gross
@@ -435,7 +430,7 @@ export function WhatIfComparisonDisplay({
                     <TableHead
                       key={period}
                       scope='col'
-                      className='sticky top-0 z-10 min-w-[180px] bg-card text-center font-semibold sm:min-w-[200px]'
+                      className='sticky top-0 z-10 min-w-44 bg-card text-center font-semibold sm:min-w-48'
                       colSpan={2}
                     >
                       {period}
@@ -449,7 +444,7 @@ export function WhatIfComparisonDisplay({
                       <TableHead
                         scope='col'
                         className={cn(
-                          'sticky top-0 z-10 min-w-[90px] bg-blue-500/10 text-right font-medium sm:min-w-[100px]',
+                          'sticky top-0 z-10 min-w-24 bg-primary/10 text-right font-medium sm:min-w-28',
                           TYPOGRAPHY.TEXT_XS,
                         )}
                       >
@@ -458,7 +453,7 @@ export function WhatIfComparisonDisplay({
                       <TableHead
                         scope='col'
                         className={cn(
-                          'sticky top-0 z-10 min-w-[90px] bg-purple-500/10 text-right font-medium sm:min-w-[100px]',
+                          'sticky top-0 z-10 min-w-24 bg-accent/10 text-right font-medium sm:min-w-28',
                           TYPOGRAPHY.TEXT_XS,
                         )}
                       >
@@ -512,14 +507,14 @@ export function WhatIfComparisonDisplay({
                           <React.Fragment key={period}>
                             {/* Current Value */}
                             <TableCell
-                              className={`bg-blue-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                              className={`bg-primary/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
                               {formatCurrency(currentValue, 0)}
                             </TableCell>
 
                             {/* What If Value */}
                             <TableCell
-                              className={`bg-purple-500/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
+                              className={`bg-accent/5 text-right font-mono ${TYPOGRAPHY.TEXT_XS} sm:${TYPOGRAPHY.TEXT_SM} ${row.color} ${row.isHighlight ? 'font-bold' : ''}`}
                             >
                               {formatCurrency(whatIfValue, 0)}
                             </TableCell>
@@ -538,8 +533,8 @@ export function WhatIfComparisonDisplay({
       {/* Footer Notes */}
       <div className={`mt-4 flex flex-col items-center ${SPACING.GAP_2}`}>
         <p className={`text-center text-muted-foreground ${TYPOGRAPHY.TEXT_XS}`}>
-          Blue columns show your current scenario. Purple columns show your "What If" scenario.
-          Values rounded to nearest pound.
+          Left columns show your current scenario. Right columns show your "What If" scenario.
+          Values are rounded to the nearest pound.
         </p>
         {showRightIndicator && (
           <div

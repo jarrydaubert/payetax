@@ -48,7 +48,7 @@ export function AllPostsGrid({
   if (posts.length === 0) {
     return (
       <div className={cn('text-center', SPACING.PY_16)}>
-        <p className={cn('text-slate-400', TYPOGRAPHY.TEXT_LG)}>No articles found.</p>
+        <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>No articles found.</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export function AllPostsGrid({
           >
             All Articles
           </h2>
-          <p className={cn('text-slate-400', TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
             {totalPosts.toLocaleString('en-GB')} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
@@ -129,8 +129,8 @@ function PostCard({ post, priority = false }: PostCardProps) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
-        'border border-slate-700/50 hover:border-cyan-500/50',
+        'group relative overflow-hidden rounded-xl bg-card/70 transition-all duration-200',
+        'border border-border/60 hover:border-primary/50',
         'motion-safe:hover:-translate-y-0.5',
       )}
     >
@@ -149,13 +149,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
           />
 
           {/* Category badge */}
-          <span
-            className='absolute top-3 left-3 rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider'
-            style={{
-              backgroundColor: categoryConfig.color,
-              color: categoryConfig.textColor,
-            }}
-          >
+          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>
@@ -164,7 +158,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
         <div className={SPACING.P_4}>
           <h3
             className={cn(
-              'line-clamp-2 font-display font-semibold text-white transition-colors group-hover:text-cyan-400',
+              'line-clamp-2 font-display font-semibold text-foreground transition-colors group-hover:text-primary',
               SPACING.MB_2,
               TYPOGRAPHY.TEXT_BASE,
             )}
@@ -172,13 +166,17 @@ function PostCard({ post, priority = false }: PostCardProps) {
             {post.title}
           </h3>
 
-          <p className={cn('line-clamp-2 text-slate-400', SPACING.MB_3, TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('line-clamp-2 text-muted-foreground', SPACING.MB_3, TYPOGRAPHY.TEXT_SM)}>
             {post.excerpt}
           </p>
 
           {/* Meta */}
           <div
-            className={cn('flex items-center text-slate-400', SPACING.GAP_2, TYPOGRAPHY.TEXT_XS)}
+            className={cn(
+              'flex items-center text-muted-foreground',
+              SPACING.GAP_2,
+              TYPOGRAPHY.TEXT_XS,
+            )}
           >
             <span>{post.readTime}</span>
             <span aria-hidden='true'>•</span>

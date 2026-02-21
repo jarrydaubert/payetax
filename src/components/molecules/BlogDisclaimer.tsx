@@ -22,8 +22,7 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
   return (
     <aside
       className={cn(
-        'rounded-lg border border-amber-200/70 bg-amber-50 p-4',
-        'dark:border-amber-400/30 dark:bg-amber-950/40',
+        'rounded-lg border border-warning/30 bg-warning/10 p-4',
         TYPOGRAPHY.TEXT_BASE,
         'md:text-lg',
         className,
@@ -33,21 +32,21 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
     >
       <div className='flex gap-3'>
         <AlertTriangle
-          className={cn(ICON_SIZES.SIZE_5, 'shrink-0 text-amber-700 dark:text-amber-300')}
+          className={cn(ICON_SIZES.SIZE_5, 'shrink-0 text-warning')}
           aria-hidden='true'
         />
         <div className='space-y-2'>
-          <p id={headingId} className='font-medium text-amber-950 dark:text-amber-100'>
+          <p id={headingId} className='font-medium text-foreground'>
             Important: This is for informational purposes only
           </p>
-          <p className='text-amber-900 dark:text-amber-200/90'>
+          <p className='text-muted-foreground'>
             This content provides general guidance and is not tax or legal advice. Tax rules change
             frequently and individual circumstances vary. Always verify calculations against{' '}
             <a
               href={HMRC_URL}
               target='_blank'
               rel='noopener noreferrer'
-              className='font-medium underline decoration-amber-700/70 underline-offset-2 transition-colors hover:text-amber-950 hover:decoration-amber-700 dark:decoration-amber-300/70 dark:hover:text-amber-50 dark:hover:decoration-amber-300'
+              className='font-medium text-warning underline decoration-warning/70 underline-offset-2 transition-colors hover:text-warning/90 hover:decoration-warning'
             >
               official HMRC sources
             </a>{' '}

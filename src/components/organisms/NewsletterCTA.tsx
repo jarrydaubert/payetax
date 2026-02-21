@@ -83,7 +83,7 @@ export function NewsletterCTA({
     >
       {/* Background decoration */}
       <div className='pointer-events-none absolute inset-0 opacity-80' aria-hidden='true'>
-        <div className='absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(6,182,212,0.2),transparent_45%),radial-gradient(circle_at_88%_82%,rgba(16,185,129,0.16),transparent_42%)]' />
+        <div className='newsletter-cta-gradient absolute inset-0' />
       </div>
 
       <div className='relative text-center'>
@@ -101,6 +101,12 @@ export function NewsletterCTA({
         />
 
         <style jsx global>{`
+          .newsletter-cta-gradient {
+            background:
+              radial-gradient(circle at 12% 18%, rgba(6, 182, 212, 0.2), transparent 45%),
+              radial-gradient(circle at 88% 82%, rgba(16, 185, 129, 0.16), transparent 42%);
+          }
+
           /* Force inline layout - target ALL possible Kit containers */
           .newsletter-cta .formkit-fields,
           .newsletter-cta .seva-fields,

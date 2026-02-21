@@ -111,7 +111,7 @@ export function MarriageAllowanceClient() {
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
       {/* Header */}
       <div className='mb-12 text-center'>
-        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-pink-100 px-4 py-2 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300'>
+        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-primary/15 px-4 py-2 text-primary'>
           <Heart className={ICON_SIZES.SIZE_4} />
           <span className='font-medium text-sm'>Marriage Allowance</span>
         </div>
@@ -140,7 +140,7 @@ export function MarriageAllowanceClient() {
             </div>
             <div>
               <p className='mb-1 font-medium text-muted-foreground text-sm'>Annual Tax Saving</p>
-              <p className='font-bold text-2xl text-emerald-600'>{formatCurrency(TAX_SAVING)}</p>
+              <p className='font-bold text-2xl text-success'>{formatCurrency(TAX_SAVING)}</p>
             </div>
             <div>
               <p className='mb-1 font-medium text-muted-foreground text-sm'>Can Backdate</p>
@@ -220,15 +220,13 @@ export function MarriageAllowanceClient() {
         <Card
           className={cn(
             'mb-8',
-            result.status === 'eligible'
-              ? 'border-emerald-200 dark:border-emerald-800'
-              : 'border-destructive/30',
+            result.status === 'eligible' ? 'border-success/30' : 'border-destructive/30',
           )}
         >
           <CardContent className='pt-6'>
             <div className='flex items-start gap-4'>
               {result.status === 'eligible' ? (
-                <CheckCircle className={cn(ICON_SIZES.SIZE_8, 'flex-shrink-0 text-emerald-600')} />
+                <CheckCircle className={cn(ICON_SIZES.SIZE_8, 'flex-shrink-0 text-success')} />
               ) : (
                 <XCircle className={cn(ICON_SIZES.SIZE_8, 'flex-shrink-0 text-destructive')} />
               )}
@@ -236,7 +234,7 @@ export function MarriageAllowanceClient() {
                 <h3
                   className={cn(
                     'mb-2 font-semibold text-lg',
-                    result.status === 'eligible' ? 'text-emerald-700 dark:text-emerald-300' : '',
+                    result.status === 'eligible' ? 'text-success' : '',
                   )}
                 >
                   {result.status === 'eligible'
@@ -245,12 +243,12 @@ export function MarriageAllowanceClient() {
                 </h3>
                 <p className='text-muted-foreground'>{result.reason}</p>
                 {result.status === 'eligible' && (
-                  <div className='mt-4 rounded-lg bg-emerald-50 p-4 dark:bg-emerald-900/20'>
-                    <p className='font-medium text-emerald-800 dark:text-emerald-200'>
+                  <div className='mt-4 rounded-lg bg-success/10 p-4'>
+                    <p className='font-medium text-success'>
                       Your annual saving:{' '}
                       <span className='text-xl'>{formatCurrency(result.annualSaving)}</span>
                     </p>
-                    <p className='mt-1 text-emerald-700 text-sm dark:text-emerald-300'>
+                    <p className='mt-1 text-sm text-success'>
                       Plus, you can backdate up to 4 years for a total of up to{' '}
                       {formatCurrency(result.annualSaving * 4)}!
                     </p>
@@ -297,10 +295,10 @@ export function MarriageAllowanceClient() {
             </div>
           </div>
 
-          <div className='rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20'>
+          <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
             <div className='flex items-start gap-2'>
-              <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-blue-600')} />
-              <div className='text-blue-800 text-sm dark:text-blue-200'>
+              <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
+              <div className='text-primary text-sm'>
                 <p className='font-medium'>Important Notes:</p>
                 <ul className='mt-1 space-y-1'>
                   <li>• You must be married or in a civil partnership</li>

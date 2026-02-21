@@ -209,23 +209,22 @@ describe('WhatIfInputs', () => {
   });
 
   describe('styling', () => {
-    it('should apply purple gradient styling to container', () => {
+    it('should apply semantic gradient styling to container', () => {
       render(<WhatIfInputs />);
 
-      // Check for purple border and gradient
+      // Check semantic border and gradient classes
       const container = screen.getByText('What If Scenario').closest('div')?.parentElement;
-      expect(container).toHaveClass('border-purple-500/30');
-      expect(container).toHaveClass('from-purple-500/5');
+      expect(container).toHaveClass('border-primary/30');
+      expect(container).toHaveClass('from-primary/5');
+      expect(container).toHaveClass('to-accent/10');
     });
 
-    it('should apply gradient-border styling to Compare button', () => {
+    it('should apply semantic primary styling to Compare button', () => {
       render(<WhatIfInputs />);
 
       const button = screen.getByTestId('what-if-trigger');
-      expect(button).toHaveClass('border-transparent');
-      expect(button).toHaveClass(
-        'bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box]',
-      );
+      expect(button).toHaveClass('bg-primary');
+      expect(button).toHaveClass('text-primary-foreground');
     });
   });
 

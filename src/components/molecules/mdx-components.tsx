@@ -70,9 +70,9 @@ export const mdxComponents = {
           SPACING.MT_8,
           SPACING.MB_4,
           SPACING.GAP_3,
+          TYPOGRAPHY.TEXT_4XL,
           'md:mt-12 md:mb-6',
         )}
-        style={{ fontSize: 'var(--blog-font-size-4xl)' }}
         id={id}
         {...props}
       >
@@ -94,9 +94,9 @@ export const mdxComponents = {
           SPACING.MT_6,
           SPACING.MB_3,
           SPACING.GAP_3,
+          TYPOGRAPHY.TEXT_3XL,
           'md:mt-10 md:mb-5',
         )}
-        style={{ fontSize: 'var(--blog-font-size-3xl)' }}
         id={id}
         {...props}
       >
@@ -118,9 +118,9 @@ export const mdxComponents = {
           'mt-5',
           SPACING.MB_2,
           SPACING.GAP_2,
+          TYPOGRAPHY.TEXT_2XL,
           'md:mt-8 md:mb-4',
         )}
-        style={{ fontSize: 'var(--blog-font-size-2xl)' }}
         id={id}
         {...props}
       >
@@ -135,8 +135,13 @@ export const mdxComponents = {
   },
   h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
     <h4
-      className={cn('font-semibold text-foreground', SPACING.MT_4, SPACING.MB_2, 'md:mt-6 md:mb-3')}
-      style={{ fontSize: 'var(--blog-font-size-xl)' }}
+      className={cn(
+        'font-semibold text-foreground',
+        SPACING.MT_4,
+        SPACING.MB_2,
+        TYPOGRAPHY.TEXT_XL,
+        'md:mt-6 md:mb-3',
+      )}
       {...props}
     >
       {children}
@@ -144,8 +149,7 @@ export const mdxComponents = {
   ),
   h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
     <h5
-      className={cn('font-semibold text-foreground', 'mt-5', SPACING.MB_2)}
-      style={{ fontSize: 'var(--blog-font-size-lg)' }}
+      className={cn('mt-5 font-semibold text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}
       {...props}
     >
       {children}
@@ -153,8 +157,12 @@ export const mdxComponents = {
   ),
   h6: ({ children, ...props }: React.ComponentPropsWithoutRef<'h6'>) => (
     <h6
-      className={cn('font-semibold text-foreground', SPACING.MT_4, SPACING.MB_2)}
-      style={{ fontSize: 'var(--blog-font-size-base)' }}
+      className={cn(
+        'font-semibold text-foreground',
+        SPACING.MT_4,
+        SPACING.MB_2,
+        TYPOGRAPHY.TEXT_BASE,
+      )}
       {...props}
     >
       {children}
@@ -164,8 +172,7 @@ export const mdxComponents = {
   // Enhanced paragraphs
   p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
     <p
-      className={cn('text-foreground/90 leading-relaxed', SPACING.MB_6)}
-      style={{ fontSize: 'var(--blog-font-size-base)' }}
+      className={cn('text-foreground/90 leading-relaxed', SPACING.MB_6, TYPOGRAPHY.TEXT_BASE)}
       {...props}
     >
       {children}
@@ -236,9 +243,9 @@ export const mdxComponents = {
       <code
         className={cn(
           'rounded border border-foreground/20 bg-foreground/10 px-1.5 py-0.5 font-mono text-foreground',
+          TYPOGRAPHY.TEXT_SM,
           className,
         )}
-        style={{ fontSize: 'var(--blog-font-size-sm)' }}
         {...props}
       >
         {children}
@@ -270,9 +277,9 @@ export const mdxComponents = {
   }) => {
     const styles = {
       info: 'border-primary/50 bg-primary/5',
-      warning: 'border-amber-500/50 bg-amber-500/5',
-      example: 'border-emerald-500/50 bg-emerald-500/5',
-      tip: 'border-blue-500/50 bg-blue-500/5',
+      warning: 'border-warning/50 bg-warning/5',
+      example: 'border-success/50 bg-success/5',
+      tip: 'border-accent/50 bg-accent/5',
     };
 
     return (
@@ -295,7 +302,7 @@ export const mdxComponents = {
     <div className='not-prose my-8 overflow-x-auto rounded-lg border border-foreground/20 bg-card/40'>
       <table
         className={cn(
-          'w-full min-w-[640px] bg-card/80 backdrop-blur-sm',
+          'w-full min-w-2xl bg-card/80 backdrop-blur-sm',
           '[&_td:last-child]:text-right [&_th:last-child]:text-right',
           '[&_td:last-child]:whitespace-nowrap [&_td:last-child]:tabular-nums',
         )}
@@ -329,8 +336,8 @@ export const mdxComponents = {
         'text-left font-semibold text-foreground uppercase tracking-wider',
         SPACING.PX_6,
         'py-3',
+        TYPOGRAPHY.TEXT_SM,
       )}
-      style={{ fontSize: 'var(--blog-font-size-sm)' }}
       {...props}
     >
       {children}
@@ -338,8 +345,12 @@ export const mdxComponents = {
   ),
   td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
     <td
-      className={cn('text-foreground/90 tabular-nums', SPACING.PX_6, SPACING.PY_4)}
-      style={{ fontSize: 'var(--blog-font-size-sm)' }}
+      className={cn(
+        'text-foreground/90 tabular-nums',
+        SPACING.PX_6,
+        SPACING.PY_4,
+        TYPOGRAPHY.TEXT_SM,
+      )}
       {...props}
     >
       {children}

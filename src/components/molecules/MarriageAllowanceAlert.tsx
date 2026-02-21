@@ -88,12 +88,9 @@ export function MarriageAllowanceAlert({
   return (
     <Alert
       variant='default'
-      className='border-2 border-pink-500/30 bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-950/20 dark:to-purple-950/20'
+      className='border-2 border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10'
     >
-      <Heart
-        className={cn(ICON_SIZES.SIZE_5, 'self-start text-pink-600 dark:text-pink-400')}
-        aria-hidden='true'
-      />
+      <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-primary')} aria-hidden='true' />
       <div
         className={cn(
           'flex flex-col sm:flex-row sm:items-center sm:justify-between',
@@ -101,13 +98,13 @@ export function MarriageAllowanceAlert({
         )}
       >
         <div className='flex-1'>
-          <AlertTitle className='text-pink-900 dark:text-pink-100'>
+          <AlertTitle className='text-foreground'>
             You May Qualify for Marriage Allowance
           </AlertTitle>
-          <AlertDescription className='text-pink-800/90 dark:text-pink-200/90'>
+          <AlertDescription className='text-muted-foreground'>
             Based on your partner's income of {formatCurrency(partnerSalary, 0)}, you may be
             eligible to receive Marriage Allowance. Estimated net saving:{' '}
-            <span className='font-bold text-pink-600 dark:text-pink-400'>
+            <span className='font-bold text-primary'>
               {formatCurrency(annualSaving, 0)} per year
             </span>{' '}
             ({formatCurrency(monthlySaving, 0)}/month) in tax.
@@ -124,7 +121,7 @@ export function MarriageAllowanceAlert({
           asChild
           size='sm'
           className={cn(
-            'w-full whitespace-nowrap border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#db2777,#7e22ce)_border-box] text-pink-700 shadow-sm hover:text-pink-800 sm:w-auto dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#db2777,#7e22ce)_border-box] dark:text-pink-300 dark:hover:text-pink-200',
+            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary shadow-sm hover:bg-primary/10 hover:text-primary sm:w-auto',
             SPACING.GAP_2,
           )}
         >

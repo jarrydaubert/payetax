@@ -92,7 +92,7 @@ function formatPublishedDateShort(isoDate: string): string {
 
 /** Common focus styles for card links */
 const focusStyles =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-xl';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl';
 
 /**
  * Large Article Card
@@ -104,8 +104,8 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
-        'border border-slate-700/50 hover:border-cyan-500/50',
+        'group relative overflow-hidden rounded-xl bg-card/60 transition-all duration-200',
+        'border border-border/60 hover:border-primary/50',
         'motion-safe:hover:-translate-y-0.5',
         className,
       )}
@@ -125,27 +125,21 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
           />
 
           {/* Category badge */}
-          <span
-            className='absolute top-4 left-4 rounded-full px-3 py-1 font-semibold text-xs uppercase tracking-wider'
-            style={{
-              backgroundColor: categoryConfig.color,
-              color: categoryConfig.textColor,
-            }}
-          >
+          <span className='absolute top-4 left-4 rounded-full bg-primary px-3 py-1 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>
 
         {/* Content */}
         <div className='p-5'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-lg text-white transition-colors group-hover:text-cyan-400 md:text-xl'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-foreground text-lg transition-colors group-hover:text-primary md:text-xl'>
             {post.title}
           </h3>
 
-          <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
+          <p className='mb-4 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-3 text-slate-400 text-xs'>
+          <div className='flex items-center gap-3 text-muted-foreground text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>
@@ -167,8 +161,8 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-lg bg-slate-800/50 transition-all duration-200',
-        'border border-slate-700/50 hover:border-cyan-500/50',
+        'group relative overflow-hidden rounded-lg bg-card/60 transition-all duration-200',
+        'border border-border/60 hover:border-primary/50',
         'motion-safe:hover:-translate-y-0.5',
         className,
       )}
@@ -187,25 +181,19 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           />
 
           {/* Category badge overlay */}
-          <span
-            className='absolute bottom-1 left-1 rounded px-1.5 py-0.5 font-semibold text-[10px] uppercase'
-            style={{
-              backgroundColor: categoryConfig.color,
-              color: categoryConfig.textColor,
-            }}
-          >
+          <span className='absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase'>
             {categoryConfig.label.split(' ')[0]}
           </span>
         </div>
 
         {/* Content */}
         <div className='flex flex-1 flex-col justify-center py-1'>
-          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-sm text-white transition-colors group-hover:text-cyan-400'>
+          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-foreground text-sm transition-colors group-hover:text-primary'>
             {post.title}
           </h3>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-slate-400 text-xs'>
+          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>
@@ -227,8 +215,8 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-slate-800/50 transition-all duration-200',
-        'border border-slate-700/50 hover:border-cyan-500/50',
+        'group relative overflow-hidden rounded-xl bg-card/60 transition-all duration-200',
+        'border border-border/60 hover:border-primary/50',
         'motion-safe:hover:-translate-y-0.5',
         className,
       )}
@@ -247,27 +235,21 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
           />
 
           {/* Category badge */}
-          <span
-            className='absolute top-3 left-3 rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider'
-            style={{
-              backgroundColor: categoryConfig.color,
-              color: categoryConfig.textColor,
-            }}
-          >
+          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>
 
         {/* Content */}
         <div className='p-4'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-white transition-colors group-hover:text-cyan-400'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-foreground transition-colors group-hover:text-primary'>
             {post.title}
           </h3>
 
-          <p className='mb-3 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
+          <p className='mb-3 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-slate-400 text-xs'>
+          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>

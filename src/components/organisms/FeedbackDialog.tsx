@@ -158,7 +158,7 @@ export function FeedbackDialog({
           <Button
             type='button'
             variant='outline'
-            className={cn('min-h-[44px]', SPACING.GAP_2, TYPOGRAPHY.TEXT_SM, triggerClassName)}
+            className={cn('min-h-11', SPACING.GAP_2, TYPOGRAPHY.TEXT_SM, triggerClassName)}
             aria-haspopup='dialog'
           >
             <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
@@ -168,7 +168,7 @@ export function FeedbackDialog({
           <button
             type='button'
             className={cn(
-              'flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
+              'flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
               'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               SPACING.GAP_2,
               TYPOGRAPHY.TEXT_SM,

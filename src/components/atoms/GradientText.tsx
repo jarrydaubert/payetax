@@ -60,7 +60,7 @@ export function GradientText<T extends AllowedElements = 'span'>({
         'inline-block',
         hasGradient && 'bg-clip-text text-transparent',
         // Forced-colors fallback: text becomes visible foreground color
-        'forced-colors:bg-none forced-colors:text-[CanvasText]',
+        'forced-colors:bg-none forced-colors:text-foreground',
         gradientClass,
         className,
       )}

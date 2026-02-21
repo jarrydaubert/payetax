@@ -54,12 +54,12 @@ export function PensionGapWarning() {
   // Qualifies for pension - green success state
   if (qualifiesForPension) {
     return (
-      <div className='rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4'>
+      <div className='rounded-xl border border-success/30 bg-success/5 p-4'>
         <div className='flex items-start gap-3'>
-          <CheckCircle2 className='mt-0.5 size-5 shrink-0 text-emerald-500' />
+          <CheckCircle2 className='mt-0.5 size-5 shrink-0 text-success' />
           <div className='space-y-1 text-sm'>
-            <p className='font-medium text-emerald-400'>State Pension: Qualifying Year</p>
-            <p className='text-slate-400'>
+            <p className='font-medium text-success'>State Pension: Qualifying Year</p>
+            <p className='text-muted-foreground'>
               Your {formatCurrency(currentSalary)} salary is above{' '}
               {formatCurrency(lowerEarningsLimit)}, so this year counts toward your State Pension
               entitlement.
@@ -73,17 +73,17 @@ export function PensionGapWarning() {
   // In the gap zone - amber warning state
   if (inGapZone) {
     return (
-      <div className='rounded-xl border border-amber-500/30 bg-amber-500/5 p-4'>
+      <div className='rounded-xl border border-warning/30 bg-warning/5 p-4'>
         <div className='flex items-start gap-3'>
-          <AlertTriangle className='mt-0.5 size-5 shrink-0 text-amber-500' />
+          <AlertTriangle className='mt-0.5 size-5 shrink-0 text-warning' />
           <div className='space-y-2 text-sm'>
-            <p className='font-medium text-amber-400'>Warning: Inefficient Salary Zone</p>
-            <p className='text-slate-400'>
+            <p className='font-medium text-warning'>Warning: Inefficient Salary Zone</p>
+            <p className='text-muted-foreground'>
               At {formatCurrency(currentSalary)} salary, your company pays{' '}
               {formatCurrency(employerNIBeingPaid)}/year in employer National Insurance, but you're{' '}
-              <strong className='text-slate-300'>not earning any State Pension credits</strong>.
+              <strong className='text-foreground'>not earning any State Pension credits</strong>.
             </p>
-            <p className='text-slate-400'>
+            <p className='text-muted-foreground'>
               Increase to {formatCurrency(lowerEarningsLimit)} (+{formatCurrency(extraMonthlyCost)}
               /month employer cost) to make this a qualifying year for your pension.
             </p>
@@ -95,12 +95,12 @@ export function PensionGapWarning() {
 
   // Below threshold - neutral info state
   return (
-    <div className='rounded-xl border border-white/[0.04] bg-[#1e293b] p-4'>
+    <div className='rounded-xl border border-border/50 bg-card p-4'>
       <div className='flex items-start gap-3'>
-        <XCircle className='mt-0.5 size-5 shrink-0 text-slate-500' />
+        <XCircle className='mt-0.5 size-5 shrink-0 text-muted-foreground' />
         <div className='space-y-1 text-sm'>
-          <p className='font-medium text-slate-400'>State Pension: No Credits This Year</p>
-          <p className='text-slate-500'>
+          <p className='font-medium text-muted-foreground'>State Pension: No Credits This Year</p>
+          <p className='text-muted-foreground'>
             {currentSalary === 0 ? (
               <>
                 With £0 salary, you pay no employer National Insurance but also earn no State

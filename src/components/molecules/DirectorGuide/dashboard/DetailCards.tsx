@@ -198,27 +198,29 @@ interface DetailCardProps {
 
 function DetailCard({ title, badge, rows, total }: DetailCardProps) {
   return (
-    <div className='rounded-xl border border-white/[0.04] bg-[#1e293b] p-5'>
+    <div className='rounded-xl border border-border/60 bg-card/80 p-5'>
       <div className='mb-4 flex items-center justify-between'>
-        <span className='font-semibold text-slate-100'>{title}</span>
+        <span className='font-semibold text-foreground'>{title}</span>
         {badge && (
-          <span className='rounded bg-cyan-500/10 px-2 py-1 text-cyan-500 text-xs'>{badge}</span>
+          <span className='rounded border border-primary/30 bg-primary/10 px-2 py-1 text-primary text-xs'>
+            {badge}
+          </span>
         )}
       </div>
 
-      <div className='space-y-0'>
+      <div>
         {rows.map((row) => (
           <div
             key={row.label}
-            className='flex items-center justify-between border-white/[0.04] border-b py-2.5 last:border-b-0'
+            className='flex items-center justify-between border-border/50 border-b py-2.5 last:border-b-0'
           >
-            <span className='text-slate-400 text-sm'>{row.label}</span>
+            <span className='text-muted-foreground text-sm'>{row.label}</span>
             <span
               className={cn(
                 'font-mono text-sm',
-                row.positive && 'text-emerald-500',
-                row.negative && 'text-red-400',
-                !(row.positive || row.negative) && 'text-slate-100',
+                row.positive && 'text-success',
+                row.negative && 'text-destructive',
+                !(row.positive || row.negative) && 'text-foreground',
               )}
             >
               {row.value}
@@ -227,12 +229,12 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
         ))}
       </div>
 
-      <div className='mt-2 flex items-center justify-between border-white/[0.08] border-t pt-3'>
-        <span className='font-semibold text-slate-100'>{total.label}</span>
+      <div className='mt-2 flex items-center justify-between border-border/70 border-t pt-3'>
+        <span className='font-semibold text-foreground'>{total.label}</span>
         <span
           className={cn(
             'font-mono font-semibold text-lg',
-            total.isError ? 'text-red-400' : 'text-cyan-500',
+            total.isError ? 'text-destructive' : 'text-primary',
           )}
         >
           {total.value}

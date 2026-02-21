@@ -77,12 +77,12 @@ export function IncomeBreakdownChart({ results, className }: IncomeBreakdownChar
 
         <ChartContainer
           config={chartConfig}
-          className='h-[250px] w-full'
+          className='h-64 w-full'
           role='img'
           aria-label='Pie chart showing breakdown of income sources'
           aria-describedby={descriptionId}
         >
-          <ResponsiveContainer width='100%' height={250}>
+          <ResponsiveContainer width='100%' height={256}>
             <PieChart>
               <ChartTooltip
                 content={

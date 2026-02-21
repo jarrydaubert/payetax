@@ -168,10 +168,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       />
 
       {/* Magazine-style layout */}
-      <div className='min-h-screen bg-slate-950'>
+      <div className='min-h-screen bg-background'>
         {/* Main Content with Sidebar */}
         <div className='container mx-auto max-w-7xl px-4 py-12'>
-          <h1 className='mb-8 font-bold font-display text-3xl text-white md:text-4xl'>
+          <h1 className='mb-8 font-bold font-display text-3xl text-foreground md:text-4xl'>
             UK Tax Guides &amp; PAYE Insights
           </h1>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
@@ -194,7 +194,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* Full-width sections - centered like All Articles */}
-        <div className='container mx-auto max-w-7xl space-y-12 px-4 pb-12'>
+        <div className='container mx-auto max-w-7xl space-y-8 px-4 pb-12'>
           {/* Pull Quote */}
           <PullQuote text={pullQuote.text} attribution={pullQuote.attribution} />
 
@@ -203,7 +203,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* All Posts Section - Server-side pagination */}
-        <div className='border-slate-800 border-t'>
+        <div className='border-border/60 border-t'>
           <AllPostsGrid
             posts={paginatedPosts}
             currentPage={currentPage}
@@ -216,7 +216,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     <Link
                       href='/blog'
                       aria-current='page'
-                      className='block rounded-full border border-cyan-500 bg-cyan-500/20 px-4 py-2 text-center text-cyan-400 text-sm'
+                      className='block rounded-full border border-primary bg-primary/20 px-4 py-2 text-center text-primary text-sm'
                     >
                       All Articles
                     </Link>
@@ -227,7 +227,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       <li key={category.slug}>
                         <Link
                           href={`/blog/category/${category.slug}`}
-                          className='block rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-center text-slate-200 text-sm transition hover:border-cyan-500/50 hover:text-white'
+                          className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
                         >
                           {category.name}
                         </Link>
@@ -246,7 +246,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
           {/* Calculator CTA */}
           <div className='mt-8 text-center'>
-            <p className='mb-4 text-slate-400'>Ready to estimate your take-home pay?</p>
+            <p className='mb-4 text-muted-foreground'>Ready to estimate your take-home pay?</p>
             <Button asChild size='touch' variant='brandOutline' className='rounded-lg px-6'>
               <Link href='/'>
                 Try the Free Calculator

@@ -115,7 +115,7 @@ export function NICalculatorClient() {
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
       {/* Header */}
       <div className='mb-12 text-center'>
-        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'>
+        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-success'>
           <Shield className={ICON_SIZES.SIZE_4} />
           <span className='font-medium text-sm'>National Insurance</span>
         </div>
@@ -272,29 +272,25 @@ export function NICalculatorClient() {
         <Card className='mb-8'>
           <CardContent className='pt-6'>
             <div className='grid gap-4 md:grid-cols-3'>
-              <div className='rounded-lg border bg-emerald-50 p-4 dark:bg-emerald-900/20'>
-                <p className='mb-1 font-medium text-emerald-800 text-sm dark:text-emerald-300'>
-                  Your NI (Employee)
-                </p>
-                <p className='font-bold text-2xl text-emerald-900 dark:text-emerald-100'>
+              <div className='rounded-lg border border-success/30 bg-success/10 p-4'>
+                <p className='mb-1 font-medium text-sm text-success'>Your NI (Employee)</p>
+                <p className='font-bold text-2xl text-foreground'>
                   {formatCurrency(result.employee)}
                 </p>
-                <p className='text-emerald-700 text-sm dark:text-emerald-400'>
+                <p className='text-sm text-success'>
                   {formatCurrency(Math.round(result.employee / 12))}/month
                 </p>
               </div>
-              <div className='rounded-lg border bg-amber-50 p-4 dark:bg-amber-900/20'>
-                <p className='mb-1 font-medium text-amber-800 text-sm dark:text-amber-300'>
-                  Employer NI
-                </p>
-                <p className='font-bold text-2xl text-amber-900 dark:text-amber-100'>
+              <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
+                <p className='mb-1 font-medium text-sm text-warning'>Employer NI</p>
+                <p className='font-bold text-2xl text-foreground'>
                   {formatCurrency(result.employer)}
                 </p>
-                <p className='text-amber-700 text-sm dark:text-amber-400'>
+                <p className='text-sm text-warning'>
                   {formatCurrency(Math.round(result.employer / 12))}/month
                 </p>
               </div>
-              <div className='rounded-lg border bg-gray-50 p-4 dark:bg-gray-800'>
+              <div className='rounded-lg border border-border/50 bg-card p-4'>
                 <p className='mb-1 font-medium text-muted-foreground text-sm'>Total NI Cost</p>
                 <p className='font-bold text-2xl'>{formatCurrency(result.total)}</p>
                 <p className='text-muted-foreground text-sm'>Employment cost to employer</p>
@@ -361,10 +357,10 @@ export function NICalculatorClient() {
             {/* Employer Rates */}
             <div>
               <h3 className='mb-3 font-semibold'>Employer NI (2025-26 changes)</h3>
-              <div className='rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20'>
+              <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 <div className='flex items-start gap-2'>
-                  <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-amber-600')} />
-                  <div className='text-amber-800 text-sm dark:text-amber-200'>
+                  <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-warning')} />
+                  <div className='text-sm text-warning'>
                     <p className='font-medium'>Autumn Budget 2024 Changes:</p>
                     <ul className='mt-1 space-y-1'>
                       <li>• Threshold reduced from £9,100 to £5,000</li>

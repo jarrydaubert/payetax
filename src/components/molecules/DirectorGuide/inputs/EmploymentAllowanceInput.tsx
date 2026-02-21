@@ -32,7 +32,7 @@ export function EmploymentAllowanceInput() {
           <TooltipContent>
             <p className='max-w-xs'>
               £10,500 allowance against Employer NI for {CURRENT_TAX_YEAR_DISPLAY}.
-              <strong className='mt-1 block text-amber-200'>
+              <strong className='mt-1 block text-warning'>
                 Not available to sole director companies
               </strong>
               You must have at least one other employee paid above £5,000/year to qualify. Two

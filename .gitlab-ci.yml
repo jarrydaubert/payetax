@@ -65,6 +65,7 @@ mr_lint_typecheck:
     - 'echo "MR validation: lint + typecheck"'
     - bun run lint
     - bun run typecheck
+    - bun run audit:tokens -- --delta
     - 'echo "Lint + typecheck passed!"'
   timeout: 15 minutes
 

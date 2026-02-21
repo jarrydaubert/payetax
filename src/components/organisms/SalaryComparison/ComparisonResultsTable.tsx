@@ -60,7 +60,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
         className={cn(
           'flex items-center justify-end',
           SPACING.GAP_1,
-          isGain ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400',
+          isGain ? 'text-success' : 'text-warning',
         )}
       >
         {isGain ? <ArrowUp className='size-4' /> : <ArrowDown className='size-4' />}
@@ -82,19 +82,14 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
 
       <section
         ref={containerRef}
-        className='cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
-          WebkitOverflowScrolling: 'touch',
-        }}
+        className='scroll-area-thin cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
         aria-label='Salary comparison results'
         aria-describedby={scrollHintId}
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead scope='col' className='sticky top-0 z-10 min-w-[120px] bg-background'>
+              <TableHead scope='col' className='sticky top-0 z-10 min-w-32 bg-background'>
                 Metric
               </TableHead>
               <TableHead
@@ -199,9 +194,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
                     className={cn(
                       'flex items-center justify-end',
                       SPACING.GAP_1,
-                      netDiff > 0
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-amber-600 dark:text-amber-400',
+                      netDiff > 0 ? 'text-success' : 'text-warning',
                     )}
                   >
                     {netDiff > 0 ? (

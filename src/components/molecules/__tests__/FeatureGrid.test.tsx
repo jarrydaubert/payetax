@@ -154,8 +154,8 @@ describe('FeatureGrid', () => {
     it('should support simple variant', () => {
       const { container } = render(<FeatureGrid features={mockFeatures} variant='simple' />);
 
-      // Simple variant has border-none
-      const cards = container.querySelectorAll('[class*="border-none"]');
+      // Simple variant has border-0
+      const cards = container.querySelectorAll('[class*="border-0"]');
       expect(cards.length).toBeGreaterThan(0);
     });
   });

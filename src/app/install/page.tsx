@@ -48,7 +48,7 @@ export default function InstallPage() {
 
       <section className='container mx-auto max-w-6xl px-4 py-24 md:py-28'>
         <div className='mx-auto max-w-3xl text-center'>
-          <p className='mb-3 font-semibold text-cyan-400 text-xs uppercase tracking-widest'>
+          <p className='mb-3 font-semibold text-primary text-xs uppercase tracking-widest'>
             Install PayeTax
           </p>
           <h1 className='font-bold text-4xl text-foreground tracking-tight md:text-5xl'>
@@ -88,9 +88,9 @@ export default function InstallPage() {
             </ol>
           </article>
 
-          <article className='rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 shadow-xl backdrop-blur-sm'>
-            <h2 className='font-semibold text-emerald-200 text-xl'>What you get</h2>
-            <ul className='mt-3 list-disc space-y-2 pl-5 text-emerald-100/90'>
+          <article className='rounded-2xl border border-success/30 bg-success/10 p-5 shadow-xl backdrop-blur-sm'>
+            <h2 className='font-semibold text-success text-xl'>What you get</h2>
+            <ul className='mt-3 list-disc space-y-2 pl-5 text-foreground/90'>
               <li>Faster launch from your home screen.</li>
               <li>Standalone app-style experience.</li>
               <li>Offline fallback when your connection drops.</li>

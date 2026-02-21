@@ -35,11 +35,11 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
       {/* Mobile: Native accordion using details/summary (zero CLS) */}
       <details className='group md:hidden'>
         <summary
-          className='flex cursor-pointer items-center justify-between rounded-lg bg-slate-800/50 p-4 text-white hover:bg-slate-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+          className='flex cursor-pointer items-center justify-between rounded-lg bg-card p-4 text-foreground hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
           aria-label="Toggle Editor's Picks section"
         >
           <span className='font-display font-semibold'>Editor&apos;s Picks</span>
-          <span className='text-slate-400 transition-transform group-open:rotate-180'>
+          <span className='text-muted-foreground transition-transform group-open:rotate-180'>
             <svg
               className='h-5 w-5'
               fill='none'
@@ -73,9 +73,9 @@ interface EditorsPicksListProps {
 
 function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) {
   return (
-    <div className='rounded-xl border border-slate-700/50 bg-slate-800/50 p-5'>
+    <div className='rounded-xl border border-border/60 bg-card/70 p-5'>
       {showHeading && (
-        <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
+        <h2 className='mb-6 font-display font-semibold text-primary text-sm uppercase tracking-widest'>
           Editor&apos;s Picks
         </h2>
       )}
@@ -89,17 +89,17 @@ function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) 
               prefetch={false}
             >
               {/* Number */}
-              <span className='flex-shrink-0 font-bold font-display text-2xl text-cyan-400/80 transition-colors group-hover:text-cyan-300'>
+              <span className='flex-shrink-0 font-bold font-display text-2xl text-primary/80 transition-colors group-hover:text-primary'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               {/* Content */}
               <div className='pt-1'>
-                <h3 className='line-clamp-2 font-medium text-sm text-white transition-colors group-hover:text-cyan-400'>
+                <h3 className='line-clamp-2 font-medium text-foreground text-sm transition-colors group-hover:text-primary'>
                   {post.title}
                 </h3>
                 {post.readTime && (
-                  <span className='mt-1 text-slate-400 text-xs'>{post.readTime}</span>
+                  <span className='mt-1 text-muted-foreground text-xs'>{post.readTime}</span>
                 )}
               </div>
             </Link>

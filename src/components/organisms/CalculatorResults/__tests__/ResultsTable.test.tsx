@@ -792,7 +792,7 @@ describe('ResultsTable Component', () => {
       render(<ResultsTable results={mockResults} previousYearResults={previousYearResults} />);
 
       const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
-      const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
+      const yearChangeValue = yearChangeRow?.querySelector('.text-success');
       expect(yearChangeValue).toBeInTheDocument();
     });
 
@@ -858,7 +858,7 @@ describe('ResultsTable Component', () => {
       render(<ResultsTable results={mockResults} previousYearResults={sameYearResults} />);
 
       const yearChangeRow = screen.getByText(/Net Change from/i).closest('tr');
-      const yearChangeValue = yearChangeRow?.querySelector('.text-green-600');
+      const yearChangeValue = yearChangeRow?.querySelector('.text-success');
       expect(yearChangeValue).toBeInTheDocument();
     });
 
@@ -1215,7 +1215,7 @@ describe('ResultsTable Component', () => {
       render(<ResultsTable results={mockResults} />);
 
       const netPayRow = screen.getByText('Net Pay').closest('tr');
-      const netPayValue = netPayRow?.querySelector('.text-green-600');
+      const netPayValue = netPayRow?.querySelector('.text-success');
       expect(netPayValue).toBeInTheDocument();
     });
 

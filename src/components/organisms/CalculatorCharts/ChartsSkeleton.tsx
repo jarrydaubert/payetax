@@ -57,8 +57,8 @@ function ChartSkeletonCard({ config }: { config: SkeletonConfig }) {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Chart area - consistent 250px height matches actual charts */}
-        <Skeleton className='h-[250px] w-full' />
+        {/* Chart area - consistent height matches actual charts */}
+        <Skeleton className='h-64 w-full' />
         {/* Legend/footer area */}
         <div className={cn('flex justify-between', SPACING.MT_2)}>
           <Skeleton className='h-4 w-28' />

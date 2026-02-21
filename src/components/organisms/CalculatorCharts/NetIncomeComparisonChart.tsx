@@ -176,7 +176,7 @@ export function NetIncomeComparisonChart({
 
         <ChartContainer
           config={chartConfig}
-          className='h-[250px] w-full'
+          className='h-64 w-full'
           role='img'
           aria-label='Bar chart comparing gross salary versus net take-home pay'
           aria-describedby={descriptionId}
@@ -271,7 +271,7 @@ export function NetIncomeComparisonChart({
                 {formatCurrency(currentSalary)}
               </span>{' '}
               → Take-home:{' '}
-              <span className='font-mono font-semibold text-emerald-600 dark:text-emerald-400'>
+              <span className='font-mono font-semibold text-success'>
                 {formatCurrency(currentStats.netPay)}
               </span>{' '}
               (

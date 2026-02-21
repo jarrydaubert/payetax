@@ -108,7 +108,7 @@ export function ScottishTaxCalculatorClient() {
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
       {/* Header */}
       <div className='mb-12 text-center'>
-        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'>
+        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-primary/15 px-4 py-2 text-primary'>
           <MapPin className={ICON_SIZES.SIZE_4} />
           <span className='font-medium text-sm'>Scottish Income Tax</span>
         </div>
@@ -190,15 +190,13 @@ export function ScottishTaxCalculatorClient() {
         <Card className='mb-8'>
           <CardContent className='pt-6'>
             <div className='grid gap-4 md:grid-cols-3'>
-              <div className='rounded-lg border border-blue-200/50 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20'>
-                <p className='mb-1 font-medium text-blue-800 text-sm dark:text-blue-300'>
-                  Scottish Tax
-                </p>
-                <p className='font-bold text-2xl text-blue-900 dark:text-blue-100'>
+              <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
+                <p className='mb-1 font-medium text-primary text-sm'>Scottish Tax</p>
+                <p className='font-bold text-2xl text-foreground'>
                   {formatCurrency(comparison.scottishTax)}
                 </p>
               </div>
-              <div className='rounded-lg border border-border/50 bg-gray-50 p-4 dark:bg-gray-800'>
+              <div className='rounded-lg border border-border/50 bg-card p-4'>
                 <p className='mb-1 font-medium text-muted-foreground text-sm'>English Tax</p>
                 <p className='font-bold text-2xl'>{formatCurrency(comparison.englishTax)}</p>
               </div>
@@ -206,10 +204,10 @@ export function ScottishTaxCalculatorClient() {
                 className={cn(
                   'rounded-lg border border-border/50 p-4',
                   comparison.difference > 0
-                    ? 'bg-amber-50 dark:bg-amber-900/20'
+                    ? 'bg-warning/10'
                     : comparison.difference < 0
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20'
-                      : 'bg-gray-50 dark:bg-gray-800',
+                      ? 'bg-success/10'
+                      : 'bg-card',
                 )}
               >
                 <p className='mb-1 font-medium text-sm'>
@@ -223,9 +221,9 @@ export function ScottishTaxCalculatorClient() {
                   className={cn(
                     'font-bold text-2xl',
                     comparison.difference > 0
-                      ? 'text-amber-700 dark:text-amber-300'
+                      ? 'text-warning'
                       : comparison.difference < 0
-                        ? 'text-emerald-700 dark:text-emerald-300'
+                        ? 'text-success'
                         : '',
                   )}
                 >
@@ -235,10 +233,10 @@ export function ScottishTaxCalculatorClient() {
               </div>
             </div>
 
-            <div className='mt-6 rounded-lg border border-blue-200/50 bg-blue-50 p-4 dark:border-blue-800/50 dark:bg-blue-900/20'>
+            <div className='mt-6 rounded-lg border border-primary/30 bg-primary/10 p-4'>
               <div className='flex items-start gap-2'>
-                <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-blue-600')} />
-                <p className='text-blue-800 text-sm dark:text-blue-200'>
+                <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
+                <p className='text-primary text-sm'>
                   This comparison shows income tax only. National Insurance is the same across the
                   UK. Scottish taxpayers have an &quot;S&quot; prefix in their tax code (e.g.,
                   S1257L).

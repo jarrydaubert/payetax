@@ -122,7 +122,7 @@ const CookieBanner: React.FC = () => {
             onClick={declineCookies}
             variant='outline'
             size='touch'
-            className='min-w-[140px] border-border/70 bg-background/80 hover:bg-background'
+            className='min-w-36 border-border/70 bg-background/80 hover:bg-background'
           >
             Essential Only
           </Button>
@@ -130,7 +130,7 @@ const CookieBanner: React.FC = () => {
             onClick={acceptCookies}
             variant='accentOutline'
             size='touch'
-            className='min-w-[140px]'
+            className='min-w-36'
             data-testid='cookie-accept-analytics'
           >
             Accept Analytics

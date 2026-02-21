@@ -100,17 +100,12 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
   return (
     <div
       className={cn(
-        'rounded-lg border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 dark:border-purple-400/30 dark:from-purple-400/10 dark:to-pink-400/10',
+        'rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/10 p-4',
         SPACING.SPACE_Y_4,
       )}
     >
       {/* Header */}
-      <div
-        className={cn(
-          'flex items-center border-purple-500/20 border-b pb-2 dark:border-purple-400/20',
-          SPACING.GAP_2,
-        )}
-      >
+      <div className={cn('flex items-center border-primary/20 border-b pb-2', SPACING.GAP_2)}>
         <Wand2 className={cn(ICON_SIZES.SIZE_5, 'text-accent-foreground')} />
         {/* IMPORTANT: Uses TEXT_LG to match other section headings (BasicInputs, ResultsTable)
             Ensures visual consistency across calculator interface */}
@@ -195,7 +190,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
           onClick={handleCompare}
           size='lg'
           className={cn(
-            'flex-1 justify-center border border-transparent bg-[linear-gradient(rgba(255,255,255,0.96),rgba(255,255,255,0.96))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] text-purple-700 dark:bg-[linear-gradient(rgba(2,6,23,0.9),rgba(2,6,23,0.9))_padding-box,linear-gradient(90deg,#a855f7,#ec4899)_border-box] dark:text-purple-300',
+            'flex-1 justify-center bg-primary text-primary-foreground hover:bg-primary/90',
             SHADOWS.GLOW_ACCENT,
             SHADOWS.GLOW_ACCENT_HOVER,
           )}
@@ -214,7 +209,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
             }}
             variant='outline'
             size='default'
-            className='border-purple-500/30 hover:border-purple-500/50 dark:border-purple-400/30 dark:hover:border-purple-400/50'
+            className='border-primary/30 hover:border-primary/50'
             data-testid='clear-what-if-button'
             aria-label='Clear What If scenario'
           >

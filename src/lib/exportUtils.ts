@@ -348,6 +348,9 @@ export function printResults({
             font-size: 9px;
             color: #64748b;
           }
+          .footer-note {
+            margin-top: 6px;
+          }
           @media print {
             body { padding: 0; }
             @page { margin: 15mm; }
@@ -495,7 +498,7 @@ export function printResults({
 
           <div class="footer">
             <p><strong>PayeTax</strong> UK PAYE Tax Calculator • payetax.co.uk</p>
-            <p style="margin-top: 6px;">
+            <p class="footer-note">
               This calculation is for illustrative purposes only.
               For official tax advice, consult HMRC or a qualified accountant.
             </p>

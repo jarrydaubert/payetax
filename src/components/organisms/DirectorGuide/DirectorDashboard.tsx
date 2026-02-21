@@ -258,25 +258,22 @@ export function DirectorDashboard() {
           <main className='p-6'>
             {/* Header */}
             <div className={inputsCollapsed ? 'mb-6 pl-12' : 'mb-6'}>
-              <h1 className='font-semibold text-2xl text-slate-100'>
-                Director Pay{' '}
-                <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
-                  Dashboard
-                </span>
+              <h1 className='font-semibold text-2xl text-foreground'>
+                Director Pay <span className='text-gradient-brand'>Dashboard</span>
               </h1>
               <nav
                 aria-label='Director Intelligence navigation links'
-                className='mt-2 flex flex-wrap items-center gap-3 text-slate-400 text-sm'
+                className='mt-2 flex flex-wrap items-center gap-3 text-muted-foreground text-sm'
               >
-                <Link href='/' className='hover:text-slate-200'>
+                <Link href='/' className='hover:text-foreground'>
                   PAYE Calculator
                 </Link>
                 <span aria-hidden='true'>|</span>
-                <Link href='/tools' className='hover:text-slate-200'>
+                <Link href='/tools' className='hover:text-foreground'>
                   All Tools
                 </Link>
                 <span aria-hidden='true'>|</span>
-                <Link href='/blog' className='hover:text-slate-200'>
+                <Link href='/blog' className='hover:text-foreground'>
                   Tax Guides
                 </Link>
               </nav>
@@ -297,31 +294,31 @@ export function DirectorDashboard() {
                 ) : (
                   <>
                     {isMonthlyMode && monthlyModeOutput && (
-                      <section className='rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4'>
-                        <h3 className='font-semibold text-emerald-300 text-sm uppercase tracking-wider'>
+                      <section className='rounded-xl border border-success/20 bg-success/10 p-4'>
+                        <h3 className='font-semibold text-sm text-success uppercase tracking-wider'>
                           Safe Monthly Draw
                         </h3>
                         <div className='mt-2 grid gap-3 md:grid-cols-3'>
                           <div>
-                            <div className='text-slate-400 text-xs'>Recommended draw</div>
-                            <div className='font-mono font-semibold text-slate-100'>
+                            <div className='text-muted-foreground text-xs'>Recommended draw</div>
+                            <div className='font-mono font-semibold text-foreground'>
                               £{Math.round(monthlyModeOutput.safeMonthlyDraw).toLocaleString()}/mo
                             </div>
                           </div>
                           <div>
-                            <div className='text-slate-400 text-xs'>Required buffer</div>
-                            <div className='font-mono font-semibold text-slate-100'>
+                            <div className='text-muted-foreground text-xs'>Required buffer</div>
+                            <div className='font-mono font-semibold text-foreground'>
                               £{Math.round(monthlyModeOutput.requiredBuffer).toLocaleString()}
                             </div>
                           </div>
                           <div>
-                            <div className='text-slate-400 text-xs'>Buffer status</div>
+                            <div className='text-muted-foreground text-xs'>Buffer status</div>
                             <div
                               className={cn(
                                 'font-medium',
                                 monthlyModeOutput.hasBufferShortfall
-                                  ? 'text-amber-300'
-                                  : 'text-emerald-300',
+                                  ? 'text-warning'
+                                  : 'text-success',
                               )}
                             >
                               {monthlyModeOutput.hasBufferShortfall
@@ -378,7 +375,7 @@ export function DirectorDashboard() {
                 {/* Email CTA Banner */}
                 <div
                   className={cn(
-                    'rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10',
+                    'rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 to-success/10',
                     SPACING.MT_8,
                     SPACING.P_6,
                   )}
@@ -390,10 +387,10 @@ export function DirectorDashboard() {
                     )}
                   >
                     <div className='text-center sm:text-left'>
-                      <h3 className='mb-1 font-semibold text-lg text-slate-100'>
+                      <h3 className='mb-1 font-semibold text-foreground text-lg'>
                         Save this breakdown for your records
                       </h3>
-                      <p className='text-slate-400 text-sm'>
+                      <p className='text-muted-foreground text-sm'>
                         Get a full tax strategy report emailed to you - perfect for sharing with
                         your accountant.
                       </p>
@@ -411,26 +408,26 @@ export function DirectorDashboard() {
               </div>
             ) : (
               /* Empty State */
-              <div className='flex min-h-[60vh] flex-col items-center justify-center rounded-2xl border border-white/[0.08] border-dashed bg-[#0f172a]/50'>
+              <div className='flex min-h-screen flex-col items-center justify-center rounded-2xl border border-border/50 border-dashed bg-background/60'>
                 <div className='mx-auto max-w-md text-center'>
-                  <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20'>
-                    <Calculator className='size-10 text-cyan-500' />
+                  <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-success/20'>
+                    <Calculator className='size-10 text-primary' />
                   </div>
-                  <h2 className='mb-2 font-semibold text-lg text-slate-100'>
+                  <h2 className='mb-2 font-semibold text-foreground text-lg'>
                     Compare salary and dividend scenarios
                   </h2>
-                  <p className='mb-6 text-slate-500'>
+                  <p className='mb-6 text-muted-foreground'>
                     Enter your company profit on the left to see estimated take-home and tax impact
                     across common mixes.
                   </p>
                   <div
                     className={cn(
-                      'flex items-center justify-center text-slate-600 text-sm',
+                      'flex items-center justify-center text-muted-foreground text-sm',
                       SPACING.GAP_2,
                     )}
                   >
                     <span
-                      className='size-2 rounded-full bg-cyan-500 motion-safe:animate-pulse'
+                      className='size-2 rounded-full bg-primary motion-safe:animate-pulse'
                       aria-hidden='true'
                     />
                     Enter your figures to get started

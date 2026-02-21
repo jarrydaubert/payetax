@@ -296,7 +296,7 @@ export function CalculatorContainer() {
     <div
       id='tax-calculator'
       className={cn(
-        'mx-auto flex w-full max-w-[1800px] flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
         SPACING.GAP_3,
         SPACING.PX_2,
         SPACING.PY_4,
@@ -324,7 +324,7 @@ export function CalculatorContainer() {
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
           Estimate your take-home pay with official HMRC rates. Fast and free.
         </p>
-        <div className='mx-auto mt-4 max-w-2xl rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-left text-amber-200 text-xs'>
+        <div className='mx-auto mt-4 max-w-2xl rounded-lg border border-warning/30 bg-warning/10 p-3 text-left text-warning text-xs'>
           <p>
             <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
             advice. Consult a qualified accountant for advice specific to your situation. Based on

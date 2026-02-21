@@ -86,13 +86,13 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
     const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(16);
 
-    // Verify Current columns have blue background
-    const blueCells = container.querySelectorAll('td.bg-blue-500\\/10');
-    expect(blueCells.length).toBe(7); // One per period
+    // Verify Current columns have primary background tint
+    const currentCells = container.querySelectorAll('td.bg-primary\\/10');
+    expect(currentCells.length).toBe(7); // One per period
 
-    // Verify What If columns have purple background
-    const purpleCells = container.querySelectorAll('td.bg-purple-500\\/10');
-    expect(purpleCells.length).toBe(7); // One per period
+    // Verify What If columns have success background tint
+    const whatIfCells = container.querySelectorAll('td.bg-success\\/10');
+    expect(whatIfCells.length).toBe(7); // One per period
   });
 
   it('should handle mixed zero and non-zero values correctly', () => {
@@ -148,9 +148,9 @@ describe('ResultTableRow - What If Zero Values Bug', () => {
     const cells = container.querySelectorAll('th, td');
     expect(cells.length).toBe(4);
 
-    // No cells should have purple background (What If columns)
-    const purpleCells = container.querySelectorAll('td.bg-purple-500\\/10');
-    expect(purpleCells.length).toBe(0);
+    // No cells should have success background tint (What If columns)
+    const whatIfCells = container.querySelectorAll('td.bg-success\\/10');
+    expect(whatIfCells.length).toBe(0);
   });
 
   it('should handle allowances/deductions with zero values correctly', () => {

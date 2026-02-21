@@ -46,7 +46,8 @@ const {
   highProfitComplexity: HIGH_PROFIT_COMPLEXITY_THRESHOLD,
 } = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS;
 
-const SECTION_HEADING_CLASS = 'mb-3 font-semibold text-slate-500 text-xs uppercase tracking-wider';
+const SECTION_HEADING_CLASS =
+  'mb-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider';
 
 interface EducationPanelProps {
   className?: string;
@@ -197,7 +198,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
   }, [sortedWarnings]);
 
   return (
-    <aside className={cn('flex h-full flex-col bg-slate-900 p-5', className)}>
+    <aside className={cn('flex h-full flex-col bg-card p-5', className)}>
       <PanelSection title='Learn'>
         <div className='space-y-3'>
           {visibleLearnCards.map((card) => (
@@ -222,8 +223,8 @@ export function EducationPanel({ className }: EducationPanelProps) {
       )}
 
       <PanelSection title='Assumptions'>
-        <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
-          <p className='mb-3 text-slate-300 text-xs leading-relaxed'>
+        <div className='rounded-[10px] border border-border/50 bg-background p-4'>
+          <p className='mb-3 text-muted-foreground text-xs leading-relaxed'>
             Results below use the current inputs and assumptions shown here.
           </p>
           <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
@@ -263,9 +264,11 @@ export function EducationPanel({ className }: EducationPanelProps) {
 
       <PanelSection title='Accuracy & Scope' className='mb-0'>
         <div className='space-y-3'>
-          <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
-            <div className='mb-2 font-medium text-slate-200 text-sm'>What this calculator does</div>
-            <ul className='space-y-1 text-slate-400 text-xs'>
+          <div className='rounded-[10px] border border-border/50 bg-background p-4'>
+            <div className='mb-2 font-medium text-foreground text-sm'>
+              What this calculator does
+            </div>
+            <ul className='space-y-1 text-muted-foreground text-xs'>
               <li>• Compares salary vs dividend extraction strategies</li>
               <li>• Uses current HMRC rates (single source of truth)</li>
               <li>
@@ -274,9 +277,9 @@ export function EducationPanel({ className }: EducationPanelProps) {
               </li>
             </ul>
           </div>
-          <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
-            <div className='mb-2 font-medium text-slate-200 text-sm'>Known limitations</div>
-            <ul className='space-y-1 text-slate-400 text-xs'>
+          <div className='rounded-[10px] border border-border/50 bg-background p-4'>
+            <div className='mb-2 font-medium text-foreground text-sm'>Known limitations</div>
+            <ul className='space-y-1 text-muted-foreground text-xs'>
               <li>• Student loan £2k unearned income rule (may overstate)</li>
               <li>• Short accounting period adjustments</li>
               <li>• Marriage Allowance transfers</li>
@@ -286,23 +289,23 @@ export function EducationPanel({ className }: EducationPanelProps) {
               <li>• Dividend timing (declaration vs payment date)</li>
             </ul>
           </div>
-          <div className='rounded-[10px] border border-cyan-500/20 bg-cyan-500/5 p-4'>
-            <div className='mb-2 font-medium text-cyan-200 text-sm'>
+          <div className='rounded-[10px] border border-primary/20 bg-primary/5 p-4'>
+            <div className='mb-2 font-medium text-primary text-sm'>
               MTD for Income Tax timeline (current HMRC plan)
             </div>
-            <ul className='space-y-1 text-cyan-100/90 text-xs'>
+            <ul className='space-y-1 text-primary/90 text-xs'>
               <li>• From 6 April 2026: qualifying income over £50,000</li>
               <li>• From 6 April 2027: qualifying income over £30,000</li>
               <li>• From 6 April 2028: qualifying income over £20,000</li>
             </ul>
-            <p className='mt-2 text-cyan-100/85 text-xs leading-relaxed'>
+            <p className='mt-2 text-primary/85 text-xs leading-relaxed'>
               Scope depends on your personal income sources. Limited-company directors may still
               file Self Assessment outside MTD for Income Tax unless qualifying self-employment or
               property income applies.
             </p>
           </div>
-          <div className='rounded-[10px] border border-amber-500/20 bg-amber-500/5 p-3'>
-            <p className='text-amber-200 text-xs leading-relaxed'>
+          <div className='rounded-[10px] border border-warning/20 bg-warning/5 p-3'>
+            <p className='text-warning text-xs leading-relaxed'>
               <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
               advice. Consult a qualified accountant for advice specific to your situation. Based on
               HMRC rates for {TAX_YEAR} which may change.
@@ -565,9 +568,9 @@ function PanelSection({
 
 function LearnCard({ title, description }: LearnCardProps) {
   return (
-    <div className='rounded-[10px] border border-white/[0.04] bg-slate-800 p-4'>
-      <div className='mb-1 font-medium text-slate-100 text-sm'>{title}</div>
-      <div className='text-slate-400 text-xs leading-relaxed'>{description}</div>
+    <div className='rounded-[10px] border border-border/50 bg-background p-4'>
+      <div className='mb-1 font-medium text-foreground text-sm'>{title}</div>
+      <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
     </div>
   );
 }
@@ -583,22 +586,22 @@ function WarningCard({ title, description, isCritical }: WarningCardProps) {
     <div
       className={cn(
         'rounded-[10px] border p-4',
-        isCritical ? 'border-red-500/30 bg-red-500/10' : 'border-amber-500/30 bg-amber-500/10',
+        isCritical ? 'border-destructive/30 bg-destructive/10' : 'border-warning/30 bg-warning/10',
       )}
     >
       <div className='mb-2 flex items-center gap-2'>
         <AlertTriangle
-          className={cn('size-4', isCritical ? 'text-red-500' : 'text-amber-500')}
+          className={cn('size-4', isCritical ? 'text-destructive' : 'text-warning')}
           aria-hidden='true'
         />
         <span
-          className={cn('font-semibold text-sm', isCritical ? 'text-red-500' : 'text-amber-500')}
+          className={cn('font-semibold text-sm', isCritical ? 'text-destructive' : 'text-warning')}
         >
           {isCritical && <span className='sr-only'>Critical warning: </span>}
           {title}
         </span>
       </div>
-      <div className='text-slate-400 text-xs leading-relaxed'>{description}</div>
+      <div className='text-muted-foreground text-xs leading-relaxed'>{description}</div>
     </div>
   );
 }
@@ -612,13 +615,10 @@ interface AssumptionRowProps {
 function AssumptionRow({ label, value, isLast }: AssumptionRowProps) {
   return (
     <div
-      className={cn(
-        'flex justify-between py-1.5 text-xs',
-        !isLast && 'border-white/[0.04] border-b',
-      )}
+      className={cn('flex justify-between py-1.5 text-xs', !isLast && 'border-border/50 border-b')}
     >
-      <span className='text-slate-500'>{label}</span>
-      <span className='text-slate-300'>{value}</span>
+      <span className='text-muted-foreground'>{label}</span>
+      <span className='text-foreground'>{value}</span>
     </div>
   );
 }

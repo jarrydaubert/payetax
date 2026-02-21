@@ -32,7 +32,7 @@ export function CompanyCarInput() {
               <span className='mt-1 block'>• Tesla Model 3 (£40k × 2%) = £800/year</span>
               <span className='block'>• BMW 330e (£45k × 8%) = £3,600/year</span>
               <span className='block'>• Range Rover (£80k × 37%) = £29,600/year</span>
-              <span className='mt-1 block text-amber-200'>
+              <span className='mt-1 block text-warning'>
                 Enter the annual BIK value (List Price × BIK %)
               </span>
             </p>

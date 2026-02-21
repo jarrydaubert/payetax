@@ -42,29 +42,25 @@ function formatCurrency(value: number, showPence = false): string {
  * Default category colors
  */
 const defaultColors = {
-  border: 'border-green-500/30',
-  accent: 'text-green-400',
-  badge: 'bg-green-500/20 text-green-400',
+  border: 'border-success/30',
+  accent: 'text-success',
 };
 
 /**
  * Category-specific accent colors
  */
-const categoryColors: Record<string, { border: string; accent: string; badge: string }> = {
+const categoryColors: Record<string, { border: string; accent: string }> = {
   'tax-trap': {
-    border: 'border-amber-500/30',
-    accent: 'text-amber-400',
-    badge: 'bg-amber-500/20 text-amber-400',
+    border: 'border-warning/30',
+    accent: 'text-warning',
   },
   'student-loan': {
-    border: 'border-blue-500/30',
-    accent: 'text-blue-400',
-    badge: 'bg-blue-500/20 text-blue-400',
+    border: 'border-primary/30',
+    accent: 'text-primary',
   },
   scottish: {
-    border: 'border-purple-500/30',
-    accent: 'text-purple-400',
-    badge: 'bg-purple-500/20 text-purple-400',
+    border: 'border-primary/30',
+    accent: 'text-primary',
   },
   'life-stage': defaultColors,
 };
@@ -137,7 +133,7 @@ export function ScenarioSummaryCard({
             </div>
             <div>
               <p className={cn(TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>After (+ Pension)</p>
-              <p className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold', 'text-green-400')}>
+              <p className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold', 'text-success')}>
                 {formatCurrency(optimizedResults.netPay.annually + optimization.suggested)}
               </p>
             </div>
@@ -206,8 +202,8 @@ function SummaryItem({
         className={cn(
           TYPOGRAPHY.TEXT_BASE,
           'font-semibold',
-          variant === 'deduction' && 'text-red-400/80',
-          variant === 'highlight' && 'text-green-400',
+          variant === 'deduction' && 'text-destructive/80',
+          variant === 'highlight' && 'text-success',
         )}
       >
         {variant === 'deduction' && value !== '£0' ? `-${value.slice(1)}` : value}
@@ -237,8 +233,8 @@ function MiniStat({
         className={cn(
           TYPOGRAPHY.TEXT_SM,
           'font-semibold',
-          negative && 'text-red-400/80',
-          highlight && 'text-green-400',
+          negative && 'text-destructive/80',
+          highlight && 'text-success',
         )}
       >
         {negative && value !== '£0' ? `-${value.slice(1)}` : value}

@@ -119,7 +119,7 @@ describe('Textarea Component', () => {
       const textarea = screen.getByRole('textbox');
 
       expect(textarea).toHaveClass('flex');
-      expect(textarea).toHaveClass('min-h-[60px]');
+      expect(textarea).toHaveClass('min-h-16');
       expect(textarea).toHaveClass('w-full');
       expect(textarea).toHaveClass('rounded-md');
       expect(textarea).toHaveClass('border');

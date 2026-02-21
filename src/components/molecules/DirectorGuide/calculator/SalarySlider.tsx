@@ -75,22 +75,20 @@ export function SalarySlider() {
   if (!hasValidComparison) return null;
 
   return (
-    <div className='space-y-5 rounded-xl border border-white/[0.04] bg-[#1e293b] p-5'>
-      <div className='rounded-lg border border-white/[0.06] bg-slate-900/70 p-3'>
+    <div className='space-y-4 rounded-xl border border-border/50 bg-card p-5'>
+      <div className='rounded-lg border border-border/50 bg-background/80 p-3'>
         <div className='flex items-center justify-between gap-2'>
-          <span className='font-medium text-slate-200 text-sm'>Active Scenario</span>
+          <span className='font-medium text-foreground text-sm'>Active Scenario</span>
           <span
             className={cn(
               'rounded px-2 py-0.5 text-xs',
-              isProfitWhatIfActive
-                ? 'bg-cyan-500/20 text-cyan-300'
-                : 'bg-emerald-500/20 text-emerald-300',
+              isProfitWhatIfActive ? 'bg-primary/20 text-primary' : 'bg-success/20 text-success',
             )}
           >
             {isProfitWhatIfActive ? 'Simulated Company' : 'Current Company'}
           </span>
         </div>
-        <p className='mt-2 text-slate-400 text-xs'>
+        <p className='mt-2 text-muted-foreground text-xs'>
           Salary slider is editing the {isProfitWhatIfActive ? 'simulated' : 'current'} company
           scenario ({isSalaryCustom ? 'custom salary' : 'baseline salary'}).
         </p>
@@ -98,7 +96,7 @@ export function SalarySlider() {
 
       <div className='space-y-3'>
         <div className='flex items-center justify-between gap-2'>
-          <div className='flex items-center gap-2 text-slate-500'>
+          <div className='flex items-center gap-2 text-muted-foreground'>
             <TrendingUp className='size-4' />
             <span className='text-sm'>Company profit scenario</span>
           </div>
@@ -108,18 +106,18 @@ export function SalarySlider() {
             className={cn(
               'rounded border px-2 py-1 text-xs transition-colors',
               isProfitWhatIfActive
-                ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20'
-                : 'cursor-default border-white/10 text-slate-600',
+                ? 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/20'
+                : 'cursor-default border-border/50 text-muted-foreground',
             )}
             disabled={!isProfitWhatIfActive}
           >
             Reset
           </button>
         </div>
-        <p className='text-slate-400 text-xs'>
+        <p className='text-muted-foreground text-xs'>
           {formatCurrency(baseGrossProfitBeforePension)} now
           {' -> '}
-          <span className='font-medium text-slate-200'>
+          <span className='font-medium text-foreground'>
             {formatCurrency(scenarioGrossProfitBeforePension)}
           </span>{' '}
           ({formatPercent(profitWhatIfPercent)})
@@ -136,11 +134,11 @@ export function SalarySlider() {
       </div>
 
       <div className='space-y-3'>
-        <div className='flex items-center gap-2 text-slate-500'>
+        <div className='flex items-center gap-2 text-muted-foreground'>
           <MoveHorizontal className='size-4' />
           <span className='text-sm'>Salary level at this scenario</span>
         </div>
-        <p className='text-slate-400 text-xs'>
+        <p className='text-muted-foreground text-xs'>
           Exploring salary from £0 to {formatCurrency(maxSalary)} (max affordable under current
           company scenario)
         </p>

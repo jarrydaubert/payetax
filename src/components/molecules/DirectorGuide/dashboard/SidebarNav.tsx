@@ -35,24 +35,24 @@ interface SidebarNavProps {
 
 // Shared styles for nav items
 const baseItemClass =
-  'group flex min-h-9 w-full items-center rounded-[10px] border border-transparent py-2 text-slate-400 transition-[color,background-color,border-color] duration-150 hover:border-white/10 hover:bg-slate-800 hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 2xl:min-h-10 2xl:py-2.5';
+  'group flex min-h-9 w-full items-center rounded-lg border border-transparent py-2 text-muted-foreground transition-[color,background-color,border-color] duration-150 hover:border-border/60 hover:bg-accent/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background 2xl:min-h-10 2xl:py-2.5';
 
 const getItemClass = (collapsed: boolean, isActive = false) =>
   cn(
     baseItemClass,
     collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5 2xl:gap-3 2xl:px-3',
-    isActive && 'border-cyan-500/25 bg-slate-800/70 text-cyan-300 shadow-cyan-inset',
+    isActive && 'border-primary/30 bg-primary/10 text-primary',
   );
 
 const getLabelClass = (collapsed: boolean) =>
   cn(
-    'block max-w-[182px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[0.9rem] tracking-[-0.01em] transition-all duration-200 2xl:max-w-[210px] 2xl:text-[0.97rem]',
+    'block max-w-44 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-sm tracking-tight transition-all duration-200 2xl:max-w-52',
     collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
   );
 
-const navIconClass = 'size-[18px] shrink-0 2xl:size-5';
+const navIconClass = 'size-4 shrink-0 2xl:size-5';
 const sectionHeaderClass =
-  'mb-1.5 px-2.5 font-semibold text-[11px] text-slate-500 uppercase tracking-[0.16em] transition-opacity duration-200 2xl:mb-2 2xl:px-3';
+  'mb-1.5 px-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest transition-opacity duration-200 2xl:mb-2 2xl:px-3';
 
 const NORMAL_WORKFLOW_ITEMS = [
   { id: 'director-summary', label: 'Summary', icon: BarChart3 },
@@ -257,8 +257,8 @@ export function SidebarNav({
   return (
     <nav
       className={cn(
-        'relative flex h-full flex-col border-white/[0.04] border-r bg-slate-950 py-3 transition-[width,padding] duration-200 ease-out 2xl:py-4',
-        collapsed ? 'w-14 px-2' : 'w-[clamp(13.75rem,15vw,17rem)] px-2.5 2xl:px-3.5',
+        'relative flex h-full flex-col border-border/40 border-r bg-background py-3 transition-[width,padding] duration-200 ease-out 2xl:py-4',
+        collapsed ? 'w-14 px-2' : 'w-56 px-2.5 xl:w-64 2xl:w-72 2xl:px-3.5',
       )}
       aria-label='Sidebar navigation'
     >
@@ -266,35 +266,31 @@ export function SidebarNav({
       <Link
         href='/'
         className={cn(
-          'mb-4 flex items-center rounded-[12px] border border-white/[0.08] bg-slate-900/60 text-slate-100 transition-colors hover:bg-slate-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+          'mb-4 flex items-center rounded-xl border border-border/50 bg-card text-foreground transition-colors hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           collapsed
             ? 'size-12 justify-center p-0'
             : 'mb-3 min-h-11 w-full gap-2.5 px-2.5 py-2 xl:mb-4 xl:min-h-12 xl:gap-3 xl:px-3 xl:py-2.5',
         )}
         aria-label='PayeTax Home'
       >
-        <span className='flex size-9 items-center justify-center rounded-[11px] bg-gradient-to-br from-cyan-500 to-emerald-500 font-bold text-slate-950'>
+        <span className='flex size-9 items-center justify-center rounded-lg bg-brand-gradient-new font-bold text-primary-foreground'>
           P
         </span>
         <span
           className={cn(
-            'brand-wordmark block max-w-[180px] overflow-hidden whitespace-nowrap text-[0.9rem] text-slate-100 transition-all duration-200 2xl:text-[0.95rem]',
+            'brand-wordmark block max-w-44 overflow-hidden whitespace-nowrap text-foreground text-sm transition-all duration-200 2xl:text-base',
             collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
           )}
         >
           paye
-          <span className='bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent'>
-            tax
-          </span>
+          <span className='text-gradient-brand'>tax</span>
         </span>
       </Link>
 
       {!collapsed && (
-        <div className='mb-3 rounded-[12px] border border-cyan-400/25 bg-gradient-to-br from-cyan-500/12 to-emerald-500/6 p-2.5 2xl:mb-4 2xl:p-3'>
-          <div className='font-semibold text-[11px] text-cyan-200 uppercase tracking-[0.16em]'>
-            Guide
-          </div>
-          <p className='mt-1 text-slate-300/90 text-xs leading-relaxed'>
+        <div className='mb-3 rounded-xl border border-primary/25 bg-primary/10 p-2.5 2xl:mb-4 2xl:p-3'>
+          <div className='font-semibold text-primary text-xs uppercase tracking-widest'>Guide</div>
+          <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
             {dashboardVariant
               ? 'Use Workflow to jump between sections instantly.'
               : 'Enter figures in the inputs panel to unlock scenario navigation.'}
@@ -327,7 +323,7 @@ export function SidebarNav({
 
       {workflowItems.length > 0 && (
         <>
-          <div className='my-2.5 h-px bg-white/[0.06] 2xl:my-3' aria-hidden='true' />
+          <div className='my-2.5 h-px bg-border/60 2xl:my-3' aria-hidden='true' />
           <section aria-label='Workflow'>
             <div className={cn(sectionHeaderClass, collapsed && 'opacity-0')}>Workflow</div>
             {workflowItems.map((item) => (
@@ -344,7 +340,7 @@ export function SidebarNav({
         </>
       )}
 
-      <div className='my-2.5 h-px bg-white/[0.06] 2xl:my-3' aria-hidden='true' />
+      <div className='my-2.5 h-px bg-border/60 2xl:my-3' aria-hidden='true' />
 
       {/* Section: Tools */}
       <section aria-label='Tools'>

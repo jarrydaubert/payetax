@@ -51,7 +51,7 @@ export function StudentLoanInputs() {
             <p className='max-w-xs'>
               <strong>Directors pay student loans on TOTAL income</strong> (salary + dividends) via
               Self Assessment — not just salary.
-              <span className='mt-1 block text-amber-200'>
+              <span className='mt-1 block text-warning'>
                 This is different from employees where student loans only come from salary via PAYE.
               </span>
             </p>

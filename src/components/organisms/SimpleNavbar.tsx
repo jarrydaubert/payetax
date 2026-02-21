@@ -33,7 +33,7 @@ const FeedbackDialog = dynamic(
   {
     ssr: false,
     loading: () => (
-      <span className='flex min-h-[44px] items-center rounded-md px-4 py-2.5 font-medium text-[0.85rem] text-text-secondary-new'>
+      <span className='flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-sm text-text-secondary-new'>
         Feedback
       </span>
     ),
@@ -151,13 +151,12 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
       <nav
         className={cn(
-          'fixed top-0 right-0 left-0 z-50',
+          'nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
           'px-4 py-4 sm:px-8 sm:py-6',
-          'bg-deep/80 backdrop-blur-[20px]',
+          'bg-deep/80 backdrop-blur-xl',
           className,
         )}
-        style={{ top: 'var(--pwa-safe-area-top, 0px)' }}
         aria-label='Main navigation'
       >
         {/* Logo - Home button */}
@@ -172,20 +171,20 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             }
           }}
         >
-          <span className='brand-wordmark text-[1.4rem] text-text-primary-new'>
+          <span className='brand-wordmark text-2xl text-text-primary-new'>
             paye
             <span className='text-gradient-new'>tax</span>
           </span>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className='hidden items-center gap-10 md:flex'>
+        <div className='hidden items-center gap-8 md:flex'>
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='font-medium text-[0.85rem] text-text-secondary-new transition-colors duration-300 hover:text-cyan'
+              className='font-medium text-sm text-text-secondary-new transition-colors duration-300 hover:text-cyan'
             >
               {link.label}
             </Link>
@@ -199,7 +198,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             asChild
             size='touch'
             variant='brandOutline'
-            className='rounded-full px-5 py-2.5 text-[0.85rem] text-text-primary-new hover:scale-105'
+            className='rounded-full px-5 py-2.5 text-sm text-text-primary-new hover:scale-105'
           >
             <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
               Open Calculator
@@ -239,10 +238,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       />
 
       {/* Spacer for fixed navbar */}
-      <div
-        className='h-[calc(4rem+var(--pwa-safe-area-top,0px))] sm:h-20'
-        data-testid='navbar-spacer'
-      />
+      <div className='navbar-safe-spacer' data-testid='navbar-spacer' />
     </>
   );
 };

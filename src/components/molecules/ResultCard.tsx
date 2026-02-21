@@ -45,11 +45,11 @@ const variantStyles = {
   },
   success: {
     card: '',
-    icon: 'text-green-600 dark:text-green-400',
+    icon: 'text-success',
   },
   warning: {
     card: '',
-    icon: 'text-amber-600 dark:text-amber-400',
+    icon: 'text-warning',
   },
   info: {
     card: '',

@@ -427,8 +427,8 @@ describe('WhatIfComparisonDisplay', () => {
         />,
       );
 
-      expect(screen.getByText(/Blue columns show your current scenario/i)).toBeInTheDocument();
-      expect(screen.getByText(/Purple columns show your "What If" scenario/i)).toBeInTheDocument();
+      expect(screen.getByText(/Left columns show your current scenario/i)).toBeInTheDocument();
+      expect(screen.getByText(/Right columns show your "What If" scenario/i)).toBeInTheDocument();
     });
   });
 });

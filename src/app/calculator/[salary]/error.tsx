@@ -23,10 +23,10 @@ export default function CalculatorError({
   }, [error, errorId]);
 
   return (
-    <div className='flex min-h-[60vh] flex-col items-center justify-center p-6'>
+    <div className='flex min-h-screen flex-col items-center justify-center p-6'>
       <div className='w-full max-w-md text-center'>
         {/* Icon */}
-        <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'>
+        <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-border/60 bg-card/50'>
           <span className='font-display text-4xl'>!</span>
         </div>
 
@@ -34,7 +34,7 @@ export default function CalculatorError({
         <h1 className='font-bold font-display text-3xl tracking-tight'>Calculation error</h1>
 
         {/* Description */}
-        <p className='mt-3 text-white/60'>
+        <p className='mt-3 text-muted-foreground'>
           We couldn't process this calculation. Please try again or use a different value.
         </p>
 
@@ -52,7 +52,7 @@ export default function CalculatorError({
           </Button>
           <a
             href='/'
-            className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+            className='inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-card/50 px-6 py-3 font-semibold text-foreground transition-all hover:border-border hover:bg-card/70'
           >
             <Home className='size-4' />
             Go home
@@ -60,7 +60,9 @@ export default function CalculatorError({
         </div>
 
         {/* Error reference */}
-        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+        <p className='mt-8 font-mono text-muted-foreground/60 text-xs'>
+          Error ID: {errorId.slice(-8)}
+        </p>
 
         {/* Dev Debug */}
         {process.env.NODE_ENV === 'development' && (
@@ -68,7 +70,7 @@ export default function CalculatorError({
             <button
               type='button'
               onClick={() => setShowDebug(!showDebug)}
-              className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
+              className='inline-flex items-center gap-1 text-sm text-warning/80 transition-colors hover:text-warning'
             >
               <ChevronDown
                 className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
@@ -76,8 +78,8 @@ export default function CalculatorError({
               Debug info
             </button>
             {showDebug && (
-              <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
-                <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
+              <div className='mt-3 rounded-xl border border-warning/20 bg-warning/5 p-4 text-left'>
+                <pre className='overflow-auto whitespace-pre-wrap font-mono text-warning/80 text-xs'>
                   {error.message}
                   {'\n\n'}
                   {error.stack}

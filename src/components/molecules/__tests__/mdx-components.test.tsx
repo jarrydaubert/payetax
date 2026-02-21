@@ -146,7 +146,7 @@ describe('mdx-components', () => {
       it('should have correct styling classes', () => {
         render(<P>Styled paragraph</P>);
         const p = screen.getByText('Styled paragraph');
-        expect(p).toHaveClass('text-foreground/90', 'leading-relaxed');
+        expect(p).toHaveClass('text-foreground/90', 'text-base');
       });
     });
 

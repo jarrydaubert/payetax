@@ -110,7 +110,7 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className='min-h-screen bg-slate-950'>
+    <div className='min-h-screen bg-background'>
       {/* Structured Data */}
       <StructuredData
         type='breadcrumb'
@@ -135,49 +135,49 @@ export default async function CategoryPage({
       />
 
       {/* Header */}
-      <div className='border-slate-800 border-b bg-slate-900/50 py-12'>
+      <div className='border-border/60 border-b bg-card/50 py-12'>
         <div className='container mx-auto max-w-7xl px-4'>
           {/* Breadcrumbs */}
-          <nav aria-label='Breadcrumbs' className='mb-6 text-slate-400 text-sm'>
+          <nav aria-label='Breadcrumbs' className='mb-6 text-muted-foreground text-sm'>
             <ol className='flex items-center gap-2'>
               <li>
-                <Link href='/' className='hover:text-white'>
+                <Link href='/' className='hover:text-foreground'>
                   Home
                 </Link>
               </li>
               <li>/</li>
               <li>
-                <Link href='/blog' className='hover:text-white'>
+                <Link href='/blog' className='hover:text-foreground'>
                   Blog
                 </Link>
               </li>
               <li>/</li>
-              <li className='text-cyan-400'>{category.name}</li>
+              <li className='text-primary'>{category.name}</li>
             </ol>
           </nav>
 
-          <h1 className='mb-4 font-bold font-display text-3xl text-white md:text-4xl'>
+          <h1 className='mb-4 font-bold font-display text-3xl text-foreground md:text-4xl'>
             {category.name}
           </h1>
-          <p className='max-w-2xl text-slate-300'>
+          <p className='max-w-2xl text-muted-foreground'>
             Expert articles on {category.name.toLowerCase()} including UK tax updates, guidance, and
             practical advice.
           </p>
-          <p className='mt-2 text-slate-400 text-sm'>
+          <p className='mt-2 text-muted-foreground text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
           </p>
         </div>
       </div>
 
       {/* Category Filter Pills */}
-      <div className='border-slate-800 border-b'>
+      <div className='border-border/60 border-b'>
         <div className='container mx-auto max-w-7xl px-4 py-6'>
           <nav aria-label='Browse blog categories'>
             <ul className='grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
               <li>
                 <Link
                   href='/blog'
-                  className='block rounded-full border border-slate-700 bg-slate-800/60 px-4 py-2 text-center text-slate-200 text-sm transition hover:border-cyan-500/50 hover:text-white'
+                  className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
                 >
                   All Articles
                 </Link>
@@ -192,8 +192,8 @@ export default async function CategoryPage({
                       className={cn(
                         'block rounded-full border px-4 py-2 text-center text-sm transition',
                         cat.slug === slug
-                          ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400'
-                          : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:border-cyan-500/50 hover:text-white',
+                          ? 'border-primary bg-primary/20 text-primary'
+                          : 'border-border/70 bg-card/70 text-foreground hover:border-primary/50 hover:text-foreground',
                       )}
                     >
                       {cat.name}
@@ -212,20 +212,20 @@ export default async function CategoryPage({
             {posts.map((post) => (
               <article
                 key={post.id}
-                className='group rounded-lg border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-slate-700'
+                className='group rounded-lg border border-border/60 bg-card/50 p-6 transition-colors hover:border-border'
               >
-                <div className='mb-3 flex items-center gap-2 text-slate-400 text-xs'>
-                  <span className='font-medium text-cyan-400'>
+                <div className='mb-3 flex items-center gap-2 text-muted-foreground text-xs'>
+                  <span className='font-medium text-primary'>
                     {post.categoryData?.name || post.category}
                   </span>
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
-                <h2 className='mb-2 font-semibold text-white group-hover:text-cyan-400'>
+                <h2 className='mb-2 font-semibold text-foreground group-hover:text-primary'>
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                 </h2>
-                <p className='mb-4 line-clamp-2 text-slate-400 text-sm'>{post.excerpt}</p>
-                <time className='text-slate-400 text-xs' dateTime={post.publishedAt}>
+                <p className='mb-4 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
+                <time className='text-muted-foreground text-xs' dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
               </article>
@@ -233,8 +233,8 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className='py-16 text-center'>
-            <p className='text-lg text-slate-400'>No articles found in this category yet.</p>
-            <Link href='/blog' className='mt-4 inline-block text-cyan-400 hover:text-cyan-300'>
+            <p className='text-lg text-muted-foreground'>No articles found in this category yet.</p>
+            <Link href='/blog' className='mt-4 inline-block text-primary hover:text-primary/90'>
               ← Browse all articles
             </Link>
           </div>
@@ -252,18 +252,18 @@ export default async function CategoryPage({
             {currentPage > 1 && (
               <Link
                 href={`/blog/category/${slug}?page=${currentPage - 1}`}
-                className='rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700'
+                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-foreground text-sm hover:bg-card/80'
               >
                 Previous
               </Link>
             )}
-            <span className='px-4 py-2 text-slate-400 text-sm'>
+            <span className='px-4 py-2 text-muted-foreground text-sm'>
               Page {currentPage} of {totalPages}
             </span>
             {currentPage < totalPages && (
               <Link
                 href={`/blog/category/${slug}?page=${currentPage + 1}`}
-                className='rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700'
+                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-foreground text-sm hover:bg-card/80'
               >
                 Next
               </Link>

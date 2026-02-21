@@ -33,7 +33,7 @@ export function PensionInput() {
               <span className='mt-1 block'>• Deductible from Corporation Tax</span>
               <span className='block'>• No Employer or Employee NI</span>
               <span className='block'>• No Income Tax</span>
-              <span className='mt-1 block text-amber-200'>
+              <span className='mt-1 block text-warning'>
                 Annual Allowance: £60,000 (or 100% of earnings if lower)
               </span>
             </p>

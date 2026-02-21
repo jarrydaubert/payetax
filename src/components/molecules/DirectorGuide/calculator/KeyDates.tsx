@@ -131,26 +131,26 @@ export function KeyDates() {
   };
 
   return (
-    <div className='rounded-xl border border-white/[0.04] bg-[#1e293b] p-4'>
+    <div className='rounded-xl border border-border/60 bg-card/80 p-4'>
       <div className='mb-3 flex items-center justify-between gap-2'>
-        <div className='flex items-center gap-2 text-slate-400'>
+        <div className='flex items-center gap-2 text-muted-foreground'>
           <Calendar className='size-4' />
           <span className='font-medium text-sm'>Key Dates</span>
         </div>
         <button
           type='button'
           onClick={handleDownloadCalendar}
-          className='inline-flex items-center gap-1.5 rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 font-medium text-cyan-300 text-xs transition-colors hover:border-cyan-400/40 hover:bg-cyan-500/20'
+          className='inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 font-medium text-primary text-xs transition-colors hover:border-primary/40 hover:bg-primary/20'
         >
           <Download className='size-3.5' />
           Download .ics
         </button>
       </div>
-      <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-xs md:grid-cols-4'>
+      <div className='grid grid-cols-2 gap-2 text-xs md:grid-cols-4 md:gap-6'>
         {dates.map(({ label, date }) => (
           <div key={label}>
-            <div className='text-slate-500'>{label}</div>
-            <div className='font-mono text-slate-300'>{formatDate(date)}</div>
+            <div className='text-muted-foreground'>{label}</div>
+            <div className='font-mono text-foreground'>{formatDate(date)}</div>
           </div>
         ))}
       </div>

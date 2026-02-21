@@ -68,13 +68,13 @@ export default function ToolsPage() {
 
       <PageContainer maxWidth='5xl'>
         <header className='mb-8'>
-          <h1 className='text-balance font-semibold text-3xl text-slate-100'>
+          <h1 className='text-balance font-semibold text-3xl text-foreground'>
             Free UK Tax{' '}
-            <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
+            <span className='bg-gradient-to-r from-primary to-success bg-clip-text text-transparent'>
               Tools
             </span>
           </h1>
-          <p className='mt-3 max-w-2xl text-pretty text-slate-400'>
+          <p className='mt-3 max-w-2xl text-pretty text-muted-foreground'>
             Quick calculators and explainers built on current HMRC rates. No signup.
           </p>
         </header>
@@ -85,16 +85,16 @@ export default function ToolsPage() {
               key={tool.href}
               href={tool.href}
               data-testid={`tools-link-${tool.href.split('/').pop()}`}
-              className='group rounded-2xl border border-white/[0.08] bg-[#0b1220]/40 p-5 transition hover:border-white/[0.14] hover:bg-[#0f172a]/50'
+              className='group rounded-2xl border border-border/60 bg-card/40 p-5 transition hover:border-primary/40 hover:bg-card/60'
             >
               <div className='flex items-center justify-between gap-3'>
                 <div>
-                  <div className='font-semibold text-slate-100 group-hover:text-white'>
+                  <div className='font-semibold text-foreground group-hover:text-primary'>
                     {tool.title}
                   </div>
-                  <div className='mt-1 text-slate-500 text-sm'>{tool.description}</div>
+                  <div className='mt-1 text-muted-foreground text-sm'>{tool.description}</div>
                 </div>
-                <span className='text-cyan-400 text-sm transition group-hover:translate-x-0.5'>
+                <span className='text-primary text-sm transition group-hover:translate-x-0.5'>
                   Use Tool →
                 </span>
               </div>

@@ -83,7 +83,7 @@ export function MarginalRateInsight({ increase, netDiff, className }: MarginalRa
         <div className={cn('mt-6', SPACING.SPACE_Y_2)}>
           <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
             <span className='text-muted-foreground'>You keep</span>
-            <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
+            <span className='font-semibold text-success'>
               {formatCurrency(keepAmount, 0)} ({keepRateDisplay}%)
             </span>
           </div>
@@ -96,13 +96,13 @@ export function MarginalRateInsight({ increase, netDiff, className }: MarginalRa
             className='h-3 w-full overflow-hidden rounded-full bg-muted'
           >
             <div
-              className='h-full bg-emerald-600 transition-all duration-500 dark:bg-emerald-500'
+              className='h-full bg-success transition-all duration-500'
               style={{ width: `${keepRateClamped}%` }}
             />
           </div>
           <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
             <span className='text-muted-foreground'>Lost to deductions</span>
-            <span className='font-medium text-amber-600 dark:text-amber-400'>
+            <span className='font-medium text-warning'>
               {formatCurrency(lostAmount, 0)} ({lostRateDisplay}%)
             </span>
           </div>

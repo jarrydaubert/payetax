@@ -109,16 +109,16 @@ export function StrategyComparisonTable() {
     <div className='space-y-3'>
       {/* Header with dynamic message */}
       <div>
-        <h3 className='font-semibold text-slate-100'>Choose Your Strategy</h3>
-        <div className='mt-2 grid grid-cols-2 gap-2 rounded-lg border border-white/[0.04] bg-slate-950 p-1'>
+        <h3 className='font-semibold text-foreground'>Choose Your Strategy</h3>
+        <div className='mt-2 grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
           <button
             type='button'
             onClick={() => setObjective('maximizeTakeHome')}
             className={cn(
               'rounded-md px-3 py-2 text-sm transition-colors',
               objective === 'maximizeTakeHome'
-                ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                : 'text-slate-400 hover:text-slate-200',
+                ? 'bg-primary/20 font-medium text-primary'
+                : 'text-muted-foreground hover:text-foreground',
             )}
             aria-pressed={objective === 'maximizeTakeHome'}
           >
@@ -130,26 +130,26 @@ export function StrategyComparisonTable() {
             className={cn(
               'rounded-md px-3 py-2 text-sm transition-colors',
               objective === 'minimizeNI'
-                ? 'bg-cyan-500/20 font-medium text-cyan-300'
-                : 'text-slate-400 hover:text-slate-200',
+                ? 'bg-primary/20 font-medium text-primary'
+                : 'text-muted-foreground hover:text-foreground',
             )}
             aria-pressed={objective === 'minimizeNI'}
           >
             Minimize NI
           </button>
         </div>
-        <p className='mt-2 text-slate-400 text-sm'>
+        <p className='mt-2 text-muted-foreground text-sm'>
           Compare salary/dividend tradeoffs using your selected objective. Switch objective to see
           how the recommended strategy changes.
         </p>
         {isNearObjective && (
           <p className='text-sm'>
-            <span className='font-medium text-emerald-400'>
+            <span className='font-medium text-success'>
               {objective === 'maximizeTakeHome'
                 ? 'Closest to max take-home objective'
                 : 'Closest to minimum NI objective'}
             </span>
-            <span className='text-slate-500'>
+            <span className='text-muted-foreground'>
               {' '}
               — use the £ deltas on each card to compare tradeoffs
             </span>
@@ -157,16 +157,18 @@ export function StrategyComparisonTable() {
         )}
         {objective === 'maximizeTakeHome' && takeHomeDifference < -10 && (
           <p className='text-sm'>
-            <span className='font-medium text-red-400'>
+            <span className='font-medium text-destructive'>
               {formatCurrency(Math.abs(takeHomeDifference))} lower take-home
             </span>
-            <span className='text-slate-500'>{' than max take-home strategy'}</span>
+            <span className='text-muted-foreground'>{' than max take-home strategy'}</span>
           </p>
         )}
         {objective === 'minimizeNI' && niDifference > 10 && (
           <p className='text-sm'>
-            <span className='font-medium text-red-400'>{formatCurrency(niDifference)} more NI</span>
-            <span className='text-slate-500'>{' than lowest-NI strategy'}</span>
+            <span className='font-medium text-destructive'>
+              {formatCurrency(niDifference)} more NI
+            </span>
+            <span className='text-muted-foreground'>{' than lowest-NI strategy'}</span>
           </p>
         )}
       </div>
@@ -193,13 +195,13 @@ export function StrategyComparisonTable() {
               className={cn(
                 'relative rounded-xl border p-4 text-left transition-all',
                 isSelected
-                  ? 'border-cyan-500 bg-cyan-500/10 shadow-cyan-glow'
-                  : 'border-white/[0.08] bg-[#1e293b] hover:border-white/[0.15] hover:bg-[#273548]',
+                  ? 'border-primary bg-primary/10 shadow-cyan-glow'
+                  : 'border-border/40 bg-card hover:border-border/70 hover:bg-accent/20',
               )}
             >
               {/* Objective badge */}
               {isRecommended && (
-                <span className='absolute -top-2 right-3 rounded-full bg-emerald-500 px-2 py-0.5 font-medium text-white text-xs'>
+                <span className='absolute -top-2 right-3 rounded-full bg-success px-2 py-0.5 font-medium text-success-foreground text-xs'>
                   {objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI'}
                 </span>
               )}
@@ -209,55 +211,61 @@ export function StrategyComparisonTable() {
                 <div
                   className={cn(
                     'flex size-8 items-center justify-center rounded-lg',
-                    isSelected ? 'bg-cyan-500/20' : 'bg-white/5',
+                    isSelected ? 'bg-primary/20' : 'bg-muted/20',
                   )}
                 >
-                  <Icon className={cn('size-4', isSelected ? 'text-cyan-400' : 'text-slate-400')} />
+                  <Icon
+                    className={cn('size-4', isSelected ? 'text-primary' : 'text-muted-foreground')}
+                  />
                 </div>
                 <div>
-                  <h4 className='font-medium text-slate-100'>{data.name}</h4>
-                  <p className='text-slate-500 text-xs'>{description}</p>
+                  <h4 className='font-medium text-foreground'>{data.name}</h4>
+                  <p className='text-muted-foreground text-xs'>{description}</p>
                 </div>
               </div>
 
               {/* Key Metrics */}
               <div className='space-y-1.5 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-slate-500'>Salary</span>
-                  <span className='font-mono text-slate-300'>{formatCurrency(data.salary)}</span>
+                  <span className='text-muted-foreground'>Salary</span>
+                  <span className='font-mono text-foreground/90'>
+                    {formatCurrency(data.salary)}
+                  </span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-slate-500'>Dividends</span>
-                  <span className='font-mono text-slate-300'>{formatCurrency(data.dividends)}</span>
+                  <span className='text-muted-foreground'>Dividends</span>
+                  <span className='font-mono text-foreground/90'>
+                    {formatCurrency(data.dividends)}
+                  </span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-slate-500'>Total Tax</span>
-                  <span className='font-mono text-red-400'>{formatCurrency(totalTax)}</span>
+                  <span className='text-muted-foreground'>Total Tax</span>
+                  <span className='font-mono text-destructive'>{formatCurrency(totalTax)}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-slate-500'>Total NI</span>
-                  <span className='font-mono text-slate-300'>{formatCurrency(totalNI)}</span>
+                  <span className='text-muted-foreground'>Total NI</span>
+                  <span className='font-mono text-foreground/90'>{formatCurrency(totalNI)}</span>
                 </div>
-                <div className='mt-2 flex justify-between border-white/[0.08] border-t pt-2'>
-                  <span className='font-medium text-slate-400'>Take-Home</span>
-                  <span className='font-mono font-semibold text-emerald-400'>
+                <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
+                  <span className='font-medium text-muted-foreground'>Take-Home</span>
+                  <span className='font-mono font-semibold text-success'>
                     {formatCurrency(data.takeHome)}
                   </span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-slate-500'>
+                  <span className='text-muted-foreground'>
                     {objective === 'maximizeTakeHome' ? 'Vs Max Take-Home' : 'Vs Lowest NI'}
                   </span>
                   <span
                     className={cn(
                       'font-mono',
                       isReference
-                        ? 'text-emerald-400'
+                        ? 'text-success'
                         : objective === 'maximizeTakeHome' && takeHomeDelta < 0
-                          ? 'text-red-400'
+                          ? 'text-destructive'
                           : objective === 'minimizeNI' && niDelta > 0
-                            ? 'text-red-400'
-                            : 'text-emerald-400',
+                            ? 'text-destructive'
+                            : 'text-success',
                     )}
                   >
                     {isReference
@@ -267,7 +275,7 @@ export function StrategyComparisonTable() {
                         : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta))}`}
                   </span>
                 </div>
-                <div className='text-right text-slate-500 text-xs'>
+                <div className='text-right text-muted-foreground text-xs'>
                   {objective === 'maximizeTakeHome' ? 'Tax delta' : 'NI delta'}:{' '}
                   {objective === 'maximizeTakeHome'
                     ? totalTax > objectiveReferenceTotalTax
@@ -284,7 +292,7 @@ export function StrategyComparisonTable() {
               </div>
 
               {/* Effective Rate */}
-              <div className='mt-2 text-right text-slate-500 text-xs'>
+              <div className='mt-2 text-right text-muted-foreground text-xs'>
                 {data.effectiveRate.toFixed(1)}% effective rate
               </div>
             </button>
@@ -318,19 +326,19 @@ function YourSetupCard({
 }: YourSetupCardProps) {
   if (!yourSetup) {
     return (
-      <div className='relative mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4'>
+      <div className='relative mt-4 rounded-xl border border-warning/50 bg-warning/10 p-4'>
         <div className='mb-3 flex items-center gap-2'>
-          <div className='flex size-8 items-center justify-center rounded-lg bg-amber-500/20'>
-            <User className='size-4 text-amber-400' />
+          <div className='flex size-8 items-center justify-center rounded-lg bg-warning/20'>
+            <User className='size-4 text-warning' />
           </div>
           <div>
-            <h4 className='font-medium text-slate-100'>Your Setup</h4>
-            <p className='text-slate-500 text-xs'>Your current arrangement</p>
+            <h4 className='font-medium text-foreground'>Your Setup</h4>
+            <p className='text-muted-foreground text-xs'>Your current arrangement</p>
           </div>
         </div>
-        <div className='rounded-lg bg-black/20 p-3 text-slate-300 text-sm'>
-          <span className='font-medium text-slate-100'>Not set.</span> Add your salary and dividends
-          in Full Inputs to compare your current setup against your selected objective.
+        <div className='rounded-lg bg-muted/20 p-3 text-foreground/80 text-sm'>
+          <span className='font-medium text-foreground'>Not set.</span> Add your salary and
+          dividends in Full Inputs to compare your current setup against your selected objective.
         </div>
       </div>
     );
@@ -348,13 +356,13 @@ function YourSetupCard({
       className={cn(
         'relative mt-4 rounded-xl border p-4',
         yourSetup.exceedsProfit
-          ? 'border-red-500/50 bg-red-500/10'
-          : 'border-amber-500/30 bg-amber-500/5',
+          ? 'border-destructive/50 bg-destructive/10'
+          : 'border-warning/50 bg-warning/10',
       )}
     >
       {/* DLA Warning Badge */}
       {yourSetup.exceedsProfit && (
-        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-full bg-red-500 px-2 py-0.5 font-medium text-white text-xs'>
+        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 font-medium text-destructive-foreground text-xs'>
           <AlertTriangle className='size-3' />
           Exceeds Profit
         </span>
@@ -362,66 +370,68 @@ function YourSetupCard({
 
       {/* Icon & Title */}
       <div className='mb-3 flex items-center gap-2'>
-        <div className='flex size-8 items-center justify-center rounded-lg bg-amber-500/20'>
-          <User className='size-4 text-amber-400' />
+        <div className='flex size-8 items-center justify-center rounded-lg bg-warning/20'>
+          <User className='size-4 text-warning' />
         </div>
         <div>
-          <h4 className='font-medium text-slate-100'>Your Setup</h4>
-          <p className='text-slate-500 text-xs'>Your current arrangement</p>
+          <h4 className='font-medium text-foreground'>Your Setup</h4>
+          <p className='text-muted-foreground text-xs'>Your current arrangement</p>
         </div>
       </div>
 
       {/* Key Metrics */}
       <div className='space-y-1.5 text-sm'>
         <div className='flex justify-between'>
-          <span className='text-slate-500'>Salary</span>
-          <span className='font-mono text-slate-300'>{formatCurrency(yourSetup.salary)}</span>
+          <span className='text-muted-foreground'>Salary</span>
+          <span className='font-mono text-foreground/90'>{formatCurrency(yourSetup.salary)}</span>
         </div>
         <div className='flex justify-between'>
-          <span className='text-slate-500'>Dividends</span>
-          <span className='font-mono text-slate-300'>{formatCurrency(yourSetup.dividends)}</span>
+          <span className='text-muted-foreground'>Dividends</span>
+          <span className='font-mono text-foreground/90'>
+            {formatCurrency(yourSetup.dividends)}
+          </span>
         </div>
         <div className='flex justify-between'>
-          <span className='text-slate-500'>Total Tax</span>
-          <span className='font-mono text-red-400'>{formatCurrency(totalTax)}</span>
+          <span className='text-muted-foreground'>Total Tax</span>
+          <span className='font-mono text-destructive'>{formatCurrency(totalTax)}</span>
         </div>
         <div className='flex justify-between'>
-          <span className='text-slate-500'>Total NI</span>
-          <span className='font-mono text-slate-300'>{formatCurrency(totalNI)}</span>
+          <span className='text-muted-foreground'>Total NI</span>
+          <span className='font-mono text-foreground/90'>{formatCurrency(totalNI)}</span>
         </div>
-        <div className='mt-2 flex justify-between border-white/[0.08] border-t pt-2'>
-          <span className='font-medium text-slate-400'>Take-Home</span>
-          <span className='font-mono font-semibold text-emerald-400'>
+        <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
+          <span className='font-medium text-muted-foreground'>Take-Home</span>
+          <span className='font-mono font-semibold text-success'>
             {formatCurrency(yourSetup.takeHome)}
           </span>
         </div>
       </div>
 
       {/* Delta vs Optimal */}
-      <div className='mt-3 rounded-lg bg-black/20 p-2 text-center text-sm'>
+      <div className='mt-3 rounded-lg bg-muted/20 p-2 text-center text-sm'>
         {objective === 'maximizeTakeHome' && isNearObjective && (
-          <span className='text-emerald-400'>Within £10 of max take-home reference</span>
+          <span className='text-success'>Within £10 of max take-home reference</span>
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta < -10 && (
-          <span className='text-red-400'>
+          <span className='text-destructive'>
             Takes home {formatCurrency(Math.abs(takeHomeDelta))} less per year vs max take-home
           </span>
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta > 10 && (
-          <span className='text-emerald-400'>
+          <span className='text-success'>
             Takes home {formatCurrency(takeHomeDelta)} more per year vs max take-home
           </span>
         )}
         {objective === 'minimizeNI' && isNearObjective && (
-          <span className='text-emerald-400'>Within £10 of minimum NI reference</span>
+          <span className='text-success'>Within £10 of minimum NI reference</span>
         )}
         {objective === 'minimizeNI' && niDelta > 10 && (
-          <span className='text-red-400'>
+          <span className='text-destructive'>
             Pays {formatCurrency(niDelta)} more NI per year vs lowest-NI strategy
           </span>
         )}
         {objective === 'minimizeNI' && niDelta < -10 && (
-          <span className='text-emerald-400'>
+          <span className='text-success'>
             Pays {formatCurrency(Math.abs(niDelta))} less NI per year vs lowest-NI strategy
           </span>
         )}
@@ -429,9 +439,9 @@ function YourSetupCard({
 
       {/* DLA Warning */}
       {yourSetup.exceedsProfit && (
-        <div className='mt-3 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3'>
-          <AlertTriangle className='mt-0.5 size-4 shrink-0 text-red-400' />
-          <p className='text-red-300 text-xs'>
+        <div className='mt-3 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3'>
+          <AlertTriangle className='mt-0.5 size-4 shrink-0 text-destructive' />
+          <p className='text-destructive/90 text-xs'>
             Your salary + dividends exceeds available profit. This may create or increase a
             Director&apos;s Loan Account balance. Speak to your accountant.
           </p>
@@ -439,7 +449,7 @@ function YourSetupCard({
       )}
 
       {/* Effective Rate */}
-      <div className='mt-2 text-right text-slate-500 text-xs'>
+      <div className='mt-2 text-right text-muted-foreground text-xs'>
         {yourSetup.effectiveRate.toFixed(1)}% effective rate
       </div>
     </div>

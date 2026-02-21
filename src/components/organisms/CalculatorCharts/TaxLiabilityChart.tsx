@@ -136,7 +136,7 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
 
         <ChartContainer
           config={chartConfig}
-          className='h-[250px] w-full'
+          className='h-64 w-full'
           role='img'
           aria-label={
             whatIf
@@ -234,7 +234,7 @@ export function TaxLiabilityChart({ results, whatIfResults, className }: TaxLiab
           )}
           <div className='text-right'>
             <p className='text-muted-foreground'>Take Home</p>
-            <p className='font-medium font-mono text-emerald-600 dark:text-emerald-400'>
+            <p className='font-medium font-mono text-success'>
               {formatCurrency(summaryStats.netPay)}
             </p>
           </div>

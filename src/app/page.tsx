@@ -12,7 +12,7 @@ import { generateMetadata } from '@/lib/metadata';
 // Using loading option for predictable fallback behavior (vs relying on outer Suspense)
 const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'), {
   loading: () => (
-    <output className='flex min-h-[400px] items-center justify-center p-8' aria-live='polite'>
+    <output className='flex min-h-96 items-center justify-center p-8' aria-live='polite'>
       <div className='flex flex-col items-center gap-3'>
         <div className='size-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
         <p className='text-muted-foreground text-sm'>Loading calculator...</p>
@@ -58,7 +58,7 @@ export default function HomePage() {
         timeout={0}
         rootMargin='100px'
         forceRenderOnHash='#tax-calculator'
-        fallback={<div className='min-h-[100px]' aria-hidden='true' />}
+        fallback={<div className='min-h-24' aria-hidden='true' />}
       >
         <HomePageContent />
       </DeferredContent>

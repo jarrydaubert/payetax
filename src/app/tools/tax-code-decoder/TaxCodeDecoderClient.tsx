@@ -110,14 +110,14 @@ export function TaxCodeDecoderClient() {
       {/* Results */}
       {result && (
         <Card
-          className={cn('mb-8', result.isValid ? 'border-emerald/30' : 'border-destructive/30')}
+          className={cn('mb-8', result.isValid ? 'border-success/30' : 'border-destructive/30')}
         >
           <CardHeader>
             <div className='flex items-start justify-between'>
               <div>
                 <CardTitle className='flex items-center gap-2'>
                   {result.isValid ? (
-                    <CheckCircle className={cn(ICON_SIZES.SIZE_5, 'text-emerald')} />
+                    <CheckCircle className={cn(ICON_SIZES.SIZE_5, 'text-success')} />
                   ) : (
                     <AlertCircle className={cn(ICON_SIZES.SIZE_5, 'text-destructive')} />
                   )}
@@ -134,7 +134,7 @@ export function TaxCodeDecoderClient() {
                     className={cn(
                       'font-bold',
                       TYPOGRAPHY.TEXT_2XL,
-                      result.allowance < 0 ? 'text-destructive' : 'text-emerald',
+                      result.allowance < 0 ? 'text-destructive' : 'text-success',
                     )}
                   >
                     {formatAllowance(result.allowance)}
@@ -148,17 +148,17 @@ export function TaxCodeDecoderClient() {
             {(result.isScottish || result.isWelsh || result.isEmergency) && (
               <div className='flex flex-wrap gap-2'>
                 {result.isScottish && (
-                  <span className='rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-800 text-sm dark:bg-blue-900/30 dark:text-blue-300'>
+                  <span className='rounded-full bg-primary/15 px-3 py-1 font-medium text-primary text-sm'>
                     Scottish Tax Rates
                   </span>
                 )}
                 {result.isWelsh && (
-                  <span className='rounded-full bg-red-100 px-3 py-1 font-medium text-red-800 text-sm dark:bg-red-900/30 dark:text-red-300'>
+                  <span className='rounded-full bg-destructive/15 px-3 py-1 font-medium text-destructive text-sm'>
                     Welsh Tax Rates
                   </span>
                 )}
                 {result.isEmergency && (
-                  <span className='rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-800 text-sm dark:bg-amber-900/30 dark:text-amber-300'>
+                  <span className='rounded-full bg-warning/15 px-3 py-1 font-medium text-sm text-warning'>
                     Emergency Code
                   </span>
                 )}
@@ -182,11 +182,11 @@ export function TaxCodeDecoderClient() {
 
             {/* Warnings */}
             {result.warnings.length > 0 && (
-              <div className='space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20'>
+              <div className='space-y-2 rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 {result.warnings.map((warning, index) => (
                   <div
                     key={`warning-${index}-${warning.slice(0, 20)}`}
-                    className='flex items-start gap-2 text-amber-800 dark:text-amber-200'
+                    className='flex items-start gap-2 text-warning'
                   >
                     <AlertCircle className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0')} />
                     <span>{warning}</span>

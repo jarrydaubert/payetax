@@ -304,7 +304,7 @@ export function FinalCTASection() {
       <Button asChild size='touch' variant='brandOutline' className='group rounded-xl px-8'>
         <Link href='#tax-calculator'>
           Show My Take Home Pay
-          <ArrowRight className='h-[18px] w-[18px] transition-transform group-hover:translate-x-1' />
+          <ArrowRight className='size-4 transition-transform group-hover:translate-x-1' />
         </Link>
       </Button>
     </section>

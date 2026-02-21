@@ -39,7 +39,7 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
   return (
     // Use aria-label instead of aria-labelledby to avoid static ID issues
     <section aria-label='Latest articles'>
-      <h2 className='mb-6 font-display font-semibold text-cyan-500 text-sm uppercase tracking-widest'>
+      <h2 className='mb-6 font-display font-semibold text-primary text-sm uppercase tracking-widest'>
         Latest Articles
       </h2>
 

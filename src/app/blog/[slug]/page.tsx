@@ -417,7 +417,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
 
             {/* Content with sidebar TOC on desktop */}
-            <div className='relative xl:flex xl:gap-12'>
+            <div className='relative xl:flex xl:gap-8'>
               {/* Table of Contents - sticky sidebar on xl screens */}
               <TableOfContents content={post.content} className='w-56 shrink-0' />
 
@@ -431,8 +431,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   'prose-strong:font-semibold prose-strong:text-foreground',
                   'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
                   'prose-li:marker:text-primary/60',
-                  'prose-blockquote:m-0 prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:not-italic',
-                  'prose-table:m-0 prose-thead:border-0 prose-tr:border-0',
+                  'prose-blockquote:border-0 prose-blockquote:p-0 prose-blockquote:not-italic',
+                  'prose-table prose-thead:border-0 prose-tr:border-0',
                   'prose-td:p-0 prose-th:p-0 prose-td:align-middle prose-th:align-middle',
                   'prose-code:rounded prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-primary prose-code:before:content-none prose-code:after:content-none',
                   'prose-pre:border prose-pre:border-foreground/10 prose-pre:bg-foreground/5',

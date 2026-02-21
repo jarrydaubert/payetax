@@ -153,26 +153,26 @@ export default async function ScenarioPage({ params }: PageProps) {
 
   // Category-specific colors - default to life-stage styling
   const defaultColors = {
-    text: 'text-green-400',
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/30',
+    text: 'text-success',
+    bg: 'bg-success/10',
+    border: 'border-success/30',
   };
 
   const categoryColors: Record<string, { text: string; bg: string; border: string }> = {
     'tax-trap': {
-      text: 'text-amber-400',
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/30',
+      text: 'text-warning',
+      bg: 'bg-warning/10',
+      border: 'border-warning/30',
     },
     'student-loan': {
-      text: 'text-blue-400',
-      bg: 'bg-blue-500/10',
-      border: 'border-blue-500/30',
+      text: 'text-primary',
+      bg: 'bg-primary/10',
+      border: 'border-primary/30',
     },
     scottish: {
-      text: 'text-purple-400',
-      bg: 'bg-purple-500/10',
-      border: 'border-purple-500/30',
+      text: 'text-primary',
+      bg: 'bg-primary/10',
+      border: 'border-primary/30',
     },
     'life-stage': defaultColors,
   };

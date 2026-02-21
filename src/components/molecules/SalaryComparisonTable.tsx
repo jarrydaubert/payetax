@@ -92,15 +92,10 @@ export function SalaryComparisonTable() {
           <Card className='overflow-hidden'>
             <section
               ref={comparisonTableRef}
-              className='overflow-x-auto scroll-smooth'
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'oklch(var(--muted-foreground)) transparent',
-                WebkitOverflowScrolling: 'touch',
-              }}
+              className='scroll-area-thin overflow-x-auto scroll-smooth'
               aria-label='Salary comparison table - scrollable'
             >
-              <table className='w-full min-w-[640px] border-collapse'>
+              <table className='w-full min-w-160 border-collapse'>
                 <thead className='bg-gradient-to-r from-primary/10 to-accent/10'>
                   <tr className='border-border/20 border-b'>
                     <th className={cn('text-left font-bold text-foreground', SPACING.P_4)}>
@@ -137,17 +132,10 @@ export function SalaryComparisonTable() {
                       <td className={cn('text-right text-destructive', SPACING.P_4)}>
                         £{row.tax.toLocaleString()}
                       </td>
-                      <td
-                        className={cn('text-right text-amber-600 dark:text-amber-400', SPACING.P_4)}
-                      >
+                      <td className={cn('text-right text-warning', SPACING.P_4)}>
                         £{row.ni.toLocaleString()}
                       </td>
-                      <td
-                        className={cn(
-                          'text-right font-bold text-green-600 dark:text-green-400',
-                          SPACING.P_4,
-                        )}
-                      >
+                      <td className={cn('text-right font-bold text-success', SPACING.P_4)}>
                         £{row.annual.toLocaleString()}
                       </td>
                       <td className={cn('text-right text-muted-foreground', SPACING.P_4)}>

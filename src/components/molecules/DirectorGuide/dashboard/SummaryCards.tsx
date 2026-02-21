@@ -111,32 +111,32 @@ function SummaryCard({
   return (
     <article
       className={cn(
-        'rounded-xl border border-white/5 bg-slate-800 p-5 transition-all hover:-translate-y-0.5 hover:border-white/10',
-        highlight &&
-          !isEmpty &&
-          'border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5',
+        'rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-border/80',
+        highlight && !isEmpty && 'border-primary/30 bg-gradient-to-br from-primary/10 to-success/5',
       )}
       aria-label={ariaDescription}
     >
-      <div className='mb-2 font-medium text-slate-500 text-xs uppercase tracking-wider'>
+      <div className='mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wider'>
         {label}
       </div>
       <div
         className={cn(
           'mb-1 font-semibold text-3xl tracking-tight',
-          !highlight && 'text-slate-100',
-          isEmpty && 'text-slate-600',
+          !highlight && 'text-foreground',
+          isEmpty && 'text-muted-foreground/60',
         )}
       >
         {highlight && !isEmpty ? (
-          <GradientText variant='custom' className='bg-gradient-to-r from-cyan-500 to-emerald-500'>
+          <GradientText variant='custom' className='bg-gradient-to-r from-primary to-success'>
             {value}
           </GradientText>
         ) : (
           value
         )}
       </div>
-      <div className={cn('text-slate-500 text-xs', isEmpty && 'text-slate-700')}>{subtext}</div>
+      <div className={cn('text-muted-foreground text-xs', isEmpty && 'text-muted-foreground/60')}>
+        {subtext}
+      </div>
     </article>
   );
 }

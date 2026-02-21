@@ -59,8 +59,7 @@ describe('ResultCard Component', () => {
       );
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('text-green-600');
-      expect(icon).toHaveClass('dark:text-green-400');
+      expect(icon).toHaveClass('text-success');
     });
 
     it('should apply warning variant styles', () => {
@@ -69,8 +68,7 @@ describe('ResultCard Component', () => {
       );
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('text-amber-600');
-      expect(icon).toHaveClass('dark:text-amber-400');
+      expect(icon).toHaveClass('text-warning');
     });
 
     it('should apply info variant styles', () => {

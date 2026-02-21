@@ -94,7 +94,7 @@ export function CompetitorCard({
           <ul className={cn(SPACING.SPACE_Y_1)}>
             {competitor.strengths.slice(0, 3).map((strength) => (
               <li key={strength} className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                <span className='mr-2 text-green-600 dark:text-green-400'>+</span>
+                <span className='mr-2 text-success'>+</span>
                 {strength}
               </li>
             ))}
@@ -109,7 +109,7 @@ export function CompetitorCard({
           <ul className={cn(SPACING.SPACE_Y_1)}>
             {competitor.weaknesses.slice(0, 3).map((weakness) => (
               <li key={weakness} className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                <span className='mr-2 text-amber-600 dark:text-amber-400'>-</span>
+                <span className='mr-2 text-warning'>-</span>
                 {weakness}
               </li>
             ))}

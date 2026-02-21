@@ -223,7 +223,7 @@ describe('SimpleNavbar Component', () => {
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      expect(nav).toHaveClass('backdrop-blur-[20px]');
+      expect(nav).toHaveClass('backdrop-blur-xl');
       expect(nav).toHaveClass('bg-deep/80');
     });
 
@@ -234,7 +234,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       // New design uses fixed positioning with backdrop blur (border removed)
-      expect(nav).toHaveClass('backdrop-blur-[20px]');
+      expect(nav).toHaveClass('backdrop-blur-xl');
       expect(nav).toHaveClass('bg-deep/80');
     });
   });

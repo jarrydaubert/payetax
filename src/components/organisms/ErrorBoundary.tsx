@@ -149,14 +149,14 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
-      {/* Animated background - dark gradient for both themes */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 dark:from-slate-950 dark:via-red-950 dark:to-slate-950'>
+      {/* Animated background */}
+      <div className='absolute inset-0 bg-gradient-to-br from-background via-destructive/20 to-background'>
         {/* Floating error particles - hidden for reduced motion */}
         <div className='absolute inset-0 motion-reduce:hidden'>
           {particles.map((particle) => (
             <div
               key={`error-particle-${particle.id}`}
-              className='absolute size-2 animate-pulse rounded-full bg-red-400 opacity-20 motion-reduce:animate-none dark:bg-red-500 dark:opacity-10'
+              className='absolute size-2 animate-pulse rounded-full bg-destructive opacity-20 motion-reduce:animate-none'
               style={{
                 left: `${particle.left}%`,
                 top: `${particle.top}%`,
@@ -173,7 +173,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
         <div
           className={cn(
             'glass-card text-center',
-            'border border-red-400/20',
+            'border border-destructive/20',
             SPACING.P_6,
             'md:p-12',
             SHADOWS.XXL,
@@ -184,7 +184,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             <div
               className={cn(
                 'inline-flex items-center justify-center rounded-full',
-                'border border-red-400/30 bg-red-500/20',
+                'border border-destructive/30 bg-destructive/20',
                 SPACING.MB_4,
                 ICON_SIZES.SIZE_12,
                 'md:size-20',
@@ -192,7 +192,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             >
               <AlertTriangle
                 className={cn(
-                  'text-red-400',
+                  'text-destructive',
                   'animate-pulse motion-reduce:animate-none',
                   ICON_SIZES.SIZE_8,
                   'md:size-10',
@@ -200,7 +200,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 aria-hidden='true'
               />
             </div>
-            <div className='absolute inset-0 animate-ping rounded-full border-2 border-red-400/20 motion-reduce:animate-none' />
+            <div className='absolute inset-0 animate-ping rounded-full border-2 border-destructive/20 motion-reduce:animate-none' />
           </div>
 
           {/* Heading - responsive typography, focusable for a11y */}
@@ -237,18 +237,12 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           <div
             className={cn(
               'glass-card',
-              'border border-yellow-400/20 bg-yellow-500/5',
+              'border border-warning/20 bg-warning/5',
               SPACING.P_6,
               SPACING.MB_8,
             )}
           >
-            <h3
-              className={cn(
-                'font-semibold text-yellow-500 dark:text-yellow-400',
-                TYPOGRAPHY.TEXT_LG,
-                SPACING.MB_3,
-              )}
-            >
+            <h3 className={cn('font-semibold text-warning', TYPOGRAPHY.TEXT_LG, SPACING.MB_3)}>
               What can you do?
             </h3>
             <ul
@@ -271,37 +265,29 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             <div
               className={cn(
                 'mx-auto max-w-md rounded-lg',
-                'border border-white/10 bg-black/20',
-                'text-white/70 dark:border-white/5 dark:bg-black/40',
+                'border border-border/60 bg-card/80',
+                'text-muted-foreground',
                 TYPOGRAPHY.TEXT_SM,
                 SPACING.P_4,
                 SPACING.MB_8,
               )}
             >
               <div className={cn('flex items-center justify-between', SPACING.MB_2)}>
-                <strong className='text-white dark:text-white/90'>Error Reference:</strong>
+                <strong className='text-foreground'>Error Reference:</strong>
                 <Button
                   variant='ghost'
                   size='sm'
                   onClick={handleCopyEventId}
-                  className='h-7 text-white/70 hover:text-white'
+                  className='h-7 text-muted-foreground hover:text-foreground'
                   aria-label='Copy error reference to clipboard'
                 >
                   <Copy className={ICON_SIZES.SIZE_4} />
                 </Button>
               </div>
-              <code
-                className={cn(
-                  'block break-all font-mono',
-                  'text-purple-300 dark:text-purple-400',
-                  TYPOGRAPHY.TEXT_XS,
-                )}
-              >
+              <code className={cn('block break-all font-mono', 'text-primary', TYPOGRAPHY.TEXT_XS)}>
                 {eventId}
               </code>
-              <p
-                className={cn('text-white/50 dark:text-white/40', TYPOGRAPHY.TEXT_XS, SPACING.MT_2)}
-              >
+              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS, SPACING.MT_2)}>
                 Share this ID when reporting the issue
               </p>
             </div>
@@ -319,7 +305,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               type='button'
               onClick={resetError}
               size='lg'
-              className='bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-600'
+              className='bg-primary text-primary-foreground hover:bg-primary/90'
             >
               <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
               Try Again
@@ -350,8 +336,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               <summary
                 className={cn(
                   'cursor-pointer font-semibold',
-                  'text-yellow-300 dark:text-yellow-400',
-                  'transition-colors hover:text-yellow-200 dark:hover:text-yellow-300',
+                  'text-warning transition-colors hover:text-warning/90',
                   TYPOGRAPHY.TEXT_LG,
                   SPACING.MB_4,
                 )}
@@ -359,37 +344,19 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 🔧 Developer Debug Info (Dev Mode Only)
               </summary>
               <div
-                className={cn(
-                  'glass-card',
-                  'border border-yellow-400/30 bg-yellow-500/5',
-                  SPACING.P_4,
-                )}
+                className={cn('glass-card', 'border border-warning/30 bg-warning/5', SPACING.P_4)}
               >
-                <h4
-                  className={cn('font-semibold text-yellow-300 dark:text-yellow-400', SPACING.MB_2)}
-                >
-                  Error Message:
-                </h4>
-                <p
-                  className={cn(
-                    'font-mono text-red-300 dark:text-red-400',
-                    TYPOGRAPHY.TEXT_SM,
-                    SPACING.MB_4,
-                  )}
-                >
+                <h4 className={cn('font-semibold text-warning', SPACING.MB_2)}>Error Message:</h4>
+                <p className={cn('font-mono text-destructive', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
                   {error.message}
                 </p>
 
-                <h4
-                  className={cn('font-semibold text-yellow-300 dark:text-yellow-400', SPACING.MB_2)}
-                >
-                  Stack Trace:
-                </h4>
+                <h4 className={cn('font-semibold text-warning', SPACING.MB_2)}>Stack Trace:</h4>
                 <pre
                   className={cn(
                     'max-h-64 overflow-auto whitespace-pre-wrap rounded',
-                    'border border-red-400/20 bg-black/40 dark:bg-black/60',
-                    'font-mono text-red-300 dark:text-red-400',
+                    'border border-destructive/20 bg-card/90',
+                    'font-mono text-destructive',
                     TYPOGRAPHY.TEXT_XS,
                     SPACING.P_4,
                   )}

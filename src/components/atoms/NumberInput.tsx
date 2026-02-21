@@ -326,18 +326,17 @@ const NumberInput = memo(
               : undefined
           }
           className={cn(
-            'glass-input w-full px-3 py-2 backdrop-blur-glass-sm',
-            'rounded-lg border-glass shadow-glass-sm',
-            'focus:glow-sm focus:outline-none focus:ring-1 focus:ring-primary',
+            'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'placeholder:text-foreground/50',
+            'placeholder:text-muted-foreground',
             'transition-all duration-200',
-            'bg-glass-deep text-foreground',
+            'text-foreground',
             TYPOGRAPHY.TEXT_SM,
             prefix && 'pl-7',
             suffix && 'pr-7',
             showControls && 'pr-16',
-            isFocused && 'glow-sm',
+            isFocused && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
             className,
           )}
           {...props}
@@ -360,8 +359,7 @@ const NumberInput = memo(
             {...controlsAnimation}
             className={cn(
               'absolute inset-y-1 right-1 flex flex-col border-l',
-              'border-glass',
-              'bg-glass-deep backdrop-blur-glass-sm',
+              'border-input bg-background',
               'overflow-hidden rounded-r-md',
               'shadow-sm',
               disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
@@ -374,8 +372,8 @@ const NumberInput = memo(
               {...buttonAnimation}
               className={cn(
                 'flex flex-1 items-center justify-center px-2',
-                'text-foreground transition-colors hover:bg-glass',
-                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
+                'text-foreground transition-colors hover:bg-accent',
+                'focus:bg-accent focus:outline-none disabled:pointer-events-none',
               )}
               aria-label='Increment value'
               aria-controls={inputId}
@@ -402,8 +400,8 @@ const NumberInput = memo(
               {...buttonAnimation}
               className={cn(
                 'flex flex-1 items-center justify-center px-2',
-                'text-foreground transition-colors hover:bg-glass',
-                'focus:bg-glass-deep focus:outline-none disabled:pointer-events-none',
+                'text-foreground transition-colors hover:bg-accent',
+                'focus:bg-accent focus:outline-none disabled:pointer-events-none',
               )}
               aria-label='Decrement value'
               aria-controls={inputId}

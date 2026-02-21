@@ -73,7 +73,7 @@ export function StatsGrid({ stats, columns = 3, variant = 'default', className }
   return (
     <ul className={gridClasses} aria-label='Statistics'>
       {stats.map((stat, index) => (
-        <li key={`stat-${index}-${stat.label}`} style={{ listStyle: 'none' }}>
+        <li key={`stat-${index}-${stat.label}`} className='list-none'>
           <StatCard stat={stat} variant={variant} />
         </li>
       ))}

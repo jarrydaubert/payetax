@@ -29,11 +29,11 @@ export default function ToolsError({
   }, [error, errorId]);
 
   return (
-    <div className='flex min-h-[70vh] flex-col items-center justify-center p-6'>
+    <div className='flex min-h-screen flex-col items-center justify-center p-6'>
       <div className='w-full max-w-md text-center' role='alert'>
         {/* Icon */}
         <div
-          className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'
+          className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-border/60 bg-card/50'
           aria-hidden='true'
         >
           <span className='font-display text-4xl'>!</span>
@@ -43,7 +43,7 @@ export default function ToolsError({
         <h1 className='font-bold font-display text-3xl tracking-tight'>Something went wrong</h1>
 
         {/* Description */}
-        <p className='mt-3 text-white/60'>
+        <p className='mt-3 text-muted-foreground'>
           This tool hit an unexpected error. Try refreshing, or head back to explore other tools.
         </p>
 
@@ -61,7 +61,7 @@ export default function ToolsError({
           </Button>
           <Link
             href='/'
-            className='inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold transition-all hover:border-white/20 hover:bg-white/10'
+            className='inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-card/50 px-6 py-3 font-semibold text-foreground transition-all hover:border-border hover:bg-card/70'
           >
             <Home className='size-4' aria-hidden='true' />
             Go home
@@ -69,7 +69,9 @@ export default function ToolsError({
         </div>
 
         {/* Error reference - subtle */}
-        <p className='mt-8 font-mono text-white/30 text-xs'>Error ID: {errorId.slice(-8)}</p>
+        <p className='mt-8 font-mono text-muted-foreground/60 text-xs'>
+          Error ID: {errorId.slice(-8)}
+        </p>
 
         {/* Dev Debug - only in development */}
         {process.env.NODE_ENV === 'development' && (
@@ -78,7 +80,7 @@ export default function ToolsError({
               type='button'
               onClick={() => setShowDebug(!showDebug)}
               aria-expanded={showDebug}
-              className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
+              className='inline-flex items-center gap-1 text-sm text-warning/80 transition-colors hover:text-warning'
             >
               <ChevronDown
                 className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
@@ -87,8 +89,8 @@ export default function ToolsError({
               Debug info
             </button>
             {showDebug && (
-              <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
-                <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
+              <div className='mt-3 rounded-xl border border-warning/20 bg-warning/5 p-4 text-left'>
+                <pre className='overflow-auto whitespace-pre-wrap font-mono text-warning/80 text-xs'>
                   {error.message}
                   {'\n\n'}
                   {error.stack}

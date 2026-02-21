@@ -21,9 +21,6 @@ import Link from 'next/link';
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-const INPUTS_PANEL_WIDTH = 280;
-const EDUCATION_PANEL_WIDTH = 320;
-
 interface DashboardLayoutProps {
   sidebar: ReactNode;
   inputs: ReactNode;
@@ -87,7 +84,7 @@ function MobileDrawer({
 
   if (!isOpen) return null;
 
-  const bgColor = variant === 'education' ? 'bg-slate-900' : 'bg-slate-950';
+  const bgColor = variant === 'education' ? 'bg-card' : 'bg-background';
 
   return (
     <div
@@ -97,10 +94,10 @@ function MobileDrawer({
       aria-labelledby={`drawer-title-${variant}`}
       className={cn('fixed inset-0 z-50 flex flex-col lg:hidden', bgColor)}
     >
-      <div className='relative border-white/[0.04] border-b px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
+      <div className='relative border-border/40 border-b px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
         <h2
           id={`drawer-title-${variant}`}
-          className='pointer-events-none text-center font-semibold text-lg text-slate-100'
+          className='pointer-events-none text-center font-semibold text-foreground text-lg'
         >
           {title}
         </h2>
@@ -109,7 +106,7 @@ function MobileDrawer({
             ref={closeButtonRef}
             type='button'
             onClick={onClose}
-            className='absolute top-1/2 right-2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/60'
+            className='absolute top-1/2 right-2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'
             aria-label={`Close ${title.toLowerCase()} panel`}
           >
             <X className='size-5' />
@@ -150,7 +147,7 @@ export function DashboardLayout({
   return (
     <>
       <div
-        className={cn('flex h-dvh overflow-hidden bg-slate-950', className)}
+        className={cn('flex h-dvh overflow-hidden bg-background', className)}
         // Prevent interaction with background when drawer is open
         aria-hidden={mobileInputsOpen || mobileEducationOpen}
         inert={mobileInputsOpen || mobileEducationOpen ? true : undefined}
@@ -160,27 +157,24 @@ export function DashboardLayout({
 
         {/* Inputs panel - collapsible, desktop only */}
         <div
-          className='relative shrink-0 overflow-hidden border-white/[0.04] border-r bg-slate-950 transition-[width] duration-200 ease-out max-lg:hidden'
-          style={{ width: inputsCollapsed ? 0 : INPUTS_PANEL_WIDTH }}
+          className={cn(
+            'relative shrink-0 overflow-hidden border-border/40 border-r bg-background transition-[width] duration-200 ease-out max-lg:hidden',
+            inputsCollapsed ? 'w-0' : 'w-72',
+          )}
           aria-hidden={inputsCollapsed}
           inert={inputsCollapsed ? true : undefined}
         >
           <div className='pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center'>
-            <h2 className='font-semibold text-slate-500 text-xs uppercase tracking-wider'>
+            <h2 className='font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
               Your Numbers
             </h2>
           </div>
-          <div
-            className='h-full overflow-y-auto bg-slate-950 pt-12'
-            style={{ width: INPUTS_PANEL_WIDTH }}
-          >
-            {inputs}
-          </div>
+          <div className='h-full w-72 overflow-y-auto bg-background pt-12'>{inputs}</div>
           {onToggleInputs && !inputsCollapsed && (
             <button
               type='button'
               onClick={onToggleInputs}
-              className='absolute top-3 right-4 z-20 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+              className='absolute top-3 right-4 z-20 rounded p-1 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground/90'
               aria-label='Hide inputs panel'
             >
               <PanelLeftClose className='size-4' />
@@ -191,19 +185,17 @@ export function DashboardLayout({
         {/* Main content area */}
         <div
           data-director-scroll-root='true'
-          className='relative min-w-0 flex-1 overflow-y-auto bg-slate-950'
+          className='relative min-w-0 flex-1 overflow-y-auto bg-background'
         >
           {/* Mobile header with logo */}
-          <div className='sticky top-0 z-30 flex items-center justify-between border-white/[0.04] border-b bg-slate-950/95 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 backdrop-blur-sm lg:hidden'>
+          <div className='sticky top-0 z-30 flex items-center justify-between border-border/40 border-b bg-background/95 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 backdrop-blur-sm lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>
-              <span className='brand-wordmark text-[1.2rem] text-slate-100'>
+              <span className='brand-wordmark text-foreground text-xl'>
                 paye
-                <span className='bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent'>
-                  tax
-                </span>
+                <span className='text-gradient-brand'>tax</span>
               </span>
             </Link>
-            <span className='text-slate-500 text-sm'>Director Intelligence</span>
+            <span className='text-muted-foreground text-sm'>Director Intelligence</span>
           </div>
 
           {/* Toggle buttons when panels are collapsed */}
@@ -211,7 +203,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={onToggleInputs}
-              className='absolute top-6 left-4 z-20 rounded-lg border border-white/10 bg-slate-800 p-2 text-slate-400 transition-colors hover:bg-slate-700 hover:text-slate-200 max-lg:hidden'
+              className='absolute top-6 left-4 z-20 rounded-lg border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
               aria-label='Show inputs panel'
             >
               <PanelLeftOpen className='size-4' />
@@ -221,7 +213,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={onToggleEducation}
-              className='absolute top-6 right-4 z-20 rounded-lg border border-white/10 bg-slate-800 p-2 text-slate-400 transition-colors hover:bg-slate-700 hover:text-slate-200 max-lg:hidden'
+              className='absolute top-6 right-4 z-20 rounded-lg border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
               aria-label='Show learn panel'
             >
               <PanelRightOpen className='size-4' />
@@ -233,24 +225,24 @@ export function DashboardLayout({
         {/* Education panel - optional, collapsible, desktop only */}
         {education && (
           <div
-            className='relative shrink-0 overflow-hidden border-white/[0.04] border-l bg-slate-900 transition-[width] duration-200 ease-out max-lg:hidden'
-            style={{ width: educationCollapsed ? 0 : EDUCATION_PANEL_WIDTH }}
+            className={cn(
+              'relative shrink-0 overflow-hidden border-border/40 border-l bg-card transition-[width] duration-200 ease-out max-lg:hidden',
+              educationCollapsed ? 'w-0' : 'w-80',
+            )}
             aria-hidden={educationCollapsed}
             inert={educationCollapsed ? true : undefined}
           >
             <div className='pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center'>
-              <h2 className='font-semibold text-slate-500 text-xs uppercase tracking-wider'>
+              <h2 className='font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                 Learn
               </h2>
             </div>
-            <div className='h-full overflow-y-auto pt-12' style={{ width: EDUCATION_PANEL_WIDTH }}>
-              {education}
-            </div>
+            <div className='h-full w-80 overflow-y-auto pt-12'>{education}</div>
             {onToggleEducation && !educationCollapsed && (
               <button
                 type='button'
                 onClick={onToggleEducation}
-                className='absolute top-3 left-4 z-20 rounded p-1 text-slate-500 transition-colors hover:bg-slate-800 hover:text-slate-300'
+                className='absolute top-3 left-4 z-20 rounded p-1 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground/90'
                 aria-label='Hide learn panel'
               >
                 <PanelRightClose className='size-4' />
@@ -265,10 +257,10 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={handleToggleMobileInputs}
-          className='fixed right-6 bottom-6 z-40 rounded-full border border-transparent bg-[linear-gradient(rgba(2,6,23,0.95),rgba(2,6,23,0.95))_padding-box,linear-gradient(90deg,#06b6d4,#10b981)_border-box] p-4 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          className='fixed right-6 bottom-6 z-40 rounded-full border border-primary/40 bg-card p-4 shadow-lg transition-transform hover:scale-105 hover:bg-primary/10 lg:hidden'
           aria-label='Open calculator inputs'
         >
-          <Calculator className='size-6 text-slate-200' />
+          <Calculator className='size-6 text-foreground' />
         </button>
       )}
 
@@ -287,10 +279,10 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={handleToggleMobileEducation}
-          className='fixed bottom-6 left-6 z-40 rounded-full border border-white/10 bg-slate-800 p-3 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          className='fixed bottom-6 left-6 z-40 rounded-full border border-border/50 bg-card p-3 shadow-lg transition-transform hover:scale-105 lg:hidden'
           aria-label='Show learn panel'
         >
-          <BookOpen className='size-5 text-cyan-500' />
+          <BookOpen className='size-5 text-primary' />
         </button>
       )}
 

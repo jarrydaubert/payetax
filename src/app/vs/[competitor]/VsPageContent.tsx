@@ -145,7 +145,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                     {PAYETAX_INFO.strengths.map((strength) => (
                       <li key={strength} className={cn('flex items-start', SPACING.GAP_2)}>
                         <span className='sr-only'>Strength:</span>
-                        <span className='text-green-600 dark:text-green-400' aria-hidden='true'>
+                        <span className='text-success' aria-hidden='true'>
                           +
                         </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{strength}</span>
@@ -195,7 +195,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                     {competitor.strengths.map((strength) => (
                       <li key={strength} className={cn('flex items-start', SPACING.GAP_2)}>
                         <span className='sr-only'>Strength:</span>
-                        <span className='text-green-600 dark:text-green-400' aria-hidden='true'>
+                        <span className='text-success' aria-hidden='true'>
                           +
                         </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{strength}</span>
@@ -212,7 +212,7 @@ export function VsPageContent({ competitor }: VsPageContentProps) {
                     {competitor.weaknesses.slice(0, 4).map((weakness) => (
                       <li key={weakness} className={cn('flex items-start', SPACING.GAP_2)}>
                         <span className='sr-only'>Weakness:</span>
-                        <span className='text-amber-600 dark:text-amber-400' aria-hidden='true'>
+                        <span className='text-warning' aria-hidden='true'>
                           −
                         </span>
                         <span className={TYPOGRAPHY.TEXT_SM}>{weakness}</span>

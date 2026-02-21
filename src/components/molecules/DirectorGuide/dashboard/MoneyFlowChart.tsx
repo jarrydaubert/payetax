@@ -51,36 +51,36 @@ export function MoneyFlowChart() {
     {
       label: 'Gross Profit',
       value: grossProfit,
-      color: 'bg-slate-500',
+      color: 'bg-muted-foreground',
       percent: 100,
       ariaLabel: `Gross Profit: ${formatCurrency(grossProfit)}, 100% of total`,
     },
     {
       label: 'Your Take-Home',
       value: actualTakeHome,
-      color: 'bg-emerald-500',
+      color: 'bg-success',
       percent: clampPercent(actualTakeHome, grossProfit),
       ariaLabel: `Your Take-Home after all taxes: ${formatCurrency(actualTakeHome)}, ${Math.round(clampPercent(actualTakeHome, grossProfit))}% of profit`,
     },
     {
       label: 'Company Taxes',
       value: companyTaxes,
-      color: 'bg-amber-500',
+      color: 'bg-warning',
       percent: clampPercent(companyTaxes, grossProfit),
       ariaLabel: `Company Taxes (CT + Employer NI): ${formatCurrency(companyTaxes)}, ${Math.round(clampPercent(companyTaxes, grossProfit))}% of profit`,
     },
     {
       label: 'Retained',
       value: retained,
-      color: 'bg-blue-500',
+      color: 'bg-primary',
       percent: clampPercent(retained, grossProfit),
       ariaLabel: `Retained in Company: ${formatCurrency(retained)}, ${Math.round(clampPercent(retained, grossProfit))}% of profit`,
     },
   ];
 
   return (
-    <div className='rounded-xl border border-white/[0.04] bg-slate-800 p-4'>
-      <div className='mb-3 flex items-center gap-2 text-slate-400'>
+    <div className='rounded-xl border border-border/50 bg-card p-4'>
+      <div className='mb-3 flex items-center gap-2 text-muted-foreground'>
         <BarChart3 className='size-4' aria-hidden='true' />
         <span className='font-medium text-sm'>Money Flow</span>
       </div>
@@ -92,9 +92,9 @@ export function MoneyFlowChart() {
             className='flex items-center gap-3 text-xs'
             aria-label={bar.ariaLabel}
           >
-            <span className='w-24 text-slate-500'>{bar.label}</span>
+            <span className='w-24 text-muted-foreground'>{bar.label}</span>
             <div
-              className='relative h-4 flex-1 overflow-hidden rounded bg-slate-900'
+              className='relative h-4 flex-1 overflow-hidden rounded bg-background'
               role='progressbar'
               aria-valuenow={Math.round(bar.percent)}
               aria-valuemin={0}
@@ -105,7 +105,7 @@ export function MoneyFlowChart() {
                 style={{ width: `${bar.percent}%` }}
               />
             </div>
-            <span className='w-16 text-right font-mono text-slate-300'>
+            <span className='w-16 text-right font-mono text-foreground'>
               {formatCurrency(bar.value)}
             </span>
           </li>
@@ -113,17 +113,17 @@ export function MoneyFlowChart() {
       </ul>
 
       {/* Legend for accessibility */}
-      <div className='mt-3 flex flex-wrap gap-3 text-slate-500 text-xs'>
+      <div className='mt-3 flex flex-wrap gap-3 text-muted-foreground text-xs'>
         <span className='flex items-center gap-1'>
-          <span className='inline-block size-2 rounded-sm bg-emerald-500' aria-hidden='true' />
+          <span className='inline-block size-2 rounded-sm bg-success' aria-hidden='true' />
           After tax
         </span>
         <span className='flex items-center gap-1'>
-          <span className='inline-block size-2 rounded-sm bg-amber-500' aria-hidden='true' />
+          <span className='inline-block size-2 rounded-sm bg-warning' aria-hidden='true' />
           CT + ErNI
         </span>
         <span className='flex items-center gap-1'>
-          <span className='inline-block size-2 rounded-sm bg-blue-500' aria-hidden='true' />
+          <span className='inline-block size-2 rounded-sm bg-primary' aria-hidden='true' />
           In company
         </span>
       </div>

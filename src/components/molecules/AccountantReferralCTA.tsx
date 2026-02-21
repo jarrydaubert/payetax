@@ -192,7 +192,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
   return (
     <Card
       className={cn(
-        'relative border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-orange-500/5',
+        'relative border-warning/30 bg-gradient-to-r from-warning/5 to-destructive/5',
         SPACING.P_6,
         className,
       )}
@@ -216,7 +216,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         // Lead capture form
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='flex items-center gap-2'>
-            <Sparkles className={cn(ICON_SIZES.SIZE_5, 'text-amber-500')} aria-hidden='true' />
+            <Sparkles className={cn(ICON_SIZES.SIZE_5, 'text-warning')} aria-hidden='true' />
             <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>Get Expert Tax Advice</h3>
           </div>
           <p className='text-muted-foreground text-sm'>
@@ -255,7 +255,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-start gap-3'>
             <AlertTriangle
-              className={cn(ICON_SIZES.SIZE_6, 'mt-0.5 shrink-0 text-amber-500')}
+              className={cn(ICON_SIZES.SIZE_6, 'mt-0.5 shrink-0 text-warning')}
               aria-hidden='true'
             />
             <div>
@@ -268,7 +268,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
           <Button
             onClick={handleShowForm}
             variant='outline'
-            className='shrink-0 border-amber-500/30 hover:bg-amber-500/10'
+            className='shrink-0 border-warning/30 hover:bg-warning/10'
           >
             Talk to an Expert
             <ArrowRight className={cn(ICON_SIZES.SIZE_4, 'ml-2')} aria-hidden='true' />

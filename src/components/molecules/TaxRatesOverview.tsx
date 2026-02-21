@@ -57,7 +57,7 @@ export function TaxRatesOverview() {
                 {
                   label: '£12,571 - £50,270',
                   value: '20%',
-                  colorClass: 'text-green-600 dark:text-green-400',
+                  colorClass: 'text-success',
                 },
                 {
                   label: '£50,271 - £125,140',
@@ -82,12 +82,12 @@ export function TaxRatesOverview() {
                 {
                   label: '£12,571 - £50,270',
                   value: '12%',
-                  colorClass: 'text-amber-600 dark:text-amber-400',
+                  colorClass: 'text-warning',
                 },
                 {
                   label: '£50,270+',
                   value: '2%',
-                  colorClass: 'text-amber-600 dark:text-amber-400',
+                  colorClass: 'text-warning',
                 },
               ]}
               footerNote='Class 1 contributions for employees'
@@ -102,17 +102,17 @@ export function TaxRatesOverview() {
                 {
                   label: '£20,000 salary',
                   value: '£17,294',
-                  colorClass: 'text-green-600 dark:text-green-400',
+                  colorClass: 'text-success',
                 },
                 {
                   label: '£30,000 salary',
                   value: '£23,894',
-                  colorClass: 'text-green-600 dark:text-green-400',
+                  colorClass: 'text-success',
                 },
                 {
                   label: '£50,000 salary',
                   value: '£37,794',
-                  colorClass: 'text-green-600 dark:text-green-400',
+                  colorClass: 'text-success',
                 },
               ]}
               footerNote='Annual take-home after tax & NI'

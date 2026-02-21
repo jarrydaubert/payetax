@@ -3,6 +3,7 @@
 const { exec } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 
 const AUDIT_DIR = path.join(__dirname, '..', 'audit-outputs');
 const SECURITY_LOG = path.join(AUDIT_DIR, 'security-audit-history.json');
@@ -19,6 +20,8 @@ const SECURITY_THRESHOLDS = {
   moderate: 2, // Max 2 moderate vulnerabilities
   low: 10, // Max 10 low vulnerabilities
 };
+
+let dependencyAllowlist = [];
 
 function emptyAuditMetadata() {
   return {
@@ -149,6 +152,7 @@ function parseBunAuditOutput(output) {
 
       vulnerabilities.push({
         name: packageName,
+        id: extractAdvisoryId(advisory.url),
         severity,
         title: advisory.title || advisory.id || 'Security advisory',
         url: advisory.url || null,
@@ -160,6 +164,51 @@ function parseBunAuditOutput(output) {
 
   summary.total = vulnerabilities.length;
   return { summary, vulnerabilities };
+}
+
+function extractAdvisoryId(url) {
+  if (!url) return null;
+  const ghsaMatch = String(url).match(/GHSA-[a-z0-9-]+/i);
+  if (ghsaMatch?.[0]) return ghsaMatch[0].toUpperCase();
+  const cveMatch = String(url).match(/CVE-\d{4}-\d+/i);
+  if (cveMatch?.[0]) return cveMatch[0].toUpperCase();
+  return null;
+}
+
+function isAllowlistedVulnerability(vulnerability) {
+  if (!(vulnerability?.id && vulnerability?.name)) return false;
+  return dependencyAllowlist.some(
+    (entry) =>
+      String(entry.id).toUpperCase() === String(vulnerability.id).toUpperCase() &&
+      String(entry.package).toLowerCase() === String(vulnerability.name).toLowerCase(),
+  );
+}
+
+async function loadDependencyAllowlist() {
+  const allowlistPath = path.join(__dirname, 'dependency-advisory-allowlist.ts');
+  const allowlistUrl = pathToFileURL(allowlistPath).href;
+
+  try {
+    const imported = await import(allowlistUrl);
+    dependencyAllowlist = imported.DEPENDENCY_ADVISORY_ALLOWLIST || [];
+  } catch (error) {
+    dependencyAllowlist = [];
+    console.warn(
+      `⚠️  Could not load dependency advisory allowlist (${allowlistPath}): ${error.message}`,
+    );
+  }
+}
+
+function isAuditConnectivityFailure(output) {
+  const normalized = String(output || '').toLowerCase();
+  return (
+    normalized.includes('connectionrefused') ||
+    normalized.includes('connection refused') ||
+    normalized.includes('econnrefused') ||
+    normalized.includes('audit request failed') ||
+    normalized.includes('enotfound') ||
+    normalized.includes('network')
+  );
 }
 
 function generateSecurityReport(audit, history) {
@@ -270,7 +319,10 @@ async function runSecurityAudit() {
         const parsedAudit = parseBunAuditOutput(output);
 
         if (error && parsedAudit.summary.total === 0) {
-          reject(error);
+          const failure = new Error(error.message || 'bun audit failed');
+          failure.auditOutput = output;
+          failure.connectivityFailure = isAuditConnectivityFailure(output);
+          reject(failure);
           return;
         }
 
@@ -297,6 +349,8 @@ async function runSecurityAudit() {
 
 async function main() {
   try {
+    await loadDependencyAllowlist();
+
     // Load existing history
     const history = loadSecurityHistory();
 
@@ -317,14 +371,39 @@ async function main() {
     // Generate report
     generateSecurityReport(audit, history);
 
+    const actionableVulnerabilities = (audit.vulnerabilities || []).filter(
+      (vuln) => !isAllowlistedVulnerability(vuln),
+    );
+
+    if (actionableVulnerabilities.length !== (audit.vulnerabilities || []).length) {
+      const allowlistedCount =
+        (audit.vulnerabilities || []).length - actionableVulnerabilities.length;
+      console.log(`\nℹ️  Allowlisted advisories ignored for gate: ${allowlistedCount}`);
+      for (const vuln of (audit.vulnerabilities || []).filter((v) =>
+        isAllowlistedVulnerability(v),
+      )) {
+        console.log(`   - ${vuln.name} (${vuln.id || 'no-id'})`);
+      }
+    }
+
+    const actionableSummary = actionableVulnerabilities.reduce(
+      (acc, vuln) => {
+        const severity = vuln.severity || 'info';
+        if (severity in acc) acc[severity] += 1;
+        acc.total += 1;
+        return acc;
+      },
+      { critical: 0, high: 0, moderate: 0, low: 0, info: 0, total: 0 },
+    );
+
     // Exit with appropriate code based on security issues
     const hasSecurityIssues =
-      audit.summary.critical > SECURITY_THRESHOLDS.critical ||
-      audit.summary.high > SECURITY_THRESHOLDS.high;
+      actionableSummary.critical > SECURITY_THRESHOLDS.critical ||
+      actionableSummary.high > SECURITY_THRESHOLDS.high;
 
     if (hasSecurityIssues) {
       console.error(
-        '\n❌ Security gate failed: critical/high vulnerabilities exceed threshold (critical=0, high=0).',
+        `\n❌ Security gate failed: critical/high vulnerabilities exceed threshold (critical=${actionableSummary.critical}/${SECURITY_THRESHOLDS.critical}, high=${actionableSummary.high}/${SECURITY_THRESHOLDS.high}).`,
       );
       process.exit(1);
     } else {
@@ -332,6 +411,16 @@ async function main() {
       process.exit(0);
     }
   } catch (error) {
+    if (error?.connectivityFailure) {
+      console.error(
+        '❌ Security audit could not reach the Bun advisory service (network/connectivity issue).',
+      );
+      console.error(
+        '   Retry when connectivity is available; this is not a vulnerability finding.',
+      );
+      process.exit(1);
+    }
+
     console.error('❌ Security audit failed:', error.message);
     process.exit(1);
   }

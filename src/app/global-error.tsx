@@ -36,18 +36,18 @@ export default function GlobalError({
 
   return (
     <html lang='en'>
-      <body className='min-h-screen bg-[#020617] text-white'>
+      <body className='min-h-screen bg-background text-foreground'>
         {/* Gradient background */}
         <div className='fixed inset-0 -z-10'>
-          <div className='absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-emerald-500/5' />
-          <div className='absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl' />
-          <div className='absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl' />
+          <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5' />
+          <div className='absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl' />
+          <div className='absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-success/10 blur-3xl' />
         </div>
 
         <div className='flex min-h-screen flex-col items-center justify-center p-6'>
           <div className='w-full max-w-md text-center'>
             {/* Icon */}
-            <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-white/10 bg-white/5'>
+            <div className='mx-auto mb-8 flex size-20 items-center justify-center rounded-full border border-border/60 bg-card/50'>
               <span className='font-display text-4xl'>!</span>
             </div>
 
@@ -55,7 +55,7 @@ export default function GlobalError({
             <h1 className='font-bold font-display text-3xl tracking-tight'>Something went wrong</h1>
 
             {/* Description */}
-            <p className='mt-3 text-white/60'>
+            <p className='mt-3 text-muted-foreground'>
               We hit an unexpected snag. Our team has been notified and we're looking into it.
             </p>
 
@@ -75,7 +75,7 @@ export default function GlobalError({
                 asChild
                 size='touch'
                 variant='outline'
-                className='rounded-full border-white/10 bg-white/5 px-6 text-white hover:border-white/20 hover:bg-white/10 hover:text-white'
+                className='rounded-full border-border/60 bg-card/50 px-6 text-foreground hover:border-border hover:bg-card/70 hover:text-foreground'
               >
                 <Link href='/'>
                   <Home className='size-3.5' />
@@ -85,7 +85,7 @@ export default function GlobalError({
             </div>
 
             {/* Error reference - actionable for support */}
-            <p className='mt-8 font-mono text-white/30 text-xs'>
+            <p className='mt-8 font-mono text-muted-foreground/60 text-xs'>
               Error ID: {displayId.length > 12 ? displayId.slice(-12) : displayId}
             </p>
 
@@ -95,7 +95,7 @@ export default function GlobalError({
                 <button
                   type='button'
                   onClick={() => setShowDebug(!showDebug)}
-                  className='inline-flex items-center gap-1 text-amber-400/70 text-sm transition-colors hover:text-amber-400'
+                  className='inline-flex items-center gap-1 text-sm text-warning/80 transition-colors hover:text-warning'
                 >
                   <ChevronDown
                     className={`size-4 transition-transform ${showDebug ? 'rotate-180' : ''}`}
@@ -103,8 +103,8 @@ export default function GlobalError({
                   Debug info
                 </button>
                 {showDebug && (
-                  <div className='mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-left'>
-                    <pre className='overflow-auto whitespace-pre-wrap font-mono text-amber-200/80 text-xs'>
+                  <div className='mt-3 rounded-xl border border-warning/20 bg-warning/5 p-4 text-left'>
+                    <pre className='overflow-auto whitespace-pre-wrap font-mono text-warning/80 text-xs'>
                       {error.message}
                       {'\n\n'}
                       {error.stack}

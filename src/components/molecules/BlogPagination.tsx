@@ -106,8 +106,8 @@ export function BlogPagination({
           scroll={false}
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
-            'border border-slate-700/50 transition-colors',
+            'bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
+            'border border-border/70 transition-colors',
           )}
           rel='prev'
         >
@@ -117,8 +117,8 @@ export function BlogPagination({
         <span
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'cursor-not-allowed bg-slate-800/30 text-slate-400',
-            'border border-slate-700/30',
+            'cursor-not-allowed bg-card/50 text-muted-foreground',
+            'border border-border/50',
           )}
           aria-disabled='true'
         >
@@ -132,7 +132,7 @@ export function BlogPagination({
           typeof page === 'string' ? (
             <span
               key={page}
-              className='flex h-10 w-10 items-center justify-center text-slate-400'
+              className='flex h-10 w-10 items-center justify-center text-muted-foreground'
               aria-hidden='true'
               role='presentation'
             >
@@ -146,8 +146,8 @@ export function BlogPagination({
               className={cn(
                 'flex h-10 w-10 items-center justify-center rounded-lg font-medium text-sm transition-colors',
                 page === safeCurrent
-                  ? 'bg-cyan-500 text-white'
-                  : 'border border-slate-700/50 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border border-border/70 bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
               )}
               aria-current={page === safeCurrent ? 'page' : undefined}
             >
@@ -158,7 +158,7 @@ export function BlogPagination({
       </div>
 
       {/* Mobile page indicator */}
-      <span className='flex h-10 items-center px-3 text-slate-400 text-sm sm:hidden'>
+      <span className='flex h-10 items-center px-3 text-muted-foreground text-sm sm:hidden'>
         Page {safeCurrent} of {totalPages}
       </span>
 
@@ -169,8 +169,8 @@ export function BlogPagination({
           scroll={false}
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:text-white',
-            'border border-slate-700/50 transition-colors',
+            'bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
+            'border border-border/70 transition-colors',
           )}
           rel='next'
         >
@@ -180,8 +180,8 @@ export function BlogPagination({
         <span
           className={cn(
             'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
-            'cursor-not-allowed bg-slate-800/30 text-slate-400',
-            'border border-slate-700/30',
+            'cursor-not-allowed bg-card/50 text-muted-foreground',
+            'border border-border/50',
           )}
           aria-disabled='true'
         >
