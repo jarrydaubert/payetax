@@ -42,7 +42,7 @@ export function DirectorGuideWelcomeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='top-2 max-h-screen w-full max-w-none translate-y-0 overflow-y-auto border-border/50 bg-card/95 text-foreground shadow-2xl backdrop-blur-xl sm:top-[50%] sm:max-w-lg sm:translate-y-[-50%]'>
+      <DialogContent className='max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)] w-[calc(100%-1rem)] overflow-y-auto border-border/50 bg-card/95 text-foreground shadow-2xl backdrop-blur-xl sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>Welcome to the Director Pay Calculator</DialogTitle>
           <DialogDescription>A quick overview before you start.</DialogDescription>

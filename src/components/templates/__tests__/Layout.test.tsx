@@ -28,6 +28,14 @@ jest.mock('@/components/organisms/PWAInstallBanner', () => ({
 }));
 
 describe('Layout Component', () => {
+  beforeEach(() => {
+    jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('should render children content', () => {
     render(
       <Layout>
@@ -71,6 +79,20 @@ describe('Layout Component', () => {
     );
 
     expect(screen.getByTestId('mock-cookie-banner')).toBeInTheDocument();
+  });
+
+  it('should not render cookie banner on full-screen director route', () => {
+    jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/tools/director-guide');
+
+    render(
+      <Layout>
+        <div>Content</div>
+      </Layout>,
+    );
+
+    expect(screen.queryByTestId('mock-cookie-banner')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mock-navbar')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mock-footer')).not.toBeInTheDocument();
   });
 
   it('should render pwa install banner', () => {

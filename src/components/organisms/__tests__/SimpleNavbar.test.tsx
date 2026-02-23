@@ -237,6 +237,12 @@ describe('SimpleNavbar Component', () => {
       expect(nav).toHaveClass('backdrop-blur-xl');
       expect(nav).toHaveClass('bg-deep/80');
     });
+
+    it('should include safe-area top padding on mobile nav', () => {
+      const { container } = render(<SimpleNavbar />);
+      const nav = container.querySelector('nav');
+      expect(nav).toHaveClass('pt-[calc(var(--pwa-safe-area-top,0px)+1rem)]');
+    });
   });
 
   describe('Calculator Link Scroll Behavior', () => {

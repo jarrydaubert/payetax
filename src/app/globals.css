@@ -164,7 +164,7 @@
 }
 
 .nav-safe-top {
-  top: var(--pwa-safe-area-top, 0px);
+  top: 0;
 }
 
 .navbar-safe-spacer {
@@ -654,7 +654,7 @@
     /* Smooth color-scheme transition for dark mode toggle (2025 enhancement) */
     transition: color-scheme 0.2s ease;
     /* Safe area support for notched devices (iPhone X+, iPad Pro) */
-    padding-top: env(safe-area-inset-top);
+    padding-top: 0;
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);

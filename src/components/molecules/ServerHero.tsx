@@ -22,7 +22,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
   return (
     <section
       className={cn(
-        'relative z-[1] flex min-h-screen flex-col items-center justify-center bg-deep px-4 py-32 text-center sm:px-8',
+        'relative z-[1] flex min-h-[calc(100vh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-start bg-deep px-4 pt-10 pb-16 text-center sm:min-h-screen sm:justify-center sm:px-8 sm:py-32',
         className,
       )}
     >

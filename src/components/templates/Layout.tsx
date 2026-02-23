@@ -32,9 +32,6 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
         <main id='main-content' className='h-screen'>
           {children}
         </main>
-        <Suspense fallback={null}>
-          <CookieBanner />
-        </Suspense>
       </div>
     );
   }

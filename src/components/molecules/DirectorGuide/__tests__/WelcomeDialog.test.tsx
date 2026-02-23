@@ -15,6 +15,10 @@ describe('DirectorGuideWelcomeDialog', () => {
       expect(screen.getByText('Welcome to the Director Pay Calculator')).toBeInTheDocument();
     });
 
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveClass('max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)]');
+    expect(dialog).not.toHaveClass('top-2');
+
     const closeButton = screen.getByRole('button', { name: /close/i });
     expect(closeButton).toHaveClass('h-11', 'w-11');
 
