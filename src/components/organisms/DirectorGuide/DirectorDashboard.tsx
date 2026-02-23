@@ -452,6 +452,7 @@ export function DirectorDashboard() {
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
         mobileInputsOpen={mobileInputsOpen}
         onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
+        mobileInputsReady={hasComparison}
         mobileEducationOpen={mobileEducationOpen}
         onToggleMobileEducation={() => setMobileEducationOpen((prev) => !prev)}
       />

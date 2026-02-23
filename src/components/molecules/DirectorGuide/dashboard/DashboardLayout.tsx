@@ -32,6 +32,7 @@ interface DashboardLayoutProps {
   onToggleEducation?: () => void;
   mobileInputsOpen?: boolean;
   onToggleMobileInputs?: () => void;
+  mobileInputsReady?: boolean;
   mobileEducationOpen?: boolean;
   onToggleMobileEducation?: () => void;
   className?: string;
@@ -46,12 +47,14 @@ function MobileDrawer({
   title,
   children,
   variant = 'default',
+  inputsReady = false,
 }: {
   isOpen: boolean;
   onClose?: () => void;
   title: string;
   children: ReactNode;
   variant?: 'default' | 'education';
+  inputsReady?: boolean;
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -90,6 +93,7 @@ function MobileDrawer({
   if (!isOpen) return null;
 
   const bgColor = variant === 'education' ? 'bg-card' : 'bg-background';
+  const showResultsHint = variant === 'default' && Boolean(onClose);
 
   return (
     <div
@@ -121,6 +125,23 @@ function MobileDrawer({
       <div className='flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
         {children}
       </div>
+      {showResultsHint && (
+        <div className='border-border/40 border-t bg-background/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] backdrop-blur-sm'>
+          <p className='text-center text-muted-foreground text-xs'>
+            {inputsReady
+              ? 'Results are ready. Close this view to see your dashboard.'
+              : 'Enter revenue, expenses, and region. Results appear automatically.'}
+          </p>
+          <button
+            type='button'
+            onClick={onClose}
+            className='mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary/40 bg-primary/10 px-4 py-2 font-medium text-foreground text-sm transition-colors hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/60'
+            aria-label='View results'
+          >
+            View Results
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -136,6 +157,7 @@ export function DashboardLayout({
   onToggleEducation,
   mobileInputsOpen = false,
   onToggleMobileInputs,
+  mobileInputsReady = false,
   mobileEducationOpen = false,
   onToggleMobileEducation,
   className,
@@ -275,6 +297,7 @@ export function DashboardLayout({
         onClose={handleToggleMobileInputs}
         title='Your Numbers'
         variant='default'
+        inputsReady={mobileInputsReady}
       >
         {inputs}
       </MobileDrawer>
