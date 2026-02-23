@@ -1,9 +1,14 @@
 // src/app/tools/page.tsx
+import { ArrowRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
+import { GradientText } from '@/components/atoms/GradientText';
+import { Card } from '@/components/atoms/ui/card';
+import { PageHero } from '@/components/molecules/PageHero';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import PageContainer from '@/components/templates/PageContainer';
+import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
+import { cn } from '@/lib/utils';
 
 export const metadata = generateBaseMetadata({
   title: 'Free UK Tax Tools | PayeTax',
@@ -66,49 +71,81 @@ export default function ToolsPage() {
         }}
       />
 
-      <PageContainer maxWidth='5xl'>
-        <header className='mb-8'>
-          <h1 className='text-balance font-semibold text-3xl text-foreground'>
-            Free UK Tax{' '}
-            <span className='bg-gradient-to-r from-primary to-success bg-clip-text text-transparent'>
-              Tools
-            </span>
-          </h1>
-          <p className='mt-3 max-w-2xl text-pretty text-muted-foreground'>
-            Quick calculators and explainers built on current HMRC rates. No signup.
-          </p>
-        </header>
+      <div className={LAYOUT.PAGE_WRAPPER}>
+        <PageHero
+          badge={{ icon: Wrench, text: 'Free Tax Tools' }}
+          title={
+            <>
+              Free UK Tax{' '}
+              <GradientText variant='brand-full' as='span'>
+                Tools
+              </GradientText>
+            </>
+          }
+          subtitle='Quick calculators and explainers built on current HMRC rates. No signup.'
+        />
 
-        <div className='grid gap-4 md:grid-cols-2'>
-          {tools.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              data-testid={`tools-link-${tool.href.split('/').pop()}`}
-              className='group rounded-2xl border border-border/60 bg-card/40 p-5 transition hover:border-primary/40 hover:bg-card/60'
-            >
-              <div className='flex items-center justify-between gap-3'>
-                <div>
-                  <div className='font-semibold text-foreground group-hover:text-primary'>
-                    {tool.title}
-                  </div>
-                  <div className='mt-1 text-muted-foreground text-sm'>{tool.description}</div>
-                </div>
-                <span className='text-primary text-sm transition group-hover:translate-x-0.5'>
-                  Use Tool →
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <section className={cn(LAYOUT.SECTION, 'pt-0 md:pt-0')}>
+          <div className={LAYOUT.CONTAINER_MD}>
+            <div className='grid gap-4 md:grid-cols-2'>
+              {tools.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  data-testid={`tools-link-${tool.href.split('/').pop()}`}
+                  className='group block h-full'
+                >
+                  <Card
+                    className={cn(
+                      'flex h-full flex-col justify-between rounded-2xl border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all duration-200',
+                      'hover:-translate-y-0.5 hover:border-primary/40 hover:bg-card/80',
+                    )}
+                  >
+                    <div>
+                      <h2
+                        className={cn(
+                          'font-semibold text-foreground transition-colors group-hover:text-primary',
+                          TYPOGRAPHY.TEXT_XL,
+                        )}
+                      >
+                        {tool.title}
+                      </h2>
+                      <p
+                        className={cn(
+                          'mt-2 text-muted-foreground leading-relaxed',
+                          TYPOGRAPHY.TEXT_SM,
+                        )}
+                      >
+                        {tool.description}
+                      </p>
+                    </div>
 
-        <div className='mt-10'>
-          <NewsletterCTA
-            title='Get HMRC Updates and Tax Tips'
-            description='Practical UK tax updates and deadline reminders, straight to your inbox.'
-          />
-        </div>
-      </PageContainer>
+                    <span
+                      className={cn(
+                        'mt-5 inline-flex items-center gap-1 whitespace-nowrap font-medium text-primary',
+                        TYPOGRAPHY.TEXT_SM,
+                        SPACING.GAP_1,
+                      )}
+                    >
+                      Use Tool
+                      <ArrowRight className='size-4 transition-transform duration-200 group-hover:translate-x-0.5' />
+                    </span>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={LAYOUT.SECTION}>
+          <div className={LAYOUT.CONTAINER_SM}>
+            <NewsletterCTA
+              title='Get HMRC Updates and Tax Tips'
+              description='Practical UK tax updates and deadline reminders, straight to your inbox.'
+            />
+          </div>
+        </section>
+      </div>
     </>
   );
 }
