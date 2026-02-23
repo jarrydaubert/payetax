@@ -240,6 +240,43 @@ describe('Director Intelligence dashboard components', () => {
       fireEvent.click(screen.getByLabelText('Close your numbers panel'));
       expect(handleMobileInputs).toHaveBeenCalled();
     });
+
+    it('does not steal input focus when drawer rerenders with a new close handler', () => {
+      const { rerender } = render(
+        <DashboardLayout
+          sidebar={<div>Sidebar</div>}
+          inputs={
+            <div className='p-4'>
+              <input aria-label='Revenue' />
+            </div>
+          }
+          main={<div>Main</div>}
+          mobileInputsOpen={true}
+          onToggleMobileInputs={() => {}}
+        />,
+      );
+
+      const drawer = screen.getByRole('dialog', { name: 'Your Numbers' });
+      const input = within(drawer).getByLabelText('Revenue');
+      input.focus();
+      expect(input).toHaveFocus();
+
+      rerender(
+        <DashboardLayout
+          sidebar={<div>Sidebar</div>}
+          inputs={
+            <div className='p-4'>
+              <input aria-label='Revenue' />
+            </div>
+          }
+          main={<div>Main</div>}
+          mobileInputsOpen={true}
+          onToggleMobileInputs={() => {}}
+        />,
+      );
+
+      expect(input).toHaveFocus();
+    });
   });
 
   describe('SidebarNav', () => {

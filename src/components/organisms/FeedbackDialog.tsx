@@ -2,7 +2,15 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
-import { startTransition, useActionState, useEffect, useId, useRef, useState } from 'react';
+import {
+  startTransition,
+  useActionState,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
@@ -30,6 +38,12 @@ interface FeedbackDialogProps {
   triggerVariant?: 'inline' | 'outline';
   /** Optional extra trigger classes */
   triggerClassName?: string;
+  /** Controlled open state (optional) */
+  open?: boolean;
+  /** Controlled state change handler (optional) */
+  onOpenChange?: (open: boolean) => void;
+  /** Hide built-in trigger and expose dialog only */
+  hideTrigger?: boolean;
 }
 
 /**
@@ -42,10 +56,13 @@ export function FeedbackDialog({
   triggerLabel = 'Feedback',
   triggerVariant = 'inline',
   triggerClassName,
+  open,
+  onOpenChange,
+  hideTrigger = false,
 }: FeedbackDialogProps = {}) {
   const emailId = useId();
   const messageId = useId();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     message: '',
@@ -54,6 +71,18 @@ export function FeedbackDialog({
     email: '',
     message: '',
   });
+  const isControlled = typeof open === 'boolean';
+  const isOpen = isControlled ? open : internalOpen;
+
+  const setDialogOpen = useCallback(
+    (nextOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(nextOpen);
+      }
+      onOpenChange?.(nextOpen);
+    },
+    [isControlled, onOpenChange],
+  );
 
   // React 19: useActionState hook for server action state management
   const [state, formAction, isPending] = useActionState<FeedbackFormState, FormData>(
@@ -83,15 +112,15 @@ export function FeedbackDialog({
       toast.success(state.message || 'Feedback sent successfully!');
       setFormData({ email: '', message: '' });
       setErrors({ email: '', message: '' });
-      setOpen(false);
+      setDialogOpen(false);
     } else if (state.error) {
       toast.error(state.error);
     }
-  }, [state, formData.email]);
+  }, [state, formData.email, setDialogOpen]);
 
   // Track dialog open
   const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen);
+    setDialogOpen(newOpen);
     if (newOpen) {
       trackEvent({
         action: 'feedback_dialog_opened',
@@ -152,36 +181,38 @@ export function FeedbackDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {triggerVariant === 'outline' ? (
-          <Button
-            type='button'
-            variant='outline'
-            className={cn('min-h-11', SPACING.GAP_2, TYPOGRAPHY.TEXT_SM, triggerClassName)}
-            aria-haspopup='dialog'
-          >
-            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-            {triggerLabel}
-          </Button>
-        ) : (
-          <button
-            type='button'
-            className={cn(
-              'flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
-              'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              SPACING.GAP_2,
-              TYPOGRAPHY.TEXT_SM,
-              triggerClassName,
-            )}
-            aria-haspopup='dialog'
-          >
-            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-            {triggerLabel}
-          </button>
-        )}
-      </DialogTrigger>
-      <DialogContent className='border-border/50 bg-background/95 backdrop-blur-xl sm:max-w-md'>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          {triggerVariant === 'outline' ? (
+            <Button
+              type='button'
+              variant='outline'
+              className={cn('min-h-11', SPACING.GAP_2, TYPOGRAPHY.TEXT_SM, triggerClassName)}
+              aria-haspopup='dialog'
+            >
+              <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+              {triggerLabel}
+            </Button>
+          ) : (
+            <button
+              type='button'
+              className={cn(
+                'flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-muted-foreground transition-colors',
+                'hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                SPACING.GAP_2,
+                TYPOGRAPHY.TEXT_SM,
+                triggerClassName,
+              )}
+              aria-haspopup='dialog'
+            >
+              <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+              {triggerLabel}
+            </button>
+          )}
+        </DialogTrigger>
+      )}
+      <DialogContent className='max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)] w-[calc(100%-1rem)] max-w-md overflow-y-auto border-border/50 bg-background/95 p-4 backdrop-blur-xl sm:p-6'>
         <DialogHeader>
           <DialogTitle>Share Your Feedback</DialogTitle>
           <DialogDescription>

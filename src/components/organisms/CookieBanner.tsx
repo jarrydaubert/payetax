@@ -21,7 +21,6 @@ import {
   isConsentExpired,
   setConsentPreferences,
 } from '@/lib/cookieUtils';
-import { cn } from '@/lib/utils';
 
 const CONSENT_UPDATED_EVENT = 'cookieConsentUpdated';
 const OPEN_PREFERENCES_EVENT = 'openCookiePreferences';
@@ -32,7 +31,6 @@ function notifyConsentUpdated(): void {
 
 const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
-  const [showReopenButton, setShowReopenButton] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [analyticsDraft, setAnalyticsDraft] = useState(false);
 
@@ -57,15 +55,12 @@ const CookieBanner: React.FC = () => {
 
         if (hasDecision) {
           setShowBanner(false);
-          setShowReopenButton(true);
           return;
         }
 
         timer = setTimeout(() => setShowBanner(true), 500);
-        setShowReopenButton(false);
       } catch {
         timer = setTimeout(() => setShowBanner(true), 500);
-        setShowReopenButton(false);
       }
     };
 
@@ -89,7 +84,6 @@ const CookieBanner: React.FC = () => {
     setAnalyticsDraft(preferences.analytics);
     setModalOpen(false);
     setShowBanner(false);
-    setShowReopenButton(true);
     notifyConsentUpdated();
   }, []);
 
@@ -177,26 +171,6 @@ const CookieBanner: React.FC = () => {
             </CardFooter>
           </Card>
         </div>
-      )}
-
-      {showReopenButton && !showBanner && !modalOpen && (
-        <Button
-          type='button'
-          variant='outline'
-          size='icon-touch'
-          onClick={() => {
-            loadCurrentPreferences();
-            setModalOpen(true);
-          }}
-          className={cn(
-            'safe-bottom fixed bottom-4 left-4 z-30 rounded-full border-border/80 bg-card/95 shadow-xl backdrop-blur-sm',
-            'hover:bg-accent',
-          )}
-          aria-label='Manage cookie preferences'
-          data-testid='cookie-reopen-button'
-        >
-          <Cookie className='size-5 text-primary' aria-hidden='true' />
-        </Button>
       )}
 
       <Dialog open={modalOpen} onOpenChange={handleModalOpenChange}>

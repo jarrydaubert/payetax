@@ -84,6 +84,15 @@ describe('FeedbackDialog Component', () => {
         expect(screen.getByText(/Help us improve PayeTax/i)).toBeInTheDocument();
       });
     });
+
+    it('uses mobile-safe dialog sizing constraints', async () => {
+      render(<FeedbackDialog />);
+      fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
+
+      const dialog = await screen.findByRole('dialog');
+      expect(dialog).toHaveClass('w-[calc(100%-1rem)]', 'max-w-md');
+      expect(dialog).toHaveClass('max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)]');
+    });
   });
 
   describe('Form Fields', () => {

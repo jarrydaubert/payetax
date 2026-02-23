@@ -1,4 +1,12 @@
-import { ArrowRight, CheckCircle2, FileText, Shield, Sparkles, Workflow } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Download,
+  FileText,
+  Shield,
+  Sparkles,
+  Workflow,
+} from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
@@ -61,8 +69,13 @@ export default function AboutPage() {
               clearly, not funnel you into ads, upsells, or data extraction loops.
             </p>
 
-            <div className='mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
-              <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+            <div className='mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-3'>
+              <Button
+                asChild
+                size='touch'
+                variant='brandOutline'
+                className='w-full rounded-xl px-6 sm:min-w-[11rem]'
+              >
                 <Link href='/'>
                   Open Calculator
                   <ArrowRight className='size-4' />
@@ -72,15 +85,23 @@ export default function AboutPage() {
                 asChild
                 size='touch'
                 variant='outline'
-                className='rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card'
+                className='w-full rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card sm:min-w-[11rem]'
               >
                 <Link href='/compliance'>
                   Compliance & Sources
                   <FileText className='size-4' />
                 </Link>
               </Button>
-              <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
-                <Link href='/install'>Install App</Link>
+              <Button
+                asChild
+                size='touch'
+                variant='brandOutline'
+                className='w-full rounded-xl px-6 sm:min-w-[11rem]'
+              >
+                <Link href='/install'>
+                  Install App
+                  <Download className='size-4' />
+                </Link>
               </Button>
             </div>
           </div>

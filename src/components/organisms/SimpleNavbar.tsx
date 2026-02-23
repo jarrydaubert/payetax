@@ -1,7 +1,7 @@
 // src/components/organisms/SimpleNavbar.tsx
 'use client';
 
-import { Menu, X } from 'lucide-react';
+import { Menu, MessageSquare, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -42,6 +42,7 @@ const FeedbackDialog = dynamic(
 
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileFeedbackOpen, setIsMobileFeedbackOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -142,6 +143,13 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
     setIsMobileMenuOpen(false);
   }, []);
 
+  const handleMobileFeedbackClick = useCallback(() => {
+    setIsMobileMenuOpen(false);
+    window.setTimeout(() => {
+      setIsMobileFeedbackOpen(true);
+    }, 120);
+  }, []);
+
   return (
     <>
       {/* Skip to main content */}
@@ -234,7 +242,23 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => setIsMobileMenuOpen(false)}
-        utilities={<FeedbackDialog />}
+        utilities={
+          <button
+            type='button'
+            onClick={handleMobileFeedbackClick}
+            className='flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-medium text-sm text-text-secondary-new transition-colors hover:text-text-primary-new'
+            aria-haspopup='dialog'
+          >
+            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            Feedback
+          </button>
+        }
+      />
+
+      <FeedbackDialog
+        open={isMobileFeedbackOpen}
+        onOpenChange={setIsMobileFeedbackOpen}
+        hideTrigger={true}
       />
 
       {/* Spacer for fixed navbar */}

@@ -91,13 +91,13 @@ describe('CookieBanner', () => {
     expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: false });
   });
 
-  it('shows reopen control after existing consent and opens modal via custom event', async () => {
+  it('does not show floating reopen control and still opens modal via custom event', async () => {
     (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
 
     render(<CookieBanner />);
     jest.advanceTimersByTime(600);
 
-    expect(screen.getByTestId('cookie-reopen-button')).toBeInTheDocument();
+    expect(screen.queryByTestId('cookie-reopen-button')).not.toBeInTheDocument();
     document.dispatchEvent(new Event('openCookiePreferences'));
 
     expect(await screen.findByText(/Privacy Overview/i)).toBeInTheDocument();

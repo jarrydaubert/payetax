@@ -55,6 +55,11 @@ function MobileDrawer({
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   // Focus trap and keyboard handling
   useEffect(() => {
@@ -69,8 +74,8 @@ function MobileDrawer({
 
     // Handle Escape key
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && onClose) {
-        onClose();
+      if (e.key === 'Escape') {
+        onCloseRef.current?.();
       }
     };
 
@@ -80,7 +85,7 @@ function MobileDrawer({
       document.body.style.overflow = originalOverflow;
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

@@ -68,7 +68,14 @@ export function NavbarMobileMenu({
 
     // Trap focus within menu (but allow Radix dialogs to manage their own focus)
     const handleFocusTrap = (event: FocusEvent) => {
-      const target = event.target as Node;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      // If another modal dialog is open (e.g., Feedback), let it own focus.
+      const hasOpenPortalDialog = Boolean(
+        document.querySelector('[data-radix-portal] [role="dialog"]'),
+      );
+      if (hasOpenPortalDialog) return;
 
       // If focus moved to a Radix dialog/portal, let Radix handle focus trapping
       // This prevents infinite focus loops when FeedbackDialog opens from mobile menu
@@ -76,7 +83,6 @@ export function NavbarMobileMenu({
       if (isInRadixPortal) return;
 
       if (menuRef.current && !menuRef.current.contains(target)) {
-        event.preventDefault();
         firstLinkRef.current?.focus();
       }
     };

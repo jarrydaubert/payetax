@@ -15,23 +15,23 @@ describe('AboutPage', () => {
       screen.getByRole('heading', { name: /How PayeTax differs in practice/i }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole('link', {
-        name: /Open Calculator/i,
-      }),
-    ).toHaveAttribute('href', '/');
+    const openCalculatorLink = screen.getByRole('link', {
+      name: /Open Calculator/i,
+    });
+    expect(openCalculatorLink).toHaveAttribute('href', '/');
+    expect(openCalculatorLink).toHaveClass('w-full');
 
-    expect(
-      screen.getByRole('link', {
-        name: /Compliance & Sources/i,
-      }),
-    ).toHaveAttribute('href', '/compliance');
+    const complianceLink = screen.getByRole('link', {
+      name: /Compliance & Sources/i,
+    });
+    expect(complianceLink).toHaveAttribute('href', '/compliance');
+    expect(complianceLink).toHaveClass('w-full');
 
-    expect(
-      screen.getByRole('link', {
-        name: /Install App/i,
-      }),
-    ).toHaveAttribute('href', '/install');
+    const installLink = screen.getByRole('link', {
+      name: /Install App/i,
+    });
+    expect(installLink).toHaveAttribute('href', '/install');
+    expect(installLink).toHaveClass('w-full');
 
     expect(
       screen.getByRole('button', {
