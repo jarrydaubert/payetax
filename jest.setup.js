@@ -7,6 +7,7 @@ expect.extend(toHaveNoViolations);
 // Many components (Analytics, etc.) read NEXT_PUBLIC_* env vars at module init time.
 // Provide stable defaults in Jest to avoid tests depending on local developer env.
 process.env.NEXT_PUBLIC_GA_ID ||= 'G-ABCDEFGHIJ';
+process.env.NEXT_PUBLIC_CLARITY_ID ||= 'vmbk1d0ng2';
 process.env.NEXT_PUBLIC_AHREFS_KEY ||= 'ahrefs-test-key';
 
 // Note: TextEncoder/TextDecoder and Fetch API polyfills (Request/Response/Headers)

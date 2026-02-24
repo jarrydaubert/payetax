@@ -40,6 +40,7 @@ describe('Environment Variable Validation', () => {
     process.env.KIT_FORM_ID = undefined;
     process.env.NEXT_PUBLIC_SITE_URL = undefined;
     process.env.NEXT_PUBLIC_GA_ID = undefined;
+    process.env.NEXT_PUBLIC_CLARITY_ID = undefined;
     process.env.NEXT_PUBLIC_ENABLE_ANALYTICS = undefined;
     process.env.UNSUBSCRIBE_SECRET = undefined;
     process.env.REFERRAL_PARTNER_EMAIL = undefined;
@@ -71,6 +72,13 @@ describe('Environment Variable Validation', () => {
       it('should accept Ahrefs key when provided', () => {
         const result = PublicEnvSchema.safeParse({
           NEXT_PUBLIC_AHREFS_KEY: 'ahrefs_public_key',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('should accept valid Microsoft Clarity ID', () => {
+        const result = PublicEnvSchema.safeParse({
+          NEXT_PUBLIC_CLARITY_ID: 'vmbk1d0ng2',
         });
         expect(result.success).toBe(true);
       });
@@ -153,6 +161,13 @@ describe('Environment Variable Validation', () => {
       it('should reject empty Ahrefs key if provided', () => {
         const result = PublicEnvSchema.safeParse({
           NEXT_PUBLIC_AHREFS_KEY: '',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('should reject invalid Microsoft Clarity ID format', () => {
+        const result = PublicEnvSchema.safeParse({
+          NEXT_PUBLIC_CLARITY_ID: 'clarity-project-id-too-long',
         });
         expect(result.success).toBe(false);
       });

@@ -19,6 +19,9 @@ import { z } from 'zod';
 const GA_ID_SCHEMA = z
   .string()
   .regex(/^G-[A-Z0-9]{10}$/i, 'Google Analytics ID must be in format G-XXXXXXXXXX');
+const CLARITY_ID_SCHEMA = z
+  .string()
+  .regex(/^[a-z0-9]{10}$/i, 'Microsoft Clarity ID must be 10 alphanumeric characters');
 
 /**
  * Zod Schema for Public Environment Variables
@@ -27,6 +30,7 @@ const GA_ID_SCHEMA = z
 export const PublicEnvSchema = z.object({
   // Analytics
   NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
+  NEXT_PUBLIC_CLARITY_ID: CLARITY_ID_SCHEMA.optional(),
   NEXT_PUBLIC_AHREFS_KEY: z.string().min(1, 'Ahrefs key must not be empty').optional(),
 
   // Error Monitoring
@@ -198,6 +202,7 @@ export type RequiredProductionEnv = z.infer<typeof RequiredProductionEnvSchema>;
 export function validatePublicEnv(): PublicEnv {
   const result = PublicEnvSchema.safeParse({
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    NEXT_PUBLIC_CLARITY_ID: process.env.NEXT_PUBLIC_CLARITY_ID,
     NEXT_PUBLIC_AHREFS_KEY: process.env.NEXT_PUBLIC_AHREFS_KEY,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
