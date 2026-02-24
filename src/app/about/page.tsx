@@ -69,7 +69,7 @@ export default function AboutPage() {
               clearly, not funnel you into ads, upsells, or data extraction loops.
             </p>
 
-            <div className='mt-8 flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center'>
+            <div className='mx-auto mt-8 flex w-full max-w-2xl flex-col justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center'>
               <Button
                 asChild
                 size='touch'
