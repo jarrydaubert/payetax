@@ -69,12 +69,12 @@ export default function AboutPage() {
               clearly, not funnel you into ads, upsells, or data extraction loops.
             </p>
 
-            <div className='mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-3'>
+            <div className='mt-8 flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center'>
               <Button
                 asChild
                 size='touch'
                 variant='brandOutline'
-                className='w-full rounded-xl px-6 sm:min-w-[11rem]'
+                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/'>
                   Open Calculator
@@ -84,8 +84,8 @@ export default function AboutPage() {
               <Button
                 asChild
                 size='touch'
-                variant='outline'
-                className='w-full rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card sm:min-w-[11rem]'
+                variant='brandOutline'
+                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/compliance'>
                   Compliance & Sources
@@ -96,7 +96,7 @@ export default function AboutPage() {
                 asChild
                 size='touch'
                 variant='brandOutline'
-                className='w-full rounded-xl px-6 sm:min-w-[11rem]'
+                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/install'>
                   Install App
