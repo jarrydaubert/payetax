@@ -14,6 +14,7 @@
 | **Use Claude skills/commands effectively?** | [`SKILLS_AND_COMMANDS.md`](./guides/SKILLS_AND_COMMANDS.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
+| **Run DevOps checks?** | [`OPS_RUNBOOK.md`](./guides/OPS_RUNBOOK.md) |
 | **Review sitemap policy?** | [`SITEMAP_POLICY.md`](./guides/SITEMAP_POLICY.md) |
 | **Verify distributed rate limits?** | [`RATE_LIMIT_VERIFICATION.md`](./guides/RATE_LIMIT_VERIFICATION.md) |
 | **Review bot mitigation rules?** | [`BOT_MITIGATION.md`](./guides/BOT_MITIGATION.md) |

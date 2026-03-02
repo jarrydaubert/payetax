@@ -116,8 +116,8 @@ mr_e2e_critical:
 #   ✅ Preview deployments (MRs)
 #   ✅ Production deployment (main)
 #
-# GITHUB (External, Free):
-#   ✅ Dependabot: Security scanning + dependency updates
+# DEPENDENCY GOVERNANCE:
+#   ✅ Use regular `bun run audit:deps` and monthly GitLab governance audits
 #
 # ──────────────────────────────────────────────────────────
 

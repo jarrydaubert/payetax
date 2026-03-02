@@ -48,6 +48,7 @@ bun run bundle:analyze      # Bundle analysis
 bun run check:env-contract # Verify critical env/template/schema sync
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
+bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits
 ```
 
 ## Vercel CLI
@@ -71,3 +72,4 @@ See `docs/guides/` for detail:
 - `TESTING.md`
 - `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`
+- `OPS_RUNBOOK.md`

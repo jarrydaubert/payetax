@@ -34,30 +34,30 @@ Skills and tools are primarily sourced from [coreyhaines31/marketingskills](http
 
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
-| ab-test-setup | 1.2.0 | 2026-02-20 |
-| ad-creative | 1.2.0 | 2026-02-20 |
-| ai-seo | 1.2.0 | 2026-02-20 |
-| analytics-tracking | 1.2.0 | 2026-02-20 |
-| churn-prevention | 1.2.0 | 2026-02-20 |
-| cold-email | 1.2.0 | 2026-02-20 |
-| competitor-alternatives | 1.2.0 | 2026-02-20 |
-| content-strategy | 1.2.0 | 2026-02-20 |
-| copy-editing | 1.2.0 | 2026-02-20 |
-| copywriting | 1.2.0 | 2026-02-20 |
-| email-sequence | 1.2.0 | 2026-02-20 |
-| form-cro | 1.2.0 | 2026-02-20 |
-| free-tool-strategy | 1.2.0 | 2026-02-20 |
-| launch-strategy | 1.2.0 | 2026-02-20 |
-| marketing-ideas | 1.2.0 | 2026-02-20 |
-| marketing-psychology | 1.2.0 | 2026-02-20 |
-| onboarding-cro | 1.2.0 | 2026-02-20 |
-| page-cro | 1.2.0 | 2026-02-20 |
-| popup-cro | 1.2.0 | 2026-02-20 |
-| product-marketing-context | 1.2.0 | 2026-02-20 |
-| programmatic-seo | 1.2.0 | 2026-02-20 |
-| schema-markup | 1.2.0 | 2026-02-20 |
-| seo-audit | 1.2.0 | 2026-02-20 |
-| social-content | 1.2.0 | 2026-02-20 |
+| ab-test-setup | 1.3.0 | 2026-03-02 |
+| ad-creative | 1.3.0 | 2026-03-02 |
+| ai-seo | 1.3.0 | 2026-03-02 |
+| analytics-tracking | 1.3.0 | 2026-03-02 |
+| churn-prevention | 1.3.0 | 2026-03-02 |
+| cold-email | 1.3.0 | 2026-03-02 |
+| competitor-alternatives | 1.3.0 | 2026-03-02 |
+| content-strategy | 1.3.0 | 2026-03-02 |
+| copy-editing | 1.3.0 | 2026-03-02 |
+| copywriting | 1.3.0 | 2026-03-02 |
+| email-sequence | 1.3.0 | 2026-03-02 |
+| form-cro | 1.3.0 | 2026-03-02 |
+| free-tool-strategy | 1.3.0 | 2026-03-02 |
+| launch-strategy | 1.3.0 | 2026-03-02 |
+| marketing-ideas | 1.3.0 | 2026-03-02 |
+| marketing-psychology | 1.3.0 | 2026-03-02 |
+| onboarding-cro | 1.3.0 | 2026-03-02 |
+| page-cro | 1.3.0 | 2026-03-02 |
+| popup-cro | 1.3.0 | 2026-03-02 |
+| product-marketing-context | 1.3.0 | 2026-03-02 |
+| programmatic-seo | 1.3.0 | 2026-03-02 |
+| schema-markup | 1.3.0 | 2026-03-02 |
+| seo-audit | 1.3.0 | 2026-03-02 |
+| social-content | 1.3.0 | 2026-03-02 |
 
 ## PayeTax-Only Skills
 
@@ -94,8 +94,22 @@ When adding a new upstream skill to PayeTax:
 - pricing-strategy
 - referral-program
 - signup-flow-cro
+- revops
+- sales-enablement
+- site-architecture
 
 ## Recent Changes
+
+### 2026-03-02
+- Synced upstream marketing skills to `coreyhaines31/marketingskills` release `v1.3.0`.
+- Updated all 24 upstream-synced installed skills to support `.agents/product-marketing-context.md` with `.claude/` fallback.
+- Preserved all existing `## PayeTax Context` local sections during sync.
+- Deferred newly added upstream skills (`site-architecture`, `sales-enablement`, `revops`) pending explicit activation.
+- Added local skills-ops workflow:
+  - `scripts/sync-marketing-skills.sh`
+  - `scripts/apply-marketing-skill-profile.sh`
+  - `scripts/validate-marketing-skills-setup.sh`
+- Added `.agents` compatibility symlinks while keeping `.claude/skills/` as canonical local path.
 
 ### 2026-02-20
 - Synced upstream skills to v1.2.0.

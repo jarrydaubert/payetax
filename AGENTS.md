@@ -60,6 +60,9 @@ bun run bundle:analyze      # Bundle analysis
 bun run check:env-contract # Verify critical env/template/schema sync
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
+bun run skills:check        # Check upstream sync status + local skill setup validation
+bun run skills:sync         # Sync pinned marketing skills + apply PayeTax profile
+bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits
 ```
 
 ## More Docs
@@ -68,12 +71,14 @@ See `CLAUDE.md` and `docs/guides/` for details:
 - `TESTING.md`
 - `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`
+- `MARKETING_SKILLS_RUNBOOK.md`
+- `OPS_RUNBOOK.md`
 
 ## Skills (Agent Reference)
 
 All skills have `## PayeTax Context` sections with project-specific guidance, file paths, and what does/doesn't apply.
 
-Skill docs live in `.claude/skills/`. Version history: `.claude/skills/VERSIONS.md`.
+Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link). Version history: `.claude/skills/VERSIONS.md`.
 
 ### SEO & Content
 - `seo-audit` — full-site SEO audit (incl. AI bot access, llms.txt)

@@ -65,13 +65,18 @@
     "seo:report:init": "bun scripts/seo-tech-report.ts init",
     "seo:report:status": "bun scripts/seo-tech-report.ts status",
     "monitor-all": "bun run audit:security && bun run bundle:analyze",
+    "audit:gitlab:policy": "bun scripts/audit-gitlab-policy-drift.ts",
+    "audit:gitlab:ci-usage": "bun scripts/audit-gitlab-ci-usage.ts",
+    "audit:gitlab:governance": "bun run audit:gitlab:policy && bun run audit:gitlab:ci-usage",
     "deploy": "bun run clean && bun run release && echo '✅ Ready for deployment!'",
     "debug": "bun run clean && bun run typecheck && bun run build",
     "linear": "bun scripts/linear.js",
     "linear:me": "bun scripts/linear.js list --me --project PayeTax",
     "linear:create": "bun scripts/linear.js create",
     "linear:done": "bun scripts/linear.js update-status",
-    "golden:generate": "tsx e2e/scripts/generate-golden-master.ts"
+    "golden:generate": "tsx e2e/scripts/generate-golden-master.ts",
+    "skills:check": "scripts/sync-marketing-skills.sh --check && scripts/validate-marketing-skills-setup.sh",
+    "skills:sync": "scripts/sync-marketing-skills.sh --sync && scripts/apply-marketing-skill-profile.sh --apply && scripts/validate-marketing-skills-setup.sh"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "1.4.0",

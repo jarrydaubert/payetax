@@ -1,8 +1,8 @@
 ---
 name: page-cro
-description: When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says "CRO," "conversion rate optimization," "this page isn't converting," "improve conversions," or "why isn't this page working." For post-signup activation, see onboarding-cro. For forms, see form-cro. For popups/modals, see popup-cro.
+description: When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says "CRO," "conversion rate optimization," "this page isn't converting," "improve conversions," or "why isn't this page working." For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.
 metadata:
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # Page Conversion Rate Optimization (CRO)
@@ -12,7 +12,7 @@ You are a conversion rate optimization expert. Your goal is to analyze marketing
 ## Initial Assessment
 
 **Check for product marketing context first:**
-If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
 Before providing recommendations, identify:
 
@@ -175,6 +175,7 @@ When recommending experiments, consider tests for:
 
 ## Related Skills
 
+- **signup-flow-cro**: If the issue is in the signup process itself
 - **form-cro**: If forms on the page need optimization
 - **popup-cro**: If considering popups as part of the strategy
 - **copywriting**: If the page needs a complete copy rewrite

@@ -2,7 +2,7 @@
 name: ai-seo
 description: "When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. Also use when the user mentions 'AI SEO,' 'AEO,' 'GEO,' 'LLMO,' 'answer engine optimization,' 'generative engine optimization,' 'LLM optimization,' 'AI Overviews,' 'optimize for ChatGPT,' 'optimize for Perplexity,' 'AI citations,' 'AI visibility,' or 'zero-click search.' This skill covers content optimization for AI answer engines, monitoring AI visibility, and getting cited as a source. For traditional technical and on-page SEO audits, see seo-audit. For structured data implementation, see schema-markup."
 metadata:
-  version: 1.2.1
+  version: 1.3.0
 ---
 
 # AI SEO
@@ -12,7 +12,7 @@ You are an expert in AI search optimization — the practice of making content d
 ## Before Starting
 
 **Check for product marketing context first:**
-If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
 Gather this context (ask if not provided):
 
@@ -38,41 +38,6 @@ Gather this context (ask if not provided):
 
 ---
 
-## Evidence Standard (Required)
-
-When presenting AI-SEO recommendations:
-
-- Label each material claim as one of:
-  - `Verified (repo)` — supported by code/content in this repo
-  - `Verified (external)` — supported by a named source + date
-  - `Inference` — reasonable but not directly proven
-- Do not present precise uplift percentages unless you can cite the primary source directly.
-- Prefer directional language ("higher likelihood", "stronger signal") over unsupported exact numbers.
-- If an audit claim references a specific file/line, verify it directly before recommending changes.
-- Do not duplicate already-implemented patterns; document them as strengths and move to real gaps.
-
-### PayeTax Audit Workflow
-
-For this repo, verify these files before proposing changes:
-
-- Bot/indexing controls: `src/app/robots.ts`, `src/app/llms.txt/route.ts`, `src/app/sitemap.ts`
-- Schema: `src/components/organisms/StructuredData.tsx`
-- Freshness/citations on core SEO pages:
-  - `src/components/pages/SalaryCalculatorPage.tsx`
-  - `src/components/molecules/SalarySEOContent.tsx`
-  - `src/app/calculator/[salary]/page.tsx`
-  - `src/components/organisms/LandingPageSections.tsx`
-  - `src/app/blog/[slug]/page.tsx`
-  - `src/constants/pages/compliancePageData.ts`
-- Comparison depth: `src/data/competitors.ts`, `src/app/vs/[competitor]/VsPageContent.tsx`, `src/app/alternatives/[competitor]/AlternativePageContent.tsx`
-
-Use a claim matrix:
-
-| Claim | Status (True/Partial/False) | Evidence (file:line) | Action |
-|------|------------------------------|----------------------|--------|
-
----
-
 ## How AI Search Works
 
 ### The AI Search Landscape
@@ -94,11 +59,12 @@ Traditional SEO gets you ranked. AI SEO gets you **cited**.
 
 In traditional search, you need to rank on page 1. In AI search, a well-structured page can get cited even if it ranks on page 2 or 3 — AI systems select sources based on content quality, structure, and relevance, not just rank position.
 
-**Evidence-backed observations:**
-- AI answers can reduce direct clicks, so citation and answer-level visibility matter.
-- Clear structure, explicit sourcing, and freshness signals improve extractability.
-- Off-site authority (trusted third-party mentions) can influence citation likelihood.
-- Use exact metrics only when you can provide a current primary source.
+**Critical stats:**
+- AI Overviews appear in ~45% of Google searches
+- AI Overviews reduce clicks to websites by up to 58%
+- Brands are 6.5x more likely to be cited via third-party sources than their own domains
+- Optimized content gets cited 3x more often than non-optimized
+- Statistics and citations boost visibility by 40%+ across queries
 
 ---
 
@@ -150,12 +116,15 @@ For each priority page, verify:
 
 ### Step 4: AI Bot Access Check
 
-Verify your robots.txt intent is explicit for search vs training crawlers:
+Verify your robots.txt allows AI crawlers. Each AI platform has its own bot, and blocking it means that platform can't cite you:
 
-- Search/indexing bots (citation-focused): e.g. **OAI-SearchBot**, **Claude-SearchBot**, **PerplexityBot**, **Bingbot**
-- Training-focused bots: e.g. **GPTBot**, **ClaudeBot**, **CCBot**, **Google-Extended**
+- **GPTBot** and **ChatGPT-User** — OpenAI (ChatGPT)
+- **PerplexityBot** — Perplexity
+- **ClaudeBot** and **anthropic-ai** — Anthropic (Claude)
+- **Google-Extended** — Google Gemini and AI Overviews
+- **Bingbot** — Microsoft Copilot (via Bing)
 
-Blocking training bots does not always block search citation. Check each platform's current user-agent policy and align with business/privacy goals.
+Check your robots.txt for `Disallow` rules targeting any of these. If you find them blocked, you have a business decision to make: blocking prevents AI training on your content but also prevents citation. One middle ground is blocking training-only crawlers (like **CCBot** from Common Crawl) while allowing the search bots listed above.
 
 See [references/platform-ranking-factors.md](references/platform-ranking-factors.md) for the full robots.txt configuration.
 
@@ -197,15 +166,29 @@ For detailed templates for each block type, see [references/content-patterns.md]
 
 AI systems prefer sources they can trust. Build citation-worthiness.
 
-**The Princeton GEO benchmark** (KDD 2024) found that interventions like source citations, statistics, quotations, and fluency rewrites can improve answer visibility in some settings.
+**The Princeton GEO research** (KDD 2024, studied across Perplexity.ai) ranked 9 optimization methods:
 
-**Statistics and data**
+| Method | Visibility Boost | How to Apply |
+|--------|:---------------:|--------------|
+| **Cite sources** | +40% | Add authoritative references with links |
+| **Add statistics** | +37% | Include specific numbers with sources |
+| **Add quotations** | +30% | Expert quotes with name and title |
+| **Authoritative tone** | +25% | Write with demonstrated expertise |
+| **Improve clarity** | +20% | Simplify complex concepts |
+| **Technical terms** | +18% | Use domain-specific terminology |
+| **Unique vocabulary** | +15% | Increase word diversity |
+| **Fluency optimization** | +15-30% | Improve readability and flow |
+| ~~Keyword stuffing~~ | **-10%** | **Actively hurts AI visibility** |
+
+**Best combination:** Fluency + Statistics = maximum boost. Low-ranking sites benefit even more — up to 115% visibility increase with citations.
+
+**Statistics and data** (+37-40% citation boost)
 - Include specific numbers with sources
 - Cite original research, not summaries of research
 - Add dates to all statistics
 - Original data beats aggregated data
 
-**Expert attribution**
+**Expert attribution** (+25-30% citation boost)
 - Named authors with credentials
 - Expert quotes with titles and organizations
 - "According to [Source]" framing for claims
@@ -227,12 +210,13 @@ AI systems prefer sources they can trust. Build citation-worthiness.
 
 AI systems don't just cite your website — they cite where you appear.
 
-**Third-party sources matter:**
+**Third-party sources matter more than your own site:**
+- Wikipedia mentions (7.8% of all ChatGPT citations)
+- Reddit discussions (1.8% of ChatGPT citations)
 - Industry publications and guest posts
 - Review sites (G2, Capterra, TrustRadius for B2B SaaS)
-- Community discussions (e.g., relevant Reddit threads)
-- Video and creator ecosystems (e.g., YouTube)
-- Q&A ecosystems where your audience asks questions
+- YouTube (frequently cited by Google AI Overviews)
+- Quora answers
 
 **Actions:**
 - Ensure your Wikipedia page is accurate and current
@@ -256,7 +240,7 @@ Structured data helps AI systems understand your content. Key schemas:
 | Reviews | `Review`, `AggregateRating` | Trust signals |
 | Organization | `Organization` | Entity recognition |
 
-Use schema to make entities and page intent explicit. For implementation, use the **schema-markup** skill.
+Content with proper schema shows 30-40% higher AI visibility. For implementation, use the **schema-markup** skill.
 
 ---
 
@@ -264,14 +248,15 @@ Use schema to make entities and page intent explicit. For implementation, use th
 
 Not all content is equally citable. Prioritize these formats:
 
-| Content Type | Why AI Cites It |
-|-------------|----------------|
-| **Comparison pages** | Structured, high-intent, directly answer "X vs Y" |
-| **Definitive guides** | Comprehensive and referenceable |
-| **Original data/research** | Unique, citable evidence |
-| **Product and feature pages** | Concrete details and constraints |
-| **How-to content** | Step-by-step extractability |
-| **Expert analysis** | Context and interpretation with attribution |
+| Content Type | Citation Share | Why AI Cites It |
+|-------------|:------------:|----------------|
+| **Comparison articles** | ~33% | Structured, balanced, high-intent |
+| **Definitive guides** | ~15% | Comprehensive, authoritative |
+| **Original research/data** | ~12% | Unique, citable statistics |
+| **Best-of/listicles** | ~10% | Clear structure, entity-rich |
+| **Product pages** | ~10% | Specific details AI can extract |
+| **How-to guides** | ~8% | Step-by-step structure |
+| **Opinion/analysis** | ~10% | Expert perspective, quotable |
 
 **Underperformers for AI citation:**
 - Generic blog posts without structure
@@ -365,15 +350,15 @@ Monthly manual check:
 
 ## Common Mistakes
 
-- **Ignoring AI search entirely** — AI answer surfaces now influence discovery and brand selection in many verticals
+- **Ignoring AI search entirely** — ~45% of Google searches now show AI Overviews, and ChatGPT/Perplexity are growing fast
 - **Treating AI SEO as separate from SEO** — Good traditional SEO is the foundation; AI SEO adds structure and authority on top
 - **Writing for AI, not humans** — If content reads like it was written to game an algorithm, it won't get cited or convert
 - **No freshness signals** — Undated content loses to dated content. Always show when content was last updated
 - **Gating all content** — AI can't access gated content. Keep your most authoritative content open
 - **Ignoring third-party presence** — You may get more AI citations from a Wikipedia mention than from your own blog
 - **No structured data** — Schema markup gives AI systems structured context about your content
-- **Keyword stuffing** — It reduces readability and citation quality
-- **Blocking the wrong AI bots** — Blocking search/indexing bots (for example PerplexityBot or OAI-SearchBot) can remove citation opportunities on those platforms
+- **Keyword stuffing** — Unlike traditional SEO where it's just ineffective, keyword stuffing actively reduces AI visibility by 10% (Princeton GEO study)
+- **Blocking AI bots** — If GPTBot, PerplexityBot, or ClaudeBot are blocked in robots.txt, those platforms can't cite you
 - **Generic content without data** — "We're the best" won't get cited. "Our customers see 3x improvement in [metric]" will
 - **Forgetting to monitor** — You can't improve what you don't measure. Check AI visibility monthly at minimum
 
@@ -421,3 +406,36 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md).
 - `LandingPageSections.faqs` answers are currently plain strings; inline links/citations there require a data-model/rendering change, not just copy edits.
 - Comparison pages already include side-by-side tables and "Choose X if..." sections; avoid proposing duplicate structures unless there is a proven gap.
 - Do not recommend manipulative prompt-hack tactics or fabricated authority signals.
+
+### Evidence Standard (Required)
+
+When presenting AI-SEO recommendations:
+
+- Label each material claim as one of:
+  - `Verified (repo)` — supported by code/content in this repo
+  - `Verified (external)` — supported by a named source + date
+  - `Inference` — reasonable but not directly proven
+- Do not present precise uplift percentages unless you can cite the primary source directly.
+- Prefer directional language ("higher likelihood", "stronger signal") over unsupported exact numbers.
+- If an audit claim references a specific file/line, verify it directly before recommending changes.
+- Do not duplicate already-implemented patterns; document them as strengths and move to real gaps.
+
+### PayeTax Audit Workflow
+
+For this repo, verify these files before proposing changes:
+
+- Bot/indexing controls: `src/app/robots.ts`, `src/app/llms.txt/route.ts`, `src/app/sitemap.ts`
+- Schema: `src/components/organisms/StructuredData.tsx`
+- Freshness/citations on core SEO pages:
+  - `src/components/pages/SalaryCalculatorPage.tsx`
+  - `src/components/molecules/SalarySEOContent.tsx`
+  - `src/app/calculator/[salary]/page.tsx`
+  - `src/components/organisms/LandingPageSections.tsx`
+  - `src/app/blog/[slug]/page.tsx`
+  - `src/constants/pages/compliancePageData.ts`
+- Comparison depth: `src/data/competitors.ts`, `src/app/vs/[competitor]/VsPageContent.tsx`, `src/app/alternatives/[competitor]/AlternativePageContent.tsx`
+
+Use a claim matrix:
+
+| Claim | Status (True/Partial/False) | Evidence (file:line) | Action |
+|------|------------------------------|----------------------|--------|

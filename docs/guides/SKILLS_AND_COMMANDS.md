@@ -17,6 +17,8 @@ A practical guide to using the PayeTax commands and skills stored in `.claude/`.
 - Skills: `.claude/skills/*/SKILL.md`
 - Tools: `.claude/tools/` (registry, integration guides, CLI scripts)
 - Versions: `.claude/skills/VERSIONS.md`
+- Ops runbook: `docs/guides/MARKETING_SKILLS_RUNBOOK.md`
+- Compatibility links for upstream `.agents` paths: `.agents/skills -> .claude/skills` and `.agents/product-marketing-context.md -> .claude/product-marketing-context.md`
 
 ## How To Use In Codex (Terminal)
 
