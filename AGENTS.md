@@ -60,6 +60,8 @@ bun run bundle:analyze      # Bundle analysis
 bun run check:env-contract # Verify critical env/template/schema sync
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
+bun run gitlab:status       # GitLab project + MR + pipeline + release summary
+bun run gitlab:mr:status    # Open MR for the current branch
 bun run skills:check        # Check upstream sync status + local skill setup validation
 bun run skills:sync         # Sync pinned marketing skills + apply PayeTax profile
 bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits

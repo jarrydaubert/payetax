@@ -23,6 +23,15 @@ bun run build
 
 3. Open merge request and wait for GitLab MR pipeline jobs to pass.
 
+Useful GitLab shortcuts:
+
+```bash
+bun run gitlab:status
+bun run gitlab:mr:status
+bun run gitlab:pipeline:latest
+bun run gitlab:release:latest
+```
+
 ## 3) Deployment Flow
 
 1. Confirm release gate passes locally:
@@ -70,12 +79,30 @@ Evidence outputs:
 - `docs/evidence/gitlab-policy-drift.md`
 - `docs/evidence/gitlab-ci-usage.md`
 
-## 5) GitLab API Alternatives to `gh`
+## 5) GitLab CLI Shortcuts
+
+Common repo-native wrappers:
+
+```bash
+bun run gitlab:project
+bun run gitlab:mr:status
+bun run gitlab:pipeline:latest
+bun run gitlab:release:latest
+bun run gitlab:status
+```
+
+Notes:
+
+1. These commands use the current repo's GitLab remote via `glab api`.
+2. `GITLAB_PROJECT_ID` remains available as an override for CI or cross-project audits.
+3. `gitlab:pipeline:latest` defaults to the current branch.
+
+## 6) GitLab API Alternatives to `gh`
 
 Use either:
 
 1. GitLab API via `curl` + `PRIVATE-TOKEN`
-2. `glab` CLI (optional; not required)
+2. `glab` CLI (recommended for local use)
 
 Examples:
 
@@ -87,7 +114,7 @@ curl -sS --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
   "https://gitlab.com/api/v4/projects/$GITLAB_PROJECT_ID/releases?per_page=1"
 ```
 
-## 6) Monthly Review
+## 7) Monthly Review
 
 1. Run governance audits and commit refreshed evidence files.
 2. Confirm `.gitlab-ci.yml` runtime/cost assumptions are still valid.
