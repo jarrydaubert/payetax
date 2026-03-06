@@ -1,6 +1,6 @@
 # PayeTax System Overview
 
-Last updated: February 20, 2026
+Last updated: March 6, 2026
 
 Purpose: a single technical brief for external reviewers covering architecture, stack choices, quality controls, and operational tradeoffs.
 
@@ -25,7 +25,7 @@ This is not a multi-tenant SaaS app with user auth and billing in core flows. Mo
 - State: Zustand
 - Validation: Zod
 - Error monitoring: Sentry
-- Analytics: Vercel Analytics, Vercel Speed Insights, direct GA4 (`gtag.js`), Ahrefs Analytics
+- Analytics: Vercel Analytics, Vercel Speed Insights, direct GA4 (`gtag.js`), Ahrefs Analytics, Microsoft Clarity
 - Email: Kit (newsletter) + Resend (transactional)
 - Testing: Jest + React Testing Library + Playwright
 - Tooling: Bun, Biome
@@ -142,9 +142,10 @@ Rules:
 
 ### 8.1 Stack
 
-- Vercel Analytics + Speed Insights: loaded in `src/app/layout.tsx`
+- Vercel Analytics + Speed Insights: loaded in `src/app/layout.tsx` when analytics are enabled
 - Direct GA4 (no GTM): `src/components/organisms/Analytics.tsx`
 - Ahrefs Analytics: `src/components/organisms/AhrefsAnalytics.tsx`
+- Microsoft Clarity: `src/components/organisms/ClarityAnalytics.tsx`
 
 ### 8.2 Consent + Governance
 
@@ -153,6 +154,7 @@ Rules:
 - Analytics docs/source-of-truth:
   - `docs/guides/ANALYTICS_TRACKING.md`
   - `src/lib/directorGuideAnalytics.ts`
+- Global analytics kill switch: `NEXT_PUBLIC_ENABLE_ANALYTICS=false`
 
 Privacy constraints:
 - No raw PII in analytics payloads

@@ -1,11 +1,12 @@
 # Analytics Tracking Plan
 
-Last updated: February 19, 2026
+Last updated: March 6, 2026
 
 ## Stack
-- Vercel Analytics + Speed Insights (always on, cookieless): `src/app/layout.tsx`
+- Vercel Analytics + Speed Insights (enabled unless `NEXT_PUBLIC_ENABLE_ANALYTICS=false`): `src/app/layout.tsx`
 - GA4 via direct `gtag.js` (consent-gated): `src/components/organisms/Analytics.tsx`
 - Ahrefs Analytics (consent-gated): `src/components/organisms/AhrefsAnalytics.tsx`
+- Microsoft Clarity (consent-gated): `src/components/organisms/ClarityAnalytics.tsx`
 - Shared event helper: `src/lib/analytics.ts`
 - Event contract source of truth: `src/lib/analyticsEvents.ts`
 - CI contract guard: `scripts/check-analytics-events.ts` (runs via `bun run fix-all`)
@@ -35,3 +36,4 @@ Last updated: February 19, 2026
 - No exact salary or revenue values in analytics.
 - No email addresses or other PII in event payloads.
 - Custom events require accepted analytics consent via cookie banner.
+- `NEXT_PUBLIC_ENABLE_ANALYTICS=false` disables vendor analytics loaders, including Vercel Analytics and Speed Insights.

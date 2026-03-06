@@ -6,6 +6,10 @@
 
 **PayeTax follows a strict shadcn/ui-first approach with minimal custom styling.**
 
+Canonical import surface for shadcn primitives:
+- Prefer `@/components/ui/*`
+- Legacy `@/components/atoms/ui/*` imports still exist in parts of the app and are tracked for consolidation in the backlog
+
 ### The Rules (Enforced)
 
 1. **Use shadcn/ui primitives first** for interactive UI
@@ -23,7 +27,7 @@
 
 ```tsx
 // ✅ CORRECT - Use shadcn Button
-import { Button } from '@/components/atoms/ui/button';
+import { Button } from '@/components/ui/button';
 <Button variant="outline" size="lg">Click Me</Button>
 
 // ❌ WRONG - Custom div styled as button

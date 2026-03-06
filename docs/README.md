@@ -9,9 +9,9 @@
 | Need to... | Read this |
 |------------|-----------|
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
-| **See active TODOs?** | [`BACKLOG.md`](./BACKLOG.md) |
+| **See active backlog items?** | [`BACKLOG.md`](./BACKLOG.md) |
 | **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
-| **Use Claude skills/commands effectively?** | [`SKILLS_AND_COMMANDS.md`](./guides/SKILLS_AND_COMMANDS.md) |
+| **Use agent skills/commands effectively?** | [`SKILLS_AND_COMMANDS.md`](./guides/SKILLS_AND_COMMANDS.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |
 | **Run tests?** | [`TESTING.md`](./guides/TESTING.md) |
 | **Run DevOps checks?** | [`OPS_RUNBOOK.md`](./guides/OPS_RUNBOOK.md) |
@@ -49,4 +49,5 @@ docs/
 
 ## Related Files
 
-- **Claude instructions:** [`../CLAUDE.md`](../CLAUDE.md)
+- **Agent instructions:** [`../AGENTS.md`](../AGENTS.md)
+- **Claude compatibility instructions:** [`../CLAUDE.md`](../CLAUDE.md)
