@@ -62,11 +62,10 @@ cache:
 mr_lint_typecheck:
   extends: .mr_base
   script:
-    - 'echo "MR validation: lint + typecheck"'
-    - bun run lint
-    - bun run typecheck
+    - 'echo "MR validation: repo static checks"'
+    - bun run check:repo
     - bun run audit:tokens -- --delta
-    - 'echo "Lint + typecheck passed!"'
+    - 'echo "Repo static checks passed!"'
   timeout: 15 minutes
 
 mr_unit_tests:
@@ -104,8 +103,7 @@ mr_e2e_critical:
 #   bun run test:e2e      - Playwright E2E tests
 #
 # GITLAB CI (This File - MRs only, parallel jobs):
-#   ✅ Lint (biome check .)
-#   ✅ Typecheck (tsc --noEmit)
+#   ✅ Repo static checks (`bun run check:repo`)
 #   ✅ Unit tests (jest --no-coverage)
 #   ✅ Build (next build)
 #   ✅ Critical E2E (Playwright smoke + golden)

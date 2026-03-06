@@ -53,6 +53,8 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 ```bash
 bun run dev                 # Start dev server
 bun run fix-all             # Format, lint, typecheck
+bun run check:repo          # Read-only repo verification gate
+bun run harness:local       # Repo gate + quick tests + build
 bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E

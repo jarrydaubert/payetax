@@ -16,8 +16,8 @@ Scope: lightweight DevOps and release operations for `PayeTax`.
 2. Run core local checks before opening/merging MR:
 
 ```bash
-bun run fix-all
-bun run test:no-coverage
+bun run check:repo
+bun run test:quick
 bun run build
 ```
 
@@ -38,6 +38,12 @@ bun run gitlab:release:latest
 
 ```bash
 bun run release:verify
+```
+
+For a broader local harness pass before risky refactors:
+
+```bash
+bun run harness:local
 ```
 
 2. Complete production checklist:
@@ -120,3 +126,19 @@ curl -sS --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
 2. Confirm `.gitlab-ci.yml` runtime/cost assumptions are still valid.
 3. Confirm release-report discipline is being followed (`release:report:check`).
 4. Confirm Vercel project/env linkage still matches this repo.
+
+## 8) Harness Command Surface
+
+Use these as the default repo harness entry points:
+
+```bash
+bun run fix-all         # Mutating hygiene pass: format/write + validation
+bun run check:repo      # Read-only repo verification gate
+bun run harness:local   # Read-only local harness: repo checks + quick tests + build
+bun run harness:release # Read-only release harness: repo checks + deps + release verify path
+```
+
+Rule of thumb:
+
+1. Use `fix-all` when you want the repo auto-corrected.
+2. Use `check:repo` or the `harness:*` commands when you want trustworthy verification with no file edits.

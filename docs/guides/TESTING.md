@@ -42,6 +42,9 @@ bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
 bun run test:e2e            # Full multi-browser E2E
 bun run test:quick          # Fast local gate: unit fast + critical E2E
 bun run test:full           # Full gate: coverage unit + full E2E
+bun run check:repo          # Read-only repo verification gate
+bun run harness:local       # Repo gate + quick tests + build
+bun run harness:release     # Release-oriented harness gate
 bun run check:test-skips    # Guardrail: block new skip/todo debt
 bun run test:metrics        # Print skip/todo + last-run confidence metrics
 bun run fix-all             # Lint + typecheck + format
@@ -52,6 +55,9 @@ Notes:
 - `bun run test` is still available when you want local coverage + HTML report auto-open.
 - `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
 - `bun run fix-all` now includes `check:test-skips`, so new unapproved skip/todo debt fails locally and in CI.
+- `bun run check:repo` is the read-only equivalent of the repo verification part of `fix-all`.
+- `bun run harness:local` is the recommended pre-refactor confidence gate.
+- `bun run harness:release` adds the dependency advisory check for stricter release-oriented validation.
 
 ---
 
@@ -99,6 +105,7 @@ Keep HMRC values anchored to source documents and code references.
 
 ## Quality Gates (Recommended)
 
+- `bun run check:repo`
 - `bun run test:no-coverage`
 - `bun run build`
 - `bun run test:e2e:critical`
