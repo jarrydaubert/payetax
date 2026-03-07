@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated: March 6, 2026
+Last updated: March 7, 2026
 
 Only active commitments are listed below. Every item has a first action and a verifiable definition of done.
 
@@ -28,7 +28,6 @@ Only active commitments are listed below. Every item has a first action and a ve
 | `P1-14` | Test Tax Pack end-to-end flows | Add integration + E2E tests for checkout, webhook idempotency, artifact generation, grant replay/expiry/revocation. | Integration and E2E coverage exists for each scoped flow, and the suite fails on regressions in checkout, delivery, replay, expiry, and revocation behavior. |
 | `P1-17` | Investigate low Google referrer share | Run GSC + Ahrefs indexability audit (coverage, canonical, noindex, sitemap, robots, structured data) focused on why Bing/DDG/Yahoo outperform Google. | A root-cause report is published in docs, and each proposed fix has a prioritized ticket with an owner and ETA. |
 | `P1-27` | Track unresolved transitive dependency advisories | Keep the current upstream-transitive advisories (`minimatch`, `rollup`, `serialize-javascript`) documented in the allowlist with `via` chain and `lastChecked`, run monthly `bun run audit:deps`, and remove entries once upstream or safe overrides resolve them. | The item closes only when `bun run audit:deps` no longer reports the currently tracked high-severity advisories, and the resolving parent package versions or approved overrides are recorded in allowlist history/docs without risky major-force upgrades. |
-| `P1-29` | Extract shared delivery service layer for outbound flows | Move email rendering/delivery orchestration out of route handlers into reusable services/templates that can also back Tax Pack fulfillment. | PAYE/director outbound routes use shared service modules for validation/orchestration/rendering boundaries, and Tax Pack can reuse the same pattern without duplicating route-level logic. |
 
 ---
 
