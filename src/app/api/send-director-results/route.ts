@@ -6,7 +6,7 @@ import {
   generateDirectorEmailHtml,
   generateDirectorEmailText,
 } from '@/lib/email/directorResultsEmail';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
@@ -34,7 +34,18 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 5 emails per minute per client
   const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
-  if (!(await checkRateLimit(`send-director-results:${clientId}`, { max: 5, window: 60000 }))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `send-director-results:${clientId}`,
+    { max: 5, window: 60000 },
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    return NextResponse.json(
+      { error: 'Email service temporarily unavailable. Please try again later.' },
+      { status: 503 },
+    );
+  }
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

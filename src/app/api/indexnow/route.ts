@@ -10,7 +10,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 // Security constants
@@ -103,8 +103,19 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 10 requests per minute per IP
   const clientId = getClientIdentifier(request, { includeAcceptHeaderInFallback: true });
-
-  if (!(await checkRateLimit(`indexnow:${clientId}`))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `indexnow:${clientId}`,
+    undefined,
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    console.error(`[IndexNow:${requestId}] Distributed rate-limit protection unavailable`);
+    return NextResponse.json(
+      { error: 'IndexNow service temporarily unavailable' },
+      { status: 503 },
+    );
+  }
+  if (!rateLimit.allowed) {
     console.warn(`[IndexNow:${requestId}] Rate limited: ${clientId}`);
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },

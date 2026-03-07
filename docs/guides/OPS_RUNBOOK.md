@@ -85,6 +85,12 @@ Evidence outputs:
 - `docs/evidence/gitlab-policy-drift.md`
 - `docs/evidence/gitlab-ci-usage.md`
 
+Interpretation notes:
+
+1. `gitlab-ci-usage.md` now distinguishes measured GitLab runtime from unmeasured pipelines.
+2. `source=external` pipelines are counted for visibility, but they do not consume GitLab CI minutes and are not treated as runtime budget.
+3. For GitLab-managed pipelines, the audit prefers pipeline duration and falls back to job-level timing data where available.
+
 ## 5) GitLab CLI Shortcuts
 
 Common repo-native wrappers:

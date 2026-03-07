@@ -1,6 +1,7 @@
 // src/lib/__tests__/rateLimit.test.ts
 import {
   checkRateLimit,
+  checkRateLimitWithPolicy,
   clearAllRateLimits,
   getRemainingRequests,
   resetRateLimit,
@@ -9,6 +10,7 @@ import {
 describe('Rate Limiting', () => {
   const originalUpstashUrl = process.env.UPSTASH_REDIS_REST_URL;
   const originalUpstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const originalNodeEnv = process.env.NODE_ENV;
 
   beforeAll(() => {
     // Keep unit tests deterministic and offline.
@@ -19,6 +21,9 @@ describe('Rate Limiting', () => {
   afterAll(() => {
     if (originalUpstashUrl) process.env.UPSTASH_REDIS_REST_URL = originalUpstashUrl;
     if (originalUpstashToken) process.env.UPSTASH_REDIS_REST_TOKEN = originalUpstashToken;
+    if (originalNodeEnv) {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   beforeEach(() => {
@@ -106,6 +111,42 @@ describe('Rate Limiting', () => {
       }
 
       await expect(checkRateLimit(ip)).resolves.toBe(false);
+    });
+  });
+
+  describe('checkRateLimitWithPolicy', () => {
+    it('fails closed in production when distributed protection is required but unavailable', async () => {
+      process.env.NODE_ENV = 'production';
+
+      const result = await checkRateLimitWithPolicy(
+        '192.168.9.1',
+        undefined,
+        'require_distributed_in_production',
+      );
+
+      expect(result).toEqual({
+        allowed: false,
+        backend: 'in-memory',
+        fallbackPolicy: 'require_distributed_in_production',
+        reason: 'distributed_unavailable',
+      });
+    });
+
+    it('still uses in-memory fallback outside production when distributed protection is required', async () => {
+      process.env.NODE_ENV = 'test';
+
+      const result = await checkRateLimitWithPolicy(
+        '192.168.9.2',
+        { max: 1, window: 60000 },
+        'require_distributed_in_production',
+      );
+
+      expect(result).toEqual({
+        allowed: true,
+        backend: 'in-memory',
+        fallbackPolicy: 'require_distributed_in_production',
+        reason: 'allowed',
+      });
     });
   });
 

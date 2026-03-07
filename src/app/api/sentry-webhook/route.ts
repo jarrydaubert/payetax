@@ -13,7 +13,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 export const runtime = 'nodejs';
@@ -110,7 +110,15 @@ export async function POST(request: NextRequest) {
   }
 
   const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
-  if (!(await checkRateLimit(`sentry-webhook:${clientId}`, RATE_LIMIT))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `sentry-webhook:${clientId}`,
+    RATE_LIMIT,
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    return NextResponse.json({ error: 'Webhook protection unavailable' }, { status: 503 });
+  }
+  if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

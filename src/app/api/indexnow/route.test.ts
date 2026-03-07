@@ -10,14 +10,16 @@
  */
 
 import { NextRequest } from 'next/server';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { POST } from './route';
 
 jest.mock('@/lib/rateLimit', () => ({
-  checkRateLimit: jest.fn(),
+  checkRateLimitWithPolicy: jest.fn(),
 }));
 
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
+const mockCheckRateLimitWithPolicy = checkRateLimitWithPolicy as jest.MockedFunction<
+  typeof checkRateLimitWithPolicy
+>;
 
 const ORIGINAL_ENV = process.env;
 let consoleErrorSpy: jest.SpyInstance;
@@ -38,7 +40,7 @@ function buildRequest(body: unknown, headers?: Record<string, string>) {
 describe('/api/indexnow POST', () => {
   beforeEach(() => {
     process.env = { ...ORIGINAL_ENV };
-    mockCheckRateLimit.mockReturnValue(true);
+    mockCheckRateLimitWithPolicy.mockReturnValue({ allowed: true, reason: 'allowed' });
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -72,7 +74,7 @@ describe('/api/indexnow POST', () => {
   it('rate limits requests when the limiter rejects the client', async () => {
     process.env.NODE_ENV = 'production';
     process.env.INDEXNOW_SUBMIT_SECRET = 'secret';
-    mockCheckRateLimit.mockReturnValue(false);
+    mockCheckRateLimitWithPolicy.mockReturnValue({ allowed: false, reason: 'rate_limited' });
 
     const request = buildRequest(
       { urls: ['https://payetax.co.uk/blog/valid'] },
@@ -83,7 +85,30 @@ describe('/api/indexnow POST', () => {
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
-    expect(mockCheckRateLimit).toHaveBeenCalledWith('indexnow:1.2.3.4');
+    expect(mockCheckRateLimitWithPolicy).toHaveBeenCalledWith(
+      'indexnow:1.2.3.4',
+      undefined,
+      'require_distributed_in_production',
+    );
+  });
+
+  it('returns 503 when distributed rate-limit protection is unavailable in production', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.INDEXNOW_SUBMIT_SECRET = 'secret';
+    mockCheckRateLimitWithPolicy.mockReturnValue({
+      allowed: false,
+      reason: 'distributed_unavailable',
+    });
+
+    const request = buildRequest(
+      { urls: ['https://payetax.co.uk/blog/valid'] },
+      { 'x-indexnow-secret': 'secret', 'x-forwarded-for': '1.2.3.4' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(json).toEqual({ error: 'IndexNow service temporarily unavailable' });
   });
 
   it('rejects invalid JSON payloads', async () => {

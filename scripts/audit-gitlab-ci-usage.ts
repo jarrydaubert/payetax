@@ -119,9 +119,44 @@ type Pipeline = {
   duration?: number | null;
 };
 
+type Job = {
+  id: number;
+  name?: string;
+  status?: string;
+  duration?: number | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+};
+
 function formatMinutes(value: number): string {
   return `${value.toFixed(2)}m`;
 }
+
+function getDurationSecondsFromTimestamps(job: Job): number | null {
+  if (!(job.started_at && job.finished_at)) {
+    return null;
+  }
+
+  const startedAt = Date.parse(job.started_at);
+  const finishedAt = Date.parse(job.finished_at);
+
+  if (Number.isNaN(startedAt) || Number.isNaN(finishedAt) || finishedAt < startedAt) {
+    return null;
+  }
+
+  return Math.max(0, Math.round((finishedAt - startedAt) / 1000));
+}
+
+async function getPipelineJobs(pipelineId: number): Promise<Job[]> {
+  return apiGet<Job[]>(`/projects/${encodedProjectId()}/pipelines/${pipelineId}/jobs?per_page=100`);
+}
+
+type PipelineUsage = {
+  pipeline: Pipeline;
+  measuredDurationSeconds: number;
+  measurement: 'pipeline' | 'jobs' | 'unmeasured';
+  jobCount: number;
+};
 
 async function main(): Promise<void> {
   if (!PROJECT_ID) {
@@ -172,16 +207,68 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const totalDurationMinutes = pipelines.reduce((total, pipeline) => {
-    const durationSeconds = pipeline.duration ?? 0;
-    return total + durationSeconds / 60;
-  }, 0);
+  const usageByPipeline: PipelineUsage[] = [];
 
-  const pipelinesWithDuration = pipelines.filter(
-    (pipeline) => typeof pipeline.duration === 'number',
+  for (const pipeline of pipelines) {
+    if (typeof pipeline.duration === 'number' && pipeline.duration > 0) {
+      usageByPipeline.push({
+        pipeline,
+        measuredDurationSeconds: pipeline.duration,
+        measurement: 'pipeline',
+        jobCount: 0,
+      });
+      continue;
+    }
+
+    if (pipeline.source === 'external') {
+      usageByPipeline.push({
+        pipeline,
+        measuredDurationSeconds: 0,
+        measurement: 'unmeasured',
+        jobCount: 0,
+      });
+      continue;
+    }
+
+    let jobs: Job[] = [];
+    try {
+      jobs = await getPipelineJobs(pipeline.id);
+    } catch {
+      usageByPipeline.push({
+        pipeline,
+        measuredDurationSeconds: 0,
+        measurement: 'unmeasured',
+        jobCount: 0,
+      });
+      continue;
+    }
+
+    const jobDurationSeconds = jobs.reduce((total, job) => {
+      if (typeof job.duration === 'number' && job.duration > 0) {
+        return total + job.duration;
+      }
+
+      const fallbackDuration = getDurationSecondsFromTimestamps(job);
+      return total + (fallbackDuration ?? 0);
+    }, 0);
+
+    usageByPipeline.push({
+      pipeline,
+      measuredDurationSeconds: jobDurationSeconds,
+      measurement: jobDurationSeconds > 0 ? 'jobs' : 'unmeasured',
+      jobCount: jobs.length,
+    });
+  }
+
+  const totalDurationMinutes = usageByPipeline.reduce(
+    (total, entry) => total + entry.measuredDurationSeconds / 60,
+    0,
   );
+
+  const measuredPipelines = usageByPipeline.filter((entry) => entry.measurement !== 'unmeasured');
   const averageMinutes =
-    pipelinesWithDuration.length > 0 ? totalDurationMinutes / pipelinesWithDuration.length : 0;
+    measuredPipelines.length > 0 ? totalDurationMinutes / measuredPipelines.length : 0;
+  const unmeasuredPipelines = usageByPipeline.filter((entry) => entry.measurement === 'unmeasured');
 
   const byRef = new Map<string, number>();
   for (const pipeline of pipelines) {
@@ -205,13 +292,35 @@ async function main(): Promise<void> {
   const hasFailures = checks.some((check) => !check.ok);
   const lines: string[] = [hasFailures ? 'Status: FAIL' : 'Status: PASS'];
   lines.push(`- Pipelines fetched: ${pipelines.length}`);
-  lines.push(`- Pipelines with duration data: ${pipelinesWithDuration.length}`);
-  lines.push(`- Total estimated runtime: ${formatMinutes(totalDurationMinutes)}`);
-  lines.push(`- Average runtime (where duration present): ${formatMinutes(averageMinutes)}`);
+  lines.push(`- Pipelines with measured runtime: ${measuredPipelines.length}`);
+  lines.push(`- Pipelines without measurable runtime: ${unmeasuredPipelines.length}`);
+  lines.push(`- Total measured runtime: ${formatMinutes(totalDurationMinutes)}`);
+  lines.push(`- Average runtime (where measurable): ${formatMinutes(averageMinutes)}`);
   lines.push('- Pipeline refs:');
 
   for (const [ref, count] of [...byRef.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
     lines.push(`  - ${ref}: ${count}`);
+  }
+
+  lines.push('');
+  lines.push('- Measurement notes:');
+  lines.push('  - Prefer pipeline.duration when GitLab provides it.');
+  lines.push(
+    '  - Fallback to summing job durations (or started_at/finished_at deltas) for non-external pipelines.',
+  );
+  lines.push(
+    '  - External pipelines (for example Vercel-managed runs) are counted but not treated as GitLab CI minutes.',
+  );
+  if (unmeasuredPipelines.length > 0) {
+    lines.push('  - Unmeasured pipelines:');
+    for (const entry of unmeasuredPipelines.slice(0, 10)) {
+      lines.push(
+        `    - #${entry.pipeline.id} ref=${entry.pipeline.ref ?? 'unknown'} source=${entry.pipeline.source ?? 'unknown'} status=${entry.pipeline.status ?? 'unknown'} jobs=${entry.jobCount}`,
+      );
+    }
+    if (unmeasuredPipelines.length > 10) {
+      lines.push(`    - ... ${unmeasuredPipelines.length - 10} more`);
+    }
   }
 
   lines.push('');

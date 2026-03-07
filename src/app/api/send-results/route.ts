@@ -4,7 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
@@ -237,7 +237,18 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 5 emails per minute per client
   const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
-  if (!(await checkRateLimit(`send-results:${clientId}`, { max: 5, window: 60000 }))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `send-results:${clientId}`,
+    { max: 5, window: 60000 },
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    return NextResponse.json(
+      { error: 'Email service temporarily unavailable. Please try again later.' },
+      { status: 503 },
+    );
+  }
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

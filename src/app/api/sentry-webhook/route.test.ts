@@ -12,18 +12,20 @@
 import { createHmac } from 'node:crypto';
 import type { LinearClient } from '@linear/sdk';
 import { NextRequest } from 'next/server';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 
 jest.mock('@linear/sdk', () => ({
   LinearClient: jest.fn(),
 }));
 
 jest.mock('@/lib/rateLimit', () => ({
-  checkRateLimit: jest.fn(() => true),
+  checkRateLimitWithPolicy: jest.fn(() => ({ allowed: true, reason: 'allowed' })),
 }));
 
 const ORIGINAL_ENV = process.env;
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
+const mockCheckRateLimitWithPolicy = checkRateLimitWithPolicy as jest.MockedFunction<
+  typeof checkRateLimitWithPolicy
+>;
 
 function signBody(body: string, secret: string): string {
   return createHmac('sha256', secret).update(Buffer.from(body)).digest('hex');
@@ -50,9 +52,22 @@ async function loadRoute(envOverrides: Record<string, string | undefined> = {}) 
 
 function setRateLimitResult(value: boolean) {
   const mocked = jest.requireMock('@/lib/rateLimit') as {
-    checkRateLimit: jest.MockedFunction<typeof checkRateLimit>;
+    checkRateLimitWithPolicy: jest.MockedFunction<typeof checkRateLimitWithPolicy>;
   };
-  mocked.checkRateLimit.mockReturnValue(value);
+  mocked.checkRateLimitWithPolicy.mockReturnValue({
+    allowed: value,
+    reason: value ? 'allowed' : 'rate_limited',
+  });
+}
+
+function setProtectionUnavailable() {
+  const mocked = jest.requireMock('@/lib/rateLimit') as {
+    checkRateLimitWithPolicy: jest.MockedFunction<typeof checkRateLimitWithPolicy>;
+  };
+  mocked.checkRateLimitWithPolicy.mockReturnValue({
+    allowed: false,
+    reason: 'distributed_unavailable',
+  });
 }
 
 const basePayload = {
@@ -85,7 +100,7 @@ describe('/api/sentry-webhook POST', () => {
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
-    mockCheckRateLimit.mockReturnValue(true);
+    mockCheckRateLimitWithPolicy.mockReturnValue({ allowed: true, reason: 'allowed' });
   });
 
   afterEach(() => {
@@ -116,14 +131,33 @@ describe('/api/sentry-webhook POST', () => {
     });
     const response = await POST(request);
     const json = await response.json();
-    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
+    const { checkRateLimitWithPolicy } = jest.requireMock('@/lib/rateLimit') as {
+      checkRateLimitWithPolicy: jest.Mock;
+    };
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests' });
-    expect(checkRateLimit).toHaveBeenCalledWith('sentry-webhook:1.2.3.4', {
-      max: 30,
-      window: 60000,
+    expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
+      'sentry-webhook:1.2.3.4',
+      { max: 30, window: 60000 },
+      'require_distributed_in_production',
+    );
+  });
+
+  it('returns 503 when distributed rate-limit protection is unavailable in production', async () => {
+    const POST = await loadRoute({ SENTRY_WEBHOOK_SECRET: 'secret', NODE_ENV: 'production' });
+    setProtectionUnavailable();
+    const body = JSON.stringify(basePayload);
+    const signature = signBody(body, 'secret');
+    const request = buildRequest(body, {
+      'sentry-hook-signature': signature,
+      'x-forwarded-for': '1.2.3.4',
     });
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(json).toEqual({ error: 'Webhook protection unavailable' });
   });
 
   it('rejects invalid signatures', async () => {

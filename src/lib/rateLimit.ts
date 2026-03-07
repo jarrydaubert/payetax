@@ -25,6 +25,16 @@ interface RateLimitConfig {
 
 export type RateLimitBackend = 'distributed' | 'in-memory';
 export type RateLimitFallbackReason = 'missing_config' | 'upstash_error';
+export type RateLimitFallbackPolicy =
+  | 'allow_in_memory_fallback'
+  | 'require_distributed_in_production';
+
+export interface RateLimitCheckResult {
+  allowed: boolean;
+  backend: RateLimitBackend;
+  fallbackPolicy: RateLimitFallbackPolicy;
+  reason: 'allowed' | 'rate_limited' | 'distributed_unavailable';
+}
 
 export interface RateLimitDiagnostics {
   configured: boolean;
@@ -157,12 +167,44 @@ export async function checkRateLimit(
   key: string,
   config: RateLimitConfig = DEFAULT_CONFIG,
 ): Promise<boolean> {
+  const result = await checkRateLimitWithPolicy(key, config);
+  return result.allowed;
+}
+
+export async function checkRateLimitWithPolicy(
+  key: string,
+  config: RateLimitConfig = DEFAULT_CONFIG,
+  fallbackPolicy: RateLimitFallbackPolicy = 'allow_in_memory_fallback',
+): Promise<RateLimitCheckResult> {
   const distributedCount = await incrementDistributedCounter(key, config.window);
   if (distributedCount !== null) {
-    return distributedCount <= config.max;
+    return {
+      allowed: distributedCount <= config.max,
+      backend: 'distributed',
+      fallbackPolicy,
+      reason: distributedCount <= config.max ? 'allowed' : 'rate_limited',
+    };
   }
 
-  return runInMemoryCheck(key, config);
+  if (
+    process.env.NODE_ENV === 'production' &&
+    fallbackPolicy === 'require_distributed_in_production'
+  ) {
+    return {
+      allowed: false,
+      backend: 'in-memory',
+      fallbackPolicy,
+      reason: 'distributed_unavailable',
+    };
+  }
+
+  const allowed = runInMemoryCheck(key, config);
+  return {
+    allowed,
+    backend: 'in-memory',
+    fallbackPolicy,
+    reason: allowed ? 'allowed' : 'rate_limited',
+  };
 }
 
 /**

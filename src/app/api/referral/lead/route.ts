@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { maskEmailForLogs } from '@/lib/newsletter/maskEmail';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
@@ -222,7 +222,18 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting: 3 leads per hour per client
   const clientId = getClientIdentifier(request, { ipPrefix: 'ip:', fallbackPrefix: 'ua:' });
-  if (!(await checkRateLimit(`referral-lead:${clientId}`, { max: 3, window: 3600000 }))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `referral-lead:${clientId}`,
+    { max: 3, window: 3600000 },
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    return NextResponse.json(
+      { error: 'Lead service temporarily unavailable. Please try again later.' },
+      { status: 503 },
+    );
+  }
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },

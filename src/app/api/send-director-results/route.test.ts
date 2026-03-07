@@ -12,7 +12,7 @@
 import { NextRequest } from 'next/server';
 
 jest.mock('@/lib/rateLimit', () => ({
-  checkRateLimit: jest.fn(),
+  checkRateLimitWithPolicy: jest.fn(),
 }));
 
 const sendMock = jest.fn();
@@ -65,14 +65,17 @@ const validPayload = {
   taxYear: '2025-2026',
 };
 
-async function loadRoute(envOverrides: Record<string, string | undefined> = {}, rateLimit = true) {
+async function loadRoute(
+  envOverrides: Record<string, string | undefined> = {},
+  rateLimit = { allowed: true, reason: 'allowed' as const },
+) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };
   const module = await import('./route');
-  const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as {
-    checkRateLimit: jest.Mock;
+  const { checkRateLimitWithPolicy } = jest.requireMock('@/lib/rateLimit') as {
+    checkRateLimitWithPolicy: jest.Mock;
   };
-  checkRateLimit.mockReturnValue(rateLimit);
+  checkRateLimitWithPolicy.mockReturnValue(rateLimit);
   return module.POST;
 }
 
@@ -98,20 +101,44 @@ describe('/api/send-director-results POST', () => {
   });
 
   it('rate limits when the limiter denies the client', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' }, false);
+    const POST = await loadRoute(
+      { RESEND_API_KEY: 'test' },
+      { allowed: false, reason: 'rate_limited' },
+    );
     const request = buildRequest(validPayload, {
       origin: 'https://payetax.co.uk',
       'x-forwarded-for': '1.2.3.4',
     });
     const response = await POST(request);
     const json = await response.json();
-    const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
+    const { checkRateLimitWithPolicy } = jest.requireMock('@/lib/rateLimit') as {
+      checkRateLimitWithPolicy: jest.Mock;
+    };
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
-    expect(checkRateLimit).toHaveBeenCalledWith('send-director-results:1.2.3.4', {
-      max: 5,
-      window: 60000,
+    expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
+      'send-director-results:1.2.3.4',
+      { max: 5, window: 60000 },
+      'require_distributed_in_production',
+    );
+  });
+
+  it('returns 503 when distributed rate-limit protection is unavailable in production', async () => {
+    const POST = await loadRoute(
+      { RESEND_API_KEY: 'test', NODE_ENV: 'production' },
+      { allowed: false, reason: 'distributed_unavailable' },
+    );
+    const request = buildRequest(validPayload, {
+      origin: 'https://payetax.co.uk',
+      'x-forwarded-for': '1.2.3.4',
+    });
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(json).toEqual({
+      error: 'Email service temporarily unavailable. Please try again later.',
     });
   });
 

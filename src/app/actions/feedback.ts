@@ -9,7 +9,7 @@
 import { headers } from 'next/headers';
 import { after } from 'next/server';
 import { Resend } from 'resend';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -92,7 +92,18 @@ export async function submitFeedback(
   const ipAddress = await getClientIp();
 
   // Check rate limit (10 requests per minute per IP)
-  if (!(await checkRateLimit(`feedback:${ipAddress}`))) {
+  const rateLimit = await checkRateLimitWithPolicy(
+    `feedback:${ipAddress}`,
+    undefined,
+    'require_distributed_in_production',
+  );
+  if (rateLimit.reason === 'distributed_unavailable') {
+    return {
+      success: false,
+      error: 'Something went wrong. Please try again later.',
+    };
+  }
+  if (!rateLimit.allowed) {
     return {
       success: false,
       error: 'Too many requests. Please try again in a minute.',
