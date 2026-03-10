@@ -43,17 +43,31 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 
 ## Required Validation Before Handoff
 
-Run what is relevant to the change:
+Validation is conditional by change type.
+
+For code or runtime behavior changes, run the smallest relevant validation set:
+
+- Baseline:
 
 ```bash
 bun run fix-all
 bun run test:no-coverage
 ```
 
-When the change affects critical user journeys, layout, calculator outputs, or release-sensitive behavior, also run the smallest relevant higher-level gate (for example `bun run test:e2e:critical`, `bun run harness:local`, or a targeted Playwright/Jest command).
+- If the change affects critical user journeys, layout, calculator outputs, or release-sensitive behavior, also run the smallest relevant higher-level gate (for example `bun run test:e2e:critical`, `bun run harness:local`, or a targeted Playwright/Jest command).
 
-If workflow/process changes, update `docs/guides/OPS_RUNBOOK.md`.
-If documentation expectations change, update `docs/DOCS_POLICY.md` or `docs/guides/TESTING.md` as appropriate.
+For docs or process-only changes:
+
+- Update the relevant docs in the same change set.
+- Check referenced commands, file paths, and source-of-truth links for accuracy.
+- Do not claim runtime validation you did not run.
+
+For workflow changes:
+
+- Update `docs/guides/OPS_RUNBOOK.md`.
+- Update `docs/DOCS_POLICY.md` or `docs/guides/TESTING.md` if the contract itself changed.
+- Run any changed workflow commands if practical; otherwise state clearly what still needs live verification.
+
 If any required validation cannot be run, state that clearly.
 
 ## Security Checks (When Relevant)
