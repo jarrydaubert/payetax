@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated: March 7, 2026
+Last updated: March 10, 2026
 
 Only active commitments are listed below. Every item has a first action and a verifiable definition of done.
 
@@ -10,7 +10,7 @@ Only active commitments are listed below. Every item has a first action and a ve
 
 | ID | Work Item | Next Step | Definition of Done |
 |---|---|---|---|
-| `P0-4` | Verify distributed rate limiting in production | Run `ops:verify-rate-limit` against production (`RATE_LIMIT_VERIFY_BASE_URL` + `RATE_LIMIT_HEALTH_SECRET`) and paste output into the release report. | A production verification run is attached to the release report, it confirms distributed limits are active, and it confirms in-memory fallback is not used in production. |
+| `P0-4` | Verify distributed rate limiting in production | Set missing production rate-limit env/config (`RATE_LIMIT_HEALTH_SECRET` and, if absent, Upstash REST vars), rerun `ops:verify-rate-limit`, and paste output into the release report. | A production verification run is attached to the release report, it confirms distributed limits are active, and it confirms in-memory fallback is not used in production. |
 | `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A Stripe test-mode purchase completes end-to-end, the order reaches `ready`, one downloadable artifact is generated, and the flow is covered by automated tests for the happy path. |
 | `P0-6` | Enforce release verification discipline | Fill `Deployment URL` + `Release Notes URL` in `docs/reports/releases/v<version>.md`, complete checklist, then run `bun run release:report:check`. | Each shipped release has a completed record in `docs/reports/releases/`, the record is linked from release notes/changelog, and `bun run release:report:check` passes. |
 | `P0-7` | Close remaining director threshold-interaction gaps | Add cross-interaction regression tests for how other income affects PA taper, dividend allowance usage, and total-income student loan thresholds in director flows. | Director-flow tests explicitly cover each scoped cross-interaction in user-visible outputs, and any unsupported interaction is blocked by an explicit UI guard with test coverage. |
