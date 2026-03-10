@@ -1,8 +1,33 @@
 # Backlog
 
-Last updated: March 10, 2026
+Only open TODO items live here.
 
-Only active commitments are listed below. Every item has a first action and a verifiable definition of done.
+## Rules
+
+- No status updates, progress notes, or completed work.
+- Every item must include a concrete next step and a clear, testable Definition of Done.
+- If an item changes behavior, its DoD must define regression protection: automated coverage at the right layer or an explicit replacement evidence path with a named bug target and oracle.
+- When an item is complete, remove it from this file.
+
+## Backlog Mantra
+
+- Open TODO items only.
+- Clear, testable DoD only.
+- Behavior changes must say how they stay fixed:
+  - automated coverage at the right layer, or
+  - explicit replacement evidence path with a named bug target and oracle.
+
+## Global DoD Contract (Applies To Every Item)
+
+A backlog item is only complete when all conditions below are true:
+
+1. `Outcome delivered`: the row's scope is implemented exactly as written.
+2. `Regression protection defined`: behavior changes add or update automated coverage at the right layer, or explicitly justify why automation is the wrong layer and what evidence replaces it.
+3. `Relevant validation passed`: the appropriate repo gates or targeted checks pass.
+4. `Evidence attached`: MR/release/evidence docs contain concrete proof for the completed outcome.
+5. `Backlog hygiene`: the completed item is removed from this file in the same change set.
+
+If any condition is missing, the item remains open.
 
 ---
 
@@ -53,3 +78,4 @@ Only active commitments are listed below. Every item has a first action and a ve
 | `P2-21` | Simplify the analytics and consent integration surface | Introduce a single analytics gateway/consent orchestration layer so vendor adapters stay thin and page instrumentation logic is not embedded in one large client component. | Consent state has one source of truth, vendor adapters are isolated behind small modules, analytics page instrumentation is easier to test, and current user-visible analytics behavior is preserved. |
 | `P2-22` | Rationalize custom framework configuration | Audit `next.config.ts` customizations, remove the ones without a measured payoff or hard requirement, and document the rationale for the remainder. | `next.config.ts` is materially smaller or clearer, every remaining non-default customization has a documented reason or measured benefit, and build/runtime behavior matches the current production intent. |
 | `P2-23` | Remove deprecated analytics event alias | Stop emitting the legacy `calculator_completion` alias, migrate any remaining call sites to `calculator_completed`, and update the analytics contract/docs. | `bun run check:analytics-events` no longer warns about `calculator_completion`, code emits only canonical event names, and docs reflect the alias removal. |
+| `P2-24` | Evaluate `agency-agents` repo for selective reuse | Review https://github.com/msitarzewski/agency-agents against the current `.claude/skills`, identify any non-overlapping agents worth adapting, and document keep/cherry-pick/ignore recommendations. | A written evaluation records the repo URL, maps notable agents to PayeTax use cases, calls out overlap/conflict with the existing skill system, and recommends whether to adapt any specific agents. |

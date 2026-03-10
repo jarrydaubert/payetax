@@ -2,6 +2,9 @@
 
 Scope: lightweight DevOps and release operations for `PayeTax`.
 
+Documentation policy: `docs/DOCS_POLICY.md`
+Backlog/source of truth for open work: `docs/BACKLOG.md`
+
 ## 1) Operational Baseline
 
 1. Repo host: GitLab (private project).

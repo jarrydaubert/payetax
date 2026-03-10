@@ -10,6 +10,7 @@
 |------------|-----------|
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
 | **See active backlog items?** | [`BACKLOG.md`](./BACKLOG.md) |
+| **Documentation rules?** | [`DOCS_POLICY.md`](./DOCS_POLICY.md) |
 | **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
 | **Use agent skills/commands effectively?** | [`SKILLS_AND_COMMANDS.md`](./guides/SKILLS_AND_COMMANDS.md) |
 | **Write blog content?** | [`BLOG_GUIDE.md`](./blog/BLOG_GUIDE.md) |

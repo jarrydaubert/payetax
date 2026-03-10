@@ -1,6 +1,7 @@
 # AGENTS.md - PayeTax
 
-This file defines how coding agents should work in this repo. Keep it short and keep it true.
+This file is the canonical agent contract for this repo.
+`CLAUDE.md` defers to this file.
 
 ## Purpose
 
@@ -19,6 +20,18 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Tax rates: `src/constants/taxRates.ts`
 - Calculator logic: `src/lib/taxCalculator.ts`
 - Director Intelligence logic: `src/lib/tax/`
+- Open work only: `docs/BACKLOG.md`
+- Testing standard: `docs/guides/TESTING.md`
+- Ops/dev workflow: `docs/guides/OPS_RUNBOOK.md`
+- Documentation rules: `docs/DOCS_POLICY.md`
+
+## Working Rules
+
+- Preserve existing architecture unless a change is required for accuracy, safety, reliability, or maintainability.
+- Keep important behavior testable: explicit inputs/outputs, injectable dependencies where practical, and assertions against real user-visible or business-visible outcomes.
+- Do not log sensitive user data or leak server env vars into client components.
+- Keep evergreen docs free of TODOs, progress markers, and stale status; open work belongs in `docs/BACKLOG.md`.
+- Prefer a small number of high-signal tests over broad low-signal coverage.
 
 ## Before You Change Code
 
@@ -26,14 +39,22 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Verify any tax changes against `src/constants/taxRates.ts`.
 - Avoid hardcoding tax figures in UI/MDX; reference `taxRates.ts`.
 - Consider accessibility impacts.
-- Avoid leaking server env vars into client components.
+- Validate user input and privacy/security implications.
 
-## After You Change Code
+## Required Validation Before Handoff
 
-- Run `bun run fix-all` when you touch TS/JS/CSS.
-- Run `bun run test:no-coverage` (or the smallest relevant test for your change).
-- Bugs: add a regression test when it fits.
-- If you cannot run tests, say so explicitly in the PR/summary.
+Run what is relevant to the change:
+
+```bash
+bun run fix-all
+bun run test:no-coverage
+```
+
+When the change affects critical user journeys, layout, calculator outputs, or release-sensitive behavior, also run the smallest relevant higher-level gate (for example `bun run test:e2e:critical`, `bun run harness:local`, or a targeted Playwright/Jest command).
+
+If workflow/process changes, update `docs/guides/OPS_RUNBOOK.md`.
+If documentation expectations change, update `docs/DOCS_POLICY.md` or `docs/guides/TESTING.md` as appropriate.
+If any required validation cannot be run, state that clearly.
 
 ## Security Checks (When Relevant)
 
@@ -59,7 +80,7 @@ bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E
 bun run bundle:analyze      # Bundle analysis
-bun run check:env-contract # Verify critical env/template/schema sync
+bun run check:env-contract  # Verify critical env/template/schema sync
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 bun run gitlab:status       # GitLab project + MR + pipeline + release summary
@@ -71,7 +92,7 @@ bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits
 
 ## More Docs
 
-See `CLAUDE.md` and `docs/guides/` for details:
+See `docs/README.md` and `docs/guides/` for detail:
 - `TESTING.md`
 - `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`

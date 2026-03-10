@@ -6,6 +6,25 @@
 
 Tests should catch real regressions in calculation, UX, or security behavior.
 
+## Good Test Standard
+
+A good test in PayeTax should be:
+
+- bug-oriented: it targets a concrete regression or failure mode
+- layer-appropriate: unit, integration, or E2E is chosen on purpose
+- based on an explicit oracle: pass/fail is tied to a meaningful business or user-visible outcome
+- actionable when it fails: the failure tells you what broke
+- deterministic: no silent skips, optional success paths, or vague "app still renders" assertions
+
+Reject low-signal tests:
+
+- broad click-through coverage with no named bug target
+- inventory/presence tests as the sole oracle for important behavior
+- tests that stay green even when the real user outcome is broken
+- test-count or coverage vanity without regression-detection value
+
+If a test cannot explain what bug it is trying to catch and why this is the right layer, it should be rewritten or deleted.
+
 See also:
 - `docs/guides/BUG_CATALOG.md`
 - `docs/guides/POST_RELEASE_VALIDATION.md`
@@ -17,6 +36,7 @@ See also:
 A test task is only done when all criteria below are met:
 
 - Bug-linked intent: every new/updated test clearly answers "What bug will this test find?" in title or nearby context.
+- Explicit oracle + layer fit: assertions prove a meaningful business or user-visible outcome, and the chosen layer is deliberate rather than convenience-driven.
 - Executable coverage: no placeholder assertions; tests are runnable and assertions are active.
 - Deterministic status: no new `skip`/`todo`; any retained debt is tagged (`PAYTAX-###` or `P#-#`) and allowlisted with rationale.
 - Monetary assertions: use `toBeCloseTo(expected, 2)` for currency/tax amounts; avoid integer precision (`..., 0`/`..., 1`) in tax-critical suites.
