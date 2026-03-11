@@ -90,6 +90,10 @@ function summarizeReport(content: string): {
   let advisoryOpenItems = 0;
 
   for (const [, rawHeading, body] of sectionBodies) {
+    if (!(rawHeading && body)) {
+      continue;
+    }
+
     const heading = rawHeading.trim();
     const openCount = [...body.matchAll(/^- \[ \]/gm)].length;
 
