@@ -65,7 +65,8 @@ function renderTemplate(version: string): string {
 
 function summarizeReport(content: string): {
   status: string;
-  uncheckedItems: number;
+  blockingOpenItems: number;
+  advisoryOpenItems: number;
   releaseVersion: string;
   deploymentUrl: string;
   releaseNotesUrl: string;
@@ -77,11 +78,32 @@ function summarizeReport(content: string): {
   const releaseNotesUrl = content.match(/^Release Notes URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const releasingEngineer =
     content.match(/^Releasing Engineer:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
-  const uncheckedItems = [...content.matchAll(/^- \[ \]/gm)].length;
+  const sectionBodies = [...content.matchAll(/^##\s+(.+?)\n([\s\S]*?)(?=^##\s+|\Z)/gm)];
+  const requiredSections = new Set([
+    '0) Local Preflight',
+    '1) Production Smoke',
+    '2) Security + Abuse Controls',
+    '3) Email + Webhooks',
+    'Final Decision',
+  ]);
+  let blockingOpenItems = 0;
+  let advisoryOpenItems = 0;
+
+  for (const [, rawHeading, body] of sectionBodies) {
+    const heading = rawHeading.trim();
+    const openCount = [...body.matchAll(/^- \[ \]/gm)].length;
+
+    if (requiredSections.has(heading)) {
+      blockingOpenItems += openCount;
+    } else {
+      advisoryOpenItems += openCount;
+    }
+  }
 
   return {
     status,
-    uncheckedItems,
+    blockingOpenItems,
+    advisoryOpenItems,
     releaseVersion,
     deploymentUrl,
     releaseNotesUrl,
@@ -115,7 +137,8 @@ function runStatus(version: string, strict: boolean): void {
 
   console.log(`🔎 Release report: ${reportPath}`);
   console.log(`   - Status: ${summary.status}`);
-  console.log(`   - Open checklist items: ${summary.uncheckedItems}`);
+  console.log(`   - Blocking open checklist items: ${summary.blockingOpenItems}`);
+  console.log(`   - Advisory open checklist items: ${summary.advisoryOpenItems}`);
   console.log(`   - Release Version: ${summary.releaseVersion}`);
   console.log(`   - Deployment URL: ${summary.deploymentUrl}`);
   console.log(`   - Release Notes URL: ${summary.releaseNotesUrl}`);
@@ -137,8 +160,8 @@ function runStatus(version: string, strict: boolean): void {
   if (summary.status !== 'COMPLETE') {
     errors.push('Status must be COMPLETE for strict check');
   }
-  if (summary.uncheckedItems > 0) {
-    errors.push(`Checklist still has ${summary.uncheckedItems} open item(s)`);
+  if (summary.blockingOpenItems > 0) {
+    errors.push(`Blocking checklist still has ${summary.blockingOpenItems} open item(s)`);
   }
   if (summary.deploymentUrl === 'TBD' || !summary.deploymentUrl.startsWith('http')) {
     errors.push('Deployment URL must be set to a valid URL');

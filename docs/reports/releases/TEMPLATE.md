@@ -10,6 +10,11 @@ Status: IN_PROGRESS
 
 Reference checklist: `docs/guides/POST_RELEASE_VALIDATION.md`
 
+Legend:
+- `- [x]` complete
+- `- [ ]` blocking and still open
+- `- [~]` explicitly deferred/non-blocking with justification in `Notes`
+
 ---
 
 ## 0) Local Preflight
@@ -52,7 +57,7 @@ Notes:
 Notes:
 - 
 
-## 4) Accessibility + Performance Spot Check
+## 4) Accessibility + Performance Spot Check (Deferrable With Notes)
 
 - [ ] Keyboard/focus sanity pass complete
 - [ ] Screen-reader/live-region sanity pass complete
@@ -62,7 +67,7 @@ Notes:
 Notes:
 - 
 
-## 5) Observability + Analytics
+## 5) Observability + Analytics (Deferrable With Notes Unless A Live Blocker Is Active)
 
 - [ ] Sentry release tagging and error volume sane
 - [ ] No repeating `calculation_anomaly` alerts
@@ -72,7 +77,7 @@ Notes:
 Notes:
 - 
 
-## 6) SEO + Indexing
+## 6) SEO + Indexing (Deferrable With Notes)
 
 - [ ] `robots.txt` and `sitemap.xml` reachable
 - [ ] Canonical/metadata sanity on key pages

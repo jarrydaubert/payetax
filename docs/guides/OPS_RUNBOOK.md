@@ -83,6 +83,12 @@ bun run release:report:init
 bun run release:report:check
 ```
 
+Strict release-report interpretation:
+
+1. Sections `0` to `3` and `Final Decision` are blocking.
+2. Sections `4` to `6` in the current report template are advisory and may be marked `- [~]` when intentionally deferred.
+3. Deferred items must have a short justification in that section's `Notes`.
+
 3. Run post-release production validation:
 
 - `docs/guides/POST_RELEASE_VALIDATION.md`

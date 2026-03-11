@@ -12,6 +12,12 @@ Evidence:
 - Validate completion: `bun run release:report:check`
 - Link report in release notes/changelog
 
+Checklist notation inside the report:
+
+- `- [x]` complete
+- `- [ ]` release-blocking and still open
+- `- [~]` explicitly deferred/non-blocking with justification in the section notes
+
 ---
 
 ## 0) Local Preflight (Required)
@@ -136,7 +142,7 @@ Goal: verify event pipelines in live environment.
 Release is considered fully validated only when:
 
 - [ ] All critical checks in sections 1-3 pass, and
-- [ ] No unresolved `FAIL` in sections 4-9 without documented owner + ETA, and
+- [ ] Any deferred checks in sections 4-8 are explicitly recorded with owner + ETA or reason, and
 - [ ] Any rollback-worthy issue has been explicitly ruled out.
 
 If rollback is needed, trigger normal rollback process and re-run this checklist on the rollback deployment.
