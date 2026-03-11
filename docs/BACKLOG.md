@@ -37,7 +37,6 @@ If any condition is missing, the item remains open.
 |---|---|---|---|
 | `P0-5` | Tax Pack V1 foundation slice | Deliver checkout session route + idempotent webhook handling + order status lifecycle for one paid artifact flow. | A Stripe test-mode purchase completes end-to-end, the order reaches `ready`, one downloadable artifact is generated, and the flow is covered by automated tests for the happy path. |
 | `P0-6` | Enforce release verification discipline | Fill `Deployment URL` + `Release Notes URL` in `docs/reports/releases/v<version>.md`, complete checklist, then run `bun run release:report:check`. | Each shipped release has a completed record in `docs/reports/releases/`, the record is linked from release notes/changelog, and `bun run release:report:check` passes. |
-| `P0-7` | Close remaining director threshold-interaction gaps | Add cross-interaction regression tests for how other income affects PA taper, dividend allowance usage, and total-income student loan thresholds in director flows. | Director-flow tests explicitly cover each scoped cross-interaction in user-visible outputs, and any unsupported interaction is blocked by an explicit UI guard with test coverage. |
 ---
 
 ## P1 - Next

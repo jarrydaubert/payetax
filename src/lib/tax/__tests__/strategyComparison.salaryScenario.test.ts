@@ -7,7 +7,10 @@
 
 import { describe, expect, it } from '@jest/globals';
 import { TAX_RATES } from '@/constants/taxRates';
+import { getDividendTax } from '../dividendTax';
+import { getIncomeTax } from '../incomeTax';
 import { calculateSalaryScenario, calculateStrategyComparison } from '../strategyComparison';
+import { getStudentLoanRepayment } from '../studentLoan';
 
 const TAX_YEAR = '2025-2026' as const;
 
@@ -286,5 +289,90 @@ describe('Strategy Comparison helpers', () => {
     expect(scenario.salary).toBeCloseTo(optimal.salary, 2);
     expect(scenario.corporationTax).toBeCloseTo(optimal.corporationTax, 2);
     expect(scenario.takeHome).toBeCloseTo(optimal.takeHome, 2);
+  });
+
+  it('applies personal allowance taper when other income pushes a director salary scenario above £100k', () => {
+    // Bug caught: director slider path ignoring other income when tapering personal allowance.
+    const salary = 12570;
+    const grossProfit = 80000;
+    const lowerOtherIncome = 99000;
+    const higherOtherIncome = 100010;
+
+    const belowTaper = calculateSalaryScenario({
+      targetSalary: salary,
+      grossProfit,
+      region: 'rUK',
+      taxYear: TAX_YEAR,
+      otherIncome: lowerOtherIncome,
+      hasEmploymentAllowance: false,
+    });
+    const aboveTaper = calculateSalaryScenario({
+      targetSalary: salary,
+      grossProfit,
+      region: 'rUK',
+      taxYear: TAX_YEAR,
+      otherIncome: higherOtherIncome,
+      hasEmploymentAllowance: false,
+    });
+
+    const expectedBelowMarginalTax =
+      getIncomeTax(salary + lowerOtherIncome, 'rUK', TAX_YEAR) -
+      getIncomeTax(lowerOtherIncome, 'rUK', TAX_YEAR);
+    const expectedAboveMarginalTax =
+      getIncomeTax(salary + higherOtherIncome, 'rUK', TAX_YEAR) -
+      getIncomeTax(higherOtherIncome, 'rUK', TAX_YEAR);
+
+    expect(belowTaper.incomeTax).toBeCloseTo(expectedBelowMarginalTax, 2);
+    expect(aboveTaper.incomeTax).toBeCloseTo(expectedAboveMarginalTax, 2);
+    expect(aboveTaper.incomeTax).toBeGreaterThan(belowTaper.incomeTax);
+  });
+
+  it('uses up dividend shielding when other income consumes the personal allowance and tax bands', () => {
+    // Bug caught: director dividend path undertaxing dividends because other income is ignored.
+    const lowProfitInput = {
+      region: 'rUK' as const,
+      revenue: 13000,
+      includesVat: false,
+      expenses: 0,
+    };
+
+    const withoutOtherIncome = calculateStrategyComparison(lowProfitInput, TAX_YEAR);
+    const withOtherIncome = calculateStrategyComparison(
+      { ...lowProfitInput, otherIncome: 40000 },
+      TAX_YEAR,
+    );
+
+    const lowIncomeDividends = withoutOtherIncome.strategies.allDividends.dividends;
+    const highIncomeDividends = withOtherIncome.strategies.allDividends.dividends;
+
+    expect(lowIncomeDividends).toBeCloseTo(highIncomeDividends, 2);
+    expect(withoutOtherIncome.strategies.allDividends.dividendTax).toBe(0);
+    expect(withOtherIncome.strategies.allDividends.dividendTax).toBeCloseTo(
+      getDividendTax(highIncomeDividends, 40000, TAX_YEAR),
+      2,
+    );
+    expect(withOtherIncome.strategies.allDividends.dividendTax).toBeGreaterThan(0);
+  });
+
+  it('charges student loan from total director income when dividends alone cross the repayment threshold', () => {
+    // Bug caught: director student loan using salary-only income and missing dividend-only repayments.
+    const result = calculateStrategyComparison(
+      {
+        region: 'rUK',
+        revenue: 35150,
+        includesVat: false,
+        expenses: 0,
+        studentLoanPlans: ['plan2'],
+      },
+      TAX_YEAR,
+    );
+
+    const dividendsOnlyIncome = result.strategies.allDividends.dividends;
+    const expectedStudentLoan = getStudentLoanRepayment(dividendsOnlyIncome, ['plan2'], TAX_YEAR);
+
+    expect(result.strategies.allDividends.salary).toBe(0);
+    expect(dividendsOnlyIncome).toBeGreaterThan(TAX_RATES[TAX_YEAR].studentLoan.plan2.threshold);
+    expect(result.strategies.allDividends.studentLoan).toBeCloseTo(expectedStudentLoan.total, 2);
+    expect(result.strategies.allDividends.studentLoan).toBeGreaterThan(0);
   });
 });

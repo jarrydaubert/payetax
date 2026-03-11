@@ -80,7 +80,7 @@ bun scripts/linear.js kanban-check --strict
 
 ## SDK Features (Verified In Repo)
 
-Installed SDK: `@linear/sdk@75.0.0` (`node_modules/@linear/sdk/package.json`).
+Installed SDK: `@linear/sdk@77.0.0` (`node_modules/@linear/sdk/package.json`).
 
 The SDK supports a broad surface area; useful capabilities for PayeTax include:
 
@@ -100,6 +100,16 @@ Current script (`scripts/linear.js`) mainly uses:
 - create issue
 - update status/priority/parent/description
 - assign to project
+
+### Sentry Webhook Issue Placement
+
+`/api/sentry-webhook` creates issues at the `PAYTAX` team level.
+
+Operational note:
+
+- This is currently acceptable and expected.
+- Auto-created Sentry issues do not need to be assigned to the `PayeTax` project to be valid triage inputs.
+- When reviewing error backlog, check team-level unassigned `PAYTAX-*` issues as well as project-filtered views.
 
 ### Automation Commands Added
 
