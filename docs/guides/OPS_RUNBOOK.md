@@ -87,6 +87,29 @@ bun run release:report:check
 
 - `docs/guides/POST_RELEASE_VALIDATION.md`
 
+### Canonical Host Policy
+
+Use `https://payetax.co.uk` as the only canonical public host.
+
+Rules:
+
+1. `https://www.payetax.co.uk/:path*` must redirect directly to `https://payetax.co.uk/:path*`.
+2. The host-normalization redirect should be permanent (`308` preferred).
+3. Canonical metadata, sitemap URLs, and internal absolute URLs should continue to use the apex host.
+
+Verification commands:
+
+```bash
+curl -sS -I https://www.payetax.co.uk/
+curl -sS -I https://www.payetax.co.uk/blog/scottish-vs-english-tax-rates-2026-comparison
+curl -sS -I https://www.payetax.co.uk/calculator/50000-after-tax
+```
+
+Pass criteria:
+
+1. Each response returns a permanent redirect to the matching apex URL.
+2. There is no extra redirect hop after the host normalization step.
+
 ### GitLab Governance Audits
 
 Commands:

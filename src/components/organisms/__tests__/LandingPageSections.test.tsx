@@ -29,4 +29,18 @@ describe('LandingPageSections', () => {
       '/calculator/30000-after-tax',
     );
   });
+
+  it('includes best-for audience links on the homepage', () => {
+    render(<LandingPageSections />);
+
+    expect(screen.getByText('Find the Right Starting Point')).toBeInTheDocument();
+    expect(screen.getByTestId('best-for-link-contractors')).toHaveAttribute(
+      'href',
+      '/best-for/contractors',
+    );
+    expect(screen.getByTestId('best-for-link-students')).toHaveAttribute(
+      'href',
+      '/best-for/students',
+    );
+  });
 });

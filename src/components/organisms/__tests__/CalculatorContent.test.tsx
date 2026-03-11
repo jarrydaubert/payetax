@@ -1,5 +1,7 @@
 // src/components/organisms/__tests__/CalculatorContent.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { calculateTax } from '@/lib/taxCalculator';
 import { CalculatorContent } from '../CalculatorContent';
 
 // Mock Next.js Link
@@ -16,6 +18,9 @@ jest.mock('@/components/atoms/ScrollIndicator', () => ({
 }));
 
 describe('CalculatorContent Component', () => {
+  const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+  const employeeNI = currentRates.nationalInsurance.employee.A;
+
   describe('Rendering', () => {
     it('should render all main sections', () => {
       render(<CalculatorContent />);
@@ -249,13 +254,34 @@ describe('CalculatorContent Component', () => {
 
     it('should show correct answer for £30k question', () => {
       const { container } = render(<CalculatorContent />);
+      const salary30kResults = calculateTax({
+        salary: 30000,
+        payPeriod: 'annually',
+        taxYear: CURRENT_TAX_YEAR,
+        taxCode: '1257L',
+        isScottish: false,
+        isMarried: false,
+        partnerGrossWage: 0,
+        isBlind: false,
+        payNoNI: false,
+        pensionContribution: 0,
+        pensionContributionType: 'percentage',
+        studentLoanPlans: 'none',
+        niCategory: 'A',
+        hoursPerWeek: 37.5,
+      });
 
       const summary = screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i);
       fireEvent.click(summary);
 
       // Check content is revealed after click
       expect(container.textContent).toContain('Income Tax');
-      expect(container.textContent).toContain('£3,486');
+      expect(container.textContent).toContain(
+        `£${Math.round(salary30kResults.incomeTax.annually).toLocaleString('en-GB')}`,
+      );
+      expect(container.textContent).toContain(
+        `£${Math.round(salary30kResults.nationalInsurance.annually).toLocaleString('en-GB')}`,
+      );
     });
 
     it('should show personal allowance value in FAQ', () => {
@@ -276,6 +302,9 @@ describe('CalculatorContent Component', () => {
 
       expect(container.textContent).toMatch(/Calculate taxable income/i);
       expect(container.textContent).toMatch(/Apply tax bands/i);
+      expect(container.textContent).toContain(
+        `${employeeNI.primary.rate}% on £${(employeeNI.primary.threshold + 1).toLocaleString('en-GB')}-£${employeeNI.upper.threshold.toLocaleString('en-GB')}, then ${employeeNI.upper.rate}% above`,
+      );
     });
 
     it('should mention Scottish tax differences', () => {

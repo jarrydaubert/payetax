@@ -4,6 +4,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import {
@@ -316,6 +317,11 @@ export default function LandingPageSections() {
     <>
       <FeaturesSection />
       <TrustSection />
+      <BestForAudienceSection
+        className='py-10'
+        title='Find the Right Starting Point'
+        subtitle='Jump straight to guidance for contractors, students, freelancers, high earners, and other common UK tax situations.'
+      />
       <HowItWorksSection />
       <FAQSection />
       <div className='container mx-auto max-w-4xl px-4 py-10'>

@@ -1121,21 +1121,6 @@ export const useCalculatorStore = create<CalculatorState>()(
                   employment_type: 'paye',
                 },
               });
-
-              // Backward-compatible alias for existing dashboards.
-              trackEvent({
-                action: 'calculator_completion',
-                category: 'funnel',
-                label: 'paye_calculator',
-                custom_data: {
-                  salary_range: salaryRange,
-                  has_student_loan: input.studentLoanPlans !== 'none',
-                  has_pension: input.pensionContribution > 0,
-                  tax_year: input.taxYear,
-                  region: input.region,
-                  employment_type: 'paye',
-                },
-              });
             }
           } catch (error) {
             // Log calculation errors for debugging

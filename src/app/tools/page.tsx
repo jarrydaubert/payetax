@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
+import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
@@ -136,6 +137,11 @@ export default function ToolsPage() {
             </div>
           </div>
         </section>
+
+        <BestForAudienceSection
+          title='Choose a Tax Calculator by Situation'
+          subtitle='Audience-specific entry points with tailored defaults for students, contractors, high earners, and other common PAYE scenarios.'
+        />
 
         <section className={LAYOUT.SECTION}>
           <div className={LAYOUT.CONTAINER_SM}>

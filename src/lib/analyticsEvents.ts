@@ -10,7 +10,6 @@ export const ANALYTICS_EVENT_ACTIONS = [
   'blog_article_read',
   'calculator_action',
   'calculator_completed',
-  'calculator_completion',
   'calculator_error',
   'calculator_start',
   'calculator_usage',
@@ -66,11 +65,3 @@ export const SEO_ACTIONS = [
 ] as const;
 
 export type SEOActionType = (typeof SEO_ACTIONS)[number];
-
-export const DEPRECATED_ANALYTICS_ALIASES = {
-  calculator_completion: {
-    canonical: 'calculator_completed',
-    removeAfter: '2026-04-30',
-    reason: 'Legacy naming from pre-funnel-standardization period.',
-  },
-} as const;

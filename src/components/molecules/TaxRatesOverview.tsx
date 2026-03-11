@@ -7,8 +7,43 @@ import Link from 'next/link';
 import { TaxRateCard } from '@/components/molecules/TaxRateCard';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { cn } from '@/lib/utils';
+import { calculateTax } from '@/lib/taxCalculator';
+import { cn, formatNumber } from '@/lib/utils';
+
+const EXAMPLE_SALARIES = [20000, 30000, 50000] as const;
+
+function formatCurrencyLabel(value: number): string {
+  return `£${formatNumber(value)}`;
+}
+
+function buildQuickExamples() {
+  return EXAMPLE_SALARIES.map((salary) => {
+    const results = calculateTax({
+      salary,
+      payPeriod: 'annually',
+      taxYear: CURRENT_TAX_YEAR,
+      taxCode: '1257L',
+      isScottish: false,
+      isMarried: false,
+      partnerGrossWage: 0,
+      isBlind: false,
+      payNoNI: false,
+      pensionContribution: 0,
+      pensionContributionType: 'percentage',
+      studentLoanPlans: 'none',
+      niCategory: 'A',
+      hoursPerWeek: 37.5,
+    });
+
+    return {
+      label: `${formatCurrencyLabel(salary)} salary`,
+      value: formatCurrencyLabel(Math.round(results.netPay.annually)),
+      colorClass: 'text-success',
+    };
+  });
+}
 
 /**
  * Tax rates overview molecule
@@ -18,6 +53,18 @@ import { cn } from '@/lib/utils';
  */
 export function TaxRatesOverview() {
   const shouldReduceMotion = useMotionPreference();
+  const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+  const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+    separator: '-',
+    shortEndYear: true,
+  });
+  const personalAllowance = currentRates.personalAllowance;
+  const basicRateBand = currentRates.bands[0];
+  const higherRateBand = currentRates.bands[1];
+  const employeeNI = currentRates.nationalInsurance.employee.A;
+  const incomeTaxBasicUpper = personalAllowance + (basicRateBand?.threshold ?? 0);
+  const incomeTaxHigherUpper = higherRateBand?.threshold ?? 0;
+  const quickExamples = buildQuickExamples();
 
   return (
     <motion.section
@@ -35,7 +82,7 @@ export function TaxRatesOverview() {
               TYPOGRAPHY.TEXT_4XL,
             )}
           >
-            UK Tax Rates 2025-26
+            UK Tax Rates {currentTaxYearDisplay}
           </h2>
           <p className='text-muted-foreground'>
             Quick reference for current tax year rates and thresholds
@@ -55,18 +102,18 @@ export function TaxRatesOverview() {
               items={[
                 { label: 'Personal Allowance', value: '0%' },
                 {
-                  label: '£12,571 - £50,270',
-                  value: '20%',
+                  label: `${formatCurrencyLabel(personalAllowance + 1)} - ${formatCurrencyLabel(incomeTaxBasicUpper)}`,
+                  value: `${basicRateBand?.rate ?? 0}%`,
                   colorClass: 'text-success',
                 },
                 {
-                  label: '£50,271 - £125,140',
-                  value: '40%',
+                  label: `${formatCurrencyLabel(incomeTaxBasicUpper + 1)} - ${formatCurrencyLabel(incomeTaxHigherUpper)}`,
+                  value: `${higherRateBand?.rate ?? 0}%`,
                   colorClass: 'text-destructive',
                 },
                 {
-                  label: '£125,140+',
-                  value: '45%',
+                  label: `${formatCurrencyLabel(incomeTaxHigherUpper)}+`,
+                  value: `${currentRates.bands[2]?.rate ?? 0}%`,
                   colorClass: 'text-destructive',
                 },
               ]}
@@ -78,15 +125,15 @@ export function TaxRatesOverview() {
               icon={TrendingUp}
               title='National Insurance'
               items={[
-                { label: '£0 - £12,570', value: '0%' },
+                { label: `£0 - ${formatCurrencyLabel(employeeNI.primary.threshold)}`, value: '0%' },
                 {
-                  label: '£12,571 - £50,270',
-                  value: '12%',
+                  label: `${formatCurrencyLabel(employeeNI.primary.threshold + 1)} - ${formatCurrencyLabel(employeeNI.upper.threshold)}`,
+                  value: `${employeeNI.primary.rate}%`,
                   colorClass: 'text-warning',
                 },
                 {
-                  label: '£50,270+',
-                  value: '2%',
+                  label: `${formatCurrencyLabel(employeeNI.upper.threshold)}+`,
+                  value: `${employeeNI.upper.rate}%`,
                   colorClass: 'text-warning',
                 },
               ]}
@@ -98,23 +145,7 @@ export function TaxRatesOverview() {
             <TaxRateCard
               icon={Calculator}
               title='Quick Examples'
-              items={[
-                {
-                  label: '£20,000 salary',
-                  value: '£17,294',
-                  colorClass: 'text-success',
-                },
-                {
-                  label: '£30,000 salary',
-                  value: '£23,894',
-                  colorClass: 'text-success',
-                },
-                {
-                  label: '£50,000 salary',
-                  value: '£37,794',
-                  colorClass: 'text-success',
-                },
-              ]}
+              items={quickExamples}
               footerNote='Annual take-home after tax & NI'
             />
           </motion.div>

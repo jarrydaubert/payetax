@@ -29,7 +29,6 @@ Last updated: March 6, 2026
 | `pwa_installed` | `appinstalled` fires | `label` | `src/components/organisms/PWAInstallBanner.tsx` |
 
 ## Migration Aliases
-- `calculator_completion` is a legacy alias for `calculator_completed` (currently dual-emitted; removal date: April 30, 2026).
 - `pro_calculator_started`/`pro_calculator_completed` are currently emitted alongside guide events.
 
 ## Privacy Rules

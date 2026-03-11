@@ -11,11 +11,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  ANALYTICS_EVENT_ACTIONS,
-  DEPRECATED_ANALYTICS_ALIASES,
-  SEO_ACTIONS,
-} from '../src/lib/analyticsEvents';
+import { ANALYTICS_EVENT_ACTIONS, SEO_ACTIONS } from '../src/lib/analyticsEvents';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -82,12 +78,6 @@ function getMatches(content: string, regex: RegExp): string[] {
 function main(): void {
   const files = collectSourceFiles(SRC_DIR);
   const unknownFindings: Finding[] = [];
-  const aliasUsage = new Map<string, string[]>();
-
-  for (const alias of Object.keys(DEPRECATED_ANALYTICS_ALIASES)) {
-    aliasUsage.set(alias, []);
-  }
-
   for (const file of files) {
     const content = readFileSync(file, 'utf-8');
     const relPath = relative(ROOT, file);
@@ -95,10 +85,6 @@ function main(): void {
     for (const action of getMatches(content, trackEventRegex)) {
       if (!analyticsActionSet.has(action)) {
         unknownFindings.push({ action, file: relPath, kind: 'trackEvent' });
-      }
-
-      if (aliasUsage.has(action)) {
-        aliasUsage.get(action)?.push(relPath);
       }
     }
 
@@ -114,26 +100,6 @@ function main(): void {
   for (const finding of unknownFindings) {
     errors.push(
       `Unknown ${finding.kind} action "${finding.action}" found in ${finding.file}. Add it to src/lib/analyticsEvents.ts or rename it.`,
-    );
-  }
-
-  const today = new Date().toISOString().slice(0, 10);
-  for (const [alias, meta] of Object.entries(DEPRECATED_ANALYTICS_ALIASES)) {
-    const filesUsingAlias = aliasUsage.get(alias) ?? [];
-
-    if (filesUsingAlias.length === 0) {
-      continue;
-    }
-
-    if (today > meta.removeAfter) {
-      errors.push(
-        `Deprecated alias "${alias}" is still used after removal date ${meta.removeAfter}. Canonical event: "${meta.canonical}". Files: ${filesUsingAlias.join(', ')}`,
-      );
-      continue;
-    }
-
-    console.log(
-      `⚠️  Deprecated analytics alias "${alias}" still in use (remove by ${meta.removeAfter}). Canonical: "${meta.canonical}".`,
     );
   }
 

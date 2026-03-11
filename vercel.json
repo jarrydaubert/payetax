@@ -10,7 +10,7 @@
         }
       ],
       "destination": "https://payetax.co.uk/:path*",
-      "permanent": true
+      "statusCode": 308
     },
     {
       "source": "/blog/scottish-vs-english-tax-rates-2025-comparison",

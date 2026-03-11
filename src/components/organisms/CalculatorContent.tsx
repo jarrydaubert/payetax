@@ -8,7 +8,9 @@ import { FAQItem } from '@/components/molecules/FAQItem';
 import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
 import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { cn } from '@/lib/utils';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { calculateTax } from '@/lib/taxCalculator';
+import { cn, formatNumber } from '@/lib/utils';
 
 /**
  * SEO-optimized content section below calculator
@@ -21,6 +23,25 @@ import { cn } from '@/lib/utils';
  * - SCOTTISH_TAX_RATES['2025-2026'].bands (6 bands, top rate 48%)
  */
 export function CalculatorContent() {
+  const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+  const employeeNI = currentRates.nationalInsurance.employee.A;
+  const salary30kResults = calculateTax({
+    salary: 30000,
+    payPeriod: 'annually',
+    taxYear: CURRENT_TAX_YEAR,
+    taxCode: '1257L',
+    isScottish: false,
+    isMarried: false,
+    partnerGrossWage: 0,
+    isBlind: false,
+    payNoNI: false,
+    pensionContribution: 0,
+    pensionContributionType: 'percentage',
+    studentLoanPlans: 'none',
+    niCategory: 'A',
+    hoursPerWeek: 37.5,
+  });
+
   return (
     <div className={SPACING.SPACE_Y_16}>
       {/* Tax Rates Overview */}
@@ -61,16 +82,29 @@ export function CalculatorContent() {
               </p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
-                  <strong>Income Tax</strong>: £3,486 (20% on £17,430 taxable income)
+                  <strong>Income Tax</strong>: £
+                  {formatNumber(Math.round(salary30kResults.incomeTax.annually))} (20% on £
+                  {formatNumber(Math.round(salary30kResults.taxableIncome))} taxable income)
                 </li>
                 <li>
-                  <strong>National Insurance</strong>: £1,394 (8% on earnings above £12,570)
+                  <strong>National Insurance</strong>: £
+                  {formatNumber(Math.round(salary30kResults.nationalInsurance.annually))} (
+                  {employeeNI.primary.rate}% on earnings above £
+                  {formatNumber(employeeNI.primary.threshold)})
                 </li>
                 <li>
-                  <strong>Total Deductions</strong>: £4,880
+                  <strong>Total Deductions</strong>: £
+                  {formatNumber(
+                    Math.round(
+                      salary30kResults.incomeTax.annually +
+                        salary30kResults.nationalInsurance.annually,
+                    ),
+                  )}
                 </li>
                 <li>
-                  <strong>Take-Home Pay</strong>: £25,120/year or £2,093/month
+                  <strong>Take-Home Pay</strong>: £
+                  {formatNumber(Math.round(salary30kResults.netPay.annually))}/year or £
+                  {formatNumber(Math.round(salary30kResults.netPay.monthly))}/month
                 </li>
               </ul>
               <a href='#tax-calculator' className='inline-block text-primary'>
@@ -115,7 +149,9 @@ export function CalculatorContent() {
                   rate (£50,271-£125,140), 45% additional rate (£125,140+)
                 </li>
                 <li>
-                  <strong>Add National Insurance</strong>: 8% on £12,571-£50,270, then 2% above
+                  <strong>Add National Insurance</strong>: {employeeNI.primary.rate}% on £
+                  {formatNumber(employeeNI.primary.threshold + 1)}-£
+                  {formatNumber(employeeNI.upper.threshold)}, then {employeeNI.upper.rate}% above
                 </li>
                 <li>
                   <strong>Deduct pension contributions</strong> (if applicable)

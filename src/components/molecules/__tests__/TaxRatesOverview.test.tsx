@@ -11,6 +11,8 @@
  */
 
 import { render, screen } from '@testing-library/react';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
+import { calculateTax } from '@/lib/taxCalculator';
 import { TaxRatesOverview } from '../TaxRatesOverview';
 
 // Mock useMotionPreference hook
@@ -21,6 +23,12 @@ jest.mock('@/hooks/useMotionPreference', () => ({
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 
 const mockUseMotionPreference = useMotionPreference as jest.Mock;
+const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+const employeeNI = currentRates.nationalInsurance.employee.A;
+const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
 
 describe('TaxRatesOverview', () => {
   beforeEach(() => {
@@ -39,7 +47,7 @@ describe('TaxRatesOverview', () => {
 
     it('should render the main heading with correct year', () => {
       render(<TaxRatesOverview />);
-      expect(screen.getByText('UK Tax Rates 2025-26')).toBeInTheDocument();
+      expect(screen.getByText(`UK Tax Rates ${currentTaxYearDisplay}`)).toBeInTheDocument();
     });
 
     it('should render the subheading', () => {
@@ -66,19 +74,19 @@ describe('TaxRatesOverview', () => {
       // Band appears in both Income Tax and NI cards
       expect(screen.getAllByText('£12,571 - £50,270').length).toBeGreaterThan(0);
       // 20% appears in the Income Tax card
-      expect(screen.getAllByText('20%').length).toBeGreaterThan(0);
+      expect(screen.getAllByText(`${currentRates.bands[0]?.rate}%`).length).toBeGreaterThan(0);
     });
 
     it('should display higher rate band', () => {
       render(<TaxRatesOverview />);
       expect(screen.getByText('£50,271 - £125,140')).toBeInTheDocument();
-      expect(screen.getByText('40%')).toBeInTheDocument();
+      expect(screen.getByText(`${currentRates.bands[1]?.rate}%`)).toBeInTheDocument();
     });
 
     it('should display additional rate', () => {
       render(<TaxRatesOverview />);
       expect(screen.getByText('£125,140+')).toBeInTheDocument();
-      expect(screen.getByText('45%')).toBeInTheDocument();
+      expect(screen.getByText(`${currentRates.bands[2]?.rate}%`)).toBeInTheDocument();
     });
   });
 
@@ -96,8 +104,8 @@ describe('TaxRatesOverview', () => {
 
     it('should display NI rates', () => {
       render(<TaxRatesOverview />);
-      expect(screen.getByText('12%')).toBeInTheDocument();
-      expect(screen.getByText('2%')).toBeInTheDocument();
+      expect(screen.getByText(`${employeeNI.primary.rate}%`)).toBeInTheDocument();
+      expect(screen.getByText(`${employeeNI.upper.rate}%`)).toBeInTheDocument();
     });
 
     it('should display Class 1 footer note', () => {
@@ -121,9 +129,29 @@ describe('TaxRatesOverview', () => {
 
     it('should display take-home amounts', () => {
       render(<TaxRatesOverview />);
-      expect(screen.getByText('£17,294')).toBeInTheDocument();
-      expect(screen.getByText('£23,894')).toBeInTheDocument();
-      expect(screen.getByText('£37,794')).toBeInTheDocument();
+
+      for (const salary of [20000, 30000, 50000]) {
+        const results = calculateTax({
+          salary,
+          payPeriod: 'annually',
+          taxYear: CURRENT_TAX_YEAR,
+          taxCode: '1257L',
+          isScottish: false,
+          isMarried: false,
+          partnerGrossWage: 0,
+          isBlind: false,
+          payNoNI: false,
+          pensionContribution: 0,
+          pensionContributionType: 'percentage',
+          studentLoanPlans: 'none',
+          niCategory: 'A',
+          hoursPerWeek: 37.5,
+        });
+
+        expect(
+          screen.getByText(`£${Math.round(results.netPay.annually).toLocaleString('en-GB')}`),
+        ).toBeInTheDocument();
+      }
     });
 
     it('should display take-home footer note', () => {
@@ -193,7 +221,7 @@ describe('TaxRatesOverview', () => {
     it('should have proper heading hierarchy', () => {
       render(<TaxRatesOverview />);
       const h2 = screen.getByRole('heading', { level: 2 });
-      expect(h2).toHaveTextContent('UK Tax Rates 2025-26');
+      expect(h2).toHaveTextContent(`UK Tax Rates ${currentTaxYearDisplay}`);
     });
 
     it('should have accessible link', () => {
