@@ -2,6 +2,17 @@
   "installCommand": "bun install --frozen-lockfile",
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.payetax.co.uk"
+        }
+      ],
+      "destination": "https://payetax.co.uk/",
+      "statusCode": 308
+    },
+    {
       "source": "/:path*",
       "has": [
         {

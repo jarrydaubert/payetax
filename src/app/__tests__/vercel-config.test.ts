@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 describe('vercel.json canonical host redirect', () => {
-  it('uses an explicit 308 redirect from www to apex', () => {
+  it('uses explicit 308 redirects from www to apex for the homepage and nested routes', () => {
     const vercelConfigPath = path.join(process.cwd(), 'vercel.json');
     const raw = readFileSync(vercelConfigPath, 'utf8');
     const config = JSON.parse(raw) as {
@@ -14,7 +14,16 @@ describe('vercel.json canonical host redirect', () => {
       }>;
     };
 
-    const wwwRedirect = config.redirects?.find(
+    const homepageRedirect = config.redirects?.find(
+      (redirect) =>
+        redirect.source === '/' &&
+        redirect.destination === 'https://payetax.co.uk/' &&
+        redirect.has?.some(
+          (condition) => condition.type === 'host' && condition.value === 'www.payetax.co.uk',
+        ),
+    );
+
+    const nestedRouteRedirect = config.redirects?.find(
       (redirect) =>
         redirect.source === '/:path*' &&
         redirect.destination === 'https://payetax.co.uk/:path*' &&
@@ -23,7 +32,9 @@ describe('vercel.json canonical host redirect', () => {
         ),
     );
 
-    expect(wwwRedirect).toBeDefined();
-    expect(wwwRedirect?.statusCode).toBe(308);
+    expect(homepageRedirect).toBeDefined();
+    expect(homepageRedirect?.statusCode).toBe(308);
+    expect(nestedRouteRedirect).toBeDefined();
+    expect(nestedRouteRedirect?.statusCode).toBe(308);
   });
 });

@@ -96,6 +96,15 @@ Rules:
 1. `https://www.payetax.co.uk/:path*` must redirect directly to `https://payetax.co.uk/:path*`.
 2. The host-normalization redirect should be permanent (`308` preferred).
 3. Canonical metadata, sitemap URLs, and internal absolute URLs should continue to use the apex host.
+4. `www.payetax.co.uk` must be attached to the Vercel project as a custom domain; if it is left unattached, Vercel can serve a platform-level `307` before the app redirect runs.
+
+Operational note:
+
+```bash
+vercel domains add www.payetax.co.uk
+```
+
+Use the command above after a fresh project/domain setup to ensure host normalization is handled by the app redirect instead of Vercel's fallback domain behavior.
 
 Verification commands:
 
