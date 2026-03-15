@@ -34,30 +34,30 @@ Skills and tools are primarily sourced from [coreyhaines31/marketingskills](http
 
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
-| ab-test-setup | 1.3.0 | 2026-03-02 |
-| ad-creative | 1.3.0 | 2026-03-02 |
-| ai-seo | 1.3.0 | 2026-03-02 |
-| analytics-tracking | 1.3.0 | 2026-03-02 |
-| churn-prevention | 1.3.0 | 2026-03-02 |
-| cold-email | 1.3.0 | 2026-03-02 |
-| competitor-alternatives | 1.3.0 | 2026-03-02 |
-| content-strategy | 1.3.0 | 2026-03-02 |
-| copy-editing | 1.3.0 | 2026-03-02 |
-| copywriting | 1.3.0 | 2026-03-02 |
-| email-sequence | 1.3.0 | 2026-03-02 |
-| form-cro | 1.3.0 | 2026-03-02 |
-| free-tool-strategy | 1.3.0 | 2026-03-02 |
-| launch-strategy | 1.3.0 | 2026-03-02 |
-| marketing-ideas | 1.3.0 | 2026-03-02 |
-| marketing-psychology | 1.3.0 | 2026-03-02 |
-| onboarding-cro | 1.3.0 | 2026-03-02 |
-| page-cro | 1.3.0 | 2026-03-02 |
-| popup-cro | 1.3.0 | 2026-03-02 |
-| product-marketing-context | 1.3.0 | 2026-03-02 |
-| programmatic-seo | 1.3.0 | 2026-03-02 |
-| schema-markup | 1.3.0 | 2026-03-02 |
-| seo-audit | 1.3.0 | 2026-03-02 |
-| social-content | 1.3.0 | 2026-03-02 |
+| ab-test-setup | 1.4.0 | 2026-03-14 |
+| ad-creative | 1.4.0 | 2026-03-14 |
+| ai-seo | 1.4.0 | 2026-03-14 |
+| analytics-tracking | 1.4.0 | 2026-03-14 |
+| churn-prevention | 1.4.0 | 2026-03-14 |
+| cold-email | 1.4.0 | 2026-03-14 |
+| competitor-alternatives | 1.4.0 | 2026-03-14 |
+| content-strategy | 1.4.0 | 2026-03-14 |
+| copy-editing | 1.4.0 | 2026-03-14 |
+| copywriting | 1.4.0 | 2026-03-14 |
+| email-sequence | 1.4.0 | 2026-03-14 |
+| form-cro | 1.4.0 | 2026-03-14 |
+| free-tool-strategy | 1.4.0 | 2026-03-14 |
+| launch-strategy | 1.4.0 | 2026-03-14 |
+| marketing-ideas | 1.4.0 | 2026-03-14 |
+| marketing-psychology | 1.4.0 | 2026-03-14 |
+| onboarding-cro | 1.4.0 | 2026-03-14 |
+| page-cro | 1.4.0 | 2026-03-14 |
+| popup-cro | 1.4.0 | 2026-03-14 |
+| product-marketing-context | 1.4.0 | 2026-03-14 |
+| programmatic-seo | 1.4.0 | 2026-03-14 |
+| schema-markup | 1.4.0 | 2026-03-14 |
+| seo-audit | 1.4.0 | 2026-03-14 |
+| social-content | 1.4.0 | 2026-03-14 |
 
 ## PayeTax-Only Skills
 
@@ -79,7 +79,7 @@ Source: [mattpocock/skills](https://github.com/mattpocock/skills), commit `8e51f
 ## New Skill Alignment Standard
 
 When adding a new upstream skill to PayeTax:
-- Use `metadata.version` in frontmatter (match upstream convention).
+- Use `metadata.version` in frontmatter to track the pinned upstream repo release used in PayeTax installs. The sync script normalizes installed upstream skills to the current local pin.
 - Add a `## PayeTax Context` section with:
   - what applies to PayeTax,
   - what does not apply by default,
@@ -89,6 +89,7 @@ When adding a new upstream skill to PayeTax:
 
 ## Deliberately Excluded Upstream Skills
 
+- lead-magnets
 - paid-ads
 - paywall-upgrade-cro
 - pricing-strategy
@@ -99,6 +100,12 @@ When adding a new upstream skill to PayeTax:
 - site-architecture
 
 ## Recent Changes
+
+### 2026-03-14
+- Synced upstream marketing skills to `coreyhaines31/marketingskills` release `v1.4.0` for the existing 24-skill PayeTax profile.
+- Preserved all local `## PayeTax Context` sections during sync.
+- Explicitly deferred the new upstream `lead-magnets` skill pending a shipped gated-content or downloadable-resource motion.
+- Kept the new upstream Composio/tooling and headless CMS docs out of the local profile because they are not evidenced in the current PayeTax stack.
 
 ### 2026-03-02
 - Synced upstream marketing skills to `coreyhaines31/marketingskills` release `v1.3.0`.

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/coreyhaines31/marketingskills}"
-UPSTREAM_REF="${UPSTREAM_REF:-v1.3.0}"
+UPSTREAM_REF="${UPSTREAM_REF:-v1.4.0}"
 EXPECTED_COMMIT="${EXPECTED_COMMIT:-}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
@@ -53,7 +53,7 @@ Options:
 
 Environment overrides:
   REPO_URL      (default: https://github.com/coreyhaines31/marketingskills)
-  UPSTREAM_REF  (default: v1.3.0)
+  UPSTREAM_REF  (default: v1.4.0)
   CACHE_DIR     (default: /tmp/marketingskills-sync)
   SKIP_FETCH    (default: 0)
 USAGE

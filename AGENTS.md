@@ -33,6 +33,12 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Keep evergreen docs free of TODOs, progress markers, and stale status; open work belongs in `docs/BACKLOG.md`.
 - Prefer a small number of high-signal tests over broad low-signal coverage.
 
+## Verification
+
+- Do not present guesses as facts.
+- Verify files, commands, and behavior before claiming they exist or passed.
+- If something is uncertain or unverified, say so clearly.
+
 ## Before You Change Code
 
 - Check existing patterns in the codebase.

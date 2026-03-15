@@ -78,7 +78,7 @@ function summarizeReport(content: string): {
   const releaseNotesUrl = content.match(/^Release Notes URL:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
   const releasingEngineer =
     content.match(/^Releasing Engineer:\s*(.+)$/m)?.[1]?.trim() ?? 'MISSING';
-  const sectionBodies = [...content.matchAll(/^##\s+(.+?)\n([\s\S]*?)(?=^##\s+|\Z)/gm)];
+  const sectionBodies = [...content.matchAll(/^##\s+(.+?)\n([\s\S]*?)(?=^##\s+|Z)/gm)];
   const requiredSections = new Set([
     '0) Local Preflight',
     '1) Production Smoke',

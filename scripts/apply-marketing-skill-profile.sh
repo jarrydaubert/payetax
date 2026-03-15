@@ -40,6 +40,7 @@ KEEP_SKILLS=(
 )
 
 EXCLUDE_SKILLS=(
+  "lead-magnets"
   "paid-ads"
   "paywall-upgrade-cro"
   "pricing-strategy"

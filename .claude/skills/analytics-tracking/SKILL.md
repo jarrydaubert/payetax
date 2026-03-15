@@ -1,8 +1,8 @@
 ---
 name: analytics-tracking
-description: When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions "set up tracking," "GA4," "Google Analytics," "conversion tracking," "event tracking," "UTM parameters," "tag manager," "GTM," "analytics implementation," or "tracking plan." For A/B test measurement, see ab-test-setup.
+description: When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions "set up tracking," "GA4," "Google Analytics," "conversion tracking," "event tracking," "UTM parameters," "tag manager," "GTM," "analytics implementation," "tracking plan," "how do I measure this," "track conversions," "attribution," "Mixpanel," "Segment," "are my events firing," or "analytics isn't working." Use this whenever someone asks how to know if something is working or wants to measure marketing results. For A/B test measurement, see ab-test-setup.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # Analytics Tracking
@@ -124,7 +124,7 @@ checkout_payment_completed
 | Campaign | source, medium, campaign, content, term |
 | Product | product_id, product_name, category, price |
 
-### Best Practices
+### Property Best Practices
 - Use consistent property names
 - Include relevant context
 - Don't duplicate automatic properties
@@ -372,5 +372,4 @@ PayeTax is a free tool with no user accounts, no purchases, and no subscriptions
   - relevant tests
 - If public analytics env vars change, update both `.env.template` and `src/lib/env.ts`
 - If tracking/privacy materially changes, ensure privacy-page wording/date is updated
-
 

@@ -1,6 +1,7 @@
 # CLAUDE.md - PayeTax
 
 This file defers to `AGENTS.md`.
+Do not invent facts, files, or validation results; verify or state uncertainty.
 
 Use `AGENTS.md` as the canonical repo contract for:
 - priorities

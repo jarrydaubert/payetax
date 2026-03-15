@@ -1,8 +1,8 @@
 ---
 name: email-sequence
-description: When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions "email sequence," "drip campaign," "nurture sequence," "onboarding emails," "welcome sequence," "re-engagement emails," "email automation," or "lifecycle emails." For in-app onboarding, see onboarding-cro.
+description: When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions "email sequence," "drip campaign," "nurture sequence," "onboarding emails," "welcome sequence," "re-engagement emails," "email automation," "lifecycle emails," "trigger-based emails," "email funnel," "email workflow," "what emails should I send," "welcome series," or "email cadence." Use this for any multi-email automated flow. For cold outreach emails, see cold-email. For in-app onboarding, see onboarding-cro.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # Email Sequence Design
@@ -301,6 +301,7 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md). Key email
 
 ## Related Skills
 
+- **lead-magnets**: For planning lead magnets that feed into nurture sequences
 - **churn-prevention**: For cancel flows, save offers, and dunning strategy (email supports this)
 - **onboarding-cro**: For in-app onboarding (email supports this)
 - **copywriting**: For landing pages emails link to

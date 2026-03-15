@@ -1,8 +1,8 @@
 ---
 name: ab-test-setup
-description: When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions "A/B test," "split test," "experiment," "test this change," "variant copy," "multivariate test," or "hypothesis." For tracking implementation, see analytics-tracking.
+description: When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions "A/B test," "split test," "experiment," "test this change," "variant copy," "multivariate test," "hypothesis," "should I test this," "which version is better," "test two versions," "statistical significance," or "how long should I run this test." Use this whenever someone is comparing two approaches and wants to measure which performs better. For tracking implementation, see analytics-tracking. For page-level conversion optimization, see page-cro.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # A/B Test Setup
@@ -180,7 +180,7 @@ We'll know this is true when [metrics].
 - Check segment quality
 - Document external factors
 
-**DON'T:**
+**Avoid:**
 - Peek at results and stop early
 - Make changes to variants
 - Add traffic from new sources
@@ -278,7 +278,7 @@ Document every test with:
 ### Test Assignment
 No user accounts — tests must use cookie-based session assignment for consistency across page views. Consider Vercel Edge Config for A/B routing or PostHog feature flags.
 
-### Guardrail Metrics
+### PayeTax Guardrail Metrics
 - Bounce rate (should not increase)
 - Calculator error rate (must not regress)
 - Core Web Vitals (LCP, CLS, INP must stay within thresholds)
@@ -290,5 +290,4 @@ No user accounts — tests must use cookie-based session assignment for consiste
 - Results display format (annual-first vs monthly-first)
 - Newsletter CTA placement and copy on blog pages
 - Trust signal variations ("HMRC-accurate" vs "Updated for 2025/26")
-
 

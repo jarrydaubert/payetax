@@ -9,6 +9,7 @@
 import { ArrowRight, Calculator } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import Link from 'next/link';
+import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
@@ -131,6 +132,11 @@ export default function ScenariosPage() {
             ))}
           </div>
         </section>
+
+        <BestForAudienceSection
+          title='Find the Right Calculator by Situation'
+          subtitle='Prefer an audience-specific starting point? Jump straight to guides for contractors, students, freelancers, pensioners, and other common PAYE scenarios.'
+        />
 
         <section className='py-12'>
           <div className={cn(LAYOUT.CONTAINER_SM)}>

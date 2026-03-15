@@ -1,8 +1,8 @@
 ---
 name: content-strategy
-description: When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions "content strategy," "what should I write about," "content ideas," "blog strategy," "topic clusters," or "content planning." For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.
+description: When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions "content strategy," "what should I write about," "content ideas," "blog strategy," "topic clusters," "content planning," "editorial calendar," "content marketing," "content roadmap," "what content should I create," "blog topics," "content pillars," or "I don't know what to write." Use this whenever someone needs help deciding what content to produce, not just writing it. For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit. For social media content specifically, see social-content.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # Content Strategy
@@ -345,6 +345,12 @@ Visual or structured representation of how content interconnects.
 3. Where are competitors' content efforts falling short?
 4. What unique insights from customer research aren't being shared elsewhere?
 5. Which existing content drives the most conversions, and why?
+
+---
+
+## References
+
+- **[Headless CMS Guide](references/headless-cms.md)**: CMS selection, content modeling for marketing, editorial workflows, platform comparison (Sanity, Contentful, Strapi)
 
 ---
 

@@ -59,6 +59,7 @@ UPSTREAM_SKILLS=(
 )
 
 EXCLUDED_SKILLS=(
+  "lead-magnets"
   "paid-ads"
   "paywall-upgrade-cro"
   "pricing-strategy"
@@ -112,12 +113,12 @@ if [[ -z "$commit_value" || ! "$commit_value" =~ ^[0-9a-f]{40}$ ]]; then
   error "Invalid or missing commit SHA in $SOURCE_FILE"
 fi
 
-if [[ "$ref_value" != "v1.3.0" ]]; then
-  error "Unexpected ref in source metadata ($ref_value). Expected v1.3.0"
+if [[ "$ref_value" != "v1.4.0" ]]; then
+  error "Unexpected ref in source metadata ($ref_value). Expected v1.4.0"
 fi
 
-if ! rg -q "Synced upstream marketing skills to .*v1.3.0" "$VERSIONS_FILE"; then
-  error "VERSIONS.md is missing the v1.3.0 sync record"
+if ! rg -q "Synced upstream marketing skills to .*v1.4.0" "$VERSIONS_FILE"; then
+  error "VERSIONS.md is missing the v1.4.0 sync record"
 fi
 
 installed_skills=()
@@ -137,8 +138,8 @@ for skill in "${UPSTREAM_SKILLS[@]}"; do
     continue
   fi
 
-  if ! rg -q '^  version: 1.3.0$' "$skill_file"; then
-    error "Version mismatch in $skill_file (expected 1.3.0)"
+  if ! rg -q '^  version: 1.4.0$' "$skill_file"; then
+    error "Version mismatch in $skill_file (expected 1.4.0)"
   fi
 
   if ! rg -q '^## PayeTax Context' "$skill_file"; then

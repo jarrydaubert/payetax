@@ -50,6 +50,7 @@ scripts/validate-marketing-skills-setup.sh
 2. Keep canonical paths in `.claude/` while maintaining `.agents/` compatibility links.
 3. Keep the deliberate upstream exclusions aligned with PayeTax model:
 
+- `lead-magnets`
 - `paid-ads`
 - `paywall-upgrade-cro`
 - `pricing-strategy`
