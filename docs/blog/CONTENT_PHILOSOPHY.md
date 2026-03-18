@@ -15,3 +15,4 @@ Purpose: every piece of content should be useful, accurate, and clear.
 - Do not hardcode tax rates or thresholds in copy.
 - Avoid sensational framing around taxes.
 - Be honest about calculator limitations.
+- Use UK English as the default editorial style. Replace American spellings/terms unless a quoted source requires the original wording.

@@ -316,6 +316,14 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
   return featuredPosts[0] || null;
 }
 
+const EDITORS_PICKS_ORDER = [
+  'student-loan-repayment-changes-2025-26',
+  '100k-tax-trap-avoid-60-percent-tax-2025',
+  'salary-sacrifice-explained-2025-26',
+  'spring-statement-2026-uk-what-to-expect',
+  'scottish-vs-english-tax-rates-2026-comparison',
+] as const;
+
 /**
  * Get editor's picks posts
  * Primary: Posts with editorsPick: true frontmatter
@@ -326,7 +334,21 @@ export async function getEditorsPicks(limit: number = 5): Promise<BlogPost[]> {
   const allPosts = await getAllCachedPosts();
 
   // Filter for editor's picks
-  const editorsPicks = allPosts.filter((post) => post.editorsPick === true);
+  const orderedSlugs = new Map<string, number>(
+    EDITORS_PICKS_ORDER.map((slug, index) => [slug, index]),
+  );
+  const editorsPicks = allPosts
+    .filter((post) => post.editorsPick === true)
+    .sort((a, b) => {
+      const aIndex = orderedSlugs.get(a.slug);
+      const bIndex = orderedSlugs.get(b.slug);
+
+      if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex;
+      if (aIndex !== undefined) return -1;
+      if (bIndex !== undefined) return 1;
+
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    });
 
   // If we have enough editor's picks, return them
   if (editorsPicks.length >= limit) {

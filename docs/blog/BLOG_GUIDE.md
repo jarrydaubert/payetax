@@ -8,6 +8,7 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Explain the *why* behind the numbers, not just the results.
 - Avoid fear-mongering or aggressive sales language.
 - Keep posts useful even if the reader never converts.
+- Use UK English throughout. Avoid American spellings and terms in headings, body copy, metadata, CTAs, and image alt text.
 
 ## Content Types
 
@@ -34,6 +35,7 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Use clean slugs and canonical URLs.
 - Avoid hardcoded rate values in text; reference the calculator.
 - Include a brief disclaimer about informational intent.
+- Double-check unstable tax/news claims against current official sources before publishing or refreshing a post.
 
 ## Publishing
 
