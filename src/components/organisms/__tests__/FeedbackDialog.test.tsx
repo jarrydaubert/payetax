@@ -6,17 +6,8 @@
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { FeedbackDialog } from '../FeedbackDialog';
-
-// Mock toast
-jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
 
 // Mock the server action
 jest.mock('@/app/actions/feedback', () => ({
@@ -303,18 +294,18 @@ describe('FeedbackDialog Component', () => {
       expect(submittedFormData.get('url')).toBe(window.location.href);
     });
 
-    it('should show success toast on successful submission', async () => {
+    it('should show inline success content on successful submission', async () => {
       render(<FeedbackDialog />);
       await fillAndSubmitForm({ email: '', message: 'Valid feedback message' });
 
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith(
-          expect.stringContaining('Thanks! Your feedback has been sent'),
-        );
+        expect(
+          screen.getByText('Thanks! Your feedback has been sent to the team.'),
+        ).toBeInTheDocument();
       });
     });
 
-    it('should show error toast on failed submission', async () => {
+    it('should show inline error content on failed submission', async () => {
       mockSubmitFeedback.mockResolvedValueOnce({
         success: false,
         error: 'Server error',
@@ -324,11 +315,11 @@ describe('FeedbackDialog Component', () => {
       await fillAndSubmitForm({ message: 'Valid feedback message' });
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Server error');
+        expect(screen.getByText('Server error')).toBeInTheDocument();
       });
     });
 
-    it('should show generic error message returned by server action', async () => {
+    it('should show generic inline error message returned by server action', async () => {
       mockSubmitFeedback.mockResolvedValueOnce({
         success: false,
         error: 'Something went wrong. Please try again later.',
@@ -338,7 +329,9 @@ describe('FeedbackDialog Component', () => {
       await fillAndSubmitForm({ message: 'Valid feedback message' });
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Something went wrong. Please try again later.');
+        expect(
+          screen.getByText('Something went wrong. Please try again later.'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -364,7 +357,9 @@ describe('FeedbackDialog Component', () => {
       });
 
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalled();
+        expect(
+          screen.getByText('Thanks! Your feedback has been sent to the team.'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -390,14 +385,17 @@ describe('FeedbackDialog Component', () => {
       });
     });
 
-    it('should clear form and close dialog after successful submission', async () => {
+    it('should clear form and reset after closing a successful submission', async () => {
       render(<FeedbackDialog />);
       await fillAndSubmitForm({ email: 'clearme@example.com', message: 'Valid feedback message' });
 
       await waitFor(() => {
-        expect(screen.queryByText('Share Your Feedback')).not.toBeInTheDocument();
+        expect(
+          screen.getByText('Thanks! Your feedback has been sent to the team.'),
+        ).toBeInTheDocument();
       });
 
+      fireEvent.click(screen.getAllByRole('button', { name: /close/i })[0]);
       fireEvent.click(screen.getByRole('button', { name: /feedback/i }));
       await waitFor(() => {
         expect(screen.getByLabelText(/email/i)).toBeInTheDocument();

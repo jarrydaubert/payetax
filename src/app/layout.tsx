@@ -11,7 +11,6 @@ import { Suspense } from 'react';
 import { inter, spaceGrotesk } from '@/app/fonts';
 import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
-import { AppToaster } from '@/components/organisms/AppToaster';
 import { ClarityAnalytics } from '@/components/organisms/ClarityAnalytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
@@ -90,7 +89,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeProvider>
           <Suspense fallback={null}>{analyticsEnabled ? <Analytics /> : null}</Suspense>
           <Layout>{children}</Layout>
-          <AppToaster />
           {analyticsEnabled ? (
             <>
               {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}

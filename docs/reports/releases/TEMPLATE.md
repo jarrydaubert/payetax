@@ -20,6 +20,7 @@ Legend:
 ## 0) Local Preflight
 
 - [ ] `bun run release:verify` passed
+- [ ] `bun run check:production-env-contract` passed against live Vercel Production
 - [ ] Key output/caveats captured below
 
 Notes:

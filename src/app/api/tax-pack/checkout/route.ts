@@ -5,8 +5,6 @@ import { isValidRequestOrigin } from '@/lib/security/origin';
 import { createTaxPackCheckout } from '@/lib/taxPack/service';
 import { TaxPackCheckoutRequestSchema } from '@/lib/validation/taxPackValidation';
 
-export const runtime = 'nodejs';
-
 const MAX_BODY_SIZE = 64 * 1024;
 
 export async function POST(request: NextRequest) {

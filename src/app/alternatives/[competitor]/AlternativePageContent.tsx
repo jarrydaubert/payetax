@@ -2,13 +2,13 @@
 import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { Button } from '@/components/atoms/ui/button';
-import { Card } from '@/components/atoms/ui/card';
 import { TwoColumnComparison } from '@/components/molecules/ComparisonTable';
 import { PageHero } from '@/components/molecules/PageHero';
 import { AdvantagesList, ProsCons } from '@/components/molecules/ProsCons';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { Competitor } from '@/data/competitors';
 import { cn } from '@/lib/utils';

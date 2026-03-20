@@ -413,7 +413,7 @@ export const TAX_RATES: Record<
     studentLoan: {
       plan1: { threshold: 22015, rate: 9 },
       plan2: { threshold: 27295, rate: 9 },
-      plan4: { threshold: 27660, rate: 9 },
+      plan4: { threshold: 31395, rate: 9 },
       plan5: { threshold: 25000, rate: 9 },
       postgrad: { threshold: 21000, rate: 6 },
     },

@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getTaxPackOrder } from '@/lib/taxPack/service';
 
-export const runtime = 'nodejs';
-
 type RouteContext = {
   params: Promise<{ orderId: string }>;
 };

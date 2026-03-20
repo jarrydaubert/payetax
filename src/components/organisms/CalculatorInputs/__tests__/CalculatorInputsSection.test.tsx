@@ -1,15 +1,7 @@
 // src/components/organisms/CalculatorInputs/__tests__/CalculatorInputsSection.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { toast } from 'sonner';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { CalculatorInputsSection } from '../CalculatorInputsSection';
-
-// Mock dependencies
-jest.mock('sonner', () => ({
-  toast: {
-    error: jest.fn(),
-  },
-}));
 
 jest.mock('@/store/calculatorStore', () => ({
   useCalculatorActions: jest.fn(),
@@ -114,7 +106,7 @@ describe('CalculatorInputsSection Component', () => {
       expect(icon).toBeInTheDocument();
     });
 
-    it('should handle calculation errors with toast', async () => {
+    it('should show an inline error when calculation throws', async () => {
       const errorOnCalculate = jest.fn(() => {
         throw new Error('Test calculation error');
       });
@@ -125,13 +117,11 @@ describe('CalculatorInputsSection Component', () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Calculation failed', {
-          description: 'Test calculation error',
-        });
+        expect(screen.getByText('Test calculation error')).toBeInTheDocument();
       });
     });
 
-    it('should handle non-Error exceptions', async () => {
+    it('should show a fallback inline error for non-Error exceptions', async () => {
       const errorOnCalculate = jest.fn(() => {
         throw 'String error';
       });
@@ -142,9 +132,7 @@ describe('CalculatorInputsSection Component', () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Calculation failed', {
-          description: 'Please check your inputs',
-        });
+        expect(screen.getByText('Please check your inputs.')).toBeInTheDocument();
       });
     });
 
@@ -181,13 +169,21 @@ describe('CalculatorInputsSection Component', () => {
       expect(mockOnCalculate).not.toHaveBeenCalled();
     });
 
-    it('should not show toast on successful reset', () => {
+    it('should clear inline messages on reset', () => {
+      (useCalculatorStore as jest.Mock).mockReturnValue(0);
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      fireEvent.click(screen.getByTestId('calculate-button'));
+      expect(
+        screen.getByText('Enter your gross salary to calculate your tax breakdown.'),
+      ).toBeInTheDocument();
 
       const button = screen.getByRole('button', { name: /Reset/i });
       fireEvent.click(button);
 
-      expect(toast.error).not.toHaveBeenCalled();
+      expect(
+        screen.queryByText('Enter your gross salary to calculate your tax breakdown.'),
+      ).not.toBeInTheDocument();
     });
   });
 

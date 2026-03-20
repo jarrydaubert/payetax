@@ -224,7 +224,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       expect(nav).toHaveClass('backdrop-blur-xl');
-      expect(nav).toHaveClass('bg-deep/80');
+      expect(nav).toHaveClass('bg-surface-brand/80');
     });
 
     it('should apply consistent styling on all pages', () => {
@@ -235,7 +235,7 @@ describe('SimpleNavbar Component', () => {
       const nav = container.querySelector('nav');
       // New design uses fixed positioning with backdrop blur (border removed)
       expect(nav).toHaveClass('backdrop-blur-xl');
-      expect(nav).toHaveClass('bg-deep/80');
+      expect(nav).toHaveClass('bg-surface-brand/80');
     });
 
     it('should include safe-area top padding on mobile nav', () => {

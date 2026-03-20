@@ -62,7 +62,7 @@ Add the next behavior as another Red -> Green -> Refactor loop.
 
 ### Required standards
 
-- Align with `.claude/commands/test.md` and `docs/guides/TESTING.md`.
+- Align with `docs/guides/TESTING.md`.
 - Apply the mantra: "What bug will this test catch?"
 - Prefer deterministic assertions over fixed sleeps in Playwright.
 - For money values, use penny-precision assertions (`toBeCloseTo(expected, 2)` unless exact integer logic is guaranteed).
@@ -86,7 +86,6 @@ When changing `src/lib/taxCalculator.ts` or `src/lib/tax/`:
 
 ## Related Files
 
-- `.claude/commands/test.md`
 - `docs/guides/TESTING.md`
 - `scripts/check-test-skips.ts`
 - `scripts/test-debt-allowlist.ts`

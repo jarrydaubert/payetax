@@ -2,10 +2,10 @@
 /**
  * Blog library for managing local MDX blog posts
  * Native Next.js 16 implementation with direct file-system access
- * OPTIMIZED: Server-side caching with unstable_cache
+ * OPTIMIZED: Server-side caching with Cache Components
  */
 
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { BLOG_CATEGORIES, BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
 import { getPostBySlug as getMDXPostBySlug, getAllPosts as getMDXPosts } from '@/lib/mdx';
 import type {
@@ -60,19 +60,30 @@ function convertMDXPost(post: ReturnType<typeof getMDXPosts>[0]): BlogPost {
  * Get all published posts (cached)
  * Returns posts sorted by publishedAt desc (newest first) as the canonical order
  */
-const getAllCachedPosts = unstable_cache(
-  // biome-ignore lint/suspicious/useAwait: unstable_cache requires async function
-  async (): Promise<BlogPost[]> => {
-    const posts = getMDXPosts();
-    // All posts in /content/blog are published
-    // Sort by publishedAt desc as canonical order
-    return posts
-      .map(convertMDXPost)
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  },
-  ['blog-all-posts'],
-  { revalidate: 3600, tags: ['blog'] },
-);
+const BLOG_CACHE_PROFILE = { stale: 600, revalidate: 3600, expire: 86400 } as const;
+
+// Keep Editor's Picks aligned with current traffic priorities rather than publish date.
+const EDITORS_PICKS_ORDER = [
+  'student-loan-repayment-changes-2025-26',
+  '100k-tax-trap-avoid-60-percent-tax-2025',
+  'salary-sacrifice-explained-2025-26',
+  'spring-statement-2026-uk-what-to-expect',
+  'scottish-vs-english-tax-rates-2026-comparison',
+] as const;
+
+// biome-ignore lint/suspicious/useAwait: `use cache` helpers stay async for Next.js cache components.
+async function getAllCachedPosts(): Promise<BlogPost[]> {
+  'use cache';
+  cacheLife(BLOG_CACHE_PROFILE);
+  cacheTag('blog');
+
+  const posts = getMDXPosts();
+  // All posts in /content/blog are published
+  // Sort by publishedAt desc as canonical order
+  return posts
+    .map(convertMDXPost)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+}
 
 /**
  * Sort posts based on the specified criteria
@@ -209,46 +220,46 @@ export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise
  * Get a single blog post by slug (cached)
  * PAYTAX-77: Added caching for individual post lookups
  */
-const getCachedBlogPostBySlug = unstable_cache(
-  // biome-ignore lint/suspicious/useAwait: unstable_cache requires async function
-  async (slug: string): Promise<BlogPost | null> => {
-    const post = getMDXPostBySlug(slug);
+// biome-ignore lint/suspicious/useAwait: `use cache` helpers stay async for Next.js cache components.
+async function getCachedBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  'use cache';
+  cacheLife(BLOG_CACHE_PROFILE);
+  cacheTag('blog', `blog-post:${slug}`);
 
-    if (!post) {
-      return null;
-    }
+  const post = getMDXPostBySlug(slug);
 
-    const categoryData = getCategoryBySlug(post.category);
+  if (!post) {
+    return null;
+  }
 
-    return {
-      id: post.slug,
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt,
-      publishedAt: post.publishedAt,
-      category: post.category,
-      content: post.content,
-      categoryData,
-      updatedAt: post.updatedAt || post.publishedAt,
-      featured: post.featured,
-      editorsPick: post.editorsPick,
-      deepDive: post.deepDive,
-      published: true, // All posts in /content/blog are published
-      author: post.author || 'PayeTax Team',
-      readTime: `${post.readingTime} min read`,
-      tags: post.tags || post.seoKeywords || [],
-      image: post.image,
-      imageAlt: post.imageAlt,
-      readingTime: post.readingTime,
-      wordCount: post.wordCount,
-      seoTitle: post.seoTitle || post.title,
-      seoDescription: post.seoDescription || post.excerpt,
-      seoKeywords: post.seoKeywords || post.tags || [],
-    };
-  },
-  ['blog-post'],
-  { revalidate: 3600, tags: ['blog'] },
-);
+  const categoryData = getCategoryBySlug(post.category);
+
+  return {
+    id: post.slug,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    category: post.category,
+    content: post.content,
+    categoryData,
+    updatedAt: post.updatedAt || post.publishedAt,
+    featured: post.featured,
+    editorsPick: post.editorsPick,
+    deepDive: post.deepDive,
+    published: true, // All posts in /content/blog are published
+    author: post.author || 'PayeTax Team',
+    readTime: `${post.readingTime} min read`,
+    tags: post.tags || post.seoKeywords || [],
+    image: post.image,
+    imageAlt: post.imageAlt,
+    readingTime: post.readingTime,
+    wordCount: post.wordCount,
+    seoTitle: post.seoTitle || post.title,
+    seoDescription: post.seoDescription || post.excerpt,
+    seoKeywords: post.seoKeywords || post.tags || [],
+  };
+}
 
 /**
  * Get a single blog post by slug
@@ -315,14 +326,6 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
   const featuredPosts = await getFeaturedPosts();
   return featuredPosts[0] || null;
 }
-
-const EDITORS_PICKS_ORDER = [
-  'student-loan-repayment-changes-2025-26',
-  '100k-tax-trap-avoid-60-percent-tax-2025',
-  'salary-sacrifice-explained-2025-26',
-  'spring-statement-2026-uk-what-to-expect',
-  'scottish-vs-english-tax-rates-2026-comparison',
-] as const;
 
 /**
  * Get editor's picks posts

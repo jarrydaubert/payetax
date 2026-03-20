@@ -3,11 +3,10 @@
 import { AlertTriangle, ArrowRight, Sparkles, X } from 'lucide-react';
 import Link from 'next/link';
 import { type FormEvent, useCallback, useId, useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@/components/atoms/ui/button';
-import { Card } from '@/components/atoms/ui/card';
-import { Input } from '@/components/atoms/ui/input';
-import { Label } from '@/components/atoms/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
@@ -117,6 +116,8 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const complexity = analyzeComplexity(situation);
   const salaryRange = getSalaryRange(situation.salary);
@@ -132,6 +133,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
 
   const handleShowForm = useCallback(() => {
     setShowForm(true);
+    setSubmissionError('');
     trackEvent({
       action: 'referral_cta_clicked',
       category: 'monetization',
@@ -145,8 +147,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
       e.preventDefault();
       if (!email) return;
 
-      // Snapshot email at submit time for toast message
-      const submittedEmail = email;
+      setSubmissionError('');
       setIsSubmitting(true);
 
       try {
@@ -154,7 +155,7 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: submittedEmail,
+            email,
             salaryRange,
             reason: complexity?.reason,
             isScottish: situation.isScottish,
@@ -162,21 +163,21 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         });
 
         if (response.ok) {
-          toast.success('Thanks! A tax specialist will be in touch soon.');
+          setSubmitted(true);
           setShowForm(false);
-          setIsDismissed(true);
+          setEmail('');
           trackEvent({
             action: 'referral_lead_submitted',
             category: 'monetization',
             label: complexity?.reason ?? 'unknown',
           });
         } else if (response.status === 429) {
-          toast.error('Too many requests. Please try again in a few minutes.');
+          setSubmissionError('Too many requests. Please try again in a few minutes.');
         } else {
-          toast.error('Something went wrong. Please try again.');
+          setSubmissionError('Something went wrong. Please try again.');
         }
       } catch {
-        toast.error('Network error. Please try again.');
+        setSubmissionError('Network error. Please try again.');
       } finally {
         setIsSubmitting(false);
       }
@@ -212,7 +213,17 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
         <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
       </button>
 
-      {showForm ? (
+      {submitted ? (
+        <div className='space-y-4'>
+          <div className='flex items-center gap-2'>
+            <Sparkles className={cn(ICON_SIZES.SIZE_5, 'text-success')} aria-hidden='true' />
+            <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>Request Received</h3>
+          </div>
+          <p className='text-muted-foreground text-sm'>
+            Thanks. A UK tax specialist will be in touch soon with next steps.
+          </p>
+        </div>
+      ) : showForm ? (
         // Lead capture form
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='flex items-center gap-2'>
@@ -231,16 +242,26 @@ export function AccountantReferralCTA({ situation, className }: AccountantReferr
                 type='email'
                 placeholder='you@example.com'
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (submissionError) setSubmissionError('');
+                }}
                 disabled={isSubmitting}
                 required
                 className='flex-1'
                 autoComplete='email'
+                aria-invalid={!!submissionError}
+                aria-describedby={submissionError ? `${emailInputId}-error` : undefined}
               />
               <Button type='submit' disabled={isSubmitting || !email}>
                 {isSubmitting ? 'Sending...' : 'Get Advice'}
               </Button>
             </div>
+            {submissionError && (
+              <p id={`${emailInputId}-error`} className='text-destructive text-sm' role='alert'>
+                {submissionError}
+              </p>
+            )}
           </div>
           <p className='text-muted-foreground text-xs'>
             We&apos;ll connect you with a trusted UK tax specialist. See our{' '}

@@ -6,13 +6,6 @@ jest.mock('@/lib/analytics', () => ({
   trackEvent: jest.fn(),
 }));
 
-jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-
 describe('AccountantReferralCTA', () => {
   it('does not render for non-complex situations', () => {
     const { container } = render(

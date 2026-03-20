@@ -4,7 +4,7 @@ Canonical inventory for PayeTax skills, with clear separation between upstream (
 
 ## Upstream Sources
 
-Skills and tools are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills). Use this file when syncing or auditing drift.
+Skills and tools are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering and UI workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) and Anthropic's Claude Code skills. Use this file when syncing or auditing drift.
 
 ## Separation of Concerns
 
@@ -12,8 +12,9 @@ Skills and tools are primarily sourced from [coreyhaines31/marketingskills](http
 - Marketing/CRO/SEO baseline methodology synced from upstream.
 - `references/` and `.claude/tools/` are upstream-first assets for that set.
 
-### 2) Engineering Workflow Upstream Layer (mattpocock/skills)
-- Engineering workflow skills adapted for PayeTax process/tooling.
+### 2) Engineering + UI Workflow Upstream Layer
+- Engineering workflow skills adapted from `mattpocock/skills`.
+- UI/design workflow skills adapted from Anthropic Claude Code skills.
 
 ### 3) PayeTax Custom Layer
 - Every skill includes a `## PayeTax Context` section for local rules, constraints, and file paths.
@@ -64,15 +65,18 @@ Skills and tools are primarily sourced from [coreyhaines31/marketingskills](http
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
 | accessibility | 1.1.0 | 2026-02-20 |
-| engineering | 1.0.0 | 2026-02-04 |
+| engineering | 1.1.0 | 2026-03-17 |
 
-## External-Adapted Skills (3)
+## External-Adapted Skills (4)
 
-Source: [mattpocock/skills](https://github.com/mattpocock/skills), commit `8e51ff7`.
+Sources:
+- [mattpocock/skills](https://github.com/mattpocock/skills), commit `8e51ff7`
+- Anthropic Claude Code `frontend-design` skill (adapted for PayeTax)
 
 | Skill | Version | Last Updated |
 |-------|---------|--------------|
 | design-an-interface | 1.0.0 | 2026-02-20 |
+| frontend-design | 1.0.0 | 2026-03-16 |
 | prd-to-issues | 1.0.0 | 2026-02-20 |
 | tdd | 1.0.0 | 2026-02-20 |
 
@@ -100,6 +104,16 @@ When adding a new upstream skill to PayeTax:
 - site-architecture
 
 ## Recent Changes
+
+### 2026-03-16
+- Added `frontend-design` as a local adapted skill based on Anthropic's Claude Code design prompt.
+- Registered the skill in the canonical inventory/docs so it is discoverable from `AGENTS.md`, the commands README, and the skills guide.
+- Scoped the skill for PayeTax to favor strong visual direction while preserving calculator trust, accessibility, and performance constraints.
+
+### 2026-03-17
+- Removed overlapping slash commands `/plan` and `/test` in favor of the installed skills `design-an-interface`, `prd-to-issues`, and `tdd`.
+- Verified the current upstream `marketingskills` release is still `v1.4.0`; no pin bump was required.
+- Rewrote the local `engineering` skill to match the repo's real build path, current Next 16 cache guidance, and evidence-based audit standards.
 
 ### 2026-03-14
 - Synced upstream marketing skills to `coreyhaines31/marketingskills` release `v1.4.0` for the existing 24-skill PayeTax profile.

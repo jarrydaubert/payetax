@@ -62,7 +62,7 @@ describe('Alert Component', () => {
       );
 
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass('border-amber-500/50');
+      expect(alert).toHaveClass('border-warning/30');
     });
 
     it('should apply destructive variant styles', () => {
@@ -84,7 +84,7 @@ describe('Alert Component', () => {
       );
 
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass('border-green-500/50');
+      expect(alert).toHaveClass('border-success/30');
     });
 
     it('should apply info variant styles', () => {
@@ -95,7 +95,7 @@ describe('Alert Component', () => {
       );
 
       const alert = container.firstChild as HTMLElement;
-      expect(alert).toHaveClass('border-blue-500/50');
+      expect(alert).toHaveClass('border-primary/30');
     });
   });
 

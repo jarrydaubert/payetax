@@ -1,9 +1,7 @@
 // src/app/api/og/route.tsx
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
-import { checkRateLimit } from '@/lib/rateLimit';
-
-export const runtime = 'edge';
+import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
 
 // Input constraints to prevent abuse and layout issues
 const MAX_TITLE_LENGTH = 70;
@@ -71,7 +69,10 @@ const CACHE_HEADERS = {
 export async function GET(request: NextRequest) {
   const clientId = getClientIdentifier(request);
   if (!(await checkRateLimit(`og:${clientId}`, RATE_LIMIT))) {
-    return new Response('Too many requests', { status: 429 });
+    return new Response('Too many requests', {
+      status: 429,
+      headers: createRateLimitHeaders(RATE_LIMIT),
+    });
   }
 
   const searchParams = request.nextUrl.searchParams;

@@ -315,4 +315,3 @@ Before recommending ANY removal:
 
 - `/audit` - Code quality and architecture review
 - `/security` - Security-focused review
-- `/test` - Test coverage analysis

@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { NumberInputSchema, FeedbackFormSchema, TaxCodeSchema } from '@/lib/validation';
+ * import { NumberInputSchema, FeedbackFormSchema } from '@/lib/validation/index';
  * ```
  */
 

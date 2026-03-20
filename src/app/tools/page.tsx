@@ -2,11 +2,11 @@
 import { ArrowRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
 import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { Card } from '@/components/ui/card';
 import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';

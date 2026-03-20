@@ -12,6 +12,14 @@ import { checkRateLimit } from '@/lib/rateLimit';
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(() => true),
+  createRateLimitHeaders: jest.fn((config?: { window?: number }, headers?: HeadersInit) => {
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set(
+      'Retry-After',
+      String(Math.max(1, Math.ceil((config?.window ?? 60000) / 1000))),
+    );
+    return responseHeaders;
+  }),
 }));
 
 type MockImageResponse = Response & {
@@ -103,6 +111,7 @@ describe('/api/og GET', () => {
     const response = await GET(buildRequest({}, { 'x-forwarded-for': '1.2.3.4' }));
 
     expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('60');
     expect(mockCheckRateLimit).toHaveBeenCalledWith('og:1.2.3.4', { max: 10, window: 60000 });
   });
 });

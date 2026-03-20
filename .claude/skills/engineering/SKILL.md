@@ -1,431 +1,187 @@
 ---
 name: engineering
-version: 1.0.0
-description: When discussing code quality, performance, React/Next.js patterns, TypeScript practices, Core Web Vitals, bundle optimization, or modern development. Covers Next.js 16, React 19, TypeScript 5.9+, and performance optimization.
+version: 1.1.0
+description: Use for engineering reviews, implementation guidance, or performance work touching Next.js, React, TypeScript, validation, caching, bundle size, and runtime safety in PayeTax.
 ---
 
-# Engineering Best Practices
+# Engineering
 
-You are an expert in modern web development. Your goal is to ensure PayeTax follows best practices for Next.js 16, React 19, TypeScript 5.9+, and web performance.
+Use this skill for broad engineering reviews and implementation guidance. Optimize for shipped correctness first, then performance, then maintainability.
 
-## PayeTax Stack
+## Operating Rules
 
-- **Next.js 16** with App Router + Turbopack
-- **React 19** with new hooks
-- **TypeScript 5.9+** strict mode
-- **Tailwind CSS 4** with OKLCH colors
-- **Zustand 5** for state management
-- **Zod 4** for validation
-- **Hosting:** Vercel (Edge, CDN)
+- Read `AGENTS.md` first.
+- Treat `src/constants/taxRates.ts` and `src/lib/taxCalculator.ts` as protected source-of-truth files.
+- Do not present runtime claims as facts unless you ran the relevant command.
+- Prefer repo-specific evidence over generic framework advice.
+- Do not recommend stale Next.js patterns. Verify current guidance before suggesting migrations.
 
----
+## Actual PayeTax Stack
 
-## Core Web Vitals Targets
+- **Next.js 16 App Router**
+  - Dev may use Turbopack.
+  - Production build currently runs `next build --webpack`.
+- **React 19**
+- **TypeScript 5.9** strict mode
+- **Tailwind CSS 4**
+- **Zustand 5**
+- **Zod 4**
+- **Jest + Playwright + Bun**
+- **Vercel + Sentry**
 
-| Metric | Target | PayeTax Focus |
-|--------|--------|---------------|
-| **LCP** | <2.5s | Hero + Calculator visible fast |
-| **INP** | <200ms | Calculator inputs responsive |
-| **CLS** | <0.1 | No layout shift on results |
+## Repo Truths To Start From
 
----
+- Homepage hero is server-rendered in `src/app/page.tsx` via `src/components/molecules/ServerHero.tsx`.
+- The main calculator already uses `useTransition` in `src/components/organisms/CalculatorContainer.tsx`.
+- Charts, feedback, and homepage content are dynamically imported.
+- Route-level error UIs already report to Sentry.
+- `src/store/calculatorStore.ts` is large and mixes validation, persistence, analytics, and orchestration.
+- Blog caching still uses `unstable_cache` in `src/lib/blog.ts` and `src/lib/mdx.ts`.
+- Some client components still import schemas from the broad validation barrel `@/lib/validation`.
 
-## Priority 1: Eliminating Waterfalls (CRITICAL)
+## Evidence Discipline
 
-### Defer Await Until Needed
-```typescript
-// Bad: blocks both branches
-async function handleRequest(userId: string, skip: boolean) {
-  const data = await fetchData(userId)
-  if (skip) return { skipped: true }
-  return processData(data)
-}
+When reviewing or recommending changes:
 
-// Good: only blocks when needed
-async function handleRequest(userId: string, skip: boolean) {
-  if (skip) return { skipped: true }
-  const data = await fetchData(userId)
-  return processData(data)
-}
+- `Verified`: observed in the repo
+- `Inferred`: plausible from nearby code, but not directly proven
+- `Unverified`: requires runtime, measurement, or production access
+
+Never claim:
+
+- bundle savings without `bun run bundle:analyze`
+- CWV wins without measurement
+- Lighthouse outcomes without running Lighthouse
+- exhaustive route/component coverage unless you enumerated the full set
+
+## Priority Order
+
+### 1. Correctness and user trust
+
+Prefer findings that affect:
+
+- tax output correctness
+- user-visible flow integrity
+- privacy or security boundaries
+- release safety
+
+Generic “clean code” notes are secondary unless they create a real regression risk.
+
+### 2. High-value engineering issues
+
+Prioritize:
+
+- stale or deprecated framework APIs
+- broad client bundle leaks from server-only or umbrella modules
+- avoidable async waterfalls on high-traffic routes
+- oversized integration surfaces that make regressions hard to contain
+
+### 3. Low-signal style advice
+
+Deprioritize:
+
+- route groups for their own sake
+- config file language preferences (`.js` vs `.ts`) unless there is actual friction
+- abstract SOLID commentary without a concrete failure mode
+
+## Current Framework Guidance
+
+### Caching
+
+- `unstable_cache` should be treated as legacy.
+- For Next 16 caching recommendations, use the current Cache Components / `use cache` model and official docs.
+- Do not recommend old PPR migrations that depend on deprecated route-level flags unless you verify they still apply.
+
+### PPR / streaming
+
+- Treat old `ppr: 'incremental'` guidance as suspect until verified against current Next docs.
+- If proposing streaming improvements, separate:
+  - static shell / cache model changes
+  - async boundary refactors
+  - measured user-facing benefit
+
+### Import optimization
+
+- `optimizePackageImports` is for third-party packages.
+- Do not suggest it for local alias modules like `@/lib/validation`.
+- For local code, prefer direct imports or a smaller export surface.
+
+## Review Workflow
+
+For engineering audits:
+
+1. Confirm the actual build/runtime path from `package.json` and `next.config.ts`.
+2. Inspect the route or module named in the claim.
+3. Separate local-code proof from ecosystem/version proof.
+4. Check whether the recommendation is still current for the installed framework version.
+5. Prefer a short list of concrete, defensible actions over broad modernization wishlists.
+
+## Implementation Guidance
+
+### Performance
+
+- Keep LCP candidates server-rendered and unblocked.
+- Use dynamic imports for heavy, non-critical UI only when they actually defer work.
+- If a route has multiple independent async operations, parallelize or stream them where it reduces blocking without harming primary content.
+
+### State
+
+- Keep stores as thin orchestration layers where practical.
+- Avoid pushing more validation, analytics, and persistence concerns into already-large stores.
+- Prefer selectors and `useShallow` for broad stores.
+
+### Validation
+
+- Keep client imports narrow.
+- Avoid broad validation barrels in client components when only one schema is needed.
+- Use Zod at external boundaries, but do not claim “all API boundaries” unless every route was checked.
+
+### Dependency upgrades
+
+- Verify upgrade pressure with `bun outdated`.
+- Treat major upgrades individually, not as one bulk task.
+- Require changelog review and repo validation after each major upgrade.
+
+## Required Validation
+
+For code changes:
+
+```bash
+bun run fix-all
+bun run test:no-coverage
 ```
 
-### Promise.all() for Independent Operations
-```typescript
-// Bad: sequential
-const user = await fetchUser()
-const posts = await fetchPosts()
+Add the smallest relevant higher-level gate when the change touches:
 
-// Good: parallel
-const [user, posts] = await Promise.all([fetchUser(), fetchPosts()])
+- homepage, calculator, or director critical flows
+- build/caching/runtime config
+- release-sensitive behavior
+
+Typical additions:
+
+```bash
+bun run build
+bun run test:e2e:critical
+bun run bundle:analyze
 ```
-
-### Strategic Suspense Boundaries
-```tsx
-// Good: wrapper shows immediately, data streams in
-function Page() {
-  return (
-    <div>
-      <Sidebar />
-      <Suspense fallback={<Skeleton />}>
-        <DataDisplay />
-      </Suspense>
-    </div>
-  )
-}
-```
-
----
-
-## Priority 2: Bundle Size (CRITICAL)
-
-### Avoid Barrel File Imports
-```tsx
-// Bad: imports entire library
-import { Check, X } from 'lucide-react'
-
-// Good: use optimizePackageImports in next.config.ts
-experimental: {
-  optimizePackageImports: ['lucide-react', 'recharts']
-}
-```
-
-### Dynamic Imports for Heavy Components
-```tsx
-import dynamic from 'next/dynamic'
-
-const Charts = dynamic(() => import('./Charts'), {
-  loading: () => <ChartsSkeleton />,
-  ssr: false
-})
-```
-
-### Defer Non-Critical Libraries
-```tsx
-// Load analytics after hydration
-const Analytics = dynamic(
-  () => import('@vercel/analytics/react').then(m => m.Analytics),
-  { ssr: false }
-)
-```
-
-### Preload on User Intent
-```tsx
-function EditorButton({ onClick }) {
-  const preload = () => void import('./heavy-editor')
-  return (
-    <button onMouseEnter={preload} onFocus={preload} onClick={onClick}>
-      Open Editor
-    </button>
-  )
-}
-```
-
----
-
-## Priority 3: Server-Side Performance (HIGH)
-
-### Authenticate Server Actions
-```typescript
-'use server'
-export async function deleteItem(id: string) {
-  const session = await verifySession()
-  if (!session) throw new Error('Unauthorized')
-  // ... proceed
-}
-```
-
-### Minimize Serialization
-```tsx
-// Bad: serializes all fields
-async function Page() {
-  const user = await fetchUser()
-  return <Profile user={user} />
-}
-
-// Good: only needed fields
-async function Page() {
-  const user = await fetchUser()
-  return <Profile name={user.name} avatar={user.avatar} />
-}
-```
-
-### Per-Request Deduplication
-```typescript
-import { cache } from 'react'
-
-export const getCurrentUser = cache(async () => {
-  const session = await auth()
-  if (!session?.user?.id) return null
-  return db.user.findUnique({ where: { id: session.user.id } })
-})
-```
-
----
-
-## Priority 4: Re-render Optimization (MEDIUM)
-
-### Use Transitions for Non-Urgent Updates
-```tsx
-'use client'
-import { useTransition } from 'react'
-
-function Calculator() {
-  const [isPending, startTransition] = useTransition()
-  const [results, setResults] = useState(null)
-
-  function handleChange(salary) {
-    startTransition(() => {
-      setResults(calculateTax(salary))
-    })
-  }
-
-  return (
-    <>
-      <input onChange={(e) => handleChange(e.target.value)} />
-      {isPending ? <Skeleton /> : <Results data={results} />}
-    </>
-  )
-}
-```
-
-### Functional setState for Stable Callbacks
-```tsx
-// Bad: needs count in deps
-const increment = useCallback(() => setCount(count + 1), [count])
-
-// Good: stable reference
-const increment = useCallback(() => setCount(c => c + 1), [])
-```
-
-### Lazy State Initialization
-```tsx
-// Bad: parseData runs every render
-const [data, setData] = useState(parseData(rawData))
-
-// Good: parseData runs once
-const [data, setData] = useState(() => parseData(rawData))
-```
-
----
-
-## Priority 5: JavaScript Performance (LOW-MEDIUM)
-
-### Use Set/Map for O(1) Lookups
-```typescript
-// Bad: O(n) per check
-const allowed = ['a', 'b', 'c']
-items.filter(item => allowed.includes(item.id))
-
-// Good: O(1) per check
-const allowed = new Set(['a', 'b', 'c'])
-items.filter(item => allowed.has(item.id))
-```
-
-### Early Return
-```typescript
-function validate(users: User[]) {
-  for (const user of users) {
-    if (!user.email) return { valid: false, error: 'Email required' }
-  }
-  return { valid: true }
-}
-```
-
-### Use toSorted() for Immutability
-```typescript
-// Bad: mutates original
-const sorted = users.sort((a, b) => a.name.localeCompare(b.name))
-
-// Good: creates new array
-const sorted = users.toSorted((a, b) => a.name.localeCompare(b.name))
-```
-
----
-
-## React 19 Features
-
-### use() Hook
-```tsx
-import { use } from 'react'
-
-function TaxRates({ ratesPromise }) {
-  const rates = use(ratesPromise) // Suspends until resolved
-  return <div>{rates.basicRate}%</div>
-}
-```
-
-### useOptimistic
-```tsx
-const [optimisticResults, setOptimisticResults] = useOptimistic(results)
-
-async function calculate(salary) {
-  setOptimisticResults({ salary, pending: true })
-  const actual = await calculateTax(salary)
-  setResults(actual)
-}
-```
-
-### Server Actions
-```tsx
-'use server'
-export async function submitFeedback(formData: FormData) {
-  const message = formData.get('message')
-  await saveFeedback(message)
-  revalidatePath('/feedback')
-}
-```
-
----
-
-## TypeScript Patterns
-
-### Strict Configuration
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUncheckedIndexedAccess": true
-  }
-}
-```
-
-### Zod for Runtime Validation
-```tsx
-import { z } from 'zod'
-
-const SalarySchema = z.number()
-  .min(0, 'Salary cannot be negative')
-  .max(10_000_000, 'Salary too high')
-
-type Salary = z.infer<typeof SalarySchema>
-```
-
-### Discriminated Unions
-```tsx
-type Result =
-  | { status: 'success'; data: TaxBreakdown }
-  | { status: 'error'; error: string }
-  | { status: 'loading' }
-```
-
----
-
-## State Management (Zustand)
-
-### Store Pattern
-```tsx
-import { create } from 'zustand'
-
-export const useCalculatorStore = create<CalculatorState>((set, get) => ({
-  salary: 0,
-  results: null,
-  setSalary: (salary) => set({ salary }),
-  calculate: () => {
-    const { salary } = get()
-    set({ results: calculateTax(salary) })
-  },
-}))
-```
-
-### Selective Subscriptions
-```tsx
-// Only re-render when specific values change
-const salary = useCalculatorStore(state => state.salary)
-```
-
----
-
-## LCP Optimization
-
-### Server-Side Render Critical Content
-```tsx
-// Good: SSR hero content
-export default function HomePage() {
-  return (
-    <main>
-      <h1>UK Tax Calculator</h1> {/* LCP candidate */}
-      <Calculator />
-    </main>
-  )
-}
-```
-
-### Avoid Animation on LCP
-```tsx
-// Bad: framer-motion delays LCP
-<motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-
-// Good: CSS animation or no animation
-<h1 className="animate-fadeIn">
-```
-
----
-
-## CLS Prevention
-
-### Reserve Space for Dynamic Content
-```tsx
-// Good: Skeleton maintains layout
-{results ? <ResultsTable data={results} /> : <ResultsSkeleton />}
-```
-
-### Always Specify Image Dimensions
-```tsx
-<Image src="/chart.png" width={600} height={400} alt="Tax breakdown" />
-```
-
----
-
-## Design System Hygiene
-
-### No Hardcoded Values
-```tsx
-// Bad
-<div className="text-[#3B82F6] p-[13px]">
-
-// Good: Use Tailwind scale and config
-<div className="text-primary p-3">
-```
-
-### Consistent Patterns
-- All buttons use same base styles
-- All cards have same padding, radius, shadow
-- All inputs have same height, border, focus states
-
----
-
-## Performance Checklist
-
-### Before Deploy
-- [ ] LCP element server-rendered
-- [ ] No animation on LCP element
-- [ ] Bundle size <200KB initial JS
-- [ ] Images optimized with next/image
-- [ ] Heavy components code-split
-- [ ] No hardcoded Tailwind values
-
-### After Deploy
-- [ ] Lighthouse score >90
-- [ ] LCP <2.5s in field data
-- [ ] INP <200ms
-- [ ] CLS <0.1
-
----
 
 ## Key Files
 
-- `next.config.ts` - Build optimizations
-- `tsconfig.json` - TypeScript configuration
-- `src/app/layout.tsx` - Root layout, fonts
-- `src/app/page.tsx` - Homepage (LCP critical)
-- `src/store/` - Zustand stores
-- `src/lib/validation/` - Zod schemas
-- `tailwind.config.ts` - Design tokens
+- `next.config.ts`
+- `package.json`
+- `tsconfig.json`
+- `src/app/layout.tsx`
+- `src/app/page.tsx`
+- `src/components/molecules/ServerHero.tsx`
+- `src/components/organisms/CalculatorContainer.tsx`
+- `src/store/calculatorStore.ts`
+- `src/lib/blog.ts`
+- `src/lib/mdx.ts`
+- `src/lib/validation/`
 
 ## PayeTax Context
 
-- Tax correctness is non-negotiable; financial logic changes must be tied back to `src/constants/taxRates.ts`.
-- Prefer changes that reduce user-facing risk over novelty (predictable behavior > clever implementation).
-- For new architecture suggestions, separate "ready now" vs "future" recommendations.
-- Always validate performance claims with project scripts and real outputs (`bun run fix-all`, `bun run build`, targeted tests).
+- Accuracy beats novelty.
+- “More modern” is not sufficient justification by itself.
+- If a framework recommendation conflicts with the repo’s verified build path or shipped behavior, trust the repo first and verify the framework docs second.
+- For backlog-worthy findings, prefer items with a concrete oracle, a named regression target, and validation that can actually be run in this repo.

@@ -14,12 +14,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { Badge } from '@/components/atoms/ui/badge';
-import { Button } from '@/components/atoms/ui/button';
-import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { UseCase, UseCaseFeature } from '@/data/useCases';
 import { cn } from '@/lib/utils';

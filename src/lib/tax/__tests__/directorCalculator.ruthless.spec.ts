@@ -49,11 +49,10 @@ describe('RUTHLESS: Off-By-One Threshold Attacks', () => {
     expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12570);
   });
 
-  it('should keep full PA at exactly £100,002 (HMRC £2 rounding)', () => {
-    // HMRC-style taper reduction rounds down to the nearest £2.
+  it('should reduce PA by £1 at exactly £100,002 (HMRC whole-pound rounding)', () => {
+    // HMRC annual taper rounds down to the nearest whole pound.
     const income = 100002;
-    // Raw reduction = £1, rounded down to £0 => PA stays £12,570.
-    expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12570);
+    expect(calculateIncomeTax(income, 'rUK', TAX_YEAR).personalAllowance).toBe(12569);
   });
 
   it('should have ZERO PA at exactly £125,140', () => {

@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
 export const size = {
   width: 1200,
   height: 630,
@@ -25,7 +24,7 @@ export default function OpengraphImage() {
     >
       <div
         style={{
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
           gap: '14px',
           fontSize: 30,
@@ -54,7 +53,7 @@ export default function OpengraphImage() {
       </div>
       <div
         style={{
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
           gap: '12px',
           fontSize: 28,

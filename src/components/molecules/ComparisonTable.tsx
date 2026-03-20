@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/atoms/ui/table';
+} from '@/components/ui/table';
 import { ICON_SIZES, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { Competitor, CompetitorFeatures } from '@/data/competitors';
 import { FEATURE_LABELS, PAYETAX_FEATURES, PAYETAX_INFO } from '@/data/competitors';

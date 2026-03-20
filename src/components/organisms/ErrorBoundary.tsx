@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/nextjs';
 import { AlertTriangle, Copy, Home, RefreshCw, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
@@ -117,10 +116,18 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
 function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
   const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const copyTimeoutRef = React.useRef<number | null>(null);
+  const [copied, setCopied] = React.useState(false);
 
   // Focus heading on mount for keyboard accessibility
   React.useEffect(() => {
     headingRef.current?.focus();
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
+    };
   }, []);
 
   // Generate stable particle data to avoid infinite re-renders
@@ -138,8 +145,11 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
   const handleCopyEventId = () => {
     if (eventId) {
-      navigator.clipboard.writeText(eventId);
-      toast.success('Error reference copied to clipboard');
+      navigator.clipboard.writeText(eventId).then(() => {
+        setCopied(true);
+        if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 2000);
+      });
     }
   };
 
@@ -278,10 +288,11 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                   variant='ghost'
                   size='sm'
                   onClick={handleCopyEventId}
-                  className='h-7 text-muted-foreground hover:text-foreground'
+                  className='h-7 gap-1 text-muted-foreground hover:text-foreground'
                   aria-label='Copy error reference to clipboard'
                 >
                   <Copy className={ICON_SIZES.SIZE_4} />
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
                 </Button>
               </div>
               <code className={cn('block break-all font-mono', 'text-primary', TYPOGRAPHY.TEXT_XS)}>

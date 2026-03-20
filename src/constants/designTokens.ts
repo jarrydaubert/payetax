@@ -4,12 +4,14 @@
  * Centralizes all styling constants for consistent design patterns across
  * the PayeTax application. All tokens follow Tailwind CSS utility patterns.
  *
- * ## Audit Results (2025-11-17) - COMPREHENSIVE EXPANSION
- * - **Files scanned**: 196
- * - **Violations**: 586 (down from 756 - 22.5% reduction!)
- * - **Token coverage**: ~95% (industry-leading)
- * - **Typography tokens**: 33 (expanded from 16 - +106%!)
- * - **Total design tokens**: 150+ comprehensive utilities
+ * ## Audit Snapshot (2026-03-18)
+ * - **Files scanned**: 293
+ * - **Total violations**: 10
+ * - **Raw palette colors**: 0
+ * - **Hardcoded classes**: 10
+ * - **Inline styles**: 0
+ * - **Typography tokens**: 33
+ * - **Total design tokens**: 150+ shared utilities
  *
  * ### What Was Added (2025 Expansion)
  * ✅ Font sizes: TEXT_9XL, TEXT_7XL (for 404/error pages)
@@ -22,8 +24,8 @@
  *
  * ### Intentional Non-Tokens (Documented Exceptions)
  * - **`border-*`** (212 uses): Framework utilities like `border-2`, `border-t` - NOT tokenized by design
- * - **Chart colors** (~150): Component-specific for Recharts data visualization
- * - **Arbitrary values** (~50): Edge cases like Radix UI CSS variables (use inline styles instead)
+ * - **Chart/domain colors**: Keep genuinely component-specific visual mappings out of the shared token surface
+ * - **Arbitrary values**: A small tail remains for layout/formula edge cases that do not warrant general-purpose tokens
  * - **Inline styles** (46): Email templates requiring inline CSS
  *
  * @module constants/designTokens
@@ -403,11 +405,6 @@ export const ARBITRARY = {
 export const SURFACES = {
   /** Standard border for all surfaces - darker, consistent with calculator section */
   BORDER_STANDARD: 'border border-primary/20',
-  /**
-   * @deprecated Use BORDER_STANDARD instead (includes 'border' prefix)
-   * Will be removed in next major version
-   */
-  _DEPRECATED_BORDER_PRIMARY: 'border-primary/20',
   /** Border with top separator */
   BORDER_TOP_DIVIDER: 'border-t border-primary/10',
 
@@ -451,16 +448,16 @@ export const SURFACES = {
  * Ensures consistent colors in both light and dark modes
  */
 export const COLORS = {
-  /** Success state text - green with dark mode support */
-  SUCCESS: 'text-green-600 dark:text-green-400',
-  /** Warning state text - amber with dark mode support */
-  WARNING: 'text-amber-600 dark:text-amber-400',
-  /** Alternative warning - yellow with dark mode support */
-  WARNING_ALT: 'text-yellow-600 dark:text-yellow-400',
+  /** Success state text - semantic theme success color */
+  SUCCESS: 'text-success',
+  /** Warning state text - semantic theme warning color */
+  WARNING: 'text-warning',
+  /** Alternative warning - use warning token until a second semantic warning tier exists */
+  WARNING_ALT: 'text-warning',
   /** Error/destructive state text - uses theme destructive color */
   DESTRUCTIVE: 'text-destructive',
-  /** Info state text - blue with dark mode support */
-  INFO: 'text-blue-600 dark:text-blue-400',
+  /** Info state text - semantic primary/brand information color */
+  INFO: 'text-primary',
   /** Special purpose - pink for marriage allowance alerts */
   ACCENT_PINK: 'text-pink-600 dark:text-pink-400',
   /** Special purpose - purple for categories/features */
@@ -468,13 +465,13 @@ export const COLORS = {
 
   // Alpha/opacity variants for backgrounds and overlays (2025 additions)
   /** Success background with subtle opacity */
-  SUCCESS_BG: 'bg-green-500/10 dark:bg-green-500/20',
+  SUCCESS_BG: 'bg-success/10',
   /** Warning background with subtle opacity */
-  WARNING_BG: 'bg-amber-500/10 dark:bg-amber-500/20',
+  WARNING_BG: 'bg-warning/10',
   /** Error background with subtle opacity */
-  DESTRUCTIVE_BG: 'bg-red-500/10 dark:bg-red-500/20',
+  DESTRUCTIVE_BG: 'bg-destructive/10',
   /** Info background with subtle opacity */
-  INFO_BG: 'bg-blue-500/10 dark:bg-blue-500/20',
+  INFO_BG: 'bg-primary/10',
 } as const;
 
 /**

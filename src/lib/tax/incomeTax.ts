@@ -45,6 +45,9 @@ export interface IncomeTaxResult {
  * Salary above the PA is taxed in progressive bands.
  *
  * Note: Personal Allowance reduces by £1 for every £2 over £100k.
+ * HMRC Tax Logic guide pseudocode uses:
+ * roundDown((adjustedNetIncome - reducedAllowanceLimit) / 2, 0)
+ * https://developer.service.hmrc.gov.uk/guides/tax-logic-service-guide/documentation/allowances-and-reliefs.html
  *
  * @param salary - Annual salary amount
  * @param region - 'rUK' or 'scotland' for rate determination
@@ -75,8 +78,8 @@ export function calculateIncomeTax(
   // Calculate personal allowance reduction for high earners
   let personalAllowance = basePersonalAllowance;
   if (salary > reductionThreshold) {
-    // Align with main PAYE engine: round down PA reduction to the nearest £2.
-    const reduction = Math.floor(((salary - reductionThreshold) * reductionRate) / 2) * 2;
+    // HMRC annual taper rounds the allowance reduction down to the nearest whole pound.
+    const reduction = Math.floor((salary - reductionThreshold) * reductionRate);
     personalAllowance = Math.max(0, basePersonalAllowance - reduction);
   }
 

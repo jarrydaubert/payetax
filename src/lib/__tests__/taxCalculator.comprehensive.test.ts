@@ -566,9 +566,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
     it('£2 over £100k - £1 PA reduction', () => {
       const result = calculateTax(createInput({ salary: 100002 }));
-      // Should reduce PA by £1
-      expect(result.taxFreeAmount).toBeLessThanOrEqual(12570);
-      expect(result.taxFreeAmount).toBeGreaterThanOrEqual(12569);
+      expect(result.taxFreeAmount).toBe(12569);
     });
   });
 

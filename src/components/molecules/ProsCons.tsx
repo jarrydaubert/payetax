@@ -8,7 +8,7 @@
  */
 
 import { Check, X } from 'lucide-react';
-import { Card } from '@/components/atoms/ui/card';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 

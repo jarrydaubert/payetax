@@ -2,19 +2,17 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { subscribeEmailToKit } from '@/lib/newsletter/kitClient';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { NewsletterSubscribeRequestSchema } from '@/lib/validation/emailValidation';
 
-// Explicit Node.js runtime for consistent server behavior and Buffer usage.
-export const runtime = 'nodejs';
-
 const KIT_API_SECRET = process.env.KIT_API_SECRET;
 const KIT_FORM_ID = process.env.KIT_FORM_ID;
 
 const MAX_BODY_SIZE = 1024; // 1KB is plenty for an email subscription
+const RATE_LIMIT = { max: 3, window: 60000 } as const;
 
 export async function POST(request: NextRequest) {
   // Basic CSRF check
@@ -25,10 +23,10 @@ export async function POST(request: NextRequest) {
   // Get client identifier - always rate limit (never skip)
   const clientId = getClientIdentifier(request);
 
-  if (!(await checkRateLimit(`newsletter-subscribe:${clientId}`, { max: 3, window: 60000 }))) {
+  if (!(await checkRateLimit(`newsletter-subscribe:${clientId}`, RATE_LIMIT))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
-      { status: 429 },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT) },
     );
   }
 

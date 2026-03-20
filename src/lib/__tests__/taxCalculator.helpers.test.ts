@@ -65,8 +65,12 @@ describe('taxCalculator helpers', () => {
       expect(calculateAllowanceReduction(90000, 12570, 100000, 0.5)).toBe(0);
     });
 
-    it('reduces allowance by £1 per £2 above threshold (rounded to £2)', () => {
+    it('reduces allowance by £1 per £2 above threshold using HMRC whole-pound rounding', () => {
       expect(calculateAllowanceReduction(110000, 12570, 100000, 0.5)).toBe(5000);
+      expect(calculateAllowanceReduction(100001, 12570, 100000, 0.5)).toBe(0);
+      expect(calculateAllowanceReduction(100003, 12570, 100000, 0.5)).toBe(1);
+      expect(calculateAllowanceReduction(125139, 12570, 100000, 0.5)).toBe(12569);
+      expect(calculateAllowanceReduction(125140, 12570, 100000, 0.5)).toBe(12570);
     });
   });
 

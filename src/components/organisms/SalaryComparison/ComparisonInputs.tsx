@@ -3,20 +3,14 @@
 
 import { Calculator } from 'lucide-react';
 import { type FormEvent, useId, useState } from 'react';
-import { Button } from '@/components/atoms/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/atoms/ui/card';
-import { Input } from '@/components/atoms/ui/input';
-import { Label } from '@/components/atoms/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { ComparisonValueSchema } from '@/lib/calculatorValidation';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { cn, formatCurrency } from '@/lib/utils';
-import { ComparisonValueSchema } from '@/lib/validation';
 
 interface ComparisonInputsProps {
   currentSalary: number;

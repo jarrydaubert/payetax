@@ -43,11 +43,11 @@ describe('Income Tax Calculator', () => {
       expect(calculateIncomeTax(125141, 'rUK').incomeTax).toBeCloseTo(42516.45, 2);
     });
 
-    it('applies personal allowance taper using the current £2-step rule', () => {
-      expect(calculateIncomeTax(100003, 'rUK').personalAllowance).toBe(12570);
-      expect(calculateIncomeTax(100004, 'rUK').personalAllowance).toBe(12568);
-      expect(calculateIncomeTax(112570, 'rUK').personalAllowance).toBe(6286);
-      expect(calculateIncomeTax(125139, 'rUK').personalAllowance).toBe(2);
+    it('applies the HMRC whole-pound personal allowance taper at odd-pound boundaries', () => {
+      expect(calculateIncomeTax(100001, 'rUK').personalAllowance).toBe(12570);
+      expect(calculateIncomeTax(100003, 'rUK').personalAllowance).toBe(12569);
+      expect(calculateIncomeTax(112570, 'rUK').personalAllowance).toBe(6285);
+      expect(calculateIncomeTax(125139, 'rUK').personalAllowance).toBe(1);
       expect(calculateIncomeTax(125140, 'rUK').personalAllowance).toBe(0);
     });
   });

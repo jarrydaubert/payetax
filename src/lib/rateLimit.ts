@@ -18,7 +18,7 @@
  */
 import { LRUCache } from 'lru-cache';
 
-interface RateLimitConfig {
+export interface RateLimitConfig {
   max: number; // Maximum requests allowed
   window: number; // Time window in milliseconds
 }
@@ -205,6 +205,19 @@ export async function checkRateLimitWithPolicy(
     fallbackPolicy,
     reason: allowed ? 'allowed' : 'rate_limited',
   };
+}
+
+export function getRetryAfterSeconds(config: RateLimitConfig = DEFAULT_CONFIG): string {
+  return String(Math.max(1, Math.ceil(config.window / 1000)));
+}
+
+export function createRateLimitHeaders(
+  config: RateLimitConfig = DEFAULT_CONFIG,
+  headers?: HeadersInit,
+): Headers {
+  const responseHeaders = new Headers(headers);
+  responseHeaders.set('Retry-After', getRetryAfterSeconds(config));
+  return responseHeaders;
 }
 
 /**

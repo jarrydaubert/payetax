@@ -3,7 +3,9 @@ import {
   checkRateLimit,
   checkRateLimitWithPolicy,
   clearAllRateLimits,
+  createRateLimitHeaders,
   getRemainingRequests,
+  getRetryAfterSeconds,
   resetRateLimit,
 } from '../rateLimit';
 
@@ -182,6 +184,23 @@ describe('Rate Limiting', () => {
 
       await checkRateLimit(ip, customConfig);
       expect(getRemainingRequests(ip, customConfig)).toBe(2);
+    });
+  });
+
+  describe('Retry-After helpers', () => {
+    it('derives retry-after seconds from the active limiter window', () => {
+      expect(getRetryAfterSeconds()).toBe('60');
+      expect(getRetryAfterSeconds({ max: 3, window: 3600000 })).toBe('3600');
+    });
+
+    it('merges retry-after into existing headers', () => {
+      const headers = createRateLimitHeaders(
+        { max: 5, window: 60000 },
+        { 'Content-Type': 'application/json' },
+      );
+
+      expect(headers.get('Retry-After')).toBe('60');
+      expect(headers.get('Content-Type')).toBe('application/json');
     });
   });
 

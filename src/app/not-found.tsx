@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className='grid min-h-dvh place-items-center bg-background px-6'>
       <div className='text-center'>
         <h1 className='font-medium text-xl tracking-tight'>
-          <span className='text-gradient-new'>404</span>
+          <span className='text-gradient-brand'>404</span>
           <span className='mx-3 text-muted-foreground'>|</span>
           <span className='text-foreground'>Page not found</span>
         </h1>

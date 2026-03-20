@@ -1,7 +1,7 @@
 'use client';
 
 import { TrackedAffiliateLink } from '@/components/atoms/TrackedAffiliateLink';
-import { Button } from '@/components/atoms/ui/button';
+import { Button } from '@/components/ui/button';
 import type { Competitor } from '@/data/competitors';
 
 interface CompetitorCTAButtonProps {

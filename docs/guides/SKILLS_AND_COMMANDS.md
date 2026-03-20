@@ -47,22 +47,24 @@ then write homepage hero copy
 
 | Command | Purpose | Example |
 | --- | --- | --- |
-| `/plan` | Architecture planning and design | `/plan self-employed calculator tool page` |
 | `/audit` | Deep code/architecture audit | `/audit calculator` |
 | `/cleanup` | Find duplicates/orphans/junk | `/cleanup components` |
 | `/debug` | Systematic debugging workflow | `/debug salary page 404` |
-| `/test` | Test gaps and test design | `/test tax-calculations` |
 | `/security` | OWASP security review | `/security api` |
 | `/finance` | UK tax accuracy (HMRC verification) | `/finance ni` |
 | `/compliance` | UK GDPR + PECR + ASA/CAP audit | `/compliance` |
 
-## Skills (29 Installed)
+Planning and test-first workflows now live in skills rather than slash commands:
+`design-an-interface`, `prd-to-issues`, and `tdd`.
+
+## Skills (30 Installed)
 
 ### Code & Quality
 
 | Skill | Use When | Example |
 | --- | --- | --- |
 | `engineering` | Next.js/React/TS performance patterns | "Review LCP + INP issues on homepage" |
+| `frontend-design` | Visual redesign, UI polish, stronger page/component identity | "Redesign the homepage hero so it feels distinct" |
 | `tdd` | Red/Green/Refactor test-first workflow | "Fix this regression with TDD" |
 | `design-an-interface` | Compare module/API shape options before coding | "Design the director engine interface in 3 ways" |
 | `accessibility` | WCAG 2.2 AA, a11y audits | "Check calculator keyboard nav + aria-live" |

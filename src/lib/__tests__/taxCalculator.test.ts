@@ -358,7 +358,7 @@ describe('Tax Calculator', () => {
    * ### Student Loan Plan Types (2024-25):
    * - **Plan 1**: 9% above £22,015 (loans before Sept 2012, Scotland)
    * - **Plan 2**: 9% above £27,295 (loans Sept 2012-Aug 2023, England/Wales)
-   * - **Plan 4**: 9% above £27,660 (Scotland post-2006)
+   * - **Plan 4**: 9% above £31,395 (Scotland post-2006)
    * - **Plan 5**: 9% above £25,000 (loans from Sept 2023, England/Wales)
    * - **Postgraduate**: 6% above £21,000 (Master's/PhD loans)
    *
@@ -429,6 +429,17 @@ describe('Tax Calculator', () => {
 
       // No repayment below threshold
       expect(result.studentLoan.annually).toBe(0);
+    });
+
+    it('uses the corrected 2024-25 Plan 4 repayment threshold', () => {
+      const atThreshold = createBasicInput(31395, { studentLoanPlans: ['plan4'] });
+      const aboveThreshold = createBasicInput(31396, { studentLoanPlans: ['plan4'] });
+
+      const atThresholdResult = calculateTax(atThreshold);
+      const aboveThresholdResult = calculateTax(aboveThreshold);
+
+      expect(atThresholdResult.studentLoan.annually).toBe(0);
+      expect(aboveThresholdResult.studentLoan.annually).toBeGreaterThan(0);
     });
 
     /**
@@ -742,6 +753,13 @@ describe('Tax Calculator', () => {
 
       // Pension reduces adjusted net income to £100,000, so full PA should apply
       expect(result.taxFreeAmount).toBe(12570);
+    });
+
+    it('uses HMRC whole-pound taper outcomes at odd-pound boundaries', () => {
+      expect(calculateTax(createBasicInput(100001)).taxFreeAmount).toBe(12570);
+      expect(calculateTax(createBasicInput(100003)).taxFreeAmount).toBe(12569);
+      expect(calculateTax(createBasicInput(125139)).taxFreeAmount).toBe(1);
+      expect(calculateTax(createBasicInput(125140)).taxFreeAmount).toBe(0);
     });
 
     it('reduces personal allowance to zero at £125,140', () => {

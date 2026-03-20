@@ -1,6 +1,5 @@
 // src/components/organisms/__tests__/CalculatorContainer.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { toast } from 'sonner';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import {
   useCalculatorActions,
@@ -8,14 +7,6 @@ import {
   useCalculatorStore,
 } from '@/store/calculatorStore';
 import { CalculatorContainer } from '../CalculatorContainer';
-
-// Mock dependencies
-jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
 
 jest.mock('@/store/calculatorStore', () => ({
   useCalculatorResults: jest.fn(),
@@ -48,25 +39,6 @@ jest.mock('../CalculatorResults/ResultsTable', () => ({
 
 // Mock next/dynamic to bypass lazy loading in tests
 // Returns the mocked component directly instead of wrapping in dynamic loader
-jest.mock('next/dynamic', () => {
-  return jest.fn(() => {
-    // Return the ChartsContainer mock from below
-    return ({ results }: { results: unknown }) =>
-      results ? <div data-testid='charts-container-mock'>Charts</div> : null;
-  });
-});
-
-// Mock the ChartsContainer component
-jest.mock('../CalculatorCharts', () => ({
-  ChartsContainer: ({ results }: { results: unknown }) =>
-    results ? <div data-testid='charts-container-mock'>Charts</div> : null,
-}));
-
-// Mock ChartsSkeleton
-jest.mock('../CalculatorCharts/ChartsSkeleton', () => ({
-  ChartsSkeleton: () => <div data-testid='charts-skeleton-mock'>Loading charts...</div>,
-}));
-
 describe('CalculatorContainer Component', () => {
   const mockResults: TaxCalculationResults = {
     grossSalary: {
@@ -292,6 +264,18 @@ describe('CalculatorContainer Component', () => {
       ).toBeInTheDocument();
     });
 
+    it('should keep export actions inside the results column when results exist', () => {
+      render(<CalculatorContainer />);
+
+      const resultsColumn = screen.getByTestId('tax-results');
+      expect(resultsColumn).toContainElement(
+        screen.getByRole('button', { name: /Print tax calculation results/i }),
+      );
+      expect(resultsColumn).toContainElement(
+        screen.getByRole('button', { name: /Download results as CSV file/i }),
+      );
+    });
+
     it('should not show export buttons when no results', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
@@ -321,7 +305,7 @@ describe('CalculatorContainer Component', () => {
       expect(exportToCSV).toHaveBeenCalledWith(mockResults);
     });
 
-    it('should show success toast after successful export', async () => {
+    it('should not show extra success copy after successful export', async () => {
       const { exportToCSV } = await import('@/lib/exportUtils');
       (exportToCSV as jest.Mock).mockImplementation(() => {});
 
@@ -330,10 +314,10 @@ describe('CalculatorContainer Component', () => {
       const button = screen.getByRole('button', { name: /Download results as CSV file/i });
       fireEvent.click(button);
 
-      expect(toast.success).toHaveBeenCalledWith('CSV exported successfully!');
+      expect(screen.queryByText(/Failed to export CSV/i)).not.toBeInTheDocument();
     });
 
-    it('should show error toast if export fails', async () => {
+    it('should show an inline error if export fails', async () => {
       const { exportToCSV } = await import('@/lib/exportUtils');
       (exportToCSV as jest.Mock).mockImplementation(() => {
         throw new Error('Export failed');
@@ -344,7 +328,7 @@ describe('CalculatorContainer Component', () => {
       const button = screen.getByRole('button', { name: /Download results as CSV file/i });
       fireEvent.click(button);
 
-      expect(toast.error).toHaveBeenCalledWith('Failed to export CSV');
+      expect(screen.getByText('Failed to export CSV. Please try again.')).toBeInTheDocument();
     });
 
     it('should not export if no results', () => {
@@ -382,7 +366,7 @@ describe('CalculatorContainer Component', () => {
       });
     });
 
-    it('should show error toast if print fails', async () => {
+    it('should show an inline error if print fails', async () => {
       const { printResults } = await import('@/lib/exportUtils');
       (printResults as jest.Mock).mockImplementation(() => {
         throw new Error('Print failed');
@@ -393,7 +377,9 @@ describe('CalculatorContainer Component', () => {
       const button = screen.getByRole('button', { name: /Print tax calculation results/i });
       fireEvent.click(button);
 
-      expect(toast.error).toHaveBeenCalledWith('Failed to open print dialog');
+      expect(
+        screen.getByText('Failed to open the print dialog. Please try again.'),
+      ).toBeInTheDocument();
     });
 
     it('should not print if no results', () => {
@@ -434,6 +420,13 @@ describe('CalculatorContainer Component', () => {
       const section = screen.getByTestId('calculator-section');
       // Updated to match current max-width
       expect(section).toHaveClass('max-w-screen-2xl');
+    });
+
+    it('should prevent the results column from stretching on desktop', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('tax-results')).toHaveClass('lg:self-start');
     });
   });
 

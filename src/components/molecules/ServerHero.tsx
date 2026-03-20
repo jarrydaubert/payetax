@@ -1,6 +1,6 @@
 // src/components/molecules/ServerHero.tsx
 // Server-rendered hero for instant LCP - no 'use client' directive
-// Matches payetax-web design: headline, dual CTAs, trust strip, bento grid
+// Uses the canonical brand-surface theme tokens for headline, CTAs, and trust strip
 
 import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
@@ -22,23 +22,23 @@ export default function ServerHero({ className }: ServerHeroProps) {
   return (
     <section
       className={cn(
-        'relative z-[1] flex min-h-[calc(100vh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-start bg-deep px-4 pt-10 pb-16 text-center sm:min-h-screen sm:justify-center sm:px-8 sm:py-32',
+        'relative z-[1] flex min-h-[calc(100vh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-start bg-surface-brand px-4 pt-10 pb-16 text-center sm:min-h-screen sm:justify-center sm:px-8 sm:py-32',
         className,
       )}
     >
-      <p className='mb-4 rounded-full border border-cyan/20 bg-cyan/5 px-4 py-1.5 font-medium text-cyan text-sm'>
+      <p className='mb-4 rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 font-medium text-brand text-sm'>
         Updated for {taxYearLabel}
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-6 max-w-4xl font-bold font-display text-5xl text-text-primary-new leading-tight tracking-tight sm:text-6xl lg:text-7xl'>
+      <h1 className='mx-auto mb-6 max-w-4xl font-bold font-display text-5xl text-on-brand leading-tight tracking-tight sm:text-6xl lg:text-7xl'>
         Free UK PAYE Tax Calculator
         <br />
-        <span className='text-gradient-new'>See your take-home pay</span>
+        <span className='text-gradient-brand'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
-      <p className='mx-auto mb-10 max-w-xl text-lg text-text-secondary-new leading-relaxed'>
+      <p className='mx-auto mb-10 max-w-xl text-lg text-on-brand-muted leading-relaxed'>
         Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
         on HMRC rates; results can vary with payslip timing and deductions.
       </p>
@@ -50,7 +50,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           trackingLabel='hero_start_calculating'
           className={cn(
             buttonVariants({ variant: 'brandOutline', size: 'touch' }),
-            'group rounded-xl px-8 text-text-primary-new hover:-translate-y-0.5',
+            'group rounded-xl px-8 text-on-brand hover:-translate-y-0.5',
           )}
         >
           See My Take Home Pay
@@ -59,7 +59,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           asChild
           variant='outline'
           size='touch'
-          className='rounded-xl border-white/10 bg-transparent px-8 text-text-primary-new hover:border-cyan/30 hover:bg-white/5 hover:text-text-primary-new'
+          className='rounded-xl border-white/10 bg-transparent px-8 text-on-brand hover:border-brand/30 hover:bg-white/5 hover:text-on-brand'
         >
           <Link href='/tools'>
             Explore Tax Tools
@@ -69,15 +69,15 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </div>
 
       {/* Trust Strip */}
-      <div className='flex max-w-4xl flex-wrap justify-center gap-6 border-border-subtle border-t py-8 sm:gap-8'>
+      <div className='flex max-w-4xl flex-wrap justify-center gap-6 border-chrome-brand border-t py-8 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
           { icon: CheckCircle, text: 'Fast in-browser results' },
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
-          <div key={text} className='flex items-center gap-2 text-sm text-text-dim'>
-            <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-emerald' />
+          <div key={text} className='flex items-center gap-2 text-on-brand-dim text-sm'>
+            <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
             <span>{text}</span>
           </div>
         ))}

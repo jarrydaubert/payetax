@@ -10,7 +10,7 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 // Security constants
@@ -18,6 +18,7 @@ const MAX_URLS = 100;
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
 const ALLOWED_HOST = 'payetax.co.uk';
 const FETCH_TIMEOUT_MS = 10000; // 10 seconds
+const RATE_LIMIT = { max: 10, window: 60000 } as const;
 
 // Allowed exact content pages (no prefix matching here)
 const ALLOWED_EXACT_PATHS = new Set([
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
   const clientId = getClientIdentifier(request, { includeAcceptHeaderInFallback: true });
   const rateLimit = await checkRateLimitWithPolicy(
     `indexnow:${clientId}`,
-    undefined,
+    RATE_LIMIT,
     'require_distributed_in_production',
   );
   if (rateLimit.reason === 'distributed_unavailable') {
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     console.warn(`[IndexNow:${requestId}] Rate limited: ${clientId}`);
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
-      { status: 429 },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT) },
     );
   }
 

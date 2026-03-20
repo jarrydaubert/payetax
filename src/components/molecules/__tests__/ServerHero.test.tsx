@@ -58,10 +58,10 @@ describe('ServerHero Component', () => {
     expect(screen.getByText('UK Coverage')).toBeInTheDocument();
   });
 
-  it('should have text-gradient-new class on headline text', () => {
+  it('should have text-gradient-brand class on headline text', () => {
     const { container } = render(<ServerHero />);
 
-    const gradientText = container.querySelector('.text-gradient-new');
+    const gradientText = container.querySelector('.text-gradient-brand');
     expect(gradientText).toBeInTheDocument();
     expect(gradientText?.textContent).toBe('See your take-home pay');
   });

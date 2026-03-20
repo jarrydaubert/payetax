@@ -11,8 +11,6 @@ const config: Config = {
        * Use these instead of inline gradient classes for consistency
        */
       backgroundImage: {
-        // New design system gradient (payetax-web mockup)
-        'brand-gradient-new': 'var(--brand-gradient-new)',
         // Brand gradients (24 uses across components)
         'brand-text':
           'linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-gradient-end))',
@@ -68,23 +66,13 @@ const config: Config = {
       // background, foreground, border, input, ring) are defined in CSS @theme inline
       // Only extend with colors NOT in @theme
       colors: {
-        // New design system colors (payetax-web mockup) - not in @theme yet
-        deep: 'var(--bg-deep)',
-        dark: 'var(--bg-dark)',
-        'card-new': 'var(--bg-card-new)',
-        'text-primary-new': 'var(--text-primary-new)',
-        'text-secondary-new': 'var(--text-secondary-new)',
-        'text-dim': 'var(--text-dim)',
-        'border-subtle': 'var(--border-subtle)',
-        'border-light': 'var(--border-light)',
-        cyan: {
-          DEFAULT: 'var(--brand-cyan)',
-          brand: 'var(--brand-cyan)',
-        },
-        emerald: {
-          DEFAULT: 'var(--brand-emerald)',
-          brand: 'var(--brand-emerald)',
-        },
+        'surface-brand': 'var(--surface-brand)',
+        'surface-brand-alt': 'var(--surface-brand-alt)',
+        'on-brand': 'var(--on-brand)',
+        'on-brand-muted': 'var(--on-brand-muted)',
+        'on-brand-dim': 'var(--on-brand-dim)',
+        'chrome-brand': 'var(--chrome-brand)',
+        'chrome-brand-strong': 'var(--chrome-brand-strong)',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],

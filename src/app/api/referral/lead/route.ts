@@ -3,13 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { maskEmailForLogs } from '@/lib/newsletter/maskEmail';
-import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { ReferralLeadRequestSchema } from '@/lib/validation/emailValidation';
-
-export const runtime = 'nodejs';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -18,6 +16,7 @@ const PARTNER_NOTIFICATION_EMAIL = process.env.REFERRAL_PARTNER_EMAIL;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const MAX_BODY_SIZE = 2048; // 2KB is plenty for a lead form
+const RATE_LIMIT = { max: 3, window: 3600000 } as const;
 
 const ReferralLeadSchema = ReferralLeadRequestSchema.extend({
   consent: z.boolean().refine((val) => val === true, {
@@ -224,7 +223,7 @@ export async function POST(request: NextRequest) {
   const clientId = getClientIdentifier(request, { ipPrefix: 'ip:', fallbackPrefix: 'ua:' });
   const rateLimit = await checkRateLimitWithPolicy(
     `referral-lead:${clientId}`,
-    { max: 3, window: 3600000 },
+    RATE_LIMIT,
     'require_distributed_in_production',
   );
   if (rateLimit.reason === 'distributed_unavailable') {
@@ -236,7 +235,7 @@ export async function POST(request: NextRequest) {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
-      { status: 429 },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT) },
     );
   }
 

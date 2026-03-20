@@ -1,12 +1,12 @@
 import { ArrowRight, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Badge } from '@/components/atoms/ui/badge';
-import { Card } from '@/components/atoms/ui/card';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { USE_CASES } from '@/data/useCases';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';

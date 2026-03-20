@@ -235,24 +235,22 @@ describe('HMRC Rate Verification & Edge Cases', () => {
 
     it('£100,002 - £2 over threshold, £1 PA reduction', () => {
       const result = calculateTax(createInput({ salary: 100002 }));
-      // Due to rounding in the calculation, may be 12570 or 12569
-      expect(result.taxFreeAmount).toBeGreaterThanOrEqual(12569);
-      expect(result.taxFreeAmount).toBeLessThanOrEqual(12570);
+      expect(result.taxFreeAmount).toBe(12569);
     });
 
-    it('£112,570 - PA taper follows current £2-step reduction rule', () => {
+    it('£100,003 - odd-pound excess rounds down to a whole-pound PA reduction', () => {
+      const result = calculateTax(createInput({ salary: 100003 }));
+      expect(result.taxFreeAmount).toBe(12569);
+    });
+
+    it('£112,570 - PA taper follows HMRC whole-pound reduction rule', () => {
       const result = calculateTax(createInput({ salary: 112570 }));
-      // Current engine aligns PA reduction to £2-step increments.
-      // At £112,570 this yields a £6,284 reduction => PA £6,286.
-      expect(result.taxFreeAmount).toBe(6286);
+      expect(result.taxFreeAmount).toBe(6285);
     });
 
-    it('£125,139 - £1-2 of PA remaining', () => {
+    it('£125,139 - £1 of PA remaining', () => {
       const result = calculateTax(createInput({ salary: 125139 }));
-      // (£125,139 - £100,000) ÷ 2 = £12,569.50 reduction
-      // Due to rounding, may be 1 or 2
-      expect(result.taxFreeAmount).toBeGreaterThanOrEqual(1);
-      expect(result.taxFreeAmount).toBeLessThanOrEqual(2);
+      expect(result.taxFreeAmount).toBe(1);
     });
 
     it('£125,140 - PA exactly zero', () => {

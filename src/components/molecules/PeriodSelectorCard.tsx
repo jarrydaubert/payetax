@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { PeriodCheckbox } from '@/components/atoms/PeriodCheckbox';
-import { Card } from '@/components/atoms/ui/card';
+import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';

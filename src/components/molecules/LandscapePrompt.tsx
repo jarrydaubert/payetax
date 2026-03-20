@@ -2,8 +2,7 @@
  * Landscape Prompt Component
  *
  * Displays a centered animated prompt on mobile devices encouraging users to rotate
- * their device to landscape orientation for optimal viewing of results tables
- * and charts.
+ * their device to landscape orientation for easier viewing of the results table.
  *
  * Features:
  * - Only shows on mobile devices (< md breakpoint)
@@ -15,7 +14,6 @@
  * - Accessible with ARIA labels
  * - Click-through overlay (only card is interactive)
  *
- * PAYTAX-58: recharts 3.4.1 optimization - landscape viewing
  * Updated: Centered positioning to avoid UI conflicts with fixed buttons
  */
 
@@ -47,7 +45,7 @@ interface LandscapePromptProps {
  * Landscape Prompt Component
  *
  * Shows a friendly animated prompt on mobile portrait mode suggesting
- * users rotate their device for better viewing of results tables and charts.
+ * users rotate their device for better viewing of results tables.
  *
  * @example
  * ```tsx

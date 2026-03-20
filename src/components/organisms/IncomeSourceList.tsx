@@ -4,21 +4,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Alert, AlertDescription, AlertTitle } from '@/components/atoms/ui/alert';
-import { Badge } from '@/components/atoms/ui/badge';
-import { Button } from '@/components/atoms/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/atoms/ui/collapsible';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/atoms/ui/select';
+} from '@/components/ui/select';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';

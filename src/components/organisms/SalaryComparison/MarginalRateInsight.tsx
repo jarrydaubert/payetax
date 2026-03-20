@@ -2,8 +2,8 @@
 'use client';
 
 import { TrendingUp } from 'lucide-react';
-import { Badge } from '@/components/atoms/ui/badge';
-import { Card, CardContent } from '@/components/atoms/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn, formatCurrency } from '@/lib/utils';
 

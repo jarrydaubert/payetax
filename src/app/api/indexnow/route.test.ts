@@ -15,6 +15,14 @@ import { POST } from './route';
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimitWithPolicy: jest.fn(),
+  createRateLimitHeaders: jest.fn((config?: { window?: number }, headers?: HeadersInit) => {
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set(
+      'Retry-After',
+      String(Math.max(1, Math.ceil((config?.window ?? 60000) / 1000))),
+    );
+    return responseHeaders;
+  }),
 }));
 
 const mockCheckRateLimitWithPolicy = checkRateLimitWithPolicy as jest.MockedFunction<
@@ -85,9 +93,10 @@ describe('/api/indexnow POST', () => {
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
+    expect(response.headers.get('Retry-After')).toBe('60');
     expect(mockCheckRateLimitWithPolicy).toHaveBeenCalledWith(
       'indexnow:1.2.3.4',
-      undefined,
+      { max: 10, window: 60000 },
       'require_distributed_in_production',
     );
   });

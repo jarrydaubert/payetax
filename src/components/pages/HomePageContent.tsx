@@ -55,7 +55,10 @@ const HomePageContent = memo(function HomePageContent() {
   }, []);
 
   return (
-    <section id={CALCULATOR_ID} className={`relative z-[1] bg-deep ${SPACING.PY_SECTION_LG}`}>
+    <section
+      id={CALCULATOR_ID}
+      className={`relative z-[1] bg-surface-brand ${SPACING.PY_SECTION_LG}`}
+    >
       <CalculatorContainer />
     </section>
   );

@@ -1,8 +1,8 @@
 'use client';
 
 import { useId } from 'react';
-import { Checkbox } from '@/components/atoms/ui/checkbox';
-import { Label } from '@/components/atoms/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 

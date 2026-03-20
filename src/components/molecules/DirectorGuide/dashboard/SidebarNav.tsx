@@ -273,7 +273,7 @@ export function SidebarNav({
         )}
         aria-label='PayeTax Home'
       >
-        <span className='flex size-9 items-center justify-center rounded-lg bg-brand-gradient-new font-bold text-primary-foreground'>
+        <span className='flex size-9 items-center justify-center rounded-lg bg-brand-surface font-bold text-primary-foreground'>
           P
         </span>
         <span

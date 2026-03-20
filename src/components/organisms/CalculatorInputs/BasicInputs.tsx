@@ -7,17 +7,17 @@ import { useId } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
-import { Checkbox } from '@/components/atoms/ui/checkbox';
-import { Input } from '@/components/atoms/ui/input';
-import { Label } from '@/components/atoms/ui/label';
+import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/atoms/ui/select';
-import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
+} from '@/components/ui/select';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';

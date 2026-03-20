@@ -191,6 +191,10 @@ export function parsePersonalAllowanceFromTaxCode(
 /**
  * Calculate high income personal allowance reduction (HMRC "60% Tax Trap")
  * Above £100k, allowance reduces by £1 for every £2 of income
+ *
+ * HMRC Tax Logic guide pseudocode:
+ * roundDown((adjustedNetIncome - reducedAllowanceLimit) / 2, 0)
+ * https://developer.service.hmrc.gov.uk/guides/tax-logic-service-guide/documentation/allowances-and-reliefs.html
  */
 export function calculateAllowanceReduction(
   salary: number,
@@ -200,8 +204,7 @@ export function calculateAllowanceReduction(
 ): number {
   if (salary <= threshold) return 0;
 
-  // HMRC formula: round down to nearest £2
-  return Math.min(currentAllowance, Math.floor(((salary - threshold) * reductionRate) / 2) * 2);
+  return Math.min(currentAllowance, Math.floor((salary - threshold) * reductionRate));
 }
 
 /**
@@ -569,7 +572,7 @@ export interface TaxCalculationResults {
  * Repayment = max(0, (Gross Income - Threshold) × Rate)
  * Plan 1: 9% above £22,015
  * Plan 2: 9% above £27,295
- * Plan 4: 9% above £27,660 (Scotland)
+ * Plan 4: 9% above £31,395 (Scotland)
  * Plan 5: 9% above £25,000
  * Postgraduate: 6% above £21,000
  * ```
@@ -745,16 +748,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // IMPORTANT: Pension contributions reduce adjusted net income, so they can restore allowance
   const adjustedNetIncome = Math.max(0, totalGrossIncome - annualPensionContribution);
   if (adjustedNetIncome > taxRates.personalAllowanceReductionThreshold) {
-    // Calculate the allowance reduction using HMRC formula:
-    // Reduction = (Adjusted Net Income - £100,000) ÷ 2
-    // The Math.floor and ×2 ensure we follow HMRC's rounding rules (round down to nearest £2)
-    const reduction = Math.min(
-      annualTaxFreeAmount, // Cannot reduce below zero
-      Math.floor(
-        ((adjustedNetIncome - taxRates.personalAllowanceReductionThreshold) *
-          taxRates.personalAllowanceReductionRate) / // Rate is 0.5 (50% of excess)
-          2, // Divide by 2 for the "£1 reduction per £2 income\" rule
-      ) * 2, // Multiply back by 2 to ensure even pound amounts (HMRC requirement)
+    const reduction = calculateAllowanceReduction(
+      adjustedNetIncome,
+      annualTaxFreeAmount,
+      taxRates.personalAllowanceReductionThreshold,
+      taxRates.personalAllowanceReductionRate,
     );
 
     // Apply the reduction - personal allowance can be reduced to zero but not negative

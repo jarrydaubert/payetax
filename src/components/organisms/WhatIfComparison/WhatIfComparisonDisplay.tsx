@@ -22,7 +22,8 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
-import { Card } from '@/components/atoms/ui/card';
+import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
+import { Card } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -30,8 +31,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/atoms/ui/table';
-import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
+} from '@/components/ui/table';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';

@@ -17,7 +17,8 @@ import type { BlogPost } from '@/types/blog';
 
 // Mock next/cache
 jest.mock('next/cache', () => ({
-  unstable_cache: jest.fn((fn) => fn),
+  cacheLife: jest.fn(),
+  cacheTag: jest.fn(),
 }));
 
 // Mock mdx module

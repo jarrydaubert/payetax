@@ -26,6 +26,7 @@ Goal: block avoidable regressions before checking production-only items.
 
 - [ ] Run `bun run release:verify` and ensure all steps pass.
 - [ ] Run `bun run release:report:init` to create the version report scaffold (if not present).
+- [ ] Run `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` against live Vercel Production and record the result in the release report.
 
 ---
 

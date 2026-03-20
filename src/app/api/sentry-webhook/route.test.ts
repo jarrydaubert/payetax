@@ -20,6 +20,14 @@ jest.mock('@linear/sdk', () => ({
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimitWithPolicy: jest.fn(() => ({ allowed: true, reason: 'allowed' })),
+  createRateLimitHeaders: jest.fn((config?: { window?: number }, headers?: HeadersInit) => {
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set(
+      'Retry-After',
+      String(Math.max(1, Math.ceil((config?.window ?? 60000) / 1000))),
+    );
+    return responseHeaders;
+  }),
 }));
 
 const ORIGINAL_ENV = process.env;
@@ -137,6 +145,7 @@ describe('/api/sentry-webhook POST', () => {
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests' });
+    expect(response.headers.get('Retry-After')).toBe('60');
     expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
       'sentry-webhook:1.2.3.4',
       { max: 30, window: 60000 },

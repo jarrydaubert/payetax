@@ -130,6 +130,7 @@ Keep HMRC values anchored to source documents and code references.
 - `bun run build`
 - `bun run test:e2e:critical`
 - `bun run release:report:init` (before manual post-release checks)
+- `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` (against live Vercel Production before release completion)
 - `bun run release:report:check` (after checklist completion)
 - Post-release production validation checklist (manual/high-confidence checks)
 

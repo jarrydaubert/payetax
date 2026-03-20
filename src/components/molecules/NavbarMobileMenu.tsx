@@ -27,7 +27,7 @@ interface NavbarMobileMenuProps {
 }
 
 /**
- * Mobile navigation menu with new design system (Cyan/Emerald theme)
+ * Mobile navigation menu using the canonical brand-surface theme
  *
  * Slides down from navbar with backdrop blur.
  * Matches desktop nav styling with mobile-optimized touch targets.
@@ -105,7 +105,7 @@ export function NavbarMobileMenu({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='fixed inset-0 z-40 bg-deep/60 md:hidden'
+            className='fixed inset-0 z-40 bg-surface-brand/60 md:hidden'
             onClick={onBackdropClick}
             aria-hidden='true'
           />
@@ -147,7 +147,7 @@ export function NavbarMobileMenu({
                     onClick={() => onLinkClick(link.label)}
                     className={cn(
                       'block min-h-11 rounded-lg px-4 py-3 font-medium text-sm transition-colors',
-                      isActive ? 'bg-cyan/10 text-cyan' : 'text-text-secondary-new',
+                      isActive ? 'bg-brand/10 text-brand' : 'text-on-brand-muted',
                     )}
                   >
                     {link.label}

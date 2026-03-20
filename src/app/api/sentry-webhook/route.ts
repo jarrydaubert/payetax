@@ -13,10 +13,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { LinearClient } from '@linear/sdk';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
-
-export const runtime = 'nodejs';
 
 // Max payload size (1MB - webhooks shouldn't be larger)
 const MAX_PAYLOAD_SIZE = 1024 * 1024;
@@ -119,7 +117,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook protection unavailable' }, { status: 503 });
   }
   if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT) },
+    );
   }
 
   // Check payload size before reading

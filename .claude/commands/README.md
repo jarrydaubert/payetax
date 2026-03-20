@@ -12,15 +12,13 @@
 
 ---
 
-## Commands (8)
+## Commands (6)
 
 | Command | Purpose | Use When |
 | --- | --- | --- |
-| `/plan` | Architecture planning | Designing features, major changes |
 | `/audit` | Deep code review | Reviewing systems, refactoring |
 | `/cleanup` | Project housekeeping | Finding duplicates, orphans, junk |
 | `/debug` | Systematic debugging | Investigating issues |
-| `/test` | Test engineering | Writing tests, coverage gaps |
 | `/security` | Security review | OWASP checklist, vulnerability audit |
 | `/finance` | UK tax compliance | Verifying HMRC accuracy |
 | `/compliance` | UK GDPR + PECR + ASA/CAP audit | Privacy, cookie consent, claims |
@@ -28,9 +26,6 @@
 ### Usage Examples
 
 ```bash
-# Plan a new feature
-/plan self-employed calculator
-
 # Audit the calculator
 /audit calculator
 
@@ -40,9 +35,6 @@
 
 # Debug a calculation issue
 /debug wrong-ni-calculation
-
-# Write tests for tax calculations
-/test tax-calculations
 
 # Security review
 /security api
@@ -56,7 +48,7 @@
 
 ---
 
-## Skills (29 installed)
+## Skills (30 installed)
 
 Skills provide expert knowledge that you load before a task.
 
@@ -65,6 +57,7 @@ Skills provide expert knowledge that you load before a task.
 | Skill | Use When |
 | --- | --- |
 | `engineering` | Next.js/React/TypeScript performance and patterns |
+| `frontend-design` | Visual redesign, UI polish, and stronger page/component identity |
 | `tdd` | Test-driven delivery with bug-first Red/Green/Refactor loops |
 | `design-an-interface` | Compare API/module interface options before implementation |
 | `accessibility` | WCAG 2.2 AA, screen readers, keyboard nav |
@@ -126,6 +119,9 @@ Skills provide expert knowledge that you load before a task.
 > "How should I optimize LCP on the homepage?"
 → `engineering`
 
+> "Redesign this landing page so it looks less generic"
+→ `frontend-design`
+
 > "Audit the calculator for WCAG issues"
 → `accessibility`
 
@@ -156,16 +152,16 @@ Skills provide expert knowledge that you load before a task.
 
 ### Feature Development
 ```bash
-/plan self-employed calculator
-# implement
+Read .claude/skills/design-an-interface/SKILL.md
+Read .claude/skills/prd-to-issues/SKILL.md
 /finance
-/test tax-calculations
+Read .claude/skills/tdd/SKILL.md
 ```
 
 ### Tax Year Update (April)
 ```bash
 /finance
-/test tax-calculations
+Read .claude/skills/tdd/SKILL.md
 # content-strategy for tax-year announcement post
 ```
 
@@ -187,9 +183,7 @@ Skills provide expert knowledge that you load before a task.
 │   ├── compliance.md
 │   ├── debug.md
 │   ├── finance.md
-│   ├── plan.md
-│   ├── security.md
-│   └── test.md
+│   └── security.md
 ├── skills/
 │   ├── ab-test-setup/
 │   ├── accessibility/
@@ -205,6 +199,7 @@ Skills provide expert knowledge that you load before a task.
 │   ├── design-an-interface/
 │   ├── email-sequence/
 │   ├── engineering/
+│   ├── frontend-design/
 │   ├── form-cro/
 │   ├── free-tool-strategy/
 │   ├── launch-strategy/

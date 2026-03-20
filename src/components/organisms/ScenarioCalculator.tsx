@@ -11,17 +11,17 @@ import { ArrowRight, Calculator, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Button } from '@/components/atoms/ui/button';
-import { Card } from '@/components/atoms/ui/card';
-import { Label } from '@/components/atoms/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/atoms/ui/select';
-import { Switch } from '@/components/atoms/ui/switch';
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { type StudentLoanPlan, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import type { ScenarioDefaults } from '@/data/scenarios';

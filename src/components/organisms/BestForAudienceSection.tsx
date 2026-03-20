@@ -1,9 +1,9 @@
 import { ArrowRight, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useId } from 'react';
-import { Badge } from '@/components/atoms/ui/badge';
-import { Card } from '@/components/atoms/ui/card';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { USE_CASES } from '@/data/useCases';
 import { cn } from '@/lib/utils';

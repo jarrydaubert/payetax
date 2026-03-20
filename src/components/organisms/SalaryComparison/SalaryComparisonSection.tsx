@@ -4,8 +4,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@/components/atoms/ui/button';
+import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import {
   type ComparisonInput,
@@ -36,6 +35,7 @@ export function SalaryComparisonSection({
 
   const [isOpen, setIsOpen] = useState(false);
   const [comparisonResults, setComparisonResults] = useState<ComparisonResults | null>(null);
+  const [comparisonError, setComparisonError] = useState('');
 
   // Stable callback - only recreate when currentInput changes
   const handleCompare = useCallback(
@@ -43,13 +43,14 @@ export function SalaryComparisonSection({
       try {
         const results = calculateComparison(currentInput, comparisonInput);
         if (!results) {
-          toast.error('Comparison failed: Invalid input values');
+          setComparisonError('Comparison failed. Check the values and try again.');
           return;
         }
+        setComparisonError('');
         setComparisonResults(results);
       } catch {
         // Error already logged by calculateComparison if needed
-        toast.error('Comparison failed: Please check your input values');
+        setComparisonError('Comparison failed. Please check your input values.');
       }
     },
     [currentInput],
@@ -108,6 +109,11 @@ export function SalaryComparisonSection({
               currentSalary={currentResults.grossSalary.annually}
               onCompare={handleCompare}
             />
+            {comparisonError && (
+              <p className='rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-destructive text-sm'>
+                {comparisonError}
+              </p>
+            )}
 
             {/* Results - simpler animation without nested AnimatePresence */}
             {comparisonResults && (

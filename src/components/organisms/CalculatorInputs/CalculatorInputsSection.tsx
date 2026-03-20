@@ -3,7 +3,6 @@
 
 import { Calculator, ChevronDown, RotateCcw } from 'lucide-react';
 import * as React from 'react';
-import { toast } from 'sonner';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -27,6 +26,10 @@ export function CalculatorInputsSection({
   const salary = useCalculatorStore((state) => state.input.salary);
   const [isCalculating, setIsCalculating] = React.useState(false);
   const [whatIfOpen, setWhatIfOpen] = React.useState(false);
+  const [formMessage, setFormMessage] = React.useState<{
+    tone: 'error' | 'warning';
+    text: string;
+  } | null>(null);
 
   // Clear What If results when collapsible closes
   const handleWhatIfToggle = (open: boolean) => {
@@ -40,17 +43,21 @@ export function CalculatorInputsSection({
   const handleCalculate = () => {
     // Validate salary is entered and reasonable
     if (salary <= 0) {
-      toast.error('Please enter a salary', {
-        description: 'Enter your gross salary to calculate your tax breakdown',
+      setFormMessage({
+        tone: 'error',
+        text: 'Enter your gross salary to calculate your tax breakdown.',
       });
       return;
     }
 
     // Warn about very low salary (less than minimum wage equivalent)
     if (salary < 100) {
-      toast.warning('Very low salary', {
-        description: 'Salary below £100/year may show unusual percentages',
+      setFormMessage({
+        tone: 'warning',
+        text: 'Salary below £100/year may show unusual percentages.',
       });
+    } else {
+      setFormMessage(null);
     }
 
     setIsCalculating(true);
@@ -58,8 +65,9 @@ export function CalculatorInputsSection({
       onCalculate();
       // Success is implicit - results appear on screen
     } catch (error) {
-      toast.error('Calculation failed', {
-        description: error instanceof Error ? error.message : 'Please check your inputs',
+      setFormMessage({
+        tone: 'error',
+        text: error instanceof Error ? error.message : 'Please check your inputs.',
       });
     } finally {
       setIsCalculating(false);
@@ -70,7 +78,7 @@ export function CalculatorInputsSection({
     reset();
     // Close What If section when resetting
     setWhatIfOpen(false);
-    // Reset is visually obvious - no toast needed
+    setFormMessage(null);
   };
 
   return (
@@ -105,6 +113,19 @@ export function CalculatorInputsSection({
             Reset
           </Button>
         </div>
+        {formMessage && (
+          <p
+            className={cn(
+              'rounded-md border px-3 py-2 text-sm',
+              formMessage.tone === 'error'
+                ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                : 'border-warning/30 bg-warning/10 text-warning',
+            )}
+            role={formMessage.tone === 'error' ? 'alert' : 'status'}
+          >
+            {formMessage.text}
+          </p>
+        )}
 
         {/* What If Collapsible Section */}
         <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>

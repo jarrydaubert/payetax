@@ -5,13 +5,6 @@ import type { StrategyComparison } from '@/lib/tax/strategyComparison';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import { EmailResultsDialog } from '../EmailResultsDialog';
 
-jest.mock('sonner', () => ({
-  toast: {
-    success: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-
 jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackEmailOpened: jest.fn(),
   trackEmailSent: jest.fn(),
@@ -144,6 +137,6 @@ describe('EmailResultsDialog analytics', () => {
       expect(trackEmailSent).toHaveBeenCalledTimes(1);
     });
 
-    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(screen.getByText(/Results sent to test@example.com/i)).toBeInTheDocument();
   });
 });

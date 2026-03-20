@@ -13,6 +13,14 @@ import { NextRequest } from 'next/server';
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimitWithPolicy: jest.fn(),
+  createRateLimitHeaders: jest.fn((config?: { window?: number }, headers?: HeadersInit) => {
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set(
+      'Retry-After',
+      String(Math.max(1, Math.ceil((config?.window ?? 60000) / 1000))),
+    );
+    return responseHeaders;
+  }),
 }));
 
 const sendMock = jest.fn();
@@ -117,6 +125,7 @@ describe('/api/send-director-results POST', () => {
 
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
+    expect(response.headers.get('Retry-After')).toBe('60');
     expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
       'send-director-results:1.2.3.4',
       { max: 5, window: 60000 },

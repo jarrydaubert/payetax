@@ -13,6 +13,14 @@ import { NextRequest } from 'next/server';
 
 jest.mock('@/lib/rateLimit', () => ({
   checkRateLimit: jest.fn(),
+  createRateLimitHeaders: jest.fn((config?: { window?: number }, headers?: HeadersInit) => {
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set(
+      'Retry-After',
+      String(Math.max(1, Math.ceil((config?.window ?? 60000) / 1000))),
+    );
+    return responseHeaders;
+  }),
 }));
 
 jest.mock('@/lib/newsletter/unsubscribeToken', () => ({
@@ -97,6 +105,7 @@ describe('/api/newsletter/unsubscribe GET', () => {
     const { checkRateLimit } = jest.requireMock('@/lib/rateLimit') as { checkRateLimit: jest.Mock };
 
     expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('60');
     expect(checkRateLimit).toHaveBeenCalledWith('newsletter-unsubscribe:1.2.3.4', {
       max: 5,
       window: 60000,

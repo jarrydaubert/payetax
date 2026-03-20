@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getRateLimitDiagnostics } from '@/lib/rateLimit';
 
-export const runtime = 'nodejs';
-
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const RATE_LIMIT_HEALTH_SECRET = process.env.RATE_LIMIT_HEALTH_SECRET;
 

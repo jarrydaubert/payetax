@@ -8,10 +8,9 @@
 
 import { Mail, RotateCcw, Send } from 'lucide-react';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES } from '@/constants/designTokens';
+import { COLORS, ICON_SIZES } from '@/constants/designTokens';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
@@ -38,6 +37,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   // Cleanup abort controller on unmount
   useEffect(() => {
@@ -61,6 +61,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
 
+    setSubmitError('');
     setIsLoading(true);
 
     try {
@@ -87,9 +88,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
         const errorData = await response.json().catch(() => null);
 
         if (response.status === 429) {
-          toast.error('Too many requests', {
-            description: 'Please wait a minute before trying again',
-          });
+          setSubmitError('Too many requests. Please wait a minute before trying again.');
           return;
         }
 
@@ -107,16 +106,11 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
           region: input.isScottish ? 'Scotland' : 'rUK',
         },
       });
-      toast.success('Results sent!', {
-        description: `Check your inbox at ${maskEmail(normalizedEmail)}`,
-      });
     } catch (error) {
       // Ignore abort errors
       if (error instanceof Error && error.name === 'AbortError') return;
 
-      toast.error('Failed to send email', {
-        description: error instanceof Error ? error.message : 'Please try again later',
-      });
+      setSubmitError(error instanceof Error ? error.message : 'Please try again later');
     } finally {
       setIsLoading(false);
     }
@@ -126,13 +120,15 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
     setIsSent(false);
     setSentEmail('');
     setEmail('');
+    setSubmitError('');
   };
 
   if (isSent) {
     return (
       <output
         className={cn(
-          'flex items-center justify-between gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-emerald-400 text-sm',
+          'flex items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm',
+          COLORS.SUCCESS,
           className,
         )}
         aria-live='polite'
@@ -146,7 +142,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
           variant='ghost'
           size='sm'
           onClick={handleReset}
-          className='h-auto p-1 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300'
+          className={cn('h-auto p-1 hover:bg-success/20', COLORS.SUCCESS)}
           aria-label='Send to different email'
         >
           <RotateCcw className={ICON_SIZES.SIZE_4} aria-hidden='true' />
@@ -156,40 +152,52 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn('flex gap-2', className)}>
-      <div className='relative flex-1'>
-        <Mail
-          className={cn(
-            'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-            ICON_SIZES.SIZE_4,
+    <div className={cn('space-y-2', className)}>
+      <form onSubmit={handleSubmit} className='flex gap-2'>
+        <div className='relative flex-1'>
+          <Mail
+            className={cn(
+              'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
+              ICON_SIZES.SIZE_4,
+            )}
+            aria-hidden='true'
+          />
+          <Input
+            ref={inputRef}
+            id={`${formId}-email`}
+            type='email'
+            required
+            autoComplete='email'
+            placeholder='Enter your email'
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (submitError) setSubmitError('');
+            }}
+            onBlur={(e) => setEmail(e.target.value.trim())}
+            className='pl-10'
+            disabled={isLoading}
+            aria-label='Email address for results'
+            aria-invalid={!!submitError}
+            aria-describedby={submitError ? `${formId}-email-error` : undefined}
+          />
+        </div>
+        <Button type='submit' disabled={isLoading || !email.trim()} variant='outline'>
+          {isLoading ? (
+            <span className='animate-pulse'>Sending...</span>
+          ) : (
+            <>
+              <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+              Email Results
+            </>
           )}
-          aria-hidden='true'
-        />
-        <Input
-          ref={inputRef}
-          id={`${formId}-email`}
-          type='email'
-          required
-          autoComplete='email'
-          placeholder='Enter your email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onBlur={(e) => setEmail(e.target.value.trim())}
-          className='pl-10'
-          disabled={isLoading}
-          aria-label='Email address for results'
-        />
-      </div>
-      <Button type='submit' disabled={isLoading || !email.trim()} variant='outline'>
-        {isLoading ? (
-          <span className='animate-pulse'>Sending...</span>
-        ) : (
-          <>
-            <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
-            Email Results
-          </>
-        )}
-      </Button>
-    </form>
+        </Button>
+      </form>
+      {submitError && (
+        <p id={`${formId}-email-error`} className='text-destructive text-sm' role='alert'>
+          {submitError}
+        </p>
+      )}
+    </div>
   );
 }

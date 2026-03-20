@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/atoms/ui/select';
+} from '@/components/ui/select';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';

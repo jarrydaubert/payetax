@@ -77,9 +77,9 @@ const features: Feature[] = [
   },
   {
     icon: '📊',
-    title: 'Understand Your Tax at a Glance',
+    title: 'Understand Your Tax Clearly',
     description:
-      'See your tax breakdown in clear charts. No spreadsheets needed — know where you stand in seconds.',
+      'See your deductions in clear summary cards and a detailed results table. Know where you stand in seconds.',
   },
 ];
 
@@ -176,7 +176,7 @@ export function FeaturesSection() {
       <div className='section-header'>
         <div className='section-label'>Features</div>
         <h2 className='section-title'>
-          Everything you need to <span className='text-gradient-new'>understand your pay</span>
+          Everything you need to <span className='text-gradient-brand'>understand your pay</span>
         </h2>
       </div>
 
@@ -202,7 +202,7 @@ export function HowItWorksSection() {
       <div className='section-header'>
         <div className='section-label'>How It Works</div>
         <h2 className='section-title'>
-          Three steps to <span className='text-gradient-new'>clarity</span>
+          Three steps to <span className='text-gradient-brand'>clarity</span>
         </h2>
       </div>
 
@@ -299,7 +299,7 @@ export function FinalCTASection() {
   return (
     <section className='final-cta'>
       <h2>
-        Stop guessing your take-home. <span className='text-gradient-new'>See it now.</span>
+        Stop guessing your take-home. <span className='text-gradient-brand'>See it now.</span>
       </h2>
       <p>Free and fast — no signup required.</p>
       <Button asChild size='touch' variant='brandOutline' className='group rounded-xl px-8'>

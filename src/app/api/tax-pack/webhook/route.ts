@@ -3,8 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { processTaxPackWebhook } from '@/lib/taxPack/service';
 import { TaxPackWebhookEventSchema } from '@/lib/validation/taxPackValidation';
 
-export const runtime = 'nodejs';
-
 const MAX_BODY_SIZE = 16 * 1024;
 
 function isValidSignature(

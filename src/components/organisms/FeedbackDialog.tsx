@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'sonner';
 import { type FeedbackFormState, submitFeedback } from '@/app/actions/feedback';
 import { Button } from '@/components/ui/button';
 import {
@@ -71,6 +70,7 @@ export function FeedbackDialog({
     email: '',
     message: '',
   });
+  const [submitted, setSubmitted] = useState(false);
   const isControlled = typeof open === 'boolean';
   const isOpen = isControlled ? open : internalOpen;
 
@@ -109,18 +109,19 @@ export function FeedbackDialog({
         category: 'feedback',
         custom_data: { has_email: !!formData.email },
       });
-      toast.success(state.message || 'Feedback sent successfully!');
       setFormData({ email: '', message: '' });
       setErrors({ email: '', message: '' });
-      setDialogOpen(false);
-    } else if (state.error) {
-      toast.error(state.error);
+      setSubmitted(true);
     }
-  }, [state, formData.email, setDialogOpen]);
+  }, [state, formData.email]);
 
   // Track dialog open
   const handleOpenChange = (newOpen: boolean) => {
     setDialogOpen(newOpen);
+    if (!newOpen) {
+      setSubmitted(false);
+      setErrors({ email: '', message: '' });
+    }
     if (newOpen) {
       trackEvent({
         action: 'feedback_dialog_opened',
@@ -220,99 +221,120 @@ export function FeedbackDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className={SPACING.SPACE_Y_4}>
-          <div className={SPACING.SPACE_Y_2}>
-            <Label htmlFor={emailId}>Email (optional)</Label>
-            <Input
-              id={emailId}
-              type='email'
-              placeholder='your@email.com'
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? `${emailId}-error` : undefined}
-            />
-            {errors.email && (
-              <p
-                id={`${emailId}-error`}
-                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
-                role='alert'
-              >
-                {errors.email}
-              </p>
-            )}
-          </div>
-
-          <div className={SPACING.SPACE_Y_2}>
-            <div className='flex items-center justify-between'>
-              <Label htmlFor={messageId}>
-                Message <span className='text-destructive'>*</span>
-              </Label>
-              <span
-                className={cn(
-                  TYPOGRAPHY.TEXT_XS,
-                  messageLength < minLength
-                    ? 'text-destructive'
-                    : messageLength > maxLength - 100
-                      ? COLORS.WARNING
-                      : 'text-muted-foreground',
+          {submitted ? (
+            <>
+              <div className='rounded-lg border border-success/30 bg-success/10 p-4 text-sm text-success'>
+                {state.message || 'Feedback sent successfully.'}
+              </div>
+              <DialogFooter>
+                <Button type='button' className='w-full' onClick={() => handleOpenChange(false)}>
+                  Close
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <div className={SPACING.SPACE_Y_2}>
+                <Label htmlFor={emailId}>Email (optional)</Label>
+                <Input
+                  id={emailId}
+                  type='email'
+                  placeholder='your@email.com'
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? `${emailId}-error` : undefined}
+                />
+                {errors.email && (
+                  <p
+                    id={`${emailId}-error`}
+                    className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
+                    role='alert'
+                  >
+                    {errors.email}
+                  </p>
                 )}
-                aria-live='polite'
-              >
-                {messageLength}/{maxLength}
-              </span>
-            </div>
-            <Textarea
-              id={messageId}
-              placeholder="What worked? What didn't? Suggestions?"
-              rows={5}
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              required
-              maxLength={maxLength}
-              aria-invalid={!!errors.message}
-              aria-describedby={errors.message ? `${messageId}-error` : `${messageId}-hint`}
-            />
-            {errors.message ? (
-              <p
-                id={`${messageId}-error`}
-                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
-                role='alert'
-              >
-                {errors.message}
-              </p>
-            ) : (
-              <p
-                id={`${messageId}-hint`}
-                className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}
-              >
-                {messageLength < minLength
-                  ? `${minLength - messageLength} more character${minLength - messageLength === 1 ? '' : 's'} needed`
-                  : 'Share your thoughts, ideas, or issues'}
-              </p>
-            )}
-          </div>
+              </div>
 
-          <DialogFooter>
-            {/* React 19: useActionState provides isPending state */}
-            <Button type='submit' className='w-full' disabled={isPending}>
-              {isPending ? (
-                <>
-                  <div
-                    className={cn(
-                      'mr-2 animate-spin rounded-full border-2 border-current border-t-transparent',
-                      ICON_SIZES.SIZE_4,
-                    )}
-                  />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} />
-                  Send Feedback
-                </>
+              {state.error && (
+                <p className='rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-destructive text-sm'>
+                  {state.error}
+                </p>
               )}
-            </Button>
-          </DialogFooter>
+
+              <div className={SPACING.SPACE_Y_2}>
+                <div className='flex items-center justify-between'>
+                  <Label htmlFor={messageId}>
+                    Message <span className='text-destructive'>*</span>
+                  </Label>
+                  <span
+                    className={cn(
+                      TYPOGRAPHY.TEXT_XS,
+                      messageLength < minLength
+                        ? 'text-destructive'
+                        : messageLength > maxLength - 100
+                          ? COLORS.WARNING
+                          : 'text-muted-foreground',
+                    )}
+                    aria-live='polite'
+                  >
+                    {messageLength}/{maxLength}
+                  </span>
+                </div>
+                <Textarea
+                  id={messageId}
+                  placeholder="What worked? What didn't? Suggestions?"
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  required
+                  maxLength={maxLength}
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? `${messageId}-error` : `${messageId}-hint`}
+                />
+                {errors.message ? (
+                  <p
+                    id={`${messageId}-error`}
+                    className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
+                    role='alert'
+                  >
+                    {errors.message}
+                  </p>
+                ) : (
+                  <p
+                    id={`${messageId}-hint`}
+                    className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}
+                  >
+                    {messageLength < minLength
+                      ? `${minLength - messageLength} more character${minLength - messageLength === 1 ? '' : 's'} needed`
+                      : 'Share your thoughts, ideas, or issues'}
+                  </p>
+                )}
+              </div>
+
+              <DialogFooter>
+                {/* React 19: useActionState provides isPending state */}
+                <Button type='submit' className='w-full' disabled={isPending}>
+                  {isPending ? (
+                    <>
+                      <div
+                        className={cn(
+                          'mr-2 animate-spin rounded-full border-2 border-current border-t-transparent',
+                          ICON_SIZES.SIZE_4,
+                        )}
+                      />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} />
+                      Send Feedback
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </form>
       </DialogContent>
     </Dialog>

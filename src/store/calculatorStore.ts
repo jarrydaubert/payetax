@@ -39,6 +39,12 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import { trackCalculatorEvent, trackCalculatorUsage, trackEvent } from '@/lib/analytics';
+import {
+  BooleanSchema,
+  NICategorySchema,
+  PensionContributionTypeSchema,
+  WhatIfTypeSchema,
+} from '@/lib/calculatorValidation';
 import { safeStorage } from '@/lib/safeStorage';
 import {
   addBreadcrumb,
@@ -52,12 +58,6 @@ import {
   type IncomeSource,
   IncomeSourceUpdateSchema,
 } from '@/lib/types/calculator';
-import {
-  BooleanSchema,
-  NICategorySchema,
-  PensionContributionTypeSchema,
-  WhatIfTypeSchema,
-} from '@/lib/validation';
 import { useShallow } from '@/lib/zustandShallow';
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';

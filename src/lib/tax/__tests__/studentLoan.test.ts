@@ -2,6 +2,7 @@ import { getStudentLoanRepayment, getStudentLoanThreshold } from '../studentLoan
 
 describe('Student Loan Calculator', () => {
   const taxYear = '2025-2026';
+  const previousTaxYear = '2024-2025';
 
   describe('getStudentLoanRepayment', () => {
     it('returns zero for empty plans array', () => {
@@ -67,6 +68,22 @@ describe('Student Loan Calculator', () => {
       expect(getStudentLoanThreshold('plan2', taxYear)).toBe(28470);
       expect(getStudentLoanThreshold('plan4', taxYear)).toBe(32745);
       expect(getStudentLoanThreshold('postgrad', taxYear)).toBe(21000);
+    });
+
+    it('returns the corrected Plan 4 threshold for 2024-25', () => {
+      expect(getStudentLoanThreshold('plan4', previousTaxYear)).toBe(31395);
+    });
+  });
+
+  describe('2024-25 Plan 4 regression', () => {
+    it('does not repay at the threshold and starts above it', () => {
+      const atThreshold = getStudentLoanRepayment(31395, ['plan4'], previousTaxYear);
+      const aboveThreshold = getStudentLoanRepayment(31396, ['plan4'], previousTaxYear);
+
+      expect(atThreshold.plan4).toBe(0);
+      expect(atThreshold.total).toBe(0);
+      expect(aboveThreshold.plan4).toBeCloseTo(0.09, 2);
+      expect(aboveThreshold.total).toBeCloseTo(0.09, 2);
     });
   });
 

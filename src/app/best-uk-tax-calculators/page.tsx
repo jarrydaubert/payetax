@@ -3,14 +3,14 @@
 import { ArrowRight, Award, Calculator, Search, Users } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { Button } from '@/components/atoms/ui/button';
-import { Card } from '@/components/atoms/ui/card';
 import { ComparisonTable } from '@/components/molecules/ComparisonTable';
 import { CompetitorCard, PayeTaxCard } from '@/components/molecules/CompetitorCard';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { COMPETITORS } from '@/data/competitors';
 import { SITE_URL } from '@/lib/metadata';

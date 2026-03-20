@@ -15,7 +15,7 @@ const CALCULATOR_ID = 'tax-calculator';
 const CALCULATOR_HASH = `#${CALCULATOR_ID}`;
 
 /**
- * Navigation bar with new design system (Cyan/Emerald theme)
+ * Navigation bar using the canonical brand-surface theme
  *
  * Design specs from payetax-web:
  * - Fixed position with backdrop blur
@@ -33,7 +33,7 @@ const FeedbackDialog = dynamic(
   {
     ssr: false,
     loading: () => (
-      <span className='flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-sm text-text-secondary-new'>
+      <span className='flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-on-brand-muted text-sm'>
         Feedback
       </span>
     ),
@@ -162,7 +162,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
           'px-4 pt-[calc(var(--pwa-safe-area-top,0px)+1rem)] pb-4 sm:px-8 sm:py-6',
-          'bg-deep/80 backdrop-blur-xl',
+          'bg-surface-brand/80 backdrop-blur-xl',
           className,
         )}
         aria-label='Main navigation'
@@ -179,9 +179,9 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             }
           }}
         >
-          <span className='brand-wordmark text-2xl text-text-primary-new'>
+          <span className='brand-wordmark text-2xl text-on-brand'>
             paye
-            <span className='text-gradient-new'>tax</span>
+            <span className='text-gradient-brand'>tax</span>
           </span>
         </Link>
 
@@ -192,7 +192,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='font-medium text-sm text-text-secondary-new transition-colors duration-300 hover:text-cyan'
+              className='font-medium text-on-brand-muted text-sm transition-colors duration-300 hover:text-brand'
             >
               {link.label}
             </Link>
@@ -206,7 +206,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             asChild
             size='touch'
             variant='brandOutline'
-            className='rounded-full px-5 py-2.5 text-sm text-text-primary-new hover:scale-105'
+            className='rounded-full px-5 py-2.5 text-on-brand text-sm hover:scale-105'
           >
             <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
               Open Calculator
@@ -218,7 +218,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         <Button
           variant='ghost'
           size='icon'
-          className='col-start-3 justify-self-end text-text-primary-new md:hidden'
+          className='col-start-3 justify-self-end text-on-brand md:hidden'
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           data-testid='mobile-menu-button'
@@ -246,7 +246,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           <button
             type='button'
             onClick={handleMobileFeedbackClick}
-            className='flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-medium text-sm text-text-secondary-new transition-colors hover:text-text-primary-new'
+            className='flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-medium text-on-brand-muted text-sm transition-colors hover:text-on-brand'
             aria-haspopup='dialog'
           >
             <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />

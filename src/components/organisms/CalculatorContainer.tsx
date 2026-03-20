@@ -3,10 +3,8 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { toast } from 'sonner';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
@@ -23,21 +21,9 @@ import {
   useCalculatorResults,
   useCalculatorStore,
 } from '@/store/calculatorStore';
-import { ChartsSkeleton } from './CalculatorCharts/ChartsSkeleton';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
-
-// Dynamic import for Recharts components to reduce initial bundle size (-571KB)
-// Lazy loads visualization library only when charts are needed
-// Reference: PAYTAX-80 Performance Optimization
-const ChartsContainer = dynamic(
-  () => import('./CalculatorCharts').then((mod) => ({ default: mod.ChartsContainer })),
-  {
-    loading: () => <ChartsSkeleton />,
-    ssr: false, // Charts not needed for SEO, reduces SSR payload
-  },
-);
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -78,6 +64,10 @@ export function CalculatorContainer() {
   ]);
   const [showScrollTop, setShowScrollTop] = React.useState(false);
   const [portalMounted, setPortalMounted] = React.useState(false);
+  const [actionMessage, setActionMessage] = React.useState<{
+    tone: 'info' | 'error';
+    text: string;
+  } | null>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
@@ -141,6 +131,8 @@ export function CalculatorContainer() {
   };
 
   const handleCalculate = () => {
+    setActionMessage(null);
+
     if (!hasTrackedCalculatorStartRef.current) {
       trackEvent({
         action: 'calculator_start',
@@ -158,10 +150,9 @@ export function CalculatorContainer() {
     });
 
     if (/\s*(W1|M1|X)$/i.test(input.taxCode)) {
-      toast.info('Emergency tax code detected', {
-        description:
-          'W1/M1/X codes are non-cumulative and may differ from your final annual tax position.',
-        duration: TIMERS.TOAST_SUCCESS,
+      setActionMessage({
+        tone: 'info',
+        text: 'Emergency tax code detected. W1, M1, and X codes are non-cumulative and may differ from your final annual tax position.',
       });
     }
 
@@ -199,10 +190,6 @@ export function CalculatorContainer() {
         behavior: shouldReduceMotion ? 'auto' : 'smooth',
         block: 'start',
       });
-      toast.success('Scenarios compared!', {
-        description: 'Check the results table to see your comparison',
-        duration: TIMERS.TOAST_SUCCESS,
-      });
     }, TIMERS.WHAT_IF_SCROLL);
   };
 
@@ -212,6 +199,7 @@ export function CalculatorContainer() {
 
   const handleExport = () => {
     if (!results) return;
+    setActionMessage(null);
     try {
       exportToCSV(results);
       trackEvent({
@@ -223,14 +211,17 @@ export function CalculatorContainer() {
           region: input.region,
         },
       });
-      toast.success('CSV exported successfully!');
     } catch {
-      toast.error('Failed to export CSV');
+      setActionMessage({
+        tone: 'error',
+        text: 'Failed to export CSV. Please try again.',
+      });
     }
   };
 
   const handlePrint = () => {
     if (!results) return;
+    setActionMessage(null);
     try {
       printResults({
         results,
@@ -251,17 +242,22 @@ export function CalculatorContainer() {
         },
       });
     } catch {
-      toast.error('Failed to open print dialog');
+      setActionMessage({
+        tone: 'error',
+        text: 'Failed to open the print dialog. Please try again.',
+      });
     }
   };
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
+    setActionMessage(null);
     try {
       // Validate pension amount
       if (typeof pensionAmount !== 'number' || Number.isNaN(pensionAmount) || pensionAmount < 0) {
         console.error('[CalculatorContainer] Invalid pension amount:', pensionAmount);
-        toast.error('Invalid pension amount', {
-          description: 'Please enter a valid pension contribution',
+        setActionMessage({
+          tone: 'error',
+          text: 'Invalid pension amount. Please enter a valid pension contribution.',
         });
         return;
       }
@@ -280,13 +276,12 @@ export function CalculatorContainer() {
         currency: 'GBP',
         minimumFractionDigits: 0,
       }).format(pensionAmount);
-      toast.success(`Added ${formattedAmount} to pension`, {
-        description: 'Your tax calculation has been updated',
-      });
+      setLiveMessage(`${formattedAmount} pension contribution applied. Results updated.`);
     } catch (error) {
       console.error('[CalculatorContainer] Error applying pension:', error);
-      toast.error('Failed to apply pension contribution', {
-        description: 'Please try entering the pension amount manually',
+      setActionMessage({
+        tone: 'error',
+        text: 'Failed to apply pension contribution. Please try entering the amount manually.',
       });
     }
   };
@@ -371,7 +366,7 @@ export function CalculatorContainer() {
         />
       </Card>
 
-      {/* Results Table - order-6 on mobile, right column on desktop */}
+      {/* Results column - order-6 on mobile, right column on desktop */}
       <AnimatePresence mode='wait'>
         {showResults && results ? (
           <motion.div
@@ -380,7 +375,11 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className='order-6 lg:order-3'
+            className={cn(
+              'order-6 flex flex-col',
+              SPACING.GAP_4,
+              'lg:order-3 lg:min-w-0 lg:self-start',
+            )}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -400,19 +399,51 @@ export function CalculatorContainer() {
                 isScottish: input.region === 'Scotland',
               }}
             />
-
-            {/* Data Visualization Charts */}
+            {/* Email Results Form */}
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, delay: 0.2 }}
-              className={SPACING.MT_6}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
+              className={cn('flex flex-col items-center', SPACING.GAP_4, 'lg:items-start')}
             >
-              <ChartsContainer
-                results={results}
-                whatIfResults={whatIfResults}
-                layout='full-width'
-              />
+              <EmailResultsForm input={emailInput} className='w-full max-w-md' />
+
+              {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
+              <div className='flex items-center justify-center gap-4 text-muted-foreground text-sm lg:justify-start'>
+                <button
+                  type='button'
+                  onClick={handlePrint}
+                  className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  aria-label='Print tax calculation results'
+                >
+                  <Printer className='h-3.5 w-3.5' />
+                  Print
+                </button>
+                <span className='text-border'>|</span>
+                <button
+                  type='button'
+                  onClick={handleExport}
+                  className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  aria-label='Download results as CSV file'
+                >
+                  <FileDown className='h-3.5 w-3.5' />
+                  Download CSV
+                </button>
+              </div>
+              {actionMessage && (
+                <p
+                  className={cn(
+                    'w-full rounded-md border px-3 py-2 text-sm',
+                    actionMessage.tone === 'error'
+                      ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                      : 'border-primary/30 bg-primary/10 text-primary',
+                  )}
+                  role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+                >
+                  {actionMessage.text}
+                </p>
+              )}
             </motion.div>
           </motion.div>
         ) : (
@@ -436,45 +467,6 @@ export function CalculatorContainer() {
               <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
                 Enter your salary. See your take-home pay in seconds.
               </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Export Buttons (bottom) - always last */}
-      <AnimatePresence mode='wait'>
-        {showResults && results && (
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
-            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
-            className={cn('order-8 flex flex-col items-center lg:col-span-2', SPACING.GAP_4)}
-          >
-            {/* Email Results Form */}
-            <EmailResultsForm input={emailInput} className='w-full max-w-md' />
-
-            {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
-            <div className='flex items-center justify-center gap-4 text-muted-foreground text-sm'>
-              <button
-                type='button'
-                onClick={handlePrint}
-                className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                aria-label='Print tax calculation results'
-              >
-                <Printer className='h-3.5 w-3.5' />
-                Print
-              </button>
-              <span className='text-border'>|</span>
-              <button
-                type='button'
-                onClick={handleExport}
-                className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                aria-label='Download results as CSV file'
-              >
-                <FileDown className='h-3.5 w-3.5' />
-                Download CSV
-              </button>
             </div>
           </motion.div>
         )}

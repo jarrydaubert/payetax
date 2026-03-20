@@ -101,6 +101,7 @@ bun run test                # Full tests with coverage
 bun run test:e2e            # Playwright E2E
 bun run bundle:analyze      # Bundle analysis
 bun run check:env-contract  # Verify critical env/template/schema sync
+bun run check:production-env-contract # Verify enabled-feature production env contract against Vercel
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 bun run gitlab:status       # GitLab project + MR + pipeline + release summary
@@ -118,6 +119,7 @@ See `docs/README.md` and `docs/guides/` for detail:
 - `LINEAR.md`
 - `MARKETING_SKILLS_RUNBOOK.md`
 - `OPS_RUNBOOK.md`
+- `PRODUCTION_ENV_CONTRACT.md`
 
 ## Skills (Agent Reference)
 
@@ -158,6 +160,7 @@ Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link)
 
 ### Engineering & Analytics
 - `engineering` — Next.js, React, TypeScript, performance
+- `frontend-design` — bold, polished, non-generic page/component UI design and implementation
 - `tdd` — test-driven development (Red/Green/Refactor) for regression-safe delivery
 - `design-an-interface` — compare multiple interface/module designs before implementation
 - `prd-to-issues` — break PRDs into vertical, testable execution slices
@@ -169,9 +172,7 @@ Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link)
 - `/audit` — deep code/architecture audit
 - `/finance` — UK tax specialist for HMRC verification
 - `/compliance` — compliance auditor
-- `/plan` — architecture planning session
 - `/cleanup` — find duplicates, orphans, junk
-- `/test` — coverage gaps, write/review tests
 - `/security` — OWASP web security review
 
 ## Tools & Integrations

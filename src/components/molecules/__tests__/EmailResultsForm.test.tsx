@@ -2,16 +2,6 @@ import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { fireEvent, render, screen, waitFor } from '@/test/testing-library';
 import { EmailResultsForm } from '../EmailResultsForm';
 
-const toastSuccess = jest.fn();
-const toastError = jest.fn();
-
-jest.mock('sonner', () => ({
-  toast: {
-    success: (...args: unknown[]) => toastSuccess(...args),
-    error: (...args: unknown[]) => toastError(...args),
-  },
-}));
-
 const makeInput = (): PayeEmailInput => ({
   salary: 50000,
   payPeriod: 'annually',
@@ -37,8 +27,6 @@ describe('EmailResultsForm', () => {
 
   afterEach(() => {
     global.fetch = originalFetch;
-    toastSuccess.mockReset();
-    toastError.mockReset();
   });
 
   it('submits and shows sent confirmation', async () => {
@@ -60,7 +48,5 @@ describe('EmailResultsForm', () => {
     await waitFor(() => {
       expect(screen.getByRole('status')).toHaveTextContent('Results sent to t***@example.com');
     });
-
-    expect(toastSuccess).toHaveBeenCalled();
   });
 });

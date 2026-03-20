@@ -210,6 +210,12 @@ describe('Tax Rates Constants', () => {
         expect(studentLoan.postgrad.threshold).toBeGreaterThan(0);
       }
     });
+
+    it('should keep Plan 4 thresholds aligned with the published tax-year values', () => {
+      expect(TAX_RATES['2023-2024'].studentLoan.plan4.threshold).toBe(27660);
+      expect(TAX_RATES['2024-2025'].studentLoan.plan4.threshold).toBe(31395);
+      expect(TAX_RATES['2025-2026'].studentLoan.plan4.threshold).toBe(32745);
+    });
   });
 
   describe('Constants', () => {

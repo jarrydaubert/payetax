@@ -8,10 +8,9 @@
  */
 'use client';
 
-import { Mail } from 'lucide-react';
+import { Mail, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -47,10 +46,17 @@ export function EmailResultsDialog({
   const inputRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [sentEmail, setSentEmail] = useState('');
 
   useEffect(() => {
     if (open) {
       trackEmailOpened();
+    } else {
+      setEmail('');
+      setIsLoading(false);
+      setSubmitError('');
+      setSentEmail('');
     }
   }, [open]);
 
@@ -64,12 +70,13 @@ export function EmailResultsDialog({
     }
 
     if (!(comparison && emailInput)) {
-      toast.error('No results to send');
+      setSubmitError('No results to send right now.');
       return;
     }
 
     const normalizedEmail = email.trim().toLowerCase();
 
+    setSubmitError('');
     setIsLoading(true);
 
     try {
@@ -88,32 +95,23 @@ export function EmailResultsDialog({
         const errorData = await response.json().catch(() => null);
 
         if (response.status === 429) {
-          toast.error('Too many requests', {
-            description: 'Please wait a minute before trying again',
-          });
+          setSubmitError('Too many requests. Please wait a minute before trying again.');
           return;
         }
 
         if (response.status === 400 && errorData?.details) {
-          toast.error('Invalid request', {
-            description: 'Please check your email address and try again',
-          });
+          setSubmitError('Please check your email address and try again.');
           return;
         }
 
         throw new Error(errorData?.error || 'Failed to send email');
       }
 
-      toast.success('Results sent!', {
-        description: `Check your inbox at ${normalizedEmail}`,
-      });
       trackEmailSent();
-      onOpenChange(false);
+      setSentEmail(normalizedEmail);
       setEmail('');
     } catch (error) {
-      toast.error('Failed to send email', {
-        description: error instanceof Error ? error.message : 'Please try again later',
-      });
+      setSubmitError(error instanceof Error ? error.message : 'Please try again later');
     } finally {
       setIsLoading(false);
     }
@@ -127,70 +125,105 @@ export function EmailResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='border-white/10 bg-slate-950 text-slate-100 sm:max-w-md'>
+      <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-slate-100'>
+          <DialogTitle className='flex items-center gap-2 text-card-foreground'>
             <Mail className={ICON_SIZES.SIZE_5} aria-hidden='true' />
             Email Your Results
           </DialogTitle>
-          <DialogDescription className='text-slate-400'>
+          <DialogDescription className='text-muted-foreground'>
             We&apos;ll send your director pay breakdown to your inbox. Results are sent directly via
             email and not stored on our servers.{' '}
-            <Link href='/privacy' className='text-cyan-400 underline hover:text-cyan-300'>
+            <Link href='/privacy' className='text-brand underline hover:text-brand-accent'>
               Privacy policy
             </Link>
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
-          <div className='space-y-2'>
-            <label htmlFor={emailInputId} className='font-medium text-slate-300 text-sm'>
-              Email address
-            </label>
-            <div className='relative'>
-              <Mail
-                className={cn(
-                  'absolute top-1/2 left-3 -translate-y-1/2 text-slate-500',
-                  ICON_SIZES.SIZE_4,
-                )}
-                aria-hidden='true'
-              />
-              <Input
-                ref={inputRef}
-                id={emailInputId}
-                type='email'
-                required
-                autoComplete='email'
-                placeholder='you@example.com'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={(e) => setEmail(e.target.value.trim())}
-                className='border-white/10 bg-slate-900 pl-10 text-slate-100 placeholder:text-slate-500'
-                disabled={isLoading}
-                autoFocus
-                aria-describedby={`${emailInputId}-hint`}
-              />
+        {sentEmail ? (
+          <div className='mt-4 space-y-4'>
+            <div className='rounded-lg border border-success/30 bg-success/10 p-4 text-sm text-success'>
+              Results sent to {sentEmail}. You can close this dialog or send the report to a
+              different address.
             </div>
-            <p id={`${emailInputId}-hint`} className='text-slate-500 text-xs'>
-              You&apos;ll receive a detailed breakdown with tax rates and key dates
-            </p>
+            <div className='flex justify-end gap-3'>
+              <Button
+                type='button'
+                variant='ghost'
+                onClick={() => {
+                  setSentEmail('');
+                  setSubmitError('');
+                }}
+                className='text-muted-foreground hover:text-foreground'
+              >
+                <RotateCcw className='mr-2 h-4 w-4' aria-hidden='true' />
+                Send Another
+              </Button>
+              <Button type='button' variant='brandOutline' onClick={() => onOpenChange(false)}>
+                Close
+              </Button>
+            </div>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
+            <div className='space-y-2'>
+              <label htmlFor={emailInputId} className='font-medium text-card-foreground text-sm'>
+                Email address
+              </label>
+              <div className='relative'>
+                <Mail
+                  className={cn(
+                    'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
+                    ICON_SIZES.SIZE_4,
+                  )}
+                  aria-hidden='true'
+                />
+                <Input
+                  ref={inputRef}
+                  id={emailInputId}
+                  type='email'
+                  required
+                  autoComplete='email'
+                  placeholder='you@example.com'
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (submitError) setSubmitError('');
+                  }}
+                  onBlur={(e) => setEmail(e.target.value.trim())}
+                  className='border-border/60 bg-background pl-10 text-foreground placeholder:text-muted-foreground'
+                  disabled={isLoading}
+                  autoFocus
+                  aria-invalid={!!submitError}
+                  aria-describedby={submitError ? `${emailInputId}-error` : `${emailInputId}-hint`}
+                />
+              </div>
+              <p id={`${emailInputId}-hint`} className='text-muted-foreground text-xs'>
+                You&apos;ll receive a detailed breakdown with tax rates and key dates
+              </p>
+              {submitError && (
+                <p id={`${emailInputId}-error`} className='text-destructive text-sm' role='alert'>
+                  {submitError}
+                </p>
+              )}
+            </div>
 
-          <div className='flex justify-end gap-3'>
-            <Button
-              type='button'
-              variant='ghost'
-              onClick={handleClose}
-              disabled={isLoading}
-              className='text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-            >
-              Cancel
-            </Button>
-            <Button type='submit' variant='brandOutline' disabled={isLoading || !email.trim()}>
-              {isLoading ? 'Sending...' : 'Send Results'}
-            </Button>
-          </div>
-        </form>
+            <div className='flex justify-end gap-3'>
+              <Button
+                type='button'
+                variant='ghost'
+                onClick={handleClose}
+                disabled={isLoading}
+                className='text-muted-foreground hover:text-foreground'
+              >
+                Cancel
+              </Button>
+              <Button type='submit' variant='brandOutline' disabled={isLoading || !email.trim()}>
+                {isLoading ? 'Sending...' : 'Send Results'}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

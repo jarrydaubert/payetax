@@ -11,7 +11,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
-import { Badge } from '@/components/atoms/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { SectionBadgeData } from '@/lib/validation/pageDataValidation';

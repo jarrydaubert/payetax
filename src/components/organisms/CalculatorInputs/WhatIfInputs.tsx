@@ -3,20 +3,19 @@
 
 import { RotateCcw, Wand2 } from 'lucide-react';
 import { useId, useState } from 'react';
-import { toast } from 'sonner';
 import { InputTooltip } from '@/components/atoms/InputTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Button } from '@/components/atoms/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/atoms/ui/select';
+} from '@/components/ui/select';
 import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { WhatIfValueSchema } from '@/lib/calculatorValidation';
 import { cn } from '@/lib/utils';
-import { WhatIfValueSchema } from '@/lib/validation';
 import { useCalculatorActions, useWhatIf, useWhatIfResults } from '@/store/calculatorStore';
 
 interface WhatIfInputsProps {
@@ -53,7 +52,6 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
       // Extract Zod's error message (now type-aware from superRefine)
       const errorMessage = validated.error.issues[0]?.message || 'Invalid input';
       setError(errorMessage);
-      toast.error(errorMessage);
       return;
     }
 
@@ -205,7 +203,7 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
           <Button
             onClick={() => {
               clearWhatIf();
-              toast.info('What If scenario cleared');
+              setError('');
             }}
             variant='outline'
             size='default'

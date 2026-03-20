@@ -8,7 +8,7 @@
  */
 
 import type { LucideIcon } from 'lucide-react';
-import { Card, CardContent } from '@/components/atoms/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { StatData } from '@/lib/validation/pageDataValidation';

@@ -70,26 +70,15 @@
   --ring: oklch(0.708 0 0);
 }
 
-/* New Design System Colors (Cyan/Emerald) - January 2026 */
+/* Brand surface tokens for dark homepage/navigation surfaces */
 :root {
-  /* New brand colors */
-  --brand-cyan: #06b6d4;
-  --brand-emerald: #10b981;
-  --brand-gradient-new: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
-
-  /* New background colors */
-  --bg-deep: #020617;
-  --bg-dark: #0f172a;
-  --bg-card-new: #1e293b;
-
-  /* New text colors */
-  --text-primary-new: #f8fafc;
-  --text-secondary-new: #94a3b8;
-  --text-dim: #94a3b8; /* slate-400 for WCAG AA contrast (was #64748b slate-500) */
-
-  /* New border colors */
-  --border-subtle: rgba(255, 255, 255, 0.01);
-  --border-light: rgba(255, 255, 255, 0.02);
+  --surface-brand: #020617;
+  --surface-brand-alt: #0f172a;
+  --on-brand: #f8fafc;
+  --on-brand-muted: #94a3b8;
+  --on-brand-dim: #94a3b8;
+  --chrome-brand: rgba(255, 255, 255, 0.08);
+  --chrome-brand-strong: rgba(255, 255, 255, 0.14);
 }
 
 /* Background Elements - Geometric patterns */
@@ -128,25 +117,12 @@
   to { transform: rotate(360deg); }
 }
 
-/* New gradient text utility */
-.text-gradient-new {
-  background: var(--brand-gradient-new);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Shared PayeTax wordmark typography */
 .brand-wordmark {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1;
-}
-
-/* New gradient background utility */
-.bg-brand-gradient-new {
-  background: var(--brand-gradient-new);
 }
 
 /* Mobile menu blur - with webkit support */
@@ -188,7 +164,7 @@
 
 .bento-item {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--chrome-brand);
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
@@ -197,7 +173,7 @@
 
 .bento-item:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: var(--brand-cyan);
+  border-color: var(--brand-primary);
   transform: translateY(-2px);
 }
 
@@ -217,13 +193,13 @@
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
   margin-bottom: 0.25rem;
 }
 
 .bento-desc {
   font-size: 0.8rem;
-  color: var(--text-dim);
+  color: var(--on-brand-dim);
 }
 
 @media (max-width: 900px) {
@@ -245,7 +221,7 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--brand-cyan);
+  color: var(--brand-primary);
   margin-bottom: 1rem;
 }
 
@@ -254,13 +230,13 @@
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 /* Features Section */
 .features-section {
   padding: 6rem 2rem;
-  background: var(--bg-dark);
+  background: var(--surface-brand-alt);
   position: relative;
   z-index: 1;
 }
@@ -275,7 +251,7 @@
 
 .feature-card {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--chrome-brand);
   border-radius: 20px;
   padding: 2rem;
   text-align: center;
@@ -284,7 +260,7 @@
 
 .feature-card:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: var(--brand-cyan);
+  border-color: var(--brand-primary);
   transform: translateY(-4px);
 }
 
@@ -305,12 +281,12 @@
   font-size: 1.15rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 .feature-card p {
   font-size: 0.9rem;
-  color: var(--text-secondary-new);
+  color: var(--on-brand-muted);
   line-height: 1.7;
 }
 
@@ -344,9 +320,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--brand-gradient-new);
+  background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
   border-radius: 50%;
-  color: var(--bg-deep);
+  color: var(--surface-brand);
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
@@ -358,12 +334,12 @@
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 .step-card p {
   font-size: 0.9rem;
-  color: var(--text-secondary-new);
+  color: var(--on-brand-muted);
   line-height: 1.6;
 }
 
@@ -374,7 +350,7 @@
 /* FAQ Section */
 .faq-section {
   padding: 6rem 2rem;
-  background: var(--bg-dark);
+  background: var(--surface-brand-alt);
   position: relative;
   z-index: 1;
 }
@@ -386,7 +362,7 @@
 
 .faq-item {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--chrome-brand);
   border-radius: 16px;
   padding: 1.5rem 2rem;
   margin-bottom: 1rem;
@@ -394,7 +370,7 @@
 }
 
 .faq-item:hover {
-  border-color: var(--border-light);
+  border-color: var(--chrome-brand-strong);
 }
 
 .faq-question {
@@ -402,12 +378,12 @@
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 .faq-answer {
   font-size: 0.9rem;
-  color: var(--text-secondary-new);
+  color: var(--on-brand-muted);
   line-height: 1.7;
 }
 
@@ -425,11 +401,11 @@
   font-weight: 600;
   max-width: 600px;
   margin: 0 auto 1.5rem;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 .final-cta p {
-  color: var(--text-secondary-new);
+  color: var(--on-brand-muted);
   font-size: 1rem;
   margin-bottom: 2rem;
 }
@@ -437,7 +413,7 @@
 /* New Footer Styles */
 .footer-new {
   padding: 3rem 2rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--chrome-brand);
   position: relative;
   z-index: 1;
 }
@@ -455,11 +431,11 @@
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary-new);
+  color: var(--on-brand);
 }
 
 .footer-brand span {
-  background: var(--brand-gradient-new);
+  background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -477,7 +453,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 24px;
-  color: var(--text-dim);
+  color: var(--on-brand-dim);
   font-size: 0.85rem;
   line-height: 1.5;
   text-decoration: none;
@@ -489,7 +465,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 24px;
-  color: var(--text-dim);
+  color: var(--on-brand-dim);
   font-size: 0.85rem;
   line-height: 1.5;
   text-decoration: none;
@@ -502,15 +478,15 @@
 }
 
 .footer-links-new a:hover {
-  color: var(--brand-cyan);
+  color: var(--brand-primary);
 }
 
 .footer-link-button:hover {
-  color: var(--brand-cyan);
+  color: var(--brand-primary);
 }
 
 .footer-copy {
-  color: var(--text-dim);
+  color: var(--on-brand-dim);
   font-size: 0.8rem;
   justify-self: end;
   white-space: nowrap;
@@ -563,6 +539,13 @@
   --brand-accent: #34d399;                      /* Emerald-400 (brighter) */
   --brand-gradient-start: #22d3ee;              /* Cyan-400 */
   --brand-gradient-end: #34d399;                /* Emerald-400 */
+  --surface-brand: #020617;
+  --surface-brand-alt: #0f172a;
+  --on-brand: #f8fafc;
+  --on-brand-muted: #cbd5e1;
+  --on-brand-dim: #cbd5e1;
+  --chrome-brand: rgba(255, 255, 255, 0.1);
+  --chrome-brand-strong: rgba(255, 255, 255, 0.16);
 
   /* Chart Colors - Brighter for dark mode visibility */
   --chart-1: 210 100% 68%;    /* Much brighter blue */

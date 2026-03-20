@@ -6,16 +6,15 @@ import {
   resolveUnsubscribeSecret,
   verifyUnsubscribeToken,
 } from '@/lib/newsletter/unsubscribeToken';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
-
-export const runtime = 'nodejs';
 
 const KIT_API_SECRET = process.env.KIT_API_SECRET;
 
 // SECURITY: Require secret in production, use dev fallback only in development
 const UNSUBSCRIBE_SECRET = process.env.UNSUBSCRIBE_SECRET;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const RATE_LIMIT = { max: 5, window: 60000 } as const;
 
 // Security headers for all responses
 const SECURITY_HEADERS = {
@@ -56,10 +55,10 @@ export async function GET(request: NextRequest) {
 
   // Rate limiting: 5 unsubscribe attempts per minute per client
   const clientId = getClientIdentifier(request);
-  if (!(await checkRateLimit(`newsletter-unsubscribe:${clientId}`, { max: 5, window: 60000 }))) {
+  if (!(await checkRateLimit(`newsletter-unsubscribe:${clientId}`, RATE_LIMIT))) {
     return new NextResponse(
       renderUnsubscribePage('Too many requests. Please try again later.', false),
-      { status: 429, headers: SECURITY_HEADERS },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT, SECURITY_HEADERS) },
     );
   }
 

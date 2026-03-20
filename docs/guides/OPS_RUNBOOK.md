@@ -79,9 +79,18 @@ bun run harness:local
 
 ```bash
 bun run release:report:init
+RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" \
+RATE_LIMIT_HEALTH_SECRET="..." \
+bun run check:production-env-contract
 # complete docs/reports/releases/v<version>.md
 bun run release:report:check
 ```
+
+Production env contract policy:
+
+1. Treat `docs/guides/PRODUCTION_ENV_CONTRACT.md` and `src/lib/productionEnvContract.ts` as the release-sensitive env contract for shipped features.
+2. Run `bun run check:production-env-contract` against live Vercel Production before marking the release report complete.
+3. If a feature is intentionally disabled in production, disable it in the checked-in contract instead of silently accepting missing env vars.
 
 Strict release-report interpretation:
 
@@ -212,6 +221,7 @@ Rule of thumb:
   - The MR pipeline passes in GitLab.
 - Release flow:
   - `bun run release:verify` passes.
+  - `bun run check:production-env-contract` passes against live Vercel Production.
   - `docs/reports/releases/v<version>.md` is initialized, completed, and accepted by `bun run release:report:check`.
   - Post-release checks in `docs/guides/POST_RELEASE_VALIDATION.md` are completed or any incomplete checks are explicitly recorded.
 - Governance audits:
@@ -230,5 +240,7 @@ Rule of thumb:
   - re-auth or relink before treating deployment checks as complete.
 - If release-report validation fails:
   - fix the report or missing evidence before release completion.
+- If the production env contract check fails:
+  - fix the missing Vercel Production env vars or explicitly disable the feature in the checked-in contract before release completion.
 - If a workflow change alters how these steps work:
   - update this runbook in the same change set.

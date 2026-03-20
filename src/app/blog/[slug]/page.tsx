@@ -201,8 +201,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  // Compile MDX content (returns function component)
-  const MDXContent = await compileMDXContent(post.content, {
+  // Compile MDX content
+  const mdxContent = await compileMDXContent(post.content, {
     slug: post.slug,
     updatedAt: post.updatedAt || post.publishedAt,
   });
@@ -439,7 +439,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   'md:prose-xl',
                 )}
               >
-                <MDXContent />
+                {mdxContent}
               </div>
             </div>
 

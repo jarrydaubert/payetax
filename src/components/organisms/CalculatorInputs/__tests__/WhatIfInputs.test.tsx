@@ -2,13 +2,11 @@
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { toast } from 'sonner';
 import * as calculatorStore from '@/store/calculatorStore';
 import { WhatIfInputs } from '../WhatIfInputs';
 
 // Mock the store
 jest.mock('@/store/calculatorStore');
-jest.mock('sonner');
 
 const mockUseWhatIf = calculatorStore.useWhatIf as jest.MockedFunction<
   typeof calculatorStore.useWhatIf
@@ -193,7 +191,7 @@ describe('WhatIfInputs', () => {
       expect(mockActions.clearWhatIf).toHaveBeenCalled();
     });
 
-    it('should show toast notification when clearing What If', async () => {
+    it('should clear What If results without extra status noise', async () => {
       const user = userEvent.setup();
       mockUseWhatIfResults.mockReturnValue({
         grossSalary: 45000,
@@ -204,7 +202,7 @@ describe('WhatIfInputs', () => {
       const clearButton = screen.getByTestId('clear-what-if-button');
       await user.click(clearButton);
 
-      expect(toast.info).toHaveBeenCalledWith('What If scenario cleared');
+      expect(mockActions.clearWhatIf).toHaveBeenCalledTimes(1);
     });
   });
 

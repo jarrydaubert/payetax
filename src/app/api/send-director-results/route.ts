@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { sendDirectorResultsEmail } from '@/lib/email/outboundResultsDelivery';
-import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
+import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { SendDirectorResultsRequestSchema } from '@/lib/validation/emailValidation';
 
-export const runtime = 'nodejs';
-
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
+const RATE_LIMIT = { max: 5, window: 60000 } as const;
 
 export async function POST(request: NextRequest) {
   if (!isValidRequestOrigin(request)) {
@@ -17,7 +16,7 @@ export async function POST(request: NextRequest) {
   const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
   const rateLimit = await checkRateLimitWithPolicy(
     `send-director-results:${clientId}`,
-    { max: 5, window: 60000 },
+    RATE_LIMIT,
     'require_distributed_in_production',
   );
   if (rateLimit.reason === 'distributed_unavailable') {
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
-      { status: 429 },
+      { status: 429, headers: createRateLimitHeaders(RATE_LIMIT) },
     );
   }
 

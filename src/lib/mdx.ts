@@ -3,14 +3,15 @@
  * Native Next.js 16 MDX utilities
  * File-system based approach using gray-matter for frontmatter parsing
  * Direct MDX compilation with rehype/remark plugins
- * OPTIMIZED: Caching, performance monitoring, and efficient syntax highlighting
+ * OPTIMIZED: Cache Components, performance monitoring, and efficient syntax highlighting
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { compileMDX } from 'next-mdx-remote/rsc';
+import type { ReactNode } from 'react';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 // Note: rehypeAutolinkHeadings removed - custom heading components in mdx-components.tsx
@@ -142,9 +143,9 @@ const REHYPE_PRETTY_CODE_OPTIONS = {
 /**
  * Internal MDX compilation function
  * Separated for better testability and caching
- * Returns a function component that renders the MDX content
+ * Returns the rendered MDX content
  */
-async function compileMDXInternal(content: string) {
+async function compileMDXInternal(content: string): Promise<ReactNode> {
   const result = await compileMDX({
     source: content,
     components: mdxComponents,
@@ -162,23 +163,24 @@ async function compileMDXInternal(content: string) {
     },
   });
 
-  // Return a function component that renders the content
-  return () => result.content;
+  return result.content;
 }
 
-const getCachedCompiledMDX = unstable_cache(
-  async (slug: string, _updatedAt: string) => {
-    const post = getPostBySlug(slug);
+const BLOG_CACHE_PROFILE = { stale: 600, revalidate: 3600, expire: 86400 } as const;
 
-    if (!post) {
-      return null;
-    }
+async function getCachedCompiledMDX(slug: string, _updatedAt: string): Promise<ReactNode | null> {
+  'use cache';
+  cacheLife(BLOG_CACHE_PROFILE);
+  cacheTag('blog', `blog-mdx:${slug}`);
 
-    return await compileMDXInternal(post.content);
-  },
-  ['blog-mdx-compiled-content'],
-  { revalidate: 3600, tags: ['blog'] },
-);
+  const post = getPostBySlug(slug);
+
+  if (!post) {
+    return null;
+  }
+
+  return await compileMDXInternal(post.content);
+}
 
 /**
  * Compile MDX content to React component
@@ -188,11 +190,11 @@ const getCachedCompiledMDX = unstable_cache(
 export async function compileMDXContent(
   content: string,
   cacheKey?: { slug: string; updatedAt: string },
-) {
+): Promise<ReactNode> {
   // Development: Performance monitoring
   const startTime = process.env.NODE_ENV === 'development' ? performance.now() : 0;
 
-  let result: Awaited<ReturnType<typeof compileMDXInternal>> | null;
+  let result: ReactNode | null;
 
   if (cacheKey) {
     try {
