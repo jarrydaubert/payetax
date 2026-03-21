@@ -424,9 +424,9 @@ export function ResultsTable({
                 hasWhatIfResults={!!whatIfResults}
               />
               <TableBody>
-                {tableRows.map((row, index) => (
+                {tableRows.map((row) => (
                   <ResultTableRow
-                    key={`${row.category}-${index}`}
+                    key={row.category}
                     category={row.category}
                     icon={row.icon}
                     annual={row.annual}

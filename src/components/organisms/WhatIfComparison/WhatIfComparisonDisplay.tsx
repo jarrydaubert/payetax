@@ -464,11 +464,11 @@ export function WhatIfComparisonDisplay({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableRows.map((row, index) => {
+                {tableRows.map((row) => {
                   const Icon = row.icon;
                   return (
                     <TableRow
-                      key={`${row.category}-${index}`}
+                      key={row.category}
                       className={`border-b transition-colors hover:bg-muted/50 ${
                         row.isHighlight ? 'border-t-2 border-t-primary bg-primary/5' : ''
                       }`}

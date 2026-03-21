@@ -79,8 +79,8 @@ export function DataFlowCards({ cards, columns = 3, className }: DataFlowCardsPr
 
   return (
     <div className={gridClasses}>
-      {cards.map((card, index) => (
-        <DataFlowCardItem key={`${card.title}-${index}`} card={card} />
+      {cards.map((card) => (
+        <DataFlowCardItem key={card.title} card={card} />
       ))}
     </div>
   );

@@ -168,9 +168,9 @@ export function TaxCodeDecoderClient() {
             {/* Details */}
             {result.details.length > 0 && (
               <div className='space-y-2'>
-                {result.details.map((detail, index) => (
+                {result.details.map((detail) => (
                   <div
-                    key={`detail-${index}-${detail.slice(0, 20)}`}
+                    key={`detail-${detail}`}
                     className='flex items-start gap-2 text-muted-foreground'
                   >
                     <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
@@ -183,11 +183,8 @@ export function TaxCodeDecoderClient() {
             {/* Warnings */}
             {result.warnings.length > 0 && (
               <div className='space-y-2 rounded-lg border border-warning/30 bg-warning/10 p-4'>
-                {result.warnings.map((warning, index) => (
-                  <div
-                    key={`warning-${index}-${warning.slice(0, 20)}`}
-                    className='flex items-start gap-2 text-warning'
-                  >
+                {result.warnings.map((warning) => (
+                  <div key={`warning-${warning}`} className='flex items-start gap-2 text-warning'>
                     <AlertCircle className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0')} />
                     <span>{warning}</span>
                   </div>

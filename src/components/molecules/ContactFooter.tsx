@@ -97,7 +97,7 @@ export function ContactFooter({
         <div className={linksContainerClasses}>
           {links.map((link, index) => (
             <ContactLinkItem
-              key={`contact-${index}-${link.text}`}
+              key={`contact-${link.text}-${link.href}`}
               link={link}
               showSeparator={centered && index < links.length - 1}
             />

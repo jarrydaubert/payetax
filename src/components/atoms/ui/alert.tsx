@@ -69,5 +69,5 @@ const AlertDescription = React.forwardRef<React.ElementRef<'div'>, AlertDescript
 );
 AlertDescription.displayName = 'AlertDescription';
 
-export { Alert, AlertTitle, AlertDescription, alertVariants };
-export type { AlertProps, AlertTitleProps, AlertDescriptionProps };
+export type { AlertDescriptionProps, AlertProps, AlertTitleProps };
+export { Alert, AlertDescription, AlertTitle, alertVariants };

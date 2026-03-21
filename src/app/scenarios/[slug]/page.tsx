@@ -182,11 +182,11 @@ export default async function ScenarioPage({ params }: PageProps) {
   return (
     <>
       {/* Structured Data */}
-      {structuredData.map((schema, index) => (
+      {structuredData.map((schema) => (
         // Escape closing script tags in serialized JSON-LD
         // to prevent script breakouts in inline script blocks.
         <script
-          key={`structured-data-${String(schema?.['@type'] ?? 'schema')}-${index}`}
+          key={`structured-data-${String(schema?.['@type'] ?? 'schema')}-${JSON.stringify(schema)}`}
           type='application/ld+json'
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - JSON-LD from our own data
           dangerouslySetInnerHTML={{
@@ -280,14 +280,14 @@ export default async function ScenarioPage({ params }: PageProps) {
                 '[&>li]:mb-2',
               )}
             >
-              {scenario.explanation.split('\n\n').map((paragraph, index) => {
+              {scenario.explanation.split('\n\n').map((paragraph) => {
                 if (paragraph.startsWith('**') && paragraph.includes(':')) {
                   // It's a heading
                   const parts = paragraph.split(':');
                   const heading = parts[0] ?? '';
                   const rest = parts.slice(1);
                   return (
-                    <div key={`explanation-${scenario.slug}-${index}`} className={SPACING.MB_4}>
+                    <div key={`explanation-${scenario.slug}-${paragraph}`} className={SPACING.MB_4}>
                       <h3 className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold', SPACING.MB_2)}>
                         {heading.replace(/\*\*/g, '')}:
                       </h3>
@@ -296,7 +296,10 @@ export default async function ScenarioPage({ params }: PageProps) {
                   );
                 }
                 return (
-                  <p key={`explanation-${scenario.slug}-${index}`} className='whitespace-pre-line'>
+                  <p
+                    key={`explanation-${scenario.slug}-${paragraph}`}
+                    className='whitespace-pre-line'
+                  >
                     {paragraph}
                   </p>
                 );
@@ -316,19 +319,19 @@ export default async function ScenarioPage({ params }: PageProps) {
                     '[&>li]:mb-1',
                   )}
                 >
-                  {scenario.optimization.split('\n\n').map((paragraph, index) => {
+                  {scenario.optimization.split('\n\n').map((paragraph) => {
                     if (paragraph.startsWith('**')) {
                       return (
-                        <p key={`opt-${scenario.slug}-${index}`} className='font-semibold'>
+                        <p key={`opt-${scenario.slug}-${paragraph}`} className='font-semibold'>
                           {paragraph.replace(/\*\*/g, '')}
                         </p>
                       );
                     }
                     if (paragraph.startsWith('- ')) {
                       return (
-                        <ul key={`opt-${scenario.slug}-${index}`}>
-                          {paragraph.split('\n').map((item, itemIndex) => (
-                            <li key={`opt-item-${scenario.slug}-${index}-${itemIndex}`}>
+                        <ul key={`opt-${scenario.slug}-${paragraph}`}>
+                          {paragraph.split('\n').map((item) => (
+                            <li key={`opt-item-${scenario.slug}-${item}`}>
                               {item.replace(/^- /, '')}
                             </li>
                           ))}
@@ -336,7 +339,7 @@ export default async function ScenarioPage({ params }: PageProps) {
                       );
                     }
                     return (
-                      <p key={`opt-${scenario.slug}-${index}`} className='whitespace-pre-line'>
+                      <p key={`opt-${scenario.slug}-${paragraph}`} className='whitespace-pre-line'>
                         {paragraph}
                       </p>
                     );

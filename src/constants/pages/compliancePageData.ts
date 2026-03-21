@@ -224,4 +224,4 @@ const complianceStats = [
   },
 ];
 
-export { complianceStats, COMPLIANCE_FEATURES, COMPLIANCE_STATEMENTS, DATA_SOURCES };
+export { COMPLIANCE_FEATURES, COMPLIANCE_STATEMENTS, complianceStats, DATA_SOURCES };

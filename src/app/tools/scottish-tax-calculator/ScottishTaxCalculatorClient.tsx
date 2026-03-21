@@ -285,10 +285,7 @@ export function ScottishTaxCalculatorClient() {
                       : scottishRates.personalAllowance + band.threshold;
 
                   return (
-                    <tr
-                      key={`${band.name}-${index}`}
-                      className='border-border/50 border-b last:border-0'
-                    >
+                    <tr key={band.name} className='border-border/50 border-b last:border-0'>
                       <td className='px-4 py-3'>{band.name}</td>
                       <td className='px-4 py-3 font-medium font-mono'>{band.rate}%</td>
                       <td className='px-4 py-3 text-muted-foreground'>
