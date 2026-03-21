@@ -27,6 +27,11 @@ interface KitSubscriberRecord {
   email_address?: unknown;
 }
 
+interface KitFormRecord {
+  id?: unknown;
+  uid?: unknown;
+}
+
 function normalizeErrorText(text: string, json: unknown): string {
   if (text.trim()) {
     return text.toLowerCase();
@@ -80,6 +85,24 @@ function getSubscribersFromResponse(json: unknown): KitSubscriberRecord[] {
   return [];
 }
 
+function getFormsFromResponse(json: unknown): KitFormRecord[] {
+  if (!json || typeof json !== 'object') {
+    return [];
+  }
+
+  const asRecord = json as Record<string, unknown>;
+
+  if (Array.isArray(asRecord.forms)) {
+    return asRecord.forms as KitFormRecord[];
+  }
+
+  if (Array.isArray(asRecord.data)) {
+    return asRecord.data as KitFormRecord[];
+  }
+
+  return [];
+}
+
 async function kitRequest(
   path: string,
   apiSecret: string,
@@ -114,6 +137,45 @@ async function kitRequest(
   };
 }
 
+async function resolveFormIdentifier(apiSecret: string, formIdentifier: string): Promise<string> {
+  if (/^\d+$/u.test(formIdentifier)) {
+    return formIdentifier;
+  }
+
+  const formsResult = await kitRequest('/forms', apiSecret);
+  if (!formsResult.ok) {
+    throw new Error(`Kit forms lookup failed (${formsResult.status})`);
+  }
+
+  const forms = getFormsFromResponse(formsResult.json);
+  const matched = forms.find((form) => {
+    if (!form || typeof form !== 'object') {
+      return false;
+    }
+
+    const id = form.id;
+    const uid = form.uid;
+    return (
+      (typeof id === 'number' && String(id) === formIdentifier) ||
+      (typeof id === 'string' && id === formIdentifier) ||
+      (typeof uid === 'string' && uid === formIdentifier)
+    );
+  });
+
+  const resolvedId =
+    matched && typeof matched.id === 'number'
+      ? String(matched.id)
+      : matched && typeof matched.id === 'string'
+        ? matched.id
+        : null;
+
+  if (!resolvedId) {
+    throw new Error(`Kit form lookup failed (unrecognized identifier: ${formIdentifier})`);
+  }
+
+  return resolvedId;
+}
+
 export async function subscribeEmailToKit(params: {
   apiSecret: string;
   formId: string;
@@ -121,6 +183,7 @@ export async function subscribeEmailToKit(params: {
 }): Promise<void> {
   const { apiSecret, formId, email } = params;
   const normalizedEmail = email.trim().toLowerCase();
+  const resolvedFormId = await resolveFormIdentifier(apiSecret, formId);
 
   const subscriberResult = await kitRequest('/subscribers', apiSecret, {
     method: 'POST',
@@ -141,7 +204,7 @@ export async function subscribeEmailToKit(params: {
   }
 
   const formResult = await kitRequest(
-    `/forms/${encodeURIComponent(formId)}/subscribers`,
+    `/forms/${encodeURIComponent(resolvedFormId)}/subscribers`,
     apiSecret,
     {
       method: 'POST',

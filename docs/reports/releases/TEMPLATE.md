@@ -49,11 +49,11 @@ Notes:
 
 ## 3) Email + Webhooks
 
-- [ ] Newsletter subscribe appears in Kit
-- [ ] Unsubscribe link works
-- [ ] PAYE results email verified
-- [ ] Director results email verified
-- [ ] Referral lead emails verified
+- [ ] Newsletter subscribe returns success and appears in Kit
+- [ ] Unsubscribe token link returns success and the subscriber is unsubscribed or absent in Kit
+- [ ] PAYE results email route returns success and Resend records the outbound message
+- [ ] Director results email route returns success and Resend records the outbound message
+- [ ] Referral lead flow verified when enabled by the production env contract
 
 Notes:
 - 

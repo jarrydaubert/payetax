@@ -77,7 +77,7 @@ export const ServerEnvSchema = z.object({
     .optional(),
   // Newsletter Service (Kit)
   KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter').optional(),
-  KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter').optional(),
+  KIT_FORM_ID: z.string().min(1, 'Kit form identifier is required for newsletter').optional(),
   UNSUBSCRIBE_SECRET: z.string().min(1, 'Unsubscribe secret must not be empty').optional(),
   UPSTASH_REDIS_REST_URL: z.string().url('Upstash Redis REST URL must be a valid URL').optional(),
   UPSTASH_REDIS_REST_TOKEN: z
@@ -150,7 +150,7 @@ export const RequiredProductionEnvSchema = z
     NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
     RESEND_API_KEY: z.string().min(1, 'Resend API key is required for email functionality'),
     KIT_API_SECRET: z.string().min(1, 'Kit API secret is required for newsletter'),
-    KIT_FORM_ID: z.string().min(1, 'Kit form ID is required for newsletter'),
+    KIT_FORM_ID: z.string().min(1, 'Kit form identifier is required for newsletter'),
     UNSUBSCRIBE_SECRET: z.string().min(1, 'Unsubscribe secret is required in production'),
     REFERRAL_PARTNER_EMAIL: z.string().email('Referral partner email is required in production'),
     INDEXNOW_SUBMIT_SECRET: z.string().min(1, 'IndexNow submit secret is required in production'),

@@ -66,11 +66,13 @@ Goal: confirm runtime protections are effective with real edge/network behavior.
 
 Goal: verify third-party integrations from real production infra.
 
-- [ ] Newsletter subscribe sends success response and appears in Kit.
-- [ ] Unsubscribe token link works from a real received email.
-- [ ] PAYE results email sends and all links render correctly.
-- [ ] Director results email sends and content renders correctly.
-- [ ] Referral lead flow sends user confirmation; partner notification fires.
+- [ ] Newsletter subscribe returns success and the subscriber appears in Kit.
+- [ ] Unsubscribe token link returns success and the Kit subscriber becomes unsubscribed or absent.
+- [ ] PAYE results email route returns success and Resend records the outbound message.
+- [ ] Director results email route returns success and Resend records the outbound message.
+- [ ] Referral lead flow returns success and both confirmation plus partner notification are observed when the feature is enabled in the production env contract.
+
+If a flow is intentionally disabled by `docs/guides/PRODUCTION_ENV_CONTRACT.md`, mark it `- [~]` with the contract reason in `Notes` instead of treating it as a release blocker.
 
 ---
 

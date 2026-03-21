@@ -6,7 +6,13 @@ Store one report per shipped version using:
 Workflow:
 1. Run `bun run release:report:init` before release validation work starts.
 2. Complete checklist entries while running `docs/guides/POST_RELEASE_VALIDATION.md`.
-3. Set `Deployment URL` and `Release Notes URL`.
+3. Set `Deployment URL` and `Release Notes URL` to the release-notes/changelog entry that links back to the report.
 4. Set `Status: COMPLETE` and ensure no unchecked items remain.
 5. Run `bun run release:report:check` to enforce completion.
 6. Link the report from release notes/changelog.
+
+## Release Notes Index
+
+### v5.1.0
+
+- Report: [`v5.1.0.md`](./v5.1.0.md)

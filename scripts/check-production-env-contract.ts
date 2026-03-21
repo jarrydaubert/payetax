@@ -131,7 +131,7 @@ function main(): void {
 
     if (feature.id === 'rate-limit-health') {
       const baseUrl = process.env.RATE_LIMIT_VERIFY_BASE_URL ?? env.NEXT_PUBLIC_SITE_URL;
-      const secret = process.env.RATE_LIMIT_HEALTH_SECRET;
+      const secret = process.env.RATE_LIMIT_HEALTH_SECRET ?? env.RATE_LIMIT_HEALTH_SECRET;
 
       if (!(baseUrl && secret)) {
         const missing = [

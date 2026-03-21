@@ -17,7 +17,8 @@ PayeTax now uses a split provider model:
 ```env
 # Newsletter (Kit)
 KIT_API_SECRET=kit_xxxxx
-KIT_FORM_ID=12345
+# Numeric form id or form uid from Kit
+KIT_FORM_ID=648a4b276a
 NEXT_PUBLIC_KIT_EMBED_UID=648a4b276a
 NEXT_PUBLIC_KIT_EMBED_VERSION=2026-02-13-1
 
@@ -44,7 +45,7 @@ Broadcasting is managed in Kit (broadcasts/sequences/automations), not from this
 
 ## Troubleshooting
 
-- Newsletter signup issues: verify `KIT_API_SECRET` and `KIT_FORM_ID`.
+- Newsletter signup issues: verify `KIT_API_SECRET` and that `KIT_FORM_ID` matches an active Kit form id or uid.
 - Transactional email issues: verify `RESEND_API_KEY`.
 - Rate limit behavior: inspect `src/lib/rateLimit.ts`.
 

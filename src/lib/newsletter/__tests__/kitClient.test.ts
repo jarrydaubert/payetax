@@ -52,6 +52,42 @@ describe('kitClient', () => {
       );
     });
 
+    it('resolves a form uid to the numeric form id before subscribing', async () => {
+      fetchMock
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          text: async () => '{"forms":[{"id":9084803,"uid":"648a4b276a"}]}',
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 201,
+          text: async () => '{"subscriber":{"id":1}}',
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 201,
+          text: async () => '{"subscription":{"id":1}}',
+        });
+
+      await expect(
+        subscribeEmailToKit({
+          apiSecret: 'kit_secret',
+          formId: '648a4b276a',
+          email: 'user@payetax.co.uk',
+        }),
+      ).resolves.toBeUndefined();
+
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        3,
+        'https://api.kit.com/v4/forms/9084803/subscribers',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ email_address: 'user@payetax.co.uk' }),
+        }),
+      );
+    });
+
     it('is idempotent when subscriber already exists or already subscribed', async () => {
       fetchMock
         .mockResolvedValueOnce({
@@ -88,6 +124,22 @@ describe('kitClient', () => {
           email: 'user@payetax.co.uk',
         }),
       ).rejects.toThrow('Kit subscriber create failed');
+    });
+
+    it('throws when a non-numeric form identifier cannot be resolved', async () => {
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => '{"forms":[{"id":9084803,"uid":"648a4b276a"}]}',
+      });
+
+      await expect(
+        subscribeEmailToKit({
+          apiSecret: 'kit_secret',
+          formId: 'missing-form-uid',
+          email: 'user@payetax.co.uk',
+        }),
+      ).rejects.toThrow('Kit form lookup failed');
     });
   });
 
