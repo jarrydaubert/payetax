@@ -2,18 +2,18 @@
  * @jest-environment jsdom
  */
 // src/components/molecules/__tests__/ServerHero.test.tsx
-// ServerHero with new payetax-web design: badge, headline, dual CTAs, trust strip, bento grid
+// ServerHero with payetax-web design: badge, headline, dual CTAs, trust strip
 
 import { render, screen } from '@testing-library/react';
 import ServerHero from '../ServerHero';
 
 describe('ServerHero Component', () => {
-  it('should render the main heading with correct text', () => {
+  it('should render the main heading with hybrid outcome+keyword text', () => {
     render(<ServerHero />);
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    expect(screen.getByText('See Your Take-Home Pay')).toBeInTheDocument();
     expect(screen.getByText('Free UK PAYE Tax Calculator')).toBeInTheDocument();
-    expect(screen.getByText('See your take-home pay')).toBeInTheDocument();
   });
 
   it('should render the tagline with HMRC mention', () => {
@@ -49,21 +49,12 @@ describe('ServerHero Component', () => {
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });
 
-  it('should render bento grid items', () => {
-    render(<ServerHero />);
-
-    expect(screen.getByText('HMRC-Based')).toBeInTheDocument();
-    expect(screen.getByText('Fast Results')).toBeInTheDocument();
-    expect(screen.getByText('Private')).toBeInTheDocument();
-    expect(screen.getByText('UK Coverage')).toBeInTheDocument();
-  });
-
-  it('should have text-gradient-brand class on headline text', () => {
+  it('should have text-gradient-brand class on keyword line', () => {
     const { container } = render(<ServerHero />);
 
     const gradientText = container.querySelector('.text-gradient-brand');
     expect(gradientText).toBeInTheDocument();
-    expect(gradientText?.textContent).toBe('See your take-home pay');
+    expect(gradientText?.textContent).toBe('Free UK PAYE Tax Calculator');
   });
 
   it('should accept and apply custom className', () => {

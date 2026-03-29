@@ -14,27 +14,25 @@ Status legend:
 ## Lean End State
 
 - Strong organic acquisition via SEO + blog + newsletter loops.
-- High-quality accountant referral path for complex users.
-- Paid Tax Pack for directors as primary productized revenue.
+- High-quality decision-support experience for complex director use cases.
+- Optional accountant referral path only if it improves user outcomes and partner quality is proven.
 - Optional: embeddable widget only if demand is validated.
 
 ## Current Snapshot (Lean Scope)
 
 | Area | Status | Notes | Source Docs |
 |------|--------|-------|-------------|
-| Director Intelligence core calculator | Live | Strategy comparison, warnings, education + input workflow are live. | `DIRECTOR_CALCULATOR_BUILD.md`, `DIRECTOR_GUIDE_POSITIONING.md` |
-| Variable Income (Monthly mode) | Live | Annual/monthly toggle, safe monthly draw, buffer logic, warnings are implemented. | `DIRECTOR_VARIABLE_INCOME_SPEC.md` |
-| Key dates `.ics` download | Live | Downloadable calendar export is implemented in product. | `COMPETITOR_GAP_ANALYSIS.md` |
-| Two Pots set-aside guidance | Live | Company/personal tax pots and set-aside messaging are live. | `DIRECTOR_GUIDE_POSITIONING.md`, `COMPETITOR_GAP_ANALYSIS.md` |
-| Case-study regression anchors (recruiter scenario) | Live | Case-study test coverage exists in tax test suite. | `CASE_STUDY_RECRUITER.md` |
-| Accountant referral backend | Partial | Lead API + email flow exist; main calculator CTA is intentionally disabled pending partner agreements. | `MONETIZATION.md`, `docs/BACKLOG.md` |
-| Tax Pack monetization flow | Planned | V1 scope and architecture are defined; checkout/export/download pipeline not yet shipped. | `MONETIZATION.md`, `tax-pack/TAX_PACK_PLAN.md` |
-| Embeddable/white-label widget | Planned | Idea-stage only, demand validation first. | `MONETIZATION.md`, `docs/BACKLOG.md` |
+| Director Intelligence core calculator | Live | Strategy comparison, warnings, education + input workflow are live. | `DIRECTOR_INTELLIGENCE.md` |
+| Variable Income (Monthly mode) | Live | Annual/monthly toggle, safe monthly draw, buffer logic, warnings are implemented. | `DIRECTOR_INTELLIGENCE.md` |
+| Key dates `.ics` download | Live | Downloadable calendar export is implemented in product. | `DIRECTOR_INTELLIGENCE.md` |
+| Two Pots set-aside guidance | Live | Company/personal tax pots and set-aside messaging are live. | `DIRECTOR_INTELLIGENCE.md` |
+| Case-study regression anchors (recruiter scenario) | Live | Case-study test coverage exists in tax test suite. | `DIRECTOR_INTELLIGENCE.md` |
+| Accountant referral backend | Partial | Lead API + email flow exist; main calculator CTA is intentionally disabled pending partner agreements. | `docs/BACKLOG.md` |
+| Embeddable/white-label widget | Planned | Idea-stage only, demand validation first. | `docs/BACKLOG.md` |
 
 ## Scope Guardrails (Current)
 
-- Tax Pack V1 scope is Director Intelligence extraction output only.
-- CGT and crypto are explicitly out of scope for Tax Pack V1.
+- No paid product flow is in active scope.
 
 ## Parked For Now (Not In Lean Scope)
 

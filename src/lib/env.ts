@@ -88,11 +88,6 @@ export const ServerEnvSchema = z.object({
     .string()
     .min(1, 'Rate-limit health secret must not be empty')
     .optional(),
-  TAX_PACK_WEBHOOK_SECRET: z
-    .string()
-    .min(1, 'Tax Pack webhook secret must not be empty')
-    .optional(),
-
   // Sentry Build Configuration
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
@@ -244,7 +239,6 @@ export function validateServerEnv(): ServerEnv {
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     RATE_LIMIT_HEALTH_SECRET: process.env.RATE_LIMIT_HEALTH_SECRET,
-    TAX_PACK_WEBHOOK_SECRET: process.env.TAX_PACK_WEBHOOK_SECRET,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,

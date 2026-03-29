@@ -6,8 +6,7 @@
  * Revenue/expense values are bucketed, not logged raw.
  *
  * @module lib/directorGuideAnalytics
- * @see docs/business/DIRECTOR_CALCULATOR_BUILD.md
- * @see docs/business/DIRECTOR_VARIABLE_INCOME_SPEC.md
+ * @see docs/business/DIRECTOR_INTELLIGENCE.md
  */
 
 import { trackEvent } from '@/lib/analytics';

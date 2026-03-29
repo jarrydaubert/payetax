@@ -4,7 +4,7 @@
  * Tests based on real company accounts (Recruiter case study).
  * Validates pension gap detection, NI threshold changes, and variable income scenarios.
  *
- * @see docs/business/CASE_STUDY_RECRUITER.md
+ * @see docs/business/DIRECTOR_INTELLIGENCE.md
  */
 
 import { TAX_RATES } from '@/constants/taxRates';

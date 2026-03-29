@@ -7,7 +7,7 @@ Define which shipped, release-sensitive features are expected to work in product
 Scope:
 
 - Shipped flows only.
-- Tax Pack is deferred and excluded by default.
+- Dormant or unshipped experiments are excluded by default.
 
 Canonical sources:
 

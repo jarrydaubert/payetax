@@ -32,7 +32,7 @@ export interface ProductionEnvContractEvaluation {
 }
 
 export const PRODUCTION_ENV_CONTRACT_SCOPE =
-  'Shipped flows only. Tax Pack is deferred and excluded by default.';
+  'Shipped flows only. Dormant or unshipped experiments are excluded by default.';
 
 function isAnalyticsEnabled(env: ProductionEnvMap): boolean {
   return env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';

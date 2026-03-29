@@ -193,7 +193,7 @@ export function StrategyComparisonTable() {
               key={key}
               onClick={() => handleSelectStrategy(key)}
               className={cn(
-                'relative rounded-xl border p-4 text-left transition-all',
+                'relative rounded-xl border p-5 text-left transition-all',
                 isSelected
                   ? 'border-primary bg-primary/10 shadow-cyan-glow'
                   : 'border-border/40 bg-card hover:border-border/70 hover:bg-accent/20',
@@ -326,7 +326,7 @@ function YourSetupCard({
 }: YourSetupCardProps) {
   if (!yourSetup) {
     return (
-      <div className='relative mt-4 rounded-xl border border-warning/50 bg-warning/10 p-4'>
+      <div className='relative mt-4 rounded-xl border border-warning/50 bg-warning/10 p-5'>
         <div className='mb-3 flex items-center gap-2'>
           <div className='flex size-8 items-center justify-center rounded-lg bg-warning/20'>
             <User className='size-4 text-warning' />
@@ -354,7 +354,7 @@ function YourSetupCard({
   return (
     <div
       className={cn(
-        'relative mt-4 rounded-xl border p-4',
+        'relative mt-4 rounded-xl border p-5',
         yourSetup.exceedsProfit
           ? 'border-destructive/50 bg-destructive/10'
           : 'border-warning/50 bg-warning/10',

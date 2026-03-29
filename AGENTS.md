@@ -13,7 +13,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Single source of truth: tax rates live in `src/constants/taxRates.ts`.
 - Test behavior: cover user-visible outcomes over implementation details.
 - Accessibility + performance: ship fast and inclusive UI.
-- Tax Pack status guardrail: Tax Pack is planned (not live); by default assess shipped flows only and treat Tax Pack work as deferred unless explicitly requested.
+- Portfolio-first guardrail: by default assess shipped free flows and hobby-project positioning unless explicitly requested otherwise.
 
 ## Source Of Truth
 
@@ -117,7 +117,6 @@ See `docs/README.md` and `docs/guides/` for detail:
 - `TESTING.md`
 - `SYSTEM_OVERVIEW.md`
 - `LINEAR.md`
-- `MARKETING_SKILLS_RUNBOOK.md`
 - `OPS_RUNBOOK.md`
 - `PRODUCTION_ENV_CONTRACT.md`
 
@@ -183,7 +182,7 @@ Skills are agents-native in PayeTax:
 
 - Tool registry: `.claude/tools/REGISTRY.md`
 - Integration guides: `.claude/tools/integrations/` (60 guides — Kit, Resend, Ahrefs, GA4, etc.)
-- CLI tool scripts: `.claude/tools/clis/` (52 vendor scripts)
+- CLI tool scripts: `.claude/tools/clis/` (51 vendor scripts)
 
 ## Email Infrastructure
 

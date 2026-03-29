@@ -153,63 +153,6 @@
   }
 }
 
-/* Bento Grid */
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  max-width: 900px;
-  margin: 3rem auto 0;
-}
-
-.bento-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--chrome-brand);
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
-  transition: all 0.3s;
-}
-
-.bento-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--brand-primary);
-  transform: translateY(-2px);
-}
-
-.bento-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(6, 182, 212, 0.1);
-  border-radius: 10px;
-  margin: 0 auto 1rem;
-  font-size: 1.25rem;
-}
-
-.bento-title {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--on-brand);
-  margin-bottom: 0.25rem;
-}
-
-.bento-desc {
-  font-size: 0.8rem;
-  color: var(--on-brand-dim);
-}
-
-@media (max-width: 900px) {
-  .bento-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 640px) {
-  .bento-grid { grid-template-columns: 1fr; max-width: 350px; }
-}
-
 /* Section Base Styles */
 .section-header {
   text-align: center;
@@ -243,9 +186,9 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  max-width: 1100px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -290,7 +233,7 @@
   line-height: 1.7;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 640px) {
   .features-grid { grid-template-columns: 1fr; max-width: 500px; }
 }
 
@@ -387,28 +330,6 @@
   line-height: 1.7;
 }
 
-/* Final CTA Section */
-.final-cta {
-  padding: 6rem 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.final-cta h2 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 600;
-  max-width: 600px;
-  margin: 0 auto 1.5rem;
-  color: var(--on-brand);
-}
-
-.final-cta p {
-  color: var(--on-brand-muted);
-  font-size: 1rem;
-  margin-bottom: 2rem;
-}
 
 /* New Footer Styles */
 .footer-new {

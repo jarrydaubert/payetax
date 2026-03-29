@@ -30,7 +30,7 @@
 | **Configure Resend?** | [`RESEND.md`](./guides/RESEND.md) |
 | **Use Linear?** | [`LINEAR.md`](./guides/LINEAR.md) |
 | **Run Kanban workflow?** | [`KANBAN.md`](./guides/KANBAN.md) |
-| **Director tools strategy?** | [`business/README.md`](./business/README.md) |
+| **Understand Director Intelligence?** | [`DIRECTOR_INTELLIGENCE.md`](./business/DIRECTOR_INTELLIGENCE.md) |
 
 ---
 

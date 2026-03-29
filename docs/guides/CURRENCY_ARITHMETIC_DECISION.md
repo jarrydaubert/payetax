@@ -87,7 +87,7 @@ This is the best risk/performance tradeoff for current production flows.
 ## Follow-Up
 
 - No immediate full-engine refactor ticket is required from this decision.
-- Existing `P1-11` (Tax Pack snapshot contract) already captures integer-pence requirements for paid artifact snapshots where stronger deterministic serialization is required.
+- If a future export or persistence workflow needs stronger deterministic serialization, reassess integer-pence requirements in that narrower context instead of changing live calculator arithmetic first.
 - Incremental cleanup of local rounding duplicates remains part of normal refactor hygiene, not a dedicated blocker.
 
 ---

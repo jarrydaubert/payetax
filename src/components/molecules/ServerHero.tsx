@@ -32,9 +32,9 @@ export default function ServerHero({ className }: ServerHeroProps) {
 
       {/* Heading */}
       <h1 className='mx-auto mb-6 max-w-4xl font-bold font-display text-5xl text-on-brand leading-tight tracking-tight sm:text-6xl lg:text-7xl'>
-        Free UK PAYE Tax Calculator
+        See Your Take-Home Pay
         <br />
-        <span className='text-gradient-brand'>See your take-home pay</span>
+        <span className='text-gradient-brand'>Free UK PAYE Tax Calculator</span>
       </h1>
 
       {/* Tagline */}
@@ -79,24 +79,6 @@ export default function ServerHero({ className }: ServerHeroProps) {
           <div key={text} className='flex items-center gap-2 text-on-brand-dim text-sm'>
             <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
             <span>{text}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Bento Grid */}
-      <div className='bento-grid'>
-        {[
-          { icon: '✅', title: 'HMRC-Based', desc: 'Estimates built from HMRC rates' },
-          { icon: '⚡', title: 'Fast Results', desc: 'Get results in seconds' },
-          { icon: '🔒', title: 'Private', desc: 'We never see your salary' },
-          { icon: '🇬🇧', title: 'UK Coverage', desc: 'Built for England, Wales, NI, and Scotland' },
-        ].map((item) => (
-          <div key={item.title} className='bento-item'>
-            <div className='bento-icon' aria-hidden='true'>
-              {item.icon}
-            </div>
-            <div className='bento-title'>{item.title}</div>
-            <div className='bento-desc'>{item.desc}</div>
           </div>
         ))}
       </div>

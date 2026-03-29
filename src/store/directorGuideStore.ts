@@ -6,8 +6,7 @@
  * Full pro calculator: student loans, pension, BIK, EA, strategy comparison.
  *
  * @module store/directorGuideStore
- * @see docs/business/DIRECTOR_CALCULATOR_BUILD.md
- * @see docs/business/DIRECTOR_VARIABLE_INCOME_SPEC.md
+ * @see docs/business/DIRECTOR_INTELLIGENCE.md
  */
 
 import { z } from 'zod';

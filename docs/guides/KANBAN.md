@@ -88,7 +88,7 @@ Use this template for Linear issues:
   - ...
 
 ## Risk / Impact
-- Area: [tax-logic | director-intelligence | tax-pack | seo | content | ops]
+- Area: [tax-logic | director-intelligence | seo | content | ops | ux]
 - Risk level: [High | Medium | Low]
 
 ## Links
@@ -102,7 +102,6 @@ Use this template for Linear issues:
 
 - `tax-logic`
 - `director-intelligence`
-- `tax-pack`
 - `tests`
 - `e2e`
 - `docs`

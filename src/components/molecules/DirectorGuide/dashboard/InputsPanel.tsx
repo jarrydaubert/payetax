@@ -1,7 +1,7 @@
 /**
  * Inputs Panel - Left panel with all calculator inputs
  *
- * Based on DIRECTOR_CALCULATOR_BUILD.md spec.
+ * Based on the Director Intelligence product spec.
  * Organized into: Core Inputs, Your Situation, Advanced Options.
  */
 'use client';

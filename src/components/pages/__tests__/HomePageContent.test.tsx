@@ -47,11 +47,11 @@ describe('HomePageContent Component', () => {
     expect(calculatorSection?.tagName).toBe('SECTION');
   });
 
-  it('should render calculator section with padding', () => {
+  it('should render calculator section with brand surface background', () => {
     const { container } = render(<HomePageContent />);
 
     const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toHaveClass('py-16', 'md:py-20', 'lg:py-24');
+    expect(calculatorSection).toHaveClass('bg-surface-brand');
   });
 
   it('should have z-index for layering above background', () => {

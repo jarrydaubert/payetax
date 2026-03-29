@@ -27,7 +27,7 @@ Every issue should include:
 - In-scope and out-of-scope
 - Acceptance criteria
 - Test plan with bug intent ("what bug does this catch?")
-- Risk area (tax-logic, director-intelligence, tax-pack, seo, content, ops)
+- Risk area (tax-logic, director-intelligence, seo, content, ops, ux)
 
 Use the template in `docs/guides/KANBAN.md`.
 

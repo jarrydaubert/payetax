@@ -5,7 +5,6 @@
 
 import { memo, useEffect, useLayoutEffect } from 'react';
 import { CalculatorContainer } from '@/components/organisms/CalculatorContainer';
-import { SPACING } from '@/constants/designTokens';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
 const CALCULATOR_HASH = '#tax-calculator';
@@ -55,10 +54,7 @@ const HomePageContent = memo(function HomePageContent() {
   }, []);
 
   return (
-    <section
-      id={CALCULATOR_ID}
-      className={`relative z-[1] bg-surface-brand ${SPACING.PY_SECTION_LG}`}
-    >
+    <section id={CALCULATOR_ID} className='relative z-[1] bg-surface-brand'>
       <CalculatorContainer />
     </section>
   );

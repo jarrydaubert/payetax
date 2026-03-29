@@ -196,7 +196,7 @@ curl -sS --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
 2. Confirm `.gitlab-ci.yml` runtime/cost assumptions are still valid.
 3. Confirm release-report discipline is being followed (`release:report:check`).
 4. Confirm Vercel project/env linkage still matches this repo.
-5. Confirm the local marketing-skills pin/profile is still intentional when upstream updates land; use `bun run skills:check` and `docs/guides/MARKETING_SKILLS_RUNBOOK.md`.
+5. Confirm the local marketing-skills pin/profile is still intentional when upstream updates land; use `bun run skills:check`.
 
 ### Harness Command Surface
 

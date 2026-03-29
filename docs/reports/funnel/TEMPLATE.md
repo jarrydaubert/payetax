@@ -12,7 +12,7 @@ Owner: TBD
 | Sessions | TBD | |
 | `calculator_start` | TBD | |
 | `calculator_completed` | TBD | |
-| Monetization click (Tax Pack / referral) | TBD | |
+| Secondary CTA click | TBD | |
 | Completion rate (`completed/start`) | TBD | |
 
 ---

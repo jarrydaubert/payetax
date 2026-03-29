@@ -1,10 +1,9 @@
 // src/components/organisms/LandingPageSections.tsx
-// Landing page sections: Features, How It Works, FAQ, Final CTA
+// Landing page sections: How It Works, Proof Strip, Features, Director Spotlight, FAQ, Newsletter
 // Server Component - no hooks/state/effects, maximizes SEO/LCP
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,39 +46,27 @@ export interface FAQ {
 const features: Feature[] = [
   {
     icon: '📈',
-    title: 'See Where Every Pound Goes',
+    title: 'Know Where Every Pound Goes',
     description:
-      'Your full breakdown: tax by band, NI, student loans, pension. Budget with confidence.',
+      'Full breakdown by tax band, National Insurance, student loans, and pension — so you can budget with confidence.',
   },
   {
     icon: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-    title: 'Scottish Rates Supported',
+    title: 'Accurate for All UK Regions',
     description:
-      'Scottish residents pay different income tax rates set by the Scottish Parliament. Select your region for the right numbers.',
-  },
-  {
-    icon: '🔒',
-    title: 'Your Salary Stays Private',
-    description:
-      'All calculations happen locally in your browser. Your salary is never sent to our servers.',
+      'Scottish, Welsh, and English rates built in. Select your region and get the right numbers instantly.',
   },
   {
     icon: '🎓',
-    title: 'Student Loans',
+    title: 'See Your Real Take-Home After Loans',
     description:
-      'All plan types supported — Plan 1, 2, 4, 5, and Postgraduate. See how much comes out each month.',
+      'Student loan Plans 1, 2, 4, 5, and Postgraduate all supported. Know exactly what lands in your account.',
   },
   {
     icon: '💰',
-    title: 'Pension Relief',
+    title: 'Spot Your Pension Tax Savings',
     description:
-      'See the estimated difference between £0 and £1,000 pension contributions (up to ~£400 at basic rate; varies by circumstances). Supports salary sacrifice schemes.',
-  },
-  {
-    icon: '📊',
-    title: 'Understand Your Tax Clearly',
-    description:
-      'See your deductions in clear summary cards and a detailed results table. Know where you stand in seconds.',
+      'See how much pension contributions could save you in tax — including salary sacrifice schemes.',
   },
 ];
 
@@ -144,24 +131,6 @@ export const faqs: FAQ[] = [
     question: 'Can I use PayeTax offline?',
     answer:
       'Yes. You can install PayeTax as an app and continue using cached pages and tools when your connection drops. Visit /install for setup steps.',
-  },
-  {
-    question: 'How much tax do I pay on £30,000?',
-    answer:
-      'Use our £30,000 after-tax page to see PAYE deductions and monthly take-home with the same calculator logic.',
-    links: [{ label: '£30,000 after tax', href: '/calculator/30000-after-tax' }],
-  },
-  {
-    question: 'How much tax do I pay on £50,000?',
-    answer:
-      'Use our £50,000 after-tax page to see your income tax, National Insurance, and net pay breakdown.',
-    links: [{ label: '£50,000 after tax', href: '/calculator/50000-after-tax' }],
-  },
-  {
-    question: 'What does tax code 1257L mean?',
-    answer:
-      '1257L is the standard UK tax code for most employees and usually means the standard personal allowance is applied.',
-    links: [{ label: 'Tax code decoder', href: '/tools/tax-code-decoder' }],
   },
 ];
 
@@ -262,52 +231,59 @@ export function FAQSection() {
   );
 }
 
-export function TrustSection() {
+export function ProofStrip() {
+  const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
+
   return (
-    <section className='py-10'>
+    <section className='py-8'>
       <div className='container mx-auto max-w-4xl px-4'>
-        <div className='mb-4 text-center'>
-          <div className='section-label'>Trust</div>
-          <h2 className='section-title'>Built for transparent tax calculations</h2>
-        </div>
-        <div className='grid gap-3 sm:grid-cols-3'>
-          <a
-            href='/compliance'
-            className='rounded-lg border border-border bg-card p-4 text-sm transition-colors hover:bg-muted/40'
-          >
-            Calculations based on official HMRC rates
-          </a>
-          <a
-            href='/compliance'
-            className='rounded-lg border border-border bg-card p-4 text-sm transition-colors hover:bg-muted/40'
-          >
-            Open methodology and verification trail
-          </a>
-          <a
-            href='/privacy'
-            className='rounded-lg border border-border bg-card p-4 text-sm transition-colors hover:bg-muted/40'
-          >
-            Privacy-first: your salary stays in your browser
-          </a>
+        <div className='flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-muted-foreground text-sm'>
+          <span className='flex items-center gap-2'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+            HMRC rates verified {ratesVerifiedDisplay}
+          </span>
+          <span className='flex items-center gap-2'>
+            <Shield aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+            <Link href='/privacy' className='underline underline-offset-2 hover:text-foreground'>
+              Privacy policy
+            </Link>
+          </span>
+          <span className='flex items-center gap-2'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+            <Link href='/compliance' className='underline underline-offset-2 hover:text-foreground'>
+              Compliance
+            </Link>
+          </span>
+          <span className='flex items-center gap-2'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+            All UK regions, 5 student loan plans, pensions
+          </span>
         </div>
       </div>
     </section>
   );
 }
 
-export function FinalCTASection() {
+export function DirectorSpotlight() {
   return (
-    <section className='final-cta'>
-      <h2>
-        Stop guessing your take-home. <span className='text-gradient-brand'>See it now.</span>
-      </h2>
-      <p>Free and fast — no signup required.</p>
-      <Button asChild size='touch' variant='brandOutline' className='group rounded-xl px-8'>
-        <Link href='#tax-calculator'>
-          Show My Take Home Pay
-          <ArrowRight className='size-4 transition-transform group-hover:translate-x-1' />
-        </Link>
-      </Button>
+    <section className='relative z-[1] px-4 py-24 sm:px-8'>
+      <div className='mx-auto max-w-3xl text-center'>
+        <div className='section-label'>For Directors</div>
+        <h2 className='section-title mb-4'>
+          Find your optimal <span className='text-gradient-brand'>salary and dividend split</span>
+        </h2>
+        <p className='mx-auto mb-8 max-w-2xl text-muted-foreground'>
+          Director Intelligence calculates the most tax-efficient way to extract income from your
+          company — comparing all-salary, balanced, and all-dividend strategies with corporation tax
+          and National Insurance factored in.
+        </p>
+        <Button asChild size='touch' variant='brandOutline' className='group rounded-xl px-8'>
+          <Link href='/tools/director-guide'>
+            Open Director Intelligence
+            <ArrowRight className='size-4 transition-transform group-hover:translate-x-1' />
+          </Link>
+        </Button>
+      </div>
     </section>
   );
 }
@@ -315,14 +291,10 @@ export function FinalCTASection() {
 export default function LandingPageSections() {
   return (
     <>
-      <FeaturesSection />
-      <TrustSection />
-      <BestForAudienceSection
-        className='py-10'
-        title='Find the Right Starting Point'
-        subtitle='Jump straight to guidance for contractors, students, freelancers, high earners, and other common UK tax situations.'
-      />
       <HowItWorksSection />
+      <ProofStrip />
+      <FeaturesSection />
+      <DirectorSpotlight />
       <FAQSection />
       <div className='container mx-auto max-w-4xl px-4 py-10'>
         <NewsletterCTA
@@ -330,7 +302,6 @@ export default function LandingPageSections() {
           description='HMRC updates, practical tax-saving tips, and important deadlines for UK employees and directors.'
         />
       </div>
-      <FinalCTASection />
     </>
   );
 }

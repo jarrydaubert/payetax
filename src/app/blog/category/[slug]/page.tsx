@@ -134,79 +134,71 @@ export default async function CategoryPage({
         }}
       />
 
-      {/* Header */}
-      <div className='border-border/60 border-b bg-card/50 py-12'>
-        <div className='container mx-auto max-w-7xl px-4'>
-          {/* Breadcrumbs */}
-          <nav aria-label='Breadcrumbs' className='mb-6 text-muted-foreground text-sm'>
-            <ol className='flex items-center gap-2'>
-              <li>
-                <Link href='/' className='hover:text-foreground'>
-                  Home
-                </Link>
-              </li>
-              <li>/</li>
-              <li>
-                <Link href='/blog' className='hover:text-foreground'>
-                  Blog
-                </Link>
-              </li>
-              <li>/</li>
-              <li className='text-primary'>{category.name}</li>
-            </ol>
-          </nav>
+      {/* Header + Filters */}
+      <div className='container mx-auto max-w-7xl px-4 pt-12'>
+        {/* Breadcrumbs */}
+        <nav aria-label='Breadcrumbs' className='mb-4 text-muted-foreground text-sm'>
+          <ol className='flex items-center gap-2'>
+            <li>
+              <Link href='/' className='hover:text-foreground'>
+                Home
+              </Link>
+            </li>
+            <li>/</li>
+            <li>
+              <Link href='/blog' className='hover:text-foreground'>
+                Blog
+              </Link>
+            </li>
+            <li>/</li>
+            <li className='text-primary'>{category.name}</li>
+          </ol>
+        </nav>
 
-          <h1 className='mb-4 font-bold font-display text-3xl text-foreground md:text-4xl'>
+        <div className='mb-6 flex items-baseline gap-3'>
+          <h1 className='font-bold font-display text-3xl text-foreground md:text-4xl'>
             {category.name}
           </h1>
-          <p className='max-w-2xl text-muted-foreground'>
-            Expert articles on {category.name.toLowerCase()} including UK tax updates, guidance, and
-            practical advice.
-          </p>
-          <p className='mt-2 text-muted-foreground text-sm'>
+          <span className='text-muted-foreground text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
-          </p>
+          </span>
         </div>
-      </div>
 
-      {/* Category Filter Pills */}
-      <div className='border-border/60 border-b'>
-        <div className='container mx-auto max-w-7xl px-4 py-6'>
-          <nav aria-label='Browse blog categories'>
-            <ul className='grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'>
-              <li>
-                <Link
-                  href='/blog'
-                  className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
-                >
-                  All Articles
-                </Link>
-              </li>
-              {[...nonEmptyCategories]
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((cat) => (
-                  <li key={cat.slug}>
-                    <Link
-                      href={`/blog/category/${cat.slug}`}
-                      aria-current={cat.slug === slug ? 'page' : undefined}
-                      className={cn(
-                        'block rounded-full border px-4 py-2 text-center text-sm transition',
-                        cat.slug === slug
-                          ? 'border-primary bg-primary/20 text-primary'
-                          : 'border-border/70 bg-card/70 text-foreground hover:border-primary/50 hover:text-foreground',
-                      )}
-                    >
-                      {cat.name}
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-          </nav>
-        </div>
+        {/* Category Filters */}
+        <nav aria-label='Browse blog categories' className='mb-10'>
+          <ul className='flex flex-wrap gap-2'>
+            <li>
+              <Link
+                href='/blog'
+                className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
+              >
+                All Articles
+              </Link>
+            </li>
+            {[...nonEmptyCategories]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((cat) => (
+                <li key={cat.slug}>
+                  <Link
+                    href={`/blog/category/${cat.slug}`}
+                    aria-current={cat.slug === slug ? 'page' : undefined}
+                    className={cn(
+                      'block rounded-full border px-4 py-2 text-center text-sm transition',
+                      cat.slug === slug
+                        ? 'border-primary bg-primary/20 text-primary'
+                        : 'border-border/70 bg-card/70 text-foreground hover:border-primary/50 hover:text-foreground',
+                    )}
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </nav>
       </div>
 
       {/* Posts Grid */}
-      <div className='container mx-auto max-w-7xl px-4 py-12'>
+      <div className='container mx-auto max-w-7xl px-4 pb-12'>
         {posts.length > 0 ? (
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {posts.map((post) => (
