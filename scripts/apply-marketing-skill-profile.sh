@@ -3,12 +3,13 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
+SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 PROFILE_DIR="$SKILLS_DIR/.profiles"
 PROFILE_FILE="$PROFILE_DIR/payetax-keep.txt"
 
 KEEP_SKILLS=(
   "ab-test-setup"
+  "accessibility"
   "ad-creative"
   "ai-seo"
   "analytics-tracking"
@@ -18,38 +19,36 @@ KEEP_SKILLS=(
   "content-strategy"
   "copy-editing"
   "copywriting"
+  "customer-research"
+  "design-an-interface"
   "email-sequence"
+  "engineering"
   "form-cro"
   "free-tool-strategy"
+  "frontend-design"
   "launch-strategy"
   "marketing-ideas"
   "marketing-psychology"
   "onboarding-cro"
   "page-cro"
+  "payetax-context"
   "popup-cro"
+  "prd-to-issues"
   "product-marketing-context"
   "programmatic-seo"
   "schema-markup"
   "seo-audit"
   "social-content"
-  "accessibility"
-  "engineering"
-  "design-an-interface"
-  "prd-to-issues"
   "tdd"
 )
 
-EXCLUDE_SKILLS=(
-  "lead-magnets"
-  "paid-ads"
-  "paywall-upgrade-cro"
-  "pricing-strategy"
-  "referral-program"
-  "signup-flow-cro"
-  "revops"
-  "sales-enablement"
-  "site-architecture"
-)
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/apply-marketing-skill-profile.sh --list
+  scripts/apply-marketing-skill-profile.sh --apply
+EOF
+}
 
 is_kept() {
   local candidate="$1"
@@ -62,37 +61,11 @@ is_kept() {
   return 1
 }
 
-is_excluded() {
-  local candidate="$1"
-  local excluded
-  for excluded in "${EXCLUDE_SKILLS[@]}"; do
-    if [[ "$excluded" == "$candidate" ]]; then
-      return 0
-    fi
-  done
-  return 1
-}
-
-usage() {
-  cat <<'USAGE'
-Usage:
-  scripts/apply-marketing-skill-profile.sh --list
-  scripts/apply-marketing-skill-profile.sh --apply
-USAGE
-}
-
 list_profile() {
   echo "Keep skills (${#KEEP_SKILLS[@]}):"
   local keep
   for keep in "${KEEP_SKILLS[@]}"; do
     echo "  - $keep"
-  done
-
-  echo
-  echo "Excluded upstream skills (${#EXCLUDE_SKILLS[@]}):"
-  local excluded
-  for excluded in "${EXCLUDE_SKILLS[@]}"; do
-    echo "  - $excluded"
   done
 
   echo
@@ -106,7 +79,7 @@ apply_profile() {
   mkdir -p "$PROFILE_DIR"
 
   {
-    echo "# PayeTax skills keep profile"
+    echo "# PayeTax agents-native skills keep profile"
     echo "# Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
     echo "# Keep list"
     local keep
@@ -117,14 +90,9 @@ apply_profile() {
 
   local dir_name
   while IFS= read -r dir_name; do
-    if is_excluded "$dir_name"; then
-      rm -rf "$SKILLS_DIR/$dir_name"
-      echo "Removed excluded upstream skill: $dir_name"
-      continue
-    fi
-
     if ! is_kept "$dir_name"; then
-      echo "Kept unknown/local skill (not in keep profile): $dir_name"
+      rm -rf "$SKILLS_DIR/$dir_name"
+      echo "Removed: $dir_name"
     fi
   done < <(
     find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -print \

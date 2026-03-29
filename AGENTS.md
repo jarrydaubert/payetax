@@ -123,9 +123,11 @@ See `docs/README.md` and `docs/guides/` for detail:
 
 ## Skills (Agent Reference)
 
-All skills have `## PayeTax Context` sections with project-specific guidance, file paths, and what does/doesn't apply.
-
-Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link). Version history: `.claude/skills/VERSIONS.md`.
+Skills are agents-native in PayeTax:
+- canonical skills path: `.agents/skills/`
+- shared product context: `.agents/product-marketing-context.md`
+- shared project constraints: `.agents/skills/payetax-context/SKILL.md`
+- version tracking: `.agents/skills/VERSIONS.md`
 
 ### SEO & Content
 - `seo-audit` — full-site SEO audit (incl. AI bot access, llms.txt)
@@ -151,12 +153,14 @@ Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link)
 
 ### Marketing & Growth
 - `marketing-ideas` — 139 categorised tactics, filtered for PayeTax
+- `customer-research` — VOC, persona, ICP, and community research synthesis
 - `launch-strategy` — feature releases, tax calendar events
 - `free-tool-strategy` — new calculator planning and evaluation
 - `marketing-psychology` — mental models and behavioural science
 - `churn-prevention` — retention, cancel flows, dunning, win-back
 - `email-sequence` — Kit newsletter + Resend transactional email
 - `product-marketing-context` — shared context doc for all skills
+- `payetax-context` — project-specific calculator, trust, privacy, and tax-accuracy constraints for marketing skills
 
 ### Engineering & Analytics
 - `engineering` — Next.js, React, TypeScript, performance
@@ -178,7 +182,7 @@ Skill docs live in `.claude/skills/` (with `.agents/skills/` compatibility link)
 ## Tools & Integrations
 
 - Tool registry: `.claude/tools/REGISTRY.md`
-- Integration guides: `.claude/tools/integrations/` (58 guides — Kit, Resend, Ahrefs, GA4, etc.)
+- Integration guides: `.claude/tools/integrations/` (60 guides — Kit, Resend, Ahrefs, GA4, etc.)
 - CLI tool scripts: `.claude/tools/clis/` (52 vendor scripts)
 
 ## Email Infrastructure

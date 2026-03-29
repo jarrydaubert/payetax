@@ -1,0 +1,35 @@
+# PayeTax agents-native skills keep profile
+# Generated: 2026-03-29T15:18:53Z
+# Keep list
+ab-test-setup
+accessibility
+ad-creative
+ai-seo
+analytics-tracking
+churn-prevention
+cold-email
+competitor-alternatives
+content-strategy
+copy-editing
+copywriting
+customer-research
+design-an-interface
+email-sequence
+engineering
+form-cro
+free-tool-strategy
+frontend-design
+launch-strategy
+marketing-ideas
+marketing-psychology
+onboarding-cro
+page-cro
+payetax-context
+popup-cro
+prd-to-issues
+product-marketing-context
+programmatic-seo
+schema-markup
+seo-audit
+social-content
+tdd

@@ -3,10 +3,10 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/coreyhaines31/marketingskills}"
-UPSTREAM_REF="${UPSTREAM_REF:-v1.4.0}"
+UPSTREAM_REF="${UPSTREAM_REF:-v1.5.0}"
 EXPECTED_COMMIT="${EXPECTED_COMMIT:-}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LOCAL_SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
+LOCAL_SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 LOCAL_SOURCE_DIR="$LOCAL_SKILLS_DIR/.sources"
 LOCAL_SOURCE_FILE="$LOCAL_SOURCE_DIR/marketingskills.json"
 CACHE_DIR="${CACHE_DIR:-/tmp/marketingskills-sync}"
@@ -23,6 +23,7 @@ KEEP_UPSTREAM_SKILLS=(
   "content-strategy"
   "copy-editing"
   "copywriting"
+  "customer-research"
   "email-sequence"
   "form-cro"
   "free-tool-strategy"
@@ -40,23 +41,35 @@ KEEP_UPSTREAM_SKILLS=(
 )
 
 usage() {
-  cat <<'USAGE'
+  cat <<'EOF'
 Usage:
   scripts/sync-marketing-skills.sh --sync [--tag vX.Y.Z] [--commit <sha>]
   scripts/sync-marketing-skills.sh --check [--tag vX.Y.Z] [--commit <sha>]
 
 Options:
-  --sync    Fetch upstream skills and sync selected skills into .claude/skills
+  --sync    Fetch upstream skills and sync selected skills into .agents/skills
   --check   Compare local synced commit vs upstream commit
   --tag     Override UPSTREAM_REF for this invocation
   --commit  Require exact upstream commit SHA
 
 Environment overrides:
   REPO_URL      (default: https://github.com/coreyhaines31/marketingskills)
-  UPSTREAM_REF  (default: v1.4.0)
+  UPSTREAM_REF  (default: v1.5.0)
   CACHE_DIR     (default: /tmp/marketingskills-sync)
   SKIP_FETCH    (default: 0)
-USAGE
+EOF
+}
+
+contains_item() {
+  local needle="$1"
+  shift
+  local item
+  for item in "$@"; do
+    if [[ "$item" == "$needle" ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 ensure_repo() {
@@ -111,14 +124,14 @@ write_source_metadata() {
   synced_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
   mkdir -p "$LOCAL_SOURCE_DIR"
-  cat >"$LOCAL_SOURCE_FILE" <<JSON
+  cat >"$LOCAL_SOURCE_FILE" <<EOF
 {
   "repo": "$REPO_URL",
   "ref": "$UPSTREAM_REF",
   "commit": "$commit",
   "synced_at_utc": "$synced_at"
 }
-JSON
+EOF
 }
 
 ref_to_version() {
@@ -126,49 +139,173 @@ ref_to_version() {
   echo "${ref#v}"
 }
 
+format_skills_inline() {
+  if [[ $# -eq 0 ]]; then
+    echo "_none_"
+    return
+  fi
+
+  local output=""
+  local skill
+  for skill in "$@"; do
+    if [[ -n "$output" ]]; then
+      output+=", "
+    fi
+    output+="\`$skill\`"
+  done
+
+  echo "$output"
+}
+
 sync_single_skill() {
   local skill="$1"
   local upstream_dir="$CACHE_DIR/skills/$skill"
   local local_dir="$LOCAL_SKILLS_DIR/$skill"
   local local_skill_file="$local_dir/SKILL.md"
-  local upstream_skill_file="$upstream_dir/SKILL.md"
 
   if [[ ! -d "$upstream_dir" ]]; then
     echo "Missing upstream skill directory: $upstream_dir" >&2
     exit 1
   fi
 
-  local ctx_tmp
-  ctx_tmp="$(mktemp)"
-  if [[ -f "$local_skill_file" ]]; then
-    awk 'BEGIN{p=0} /^## PayeTax Context/{p=1} p' "$local_skill_file" > "$ctx_tmp"
-  fi
-
   mkdir -p "$local_dir"
   rsync -a --delete "$upstream_dir/" "$local_dir/"
-
-  if [[ -s "$ctx_tmp" ]] && [[ -f "$upstream_skill_file" ]]; then
-    printf "\n" >> "$local_skill_file"
-    cat "$ctx_tmp" >> "$local_skill_file"
-  fi
 
   if [[ -f "$local_skill_file" ]]; then
     sed -i '' -E "s/^  version: .*/  version: $(ref_to_version "$UPSTREAM_REF")/" "$local_skill_file"
   fi
-
-  rm -f "$ctx_tmp"
 }
 
-ensure_agents_compat() {
-  mkdir -p "$PROJECT_ROOT/.agents"
+apply_payetax_overrides() {
+  local skill
+  local skill_file
 
-  if [[ ! -e "$PROJECT_ROOT/.agents/skills" ]]; then
-    ln -s ../.claude/skills "$PROJECT_ROOT/.agents/skills"
+  for skill in "${KEEP_UPSTREAM_SKILLS[@]}"; do
+    skill_file="$LOCAL_SKILLS_DIR/$skill/SKILL.md"
+    if [[ ! -f "$skill_file" ]]; then
+      continue
+    fi
+
+    perl -0pi -e 's# \Q(or `.claude/product-marketing-context.md` in older setups)\E##g' "$skill_file"
+
+    if grep -q ".agents/product-marketing-context.md" "$skill_file" \
+      && ! grep -q ".agents/skills/payetax-context/SKILL.md" "$skill_file"; then
+      perl -0pi -e 's#(If `\.agents/product-marketing-context\.md` exists[^\n]*\.)#$1\nIf you are working inside `PayeTax`, also read `.agents/skills/payetax-context/SKILL.md` first and apply its constraints.#' "$skill_file"
+    fi
+  done
+
+  local product_context_file="$LOCAL_SKILLS_DIR/product-marketing-context/SKILL.md"
+  if [[ -f "$product_context_file" ]]; then
+    perl -0pi -e 's#\QFirst, check if `.agents/product-marketing-context.md` already exists. Also check `.claude/product-marketing-context.md` for older setups — if found there but not in `.agents/`, offer to move it.\E#First, check if `.agents/product-marketing-context.md` already exists.#g' "$product_context_file"
+    if ! grep -q ".agents/skills/payetax-context/SKILL.md" "$product_context_file"; then
+      perl -0pi -e 's#\QThe document is stored at `.agents/product-marketing-context.md`.\E#The document is stored at `.agents/product-marketing-context.md`.\nIf you are working inside `PayeTax`, also read `.agents/skills/payetax-context/SKILL.md` first and apply its constraints while drafting or updating marketing context.#' "$product_context_file"
+    fi
   fi
 
-  if [[ ! -e "$PROJECT_ROOT/.agents/product-marketing-context.md" ]] && [[ -f "$PROJECT_ROOT/.claude/product-marketing-context.md" ]]; then
-    ln -s ../.claude/product-marketing-context.md "$PROJECT_ROOT/.agents/product-marketing-context.md"
+  local product_context_evals="$LOCAL_SKILLS_DIR/product-marketing-context/evals/evals.json"
+  if [[ -f "$product_context_evals" ]]; then
+    perl -0pi -e 's# \(and the older \.claude/product-marketing-context\.md location\)##g' "$product_context_evals"
+    perl -0pi -e 's#Checks both file locations#Checks the agents file location#g' "$product_context_evals"
   fi
+
+  local ai_seo_ref="$LOCAL_SKILLS_DIR/ai-seo/references/platform-ranking-factors.md"
+  if [[ -f "$ai_seo_ref" ]] && ! rg -q "^> Evidence note:" "$ai_seo_ref"; then
+    perl -0pi -e 's#\nSources cited throughout:#\n> Evidence note: treat benchmark percentages in this document as directional unless independently verified with a current primary source before quoting them in audits or recommendations.\n\nSources cited throughout:#' "$ai_seo_ref"
+  fi
+}
+
+write_versions_tracking() {
+  local upstream_commit="$1"
+  local synced_at
+  synced_at="$(date -u +"%Y-%m-%d")"
+  local versions_file="$LOCAL_SKILLS_DIR/VERSIONS.md"
+
+  local upstream_skills=()
+  while IFS= read -r line; do
+    upstream_skills+=("$line")
+  done < <(
+    find "$CACHE_DIR/skills" -mindepth 1 -maxdepth 1 -type d -print \
+      | sed "s#^$CACHE_DIR/skills/##" \
+      | sort
+  )
+
+  local installed_skills=()
+  while IFS= read -r line; do
+    installed_skills+=("$line")
+  done < <(
+    find "$LOCAL_SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d ! -name ".*" -print \
+      | sed "s#^$LOCAL_SKILLS_DIR/##" \
+      | sort
+  )
+
+  local included_upstream=()
+  local excluded_upstream=()
+  local local_only=()
+  local skill
+
+  for skill in "${installed_skills[@]}"; do
+    if contains_item "$skill" "${upstream_skills[@]}"; then
+      included_upstream+=("$skill")
+    else
+      local_only+=("$skill")
+    fi
+  done
+
+  for skill in "${upstream_skills[@]}"; do
+    if ! contains_item "$skill" "${included_upstream[@]}"; then
+      excluded_upstream+=("$skill")
+    fi
+  done
+
+  local included_count excluded_count local_only_count
+  local included_inline excluded_inline local_only_inline
+  set +u
+  included_count="${#included_upstream[@]}"
+  excluded_count="${#excluded_upstream[@]}"
+  local_only_count="${#local_only[@]}"
+  included_inline="$(format_skills_inline "${included_upstream[@]}")"
+  excluded_inline="$(format_skills_inline "${excluded_upstream[@]}")"
+  local_only_inline="$(format_skills_inline "${local_only[@]}")"
+  set -u
+
+  cat >"$versions_file" <<EOF
+# Skills Version Tracking
+
+Canonical source for upstream skill provenance and local inclusion policy.
+
+## Upstream Reference
+
+- Repository: $REPO_URL
+- Version tag: \`$UPSTREAM_REF\`
+- Commit: \`$upstream_commit\`
+
+## Freshness Check ($synced_at)
+
+- Local sync metadata is stored in \`.agents/skills/.sources/marketingskills.json\`.
+- Upstream skills at tag: ${#upstream_skills[@]} total
+- Included upstream skills: $included_count
+- Local-only skills: $local_only_count
+
+## Upstream Skills Included ($included_count/${#upstream_skills[@]})
+
+$included_inline
+
+## Upstream Skills Excluded ($excluded_count)
+
+$excluded_inline
+
+## Local-Only Skills ($local_only_count)
+
+$local_only_inline
+
+## Optimization Policy
+
+1. Canonical skills path is \`.agents/skills/\` (agents-first route).
+2. Shared product context lives in \`.agents/product-marketing-context.md\`.
+3. Shared project constraints live in \`.agents/skills/payetax-context/SKILL.md\`.
+4. Upstream marketing skills stay close to upstream; PayeTax-specific rules are centralized instead of duplicated in every synced skill.
+5. \`scripts/validate-marketing-skills-setup.sh\` must pass after every sync/update.
+EOF
 }
 
 sync_skills() {
@@ -180,14 +317,6 @@ sync_skills() {
   done
 
   apply_payetax_overrides
-  ensure_agents_compat
-}
-
-apply_payetax_overrides() {
-  local ai_seo_ref="$LOCAL_SKILLS_DIR/ai-seo/references/platform-ranking-factors.md"
-  if [[ -f "$ai_seo_ref" ]] && ! rg -q "^> Evidence note:" "$ai_seo_ref"; then
-    perl -0pi -e 's#\nSources cited throughout:#\n> Evidence note: treat benchmark percentages in this document as directional unless independently verified with a current primary source before quoting them in audits or recommendations.\n\nSources cited throughout:#' "$ai_seo_ref"
-  fi
 }
 
 main() {
@@ -252,6 +381,7 @@ main() {
     --sync)
       sync_skills
       write_source_metadata "$upstream_commit"
+      write_versions_tracking "$upstream_commit"
       echo "Synced selected marketing skills from $REPO_URL@$upstream_commit"
       ;;
     --check)

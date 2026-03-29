@@ -37,8 +37,10 @@ Quick reference for AI agents to discover tool capabilities and integration meth
 | dub-co | Links | ✓ | - | [✓](clis/dub.js) | ✓ | [dub-co.md](integrations/dub-co.md) |
 | mention-me | Referral | ✓ | - | [✓](clis/mention-me.js) | - | [mention-me.md](integrations/mention-me.md) |
 | partnerstack | Affiliate | ✓ | - | [✓](clis/partnerstack.js) | - | [partnerstack.md](integrations/partnerstack.md) |
+| introw | Partner Management | - | ✓ | - | - | [introw.md](integrations/introw.md) |
 | mailchimp | Email | ✓ | ✓ | [✓](clis/mailchimp.js) | ✓ | [mailchimp.md](integrations/mailchimp.md) |
 | customer-io | Email | ✓ | - | [✓](clis/customer-io.js) | ✓ | [customer-io.md](integrations/customer-io.md) |
+| nitrosend | Email | ✓ | ✓ | - | - | [nitrosend.md](integrations/nitrosend.md) |
 | sendgrid | Email | ✓ | - | [✓](clis/sendgrid.js) | ✓ | [sendgrid.md](integrations/sendgrid.md) |
 | resend | Email | ✓ | ✓ | [✓](clis/resend.js) | ✓ | [resend.md](integrations/resend.md) |
 | kit | Email | ✓ | - | [✓](clis/kit.js) | ✓ | [kit.md](integrations/kit.md) |
@@ -141,8 +143,9 @@ Tools for referral programs, affiliate tracking, and partner management.
 | **mention-me** | Enterprise referral programs | ✓ |
 | **dub-co** | Link tracking, attribution | - |
 | **partnerstack** | Enterprise partner programs | ✓ |
+| **introw** | Channel partner management, deal registration | - |
 
-**Agent recommendation**: Rewardful or Tolt for Stripe-based SaaS. PartnerStack for enterprise partner programs. Dub.co for link attribution.
+**Agent recommendation**: Rewardful or Tolt for Stripe-based SaaS. PartnerStack for enterprise partner programs. Introw for partner relationship management. Dub.co for link attribution.
 
 ### Email
 
@@ -152,6 +155,7 @@ Email marketing, transactional email, and automation platforms.
 |------|----------|:-------------:|
 | **mailchimp** | SMB email marketing | ✓ |
 | **customer-io** | Behavior-based messaging | - |
+| **nitrosend** | AI-native email via prompting | ✓ |
 | **sendgrid** | Transactional email at scale | - |
 | **resend** | Developer-friendly transactional | ✓ |
 | **kit** | Creator/newsletter focused | - |
@@ -161,7 +165,7 @@ Email marketing, transactional email, and automation platforms.
 | **brevo** | Email + SMS, popular in EU | - |
 | **activecampaign** | Email automation + CRM | - |
 
-**Agent recommendation**: Resend for transactional (dev-friendly). Postmark for deliverability. Customer.io for advanced automation. Kit for creators. Beehiiv for newsletters. Klaviyo for e-commerce email/SMS. ActiveCampaign for email + CRM combo.
+**Agent recommendation**: Resend for transactional (dev-friendly). Nitrosend for AI-native prompted sequencing. Postmark for deliverability. Customer.io for advanced automation. Kit for creators. Beehiiv for newsletters. Klaviyo for e-commerce email/SMS. ActiveCampaign for email + CRM combo.
 
 ### Advertising
 
@@ -337,9 +341,11 @@ These tools have Model Context Protocol servers available, enabling direct agent
 - **ga4** - Google Analytics 4 data access
 - **stripe** - Payment and subscription management
 - **mailchimp** - Email campaign management
+- **nitrosend** - AI-native email sequencing and campaigns
 - **google-ads** - Ad campaign management
 - **resend** - Transactional email sending
 - **zapier** - Workflow automation
+- **introw** - Partner relationship management
 
 To use MCP tools, ensure the appropriate MCP server is configured in your environment.
 
@@ -358,6 +364,10 @@ To use MCP tools, ensure the appropriate MCP server is configured in your enviro
 ### Setting up email automation
 1. Read [customer-io.md](integrations/customer-io.md) for behavior-based automation
 2. Read [resend.md](integrations/resend.md) for transactional email
+3. Read [nitrosend.md](integrations/nitrosend.md) for AI-native prompted email sequences
+
+### Managing channel partners
+1. Read [introw.md](integrations/introw.md) for deal registration, commissions, and partner review workflows
 
 ### Running email outreach for backlinks
 1. Read [hunter.md](integrations/hunter.md) for finding emails

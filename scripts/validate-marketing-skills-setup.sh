@@ -3,14 +3,13 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
-SOURCE_FILE="$SKILLS_DIR/.sources/marketingskills.json"
+SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 PROFILE_FILE="$SKILLS_DIR/.profiles/payetax-keep.txt"
+SOURCE_FILE="$SKILLS_DIR/.sources/marketingskills.json"
 VERSIONS_FILE="$SKILLS_DIR/VERSIONS.md"
+AGENTS_CONTEXT_FILE="$PROJECT_ROOT/.agents/product-marketing-context.md"
 CLAUDE_CONTEXT_FILE="$PROJECT_ROOT/.claude/product-marketing-context.md"
-AGENTS_DIR="$PROJECT_ROOT/.agents"
-AGENTS_CONTEXT_FILE="$AGENTS_DIR/product-marketing-context.md"
-AGENTS_SKILLS_LINK="$AGENTS_DIR/skills"
+CLAUDE_SKILLS_DIR="$PROJECT_ROOT/.claude/skills"
 
 error_count=0
 
@@ -42,6 +41,7 @@ UPSTREAM_SKILLS=(
   "content-strategy"
   "copy-editing"
   "copywriting"
+  "customer-research"
   "email-sequence"
   "form-cro"
   "free-tool-strategy"
@@ -58,48 +58,36 @@ UPSTREAM_SKILLS=(
   "social-content"
 )
 
-EXCLUDED_SKILLS=(
-  "lead-magnets"
-  "paid-ads"
-  "paywall-upgrade-cro"
-  "pricing-strategy"
-  "referral-program"
-  "signup-flow-cro"
-  "revops"
-  "sales-enablement"
-  "site-architecture"
-)
-
 if [[ ! -d "$SKILLS_DIR" ]]; then
   error "Missing skills directory: $SKILLS_DIR"
 fi
 
-if [[ ! -f "$CLAUDE_CONTEXT_FILE" ]]; then
-  error "Missing product context file: $CLAUDE_CONTEXT_FILE"
+if [[ ! -f "$AGENTS_CONTEXT_FILE" ]]; then
+  error "Missing agents product context: $AGENTS_CONTEXT_FILE"
 fi
 
-if [[ ! -d "$AGENTS_DIR" ]]; then
-  error "Missing .agents compatibility directory: $AGENTS_DIR"
+if [[ -f "$CLAUDE_CONTEXT_FILE" ]]; then
+  error "Legacy context file still present: $CLAUDE_CONTEXT_FILE"
 fi
 
-if [[ ! -L "$AGENTS_SKILLS_LINK" ]]; then
-  error "Missing .agents skills symlink: $AGENTS_SKILLS_LINK"
-fi
-
-if [[ ! -L "$AGENTS_CONTEXT_FILE" ]]; then
-  error "Missing .agents product context symlink: $AGENTS_CONTEXT_FILE"
+if [[ -d "$CLAUDE_SKILLS_DIR" ]]; then
+  error "Legacy skills directory still present: $CLAUDE_SKILLS_DIR"
 fi
 
 if [[ ! -f "$SOURCE_FILE" ]]; then
   error "Missing source metadata file: $SOURCE_FILE"
 fi
 
+if [[ ! -f "$VERSIONS_FILE" ]]; then
+  error "Missing skills versions tracking file: $VERSIONS_FILE"
+fi
+
 if [[ ! -f "$PROFILE_FILE" ]]; then
   error "Missing skills profile file: $PROFILE_FILE"
 fi
 
-if [[ ! -f "$VERSIONS_FILE" ]]; then
-  error "Missing versions file: $VERSIONS_FILE"
+if (( error_count > 0 )); then
+  exit 1
 fi
 
 ref_value="$(sed -n 's/.*"ref": "\([^"]*\)".*/\1/p' "$SOURCE_FILE" | head -n 1)"
@@ -113,12 +101,21 @@ if [[ -z "$commit_value" || ! "$commit_value" =~ ^[0-9a-f]{40}$ ]]; then
   error "Invalid or missing commit SHA in $SOURCE_FILE"
 fi
 
-if [[ "$ref_value" != "v1.4.0" ]]; then
-  error "Unexpected ref in source metadata ($ref_value). Expected v1.4.0"
+if ! rg -q "Version tag: \`$ref_value\`" "$VERSIONS_FILE"; then
+  error "Version tag in $VERSIONS_FILE does not match source metadata ref ($ref_value)"
 fi
 
-if ! rg -q "Synced upstream marketing skills to .*v1.4.0" "$VERSIONS_FILE"; then
-  error "VERSIONS.md is missing the v1.4.0 sync record"
+if ! rg -q "Commit: \`$commit_value\`" "$VERSIONS_FILE"; then
+  error "Commit in $VERSIONS_FILE does not match source metadata commit"
+fi
+
+keep_skills=()
+while IFS= read -r line; do
+  keep_skills+=("$line")
+done < <(grep -vE '^\s*#|^\s*$' "$PROFILE_FILE")
+
+if [[ "${#keep_skills[@]}" -eq 0 ]]; then
+  error "Profile file has no kept skills: $PROFILE_FILE"
 fi
 
 installed_skills=()
@@ -130,26 +127,49 @@ done < <(
     | sort
 )
 
-skill=""
-for skill in "${UPSTREAM_SKILLS[@]}"; do
-  skill_file="$SKILLS_DIR/$skill/SKILL.md"
-  if [[ ! -f "$skill_file" ]]; then
-    error "Missing required skill: $skill"
-    continue
-  fi
-
-  if ! rg -q '^  version: 1.4.0$' "$skill_file"; then
-    error "Version mismatch in $skill_file (expected 1.4.0)"
-  fi
-
-  if ! rg -q '^## PayeTax Context' "$skill_file"; then
-    error "Missing PayeTax Context section in $skill_file"
+for keep_skill in "${keep_skills[@]}"; do
+  if ! contains_item "$keep_skill" "${installed_skills[@]}"; then
+    error "Kept skill missing from installation: $keep_skill"
   fi
 done
 
-for skill in "${EXCLUDED_SKILLS[@]}"; do
-  if contains_item "$skill" "${installed_skills[@]}"; then
-    error "Excluded skill should not be installed: $skill"
+for installed_skill in "${installed_skills[@]}"; do
+  if ! contains_item "$installed_skill" "${keep_skills[@]}"; then
+    error "Installed skill is not in keep profile: $installed_skill"
+  fi
+done
+
+if rg -n "\.claude/product-marketing-context\.md|\.claude/skills/" "$SKILLS_DIR" >/tmp/payetax-skills-legacy-paths.txt 2>/dev/null; then
+  error "Legacy .claude references remain in skills files (see /tmp/payetax-skills-legacy-paths.txt)"
+fi
+
+missing_hook_files=()
+while IFS= read -r skill_file; do
+  if grep -q ".agents/product-marketing-context.md" "$skill_file" \
+    && ! grep -q ".agents/skills/payetax-context/SKILL.md" "$skill_file"; then
+    missing_hook_files+=("$skill_file")
+  fi
+done < <(find "$SKILLS_DIR" -type f -name "SKILL.md" | sort)
+
+if [[ "${#missing_hook_files[@]}" -gt 0 ]]; then
+  for missing_hook_file in "${missing_hook_files[@]}"; do
+    error "Missing payetax-context hook in: $missing_hook_file"
+  done
+fi
+
+for skill in "${UPSTREAM_SKILLS[@]}"; do
+  skill_file="$SKILLS_DIR/$skill/SKILL.md"
+  if [[ ! -f "$skill_file" ]]; then
+    error "Missing required upstream skill: $skill"
+    continue
+  fi
+
+  if ! rg -q '^  version: 1.5.0$' "$skill_file"; then
+    error "Version mismatch in $skill_file (expected 1.5.0)"
+  fi
+
+  if rg -q '^## PayeTax Context' "$skill_file"; then
+    error "Upstream skill still carries duplicated PayeTax Context block: $skill_file"
   fi
 done
 

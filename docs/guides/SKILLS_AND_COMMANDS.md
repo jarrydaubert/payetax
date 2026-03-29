@@ -1,24 +1,24 @@
 # Skills & Commands System
 
-A practical guide to using the PayeTax commands and skills stored in `.claude/`. ie ./.claude/skills/copywriting/SKILL.md (note the hidden .claude directory, not claude)
+A practical guide to using PayeTax's commands and agents-native skills.
 
 ## Overview
 
 - **Commands** = explicit workflows you invoke (e.g. `/audit`)
 - **Skills** = knowledge packs you load before doing a task (e.g. SEO, copy, CRO)
-- **Layering model** = one active `SKILL.md` per skill:
-  - upstream methodology baseline
-  - plus local `## PayeTax Context` rules
+- **Layering model**:
+  - upstream methodology in `.agents/skills/*/SKILL.md`
+  - shared product context in `.agents/product-marketing-context.md`
+  - shared repo/project constraints in `.agents/skills/payetax-context/SKILL.md`
 - We do **not** maintain duplicate "vanilla + custom" skill files side-by-side.
 
 ## Where They Live
 
 - Commands: `.claude/commands/*.md`
-- Skills: `.claude/skills/*/SKILL.md`
+- Skills: `.agents/skills/*/SKILL.md`
 - Tools: `.claude/tools/` (registry, integration guides, CLI scripts)
-- Versions: `.claude/skills/VERSIONS.md`
+- Versions: `.agents/skills/VERSIONS.md`
 - Ops runbook: `docs/guides/MARKETING_SKILLS_RUNBOOK.md`
-- Compatibility links for upstream `.agents` paths: `.agents/skills -> .claude/skills` and `.agents/product-marketing-context.md -> .claude/product-marketing-context.md`
 
 ## How To Use In Codex (Terminal)
 
@@ -33,13 +33,13 @@ Read .claude/commands/audit.md, then /audit calculator
 **Skill pattern:**
 
 ```bash
-Read .claude/skills/seo-audit/SKILL.md, then audit the salary pages
+Read .agents/skills/seo-audit/SKILL.md, then audit the salary pages
 ```
 
 You can combine multiple skills:
 
 ```bash
-Read .claude/skills/copywriting/SKILL.md and .claude/skills/marketing-psychology/SKILL.md,
+Read .agents/skills/copywriting/SKILL.md and .agents/skills/marketing-psychology/SKILL.md,
 then write homepage hero copy
 ```
 
@@ -54,10 +54,15 @@ then write homepage hero copy
 | `/finance` | UK tax accuracy (HMRC verification) | `/finance ni` |
 | `/compliance` | UK GDPR + PECR + ASA/CAP audit | `/compliance` |
 
-Planning and test-first workflows now live in skills rather than slash commands:
-`design-an-interface`, `prd-to-issues`, and `tdd`.
+Planning and test-first workflows now live in skills rather than slash commands: `design-an-interface`, `prd-to-issues`, and `tdd`.
 
-## Skills (30 Installed)
+## Skills (32 Installed)
+
+### Shared Context
+
+| Skill | Use When | Example |
+| --- | --- | --- |
+| `payetax-context` | Apply PayeTax-specific calculator, privacy, and trust constraints before other marketing skills | "Load PayeTax constraints before a CRO audit" |
 
 ### Code & Quality
 
@@ -113,6 +118,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | Skill | Use When | Example |
 | --- | --- | --- |
 | `marketing-ideas` | Growth idea generation | "Give 10 promo ideas for tax-year change" |
+| `customer-research` | VOC, persona, and community research | "Synthesize Reddit and G2 feedback into themes" |
 | `marketing-psychology` | Persuasion/behavior models | "Improve conversion using loss aversion" |
 | `launch-strategy` | Product launches | "Plan a feature release announcement" |
 | `free-tool-strategy` | Free tool growth strategy | "Optional email capture without hurting SEO" |
@@ -121,6 +127,6 @@ Planning and test-first workflows now live in skills rather than slash commands:
 
 ## Notes
 
-- If a command or skill is mentioned but not installed under `.claude/`, it can't be used until added.
+- If a command or skill is mentioned but not installed under its canonical path (`.claude/commands/` for commands, `.agents/skills/` for skills), it can't be used until added.
 - If you want to make skills available globally in Codex, add them to your `AGENTS.md` list with name + description + path.
-- Skills are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — see `.claude/skills/VERSIONS.md` for sync history.
+- Skills are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — see `.agents/skills/VERSIONS.md` for sync history.

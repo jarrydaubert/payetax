@@ -7,11 +7,10 @@ Operational guide for maintaining the local marketing skills setup in `PayeTax`.
 ## Current Standard
 
 1. Source repo: `https://github.com/coreyhaines31/marketingskills`
-2. Canonical install path: `.claude/skills/`
-3. Compatibility path for upstream skills: `.agents/skills/` (symlink to `.claude/skills/`)
-4. Product context canonical path: `.claude/product-marketing-context.md`
-5. Product context compatibility path: `.agents/product-marketing-context.md` (symlink)
-6. Pinned tag: set in `scripts/sync-marketing-skills.sh` (`UPSTREAM_REF`)
+2. Canonical install path: `.agents/skills/`
+3. Product context path: `.agents/product-marketing-context.md`
+4. Shared project constraints skill: `.agents/skills/payetax-context/SKILL.md`
+5. Pinned tag: set in `scripts/sync-marketing-skills.sh` (`UPSTREAM_REF`)
 
 ## Normal Maintenance
 
@@ -39,16 +38,19 @@ scripts/validate-marketing-skills-setup.sh
 ```
 
 3. If that version should become the default pin, update `UPSTREAM_REF` in:
-
-- `scripts/sync-marketing-skills.sh`
-- `AGENTS.md` (skills pin text)
-- `.claude/skills/VERSIONS.md` (versions and recent changes)
+   - `scripts/sync-marketing-skills.sh`
+   - `AGENTS.md` (skills pin text)
 
 ## Local Customizations That Must Persist
 
-1. Preserve every `## PayeTax Context` section when syncing upstream skills.
-2. Keep canonical paths in `.claude/` while maintaining `.agents/` compatibility links.
-3. Keep the deliberate upstream exclusions aligned with PayeTax model:
+These are enforced automatically during `scripts/sync-marketing-skills.sh --sync`:
+
+1. Remove legacy `.claude` fallback wording inside synced skills.
+2. Ensure skills that read `.agents/product-marketing-context.md` also load `.agents/skills/payetax-context/SKILL.md`.
+3. Keep `product-marketing-context` aligned to `.agents`-only usage plus the local `payetax-context` hook.
+4. Preserve PayeTax-only/local skills that are not part of the upstream marketing repo.
+5. Regenerate `.agents/skills/VERSIONS.md` from the actual synced/install state.
+6. Keep the deliberate upstream exclusions aligned with PayeTax model:
 
 - `lead-magnets`
 - `paid-ads`
@@ -60,7 +62,7 @@ scripts/validate-marketing-skills-setup.sh
 - `sales-enablement`
 - `site-architecture`
 
-4. `scripts/validate-marketing-skills-setup.sh` must pass after each update.
+7. `scripts/validate-marketing-skills-setup.sh` must pass after each update.
 
 ## Fast Health Check
 

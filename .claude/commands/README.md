@@ -1,4 +1,4 @@
-# PayeTax Claude Configuration
+# PayeTax Agent Configuration
 
 > Optimized commands and skills for PayeTax development.
 >
@@ -8,7 +8,7 @@
 
 **Commands** = explicit workflow actions (you invoke them)
 **Skills** = contextual knowledge (load before a task)
-**Skill structure** = one active `SKILL.md` per skill, with upstream methodology + `## PayeTax Context` custom layer.
+**Skill structure** = agents-native `SKILL.md` files in `.agents/skills/`, plus shared project constraints in `payetax-context`.
 
 ---
 
@@ -48,9 +48,15 @@
 
 ---
 
-## Skills (30 installed)
+## Skills (32 installed)
 
 Skills provide expert knowledge that you load before a task.
+
+### Shared Context
+
+| Skill | Use When |
+| --- | --- |
+| `payetax-context` | Apply PayeTax-specific calculator, trust, privacy, and tax-accuracy constraints before other marketing skills |
 
 ### Code & Quality
 
@@ -106,6 +112,7 @@ Skills provide expert knowledge that you load before a task.
 | Skill | Use When |
 | --- | --- |
 | `marketing-ideas` | Growth idea generation |
+| `customer-research` | VOC, persona, ICP, and community research |
 | `marketing-psychology` | Persuasion and behavioral models |
 | `launch-strategy` | Feature releases, tax calendar events |
 | `free-tool-strategy` | Free tool growth strategy |
@@ -152,16 +159,16 @@ Skills provide expert knowledge that you load before a task.
 
 ### Feature Development
 ```bash
-Read .claude/skills/design-an-interface/SKILL.md
-Read .claude/skills/prd-to-issues/SKILL.md
+Read .agents/skills/design-an-interface/SKILL.md
+Read .agents/skills/prd-to-issues/SKILL.md
 /finance
-Read .claude/skills/tdd/SKILL.md
+Read .agents/skills/tdd/SKILL.md
 ```
 
 ### Tax Year Update (April)
 ```bash
 /finance
-Read .claude/skills/tdd/SKILL.md
+Read .agents/skills/tdd/SKILL.md
 # content-strategy for tax-year announcement post
 ```
 
@@ -176,6 +183,45 @@ Read .claude/skills/tdd/SKILL.md
 ## File Structure
 
 ```
+.agents/
+├── product-marketing-context.md
+└── skills/
+    ├── ab-test-setup/
+    ├── accessibility/
+    ├── ad-creative/
+    ├── ai-seo/
+    ├── analytics-tracking/
+    ├── churn-prevention/
+    ├── cold-email/
+    ├── competitor-alternatives/
+    ├── content-strategy/
+    ├── copy-editing/
+    ├── copywriting/
+    ├── customer-research/
+    ├── design-an-interface/
+    ├── email-sequence/
+    ├── engineering/
+    ├── form-cro/
+    ├── free-tool-strategy/
+    ├── frontend-design/
+    ├── launch-strategy/
+    ├── marketing-ideas/
+    ├── marketing-psychology/
+    ├── onboarding-cro/
+    ├── page-cro/
+    ├── payetax-context/
+    ├── popup-cro/
+    ├── prd-to-issues/
+    ├── product-marketing-context/
+    ├── programmatic-seo/
+    ├── schema-markup/
+    ├── seo-audit/
+    ├── social-content/
+    ├── tdd/
+    └── VERSIONS.md
+```
+
+```
 .claude/
 ├── commands/
 │   ├── audit.md
@@ -184,40 +230,8 @@ Read .claude/skills/tdd/SKILL.md
 │   ├── debug.md
 │   ├── finance.md
 │   └── security.md
-├── skills/
-│   ├── ab-test-setup/
-│   ├── accessibility/
-│   ├── ad-creative/
-│   ├── ai-seo/
-│   ├── analytics-tracking/
-│   ├── churn-prevention/
-│   ├── cold-email/
-│   ├── competitor-alternatives/
-│   ├── content-strategy/
-│   ├── copy-editing/
-│   ├── copywriting/
-│   ├── design-an-interface/
-│   ├── email-sequence/
-│   ├── engineering/
-│   ├── frontend-design/
-│   ├── form-cro/
-│   ├── free-tool-strategy/
-│   ├── launch-strategy/
-│   ├── marketing-ideas/
-│   ├── marketing-psychology/
-│   ├── onboarding-cro/
-│   ├── page-cro/
-│   ├── popup-cro/
-│   ├── prd-to-issues/
-│   ├── product-marketing-context/
-│   ├── programmatic-seo/
-│   ├── schema-markup/
-│   ├── seo-audit/
-│   ├── social-content/
-│   ├── tdd/
-│   └── VERSIONS.md
 └── tools/
     ├── REGISTRY.md
-    ├── clis/          (52 vendor CLI scripts)
-    └── integrations/  (58 integration guides)
+    ├── clis/
+    └── integrations/
 ```
