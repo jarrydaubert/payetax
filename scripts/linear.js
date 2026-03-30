@@ -645,7 +645,7 @@ async function listIssues(options = {}) {
     }
 
     if (issues.nodes.length === 0) {
-      log('  No issues found. Create one with: bun run linear:create', 'dim');
+      log('  No issues found. Create one with: bun run linear create', 'dim');
       return issues.nodes;
     }
 
@@ -1413,7 +1413,7 @@ async function main() {
 
       default:
         log('\n📊 Linear Helper for PayeTax\n', 'bright');
-        log('Usage: bun run linear:<command> [options]\n', 'cyan');
+        log('Usage: bun run linear <command> [options]\n', 'cyan');
         log('Commands:', 'bright');
         log('  list, ls                List all issues', 'dim');
         log('    --me                  List issues assigned to you', 'dim');
@@ -1454,10 +1454,10 @@ async function main() {
         log('  info                    Show workspace info', 'dim');
         log('  help                    Show this help', 'dim');
         log('\nExamples:', 'bright');
-        log('  bun run linear:list', 'cyan');
+        log('  bun run linear list', 'cyan');
         log('  bun run linear list --project PayeTax', 'cyan');
         log('  bun run linear list --team-only', 'cyan');
-        log('  bun run linear:create', 'cyan');
+        log('  bun run linear create', 'cyan');
         log('  bun run linear update-status PAYTAX-24 Done', 'cyan');
         log('  bun run linear assign-to-project PayeTax PAYTAX-55 PAYTAX-56', 'cyan');
         log('  bun run linear sync-backlog --strict', 'cyan');
@@ -1467,7 +1467,7 @@ async function main() {
         log('  bun run linear kanban-check --strict', 'cyan');
         log('\nEnvironment:', 'bright');
         log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');
-        log('  LINEAR_TEAM_KEY    Team identifier [default: PAYETAX]', 'dim');
+        log('  LINEAR_TEAM_KEY    Team identifier [default: PAYTAX]', 'dim');
         log('');
         break;
     }

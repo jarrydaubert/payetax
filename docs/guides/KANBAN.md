@@ -138,26 +138,29 @@ Use this template for Linear issues:
 bun run linear:me
 
 # List issues for PayeTax project
-bun scripts/linear.js list --project PayeTax
+bun run linear list --project PayeTax
+
+# List team-level issues without a project (including Sentry triage)
+bun run linear list --team-only
 
 # Create issue
-bun scripts/linear.js create
+bun run linear create
 
 # Move issue state
-bun scripts/linear.js update-status PAYTAX-123 "In Progress"
+bun run linear update-status PAYTAX-123 "In Progress"
 
 # Validate backlog/board linkage
-bun scripts/linear.js sync-backlog --strict
+bun run linear sync-backlog --strict
 
 # Check open release blockers before release
-bun scripts/linear.js release-blockers --strict
+bun run linear release-blockers --strict
 
 # Validate Ready-state DoR fields
-bun scripts/linear.js enforce-dor --strict
+bun run linear enforce-dor --strict
 
 # Detect done/backlog drift
-bun scripts/linear.js burn-down-cleanup
+bun run linear burn-down-cleanup
 
 # One-shot hygiene suite
-bun scripts/linear.js kanban-check --strict
+bun run linear kanban-check --strict
 ```

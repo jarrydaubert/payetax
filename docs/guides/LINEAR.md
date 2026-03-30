@@ -45,42 +45,62 @@ Use the template in `docs/guides/KANBAN.md`.
 
 ---
 
+## Correct Usage In This Repo
+
+Use Linear for execution tracking, not idea storage:
+
+- Add or change work in `docs/BACKLOG.md` first.
+- Create a Linear issue only when the work is ready to execute.
+- Treat the `PayeTax` project as the main board for planned delivery work.
+- Treat team-level `PAYTAX-*` issues without a project as triage inputs, especially for Sentry-created issues.
+
+In practice:
+
+- `bun run linear:me` is useful for your assigned project work.
+- `bun run linear list --project PayeTax` is the main project view.
+- `bun run linear list --team-only` is the team-level triage view and should be checked when reviewing Sentry-created issues.
+
+---
+
 ## CLI Commands
 
 ```bash
-# List my issues in PayeTax project
+# List my issues in the PayeTax project
 bun run linear:me
 
-# List issues by project
-bun scripts/linear.js list --project PayeTax
+# List issues in the PayeTax project
+bun run linear list --project PayeTax
+
+# List team-level issues with no project
+bun run linear list --team-only
 
 # Create issue (interactive)
-bun scripts/linear.js create
+bun run linear create
 
 # Move issue status
-bun scripts/linear.js update-status PAYTAX-123 "In Progress"
+bun run linear update-status PAYTAX-123 "In Progress"
 
 # Validate backlog <-> Linear linkage
-bun scripts/linear.js sync-backlog
+bun run linear sync-backlog
 
 # Release blocker report
-bun scripts/linear.js release-blockers
+bun run linear release-blockers
 
 # Validate DoR for Ready-state issues
-bun scripts/linear.js enforce-dor --strict
+bun run linear enforce-dor --strict
 
 # Burn-down hygiene report
-bun scripts/linear.js burn-down-cleanup
+bun run linear burn-down-cleanup
 
 # One-shot pre-planning / pre-release hygiene suite
-bun scripts/linear.js kanban-check --strict
+bun run linear kanban-check --strict
 ```
 
 ---
 
 ## SDK Features (Verified In Repo)
 
-Installed SDK: `@linear/sdk@77.0.0` (`node_modules/@linear/sdk/package.json`).
+Installed SDK: `@linear/sdk@78.0.0` (`package.json` / lockfile).
 
 The SDK supports a broad surface area; useful capabilities for PayeTax include:
 
@@ -109,7 +129,8 @@ Operational note:
 
 - This is currently acceptable and expected.
 - Auto-created Sentry issues do not need to be assigned to the `PayeTax` project to be valid triage inputs.
-- When reviewing error backlog, check team-level unassigned `PAYTAX-*` issues as well as project-filtered views.
+- `bun run linear:me` will not show unassigned team-level Sentry issues.
+- When reviewing error backlog, check `bun run linear list --team-only` as well as project-filtered views.
 
 ### Automation Commands Added
 
@@ -149,4 +170,4 @@ Operational note:
 
 ### Next Automation Candidate
 
-1. Add transition guard in `update-status` to auto-run `enforce-dor` before allowing move to `Ready` (with explicit `--force` override).
+1. Add a dedicated Sentry triage helper that filters team-level issues by `🐛 Sentry:` title prefix.
