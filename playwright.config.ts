@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const DEFAULT_PLAYWRIGHT_PORT = 3100;
+const DEFAULT_PLAYWRIGHT_BASE_URL = `http://localhost:${DEFAULT_PLAYWRIGHT_PORT}`;
+
 /**
  * Playwright Configuration
  * @see https://playwright.dev/docs/test-configuration
@@ -42,7 +45,7 @@ export default defineConfig({
 
   use: {
     // Environment-driven baseURL for preview deploys, staging, etc.
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_PLAYWRIGHT_BASE_URL,
     storageState: 'playwright/.auth/storageState.json',
     trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -130,11 +133,12 @@ export default defineConfig({
 
   webServer: {
     command: 'bun run build && bun run start',
-    url: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    url: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_PLAYWRIGHT_BASE_URL,
+    reuseExistingServer: false,
     timeout: 120 * 1000,
     env: {
       NODE_ENV: 'production',
+      PORT: String(DEFAULT_PLAYWRIGHT_PORT),
     },
   },
 

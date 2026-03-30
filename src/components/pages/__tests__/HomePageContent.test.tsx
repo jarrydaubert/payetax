@@ -38,26 +38,4 @@ describe('HomePageContent Component', () => {
 
     expect(mockInit).toHaveBeenCalledTimes(1);
   });
-
-  it('should have #tax-calculator ID on calculator section', () => {
-    const { container } = render(<HomePageContent />);
-
-    const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toBeInTheDocument();
-    expect(calculatorSection?.tagName).toBe('SECTION');
-  });
-
-  it('should render calculator section with brand surface background', () => {
-    const { container } = render(<HomePageContent />);
-
-    const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toHaveClass('bg-surface-brand');
-  });
-
-  it('should have z-index for layering above background', () => {
-    const { container } = render(<HomePageContent />);
-
-    const calculatorSection = container.querySelector('#tax-calculator');
-    expect(calculatorSection).toHaveClass('z-[1]');
-  });
 });

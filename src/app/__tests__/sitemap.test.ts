@@ -58,7 +58,6 @@ describe('sitemap', () => {
         expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.9 }),
         expect.objectContaining({ url: 'https://example.com/blog/category/tax-basics' }),
         expect.objectContaining({ url: 'https://example.com/alternatives/listentotaxman' }),
-        expect.objectContaining({ url: 'https://example.com/vs/listentotaxman' }),
         expect.objectContaining({ url: 'https://example.com/scenarios' }),
         expect.objectContaining({ url: 'https://example.com/scenarios/tax-trap-100k' }),
         expect.objectContaining({ url: 'https://example.com/best-for/contractors' }),
@@ -119,8 +118,7 @@ describe('sitemap', () => {
     expect(urls).not.toContain('https://example.com/calculator/104000-after-tax');
 
     const alternativesCount = urls.filter((url) => url.includes('/alternatives/')).length;
-    const vsCount = urls.filter((url) => url.includes('/vs/')).length;
     expect(alternativesCount).toBeLessThanOrEqual(12);
-    expect(vsCount).toBeLessThanOrEqual(12);
+    expect(urls.some((url) => url.includes('/vs/'))).toBe(false);
   });
 });

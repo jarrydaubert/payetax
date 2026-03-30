@@ -50,6 +50,12 @@ bun run test:quick
 bun run build
 ```
 
+For UI-heavy homepage, calculator, or Director Intelligence changes, also run:
+
+```bash
+bun run test:e2e:visual
+```
+
 3. Open a merge request and wait for GitLab MR pipeline jobs to pass.
 
 Useful GitLab shortcuts:

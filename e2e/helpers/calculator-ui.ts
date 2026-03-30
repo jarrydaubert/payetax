@@ -13,6 +13,12 @@ export async function ensureCalculatorVisible(page: Page): Promise<void> {
   const alreadyVisible = await salaryInput.isVisible().catch(() => false);
   if (alreadyVisible) return;
 
+  const becameVisibleWithoutNavigation = await salaryInput
+    .waitFor({ state: 'visible', timeout: 5000 })
+    .then(() => true)
+    .catch(() => false);
+  if (becameVisibleWithoutNavigation) return;
+
   const openCalculatorCta = page
     .getByRole('link', { name: /open calculator|see my take home pay|show my take home pay/i })
     .first();

@@ -136,7 +136,6 @@ export default function AlternativesIndexPage() {
                   competitor={competitor}
                   showAdvantages={false}
                   showCompareLink
-                  linkVariant='alternatives'
                 />
               ))}
             </div>

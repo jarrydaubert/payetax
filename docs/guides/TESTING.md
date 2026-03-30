@@ -59,6 +59,7 @@ Target state for "no issues found" audits:
 bun run test:no-coverage    # Unit tests (fast)
 bun run test:ci             # Full unit suite with coverage (CI-safe)
 bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
+bun run test:e2e:visual     # Visual regression pilot (Chromium snapshots)
 bun run test:e2e            # Full multi-browser E2E
 bun run test:quick          # Fast local gate: unit fast + critical E2E
 bun run test:full           # Full gate: coverage unit + full E2E
@@ -78,6 +79,24 @@ Notes:
 - `bun run check:repo` is the read-only equivalent of the repo verification part of `fix-all`.
 - `bun run harness:local` is the recommended pre-refactor confidence gate.
 - `bun run harness:release` adds the dependency advisory check for stricter release-oriented validation.
+- `bun run test:e2e:visual:update` refreshes the checked-in Chromium baselines after an intentional UI change.
+
+### Visual Regression Pilot
+
+Current pilot surfaces:
+
+- homepage hero
+- homepage calculator results
+- Director Intelligence dashboard main results
+
+Commands:
+
+```bash
+bun run test:e2e:visual
+bun run test:e2e:visual:update
+```
+
+Use the update command only when a visual change is intentional and the new screenshots have been reviewed.
 
 ---
 

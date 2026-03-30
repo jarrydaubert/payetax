@@ -115,7 +115,11 @@ const CookieBanner: React.FC = () => {
   return (
     <>
       {showBanner && (
-        <div className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'>
+        <aside
+          aria-label='Cookie preferences'
+          data-testid='cookie-banner'
+          className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'
+        >
           <Card className='motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 border-border/70 bg-card/95 shadow-2xl backdrop-blur-xl motion-safe:animate-in'>
             <CardContent className='p-4'>
               <div className='mb-3 flex items-start gap-3'>
@@ -144,7 +148,7 @@ const CookieBanner: React.FC = () => {
                   onClick={handleRejectAll}
                   variant='outline'
                   size='touch'
-                  className='w-full'
+                  className='!border-slate-300 !bg-slate-100 !text-slate-950 hover:!border-white hover:!bg-white hover:!text-slate-950 w-full'
                   data-testid='cookie-reject-all'
                 >
                   Essential Only
@@ -153,7 +157,7 @@ const CookieBanner: React.FC = () => {
                   onClick={handleAcceptAll}
                   variant='default'
                   size='touch'
-                  className='w-full'
+                  className='!bg-cyan-300 !text-slate-950 hover:!bg-cyan-200 w-full'
                   data-testid='cookie-accept-all'
                 >
                   Accept All
@@ -163,14 +167,14 @@ const CookieBanner: React.FC = () => {
                 onClick={handleManageFromBanner}
                 variant='ghost'
                 size='sm'
-                className='h-auto py-1 text-xs'
+                className='min-h-6 px-2 py-1 text-xs'
                 data-testid='cookie-manage-preferences'
               >
                 Manage Preferences
               </Button>
             </CardFooter>
           </Card>
-        </div>
+        </aside>
       )}
 
       <Dialog open={modalOpen} onOpenChange={handleModalOpenChange}>

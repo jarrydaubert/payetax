@@ -146,7 +146,13 @@ test.describe('Essential SEO Tests', () => {
       console.log('🎯 Clicking calculator link from blog...');
 
       await homeLink.click();
-      await page.waitForLoadState('networkidle');
+      await page
+        .waitForURL((url) => {
+          const pathname = url.pathname;
+          return pathname === '/' || pathname.startsWith('/calculator');
+        })
+        .catch(() => {});
+      await page.waitForLoadState('domcontentloaded').catch(() => {});
 
       // Should arrive at calculator page
       await expect(

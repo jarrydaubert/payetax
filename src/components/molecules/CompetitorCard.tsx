@@ -24,8 +24,6 @@ export interface CompetitorCardProps {
   showAdvantages?: boolean;
   /** Show link to detailed comparison */
   showCompareLink?: boolean;
-  /** Link variant (alternatives or vs) */
-  linkVariant?: 'alternatives' | 'vs';
   /** Highlight as featured/recommended */
   featured?: boolean;
   /** Optional custom className */
@@ -41,7 +39,6 @@ export interface CompetitorCardProps {
  *   competitor={govUkCompetitor}
  *   showAdvantages
  *   showCompareLink
- *   linkVariant="alternatives"
  * />
  * ```
  */
@@ -49,14 +46,10 @@ export function CompetitorCard({
   competitor,
   showAdvantages = false,
   showCompareLink = true,
-  linkVariant = 'alternatives',
   featured = false,
   className,
 }: CompetitorCardProps) {
-  const compareUrl =
-    linkVariant === 'vs'
-      ? (`/vs/${competitor.slug}` as Route)
-      : (`/alternatives/${competitor.slug}` as Route);
+  const compareUrl = `/alternatives/${competitor.slug}` as Route;
 
   return (
     <Card

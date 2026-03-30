@@ -10,4 +10,15 @@ describe('BestUKTaxCalculatorsPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('At-a-Glance Comparison')).toBeInTheDocument();
   });
+
+  it('uses the canonical alternatives route for direct comparison links', () => {
+    render(<BestUKTaxCalculatorsPage />);
+
+    const comparisonLink = screen.getAllByRole('link', {
+      name: /^PayeTax vs /i,
+    })[0];
+
+    expect(comparisonLink).toBeDefined();
+    expect(comparisonLink).toHaveAttribute('href', expect.stringMatching(/^\/alternatives\//));
+  });
 });

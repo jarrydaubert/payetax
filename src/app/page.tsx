@@ -2,14 +2,13 @@
 
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { DeferredContent } from '@/components/molecules/DeferredContent';
 import ServerHero from '@/components/molecules/ServerHero';
 import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { generateMetadata } from '@/lib/metadata';
 
-// Dynamic import for interactive content - hero is server-rendered for fast LCP
-// Using loading option for predictable fallback behavior (vs relying on outer Suspense)
+// Keep the hero server-rendered for LCP, but render the calculator shell immediately
+// so /#tax-calculator works natively on cold loads.
 const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent'), {
   loading: () => (
     <output className='flex min-h-96 items-center justify-center p-8' aria-live='polite'>
@@ -35,8 +34,8 @@ export const metadata: Metadata = generateMetadata({
 
 /**
  * Home page component with enhanced SEO
- * Hero is server-rendered for instant LCP (<2.5s target)
- * Calculator and interactive content loaded via dynamic import
+ * Hero stays server-rendered for LCP while the calculator anchor shell is present
+ * in the initial HTML for simpler navigation and discoverability.
  */
 export default function HomePage() {
   return (
@@ -52,18 +51,17 @@ export default function HomePage() {
       {/* Server-rendered hero for instant LCP - H1 appears immediately */}
       <ServerHero />
 
-      {/* Interactive content - deferred until user scrolls */}
-      {/* No timeout, small margin = calculator loads only on scroll, H1 is LCP */}
-      <DeferredContent
-        timeout={0}
-        rootMargin='100px'
-        forceRenderOnHash='#tax-calculator'
-        fallback={<div className='min-h-24' aria-hidden='true' />}
+      {/* Calculator shell is always in the document so hash navigation works on first load */}
+      {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for homepage anchor navigation */}
+      <section
+        id='tax-calculator'
+        data-testid='homepage-calculator'
+        className='relative z-[1] bg-surface-brand'
       >
         <HomePageContent />
-      </DeferredContent>
+      </section>
 
-      {/* Landing page sections: Features, How It Works, FAQ, Final CTA */}
+      {/* Landing page sections below the calculator */}
       <LandingPageSections />
     </>
   );

@@ -34,3 +34,7 @@ Canonical source for upstream skill provenance and local inclusion policy.
 3. Shared project constraints live in `.agents/skills/payetax-context/SKILL.md`.
 4. Upstream marketing skills stay close to upstream; PayeTax-specific rules are centralized instead of duplicated in every synced skill.
 5. `scripts/validate-marketing-skills-setup.sh` must pass after every sync/update.
+
+## Related Files
+
+- Run history tracker: `.agents/skills/RUN_HISTORY.md`

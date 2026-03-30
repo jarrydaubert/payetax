@@ -107,7 +107,7 @@ export const InputTooltip = memo(function InputTooltip({
           <button
             type='button'
             className={cn(
-              'flex-shrink-0 text-muted-foreground transition-colors hover:text-foreground',
+              'flex min-h-6 min-w-6 flex-shrink-0 items-center justify-center p-1 text-muted-foreground transition-colors hover:text-foreground',
               'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
               SURFACES.SHAPE_CIRCLE,
             )}

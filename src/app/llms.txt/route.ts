@@ -89,10 +89,7 @@ export async function GET() {
     .join('\n');
 
   const competitorPages = getAllCompetitorSlugs()
-    .map(
-      (slug) =>
-        `- [PayeTax vs ${titleizeSlug(slug)}](${SITE_URL}/vs/${slug}) | [${titleizeSlug(slug)} Alternative](${SITE_URL}/alternatives/${slug})`,
-    )
+    .map((slug) => `- [${titleizeSlug(slug)} Alternative](${SITE_URL}/alternatives/${slug})`)
     .join('\n');
 
   const lastUpdated = new Date().toISOString().split('T')[0];

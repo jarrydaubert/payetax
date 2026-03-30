@@ -2,7 +2,7 @@
  * Competitor Data
  *
  * Central data source for competitor comparison pages.
- * Used by /best-uk-tax-calculators, /alternatives/*, and /vs/* pages.
+ * Used by /best-uk-tax-calculators and /alternatives/* pages.
  *
  * Canonical depth contract:
  * - `features` powers `TwoColumnComparison`

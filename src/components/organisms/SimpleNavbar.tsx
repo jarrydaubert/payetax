@@ -5,7 +5,7 @@ import { Menu, MessageSquare, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
@@ -46,29 +46,12 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Refs for cleanup of async operations
-  const observerRef = useRef<MutationObserver | null>(null);
-  const timeoutRef = useRef<number | null>(null);
-
   const links = [
     { href: `/${CALCULATOR_HASH}`, label: 'Calculator' },
     { href: '/tools/director-guide', label: 'Director Intelligence' },
     { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About' },
   ] as const;
-
-  /** Clean up any pending observers/timeouts */
-  const cleanupWait = useCallback(() => {
-    observerRef.current?.disconnect();
-    observerRef.current = null;
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => cleanupWait, [cleanupWait]);
 
   /** Scroll to calculator element, returns true if successful */
   const scrollToCalculator = useCallback(() => {
@@ -79,33 +62,6 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
     }
     return false;
   }, []);
-
-  /**
-   * Wait for calculator element and scroll when found
-   * Uses MutationObserver with proper cleanup
-   */
-  const waitForElementAndScroll = useCallback(() => {
-    // Clean up any previous wait
-    cleanupWait();
-
-    // Try immediately
-    if (scrollToCalculator()) return;
-
-    // Watch for calculator to be added to DOM
-    observerRef.current = new MutationObserver(() => {
-      if (scrollToCalculator()) {
-        cleanupWait();
-      }
-    });
-
-    observerRef.current.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Safety timeout to prevent infinite observation (5s)
-    timeoutRef.current = window.setTimeout(cleanupWait, 5000);
-  }, [cleanupWait, scrollToCalculator]);
 
   /**
    * Handle calculator link click
@@ -122,21 +78,17 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       setIsMobileMenuOpen(false);
 
       if (pathname === '/') {
-        // Already on home - scroll directly or wait for element
-        if (!scrollToCalculator()) {
-          waitForElementAndScroll();
-          // Trigger hashchange so DeferredContent can render the calculator section even if it's deferred.
-          window.location.hash = CALCULATOR_ID;
-          return;
+        if (scrollToCalculator()) {
+          // Update hash for bookmarking/sharing without adding a second history entry.
+          window.history.replaceState(null, '', CALCULATOR_HASH);
         }
-        // Update hash for bookmarking/sharing (no extra history entry)
-        window.history.replaceState(null, '', CALCULATOR_HASH);
       } else {
-        // Navigate to home with hash - HomePageContent handles scroll via hashchange
+        // The calculator section shell is server-rendered on the homepage,
+        // so native browser hash navigation can handle the rest.
         router.push(`/${CALCULATOR_HASH}`);
       }
     },
-    [pathname, router, scrollToCalculator, waitForElementAndScroll],
+    [pathname, router, scrollToCalculator],
   );
 
   const handleMobileLinkClick = useCallback(() => {

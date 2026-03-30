@@ -90,11 +90,11 @@ Includes income tax, dividend tax, corporation tax, strategy comparison, warning
 Canonical competitor comparison pattern:
 - Data source: `src/data/competitors.ts`
 - Required fields: `features`, `strengths`, `weaknesses`, `bestFor`, `payeTaxAdvantages`, `verification`
-- Rendering contract: `TwoColumnComparison` + detailed strengths/weaknesses columns + explicit verdict section in `src/app/vs/[competitor]/VsPageContent.tsx`
+- Rendering contract: `TwoColumnComparison` + detailed strengths/weaknesses columns + explicit verdict section in `src/app/alternatives/[competitor]/AlternativePageContent.tsx`
 
 Current decision:
 - Do not add a separate `detailedComparison` data field right now.
-- When additional depth is needed, extend existing competitor fields and/or the `VsPageContent` narrative sections so one pattern remains authoritative.
+- When additional depth is needed, extend existing competitor fields and/or the `AlternativePageContent` narrative sections so one pattern remains authoritative.
 
 ---
 

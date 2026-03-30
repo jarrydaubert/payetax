@@ -257,20 +257,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Competitor comparison pages
   const competitorSlugs = selectCompetitorSlugsForSitemap(getAllCompetitorSlugs());
-  const competitorPages: SitemapEntry[] = competitorSlugs.flatMap((slug) => [
-    {
-      url: `${baseUrl}/alternatives/${slug}`,
-      lastModified: staticPagesDate,
-      changeFrequency: 'monthly' as SitemapFrequency,
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/vs/${slug}`,
-      lastModified: staticPagesDate,
-      changeFrequency: 'monthly' as SitemapFrequency,
-      priority: 0.7,
-    },
-  ]);
+  const competitorPages: SitemapEntry[] = competitorSlugs.map((slug) => ({
+    url: `${baseUrl}/alternatives/${slug}`,
+    lastModified: staticPagesDate,
+    changeFrequency: 'monthly' as SitemapFrequency,
+    priority: 0.75,
+  }));
 
   // Scenario pages (tax optimization guides)
   const scenarioSlugs = getAllScenarioSlugs();

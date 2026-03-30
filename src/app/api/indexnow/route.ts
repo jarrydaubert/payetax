@@ -32,14 +32,12 @@ const ALLOWED_EXACT_PATHS = new Set([
   '/best-for',
   '/alternatives',
   '/best-uk-tax-calculators',
-  '/vs',
 ]);
 
 // Allowed section prefixes (supports nested detail pages)
 const ALLOWED_PATH_PREFIXES = [
   '/blog/',
   '/alternatives/',
-  '/vs/',
   '/calculator/',
   '/tools/',
   '/scenarios/',

@@ -133,6 +133,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/vs',
+        destination: '/alternatives',
+        permanent: true,
+      },
+      {
+        source: '/vs/:competitor',
+        destination: '/alternatives/:competitor',
+        permanent: true,
+      },
+      {
         source: '/blog/category/tax-tools',
         destination: '/blog/category/tax-basics',
         permanent: true,

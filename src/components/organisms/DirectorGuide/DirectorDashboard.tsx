@@ -255,7 +255,7 @@ export function DirectorDashboard() {
         }
         inputs={<InputsPanel onReset={handleReset} />}
         main={
-          <main className='p-6'>
+          <main className='p-6' data-testid='director-dashboard-main'>
             {/* Header */}
             <div className={inputsCollapsed ? 'mb-6 pl-12' : 'mb-6'}>
               <h1 className='font-semibold text-2xl text-foreground'>

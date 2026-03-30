@@ -96,7 +96,7 @@ export default function BestUKTaxCalculatorsPage() {
               {COMPETITORS.map((competitor) => (
                 <Link
                   key={competitor.slug}
-                  href={`/vs/${competitor.slug}`}
+                  href={`/alternatives/${competitor.slug}`}
                   className={cn(
                     'rounded-xl border border-border/60 bg-card/40 px-4 py-3',
                     'text-foreground text-sm transition hover:border-primary/40 hover:bg-card/60',
@@ -220,7 +220,6 @@ export default function BestUKTaxCalculatorsPage() {
                   competitor={competitor}
                   showAdvantages
                   showCompareLink
-                  linkVariant='alternatives'
                 />
               ))}
             </div>

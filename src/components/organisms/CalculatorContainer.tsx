@@ -287,9 +287,7 @@ export function CalculatorContainer() {
   };
 
   return (
-    // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation from hero/CTAs
     <div
-      id='tax-calculator'
       className={cn(
         'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
         SPACING.GAP_3,

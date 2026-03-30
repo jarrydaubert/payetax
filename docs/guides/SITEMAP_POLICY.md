@@ -24,7 +24,7 @@ Purpose: keep sitemap entries focused on high-value, indexable pages and avoid c
 
 - Include a capped subset (`MAX_COMPETITOR_SLUGS_IN_SITEMAP`) to prevent index dilution.
 - Prefer known high-intent competitors first (`PRIORITY_COMPETITOR_SLUGS`).
-- Keep `/alternatives/[slug]` and `/vs/[slug]` in sync for included slugs.
+- Submit only the canonical `/alternatives/[slug]` route for included slugs.
 
 ## Quality Gates
 

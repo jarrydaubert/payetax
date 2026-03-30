@@ -19,6 +19,8 @@
     "test:dev": "playwright test --project=chromium && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:golden": "playwright test e2e/golden-master-PERFECT.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
+    "test:e2e:visual": "playwright test e2e/visual-regression.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
+    "test:e2e:visual:update": "playwright test e2e/visual-regression.spec.ts --project=chromium --workers=1 --update-snapshots && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:critical": "bun run test:e2e:smoke && bun run test:e2e:golden",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",

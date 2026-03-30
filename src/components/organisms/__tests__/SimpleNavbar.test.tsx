@@ -273,6 +273,17 @@ describe('SimpleNavbar Component', () => {
         block: 'start',
       });
     });
+
+    it('should navigate back to the homepage calculator when used off-home', () => {
+      (usePathname as jest.Mock).mockReturnValue('/blog');
+
+      render(<SimpleNavbar />);
+
+      const calculatorLinks = screen.getAllByText('Calculator');
+      fireEvent.click(calculatorLinks[0]);
+
+      expect(mockPush).toHaveBeenCalledWith('/#tax-calculator');
+    });
   });
 
   describe('Styling', () => {

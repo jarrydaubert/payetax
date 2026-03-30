@@ -16,6 +16,13 @@ async function openWhatIfSection(page: Page) {
   await expect(page.getByTestId('what-if-value-input')).toBeVisible({ timeout: 5000 });
 }
 
+async function expectWhatIfComparisonVisible(page: Page) {
+  const comparisonTable = page.getByTestId('results-table');
+  await expect(comparisonTable).toBeVisible({ timeout: 5000 });
+  await expect(comparisonTable.getByText('Current').first()).toBeVisible({ timeout: 5000 });
+  await expect(comparisonTable.getByText('What If').first()).toBeVisible({ timeout: 5000 });
+}
+
 /**
  * What-If Comparison E2E Tests
  *
@@ -111,8 +118,7 @@ test.describe('What-If Comparison - Core Functionality', () => {
     await compareButton.click();
 
     // Comparison should be visible
-    const comparisonHeading = page.locator('text=Current vs What If').first();
-    await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // Clear button should now be visible
     const clearButton = page.locator('[data-testid="clear-what-if-button"]');
@@ -125,7 +131,9 @@ test.describe('What-If Comparison - Core Functionality', () => {
     await expect(clearButton).toBeHidden({ timeout: 5000 });
 
     // Comparison heading should no longer be visible
-    await expect(comparisonHeading).toBeHidden({ timeout: 5000 });
+    await expect(page.getByTestId('results-table').getByText('What If')).toHaveCount(0, {
+      timeout: 5000,
+    });
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ What-If clear works correctly');
@@ -175,8 +183,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await compareButton.click();
 
     // Comparison table should be visible with Current vs What If columns
-    const comparisonHeading = page.locator('text=Current vs What If').first();
-    await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ 10% increase scenario calculated');
@@ -202,8 +209,7 @@ test.describe('What-If Comparison - Percentage Changes', () => {
     await compareButton.click();
 
     // Comparison should show decreased values
-    const comparisonHeading = page.locator('text=Current vs What If').first();
-    await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ 5% decrease scenario calculated');
@@ -248,8 +254,7 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await compareButton.click();
 
     // Verify comparison displayed
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ £5,000 raise scenario calculated');
@@ -280,8 +285,7 @@ test.describe('What-If Comparison - Amount Changes', () => {
     await compareButton.click();
 
     // Verify comparison displayed
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Salary reduction scenario calculated');
@@ -326,8 +330,7 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await compareButton.click();
 
     // Verify comparison displayed
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ £40k vs £50k comparison calculated');
@@ -358,8 +361,7 @@ test.describe('What-If Comparison - New Total Salary', () => {
     await compareButton.click();
 
     // Verify comparison displayed
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Career progression scenario calculated');
@@ -404,8 +406,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await compareButton.click();
 
     // Comparison should be visible showing the tax trap effects
-    const comparisonHeading = page.locator('text=Current vs What If').first();
-    await expect(comparisonHeading).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // Should show tax calculations for both scenarios
     const resultsTable = page.locator('[data-testid="results-table"]');
@@ -440,8 +441,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await compareButton.click();
 
     // Comparison should show marginal rate differences
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Full tax trap comparison calculated');
@@ -472,8 +472,7 @@ test.describe('What-If Comparison - Tax Trap Scenarios', () => {
     await compareButton.click();
 
     // Comparison should show improved marginal rate
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Post-trap scenario calculated');
@@ -518,8 +517,7 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await compareButton.click();
 
     // Comparison should show tax savings
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Salary sacrifice impact calculated');
@@ -550,8 +548,7 @@ test.describe('What-If Comparison - Salary Sacrifice Scenarios', () => {
     await compareButton.click();
 
     // Comparison should show benefit of avoiding trap
-    const comparisonSection = page.locator('text=Current vs What If').first();
-    await expect(comparisonSection).toBeVisible({ timeout: 5000 });
+    await expectWhatIfComparisonVisible(page);
 
     // biome-ignore lint/suspicious/noConsole: Test debugging output
     console.log('✅ Tax trap mitigation scenario calculated');

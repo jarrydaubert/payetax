@@ -244,13 +244,19 @@ export function ProofStrip() {
           </span>
           <span className='flex items-center gap-2'>
             <Shield aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
-            <Link href='/privacy' className='underline underline-offset-2 hover:text-foreground'>
+            <Link
+              href='/privacy'
+              className='inline-flex min-h-6 items-center underline underline-offset-2 hover:text-foreground'
+            >
               Privacy policy
             </Link>
           </span>
           <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
-            <Link href='/compliance' className='underline underline-offset-2 hover:text-foreground'>
+            <Link
+              href='/compliance'
+              className='inline-flex min-h-6 items-center underline underline-offset-2 hover:text-foreground'
+            >
               Compliance
             </Link>
           </span>

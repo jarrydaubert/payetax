@@ -27,15 +27,7 @@ const competitor: Competitor = {
 
 describe('CompetitorCard', () => {
   it('renders competitor details and links', () => {
-    render(
-      <CompetitorCard
-        competitor={competitor}
-        showAdvantages
-        showCompareLink
-        featured
-        linkVariant='alternatives'
-      />,
-    );
+    render(<CompetitorCard competitor={competitor} showAdvantages showCompareLink featured />);
 
     expect(screen.getByText('Example Competitor')).toBeInTheDocument();
     expect(screen.getByText('Top Pick')).toBeInTheDocument();
