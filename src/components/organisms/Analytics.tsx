@@ -4,7 +4,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { initCoreWebVitals } from '@/lib/analytics';
+import { initCoreWebVitals, trackEvent } from '@/lib/analytics';
 import { areCookiesAccepted } from '@/lib/cookieUtils';
 
 import type { GtagFunction } from '@/types/gtag';
@@ -76,9 +76,10 @@ export function Analytics() {
     const trackTimeSpent = () => {
       const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
       if (timeSpentSeconds >= 30) {
-        window.gtag?.('event', 'engagement', {
-          event_category: 'time_on_page',
-          event_label: pathname,
+        trackEvent({
+          action: 'time_on_page',
+          category: 'engagement',
+          label: pathname,
           value: timeSpentSeconds,
         });
       }
@@ -101,9 +102,10 @@ export function Analytics() {
       for (const threshold of SCROLL_THRESHOLDS) {
         if (scrollPercentage >= threshold && !sentThresholds.has(threshold)) {
           sentThresholds.add(threshold);
-          window.gtag?.('event', 'scroll_depth', {
-            event_category: 'engagement',
-            event_label: `${threshold}%`,
+          trackEvent({
+            action: 'scroll_depth',
+            category: 'engagement',
+            label: `${threshold}%`,
             value: threshold,
           });
         }

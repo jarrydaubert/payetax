@@ -299,11 +299,11 @@ describe('Analytics Component', () => {
       window.dispatchEvent(new Event('beforeunload'));
 
       await waitFor(() => {
-        const engagementEvents = mockGtag.mock.calls.filter(
-          (call) => call[0] === 'event' && call[1] === 'engagement',
+        const timeOnPageEvents = mockGtag.mock.calls.filter(
+          (call) => call[0] === 'event' && call[1] === 'time_on_page',
         );
-        expect(engagementEvents.length).toBeGreaterThan(0);
-        expect(engagementEvents[0][2].value).toBeGreaterThanOrEqual(30);
+        expect(timeOnPageEvents.length).toBeGreaterThan(0);
+        expect(timeOnPageEvents[0][2].value).toBeGreaterThanOrEqual(30);
       });
     });
 
@@ -319,10 +319,10 @@ describe('Analytics Component', () => {
 
       window.dispatchEvent(new Event('beforeunload'));
 
-      const engagementEvents = mockGtag.mock.calls.filter(
-        (call) => call[0] === 'event' && call[1] === 'engagement',
+      const timeOnPageEvents = mockGtag.mock.calls.filter(
+        (call) => call[0] === 'event' && call[1] === 'time_on_page',
       );
-      expect(engagementEvents.length).toBe(0);
+      expect(timeOnPageEvents.length).toBe(0);
     });
   });
 

@@ -9,6 +9,7 @@ import { cache } from 'react';
 
 import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
+import { TrackedNavigationLink } from '@/components/molecules/TrackedNavigationLink';
 import { BlogArticleAnalytics } from '@/components/organisms/BlogArticleAnalytics';
 import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
@@ -509,18 +510,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       {salaryIntentLabel}.
                     </p>
                     <Button asChild size='sm' className='shrink-0'>
-                      <Link href={`/calculator/${salaryIntentTarget}-after-tax`}>
+                      <TrackedNavigationLink
+                        href={`/calculator/${salaryIntentTarget}-after-tax`}
+                        source='blog_salary_intent_cta'
+                        target={`calculator:${salaryIntentTarget}`}
+                        destination='salary_calculator'
+                      >
                         Calculate your take-home pay
-                      </Link>
+                      </TrackedNavigationLink>
                     </Button>
                   </div>
                 </div>
               )}
               <div className='grid gap-6 md:grid-cols-3'>
                 {relatedPosts.map((relatedPost) => (
-                  <Link
+                  <TrackedNavigationLink
                     key={relatedPost.slug}
                     href={`/blog/${relatedPost.slug}`}
+                    source='blog_related_articles'
+                    target={relatedPost.slug}
+                    destination={relatedPost.category}
                     className='group rounded-lg border border-foreground/10 p-5 transition-all hover:border-primary/30 hover:bg-primary/5'
                   >
                     <div className={cn('mb-2 text-primary', TYPOGRAPHY.TEXT_SM)}>
@@ -551,7 +560,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       )}
                       <time>{formatDate(relatedPost.publishedAt)}</time>
                     </div>
-                  </Link>
+                  </TrackedNavigationLink>
                 ))}
               </div>
             </section>

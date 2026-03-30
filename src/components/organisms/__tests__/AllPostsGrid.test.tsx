@@ -65,5 +65,4 @@ describe('AllPostsGrid', () => {
       '/blog?page=2#all-posts-heading',
     );
   });
-
 });

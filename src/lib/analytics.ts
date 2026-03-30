@@ -199,43 +199,6 @@ export function trackCalculatorUsage(calculation_type: string, salary_range?: st
 }
 
 /**
- * Track page views
- *
- * @deprecated Prefer using Analytics.tsx for pageview tracking to avoid duplicates.
- * This function is kept for edge cases where manual pageview tracking is needed.
- *
- * @param page_path - The path of the page being viewed
- * @param page_title - The title of the page
- */
-export function trackPageView(page_path: string, page_title?: string): void {
-  try {
-    // Respect user consent - only track if cookies accepted
-    if (!areCookiesAccepted()) {
-      return;
-    }
-
-    // Guard against missing GA ID
-    const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-    if (!(GA_ID && window?.gtag)) {
-      return;
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
-      console.log('📄 Page View:', page_path, page_title);
-    }
-
-    window.gtag('config', GA_ID, {
-      page_path,
-      page_title,
-      send_page_view: true,
-    });
-  } catch (error) {
-    logAnalyticsWarning('Page view tracking error:', error);
-  }
-}
-
-/**
  * Track form interactions
  *
  * @param form_name - Name of the form

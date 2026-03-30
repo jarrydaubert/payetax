@@ -8,7 +8,6 @@ import {
   trackCoreWebVitals,
   trackEvent,
   trackFormInteraction,
-  trackPageView,
   trackPerformanceMetric,
   trackSEOAction,
 } from '../analytics';
@@ -297,61 +296,6 @@ describe('analytics', () => {
           timestamp: expect.any(String),
         }),
       );
-    });
-  });
-
-  describe('trackPageView', () => {
-    it('tracks page view with title', () => {
-      process.env.NEXT_PUBLIC_GA_ID = 'GA-TEST-123';
-      trackPageView('/calculator', 'Tax Calculator');
-
-      expect(mockGtag).toHaveBeenCalledWith('config', 'GA-TEST-123', {
-        page_path: '/calculator',
-        page_title: 'Tax Calculator',
-        send_page_view: true,
-      });
-    });
-
-    it('tracks page view without title', () => {
-      process.env.NEXT_PUBLIC_GA_ID = 'GA-TEST-123';
-      trackPageView('/about');
-
-      expect(mockGtag).toHaveBeenCalledWith('config', 'GA-TEST-123', {
-        page_path: '/about',
-        page_title: undefined,
-        send_page_view: true,
-      });
-    });
-
-    it('logs to console in development mode', () => {
-      process.env.NODE_ENV = 'development';
-      trackPageView('/test', 'Test Page');
-
-      expect(consoleLogSpy).toHaveBeenCalledWith('📄 Page View:', '/test', 'Test Page');
-    });
-
-    it('handles missing gtag gracefully', () => {
-      (window as Window & { gtag?: unknown }).gtag = undefined;
-
-      expect(() => trackPageView('/test')).not.toThrow();
-    });
-
-    it('handles errors gracefully', () => {
-      mockGtag.mockImplementation(() => {
-        throw new Error('Page view error');
-      });
-
-      expect(() => trackPageView('/test')).not.toThrow();
-      expect(consoleWarnSpy).toHaveBeenCalledWith('Page view tracking error:', expect.any(Error));
-    });
-
-    it('uses empty string as GA_ID when not set', () => {
-      const originalGaId = process.env.NEXT_PUBLIC_GA_ID;
-      process.env.NEXT_PUBLIC_GA_ID = '';
-      trackPageView('/test');
-
-      expect(mockGtag).not.toHaveBeenCalled();
-      process.env.NEXT_PUBLIC_GA_ID = originalGaId;
     });
   });
 

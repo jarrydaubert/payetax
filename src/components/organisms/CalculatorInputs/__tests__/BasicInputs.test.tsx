@@ -1,12 +1,19 @@
 // src/components/organisms/CalculatorInputs/__tests__/BasicInputs.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
+import { trackFormInteraction } from '@/lib/analytics';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from '../BasicInputs';
 
 // Mock the store
 jest.mock('@/store/calculatorStore');
+jest.mock('@/lib/analytics', () => ({
+  trackFormInteraction: jest.fn(),
+}));
 
 describe('BasicInputs Component', () => {
+  const mockTrackFormInteraction = trackFormInteraction as jest.MockedFunction<
+    typeof trackFormInteraction
+  >;
   const mockSetSalary = jest.fn();
   const mockSetPayPeriod = jest.fn();
   const mockSetTaxYear = jest.fn();
@@ -177,6 +184,33 @@ describe('BasicInputs Component', () => {
       fireEvent.click(screen.getByTestId('married-checkbox'));
 
       expect(mockSetIsMarried).toHaveBeenCalledWith(true);
+    });
+
+    it('should track first salary field focus', () => {
+      render(<BasicInputs />);
+
+      fireEvent.focus(screen.getByTestId('salary-input'));
+
+      expect(mockTrackFormInteraction).toHaveBeenCalledWith('paye_calculator', 'focus', 'salary');
+    });
+
+    it('should only track salary focus once per render cycle', () => {
+      render(<BasicInputs />);
+
+      const salaryInput = screen.getByTestId('salary-input');
+      fireEvent.focus(salaryInput);
+      fireEvent.blur(salaryInput);
+      fireEvent.focus(salaryInput);
+
+      expect(mockTrackFormInteraction).toHaveBeenCalledTimes(1);
+    });
+
+    it('should track tax code field focus', () => {
+      render(<BasicInputs />);
+
+      fireEvent.focus(screen.getByTestId('tax-code-input'));
+
+      expect(mockTrackFormInteraction).toHaveBeenCalledWith('paye_calculator', 'focus', 'tax_code');
     });
   });
 

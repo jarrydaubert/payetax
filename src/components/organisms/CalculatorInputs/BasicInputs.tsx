@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { Percent, PoundSterling } from 'lucide-react';
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
+import { trackFormInteraction } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
@@ -30,6 +31,8 @@ const STATE_PENSION_AGE = 66;
 const TAX_CODE_REGEX = /^[A-Z0-9]{0,10}$/;
 
 export function BasicInputs() {
+  const trackedFieldFocusesRef = useRef<Set<string>>(new Set());
+
   // Use optimized selectors - extract only input state and actions
   const input = useCalculatorStore((state) => state.input);
   const {
@@ -120,7 +123,16 @@ export function BasicInputs() {
   // Determine if user is over State Pension Age (for NI exemption)
   const isOverStatePensionAge = input.age !== undefined && input.age >= STATE_PENSION_AGE;
 
+  const trackCalculatorFieldFocus = (fieldName: string) => {
+    if (trackedFieldFocusesRef.current.has(fieldName)) return;
+
+    trackedFieldFocusesRef.current.add(fieldName);
+    trackFormInteraction('paye_calculator', 'focus', fieldName);
+  };
+
   const handleUndergraduateLoanChange = (value: string) => {
+    trackFormInteraction('paye_calculator', 'change', 'student_loan');
+
     if (value === 'none') {
       setStudentLoanPlans('none');
       return;
@@ -195,6 +207,7 @@ export function BasicInputs() {
             onChange={(value) => {
               setSalary(value);
             }}
+            onFocus={() => trackCalculatorFieldFocus('salary')}
             prefix='£'
             decimals={2}
             placeholder='0.00'
@@ -252,6 +265,7 @@ export function BasicInputs() {
           type='text'
           value={input.taxCode}
           onChange={handleTaxCodeChange}
+          onFocus={() => trackCalculatorFieldFocus('tax_code')}
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
           className='w-24 uppercase'
           maxLength={10}
@@ -477,7 +491,14 @@ export function BasicInputs() {
         </div>
         <div className={cn('flex flex-1', SPACING.GAP_1_5)}>
           {/* Type selector with icons */}
-          <Select value={input.pensionContributionType} onValueChange={setPensionContributionType}>
+          <Select
+            value={input.pensionContributionType}
+            onValueChange={(value) => {
+              if (!(value === 'percentage' || value === 'amount')) return;
+              trackFormInteraction('paye_calculator', 'change', 'pension_type');
+              setPensionContributionType(value);
+            }}
+          >
             <SelectTrigger
               id={pensionTypeId}
               className='w-20 shrink-0'
@@ -515,6 +536,7 @@ export function BasicInputs() {
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}
+            onFocus={() => trackCalculatorFieldFocus('pension')}
             prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
             suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}
             decimals={2}
