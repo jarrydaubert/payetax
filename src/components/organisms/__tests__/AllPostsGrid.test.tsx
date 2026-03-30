@@ -66,24 +66,4 @@ describe('AllPostsGrid', () => {
     );
   });
 
-  it('renders optional filter slot content', () => {
-    const posts = [makePost({ id: 'post-1', slug: 'post-1', title: 'First' })];
-
-    render(
-      <AllPostsGrid
-        posts={posts}
-        currentPage={1}
-        totalPages={1}
-        totalPosts={1}
-        filterSlot={
-          <nav aria-label='Browse blog categories'>
-            <a href='/blog'>All Articles</a>
-          </nav>
-        }
-      />,
-    );
-
-    expect(screen.getByRole('navigation', { name: 'Browse blog categories' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'All Articles' })).toHaveAttribute('href', '/blog');
-  });
 });

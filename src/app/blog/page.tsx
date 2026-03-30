@@ -161,7 +161,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {/* Blog layout */}
       <div className='min-h-screen bg-background'>
         {/* Header: H1 + Category Filters */}
-        <div className='container mx-auto max-w-7xl px-4 pt-12'>
+        <div className='container mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8'>
           <h1 className='mb-6 font-bold font-display text-3xl text-foreground md:text-4xl'>
             UK Tax Guides &amp; PAYE Insights
           </h1>
@@ -195,7 +195,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* Latest Articles + Editor's Picks Sidebar */}
-        <div className='container mx-auto max-w-7xl px-4'>
+        <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
             <div>
               <LatestArticles posts={latestPosts} />
@@ -212,7 +212,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* All Posts — paginated grid */}
-        <div className='mt-12 border-border/60 border-t'>
+        <div className='border-border/60 border-t'>
           <AllPostsGrid
             posts={paginatedPosts}
             currentPage={currentPage}
@@ -222,7 +222,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* Newsletter CTA */}
-        <div className='container mx-auto max-w-7xl px-4 py-16'>
+        <div className='container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
           <NewsletterCTA className='mx-auto max-w-4xl' />
         </div>
       </div>

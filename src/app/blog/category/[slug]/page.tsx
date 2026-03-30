@@ -135,7 +135,7 @@ export default async function CategoryPage({
       />
 
       {/* Header + Filters */}
-      <div className='container mx-auto max-w-7xl px-4 pt-12'>
+      <div className='container mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8'>
         {/* Breadcrumbs */}
         <nav aria-label='Breadcrumbs' className='mb-4 text-muted-foreground text-sm'>
           <ol className='flex items-center gap-2'>
@@ -198,13 +198,13 @@ export default async function CategoryPage({
       </div>
 
       {/* Posts Grid */}
-      <div className='container mx-auto max-w-7xl px-4 pb-12'>
+      <div className='container mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8'>
         {posts.length > 0 ? (
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {posts.map((post) => (
               <article
                 key={post.id}
-                className='group rounded-lg border border-border/60 bg-card/50 p-6 transition-colors hover:border-border'
+                className='group rounded-xl border border-border/60 bg-card/70 p-5 transition-colors hover:border-primary/50'
               >
                 <div className='mb-3 flex items-center gap-2 text-muted-foreground text-xs'>
                   <span className='font-medium text-primary'>
@@ -232,12 +232,6 @@ export default async function CategoryPage({
           </div>
         )}
 
-        <NewsletterCTA
-          className='mx-auto mt-10 max-w-4xl'
-          title='Get Tax Articles in Your Inbox'
-          description='Subscribe for new UK tax explainers, deadline reminders, and PAYE updates.'
-        />
-
         {/* Pagination */}
         {totalPages > 1 && (
           <nav className='mt-12 flex items-center justify-center gap-2' aria-label='Pagination'>
@@ -262,6 +256,15 @@ export default async function CategoryPage({
             )}
           </nav>
         )}
+      </div>
+
+      {/* Newsletter CTA */}
+      <div className='container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
+        <NewsletterCTA
+          className='mx-auto max-w-4xl'
+          title='Get Tax Articles in Your Inbox'
+          description='Subscribe for new UK tax explainers, deadline reminders, and PAYE updates.'
+        />
       </div>
     </div>
   );

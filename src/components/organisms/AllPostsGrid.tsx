@@ -34,17 +34,9 @@ interface AllPostsGridProps {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
-  /** Optional slot for category filter between header and grid */
-  filterSlot?: React.ReactNode;
 }
 
-export function AllPostsGrid({
-  posts,
-  currentPage,
-  totalPages,
-  totalPosts,
-  filterSlot,
-}: AllPostsGridProps) {
+export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: AllPostsGridProps) {
   if (posts.length === 0) {
     return (
       <div className={cn('text-center', SPACING.PY_16)}>
@@ -73,9 +65,6 @@ export function AllPostsGrid({
             {totalPosts.toLocaleString('en-GB')} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
-
-        {/* Filter Slot */}
-        {filterSlot}
 
         {/* Posts Grid */}
         <ul
