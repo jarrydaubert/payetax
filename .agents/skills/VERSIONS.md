@@ -5,23 +5,23 @@ Canonical source for upstream skill provenance and local inclusion policy.
 ## Upstream Reference
 
 - Repository: https://github.com/coreyhaines31/marketingskills
-- Version tag: `v1.5.0`
-- Commit: `7c8c087486c29290b982820d719e1c4a556c0053`
+- Version tag: `v1.7.0`
+- Commit: `978051caf17c3aef0dafd1729aaf85cea91a4416`
 
-## Freshness Check (2026-03-29)
+## Freshness Check (2026-04-13)
 
 - Local sync metadata is stored in `.agents/skills/.sources/marketingskills.json`.
-- Upstream skills at tag: 34 total
-- Included upstream skills: 25
+- Upstream skills at tag: 36 total
+- Included upstream skills: 26
 - Local-only skills: 7
 
-## Upstream Skills Included (25/34)
+## Upstream Skills Included (26/36)
 
-`ab-test-setup`, `ad-creative`, `ai-seo`, `analytics-tracking`, `churn-prevention`, `cold-email`, `competitor-alternatives`, `content-strategy`, `copy-editing`, `copywriting`, `customer-research`, `email-sequence`, `form-cro`, `free-tool-strategy`, `launch-strategy`, `marketing-ideas`, `marketing-psychology`, `onboarding-cro`, `page-cro`, `popup-cro`, `product-marketing-context`, `programmatic-seo`, `schema-markup`, `seo-audit`, `social-content`
+`ab-test-setup`, `ad-creative`, `ai-seo`, `analytics-tracking`, `churn-prevention`, `cold-email`, `community-marketing`, `competitor-alternatives`, `content-strategy`, `copy-editing`, `copywriting`, `customer-research`, `email-sequence`, `form-cro`, `free-tool-strategy`, `launch-strategy`, `marketing-ideas`, `marketing-psychology`, `onboarding-cro`, `page-cro`, `popup-cro`, `product-marketing-context`, `programmatic-seo`, `schema-markup`, `seo-audit`, `social-content`
 
-## Upstream Skills Excluded (9)
+## Upstream Skills Excluded (10)
 
-`lead-magnets`, `paid-ads`, `paywall-upgrade-cro`, `pricing-strategy`, `referral-program`, `revops`, `sales-enablement`, `signup-flow-cro`, `site-architecture`
+`aso-audit`, `lead-magnets`, `paid-ads`, `paywall-upgrade-cro`, `pricing-strategy`, `referral-program`, `revops`, `sales-enablement`, `signup-flow-cro`, `site-architecture`
 
 ## Local-Only Skills (7)
 
@@ -34,7 +34,3 @@ Canonical source for upstream skill provenance and local inclusion policy.
 3. Shared project constraints live in `.agents/skills/payetax-context/SKILL.md`.
 4. Upstream marketing skills stay close to upstream; PayeTax-specific rules are centralized instead of duplicated in every synced skill.
 5. `scripts/validate-marketing-skills-setup.sh` must pass after every sync/update.
-
-## Related Files
-
-- Run history tracker: `.agents/skills/RUN_HISTORY.md`

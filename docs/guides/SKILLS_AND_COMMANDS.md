@@ -56,7 +56,7 @@ then write homepage hero copy
 
 Planning and test-first workflows now live in skills rather than slash commands: `design-an-interface`, `prd-to-issues`, and `tdd`.
 
-## Skills (32 Installed)
+## Skills (33 Installed)
 
 ### Shared Context
 
@@ -119,6 +119,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | --- | --- | --- |
 | `marketing-ideas` | Growth idea generation | "Give 10 promo ideas for tax-year change" |
 | `customer-research` | VOC, persona, and community research | "Synthesize Reddit and G2 feedback into themes" |
+| `community-marketing` | Community-led growth, advocates, and owned community strategy | "Plan a Reddit/Discord-style community motion around tax-year questions" |
 | `marketing-psychology` | Persuasion/behavior models | "Improve conversion using loss aversion" |
 | `launch-strategy` | Product launches | "Plan a feature release announcement" |
 | `free-tool-strategy` | Free tool growth strategy | "Optional email capture without hurting SEO" |

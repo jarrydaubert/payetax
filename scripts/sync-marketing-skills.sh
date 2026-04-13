@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/coreyhaines31/marketingskills}"
-UPSTREAM_REF="${UPSTREAM_REF:-v1.5.0}"
+UPSTREAM_REF="${UPSTREAM_REF:-v1.7.0}"
 EXPECTED_COMMIT="${EXPECTED_COMMIT:-}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
@@ -18,6 +18,7 @@ KEEP_UPSTREAM_SKILLS=(
   "ai-seo"
   "analytics-tracking"
   "churn-prevention"
+  "community-marketing"
   "cold-email"
   "competitor-alternatives"
   "content-strategy"
@@ -54,7 +55,7 @@ Options:
 
 Environment overrides:
   REPO_URL      (default: https://github.com/coreyhaines31/marketingskills)
-  UPSTREAM_REF  (default: v1.5.0)
+  UPSTREAM_REF  (default: v1.7.0)
   CACHE_DIR     (default: /tmp/marketingskills-sync)
   SKIP_FETCH    (default: 0)
 EOF

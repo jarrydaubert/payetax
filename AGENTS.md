@@ -153,6 +153,7 @@ Skills are agents-native in PayeTax:
 ### Marketing & Growth
 - `marketing-ideas` — 139 categorised tactics, filtered for PayeTax
 - `customer-research` — VOC, persona, ICP, and community research synthesis
+- `community-marketing` — community-led growth, brand advocates, and owned/community channel strategy
 - `launch-strategy` — feature releases, tax calendar events
 - `free-tool-strategy` — new calculator planning and evaluation
 - `marketing-psychology` — mental models and behavioural science

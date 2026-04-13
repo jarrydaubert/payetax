@@ -14,6 +14,7 @@ KEEP_SKILLS=(
   "ai-seo"
   "analytics-tracking"
   "churn-prevention"
+  "community-marketing"
   "cold-email"
   "competitor-alternatives"
   "content-strategy"

@@ -36,6 +36,7 @@ UPSTREAM_SKILLS=(
   "ai-seo"
   "analytics-tracking"
   "churn-prevention"
+  "community-marketing"
   "cold-email"
   "competitor-alternatives"
   "content-strategy"
@@ -92,6 +93,7 @@ fi
 
 ref_value="$(sed -n 's/.*"ref": "\([^"]*\)".*/\1/p' "$SOURCE_FILE" | head -n 1)"
 commit_value="$(sed -n 's/.*"commit": "\([^"]*\)".*/\1/p' "$SOURCE_FILE" | head -n 1)"
+expected_skill_version="${ref_value#v}"
 
 if [[ -z "$ref_value" ]]; then
   error "Could not read ref from $SOURCE_FILE"
@@ -99,6 +101,10 @@ fi
 
 if [[ -z "$commit_value" || ! "$commit_value" =~ ^[0-9a-f]{40}$ ]]; then
   error "Invalid or missing commit SHA in $SOURCE_FILE"
+fi
+
+if [[ -z "$expected_skill_version" ]]; then
+  error "Could not derive skill version from ref value in $SOURCE_FILE"
 fi
 
 if ! rg -q "Version tag: \`$ref_value\`" "$VERSIONS_FILE"; then
@@ -164,8 +170,8 @@ for skill in "${UPSTREAM_SKILLS[@]}"; do
     continue
   fi
 
-  if ! rg -q '^  version: 1.5.0$' "$skill_file"; then
-    error "Version mismatch in $skill_file (expected 1.5.0)"
+  if ! rg -q "^  version: ${expected_skill_version}$" "$skill_file"; then
+    error "Version mismatch in $skill_file (expected ${expected_skill_version})"
   fi
 
   if rg -q '^## PayeTax Context' "$skill_file"; then
