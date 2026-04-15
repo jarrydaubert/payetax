@@ -9,8 +9,12 @@
  * @module lib/tax/strategyComparison
  */
 
-import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  type StudentLoanPlan,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
 import { getCorporationTax } from './corporationTax';
 import { getDividendTax } from './dividendTax';
@@ -200,7 +204,7 @@ function getEmployeeNIWithNoThreshold(salary: number, taxYear: TaxYear): number 
 
 export function calculateStrategyComparison(
   input: StrategyInput,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): StrategyComparison {
   // Calculate YTD amounts already taken
   const ytdSalary = input.ytdSalary ?? 0;

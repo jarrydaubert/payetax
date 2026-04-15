@@ -58,12 +58,13 @@ export function WhatIfInputs({ onCompare }: WhatIfInputsProps) {
     // Clear any previous errors
     setError('');
 
-    // Enable What If mode and calculate
-    calculateWhatIf();
+    try {
+      calculateWhatIf();
 
-    // Notify parent to scroll to results
-    if (onCompare) {
-      onCompare();
+      // Notify parent to scroll to results
+      onCompare?.();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Please check your inputs.');
     }
   };
 

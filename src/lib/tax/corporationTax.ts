@@ -12,9 +12,6 @@
 import { CT_RATES } from '@/constants/taxRates';
 import { roundToPence } from './utils';
 
-// Re-export for backwards compatibility with existing imports
-export { CT_RATES } from '@/constants/taxRates';
-
 // ============================================================================
 // TYPES
 // ============================================================================

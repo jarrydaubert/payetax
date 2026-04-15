@@ -1,10 +1,7 @@
 import {
-  areCookiesAccepted,
-  areCookiesDeclined,
   clearCookieConsent,
   getConsentPreferences,
   getConsentTimestamp,
-  getCookieConsent,
   isAnalyticsConsented,
   isConsentExpired,
   setConsentPreferences,
@@ -42,7 +39,6 @@ describe('cookieUtils', () => {
       setConsentPreferences({ analytics: true });
 
       expect(getConsentPreferences()).toEqual({ analytics: true });
-      expect(getCookieConsent()).toBe('accepted');
       expect(isAnalyticsConsented()).toBe(true);
     });
 
@@ -51,9 +47,7 @@ describe('cookieUtils', () => {
       localStorageMock.setItem('cookie-consent-timestamp', new Date().toISOString());
 
       expect(getConsentPreferences()).toEqual({ analytics: false });
-      expect(getCookieConsent()).toBe('declined');
       expect(isAnalyticsConsented()).toBe(false);
-      expect(areCookiesDeclined()).toBe(true);
     });
 
     it('clears malformed JSON consent payloads', () => {
@@ -63,30 +57,6 @@ describe('cookieUtils', () => {
       expect(getConsentPreferences()).toBeNull();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent-timestamp');
-    });
-  });
-
-  describe('legacy migration', () => {
-    it('migrates legacy accepted format', () => {
-      localStorageMock.setItem('cookie-consent', 'accepted');
-      localStorageMock.setItem('cookie-consent-timestamp', new Date().toISOString());
-
-      expect(getConsentPreferences()).toEqual({ analytics: true });
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'cookie-consent',
-        JSON.stringify({ analytics: true }),
-      );
-    });
-
-    it('migrates legacy declined format', () => {
-      localStorageMock.setItem('cookie-consent', 'declined');
-      localStorageMock.setItem('cookie-consent-timestamp', new Date().toISOString());
-
-      expect(getConsentPreferences()).toEqual({ analytics: false });
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'cookie-consent',
-        JSON.stringify({ analytics: false }),
-      );
     });
   });
 
@@ -134,12 +104,11 @@ describe('cookieUtils', () => {
       expect(getConsentTimestamp()?.toISOString()).toBe(ts.toISOString());
     });
 
-    it('areCookiesAccepted remains backward compatible alias', () => {
+    it('uses the canonical analytics consent helper', () => {
       localStorageMock.setItem('cookie-consent', JSON.stringify({ analytics: true }));
       localStorageMock.setItem('cookie-consent-timestamp', new Date().toISOString());
 
-      expect(areCookiesAccepted()).toBe(true);
-      expect(getCookieConsent()).toBe('accepted');
+      expect(isAnalyticsConsented()).toBe(true);
     });
   });
 });

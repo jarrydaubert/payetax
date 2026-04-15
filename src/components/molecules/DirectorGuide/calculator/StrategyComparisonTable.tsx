@@ -12,17 +12,9 @@ import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
 import { useState } from 'react';
 import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
 import type { YourSetupResult } from '@/lib/tax/strategyComparison';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorGuideActions, useSelectedStrategy } from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 
 type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
@@ -158,7 +150,7 @@ export function StrategyComparisonTable() {
         {objective === 'maximizeTakeHome' && takeHomeDifference < -10 && (
           <p className='text-sm'>
             <span className='font-medium text-destructive'>
-              {formatCurrency(Math.abs(takeHomeDifference))} lower take-home
+              {formatCurrency(Math.abs(takeHomeDifference), 0)} lower take-home
             </span>
             <span className='text-muted-foreground'>{' than max take-home strategy'}</span>
           </p>
@@ -166,7 +158,7 @@ export function StrategyComparisonTable() {
         {objective === 'minimizeNI' && niDifference > 10 && (
           <p className='text-sm'>
             <span className='font-medium text-destructive'>
-              {formatCurrency(niDifference)} more NI
+              {formatCurrency(niDifference, 0)} more NI
             </span>
             <span className='text-muted-foreground'>{' than lowest-NI strategy'}</span>
           </p>
@@ -229,27 +221,27 @@ export function StrategyComparisonTable() {
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Salary</span>
                   <span className='font-mono text-foreground/90'>
-                    {formatCurrency(data.salary)}
+                    {formatCurrency(data.salary, 0)}
                   </span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Dividends</span>
                   <span className='font-mono text-foreground/90'>
-                    {formatCurrency(data.dividends)}
+                    {formatCurrency(data.dividends, 0)}
                   </span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Total Tax</span>
-                  <span className='font-mono text-destructive'>{formatCurrency(totalTax)}</span>
+                  <span className='font-mono text-destructive'>{formatCurrency(totalTax, 0)}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Total NI</span>
-                  <span className='font-mono text-foreground/90'>{formatCurrency(totalNI)}</span>
+                  <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
                 </div>
                 <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
                   <span className='font-medium text-muted-foreground'>Take-Home</span>
                   <span className='font-mono font-semibold text-success'>
-                    {formatCurrency(data.takeHome)}
+                    {formatCurrency(data.takeHome, 0)}
                   </span>
                 </div>
                 <div className='flex justify-between'>
@@ -271,22 +263,22 @@ export function StrategyComparisonTable() {
                     {isReference
                       ? 'Reference'
                       : objective === 'maximizeTakeHome'
-                        ? `${takeHomeDelta < 0 ? '-' : '+'}${formatCurrency(Math.abs(takeHomeDelta))}`
-                        : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta))}`}
+                        ? `${takeHomeDelta < 0 ? '-' : '+'}${formatCurrency(Math.abs(takeHomeDelta), 0)}`
+                        : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta), 0)}`}
                   </span>
                 </div>
                 <div className='text-right text-muted-foreground text-xs'>
                   {objective === 'maximizeTakeHome' ? 'Tax delta' : 'NI delta'}:{' '}
                   {objective === 'maximizeTakeHome'
                     ? totalTax > objectiveReferenceTotalTax
-                      ? `+${formatCurrency(totalTax - objectiveReferenceTotalTax)}`
+                      ? `+${formatCurrency(totalTax - objectiveReferenceTotalTax, 0)}`
                       : totalTax < objectiveReferenceTotalTax
-                        ? `-${formatCurrency(Math.abs(totalTax - objectiveReferenceTotalTax))}`
+                        ? `-${formatCurrency(Math.abs(totalTax - objectiveReferenceTotalTax), 0)}`
                         : '£0'
                     : niDelta > 0
-                      ? `+${formatCurrency(niDelta)}`
+                      ? `+${formatCurrency(niDelta, 0)}`
                       : niDelta < 0
-                        ? `-${formatCurrency(Math.abs(niDelta))}`
+                        ? `-${formatCurrency(Math.abs(niDelta), 0)}`
                         : '£0'}
                 </div>
               </div>
@@ -383,26 +375,28 @@ function YourSetupCard({
       <div className='space-y-1.5 text-sm'>
         <div className='flex justify-between'>
           <span className='text-muted-foreground'>Salary</span>
-          <span className='font-mono text-foreground/90'>{formatCurrency(yourSetup.salary)}</span>
+          <span className='font-mono text-foreground/90'>
+            {formatCurrency(yourSetup.salary, 0)}
+          </span>
         </div>
         <div className='flex justify-between'>
           <span className='text-muted-foreground'>Dividends</span>
           <span className='font-mono text-foreground/90'>
-            {formatCurrency(yourSetup.dividends)}
+            {formatCurrency(yourSetup.dividends, 0)}
           </span>
         </div>
         <div className='flex justify-between'>
           <span className='text-muted-foreground'>Total Tax</span>
-          <span className='font-mono text-destructive'>{formatCurrency(totalTax)}</span>
+          <span className='font-mono text-destructive'>{formatCurrency(totalTax, 0)}</span>
         </div>
         <div className='flex justify-between'>
           <span className='text-muted-foreground'>Total NI</span>
-          <span className='font-mono text-foreground/90'>{formatCurrency(totalNI)}</span>
+          <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
         </div>
         <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
           <span className='font-medium text-muted-foreground'>Take-Home</span>
           <span className='font-mono font-semibold text-success'>
-            {formatCurrency(yourSetup.takeHome)}
+            {formatCurrency(yourSetup.takeHome, 0)}
           </span>
         </div>
       </div>
@@ -414,12 +408,12 @@ function YourSetupCard({
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta < -10 && (
           <span className='text-destructive'>
-            Takes home {formatCurrency(Math.abs(takeHomeDelta))} less per year vs max take-home
+            Takes home {formatCurrency(Math.abs(takeHomeDelta), 0)} less per year vs max take-home
           </span>
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta > 10 && (
           <span className='text-success'>
-            Takes home {formatCurrency(takeHomeDelta)} more per year vs max take-home
+            Takes home {formatCurrency(takeHomeDelta, 0)} more per year vs max take-home
           </span>
         )}
         {objective === 'minimizeNI' && isNearObjective && (
@@ -427,12 +421,12 @@ function YourSetupCard({
         )}
         {objective === 'minimizeNI' && niDelta > 10 && (
           <span className='text-destructive'>
-            Pays {formatCurrency(niDelta)} more NI per year vs lowest-NI strategy
+            Pays {formatCurrency(niDelta, 0)} more NI per year vs lowest-NI strategy
           </span>
         )}
         {objective === 'minimizeNI' && niDelta < -10 && (
           <span className='text-success'>
-            Pays {formatCurrency(Math.abs(niDelta))} less NI per year vs lowest-NI strategy
+            Pays {formatCurrency(Math.abs(niDelta), 0)} less NI per year vs lowest-NI strategy
           </span>
         )}
       </div>

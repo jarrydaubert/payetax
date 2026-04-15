@@ -78,15 +78,10 @@ describe('exportUtils', () => {
 
     beforeEach(() => {
       // Mock link element
-      mockLink = {
-        href: '',
-        download: '',
-        click: jest.fn(),
-      };
+      mockLink = document.createElement('a');
+      mockLink.click = jest.fn();
 
-      createElementSpy = jest
-        .spyOn(document, 'createElement')
-        .mockReturnValue(mockLink as unknown as HTMLElement);
+      createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockLink);
 
       // Mock URL methods
       createObjectURLMock = jest.fn().mockReturnValue('blob:mock-url');
@@ -98,7 +93,7 @@ describe('exportUtils', () => {
       global.Blob = jest.fn().mockImplementation((content, options) => ({
         content,
         options,
-      })) as unknown as typeof Blob;
+      })) as typeof Blob;
     });
 
     afterEach(() => {

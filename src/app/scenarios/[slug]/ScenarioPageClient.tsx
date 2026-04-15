@@ -13,13 +13,11 @@ import {
   type ScenarioCalculatorInputs,
 } from '@/components/organisms/ScenarioCalculator';
 import { LAYOUT, SPACING } from '@/constants/designTokens';
-import { type StudentLoanPlan, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type StudentLoanPlan } from '@/constants/taxRates';
 import type { Scenario } from '@/data/scenarios';
 import { calculateOptimalPension, type PensionOptimization } from '@/lib/pensionOptimizer';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
-
-const CURRENT_TAX_YEAR: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear;
 
 interface ScenarioPageClientProps {
   scenario: Scenario;

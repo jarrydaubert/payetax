@@ -7,6 +7,8 @@ import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { Card } from '@/components/ui/card';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { calculateTax } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
@@ -23,7 +25,7 @@ function generateSalaryData() {
     const results = calculateTax({
       salary,
       payPeriod: 'annually',
-      taxYear: '2025-2026',
+      taxYear: CURRENT_TAX_YEAR,
       taxCode: '1257L',
       isScottish: false,
       isMarried: false,
@@ -151,7 +153,8 @@ export function SalaryComparisonTable() {
 
         <div className={cn('text-center', SPACING.MT_6)}>
           <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
-            Based on England/Wales/NI rates for 2025-26. Scottish rates differ.
+            Based on England/Wales/NI rates for {CURRENT_TAX_YEAR_DISPLAY_SHORT}. Scottish rates
+            differ.
           </p>
         </div>
       </div>

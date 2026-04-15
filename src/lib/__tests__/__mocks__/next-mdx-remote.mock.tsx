@@ -4,9 +4,13 @@
  * Used to test MDX rendering without actual MDX compilation
  */
 
-export const MDXRemote = ({ source, components }: any) => {
+import type { MDXRemoteProps } from 'next-mdx-remote/rsc';
+
+export const MDXRemote = ({ source }: MDXRemoteProps) => {
   // Simple mock that renders test content
-  return <div data-testid='mdx-mock'>{source || 'Mock MDX Content'}</div>;
+  return (
+    <div data-testid='mdx-mock'>{typeof source === 'string' ? source : 'Mock MDX Content'}</div>
+  );
 };
 
 export const compileMDX = (source: string) => {

@@ -40,18 +40,14 @@ export function SalaryComparisonSection({
   // Stable callback - only recreate when currentInput changes
   const handleCompare = useCallback(
     (comparisonInput: ComparisonInput) => {
-      try {
-        const results = calculateComparison(currentInput, comparisonInput);
-        if (!results) {
-          setComparisonError('Comparison failed. Check the values and try again.');
-          return;
-        }
-        setComparisonError('');
-        setComparisonResults(results);
-      } catch {
-        // Error already logged by calculateComparison if needed
-        setComparisonError('Comparison failed. Please check your input values.');
+      const results = calculateComparison(currentInput, comparisonInput);
+      if (!results) {
+        setComparisonResults(null);
+        setComparisonError('Comparison failed. Check the values and try again.');
+        return;
       }
+      setComparisonError('');
+      setComparisonResults(results);
     },
     [currentInput],
   );

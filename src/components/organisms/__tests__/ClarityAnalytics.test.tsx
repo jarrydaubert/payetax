@@ -3,7 +3,7 @@ import { render, waitFor } from '@/test/testing-library';
 const mockAreCookiesAccepted = jest.fn();
 
 jest.mock('@/lib/cookieUtils', () => ({
-  areCookiesAccepted: () => mockAreCookiesAccepted(),
+  isAnalyticsConsented: () => mockAreCookiesAccepted(),
 }));
 
 jest.mock('next/script', () => ({

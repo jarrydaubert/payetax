@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
+import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
+import { cn, formatCurrency } from '@/lib/utils';
 
-const TAX_YEAR = '2025-2026' as const;
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const scottishRates = SCOTTISH_TAX_RATES[TAX_YEAR];
 const englishRates = TAX_RATES[TAX_YEAR];
 
@@ -48,15 +49,6 @@ function calculateTax(
   }
 
   return Math.round(tax);
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 export function ScottishTaxCalculatorClient() {
@@ -118,7 +110,7 @@ export function ScottishTaxCalculatorClient() {
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
-          Scottish Tax Calculator 2025-26
+          Scottish Tax Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
           Scotland has 6 income tax bands with different rates to the rest of the UK. See how much
@@ -193,12 +185,12 @@ export function ScottishTaxCalculatorClient() {
               <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
                 <p className='mb-1 font-medium text-primary text-sm'>Scottish Tax</p>
                 <p className='font-bold text-2xl text-foreground'>
-                  {formatCurrency(comparison.scottishTax)}
+                  {formatCurrency(comparison.scottishTax, 0)}
                 </p>
               </div>
               <div className='rounded-lg border border-border/50 bg-card p-4'>
                 <p className='mb-1 font-medium text-muted-foreground text-sm'>English Tax</p>
-                <p className='font-bold text-2xl'>{formatCurrency(comparison.englishTax)}</p>
+                <p className='font-bold text-2xl'>{formatCurrency(comparison.englishTax, 0)}</p>
               </div>
               <div
                 className={cn(
@@ -228,7 +220,7 @@ export function ScottishTaxCalculatorClient() {
                   )}
                 >
                   {comparison.difference > 0 ? '+' : ''}
-                  {formatCurrency(comparison.difference)}/year
+                  {formatCurrency(comparison.difference, 0)}/year
                 </p>
               </div>
             </div>
@@ -252,7 +244,7 @@ export function ScottishTaxCalculatorClient() {
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <TrendingUp className={ICON_SIZES.SIZE_5} />
-            Scottish Tax Bands 2025-26
+            Scottish Tax Bands {CURRENT_TAX_YEAR_DISPLAY_SHORT}
           </CardTitle>
           <CardDescription>
             Scotland has 6 income tax bands compared to England&apos;s 3 bands.
@@ -306,7 +298,9 @@ export function ScottishTaxCalculatorClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle>Scottish vs English Tax Rates</CardTitle>
-          <CardDescription>Key differences in the tax systems for 2025-26.</CardDescription>
+          <CardDescription>
+            Key differences in the tax systems for {CURRENT_TAX_YEAR_DISPLAY_SHORT}.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='grid gap-4 md:grid-cols-2'>

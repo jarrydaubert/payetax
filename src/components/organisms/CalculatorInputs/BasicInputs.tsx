@@ -249,6 +249,7 @@ export function BasicInputs() {
           onChange={setTaxYear}
           label=''
           className='w-44'
+          data-testid='tax-year-select'
         />
       </div>
 

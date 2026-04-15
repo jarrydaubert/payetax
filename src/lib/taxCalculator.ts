@@ -43,7 +43,6 @@
 import {
   DEFAULT_HOURS_PER_WEEK,
   DEFAULT_TAX_CODE,
-  type NICategory,
   type PayPeriod,
   PERIOD_CONVERSION_FACTORS,
   PERIODS,
@@ -51,12 +50,13 @@ import {
   SCOTTISH_TAX_RATES,
   type StudentLoanSelection,
   TAX_RATES,
-  type TaxYear,
   WEEKS_PER_YEAR,
 } from '@/constants/taxRates';
-import type { IncomeSource } from '@/lib/types/calculator';
+import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
 import { roundToPence } from './tax/utils';
+
+export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 
 const AVERAGE_WEEKS_PER_MONTH = WEEKS_PER_YEAR / 12;
 
@@ -174,18 +174,6 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
 
   // Unrecognized format - return default allowance
   return result;
-}
-
-/**
- * @deprecated Use parseTaxCode() instead for comprehensive tax code handling.
- * This function doesn't handle K-codes, BR/D0/D1/NT, or emergency codes.
- */
-export function parsePersonalAllowanceFromTaxCode(
-  taxCode: string,
-  defaultAllowance: number,
-): number {
-  // Delegate to new function for backwards compatibility
-  return parseTaxCode(taxCode, defaultAllowance).allowance;
 }
 
 /**
@@ -436,93 +424,6 @@ export function convertToPeriods(
 // ============================================================================
 // END HELPER FUNCTIONS
 // ============================================================================
-
-/**
- * Input parameters required for tax calculation
- */
-export interface TaxCalculationInput {
-  /** Gross salary amount */
-  salary: number;
-  /** Period of the salary (annual, monthly, etc.) */
-  payPeriod: PayPeriod;
-  /** Tax year for calculation */
-  taxYear: TaxYear;
-  /** Tax code (e.g., "1257L") */
-  taxCode: string;
-  /** Whether Scottish tax rates apply */
-  isScottish: boolean;
-  /** Whether married/civil partnership for marriage allowance */
-  isMarried: boolean;
-  /** Partner's gross wage for marriage allowance calculation */
-  partnerGrossWage: number;
-  /** Whether blind person's allowance applies */
-  isBlind: boolean;
-  /** Age of the taxpayer (for age-related allowances) */
-  age?: number;
-  /** Whether paying no National Insurance */
-  payNoNI: boolean;
-  /** Pension contribution amount or percentage */
-  pensionContribution: number;
-  /** Type of pension contribution (percentage or fixed amount) */
-  pensionContributionType: 'percentage' | 'amount';
-  /** Student loan plans that apply (can be multiple) */
-  studentLoanPlans: StudentLoanSelection;
-  /** National Insurance category */
-  niCategory: NICategory;
-  /** Hours worked per week (for hourly calculations) */
-  hoursPerWeek: number;
-  /** Additional income sources beyond primary employment */
-  incomeSources?: IncomeSource[];
-  /**
-   * Non-taxable allowances paid to you (annual total).
-   *
-   * Intended for payslip items that increase take-home but are NOT taxed/NI'd
-   * (e.g., "Home Base", reimbursed expenses shown as non-taxable).
-   *
-   * This does not change taxable income or NI - it is added to net pay only.
-   */
-  allowancesDeductions?: number;
-}
-
-/**
- * Results from tax calculation, containing detailed breakdown
- * of taxes, deductions, and net pay across different pay periods
- */
-export interface TaxCalculationResults {
-  /** Gross salary across different periods */
-  grossSalary: Record<PayPeriod, number>;
-  /** Tax-free allowance amount */
-  taxFreeAmount: number;
-  /** Taxable income after allowances and deductions */
-  taxableIncome: number;
-
-  /** Income tax amounts for each period */
-  incomeTax: Record<PayPeriod, number>;
-  /** National Insurance contributions for each period */
-  nationalInsurance: Record<PayPeriod, number>;
-  /** Student loan repayments for each period */
-  studentLoan: Record<PayPeriod, number>;
-
-  /** Pension contributions for each period */
-  pensionContribution: Record<PayPeriod, number>;
-  /** Employer's NI contribution (annual) */
-  employerNI: number;
-  /** Net take-home pay for each period */
-  netPay: Record<PayPeriod, number>;
-
-  /** Breakdown of tax bands applied */
-  taxBands: Array<{
-    name: string;
-    rate: number;
-    amount: number;
-  }>;
-  /** Breakdown of income by source (if multiple income sources exist) */
-  incomeBreakdown?: {
-    employment: number;
-    nonEmployment: number;
-    total: number;
-  };
-}
 
 /**
  * Comprehensive UK PAYE Tax Calculation Engine

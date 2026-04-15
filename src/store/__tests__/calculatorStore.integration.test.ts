@@ -102,10 +102,10 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      // Plan 2 threshold: £28,470 (2025-26), 9% above
-      // (£35,000 - £28,470) × 9% = £587.70
+      // Plan 2 threshold: £29,385 (2026-27), 9% above
+      // Store calculations annualize per-period deductions, so expect the live calculator output.
       expect(state.results?.studentLoan.annually).toBeGreaterThan(0);
-      expect(state.results?.studentLoan.annually).toBeCloseTo(587.7, 0);
+      expect(state.results?.studentLoan.annually).toBeCloseTo(505.32, 0);
     });
 
     it('should calculate previous year comparison', () => {

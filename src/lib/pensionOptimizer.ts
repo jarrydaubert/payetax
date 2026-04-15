@@ -78,19 +78,13 @@ export function calculateOptimalPension(
   currentPension = 0,
   taxYear: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear,
 ): PensionOptimization | null {
-  // Validate inputs
-  try {
-    if (!isValidSalary(salary)) {
-      logPensionWarning(`[pensionOptimizer] Invalid salary input: ${salary}`);
-      return null;
-    }
+  if (!isValidSalary(salary)) {
+    logPensionWarning(`[pensionOptimizer] Invalid salary input: ${salary}`);
+    return null;
+  }
 
-    if (currentPension < 0 || !Number.isFinite(currentPension)) {
-      logPensionWarning(`[pensionOptimizer] Invalid pension input: ${currentPension}`);
-      return null;
-    }
-  } catch (error) {
-    console.error('[pensionOptimizer] Error in calculateOptimalPension:', error);
+  if (currentPension < 0 || !Number.isFinite(currentPension)) {
+    logPensionWarning(`[pensionOptimizer] Invalid pension input: ${currentPension}`);
     return null;
   }
 
@@ -174,24 +168,18 @@ export function compareWithOptimization(
   difference: number;
   worthIt: boolean;
 } | null {
-  try {
-    // Validate inputs
-    if (!(isValidSalary(salary) && isValidSalary(pensionContribution))) {
-      logPensionWarning('[pensionOptimizer] Invalid input to compareWithOptimization');
-      return null;
-    }
-
-    if (pensionContribution < 0 || pensionContribution > salary) {
-      logPensionWarning('[pensionOptimizer] Pension contribution must be between 0 and salary');
-      return null;
-    }
-
-    const optimization = calculateOptimalPension(salary);
-    if (!optimization) return null;
-  } catch (error) {
-    console.error('[pensionOptimizer] Error in compareWithOptimization:', error);
+  if (!(isValidSalary(salary) && isValidSalary(pensionContribution))) {
+    logPensionWarning('[pensionOptimizer] Invalid input to compareWithOptimization');
     return null;
   }
+
+  if (pensionContribution < 0 || pensionContribution > salary) {
+    logPensionWarning('[pensionOptimizer] Pension contribution must be between 0 and salary');
+    return null;
+  }
+
+  const optimization = calculateOptimalPension(salary);
+  if (!optimization) return null;
 
   // Get tax rates for calculations
   const currentTaxYear = TAX_YEARS[0] ?? '2025-2026';

@@ -215,6 +215,7 @@ describe('Tax Rates Constants', () => {
       expect(TAX_RATES['2023-2024'].studentLoan.plan4.threshold).toBe(27660);
       expect(TAX_RATES['2024-2025'].studentLoan.plan4.threshold).toBe(31395);
       expect(TAX_RATES['2025-2026'].studentLoan.plan4.threshold).toBe(32745);
+      expect(TAX_RATES['2026-2027'].studentLoan.plan4.threshold).toBe(33795);
     });
   });
 
@@ -238,9 +239,10 @@ describe('Tax Rates Constants', () => {
       expect(TAX_YEARS).toContain('2023-2024');
       expect(TAX_YEARS).toContain('2024-2025');
       expect(TAX_YEARS).toContain('2025-2026');
+      expect(TAX_YEARS).toContain('2026-2027');
 
       // Should be ordered newest to oldest
-      expect(TAX_YEARS[0]).toBe('2025-2026');
+      expect(TAX_YEARS[0]).toBe('2026-2027');
       expect(TAX_YEARS[TAX_YEARS.length - 1]).toBe('2023-2024');
     });
 
@@ -260,13 +262,13 @@ describe('Tax Rates Constants', () => {
     });
   });
 
-  describe('2025-2026 Specific Validation', () => {
-    it('should have correct 2025-26 personal allowance', () => {
-      expect(TAX_RATES['2025-2026'].personalAllowance).toBe(12570);
+  describe('2026-2027 Specific Validation', () => {
+    it('should have correct 2026-27 personal allowance', () => {
+      expect(TAX_RATES['2026-2027'].personalAllowance).toBe(12570);
     });
 
-    it('should have correct 2025-26 tax bands', () => {
-      const bands = TAX_RATES['2025-2026'].bands;
+    it('should have correct 2026-27 tax bands', () => {
+      const bands = TAX_RATES['2026-2027'].bands;
 
       expect(bands[0].name).toBe('Basic rate');
       expect(bands[0].rate).toBe(20);
@@ -280,8 +282,8 @@ describe('Tax Rates Constants', () => {
       expect(bands[2].rate).toBe(45);
     });
 
-    it('should have correct 2025-26 NI rates for Category A', () => {
-      const categoryA = TAX_RATES['2025-2026'].nationalInsurance.employee.A;
+    it('should have correct 2026-27 NI rates for Category A', () => {
+      const categoryA = TAX_RATES['2026-2027'].nationalInsurance.employee.A;
 
       expect(categoryA.primary.threshold).toBe(12570);
       expect(categoryA.primary.rate).toBe(8);
@@ -289,8 +291,8 @@ describe('Tax Rates Constants', () => {
       expect(categoryA.upper.rate).toBe(2);
     });
 
-    it('should have updated 2025-26 blind persons allowance', () => {
-      expect(TAX_RATES['2025-2026'].blindPersonsAllowance).toBe(3130);
+    it('should have updated 2026-27 blind persons allowance', () => {
+      expect(TAX_RATES['2026-2027'].blindPersonsAllowance).toBe(3250);
     });
   });
 
@@ -315,9 +317,11 @@ describe('Tax Rates Constants', () => {
       const allowance2023 = TAX_RATES['2023-2024'].personalAllowance;
       const allowance2024 = TAX_RATES['2024-2025'].personalAllowance;
       const allowance2025 = TAX_RATES['2025-2026'].personalAllowance;
+      const allowance2026 = TAX_RATES['2026-2027'].personalAllowance;
 
       expect(allowance2024).toBeGreaterThanOrEqual(allowance2023);
       expect(allowance2025).toBeGreaterThanOrEqual(allowance2024);
+      expect(allowance2026).toBeGreaterThanOrEqual(allowance2025);
     });
   });
 });

@@ -250,7 +250,12 @@ describe('PensionPercentageSchema', () => {
 
 describe('TaxYearSchema', () => {
   describe('valid tax years', () => {
-    it('should accept 2025-2026 (current)', () => {
+    it('should accept 2026-2027 (current)', () => {
+      const result = TaxYearSchema.safeParse('2026-2027');
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept 2025-2026', () => {
       const result = TaxYearSchema.safeParse('2025-2026');
       expect(result.success).toBe(true);
     });
@@ -273,7 +278,7 @@ describe('TaxYearSchema', () => {
     });
 
     it('should reject future tax year not in TAX_YEARS', () => {
-      const result = TaxYearSchema.safeParse('2026-2027');
+      const result = TaxYearSchema.safeParse('2027-2028');
       expect(result.success).toBe(false);
     });
 
@@ -393,7 +398,12 @@ describe('Helper Functions', () => {
   });
 
   describe('validateTaxYear', () => {
-    it('should validate current tax year (2025-2026)', () => {
+    it('should validate current tax year (2026-2027)', () => {
+      const result = validateTaxYear('2026-2027');
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate 2025-2026', () => {
       const result = validateTaxYear('2025-2026');
       expect(result.success).toBe(true);
     });
@@ -414,7 +424,7 @@ describe('Helper Functions', () => {
     });
 
     it('should reject future tax year', () => {
-      const result = validateTaxYear('2026-2027');
+      const result = validateTaxYear('2027-2028');
       expect(result.success).toBe(false);
     });
 

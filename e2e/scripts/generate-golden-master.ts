@@ -230,17 +230,15 @@ const output = {
   cases: generated,
 };
 
-// Add the dual-student-loans scenario with known issue (calculator doesn't support multiple loans yet)
-// biome-ignore lint/suspicious/noExplicitAny: Intentionally tracking a known bug with invalid type
-(generated as any).push({
+// Add a manual multi-plan student loan scenario for regression coverage.
+generated.push({
   id: 'dual-student-loans',
   description: 'Plan 2 + Postgrad loans £50k (47% marginal!)',
   input: {
     salary: 50000,
     region: 'England',
     taxCode: '1257L',
-    // biome-ignore lint/suspicious/noExplicitAny: plan2-postgrad is not a valid StudentLoanPlan - this is the known bug we're tracking
-    studentLoan: 'plan2-postgrad' as any,
+    studentLoanPlans: ['plan2', 'postgrad'],
   },
   expected: {
     incomeTax: 7485.96,
@@ -248,8 +246,6 @@ const output = {
     studentLoanRepayment: 3677.7, // Combined Plan 2 + Postgrad
     netPay: 35841.98,
   },
-  knownIssue:
-    '🐛 BUG: Calculator UI does not support selecting multiple student loans. Only applies one loan instead of both. This test will FAIL until the calculator is fixed to support Plan 2 + Postgraduate simultaneously.',
   generatedAt: new Date().toISOString(),
   taxYear: TAX_YEAR,
 });

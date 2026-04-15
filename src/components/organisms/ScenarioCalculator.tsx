@@ -23,14 +23,12 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { type StudentLoanPlan, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type StudentLoanPlan, type TaxYear } from '@/constants/taxRates';
 import type { ScenarioDefaults } from '@/data/scenarios';
 import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn, formatCurrency } from '@/lib/utils';
 
 // Current tax year from single source of truth (TAX_YEARS is ordered newest first)
-const CURRENT_TAX_YEAR = TAX_YEARS[0] ?? '2025-2026';
-
 // Valid student loan values for runtime type guard
 const STUDENT_LOAN_VALUES = ['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 type StudentLoanValue = (typeof STUDENT_LOAN_VALUES)[number];

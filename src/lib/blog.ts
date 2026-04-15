@@ -7,6 +7,7 @@
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { BLOG_CATEGORIES, BLOG_CONFIG, getCategoryBySlug } from '@/config/blog.config';
+import { DEEP_DIVE_FALLBACK_SLUGS } from '@/constants/deepDives';
 import { getPostBySlug as getMDXPostBySlug, getAllPosts as getMDXPosts } from '@/lib/mdx';
 import type {
   BlogCategory,
@@ -382,9 +383,6 @@ export async function getDeepDives(limit: number = 6): Promise<BlogPost[]> {
   if (deepDives.length >= 3) {
     return deepDives.slice(0, limit);
   }
-
-  // Import fallback slugs dynamically to avoid circular dependency
-  const { DEEP_DIVE_FALLBACK_SLUGS } = await import('@/constants/deepDives');
 
   // Backfill with curated slugs
   const deepDiveSlugs = new Set(deepDives.map((p) => p.slug));

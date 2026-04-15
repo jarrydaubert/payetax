@@ -10,8 +10,12 @@
  * @module lib/tax/studentLoan
  */
 
-import type { StudentLoanPlan, TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  type StudentLoanPlan,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
 import { roundToPence } from './utils';
 
 export interface StudentLoanResult {
@@ -34,7 +38,7 @@ export interface StudentLoanResult {
 export function getStudentLoanRepayment(
   totalIncome: number,
   plans: StudentLoanPlan[],
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): StudentLoanResult {
   const rates = TAX_RATES[taxYear].studentLoan;
 
@@ -70,7 +74,7 @@ export function getStudentLoanRepayment(
  */
 export function getStudentLoanThreshold(
   plan: StudentLoanPlan,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): number {
   return TAX_RATES[taxYear].studentLoan[plan].threshold;
 }
@@ -78,7 +82,10 @@ export function getStudentLoanThreshold(
 /**
  * Get student loan rate for a specific plan
  */
-export function getStudentLoanRate(plan: StudentLoanPlan, taxYear: TaxYear = '2025-2026'): number {
+export function getStudentLoanRate(
+  plan: StudentLoanPlan,
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
+): number {
   return TAX_RATES[taxYear].studentLoan[plan].rate;
 }
 

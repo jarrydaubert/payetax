@@ -45,6 +45,30 @@ export interface RateLimitDiagnostics {
   upstashError?: string;
 }
 
+interface UpstashResponse {
+  result?: string | number | boolean;
+  error?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isUpstashResponse(value: unknown): value is UpstashResponse {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { error, result } = value;
+  return (
+    (error === undefined || typeof error === 'string') &&
+    (result === undefined ||
+      typeof result === 'string' ||
+      typeof result === 'number' ||
+      typeof result === 'boolean')
+  );
+}
+
 // Default: 10 requests per minute per IP
 const DEFAULT_CONFIG: RateLimitConfig = {
   max: 10,
@@ -84,7 +108,7 @@ function runInMemoryCheck(key: string, config: RateLimitConfig): boolean {
   return true;
 }
 
-async function runUpstashCommand(parts: string[]): Promise<unknown> {
+async function runUpstashCommand(parts: string[]): Promise<UpstashResponse['result']> {
   if (!(UPSTASH_REDIS_REST_URL && UPSTASH_REDIS_REST_TOKEN)) {
     throw new Error('Distributed rate limiter not configured');
   }
@@ -102,7 +126,11 @@ async function runUpstashCommand(parts: string[]): Promise<unknown> {
     throw new Error(`Upstash request failed: ${response.status}`);
   }
 
-  const payload = (await response.json()) as { result?: unknown; error?: string };
+  const payload: unknown = await response.json();
+  if (!isUpstashResponse(payload)) {
+    throw new Error('Upstash response was not valid JSON');
+  }
+
   if (payload.error) {
     throw new Error(payload.error);
   }

@@ -23,12 +23,8 @@ const slugger = new GithubSlugger();
 function getNodeText(node: ReactNode): string {
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(getNodeText).join('');
-  if (isValidElement(node)) {
-    // Props type is unknown, so we need to safely access children
-    const props = node.props as { children?: ReactNode };
-    if (props.children) {
-      return getNodeText(props.children);
-    }
+  if (isValidElement<{ children?: ReactNode }>(node) && node.props.children) {
+    return getNodeText(node.props.children);
   }
   return '';
 }

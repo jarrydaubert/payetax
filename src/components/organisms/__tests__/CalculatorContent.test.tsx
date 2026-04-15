@@ -1,5 +1,6 @@
 // src/components/organisms/__tests__/CalculatorContent.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateTax } from '@/lib/taxCalculator';
 import { CalculatorContent } from '../CalculatorContent';
@@ -25,7 +26,9 @@ describe('CalculatorContent Component', () => {
     it('should render all main sections', () => {
       render(<CalculatorContent />);
 
-      expect(screen.getByText('UK Tax Rates 2025-26')).toBeInTheDocument();
+      expect(
+        screen.getByText(`UK Tax Rates ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`),
+      ).toBeInTheDocument();
       expect(screen.getByText('Salary Take-Home Comparison')).toBeInTheDocument();
       expect(screen.getByText('Common Tax Questions')).toBeInTheDocument();
       expect(screen.getByText('How to Use the Calculator')).toBeInTheDocument();
@@ -34,7 +37,11 @@ describe('CalculatorContent Component', () => {
     it('should render tax facts section heading', () => {
       render(<CalculatorContent />);
 
-      expect(screen.getByRole('heading', { name: /UK Tax Rates 2025-26/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', {
+          name: new RegExp(`UK Tax Rates ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`, 'i'),
+        }),
+      ).toBeInTheDocument();
     });
 
     it('should render comparison table heading', () => {
@@ -195,7 +202,12 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Based on England\/Wales\/NI rates for 2025-26. Scottish rates differ./i),
+        screen.getByText(
+          new RegExp(
+            `Based on England/Wales/NI rates for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\. Scottish rates differ\\.`,
+            'i',
+          ),
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -220,10 +232,20 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i),
+        screen.getByText(
+          new RegExp(
+            `How much tax do I pay on £30,000 in the UK in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\?`,
+            'i',
+          ),
+        ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/What is the UK personal allowance for 2025-26\?/i),
+        screen.getByText(
+          new RegExp(
+            `What is the UK personal allowance for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\?`,
+            'i',
+          ),
+        ),
       ).toBeInTheDocument();
       expect(screen.getByText(/How is PAYE tax calculated in the UK\?/i)).toBeInTheDocument();
       expect(
@@ -245,7 +267,12 @@ describe('CalculatorContent Component', () => {
     it('should expand FAQ when clicked', () => {
       render(<CalculatorContent />);
 
-      const summary = screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i);
+      const summary = screen.getByText(
+        new RegExp(
+          `How much tax do I pay on £30,000 in the UK in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\?`,
+          'i',
+        ),
+      );
       fireEvent.click(summary);
 
       // Content should be visible after click
@@ -271,7 +298,12 @@ describe('CalculatorContent Component', () => {
         hoursPerWeek: 37.5,
       });
 
-      const summary = screen.getByText(/How much tax do I pay on £30,000 in UK 2025\?/i);
+      const summary = screen.getByText(
+        new RegExp(
+          `How much tax do I pay on £30,000 in the UK in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\?`,
+          'i',
+        ),
+      );
       fireEvent.click(summary);
 
       // Check content is revealed after click
@@ -287,7 +319,12 @@ describe('CalculatorContent Component', () => {
     it('should show personal allowance value in FAQ', () => {
       const { container } = render(<CalculatorContent />);
 
-      const summary = screen.getByText(/What is the UK personal allowance for 2025-26\?/i);
+      const summary = screen.getByText(
+        new RegExp(
+          `What is the UK personal allowance for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}\\?`,
+          'i',
+        ),
+      );
       fireEvent.click(summary);
 
       // Value appears multiple times in the page
@@ -401,7 +438,12 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       expect(
-        screen.getByText(/Choose the tax year \(2025-26 for current rates\)/i),
+        screen.getByText(
+          new RegExp(
+            `Choose the tax year \\(${CURRENT_TAX_YEAR_DISPLAY_SHORT} for current rates\\)`,
+            'i',
+          ),
+        ),
       ).toBeInTheDocument();
     });
 
@@ -478,7 +520,9 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       // Component should render without throwing
-      expect(screen.getByText('UK Tax Rates 2025-26')).toBeInTheDocument();
+      expect(
+        screen.getByText(`UK Tax Rates ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`),
+      ).toBeInTheDocument();
     });
 
     it('should not throw errors on mount', () => {
@@ -495,11 +539,10 @@ describe('CalculatorContent Component', () => {
   });
 
   describe('Content Accuracy', () => {
-    it('should display correct 2025-26 tax year', () => {
+    it('should display the current tax year', () => {
       const { container } = render(<CalculatorContent />);
 
-      // Check that 2025-26 appears somewhere in the content
-      expect(container.textContent).toContain('2025-26');
+      expect(container.textContent).toContain(CURRENT_TAX_YEAR_DISPLAY_SHORT);
     });
 
     it('should mention HMRC', () => {

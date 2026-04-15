@@ -5,10 +5,10 @@
 
 import { describe, expect, it } from '@jest/globals';
 import {
+  BoundedNumberInputSchema,
   CheckboxSchema,
   CookieConsentSchema,
   EmailInputSchema,
-  NumberInputSchema,
   SelectInputSchema,
   TextAreaSchema,
   TextInputSchema,
@@ -47,24 +47,24 @@ describe('EmailInputSchema', () => {
   });
 });
 
-describe('NumberInputSchema', () => {
+describe('BoundedNumberInputSchema', () => {
   it('should accept valid number', () => {
-    const result = NumberInputSchema.safeParse({ value: 42 });
+    const result = BoundedNumberInputSchema.safeParse({ value: 42 });
     expect(result.success).toBe(true);
   });
 
   it('should accept undefined value (optional)', () => {
-    const result = NumberInputSchema.safeParse({});
+    const result = BoundedNumberInputSchema.safeParse({});
     expect(result.success).toBe(true);
   });
 
   it('should reject infinite values', () => {
-    const result = NumberInputSchema.safeParse({ value: Number.POSITIVE_INFINITY });
+    const result = BoundedNumberInputSchema.safeParse({ value: Number.POSITIVE_INFINITY });
     expect(result.success).toBe(false);
   });
 
   it('should reject NaN', () => {
-    const result = NumberInputSchema.safeParse({ value: Number.NaN });
+    const result = BoundedNumberInputSchema.safeParse({ value: Number.NaN });
     expect(result.success).toBe(false);
   });
 });

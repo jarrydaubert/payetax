@@ -8,20 +8,11 @@
 
 import { GradientText } from '@/components/atoms/GradientText';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorFormValue, useMonthlyModeOutput } from '@/store/directorGuideStore';
 
 interface SummaryCardsProps {
   className?: string;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 export function SummaryCards({ className }: SummaryCardsProps) {
@@ -36,7 +27,7 @@ export function SummaryCards({ className }: SummaryCardsProps) {
       ? monthlyModeOutput.safeMonthlyDraw
       : activeScenario.takeHome / 12
     : null;
-  const monthlyDrawLabel = monthlyDrawAmount === null ? '—' : formatCurrency(monthlyDrawAmount);
+  const monthlyDrawLabel = monthlyDrawAmount === null ? '—' : formatCurrency(monthlyDrawAmount, 0);
 
   // Calculate net dividends for display (gross dividends - dividend tax)
   const netDividends = hasResults ? activeScenario.dividends - activeScenario.dividendTax : 0;
@@ -55,26 +46,26 @@ export function SummaryCards({ className }: SummaryCardsProps) {
     },
     {
       label: 'Annual Salary',
-      value: hasResults ? formatCurrency(activeScenario.salary) : '—',
+      value: hasResults ? formatCurrency(activeScenario.salary, 0) : '—',
       subtext: 'Gross via PAYE',
       ariaDescription: hasResults
-        ? `Annual gross salary of ${formatCurrency(activeScenario.salary)} paid via PAYE`
+        ? `Annual gross salary of ${formatCurrency(activeScenario.salary, 0)} paid via PAYE`
         : 'No results available',
     },
     {
       label: 'Annual Dividends',
-      value: hasResults ? formatCurrency(activeScenario.dividends) : '—',
-      subtext: `Gross declared${hasResults && activeScenario.dividendTax > 0 ? ` (${formatCurrency(netDividends)} after tax)` : ''}`,
+      value: hasResults ? formatCurrency(activeScenario.dividends, 0) : '—',
+      subtext: `Gross declared${hasResults && activeScenario.dividendTax > 0 ? ` (${formatCurrency(netDividends, 0)} after tax)` : ''}`,
       ariaDescription: hasResults
-        ? `Annual gross dividends of ${formatCurrency(activeScenario.dividends)}${activeScenario.dividendTax > 0 ? `, ${formatCurrency(netDividends)} after dividend tax` : ''}`
+        ? `Annual gross dividends of ${formatCurrency(activeScenario.dividends, 0)}${activeScenario.dividendTax > 0 ? `, ${formatCurrency(netDividends, 0)} after dividend tax` : ''}`
         : 'No results available',
     },
     {
       label: 'Corporation Tax',
-      value: hasResults ? formatCurrency(activeScenario.corporationTax) : '—',
+      value: hasResults ? formatCurrency(activeScenario.corporationTax, 0) : '—',
       subtext: 'To set aside for HMRC',
       ariaDescription: hasResults
-        ? `Corporation tax of ${formatCurrency(activeScenario.corporationTax)} to set aside`
+        ? `Corporation tax of ${formatCurrency(activeScenario.corporationTax, 0)} to set aside`
         : 'No results available',
     },
   ];

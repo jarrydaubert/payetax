@@ -7,14 +7,7 @@
 'use client';
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+import { formatCurrency } from '@/lib/utils';
 
 export function TaxPots() {
   const { activeScenario } = useActiveDirectorScenario();
@@ -41,20 +34,20 @@ export function TaxPots() {
           <div className='space-y-1.5 text-sm'>
             <div className='flex justify-between text-foreground'>
               <span>Corporation Tax</span>
-              <span className='font-mono'>{formatCurrency(activeScenario.corporationTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.corporationTax, 0)}</span>
             </div>
             {activeScenario.employerNI > 0 && (
               <div className='flex justify-between text-foreground'>
                 <span>
                   {activeScenario.companyCarBIK > 0 ? 'Employer NI + Class 1A' : 'Employer NI'}
                 </span>
-                <span className='font-mono'>{formatCurrency(activeScenario.employerNI)}</span>
+                <span className='font-mono'>{formatCurrency(activeScenario.employerNI, 0)}</span>
               </div>
             )}
             <div className='flex justify-between border-border/50 border-t pt-2'>
               <span className='font-medium text-foreground'>Monthly</span>
               <span className='font-mono font-semibold text-primary'>
-                {formatCurrency(monthlyCompanyPot)}/mo
+                {formatCurrency(monthlyCompanyPot, 0)}/mo
               </span>
             </div>
           </div>
@@ -69,22 +62,22 @@ export function TaxPots() {
           <div className='space-y-1.5 text-sm'>
             <div className='flex justify-between text-foreground'>
               <span>Income Tax</span>
-              <span className='font-mono'>{formatCurrency(activeScenario.incomeTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.incomeTax, 0)}</span>
             </div>
             <div className='flex justify-between text-foreground'>
               <span>Dividend Tax</span>
-              <span className='font-mono'>{formatCurrency(activeScenario.dividendTax)}</span>
+              <span className='font-mono'>{formatCurrency(activeScenario.dividendTax, 0)}</span>
             </div>
             {activeScenario.studentLoan > 0 && (
               <div className='flex justify-between text-foreground'>
                 <span>Student Loan</span>
-                <span className='font-mono'>{formatCurrency(activeScenario.studentLoan)}</span>
+                <span className='font-mono'>{formatCurrency(activeScenario.studentLoan, 0)}</span>
               </div>
             )}
             <div className='flex justify-between border-border/50 border-t pt-2'>
               <span className='font-medium text-foreground'>Monthly</span>
               <span className='font-mono font-semibold text-success'>
-                {formatCurrency(monthlyPersonalPot)}/mo
+                {formatCurrency(monthlyPersonalPot, 0)}/mo
               </span>
             </div>
           </div>

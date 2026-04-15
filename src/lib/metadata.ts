@@ -8,6 +8,7 @@
  */
 
 import type { Metadata, Viewport } from 'next';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 
 // Base domain for absolute URLs - exported for use in structured data
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
@@ -15,12 +16,15 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.
 // Logo URL for structured data
 export const LOGO_URL = `${SITE_URL}/logo.png`;
 
+const CURRENT_TAX_YEAR_SHORT = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+  separator: '-',
+  shortEndYear: true,
+});
+
 // Default metadata values
-const DEFAULT_TITLE = 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay';
-const DEFAULT_DESCRIPTION =
-  'Free UK PAYE tax calculator with official HMRC rates 2025-2026. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.';
-const DEFAULT_KEYWORDS =
-  'UK tax calculator 2025, PAYE calculator, salary calculator, HMRC rates 2025, National Insurance calculator, take-home pay calculator, UK income tax, tax code calculator, free tax calculator UK';
+const DEFAULT_TITLE = `Free UK PAYE Tax Calculator ${CURRENT_TAX_YEAR} | Salary & Take-Home Pay`;
+const DEFAULT_DESCRIPTION = `Free UK PAYE tax calculator with official HMRC rates ${CURRENT_TAX_YEAR}. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.`;
+const DEFAULT_KEYWORDS = `UK tax calculator ${CURRENT_TAX_YEAR_SHORT}, PAYE calculator, salary calculator, HMRC rates ${CURRENT_TAX_YEAR_SHORT}, National Insurance calculator, take-home pay calculator, UK income tax, tax code calculator, free tax calculator UK`;
 const DEFAULT_OG_IMAGE = '/images/og-image.png';
 
 /**

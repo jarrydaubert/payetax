@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type TaxYear } from '@/constants/taxRates';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -53,14 +53,14 @@ export function MarriageAllowanceAlert({
   partnerSalary,
   hasMarriageCode,
   isScottish = false,
-  taxYear = TAX_YEARS[0],
+  taxYear = CURRENT_TAX_YEAR,
 }: MarriageAllowanceAlertProps) {
   // Don't show if they already have the M code
   if (hasMarriageCode) {
     return null;
   }
 
-  const effectiveTaxYear = taxYear ?? '2025-2026';
+  const effectiveTaxYear = taxYear ?? CURRENT_TAX_YEAR;
   const saving = calculateMarriageAllowanceNetSaving({
     recipientIncome: userSalary,
     transferorIncome: partnerSalary,

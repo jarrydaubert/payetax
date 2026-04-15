@@ -37,6 +37,8 @@ interface TaxYearSelectProps {
    * Required when hideLabel is true or label is omitted.
    */
   'aria-label'?: string;
+  /** Stable hook for end-to-end tests */
+  'data-testid'?: string;
 }
 
 /**
@@ -80,6 +82,7 @@ export default function TaxYearSelect({
   label = 'Tax Year',
   hideLabel = false,
   'aria-label': ariaLabel,
+  'data-testid': dataTestId,
 }: TaxYearSelectProps) {
   const uniqueId = useId();
   const selectId = id ?? `tax-year-select-${uniqueId}`;
@@ -112,6 +115,7 @@ export default function TaxYearSelect({
           aria-labelledby={accessibleName}
           aria-label={accessibleName ? undefined : fallbackAriaLabel}
           className='w-full'
+          data-testid={dataTestId}
         >
           <div className={cn('flex items-center', SPACING.GAP_2)}>
             <Calendar className={cn('text-foreground/70', ICON_SIZES.SIZE_4)} aria-hidden='true' />

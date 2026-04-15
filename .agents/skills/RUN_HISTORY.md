@@ -17,9 +17,10 @@ Canonical tracker for installed skill inventory and the most recent verified usa
 | `accessibility` | Local | Not tracked yet | WCAG and a11y reviews |
 | `ad-creative` | Upstream | Not tracked yet | Paid ad copy |
 | `ai-seo` | Upstream | Not tracked yet | AI search optimisation |
-| `analytics-tracking` | Upstream | 2026-03-30 | Used for a full analytics audit and Sentry/analytics issue triage |
+| `analytics-tracking` | Upstream | Not tracked yet | Event tracking and analytics audits |
 | `churn-prevention` | Upstream | Not tracked yet | Retention and dunning |
 | `cold-email` | Upstream | Not tracked yet | B2B outreach copy |
+| `community-marketing` | Upstream | Not tracked yet | Community-led growth and advocacy |
 | `competitor-alternatives` | Upstream | Not tracked yet | Comparison and alternative pages |
 | `content-strategy` | Upstream | Not tracked yet | Content planning |
 | `copy-editing` | Upstream | Not tracked yet | Editing existing copy |
@@ -27,7 +28,7 @@ Canonical tracker for installed skill inventory and the most recent verified usa
 | `customer-research` | Upstream | Not tracked yet | VOC and ICP synthesis |
 | `design-an-interface` | Local | Not tracked yet | Interface and module design |
 | `email-sequence` | Upstream | Not tracked yet | Lifecycle email flows |
-| `engineering` | Local | 2026-03-30 | Used for Sentry/runtime issue triage, homepage loading-path simplification, route cleanup, and visual regression setup |
+| `engineering` | Local | Not tracked yet | Engineering reviews and implementation guidance |
 | `form-cro` | Upstream | Not tracked yet | Form conversion work |
 | `free-tool-strategy` | Upstream | Not tracked yet | Free tool planning |
 | `frontend-design` | Local | Not tracked yet | UI redesign and visual direction |
@@ -35,13 +36,13 @@ Canonical tracker for installed skill inventory and the most recent verified usa
 | `marketing-ideas` | Upstream | Not tracked yet | Growth idea generation |
 | `marketing-psychology` | Upstream | Not tracked yet | Persuasion models |
 | `onboarding-cro` | Upstream | Not tracked yet | Activation and onboarding |
-| `page-cro` | Upstream | 2026-03-30 | Used for homepage and blog CRO reviews and implementation |
+| `page-cro` | Upstream | Not tracked yet | Page-level conversion work |
 | `payetax-context` | Local | Not tracked yet | Shared project constraints |
 | `popup-cro` | Upstream | Not tracked yet | Popup and modal CRO |
 | `prd-to-issues` | Local | Not tracked yet | PRD decomposition |
 | `product-marketing-context` | Upstream | Not tracked yet | Shared marketing context |
 | `programmatic-seo` | Upstream | Not tracked yet | Templated SEO pages |
 | `schema-markup` | Upstream | Not tracked yet | Structured data |
-| `seo-audit` | Upstream | 2026-03-30 | Used for a comprehensive SEO audit and internal linking audit verification |
+| `seo-audit` | Upstream | Not tracked yet | SEO audits and diagnostics |
 | `social-content` | Upstream | Not tracked yet | Social media content |
 | `tdd` | Local | Not tracked yet | Test-first workflow |

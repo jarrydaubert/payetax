@@ -61,15 +61,6 @@ export const BoundedNumberInputSchema = z.object({
 export type BoundedNumberInputData = z.infer<typeof BoundedNumberInputSchema>;
 
 /**
- * @deprecated Use BoundedNumberInputSchema instead. Kept for backwards compatibility.
- */
-export const NumberInputSchema = BoundedNumberInputSchema;
-/**
- * @deprecated Use BoundedNumberInputData instead. Kept for backwards compatibility.
- */
-export type NumberInputData = BoundedNumberInputData;
-
-/**
  * Text input validation schema with length constraints
  *
  * Standard validation for text inputs with min/max length requirements.

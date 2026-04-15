@@ -1,5 +1,6 @@
 // src/lib/exportUtils.ts
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
+import type { TaxCalculationResults } from '@/lib/types/calculator';
 
 /**
  * Escape a value for CSV: wrap in quotes and escape internal quotes
@@ -147,7 +148,7 @@ export function printResults({
 
   // Calculate year-over-year change
   const grossAnnual = results.grossSalary.annually;
-  const currentTaxYear = taxYear || '2025-2026';
+  const currentTaxYear = taxYear || CURRENT_TAX_YEAR;
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10);
   const previousYearLabel = currentYearStart - 1;
   const yearChange = previousYearResults

@@ -2,6 +2,7 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
+import { formatCurrency } from '@/lib/utils';
 
 // Input constraints to prevent abuse and layout issues
 const MAX_TITLE_LENGTH = 70;
@@ -50,17 +51,6 @@ function parseMoney(value: string | null): number | null {
   return num;
 }
 
-/**
- * Format a number as GBP currency
- */
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 // Cache headers for CDN - OG images are expensive to generate
 const CACHE_HEADERS = {
   'Cache-Control': 'public, immutable, s-maxage=31536000, stale-while-revalidate=86400',
@@ -89,8 +79,8 @@ export async function GET(request: NextRequest) {
   const salary = parseMoney(searchParams.get('salary'));
   const takeHome = parseMoney(searchParams.get('takeHome'));
 
-  const formattedSalary = salary !== null ? formatCurrency(salary) : null;
-  const formattedTakeHome = takeHome !== null ? formatCurrency(takeHome) : null;
+  const formattedSalary = salary !== null ? formatCurrency(salary, 0) : null;
+  const formattedTakeHome = takeHome !== null ? formatCurrency(takeHome, 0) : null;
   const hasResults = Boolean(formattedSalary && formattedTakeHome);
 
   return new ImageResponse(

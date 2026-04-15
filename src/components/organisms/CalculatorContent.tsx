@@ -8,6 +8,7 @@ import { FAQItem } from '@/components/molecules/FAQItem';
 import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
 import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateTax } from '@/lib/taxCalculator';
 import { cn, formatNumber } from '@/lib/utils';
@@ -75,10 +76,12 @@ export function CalculatorContent() {
           </div>
 
           <div className={SPACING.SPACE_Y_4}>
-            {/* £30k example - calculated using 2025-26 rates from taxRates.ts */}
-            <FAQItem question='How much tax do I pay on £30,000 in UK 2025?'>
+            <FAQItem
+              question={`How much tax do I pay on £30,000 in the UK in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}?`}
+            >
               <p>
-                <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for 2025-26:
+                <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for{' '}
+                {CURRENT_TAX_YEAR_DISPLAY_SHORT}:
               </p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
@@ -112,11 +115,13 @@ export function CalculatorContent() {
               </a>
             </FAQItem>
 
-            <FAQItem question='What is the UK personal allowance for 2025-26?'>
+            <FAQItem
+              question={`What is the UK personal allowance for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}?`}
+            >
               <p>
-                The UK personal allowance (tax-free allowance) for 2025-26 is{' '}
-                <strong>£12,570</strong>. This is the amount you can earn tax-free each year before
-                paying income tax.
+                The UK personal allowance (tax-free allowance) for {CURRENT_TAX_YEAR_DISPLAY_SHORT}{' '}
+                is <strong>£12,570</strong>. This is the amount you can earn tax-free each year
+                before paying income tax.
               </p>
               <p className='font-medium'>Important notes:</p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
@@ -134,7 +139,6 @@ export function CalculatorContent() {
               </ul>
             </FAQItem>
 
-            {/* NI rate updated to 8% for 2025-26 */}
             <FAQItem question='How is PAYE tax calculated in the UK?'>
               <p>
                 PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
@@ -163,13 +167,12 @@ export function CalculatorContent() {
               <p>Your employer reports this to HMRC through Real Time Information (RTI).</p>
             </FAQItem>
 
-            {/* Scotland: 6 bands for 2025-26 (19%, 20%, 21%, 42%, 45%, 48%) */}
             <FAQItem question="What's the difference between Scottish and English tax rates?">
               <p>
                 Scotland has different income tax bands but the same National Insurance and personal
                 allowance (£12,570).
               </p>
-              <p className='font-medium'>Key differences for 2025-26:</p>
+              <p className='font-medium'>Key differences for {CURRENT_TAX_YEAR_DISPLAY_SHORT}:</p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
                   <strong>Scotland</strong> has 6 tax bands (19%, 20%, 21%, 42%, 45%, 48%)
@@ -188,7 +191,6 @@ export function CalculatorContent() {
               </Link>
             </FAQItem>
 
-            {/* Student loan thresholds updated to 2025-26 from taxRates.ts */}
             <FAQItem question='How do student loan repayments work with PAYE?'>
               <p>
                 Student loan repayments are deducted automatically through PAYE if you earn above
@@ -196,19 +198,24 @@ export function CalculatorContent() {
               </p>
               <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
                 <li>
-                  <strong>Plan 1</strong>: 9% on earnings above £26,065
+                  <strong>Plan 1</strong>: 9% on earnings above £
+                  {formatNumber(currentRates.studentLoan.plan1.threshold)}
                 </li>
                 <li>
-                  <strong>Plan 2</strong>: 9% on earnings above £28,470
+                  <strong>Plan 2</strong>: 9% on earnings above £
+                  {formatNumber(currentRates.studentLoan.plan2.threshold)}
                 </li>
                 <li>
-                  <strong>Plan 4</strong> (Scotland): 9% on earnings above £32,745
+                  <strong>Plan 4</strong> (Scotland): 9% on earnings above £
+                  {formatNumber(currentRates.studentLoan.plan4.threshold)}
                 </li>
                 <li>
-                  <strong>Plan 5</strong>: 9% on earnings above £25,000
+                  <strong>Plan 5</strong>: 9% on earnings above £
+                  {formatNumber(currentRates.studentLoan.plan5.threshold)}
                 </li>
                 <li>
-                  <strong>Postgraduate</strong>: 6% on earnings above £21,000
+                  <strong>Postgraduate</strong>: 6% on earnings above £
+                  {formatNumber(currentRates.studentLoan.postgrad.threshold)}
                 </li>
               </ul>
               <p>
@@ -243,7 +250,6 @@ export function CalculatorContent() {
               <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
             </FAQItem>
 
-            {/* Blind Person's Allowance updated to £3,130 for 2025-26 */}
             <FAQItem question='What tax reliefs are available to reduce my tax bill?'>
               <p>
                 The UK offers several tax reliefs that can reduce your tax bill. Here are the main

@@ -3,7 +3,7 @@
 
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
-import { areCookiesAccepted } from '@/lib/cookieUtils';
+import { isAnalyticsConsented } from '@/lib/cookieUtils';
 
 // Microsoft Clarity Project ID - configure NEXT_PUBLIC_CLARITY_ID in Vercel environment variables
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
@@ -21,7 +21,7 @@ export function ClarityAnalytics() {
 
   useEffect(() => {
     const checkConsent = () => {
-      setHasConsent(areCookiesAccepted());
+      setHasConsent(isAnalyticsConsented());
     };
 
     checkConsent();

@@ -23,6 +23,10 @@ export interface BotGuardOptions {
   honeypotKeys?: readonly string[];
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 /**
  * Returns a compact reason string for likely bot traffic, otherwise null.
  *
@@ -36,10 +40,9 @@ export function detectLikelyBotRequest(
 ): string | null {
   const honeypotKeys = options.honeypotKeys ?? DEFAULT_HONEYPOT_KEYS;
 
-  if (body && typeof body === 'object' && !Array.isArray(body)) {
-    const bodyRecord = body as Record<string, unknown>;
+  if (isRecord(body)) {
     for (const key of honeypotKeys) {
-      const value = bodyRecord[key];
+      const value = body[key];
       if (typeof value === 'string' && value.trim().length > 0) {
         return `honeypot:${key}`;
       }

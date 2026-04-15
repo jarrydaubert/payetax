@@ -10,13 +10,9 @@ import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { calculateTax } from '@/lib/taxCalculator';
-import { cn, formatNumber } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 const EXAMPLE_SALARIES = [20000, 30000, 50000] as const;
-
-function formatCurrencyLabel(value: number): string {
-  return `£${formatNumber(value)}`;
-}
 
 function buildQuickExamples() {
   return EXAMPLE_SALARIES.map((salary) => {
@@ -38,8 +34,8 @@ function buildQuickExamples() {
     });
 
     return {
-      label: `${formatCurrencyLabel(salary)} salary`,
-      value: formatCurrencyLabel(Math.round(results.netPay.annually)),
+      label: `${formatCurrency(salary, 0)} salary`,
+      value: formatCurrency(Math.round(results.netPay.annually), 0),
       colorClass: 'text-success',
     };
   });
@@ -102,17 +98,17 @@ export function TaxRatesOverview() {
               items={[
                 { label: 'Personal Allowance', value: '0%' },
                 {
-                  label: `${formatCurrencyLabel(personalAllowance + 1)} - ${formatCurrencyLabel(incomeTaxBasicUpper)}`,
+                  label: `${formatCurrency(personalAllowance + 1, 0)} - ${formatCurrency(incomeTaxBasicUpper, 0)}`,
                   value: `${basicRateBand?.rate ?? 0}%`,
                   colorClass: 'text-success',
                 },
                 {
-                  label: `${formatCurrencyLabel(incomeTaxBasicUpper + 1)} - ${formatCurrencyLabel(incomeTaxHigherUpper)}`,
+                  label: `${formatCurrency(incomeTaxBasicUpper + 1, 0)} - ${formatCurrency(incomeTaxHigherUpper, 0)}`,
                   value: `${higherRateBand?.rate ?? 0}%`,
                   colorClass: 'text-destructive',
                 },
                 {
-                  label: `${formatCurrencyLabel(incomeTaxHigherUpper)}+`,
+                  label: `${formatCurrency(incomeTaxHigherUpper, 0)}+`,
                   value: `${currentRates.bands[2]?.rate ?? 0}%`,
                   colorClass: 'text-destructive',
                 },
@@ -125,14 +121,14 @@ export function TaxRatesOverview() {
               icon={TrendingUp}
               title='National Insurance'
               items={[
-                { label: `£0 - ${formatCurrencyLabel(employeeNI.primary.threshold)}`, value: '0%' },
+                { label: `£0 - ${formatCurrency(employeeNI.primary.threshold, 0)}`, value: '0%' },
                 {
-                  label: `${formatCurrencyLabel(employeeNI.primary.threshold + 1)} - ${formatCurrencyLabel(employeeNI.upper.threshold)}`,
+                  label: `${formatCurrency(employeeNI.primary.threshold + 1, 0)} - ${formatCurrency(employeeNI.upper.threshold, 0)}`,
                   value: `${employeeNI.primary.rate}%`,
                   colorClass: 'text-warning',
                 },
                 {
-                  label: `${formatCurrencyLabel(employeeNI.upper.threshold)}+`,
+                  label: `${formatCurrency(employeeNI.upper.threshold, 0)}+`,
                   value: `${employeeNI.upper.rate}%`,
                   colorClass: 'text-warning',
                 },

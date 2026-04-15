@@ -48,26 +48,30 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
    * @param diff - The signed difference (new - current)
    * @param higherIsBetter - true if positive diff is good (e.g., gross salary), false if bad (e.g., tax)
    */
-  const renderDiff = React.useCallback((diff: number, higherIsBetter: boolean) => {
-    if (diff === 0) return <span className='text-muted-foreground'>—</span>;
+  const renderDiff = React.useCallback(
+    (diff: number, higherIsBetter: boolean, options?: { emphasized?: boolean }) => {
+      if (diff === 0) return <span className='text-muted-foreground'>—</span>;
 
-    // Determine if this is a gain (good outcome) based on direction preference
-    const isGain = higherIsBetter ? diff > 0 : diff < 0;
-    const amount = Math.abs(diff);
+      const isGain = higherIsBetter ? diff > 0 : diff < 0;
+      const amount = Math.abs(diff);
+      const iconSize = options?.emphasized ? 'size-5' : 'size-4';
+      const valueClassName = options?.emphasized ? 'font-bold text-lg' : 'font-medium';
 
-    return (
-      <div
-        className={cn(
-          'flex items-center justify-end',
-          SPACING.GAP_1,
-          isGain ? 'text-success' : 'text-warning',
-        )}
-      >
-        {isGain ? <ArrowUp className='size-4' /> : <ArrowDown className='size-4' />}
-        <span className='font-medium'>{formatCurrency(amount, 0)}</span>
-      </div>
-    );
-  }, []);
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-end',
+            SPACING.GAP_1,
+            isGain ? 'text-success' : 'text-warning',
+          )}
+        >
+          {isGain ? <ArrowUp className={iconSize} /> : <ArrowDown className={iconSize} />}
+          <span className={valueClassName}>{formatCurrency(amount, 0)}</span>
+        </div>
+      );
+    },
+    [],
+  );
 
   return (
     <div className={cn('relative', className)}>
@@ -187,26 +191,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
                 {formatCurrency(newResults.netPay.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>
-                {netDiff === 0 ? (
-                  <span className='text-muted-foreground'>—</span>
-                ) : (
-                  <div
-                    className={cn(
-                      'flex items-center justify-end',
-                      SPACING.GAP_1,
-                      netDiff > 0 ? 'text-success' : 'text-warning',
-                    )}
-                  >
-                    {netDiff > 0 ? (
-                      <ArrowUp className='size-5' />
-                    ) : (
-                      <ArrowDown className='size-5' />
-                    )}
-                    <span className='font-bold text-lg'>
-                      {formatCurrency(Math.abs(netDiff), 0)}
-                    </span>
-                  </div>
-                )}
+                {renderDiff(netDiff, true, { emphasized: true })}
               </TableCell>
             </TableRow>
           </TableBody>

@@ -1,4 +1,3 @@
-// src/components/organisms/StructuredData.tsx
 /**
  * Type-safe structured data component for SEO
  * Adds JSON-LD schema markup to pages for search engines and AI crawlers
@@ -13,15 +12,7 @@
 import type React from 'react';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
-
-/**
- * Format a number as GBP currency string for schema data
- * @param amount - The amount to format
- * @returns Formatted currency string (e.g., "£12,570")
- */
-function formatCurrency(amount: number): string {
-  return `£${amount.toLocaleString('en-GB')}`;
-}
+import { formatCurrency } from '@/lib/utils';
 
 /**
  * Round currency values for schema output to avoid floating-point artifacts
@@ -31,7 +22,6 @@ function roundCurrencyValue(amount: number): number {
   return Math.round(amount * 100) / 100;
 }
 
-// Define typed interfaces for each schema type
 interface OrganizationSchema {
   '@context': 'https://schema.org';
   '@type': 'Organization';
@@ -323,7 +313,6 @@ interface SalaryCalculationSchema {
   }>;
 }
 
-// Union type for all schema types
 export type SchemaType =
   | OrganizationSchema
   | WebsiteSchema
@@ -338,7 +327,6 @@ export type SchemaType =
   | DatasetSchema
   | SalaryCalculationSchema;
 
-// Base organization details
 const ORG_DATA: OrganizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -359,7 +347,6 @@ const ORG_DATA: OrganizationSchema = {
   sameAs: ['https://twitter.com/PayeTaxUK'],
 };
 
-// Website data
 const WEBSITE_DATA: WebsiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -367,10 +354,8 @@ const WEBSITE_DATA: WebsiteSchema = {
   url: SITE_URL,
   description:
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
-  // Note: SearchAction removed - /search route not implemented
 };
 
-// Software application data for the tax calculator
 const CALCULATOR_DATA: SoftwareApplicationSchema = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
@@ -386,7 +371,6 @@ const CALCULATOR_DATA: SoftwareApplicationSchema = {
     'Free UK PAYE tax calculator with detailed breakdowns. Calculate your take-home pay after tax, National Insurance, student loans, and pension contributions.',
 };
 
-// Financial service data for enhanced AI discovery
 const CURRENT_TAX_YEAR_LONG = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
   separator: '-',
   shortEndYear: false,
@@ -449,7 +433,6 @@ const FINANCIAL_SERVICE_DATA: FinancialServiceSchema = {
   },
 };
 
-// HowTo schema for calculator usage
 const HOW_TO_DATA: HowToSchema = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
@@ -507,7 +490,6 @@ function generateDatasetData(): DatasetSchema {
   const safeEndYear = endYear || String(Number(safeStartYear) + 1);
   const shortEndYear = safeEndYear.slice(-2);
 
-  // Calculate thresholds for descriptions
   const basicRateMax = rates.personalAllowance + (basicBand?.threshold ?? 0);
   const higherRateMax = rates.personalAllowance + (higherBand?.threshold ?? 0);
   const datasetYearLabel = `${safeStartYear}-${shortEndYear}`;
@@ -545,38 +527,38 @@ function generateDatasetData(): DatasetSchema {
       {
         '@type': 'PropertyValue',
         name: 'Personal Allowance',
-        value: formatCurrency(rates.personalAllowance),
+        value: formatCurrency(rates.personalAllowance, 0),
         description: `Tax-free income threshold for ${datasetYearLabel}`,
       },
       {
         '@type': 'PropertyValue',
         name: 'Basic Rate Tax',
         value: `${basicBand?.rate ?? 20}%`,
-        description: `Tax on income between ${formatCurrency(rates.personalAllowance + 1)} and ${formatCurrency(basicRateMax)}`,
+        description: `Tax on income between ${formatCurrency(rates.personalAllowance + 1, 0)} and ${formatCurrency(basicRateMax, 0)}`,
       },
       {
         '@type': 'PropertyValue',
         name: 'Higher Rate Tax',
         value: `${higherBand?.rate ?? 40}%`,
-        description: `Tax on income between ${formatCurrency(basicRateMax + 1)} and ${formatCurrency(higherRateMax)}`,
+        description: `Tax on income between ${formatCurrency(basicRateMax + 1, 0)} and ${formatCurrency(higherRateMax, 0)}`,
       },
       {
         '@type': 'PropertyValue',
         name: 'Additional Rate Tax',
         value: `${additionalBand?.rate ?? 45}%`,
-        description: `Tax on income above ${formatCurrency(higherRateMax)}`,
+        description: `Tax on income above ${formatCurrency(higherRateMax, 0)}`,
       },
       {
         '@type': 'PropertyValue',
         name: 'National Insurance (Standard)',
         value: `${niRates.primary.rate}%`,
-        description: `NI on income between ${formatCurrency(niRates.primary.threshold + 1)} and ${formatCurrency(niRates.upper.threshold)}`,
+        description: `NI on income between ${formatCurrency(niRates.primary.threshold + 1, 0)} and ${formatCurrency(niRates.upper.threshold, 0)}`,
       },
       {
         '@type': 'PropertyValue',
         name: 'National Insurance (Higher)',
         value: `${niRates.upper.rate}%`,
-        description: `NI on income above ${formatCurrency(niRates.upper.threshold)}`,
+        description: `NI on income above ${formatCurrency(niRates.upper.threshold, 0)}`,
       },
     ],
     distribution: [
@@ -662,7 +644,6 @@ export interface StructuredDataProps {
     wordCount?: number;
     /** Article section/category */
     articleSection?: string;
-    // Note: articleBody intentionally omitted - bloats HTML, not needed for rich results
   };
   /** Expert person data */
   expert?: {
@@ -706,7 +687,6 @@ export function StructuredData({
   expert,
   salaryData,
 }: StructuredDataProps): React.ReactNode {
-  // Determine the data to include based on the type
   let schemaData: SchemaType | null = null;
 
   switch (type) {
@@ -781,8 +761,6 @@ export function StructuredData({
     case 'article': {
       if (!articleData) return null;
 
-      // Use BlogPosting for better SEO (more specific than generic Article)
-      // Note: articleBody intentionally omitted - bloats HTML, not needed for rich results
       schemaData = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
@@ -792,7 +770,6 @@ export function StructuredData({
         datePublished: articleData.publishDate,
         dateModified: articleData.modifiedDate || articleData.publishDate,
         author: {
-          // Use Organization for editorial team, Person for named authors
           '@type': articleData.authorName === 'PayeTax Editorial Team' ? 'Organization' : 'Person',
           name: articleData.authorName || 'PayeTax',
           url: `${SITE_URL}/about`,
@@ -923,14 +900,10 @@ export function StructuredData({
       return null;
   }
 
-  // If we couldn't build valid schema data, return null
   if (!schemaData) return null;
 
-  // Escape </script> to prevent XSS if content-managed fields contain it
-  // This is standard practice for JSON-LD even when we "control" the data
   const safeJson = JSON.stringify(schemaData).replace(/<\/script/gi, '<\\/script');
 
-  // Render as regular script tag for SSR (critical for SEO)
   return (
     <script
       type='application/ld+json'

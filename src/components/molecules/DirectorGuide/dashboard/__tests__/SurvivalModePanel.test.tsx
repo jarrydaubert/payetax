@@ -26,11 +26,11 @@ describe('DirectorGuide SurvivalModePanel', () => {
     expect(screen.getByTestId('director-survival-mode')).toBeInTheDocument();
     expect(screen.getByText('Survival Mode')).toBeInTheDocument();
 
-    // 2025-26 LEL is £6,500.
-    expect(screen.getAllByText(/£6,500/).length).toBeGreaterThan(0);
+    // 2026-27 LEL is £6,708.
+    expect(screen.getAllByText(/£6,708/).length).toBeGreaterThan(0);
 
-    // Employer NI threshold £5,000 @ 15% => £225 employer NI, so loss is £6,725 when starting from £0 profit.
-    expect(screen.getByText(/£6,725/)).toBeInTheDocument();
+    // Employer NI threshold £5,000 @ 15% => ~£256.20 employer NI, so loss is ~£6,964 when starting from £0 profit.
+    expect(screen.getByText(/£6,964/)).toBeInTheDocument();
   });
 
   test('does not render in normal mode (profit > 0)', () => {

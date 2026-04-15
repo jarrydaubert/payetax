@@ -240,9 +240,9 @@ test.describe('Calculator critical @critical', () => {
     await page.getByTestId('calculate-button').click();
     await expect(page.getByTestId('results-table')).toBeVisible();
 
-    // Expected from current rules/rounding (also covered in golden-master):
+    // Expected from current 2026-2027 rules/rounding:
     // Plan 2 (9%) + Postgrad (6%) at £50k.
     const sl = await getYearlyTableValue(page, 'Student Loan');
-    expect(sl).toBeCloseTo(3677.76, 2);
+    expect(sl).toBeCloseTo(3595.32, 2);
   });
 });

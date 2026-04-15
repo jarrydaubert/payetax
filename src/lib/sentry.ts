@@ -18,6 +18,30 @@
 import type { SeverityLevel, User } from '@sentry/nextjs';
 import * as Sentry from '@sentry/nextjs';
 
+type ZodIssueLike = {
+  message: string;
+  code?: string;
+  path?: (string | number)[];
+  expected?: unknown;
+  received?: unknown;
+};
+
+interface ZodErrorLike {
+  issues: ZodIssueLike[];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isZodIssueLike(value: unknown): value is ZodIssueLike {
+  return isRecord(value) && typeof value.message === 'string';
+}
+
+function isZodErrorLike(error: unknown): error is ZodErrorLike {
+  return isRecord(error) && Array.isArray(error.issues) && error.issues.every(isZodIssueLike);
+}
+
 /**
  * Error Severity Levels
  * Maps to Sentry severity levels for consistent error classification
@@ -106,8 +130,9 @@ export function captureCalculatorError(
   context: CalculatorErrorContext,
   severity: ErrorSeverity = 'error',
 ): string | undefined {
+  const level: SeverityLevel = severity;
   return Sentry.captureException(error, {
-    level: severity as SeverityLevel,
+    level,
     tags: {
       error_type: 'calculator',
       tax_year: context.taxYear,
@@ -190,22 +215,8 @@ function extractZodErrorDetails(error: unknown): {
   paths: string[];
   validationType: string | null;
 } {
-  // Check if it's a Zod error with issues array
-  if (
-    error &&
-    typeof error === 'object' &&
-    'issues' in error &&
-    Array.isArray((error as { issues: unknown[] }).issues)
-  ) {
-    const zodError = error as {
-      issues: Array<{
-        message: string;
-        code?: string;
-        path?: (string | number)[];
-        expected?: unknown;
-        received?: unknown;
-      }>;
-    };
+  if (isZodErrorLike(error)) {
+    const zodError = error;
 
     const allIssues = zodError.issues.map((issue, index) => {
       const pathStr = issue.path?.join('.') || 'root';
@@ -275,8 +286,9 @@ export function captureAPIError(
   context: APIErrorContext,
   severity: ErrorSeverity = 'error',
 ): string | undefined {
+  const level: SeverityLevel = severity;
   return Sentry.captureException(error, {
-    level: severity as SeverityLevel,
+    level,
     tags: {
       error_type: 'api',
       endpoint: context.endpoint,
@@ -324,8 +336,9 @@ export function capturePerformanceIssue(
   context: PerformanceContext,
   severity: ErrorSeverity = 'warning',
 ): string | undefined {
+  const level: SeverityLevel = severity;
   return Sentry.captureMessage(message, {
-    level: severity as SeverityLevel,
+    level,
     tags: {
       issue_type: 'performance',
       operation: context.operation,
@@ -433,10 +446,11 @@ export function addBreadcrumb(
     data?: Record<string, unknown>;
   },
 ): void {
+  const level: SeverityLevel = options.level ?? 'info';
   Sentry.addBreadcrumb({
     category,
     message: options.message,
-    level: (options.level as SeverityLevel) || 'info',
+    level,
     data: options.data,
     timestamp: Date.now() / 1000,
   });
@@ -521,8 +535,8 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
   fn: T,
   operationName: string,
   tags?: Record<string, string>,
-): T {
-  return (async (...args: unknown[]) => {
+): (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>> {
+  return (async (...args: Parameters<T>) => {
     const transaction = startPerformanceTransaction(operationName, {
       args: args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)),
     });
@@ -545,7 +559,7 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
     } finally {
       transaction?.end();
     }
-  }) as T;
+  }) as (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>;
 }
 
 /**
@@ -566,8 +580,8 @@ export function withErrorTrackingSync<T extends (...args: unknown[]) => unknown>
   fn: T,
   operationName: string,
   tags?: Record<string, string>,
-): T {
-  return ((...args: unknown[]) => {
+): (...args: Parameters<T>) => ReturnType<T> {
+  return ((...args: Parameters<T>) => {
     const transaction = startPerformanceTransaction(operationName, {
       args: args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)),
     });
@@ -590,7 +604,7 @@ export function withErrorTrackingSync<T extends (...args: unknown[]) => unknown>
     } finally {
       transaction?.end();
     }
-  }) as T;
+  }) as (...args: Parameters<T>) => ReturnType<T>;
 }
 
 /**

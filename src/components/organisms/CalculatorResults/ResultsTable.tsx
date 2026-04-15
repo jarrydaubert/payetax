@@ -32,7 +32,7 @@ import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicat
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { trackEvent } from '@/lib/analytics';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import type { TaxCalculationResults } from '@/lib/types/calculator';
 
 interface ResultsTableProps {
   results: TaxCalculationResults;

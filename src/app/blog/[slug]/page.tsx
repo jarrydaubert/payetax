@@ -1,5 +1,3 @@
-// src/app/blog/[slug]/page.tsx
-
 import { ArrowLeft, Calendar, ChevronRight, Clock, RefreshCw, User } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import Image from 'next/image';
@@ -117,21 +115,17 @@ function getInternalToolLinks(post: {
   return uniqueLinks.slice(0, 4);
 }
 
-/** Normalize image URL - handles both relative and absolute paths */
 function getAbsoluteImageUrl(image: string | undefined): string | undefined {
   if (!image) return undefined;
   return image.startsWith('http') ? image : `${SITE_URL}${image}`;
 }
 
-// Next.js 16: Route segment config for optimized blog posts
-export const dynamic = 'force-static'; // Static generation with ISR
-export const dynamicParams = true; // Unknown slugs generated on-demand (not just at build time)
-export const revalidate = 3600; // ISR: Revalidate hourly to match blog data/cache freshness
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+export const revalidate = 3600;
 
-// Generate static params for blog posts at build time
-// Note: With dynamicParams=true, slugs not in this list are generated on-demand
 export async function generateStaticParams() {
-  const posts = await getBlogPosts({ pageSize: 1000 }); // Cap at 1000; beyond this uses on-demand generation
+  const posts = await getBlogPosts({ pageSize: 1000 });
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -149,7 +143,6 @@ export async function generateMetadata({
     return { title: 'Post Not Found | PayeTax Blog' };
   }
 
-  // Normalize image URL once for consistent usage
   const imageUrl = getAbsoluteImageUrl(post.image);
   const title = post.seoTitle || post.title;
   const description = post.seoDescription || post.excerpt;
@@ -202,33 +195,28 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  // Compile MDX content
   const mdxContent = await compileMDXContent(post.content, {
     slug: post.slug,
     updatedAt: post.updatedAt || post.publishedAt,
   });
 
-  // Get related posts
   const relatedPosts = await getRelatedPosts(post, 3);
 
-  // Extract FAQs from content for schema.org FAQPage markup
   const faqs = extractFAQs(post.content);
 
-  // Extract HowTo steps for instructional posts
   const howToSteps = extractHowToSteps(post.content);
 
-  // Calculate word count from content (strip markdown/HTML for accurate count)
+  // Strip markdown and HTML before counting words.
   const plainText = post.content
-    .replace(/```[\s\S]*?```/g, '') // Remove code blocks
-    .replace(/`[^`]*`/g, '') // Remove inline code
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // Replace links with text
-    .replace(/[#*_~>\-|]/g, '') // Remove markdown symbols
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]*`/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[#*_~>\-|]/g, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
-  // Normalize image URL for consistent usage across metadata and JSON-LD
   const imageUrl = getAbsoluteImageUrl(post.image) ?? LOGO_URL;
 
   const authorName =
@@ -286,9 +274,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <ReadingProgress />
       <div className='min-h-screen pt-20 md:pt-24'>
-        {/* Clean, seamless container - wider on xl for sidebar TOC */}
         <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:max-w-5xl lg:px-8 xl:max-w-6xl 2xl:max-w-7xl'>
-          {/* Breadcrumb Navigation */}
           <nav aria-label='Breadcrumb' className={cn('mb-8', TYPOGRAPHY.TEXT_SM)}>
             <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>
               <li>
@@ -313,11 +299,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </ol>
           </nav>
 
-          {/* Article */}
           <article>
-            {/* Header */}
             <header className='mb-8 md:mb-12'>
-              {/* Category & Tags */}
               <div className='mb-4 flex flex-wrap items-center gap-2'>
                 <span
                   className={cn(
@@ -340,7 +323,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 ))}
               </div>
 
-              {/* Title */}
               <h1
                 className={cn(
                   'mb-4 font-bold text-foreground leading-tight md:mb-6',
@@ -351,7 +333,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {post.title}
               </h1>
 
-              {/* Excerpt */}
               <p
                 className={cn(
                   'mb-6 text-foreground/80 leading-relaxed md:mb-8',
@@ -362,7 +343,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {post.excerpt}
               </p>
 
-              {/* Meta Info */}
               <div
                 className={cn(
                   'flex flex-wrap items-center gap-4 text-foreground/60 md:gap-6',
@@ -401,7 +381,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </header>
 
-            {/* Hero Image */}
             {post.image && (
               <div className='relative -mx-4 mb-8 aspect-video overflow-hidden md:-mx-6 md:mb-12 md:rounded-xl lg:-mx-8'>
                 <Image
@@ -417,16 +396,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             )}
 
-            {/* Content with sidebar TOC on desktop */}
             <div className='relative xl:flex xl:gap-8'>
-              {/* Table of Contents - sticky sidebar on xl screens */}
               <TableOfContents content={post.content} className='w-56 shrink-0' />
 
-              {/* Article Content - clean prose styling */}
               <div
                 className={cn(
                   'prose prose-lg dark:prose-invert min-w-0 max-w-none flex-1',
-                  // Improved typography for desktop readability
                   'prose-headings:font-bold prose-headings:text-foreground',
                   'prose-p:text-foreground/90 prose-p:leading-relaxed',
                   'prose-strong:font-semibold prose-strong:text-foreground',
@@ -444,7 +419,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
 
-            {/* Financial Disclaimer - Required for HMRC compliance */}
             <BlogDisclaimer className='mt-12 md:mt-16' />
 
             <section className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
@@ -468,7 +442,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </section>
 
-            {/* CTA Section */}
             <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
@@ -496,7 +469,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             />
           </article>
 
-          {/* Related Posts */}
           {relatedPosts.length > 0 && (
             <section className='mt-12 border-foreground/10 border-t pt-12 md:mt-16 md:pt-16'>
               <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
@@ -566,7 +538,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </section>
           )}
 
-          {/* Footer Navigation */}
           <div className='mt-12 flex justify-center border-foreground/10 border-t pt-8'>
             <Link
               href='/blog'

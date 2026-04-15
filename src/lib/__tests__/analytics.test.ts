@@ -14,7 +14,7 @@ import {
 
 // Mock cookieUtils to simulate accepted consent
 jest.mock('@/lib/cookieUtils', () => ({
-  areCookiesAccepted: jest.fn(() => true),
+  isAnalyticsConsented: jest.fn(() => true),
 }));
 
 describe('analytics', () => {

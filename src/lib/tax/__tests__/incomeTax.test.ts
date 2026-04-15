@@ -53,20 +53,20 @@ describe('Income Tax Calculator', () => {
   });
 
   describe('calculateIncomeTax (Scotland)', () => {
-    it('handles Scottish 2025-26 band boundaries', () => {
+    it('handles Scottish 2026-27 band boundaries', () => {
       expect(calculateIncomeTax(15397, 'scotland').incomeTax).toBeCloseTo(537.13, 2);
-      expect(calculateIncomeTax(27491, 'scotland').incomeTax).toBeCloseTo(2955.93, 2);
-      expect(calculateIncomeTax(43662, 'scotland').incomeTax).toBeCloseTo(6351.84, 2);
-      expect(calculateIncomeTax(75000, 'scotland').incomeTax).toBeCloseTo(19513.8, 2);
-      expect(calculateIncomeTax(125140, 'scotland').incomeTax).toBeCloseTo(48110.4, 2);
+      expect(calculateIncomeTax(27491, 'scotland').incomeTax).toBeCloseTo(2944.53, 2);
+      expect(calculateIncomeTax(43662, 'scotland').incomeTax).toBeCloseTo(6320.09, 2);
+      expect(calculateIncomeTax(75000, 'scotland').incomeTax).toBeCloseTo(19482.05, 2);
+      expect(calculateIncomeTax(125140, 'scotland').incomeTax).toBeCloseTo(48078.65, 2);
     });
 
     it('taxes the first pound into the next band at each boundary', () => {
-      expect(calculateIncomeTax(15398, 'scotland').incomeTax).toBeCloseTo(537.33, 2);
-      expect(calculateIncomeTax(27492, 'scotland').incomeTax).toBeCloseTo(2956.14, 2);
-      expect(calculateIncomeTax(43663, 'scotland').incomeTax).toBeCloseTo(6352.26, 2);
-      expect(calculateIncomeTax(75001, 'scotland').incomeTax).toBeCloseTo(19514.25, 2);
-      expect(calculateIncomeTax(125141, 'scotland').incomeTax).toBeCloseTo(48110.88, 2);
+      expect(calculateIncomeTax(15398, 'scotland').incomeTax).toBeCloseTo(537.32, 2);
+      expect(calculateIncomeTax(27492, 'scotland').incomeTax).toBeCloseTo(2944.73, 2);
+      expect(calculateIncomeTax(43663, 'scotland').incomeTax).toBeCloseTo(6320.51, 2);
+      expect(calculateIncomeTax(75001, 'scotland').incomeTax).toBeCloseTo(19482.5, 2);
+      expect(calculateIncomeTax(125141, 'scotland').incomeTax).toBeCloseTo(48079.13, 2);
     });
   });
 
@@ -77,8 +77,8 @@ describe('Income Tax Calculator', () => {
       expect(getIncomeTax(salary, 'rUK', '2025-2026')).toBe(detailed.incomeTax);
     });
 
-    it('defaults to 2025-2026 tax year', () => {
-      expect(getIncomeTax(60000, 'rUK')).toBe(getIncomeTax(60000, 'rUK', '2025-2026'));
+    it('defaults to the latest supported tax year', () => {
+      expect(getIncomeTax(60000, 'rUK')).toBe(getIncomeTax(60000, 'rUK', '2026-2027'));
     });
   });
 });

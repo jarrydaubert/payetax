@@ -8,6 +8,7 @@ ai-seo
 analytics-tracking
 churn-prevention
 community-marketing
+codebase-cleanup-sweep
 cold-email
 competitor-alternatives
 content-strategy

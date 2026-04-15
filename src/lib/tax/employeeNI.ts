@@ -15,8 +15,7 @@
  * - Rate above UEL: 2%
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -49,7 +48,7 @@ export interface EmployeeNIResult {
  */
 export function calculateEmployeeNI(
   salary: number,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): EmployeeNIResult {
   const rates = TAX_RATES[taxYear];
   const employeeRates = rates.nationalInsurance.employee.A;
@@ -96,6 +95,6 @@ export function calculateEmployeeNI(
 /**
  * Get Employee NI amount (convenience function)
  */
-export function getEmployeeNI(salary: number, taxYear: TaxYear = '2025-2026'): number {
+export function getEmployeeNI(salary: number, taxYear: TaxYear = CURRENT_TAX_YEAR): number {
   return calculateEmployeeNI(salary, taxYear).employeeNI;
 }

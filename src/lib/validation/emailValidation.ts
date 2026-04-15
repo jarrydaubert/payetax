@@ -10,6 +10,7 @@
 
 import { z } from 'zod';
 import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
+import { INCOME_SOURCE_TYPES } from '@/lib/types/calculator';
 import { CurrencyAmountSchema, DirectorTaxYearSchema, RegionSchema } from './directorValidation';
 
 // ============================================================================
@@ -57,14 +58,7 @@ const StudentLoanSelectionSchema = z
     'Duplicate student loan plans not allowed',
   );
 
-const IncomeSourceTypeSchema = z.enum([
-  'employment',
-  'pension',
-  'statePension',
-  'rental',
-  'investment',
-  'other',
-]);
+const IncomeSourceTypeSchema = z.enum(INCOME_SOURCE_TYPES);
 
 /**
  * Pay period values for tax calculation results

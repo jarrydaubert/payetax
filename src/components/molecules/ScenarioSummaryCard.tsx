@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import type { PensionOptimization } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface ScenarioSummaryCardProps {
   /** Gross salary for the scenario */
@@ -26,16 +26,6 @@ interface ScenarioSummaryCardProps {
   heroStatLabel?: string;
   /** Category-specific styling */
   category?: 'tax-trap' | 'student-loan' | 'life-stage' | 'scottish';
-}
-
-/**
- * Format currency with proper locale
- */
-function formatCurrency(value: number, showPence = false): string {
-  return `£${value.toLocaleString('en-GB', {
-    minimumFractionDigits: showPence ? 2 : 0,
-    maximumFractionDigits: showPence ? 2 : 0,
-  })}`;
 }
 
 /**
@@ -87,32 +77,32 @@ export function ScenarioSummaryCard({
       <div className={cn('text-center', SPACING.MB_6)}>
         <p className={cn(TYPOGRAPHY.TEXT_SM, 'text-muted-foreground', SPACING.MB_2)}>{heroLabel}</p>
         <p className={cn(TYPOGRAPHY.TEXT_4XL, 'font-bold', colors.accent)}>
-          {formatCurrency(heroStat)}
+          {formatCurrency(heroStat, 0)}
         </p>
         {hasOptimization && (
           <p className={cn(TYPOGRAPHY.TEXT_SM, 'text-muted-foreground', SPACING.MT_1)}>
-            by contributing {formatCurrency(optimization.suggested)} to pension
+            by contributing {formatCurrency(optimization.suggested, 0)} to pension
           </p>
         )}
       </div>
 
       {/* Breakdown Grid */}
       <div className={cn('grid grid-cols-2', SPACING.GAP_4, SPACING.MB_6)}>
-        <SummaryItem label='Gross Salary' value={formatCurrency(salary)} variant='neutral' />
+        <SummaryItem label='Gross Salary' value={formatCurrency(salary, 0)} variant='neutral' />
         <SummaryItem
           label='Income Tax'
-          value={formatCurrency(results.incomeTax.annually)}
+          value={formatCurrency(results.incomeTax.annually, 0)}
           variant='deduction'
           align='right'
         />
         <SummaryItem
           label='National Insurance'
-          value={formatCurrency(results.nationalInsurance.annually)}
+          value={formatCurrency(results.nationalInsurance.annually, 0)}
           variant='deduction'
         />
         <SummaryItem
           label='Student Loan'
-          value={formatCurrency(results.studentLoan.annually)}
+          value={formatCurrency(results.studentLoan.annually, 0)}
           variant={results.studentLoan.annually > 0 ? 'deduction' : 'neutral'}
           align='right'
         />
@@ -128,13 +118,13 @@ export function ScenarioSummaryCard({
             <div>
               <p className={cn(TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>Before</p>
               <p className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold')}>
-                {formatCurrency(results.netPay.annually)}
+                {formatCurrency(results.netPay.annually, 0)}
               </p>
             </div>
             <div>
               <p className={cn(TYPOGRAPHY.TEXT_XS, 'text-muted-foreground')}>After (+ Pension)</p>
               <p className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold', 'text-success')}>
-                {formatCurrency(optimizedResults.netPay.annually + optimization.suggested)}
+                {formatCurrency(optimizedResults.netPay.annually + optimization.suggested, 0)}
               </p>
             </div>
           </div>
@@ -147,17 +137,18 @@ export function ScenarioSummaryCard({
           Monthly Breakdown
         </p>
         <div className={cn('grid grid-cols-3', SPACING.GAP_2)}>
-          <MiniStat label='Gross' value={formatCurrency(results.grossSalary.monthly)} />
+          <MiniStat label='Gross' value={formatCurrency(results.grossSalary.monthly, 0)} />
           <MiniStat
             label='Deductions'
             value={formatCurrency(
               results.incomeTax.monthly +
                 results.nationalInsurance.monthly +
                 results.studentLoan.monthly,
+              0,
             )}
             negative
           />
-          <MiniStat label='Take-Home' value={formatCurrency(results.netPay.monthly)} highlight />
+          <MiniStat label='Take-Home' value={formatCurrency(results.netPay.monthly, 0)} highlight />
         </div>
       </div>
 
@@ -206,7 +197,7 @@ function SummaryItem({
           variant === 'highlight' && 'text-success',
         )}
       >
-        {variant === 'deduction' && value !== '£0' ? `-${value.slice(1)}` : value}
+        {variant === 'deduction' && value !== formatCurrency(0, 0) ? `-${value.slice(1)}` : value}
       </p>
     </div>
   );

@@ -7,12 +7,8 @@
  * @see https://www.gov.uk/corporation-tax-rates
  */
 
-import {
-  CT_RATES,
-  calculateCorporationTax,
-  getCorporationTax,
-  getEffectiveCTRate,
-} from '../corporationTax';
+import { CT_RATES } from '@/constants/taxRates';
+import { calculateCorporationTax, getCorporationTax, getEffectiveCTRate } from '../corporationTax';
 
 describe('Corporation Tax Calculator', () => {
   describe('calculateCorporationTax', () => {

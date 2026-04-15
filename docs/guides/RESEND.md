@@ -29,7 +29,7 @@ RESEND_API_KEY=re_xxxxx
 ## Newsletter (Kit)
 
 - Subscribe API: `src/app/api/newsletter/subscribe/route.ts`
-- Unsubscribe API (tokenized legacy links): `src/app/api/newsletter/unsubscribe/route.ts`
+- Unsubscribe API (tokenized unsubscribe flow): `src/app/api/newsletter/unsubscribe/route.ts`
 - Signup UI: `src/components/organisms/NewsletterCTA.tsx`
 - Embed spots: homepage sections, blog index, blog categories, and individual blog posts
 - Kit Custom CSS source: `docs/guides/KIT_EMBED_CSS.css`

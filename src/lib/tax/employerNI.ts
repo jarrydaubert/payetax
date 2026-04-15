@@ -17,8 +17,7 @@
  * 4. This is why we recommend £12,570 salary (uses PA but triggers some Employer NI)
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -56,7 +55,7 @@ export interface EmployerNIResult {
  * Note: This changed in the October 2024 Budget (previously 13.8% above £9,100)
  *
  * @param salary - Annual salary amount
- * @param taxYear - Tax year for rates (defaults to 2025-2026)
+ * @param taxYear - Tax year for rates (defaults to the latest supported tax year)
  * @returns Full calculation result with breakdown
  *
  * @example
@@ -68,7 +67,7 @@ export interface EmployerNIResult {
  */
 export function calculateEmployerNI(
   salary: number,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): EmployerNIResult {
   // Get employer NI rates from tax rates constant
   const rates = TAX_RATES[taxYear];
@@ -112,7 +111,7 @@ export function calculateEmployerNI(
  * @param taxYear - Tax year for rates
  * @returns Employer NI due (rounded to pence)
  */
-export function getEmployerNI(salary: number, taxYear: TaxYear = '2025-2026'): number {
+export function getEmployerNI(salary: number, taxYear: TaxYear = CURRENT_TAX_YEAR): number {
   return calculateEmployerNI(salary, taxYear).employerNI;
 }
 
@@ -124,7 +123,7 @@ export function getEmployerNI(salary: number, taxYear: TaxYear = '2025-2026'): n
  * @param taxYear - Tax year for rates
  * @returns Annual threshold amount
  */
-export function getEmployerNIThreshold(taxYear: TaxYear = '2025-2026'): number {
+export function getEmployerNIThreshold(taxYear: TaxYear = CURRENT_TAX_YEAR): number {
   const rates = TAX_RATES[taxYear];
   return rates.nationalInsurance.employer.A.secondary.threshold;
 }
@@ -135,7 +134,7 @@ export function getEmployerNIThreshold(taxYear: TaxYear = '2025-2026'): number {
  * @param taxYear - Tax year for rates
  * @returns Rate as decimal (e.g., 0.15 for 15%)
  */
-export function getEmployerNIRate(taxYear: TaxYear = '2025-2026'): number {
+export function getEmployerNIRate(taxYear: TaxYear = CURRENT_TAX_YEAR): number {
   const rates = TAX_RATES[taxYear];
   return rates.nationalInsurance.employer.A.secondary.rate / 100;
 }

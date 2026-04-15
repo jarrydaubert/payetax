@@ -334,7 +334,10 @@ describe('Pension Optimizer - Error Handling', () => {
     });
 
     it('should not leak memory on repeated error conditions', () => {
-      const before = (performance as any).memory?.usedJSHeapSize || 0;
+      const memoryPerformance = performance as Performance & {
+        memory?: { usedJSHeapSize?: number };
+      };
+      const before = memoryPerformance.memory?.usedJSHeapSize || 0;
 
       for (let i = 0; i < 10000; i++) {
         calculateOptimalPension(Infinity);
@@ -342,7 +345,7 @@ describe('Pension Optimizer - Error Handling', () => {
         formatCurrency(NaN);
       }
 
-      const after = (performance as any).memory?.usedJSHeapSize || 0;
+      const after = memoryPerformance.memory?.usedJSHeapSize || 0;
       const growth = after - before;
 
       // Memory growth should be minimal (< 1MB)

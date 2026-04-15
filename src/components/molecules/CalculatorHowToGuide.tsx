@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion';
 import { HowToStepCard } from '@/components/molecules/HowToStepCard';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { cn } from '@/lib/utils';
 
 /**
@@ -46,7 +47,7 @@ export function CalculatorHowToGuide() {
           <HowToStepCard
             step={2}
             title='Select Tax Year & Region'
-            description='Choose the tax year (2025-26 for current rates) and your region (England, Scotland, Wales, or Northern Ireland).'
+            description={`Choose the tax year (${CURRENT_TAX_YEAR_DISPLAY_SHORT} for current rates) and your region (England, Scotland, Wales, or Northern Ireland).`}
           />
 
           <HowToStepCard

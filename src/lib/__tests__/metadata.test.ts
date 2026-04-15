@@ -20,11 +20,11 @@ describe('Metadata Module', () => {
       const metadata = generateMetadata({});
 
       expect(metadata.title).toEqual({
-        default: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay | PayeTax',
+        default: 'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay | PayeTax',
         template: '%s | PayeTax',
       });
       expect(metadata.description).toContain('Free UK PAYE tax calculator');
-      expect(metadata.keywords).toContain('UK tax calculator 2025');
+      expect(metadata.keywords).toContain('UK tax calculator 2026-27');
       expect(metadata.metadataBase).toBeInstanceOf(URL);
     });
 
@@ -70,7 +70,7 @@ describe('Metadata Module', () => {
           url: 'https://example.com/custom-image.jpg',
           width: 1200,
           height: 630,
-          alt: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay',
+          alt: 'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay',
         },
       ]);
       expect(metadata.twitter?.images).toEqual(['https://example.com/custom-image.jpg']);
@@ -86,7 +86,7 @@ describe('Metadata Module', () => {
           url: 'https://payetax.co.uk/images/custom-og.png',
           width: 1200,
           height: 630,
-          alt: 'Free UK PAYE Tax Calculator 2025-2026 | Salary & Take-Home Pay',
+          alt: 'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay',
         },
       ]);
     });

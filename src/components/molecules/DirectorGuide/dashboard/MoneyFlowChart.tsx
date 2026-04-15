@@ -10,14 +10,7 @@
 
 import { BarChart3 } from 'lucide-react';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Math.abs(value));
+import { formatCurrency } from '@/lib/utils';
 
 export function MoneyFlowChart() {
   const { comparison, activeScenario } = useActiveDirectorScenario();
@@ -53,28 +46,28 @@ export function MoneyFlowChart() {
       value: grossProfit,
       color: 'bg-muted-foreground',
       percent: 100,
-      ariaLabel: `Gross Profit: ${formatCurrency(grossProfit)}, 100% of total`,
+      ariaLabel: `Gross Profit: ${formatCurrency(grossProfit, 0)}, 100% of total`,
     },
     {
       label: 'Your Take-Home',
       value: actualTakeHome,
       color: 'bg-success',
       percent: clampPercent(actualTakeHome, grossProfit),
-      ariaLabel: `Your Take-Home after all taxes: ${formatCurrency(actualTakeHome)}, ${Math.round(clampPercent(actualTakeHome, grossProfit))}% of profit`,
+      ariaLabel: `Your Take-Home after all taxes: ${formatCurrency(actualTakeHome, 0)}, ${Math.round(clampPercent(actualTakeHome, grossProfit))}% of profit`,
     },
     {
       label: 'Company Taxes',
       value: companyTaxes,
       color: 'bg-warning',
       percent: clampPercent(companyTaxes, grossProfit),
-      ariaLabel: `Company Taxes (CT + Employer NI): ${formatCurrency(companyTaxes)}, ${Math.round(clampPercent(companyTaxes, grossProfit))}% of profit`,
+      ariaLabel: `Company Taxes (CT + Employer NI): ${formatCurrency(companyTaxes, 0)}, ${Math.round(clampPercent(companyTaxes, grossProfit))}% of profit`,
     },
     {
       label: 'Retained',
       value: retained,
       color: 'bg-primary',
       percent: clampPercent(retained, grossProfit),
-      ariaLabel: `Retained in Company: ${formatCurrency(retained)}, ${Math.round(clampPercent(retained, grossProfit))}% of profit`,
+      ariaLabel: `Retained in Company: ${formatCurrency(retained, 0)}, ${Math.round(clampPercent(retained, grossProfit))}% of profit`,
     },
   ];
 
@@ -106,7 +99,7 @@ export function MoneyFlowChart() {
               />
             </div>
             <span className='w-16 text-right font-mono text-foreground'>
-              {formatCurrency(bar.value)}
+              {formatCurrency(bar.value, 0)}
             </span>
           </li>
         ))}

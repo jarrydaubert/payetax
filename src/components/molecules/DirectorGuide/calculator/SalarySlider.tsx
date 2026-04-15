@@ -11,21 +11,13 @@ import { MoveHorizontal, TrendingUp } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import {
   DIRECTOR_PROFIT_WHAT_IF_MAX_PERCENT,
   DIRECTOR_PROFIT_WHAT_IF_MIN_PERCENT,
   useDirectorGuideActions,
 } from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 
 const formatPercent = (amount: number) => (amount > 0 ? `+${amount}%` : `${amount}%`);
 
@@ -115,10 +107,10 @@ export function SalarySlider() {
           </button>
         </div>
         <p className='text-muted-foreground text-xs'>
-          {formatCurrency(baseGrossProfitBeforePension)} now
+          {formatCurrency(baseGrossProfitBeforePension, 0)} now
           {' -> '}
           <span className='font-medium text-foreground'>
-            {formatCurrency(scenarioGrossProfitBeforePension)}
+            {formatCurrency(scenarioGrossProfitBeforePension, 0)}
           </span>{' '}
           ({formatPercent(profitWhatIfPercent)})
         </p>
@@ -139,7 +131,7 @@ export function SalarySlider() {
           <span className='text-sm'>Salary level at this scenario</span>
         </div>
         <p className='text-muted-foreground text-xs'>
-          Exploring salary from £0 to {formatCurrency(maxSalary)} (max affordable under current
+          Exploring salary from £0 to {formatCurrency(maxSalary, 0)} (max affordable under current
           company scenario)
         </p>
         <Slider

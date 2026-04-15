@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
-import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface TaxTrapInlineAlertProps {
@@ -46,7 +46,7 @@ export function TaxTrapInlineAlert({
   salary,
   suggestedPension,
   onApplyPension,
-  taxYear = TAX_YEARS[0],
+  taxYear = CURRENT_TAX_YEAR,
 }: TaxTrapInlineAlertProps) {
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -66,7 +66,7 @@ export function TaxTrapInlineAlert({
   }, []);
 
   // Get tax rates for the specified tax year
-  const effectiveTaxYear = taxYear ?? '2025-2026';
+  const effectiveTaxYear = taxYear ?? CURRENT_TAX_YEAR;
   const taxRates = TAX_RATES[effectiveTaxYear];
   if (!taxRates) return null;
   const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000

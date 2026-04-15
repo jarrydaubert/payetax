@@ -10,9 +10,11 @@
 
 const KIT_API_BASE = 'https://api.kit.com/v4';
 
+type KitRecordId = string | number;
+
 interface KitRequestOptions {
   method?: 'GET' | 'POST';
-  body?: unknown;
+  body?: Record<string, unknown>;
 }
 
 interface KitRequestResult {
@@ -23,13 +25,41 @@ interface KitRequestResult {
 }
 
 interface KitSubscriberRecord {
-  id?: unknown;
-  email_address?: unknown;
+  id?: KitRecordId;
+  email_address?: string;
 }
 
 interface KitFormRecord {
-  id?: unknown;
-  uid?: unknown;
+  id?: KitRecordId;
+  uid?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isKitSubscriberRecord(value: unknown): value is KitSubscriberRecord {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { email_address, id } = value;
+  return (
+    (email_address === undefined || typeof email_address === 'string') &&
+    (typeof id === 'string' || typeof id === 'number' || id === undefined)
+  );
+}
+
+function isKitFormRecord(value: unknown): value is KitFormRecord {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { id, uid } = value;
+  return (
+    (uid === undefined || typeof uid === 'string') &&
+    (typeof id === 'string' || typeof id === 'number' || id === undefined)
+  );
 }
 
 function normalizeErrorText(text: string, json: unknown): string {
@@ -37,13 +67,13 @@ function normalizeErrorText(text: string, json: unknown): string {
     return text.toLowerCase();
   }
 
-  if (!json || typeof json !== 'object') {
+  if (!isRecord(json)) {
     return '';
   }
 
   const candidates = ['message', 'error', 'detail'] as const;
   for (const key of candidates) {
-    const value = (json as Record<string, unknown>)[key];
+    const value = json[key];
     if (typeof value === 'string') {
       return value.toLowerCase();
     }
@@ -68,36 +98,32 @@ function isIdempotentSubscriberState(status: number, text: string, json: unknown
 }
 
 function getSubscribersFromResponse(json: unknown): KitSubscriberRecord[] {
-  if (!json || typeof json !== 'object') {
+  if (!isRecord(json)) {
     return [];
   }
 
-  const asRecord = json as Record<string, unknown>;
-
-  if (Array.isArray(asRecord.subscribers)) {
-    return asRecord.subscribers as KitSubscriberRecord[];
+  if (Array.isArray(json.subscribers)) {
+    return json.subscribers.filter(isKitSubscriberRecord);
   }
 
-  if (Array.isArray(asRecord.data)) {
-    return asRecord.data as KitSubscriberRecord[];
+  if (Array.isArray(json.data)) {
+    return json.data.filter(isKitSubscriberRecord);
   }
 
   return [];
 }
 
 function getFormsFromResponse(json: unknown): KitFormRecord[] {
-  if (!json || typeof json !== 'object') {
+  if (!isRecord(json)) {
     return [];
   }
 
-  const asRecord = json as Record<string, unknown>;
-
-  if (Array.isArray(asRecord.forms)) {
-    return asRecord.forms as KitFormRecord[];
+  if (Array.isArray(json.forms)) {
+    return json.forms.filter(isKitFormRecord);
   }
 
-  if (Array.isArray(asRecord.data)) {
-    return asRecord.data as KitFormRecord[];
+  if (Array.isArray(json.data)) {
+    return json.data.filter(isKitFormRecord);
   }
 
   return [];
@@ -149,10 +175,6 @@ async function resolveFormIdentifier(apiSecret: string, formIdentifier: string):
 
   const forms = getFormsFromResponse(formsResult.json);
   const matched = forms.find((form) => {
-    if (!form || typeof form !== 'object') {
-      return false;
-    }
-
     const id = form.id;
     const uid = form.uid;
     return (
@@ -240,9 +262,6 @@ export async function unsubscribeEmailInKit(params: {
 
   const subscribers = getSubscribersFromResponse(lookupResult.json);
   const matched = subscribers.find((subscriber) => {
-    if (!subscriber || typeof subscriber !== 'object') {
-      return false;
-    }
     const emailAddress = subscriber.email_address;
     return typeof emailAddress === 'string' && emailAddress.toLowerCase() === normalizedEmail;
   });

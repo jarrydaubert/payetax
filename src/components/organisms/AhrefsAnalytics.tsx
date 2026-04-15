@@ -3,7 +3,7 @@
 
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
-import { areCookiesAccepted } from '@/lib/cookieUtils';
+import { isAnalyticsConsented } from '@/lib/cookieUtils';
 
 // Ahrefs Analytics Key - configure NEXT_PUBLIC_AHREFS_KEY in Vercel environment variables
 const AHREFS_KEY = process.env.NEXT_PUBLIC_AHREFS_KEY;
@@ -22,7 +22,7 @@ export function AhrefsAnalytics() {
   useEffect(() => {
     // Check consent on mount
     const checkConsent = () => {
-      setHasConsent(areCookiesAccepted());
+      setHasConsent(isAnalyticsConsented());
     };
 
     checkConsent();

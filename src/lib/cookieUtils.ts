@@ -3,8 +3,6 @@
 
 import { safeGetItem, safeRemoveItem, safeSetItem } from './safeStorage';
 
-export type CookieConsent = 'accepted' | 'declined' | null;
-
 export interface ConsentPreferences {
   analytics: boolean;
 }
@@ -13,6 +11,24 @@ const CONSENT_KEY = 'cookie-consent';
 const CONSENT_TIMESTAMP_KEY = 'cookie-consent-timestamp';
 /** Approximately 12 months in milliseconds (365 days) */
 const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function isConsentPreferences(value: unknown): value is ConsentPreferences {
+  return isRecord(value) && typeof value.analytics === 'boolean';
+}
+
+function maybeMigrateLegacyConsent(raw: string | null): void {
+  if (!(raw === 'accepted' || raw === 'declined')) return;
+
+  safeSetItem(CONSENT_KEY, JSON.stringify({ analytics: raw === 'accepted' }));
+  // Preserve existing timestamp if present; otherwise initialize now.
+  if (!safeGetItem(CONSENT_TIMESTAMP_KEY)) {
+    safeSetItem(CONSENT_TIMESTAMP_KEY, new Date().toISOString());
+  }
+}
 
 function parseConsentPreferences(value: string | null): ConsentPreferences | null {
   if (!value) return null;
@@ -26,29 +42,14 @@ function parseConsentPreferences(value: string | null): ConsentPreferences | nul
 
   try {
     const parsed: unknown = JSON.parse(value);
-    if (
-      parsed &&
-      typeof parsed === 'object' &&
-      'analytics' in parsed &&
-      typeof parsed.analytics === 'boolean'
-    ) {
-      return { analytics: parsed.analytics };
+    if (isConsentPreferences(parsed)) {
+      return parsed;
     }
   } catch {
     return null;
   }
 
   return null;
-}
-
-function maybeMigrateLegacyConsent(raw: string | null): void {
-  if (!(raw === 'accepted' || raw === 'declined')) return;
-
-  safeSetItem(CONSENT_KEY, JSON.stringify({ analytics: raw === 'accepted' }));
-  // Preserve existing timestamp if present; otherwise initialize now.
-  if (!safeGetItem(CONSENT_TIMESTAMP_KEY)) {
-    safeSetItem(CONSENT_TIMESTAMP_KEY, new Date().toISOString());
-  }
 }
 
 /**
@@ -107,35 +108,11 @@ export function getConsentPreferences(): ConsentPreferences | null {
     return null;
   }
 
-  // Migrate accepted/declined legacy format to JSON once read.
   maybeMigrateLegacyConsent(raw);
   return parsed;
-}
-
-/**
- * Backward-compatible legacy status getter.
- */
-export function getCookieConsent(): CookieConsent {
-  const preferences = getConsentPreferences();
-  if (!preferences) return null;
-  return preferences.analytics ? 'accepted' : 'declined';
 }
 
 export function isAnalyticsConsented(): boolean {
   const preferences = getConsentPreferences();
   return preferences?.analytics === true;
-}
-
-/**
- * Backward-compatible alias.
- */
-export function areCookiesAccepted(): boolean {
-  return isAnalyticsConsented();
-}
-
-/**
- * Backward-compatible alias.
- */
-export function areCookiesDeclined(): boolean {
-  return getCookieConsent() === 'declined';
 }

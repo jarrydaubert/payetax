@@ -112,6 +112,17 @@ describe('Salary Comparison', () => {
       expect(result?.increasePercentage).toBe(25);
     });
 
+    it('should allow a zero total salary comparison', () => {
+      const result = calculateComparison(mockCurrentInput, {
+        mode: 'total',
+        value: 0,
+        currentSalary: 40000,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result?.newSalary).toBe(0);
+    });
+
     it('should calculate differences with specific expected values', () => {
       const result = calculateComparison(mockCurrentInput, {
         mode: 'amount',

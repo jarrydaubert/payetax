@@ -9,20 +9,11 @@
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorFormValue } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const DIVIDEND_ALLOWANCE = TAX_RATES[TAX_YEAR].dividendAllowance;
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 interface DetailCardsProps {
   className?: string;
@@ -47,15 +38,15 @@ export function DetailCards({ className }: DetailCardsProps) {
         title='Salary Breakdown'
         badge='Via payroll'
         rows={[
-          { label: 'Gross Salary', value: formatCurrency(activeScenario.salary) },
+          { label: 'Gross Salary', value: formatCurrency(activeScenario.salary, 0) },
           {
             label: 'Income Tax',
-            value: formatCurrency(activeScenario.incomeTax),
+            value: formatCurrency(activeScenario.incomeTax, 0),
             positive: activeScenario.incomeTax === 0,
           },
           {
             label: 'Employee NI',
-            value: formatCurrency(activeScenario.employeeNI),
+            value: formatCurrency(activeScenario.employeeNI, 0),
             positive: activeScenario.employeeNI === 0,
           },
           {
@@ -65,7 +56,7 @@ export function DetailCards({ className }: DetailCardsProps) {
                 : 'Employer NI (company cost)',
             value:
               activeScenario.employerNI > 0
-                ? `-${formatCurrency(activeScenario.employerNI)}`
+                ? `-${formatCurrency(activeScenario.employerNI, 0)}`
                 : '£0',
             negative: activeScenario.employerNI > 0,
           },
@@ -74,6 +65,7 @@ export function DetailCards({ className }: DetailCardsProps) {
           label: 'Net Salary',
           value: formatCurrency(
             activeScenario.salary - activeScenario.incomeTax - activeScenario.employeeNI,
+            0,
           ),
         }}
       />
@@ -83,28 +75,28 @@ export function DetailCards({ className }: DetailCardsProps) {
         title='Dividend Breakdown'
         badge='Rate varies by band'
         rows={[
-          { label: 'Gross Dividends', value: formatCurrency(activeScenario.dividends) },
+          { label: 'Gross Dividends', value: formatCurrency(activeScenario.dividends, 0) },
           {
             label: 'Dividend Allowance',
-            value: `${formatCurrency(DIVIDEND_ALLOWANCE)} tax-free`,
+            value: `${formatCurrency(DIVIDEND_ALLOWANCE, 0)} tax-free`,
             positive: true,
           },
           {
             label: 'Taxable Amount',
-            value: formatCurrency(Math.max(0, activeScenario.dividends - DIVIDEND_ALLOWANCE)),
+            value: formatCurrency(Math.max(0, activeScenario.dividends - DIVIDEND_ALLOWANCE), 0),
           },
           {
             label: 'Dividend Tax',
             value:
               activeScenario.dividendTax > 0
-                ? `-${formatCurrency(activeScenario.dividendTax)}`
+                ? `-${formatCurrency(activeScenario.dividendTax, 0)}`
                 : '£0',
             negative: activeScenario.dividendTax > 0,
           },
         ]}
         total={{
           label: 'Net Dividends',
-          value: formatCurrency(activeScenario.dividends - activeScenario.dividendTax),
+          value: formatCurrency(activeScenario.dividends - activeScenario.dividendTax, 0),
         }}
       />
 
@@ -117,27 +109,27 @@ export function DetailCards({ className }: DetailCardsProps) {
             ? [
                 {
                   label: 'Scenario Gross Profit',
-                  value: formatCurrency(scenarioGrossProfitBeforePension),
+                  value: formatCurrency(scenarioGrossProfitBeforePension, 0),
                 },
               ]
             : [
-                { label: 'Revenue', value: formatCurrency(revenue) },
+                { label: 'Revenue', value: formatCurrency(revenue, 0) },
                 {
                   label: 'Business Expenses',
-                  value: expenses > 0 ? `-${formatCurrency(expenses)}` : '£0',
+                  value: expenses > 0 ? `-${formatCurrency(expenses, 0)}` : '£0',
                   negative: expenses > 0,
                 },
               ]),
           {
             label: 'Salary + Employer NI',
-            value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI)}`,
+            value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI, 0)}`,
             negative: true,
           },
-          { label: 'Taxable Profit', value: formatCurrency(taxableProfit) },
+          { label: 'Taxable Profit', value: formatCurrency(taxableProfit, 0) },
         ]}
         total={{
           label: 'Corp Tax Due',
-          value: formatCurrency(activeScenario.corporationTax),
+          value: formatCurrency(activeScenario.corporationTax, 0),
         }}
       />
 
@@ -147,19 +139,19 @@ export function DetailCards({ className }: DetailCardsProps) {
         rows={[
           {
             label: 'Corporation Tax (company)',
-            value: formatCurrency(activeScenario.corporationTax),
+            value: formatCurrency(activeScenario.corporationTax, 0),
           },
           {
             label:
               activeScenario.companyCarBIK > 0
                 ? 'Employer NI + Class 1A (company)'
                 : 'Employer NI (company)',
-            value: formatCurrency(activeScenario.employerNI),
+            value: formatCurrency(activeScenario.employerNI, 0),
           },
-          { label: 'Dividend Tax (you)', value: formatCurrency(activeScenario.dividendTax) },
+          { label: 'Dividend Tax (you)', value: formatCurrency(activeScenario.dividendTax, 0) },
           {
             label: 'Personal Tax (salary)',
-            value: formatCurrency(activeScenario.incomeTax + activeScenario.employeeNI),
+            value: formatCurrency(activeScenario.incomeTax + activeScenario.employeeNI, 0),
           },
         ]}
         total={{
@@ -170,6 +162,7 @@ export function DetailCards({ className }: DetailCardsProps) {
               activeScenario.dividendTax +
               activeScenario.incomeTax +
               activeScenario.employeeNI,
+            0,
           ),
           isError: true,
         }}

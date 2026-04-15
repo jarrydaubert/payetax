@@ -9,18 +9,11 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorFormSlice, useStrategyComparison } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
-
-const formatGBP = (amount: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    maximumFractionDigits: 0,
-  }).format(Math.round(amount));
 
 export function SurvivalModePanel({ className }: { className?: string }) {
   const formData = useDirectorFormSlice((state) => ({
@@ -74,21 +67,25 @@ export function SurvivalModePanel({ className }: { className?: string }) {
         <div className='mb-2 font-medium text-foreground'>NI credits threshold (illustrative)</div>
         <div className='text-muted-foreground text-sm'>
           NI credits typically require earnings around{' '}
-          <span className='font-semibold text-foreground'>{formatGBP(niCreditsSalary)}</span>. This
-          example shows the trade-off if you pay a salary to keep a qualifying year (even if it
-          creates a company loss).
+          <span className='font-semibold text-foreground'>
+            {formatCurrency(niCreditsSalary, 0)}
+          </span>
+          . This example shows the trade-off if you pay a salary to keep a qualifying year (even if
+          it creates a company loss).
         </div>
 
         <div className='mt-4 grid gap-3 md:grid-cols-3'>
           <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
             <div className='text-muted-foreground text-xs'>Company loss (estimate)</div>
             <div className='font-mono font-semibold text-warning'>
-              {formatGBP(companyLossIfPaySalary)}
+              {formatCurrency(Math.round(companyLossIfPaySalary), 0)}
             </div>
           </div>
           <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
             <div className='text-muted-foreground text-xs'>Take-home (approx)</div>
-            <div className='font-mono font-semibold text-success'>{formatGBP(niCreditsSalary)}</div>
+            <div className='font-mono font-semibold text-success'>
+              {formatCurrency(Math.round(niCreditsSalary), 0)}
+            </div>
           </div>
           <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
             <div className='text-muted-foreground text-xs'>NI credits</div>
@@ -100,9 +97,9 @@ export function SurvivalModePanel({ className }: { className?: string }) {
       </div>
 
       <div className='mt-4 text-muted-foreground text-xs'>
-        Alternative: pay <span className='font-semibold text-foreground'>{formatGBP(0)}</span>{' '}
-        salary (no additional company loss created by payroll), but you may miss an NI qualifying
-        year.
+        Alternative: pay{' '}
+        <span className='font-semibold text-foreground'>{formatCurrency(0, 0)}</span> salary (no
+        additional company loss created by payroll), but you may miss an NI qualifying year.
       </div>
     </section>
   );

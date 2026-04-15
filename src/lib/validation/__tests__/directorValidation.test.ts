@@ -151,20 +151,20 @@ describe('RegionSchema', () => {
 
 describe('DirectorTaxYearSchema', () => {
   describe('valid tax years', () => {
-    it('should accept "2025-2026"', () => {
-      const result = DirectorTaxYearSchema.safeParse('2025-2026');
+    it('should accept "2026-2027"', () => {
+      const result = DirectorTaxYearSchema.safeParse('2026-2027');
       expect(result.success).toBe(true);
     });
 
-    it('should accept "2024-2025"', () => {
-      const result = DirectorTaxYearSchema.safeParse('2024-2025');
+    it('should accept "2025-2026"', () => {
+      const result = DirectorTaxYearSchema.safeParse('2025-2026');
       expect(result.success).toBe(true);
     });
   });
 
   describe('invalid tax years', () => {
-    it('should reject "2023-2024"', () => {
-      const result = DirectorTaxYearSchema.safeParse('2023-2024');
+    it('should reject "2024-2025"', () => {
+      const result = DirectorTaxYearSchema.safeParse('2024-2025');
       expect(result.success).toBe(false);
     });
 
@@ -558,7 +558,7 @@ describe('Constants', () => {
   });
 
   it('should export correct DIRECTOR_TAX_YEARS', () => {
-    expect(DIRECTOR_TAX_YEARS).toEqual(['2025-2026', '2024-2025']);
+    expect(DIRECTOR_TAX_YEARS).toEqual(['2026-2027', '2025-2026']);
   });
 
   it('should export correct CALCULATION_MODES', () => {

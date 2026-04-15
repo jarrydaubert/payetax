@@ -15,7 +15,7 @@
  */
 
 import type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
-import { areCookiesAccepted } from '@/lib/cookieUtils';
+import { isAnalyticsConsented } from '@/lib/cookieUtils';
 
 export type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 
@@ -80,7 +80,7 @@ export interface SEOAnalyticsData {
 export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {}): void {
   try {
     // Respect user consent - only track if cookies accepted
-    if (!areCookiesAccepted()) {
+    if (!isAnalyticsConsented()) {
       return;
     }
 
@@ -128,7 +128,7 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
 export function trackEvent(event: AnalyticsEvent): void {
   try {
     // Respect user consent - only track if cookies accepted
-    if (!areCookiesAccepted()) {
+    if (!isAnalyticsConsented()) {
       return;
     }
 

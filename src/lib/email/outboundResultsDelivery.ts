@@ -1,4 +1,4 @@
-import type { PayPeriod, TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type PayPeriod, type TaxYear } from '@/constants/taxRates';
 import {
   generateDirectorEmailHtml,
   generateDirectorEmailText,
@@ -10,7 +10,8 @@ import {
   generatePayeEmailText,
 } from '@/lib/email/payeResultsEmail';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
-import { calculateTax, type TaxCalculationInput } from '@/lib/taxCalculator';
+import { calculateTax } from '@/lib/taxCalculator';
+import type { TaxCalculationInput } from '@/lib/types/calculator';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorEmailInput, PayeEmailInput } from '@/lib/validation/emailValidation';
 
@@ -53,7 +54,7 @@ export function sendDirectorResultsEmail(args: {
   input: DirectorEmailInput;
   taxYear?: string;
 }): Promise<OutboundResultsDeliveryResult> {
-  const normalizedTaxYear = (args.taxYear ?? '2025-2026') as TaxYear;
+  const normalizedTaxYear = (args.taxYear ?? CURRENT_TAX_YEAR) as TaxYear;
   const comparison = calculateStrategyComparison(args.input, normalizedTaxYear);
   const strategies = {
     allSalary: comparison.strategies.allSalary,

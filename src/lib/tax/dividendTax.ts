@@ -11,17 +11,18 @@
  * ## Key Rules
  *
  * 1. Dividends use UK rates for ALL UK residents (including Scottish)
- * 2. The dividend allowance (£500 for 2025-26) is tax-free
+ * 2. The dividend allowance is tax-free up to the current tax-year threshold
  * 3. Dividends "stack" on top of other income for band calculation
  * 4. Dividend rates are lower than income tax rates (to account for CT already paid)
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { DIVIDEND_RATES, TAX_RATES } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  DIVIDEND_TAX_RATES,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
 import { roundToPence } from './utils';
-
-// Re-export for backwards compatibility with existing imports
-export { DIVIDEND_RATES } from '@/constants/taxRates';
 
 // ============================================================================
 // TYPES
@@ -79,7 +80,7 @@ export interface DividendTaxResult {
  *
  * @param dividends - Total dividend amount to be taxed
  * @param otherIncome - Other taxable income (e.g., salary) - for band calculation
- * @param taxYear - Tax year for rates (defaults to 2025-2026)
+ * @param taxYear - Tax year for rates (defaults to the latest supported tax year)
  * @returns Full calculation result with breakdown
  *
  * @example
@@ -96,7 +97,7 @@ export interface DividendTaxResult {
 export function calculateDividendTax(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): DividendTaxResult {
   // Handle invalid, zero, or negative dividends
   if (!Number.isFinite(dividends) || dividends <= 0) {
@@ -138,7 +139,7 @@ export function calculateDividendTax(
   // which is the cumulative taxable income amount (37700)
   const higherBandEnd = rates.bands[1]?.threshold ?? Number.POSITIVE_INFINITY;
 
-  const { BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_RATES;
+  const { BASIC_RATE, HIGHER_RATE, ADDITIONAL_RATE } = DIVIDEND_TAX_RATES[taxYear];
   const dividendAllowance = rates.dividendAllowance;
 
   // Step 1: Calculate unused Personal Allowance that can shelter dividends
@@ -284,7 +285,7 @@ export function calculateDividendTax(
 export function getDividendTax(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): number {
   return calculateDividendTax(dividends, otherIncome, taxYear).dividendTax;
 }
@@ -300,7 +301,7 @@ export function getDividendTax(
 export function getEffectiveDividendRate(
   dividends: number,
   otherIncome: number,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): number {
   return calculateDividendTax(dividends, otherIncome, taxYear).effectiveRate;
 }

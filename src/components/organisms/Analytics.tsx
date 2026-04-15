@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { initCoreWebVitals, trackEvent } from '@/lib/analytics';
-import { areCookiesAccepted } from '@/lib/cookieUtils';
+import { isAnalyticsConsented, isConsentPreferences } from '@/lib/cookieUtils';
 
 import type { GtagFunction } from '@/types/gtag';
 
@@ -17,8 +17,8 @@ const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
 declare global {
   interface Window {
     gtag?: GtagFunction;
-    dataLayer: unknown[];
-    consentMode: {
+    dataLayer: IArguments[];
+    consentMode?: {
       isConsentGiven: boolean;
     };
   }
@@ -134,7 +134,7 @@ export function Analytics() {
     if (!(isLoaded && window?.gtag)) return;
 
     // Check if user previously gave consent (respects 12-month expiry)
-    const hasConsent = areCookiesAccepted();
+    const hasConsent = isAnalyticsConsented();
 
     // Store in window for other components to access
     window.consentMode = {
@@ -158,7 +158,7 @@ export function Analytics() {
     if (!(isLoaded && GA_MEASUREMENT_ID)) return;
 
     // Only track page views if consent is given (respects 12-month expiry)
-    const hasConsent = areCookiesAccepted();
+    const hasConsent = isAnalyticsConsented();
     if (!(hasConsent && window.gtag)) return;
 
     // Construct full URL for tracking
@@ -185,23 +185,18 @@ export function Analytics() {
     const parseAnalyticsConsentValue = (value: string | null): boolean => {
       if (value === 'accepted') return true;
       if (value === 'declined') return false;
-      if (!value) return areCookiesAccepted();
+      if (!value) return isAnalyticsConsented();
 
       try {
         const parsed: unknown = JSON.parse(value);
-        if (
-          parsed &&
-          typeof parsed === 'object' &&
-          'analytics' in parsed &&
-          typeof parsed.analytics === 'boolean'
-        ) {
+        if (isConsentPreferences(parsed)) {
           return parsed.analytics;
         }
       } catch {
-        return areCookiesAccepted();
+        return isAnalyticsConsented();
       }
 
-      return areCookiesAccepted();
+      return isAnalyticsConsented();
     };
 
     const handleStorageChange = (e: StorageEvent) => {
@@ -215,7 +210,7 @@ export function Analytics() {
     };
 
     const handleConsentUpdate = () => {
-      const newConsent = areCookiesAccepted();
+      const newConsent = isAnalyticsConsented();
       updateConsent(newConsent);
     };
 

@@ -15,10 +15,10 @@ jest.mock('../utils', () => ({
 
 describe('Tax Rate Descriptions', () => {
   describe('getTaxRateDescription', () => {
-    test('should generate description for default tax year (2025-2026)', () => {
+    test('should generate description for default tax year (2026-2027)', () => {
       const description = getTaxRateDescription();
 
-      expect(description).toContain('2025-2026 tax year');
+      expect(description).toContain('2026-2027 tax year');
       expect(description).toContain('2000% basic rate');
       expect(description).toContain('4000% higher rate');
       expect(description).toContain('4500% additional rate');
@@ -82,14 +82,14 @@ describe('Tax Rate Descriptions', () => {
     });
 
     test('should handle infinity threshold for additional rate', () => {
-      const description = getTaxRateDescription('2025-2026');
+      const description = getTaxRateDescription('2026-2027');
 
       // Should specifically mention "above" for the additional rate with infinity threshold
       expect(description).toContain('4500% additional rate (above £125,140)');
     });
 
     test('should format currency amounts properly', () => {
-      const description = getTaxRateDescription('2025-2026');
+      const description = getTaxRateDescription('2026-2027');
 
       // Check that formatCurrency is called and amounts are formatted
       expect(description).toContain('£12,570');
@@ -100,26 +100,26 @@ describe('Tax Rate Descriptions', () => {
   });
 
   describe('getCurrentTaxYearLabel', () => {
-    test('should return current tax year when 2025-2026 data exists', () => {
+    test('should return current tax year when 2026-2027 data exists', () => {
       const label = getCurrentTaxYearLabel();
-      expect(label).toBe('2025-2026');
+      expect(label).toBe('2026-2027');
     });
 
-    test('should return fallback when 2025-2026 data does not exist', () => {
-      // Mock scenario where 2025-2026 data is not available
-      const original2025Data = TAX_RATES['2025-2026'];
-      (TAX_RATES as Record<string, unknown>)['2025-2026'] = undefined;
+    test('should return fallback when 2026-2027 data does not exist', () => {
+      // Mock scenario where 2026-2027 data is not available
+      const originalCurrentData = TAX_RATES['2026-2027'];
+      (TAX_RATES as Record<string, unknown>)['2026-2027'] = undefined;
 
       const label = getCurrentTaxYearLabel();
       expect(label).toBe('current tax year');
 
       // Restore original data
-      TAX_RATES['2025-2026'] = original2025Data;
+      TAX_RATES['2026-2027'] = originalCurrentData;
     });
   });
 
   describe('getPersonalAllowance', () => {
-    test('should return personal allowance for default tax year (2025-2026)', () => {
+    test('should return personal allowance for default tax year (2026-2027)', () => {
       const allowance = getPersonalAllowance();
       expect(allowance).toBe(12570);
     });

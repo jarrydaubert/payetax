@@ -1,9 +1,5 @@
-// src/lib/mdx.ts
 /**
- * Native Next.js 16 MDX utilities
- * File-system based approach using gray-matter for frontmatter parsing
- * Direct MDX compilation with rehype/remark plugins
- * OPTIMIZED: Cache Components, performance monitoring, and efficient syntax highlighting
+ * Native Next.js 16 MDX utilities for blog content.
  */
 
 import fs from 'node:fs';
@@ -12,10 +8,12 @@ import matter from 'gray-matter';
 import { cacheLife, cacheTag } from 'next/cache';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import type { ReactNode } from 'react';
-import rehypePrettyCode from 'rehype-pretty-code';
+import rehypePrettyCode, {
+  type CharsElement,
+  type LineElement,
+  type Options,
+} from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
-// Note: rehypeAutolinkHeadings removed - custom heading components in mdx-components.tsx
-// already render anchor links with Hash icons, so using both creates duplicates
 import remarkGfm from 'remark-gfm';
 import { mdxComponents } from '@/components/molecules/mdx-components';
 import type { BlogPostFrontmatter } from '@/types/blog';
@@ -118,27 +116,22 @@ export function getPostBySlug(slug: string) {
   };
 }
 
-/**
- * Optimized rehype-pretty-code configuration for better performance
- * PAYTAX-77: Reduced complexity while maintaining quality syntax highlighting
- */
 const REHYPE_PRETTY_CODE_OPTIONS = {
   theme: 'one-dark-pro',
   keepBackground: false,
-  // OPTIMIZATION: Simplified line/word highlighting for better performance
-  onVisitLine(node: { children: unknown[] }) {
-    // Prevent empty lines from collapsing
+  onVisitLine(node: LineElement) {
+    // Keep empty highlighted lines visible.
     if (node.children.length === 0) {
       node.children = [{ type: 'text', value: ' ' }];
     }
   },
-  onVisitHighlightedLine(node: { properties: { className: string[] } }) {
-    node.properties.className.push('line--highlighted');
+  onVisitHighlightedLine(node: LineElement) {
+    node.properties.className = [...(node.properties.className ?? []), 'line--highlighted'];
   },
-  onVisitHighlightedWord(node: { properties: { className: string[] } }) {
+  onVisitHighlightedChars(node: CharsElement) {
     node.properties.className = ['word--highlighted'];
   },
-} as const;
+} satisfies Options;
 
 /**
  * Internal MDX compilation function
@@ -153,12 +146,7 @@ async function compileMDXInternal(content: string): Promise<ReactNode> {
       parseFrontmatter: false, // Already parsed with gray-matter
       mdxOptions: {
         remarkPlugins: [remarkGfm],
-        rehypePlugins: [
-          rehypeSlug, // Adds id attributes to headings
-          [rehypePrettyCode, REHYPE_PRETTY_CODE_OPTIONS],
-          // Note: rehypeAutolinkHeadings intentionally omitted
-          // Custom heading components in mdx-components.tsx handle anchor links
-        ],
+        rehypePlugins: [rehypeSlug, [rehypePrettyCode, REHYPE_PRETTY_CODE_OPTIONS]],
       },
     },
   });

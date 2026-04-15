@@ -168,6 +168,19 @@ async function waitForInputProcessed(page: Page): Promise<void> {
   }
 }
 
+async function selectTaxYear(page: Page, taxYear: string): Promise<void> {
+  const taxYearSelect = page.getByTestId('tax-year-select');
+  const selectExists = await taxYearSelect.isVisible({ timeout: 2000 }).catch(() => false);
+
+  if (!selectExists) {
+    throw new Error(`❌ INPUT FAILED: Tax year selector not found while selecting "${taxYear}".`);
+  }
+
+  await taxYearSelect.click();
+  await page.getByRole('option', { name: taxYear, exact: true }).click();
+  await waitForInputProcessed(page);
+}
+
 // ============================================================================
 // TEST SUITE
 // ============================================================================
@@ -227,7 +240,12 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
       await salaryInput.fill(input.salary.toString());
       await waitForInputProcessed(page);
 
-      // 2. Tax Code (if not default)
+      // 2. Tax Year (if specified)
+      if (scenario.taxYear) {
+        await selectTaxYear(page, scenario.taxYear);
+      }
+
+      // 3. Tax Code (if not default)
       if (input.taxCode && input.taxCode !== '1257L') {
         const taxCodeInput = page.getByTestId('tax-code-input');
         const exists = await taxCodeInput.isVisible({ timeout: 2000 }).catch(() => false);
@@ -237,7 +255,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 3. Region (if not England)
+      // 4. Region (if not England)
       if (input.region && input.region !== 'England') {
         const regionSelect = page.getByTestId('region-select');
         const exists = await regionSelect.isVisible({ timeout: 2000 }).catch(() => false);
@@ -248,7 +266,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 4. Pension (if specified)
+      // 5. Pension (if specified)
       if (input.pensionPercent && input.pensionPercent > 0) {
         const pensionInput = page.getByTestId('pension-input');
         const pensionVisible = await pensionInput.isVisible({ timeout: 2000 }).catch(() => false);
@@ -260,7 +278,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 5. Student Loan (if specified)
+      // 6. Student Loan (if specified)
       if (input.studentLoan && input.studentLoan !== 'none') {
         const loans = Array.isArray(input.studentLoan) ? input.studentLoan : [input.studentLoan];
 
@@ -299,7 +317,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 6. Marriage Allowance (if specified)
+      // 7. Marriage Allowance (if specified)
       if (input.isMarried) {
         const marriedCheckbox = page.getByTestId('married-checkbox');
         const exists = await marriedCheckbox.isVisible({ timeout: 2000 }).catch(() => false);
@@ -320,7 +338,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 7. Children (for HICBC)
+      // 8. Children (for HICBC)
       if (input.childrenUnder18) {
         const childrenInput = page.getByTestId('children-input');
         const exists = await childrenInput.isVisible({ timeout: 2000 }).catch(() => false);

@@ -12,8 +12,11 @@
 //
 // If you find hardcoded tax values elsewhere, that's a bug - please refactor to use this file.
 //
-// Updated: 2025-04-06 for tax year 2025-2026
-// Source: https://www.gov.uk/income-tax-rates
+// Updated: 2026-04-15 for tax year 2026-2027
+// Sources:
+// - https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
+// - https://www.gov.uk/government/publications/budget-2025-overview-of-tax-legislation-and-rates-ootlar/annex-a-rates-and-allowances
+// - https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/
 
 // Default tax code
 export const DEFAULT_TAX_CODE = '1257L';
@@ -46,7 +49,7 @@ export const WORKING_DAYS_PER_YEAR = 260;
 
 // Types
 export type PayPeriod = (typeof PERIODS)[keyof typeof PERIODS];
-export type TaxYear = '2023-2024' | '2024-2025' | '2025-2026';
+export type TaxYear = '2023-2024' | '2024-2025' | '2025-2026' | '2026-2027';
 export type TaxBand = { name: string; rate: number; threshold: number };
 export type StudentLoanPlan = 'plan1' | 'plan2' | 'plan4' | 'plan5' | 'postgrad';
 export type StudentLoanSelection = StudentLoanPlan[] | 'none';
@@ -69,7 +72,7 @@ export interface TaxAllowance {
 }
 
 // Available tax years (newest to oldest)
-export const TAX_YEARS: TaxYear[] = ['2025-2026', '2024-2025', '2023-2024'];
+export const TAX_YEARS: TaxYear[] = ['2026-2027', '2025-2026', '2024-2025', '2023-2024'];
 export const CURRENT_TAX_YEAR: TaxYear = TAX_YEARS[0] as TaxYear;
 
 /**
@@ -98,6 +101,42 @@ export interface TaxYearLegislativeSources {
 }
 
 export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
+  '2026-2027': {
+    incomeTax: {
+      ukMainBands: [
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
+        'https://www.gov.uk/government/publications/budget-2025-overview-of-tax-legislation-and-rates-ootlar/annex-a-rates-and-allowances',
+      ],
+      scotlandBands: [
+        'https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/',
+      ],
+    },
+    nationalInsurance: {
+      employeeAndEmployerClass1: [
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
+        'https://www.gov.uk/government/publications/budget-2025-overview-of-tax-legislation-and-rates-ootlar/annex-a-rates-and-allowances',
+      ],
+      employmentAllowanceAndClass1A: [
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
+        'https://www.gov.uk/claim-employment-allowance',
+      ],
+    },
+    dividends: {
+      allowanceAndRates: [
+        'https://www.gov.uk/government/publications/budget-2025-overview-of-tax-legislation-and-rates-ootlar/annex-a-rates-and-allowances',
+      ],
+    },
+    studentLoan: {
+      plansAndThresholds: [
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
+      ],
+    },
+    verifiedOn: '2026-04-15',
+    notes: [
+      '2026-27 dividend ordinary and upper rates increased, while the dividend allowance remained at £500.',
+      'Scottish starter and basic thresholds increased for 2026-27; higher and above remain aligned to published Scottish Budget tables.',
+    ],
+  },
   '2023-2024': {
     incomeTax: {
       ukMainBands: ['https://www.gov.uk/income-tax-rates'],
@@ -236,6 +275,92 @@ export const TAX_RATES: Record<
     };
   }
 > = {
+  '2026-2027': {
+    personalAllowance: 12570,
+    personalAllowanceReductionThreshold: 100000,
+    personalAllowanceReductionRate: 0.5,
+    bands: [
+      { name: 'Basic rate', rate: 20, threshold: 37700 },
+      { name: 'Higher rate', rate: 40, threshold: 125140 },
+      { name: 'Additional rate', rate: 45, threshold: Number.POSITIVE_INFINITY },
+    ],
+    marriageAllowance: 1260,
+    blindPersonsAllowance: 3250,
+    dividendAllowance: 500,
+    vatRegistrationThreshold: 90000,
+    hicbc: {
+      start: 60000,
+      end: 80000,
+    },
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
+    nationalInsurance: {
+      employee: {
+        A: {
+          primary: { threshold: 12570, rate: 8 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+        B: {
+          primary: { threshold: 12570, rate: 1.85 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+        C: {
+          primary: { threshold: 12570, rate: 0 },
+          upper: { threshold: 50270, rate: 0 },
+        },
+        H: {
+          primary: { threshold: 12570, rate: 8 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+        J: {
+          primary: { threshold: 12570, rate: 2 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+        M: {
+          primary: { threshold: 12570, rate: 8 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+        Z: {
+          primary: { threshold: 12570, rate: 2 },
+          upper: { threshold: 50270, rate: 2 },
+        },
+      },
+      employer: {
+        A: {
+          secondary: { threshold: 5000, rate: 15 },
+        },
+        B: {
+          secondary: { threshold: 5000, rate: 15 },
+        },
+        C: {
+          secondary: { threshold: 5000, rate: 15 },
+        },
+        H: {
+          secondary: { threshold: 50270, rate: 15 },
+        },
+        J: {
+          secondary: { threshold: 5000, rate: 15 },
+        },
+        M: {
+          secondary: { threshold: 50270, rate: 15 },
+        },
+        Z: {
+          secondary: { threshold: 50270, rate: 15 },
+        },
+      },
+      employmentAllowance: 10500,
+      class1A: { rate: 15 },
+      lowerEarningsLimit: 6708,
+    },
+    studentLoan: {
+      plan1: { threshold: 26900, rate: 9 },
+      plan2: { threshold: 29385, rate: 9 },
+      plan4: { threshold: 33795, rate: 9 },
+      plan5: { threshold: 25000, rate: 9 },
+      postgrad: { threshold: 21000, rate: 6 },
+    },
+  },
   '2023-2024': {
     personalAllowance: 12570,
     personalAllowanceReductionThreshold: 100000,
@@ -528,6 +653,24 @@ export const SCOTTISH_TAX_RATES: Record<
     ageAllowanceTaperThreshold: number;
   }
 > = {
+  '2026-2027': {
+    personalAllowance: 12570,
+    personalAllowanceReductionThreshold: 100000,
+    personalAllowanceReductionRate: 0.5,
+    bands: [
+      { name: 'Starter rate', rate: 19, threshold: 3967 },
+      { name: 'Basic rate', rate: 20, threshold: 16956 },
+      { name: 'Intermediate rate', rate: 21, threshold: 31092 },
+      { name: 'Higher rate', rate: 42, threshold: 62430 },
+      { name: 'Advanced rate', rate: 45, threshold: 112570 },
+      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY },
+    ],
+    marriageAllowance: 1260,
+    blindPersonsAllowance: 3250,
+    ageAllowance65to74: 3660,
+    ageAllowance75plus: 3960,
+    ageAllowanceTaperThreshold: 34600,
+  },
   '2023-2024': {
     personalAllowance: 12570,
     personalAllowanceReductionThreshold: 100000,
@@ -596,29 +739,49 @@ export const SCOTTISH_TAX_RATES: Record<
 };
 
 // ============================================================================
-// DIVIDEND TAX RATES (2024-25 and 2025-26)
+// DIVIDEND TAX RATES
 // ============================================================================
 //
 // Dividend tax rates for UK shareholders. These rates apply after the
 // dividend allowance and are based on the individual's income tax band.
 //
-// IMPORTANT: Rates may change in future tax years (e.g., 2026-27 Budget proposals).
 // For the dividend allowance, always use TAX_RATES[year].dividendAllowance (year-specific).
 //
 // @see https://www.gov.uk/tax-on-dividends
 
-export const DIVIDEND_RATES = {
-  /** Basic rate (8.75%) - for income within basic rate band */
-  BASIC_RATE: 0.0875,
+export const DIVIDEND_TAX_RATES: Record<
+  TaxYear,
+  {
+    BASIC_RATE: number;
+    HIGHER_RATE: number;
+    ADDITIONAL_RATE: number;
+  }
+> = {
+  '2023-2024': {
+    BASIC_RATE: 0.0875,
+    HIGHER_RATE: 0.3375,
+    ADDITIONAL_RATE: 0.3935,
+  },
+  '2024-2025': {
+    BASIC_RATE: 0.0875,
+    HIGHER_RATE: 0.3375,
+    ADDITIONAL_RATE: 0.3935,
+  },
+  '2025-2026': {
+    BASIC_RATE: 0.0875,
+    HIGHER_RATE: 0.3375,
+    ADDITIONAL_RATE: 0.3935,
+  },
+  '2026-2027': {
+    BASIC_RATE: 0.1075,
+    HIGHER_RATE: 0.3575,
+    ADDITIONAL_RATE: 0.3935,
+  },
+};
 
-  /** Higher rate (33.75%) - for income within higher rate band */
-  HIGHER_RATE: 0.3375,
+export const DIVIDEND_RATES = DIVIDEND_TAX_RATES[CURRENT_TAX_YEAR];
 
-  /** Additional rate (39.35%) - for income above £125,140 */
-  ADDITIONAL_RATE: 0.3935,
-} as const;
-
-export type DividendRates = typeof DIVIDEND_RATES;
+export type DividendRates = (typeof DIVIDEND_TAX_RATES)[TaxYear];
 
 // ============================================================================
 // CORPORATION TAX RATES (April 2023 onwards)

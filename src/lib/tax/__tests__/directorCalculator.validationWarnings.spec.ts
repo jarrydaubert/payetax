@@ -329,11 +329,11 @@ describe('Validation Edge Cases', () => {
     it('should reject invalid student loan plan', () => {
       const input = {
         profit: 100000,
-        studentLoanPlans: ['plan5'], // Not valid until April 2026
+        studentLoanPlans: ['plan5'], // Still intentionally excluded from director flows
       };
       const result = validateInput(input);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Student loan plan plan5 is not available for 2025-2026');
+      expect(result.errors).toContain('Student loan plan plan5 is not available for 2026-2027');
     });
 
     it('should handle NaN profit gracefully', () => {

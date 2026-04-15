@@ -13,16 +13,9 @@ import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
-
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 
 export function PensionGapWarning() {
   const { comparison, activeScenario } = useActiveDirectorScenario();
@@ -60,8 +53,8 @@ export function PensionGapWarning() {
           <div className='space-y-1 text-sm'>
             <p className='font-medium text-success'>State Pension: Qualifying Year</p>
             <p className='text-muted-foreground'>
-              Your {formatCurrency(currentSalary)} salary is above{' '}
-              {formatCurrency(lowerEarningsLimit)}, so this year counts toward your State Pension
+              Your {formatCurrency(currentSalary, 0)} salary is above{' '}
+              {formatCurrency(lowerEarningsLimit, 0)}, so this year counts toward your State Pension
               entitlement.
             </p>
           </div>
@@ -79,12 +72,14 @@ export function PensionGapWarning() {
           <div className='space-y-2 text-sm'>
             <p className='font-medium text-warning'>Warning: Inefficient Salary Zone</p>
             <p className='text-muted-foreground'>
-              At {formatCurrency(currentSalary)} salary, your company pays{' '}
-              {formatCurrency(employerNIBeingPaid)}/year in employer National Insurance, but you're{' '}
+              At {formatCurrency(currentSalary, 0)} salary, your company pays{' '}
+              {formatCurrency(employerNIBeingPaid, 0)}/year in employer National Insurance, but
+              you're{' '}
               <strong className='text-foreground'>not earning any State Pension credits</strong>.
             </p>
             <p className='text-muted-foreground'>
-              Increase to {formatCurrency(lowerEarningsLimit)} (+{formatCurrency(extraMonthlyCost)}
+              Increase to {formatCurrency(lowerEarningsLimit, 0)} (+
+              {formatCurrency(extraMonthlyCost, 0)}
               /month employer cost) to make this a qualifying year for your pension.
             </p>
           </div>
@@ -108,9 +103,9 @@ export function PensionGapWarning() {
               </>
             ) : (
               <>
-                Your {formatCurrency(currentSalary)} salary is below{' '}
-                {formatCurrency(secondaryThreshold)}, so there's no employer National Insurance cost
-                — but also no pension credits.
+                Your {formatCurrency(currentSalary, 0)} salary is below{' '}
+                {formatCurrency(secondaryThreshold, 0)}, so there's no employer National Insurance
+                cost — but also no pension credits.
               </>
             )}
           </p>

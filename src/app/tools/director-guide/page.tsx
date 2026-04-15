@@ -2,10 +2,11 @@
 
 import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 
 export const metadata = generateBaseMetadata({
-  title: 'Director Pay Dashboard | Salary & Dividend Calculator 2025-26',
+  title: `Director Pay Dashboard | Salary & Dividend Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`,
   description:
     'Free calculator for UK company directors. Compare salary and dividend scenarios and see estimated tax to set aside.',
   keywords:
@@ -39,7 +40,7 @@ export default function DirectorGuidePage() {
   // FAQ schema - uses softer language to avoid over-specific claims that may drift
   const faqItems = [
     {
-      question: 'How do salary and dividends compare for company directors in 2025-26?',
+      question: `How do salary and dividends compare for company directors in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}?`,
       answer:
         'Salary uses your Personal Allowance and can help build State Pension credits, while dividends are often taxed at different rates. The right mix depends on profits, Employment Allowance eligibility, and your wider income.',
     },

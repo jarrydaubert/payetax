@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { type NICategory, TAX_RATES } from '@/constants/taxRates';
-import { cn } from '@/lib/utils';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
+import { CURRENT_TAX_YEAR, type NICategory, TAX_RATES } from '@/constants/taxRates';
+import { cn, formatCurrency } from '@/lib/utils';
 
-const TAX_YEAR = '2025-2026' as const;
+const TAX_YEAR = CURRENT_TAX_YEAR;
 const niRates = TAX_RATES[TAX_YEAR].nationalInsurance;
 
 const EXAMPLE_SALARIES = [25000, 35000, 50000, 70000, 100000];
@@ -56,15 +57,6 @@ function calculateNI(salary: number, category: NICategory): { employee: number; 
     employee: Math.round(employeeNI),
     employer: Math.round(employerNI),
   };
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 export function NICalculatorClient() {
@@ -125,7 +117,7 @@ export function NICalculatorClient() {
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
-          National Insurance Calculator 2025-26
+          National Insurance Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
           Calculate your employee and employer National Insurance contributions. NI is separate from
@@ -275,24 +267,24 @@ export function NICalculatorClient() {
               <div className='rounded-lg border border-success/30 bg-success/10 p-4'>
                 <p className='mb-1 font-medium text-sm text-success'>Your NI (Employee)</p>
                 <p className='font-bold text-2xl text-foreground'>
-                  {formatCurrency(result.employee)}
+                  {formatCurrency(result.employee, 0)}
                 </p>
                 <p className='text-sm text-success'>
-                  {formatCurrency(Math.round(result.employee / 12))}/month
+                  {formatCurrency(Math.round(result.employee / 12), 0)}/month
                 </p>
               </div>
               <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 <p className='mb-1 font-medium text-sm text-warning'>Employer NI</p>
                 <p className='font-bold text-2xl text-foreground'>
-                  {formatCurrency(result.employer)}
+                  {formatCurrency(result.employer, 0)}
                 </p>
                 <p className='text-sm text-warning'>
-                  {formatCurrency(Math.round(result.employer / 12))}/month
+                  {formatCurrency(Math.round(result.employer / 12), 0)}/month
                 </p>
               </div>
               <div className='rounded-lg border border-border/50 bg-card p-4'>
                 <p className='mb-1 font-medium text-muted-foreground text-sm'>Total NI Cost</p>
-                <p className='font-bold text-2xl'>{formatCurrency(result.total)}</p>
+                <p className='font-bold text-2xl'>{formatCurrency(result.total, 0)}</p>
                 <p className='text-muted-foreground text-sm'>Employment cost to employer</p>
               </div>
             </div>
@@ -315,7 +307,7 @@ export function NICalculatorClient() {
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <HelpCircle className={ICON_SIZES.SIZE_5} />
-            NI Rates 2025-26
+            NI Rates {CURRENT_TAX_YEAR_DISPLAY_SHORT}
           </CardTitle>
           <CardDescription>Current National Insurance thresholds and rates.</CardDescription>
         </CardHeader>
@@ -356,7 +348,9 @@ export function NICalculatorClient() {
 
             {/* Employer Rates */}
             <div>
-              <h3 className='mb-3 font-semibold'>Employer NI (2025-26 changes)</h3>
+              <h3 className='mb-3 font-semibold'>
+                Employer NI ({CURRENT_TAX_YEAR_DISPLAY_SHORT} changes)
+              </h3>
               <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 <div className='flex items-start gap-2'>
                   <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-warning')} />

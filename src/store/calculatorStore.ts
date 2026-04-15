@@ -52,11 +52,14 @@ import {
   setContext,
   startPerformanceTransaction,
 } from '@/lib/sentry';
-import { calculateTax, type TaxCalculationResults } from '@/lib/taxCalculator';
+import { calculateTax } from '@/lib/taxCalculator';
 import {
+  INCOME_SOURCE_TYPES,
   INCOME_TYPE_LABELS,
   type IncomeSource,
   IncomeSourceUpdateSchema,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
 } from '@/lib/types/calculator';
 import { useShallow } from '@/lib/zustandShallow';
 
@@ -188,47 +191,14 @@ const ALLOWANCES_DEDUCTIONS_INPUT_SCHEMA = z
   .finite('Allowances/deductions must be a valid number');
 
 /**
- * Interface defining all inputs required for tax calculations
- * These values are collected from the UI and passed to the calculation engine
+ * Calculator store input mirrors the shared tax engine contract, with income sources required
+ * because the store always keeps them materialized in state.
  */
-interface CalculatorInput {
-  /** Gross salary amount in the specified pay period */
-  salary: number;
-  /** How often the salary is paid (annually, monthly, weekly, etc.) */
-  payPeriod: PayPeriod;
-  /** Tax year to use for rates and thresholds */
-  taxYear: TaxYear;
-  /** HMRC tax code (e.g., 1257L, S1257L) */
-  taxCode: string;
-  /** Tax region (England, Scotland, Wales, Northern Ireland) */
-  region: 'England' | 'Scotland' | 'Wales' | 'Northern Ireland';
-  /** Whether Scottish tax rates apply (derived from region) */
-  isScottish: boolean;
-  /** Whether married/civil partnership for marriage allowance */
-  isMarried: boolean;
-  /** Partner's gross wage for marriage allowance calculation */
-  partnerGrossWage: number;
-  /** Whether blind person's allowance applies */
-  isBlind: boolean;
-  /** Age of the taxpayer (for age-related allowances and NI exemptions) */
-  age?: number;
-  /** Whether paying no National Insurance (e.g., over state pension age) */
-  payNoNI: boolean;
-  /** Student loan plans (can select multiple, or 'none') */
-  studentLoanPlans: StudentLoanSelection;
-  /** Pension contribution amount */
-  pensionContribution: number;
-  /** Whether pension contribution is a percentage or fixed amount */
-  pensionContributionType: 'percentage' | 'amount';
-  /** National Insurance category (A, B, C, etc.) */
-  niCategory: NICategory;
-  /** Hours worked per week (for hourly rate calculations) */
-  hoursPerWeek: number;
-  /** Additional allowances or deductions (annual) */
-  allowancesDeductions: number;
-  /** Additional income sources (pensions, rental, etc.) */
+type CalculatorInput = Omit<TaxCalculationInput, 'incomeSources' | 'allowancesDeductions'> & {
   incomeSources: IncomeSource[];
-}
+  region: 'England' | 'Scotland' | 'Wales' | 'Northern Ireland';
+  allowancesDeductions: number;
+};
 
 // Interface for calculation results
 type CalculationResults = TaxCalculationResults | null;
@@ -546,7 +516,7 @@ const defaultInput: CalculatorInput = {
 const PersistedIncomeSourceSchema = z
   .object({
     id: z.string().min(1),
-    type: z.enum(['employment', 'pension', 'statePension', 'rental', 'investment', 'other']),
+    type: z.enum(INCOME_SOURCE_TYPES),
     label: z.string().max(100).optional(),
     amount: z.number().finite().nonnegative().max(10_000_000),
     period: PAY_PERIOD_INPUT_SCHEMA,
@@ -611,71 +581,51 @@ export const useCalculatorStore = create<CalculatorState>()(
 
         // Input actions
         setSalary: (salary) => {
-          // Validate salary input
-          try {
-            const validated = SALARY_INPUT_SCHEMA.safeParse(salary);
+          const validated = SALARY_INPUT_SCHEMA.safeParse(salary);
 
-            if (!validated.success) {
-              // Expected user behavior - don't log as warning (Sentry captures console.warn)
-              return;
-            }
-
-            // Add breadcrumb for debugging
-            addBreadcrumb('calculator-input', {
-              message: 'Salary updated',
-              level: 'info',
-              data: { salary: validated.data },
-            });
-
-            set((state) => ({ input: { ...state.input, salary: validated.data } }));
-          } catch (_error) {
-            // Zod v4 can throw in edge cases - silently ignore in production
-            // Error already handled by Zod validation feedback
+          if (!validated.success) {
+            return;
           }
+
+          addBreadcrumb('calculator-input', {
+            message: 'Salary updated',
+            level: 'info',
+            data: { salary: validated.data },
+          });
+
+          set((state) => ({ input: { ...state.input, salary: validated.data } }));
         },
         setPayPeriod: (payPeriod) => {
-          // Validate pay period - include all valid periods from PERIODS constant
-          try {
-            const validated = PAY_PERIOD_INPUT_SCHEMA.safeParse(payPeriod);
+          const validated = PAY_PERIOD_INPUT_SCHEMA.safeParse(payPeriod);
 
-            if (!validated.success) {
-              // Invalid pay period - just log and don't update state
-              logCalculatorWarning(
-                '[Calculator] Invalid pay period:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-              return;
-            }
-
-            set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
-          } catch (error) {
-            // Zod v4 can throw in some edge cases even with safeParse
-            logCalculatorWarning('[Calculator] Pay period validation error:', error);
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid pay period:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
           }
+
+          set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
         },
         setTaxYear: (taxYear) => {
-          try {
-            const validated = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYear);
+          const validated = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYear);
 
-            if (!validated.success) {
-              logCalculatorWarning(
-                '[Calculator] Invalid tax year:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-              return;
-            }
-
-            const normalized = normalizeTaxYear(validated.data);
-            if (!TAX_RATES[normalized]) {
-              logCalculatorWarning('[Calculator] Unsupported tax year:', normalized);
-              return;
-            }
-
-            set((state) => ({ input: { ...state.input, taxYear: normalized } }));
-          } catch (error) {
-            // Zod v4 can throw in some edge cases even with safeParse
-            logCalculatorWarning('[Calculator] Tax year validation error:', error);
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid tax year:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
           }
+
+          const normalized = normalizeTaxYear(validated.data);
+          if (!TAX_RATES[normalized]) {
+            logCalculatorWarning('[Calculator] Unsupported tax year:', normalized);
+            return;
+          }
+
+          set((state) => ({ input: { ...state.input, taxYear: normalized } }));
         },
         setTaxCode: (taxCode) => {
           // Validate tax code format (allow empty for default)
@@ -684,50 +634,38 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          try {
-            const validated = TAX_CODE_INPUT_SCHEMA.safeParse(taxCode);
+          const validated = TAX_CODE_INPUT_SCHEMA.safeParse(taxCode);
 
-            if (!validated.success) {
-              // Invalid tax code - just log and don't update state
-              // This is expected user behavior, not an error
-              logCalculatorWarning(
-                '[Calculator] Invalid tax code:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-              return;
-            }
-
-            set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
-          } catch (error) {
-            // Zod v4 can throw in some edge cases even with safeParse
-            // This is expected user input validation, not an application error
-            logCalculatorWarning('[Calculator] Tax code validation error:', error);
+          if (!validated.success) {
+            // Invalid tax code - just log and don't update state
+            // This is expected user behavior, not an error
+            logCalculatorWarning(
+              '[Calculator] Invalid tax code:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
           }
+
+          set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
         },
         setRegion: (region) => {
-          // Validate region
-          try {
-            const validated = REGION_INPUT_SCHEMA.safeParse(region);
+          const validated = REGION_INPUT_SCHEMA.safeParse(region);
 
-            if (!validated.success) {
-              logCalculatorWarning(
-                '[Calculator] Invalid region:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-              return;
-            }
-
-            set((state) => ({
-              input: {
-                ...state.input,
-                region: validated.data,
-                isScottish: validated.data === 'Scotland',
-              },
-            }));
-          } catch (error) {
-            // Zod v4 can throw in some edge cases even with safeParse
-            logCalculatorWarning('[Calculator] Region validation error:', error);
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid region:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
           }
+
+          set((state) => ({
+            input: {
+              ...state.input,
+              region: validated.data,
+              isScottish: validated.data === 'Scotland',
+            },
+          }));
         },
         setIsScottish: (isScottish) => {
           // Validate boolean using extracted schema
@@ -1231,52 +1169,39 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         calculateWhatIf: () => {
-          try {
-            const { input, whatIf } = get();
+          const { input, whatIf } = get();
 
-            const currentSalary = input.salary;
+          const currentSalary = input.salary;
 
-            // Don't calculate if no salary entered
-            if (!currentSalary || currentSalary <= 0) {
-              logCalculatorWarning('Cannot calculate What If: No current salary');
-              return;
-            }
-            let newSalary: number;
-
-            // Calculate new salary based on What If type
-            switch (whatIf.type) {
-              case 'percentage': {
-                // Percentage increase/decrease
-                newSalary = currentSalary * (1 + whatIf.value / 100);
-                break;
-              }
-              case 'amount': {
-                // Fixed amount change
-                newSalary = currentSalary + whatIf.value;
-                break;
-              }
-              case 'total': {
-                // New total salary
-                newSalary = whatIf.value;
-                break;
-              }
-              default:
-                newSalary = currentSalary;
-            }
-
-            // Ensure non-negative
-            newSalary = Math.max(0, newSalary);
-
-            // Calculate tax with new salary
-            const whatIfInput = { ...input, salary: newSalary };
-            const whatIfResults = calculateTax(whatIfInput);
-
-            set({ whatIfResults });
-            reportCalculationAnomalies(whatIfResults, whatIfInput, 'what_if');
-          } catch (error) {
-            console.error('What If calculation error:', error);
-            set({ whatIfResults: null });
+          // Don't calculate if no salary entered
+          if (currentSalary <= 0) {
+            logCalculatorWarning('Cannot calculate What If: No current salary');
+            return;
           }
+
+          let newSalary: number;
+
+          switch (whatIf.type) {
+            case 'percentage':
+              newSalary = currentSalary * (1 + whatIf.value / 100);
+              break;
+            case 'amount':
+              newSalary = currentSalary + whatIf.value;
+              break;
+            case 'total':
+              newSalary = whatIf.value;
+              break;
+            default:
+              newSalary = currentSalary;
+          }
+
+          newSalary = Math.max(0, newSalary);
+
+          const whatIfInput = { ...input, salary: newSalary };
+          const whatIfResults = calculateTax(whatIfInput);
+
+          set({ whatIfResults });
+          reportCalculationAnomalies(whatIfResults, whatIfInput, 'what_if');
         },
 
         /**

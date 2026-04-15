@@ -12,8 +12,7 @@
  * @module lib/tax/warnings
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from './businessThresholds';
 
 // ============================================================================
@@ -94,7 +93,7 @@ const HIGH_COMPLEXITY_THRESHOLD = 10000000; // £10m+ is complex
  */
 export function getWarnings(input: WarningInput): Warning[] {
   const warnings: Warning[] = [];
-  const taxYear = input.taxYear ?? '2025-2026';
+  const taxYear = input.taxYear ?? CURRENT_TAX_YEAR;
   const rates = TAX_RATES[taxYear];
   const vatRegistrationThreshold = rates.vatRegistrationThreshold;
   const hicbcStart = rates.hicbc.start;

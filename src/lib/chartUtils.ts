@@ -6,7 +6,7 @@
  */
 
 import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
-import type { TaxCalculationResults } from './taxCalculator';
+import type { TaxCalculationResults } from '@/lib/types/calculator';
 import { formatCurrency } from './utils';
 
 // Get tax thresholds from the single source of truth

@@ -491,7 +491,7 @@ describe('Environment Variable Validation', () => {
     });
 
     it('should throw on invalid server env vars', () => {
-      process.env.NODE_ENV = 'invalid' as any;
+      process.env.NODE_ENV = 'invalid';
 
       expect(() => validateServerEnv()).toThrow('Invalid server environment variables');
     });

@@ -62,21 +62,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Only accept token-based unsubscribe (legacy email param removed for security)
   const tokenParam = request.nextUrl.searchParams.get('token');
-
   if (!tokenParam) {
-    // Check if legacy email param was used
-    if (request.nextUrl.searchParams.get('email')) {
-      console.warn('[newsletter/unsubscribe] Legacy email param rejected - tokens required');
-      return new NextResponse(
-        renderUnsubscribePage(
-          'This unsubscribe link has expired. Please use a link from a recent email.',
-          false,
-        ),
-        { status: 400, headers: SECURITY_HEADERS },
-      );
-    }
     return new NextResponse(renderUnsubscribePage('Missing unsubscribe token', false), {
       status: 400,
       headers: SECURITY_HEADERS,

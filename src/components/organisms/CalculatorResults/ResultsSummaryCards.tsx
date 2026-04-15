@@ -11,11 +11,8 @@ import { SPACING } from '@/constants/designTokens';
 import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
-import {
-  calculateTax,
-  type TaxCalculationInput,
-  type TaxCalculationResults,
-} from '@/lib/taxCalculator';
+import { calculateTax } from '@/lib/taxCalculator';
+import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultsSummaryCardsProps {

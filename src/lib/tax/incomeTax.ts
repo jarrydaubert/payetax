@@ -17,8 +17,12 @@
  * Scotland has different rates (starter, basic, intermediate, higher, advanced, top).
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  SCOTTISH_TAX_RATES,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
 import { roundToPence } from './utils';
 
@@ -51,13 +55,13 @@ export interface IncomeTaxResult {
  *
  * @param salary - Annual salary amount
  * @param region - 'rUK' or 'scotland' for rate determination
- * @param taxYear - Tax year for rates (defaults to 2025-2026)
+ * @param taxYear - Tax year for rates (defaults to the latest supported tax year)
  * @returns Full calculation result with breakdown
  */
 export function calculateIncomeTax(
   salary: number,
   region: Region,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): IncomeTaxResult {
   const rates = region === 'scotland' ? SCOTTISH_TAX_RATES[taxYear] : TAX_RATES[taxYear];
 
@@ -128,7 +132,7 @@ export function calculateIncomeTax(
 export function getIncomeTax(
   salary: number,
   region: Region,
-  taxYear: TaxYear = '2025-2026',
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): number {
   return calculateIncomeTax(salary, region, taxYear).incomeTax;
 }

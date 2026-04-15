@@ -9,25 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
-const MARRIAGE_ALLOWANCE = rates.marriageAllowance; // £1,260 for 2025-26
+const MARRIAGE_ALLOWANCE = rates.marriageAllowance;
 const PERSONAL_ALLOWANCE = rates.personalAllowance; // £12,570
 const BASIC_RATE_LIMIT = PERSONAL_ALLOWANCE + (rates.bands[0]?.threshold ?? 0);
 const TAX_SAVING = Math.round(MARRIAGE_ALLOWANCE * 0.2); // £252
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 type EligibilityStatus = 'eligible' | 'not_eligible';
 
@@ -51,7 +43,7 @@ function checkEligibility(transferorIncome: number, recipientIncome: number): El
     return {
       ...baseResult,
       status: 'not_eligible',
-      reason: `The lower earner must earn less than ${formatCurrency(PERSONAL_ALLOWANCE)} (the Personal Allowance) to transfer their unused allowance.`,
+      reason: `The lower earner must earn less than ${formatCurrency(PERSONAL_ALLOWANCE, 0)} (the Personal Allowance) to transfer their unused allowance.`,
     };
   }
 
@@ -60,7 +52,7 @@ function checkEligibility(transferorIncome: number, recipientIncome: number): El
     return {
       ...baseResult,
       status: 'not_eligible',
-      reason: `The higher earner must earn more than ${formatCurrency(PERSONAL_ALLOWANCE)} to benefit from the transferred allowance.`,
+      reason: `The higher earner must earn more than ${formatCurrency(PERSONAL_ALLOWANCE, 0)} to benefit from the transferred allowance.`,
     };
   }
 
@@ -68,7 +60,7 @@ function checkEligibility(transferorIncome: number, recipientIncome: number): El
     return {
       ...baseResult,
       status: 'not_eligible',
-      reason: `The higher earner must be a basic rate taxpayer (earning up to ${formatCurrency(BASIC_RATE_LIMIT)}). Higher rate taxpayers cannot receive Marriage Allowance.`,
+      reason: `The higher earner must be a basic rate taxpayer (earning up to ${formatCurrency(BASIC_RATE_LIMIT, 0)}). Higher rate taxpayers cannot receive Marriage Allowance.`,
     };
   }
 
@@ -83,7 +75,7 @@ function checkEligibility(transferorIncome: number, recipientIncome: number): El
   return {
     ...baseResult,
     status: 'eligible',
-    reason: `You qualify for Marriage Allowance. The lower earner can transfer ${formatCurrency(MARRIAGE_ALLOWANCE)} of their Personal Allowance to their partner.`,
+    reason: `You qualify for Marriage Allowance. The lower earner can transfer ${formatCurrency(MARRIAGE_ALLOWANCE, 0)} of their Personal Allowance to their partner.`,
     annualSaving: saving,
   };
 }
@@ -121,11 +113,11 @@ export function MarriageAllowanceClient() {
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
-          Marriage Allowance Calculator 2025-26
+          Marriage Allowance Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
           Married? In a civil partnership? You could save up to{' '}
-          <span className='font-semibold text-foreground'>{formatCurrency(TAX_SAVING)}</span> per
+          <span className='font-semibold text-foreground'>{formatCurrency(TAX_SAVING, 0)}</span> per
           year by transferring unused Personal Allowance to your partner.
         </p>
       </div>
@@ -136,11 +128,11 @@ export function MarriageAllowanceClient() {
           <div className='grid gap-6 text-center md:grid-cols-3'>
             <div>
               <p className='mb-1 font-medium text-muted-foreground text-sm'>Amount Transferred</p>
-              <p className='font-bold text-2xl'>{formatCurrency(MARRIAGE_ALLOWANCE)}</p>
+              <p className='font-bold text-2xl'>{formatCurrency(MARRIAGE_ALLOWANCE, 0)}</p>
             </div>
             <div>
               <p className='mb-1 font-medium text-muted-foreground text-sm'>Annual Tax Saving</p>
-              <p className='font-bold text-2xl text-success'>{formatCurrency(TAX_SAVING)}</p>
+              <p className='font-bold text-2xl text-success'>{formatCurrency(TAX_SAVING, 0)}</p>
             </div>
             <div>
               <p className='mb-1 font-medium text-muted-foreground text-sm'>Can Backdate</p>
@@ -246,11 +238,11 @@ export function MarriageAllowanceClient() {
                   <div className='mt-4 rounded-lg bg-success/10 p-4'>
                     <p className='font-medium text-success'>
                       Your annual saving:{' '}
-                      <span className='text-xl'>{formatCurrency(result.annualSaving)}</span>
+                      <span className='text-xl'>{formatCurrency(result.annualSaving, 0)}</span>
                     </p>
                     <p className='mt-1 text-sm text-success'>
                       Plus, you can backdate up to 4 years for a total of up to{' '}
-                      {formatCurrency(result.annualSaving * 4)}!
+                      {formatCurrency(result.annualSaving * 4, 0)}!
                     </p>
                   </div>
                 )}
@@ -270,13 +262,13 @@ export function MarriageAllowanceClient() {
             <div className='rounded-lg border p-4'>
               <h3 className='mb-2 font-semibold'>The Transferor (Lower Earner)</h3>
               <ul className='space-y-2 text-muted-foreground text-sm'>
-                <li>• Must earn less than {formatCurrency(PERSONAL_ALLOWANCE)}</li>
+                <li>• Must earn less than {formatCurrency(PERSONAL_ALLOWANCE, 0)}</li>
                 <li>
-                  • Transfers {formatCurrency(MARRIAGE_ALLOWANCE)} of their Personal Allowance
+                  • Transfers {formatCurrency(MARRIAGE_ALLOWANCE, 0)} of their Personal Allowance
                 </li>
                 <li>
                   • Their Personal Allowance reduces to{' '}
-                  {formatCurrency(PERSONAL_ALLOWANCE - MARRIAGE_ALLOWANCE)}
+                  {formatCurrency(PERSONAL_ALLOWANCE - MARRIAGE_ALLOWANCE, 0)}
                 </li>
                 <li>• Usually pays no tax anyway, so no impact</li>
               </ul>
@@ -285,11 +277,11 @@ export function MarriageAllowanceClient() {
               <h3 className='mb-2 font-semibold'>The Recipient (Higher Earner)</h3>
               <ul className='space-y-2 text-muted-foreground text-sm'>
                 <li>• Must be a basic rate taxpayer (20%)</li>
-                <li>• Cannot earn more than {formatCurrency(BASIC_RATE_LIMIT)}</li>
-                <li>• Receives {formatCurrency(MARRIAGE_ALLOWANCE)} extra allowance</li>
+                <li>• Cannot earn more than {formatCurrency(BASIC_RATE_LIMIT, 0)}</li>
+                <li>• Receives {formatCurrency(MARRIAGE_ALLOWANCE, 0)} extra allowance</li>
                 <li>
-                  • Saves {formatCurrency(TAX_SAVING)} in tax (20% of{' '}
-                  {formatCurrency(MARRIAGE_ALLOWANCE)})
+                  • Saves {formatCurrency(TAX_SAVING, 0)} in tax (20% of{' '}
+                  {formatCurrency(MARRIAGE_ALLOWANCE, 0)})
                 </li>
               </ul>
             </div>
@@ -338,7 +330,7 @@ export function MarriageAllowanceClient() {
             <h3 className='mb-2 font-semibold'>Can I backdate my claim?</h3>
             <p className='text-muted-foreground'>
               Yes! You can backdate your claim for up to 4 tax years. If you qualified for all 4
-              years, you could receive up to {formatCurrency(TAX_SAVING * 4)} as a lump sum.
+              years, you could receive up to {formatCurrency(TAX_SAVING * 4, 0)} as a lump sum.
             </p>
           </div>
           <div>

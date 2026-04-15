@@ -13,7 +13,7 @@ Canonical source for upstream skill provenance and local inclusion policy.
 - Local sync metadata is stored in `.agents/skills/.sources/marketingskills.json`.
 - Upstream skills at tag: 36 total
 - Included upstream skills: 26
-- Local-only skills: 7
+- Local-only skills: 8
 
 ## Upstream Skills Included (26/36)
 
@@ -23,9 +23,9 @@ Canonical source for upstream skill provenance and local inclusion policy.
 
 `aso-audit`, `lead-magnets`, `paid-ads`, `paywall-upgrade-cro`, `pricing-strategy`, `referral-program`, `revops`, `sales-enablement`, `signup-flow-cro`, `site-architecture`
 
-## Local-Only Skills (7)
+## Local-Only Skills (8)
 
-`accessibility`, `design-an-interface`, `engineering`, `frontend-design`, `payetax-context`, `prd-to-issues`, `tdd`
+`accessibility`, `codebase-cleanup-sweep`, `design-an-interface`, `engineering`, `frontend-design`, `payetax-context`, `prd-to-issues`, `tdd`
 
 ## Optimization Policy
 
