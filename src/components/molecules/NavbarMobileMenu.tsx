@@ -19,6 +19,7 @@ interface NavbarMobileMenuProps {
   pathname: string;
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
+  onExitComplete?: () => void;
   /**
    * Optional utility components rendered after nav links (e.g., FeedbackDialog).
    * Styled consistently with nav links for visual coherence.
@@ -39,6 +40,7 @@ export function NavbarMobileMenu({
   pathname,
   onLinkClick,
   onBackdropClick,
+  onExitComplete,
   utilities,
 }: NavbarMobileMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -96,11 +98,12 @@ export function NavbarMobileMenu({
   }, [isOpen, handleKeyDown]);
 
   return (
-    <>
-      {/* Mobile Menu Backdrop */}
-      <AnimatePresence>
-        {isOpen && (
+    <AnimatePresence onExitComplete={onExitComplete}>
+      {isOpen ? (
+        <>
+          {/* Mobile Menu Backdrop */}
           <motion.div
+            key='mobile-menu-backdrop'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -109,13 +112,10 @@ export function NavbarMobileMenu({
             onClick={onBackdropClick}
             aria-hidden='true'
           />
-        )}
-      </AnimatePresence>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
+          {/* Mobile Menu */}
           <motion.div
+            key='mobile-menu-panel'
             ref={menuRef}
             role='dialog'
             aria-modal='true'
@@ -163,8 +163,8 @@ export function NavbarMobileMenu({
               {utilities}
             </nav>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        </>
+      ) : null}
+    </AnimatePresence>
   );
 }
