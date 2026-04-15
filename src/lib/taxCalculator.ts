@@ -41,6 +41,7 @@
  */
 
 import {
+  CURRENT_TAX_YEAR,
   DEFAULT_HOURS_PER_WEEK,
   DEFAULT_TAX_CODE,
   type PayPeriod,
@@ -50,6 +51,7 @@ import {
   SCOTTISH_TAX_RATES,
   type StudentLoanSelection,
   TAX_RATES,
+  type TaxYear,
   WEEKS_PER_YEAR,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
@@ -59,6 +61,22 @@ import { roundToPence } from './tax/utils';
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 
 const AVERAGE_WEEKS_PER_MONTH = WEEKS_PER_YEAR / 12;
+
+function resolveSupportedTaxYear(taxYear: string | undefined): TaxYear {
+  if (typeof taxYear !== 'string') {
+    return CURRENT_TAX_YEAR;
+  }
+
+  const [start, endRaw] = taxYear.split('-');
+  if (!(start && endRaw)) {
+    return CURRENT_TAX_YEAR;
+  }
+
+  const normalizedEnd = endRaw.length === 2 ? `20${endRaw}` : endRaw;
+  const normalizedTaxYear = `${start}-${normalizedEnd}`;
+
+  return normalizedTaxYear in TAX_RATES ? (normalizedTaxYear as TaxYear) : CURRENT_TAX_YEAR;
+}
 
 // ============================================================================
 // HELPER FUNCTIONS - Extracted for maintainability
@@ -543,10 +561,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const hasScottishPrefix = normalizedTaxCode.startsWith(SCOTTISH_PREFIX);
   const hasWelshPrefix = normalizedTaxCode.startsWith('C');
   const isScottish = hasWelshPrefix ? false : input.isScottish || hasScottishPrefix;
+  const taxYear = resolveSupportedTaxYear(input.taxYear);
 
   // Get the tax rates for the selected year
-  const standardRates = TAX_RATES[input.taxYear];
-  const scottishRates = SCOTTISH_TAX_RATES[input.taxYear];
+  const standardRates = TAX_RATES[taxYear];
+  const scottishRates = SCOTTISH_TAX_RATES[taxYear];
 
   // Choose appropriate tax rates based on whether the taxpayer is Scottish
   const taxRates = isScottish ? scottishRates : standardRates;

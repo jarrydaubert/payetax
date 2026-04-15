@@ -118,6 +118,19 @@ describe('Tax Calculator', () => {
    * cross-checked against gov.uk tax calculators for accuracy.
    */
   describe('Basic Tax Calculations', () => {
+    it('falls back to the current supported tax year when runtime input passes an unsupported year', () => {
+      const supported = calculateTax(createBasicInput(50000, { taxYear: '2026-2027' }));
+      const malformed = calculateTax(
+        createBasicInput(50000, {
+          taxYear: '2027-2028' as TaxCalculationInput['taxYear'],
+        }),
+      );
+
+      expect(malformed.incomeTax.annually).toBe(supported.incomeTax.annually);
+      expect(malformed.nationalInsurance.annually).toBe(supported.nationalInsurance.annually);
+      expect(malformed.netPay.annually).toBe(supported.netPay.annually);
+    });
+
     /**
      * **Test Case**: Basic Rate Taxpayer Calculation
      *
