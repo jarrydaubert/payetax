@@ -5,6 +5,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 PROFILE_FILE="$SKILLS_DIR/.profiles/payetax-keep.txt"
+UPSTREAM_PROFILE_FILE="$SKILLS_DIR/.profiles/upstream-marketing-skills.txt"
 SOURCE_FILE="$SKILLS_DIR/.sources/marketingskills.json"
 VERSIONS_FILE="$SKILLS_DIR/VERSIONS.md"
 AGENTS_CONTEXT_FILE="$PROJECT_ROOT/.agents/product-marketing-context.md"
@@ -30,34 +31,7 @@ contains_item() {
   return 1
 }
 
-UPSTREAM_SKILLS=(
-  "ab-test-setup"
-  "ad-creative"
-  "ai-seo"
-  "analytics-tracking"
-  "churn-prevention"
-  "community-marketing"
-  "cold-email"
-  "competitor-alternatives"
-  "content-strategy"
-  "copy-editing"
-  "copywriting"
-  "customer-research"
-  "email-sequence"
-  "form-cro"
-  "free-tool-strategy"
-  "launch-strategy"
-  "marketing-ideas"
-  "marketing-psychology"
-  "onboarding-cro"
-  "page-cro"
-  "popup-cro"
-  "product-marketing-context"
-  "programmatic-seo"
-  "schema-markup"
-  "seo-audit"
-  "social-content"
-)
+UPSTREAM_SKILLS=()
 
 if [[ ! -d "$SKILLS_DIR" ]]; then
   error "Missing skills directory: $SKILLS_DIR"
@@ -85,6 +59,10 @@ fi
 
 if [[ ! -f "$PROFILE_FILE" ]]; then
   error "Missing skills profile file: $PROFILE_FILE"
+fi
+
+if [[ ! -f "$UPSTREAM_PROFILE_FILE" ]]; then
+  error "Missing upstream skills profile file: $UPSTREAM_PROFILE_FILE"
 fi
 
 if (( error_count > 0 )); then
@@ -120,8 +98,16 @@ while IFS= read -r line; do
   keep_skills+=("$line")
 done < <(grep -vE '^\s*#|^\s*$' "$PROFILE_FILE")
 
+while IFS= read -r line; do
+  UPSTREAM_SKILLS+=("$line")
+done < <(grep -vE '^\s*#|^\s*$' "$UPSTREAM_PROFILE_FILE")
+
 if [[ "${#keep_skills[@]}" -eq 0 ]]; then
   error "Profile file has no kept skills: $PROFILE_FILE"
+fi
+
+if [[ "${#UPSTREAM_SKILLS[@]}" -eq 0 ]]; then
+  error "Upstream profile file has no kept skills: $UPSTREAM_PROFILE_FILE"
 fi
 
 installed_skills=()

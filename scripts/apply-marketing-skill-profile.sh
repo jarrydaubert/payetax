@@ -6,42 +6,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 PROFILE_DIR="$SKILLS_DIR/.profiles"
 PROFILE_FILE="$PROFILE_DIR/payetax-keep.txt"
-
-KEEP_SKILLS=(
-  "ab-test-setup"
-  "accessibility"
-  "ad-creative"
-  "ai-seo"
-  "analytics-tracking"
-  "churn-prevention"
-  "community-marketing"
-  "cold-email"
-  "competitor-alternatives"
-  "content-strategy"
-  "copy-editing"
-  "copywriting"
-  "customer-research"
-  "design-an-interface"
-  "email-sequence"
-  "engineering"
-  "form-cro"
-  "free-tool-strategy"
-  "frontend-design"
-  "launch-strategy"
-  "marketing-ideas"
-  "marketing-psychology"
-  "onboarding-cro"
-  "page-cro"
-  "payetax-context"
-  "popup-cro"
-  "prd-to-issues"
-  "product-marketing-context"
-  "programmatic-seo"
-  "schema-markup"
-  "seo-audit"
-  "social-content"
-  "tdd"
-)
+KEEP_SKILLS=()
 
 usage() {
   cat <<'EOF'
@@ -62,7 +27,25 @@ is_kept() {
   return 1
 }
 
+load_keep_skills() {
+  if [[ ! -f "$PROFILE_FILE" ]]; then
+    echo "Missing keep profile: $PROFILE_FILE" >&2
+    exit 1
+  fi
+
+  KEEP_SKILLS=()
+  while IFS= read -r line; do
+    KEEP_SKILLS+=("$line")
+  done < <(grep -vE '^\s*#|^\s*$' "$PROFILE_FILE")
+
+  if [[ "${#KEEP_SKILLS[@]}" -eq 0 ]]; then
+    echo "Keep profile has no skills: $PROFILE_FILE" >&2
+    exit 1
+  fi
+}
+
 list_profile() {
+  load_keep_skills
   echo "Keep skills (${#KEEP_SKILLS[@]}):"
   local keep
   for keep in "${KEEP_SKILLS[@]}"; do
@@ -77,17 +60,7 @@ list_profile() {
 }
 
 apply_profile() {
-  mkdir -p "$PROFILE_DIR"
-
-  {
-    echo "# PayeTax agents-native skills keep profile"
-    echo "# Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    echo "# Keep list"
-    local keep
-    for keep in "${KEEP_SKILLS[@]}"; do
-      echo "$keep"
-    done
-  } > "$PROFILE_FILE"
+  load_keep_skills
 
   local dir_name
   while IFS= read -r dir_name; do

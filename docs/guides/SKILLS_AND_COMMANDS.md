@@ -132,6 +132,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 - If you want to make skills available globally in Codex, add them to your `AGENTS.md` list with name + description + path.
 - Skills are primarily sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills), with selected engineering workflow skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) — see `.agents/skills/VERSIONS.md` for sync history.
 - Skill usage dates live in `.agents/skills/RUN_HISTORY.md`. Historical usage before that tracker exists should stay `Not tracked yet` unless it can be verified.
+- Canonical keep/sync lists live in `.agents/skills/.profiles/` and should be updated there instead of being re-hardcoded in maintenance scripts.
 - Maintenance commands:
   - `bun run skills:check`
   - `bun run skills:sync`

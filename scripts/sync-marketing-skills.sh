@@ -9,37 +9,10 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
 LOCAL_SOURCE_DIR="$LOCAL_SKILLS_DIR/.sources"
 LOCAL_SOURCE_FILE="$LOCAL_SOURCE_DIR/marketingskills.json"
+UPSTREAM_PROFILE_FILE="$LOCAL_SKILLS_DIR/.profiles/upstream-marketing-skills.txt"
 CACHE_DIR="${CACHE_DIR:-/tmp/marketingskills-sync}"
 SKIP_FETCH="${SKIP_FETCH:-0}"
-
-KEEP_UPSTREAM_SKILLS=(
-  "ab-test-setup"
-  "ad-creative"
-  "ai-seo"
-  "analytics-tracking"
-  "churn-prevention"
-  "community-marketing"
-  "cold-email"
-  "competitor-alternatives"
-  "content-strategy"
-  "copy-editing"
-  "copywriting"
-  "customer-research"
-  "email-sequence"
-  "form-cro"
-  "free-tool-strategy"
-  "launch-strategy"
-  "marketing-ideas"
-  "marketing-psychology"
-  "onboarding-cro"
-  "page-cro"
-  "popup-cro"
-  "product-marketing-context"
-  "programmatic-seo"
-  "schema-markup"
-  "seo-audit"
-  "social-content"
-)
+KEEP_UPSTREAM_SKILLS=()
 
 usage() {
   cat <<'EOF'
@@ -71,6 +44,23 @@ contains_item() {
     fi
   done
   return 1
+}
+
+load_upstream_skill_profile() {
+  if [[ ! -f "$UPSTREAM_PROFILE_FILE" ]]; then
+    echo "Missing upstream skills profile: $UPSTREAM_PROFILE_FILE" >&2
+    exit 1
+  fi
+
+  KEEP_UPSTREAM_SKILLS=()
+  while IFS= read -r line; do
+    KEEP_UPSTREAM_SKILLS+=("$line")
+  done < <(grep -vE '^\s*#|^\s*$' "$UPSTREAM_PROFILE_FILE")
+
+  if [[ "${#KEEP_UPSTREAM_SKILLS[@]}" -eq 0 ]]; then
+    echo "Upstream skills profile has no skills: $UPSTREAM_PROFILE_FILE" >&2
+    exit 1
+  fi
 }
 
 ensure_repo() {
@@ -321,6 +311,8 @@ sync_skills() {
 }
 
 main() {
+  load_upstream_skill_profile
+
   if [[ $# -lt 1 ]]; then
     usage
     exit 1

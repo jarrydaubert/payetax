@@ -42,6 +42,7 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Add new posts in the backlog before writing.
 - Update or retire posts when tax rules change.
 - Keep all work items in `docs/BACKLOG.md`.
+- Use `docs/blog/IMAGE_WORKFLOW.md` for featured-image prompts and import steps.
 
 ## Conversion Checklist (Default)
 

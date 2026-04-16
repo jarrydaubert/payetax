@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Summary-only companion to the stricter dependency gate in scripts/audit-deps.ts.
+// Keep this for historical trend/outdated-package reporting, not as the canonical
+// release-blocking vulnerability decision.
+
 const { exec } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
