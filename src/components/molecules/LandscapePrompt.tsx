@@ -58,7 +58,6 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
 
   useEffect(() => {
     setPortalMounted(true);
-    return () => setPortalMounted(false);
   }, []);
 
   useEffect(() => {

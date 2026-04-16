@@ -99,4 +99,11 @@ describe('LandscapePrompt', () => {
 
     expect(document.body.querySelector('.custom-class')).toBeInTheDocument();
   });
+
+  it('unmounts cleanly while visible', () => {
+    setViewport(375, 812);
+    const { unmount } = render(<LandscapePrompt />);
+
+    expect(() => unmount()).not.toThrow();
+  });
 });
