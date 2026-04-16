@@ -62,6 +62,7 @@ Useful GitLab shortcuts:
 
 ```bash
 bun run gitlab:status
+bun run gitlab:deploy:status
 bun run gitlab:mr:status
 bun run gitlab:pipeline:latest
 bun run gitlab:release:latest
@@ -107,6 +108,43 @@ Strict release-report interpretation:
 3. Run post-release production validation:
 
 - `docs/guides/POST_RELEASE_VALIDATION.md`
+
+### GitLab To Vercel Status Recovery
+
+Use this when GitLab receives the push but Vercel does not create or report an automatic deployment.
+
+Detection:
+
+```bash
+bun run gitlab:status
+bun run gitlab:deploy:status
+vercel ls payetax
+```
+
+Recovery flow for a successful manual deployment:
+
+```bash
+vercel deploy --prod --yes
+vercel inspect <deployment-or-domain-url>
+bun run gitlab:deploy:reconcile success <verified-deployment-url>
+```
+
+Recovery flow for a failed manual deployment:
+
+```bash
+vercel deploy --prod --yes
+# capture the Vercel inspect/build URL that shows the failure
+bun run gitlab:deploy:reconcile failed <vercel-inspect-or-build-url>
+```
+
+Notes:
+
+1. `gitlab:deploy:status` reports the pushed branch SHA's GitLab status, any external statuses, and the latest GitLab pipeline linked to that commit by default.
+2. `gitlab:deploy:status` and `gitlab:deploy:reconcile` default to the branch's pushed upstream SHA when one exists, so a locally-ahead branch still inspects or reconciles the deployable GitLab commit rather than an unpushed local commit.
+3. `gitlab:deploy:reconcile` posts a manual external GitLab status named `vercel-production-manual` for the pushed branch SHA by default.
+4. Pass an explicit SHA as the third argument if you need to reconcile a non-default commit.
+5. Use `success` only after the deployment URL is verified as the production outcome you intend to trust.
+6. Use `failed` when the manual recovery attempt itself fails and you want GitLab to reflect that outcome instead of staying status-less.
 
 ### Canonical Host Policy
 
@@ -169,6 +207,8 @@ Common repo-native wrappers:
 bun run gitlab:project
 bun run gitlab:mr:status
 bun run gitlab:pipeline:latest
+bun run gitlab:deploy:status
+bun run gitlab:deploy:reconcile success <verified-deployment-url>
 bun run gitlab:release:latest
 bun run gitlab:status
 ```

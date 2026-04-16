@@ -77,6 +77,8 @@
     "gitlab:project": "bun scripts/gitlab.ts project",
     "gitlab:mr:status": "bun scripts/gitlab.ts mr-status",
     "gitlab:pipeline:latest": "bun scripts/gitlab.ts pipeline-latest",
+    "gitlab:deploy:status": "bun scripts/gitlab.ts deploy-status",
+    "gitlab:deploy:reconcile": "bun scripts/gitlab.ts deploy-reconcile",
     "gitlab:release:latest": "bun scripts/gitlab.ts release-latest",
     "gitlab:status": "bun scripts/gitlab.ts status",
     "deploy": "bun run clean && bun run release && echo '✅ Ready for deployment!'",
