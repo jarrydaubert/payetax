@@ -6,14 +6,14 @@ Only open TODO items live here.
 
 - No status updates, progress notes, or completed work.
 - Every item must include a concrete next step and a clear, testable Definition of Done.
-- If an item changes behavior, its DoD must define regression protection: automated coverage at the right layer or an explicit replacement evidence path with a named bug target and oracle.
+- If an item changes code or behavior, its default DoD expectation is automated regression protection at the right layer. Use a non-test evidence path only when automation is genuinely the wrong layer, and name the bug target and oracle explicitly.
 - When an item is complete, remove it from this file.
 
 ## Backlog Mantra
 
 - Open TODO items only.
 - Clear, testable DoD only.
-- Behavior changes must say how they stay fixed:
+- Code and behavior changes must say how they stay fixed:
   - automated coverage at the right layer, or
   - explicit replacement evidence path with a named bug target and oracle.
 
@@ -22,7 +22,7 @@ Only open TODO items live here.
 A backlog item is only complete when all conditions below are true:
 
 1. `Outcome delivered`: the row's scope is implemented exactly as written.
-2. `Regression protection defined`: behavior changes add or update automated coverage at the right layer, or explicitly justify why automation is the wrong layer and what evidence replaces it.
+2. `Regression protection defined`: code and behavior changes add or update automated coverage at the right layer by default, or explicitly justify why automation is the wrong layer and what evidence replaces it.
 3. `Relevant validation passed`: the appropriate repo gates or targeted checks pass.
 4. `Evidence captured`: the change set includes concrete proof for the completed outcome at the smallest sensible level (tests, screenshots, short notes, or docs).
 5. `Backlog hygiene`: the completed item is removed from this file in the same change set.

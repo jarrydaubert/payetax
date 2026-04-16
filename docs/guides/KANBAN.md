@@ -45,7 +45,7 @@ A card can move to `Ready` only if all are true:
 - Problem statement is clear and user/business impact is stated.
 - Scope is explicit (what is in, what is out).
 - Acceptance criteria are observable and testable.
-- Test plan is defined (unit, integration, E2E, or explicit rationale for none).
+- Test plan is defined. For code or behavior work, this should default to named automated coverage at the right layer (unit, integration, E2E, or scripted verification). Use an explicit rationale for no automation only when the work is docs/research/config-only or automation is the wrong layer.
 - Risk level is set (`tax-logic`, `security`, `seo`, `content`, `ops`).
 
 ---
@@ -55,8 +55,9 @@ A card can move to `Ready` only if all are true:
 A card is `Done` only when all are true:
 
 - Implementation matches acceptance criteria.
-- Required tests are added/updated and passing.
+- Required tests are added/updated and passing for any code or behavior change.
 - Test intent is explicit: "what bug does this test catch?"
+- If the work does not use automated tests, the replacement evidence path is named, captured, and justified.
 - No undocumented test debt added (`skip`/`todo`/placeholder tests).
 - Docs/backlog updated if behavior or scope changed.
 - For tax-impacting work, logic still aligns with `src/constants/taxRates.ts`.
