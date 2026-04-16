@@ -1,9 +1,9 @@
 // Service Worker for PayeTax - UK PAYE Tax Calculator
 // Optimized for 2025 PWA best practices
 
-const CACHE_NAME = 'payetax-v5.1.0';
-const STATIC_CACHE_NAME = 'payetax-static-v5.1.0';
-const API_CACHE_NAME = 'payetax-api-v5.1.0';
+const CACHE_NAME = 'payetax-v5.1.1';
+const STATIC_CACHE_NAME = 'payetax-static-v5.1.1';
+const API_CACHE_NAME = 'payetax-api-v5.1.1';
 
 // Max entries per cache (cheaper than size-based eviction)
 const MAX_CACHE_ENTRIES = 100;
