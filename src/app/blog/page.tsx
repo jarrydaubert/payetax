@@ -161,19 +161,28 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {/* Blog layout */}
       <div className='min-h-screen bg-background'>
         {/* Header: H1 + Category Filters */}
-        <div className='container mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8'>
-          <h1 className='mb-6 font-bold font-display text-3xl text-foreground md:text-4xl'>
-            UK Tax Guides &amp; PAYE Insights
-          </h1>
+        <div className='container mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8'>
+          <div className='max-w-3xl'>
+            <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em] sm:mb-4'>
+              TaxInsights by PayeTax
+            </p>
+            <h1 className='max-w-[14ch] font-bold font-display text-3xl text-foreground leading-tight sm:max-w-none sm:text-4xl'>
+              UK Tax Guides &amp; PAYE Insights
+            </h1>
+            <p className='mt-3 max-w-2xl text-muted-foreground text-sm leading-6 sm:mt-4 sm:text-base'>
+              Clear UK tax explainers, financial-year updates, and practical guides that point
+              readers back to the right calculator or tool.
+            </p>
+          </div>
 
           {/* Category Filters */}
-          <nav aria-label='Browse blog categories' className='mb-10'>
-            <ul className='flex flex-wrap gap-2'>
+          <nav aria-label='Browse blog categories' className='mt-6 mb-8 sm:mt-8 sm:mb-10'>
+            <ul className='flex flex-wrap gap-2 sm:gap-3'>
               <li>
                 <Link
                   href='/blog'
                   aria-current='page'
-                  className='block rounded-full border border-primary bg-primary/20 px-4 py-2 text-center text-primary text-sm'
+                  className='block rounded-full border border-primary/70 bg-primary/15 px-3.5 py-2 text-center font-medium text-primary text-sm shadow-[0_0_0_1px_rgba(96,165,250,0.12)] sm:px-4'
                 >
                   All Articles
                 </Link>
@@ -184,7 +193,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   <li key={category.slug}>
                     <Link
                       href={`/blog/category/${category.slug}`}
-                      className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
+                      className='block rounded-full border border-border/70 bg-card/80 px-3.5 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:bg-card hover:text-foreground sm:px-4'
                     >
                       {category.name}
                     </Link>
@@ -196,7 +205,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
         {/* Latest Articles + Editor's Picks Sidebar */}
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-          <div className='grid gap-8 lg:grid-cols-[1fr_300px]'>
+          <div className='grid gap-6 sm:gap-8 lg:grid-cols-[1fr_300px]'>
             <div>
               <LatestArticles posts={latestPosts} />
             </div>
@@ -206,7 +215,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
 
           {/* Mobile Editor's Picks */}
-          <div className='mt-12 lg:hidden'>
+          <div className='mt-8 sm:mt-12 lg:hidden'>
             <EditorsPicksSticky posts={editorsPicks} />
           </div>
         </div>

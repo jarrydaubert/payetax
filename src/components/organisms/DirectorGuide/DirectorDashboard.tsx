@@ -408,29 +408,75 @@ export function DirectorDashboard() {
               </div>
             ) : (
               /* Empty State */
-              <div className='flex min-h-screen flex-col items-center justify-center rounded-2xl border border-border/50 border-dashed bg-background/60'>
-                <div className='mx-auto max-w-md text-center'>
-                  <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-success/20'>
+              <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-[1.75rem] border border-border/50 border-dashed bg-background/60 px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
+                <div className='mx-auto max-w-xl text-center'>
+                  <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em]'>
+                    Start Here
+                  </p>
+                  <div className='mx-auto mb-5 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-success/20'>
                     <Calculator className='size-10 text-primary' />
                   </div>
-                  <h2 className='mb-2 font-semibold text-foreground text-lg'>
-                    Compare salary and dividend scenarios
+                  <h2 className='mb-3 font-semibold text-[1.7rem] text-foreground leading-tight sm:text-[2rem]'>
+                    Enter your numbers to compare director pay options
                   </h2>
-                  <p className='mb-6 text-muted-foreground'>
-                    Enter your company profit on the left to see estimated take-home and tax impact
-                    across common mixes.
+                  <p className='mx-auto max-w-2xl text-muted-foreground text-sm leading-7 sm:text-base'>
+                    Add your company profit, costs, and region to see take-home pay, tax to set
+                    aside, and common salary versus dividend mixes.
                   </p>
-                  <div
-                    className={cn(
-                      'flex items-center justify-center text-muted-foreground text-sm',
-                      SPACING.GAP_2,
-                    )}
-                  >
-                    <span
-                      className='size-2 rounded-full bg-primary motion-safe:animate-pulse'
-                      aria-hidden='true'
-                    />
-                    Enter your figures to get started
+
+                  <div className='mt-6 grid gap-3 text-left sm:grid-cols-3'>
+                    {[
+                      {
+                        title: '1. Company profit',
+                        copy: 'Annual profit or monthly income, depending on the mode you choose.',
+                      },
+                      {
+                        title: '2. Expenses and region',
+                        copy: 'Add costs and select your tax region so the comparison is grounded.',
+                      },
+                      {
+                        title: '3. Compare outcomes',
+                        copy: 'See take-home, tax pots, and common salary/dividend mixes.',
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.title}
+                        className='rounded-2xl border border-border/60 bg-card/70 p-4'
+                      >
+                        <h3 className='mb-1 font-medium text-foreground text-sm'>{item.title}</h3>
+                        <p className='text-muted-foreground text-sm leading-6'>{item.copy}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className='mt-6 space-y-3'>
+                    <p className='hidden text-muted-foreground text-sm lg:block'>
+                      Use the <span className='font-medium text-foreground'>Your Numbers</span>{' '}
+                      panel on the left to start the comparison.
+                    </p>
+
+                    <Button
+                      type='button'
+                      onClick={() => setMobileInputsOpen(true)}
+                      variant='brandOutline'
+                      className='inline-flex min-h-11 items-center gap-2 px-5 py-3 font-semibold lg:hidden'
+                    >
+                      <Calculator className='size-4' aria-hidden='true' />
+                      Open Calculator
+                    </Button>
+
+                    <div
+                      className={cn(
+                        'flex items-center justify-center text-muted-foreground text-sm',
+                        SPACING.GAP_2,
+                      )}
+                    >
+                      <span
+                        className='size-2 rounded-full bg-primary motion-safe:animate-pulse'
+                        aria-hidden='true'
+                      />
+                      On mobile, tap the calculator button to enter your figures.
+                    </div>
                   </div>
                 </div>
               </div>

@@ -104,7 +104,7 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-card/60 transition-all duration-200',
+        'group relative overflow-hidden rounded-[1.15rem] bg-card/60 transition-all duration-200',
         'border border-border/60 hover:border-primary/50',
         'motion-safe:hover:-translate-y-0.5',
         className,
@@ -125,21 +125,23 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
           />
 
           {/* Category badge */}
-          <span className='absolute top-4 left-4 rounded-full bg-primary px-3 py-1 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
+          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-1 font-semibold text-[11px] text-primary-foreground uppercase tracking-[0.22em] sm:top-4 sm:left-4 sm:px-3 sm:text-xs sm:tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>
 
         {/* Content */}
-        <div className='p-5'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-foreground text-lg transition-colors group-hover:text-primary md:text-xl'>
+        <div className='p-4 sm:p-5'>
+          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-[1.35rem] text-foreground leading-tight transition-colors group-hover:text-primary sm:text-lg md:text-xl'>
             {post.title}
           </h3>
 
-          <p className='mb-4 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
+          <p className='mb-3 line-clamp-3 text-muted-foreground text-sm leading-6 sm:mb-4 sm:line-clamp-2'>
+            {post.excerpt}
+          </p>
 
           {/* Meta */}
-          <div className='flex items-center gap-3 text-muted-foreground text-xs'>
+          <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>
@@ -167,9 +169,9 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
         className,
       )}
     >
-      <Link href={href} className={cn('flex gap-4 p-3', focusStyles)}>
+      <Link href={href} className={cn('flex gap-3 p-3 sm:gap-4', focusStyles)}>
         {/* Thumbnail - square */}
-        <div className='relative size-20 shrink-0 overflow-hidden rounded-md'>
+        <div className='relative size-[4.5rem] shrink-0 overflow-hidden rounded-xl sm:size-20 sm:rounded-md'>
           <Image
             src={imageSrc}
             alt={alt}
@@ -181,19 +183,19 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           />
 
           {/* Category badge overlay */}
-          <span className='absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase'>
+          <span className='absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 font-semibold text-[10px] text-primary-foreground uppercase sm:text-xs'>
             {categoryConfig.label.split(' ')[0]}
           </span>
         </div>
 
         {/* Content */}
         <div className='flex flex-1 flex-col justify-center py-1'>
-          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-foreground text-sm transition-colors group-hover:text-primary'>
+          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-[0.95rem] text-foreground leading-5 transition-colors group-hover:text-primary sm:text-sm'>
             {post.title}
           </h3>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+          <div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>

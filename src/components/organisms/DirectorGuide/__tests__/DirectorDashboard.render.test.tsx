@@ -174,8 +174,11 @@ describe('DirectorDashboard (normal mode)', () => {
 
   it('shows the empty state when no comparison exists', () => {
     render(<DirectorDashboard />);
-    expect(screen.getByText(/Compare salary and dividend scenarios/i)).toBeInTheDocument();
-    expect(screen.getByText(/Enter your figures to get started/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Enter your numbers to compare director pay options/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Open Calculator/i })).toBeInTheDocument();
+    expect(screen.getByText(/On mobile, tap the calculator button/i)).toBeInTheDocument();
   });
 
   it('tracks one reset event for one reset click', () => {

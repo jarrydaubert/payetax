@@ -39,12 +39,12 @@ export function LatestArticles({ posts }: LatestArticlesProps) {
   return (
     // Use aria-label instead of aria-labelledby to avoid static ID issues
     <section aria-label='Latest articles'>
-      <h2 className='mb-6 font-display font-semibold text-primary text-sm uppercase tracking-widest'>
+      <h2 className='mb-4 font-display font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
         Latest Articles
       </h2>
 
       {/* Grid: single column -> 2-col equal (md) -> 60/40 asymmetric (lg) */}
-      <ul className='grid gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]'>
+      <ul className='grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr]'>
         {/* Large featured card - spans all rows on desktop */}
         {featuredPost && (
           <li className='md:col-span-2 lg:col-span-1 lg:row-span-4'>

@@ -35,10 +35,12 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
       {/* Mobile: Native accordion using details/summary (zero CLS) */}
       <details className='group md:hidden'>
         <summary
-          className='flex cursor-pointer items-center justify-between rounded-lg bg-card p-4 text-foreground hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+          className='flex cursor-pointer items-center justify-between rounded-2xl border border-border/60 bg-card/70 px-4 py-3.5 text-foreground hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
           aria-label="Toggle Editor's Picks section"
         >
-          <span className='font-display font-semibold'>Editor&apos;s Picks</span>
+          <span className='font-display font-semibold text-primary/90 text-sm uppercase tracking-[0.2em]'>
+            Editor&apos;s Picks
+          </span>
           <span className='text-muted-foreground transition-transform group-open:rotate-180'>
             <svg
               className='h-5 w-5'
@@ -56,7 +58,7 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
             </svg>
           </span>
         </summary>
-        <div className='mt-2'>
+        <div className='mt-3'>
           {/* Hide heading on mobile since summary already says "Editor's Picks" */}
           <EditorsPicksList posts={displayedPosts} showHeading={false} />
         </div>
@@ -73,14 +75,14 @@ interface EditorsPicksListProps {
 
 function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) {
   return (
-    <div className='rounded-xl border border-border/60 bg-card/70 p-5'>
+    <div className='rounded-2xl border border-border/60 bg-card/70 p-4 sm:p-5'>
       {showHeading && (
-        <h2 className='mb-6 font-display font-semibold text-primary text-sm uppercase tracking-widest'>
+        <h2 className='mb-5 font-display font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
         </h2>
       )}
 
-      <ol className='space-y-4'>
+      <ol className='space-y-3 sm:space-y-4'>
         {posts.map((post, index) => (
           <li key={post.slug}>
             <Link
@@ -89,13 +91,13 @@ function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) 
               prefetch={false}
             >
               {/* Number */}
-              <span className='flex-shrink-0 font-bold font-display text-2xl text-primary/80 transition-colors group-hover:text-primary'>
+              <span className='flex-shrink-0 font-bold font-display text-[1.6rem] text-primary/80 transition-colors group-hover:text-primary sm:text-2xl'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               {/* Content */}
               <div className='pt-1'>
-                <h3 className='line-clamp-2 font-medium text-foreground text-sm transition-colors group-hover:text-primary'>
+                <h3 className='line-clamp-2 font-medium text-[0.95rem] text-foreground leading-5 transition-colors group-hover:text-primary sm:text-sm'>
                   {post.title}
                 </h3>
                 {post.readTime && (
