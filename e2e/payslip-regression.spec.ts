@@ -30,7 +30,7 @@ function parseGBP(text: string): number {
 async function getTableValue(
   page: Page,
   label: string,
-  period: 'Monthly' | 'Yearly',
+  period: 'Hourly' | 'Monthly' | 'Yearly',
 ): Promise<number> {
   const table = page.getByTestId('results-table');
   const headerRow = table.locator('thead tr').first();
@@ -54,6 +54,11 @@ async function getTableValue(
   const cellText = await cells.nth(colIdx).textContent();
   if (!cellText) throw new Error(`${period} value cell empty for "${label}"`);
   return parseGBP(cellText);
+}
+
+async function selectTaxYear(page: Page, taxYear: string): Promise<void> {
+  await page.getByTestId('tax-year-select').click();
+  await page.getByRole('option', { name: taxYear, exact: true }).click();
 }
 
 test.describe('Payslip regression @rounding', () => {
@@ -88,5 +93,28 @@ test.describe('Payslip regression @rounding', () => {
     const marginalText = (await marginalCard.textContent()) ?? '';
     const marginal = parsePercent(marginalText);
     expect(marginal).toBeCloseTo(26.9, 1);
+  });
+
+  test('Monthly and hourly breakdown match latest 2026-27 payslip @rounding', async ({ page }) => {
+    await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
+
+    // Start from a clean baseline (localStorage can persist inputs between runs).
+    await page.getByRole('button', { name: /reset/i }).click();
+
+    await page.getByTestId('salary-input').fill('49131');
+    await selectTaxYear(page, '2026-2027');
+    await page.getByTestId('pension-input').fill('5');
+    await page.getByTestId('non-taxable-allowances-input').fill('312');
+
+    await page.getByTestId('calculate-button').click();
+    await expect(page.getByTestId('results-table')).toBeVisible();
+
+    expect(await getTableValue(page, 'Gross Pay', 'Monthly')).toBeCloseTo(4094.25, 2);
+    expect(await getTableValue(page, 'Total Tax Due', 'Monthly')).toBeCloseTo(568.2, 2);
+    expect(await getTableValue(page, 'National Insurance', 'Monthly')).toBeCloseTo(227.32, 2);
+    expect(await getTableValue(page, 'Pension', 'Monthly')).toBeCloseTo(204.71, 2);
+    expect(await getTableValue(page, 'Non-taxable allowance(s)', 'Monthly')).toBeCloseTo(26, 2);
+    expect(await getTableValue(page, 'Net Pay', 'Monthly')).toBeCloseTo(3120.02, 2);
+    expect(await getTableValue(page, 'Net Pay', 'Hourly')).toBeCloseTo(18, 2);
   });
 });
