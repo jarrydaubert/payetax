@@ -134,6 +134,8 @@ export interface TaxCalculationResults {
   grossSalary: Record<PayPeriod, number>;
   /** Tax-free allowance amount */
   taxFreeAmount: number;
+  /** Tax-free allowance amounts for payroll display periods when they differ from annual averaging */
+  taxFreeAmountByPeriod?: Partial<Record<PayPeriod, number>>;
   /** Taxable income after allowances and deductions */
   taxableIncome: number;
 

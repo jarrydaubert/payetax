@@ -27,6 +27,7 @@ import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import type { PayPeriod } from '@/constants/taxRates';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
@@ -58,6 +59,8 @@ interface ResultRowData {
   icon: React.ElementType;
   annual: number;
   whatIfAnnual?: number;
+  valuesByPeriod?: Partial<Record<PayPeriod, number>>;
+  whatIfValuesByPeriod?: Partial<Record<PayPeriod, number>>;
   percentage: string;
   color: string;
   isHighlight?: boolean;
@@ -260,6 +263,8 @@ export function ResultsTable({
       icon: Shield,
       annual: taxFreeAllowance,
       whatIfAnnual: whatIfResults?.taxFreeAmount,
+      valuesByPeriod: results.taxFreeAmountByPeriod,
+      whatIfValuesByPeriod: whatIfResults?.taxFreeAmountByPeriod,
       percentage: calculatePercentage(taxFreeAllowance, grossAnnual),
       color: 'text-foreground',
       isHighlight: false,
@@ -431,6 +436,8 @@ export function ResultsTable({
                     icon={row.icon}
                     annual={row.annual}
                     whatIfAnnual={row.whatIfAnnual}
+                    valuesByPeriod={row.valuesByPeriod}
+                    whatIfValuesByPeriod={row.whatIfValuesByPeriod}
                     percentage={row.percentage}
                     color={row.color}
                     isHighlight={row.isHighlight}

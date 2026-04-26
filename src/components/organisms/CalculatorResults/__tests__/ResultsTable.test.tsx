@@ -116,6 +116,27 @@ describe('ResultsTable Component', () => {
       expect(screen.getAllByText(/£12,570/).length).toBeGreaterThan(0);
     });
 
+    it('uses payroll-period tax-free allowance values when annual averaging would not reconcile', () => {
+      render(
+        <ResultsTable
+          results={{
+            ...mockResults,
+            taxFreeAmount: 12570,
+            taxFreeAmountByPeriod: {
+              annually: 12570,
+              monthly: 1048,
+            },
+          }}
+          visiblePeriods={['Yearly', 'Monthly']}
+        />,
+      );
+
+      expect(screen.getByText('Tax-Free Allowance')).toBeInTheDocument();
+      expect(screen.getByText('£12,570.00')).toBeInTheDocument();
+      expect(screen.getByText('£1,048.00')).toBeInTheDocument();
+      expect(screen.queryByText('£1,047.50')).not.toBeInTheDocument();
+    });
+
     it('should render taxable income row', () => {
       render(<ResultsTable results={mockResults} />);
 

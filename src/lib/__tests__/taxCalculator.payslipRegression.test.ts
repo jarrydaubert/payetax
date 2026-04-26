@@ -52,6 +52,8 @@ describe('Tax Calculator payslip regression', () => {
     });
 
     expect(result.grossSalary.monthly).toBeCloseTo(4094.25, 2);
+    expect(result.taxFreeAmount).toBe(12570);
+    expect(result.taxFreeAmountByPeriod?.monthly).toBe(1048);
     expect(result.pensionContribution.monthly).toBeCloseTo(204.71, 2);
     expect(result.incomeTax.monthly).toBeCloseTo(568.2, 2);
     expect(result.nationalInsurance.monthly).toBeCloseTo(227.32, 2);

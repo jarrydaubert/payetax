@@ -1256,6 +1256,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const results: TaxCalculationResults = {
     grossSalary,
     taxFreeAmount: annualTaxFreeAmount,
+    taxFreeAmountByPeriod: {
+      annually: annualTaxFreeAmount,
+      monthly: monthlyTaxFreeAmount,
+    },
     taxableIncome: annualTaxableIncome,
     incomeTax: incomeTax,
     nationalInsurance: nationalInsuranceByPeriod,

@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion';
 import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
+import type { PayPeriod } from '@/constants/taxRates';
 
 // Create motion component once at module level (Framer Motion best practice)
 const MotionTableRow = motion.create(TableRow);
@@ -18,6 +19,8 @@ interface ResultTableRowProps {
   icon: React.ElementType;
   annual: number;
   whatIfAnnual?: number;
+  valuesByPeriod?: Partial<Record<PayPeriod, number>>;
+  whatIfValuesByPeriod?: Partial<Record<PayPeriod, number>>;
   percentage: string;
   color: string;
   isHighlight?: boolean;
@@ -25,6 +28,16 @@ interface ResultTableRowProps {
   visiblePeriods: string[];
   periodOptions: Record<string, number>;
 }
+
+const periodToPayPeriod: Record<string, PayPeriod> = {
+  Yearly: 'annually',
+  Monthly: 'monthly',
+  '4-Weekly': 'fourWeekly',
+  Fortnightly: 'fortnightly',
+  Weekly: 'weekly',
+  Daily: 'daily',
+  Hourly: 'hourly',
+};
 
 /**
  * Table row component for displaying a single calculation result.
@@ -38,6 +51,8 @@ export function ResultTableRow({
   icon: Icon,
   annual,
   whatIfAnnual,
+  valuesByPeriod,
+  whatIfValuesByPeriod,
   percentage,
   color,
   isHighlight = false,
@@ -85,8 +100,12 @@ export function ResultTableRow({
       </TableCell>
       {visiblePeriods.map((period) => {
         const divisor = periodOptions[period] ?? 1;
-        const currentValue = annual / divisor;
-        const whatIfValue = whatIfAnnual !== undefined ? whatIfAnnual / divisor : undefined;
+        const periodKey = periodToPayPeriod[period];
+        const currentValue =
+          (periodKey ? valuesByPeriod?.[periodKey] : undefined) ?? annual / divisor;
+        const whatIfValue =
+          (periodKey ? whatIfValuesByPeriod?.[periodKey] : undefined) ??
+          (whatIfAnnual !== undefined ? whatIfAnnual / divisor : undefined);
 
         if (hasWhatIf && whatIfValue !== undefined) {
           // Render Current and What If columns with min-width to prevent overlap
