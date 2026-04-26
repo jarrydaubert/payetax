@@ -146,7 +146,7 @@ test.describe('Calculator critical @critical', () => {
     await expect(page.getByText(/You May Qualify for Marriage Allowance/i)).toBeHidden();
   });
 
-  test('Payslip table renders and marginal responds to student loan @critical', async ({
+  test('Breakdown table renders and marginal responds to student loan @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
@@ -156,7 +156,7 @@ test.describe('Calculator critical @critical', () => {
     await page.getByTestId('salary-input').fill('30000');
     await page.getByTestId('calculate-button').click();
     await expect(page.getByTestId('results-table')).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: 'Payslip' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Breakdown' })).toBeVisible();
 
     const marginalCard = page.getByRole('button', { name: /Marginal Tax Rate/i });
     const baseMarginalText = (await marginalCard.textContent()) ?? '';

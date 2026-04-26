@@ -27,11 +27,15 @@ import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
 import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import type { PayPeriod } from '@/constants/taxRates';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { trackEvent } from '@/lib/analytics';
+import {
+  buildResultsTableRows,
+  type ResultsTableRowKind,
+  type ResultsTableRowViewModel,
+} from '@/lib/calculatorResultsPresenter';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 
@@ -54,17 +58,9 @@ interface ResultsTableProps {
   };
 }
 
-interface ResultRowData {
-  category: string;
+interface RowPresentation {
   icon: React.ElementType;
-  annual: number;
-  whatIfAnnual?: number;
-  valuesByPeriod?: Partial<Record<PayPeriod, number>>;
-  whatIfValuesByPeriod?: Partial<Record<PayPeriod, number>>;
-  percentage: string;
   color: string;
-  isHighlight?: boolean;
-  isSubRow?: boolean;
 }
 
 const periodOptions: Record<string, number> = {
@@ -76,6 +72,31 @@ const periodOptions: Record<string, number> = {
   Daily: 260,
   Hourly: 1950,
 };
+
+const rowPresentation: Record<ResultsTableRowKind, RowPresentation> = {
+  gross: { icon: PoundSterling, color: 'text-foreground' },
+  employment: { icon: Building, color: 'text-muted-foreground' },
+  otherIncome: { icon: Coins, color: 'text-muted-foreground' },
+  taxFree: { icon: Shield, color: 'text-foreground' },
+  taxable: { icon: Scale, color: 'text-foreground' },
+  incomeTax: { icon: Calculator, color: 'text-destructive' },
+  taxBand: { icon: Percent, color: 'text-destructive' },
+  studentLoan: { icon: GraduationCap, color: 'text-destructive' },
+  nationalInsurance: { icon: CreditCard, color: 'text-warning' },
+  pension: { icon: PiggyBank, color: 'text-accent-foreground' },
+  nonTaxableAllowance: { icon: Coins, color: 'text-primary' },
+  netPay: { icon: Wallet, color: 'text-success' },
+  employerNI: { icon: Building, color: 'text-muted-foreground' },
+  yearChange: { icon: TrendingUp, color: 'text-success' },
+};
+
+function getRowPresentation(row: ResultsTableRowViewModel): RowPresentation {
+  if (row.kind === 'yearChange' && row.annual < 0) {
+    return { icon: TrendingUp, color: 'text-destructive' };
+  }
+
+  return rowPresentation[row.kind];
+}
 
 export function ResultsTable({
   results,
@@ -149,9 +170,6 @@ export function ResultsTable({
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
   const previousYearLabel = currentYearStart - 1; // 2024
 
-  // Format the previous year row label (only used when previousYearResults exists)
-  const previousYearRowLabel = `Net Change from ${previousYearLabel}`;
-
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
 
@@ -186,192 +204,14 @@ export function ResultsTable({
     onVisiblePeriodsChange(newPeriods);
   };
 
-  const calculatePercentage = (amount: number, total: number): string => {
-    if (total === 0) return '0.0%';
-    const percentage = Math.abs((amount / total) * 100);
-    // Cap percentage display at 999.9% for readability
-    // (e.g., Tax-Free Allowance of £12,570 on £1 salary would be 1,257,000%)
-    const cappedPercentage = Math.min(percentage, 999.9);
-    return `${cappedPercentage.toFixed(1)}%`;
-  };
-
-  // Use total gross income (employment + other income) for percentage calculations
-  // If incomeBreakdown exists, use the total field; otherwise fall back to grossSalary
-  const grossAnnual = results.incomeBreakdown?.total || results.grossSalary.annually;
-  const taxFreeAllowance = results.taxFreeAmount;
-  const taxableIncome = results.taxableIncome;
-  const allowancesAmount = allowancesDeductions;
-
-  // Calculate year-over-year change
-  const yearChange = previousYearResults
-    ? results.netPay.annually - previousYearResults.netPay.annually
-    : 0;
-  const yearChangePercentage = previousYearResults
-    ? calculatePercentage(yearChange, previousYearResults.netPay.annually)
-    : '0.0%';
-
-  // Calculate What If year-over-year change
-  const whatIfYearChange =
-    previousYearResults && whatIfResults
-      ? whatIfResults.netPay.annually - previousYearResults.netPay.annually
-      : undefined;
-
-  const tableRows: ResultRowData[] = [
-    {
-      category: 'Gross Pay',
-      icon: PoundSterling,
-      annual: grossAnnual,
-      whatIfAnnual: whatIfResults?.incomeBreakdown?.total || whatIfResults?.grossSalary.annually,
-      percentage: '100%',
-      color: 'text-foreground',
-      isHighlight: false,
-    },
-    // Add income breakdown if multiple sources exist
-    ...(results.incomeBreakdown
-      ? [
-          {
-            category: 'Employment Income',
-            icon: Building,
-            annual: results.incomeBreakdown.employment,
-            whatIfAnnual: whatIfResults?.incomeBreakdown?.employment,
-            percentage: calculatePercentage(results.incomeBreakdown.employment, grossAnnual),
-            color: 'text-muted-foreground',
-            isHighlight: false,
-            isSubRow: true,
-          },
-          ...(results.incomeBreakdown.nonEmployment > 0
-            ? [
-                {
-                  category: 'Other Income (No NI)',
-                  icon: Coins,
-                  annual: results.incomeBreakdown.nonEmployment,
-                  whatIfAnnual: whatIfResults?.incomeBreakdown?.nonEmployment,
-                  percentage: calculatePercentage(
-                    results.incomeBreakdown.nonEmployment,
-                    grossAnnual,
-                  ),
-                  color: 'text-muted-foreground',
-                  isHighlight: false,
-                  isSubRow: true,
-                },
-              ]
-            : []),
-        ]
-      : []),
-    {
-      category: 'Tax-Free Allowance',
-      icon: Shield,
-      annual: taxFreeAllowance,
-      whatIfAnnual: whatIfResults?.taxFreeAmount,
-      valuesByPeriod: results.taxFreeAmountByPeriod,
-      whatIfValuesByPeriod: whatIfResults?.taxFreeAmountByPeriod,
-      percentage: calculatePercentage(taxFreeAllowance, grossAnnual),
-      color: 'text-foreground',
-      isHighlight: false,
-    },
-    {
-      category: 'Total Taxable',
-      icon: Scale,
-      annual: taxableIncome,
-      whatIfAnnual: whatIfResults?.taxableIncome,
-      percentage: calculatePercentage(taxableIncome, grossAnnual),
-      color: 'text-foreground',
-      isHighlight: false,
-    },
-    {
-      category: 'Total Tax Due',
-      icon: Calculator,
-      annual: results.incomeTax.annually,
-      whatIfAnnual: whatIfResults?.incomeTax.annually,
-      percentage: calculatePercentage(results.incomeTax.annually, grossAnnual),
-      color: 'text-destructive',
-      isHighlight: false,
-    },
-    // Tax Band Breakdown
-    ...results.taxBands.map((band, idx) => ({
-      category: `${band.rate}% Rate`,
-      icon: Percent,
-      annual: band.amount,
-      whatIfAnnual: whatIfResults?.taxBands[idx]?.amount,
-      percentage: calculatePercentage(band.amount, grossAnnual),
-      color: 'text-destructive',
-      isHighlight: false,
-      isSubRow: true,
-    })),
-    // Student Loans
-    ...(studentLoans.length > 0
-      ? [
-          {
-            category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
-            icon: GraduationCap,
-            annual: results.studentLoan.annually,
-            whatIfAnnual: whatIfResults?.studentLoan.annually,
-            percentage: calculatePercentage(results.studentLoan.annually, grossAnnual),
-            color: 'text-destructive',
-            isHighlight: false,
-          },
-        ]
-      : []),
-    {
-      category: 'National Insurance',
-      icon: CreditCard,
-      annual: results.nationalInsurance.annually,
-      whatIfAnnual: whatIfResults?.nationalInsurance.annually,
-      percentage: calculatePercentage(results.nationalInsurance.annually, grossAnnual),
-      color: 'text-warning',
-      isHighlight: false,
-    },
-    {
-      category: 'Pension',
-      icon: PiggyBank,
-      annual: results.pensionContribution.annually,
-      whatIfAnnual: whatIfResults?.pensionContribution.annually,
-      percentage: calculatePercentage(results.pensionContribution.annually, grossAnnual),
-      color: 'text-accent-foreground',
-      isHighlight: false,
-    },
-    {
-      category: 'Non-taxable allowance(s)',
-      icon: Coins,
-      annual: allowancesAmount,
-      whatIfAnnual: whatIfResults ? allowancesAmount : undefined,
-      percentage: calculatePercentage(allowancesAmount, grossAnnual),
-      color: 'text-primary',
-      isHighlight: false,
-    },
-    {
-      category: 'Net Pay',
-      icon: Wallet,
-      annual: results.netPay.annually,
-      whatIfAnnual: whatIfResults?.netPay.annually,
-      percentage: calculatePercentage(results.netPay.annually, grossAnnual),
-      color: 'text-success',
-      isHighlight: true,
-    },
-    {
-      category: 'Employers NI',
-      icon: Building,
-      annual: results.employerNI,
-      whatIfAnnual: whatIfResults?.employerNI,
-      percentage: calculatePercentage(results.employerNI, grossAnnual),
-      color: 'text-muted-foreground',
-      isHighlight: false,
-    },
-    // Only show year change row when we have previous year data
-    ...(previousYearResults
-      ? [
-          {
-            category: previousYearRowLabel,
-            icon: TrendingUp,
-            annual: yearChange,
-            whatIfAnnual: whatIfYearChange,
-            percentage: yearChangePercentage,
-            color: yearChange >= 0 ? 'text-success' : 'text-destructive',
-            isHighlight: false,
-          },
-        ]
-      : []),
-  ];
+  const tableRows = buildResultsTableRows({
+    results,
+    allowancesDeductions,
+    studentLoans,
+    previousYearResults,
+    whatIfResults,
+    previousYearLabel: String(previousYearLabel),
+  });
 
   return (
     <motion.div
@@ -429,23 +269,27 @@ export function ResultsTable({
                 hasWhatIfResults={!!whatIfResults}
               />
               <TableBody>
-                {tableRows.map((row) => (
-                  <ResultTableRow
-                    key={row.category}
-                    category={row.category}
-                    icon={row.icon}
-                    annual={row.annual}
-                    whatIfAnnual={row.whatIfAnnual}
-                    valuesByPeriod={row.valuesByPeriod}
-                    whatIfValuesByPeriod={row.whatIfValuesByPeriod}
-                    percentage={row.percentage}
-                    color={row.color}
-                    isHighlight={row.isHighlight}
-                    isSubRow={row.isSubRow}
-                    visiblePeriods={visiblePeriods}
-                    periodOptions={periodOptions}
-                  />
-                ))}
+                {tableRows.map((row) => {
+                  const presentation = getRowPresentation(row);
+
+                  return (
+                    <ResultTableRow
+                      key={row.id}
+                      category={row.category}
+                      icon={presentation.icon}
+                      annual={row.annual}
+                      whatIfAnnual={row.whatIfAnnual}
+                      valuesByPeriod={row.valuesByPeriod}
+                      whatIfValuesByPeriod={row.whatIfValuesByPeriod}
+                      percentage={row.percentage}
+                      color={presentation.color}
+                      isHighlight={row.isHighlight}
+                      isSubRow={row.isSubRow}
+                      visiblePeriods={visiblePeriods}
+                      periodOptions={periodOptions}
+                    />
+                  );
+                })}
               </TableBody>
             </table>
           </section>

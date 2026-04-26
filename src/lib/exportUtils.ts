@@ -372,7 +372,7 @@ export function printResults({
           <table>
             <thead>
               <tr>
-                <th>Payslip</th>
+                <th>Breakdown</th>
                 <th>%</th>
                 ${periodHeaders}
               </tr>

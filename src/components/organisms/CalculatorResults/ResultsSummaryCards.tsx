@@ -8,10 +8,9 @@ import { ResultCard } from '@/components/molecules/ResultCard';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { SPACING } from '@/constants/designTokens';
-import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { convertAnnualToPeriod } from '@/lib/periodCalculator';
-import { calculateTax } from '@/lib/taxCalculator';
+import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -37,63 +36,10 @@ export function ResultsSummaryCards({
   const effectiveRate =
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
 
-  // Get tax rates for the specified tax year
-  const taxRates = TAX_RATES[taxYear];
-  const basicBandThreshold = taxRates.bands[0]?.threshold ?? 0;
-  const higherBandThreshold = taxRates.bands[1]?.threshold ?? basicBandThreshold;
-  const personalAllowance = taxRates.personalAllowance;
-  const basicRateThreshold = personalAllowance + basicBandThreshold;
-  const paReductionThreshold = taxRates.personalAllowanceReductionThreshold;
-  const higherRateThreshold = higherBandThreshold;
-
-  // Marginal tax rate: approximate tax/NI/SL rate on the next bit of salary.
-  // Prefer dynamic calculation from the user's actual input; fall back to a band approximation.
-  const marginalTaxRate = useMemo(() => {
-    // Dynamic: compute tax delta for a small salary increase (annualized) to reflect user settings.
-    if (input) {
-      const deltaAnnual = 100; // Larger than £1 to reduce rounding noise while staying "marginal".
-      const deltaInInputPeriod = convertAnnualToPeriod(
-        deltaAnnual,
-        input.payPeriod,
-        input.hoursPerWeek,
-      );
-
-      const bumped = calculateTax({
-        ...input,
-        salary: input.salary + deltaInInputPeriod,
-      });
-
-      const baseTax =
-        results.incomeTax.annually +
-        results.nationalInsurance.annually +
-        results.studentLoan.annually;
-      const bumpedTax =
-        bumped.incomeTax.annually + bumped.nationalInsurance.annually + bumped.studentLoan.annually;
-
-      const deltaTax = bumpedTax - baseTax;
-      const rate = (deltaTax / deltaAnnual) * 100;
-      // Clamp for display sanity.
-      return Math.min(100, Math.max(0, rate));
-    }
-
-    // Fallback approximation: band-based marginal tax+NI (ignores pension, student loan, etc.)
-    const salary = results.grossSalary.annually;
-    if (salary <= personalAllowance) return 0;
-    if (salary <= basicRateThreshold) return 28; // 20% IT + 8% NI (2025-26) in basic band
-    if (salary <= paReductionThreshold) return 42; // 40% IT + 2% NI
-    if (salary <= higherRateThreshold) return 62; // 60% effective + 2% NI
-    return 47; // 45% IT + 2% NI
-  }, [
-    input,
-    results.incomeTax.annually,
-    results.nationalInsurance.annually,
-    results.studentLoan.annually,
-    results.grossSalary.annually,
-    personalAllowance,
-    basicRateThreshold,
-    paReductionThreshold,
-    higherRateThreshold,
-  ]);
+  const marginalTaxRate = useMemo(
+    () => calculateMarginalTaxRate({ results, taxYear, input }),
+    [input, results, taxYear],
+  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -123,7 +69,7 @@ export function ResultsSummaryCards({
             icon={Calendar}
             variant='info'
             delay={0.05}
-            tooltip='The amount you receive in your bank account each month. This is your annual take-home divided by 12.'
+            tooltip='The amount you receive in your bank account each month after income tax, National Insurance, and other deductions.'
           />
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>

@@ -76,11 +76,11 @@ test.describe('Payslip regression @rounding', () => {
 
     // Monthly targets (regression locks for our calculator behavior)
     expect(await getTableValue(page, 'Gross Pay', 'Monthly')).toBeCloseTo(4094.25, 2);
-    expect(await getTableValue(page, 'Total Tax Due', 'Monthly')).toBeCloseTo(576.6, 2);
-    expect(await getTableValue(page, 'National Insurance', 'Monthly')).toBeCloseTo(230.64, 2);
+    expect(await getTableValue(page, 'Total Tax Due', 'Monthly')).toBeCloseTo(576.4, 2);
+    expect(await getTableValue(page, 'National Insurance', 'Monthly')).toBeCloseTo(230.6, 2);
     expect(await getTableValue(page, 'Pension', 'Monthly')).toBeCloseTo(163.77, 2);
     expect(await getTableValue(page, 'Non-taxable allowance(s)', 'Monthly')).toBeCloseTo(26.0, 2);
-    expect(await getTableValue(page, 'Net Pay', 'Monthly')).toBeCloseTo(3149.24, 2);
+    expect(await getTableValue(page, 'Net Pay', 'Monthly')).toBeCloseTo(3149.48, 2);
 
     // Regression lock: salary sacrifice should reduce marginal tax/NI on the "next £100".
     // For this scenario, marginal should be ~26.9% (not ~28% basic band, and definitely not a higher figure).

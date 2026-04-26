@@ -12,6 +12,7 @@ const MotionTableRow = motion.create(TableRow);
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { ARBITRARY, ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
+import { PERIOD_LABEL_TO_PAY_PERIOD } from '@/lib/calculatorResultsPresenter';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultTableRowProps {
@@ -28,16 +29,6 @@ interface ResultTableRowProps {
   visiblePeriods: string[];
   periodOptions: Record<string, number>;
 }
-
-const periodToPayPeriod: Record<string, PayPeriod> = {
-  Yearly: 'annually',
-  Monthly: 'monthly',
-  '4-Weekly': 'fourWeekly',
-  Fortnightly: 'fortnightly',
-  Weekly: 'weekly',
-  Daily: 'daily',
-  Hourly: 'hourly',
-};
 
 /**
  * Table row component for displaying a single calculation result.
@@ -100,7 +91,7 @@ export function ResultTableRow({
       </TableCell>
       {visiblePeriods.map((period) => {
         const divisor = periodOptions[period] ?? 1;
-        const periodKey = periodToPayPeriod[period];
+        const periodKey = PERIOD_LABEL_TO_PAY_PERIOD[period];
         const currentValue =
           (periodKey ? valuesByPeriod?.[periodKey] : undefined) ?? annual / divisor;
         const whatIfValue =

@@ -1,6 +1,10 @@
 // src/components/organisms/CalculatorResults/__tests__/ResultsTable.test.tsx
-import { fireEvent, render, screen } from '@testing-library/react';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  calculateTax,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
+} from '@/lib/taxCalculator';
 import { ResultsTable } from '../ResultsTable';
 
 describe('ResultsTable Component', () => {
@@ -87,7 +91,7 @@ describe('ResultsTable Component', () => {
       const headers = screen.getAllByRole('columnheader');
       const headerTexts = headers.map((h) => h.textContent);
 
-      expect(headerTexts).toContain('Payslip');
+      expect(headerTexts).toContain('Breakdown');
       expect(headerTexts).toContain('%');
       expect(headerTexts).toContain('Yearly');
       expect(headerTexts).toContain('Monthly');
@@ -135,6 +139,43 @@ describe('ResultsTable Component', () => {
       expect(screen.getByText('£12,570.00')).toBeInTheDocument();
       expect(screen.getByText('£1,048.00')).toBeInTheDocument();
       expect(screen.queryByText('£1,047.50')).not.toBeInTheDocument();
+    });
+
+    it('uses calculator period values instead of annual divisors for payslip rows', () => {
+      const payslipInput: TaxCalculationInput = {
+        salary: 49131,
+        payPeriod: 'annually',
+        taxYear: '2026-2027',
+        taxCode: '1257L',
+        isScottish: false,
+        isMarried: false,
+        partnerGrossWage: 0,
+        isBlind: false,
+        payNoNI: false,
+        pensionContribution: 5,
+        pensionContributionType: 'percentage',
+        studentLoanPlans: 'none',
+        niCategory: 'A',
+        hoursPerWeek: 40,
+        allowancesDeductions: 312,
+      };
+      const results = calculateTax(payslipInput);
+
+      render(
+        <ResultsTable
+          results={results}
+          allowancesDeductions={312}
+          visiblePeriods={['Monthly', 'Hourly']}
+        />,
+      );
+
+      const netPayRow = screen.getByText('Net Pay').closest('tr');
+      expect(netPayRow).not.toBeNull();
+
+      const row = within(netPayRow as HTMLTableRowElement);
+      expect(row.getByText('£3,120.02')).toBeInTheDocument();
+      expect(row.getByText('£18.00')).toBeInTheDocument();
+      expect(row.queryByText('£19.20')).not.toBeInTheDocument();
     });
 
     it('should render taxable income row', () => {
