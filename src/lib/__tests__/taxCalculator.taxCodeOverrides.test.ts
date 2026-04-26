@@ -59,14 +59,13 @@ describe('Tax code overrides', () => {
 
     // No allowance, so full income is taxable at 20% basic rate
     expect(result.taxFreeAmount).toBe(0);
-    // Monthly rounding: 10,000 / 12 = 833.33..., tax rounded to £166.67 => £2,000.04 annual.
-    expect(result.incomeTax.annually).toBeCloseTo(2000.04, 2);
+    expect(result.incomeTax.annually).toBeCloseTo(1999.2, 2);
   });
 
   it('K codes create negative allowance and increase taxable income', () => {
     const result = calculateTax({ ...baseInput, taxCode: 'K100' });
 
     expect(result.taxFreeAmount).toBe(-1000);
-    expect(result.taxableIncome).toBeCloseTo(31000, 2);
+    expect(result.taxableIncome).toBeCloseTo(30996, 2);
   });
 });

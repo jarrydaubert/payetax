@@ -75,7 +75,7 @@ describe('Tax Calculator invariants', () => {
   it('BR tax code implies 0 allowance and a single-rate income tax calculation', () => {
     const r = calculateTax(createInput({ salary: 25000, taxCode: 'BR' }));
     expect(r.taxFreeAmount).toBe(0);
-    expect(r.incomeTax.annually).toBeCloseTo(5000.04, 2);
+    expect(r.incomeTax.annually).toBeCloseTo(4999.2, 2);
   });
 
   it('K-code increases taxable income (negative allowance)', () => {

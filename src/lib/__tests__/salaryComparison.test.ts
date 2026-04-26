@@ -130,12 +130,10 @@ describe('Salary Comparison', () => {
         currentSalary: 40000,
       });
 
-      // £40k → £50k: Additional £10k taxed at 20% + 8% NI = £2,800 deductions
-      // Net increase: £10,000 - £2,800 = £7,200
       expect(result?.grossDiff).toBe(10000);
-      expect(result?.netDiff).toBeCloseTo(7200, 0);
-      expect(result?.taxDiff).toBeCloseTo(2000, 0); // £10k × 20%
-      expect(result?.niDiff).toBeCloseTo(800, 0); // £10k × 8%
+      expect(result?.netDiff).toBeCloseTo(7200.88, 0);
+      expect(result?.taxDiff).toBeCloseTo(1999.2, 0);
+      expect(result?.niDiff).toBeCloseTo(799.92, 0);
     });
 
     it('should return null for invalid input', () => {

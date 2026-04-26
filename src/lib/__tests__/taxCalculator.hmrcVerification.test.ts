@@ -51,32 +51,32 @@ describe('HMRC Rate Verification & Edge Cases', () => {
   const scottishHmrcFixtures202526 = [
     {
       salary: 15397,
-      expectedIncomeTax: 537.12,
-      expectedNI: 226.2,
+      expectedIncomeTax: 535.8,
+      expectedNI: 225.72,
       note: 'Starter rate boundary (19%)',
     },
     {
       salary: 27491,
-      expectedIncomeTax: 2955.96,
-      expectedNI: 1193.64,
+      expectedIncomeTax: 2952.48,
+      expectedNI: 1193.16,
       note: 'Basic rate boundary (20%)',
     },
     {
       salary: 43662,
-      expectedIncomeTax: 6351.84,
-      expectedNI: 2487.36,
+      expectedIncomeTax: 6349.2,
+      expectedNI: 2486.88,
       note: 'Intermediate rate boundary (21%)',
     },
     {
       salary: 75000,
-      expectedIncomeTax: 19513.8,
-      expectedNI: 3510.6,
+      expectedIncomeTax: 19511.16,
+      expectedNI: 3510,
       note: 'Higher rate boundary (42%)',
     },
     {
       salary: 90000,
-      expectedIncomeTax: 26263.8,
-      expectedNI: 3810.6,
+      expectedIncomeTax: 26260.8,
+      expectedNI: 3810,
       note: 'Advanced rate in-range (45%)',
     },
   ] as const;
@@ -85,41 +85,30 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     it('£25,000 salary - standard calculation', () => {
       const result = calculateTax(createInput({ salary: 25000 }));
 
-      // Taxable income: £25,000 - £12,570 = £12,430
-      // Annualized from monthly HMRC-style rounding in engine = £2,486.04
+      // Annualized from whole-pound monthly taxable pay.
       expect(result.taxFreeAmount).toBe(12570);
-      expect(result.taxableIncome).toBeCloseTo(12430, 2);
-      expect(result.incomeTax.annually).toBeCloseTo(2486.04, 2);
+      expect(result.taxableIncome).toBeCloseTo(12420, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(2484, 2);
 
-      // NI annualized from monthly rounding = £994.44
-      expect(result.nationalInsurance.annually).toBeCloseTo(994.44, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(993.96, 2);
 
-      // Net pay annualized from monthly rounding = £21,519.52
-      expect(result.netPay.annually).toBeCloseTo(21519.52, 2);
+      expect(result.netPay.annually).toBeCloseTo(21522.04, 2);
     });
 
     it('£50,270 salary - top of basic rate', () => {
       const result = calculateTax(createInput({ salary: 50270 }));
 
-      // Taxable income: £50,270 - £12,570 = £37,700
-      // Annualized from monthly HMRC-style rounding = £7,539.96
-      expect(result.incomeTax.annually).toBeCloseTo(7539.96, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
 
-      // NI annualized from monthly rounding = £3,015.96
-      expect(result.nationalInsurance.annually).toBeCloseTo(3015.96, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(3015.36, 2);
     });
 
     it('£60,000 salary - higher rate taxpayer', () => {
       const result = calculateTax(createInput({ salary: 60000 }));
 
-      // Taxable income: £60,000 - £12,570 = £47,430
-      // Tax annualized from monthly rounding = £11,432.04
-      expect(result.incomeTax.annually).toBeCloseTo(11432.04, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11428.8, 2);
 
-      // NI: £37,700 × 8% = £3,016
-      //     £9,730 × 2% = £194.60
-      //     Total = £3,210.60
-      expect(result.nationalInsurance.annually).toBeCloseTo(3210.6, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
     });
 
     it('£100,000 salary - personal allowance tapering starts', () => {
@@ -128,11 +117,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Personal allowance unchanged at £100k
       expect(result.taxFreeAmount).toBe(12570);
 
-      // Taxable: £100,000 - £12,570 = £87,430
-      // Tax: £37,700 × 20% = £7,540
-      //      £49,730 × 40% = £19,892
-      //      Total = £27,432
-      expect(result.incomeTax.annually).toBeCloseTo(27432, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(27427.2, 2);
     });
 
     it('£125,140 salary - personal allowance fully removed', () => {
@@ -141,11 +126,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // PA reduced to zero: (£125,140 - £100,000) ÷ 2 = £12,570 reduction
       expect(result.taxFreeAmount).toBe(0);
 
-      // All income is taxable: £125,140
-      // Tax: £37,700 × 20% = £7,540
-      //      £87,440 × 40% = £34,976
-      //      Total = £42,516
-      expect(result.incomeTax.annually).toBeCloseTo(42516, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(42513.6, 2);
     });
 
     it('£150,000 salary - additional rate taxpayer', () => {
@@ -154,11 +135,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // No personal allowance
       expect(result.taxFreeAmount).toBe(0);
 
-      // Tax: £37,700 × 20% = £7,540
-      //      £87,440 × 40% = £34,976
-      //      £24,860 × 45% = £11,187
-      //      Total = £53,703
-      expect(result.incomeTax.annually).toBeCloseTo(53703, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(53701.8, 2);
     });
 
     it('should add non-taxable allowances to net pay (without changing tax/NI)', () => {
@@ -463,8 +440,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           niCategory: 'A',
         }),
       );
-      // (£30,000 - £12,570) × 8% = £1,394.40
-      expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
     });
 
     it('Category B - married woman reduced rate', () => {
@@ -474,8 +450,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           niCategory: 'B',
         }),
       );
-      // Category B annualized from monthly rounding = £871.56
-      expect(result.nationalInsurance.annually).toBeCloseTo(871.56, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(871.2, 2);
     });
 
     it('Category C - over state pension age', () => {
@@ -516,11 +491,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // £4,000 pension contribution
       expect(result.pensionContribution.annually).toBe(4000);
 
-      // Taxable: £40,000 - £12,570 - £4,000 = £23,430
-      expect(result.taxableIncome).toBe(23430);
+      expect(result.taxableIncome).toBe(23424);
 
-      // Tax: £23,430 × 20% = £4,686
-      expect(result.incomeTax.annually).toBeCloseTo(4686, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(4684.8, 2);
     });
 
     it('Fixed £5,000 pension contribution', () => {
@@ -534,8 +507,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
 
       expect(result.pensionContribution.annually).toBe(5000);
 
-      // Taxable: £50,000 - £12,570 - £5,000 = £32,430
-      expect(result.taxableIncome).toBeCloseTo(32430, 2);
+      expect(result.taxableIncome).toBeCloseTo(32424, 2);
     });
   });
 
@@ -586,14 +558,14 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Band amount is the taxable income in that band: £37,700
       // Or it might store the tax amount: £7,540
       if (basicBand?.amount > 10000) {
-        expect(basicBand?.amount).toBeCloseTo(37700, 2); // Taxable income in band
+        expect(basicBand?.amount).toBeCloseTo(37704, 2); // Taxable income in band
       } else {
         expect(basicBand?.amount).toBeCloseTo(7540, 2); // Tax amount
       }
 
       expect(higherBand).toBeDefined();
       if (higherBand?.amount > 5000) {
-        expect(higherBand?.amount).toBeCloseTo(9730, 2); // Taxable income in band
+        expect(higherBand?.amount).toBeCloseTo(9720, 2); // Taxable income in band
       } else {
         expect(higherBand?.amount).toBeCloseTo(3892, 2); // Tax amount
       }
@@ -607,9 +579,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Bug class: TAX-CODE-OVERRIDES
       // BR should remove the personal allowance and apply a flat 20%.
       expect(result.taxFreeAmount).toBe(0);
-      expect(result.incomeTax.annually).toBeCloseTo(5000.04, 2);
-      expect(result.nationalInsurance.annually).toBeCloseTo(994.44, 2);
-      expect(result.netPay.annually).toBeCloseTo(19005.52, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(4999.2, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(993.96, 2);
+      expect(result.netPay.annually).toBeCloseTo(19006.84, 2);
     });
 
     it('K100: applies a negative allowance (adds to taxable income)', () => {
@@ -618,9 +590,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Bug class: TAX-CODE-OVERRIDES
       // K100 means -£1,000 allowance, so taxable income increases.
       expect(result.taxFreeAmount).toBe(-1000);
-      expect(result.incomeTax.annually).toBeCloseTo(8859.96, 2);
-      expect(result.nationalInsurance.annually).toBeCloseTo(2194.44, 2);
-      expect(result.netPay.annually).toBeCloseTo(28945.6, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(8856, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(2193.96, 2);
+      expect(result.netPay.annually).toBeCloseTo(28950.04, 2);
     });
 
     it('D0: taxes all income at 40% with no personal allowance', () => {
@@ -628,8 +600,8 @@ describe('HMRC Rate Verification & Edge Cases', () => {
 
       // Bug class: TAX-CODE-OVERRIDES
       expect(result.taxFreeAmount).toBe(0);
-      expect(result.incomeTax.annually).toBeCloseTo(20000.04, 2);
-      expect(result.nationalInsurance.annually).toBeCloseTo(2994.36, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(19996.8, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(2993.88, 2);
     });
   });
 
@@ -643,7 +615,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Expected values derived from current rules and rounding:
       // Plan 2: 9% above £28,470 + Postgrad: 6% above £21,000 (both via PAYE on employment income).
       expect(result.studentLoan.annually).toBeCloseTo(3677.76, 2);
-      expect(result.netPay.annually).toBeCloseTo(35841.92, 2);
+      expect(result.netPay.annually).toBeCloseTo(35845.16, 2);
     });
   });
 

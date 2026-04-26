@@ -172,11 +172,11 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         switch (category) {
           case 'A':
             // Standard: 8% on £12,570-£50,270
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
             break;
           case 'B':
             // Married woman/widow: 5% on £12,570-£50,270
-            expect(result.nationalInsurance.annually).toBeCloseTo(871.56, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(871.2, 2);
             break;
           case 'C':
             // Over state pension age: 0%
@@ -184,19 +184,19 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
             break;
           case 'H':
             // Apprentice under 25: 8% (same as A)
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
             break;
           case 'J':
             // Deferment: 2% on all earnings above £12,570
-            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(348.48, 2);
             break;
           case 'M':
             // Under 21: 8% (same as A)
-            expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
             break;
           case 'Z':
             // Under 21 deferment: 2% (same as J)
-            expect(result.nationalInsurance.annually).toBeCloseTo(348.6, 2);
+            expect(result.nationalInsurance.annually).toBeCloseTo(348.48, 2);
             break;
         }
       });
@@ -538,20 +538,19 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
     it('£1 over personal allowance', () => {
       const result = calculateTax(createInput({ salary: 12571 }));
-      expect(result.taxableIncome).toBeCloseTo(1, 2);
-      // Monthly calculation may round differently
-      expect(result.incomeTax.annually).toBeCloseTo(0.24, 2); // ~24p annualized from monthly rounding
-      expect(result.nationalInsurance.annually).toBeCloseTo(0.12, 2); // ~12p annualized from monthly rounding
+      expect(result.taxableIncome).toBe(0);
+      expect(result.incomeTax.annually).toBe(0);
+      expect(result.nationalInsurance.annually).toBe(0);
     });
 
     it('exactly at higher rate threshold', () => {
       const result = calculateTax(createInput({ salary: 50270 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7539.96, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
     });
 
     it('£1 into higher rate', () => {
       const result = calculateTax(createInput({ salary: 50271 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7540.44, 2); // Extra 44p annualized from monthly rounding
+      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
     });
 
     it('exactly at additional rate threshold', () => {
@@ -589,7 +588,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         // NI rates differ between years
         if (year === '2025-2026') {
           // 8% rate for 2025-26
-          expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+          expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
         }
       });
     });
@@ -670,7 +669,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       // £11.50 × 25 × 52 = £14,950
       expect(result.grossSalary.annually).toBe(14950);
       // Just above PA, minimal tax
-      expect(result.incomeTax.annually).toBeCloseTo(476.04, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(472.8, 2);
     });
   });
 });

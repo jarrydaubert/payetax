@@ -164,11 +164,10 @@ describe('Tax Calculator', () => {
       // Validate gross salary input preservation
       expect(result.grossSalary.annually).toBe(30000);
 
-      // Income tax: (£30,000 - £12,570) × 20% = £17,430 × 20% = £3,486
-      expect(result.incomeTax.annually).toBeCloseTo(3486, 2);
+      // PAYE is annualized from whole-pound monthly taxable pay.
+      expect(result.incomeTax.annually).toBeCloseTo(3484.8, 2);
 
-      // National Insurance: (£30,000 - £12,570) × 8% = £17,430 × 8% = £1,394.40
-      expect(result.nationalInsurance.annually).toBeCloseTo(1394.4, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
 
       // Net pay should be positive and less than gross
       expect(result.netPay.annually).toBeLessThan(30000);
@@ -203,11 +202,10 @@ describe('Tax Calculator', () => {
       // Validate gross salary preservation
       expect(result.grossSalary.annually).toBe(60000);
 
-      // Annualized from monthly HMRC-style rounding = £11,432.04
-      expect(result.incomeTax.annually).toBeCloseTo(11432.04, 2);
+      // Annualized from monthly HMRC-style rounding.
+      expect(result.incomeTax.annually).toBeCloseTo(11428.8, 2);
 
-      // National Insurance: £37,700 × 8% + £9,730 × 2% = £3,016 + £194.60 = £3,210.60
-      expect(result.nationalInsurance.annually).toBeCloseTo(3210.6, 2);
+      expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
 
       // Net pay validation
       expect(result.netPay.annually).toBeLessThan(60000);
@@ -691,9 +689,9 @@ describe('Tax Calculator', () => {
       // Should add £3,070 (2024-25) to tax-free allowance
       expect(resultWith.taxFreeAmount).toBe(resultWithout.taxFreeAmount + 3070);
 
-      // Annualized from monthly HMRC-style rounding = £614.04 less tax
+      // Annualized from monthly HMRC-style rounding.
       expect(resultWithout.incomeTax.annually - resultWith.incomeTax.annually).toBeCloseTo(
-        614.04,
+        614.4,
         2,
       );
     });
@@ -835,8 +833,7 @@ describe('Tax Calculator', () => {
 
       // With £80,000 income:
       // Taxable: £80,000 - £12,570 = £67,430
-      // Advanced rate applies to income £62,431-£67,430 = £5,000
-      expect(advancedBand?.amount).toBeCloseTo(5000, 2);
+      expect(advancedBand?.amount).toBeCloseTo(4980, 2);
     });
 
     it('does not apply Advanced rate for income below £75,000', () => {
@@ -865,8 +862,7 @@ describe('Tax Calculator', () => {
       // Personal allowance is fully tapered (income > £125,140)
       // Taxable: £150,000 - £0 PA = £150,000
       // Top rate applies to taxable income above £112,570
-      // Amount in top band: £150,000 - £112,570 = £37,430
-      expect(topBand?.amount).toBeCloseTo(37430, 2);
+      expect(topBand?.amount).toBeCloseTo(37428, 2);
     });
   });
 
@@ -1042,12 +1038,11 @@ describe('Tax Calculator', () => {
       expect(result.netPay.annually).toBeLessThan(500000);
     });
 
-    it('handles precision for small amounts', () => {
+    it('floors sub-pound monthly taxable pay under PAYE table rules', () => {
       const input = createBasicInput(12571); // £1 over personal allowance
       const result = calculateTax(input);
 
-      expect(result.incomeTax.annually).toBeGreaterThan(0);
-      expect(result.incomeTax.annually).toBeLessThan(1);
+      expect(result.incomeTax.annually).toBe(0);
     });
 
     it('handles hourly period with default hours when hoursPerWeek is 0', () => {

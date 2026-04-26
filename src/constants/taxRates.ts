@@ -71,6 +71,19 @@ export interface TaxAllowance {
   period: PayPeriod;
 }
 
+export interface PayrollPeriodThresholds {
+  weekly: {
+    payeFreePay: number;
+    niPrimary: number;
+    niUpper: number;
+  };
+  monthly: {
+    payeFreePay: number;
+    niPrimary: number;
+    niUpper: number;
+  };
+}
+
 // Available tax years (newest to oldest)
 export const TAX_YEARS: TaxYear[] = ['2026-2027', '2025-2026', '2024-2025', '2023-2024'];
 export const CURRENT_TAX_YEAR: TaxYear = TAX_YEARS[0] as TaxYear;
@@ -227,6 +240,25 @@ export function formatTaxYearDisplay(
 }
 
 export const CURRENT_TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR);
+
+export const PAYROLL_PERIOD_THRESHOLDS: Record<TaxYear, PayrollPeriodThresholds> = {
+  '2026-2027': {
+    weekly: { payeFreePay: 242, niPrimary: 242, niUpper: 967 },
+    monthly: { payeFreePay: 1048, niPrimary: 1048, niUpper: 4189 },
+  },
+  '2025-2026': {
+    weekly: { payeFreePay: 242, niPrimary: 242, niUpper: 967 },
+    monthly: { payeFreePay: 1048, niPrimary: 1048, niUpper: 4189 },
+  },
+  '2024-2025': {
+    weekly: { payeFreePay: 242, niPrimary: 242, niUpper: 967 },
+    monthly: { payeFreePay: 1048, niPrimary: 1048, niUpper: 4189 },
+  },
+  '2023-2024': {
+    weekly: { payeFreePay: 242, niPrimary: 242, niUpper: 967 },
+    monthly: { payeFreePay: 1048, niPrimary: 1048, niUpper: 4189 },
+  },
+};
 
 // Standard UK Tax Rates (England, Wales, NI)
 export const TAX_RATES: Record<

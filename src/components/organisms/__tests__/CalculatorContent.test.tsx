@@ -168,8 +168,8 @@ describe('CalculatorContent Component', () => {
     it('should display tax amounts for each salary', () => {
       render(<CalculatorContent />);
 
-      // £30k row: tax = £3,486 (dynamically calculated)
-      expect(screen.getByText('£3,486')).toBeInTheDocument();
+      // £30k row: annualized monthly PAYE tax is dynamically calculated.
+      expect(screen.getByText('£3,485')).toBeInTheDocument();
     });
 
     it('should display NI amounts for each salary', () => {

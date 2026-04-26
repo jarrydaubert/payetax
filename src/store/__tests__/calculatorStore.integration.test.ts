@@ -24,12 +24,10 @@ describe('CalculatorStore Integration', () => {
       const state = useCalculatorStore.getState();
 
       // Verify real calculation results
-      // £50k: Tax = (£50,000 - £12,570) × 20% = £7,486
-      // NI = (£50,000 - £12,570) × 8% = £2,994.40
       expect(state.results).not.toBeNull();
-      expect(state.results?.incomeTax.annually).toBeCloseTo(7486, 0);
-      expect(state.results?.nationalInsurance.annually).toBeCloseTo(2994.4, 0);
-      expect(state.results?.netPay.annually).toBeCloseTo(39519.6, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(7483.2, 0);
+      expect(state.results?.nationalInsurance.annually).toBeCloseTo(2993.88, 0);
+      expect(state.results?.netPay.annually).toBeCloseTo(39522.92, 0);
     });
 
     it('should produce correct tax for £30k salary', () => {
@@ -40,11 +38,9 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      // £30k: Tax = (£30,000 - £12,570) × 20% = £3,486
-      // NI = (£30,000 - £12,570) × 8% = £1,394.40
-      expect(state.results?.incomeTax.annually).toBeCloseTo(3486, 0);
-      expect(state.results?.nationalInsurance.annually).toBeCloseTo(1394.4, 0);
-      expect(state.results?.netPay.annually).toBeCloseTo(25119.6, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(3484.8, 0);
+      expect(state.results?.nationalInsurance.annually).toBeCloseTo(1393.92, 0);
+      expect(state.results?.netPay.annually).toBeCloseTo(25121.28, 0);
     });
 
     it('should handle higher rate taxpayer at £60k', () => {
@@ -55,13 +51,8 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      // £60k crosses into 40% band at £50,270
-      // Basic: (£50,270 - £12,570) × 20% = £7,540
-      // Higher: (£60,000 - £50,270) × 40% = £3,892
-      // Total tax: £11,432
-      // NI: 8% up to upper earnings limit, 2% above
-      expect(state.results?.incomeTax.annually).toBeCloseTo(11432, 0);
-      expect(state.results?.nationalInsurance.annually).toBeCloseTo(3210.6, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(11428.8, 0);
+      expect(state.results?.nationalInsurance.annually).toBeCloseTo(3210, 0);
     });
 
     it('should handle Scottish tax rates when isScottish is true', () => {

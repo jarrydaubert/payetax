@@ -9,13 +9,13 @@
  * ## HMRC Compliance & Implementation Notes
  *
  * ### Tax Calculation Methodology
- * The calculator uses a **hybrid monthly-annual approach** that mirrors real UK payroll systems:
+ * The calculator uses a **hybrid monthly-annual approach** for payslip-style estimates:
  * 1. **Annual Conversion**: All inputs are normalized to annual amounts for consistency
- * 2. **Monthly Processing**: Tax calculations are performed on monthly amounts for accuracy
+ * 2. **Monthly Processing**: Tax calculations are performed using monthly payroll thresholds
  * 3. **Period Scaling**: Results are scaled to all requested pay periods from monthly base
  *
  * This approach ensures:
- * - Accurate cumulative tax calculations (matching HMRC RTI)
+ * - Accurate month-1 style PAYE and NI estimates for common employee scenarios
  * - Proper handling of tax bands and thresholds
  * - Consistency across different pay period inputs
  *
@@ -44,6 +44,7 @@ import {
   CURRENT_TAX_YEAR,
   DEFAULT_HOURS_PER_WEEK,
   DEFAULT_TAX_CODE,
+  PAYROLL_PERIOD_THRESHOLDS,
   type PayPeriod,
   PERIOD_CONVERSION_FACTORS,
   PERIODS,
@@ -61,6 +62,32 @@ import { roundToPence } from './tax/utils';
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 
 const AVERAGE_WEEKS_PER_MONTH = WEEKS_PER_YEAR / 12;
+
+function getMonthlyPayrollFreePay(
+  annualTaxFreeAmount: number,
+  standardPersonalAllowance: number,
+  taxYear: TaxYear,
+): number {
+  if (annualTaxFreeAmount <= 0) {
+    return annualTaxFreeAmount / 12;
+  }
+
+  const thresholds = PAYROLL_PERIOD_THRESHOLDS[taxYear];
+
+  if (annualTaxFreeAmount === standardPersonalAllowance) {
+    return thresholds.monthly.payeFreePay;
+  }
+
+  return Math.ceil(annualTaxFreeAmount / 12);
+}
+
+function getMonthlyPayrollBandThreshold(annualThreshold: number): number {
+  if (!Number.isFinite(annualThreshold)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return Math.ceil(annualThreshold / 12);
+}
 
 function resolveSupportedTaxYear(taxYear: string | undefined): TaxYear {
   if (typeof taxYear !== 'string') {
@@ -285,14 +312,16 @@ export function calculateNIContributions(
     upperEarningsLimit: number;
     employeeRate: number;
     employeeRateAboveUEL: number;
+    monthlyPrimaryThreshold?: number;
+    monthlyUpperEarningsLimit?: number;
   },
   payNoNI: boolean,
   isOverStatePensionAge: boolean,
 ): number {
   if (payNoNI || isOverStatePensionAge) return 0;
 
-  const monthlyPrimaryThreshold = rates.primaryThreshold / 12;
-  const monthlyUEL = rates.upperEarningsLimit / 12;
+  const monthlyPrimaryThreshold = rates.monthlyPrimaryThreshold ?? rates.primaryThreshold / 12;
+  const monthlyUEL = rates.monthlyUpperEarningsLimit ?? rates.upperEarningsLimit / 12;
 
   let monthlyNI = 0;
 
@@ -748,8 +777,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
   }
 
-  // Calculate monthly tax-free amount for payslip calculation
-  const monthlyTaxFreeAmount = annualTaxFreeAmount / 12;
+  // Calculate monthly tax-free amount for payslip calculation.
+  const monthlyTaxFreeAmount = getMonthlyPayrollFreePay(
+    annualTaxFreeAmount,
+    taxRates.personalAllowance,
+    taxYear,
+  );
 
   // ---------------
   // 5. Calculate adjusted salary and taxable income (annual and monthly)
@@ -758,8 +791,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Adjusted salary (after pre-tax deductions - pension only)
   const monthlyTaxableAdjustedSalary = monthlyGrossSalary - monthlyPensionContribution;
 
-  // Calculate taxable income (adjusted salary minus tax-free amount)
-  const monthlyTaxableIncome = Math.max(0, monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount);
+  // HMRC manual PAYE tables use whole-pound taxable pay after pay adjustment.
+  const monthlyTaxableIncome = Math.floor(
+    Math.max(0, monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount),
+  );
   const annualTaxableIncome = monthlyTaxableIncome * 12;
 
   // ---------------
@@ -820,7 +855,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         // Example: Annual threshold £2,306 becomes monthly threshold £192.17
         const monthlyBoundaries = [
           0, // Always start from £0
-          ...taxRates.bands.map((band) => band.threshold / 12), // Convert each threshold to monthly
+          ...taxRates.bands.map((band) => getMonthlyPayrollBandThreshold(band.threshold)),
           Number.POSITIVE_INFINITY, // Top band has no upper limit
         ];
 
@@ -887,9 +922,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           const band = taxRates.bands[i];
           if (!band) continue;
 
-          // Convert annual band threshold to monthly equivalent
-          // Example: £37,700 annual basic rate threshold = £3,141.67 monthly
-          const monthlyThreshold = band.threshold / 12;
+          // Convert annual band threshold to the whole-pound monthly payroll threshold.
+          const monthlyThreshold = getMonthlyPayrollBandThreshold(band.threshold);
 
           // Calculate the "width" of this tax band
           // This is how much income can be taxed at this band's rate
@@ -970,10 +1004,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // - Age >= 66: Automatic exemption at State Pension Age
   if (!input.payNoNI && input.niCategory !== 'C' && !isOverStatePensionAge) {
     const niRates = standardRates.nationalInsurance.employee[input.niCategory];
+    const periodThresholds = PAYROLL_PERIOD_THRESHOLDS[taxYear].monthly;
 
-    // Convert annual thresholds to monthly
-    const monthlyPrimaryThreshold = niRates.primary.threshold / 12;
-    const monthlyUpperThreshold = niRates.upper.threshold / 12;
+    const monthlyPrimaryThreshold = periodThresholds.niPrimary;
+    const monthlyUpperThreshold = periodThresholds.niUpper;
 
     // NI base: Employment income minus pension (salary sacrifice reduces NI liability)
     const monthlyTaxableAdjustedEmploymentIncome =
