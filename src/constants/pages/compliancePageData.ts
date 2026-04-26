@@ -12,11 +12,11 @@
  */
 
 import type { LucideIcon } from 'lucide-react';
-import Award from 'lucide-react/dist/esm/icons/award.js';
-import Calendar from 'lucide-react/dist/esm/icons/calendar.js';
-import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.js';
-import FileText from 'lucide-react/dist/esm/icons/file-text.js';
-import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Award from 'lucide-react/dist/esm/icons/award.mjs';
+import Calendar from 'lucide-react/dist/esm/icons/calendar.mjs';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle.mjs';
+import FileText from 'lucide-react/dist/esm/icons/file-text.mjs';
+import Shield from 'lucide-react/dist/esm/icons/shield.mjs';
 import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import {
   HMRC_INCOME_TAX_RATES_URL,

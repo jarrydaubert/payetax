@@ -32,6 +32,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 - Do not log sensitive user data or leak server env vars into client components.
 - Keep evergreen docs free of TODOs, progress markers, and stale status; open work belongs in `docs/BACKLOG.md`.
 - Prefer a small number of high-signal tests over broad low-signal coverage.
+- Treat tests and validation as the primary proof of completion; do not create standalone evidence docs for backlog closure.
 
 ## Verification
 

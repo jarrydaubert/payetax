@@ -22,9 +22,9 @@ Use this column order:
 |---|---|---|
 | `Backlog` | Work is captured in `docs/BACKLOG.md` with ID, next step, done condition. | Item is fully scoped and meets Definition of Ready. |
 | `Ready` | Card has owner, scope, acceptance criteria, and test plan. | Work has started and card moved to `In Progress`. |
-| `In Progress` | Active implementation on a branch/PR by assignee. | PR is open with evidence attached, then move to `Review`. |
-| `Review` | Code is ready for review with test evidence and risk notes. | Approved + merged + any required post-merge validation complete. |
-| `Done` | Change shipped and verified against acceptance criteria. | Remove completed item from `docs/BACKLOG.md` at next backlog burn-down pass. |
+| `In Progress` | Active implementation on a branch/PR by assignee. | PR is open with tests, validation results, and risk notes, then move to `Review`. |
+| `Review` | Code is ready for review with relevant tests and validation passing. | Approved + merged + any required post-merge validation complete. |
+| `Done` | Change shipped and verified against acceptance criteria. | Linked Linear issue is closed and completed item is removed from `docs/BACKLOG.md` in the same change set. |
 
 ---
 
@@ -45,7 +45,9 @@ A card can move to `Ready` only if all are true:
 - Problem statement is clear and user/business impact is stated.
 - Scope is explicit (what is in, what is out).
 - Acceptance criteria are observable and testable.
-- Test plan is defined. For code or behavior work, this should default to named automated coverage at the right layer (unit, integration, E2E, or scripted verification). Use an explicit rationale for no automation only when the work is docs/research/config-only or automation is the wrong layer.
+- Test plan is defined. For code or behavior work, this defaults to named automated coverage at the right layer (unit, integration, E2E, or scripted verification).
+- E2E coverage is expected for critical user journeys, cross-route behavior, and browser-only regressions; unit tests alone are not enough for those cases.
+- Manual validation is allowed only when automation is genuinely the wrong layer, and the validation steps belong in the PR or linked Linear issue.
 - Risk level is set (`tax-logic`, `security`, `seo`, `content`, `ops`).
 
 ---
@@ -57,9 +59,10 @@ A card is `Done` only when all are true:
 - Implementation matches acceptance criteria.
 - Required tests are added/updated and passing for any code or behavior change.
 - Test intent is explicit: "what bug does this test catch?"
-- If the work does not use automated tests, the replacement evidence path is named, captured, and justified.
+- If the work does not use automated tests, the PR or linked Linear issue explains why automation is the wrong layer and lists the manual validation performed.
 - No undocumented test debt added (`skip`/`todo`/placeholder tests).
 - Docs/backlog updated if behavior or scope changed.
+- Linked Linear production issues are closed once fixed, or updated with the reason if no code change is needed.
 - For tax-impacting work, logic still aligns with `src/constants/taxRates.ts`.
 
 ---

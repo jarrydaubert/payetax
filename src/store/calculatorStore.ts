@@ -404,7 +404,9 @@ export const collectCalculationAnomalies = (
     Number.isFinite(annualNet)
   ) {
     const effectiveRate = ((annualGross - annualNet) / annualGross) * 100;
-    if (!Number.isFinite(effectiveRate) || effectiveRate < 0 || effectiveRate > 100) {
+    // Non-taxable allowances can legitimately push net pay above taxable gross.
+    // Keep catching impossible over-100% deductions and non-finite math.
+    if (!Number.isFinite(effectiveRate) || effectiveRate > 100) {
       anomalies.push({
         code: 'invalid_effective_rate',
         detail: 'annual_effective_rate',

@@ -188,10 +188,10 @@ bun run audit:gitlab:ci-usage
 bun run audit:gitlab:governance
 ```
 
-Evidence outputs:
+Outputs:
 
-- `docs/evidence/gitlab-policy-drift.md`
-- `docs/evidence/gitlab-ci-usage.md`
+- Governance audit results print to the terminal.
+- Fix drift immediately, or add a concrete `docs/BACKLOG.md` row when follow-up work is needed.
 
 Interpretation notes:
 
@@ -238,11 +238,16 @@ curl -sS --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
 
 ### Monthly Review
 
-1. Run governance audits and commit refreshed evidence files.
+1. Run governance audits and fix drift or add a concrete backlog item.
 2. Confirm `.gitlab-ci.yml` runtime/cost assumptions are still valid.
 3. Confirm release-report discipline is being followed (`release:report:check`).
 4. Confirm Vercel project/env linkage still matches this repo.
 5. Confirm the local marketing-skills pin/profile is still intentional when upstream updates land; use `bun run skills:check`.
+6. Review team-level Sentry issues in Linear and link actionable production issues to backlog rows.
+
+```bash
+bun run linear list --team-only
+```
 
 ### Harness Command Surface
 
@@ -272,7 +277,7 @@ Rule of thumb:
   - Post-release checks in `docs/guides/POST_RELEASE_VALIDATION.md` are completed or any incomplete checks are explicitly recorded.
 - Governance audits:
   - `bun run audit:gitlab:governance` completes without unexpected failures.
-  - Evidence files in `docs/evidence/` reflect the latest audit run.
+  - Any drift is fixed immediately or captured as a concrete backlog item.
 - Harness usage:
   - Chosen harness command completes without mutating files unless `fix-all` was intentionally used.
 
@@ -281,11 +286,11 @@ Rule of thumb:
 - If a local gate fails:
   - fix the issue before merge, or document the blocker and keep the related backlog item open.
 - If GitLab audit commands cannot reach the API:
-  - use `ALLOW_OFFLINE_GITLAB_AUDITS=1` only when the temporary skip is acceptable, and record the gap in evidence or backlog.
+  - use `ALLOW_OFFLINE_GITLAB_AUDITS=1` only when the temporary skip is acceptable, and record the gap in Linear or backlog if follow-up is needed.
 - If Vercel project/env linkage is broken:
   - re-auth or relink before treating deployment checks as complete.
 - If release-report validation fails:
-  - fix the report or missing evidence before release completion.
+  - fix the report before release completion.
 - If the production env contract check fails:
   - fix the missing Vercel Production env vars or explicitly disable the feature in the checked-in contract before release completion.
 - If a workflow change alters how these steps work:

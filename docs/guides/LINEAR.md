@@ -36,6 +36,8 @@ Use the template in `docs/guides/KANBAN.md`.
 ## Workflow Rules
 
 - Keep issue state accurate (`Backlog` -> `Ready` -> `In Progress` -> `Review` -> `Done`).
+- Do not use `In Progress` to mean "seen"; use it only when implementation has actually started.
+- A triaged-but-not-started production issue should be linked to a backlog ID and left in `Backlog` or moved to `Ready` if it meets DoR.
 - Respect WIP limits from `docs/guides/KANBAN.md`.
 - Do not close an issue unless Definition of Done is met:
   - behavior shipped,
@@ -132,6 +134,25 @@ Operational note:
 - `bun run linear:me` will not show unassigned team-level Sentry issues.
 - When reviewing error backlog, check `bun run linear list --team-only` as well as project-filtered views.
 
+### Production Issue Triage
+
+Review team-level Sentry issues regularly, especially before backlog planning and release work:
+
+```bash
+bun run linear list --team-only
+```
+
+For each new production issue:
+
+1. Check whether an active backlog item already covers it.
+2. If it is actionable and not covered, add or update a `docs/BACKLOG.md` row with a concrete next step, DoD, and test plan.
+3. Link the backlog ID in the Linear issue title or description.
+4. Move the issue to `Backlog`, or to `Ready` only when it meets Definition of Ready.
+5. Move to `In Progress` only when implementation starts.
+6. Close the Linear issue only after the fix ships, tests/validation pass, and the backlog row is removed.
+
+If the issue is duplicate, already fixed, third-party noise, or not actionable, close it in Linear with a short reason. Do not create standalone evidence docs for that decision.
+
 ### Automation Commands Added
 
 - `sync-backlog`:
@@ -170,4 +191,4 @@ Operational note:
 
 ### Next Automation Candidate
 
-1. Add a dedicated Sentry triage helper that filters team-level issues by `🐛 Sentry:` title prefix.
+1. Add a dedicated Sentry triage helper that filters team-level issues by `🐛 Sentry:` title prefix and reports which ones lack a backlog ID or closure reason.

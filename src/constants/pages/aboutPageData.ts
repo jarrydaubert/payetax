@@ -4,16 +4,16 @@
  * Curated content blocks for the About page.
  */
 
-import ChartColumnIncreasing from 'lucide-react/dist/esm/icons/chart-column-increasing.js';
-import Clock3 from 'lucide-react/dist/esm/icons/clock-3.js';
-import DatabaseZap from 'lucide-react/dist/esm/icons/database-zap.js';
-import Eye from 'lucide-react/dist/esm/icons/eye.js';
-import FileCode from 'lucide-react/dist/esm/icons/file-code.js';
-import Lock from 'lucide-react/dist/esm/icons/lock.js';
-import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw.js';
-import Scale from 'lucide-react/dist/esm/icons/scale.js';
-import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check.js';
-import Target from 'lucide-react/dist/esm/icons/target.js';
+import ChartColumnIncreasing from 'lucide-react/dist/esm/icons/chart-column-increasing.mjs';
+import Clock3 from 'lucide-react/dist/esm/icons/clock-3.mjs';
+import DatabaseZap from 'lucide-react/dist/esm/icons/database-zap.mjs';
+import Eye from 'lucide-react/dist/esm/icons/eye.mjs';
+import FileCode from 'lucide-react/dist/esm/icons/file-code.mjs';
+import Lock from 'lucide-react/dist/esm/icons/lock.mjs';
+import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw.mjs';
+import Scale from 'lucide-react/dist/esm/icons/scale.mjs';
+import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check.mjs';
+import Target from 'lucide-react/dist/esm/icons/target.mjs';
 import type { z } from 'zod';
 import type { FeatureSchema, StatSchema } from '@/lib/validation/pageDataValidation';
 

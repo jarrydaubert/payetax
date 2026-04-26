@@ -1,3 +1,4 @@
+import { afterEach } from '@jest/globals';
 import {
   cleanup,
   type RenderOptions,
@@ -15,9 +16,7 @@ function AllTheProviders({ children }: { children: ReactNode }) {
 }
 
 // @testing-library/react auto-registers cleanup; the /pure entry does not.
-if (typeof afterEach === 'function') {
-  afterEach(() => cleanup());
-}
+afterEach(() => cleanup());
 
 function render(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>): RenderResult {
   return rtlRender(ui, { wrapper: AllTheProviders, ...options });

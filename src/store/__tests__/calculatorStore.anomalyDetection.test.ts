@@ -85,4 +85,27 @@ describe('collectCalculationAnomalies', () => {
       ]),
     );
   });
+
+  it('allows net pay above gross when non-taxable allowances exceed deductions', () => {
+    const anomalies = collectCalculationAnomalies(
+      createResult({
+        grossSalary: createPeriodValue(10000),
+        taxableIncome: 0,
+        incomeTax: createPeriodValue(0),
+        nationalInsurance: createPeriodValue(0),
+        studentLoan: createPeriodValue(0),
+        pensionContribution: createPeriodValue(0),
+        employerNI: 0,
+        netPay: createPeriodValue(15000),
+        taxBands: [],
+        incomeBreakdown: {
+          employment: 10000,
+          nonEmployment: 0,
+          total: 10000,
+        },
+      }),
+    );
+
+    expect(anomalies).toEqual([]);
+  });
 });

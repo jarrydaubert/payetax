@@ -2,9 +2,9 @@
 'use client';
 
 import Fuse from 'fuse.js';
-import Clock from 'lucide-react/dist/esm/icons/clock.js';
-import Search from 'lucide-react/dist/esm/icons/search.js';
-import X from 'lucide-react/dist/esm/icons/x.js';
+import Clock from 'lucide-react/dist/esm/icons/clock.mjs';
+import Search from 'lucide-react/dist/esm/icons/search.mjs';
+import X from 'lucide-react/dist/esm/icons/x.mjs';
 import Link from 'next/link';
 import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';

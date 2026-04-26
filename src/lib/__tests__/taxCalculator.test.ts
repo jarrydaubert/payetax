@@ -40,6 +40,7 @@
 
 // src/lib/__tests__/taxCalculator.test.ts
 
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
 
 /**
@@ -118,11 +119,17 @@ describe('Tax Calculator', () => {
    * cross-checked against gov.uk tax calculators for accuracy.
    */
   describe('Basic Tax Calculations', () => {
-    it('falls back to the current supported tax year when runtime input passes an unsupported year', () => {
-      const supported = calculateTax(createBasicInput(50000, { taxYear: '2026-2027' }));
+    it.each([
+      ['unsupported long year', '2027-2028'],
+      ['unsupported short year', '2027-28'],
+      ['malformed year', 'not-a-tax-year'],
+      ['missing year', undefined],
+      ['non-string year', null],
+    ])('falls back to the current supported tax year for %s runtime input', (_label, taxYear) => {
+      const supported = calculateTax(createBasicInput(50000, { taxYear: CURRENT_TAX_YEAR }));
       const malformed = calculateTax(
         createBasicInput(50000, {
-          taxYear: '2027-2028' as TaxCalculationInput['taxYear'],
+          taxYear: taxYear as TaxCalculationInput['taxYear'],
         }),
       );
 

@@ -1,12 +1,12 @@
 ---
 name: engineering
 version: 1.1.0
-description: Use for engineering reviews, implementation guidance, or performance work touching Next.js, React, TypeScript, validation, caching, bundle size, and runtime safety in PayeTax.
+description: Use for engineering reviews, implementation guidance, dependency-upgrade fallout, or performance work touching Next.js, React, TypeScript, Tailwind, validation, caching, bundle size, and runtime safety in PayeTax.
 ---
 
 # Engineering
 
-Use this skill for broad engineering reviews and implementation guidance. Optimize for shipped correctness first, then performance, then maintainability.
+Use this skill for broad engineering reviews and implementation guidance. Keep advice evergreen: discover the installed stack from the repo, apply durable framework practices, and optimize for shipped correctness first, then performance, then maintainability.
 
 ## Operating Rules
 
@@ -14,20 +14,31 @@ Use this skill for broad engineering reviews and implementation guidance. Optimi
 - Treat `src/constants/taxRates.ts` and `src/lib/taxCalculator.ts` as protected source-of-truth files.
 - Do not present runtime claims as facts unless you ran the relevant command.
 - Prefer repo-specific evidence over generic framework advice.
-- Do not recommend stale Next.js patterns. Verify current guidance before suggesting migrations.
+- Do not recommend version-sensitive framework migrations without checking the installed version and current official guidance.
+- Keep comments and docs evergreen: explain durable invariants, constraints, and non-obvious tradeoffs; avoid progress notes, temporary TODOs, and comments that repeat the code.
 
-## Actual PayeTax Stack
+## Stack Discovery
 
-- **Next.js 16 App Router**
-  - Dev may use Turbopack.
-  - Production build currently runs `next build --webpack`.
-- **React 19**
-- **TypeScript 5.9** strict mode
-- **Tailwind CSS 4**
-- **Zustand 5**
-- **Zod 4**
-- **Jest + Playwright + Bun**
-- **Vercel + Sentry**
+Before version-sensitive work, verify the current stack instead of trusting this file:
+
+- Read `package.json` for installed versions, scripts, and package-manager expectations.
+- Read `next.config.ts` before advising on Next.js build, caching, images, redirects, or compiler behavior.
+- Check whether the failing path is dev/Turbopack, production build/Webpack, Jest, Playwright, or Bun runtime.
+- Inspect package exports or installed files before changing deep imports after dependency updates.
+- Treat `AGENTS.md`, `docs/guides/TESTING.md`, and `docs/guides/OPS_RUNBOOK.md` as the repo contract for validation and workflow.
+
+## Stack Defaults
+
+Use these as durable defaults unless the repo proves otherwise:
+
+- Next.js App Router with Server Components by default; add client boundaries only where interactivity, browser APIs, or client state require them.
+- React should favor simple derived rendering, narrow effects, explicit transitions for expensive UI updates, and accessible component composition.
+- TypeScript should stay strict, narrow at boundaries, and avoid weak escape hatches such as broad `any`, unsafe casts, or duplicated domain types.
+- Tailwind should use the local token/design system patterns; avoid one-off styling that makes future UI changes harder.
+- Zod belongs at external or persistence boundaries; avoid importing broad schema barrels into client code when a narrow import is available.
+- Zustand stores should stay focused on orchestration and state, with business rules and validation kept in testable modules where practical.
+- Jest covers user-visible behavior and pure business logic; Playwright covers critical journeys, browser integration, and layout-sensitive flows.
+- Bun is the package/script runner; verify behavior with the repo scripts rather than assuming npm-compatible edge cases.
 
 ## Repo Truths To Start From
 
@@ -84,17 +95,17 @@ Deprioritize:
 - config file language preferences (`.js` vs `.ts`) unless there is actual friction
 - abstract SOLID commentary without a concrete failure mode
 
-## Current Framework Guidance
+## Modern Framework Guidance
 
 ### Caching
 
-- `unstable_cache` should be treated as legacy.
-- For Next 16 caching recommendations, use the current Cache Components / `use cache` model and official docs.
-- Do not recommend old PPR migrations that depend on deprecated route-level flags unless you verify they still apply.
+- Treat caching guidance as version-sensitive. Verify the installed Next.js docs before proposing migrations.
+- Prefer explicit cache boundaries and invalidation behavior that can be tested or reasoned about from the route contract.
+- When replacing legacy cache APIs, separate correctness, freshness, and performance benefits.
 
 ### PPR / streaming
 
-- Treat old `ppr: 'incremental'` guidance as suspect until verified against current Next docs.
+- Treat old PPR guidance as suspect until verified against the installed Next.js version.
 - If proposing streaming improvements, separate:
   - static shell / cache model changes
   - async boundary refactors
@@ -105,6 +116,7 @@ Deprioritize:
 - `optimizePackageImports` is for third-party packages.
 - Do not suggest it for local alias modules like `@/lib/validation`.
 - For local code, prefer direct imports or a smaller export surface.
+- For third-party deep imports, verify the package's current shipped files/exports after upgrades.
 
 ## Review Workflow
 
@@ -123,6 +135,7 @@ For engineering audits:
 - Keep LCP candidates server-rendered and unblocked.
 - Use dynamic imports for heavy, non-critical UI only when they actually defer work.
 - If a route has multiple independent async operations, parallelize or stream them where it reduces blocking without harming primary content.
+- Do not claim bundle, rendering, or Core Web Vitals wins without measuring the relevant path.
 
 ### State
 
@@ -136,11 +149,20 @@ For engineering audits:
 - Avoid broad validation barrels in client components when only one schema is needed.
 - Use Zod at external boundaries, but do not claim “all API boundaries” unless every route was checked.
 
+### Comments and maintainability
+
+- Add comments for durable business rules, tax assumptions, privacy/security constraints, browser quirks, or framework behavior that is not obvious from the code.
+- Remove stale comments, progress markers, commented-out code, and comments that merely translate syntax into English.
+- Prefer names and module boundaries over comments when clearer code can carry the meaning.
+- Keep evergreen docs free of TODOs or status notes; put open work in `docs/BACKLOG.md`.
+
 ### Dependency upgrades
 
 - Verify upgrade pressure with `bun outdated`.
 - Treat major upgrades individually, not as one bulk task.
-- Require changelog review and repo validation after each major upgrade.
+- After `bun update` or any broad dependency bump, expect package exports, type globals, lint schemas, and framework defaults to shift.
+- For resolver failures, inspect the installed package shape and smoke the runtime that failed, especially if dev/Turbopack and production/Webpack differ.
+- Require changelog review and repo validation after each major upgrade or version-sensitive runtime change.
 
 ## Required Validation
 

@@ -13,12 +13,12 @@
  */
 
 import type { LucideIcon } from 'lucide-react';
-import Database from 'lucide-react/dist/esm/icons/database.js';
-import Eye from 'lucide-react/dist/esm/icons/eye.js';
-import FileText from 'lucide-react/dist/esm/icons/file-text.js';
-import Globe from 'lucide-react/dist/esm/icons/globe.js';
-import Lock from 'lucide-react/dist/esm/icons/lock.js';
-import Shield from 'lucide-react/dist/esm/icons/shield.js';
+import Database from 'lucide-react/dist/esm/icons/database.mjs';
+import Eye from 'lucide-react/dist/esm/icons/eye.mjs';
+import FileText from 'lucide-react/dist/esm/icons/file-text.mjs';
+import Globe from 'lucide-react/dist/esm/icons/globe.mjs';
+import Lock from 'lucide-react/dist/esm/icons/lock.mjs';
+import Shield from 'lucide-react/dist/esm/icons/shield.mjs';
 import type { z } from 'zod';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 

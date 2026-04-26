@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 
 // Mock lucide-react icons
-jest.mock('lucide-react/dist/esm/icons/list.js', () => ({
+jest.mock('lucide-react/dist/esm/icons/list.mjs', () => ({
   __esModule: true,
   default: () => <span data-testid='list-icon' />,
 }));

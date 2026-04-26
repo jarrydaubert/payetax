@@ -32,6 +32,11 @@
       "source": "/tools/director-calculator",
       "destination": "/tools/director-guide",
       "permanent": true
+    },
+    {
+      "source": "/tools/embed-widget",
+      "destination": "/tools",
+      "permanent": true
     }
   ]
 }

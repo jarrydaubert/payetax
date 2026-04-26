@@ -22,6 +22,7 @@ Reject low-signal tests:
 - inventory/presence tests as the sole oracle for important behavior
 - tests that stay green even when the real user outcome is broken
 - test-count or coverage vanity without regression-detection value
+- mocks that assert the mocked behavior instead of the production contract
 
 If a test cannot explain what bug it is trying to catch and why this is the right layer, it should be rewritten or deleted.
 
@@ -45,6 +46,15 @@ A test task is only done when all criteria below are met:
   - Critical user-path/UI changes: `bun run test:e2e:critical`
   - Full confidence gate before closure: `bun run test:ci` and `bun run test:e2e` (CI or equivalent environment)
 - Debt/accounting updated: `scripts/test-debt-allowlist.ts`, `docs/BACKLOG.md`, and related docs reflect the new truth.
+
+For backlog closure, automated tests are the default proof path. Add or update the narrowest test that would have failed before the fix:
+
+- pure calculation or parser bug: unit test
+- component state or rendering bug: component/integration test
+- routing, browser API, critical journey, or cross-page behavior: E2E or scripted browser test
+- SEO metadata, sitemap, redirects, or canonical behavior: route/config/sitemap test plus live validation when relevant
+
+Use manual validation only when automation is the wrong layer, and keep the validation steps in the PR or linked Linear issue rather than creating standalone evidence docs.
 
 Target state for "no issues found" audits:
 - `bun run check:test-skips` passes with no unexpected debt.

@@ -3,15 +3,15 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import type { BlogPost } from '@/types/blog';
 
 // Mock lucide-react icons
-jest.mock('lucide-react/dist/esm/icons/clock.js', () => ({
+jest.mock('lucide-react/dist/esm/icons/clock.mjs', () => ({
   __esModule: true,
   default: () => <span data-testid='clock-icon' />,
 }));
-jest.mock('lucide-react/dist/esm/icons/search.js', () => ({
+jest.mock('lucide-react/dist/esm/icons/search.mjs', () => ({
   __esModule: true,
   default: () => <span data-testid='search-icon' />,
 }));
-jest.mock('lucide-react/dist/esm/icons/x.js', () => ({
+jest.mock('lucide-react/dist/esm/icons/x.mjs', () => ({
   __esModule: true,
   default: () => <span data-testid='x-icon' />,
 }));

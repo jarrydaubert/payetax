@@ -206,7 +206,7 @@ This separation keeps lifecycle marketing and transactional deliverability conce
 
 Covers production-only checks for security controls, external integrations, observability, SEO/indexing, and analytics sanity.
 
-Release evidence artifact:
+Release validation record:
 - `docs/reports/releases/v<version>.md` (generated via `release:report:init`, validated via `release:report:check`)
 
 ---
