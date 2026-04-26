@@ -91,6 +91,7 @@
     "blog:image:import": "scripts/import-blog-image.sh",
     "golden:generate": "tsx e2e/scripts/generate-golden-master.ts",
     "skills:check": "scripts/sync-marketing-skills.sh --check && scripts/validate-marketing-skills-setup.sh",
+    "skills:review": "scripts/review-marketing-skills-updates.sh",
     "skills:sync": "scripts/sync-marketing-skills.sh --sync && scripts/apply-marketing-skill-profile.sh --apply && scripts/validate-marketing-skills-setup.sh"
   },
   "dependencies": {

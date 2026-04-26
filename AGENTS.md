@@ -107,7 +107,8 @@ bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
 bun run gitlab:status       # GitLab project + MR + pipeline + release summary
 bun run gitlab:mr:status    # Open MR for the current branch
-bun run skills:check        # Check upstream sync status + local skill setup validation
+bun run skills:review       # Review latest upstream marketing skill versions and changes
+bun run skills:check        # Validate current local skill pin/profile + setup
 bun run skills:sync         # Sync pinned marketing skills + apply PayeTax profile
 bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits
 ```
@@ -136,13 +137,16 @@ Skills are agents-native in PayeTax:
 - `schema-markup` — JSON-LD structured data
 - `content-strategy` — blog planning, topic clusters, content pillars
 - `competitor-alternatives` — vs pages, alternative pages
+- `competitor-profiling` — competitor research and profile documents
 
 ### Copy & Creative
 - `copywriting` — page copy, headlines, CTAs
 - `copy-editing` — editing passes on existing copy
 - `ad-creative` — ad copy variations, headlines, platform-specific creative
 - `cold-email` — B2B cold outreach emails and follow-up sequences
-- `social-content` — LinkedIn, Twitter/X, Reddit content
+- `social-content` — LinkedIn, Twitter/X, Reddit, and short-form video scripts
+- `image` — marketing images, blog heroes, social graphics, product mockups, and visual optimization
+- `video` — marketing video production workflows, AI video, explainers, and product demos
 
 ### Conversion & UX
 - `page-cro` — page-level conversion optimisation
@@ -158,6 +162,7 @@ Skills are agents-native in PayeTax:
 - `launch-strategy` — feature releases, tax calendar events
 - `free-tool-strategy` — new calculator planning and evaluation
 - `marketing-psychology` — mental models and behavioural science
+- `directory-submissions` — directory listing, launch surfaces, and backlink planning
 - `churn-prevention` — retention, cancel flows, dunning, win-back
 - `email-sequence` — Kit newsletter + Resend transactional email
 - `product-marketing-context` — shared context doc for all skills
@@ -165,6 +170,7 @@ Skills are agents-native in PayeTax:
 
 ### Engineering & Analytics
 - `engineering` — Next.js, React, TypeScript, performance
+- `codebase-cleanup-sweep` — broad cleanup, deduplication, unused-code review, and quality sweeps
 - `frontend-design` — bold, polished, non-generic page/component UI design and implementation
 - `tdd` — test-driven development (Red/Green/Refactor) for regression-safe delivery
 - `design-an-interface` — compare multiple interface/module designs before implementation

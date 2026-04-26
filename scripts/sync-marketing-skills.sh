@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/coreyhaines31/marketingskills}"
-UPSTREAM_REF="${UPSTREAM_REF:-v1.7.0}"
+UPSTREAM_REF="${UPSTREAM_REF:-v1.9.0}"
 EXPECTED_COMMIT="${EXPECTED_COMMIT:-}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_SKILLS_DIR="$PROJECT_ROOT/.agents/skills"
@@ -28,7 +28,7 @@ Options:
 
 Environment overrides:
   REPO_URL      (default: https://github.com/coreyhaines31/marketingskills)
-  UPSTREAM_REF  (default: v1.7.0)
+  UPSTREAM_REF  (default: v1.9.0)
   CACHE_DIR     (default: /tmp/marketingskills-sync)
   SKIP_FETCH    (default: 0)
 EOF
@@ -70,6 +70,19 @@ ensure_repo() {
       exit 1
     fi
     return
+  fi
+
+  if [[ -e "$CACHE_DIR" ]] && ! git -C "$CACHE_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+    case "$CACHE_DIR" in
+      /tmp/marketingskills-*)
+        rm -rf "$CACHE_DIR"
+        ;;
+      *)
+        echo "CACHE_DIR exists but is not a valid git checkout: $CACHE_DIR" >&2
+        echo "Use a fresh CACHE_DIR or remove the invalid directory." >&2
+        exit 1
+        ;;
+    esac
   fi
 
   if [[ ! -d "$CACHE_DIR/.git" ]]; then
@@ -296,6 +309,7 @@ $local_only_inline
 3. Shared project constraints live in \`.agents/skills/payetax-context/SKILL.md\`.
 4. Upstream marketing skills stay close to upstream; PayeTax-specific rules are centralized instead of duplicated in every synced skill.
 5. \`scripts/validate-marketing-skills-setup.sh\` must pass after every sync/update.
+6. Canonical keep/sync lists live in \`.agents/skills/.profiles/\` and should be edited there rather than re-hardcoded in scripts.
 EOF
 }
 

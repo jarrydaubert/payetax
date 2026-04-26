@@ -36,6 +36,14 @@ Use this context before applying other marketing skills when tasks involve:
    - Resend for transactional email
 4. No accounts, no billing, and no paid upgrade path are assumed by default.
 
+## Skill-Specific Guardrails
+
+1. For `directory-submissions`, treat directory work as optional distribution support, not the default growth plan. Do not assume SaaS pricing, trials, G2 review motions, Product Hunt readiness, paid tiers, or user accounts unless the user explicitly asks for that route. Verify current directory rules, pricing, and platform claims before recommending them.
+2. For `competitor-profiling`, keep competitive claims factual and sourced. Do not create persistent research folders or raw scrape archives unless the user explicitly asks for saved artifacts.
+3. For `image` and `video`, prefer real PayeTax UI screenshots, tax-calendar context, and UK-specific financial imagery over generic SaaS visuals. Do not use AI-generated product UI as evidence of shipped features.
+4. For `social-content`, `copywriting`, and `ad-creative`, keep tax examples conservative and source-backed. Avoid implying personalized financial advice.
+5. For any marketing skill that includes benchmark percentages, platform algorithm claims, pricing, or current vendor behavior, verify against current primary sources before presenting the claim as fact.
+
 ## Source Of Truth
 
 Consult these files before making product or marketing claims:
@@ -59,5 +67,6 @@ bun run test:no-coverage
 For skills maintenance changes, also run:
 
 ```bash
+bun run skills:review
 bun run skills:check
 ```

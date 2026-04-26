@@ -4,15 +4,18 @@ ai-seo
 analytics-tracking
 churn-prevention
 community-marketing
+competitor-profiling
 cold-email
 competitor-alternatives
 content-strategy
 copy-editing
 copywriting
 customer-research
+directory-submissions
 email-sequence
 form-cro
 free-tool-strategy
+image
 launch-strategy
 marketing-ideas
 marketing-psychology
@@ -24,3 +27,4 @@ programmatic-seo
 schema-markup
 seo-audit
 social-content
+video

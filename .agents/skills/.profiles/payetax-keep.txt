@@ -9,6 +9,7 @@ analytics-tracking
 churn-prevention
 community-marketing
 codebase-cleanup-sweep
+competitor-profiling
 cold-email
 competitor-alternatives
 content-strategy
@@ -16,11 +17,13 @@ copy-editing
 copywriting
 customer-research
 design-an-interface
+directory-submissions
 email-sequence
 engineering
 form-cro
 free-tool-strategy
 frontend-design
+image
 launch-strategy
 marketing-ideas
 marketing-psychology
@@ -35,3 +38,4 @@ schema-markup
 seo-audit
 social-content
 tdd
+video

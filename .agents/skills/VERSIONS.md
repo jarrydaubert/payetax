@@ -5,19 +5,19 @@ Canonical source for upstream skill provenance and local inclusion policy.
 ## Upstream Reference
 
 - Repository: https://github.com/coreyhaines31/marketingskills
-- Version tag: `v1.7.0`
-- Commit: `978051caf17c3aef0dafd1729aaf85cea91a4416`
+- Version tag: `v1.9.0`
+- Commit: `1bcff9fc79c64fd7886c3c7aa583f4bd63916ff2`
 
-## Freshness Check (2026-04-13)
+## Freshness Check (2026-04-26)
 
 - Local sync metadata is stored in `.agents/skills/.sources/marketingskills.json`.
-- Upstream skills at tag: 36 total
-- Included upstream skills: 26
+- Upstream skills at tag: 40 total
+- Included upstream skills: 30
 - Local-only skills: 8
 
-## Upstream Skills Included (26/36)
+## Upstream Skills Included (30/40)
 
-`ab-test-setup`, `ad-creative`, `ai-seo`, `analytics-tracking`, `churn-prevention`, `cold-email`, `community-marketing`, `competitor-alternatives`, `content-strategy`, `copy-editing`, `copywriting`, `customer-research`, `email-sequence`, `form-cro`, `free-tool-strategy`, `launch-strategy`, `marketing-ideas`, `marketing-psychology`, `onboarding-cro`, `page-cro`, `popup-cro`, `product-marketing-context`, `programmatic-seo`, `schema-markup`, `seo-audit`, `social-content`
+`ab-test-setup`, `ad-creative`, `ai-seo`, `analytics-tracking`, `churn-prevention`, `cold-email`, `community-marketing`, `competitor-alternatives`, `competitor-profiling`, `content-strategy`, `copy-editing`, `copywriting`, `customer-research`, `directory-submissions`, `email-sequence`, `form-cro`, `free-tool-strategy`, `image`, `launch-strategy`, `marketing-ideas`, `marketing-psychology`, `onboarding-cro`, `page-cro`, `popup-cro`, `product-marketing-context`, `programmatic-seo`, `schema-markup`, `seo-audit`, `social-content`, `video`
 
 ## Upstream Skills Excluded (10)
 

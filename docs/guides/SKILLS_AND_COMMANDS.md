@@ -56,7 +56,7 @@ then write homepage hero copy
 
 Planning and test-first workflows now live in skills rather than slash commands: `design-an-interface`, `prd-to-issues`, and `tdd`.
 
-## Skills (33 Installed)
+## Skills (38 Installed)
 
 ### Shared Context
 
@@ -69,6 +69,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | Skill | Use When | Example |
 | --- | --- | --- |
 | `engineering` | Next.js/React/TS performance patterns | "Review LCP + INP issues on homepage" |
+| `codebase-cleanup-sweep` | Broad cleanup, deduplication, unused-code review, and quality sweeps | "Find low-risk cleanup opportunities" |
 | `frontend-design` | Visual redesign, UI polish, stronger page/component identity | "Redesign the homepage hero so it feels distinct" |
 | `tdd` | Red/Green/Refactor test-first workflow | "Fix this regression with TDD" |
 | `design-an-interface` | Compare module/API shape options before coding | "Design the director engine interface in 3 ways" |
@@ -91,6 +92,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | `schema-markup` | JSON-LD/structured data | "Add FAQ schema to salary pages" |
 | `analytics-tracking` | GA4/Vercel event tracking | "Define events for calculator completion" |
 | `competitor-alternatives` | Vs/alternative page strategy | "Outline PayeTax vs GOV.UK page" |
+| `competitor-profiling` | Competitor research and profile documents | "Profile tax calculator competitors before alternative pages" |
 
 ### Copy & Creative
 
@@ -100,7 +102,9 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | `copy-editing` | Editing existing copy | "Edit /about page copy" |
 | `ad-creative` | Ad copy variations, headlines | "Generate RSA headlines for Google Ads" |
 | `cold-email` | B2B cold outreach sequences | "Write a 3-touch cold email sequence" |
-| `social-content` | Social posts or calendars | "Draft a LinkedIn post about £100k trap" |
+| `social-content` | Social posts, calendars, and short-form video scripts | "Draft a LinkedIn post about £100k trap" |
+| `image` | Marketing images, blog heroes, social graphics, and product mockups | "Create an OG image brief for a tax guide" |
+| `video` | Marketing video workflows, explainers, and product demos | "Script a short product demo video" |
 
 ### Conversion & Growth
 
@@ -121,6 +125,7 @@ Planning and test-first workflows now live in skills rather than slash commands:
 | `customer-research` | VOC, persona, and community research | "Synthesize Reddit and G2 feedback into themes" |
 | `community-marketing` | Community-led growth, advocates, and owned community strategy | "Plan a Reddit/Discord-style community motion around tax-year questions" |
 | `marketing-psychology` | Persuasion/behavior models | "Improve conversion using loss aversion" |
+| `directory-submissions` | Directory listing and backlink planning | "Assess whether PayeTax is ready for directory submissions" |
 | `launch-strategy` | Product launches | "Plan a feature release announcement" |
 | `free-tool-strategy` | Free tool growth strategy | "Optional email capture without hurting SEO" |
 | `email-sequence` | Email sequences and campaigns | "Design a welcome drip sequence" |
@@ -134,5 +139,6 @@ Planning and test-first workflows now live in skills rather than slash commands:
 - Skill usage dates live in `.agents/skills/RUN_HISTORY.md`. Historical usage before that tracker exists should stay `Not tracked yet` unless it can be verified.
 - Canonical keep/sync lists live in `.agents/skills/.profiles/` and should be updated there instead of being re-hardcoded in maintenance scripts.
 - Maintenance commands:
-  - `bun run skills:check`
-  - `bun run skills:sync`
+  - `bun run skills:review` checks the latest upstream marketing-skills tag and reports new skills, changed installed skills, changed excluded skills, and upstream changelog entries.
+  - `bun run skills:check` validates the current local pin/profile and installed setup.
+  - `bun run skills:sync` syncs the pinned upstream profile and validates the result; review upstream changes first before changing the pin/profile.
