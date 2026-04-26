@@ -16,19 +16,10 @@ import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { formatIsoDateForDisplay, RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
-
+import { getSalaryComparisonLinks } from '@/lib/seo/salaryPages';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorStore } from '@/store/calculatorStore';
-
-const MIN_POPULAR_SALARY = 18000;
-const MAX_POPULAR_SALARY = 500000;
-
-function formatDeltaLabel(delta: number): string {
-  const amount = Math.abs(delta) / 1000;
-  const label = Number.isInteger(amount) ? amount.toString() : amount.toFixed(1);
-  return `£${label}k ${delta < 0 ? 'less' : 'more'}`;
-}
 
 // Blog posts that exist for specific salaries
 const SALARY_BLOG_POSTS = new Map<number, { slug: string; title: string }>([
@@ -76,6 +67,50 @@ const SALARY_BLOG_POSTS = new Map<number, { slug: string; title: string }>([
   ],
 ]);
 
+const EVERGREEN_TAX_GUIDES = [
+  {
+    slug: 'uk-tax-calculator-2025-complete-guide',
+    title: 'UK Tax Calculator: Complete Guide',
+  },
+  {
+    slug: 'how-much-tax-will-i-pay-uk-2025',
+    title: 'How Much Tax Will I Pay?',
+  },
+  {
+    slug: 'understanding-the-uk-tax-system-2025',
+    title: 'Understanding the UK Tax System',
+  },
+  {
+    slug: 'higher-rate-taxpayer-guide-uk-2025',
+    title: 'Higher Rate Taxpayer Guide',
+  },
+  {
+    slug: 'marriage-allowance-uk-2025-guide',
+    title: 'Marriage Allowance Guide',
+  },
+];
+
+const SALARY_SCENARIO_LINKS = new Map<number, Array<{ slug: string; title: string }>>([
+  [
+    40000,
+    [
+      {
+        slug: 'student-loan-plan-2-40k',
+        title: 'Plan 2 Student Loan at £40k',
+      },
+    ],
+  ],
+  [
+    60000,
+    [
+      {
+        slug: 'scotland-vs-england-60k',
+        title: 'Scotland vs England Tax at £60k',
+      },
+    ],
+  ],
+]);
+
 interface SalaryCalculatorPageProps {
   salary: number;
   isHighPriority?: boolean;
@@ -103,22 +138,7 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
   });
   const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
-  // Generate comparison salaries
-  const comparisons = useMemo(() => {
-    const deltas =
-      salary <= 25000 ? [-10000, -5000, -1000, 1000, 5000, 10000] : [-10000, -5000, 5000, 10000];
-    const unique = new Map<number, number>();
-
-    for (const delta of deltas) {
-      const amount = salary + delta;
-      if (amount < MIN_POPULAR_SALARY || amount > MAX_POPULAR_SALARY) continue;
-      unique.set(amount, delta);
-    }
-
-    return Array.from(unique.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([amount, delta]) => ({ amount, label: formatDeltaLabel(delta) }));
-  }, [salary]);
+  const comparisons = useMemo(() => getSalaryComparisonLinks(salary), [salary]);
 
   // Find related blog post for this salary
   const relatedBlogPost = SALARY_BLOG_POSTS.get(salary);
@@ -132,6 +152,15 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
         .map(([, post]) => post),
     [salary],
   );
+  const evergreenBlogPosts = useMemo(() => {
+    const existingSlugs = new Set([
+      relatedBlogPost?.slug,
+      ...nearbyBlogPosts.map((post) => post.slug),
+    ]);
+
+    return EVERGREEN_TAX_GUIDES.filter((post) => !existingSlugs.has(post.slug)).slice(0, 3);
+  }, [nearbyBlogPosts, relatedBlogPost]);
+  const relatedScenarioLinks = SALARY_SCENARIO_LINKS.get(salary) ?? [];
 
   return (
     <div className='min-h-screen bg-background'>
@@ -215,13 +244,36 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
       </section>
 
       {/* Related Reading (Blog Links) */}
-      {(relatedBlogPost || nearbyBlogPosts.length > 0) && (
+      {(relatedBlogPost ||
+        nearbyBlogPosts.length > 0 ||
+        evergreenBlogPosts.length > 0 ||
+        relatedScenarioLinks.length > 0) && (
         <section className={cn('bg-muted/20', 'py-8 sm:py-12')}>
           <div className={cn('container mx-auto max-w-7xl', SPACING.PX_RESPONSIVE)}>
             <h2 className={cn('font-semibold', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>
               Related Reading
             </h2>
             <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-3')}>
+              {relatedScenarioLinks.map((scenario) => (
+                <Link
+                  key={scenario.slug}
+                  href={`/scenarios/${scenario.slug}`}
+                  className={cn(
+                    SURFACES.SHAPE_ROUNDED_LG,
+                    'block border border-border bg-card p-4 transition-colors hover:bg-muted/50',
+                  )}
+                >
+                  <span className={cn('font-medium text-primary', TYPOGRAPHY.TEXT_SM)}>
+                    Scenario
+                  </span>
+                  <h3 className={cn('font-semibold', SPACING.MT_1, TYPOGRAPHY.TEXT_BASE)}>
+                    {scenario.title}
+                  </h3>
+                  <p className={cn('text-muted-foreground', SPACING.MT_1, TYPOGRAPHY.TEXT_SM)}>
+                    Explore a pre-filled example for this salary.
+                  </p>
+                </Link>
+              ))}
               {relatedBlogPost && (
                 <Link
                   href={`/blog/${relatedBlogPost.slug}`}
@@ -253,6 +305,24 @@ export function SalaryCalculatorPage({ salary, initialResults }: SalaryCalculato
                   <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_BASE)}>{post.title}</h3>
                   <p className={cn('text-muted-foreground', SPACING.MT_1, TYPOGRAPHY.TEXT_SM)}>
                     Read the full guide
+                  </p>
+                </Link>
+              ))}
+              {evergreenBlogPosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className={cn(
+                    SURFACES.SHAPE_ROUNDED_LG,
+                    'block border border-border bg-card p-4 transition-colors hover:bg-muted/50',
+                  )}
+                >
+                  <span className={cn('font-medium text-primary', TYPOGRAPHY.TEXT_SM)}>Guide</span>
+                  <h3 className={cn('font-semibold', SPACING.MT_1, TYPOGRAPHY.TEXT_BASE)}>
+                    {post.title}
+                  </h3>
+                  <p className={cn('text-muted-foreground', SPACING.MT_1, TYPOGRAPHY.TEXT_SM)}>
+                    Build confidence in the tax rules behind the result.
                   </p>
                 </Link>
               ))}

@@ -8,10 +8,13 @@ import { SalaryCalculatorPage } from '../SalaryCalculatorPage';
 
 // Mock child components
 jest.mock('@/components/molecules/SalaryQuickResults', () => ({
-  SalaryQuickResults: ({ salary, results }: any) => (
+  SalaryQuickResults: ({ salary, results, comparisons }: any) => (
     <div data-testid='mock-salary-quick-results'>
       <div data-testid='salary-value'>{salary}</div>
       <div data-testid='take-home'>{results?.takeHome || 0}</div>
+      <div data-testid='salary-comparisons'>
+        {comparisons.map((item: any) => item.amount).join(',')}
+      </div>
     </div>
   ),
 }));
@@ -240,10 +243,48 @@ describe('SalaryCalculatorPage', () => {
         expect(screen.getByTestId('mock-salary-quick-results')).toBeInTheDocument();
       });
     });
+
+    it('should pass only indexable nearby salary comparisons', async () => {
+      render(
+        <SalaryCalculatorPage salary={57000} initialResults={createMockResults(57000) as any} />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('salary-comparisons')).toHaveTextContent(
+          '50000,55000,60000,65000',
+        );
+      });
+    });
   });
 
   // Note: Related Searches section was removed from SalaryCalculatorPage
   // Salary comparisons are now handled in SalaryQuickResults component
+
+  describe('Related internal links', () => {
+    it('links flagged scenario pages from matching salary pages', async () => {
+      render(
+        <SalaryCalculatorPage salary={40000} initialResults={createMockResults(40000) as any} />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('link', { name: /Scenario Plan 2 Student Loan at £40k/i }),
+        ).toHaveAttribute('href', '/scenarios/student-loan-plan-2-40k');
+      });
+    });
+
+    it('links evergreen tax guides from salary pages', async () => {
+      render(
+        <SalaryCalculatorPage salary={57000} initialResults={createMockResults(57000) as any} />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('link', { name: /Guide UK Tax Calculator: Complete Guide/i }),
+        ).toHaveAttribute('href', '/blog/uk-tax-calculator-2025-complete-guide');
+      });
+    });
+  });
 
   describe('Accessibility', () => {
     it('should have proper semantic sections', async () => {

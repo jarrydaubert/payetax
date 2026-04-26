@@ -5,6 +5,7 @@ import { getAllCompetitorSlugs } from '@/data/competitors';
 import { getAllScenarioSlugs } from '@/data/scenarios';
 import { getAllUseCaseSlugs } from '@/data/useCases';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { INDEXABLE_SALARIES, SALARY_SEARCH_VOLUME_HINT } from '@/lib/seo/salaryPages';
 
 // Revalidate daily - blog content can change
 export const revalidate = 86400;
@@ -24,38 +25,6 @@ const SITE_URL =
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : 'https://payetax.co.uk');
-
-// Crawl-budget strategy:
-// Prioritize high-intent salary URLs instead of submitting the full long-tail set.
-const PRIORITY_SALARIES = [
-  18000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000, 65000, 70000, 75000, 80000,
-  85000, 90000, 95000, 100000, 101000, 105000, 110000, 115000, 120000, 125000, 130000, 140000,
-  150000, 175000, 200000, 250000, 300000, 500000,
-];
-
-// High-volume salaries with known search data
-const SALARY_SEARCH_VOLUME_HINT: Record<number, number> = {
-  80000: 620,
-  90000: 530,
-  70000: 480,
-  100000: 450,
-  60000: 390,
-  50000: 350,
-  40000: 320,
-  30000: 280,
-  35000: 250,
-  45000: 230,
-  55000: 210,
-  65000: 190,
-  75000: 180,
-  105000: 170,
-  115000: 170,
-  85000: 160,
-  95000: 150,
-  125000: 140,
-  110000: 130,
-  120000: 120,
-};
 
 const PRIORITY_COMPETITOR_SLUGS = [
   'gov-uk-calculator',
@@ -185,7 +154,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const salaryPages: SitemapEntry[] = PRIORITY_SALARIES.map((salary) => {
+  const salaryPages: SitemapEntry[] = INDEXABLE_SALARIES.map((salary) => {
     const volume = SALARY_SEARCH_VOLUME_HINT[salary] || 50;
     return {
       url: `${baseUrl}/calculator/${salary}-after-tax`,

@@ -114,8 +114,12 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).toContain('https://example.com/calculator/30000-after-tax');
+    expect(urls).toContain('https://example.com/calculator/57000-after-tax');
+    expect(urls).toContain('https://example.com/calculator/78000-after-tax');
     expect(urls).not.toContain('https://example.com/calculator/19000-after-tax');
     expect(urls).not.toContain('https://example.com/calculator/104000-after-tax');
+    expect(urls).not.toContain('https://example.com/calculator/275000-after-tax');
+    expect(urls).not.toContain('https://example.com/calculator/370000-after-tax');
 
     const alternativesCount = urls.filter((url) => url.includes('/alternatives/')).length;
     expect(alternativesCount).toBeLessThanOrEqual(12);

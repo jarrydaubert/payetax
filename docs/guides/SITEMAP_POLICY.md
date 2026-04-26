@@ -16,8 +16,9 @@ Purpose: keep sitemap entries focused on high-value, indexable pages and avoid c
 
 ## Salary Pages
 
-- Use the curated high-intent salary set (`PRIORITY_SALARIES`) rather than all generated permutations.
+- Use the shared curated high-intent salary set (`INDEXABLE_SALARIES` in `src/lib/seo/salaryPages.ts`) rather than all supported permutations.
 - Prioritize by known demand hints (`SALARY_SEARCH_VOLUME_HINT`) and keep priority bounded.
+- Keep salary-page metadata, sitemap inclusion, and nearby salary links aligned to the same shared policy.
 - Review list monthly and adjust based on GSC impressions/clicks and conversion signals.
 
 ## Competitor Pages
