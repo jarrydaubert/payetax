@@ -9,8 +9,6 @@ export const metadata = generateBaseMetadata({
   title: `Director Pay Dashboard | Salary & Dividend Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`,
   description:
     'Free calculator for UK company directors. Compare salary and dividend scenarios and see estimated tax to set aside.',
-  keywords:
-    'director salary calculator, salary vs dividends, limited company tax, director dividends, corporation tax calculator, employer NI',
   pathname: '/tools/director-guide',
 });
 

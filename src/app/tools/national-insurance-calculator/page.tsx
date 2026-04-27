@@ -7,7 +7,6 @@ import { NICalculatorClient } from './NICalculatorClient';
 export const metadata = generateBaseMetadata({
   title: `National Insurance Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT} | NI Rates & Thresholds`,
   description: `Free UK National Insurance calculator for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}. Calculate employee and employer NI contributions. See all NI categories (A, B, C, H, J, M, Z) and current rates.`,
-  keywords: `National Insurance calculator, NI calculator UK, NI contributions ${CURRENT_TAX_YEAR_DISPLAY_SHORT}, employee NI, employer NI, Class 1 NI, NI category A, NI thresholds`,
   pathname: '/tools/national-insurance-calculator',
 });
 

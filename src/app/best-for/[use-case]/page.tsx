@@ -36,7 +36,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateMetadataHelper({
     title,
     description: useCase.description,
-    keywords: useCase.searchIntent.join(', '),
     pathname: `/best-for/${slug}`,
     type: 'article',
     section: 'Best For',

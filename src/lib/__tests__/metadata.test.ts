@@ -24,7 +24,7 @@ describe('Metadata Module', () => {
         template: '%s | PayeTax',
       });
       expect(metadata.description).toContain('Free UK PAYE tax calculator');
-      expect(metadata.keywords).toContain('UK tax calculator 2026-27');
+      expect(metadata).not.toHaveProperty('keywords');
       expect(metadata.metadataBase).toBeInstanceOf(URL);
     });
 
@@ -155,14 +155,6 @@ describe('Metadata Module', () => {
           'max-video-preview': -1,
         },
       });
-    });
-
-    test('should process keywords correctly', () => {
-      const metadata = generateMetadata({
-        keywords: 'tax calculator, paye, uk tax, hmrc rates',
-      });
-
-      expect(metadata.keywords).toEqual(['tax calculator', 'paye', 'uk tax', 'hmrc rates']);
     });
 
     test('should handle custom pathname for canonical URL', () => {

@@ -34,8 +34,6 @@ export const metadata: Metadata = generateMetadataHelper({
   title: 'Tax Scenarios & Calculators | UK Tax Planning Guides',
   description:
     'Explore real UK tax scenarios with pre-calculated examples. Learn how to optimize your tax for £100k+ salaries, student loans, Scottish tax, and more.',
-  keywords:
-    '100k tax trap, student loan calculator, scottish tax calculator, uk tax scenarios, pension optimization, tax planning uk',
   pathname: '/scenarios',
 });
 

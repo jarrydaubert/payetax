@@ -11,8 +11,6 @@ export const metadata: Metadata = {
   title: 'Privacy Policy | PayeTax - Privacy-First Tax Calculations',
   description:
     "PayeTax privacy policy: Interactive calculations run in your browser and tax inputs aren't stored. Learn how we protect your financial privacy.",
-  keywords:
-    'privacy policy, data privacy, in-browser calculations, no stored salary data, uk tax calculator privacy',
   alternates: {
     canonical: `${SITE_URL}/privacy`,
   },

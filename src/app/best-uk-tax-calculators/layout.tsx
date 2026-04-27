@@ -8,8 +8,6 @@ export const metadata: Metadata = {
   title: 'Best UK Tax Calculators 2026 | Compare Top PAYE Calculators',
   description:
     'Compare the best UK tax calculators for 2026. Honest reviews of PayeTax, GOV.UK, MoneySavingExpert, and The Salary Calculator. Find the right tool for your needs.',
-  keywords:
-    'best uk tax calculator, uk tax calculator comparison, paye calculator 2026, take home pay calculator uk, salary calculator uk, tax calculator reviews',
   alternates: {
     canonical: `${SITE_URL}/best-uk-tax-calculators`,
   },

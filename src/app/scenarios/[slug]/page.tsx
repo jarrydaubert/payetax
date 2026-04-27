@@ -58,7 +58,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateMetadataHelper({
     title: scenario.title,
     description: scenario.description,
-    keywords: scenario.searchIntent.join(', '),
     pathname: `/scenarios/${slug}`,
   });
 }

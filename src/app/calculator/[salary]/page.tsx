@@ -143,7 +143,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateMetadataHelper({
     title: `£${formattedSalary} After Tax UK ${TAX_YEAR_DISPLAY} | PayeTax`,
     description: `Estimate take-home pay from a £${formattedSalary} salary in the UK for ${TAX_YEAR_DISPLAY}. See income tax, National Insurance, and net pay breakdown quickly.`,
-    keywords: `${salary} after tax, ${salary} take home pay, ${salary} salary UK, ${salary} net pay, ${salary} salary calculator, £${formattedSalary} after tax UK`,
     pathname: canonicalPath,
   });
 }

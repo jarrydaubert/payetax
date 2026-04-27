@@ -7,7 +7,6 @@ import { MarriageAllowanceClient } from './MarriageAllowanceClient';
 export const metadata = generateBaseMetadata({
   title: `Marriage Allowance Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT} | Save Up to £252`,
   description: `Free Marriage Allowance calculator for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}. Check if you qualify and calculate your £252 annual tax saving. Transfer 10% of your Personal Allowance to your spouse.`,
-  keywords: `Marriage Allowance calculator, marriage tax allowance UK, marriage allowance ${CURRENT_TAX_YEAR_DISPLAY_SHORT}, £252 tax saving, transfer personal allowance, marriage allowance eligibility`,
   pathname: '/tools/marriage-allowance-calculator',
 });
 

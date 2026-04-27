@@ -15,8 +15,6 @@ export const metadata = generateBaseMetadata({
   title: 'Free UK Tax Tools | PayeTax',
   description:
     'Free UK tax tools: director salary vs dividends, tax code decoder, Scottish tax calculator, National Insurance calculator, and marriage allowance checker.',
-  keywords:
-    'UK tax tools, tax code decoder, Scottish tax calculator, NI calculator, director dividends calculator, marriage allowance calculator',
   pathname: '/tools',
 });
 

@@ -16,8 +16,6 @@ export const metadata: Metadata = generateBaseMetadata({
   title: 'Best For: UK Tax Calculator by Audience | PayeTax',
   description:
     'Find the right UK tax calculator for your situation. Explore tailored guides for freelancers, contractors, students, first jobs, and more.',
-  keywords:
-    'uk tax calculator by audience, tax calculator for freelancers, contractor tax calculator, student loan calculator, first job tax calculator',
   pathname: '/best-for',
 });
 

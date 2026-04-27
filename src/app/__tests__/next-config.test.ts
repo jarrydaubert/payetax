@@ -25,3 +25,19 @@ describe('next.config canonical redirects', () => {
     );
   });
 });
+
+describe('next.config crawler headers', () => {
+  it('adds an X-Robots-Tag header to API routes', async () => {
+    const { default: nextConfig } = await import('../../../next.config');
+    const headers = await nextConfig.headers?.();
+
+    expect(headers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/api/:path*',
+          headers: expect.arrayContaining([{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
+        }),
+      ]),
+    );
+  });
+});

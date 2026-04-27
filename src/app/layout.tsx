@@ -1,7 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { generateMetadata as metadataGenerator, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
@@ -21,10 +20,9 @@ import { ThemeProvider } from '@/lib/theme';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   ...metadataGenerator({
-    title: `PayeTax - Free UK PAYE Tax Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT} | Salary & Take-Home Pay`,
+    title: 'UK PAYE Tax Calculator',
     description: `Free UK PAYE tax calculator with official HMRC rates ${CURRENT_TAX_YEAR}. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.`,
     pathname: '/',
-    keywords: `UK tax calculator, PAYE calculator, salary calculator, HMRC rates ${CURRENT_TAX_YEAR_DISPLAY_SHORT}, take-home pay calculator, National Insurance calculator, UK income tax, tax code calculator`,
   }),
 };
 

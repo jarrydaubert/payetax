@@ -27,7 +27,6 @@ const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent
 export const metadata: Metadata = generateMetadata({
   title: `UK PAYE Tax Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT} | HMRC Rates`,
   description: `Calculate UK take-home pay with our free PAYE calculator using official HMRC rates for ${CURRENT_TAX_YEAR_DISPLAY_SHORT}. Scottish rates, student loans, and pensions included.`,
-  keywords: `UK tax calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT}, PAYE calculator, income tax calculator, income tax rates, income tax bands, take home pay calculator, salary calculator, Scottish tax rates ${CURRENT_TAX_YEAR_DISPLAY_SHORT}, student loan calculator UK, pension tax relief calculator, marriage allowance calculator, national insurance, capital gains tax, inheritance tax, effective tax rates, higher rate taxpayers, tax free allowance, tax band, tax reliefs, tax return, HMRC, revenue and customs`,
   pathname: '/',
 });
 

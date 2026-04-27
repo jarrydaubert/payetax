@@ -54,7 +54,6 @@ export async function generateMetadata({
   const metadata = generateMetadataHelper({
     title,
     description,
-    keywords: `${category.name.toLowerCase()}, uk tax guides, paye guides, tax insights`,
     pathname: canonicalPath,
     ogImage: '/images/og-image.png',
     noIndex: articleCount === 0,

@@ -57,8 +57,6 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   const metadata = generateMetadataHelper({
     title,
     description,
-    keywords:
-      'TaxInsights, UK tax blog, PAYE updates, tax insights, UK tax news, tax guidance, self-assessment tips',
     pathname: canonicalPath,
     noIndex: isOutOfRange,
     ogImage: '/images/blog/taxinsights-og.jpg',

@@ -52,7 +52,10 @@ describe('sitemap', () => {
 
     expect(entries).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ url: 'https://example.com/' }),
+        expect.objectContaining({
+          url: 'https://example.com/',
+          lastModified: '2026-04-15T00:00:00.000Z',
+        }),
         expect.objectContaining({ url: 'https://example.com/privacy' }),
         expect.objectContaining({ url: 'https://example.com/install' }),
         expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.9 }),
@@ -62,6 +65,28 @@ describe('sitemap', () => {
         expect.objectContaining({ url: 'https://example.com/scenarios/tax-trap-100k' }),
         expect.objectContaining({ url: 'https://example.com/best-for/contractors' }),
         expect.objectContaining({ url: 'https://example.com/calculator/30000-after-tax' }),
+      ]),
+    );
+  });
+
+  it('emits rounded sitemap priorities', async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
+
+    getBlogPosts.mockResolvedValue([]);
+    getBlogCategories.mockResolvedValue([]);
+
+    const { default: sitemap } = await import('../sitemap');
+    const entries = (await sitemap()) as MetadataRoute.Sitemap;
+
+    for (const entry of entries) {
+      expect(entry.priority).toBe(Number(entry.priority?.toFixed(2)));
+    }
+    expect(entries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          url: 'https://example.com/calculator/110000-after-tax',
+          priority: 0.72,
+        }),
       ]),
     );
   });

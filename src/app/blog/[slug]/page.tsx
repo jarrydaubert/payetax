@@ -146,14 +146,10 @@ export async function generateMetadata({
   const imageUrl = getAbsoluteImageUrl(post.image);
   const title = post.seoTitle || post.title;
   const description = post.seoDescription || post.excerpt;
-  const keywords =
-    post.seoKeywords?.join(', ') ||
-    `${post.categoryData?.name || post.category}, uk tax, paye, tax insights`;
   const pathname = `/blog/${resolvedParams.slug}`;
   const metadata = generateMetadataHelper({
     title,
     description,
-    keywords,
     pathname,
     type: 'article',
     publishedTime: post.publishedAt,
