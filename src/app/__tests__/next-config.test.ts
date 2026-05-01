@@ -24,6 +24,26 @@ describe('next.config canonical redirects', () => {
       ]),
     );
   });
+
+  it('redirects stale blog category URLs to live category hubs', async () => {
+    const { default: nextConfig } = await import('../../../next.config');
+    const redirects = await nextConfig.redirects?.();
+
+    expect(redirects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/blog/category/tax-tools',
+          destination: '/blog/category/tax-basics',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/blog/category/self-assessment',
+          destination: '/blog/category/tax-deadlines',
+          permanent: true,
+        }),
+      ]),
+    );
+  });
 });
 
 describe('next.config crawler headers', () => {

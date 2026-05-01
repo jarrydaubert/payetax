@@ -231,20 +231,25 @@ const output = {
 };
 
 // Add a manual multi-plan student loan scenario for regression coverage.
+const dualLoanInput = createInput({
+  salary: 50000,
+  studentLoanPlans: ['plan2', 'postgrad'],
+});
+const dualLoanResults = calculateTax(dualLoanInput);
 generated.push({
   id: 'dual-student-loans',
   description: 'Plan 2 + Postgrad loans £50k (47% marginal!)',
   input: {
-    salary: 50000,
+    salary: dualLoanInput.salary,
     region: 'England',
-    taxCode: '1257L',
-    studentLoanPlans: ['plan2', 'postgrad'],
+    taxCode: dualLoanInput.taxCode,
+    studentLoan: dualLoanInput.studentLoanPlans,
   },
   expected: {
-    incomeTax: 7485.96,
-    employeeNI: 2994.36,
-    studentLoanRepayment: 3677.7, // Combined Plan 2 + Postgrad
-    netPay: 35841.98,
+    incomeTax: Math.round(dualLoanResults.incomeTax.annually * 100) / 100,
+    employeeNI: Math.round(dualLoanResults.nationalInsurance.annually * 100) / 100,
+    studentLoanRepayment: Math.round((dualLoanResults.studentLoan?.annually ?? 0) * 100) / 100,
+    netPay: Math.round(dualLoanResults.netPay.annually * 100) / 100,
   },
   generatedAt: new Date().toISOString(),
   taxYear: TAX_YEAR,

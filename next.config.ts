@@ -147,6 +147,11 @@ const nextConfig: NextConfig = {
         destination: '/blog/category/tax-basics',
         permanent: true,
       },
+      {
+        source: '/blog/category/self-assessment',
+        destination: '/blog/category/tax-deadlines',
+        permanent: true,
+      },
     ];
   },
 

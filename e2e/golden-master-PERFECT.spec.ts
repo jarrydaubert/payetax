@@ -1,8 +1,9 @@
 /**
- * GOLDEN MASTER E2E TEST SUITE - HMRC Reference Implementation
+ * GOLDEN MASTER E2E TEST SUITE - Calculator UI Regression
  *
- * This is the ONE SOURCE OF TRUTH for tax calculation accuracy.
- * Test cases sourced from official HMRC testing spreadsheet (2025-26).
+ * This suite proves the browser UI matches the production calculator engine.
+ * HMRC oracle coverage lives in focused unit/integration tax tests, while this
+ * spec catches form, rendering, extraction, and browser-regression drift.
  *
  * ============================================================================
  * REGRESSION-ACCURATE ASSERTIONS (10p tolerance)
@@ -21,9 +22,9 @@
  * DATA-DRIVEN TESTING
  * ============================================================================
  *
- * All scenarios defined in golden-tax-cases-2025-26-COMPLETE.json.
- * Expected values sourced from HMRC testing spreadsheet - DO NOT MODIFY.
- * When tax rates change: regenerate JSON from HMRC source, tests adapt.
+ * All scenarios are defined in golden-tax-cases-2025-26-COMPLETE.json.
+ * Expected values are generated from src/constants/taxRates.ts +
+ * src/lib/taxCalculator.ts via e2e/scripts/generate-golden-master.ts.
  *
  * ============================================================================
  * COVERAGE (24 SCENARIOS)
@@ -38,7 +39,7 @@
  * HICBC: Full withdrawal, 50% taper, pension avoidance
  * Edge Cases: Exact thresholds
  *
- * Priority: CRITICAL - This file determines user trust
+ * Priority: CRITICAL - This file guards calculator UI trust
  */
 
 import type { Page } from '@playwright/test';

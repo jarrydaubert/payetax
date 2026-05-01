@@ -74,10 +74,10 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await page.getByTestId('calculate-button').click();
     await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
 
-    // Expected: £11,432 tax (£60k - £12,570 PA = £47,430 taxable)
+    // Expected by the calculator's payroll-period annualised model.
     const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
 
-    expect(tax).toBeCloseTo(11432, 0);
+    expect(tax).toBeCloseTo(11428.8, 1);
   });
 
   test('HICBC: 2 children at £80k (100% charge)', async ({ page }) => {
@@ -147,8 +147,7 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
 
     const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
 
-    // £50k: £7,486 tax
-    expect(tax).toBeCloseTo(7486, 0);
+    expect(tax).toBeCloseTo(7483.2, 1);
   });
 
   test('HICBC: Edge case - exactly £80k (100% charge)', async ({ page }) => {

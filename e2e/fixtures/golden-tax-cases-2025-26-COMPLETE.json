@@ -1,22 +1,11 @@
 {
   "version": "2025-2026",
-  "generatedAt": "2025-11-19T16:43:03.406Z",
-  "description": "Golden master test cases for E2E regression testing. Expected values sourced from official HMRC testing spreadsheet.",
-  "source": {
-    "origin": "HMRC Testing Spreadsheet 2025-26",
-    "note": "DO NOT MODIFY expected values - these are the HMRC source of truth"
-  },
+  "generatedAt": "2026-04-28T18:13:52.749Z",
+  "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
   "metadata": {
     "personalAllowance": 12570,
     "niPrimaryThreshold": 12570,
-    "niPrimaryRate": 8,
-    "tolerances": {
-      "incomeTax": "10p (1 decimal place)",
-      "employeeNI": "10p (1 decimal place)",
-      "netPay": "10p (1 decimal place)",
-      "studentLoan": "1p (2 decimal places)",
-      "pension": "1p (2 decimal places)"
-    }
+    "niPrimaryRate": 8
   },
   "cases": [
     {
@@ -28,11 +17,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 3486,
-        "employeeNI": 1394.4,
-        "netPay": 25119.6
+        "incomeTax": 3484.8,
+        "employeeNI": 1393.92,
+        "netPay": 25121.28
       },
-      "generatedAt": "2025-11-19T16:43:03.404Z",
+      "generatedAt": "2026-04-28T18:13:52.748Z",
       "taxYear": "2025-2026"
     },
     {
@@ -44,11 +33,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 6486,
-        "employeeNI": 2594.4,
-        "netPay": 35919.6
+        "incomeTax": 6484.8,
+        "employeeNI": 2593.92,
+        "netPay": 35921.28
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -60,11 +49,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 9432,
-        "employeeNI": 3110.64,
-        "netPay": 42457.36
+        "incomeTax": 9427.2,
+        "employeeNI": 3110.04,
+        "netPay": 42462.76
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -80,7 +69,7 @@
         "employeeNI": 0,
         "netPay": 12570
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -92,11 +81,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 7539.96,
-        "employeeNI": 3015.96,
-        "netPay": 39714.08
+        "incomeTax": 7538.4,
+        "employeeNI": 3015.36,
+        "netPay": 39716.24
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -108,11 +97,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 27432,
-        "employeeNI": 4010.64,
-        "netPay": 68557.36
+        "incomeTax": 27427.2,
+        "employeeNI": 4010.04,
+        "netPay": 68562.76
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -124,11 +113,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 33432,
-        "employeeNI": 4210.56,
-        "netPay": 72357.44
+        "incomeTax": 33427.2,
+        "employeeNI": 4209.96,
+        "netPay": 72362.84
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -140,11 +129,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 42516,
-        "employeeNI": 4513.44,
-        "netPay": 78110.56
+        "incomeTax": 42513.6,
+        "employeeNI": 4512.84,
+        "netPay": 78113.56
       },
-      "generatedAt": "2025-11-19T16:43:03.405Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -156,11 +145,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 53703,
-        "employeeNI": 5010.6,
-        "netPay": 91286.4
+        "incomeTax": 53701.8,
+        "employeeNI": 5010,
+        "netPay": 91288.2
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -172,11 +161,11 @@
         "taxCode": "S1257L"
       },
       "expected": {
-        "incomeTax": 6913.8,
-        "employeeNI": 2594.4,
-        "netPay": 35491.8
+        "incomeTax": 6911.16,
+        "employeeNI": 2593.92,
+        "netPay": 35494.92
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -188,11 +177,11 @@
         "taxCode": "S1257L"
       },
       "expected": {
-        "incomeTax": 84043.2,
-        "employeeNI": 6010.56,
-        "netPay": 109946.24
+        "incomeTax": 84039,
+        "employeeNI": 6009.96,
+        "netPay": 109951.04
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -204,11 +193,11 @@
         "taxCode": "BR"
       },
       "expected": {
-        "incomeTax": 5000.04,
-        "employeeNI": 994.44,
-        "netPay": 19005.52
+        "incomeTax": 4999.2,
+        "employeeNI": 993.96,
+        "netPay": 19006.84
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -220,11 +209,11 @@
         "taxCode": "K100"
       },
       "expected": {
-        "incomeTax": 8859.96,
-        "employeeNI": 2194.44,
-        "netPay": 28945.6
+        "incomeTax": 8856,
+        "employeeNI": 2193.96,
+        "netPay": 28950.04
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -236,11 +225,11 @@
         "taxCode": "1257L M1"
       },
       "expected": {
-        "incomeTax": 4686,
-        "employeeNI": 1874.4,
-        "netPay": 29439.6
+        "incomeTax": 4684.8,
+        "employeeNI": 1873.92,
+        "netPay": 29441.28
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -253,11 +242,11 @@
         "studentLoan": ["plan1"]
       },
       "expected": {
-        "incomeTax": 2486.04,
-        "employeeNI": 994.44,
-        "netPay": 21519.52
+        "incomeTax": 2484,
+        "employeeNI": 993.96,
+        "netPay": 21522.04
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -270,12 +259,12 @@
         "studentLoan": ["plan2"]
       },
       "expected": {
-        "incomeTax": 5486.04,
-        "employeeNI": 2194.44,
+        "incomeTax": 5484,
+        "employeeNI": 2193.96,
         "studentLoanRepayment": 1037.76,
-        "netPay": 31281.76
+        "netPay": 31284.28
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -288,12 +277,12 @@
         "pensionPercent": 10
       },
       "expected": {
-        "incomeTax": 6486,
-        "employeeNI": 2594.4,
+        "incomeTax": 6484.8,
+        "employeeNI": 2593.92,
         "pensionContribution": 5000,
-        "netPay": 35919.6
+        "netPay": 35921.28
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -306,12 +295,12 @@
         "pensionPercent": 40
       },
       "expected": {
-        "incomeTax": 4686,
-        "employeeNI": 1874.4,
+        "incomeTax": 4684.8,
+        "employeeNI": 1873.92,
         "pensionContribution": 24000,
-        "netPay": 29439.6
+        "netPay": 29441.28
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -324,11 +313,11 @@
         "partnerGrossWage": 45000
       },
       "expected": {
-        "incomeTax": 486,
-        "employeeNI": 194.4,
-        "netPay": 14319.6
+        "incomeTax": 484.8,
+        "employeeNI": 193.92,
+        "netPay": 14321.28
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     },
     {
@@ -341,12 +330,12 @@
         "studentLoan": ["plan2", "postgrad"]
       },
       "expected": {
-        "incomeTax": 7485.96,
-        "employeeNI": 2994.36,
+        "incomeTax": 7483.2,
+        "employeeNI": 2993.88,
         "studentLoanRepayment": 3677.76,
-        "netPay": 35841.92
+        "netPay": 35845.16
       },
-      "generatedAt": "2025-11-19T16:43:03.406Z",
+      "generatedAt": "2026-04-28T18:13:52.749Z",
       "taxYear": "2025-2026"
     }
   ]

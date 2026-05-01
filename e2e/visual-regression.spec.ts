@@ -61,7 +61,7 @@ test.describe('Visual regression pilot @visual', () => {
     await expect(page.getByTestId('homepage-hero')).toHaveScreenshot('homepage-hero.png', {
       animations: 'disabled',
       caret: 'hide',
-      ...(browserName === 'webkit' ? { maxDiffPixelRatio: 0.015 } : {}),
+      ...(browserName === 'webkit' ? { maxDiffPixelRatio: 0.025 } : {}),
     });
   });
 

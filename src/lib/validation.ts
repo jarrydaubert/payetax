@@ -307,6 +307,27 @@ export const TaxCodeSchema = z
  * Blog Frontmatter Validation Schema
  * Validates all required and optional fields in blog post frontmatter
  */
+const fallbackString = (value: string) =>
+  z
+    .string()
+    .optional()
+    .catch(value)
+    .transform((parsed) => parsed ?? value);
+
+const fallbackBoolean = (value: boolean) =>
+  z
+    .boolean()
+    .optional()
+    .catch(value)
+    .transform((parsed) => parsed ?? value);
+
+const fallbackStringArray = (value: string[]) =>
+  z
+    .array(z.string())
+    .optional()
+    .catch(value)
+    .transform((parsed) => parsed ?? value);
+
 export const BlogFrontmatterSchema = z.object({
   title: z
     .string()
@@ -330,14 +351,14 @@ export const BlogFrontmatterSchema = z.object({
     })
     .optional(),
   category: z.string().min(1, 'Category is required'),
-  tags: z.array(z.string()).catch([]), // Zod 4: fallback to empty array on parse error
-  author: z.string().catch('PayeTax Team'), // Zod 4: fallback to default on parse error
-  featured: z.boolean().catch(false), // Zod 4: fallback to false on parse error
-  editorsPick: z.boolean().catch(false), // Show in Editor's Picks sidebar
-  deepDive: z.boolean().catch(false), // Show in Deep Dives section
+  tags: fallbackStringArray([]), // Fallback to empty array on missing or invalid input
+  author: fallbackString('PayeTax Team'), // Fallback to default on missing or invalid input
+  featured: fallbackBoolean(false), // Fallback to false on missing or invalid input
+  editorsPick: fallbackBoolean(false), // Show in Editor's Picks sidebar
+  deepDive: fallbackBoolean(false), // Show in Deep Dives section
   image: z.string().optional(), // Allow both URLs and relative paths
   imageAlt: z.string().optional(),
-  readTime: z.string().catch('5 min read'), // Zod 4: fallback if missing or invalid
+  readTime: fallbackString('5 min read'), // Fallback on missing or invalid input
 });
 
 export type BlogFrontmatter = z.infer<typeof BlogFrontmatterSchema>;
