@@ -6,6 +6,7 @@ This file is the canonical agent contract for this repo.
 ## Purpose
 
 PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user outcomes.
+Product direction lives in `docs/business/PRODUCT_DIRECTION.md`: PayeTax is the UK take-home pay calculator that explains payroll reality, not a broad finance app or generic tax content site.
 
 ## Priorities
 
@@ -17,6 +18,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 
 ## Source Of Truth
 
+- Product direction: `docs/business/PRODUCT_DIRECTION.md`
 - Tax rates: `src/constants/taxRates.ts`
 - Calculator logic: `src/lib/taxCalculator.ts`
 - Director Intelligence logic: `src/lib/tax/`
@@ -27,6 +29,7 @@ PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user
 
 ## Working Rules
 
+- Before using skills for audits, planning, SEO, content, CRO, or feature ideation, read `docs/business/PRODUCT_DIRECTION.md` and keep recommendations focused on that direction.
 - Preserve existing architecture unless a change is required for accuracy, safety, reliability, or maintainability.
 - Keep important behavior testable: explicit inputs/outputs, injectable dependencies where practical, and assertions against real user-visible or business-visible outcomes.
 - Do not log sensitive user data or leak server env vars into client components.

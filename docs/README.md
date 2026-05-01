@@ -9,6 +9,7 @@
 | Need to... | Read this |
 |------------|-----------|
 | **Understand priorities?** | [`READ_THIS_FIRST.md`](./READ_THIS_FIRST.md) |
+| **Understand product direction?** | [`PRODUCT_DIRECTION.md`](./business/PRODUCT_DIRECTION.md) |
 | **See active backlog items?** | [`BACKLOG.md`](./BACKLOG.md) |
 | **Documentation rules?** | [`DOCS_POLICY.md`](./DOCS_POLICY.md) |
 | **Understand architecture + stack?** | [`SYSTEM_OVERVIEW.md`](./guides/SYSTEM_OVERVIEW.md) |
@@ -42,7 +43,7 @@ docs/
 ├── READ_THIS_FIRST.md
 ├── BACKLOG.md
 │
-├── business/              # Product & business strategy
+├── business/              # Product direction & business strategy
 ├── blog/                  # Blog content & strategy
 └── guides/                # Developer guides (incl. skills/commands)
 ```
