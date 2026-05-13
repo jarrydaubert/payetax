@@ -23,7 +23,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : '50%',
 
   // Reporting: Use blob in CI for shard merging, HTML locally
-  // After CI run: npx playwright merge-reports --reporter html ./blob-report
+  // After CI run: bunx playwright merge-reports --reporter html ./audit-outputs/blob-report
   reporter: process.env.CI
     ? [['blob', { outputDir: 'audit-outputs/blob-report' }], ['github']]
     : [['html', { outputFolder: 'audit-outputs/playwright-report' }]],
@@ -80,21 +80,6 @@ export default defineConfig({
         ...devices['Desktop Safari'],
       },
     },
-
-    // Firefox - Commented out due to flaky test issues
-    // See commit: d76a7c9 "Skip unreliable E2E tests to achieve 0 failures"
-    // {
-    //   name: 'firefox',
-    //   use: {
-    //     ...devices['Desktop Firefox'],
-    //     launchOptions: {
-    //       firefoxUserPrefs: {
-    //         'dom.webnotifications.enabled': false,
-    //         'media.navigator.permission.disabled': true,
-    //       },
-    //     },
-    //   },
-    // },
 
     // Mobile Chrome - Critical paths only
     {

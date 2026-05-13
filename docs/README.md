@@ -52,5 +52,6 @@ docs/
 
 ## Related Files
 
+- **Root overview:** [`../README.md`](../README.md)
 - **Agent instructions:** [`../AGENTS.md`](../AGENTS.md)
 - **Claude compatibility instructions:** [`../CLAUDE.md`](../CLAUDE.md)
