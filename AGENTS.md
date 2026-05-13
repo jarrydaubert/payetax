@@ -96,7 +96,8 @@ If any required validation cannot be run, state that clearly.
 ## Quick Commands
 
 ```bash
-bun run dev                 # Start dev server
+bun run dev                 # Start webpack-backed dev server
+bun run dev:turbo           # Opt-in Turbopack dev path
 bun run fix-all             # Format, lint, typecheck
 bun run check:repo          # Read-only repo verification gate
 bun run harness:local       # Repo gate + quick tests + build
