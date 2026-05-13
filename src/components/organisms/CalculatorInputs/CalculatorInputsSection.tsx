@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
+import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
@@ -24,6 +25,8 @@ export function CalculatorInputsSection({
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
   const salary = useCalculatorStore((state) => state.input.salary);
+  const payPeriod = useCalculatorStore((state) => state.input.payPeriod);
+  const hoursPerWeek = useCalculatorStore((state) => state.input.hoursPerWeek);
   const [isCalculating, setIsCalculating] = React.useState(false);
   const [whatIfOpen, setWhatIfOpen] = React.useState(false);
   const [formMessage, setFormMessage] = React.useState<{
@@ -50,8 +53,9 @@ export function CalculatorInputsSection({
       return;
     }
 
-    // Warn about very low salary (less than minimum wage equivalent)
-    if (salary < 100) {
+    const annualSalary = convertPeriodToAnnual(salary, payPeriod, hoursPerWeek);
+
+    if (annualSalary < 100) {
       setFormMessage({
         tone: 'warning',
         text: 'Salary below £100/year may show unusual percentages.',

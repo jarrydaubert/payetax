@@ -15,14 +15,20 @@ jest.mock('../BasicInputs', () => ({
 describe('CalculatorInputsSection Component', () => {
   const mockOnCalculate = jest.fn();
   const mockReset = jest.fn();
+  const defaultInput = {
+    salary: 50000,
+    payPeriod: 'annually' as const,
+    hoursPerWeek: 40,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useCalculatorActions as jest.Mock).mockReturnValue({
       reset: mockReset,
     });
-    // Mock useCalculatorStore to return a default salary
-    (useCalculatorStore as jest.Mock).mockReturnValue(50000);
+    (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+      selector({ input: defaultInput }),
+    );
   });
 
   describe('Rendering', () => {
@@ -170,7 +176,9 @@ describe('CalculatorInputsSection Component', () => {
     });
 
     it('should clear inline messages on reset', () => {
-      (useCalculatorStore as jest.Mock).mockReturnValue(0);
+      (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+        selector({ input: { ...defaultInput, salary: 0 } }),
+      );
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       fireEvent.click(screen.getByTestId('calculate-button'));
@@ -184,6 +192,18 @@ describe('CalculatorInputsSection Component', () => {
       expect(
         screen.queryByText('Enter your gross salary to calculate your tax breakdown.'),
       ).not.toBeInTheDocument();
+    });
+
+    it('does not show the low annual salary warning for a normal hourly rate', () => {
+      (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+        selector({ input: { ...defaultInput, salary: 12.5, payPeriod: 'hourly' } }),
+      );
+      render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
+
+      fireEvent.click(screen.getByTestId('calculate-button'));
+
+      expect(mockOnCalculate).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText('Salary below £100/year may show unusual percentages.')).toBeNull();
     });
   });
 

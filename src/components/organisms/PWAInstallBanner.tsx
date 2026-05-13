@@ -37,6 +37,8 @@ export default function PWAInstallBanner() {
     if (isStandaloneDisplayMode() || wasDismissedRecently()) return;
 
     const onBeforeInstallPrompt = (event: Event) => {
+      if (isStandaloneDisplayMode() || wasDismissedRecently()) return;
+
       const promptEvent = event as BeforeInstallPromptEvent;
       promptEvent.preventDefault();
       setDeferredPrompt(promptEvent);

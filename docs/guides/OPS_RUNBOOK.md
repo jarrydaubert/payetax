@@ -42,7 +42,15 @@ Optional env vars:
 ### Daily Flow
 
 1. Branch from the default branch.
-2. Run core local checks before opening or merging an MR:
+2. Start local development with the repo's webpack-backed dev server:
+
+```bash
+bun run dev
+```
+
+Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
+
+3. Run core local checks before opening or merging an MR:
 
 ```bash
 bun run check:repo
@@ -56,7 +64,7 @@ For UI-heavy homepage, calculator, or Director Intelligence changes, also run:
 bun run test:e2e:visual
 ```
 
-3. Open a merge request and wait for GitLab MR pipeline jobs to pass.
+4. Open a merge request and wait for GitLab MR pipeline jobs to pass.
 
 Useful GitLab shortcuts:
 

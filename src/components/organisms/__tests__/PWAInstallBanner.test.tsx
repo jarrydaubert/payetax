@@ -65,4 +65,15 @@ describe('PWAInstallBanner', () => {
 
     expect(localStorage.getItem('pwa-install-banner-dismissed-at')).toBeTruthy();
   });
+
+  it('does not reopen when the browser fires another prompt event after dismissal', async () => {
+    render(<PWAInstallBanner />);
+    dispatchInstallPromptEvent('accepted');
+
+    const dismissButton = await screen.findByRole('button', { name: /Not now/i });
+    fireEvent.click(dismissButton);
+    dispatchInstallPromptEvent('accepted');
+
+    expect(screen.queryByText('Install PayeTax')).not.toBeInTheDocument();
+  });
 });

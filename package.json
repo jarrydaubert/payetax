@@ -1,11 +1,11 @@
 {
   "name": "payetax",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "private": true,
   "license": "UNLICENSED",
   "packageManager": "bun@1.3.13",
   "scripts": {
-    "dev": "NODE_OPTIONS='--no-deprecation' next dev",
+    "dev": "NODE_OPTIONS='--no-deprecation' next dev --webpack",
     "build": "next build --webpack",
     "build:analyze": "ANALYZE=true next build --webpack",
     "bundle:analyze": "bun scripts/bundle-analyzer.js",
