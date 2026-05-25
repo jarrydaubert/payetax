@@ -669,11 +669,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       monthlyPensionContribution = annualPensionContribution / 12; // Derive from annual for consistency
     } else {
       // Fixed amount (normalize from input period to annual and monthly)
-      annualPensionContribution = convertPeriodToAnnual(
+      const requestedAnnualPensionContribution = convertPeriodToAnnual(
         input.pensionContribution,
         input.payPeriod,
         hoursPerWeek,
       );
+      annualPensionContribution = Math.min(requestedAnnualPensionContribution, annualGrossSalary);
       monthlyPensionContribution = annualPensionContribution / 12;
     }
   }

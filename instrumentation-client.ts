@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
 
 // Export router transition hook for navigation instrumentation
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
@@ -97,6 +98,8 @@ Sentry.init({
   ignoreErrors: [
     // Sentry SDK internal errors (not actionable)
     'feature named `webCompat` was not found',
+    'feature named `hover` was not found',
+    'feature named `performanceMetrics` was not found',
     // Storage access denied (privacy mode, iframe restrictions, blocked cookies)
     "Failed to read the 'localStorage' property from 'Window'",
     "Failed to read the 'sessionStorage' property from 'Window'",
@@ -143,6 +146,8 @@ Sentry.init({
     'bmi_SafeAddOnload',
     'EBCallBackMessageReceived',
     // Non-actionable errors
+    'Connection closed.',
+    'Event `CustomEvent` (type=unhandledrejection) captured as promise rejection',
     'Non-Error promise rejection captured',
   ],
 
@@ -158,6 +163,10 @@ Sentry.init({
   ],
 
   beforeSend(event, hint) {
+    if (shouldDropClientSentryEvent(event, hint)) {
+      return null;
+    }
+
     // Filter out localhost/local errors
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;

@@ -86,6 +86,29 @@ describe('collectCalculationAnomalies', () => {
     );
   });
 
+  it('does not flag fully salary-capped pension output as anomalous', () => {
+    const anomalies = collectCalculationAnomalies(
+      createResult({
+        grossSalary: createPeriodValue(10000),
+        taxableIncome: 0,
+        incomeTax: createPeriodValue(0),
+        nationalInsurance: createPeriodValue(0),
+        studentLoan: createPeriodValue(0),
+        pensionContribution: createPeriodValue(10000),
+        employerNI: 0,
+        netPay: createPeriodValue(0),
+        taxBands: [],
+        incomeBreakdown: {
+          employment: 10000,
+          nonEmployment: 0,
+          total: 10000,
+        },
+      }),
+    );
+
+    expect(anomalies).toEqual([]);
+  });
+
   it('allows net pay above gross when non-taxable allowances exceed deductions', () => {
     const anomalies = collectCalculationAnomalies(
       createResult({

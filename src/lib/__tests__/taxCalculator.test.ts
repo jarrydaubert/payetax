@@ -505,6 +505,17 @@ describe('Tax Calculator', () => {
 
       expect(result.pensionContribution.annually).toBe(3000);
     });
+
+    it('caps fixed amount pension contributions at the primary salary', () => {
+      const input = createBasicInput(10000, {
+        pensionContribution: 20000,
+        pensionContributionType: 'amount',
+      });
+      const result = calculateTax(input);
+
+      expect(result.pensionContribution.annually).toBe(10000);
+      expect(result.netPay.annually).toBe(0);
+    });
   });
 
   describe('Pay Period Calculations', () => {
