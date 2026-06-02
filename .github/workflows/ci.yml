@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   repo-health:
-    name: Repo health
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
