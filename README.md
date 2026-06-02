@@ -32,7 +32,7 @@ bun run release:verify      # Release readiness gate
 
 Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
 
-Production deployment is intentionally blocked until the Vercel migration is complete. `bun run deploy` exits with instructions instead of deploying.
+Production deployment is intentionally blocked until the Vercel migration is complete. `bun run deploy` exits with instructions instead of deploying, and `vercel.json` tells Vercel to skip automatic deployments while migration is pending.
 
 ## Repo quality
 

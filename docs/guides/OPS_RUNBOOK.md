@@ -83,7 +83,7 @@ GitHub repo controls:
 
 PayeTax is not ready for production deployment from this repo until the migration in `docs/guides/VERCEL_MIGRATION.md` is complete.
 
-Do not deploy to a previous, incorrect, or ambiguous Vercel project. `bun run deploy` is intentionally blocked while migration is pending.
+Do not deploy to a previous, incorrect, or ambiguous Vercel project. `bun run deploy` is intentionally blocked while migration is pending, and `vercel.json` tells Vercel to skip automatic deployments.
 
 Before any production deploy, complete the migration preflight, target-project setup, env migration, domain cutover, and validation checklist in `docs/guides/VERCEL_MIGRATION.md`.
 

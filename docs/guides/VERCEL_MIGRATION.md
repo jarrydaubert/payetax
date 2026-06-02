@@ -12,6 +12,7 @@ This migration is not complete yet. Until it is complete, production deployment 
 - CI: GitHub Actions `CI` plus CodeQL.
 - Production deployment: pending correct Vercel project linkage.
 - `bun run deploy`: intentionally blocked until this migration is complete.
+- `vercel.json` ignored build step: intentionally skips automatic Vercel deployments until this migration is complete.
 
 ## Target State
 
@@ -53,8 +54,9 @@ bun run build
    - Install command: `bun install --frozen-lockfile`
    - Build command: `bun run build`
    - Output handling: Vercel default for Next.js
-4. Confirm the project is not linked to a previous or incorrect deployment target.
-5. Pull or inspect local project linkage only after the intended project is selected:
+4. Remove the temporary `ignoreCommand` from `vercel.json` only after the intended project is selected and this checklist is ready for preview validation.
+5. Confirm the project is not linked to a previous or incorrect deployment target.
+6. Pull or inspect local project linkage only after the intended project is selected:
 
 ```bash
 vercel link
@@ -159,3 +161,4 @@ Migration is complete only when:
 - `payetax.co.uk` and `www.payetax.co.uk` resolve through the intended project.
 - Any previous or incorrect project is disconnected, archived, renamed, or clearly marked as retired.
 - `bun run deploy` can be safely replaced or restored in a follow-up PR.
+- The temporary `vercel.json` ignored build step has been removed in the same follow-up PR that enables intended Vercel previews/deployments.

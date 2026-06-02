@@ -1,5 +1,6 @@
 {
   "installCommand": "bun install --frozen-lockfile",
+  "ignoreCommand": "echo \"PayeTax Vercel migration is pending; skipping Vercel deployment.\"",
   "redirects": [
     {
       "source": "/",
