@@ -1,4 +1,4 @@
-# Ops Runbook (GitLab + Vercel)
+# Ops Runbook (GitHub + GitLab + Vercel)
 
 ## Purpose
 
@@ -13,17 +13,25 @@ Source of truth:
 
 Operational baseline:
 
-1. Repo host: GitLab (private project).
-2. CI platform: GitLab CI (`.gitlab-ci.yml`).
+1. Public repo host: GitHub.
+2. Legacy/internal CI platform: GitLab CI (`.gitlab-ci.yml`).
 3. Deploy platform: Vercel.
-4. Merge validation model: merge-request pipelines only.
-5. Primary local gate: `bun run release:verify`.
+4. Public GitHub merge validation model: pull requests require the `CI` status check.
+5. GitHub security baseline: CodeQL for JavaScript/TypeScript, Dependabot, secret scanning, and push protection.
+6. Primary local release gate: `bun run release:verify`.
 
 Required access:
 
+- GitHub repo access
 - GitLab repo access
 - Vercel project access
 - local Bun toolchain installed
+
+Required local env files:
+
+- No real `.env` file should be committed.
+- Use `.env.template` as the committed placeholder contract for local configuration.
+- Production and preview secrets live in the deployment provider, not in git.
 
 Required env vars for GitLab audits:
 
@@ -64,7 +72,19 @@ For UI-heavy homepage, calculator, or Director Intelligence changes, also run:
 bun run test:e2e:visual
 ```
 
-4. Open a merge request and wait for GitLab MR pipeline jobs to pass.
+4. Open a pull request on GitHub and wait for the `CI` and CodeQL checks to pass. If the same work is mirrored through GitLab, wait for the GitLab MR pipeline jobs as well.
+
+GitHub checks:
+
+- `CI`: lockfile install, repo checks, production build.
+- `CodeQL`: JavaScript/TypeScript code scanning.
+
+GitHub repo controls:
+
+- Main branch is protected by a branch ruleset requiring `CI`.
+- Dependabot is configured in `.github/dependabot.yml`.
+- Secret scanning and push protection should stay enabled in repository security settings.
+- Do not add visual, Lighthouse, flake-audit, governance, or release workflows as default PR blockers.
 
 Useful GitLab shortcuts:
 
