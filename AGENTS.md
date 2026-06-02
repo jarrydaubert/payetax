@@ -99,7 +99,7 @@ If any required validation cannot be run, state that clearly.
 bun run dev                 # Start webpack-backed dev server
 bun run dev:turbo           # Opt-in Turbopack dev path
 bun run fix-all             # Format, lint, typecheck
-bun run check:repo          # Read-only repo verification gate
+bun run check:repo          # Repo verification gate
 bun run audit:deps          # Bun dependency audit with allowlist policy
 bun run harness:local       # Repo gate + quick tests + build
 bun run test:no-coverage    # Fast tests

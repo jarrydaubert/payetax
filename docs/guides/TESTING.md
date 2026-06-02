@@ -73,7 +73,7 @@ bun run test:e2e:visual     # Visual regression pilot (Chromium snapshots)
 bun run test:e2e            # Full multi-browser E2E
 bun run test:quick          # Fast local gate: unit fast + critical E2E
 bun run test:full           # Full gate: coverage unit + full E2E
-bun run check:repo          # Read-only repo verification gate
+bun run check:repo          # Repo verification gate
 bun run harness:local       # Repo gate + quick tests + build
 bun run harness:release     # Release-oriented harness gate
 bun run check:test-skips    # Guardrail: block new skip/todo debt
@@ -86,7 +86,7 @@ Notes:
 - `bun run test` is still available when you want local coverage + HTML report auto-open.
 - `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
 - `bun run fix-all` now includes `check:test-skips`, so new unapproved skip/todo debt fails locally and in CI.
-- `bun run check:repo` is the read-only equivalent of the repo verification part of `fix-all`.
+- `bun run check:repo` is the non-auto-fixing equivalent of the repo verification part of `fix-all`.
 - GitHub `CI` runs `bun run audit:deps` as a separate dependency-advisory gate after repo checks.
 - `bun run harness:local` is the recommended pre-refactor confidence gate.
 - `bun run harness:release` keeps the dependency advisory check in the stricter release-oriented validation path.

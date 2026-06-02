@@ -197,16 +197,16 @@ Use these as the default repo harness entry points:
 
 ```bash
 bun run fix-all         # Mutating hygiene pass: format/write + validation
-bun run check:repo      # Read-only repo verification gate
+bun run check:repo      # Repo verification gate
 bun run audit:deps      # Dependency advisory audit with allowlist policy
-bun run harness:local   # Read-only local harness: repo checks + quick tests + build
-bun run harness:release # Read-only release harness: repo checks + deps + release verify path
+bun run harness:local   # Local harness: repo checks + quick tests + build
+bun run harness:release # Release harness: repo checks + deps + release verify path
 ```
 
 Rule of thumb:
 
 1. Use `fix-all` when you want the repo auto-corrected.
-2. Use `check:repo` or the `harness:*` commands when you want trustworthy verification with no file edits.
+2. Use `check:repo` or the `harness:*` commands when you want deterministic verification rather than auto-fixing.
 3. Use `audit:deps` after dependency changes and before release.
 
 ## Pass Criteria

@@ -9,6 +9,7 @@ Start here:
 - Agent contract: [`AGENTS.md`](AGENTS.md)
 - Testing standard: [`docs/guides/TESTING.md`](docs/guides/TESTING.md)
 - Ops runbook: [`docs/guides/OPS_RUNBOOK.md`](docs/guides/OPS_RUNBOOK.md)
+- Vercel migration plan: [`docs/guides/VERCEL_MIGRATION.md`](docs/guides/VERCEL_MIGRATION.md)
 
 Protected sources of truth:
 
@@ -19,18 +20,23 @@ Protected sources of truth:
 Common commands:
 
 ```bash
+bun install --frozen-lockfile
 bun run dev                 # Start local dev server with webpack
-bun run check:repo          # Read-only lint/type/version/env/event/test-skip checks
+bun run check:repo          # Lint/type/version/env/event/test-skip checks
+bun run audit:deps          # Dependency advisory audit
 bun run fix-all             # Mutating format/lint pass plus repo checks
 bun run test:no-coverage    # Fast Jest suite
 bun run build               # Production build
+bun run release:verify      # Release readiness gate
 ```
 
 Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
 
+Production deployment is intentionally blocked until the Vercel migration is complete. `bun run deploy` exits with instructions instead of deploying.
+
 ## Repo quality
 
-PayeTax allows AI-assisted changes, but unverified AI-assisted code is not acceptable. Public GitHub pull requests are protected by:
+PayeTax is a public GitHub repository. AI-assisted changes are allowed, but unverified AI-assisted code is not acceptable. Pull requests are protected by:
 
 - `CI`: install from `bun.lock`, repo checks, dependency audit, and production build.
 - `CodeQL`: JavaScript and TypeScript code scanning.
@@ -38,3 +44,5 @@ PayeTax allows AI-assisted changes, but unverified AI-assisted code is not accep
 - Secret scanning and push protection in GitHub repository settings.
 
 Local environment values should be copied from `.env.template` when needed. Do not commit real `.env` files.
+
+Deployment target note: PayeTax is not yet linked to the intended Vercel account/organisation used by `jarrydaubert` and `prosepal-web`. Do not deploy or copy production env values until [`docs/guides/VERCEL_MIGRATION.md`](docs/guides/VERCEL_MIGRATION.md) is complete.
