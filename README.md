@@ -27,3 +27,14 @@ bun run build               # Production build
 ```
 
 Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
+
+## Repo quality
+
+PayeTax allows AI-assisted changes, but unverified AI-assisted code is not acceptable. Public GitHub pull requests are protected by:
+
+- `CI`: install from `bun.lock`, repo checks, and production build.
+- `CodeQL`: JavaScript and TypeScript code scanning.
+- Dependabot dependency monitoring through `.github/dependabot.yml`.
+- Secret scanning and push protection in GitHub repository settings.
+
+Local environment values should be copied from `.env.template` when needed. Do not commit real `.env` files.
