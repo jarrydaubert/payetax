@@ -65,6 +65,15 @@ jest.mock('lucide-react', () => {
   );
 });
 
+// Mock Resend so app/action tests do not parse its ESM-only transitive dependencies.
+jest.mock('resend', () => ({
+  Resend: jest.fn().mockImplementation(() => ({
+    emails: {
+      send: jest.fn().mockResolvedValue({ data: { id: 'test-email-id' }, error: null }),
+    },
+  })),
+}));
+
 // Mock ResizeObserver (not available in jsdom)
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),

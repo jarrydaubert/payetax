@@ -100,6 +100,7 @@ bun run dev                 # Start webpack-backed dev server
 bun run dev:turbo           # Opt-in Turbopack dev path
 bun run fix-all             # Format, lint, typecheck
 bun run check:repo          # Read-only repo verification gate
+bun run audit:deps          # Bun dependency audit with allowlist policy
 bun run harness:local       # Repo gate + quick tests + build
 bun run test:no-coverage    # Fast tests
 bun run test                # Full tests with coverage
@@ -109,12 +110,9 @@ bun run check:env-contract  # Verify critical env/template/schema sync
 bun run check:production-env-contract # Verify enabled-feature production env contract against Vercel
 bun run release:verify      # Fix, test, and build release gate
 bun run linear:me           # View Linear issues
-bun run gitlab:status       # GitLab project + MR + pipeline + release summary
-bun run gitlab:mr:status    # Open MR for the current branch
 bun run skills:review       # Review latest upstream marketing skill versions and changes
 bun run skills:check        # Validate current local skill pin/profile + setup
 bun run skills:sync         # Sync pinned marketing skills + apply PayeTax profile
-bun run audit:gitlab:governance # Basic GitLab policy + CI usage audits
 ```
 
 ## More Docs

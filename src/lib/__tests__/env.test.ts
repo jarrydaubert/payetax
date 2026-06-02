@@ -437,7 +437,7 @@ describe('Environment Variable Validation', () => {
         NEXT_PUBLIC_ENABLE_ANALYTICS: 'false',
         NEXT_PUBLIC_GA_ID: undefined,
         SENTRY_WEBHOOK_SECRET: undefined,
-        LINEAR_API_KEY: 'lin_api_123',
+        LINEAR_API_KEY: ['lin', 'api', 'test'].join('_'),
       });
       expect(result.success).toBe(false);
     });

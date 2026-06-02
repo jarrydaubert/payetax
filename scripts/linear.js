@@ -19,10 +19,10 @@ if (!LINEAR_API_KEY) {
   console.error('2. Click "Create key"');
   console.error('3. Copy the key');
   console.error('4. Add to your shell profile:');
-  console.error('   export LINEAR_API_KEY="lin_api_xxxxxxxxxxxxxxxx"');
+  console.error('   export LINEAR_API_KEY="<your Linear API key>"');
   console.error('');
   console.error('Or create a .env file in the project root:');
-  console.error('   LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxx');
+  console.error('   LINEAR_API_KEY=<your Linear API key>');
   process.exit(1);
 }
 
