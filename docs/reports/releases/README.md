@@ -13,6 +13,11 @@ Workflow:
 
 ## Release Notes Index
 
+### v5.1.3
+
+- Report: [`v5.1.3.md`](./v5.1.3.md)
+- Status: local release readiness in progress; production validation deferred until Vercel migration is complete.
+
 ### v5.1.0
 
 - Report: [`v5.1.0.md`](./v5.1.0.md)

@@ -87,8 +87,9 @@ Notes:
 - `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
 - `bun run fix-all` now includes `check:test-skips`, so new unapproved skip/todo debt fails locally and in CI.
 - `bun run check:repo` is the read-only equivalent of the repo verification part of `fix-all`.
+- GitHub `CI` runs `bun run audit:deps` as a separate dependency-advisory gate after repo checks.
 - `bun run harness:local` is the recommended pre-refactor confidence gate.
-- `bun run harness:release` adds the dependency advisory check for stricter release-oriented validation.
+- `bun run harness:release` keeps the dependency advisory check in the stricter release-oriented validation path.
 - `bun run test:e2e:visual:update` refreshes the checked-in Chromium baselines after an intentional UI change.
 
 ### Visual Regression Pilot
@@ -159,7 +160,8 @@ Keep HMRC values anchored to source documents and code references.
 - `bun run build`
 - `bun run test:e2e:critical`
 - `bun run release:report:init` (before manual post-release checks)
-- `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` (against live Vercel Production before release completion)
+- Confirm `docs/guides/VERCEL_MIGRATION.md` is complete before the first GitHub-sourced production deploy
+- `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` (against the intended Vercel Production project before release completion)
 - `bun run release:report:check` (after checklist completion)
 - Post-release production validation checklist (manual/high-confidence checks)
 

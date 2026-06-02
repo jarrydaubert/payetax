@@ -37,6 +37,8 @@ Notes:
 
 ## Release Use
 
+This check applies only after PayeTax has been migrated to the intended Vercel project. See `docs/guides/VERCEL_MIGRATION.md`.
+
 Run this command against live Vercel Production before marking a release report complete:
 
 ```bash

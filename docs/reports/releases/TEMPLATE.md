@@ -20,7 +20,8 @@ Legend:
 ## 0) Local Preflight
 
 - [ ] `bun run release:verify` passed
-- [ ] `bun run check:production-env-contract` passed against live Vercel Production
+- [ ] `docs/guides/VERCEL_MIGRATION.md` is complete if this is the first production deploy from the GitHub repo
+- [ ] `bun run check:production-env-contract` passed against the intended Vercel Production project
 - [ ] Key output/caveats captured below
 
 Notes:
